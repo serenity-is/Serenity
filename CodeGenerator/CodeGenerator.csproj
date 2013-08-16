@@ -77,9 +77,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>References\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RazorEngine.Core, Version=1.1.4015.1704, Culture=neutral, PublicKeyToken=ad203821905851fc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\ThirdParty\RazorEngine\RazorEngine.Core.dll</HintPath>
+    <Reference Include="RazorEngine.Core">
+      <HintPath>..\References\RazorEngine\RazorEngine.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
