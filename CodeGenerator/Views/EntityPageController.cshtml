@@ -1,0 +1,16 @@
+﻿
+namespace @(Model.RootNamespace).@(Model.Module).Pages
+{
+    using Serenity;
+    using System.Web.Mvc;
+
+    public class @(Model.ClassName)Controller : Controller
+    {
+        [Authorize]
+        public ActionResult Index()
+        {
+            SecurityHelper.EnsurePermission("@(Model.Permission)", RightErrorHandling.Redirect);
+            return View("~/Modules/@(Model.Module)/@(Model.ClassName)/@(Model.ClassName)Index.cshtml");
+        }
+    }
+}

@@ -1,0 +1,13 @@
+﻿<Window x:Class="Serenity.CodeGenerator.AddConnectionStringWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Bağlantı Ekle" Height="110" Width="600">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="25" />
+        </Grid.RowDefinitions>
+        <TextBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Top" Name="ConnectionString"></TextBox>
+        <Button Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Width="100" Click="Button_Click" IsDefault="True" >Ekle</Button>
+    </Grid>
+</Window>

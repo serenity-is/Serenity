@@ -1,0 +1,16 @@
+﻿
+namespace @(Model.RootNamespace).@(Model.Module)
+{
+    using jQueryApi;
+    using Serenity;
+    using System.Collections.Generic;
+
+    [IdProperty("@Model.Identity")@if (Model.NameField != null) {<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
+    public class @(Model.ClassName)Dialog : EntityDialog<@(Model.RowClassName), object>
+    {
+        public @(Model.ClassName)Dialog(jQueryObject container)
+            : base(new object())
+        {
+        }
+    }
+}

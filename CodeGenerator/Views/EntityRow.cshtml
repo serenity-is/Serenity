@@ -1,0 +1,170 @@
+﻿@{
+    Func<string, string, string> jf = (x, y) =>
+    {
+        if (x.ToLowerInvariant() == y.ToLowerInvariant())
+            return y;
+        else
+            return x + y;
+    };
+}
+namespace @(Model.RootNamespace).@(Model.Module).Entities
+{
+    using Serenity;
+    using Serenity.Data;
+    using Newtonsoft.Json;
+    using System;
+    using System.ComponentModel;
+    using R = @Model.RowClassName;
+
+    /// <summary>
+    ///   Entity class for "@Model.Tablename" table</summary>
+    [Schema("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename")]
+    [JsonConverter(typeof(JsonRowConverter))]
+    public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
+    {
+        /// <summary>Table name</summary>
+        public const string TableName = "@Model.Tablename";
+
+        public class RowFields : @(Model.FieldsBaseClass)
+        {
+@foreach (var x in Model.Fields) {
+<text>            /// <summary>@x.Ident field</summary>
+            public readonly @(x.Type)Field @(x.Ident);
+</text>}
+@foreach (var x in Model.Joins) {
+<text>
+            /// <summary>@x.Name join</summary>
+            public readonly LeftJoin @(x.Name)Join;
+@foreach (var y in x.Fields) {
+<text>            /// <summary>@(jf(x.Name, y.Ident)) field</summary>
+            public readonly @(y.Type)Field @(jf(x.Name, y.Ident));
+</text>}
+</text>}
+
+            public RowFields()
+                : base(R.TableName, "@(Model.FieldPrefix)")
+            {
+                LocalTextPrefix = "@(Model.Schema).@(Model.ClassName)";
+
+@foreach (var x in Model.Fields) {
+<text>                @(x.Ident) = new @(x.Type)Field(this, "@x.Name", "@x.Name", @((x.Size ?? 0).ToString()), @("FieldFlags." + (x.Flags ?? "Default")),
+                    r => ((R)r)._@(x.Ident), (r, v) => ((R)r)._@(x.Ident) = v)@if (Model.NameField != null && x.Name == Model.NameField) {
+<text>
+                {
+                    MinSelectLevel = SelectLevel.Lookup
+                }</text>}@if (x.Scale > 0) {
+<text>
+                {
+                    Scale = @(x.Scale)
+                }</text>}@if (x.ForeignTable != null) {
+<text>
+                {
+                    ForeignTable = "@x.ForeignTable",
+                    ForeignField = "@x.ForeignField"
+                }</text>}
+;
+
+</text>}
+@foreach(var x in Model.Joins) {
+<text>                @(x.Name)Join = @(x.SourceField).ForeignJoin();
+@foreach(var y in x.Fields) {
+<text>                @(jf(x.Name, y.Ident)) = new @(y.Type)Field(this, "@(jf(x.Name, y.Ident))", @(x.Name)).SetOrigin(@(x.Name)Join, "@y.Name");
+</text>}
+
+</text>}
+            }
+        }
+
+        /// <summary>Row fields</summary>
+        public static readonly RowFields Fields;
+@if (Model.IsLookup) {
+<text>        /// <summary>Shared cache of Id/name pairs</summary>
+        public static readonly DbSharedLookupCache<@Model.RowClassName> Cache;
+</text>}
+@if (Model.Instance) {
+<text>        /// <summary>Shared instance of the row class</summary>
+        public static readonly @Model.RowClassName Instance;
+</text>}
+
+        /// <summary>Initializes field definitions</summary>
+        static @(Model.RowClassName)()
+        {
+            Fields = new RowFields();
+@if (Model.IsLookup) {
+<text>            Cache = new DbSharedLookupCache<@(Model.RowClassName)>();
+</text>
+}
+@if (Model.Instance) { 
+<text>            Instance = new @(Model.RowClassName)();
+</text>}
+        }
+
+@foreach (var x in Model.Fields) {
+<text>        private @x.Type@(x.IsValueType ? "?" : "") _@(x.Ident);
+</text>}
+
+        /// <summary>Creates a new @(Model.RowClassName) instance.</summary>
+        public @(Model.RowClassName)()
+            : base(Fields)
+        {
+        }
+
+        /// <summary>Creates a new @(Model.RowClassName) instance.</summary>
+        public override Row CreateNew()
+        {
+            return new @(Model.RowClassName)();
+        }
+        
+@foreach (var x in Model.Fields) {
+<text>        /// <summary>@x.Ident field value</summary>
+        public @x.Type@(x.IsValueType ? "?" : "") @x.Ident
+        {
+            get { return _@(x.Ident); }
+            set { Fields.@(x.Ident)[this] = value; }
+        }
+
+</text>}
+@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+<text>        /// <summary>@(jf(x.Name, y.Ident)) field value</summary>
+        public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident))
+        {
+            get { return Fields.@(jf(x.Name, y.Ident))[this]; }
+            set { Fields.@(jf(x.Name, y.Ident))[this] = value; }
+        }
+
+</text>}}
+        /// <summary>Implements IIdRow.IdField by returning the identity field</summary>
+        IIdField IIdRow.IdField
+        {
+            get { return Fields.@(Model.Identity); }
+        }
+@if (Model.IsLookup) {
+<text>
+        /// <summary>Implements INameRow.NameField by returning @Model.NameField field</summary>
+        StringField IdbLookupRow.NameField
+        {
+            get { return Fields.@Model.NameField; }
+        }
+
+        /// <summary>Implements INameRow.NamePrefix by returning local text prefix</summary>
+        string IdbLookupRow.NamePrefix
+        {
+            get { return "@Model.TextPrefix"; }
+        }
+
+        /// <summary>Implements IDbCacheRow.Cache by returning the row cache</summary>
+        IdbLookupCache IdbCacheRow.Cache
+        {
+            get { return Cache; }
+        }
+</text>}
+@if (Model.NameField != null) {
+<text>
+        /// <summary>Implements INameRow.NameField by returning @Model.NameField field</summary>
+        StringField INameRow.NameField
+        {
+            get { return Fields.@Model.NameField; }
+        }
+</text>}
+    }
+}

@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{55FCC86F-C622-4909-819F-19DDD5263579}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Serenity</RootNamespace>
+    <AssemblyName>Serenity.Core</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NoStdLib>True</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Extensions\IdExtensions.cs" />
+    <Compile Include="Extensions\TabsExtensions.cs" />
+    <Compile Include="LocalText.cs" />
+    <Compile Include="Lookup.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Q\Q.Extensibility.cs" />
+    <Compile Include="Q\Q.BlockUI.cs" />
+    <Compile Include="Q\Q.Config.cs" />
+    <Compile Include="Q\Q.cs" />
+    <Compile Include="Q\Q.Culture.cs" />
+    <Compile Include="Q\Q.Date.cs" />
+    <Compile Include="Q\Q.Dialogs.cs" />
+    <Compile Include="Q\Q.ErrorHandling.cs" />
+    <Compile Include="Q\Q.Externals.cs" />
+    <Compile Include="Q\Q.HtmlUtils.cs" />
+    <Compile Include="Q\Q.Layout.cs" />
+    <Compile Include="Q\Q.Notifications.cs" />
+    <Compile Include="Q\Q.Number.cs" />
+    <Compile Include="Q\Q.ScriptData.cs" />
+    <Compile Include="Q\Q.Services.cs" />
+    <Compile Include="Q\Q.StringHelper.cs" />
+    <Compile Include="Q\Q.Text.cs" />
+    <Compile Include="Q\Q.UrlUtils.cs" />
+    <Compile Include="SlickGrid\SlickTreeHelper.cs" />
+    <Compile Include="SlickGrid\LazyLoadHelper.cs" />
+    <Compile Include="SlickGrid\SlickColumnHelper.cs" />
+    <Compile Include="SlickGrid\SlickFormatting.cs" />
+    <Compile Include="Texts\Texts.cs" />
+    <Compile Include="Texts\Texts.Dialogs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.2.0\tools\Assemblies\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.jQuery">
+      <HintPath>..\..\packages\Saltarelle.jQuery.1.9.0\lib\Saltarelle.jQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.jQuery.UI">
+      <HintPath>..\..\packages\Saltarelle.jQuery.UI.1.9.3\lib\Saltarelle.jQuery.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.Web">
+      <HintPath>..\..\packages\Saltarelle.Web.2.2.0\lib\Saltarelle.Web.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Script.Imports\Serenity.Script.Imports.csproj">
+      <Project>{1e32ed5b-d96e-41d9-b532-577005b0ddb0}</Project>
+      <Name>Serenity.Script.Imports</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.2.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.2.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.2.0\tools\Saltarelle.Compiler.targets')" />
+  <Target Name="CopyGeneratedScriptToWeb" AfterTargets="CopyFilesToOutputDirectory">
+    <Copy SourceFiles="$(TargetDir)Serenity.Core.js" DestinationFiles="$(SolutionDir)Marmara.Web\Scripts\Site\Serenity.Core.js" Condition="Exists('$(TargetDir)Serenity.Core.js')">
+    </Copy>
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

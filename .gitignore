@@ -1,0 +1,18 @@
+
+#ignore thumbnails created by windows
+Thumbs.db
+#Ignore files build by Visual Studio
+Thumbs.db
+*.pdb
+*.dcu
+*/bin/
+*/obj/
+App_Data/*.log
+ErrorLog.db
+*.dcp
+*.dsk
+*.suo
+*.dcp
+*.dsk
+*.suo
+StyleCop.Cache

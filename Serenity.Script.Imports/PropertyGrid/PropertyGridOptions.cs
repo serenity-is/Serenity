@@ -1,0 +1,23 @@
+﻿using jQueryApi;
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+namespace Serenity
+{
+    [Imported, Serializable]
+    public class PropertyGridOptions
+    {
+        public string IdPrefix { get; set; }
+        public List<PropertyItem> Items { get; set; }
+        public bool UseCategories { get; set; }
+        public string DefaultCategory { get; set; }
+        public PropertyGridMode Mode { get; set; }
+    }
+
+    public enum PropertyGridMode
+    {
+        Insert,
+        Update
+    }
+}

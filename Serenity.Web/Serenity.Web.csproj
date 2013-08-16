@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8632943D-2A88-4C83-8451-69D62F059EFC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Serenity.Web</RootNamespace>
+    <AssemblyName>Serenity.Web</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Content\CsvWriter.cs" />
+    <Compile Include="Content\LocaleID.cs" />
+    <Compile Include="Content\RegistrationHelper.cs" />
+    <Compile Include="Content\TemplateHelper.cs" />
+    <Compile Include="Content\UrlHelper.cs" />
+    <Compile Include="MvcFakes\FakeController.cs" />
+    <Compile Include="MvcFakes\FakeControllerContext.cs" />
+    <Compile Include="MvcFakes\FakeHttpContext.cs" />
+    <Compile Include="MvcFakes\FakeHttpRequest.cs" />
+    <Compile Include="MvcFakes\FakeHttpSessionState.cs" />
+    <Compile Include="MvcFakes\FakeIdentity.cs" />
+    <Compile Include="MvcFakes\FakePrincipal.cs" />
+    <Compile Include="Mvc\AuditLogController.cs" />
+    <Compile Include="Mvc\CompressFilter.cs" />
+    <Compile Include="Mvc\DtoFilter.cs" />
+    <Compile Include="Mvc\EndpointExtensions.cs" />
+    <Compile Include="Mvc\JsonFilter.cs" />
+    <Compile Include="Mvc\JsonNetResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script\ConcatenatedScript.cs" />
+    <Compile Include="Script\DynamicScriptHandler.cs" />
+    <Compile Include="Script\DynamicScriptManager.cs" />
+    <Compile Include="Script\HtmlScriptExtensions.cs" />
+    <Compile Include="Script\JsConfigHelper.cs" />
+    <Compile Include="Script\JSHelper.cs" />
+    <Compile Include="Script\LocalInitScript.cs" />
+    <Compile Include="Script\LocalTextScript.cs" />
+    <Compile Include="Script\DbLookupScript.cs" />
+    <Compile Include="Script\PropertyEditor\EditablePropertyAttributes.cs" />
+    <Compile Include="Script\PropertyEditor\FilterFieldsScript.cs" />
+    <Compile Include="Script\PropertyEditor\FormScript.cs" />
+    <Compile Include="Script\PropertyEditor\ICustomizedFormScript.cs" />
+    <Compile Include="Script\PropertyEditor\PropertyEditorHelper.cs" />
+    <Compile Include="Script\PropertyEditor\PropertyItem.cs" />
+    <Compile Include="Script\RegisteredScripts.cs" />
+    <Compile Include="Script\ScriptBundleManager.cs" />
+    <Compile Include="Script\TemplateScript.cs" />
+    <Compile Include="Security\ImpersonalizationHelper.cs" />
+    <Compile Include="Security\NetMappingHelper.cs" />
+    <Compile Include="Security\SiteMembershipProvider.cs" />
+    <Compile Include="Security\SiteRoleProvider.cs" />
+    <Compile Include="Mvc\Throttling.cs" />
+    <Compile Include="WebApplicationSettings.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
+      <Name>Serenity.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,9 @@
+﻿using System;
+
+namespace Serenity.Services
+{
+    public class UndeleteRequest : ServiceRequest
+    {
+        public Int64? EntityId;
+    }
+}

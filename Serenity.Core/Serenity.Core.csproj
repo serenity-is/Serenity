@@ -1,0 +1,385 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B7CCA37B-2CC4-4F86-869A-43413ABC1ABB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Serenity.Core</RootNamespace>
+    <AssemblyName>Serenity.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Couchbase">
+      <HintPath>..\..\References\Couchbase\Couchbase.dll</HintPath>
+    </Reference>
+    <Reference Include="Enyim.Caching">
+      <HintPath>..\..\References\Couchbase\Enyim.Caching.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NQuery">
+      <HintPath>..\..\References\NQuery\NQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ServiceStack.Common.3.9.56\lib\net35\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ServiceStack.Common.3.9.56\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Redis, Version=3.9.57.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ServiceStack.Redis.3.9.57\lib\net35\ServiceStack.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ServiceStack.Text.3.9.56\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attached\AttachedLock.cs" />
+    <Compile Include="Attached\AttachedProperty.cs" />
+    <Compile Include="Caching\BaseMirroredRowCache.cs" />
+    <Compile Include="Caching\BaseOnDemandRowCache.cs" />
+    <Compile Include="Caching\CacheExpiration.cs" />
+    <Compile Include="Caching\CouchbaseDistributedCache.cs" />
+    <Compile Include="Caching\LZ4Compression.cs" />
+    <Compile Include="Caching\DistributedCache.cs" />
+    <Compile Include="Caching\TwoLevelCache.cs" />
+    <Compile Include="Caching\DistributedCacheEmulator.cs" />
+    <Compile Include="Caching\IByIdCache.cs" />
+    <Compile Include="Caching\IDistributedCache.cs" />
+    <Compile Include="Caching\LocalCache.cs" />
+    <Compile Include="Caching\LocalUserStateCache.cs" />
+    <Compile Include="Caching\RedisDistributedCache.cs" />
+    <Compile Include="Caching\SiteStateCache.cs" />
+    <Compile Include="Contracts\ICreateService.cs" />
+    <Compile Include="Contracts\IDeleteService.cs" />
+    <Compile Include="Contracts\IGenericService.cs" />
+    <Compile Include="Contracts\IListService.cs" />
+    <Compile Include="Contracts\IRetrieveService.cs" />
+    <Compile Include="Contracts\IUpdateService.cs" />
+    <Compile Include="Core\ContextItems.cs" />
+    <Compile Include="Core\DeleteType.cs" />
+    <Compile Include="Core\Helpers\PrefixHelper.cs" />
+    <Compile Include="Core\Interface\DateElementOrder.cs" />
+    <Compile Include="Core\IoC.cs" />
+    <Compile Include="Core\LocalText.cs" />
+    <Compile Include="Core\LruCache.cs" />
+    <Compile Include="Core\LruCacheNode.cs" />
+    <Compile Include="Core\RelativePathBase.cs" />
+    <Compile Include="Core\StringHelper.cs" />
+    <Compile Include="Core\TemporaryFileHelper.cs" />
+    <Compile Include="CustomField\ICustomFieldDefinition.cs" />
+    <Compile Include="CustomField\CustomFieldCache.cs" />
+    <Compile Include="CustomField\CustomFieldExtensions.cs" />
+    <Compile Include="CustomField\ICustomFieldListService.cs" />
+    <Compile Include="CustomField\CustomFieldType.cs" />
+    <Compile Include="Data\BasicFilter\BasicCriteria.cs" />
+    <Compile Include="Data\BasicFilter\BasicFilter.cs" />
+    <Compile Include="Data\BasicFilter\BasicFilterExtensions.cs" />
+    <Compile Include="Data\BasicFilter\BasicFilterGroup.cs" />
+    <Compile Include="Data\BasicFilter\BasicFilterStringConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\BasicFilter\ExpressionToBasicFilter.cs" />
+    <Compile Include="Data\BasicFilter\FilterField.cs" />
+    <Compile Include="Data\BasicFilter\FilterFieldExtensions.cs" />
+    <Compile Include="Data\BasicFilter\FilterFields.cs" />
+    <Compile Include="Data\BasicFilter\FilterFieldType.cs" />
+    <Compile Include="Data\BasicFilter\FilterLine.cs" />
+    <Compile Include="Data\BasicFilter\FilterLineExtensions.cs" />
+    <Compile Include="Data\BasicFilter\FilterLineJsonConverter.cs" />
+    <Compile Include="Data\BasicFilter\FilterOp.cs" />
+    <Compile Include="Data\BasicFilter\JsonFilterLineConverter.cs" />
+    <Compile Include="Data\BasicFilter\LogicalOp.cs" />
+    <Compile Include="Data\DataEnum\DataEnum.cs" />
+    <Compile Include="Data\DataEnum\DataEnumCache.cs" />
+    <Compile Include="Data\DataEnum\DataEnumConverter.cs" />
+    <Compile Include="Data\DataEnum\DataEnumRow.cs" />
+    <Compile Include="Data\DataEnum\EntityType.cs" />
+    <Compile Include="Data\DateHelper.cs" />
+    <Compile Include="Data\DictionaryHelper.cs" />
+    <Compile Include="Data\Encoding\Base32.cs" />
+    <Compile Include="Data\Extensions\DbFieldExtensions.cs" />
+    <Compile Include="Data\Extensions\IDataReaderExtensions.cs" />
+    <Compile Include="Data\Extensions\IDbFilterableExtensions.cs" />
+    <Compile Include="Data\Extensions\IDbParameterizedExtensions.cs" />
+    <Compile Include="Data\Extensions\IDbSetFieldToExtensions.cs" />
+    <Compile Include="Data\Extensions\JsonWriterExtensions.cs" />
+    <Compile Include="Data\FieldTypes\BooleanField.cs" />
+    <Compile Include="Data\FieldTypes\CustomClassField.cs" />
+    <Compile Include="Data\FieldTypes\DateTimeField.cs" />
+    <Compile Include="Data\FieldTypes\DecimalField.cs" />
+    <Compile Include="Data\FieldTypes\DoubleField.cs" />
+    <Compile Include="Data\FieldTypes\ForeignRowSetField.cs" />
+    <Compile Include="Data\FieldTypes\GenericClassField.cs" />
+    <Compile Include="Data\FieldTypes\GenericField.cs" />
+    <Compile Include="Data\FieldTypes\GenericValueField.cs" />
+    <Compile Include="Data\FieldTypes\GuidField.cs" />
+    <Compile Include="Data\FieldTypes\Int16Field.cs" />
+    <Compile Include="Data\FieldTypes\Int32Field.cs" />
+    <Compile Include="Data\FieldTypes\Int64Field.cs" />
+    <Compile Include="Data\FieldTypes\StreamField.cs" />
+    <Compile Include="Data\FieldTypes\StringField.cs" />
+    <Compile Include="Data\Field\ReadPermissionAttribute.cs" />
+    <Compile Include="Data\Field\ModifyPermissionAttribute.cs" />
+    <Compile Include="Data\Field\TwoLevelCached.cs" />
+    <Compile Include="Data\Field\SchemaChangeSource.cs" />
+    <Compile Include="Data\Field\Field.cs" />
+    <Compile Include="Data\Field\FieldDescriptor.cs" />
+    <Compile Include="Data\Field\FieldFlags.cs" />
+    <Compile Include="Data\Field\FieldSelectMode.cs" />
+    <Compile Include="Data\Field\FieldType.cs" />
+    <Compile Include="Data\Field\Foreign.cs" />
+    <Compile Include="Data\Field\InstanceNameAttribute.cs" />
+    <Compile Include="Data\Field\JoinAliasLocator.cs" />
+    <Compile Include="Data\Field\LeftJoin.cs" />
+    <Compile Include="Data\Field\Row.cs" />
+    <Compile Include="Data\Field\RowFieldsBase.cs" />
+    <Compile Include="Data\Field\RowRegistry.cs" />
+    <Compile Include="Data\Field\SchemaAttribute.cs" />
+    <Compile Include="Data\Field\T0ReferenceRemover.cs" />
+    <Compile Include="Data\GroupingHelper.cs" />
+    <Compile Include="Data\Index\DbIndex.cs" />
+    <Compile Include="Data\Index\DbIndexFlags.cs" />
+    <Compile Include="Data\Index\IndexMatch.cs" />
+    <Compile Include="Data\Index\OrderedDictionary.cs" />
+    <Compile Include="Data\Index\TreeDictionary.cs" />
+    <Compile Include="Data\Index\TreeIndex.cs" />
+    <Compile Include="Data\Interface\ICaptureLogRow.cs" />
+    <Compile Include="Data\Interface\IDbCache.cs" />
+    <Compile Include="Data\Interface\IDbCacheRow.cs" />
+    <Compile Include="Data\Interface\IDbDisplayOrderRow.cs" />
+    <Compile Include="Data\Interface\IDbFilterable.cs" />
+    <Compile Include="Data\Interface\IDbLanguageIDRow.cs" />
+    <Compile Include="Data\Interface\IDbLookupCache.cs" />
+    <Compile Include="Data\Interface\IDbLookupRow.cs" />
+    <Compile Include="Data\Interface\IDbParameterized.cs" />
+    <Compile Include="Data\Interface\IDbRow.cs" />
+    <Compile Include="Data\Interface\IDbSetFieldTo.cs" />
+    <Compile Include="Data\Interface\IDbTableName.cs" />
+    <Compile Include="Data\Interface\IIdField.cs" />
+    <Compile Include="Data\Interface\IIdRow.cs" />
+    <Compile Include="Data\Interface\IIsActiveRow.cs" />
+    <Compile Include="Data\Interface\ILoggingRow.cs" />
+    <Compile Include="Data\Interface\INameRow.cs" />
+    <Compile Include="Data\Interface\IOrderedDictionary.cs" />
+    <Compile Include="Data\Interface\IParentIdRow.cs" />
+    <Compile Include="Data\Interface\ISqlQuery.cs" />
+    <Compile Include="Data\Interface\ISqlSelect.cs" />
+    <Compile Include="Data\Interface\IStagingRow.cs" />
+    <Compile Include="Data\Interface\IUnitOfWork.cs" />
+    <Compile Include="Data\Interface\SortingOrder.cs" />
+    <Compile Include="Data\Invariants.cs" />
+    <Compile Include="Data\Json\Json.cs" />
+    <Compile Include="Data\Json\JsonDataEnumConverter.cs" />
+    <Compile Include="Data\Json\JsonRowConverter.cs" />
+    <Compile Include="Data\Json\JsonSafeInt64Converter.cs" />
+    <Compile Include="Data\Json\JsonSettings.cs" />
+    <Compile Include="Data\Json\JsonStringRawConverter.cs" />
+    <Compile Include="Data\Parameter.cs" />
+    <Compile Include="Data\RowHelper.cs" />
+    <Compile Include="Data\Sql\Filter.cs" />
+    <Compile Include="Data\Sql\SqlConsts.cs" />
+    <Compile Include="Data\Sql\SqlConversions.cs" />
+    <Compile Include="Data\Sql\SqlDialect.cs" />
+    <Compile Include="Data\Sql\SqlFormats.cs" />
+    <Compile Include="Data\Sql\SqlSettings.cs" />
+    <Compile Include="Reflection\DtoGenerator.cs" />
+    <Compile Include="Extensibility\BaseRegistrarAttribute.cs" />
+    <Compile Include="Extensibility\EnumRegistrarAttribute.cs" />
+    <Compile Include="Extensibility\ExtensibilityHelper.cs" />
+    <Compile Include="Extensibility\RegisterFormAttribute.cs" />
+    <Compile Include="Extensibility\RegisterReportAttribute.cs" />
+    <Compile Include="Extensibility\ScriptRegistrarAttribute.cs" />
+    <Compile Include="Extensibility\SelfAssemblyAttribute.cs" />
+    <Compile Include="Extensions\AttachedExtensions.cs" />
+    <Compile Include="Extensions\GenericExtensions.cs" />
+    <Compile Include="Extensions\ReflectionExtensions.cs" />
+    <Compile Include="Extensions\RowExtensions.cs" />
+    <Compile Include="Extensions\StringHelpers.cs" />
+    <Compile Include="Extensions\WeakHashtable.cs" />
+    <Compile Include="Reflection\InstanceCreator.cs" />
+    <Compile Include="IocMunq\AlwaysNewLifetime.cs" />
+    <Compile Include="IocMunq\Container.cs" />
+    <Compile Include="IocMunq\Container.Registrar.cs" />
+    <Compile Include="IocMunq\Container.Resolver.cs" />
+    <Compile Include="IocMunq\CreateInstanceDelegateFactory.cs" />
+    <Compile Include="IocMunq\IContainerFluent.cs" />
+    <Compile Include="IocMunq\IDependecyRegistrar.cs" />
+    <Compile Include="IocMunq\IDependencyResolver.cs" />
+    <Compile Include="IocMunq\ILifetimeManager.cs" />
+    <Compile Include="IocMunq\IRegistration.cs" />
+    <Compile Include="IocMunq\IRegistrationKey.cs" />
+    <Compile Include="IocMunq\NamedRegistrationKey.cs" />
+    <Compile Include="IocMunq\Registration.cs" />
+    <Compile Include="IocMunq\TypeRegistry.cs" />
+    <Compile Include="IocMunq\UnNamedRegistrationKey.cs" />
+    <Compile Include="IProgressManager.cs" />
+    <Compile Include="Json\JsonIdentifierSetConverter.cs" />
+    <Compile Include="Json\JsonSortByConverter.cs" />
+    <Compile Include="Logging\ExceptionLog.cs" />
+    <Compile Include="Logging\Log.cs" />
+    <Compile Include="Logging\LoggingLevel.cs" />
+    <Compile Include="Media\ImageChecker.cs" />
+    <Compile Include="Media\ImageCheckResult.cs" />
+    <Compile Include="Media\MP3Checker.cs" />
+    <Compile Include="Media\Mp3CheckResult.cs" />
+    <Compile Include="Media\SwfInfo.cs" />
+    <Compile Include="Media\ThumbnailGenerator.cs" />
+    <Compile Include="Media\ThumbnailScaleMode.cs" />
+    <Compile Include="Model\ServiceError.cs" />
+    <Compile Include="Model\SortBy.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyGrid\Attributes\BasedOnRowAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\EditorOptionAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\EditorTypeAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
+    <Compile Include="PropertyGrid\Attributes\HiddenAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\HintAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\InsertableAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\MaxLengthAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\OneWayAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\RequiredAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\UpdatableAttribute.cs" />
+    <Compile Include="PropertyGrid\CustomProperties\CustomPropertiesAttribute.cs" />
+    <Compile Include="PropertyGrid\CustomProperties\CustomPropertyInfo.cs" />
+    <Compile Include="PropertyGrid\EditorRepository\IPropertyEditor.cs" />
+    <Compile Include="PropertyGrid\EditorRepository\PropertyEditorRepository.cs" />
+    <Compile Include="PropertyGrid\EditorRepository\TypeConversions.cs" />
+    <Compile Include="Reflection\ReflectionExtensions.cs" />
+    <Compile Include="RequestResponse\CreateResponse.cs" />
+    <Compile Include="RequestResponse\DeleteRequest.cs" />
+    <Compile Include="RequestResponse\DeleteResponse.cs" />
+    <Compile Include="RequestResponse\ListRequest.cs" />
+    <Compile Include="RequestResponse\ListResponse.cs" />
+    <Compile Include="RequestResponse\PostRequest.cs" />
+    <Compile Include="RequestResponse\RetrieveLocalizationRequest.cs" />
+    <Compile Include="RequestResponse\RetrieveRequest.cs" />
+    <Compile Include="RequestResponse\RetrieveResponse.cs" />
+    <Compile Include="RequestResponse\ServiceRequest.cs" />
+    <Compile Include="RequestResponse\ServiceResponse.cs" />
+    <Compile Include="RequestResponse\UndeleteRequest.cs" />
+    <Compile Include="RequestResponse\UndeleteResponse.cs" />
+    <Compile Include="RequestResponse\UpdateLocalizationRequest.cs" />
+    <Compile Include="RequestResponse\UpdateResponse.cs" />
+    <Compile Include="Services\AuditLog\AuditDeleteRequest.cs" />
+    <Compile Include="Services\AuditLog\AuditFileFieldInfo.cs" />
+    <Compile Include="Services\AuditLog\AuditInsertRequest.cs" />
+    <Compile Include="Services\AuditLog\AuditLogListRequest.cs" />
+    <Compile Include="Services\AuditLog\AuditLogListResponse.cs" />
+    <Compile Include="Services\AuditLog\IAuditLogRow.cs" />
+    <Compile Include="Services\AuditLog\AuditLogService.cs" />
+    <Compile Include="Services\AuditLog\AuditUndeleteRequest.cs" />
+    <Compile Include="Services\AuditLog\AuditUpdateData.cs" />
+    <Compile Include="Services\AuditLog\AuditUpdateRequest.cs" />
+    <Compile Include="Services\CaptureLog\CaptureLogAttribute.cs" />
+    <Compile Include="Services\CaptureLog\CaptureLogHandler.cs" />
+    <Compile Include="Services\BatchGenerationUpdater.cs" />
+    <Compile Include="Services\CreateRequestHandler.cs" />
+    <Compile Include="Services\CustomField\CustomizableAttribute.cs" />
+    <Compile Include="Services\DeleteRequestHandler.cs" />
+    <Compile Include="Services\GenericEntityController.cs" />
+    <Compile Include="Services\GenericEntityService.cs" />
+    <Compile Include="Services\ListRequestHandler.cs" />
+    <Compile Include="Services\Localization\ILocalizationRow.cs" />
+    <Compile Include="Services\Localization\LocalizationHandler.cs" />
+    <Compile Include="Services\Localization\LocalizationRowAttribute.cs" />
+    <Compile Include="Services\RetrieveRequestHandler.cs" />
+    <Compile Include="Services\Security\IUserDefinition.cs" />
+    <Compile Include="Services\Security\SecurityHelper.cs" />
+    <Compile Include="Services\Security\UserCache.cs" />
+    <Compile Include="Services\ServiceHelper.cs" />
+    <Compile Include="Services\UndeleteRequestHandler.cs" />
+    <Compile Include="Services\UpdateRequestHandler.cs" />
+    <Compile Include="Settings\Config.cs" />
+    <Compile Include="Settings\DecimalSettingsBase.cs" />
+    <Compile Include="Settings\FormatHelper.cs" />
+    <Compile Include="Settings\ILocalSetting.cs" />
+    <Compile Include="Settings\ILocalUserStateService.cs" />
+    <Compile Include="Settings\ISettings.cs" />
+    <Compile Include="Settings\ISiteSetting.cs" />
+    <Compile Include="Settings\ISiteStateService.cs" />
+    <Compile Include="Settings\IStateService.cs" />
+    <Compile Include="SilentException.cs" />
+    <Compile Include="Sql\AutoTransaction.cs" />
+    <Compile Include="Sql\DisplayOrderHelper.cs" />
+    <Compile Include="Sql\DummyTransaction.cs" />
+    <Compile Include="Sql\Helpers\BoundTableHelper.cs" />
+    <Compile Include="Sql\QueryHelper.cs" />
+    <Compile Include="Sql\Query\Sql.cs" />
+    <Compile Include="Sql\Query\Sql.Format.cs" />
+    <Compile Include="Sql\Query\Sql.Format.Select.cs" />
+    <Compile Include="Sql\Query\Sql.Keyword.cs" />
+    <Compile Include="Sql\Query\SqlDelete.cs" />
+    <Compile Include="Sql\Query\SqlInsert.cs" />
+    <Compile Include="Sql\Query\SqlUpdate.cs" />
+    <Compile Include="Sql\Select\SqlSelect.cs" />
+    <Compile Include="Sql\Select\SqlSelect_AppendUtils.cs" />
+    <Compile Include="Sql\Select\SqlSelect_Clone.cs" />
+    <Compile Include="Sql\Select\SqlSelect_Column.cs" />
+    <Compile Include="Sql\Select\SqlSelect_Consts.cs" />
+    <Compile Include="Sql\Select\SqlSelect_FullTextSearch.cs" />
+    <Compile Include="Sql\Select\SqlSelect_StringList.cs" />
+    <Compile Include="Sql\Select\SqlSelect_ToString.cs" />
+    <Compile Include="Sql\SqlConnections.cs" />
+    <Compile Include="Sql\SqlHelper.cs" />
+    <Compile Include="Sql\SqlRowExtensions.cs" />
+    <Compile Include="Sql\SqlTransactions.cs" />
+    <Compile Include="Sql\UnitOfWork.cs" />
+    <Compile Include="Texts\Texts.Controls.cs" />
+    <Compile Include="Texts\Texts.cs" />
+    <Compile Include="Texts\Texts.Forms.cs" />
+    <Compile Include="Texts\Texts.Validation.cs" />
+    <Compile Include="TimeUnit\TimeUnit.cs" />
+    <Compile Include="TimeUnit\TimeUnitConsts.cs" />
+    <Compile Include="Validation\DataValidation.cs" />
+    <Compile Include="Validation\ValidationError.cs" />
+    <Compile Include="ValueFormatter.cs" />
+    <Compile Include="ValueFormatters.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

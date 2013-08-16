@@ -1,0 +1,21 @@
+﻿
+namespace @(Model.RootNamespace).@(Model.Module).Forms
+{
+    using System;
+    using Serenity;
+    using Serenity.ComponentModel;
+    using Serenity.Data;
+    using System.Collections.Generic;
+
+    [FormScript("@(Model.Module).@(Model.ClassName)")]
+    [BasedOnRow(typeof(Entities.@(Model.RowClassName)))]
+    public class @(Model.ClassName)Form
+    {@foreach (var x in Model.Fields)
+    {
+        if (x.Ident != Model.IdField)
+        {<text>
+        public @x.Type @x.Ident { get; set; }</text>}
+    }
+
+    }
+}
