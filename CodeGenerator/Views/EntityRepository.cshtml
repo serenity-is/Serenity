@@ -14,37 +14,31 @@ namespace @(Model.RootNamespace).@(Model.Module).Repositories
 
         public CreateResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            SecurityHelper.EnsurePermission("@(Model.Permission)", RightErrorHandling.ThrowException);
             return new MyCreateHandler().Process(uow, request);
         }
 
         public UpdateResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            SecurityHelper.EnsurePermission("@(Model.Permission)", RightErrorHandling.ThrowException);
             return new MyUpdateHandler().Process(uow, request);
         }
 
         public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
         {
-            SecurityHelper.EnsurePermission("@(Model.Permission)", RightErrorHandling.ThrowException);
             return new MyDeleteHandler().Process(uow, request);
         }
 
         public UndeleteResponse Undelete(IUnitOfWork uow, UndeleteRequest request)
         {
-            SecurityHelper.EnsurePermission("@(Model.Permission)", RightErrorHandling.ThrowException);
             return new MyUndeleteHandler().Process(uow, request);
         }
 
         public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
         {
-            SecurityHelper.EnsurePermission("@(Model.Permission)", RightErrorHandling.ThrowException);
             return new MyRetrieveHandler().Process(connection, request);
         }
 
         public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
-            SecurityHelper.EnsurePermission("@(Model.Permission)", RightErrorHandling.ThrowException);
             return new MyListHandler().Process(connection, request);
         }
 
