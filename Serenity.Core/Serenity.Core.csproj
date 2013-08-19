@@ -69,8 +69,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attached\AttachedLock.cs" />
-    <Compile Include="Attached\AttachedProperty.cs" />
     <Compile Include="Caching\BaseMirroredRowCache.cs" />
     <Compile Include="Caching\BaseOnDemandRowCache.cs" />
     <Compile Include="Caching\CacheExpiration.cs" />
@@ -226,10 +224,8 @@
     <Compile Include="Extensibility\RegisterReportAttribute.cs" />
     <Compile Include="Extensibility\ScriptRegistrarAttribute.cs" />
     <Compile Include="Extensibility\SelfAssemblyAttribute.cs" />
-    <Compile Include="Extensions\AttachedExtensions.cs" />
     <Compile Include="Extensions\GenericExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
-    <Compile Include="Extensions\RowExtensions.cs" />
     <Compile Include="Extensions\StringHelpers.cs" />
     <Compile Include="Extensions\WeakHashtable.cs" />
     <Compile Include="Reflection\InstanceCreator.cs" />
@@ -374,6 +370,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -5,7 +5,7 @@ using System.Web;
 namespace Serenity
 {
     /// <summary>
-    ///   Helper class to access a hashtable for current request, or a global hashtable if this is not
+    ///   Helper class to access a hashtable for current request, or a thread local hashtable if this is not
     ///   a web application.</summary>
     public class ContextItems
     {
