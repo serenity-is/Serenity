@@ -71,41 +71,47 @@ namespace Serenity.Services
             return query;
         }
 
-        public static SqlSelect ApplyContainsText(this SqlSelect query, string containsText, int joinIndex, params Field[] fields)
+        public static SqlSelect ApplyContainsText(this SqlSelect query, string containsText,
+            Filter idField, params Filter[] fields)
         {
-            containsText = containsText.TrimToNull();
-            if (containsText != null)
-            {
-                var flt = new Filter();
-                foreach (var field in fields)
-                    flt |= new Filter(joinIndex, field).Contains(containsText);
-                flt = ~(flt);
-                query.Where(flt);
-            }
+            var flt = GetContainsTextFilter(containsText, idField, fields);
+            query.Where(flt);
             return query;
         }
 
-        public static SqlSelect ApplyContainsText(this SqlSelect query,
-            string containsText, params Field[] fields)
+        public static Filter GetContainsTextFilter(string containsText, Filter idField, params Filter[] fields)
+        {
+            Filter ctFilter = GetContainsTextFilter(containsText, fields);
+            if (Object.ReferenceEquals(idField, null))
+                return ctFilter;
+
+            containsText = containsText.TrimToNull();
+            if (containsText == null)
+                return ctFilter;
+
+            Int64 idValue;
+            if (Int64.TryParse(containsText, out idValue))
+                if (Object.ReferenceEquals(null, ctFilter) || ctFilter.IsEmpty)
+                    ctFilter = idField == idValue;
+                else
+                    ctFilter = ~(idField == idValue | ~(ctFilter));
+
+            return ctFilter;
+        }
+
+        public static Filter GetContainsTextFilter(string containsText, params Filter[] fields)
         {
             containsText = containsText.TrimToNull();
-            if (containsText != null)
+            if (containsText != null && fields.Length > 0)
             {
                 var flt = new Filter();
                 foreach (var field in fields)
-                {
-                    if (field.Expression != null)
-                    {
-                        query.EnsureForeignJoin(field);
-                        flt |= new Filter(field.Expression).Contains(containsText);
-                    }
-                    else
-                        flt |= new Filter(0, field).Contains(containsText);
-                }
+                    flt |= field.Contains(containsText);
                 flt = ~(flt);
-                query.Where(flt);
+
+                return flt;
             }
-            return query;
+            return null;
         }
 
         public static SqlSelect ApplyFilters(this SqlSelect query,

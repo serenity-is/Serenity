@@ -121,8 +121,13 @@
         protected virtual void ApplyContainsText(SqlSelect query, string containsText)
         {
             var nameRow = Row as INameRow;
+            var idRow = Row as IIdRow;
+            var idField = idRow != null ? (Field)idRow.IdField : null;
+            var idFieldFilter = idField == null ? null : new Filter(idField);
             if (nameRow != null)
-                query.ApplyContainsText(containsText, 0, nameRow.NameField);
+                query.ApplyContainsText(containsText, idFieldFilter, new Filter(0, nameRow.NameField));
+            else if (idField != null)
+                query.ApplyContainsText(containsText, idFieldFilter, new Filter[] { });
         }
 
         protected virtual void OnBeforeExecuteQuery()
@@ -170,6 +175,12 @@
             }
         }
 
+        protected virtual SqlSelect CreateQuery()
+        {
+            return new SqlSelect()
+                .FromAs(Row, 0);
+        }
+
         public TListResponse Process(IDbConnection connection, TListRequest request)
         {
             if (connection == null)
@@ -183,7 +194,7 @@
 
             Row = new TRow();
 
-            var query = new SqlSelect().FromAs(Row, 0);
+            var query = CreateQuery();
 
             PrepareQuery(query);
 

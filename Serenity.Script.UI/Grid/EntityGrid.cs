@@ -70,6 +70,7 @@ namespace Serenity
             BindToViewEvents();
 
             CreateIncludeDeletedButton();
+            CreateQuickSearchInput();
 
             UpdateDisabledState();
 
@@ -161,6 +162,11 @@ namespace Serenity
         protected virtual void CreateIncludeDeletedButton()
         {
             GridUtils.AddIncludeDeletedToggle(toolbar.Element, view);
+        }
+
+        protected virtual void CreateQuickSearchInput()
+        {
+            GridUtils.AddQuickSearchInput(toolbar.Element, view);
         }
 
         public List<TEntity> Items

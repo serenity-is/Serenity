@@ -1,10 +1,7 @@
 ﻿using jQueryApi;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 
 namespace Serenity
 {
@@ -62,6 +59,46 @@ namespace Serenity
             {
                 view.OnSubmit = null;
                 oldSubmit = null;
+            });
+        }
+
+        public static void AddQuickSearchInput<TEntity>(jQueryObject toolDiv,
+            SlickRemoteView<TEntity> view)
+        {
+            var oldSubmit = view.OnSubmit;
+            var searchText = "";
+            
+            view.OnSubmit = (v) =>
+            {
+                if (searchText != null && searchText.Length > 0)
+                    v.Params.ContainsText = searchText;
+                else
+                    Type.DeleteField(v.Params, "ContainsText");
+
+                if (oldSubmit != null)
+                    return oldSubmit(v);
+
+                return true;
+            };
+
+            AddQuickSearchInputCustom(toolDiv, delegate(string query)
+            {
+                searchText = query;
+                view.SeekToPage = 1;
+                view.Populate();
+            });
+        }
+
+        private static void AddQuickSearchInputCustom(jQueryObject container, Action<string> onSearch)
+        {
+            var input = jQuery.FromHtml("<div><input type=\"text\"/></div>")
+                .AddClass("s-QuickSearchBar")
+                .PrependTo(container)
+                .Children();
+
+            new QuickSearchInput(input, new QuickSearchInputOptions
+            {
+                OnSearch = onSearch
             });
         }
     }

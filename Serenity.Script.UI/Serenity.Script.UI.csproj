@@ -57,6 +57,7 @@
     <Compile Include="EntityDialog\EntityDialog_Undelete.cs" />
     <Compile Include="EntityDialog\StringInflector.cs" />
     <Compile Include="EntityDialog\Validator.cs" />
+    <Compile Include="Grid\QuickSearchInput.cs" />
     <Compile Include="Grid\SubDialogHelper.cs" />
     <Compile Include="Grid\GridUtils.cs" />
     <Compile Include="Grid\EntityGrid.cs" />

@@ -46,7 +46,7 @@ namespace @(Model.RootNamespace).@(Model.Module).Entities
             public RowFields()
                 : base(R.TableName, "@(Model.FieldPrefix)")
             {
-                LocalTextPrefix = "@(Model.Schema).@(Model.ClassName)";
+                LocalTextPrefix = "@(Model.Module).@(Model.ClassName)";
 
 @foreach (var x in Model.Fields) {
 <text>                @(x.Ident) = new @(x.Type)Field(this, "@x.Name", "@x.Name", @((x.Size ?? 0).ToString()), @("FieldFlags." + (x.Flags ?? "Default")),

@@ -119,6 +119,16 @@
             }
         }
 
+        protected virtual SqlSelect CreateQuery()
+        {
+            var query = new SqlSelect()
+                .FromAs(Row, 0);
+
+            query.WhereEqual((Field)(((IIdRow)Row).IdField), Request.EntityId.Value);
+
+            return query;
+        }
+
         public TRetrieveResponse Process(IDbConnection connection, TRetrieveRequest request)
         {
             if (connection == null)
@@ -134,10 +144,7 @@
             if (request.EntityId == null)
                 throw DataValidation.RequiredError("EntityId");
 
-            var query = new SqlSelect()
-                .FromAs(Row, 0);               
-            
-            query.WhereEqual((Field)(((IIdRow)Row).IdField), request.EntityId.Value);
+            var query = CreateQuery();
 
             PrepareQuery(query);
 
