@@ -15,6 +15,7 @@ namespace Serenity.Services
         protected UndeleteRequest Request;
         private static bool loggingInitialized;
         protected static CaptureLogHandler<TRow> captureLogHandler;
+        protected static bool hasAuditLogAttribute;
 
         protected IDbConnection Connection
         {
@@ -74,18 +75,18 @@ namespace Serenity.Services
         {
             if (!loggingInitialized)
             {
-                var logTableAttr = Row.GetType().GetCustomAttribute<CaptureLogAttribute>();
+                var logTableAttr = typeof(TRow).GetCustomAttribute<CaptureLogAttribute>();
                 if (logTableAttr != null)
                     captureLogHandler = new CaptureLogHandler<TRow>();
+
+                hasAuditLogAttribute = typeof(TRow).GetCustomAttribute<AuditLogAttribute>(false) != null;
 
                 loggingInitialized = true;
             }
 
             if (captureLogHandler != null)
-            {
                 DoCaptureLog();
-            }
-            else
+            else if (hasAuditLogAttribute)
                 DoGenericAudit();
         }
 

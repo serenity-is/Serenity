@@ -297,6 +297,7 @@
     <Compile Include="Services\AuditLog\AuditInsertRequest.cs" />
     <Compile Include="Services\AuditLog\AuditLogListRequest.cs" />
     <Compile Include="Services\AuditLog\AuditLogListResponse.cs" />
+    <Compile Include="Services\AuditLog\AuditLogAttribute.cs" />
     <Compile Include="Services\AuditLog\IAuditLogRow.cs" />
     <Compile Include="Services\AuditLog\AuditLogService.cs" />
     <Compile Include="Services\AuditLog\AuditUndeleteRequest.cs" />

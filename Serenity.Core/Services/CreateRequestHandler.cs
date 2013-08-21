@@ -20,6 +20,7 @@ namespace Serenity.Services
 
         private static bool loggingInitialized;
         protected static CaptureLogHandler<TRow> captureLogHandler;
+        protected static bool hasAuditLogAttribute;
 
         protected IDbConnection Connection 
         { 
@@ -224,10 +225,16 @@ namespace Serenity.Services
 
         protected virtual void ExecuteInsert()
         {
-            Response.EntityId = new SqlInsert(Row)
-                .ExecuteAndGetID(Connection).Value;
-
-            Row.IdField[Row] = Response.EntityId;
+            var idField = Row.IdField as Field;
+            if (idField != null &&
+                idField.Flags.HasFlag(FieldFlags.AutoIncrement))
+            {
+                Response.EntityId = new SqlInsert(Row)
+                    .ExecuteAndGetID(Connection).Value;
+                Row.IdField[Row] = Response.EntityId;
+            }
+            else
+                new SqlInsert(Row).Execute(Connection);
 
             InvalidateCacheOnCommit();
         }
@@ -251,18 +258,17 @@ namespace Serenity.Services
         {
             if (!loggingInitialized)
             {
-                var logTableAttr = Row.GetType().GetCustomAttribute<CaptureLogAttribute>();
+                var logTableAttr = typeof(TRow).GetCustomAttribute<CaptureLogAttribute>();
                 if (logTableAttr != null)
                     captureLogHandler = new CaptureLogHandler<TRow>();
 
+                hasAuditLogAttribute = typeof(TRow).GetCustomAttribute<AuditLogAttribute>() != null;
                 loggingInitialized = true;
             }
 
             if (captureLogHandler != null)
-            {
                 DoCaptureLog();
-            }
-            else
+            else if (hasAuditLogAttribute)
                 DoGenericAudit();
         }
 
