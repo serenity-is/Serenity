@@ -123,11 +123,11 @@
             var nameRow = Row as INameRow;
             var idRow = Row as IIdRow;
             var idField = idRow != null ? (Field)idRow.IdField : null;
-            var idFieldFilter = idField == null ? null : new Filter(idField);
+            var idFieldFilter = idField == null ? null : new Criteria(idField);
             if (nameRow != null)
-                query.ApplyContainsText(containsText, idFieldFilter, new Filter(0, nameRow.NameField));
+                query.ApplyContainsText(containsText, idFieldFilter, new Criteria(0, nameRow.NameField));
             else if (idField != null)
-                query.ApplyContainsText(containsText, idFieldFilter, new Filter[] { });
+                query.ApplyContainsText(containsText, idFieldFilter, new Criteria[] { });
         }
 
         protected virtual void OnBeforeExecuteQuery()
@@ -143,7 +143,7 @@
             return row;
         }
 
-        protected virtual Filter ProcessCriteria(BasicCriteria criteria)
+        protected virtual Criteria ProcessCriteria(BasicCriteria criteria)
         {
             return null;
         }
@@ -159,7 +159,7 @@
             {
                 var isActiveRow = Row as IIsActiveRow;
                 if (isActiveRow != null)
-                    query.Where(new Filter(isActiveRow.IsActiveField) >= 0);
+                    query.Where(new Criteria(isActiveRow.IsActiveField) >= 0);
             }
         }
 

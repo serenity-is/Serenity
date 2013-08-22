@@ -72,16 +72,16 @@ namespace Serenity.Services
         }
 
         public static SqlSelect ApplyContainsText(this SqlSelect query, string containsText,
-            Filter idField, params Filter[] fields)
+            Criteria idField, params Criteria[] fields)
         {
             var flt = GetContainsTextFilter(containsText, idField, fields);
             query.Where(flt);
             return query;
         }
 
-        public static Filter GetContainsTextFilter(string containsText, Filter idField, params Filter[] fields)
+        public static Criteria GetContainsTextFilter(string containsText, Criteria idField, params Criteria[] fields)
         {
-            Filter ctFilter = GetContainsTextFilter(containsText, fields);
+            Criteria ctFilter = GetContainsTextFilter(containsText, fields);
             if (Object.ReferenceEquals(idField, null))
                 return ctFilter;
 
@@ -99,12 +99,12 @@ namespace Serenity.Services
             return ctFilter;
         }
 
-        public static Filter GetContainsTextFilter(string containsText, params Filter[] fields)
+        public static Criteria GetContainsTextFilter(string containsText, params Criteria[] fields)
         {
             containsText = containsText.TrimToNull();
             if (containsText != null && fields.Length > 0)
             {
-                var flt = new Filter();
+                var flt = new Criteria();
                 foreach (var field in fields)
                     flt |= field.Contains(containsText);
                 flt = ~(flt);
@@ -118,7 +118,7 @@ namespace Serenity.Services
             BasicFilter filter,
             IList<FilterLine> filterLines,
             Row row,
-            Func<BasicCriteria, Filter> processCriteria,
+            Func<BasicCriteria, Criteria> processCriteria,
             FilterFields filterFields)
         {
             if (Object.ReferenceEquals(filter, null) &&
@@ -128,12 +128,12 @@ namespace Serenity.Services
 
             var converter = new BasicFilterStringConverter(query, row, processCriteria, filterFields);
 
-            string where;
+            Criteria where;
 
             if (!Object.ReferenceEquals(filter, null))
             {
                 where = converter.Convert(filter);
-                if (!where.IsEmptyOrNull())
+                if (!where.IsEmpty)
                     query.Where(where);
             }
 
@@ -142,7 +142,7 @@ namespace Serenity.Services
             {
                 var linesFilter = filterLines.ToBasicFilter();
                 where = converter.Convert(linesFilter);
-                if (!where.IsEmptyOrNull())
+                if (!where.IsEmpty)
                     query.Where(where);
             }
             return query;

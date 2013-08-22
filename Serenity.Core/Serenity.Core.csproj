@@ -36,6 +36,9 @@
     <Reference Include="Enyim.Caching">
       <HintPath>..\References\Couchbase\Enyim.Caching.dll</HintPath>
     </Reference>
+    <Reference Include="LZ4">
+      <HintPath>..\References\LZ4\LZ4.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -210,7 +213,9 @@
     <Compile Include="Data\Json\JsonStringRawConverter.cs" />
     <Compile Include="Data\Parameter.cs" />
     <Compile Include="Data\RowHelper.cs" />
-    <Compile Include="Data\Sql\Filter.cs" />
+    <Compile Include="Data\Sql\Alias.cs" />
+    <Compile Include="Data\Sql\Dapper.cs" />
+    <Compile Include="Data\Sql\Criteria.cs" />
     <Compile Include="Data\Sql\SqlConsts.cs" />
     <Compile Include="Data\Sql\SqlConversions.cs" />
     <Compile Include="Data\Sql\SqlDialect.cs" />

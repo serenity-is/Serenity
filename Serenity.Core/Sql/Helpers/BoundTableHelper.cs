@@ -33,7 +33,7 @@ namespace Serenity
             .FromAs(
                 tableName, 0)
             .Where(
-                new Filter(mKeyID) == keyID)))
+                new Criteria(mKeyID) == keyID)))
             {
                 while (reader.Read())
                     if (!reader.IsDBNull(0))
@@ -77,7 +77,7 @@ namespace Serenity
             .FromAs(
                 tableName, 0)
             .Where(
-                new Filter(mKeyID) == keyID);
+                new Criteria(mKeyID) == keyID);
 
             Dictionary<Int64, Int64> existing = new Dictionary<Int64, Int64>();
             List<Int64> free = new List<Int64>();

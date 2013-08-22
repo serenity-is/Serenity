@@ -9,7 +9,7 @@ namespace Serenity.Data
     {
         private IFilterableQuery _query;
         private Row _row;
-        private Func<BasicCriteria, Filter> _processCriteria;
+        private Func<BasicCriteria, Criteria> _processCriteria;
         private FilterFields filterFields;
 
         const string AND = " AND ";
@@ -18,7 +18,7 @@ namespace Serenity.Data
         const string RPAREN = ")";
 
         public BasicFilterStringConverter(IFilterableQuery query, 
-            Row row = null, Func<BasicCriteria, Filter> processCriteria = null,
+            Row row = null, Func<BasicCriteria, Criteria> processCriteria = null,
             FilterFields filterFields = null)
         {
             _query = query;
@@ -70,45 +70,78 @@ namespace Serenity.Data
             return fieldExpr;
         }
 
-        public string Convert(BasicFilter node)
-        {
-            StringBuilder sb = new StringBuilder();
-            Convert(sb, node);
-            return sb.ToString();
-        }
-
-        public void Convert(StringBuilder sb, BasicFilter node)
+        public Criteria Convert(BasicFilter node)
         {
             if (node == null)
                 throw new ArgumentNullException("node");
 
             var sub = node as BasicFilterGroup;
             if (sub != null)
-                Convert(sb, sub);
+                return Convert(sub);
             else
-                Convert(sb, (BasicCriteria)node);
+                return Convert((BasicCriteria)node);
         }
 
-        private void Convert(StringBuilder sb, BasicCriteria criteria)
+        private Double ParseDoubleValue(string valueText)
         {
-            if (criteria == null)
+            valueText = valueText.TrimToEmpty();
+
+            double d;
+            if (!Double.TryParse(valueText, NumberStyles.Float, Invariants.NumberFormat, out d))
+                throw new ArgumentOutOfRangeException(String.Format("Invalid double value {0}", valueText));
+
+            return d;
+        }
+
+        private long ParseIntegerValue(Field field, string valueText)
+        {
+            valueText = valueText.TrimToEmpty();
+
+            long l;
+            if (Int64.TryParse(valueText, out l))
+                return l;
+            else if (field != null && !valueText.IsTrimmedEmpty())
+            {
+                var enumType = FieldDescriptor.GetEnumType(field);
+                if (enumType != null)
+                    return (System.Convert.ToInt32(Enum.Parse(enumType, valueText)));
+                else
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid integer value {0}", valueText));
+            }
+            else
+                throw new ArgumentOutOfRangeException(String.Format("Invalid integer value {0}", valueText));
+        }
+
+        private DateTime ParseDateTimeValue(string valueText)
+        {
+            DateTime d;
+            if (!DateHelper.TryParseISO8601DateTime(valueText, out d))
+                throw new ArgumentOutOfRangeException(String.Format("Invalid date time value {0}", valueText));
+
+            return d;
+        }
+
+        private Criteria Convert(BasicCriteria filter)
+        {
+            if (filter == null)
                 throw new ArgumentNullException("criteria");
 
-            if (!criteria.IsValid)
-                throw new ArgumentOutOfRangeException("InvalidFilterCriteria", criteria.ToJsonString());
+            if (!filter.IsValid)
+                throw new ArgumentOutOfRangeException("InvalidFilterCriteria", filter.ToJsonString());
 
             if (_processCriteria != null)
             {
-                var filter = _processCriteria(criteria);
-                if (!Object.ReferenceEquals(filter, null))
+                var processed = _processCriteria(filter);
+                if (!Object.ReferenceEquals(processed, null))
                 {
-                    if (filter.IsEmpty)
-                        throw new ArgumentOutOfRangeException("EmptyFilterLine", criteria.ToJsonString());
-                    sb.Append(filter.ToString());
+                    if (processed.IsEmpty)
+                        throw new ArgumentOutOfRangeException("EmptyFilterLine", filter.ToJsonString());
+
+                    return processed;
                 }
             }
 
-            string fieldName = criteria.Field;
+            string fieldName = filter.Field;
 
             Field field = null;
             if (_row != null)
@@ -134,199 +167,202 @@ namespace Serenity.Data
             {
                 // field is not found anywhere, don't allow unknown fields as it may cause a script injection 
                 // attack or other types of security threats!
-                throw new ArgumentOutOfRangeException("UnknownFilterField", criteria.ToJsonString());
+                throw new ArgumentOutOfRangeException("UnknownFilterField", filter.ToJsonString());
             }
 
-            bool isNumeric =
-                (filterField != null && (filterField.Handler == "Integer" || filterField.Handler == "Decimal")) ||
-                (filterField == null && field != null &&
-                    (field is Int16Field || field is Int32Field || field is Int64Field || field is DoubleField || field is DecimalField));
+            bool isInteger = (filterField != null && (filterField.Handler == "Integer")) ||
+                (filterField == null && field != null && (field is Int16Field || field is Int32Field || field is Int64Field));
+
+            bool isDecimal = (filterField != null && (filterField.Handler == "Decimal")) ||
+                (filterField == null && field != null && (field is DoubleField || field is DecimalField));
+
+            bool isNumeric = isInteger || isDecimal;
 
             bool isDateTime =
                 (filterField != null && (filterField.Handler == "Date")) ||
                 (filterField == null && field != null &&
                     (field is DateTimeField));
 
-            // determine expression for this filter by operator type
-            FilterOp op = criteria.Operator;
-            string sqlOp = FilterOpToWhereString[(int)(op)];
+            var op = filter.Operator;
 
             switch (op)
             {
                 case FilterOp.True:
+                    return new Criteria(fieldExpr) == 1;
                 case FilterOp.False:
+                    return new Criteria(fieldExpr) == 0;
                 case FilterOp.IsNull:
+                    return new Criteria(fieldExpr).IsNull();
                 case FilterOp.IsNotNull:
-                    sb.AppendFormat(sqlOp, fieldExpr);
-                    return;
-
+                    return new Criteria(fieldExpr).IsNotNull();
                 case FilterOp.Like:
+                    return new Criteria(fieldExpr).Like(filter.Value);
                 case FilterOp.NotLike:
+                    return new Criteria(fieldExpr).NotLike(filter.Value);
                 case FilterOp.Contains:
+                    return new Criteria(fieldExpr).Contains(filter.Value);
                 case FilterOp.NotContains:
+                    return new Criteria(fieldExpr).NotContains(filter.Value);
                 case FilterOp.StartsWith:
+                    return new Criteria(fieldExpr).StartsWith(filter.Value);
                 case FilterOp.EndsWith:
-                    var value = criteria.Value.Replace("'", "''");
-                    if (SqlSettings.IsCaseSensitive)
-                    {
-                        fieldExpr = "UPPER(" + fieldExpr + ")";
-                        value = value.ToUpper();
-                    }
-                    sb.AppendFormat(sqlOp, fieldExpr, value);
-                    return;
-
+                    return new Criteria(fieldExpr).EndsWith(filter.Value);
                 case FilterOp.IN:
                 case FilterOp.NotIN:
                     {
-                        StringBuilder vs = new StringBuilder();
-                        foreach (var s in criteria.Values)
+                        var values = new List<object>();
+                        foreach (var s in filter.Values)
                         {
-                            if (isNumeric)
-                            {   // parse invariant decimal value for integer and float fields
-                                double d;
-                                if (Double.TryParse(s, NumberStyles.Float, Invariants.NumberFormat, out d))
-                                {
-                                    if (vs.Length > 0)
-                                        vs.Append(",");
-                                    vs.Append(d.ToInvariant());
-                                }
-                                else
-                                {
-                                    if (field != null && !s.IsTrimmedEmpty())
-                                    {
-                                        var enumType = FieldDescriptor.GetEnumType(field);
-                                        if (enumType != null)
-                                            d = System.Convert.ToInt32(Enum.Parse(enumType, s));
-                                    }
-                                    if (vs.Length > 0)
-                                        vs.Append(",");
-                                    vs.Append(d.ToInvariant());
-                                }
-                            }
+                            if (isDecimal)
+                                values.Add(ParseDoubleValue(s));
+                            else if (isInteger)
+                                values.Add(ParseIntegerValue(field, s));
                             else
-                            {
-                                if (vs.Length > 0)
-                                    vs.Append(",");
-
-                                vs.Append(s.ToSql());
-                            }
+                                values.Add(s);
                         }
 
-                        if (vs.Length == 0)
-                            throw new ArgumentOutOfRangeException("InvalidFilterLine", criteria.ToJsonString());
-                        else
-                            sb.AppendFormat(sqlOp, fieldExpr, vs.ToString());
+                        if (values.Count == 0)
+                            throw new ArgumentOutOfRangeException("InvalidFilterLine", filter.ToJsonString());
 
-                        return;
+                        if (op == FilterOp.IN)
+                            return new Criteria(fieldExpr).In(values);
+                        else 
+                            return new Criteria(fieldExpr).NotIn(values);
                     }
             }
 
             // parse value1 and value2
-            string value1 = "";
-            string value2 = "";
+            string value1Text = filter.Value.TrimToEmpty();
+            string value2Text = filter.Value2.TrimToEmpty();
 
-            // simple loop to parse value1 and value2 in one turn
-            //bool cancel = false;
-            for (int phase = 0; phase <= 1; phase++)
+            if ((op == FilterOp.BW || op == FilterOp.NotBW))
             {
-                string valueText;
+                if (value1Text.IsEmptyOrNull() || value2Text.IsEmptyOrNull())
+                    throw new ArgumentOutOfRangeException("InvalidFilterLine", filter.ToJsonString());
 
-                if (phase == 0)
-                    valueText = criteria.Value;
-                else
-                    valueText = criteria.Value2;
-
-                valueText = valueText.TrimToEmpty();
-
-                /*
-                // value must be entered
-                if (valueText == null)
-                    throw new ArgumentOutOfRangeException("InvalidFilterLine", criteria.ToJsonString());*/
-
-                if (isNumeric)
-                {   // parse invariant decimal value for integer and float fields
-                    double d;
-                    if (!Double.TryParse(valueText, NumberStyles.Float, Invariants.NumberFormat, out d))
-                    {
-                        if (field != null)
-                        {
-                            var enumType = FieldDescriptor.GetEnumType(field);
-                            if (enumType == null)
-                                throw new ArgumentOutOfRangeException("InvalidFilterLine", criteria.ToJsonString());
-                            else
-                                d = System.Convert.ToInt32(Enum.Parse(enumType, valueText));
-                        }
-                        else
-                            throw new ArgumentOutOfRangeException("InvalidFilterLine", criteria.ToJsonString());
-                    }
-                    valueText = d.ToInvariant();
-                }
+                if (isInteger)
+                    return new Criteria(fieldExpr) >= ParseIntegerValue(field, value1Text) &
+                        new Criteria(fieldExpr) <= ParseIntegerValue(field, value2Text);
+                else if (isDecimal)
+                    return new Criteria(fieldExpr) >= ParseDoubleValue(value1Text) &
+                        new Criteria(fieldExpr) <= ParseDoubleValue(value2Text);
                 else if (isDateTime)
-                {   // parse iso date-time string
-                    DateTime d;
-                    if (!DateHelper.TryParseISO8601DateTime(valueText, out d))
-                        throw new ArgumentOutOfRangeException("InvalidFilterLine", criteria.ToJsonString());
+                {
+                    var d1 = ParseDateTimeValue(value1Text);
+                    var d2 = ParseDateTimeValue(value2Text);
 
-                    // datetime fields requires special care for date only values
-
-                    if (d.Date == d)
+                    if (d1.Date == d1 && d2.Date == d2)
                     {
-                        if (op == FilterOp.BW || op == FilterOp.NotBW)
-                        {
-                            if (phase == 1)
-                                d = d.Date.AddDays(1).AddMilliseconds(-1);
-                        }
-                        else if (phase == 0)
-                        {
-                            if (op == FilterOp.NE || op == FilterOp.EQ)
-                            {
-                                value1 = d.Date.ToSql();
-                                value2 = d.Date.AddDays(1).AddMilliseconds(-1).ToSql();
-                                op = (op == FilterOp.NE ? FilterOp.NotBW : FilterOp.BW);
-                                break;
-                            }
-                            else
-                            {
-                                if (op == FilterOp.GT)
-                                {
-                                    op = FilterOp.GE;
-                                    d = d.Date.AddDays(1);
-                                }
-                                else if (op == FilterOp.LE)
-                                {
-                                    op = FilterOp.LT;
-                                    d = d.Date.AddDays(1);
-                                }
-                            }
-                        }
+                        if (op == FilterOp.BW)
+                            return new Criteria(fieldExpr) >= d1.Date & new Criteria(fieldExpr) < d2.Date.AddDays(1);
+                        else
+                            return ~(new Criteria(fieldExpr) < d1.Date | new Criteria(fieldExpr) >= d2.Date.AddDays(1));
                     }
-
-                    valueText = d.ToSql();
+                    else
+                    {
+                        if (op == FilterOp.BW)
+                            return new Criteria(fieldExpr) >= d1 & new Criteria(fieldExpr) <= d2;
+                        else
+                            return ~((new Criteria(fieldExpr) < d1 | new Criteria(fieldExpr) > d2));
+                    }
                 }
-                else // convert simple string value to sql string (duplicate quotes)
-                    valueText = valueText.ToSql();
-
-                if (phase == 0)
-                    value1 = valueText;
                 else
-                    value2 = valueText;
-
-                // use second phase to parse value2 if operator is BW
-                if (op != FilterOp.BW && op != FilterOp.NotBW)
-                    break;
+                {
+                    if (op == FilterOp.BW)
+                        return new Criteria(fieldExpr) >= value1Text & new Criteria(fieldExpr) <= value2Text;
+                    else
+                        return ~((new Criteria(fieldExpr) < value2Text | new Criteria(fieldExpr) > value2Text));
+                }
             }
 
-            // operator may have been changed (probably by datetime interval fix)
-            sqlOp = FilterOpToWhereString[(int)(op)];
+            var result = new Criteria(fieldExpr);
 
-            // format sql operator text with values
-            if (op == FilterOp.BW || op == FilterOp.NotBW)
-                sb.AppendFormat(sqlOp, fieldExpr, value1, value2);
+            if (isInteger)
+            {
+                var i = ParseIntegerValue(field, value1Text);
+                if (op == FilterOp.EQ)
+                    return result == i;
+                else if (op == FilterOp.NE)
+                    return result != i;
+                else if (op == FilterOp.GT)
+                    return result > i;
+                else if (op == FilterOp.GE)
+                    return result >= i;
+                else if (op == FilterOp.LT)
+                    return result < i;
+                else if (op == FilterOp.LE)
+                    return result <= i;
+            }
+            else if (isDecimal)
+            {
+                var o = ParseIntegerValue(field, value1Text);
+                if (op == FilterOp.EQ)
+                    return result == o;
+                else if (op == FilterOp.NE)
+                    return result != o;
+                else if (op == FilterOp.GT)
+                    return result > o;
+                else if (op == FilterOp.GE)
+                    return result >= o;
+                else if (op == FilterOp.LT)
+                    return result < o;
+                else if (op == FilterOp.LE)
+                    return result <= o;
+            }
+            else if (isDateTime)
+            {
+                var d = ParseDateTimeValue(value1Text);
+                if (d.Date == d)
+                {
+                    if (op == FilterOp.EQ)
+                        return result >= d & result < d.AddDays(1);
+                    else if (op == FilterOp.NE)
+                        return ~(result < d | result >= d.AddDays(1));
+                    else if (op == FilterOp.GT)
+                        return result >= d.AddDays(1);
+                    else if (op == FilterOp.GE)
+                        return result >= d;
+                    else if (op == FilterOp.LT)
+                        return result < d;
+                    else if (op == FilterOp.LE)
+                        return result < d.AddDays(1);
+                }
+                else
+                {
+                    if (op == FilterOp.EQ)
+                        return result == d;
+                    else if (op == FilterOp.NE)
+                        return result != d;
+                    else if (op == FilterOp.GT)
+                        return result > d;
+                    else if (op == FilterOp.GE)
+                        return result >= d;
+                    else if (op == FilterOp.LT)
+                        return result < d;
+                    else if (op == FilterOp.LE)
+                        return result <= d;
+                }
+            }
             else
-                sb.AppendFormat(sqlOp, fieldExpr, value1);
+            {
+                if (op == FilterOp.EQ)
+                    return result == value1Text;
+                else if (op == FilterOp.NE)
+                    return result != value1Text;
+                else if (op == FilterOp.GT)
+                    return result > value1Text;
+                else if (op == FilterOp.GE)
+                    return result >= value1Text;
+                else if (op == FilterOp.LT)
+                    return result < value1Text;
+                else if (op == FilterOp.LE)
+                    return result <= value1Text;
+            }
+
+            throw new InvalidOperationException();
         }
 
-        public void Convert(StringBuilder sb, BasicFilterGroup group)
+        public Criteria Convert(BasicFilterGroup group)
         {
             if (group == null)
                 throw new ArgumentNullException("group");
@@ -334,52 +370,28 @@ namespace Serenity.Data
             if (group.Nodes.IsEmptyOrNull())
                 throw new ArgumentNullException("group.Nodes");
 
+            var result = new Criteria();
+
+            foreach (var node in group.Nodes)
+            {
+                var sub = Convert(node);
+
+                if (group.Operator == LogicalOp.And ||
+                    group.Operator == LogicalOp.NotAnd)
+                    result &= sub;
+                else
+                    result |= sub;
+            }
+
+            result = ~(result);
+
             if (group.Operator == LogicalOp.NotOr ||
                 group.Operator == LogicalOp.NotAnd)
             {
-                sb.Append("NOT ");
+                result = ~(!result);
             }
 
-            sb.Append("(");
-
-            string separator = null;
-            foreach (var node in group.Nodes)
-            {
-                if (separator == null)
-                    separator = group.Operator == LogicalOp.And ? " AND " : " OR ";
-                else
-                    sb.Append(separator);
-
-                Convert(sb, node);
-            }
-
-            sb.Append(")");
+            return result;
         }
-
-        /// <summary>
-        ///   Constant SQL where clause formats for each operator type</summary>
-        private static readonly string[] FilterOpToWhereString =
-        {
-            "{0} = 1",
-            "{0} = 0",
-            "{0} = {1}",
-            "{0} <> {1}",
-            "{0} > {1}",
-            "{0} >= {1}",
-            "{0} < {1}",
-            "{0} <= {1}",
-            "({0} >= {1} AND {0} <= {2})",
-            "({0} < {1} OR {0} > {2})",
-            "{0} LIKE '%{1}%'",
-            "{0} NOT LIKE '%{1}%'",
-            "{0} LIKE '{1}%'",
-            "{0} LIKE '%{1}'",
-            "{0} LIKE '{1}'",
-            "{0} NOT LIKE '{1}'",
-            "{0} IS NULL",
-            "{0} IS NOT NULL",
-            "{0} IN ({1})",
-            "{0} NOT IN ({1})"
-        };
     }
 }

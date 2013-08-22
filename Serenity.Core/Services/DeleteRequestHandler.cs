@@ -101,7 +101,7 @@ namespace Serenity.Services
                 if (new SqlUpdate(Row.Table)
                         .Set(isActiveRow.IsActiveField, -1)
                         .WhereEqual(idField, id)
-                        .Where(new Filter(isActiveRow.IsActiveField) >= 0)
+                        .Where(new Criteria(isActiveRow.IsActiveField) >= 0)
                         .Execute(Connection) != 1)
                     throw DataValidation.EntityNotFoundError(Row, id);
             }

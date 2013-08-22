@@ -238,9 +238,9 @@ namespace Serenity.Services
                 return;
 
             ServiceHelper.CheckParentNotDeleted(Connection, foreignRow.Table, query => query
-                .Where(q =>
-                    new Filter((Field)idForeign.IdField) == q.Param(parentId) &
-                    new Filter(isActiveForeign.IsActiveField) < q.Param(0)));
+                .Where(
+                    new Criteria((Field)idForeign.IdField) == parentId.Value &
+                    new Criteria(isActiveForeign.IsActiveField) < 0));
         }
 
         protected virtual void DoGenericAudit()

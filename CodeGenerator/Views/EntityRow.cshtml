@@ -50,11 +50,7 @@ namespace @(Model.RootNamespace).@(Model.Module).Entities
 
 @foreach (var x in Model.Fields) {
 <text>                @(x.Ident) = new @(x.Type)Field(this, "@x.Name", "@x.Name", @((x.Size ?? 0).ToString()), @("FieldFlags." + (x.Flags ?? "Default")),
-                    r => ((R)r)._@(x.Ident), (r, v) => ((R)r)._@(x.Ident) = v)@if (Model.NameField != null && x.Name == Model.NameField) {
-<text>
-                {
-                    MinSelectLevel = SelectLevel.Lookup
-                }</text>}@if (x.Scale > 0) {
+                    r => ((R)r)._@(x.Ident), (r, v) => ((R)r)._@(x.Ident) = v)@if (x.Scale > 0) {
 <text>
                 {
                     Scale = @(x.Scale)
@@ -70,7 +66,7 @@ namespace @(Model.RootNamespace).@(Model.Module).Entities
 @foreach(var x in Model.Joins) {
 <text>                @(x.Name)Join = @(x.SourceField).ForeignJoin();
 @foreach(var y in x.Fields) {
-<text>                @(jf(x.Name, y.Ident)) = new @(y.Type)Field(this, "@(jf(x.Name, y.Ident))", @(x.Name)).SetOrigin(@(x.Name)Join, "@y.Name");
+<text>                @(jf(x.Name, y.Ident)) = new @(y.Type)Field(this, "@(jf(x.Name, y.Ident))", "@(jf(x.Name, y.Ident))").OfJoin(@(x.Name)Join, "@y.Name");
 </text>}
 
 </text>}

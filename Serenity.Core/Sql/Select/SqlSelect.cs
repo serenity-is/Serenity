@@ -30,7 +30,6 @@
         private StringBuilder _having;
         private HashSet<string> _joinAliases = null;
         private Dictionary _params;
-        private int _autoParam;
         private string _cachedQuery;
 
         public SqlSelect()
@@ -135,7 +134,7 @@
             _cachedQuery = null;
 
             if (field.Expression == null)
-                _columns.Add(new Column("T0." + field.Name, field.Name, _intoIndex, field));
+                _columns.Add(new Column(field.QueryExpression, field.Name, _intoIndex, field));
             else
             {
                 EnsureForeignJoin(field);
@@ -293,7 +292,7 @@
             return this;
         }
 
-        public SqlSelect LeftJoin(string joinTable, int joinNumber, Filter joinCondition)
+        public SqlSelect LeftJoin(string joinTable, int joinNumber, Criteria joinCondition)
         {
             if (Object.ReferenceEquals(joinCondition, null))
                 throw new ArgumentNullException("joinCondition");
@@ -373,7 +372,7 @@
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return OrderBy(field.Expression ?? ("T0." + field.Name));
+            return OrderBy(field.QueryExpression);
         }
 
         public SqlSelect OrderBy(params Field[] fields)
@@ -450,7 +449,7 @@
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return OrderByDescending(field.Expression ?? ("T0." + field.Name));
+            return OrderByDescending(field.QueryExpression);
         }
 
         public SqlSelect OrderByDescending(params Field[] fields)
@@ -493,7 +492,7 @@
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return GroupBy(field.Expression ?? "T0." + field.Name);
+            return GroupBy(field.QueryExpression);
         }
 
         public SqlSelect GroupBy(params string[] fields)
@@ -604,18 +603,6 @@
             return this;
         }
 
-        void IDbParameterized.SetParam(string name, object value)
-        {
-            if (_params == null)
-                _params = new Dictionary();
-            _params[name] = value;
-        }
-
-        public Parameter AutoParam()
-        {
-            return new Parameter((++_autoParam).IndexParam());
-        }
-
         public string Text
         {
             get { return ToString(); }
@@ -710,9 +697,10 @@
             set { _countRecords = value; }
         }
 
-        public IDictionary<string, object> Params
+        public Dictionary<string, object> Params
         {
             get { return _params; }
+            set { _params = value; }
         }
 
         public int ParamCount

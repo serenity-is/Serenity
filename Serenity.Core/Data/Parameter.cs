@@ -1,27 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Threading;
 
 namespace Serenity.Data
 {
     public struct Parameter
     {
-        private string _name;
+        private static long next;
+        private string name;
 
         public Parameter(string name)
         {
-            _name = name;
+            this.name = name;
         }
 
-        public Parameter(int index)
+        public static long NextNumber()
         {
-            _name = index.IndexParam();
+            var mine = Interlocked.Increment(ref next);
+            if (mine > 9000000000000000000)
+                Interlocked.CompareExchange(ref next, 1, mine);
+            return mine;
+        }
+
+        public static string NextName()
+        {
+            var mine = Interlocked.Increment(ref next);
+            if (mine > 9000000000000000000)
+                Interlocked.CompareExchange(ref next, 1, mine);
+            return "@p" + mine.ToInvariant();
+        }
+
+        public static Parameter Next()
+        {
+            return new Parameter(NextName());
         }
 
         public string Name
         {
-            get { return _name; }
+            get { return name; }
         }
     }
 }

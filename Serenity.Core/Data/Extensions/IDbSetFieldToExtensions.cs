@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Serenity.Data
 {
@@ -20,7 +21,8 @@ namespace Serenity.Data
         public static T Set<T>(this T self, string field, string param, object value) where T : IDbSetFieldTo
         {
             self.SetTo(field, param);
-            self.SetParam(param, value);
+            self.Params = self.Params ?? new Dictionary<string, object>();
+            self.Params[param] = value;
             return self;
         }
 
@@ -37,7 +39,8 @@ namespace Serenity.Data
         public static T Set<T>(this T self, Field field, string param, object value) where T : IDbSetFieldTo
         {
             self.SetTo(field.Name, param);
-            self.SetParam(param, value);
+            self.Params = self.Params ?? new Dictionary<string, object>();
+            self.Params[param] = value;
             return self;
         }
 
@@ -53,9 +56,10 @@ namespace Serenity.Data
         ///   Object itself.</returns>
         public static T Set<T>(this T self, string field, object value) where T : IDbSetFieldTo
         {
-            var param = self.AutoParam();
-            self.SetTo(field, param.Name);
-            self.SetParam(param.Name, value);
+            var param = Parameter.NextName();
+            self.SetTo(field, param);
+            self.Params = self.Params ?? new Dictionary<string, object>();
+            self.Params[param] = value;
             return self;
         }
 
@@ -71,9 +75,10 @@ namespace Serenity.Data
         ///   Object itself.</returns>
         public static T Set<T>(this T self, Field field, object value) where T : IDbSetFieldTo
         {
-            var param = self.AutoParam();
-            self.SetTo(field.Name, param.Name);
-            self.SetParam(param.Name, value);
+            var param = Parameter.NextName();
+            self.SetTo(field.Name, param);
+            self.Params = self.Params ?? new Dictionary<string, object>();
+            self.Params[param] = value;
             return self;
         }
 
@@ -92,13 +97,6 @@ namespace Serenity.Data
             foreach (var field in row.GetFields())
                 if (row.IsAssigned(field))
                     Set(self, field, field.AsObject(row));
-            return self;
-        }
-
-        public static T Set<T>(this T self, Field field, out Parameter param) where T : IDbSetFieldTo
-        {
-            param = self.AutoParam();
-            self.SetTo(field.Name, param.Name);
             return self;
         }
     }

@@ -176,6 +176,14 @@ namespace Serenity.Data
             }
         }
 
+        public string QueryExpression
+        {
+            get
+            {
+                return Expression ?? ("T0." + this.Name);
+            }
+        }
+
         public string JoinAlias
         {
             get { return _joinAlias; }
@@ -251,7 +259,7 @@ namespace Serenity.Data
             var sourceAlias = "T0";
             var sourceKeyField = Name;
             return new LeftJoin(this.Fields, ForeignTable, foreignJoin,
-                new Filter(foreignJoin, joinKeyField) == new Filter(sourceAlias, sourceKeyField));
+                new Criteria(foreignJoin, joinKeyField) == new Criteria(sourceAlias, sourceKeyField));
         }
 
         protected internal virtual void OnRowInitialization()

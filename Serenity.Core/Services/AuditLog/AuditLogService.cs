@@ -54,13 +54,13 @@ namespace Serenity.Services
 
                     query.Where(~(
                         ~(
-                            new Filter(0, fld.EntityTypeIdField) == pEntityTypeId &
-                            new Filter(0, fld.EntityIdField) == pEntityId) |
+                            new Criteria(0, fld.EntityTypeIdField) == pEntityTypeId &
+                            new Criteria(0, fld.EntityIdField) == pEntityId) |
                         ~(
-                            new Filter(0, fld.ParentTypeIdField) == pEntityTypeId &
+                            new Criteria(0, fld.ParentTypeIdField) == pEntityTypeId &
                             ~(
-                                new Filter(0, fld.OldParentIdField) == pEntityId |
-                                new Filter(0, fld.NewParentIdField) == pEntityId))));
+                                new Criteria(0, fld.OldParentIdField) == pEntityId |
+                                new Criteria(0, fld.NewParentIdField) == pEntityId))));
                 }
                 else
                 {
@@ -281,7 +281,7 @@ namespace Serenity.Services
                 list.CopyTo(start, part, 0, len);
 
                 var query = new SqlSelect().Select(((Field)row.IdField).Name, nameField.Name).From(theRow.Table);
-                query.Where(new Filter((Field)row.IdField).InParams(query, part));
+                query.Where(new Criteria((Field)row.IdField).In(part));
 
                 using (var reader = SqlHelper.ExecuteReader(connection, query))
                     while (reader.Read())

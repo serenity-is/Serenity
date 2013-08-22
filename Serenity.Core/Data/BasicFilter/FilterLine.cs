@@ -146,7 +146,7 @@ namespace Serenity.Data
         /// <remarks>
         ///   Invalid filter lines are simply skipped, no error occurs.</remarks>
         public static string ToWhereString(SqlSelect query, IEnumerable<FilterLine> lines, FilterFields filterFields, 
-            IDictionary<string, string> fieldExpressions = null, Row row = null, Func<FilterLine, Filter> process = null)
+            IDictionary<string, string> fieldExpressions = null, Row row = null, Func<FilterLine, Criteria> process = null)
         {
             if (lines == null)
                 throw new ArgumentNullException("lines");

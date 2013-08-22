@@ -25,7 +25,7 @@ namespace Serenity.Data
         ///   One more of maximum display order values of records in the group. 
         ///   If none, 1.</returns>
         public static int GetNextDisplayOrderValue(IDbConnection connection, string tableName, 
-            Field orderField, Filter filter)
+            Field orderField, Criteria filter)
         {
             if (connection == null)
                 throw new ArgumentNullException("connection");
@@ -60,7 +60,7 @@ namespace Serenity.Data
         /// <returns>
         ///   One more of maximum display order values of records in the group. 
         ///   If none, 1.</returns>
-        public static int GetNextDisplayOrderValue(IDbConnection connection, IDisplayOrderRow row, Filter filter)
+        public static int GetNextDisplayOrderValue(IDbConnection connection, IDisplayOrderRow row, Criteria filter)
         {
             return GetNextDisplayOrderValue(connection, ((Row)row).Table, row.DisplayOrderField, filter);
         }
@@ -108,7 +108,7 @@ namespace Serenity.Data
                 new SqlSelect()
                     .SelectOf(0, orderField.Name)
                     .FromAs(tableName, 0)
-                    .Where(new Filter(keyField) == recordID)))
+                    .Where(new Criteria(keyField) == recordID)))
             {
                 if (reader.Read())
                     return Convert.ToInt32(reader.GetValue(0));
@@ -146,7 +146,7 @@ namespace Serenity.Data
         ///   Records actual display order value. If not found, <see cref="Null.Int32"/></returns>
         public static Int32? GetTrueDisplayOrder(IDbConnection connection, string tableName,
             Field keyField, Field baseKeyField, Field orderField, 
-            Filter filter, Int64 recordID, bool descendingKeyOrder)
+            Criteria filter, Int64 recordID, bool descendingKeyOrder)
         {
             if (connection == null)
                 throw new ArgumentNullException("connection");
@@ -170,7 +170,7 @@ namespace Serenity.Data
                     orderField);
 
             if (baseKeyField != null)
-                query.Where(new Filter(baseKeyField).IsNull());
+                query.Where(new Criteria(baseKeyField).IsNull());
 
             if (descendingKeyOrder)
                 query.OrderByDescending(keyField.Name);
@@ -219,7 +219,7 @@ namespace Serenity.Data
         ///   If any of the display order values is changed true.</returns>
         public static bool FixRecordOrdering(IDbConnection connection, string tableName,
             Field keyField, Field baseKeyField, Field orderField, 
-            Filter filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder,
+            Criteria filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder,
             bool hasUniqueConstraint = false)
         {
             if (connection == null)
@@ -254,7 +254,7 @@ namespace Serenity.Data
                     orderField);
 
             if (baseKeyField != null)
-                query.Where(new Filter(baseKeyField).IsNull());
+                query.Where(new Criteria(baseKeyField).IsNull());
 
             // determine display order for records with same display order values 
             // based on ID ordering set
@@ -441,7 +441,7 @@ namespace Serenity.Data
                             tableName,
                             orderField.Name,
                             rs.oldOrder - rs.newOrder,
-                            Object.ReferenceEquals(filter, null) ? "1 = 1" : filter.Text,
+                            Object.ReferenceEquals(filter, null) ? "1 = 1" : filter.ToString(),
                             keyField.Name,
                             sb.ToString()));
                         updateCount++;
@@ -462,14 +462,14 @@ namespace Serenity.Data
                         .Where(
                             filter)
                         .Where(
-                            new Filter(baseKeyField).IsNotNull())
+                            new Criteria(baseKeyField).IsNotNull())
                         .ToString());
                 }
 
                 if (SqlSettings.NeedsExecuteBlockStatement)
                     queries.AppendLine("END;");
 
-                SqlHelper.ExecuteNonQuery(connection, queries.ToString());
+                SqlHelper.ExecuteNonQuery(connection, queries.ToString(), Object.ReferenceEquals(filter, null) ? null : filter.Parameters);
                 // one ore more records has changed display order values
 
                 return true;
@@ -503,7 +503,7 @@ namespace Serenity.Data
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
         public static bool FixRecordOrdering(IDbConnection connection, IDisplayOrderRow row,
-            Filter filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint = false)
+            Criteria filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint = false)
         {
             return FixRecordOrdering(connection, ((Row)row).Table, (Field)((IIdRow)row).IdField, (row is IStagingRow) ?
                 ((IStagingRow)row).StagingBaseIdField : null, row.DisplayOrderField, filter, recordID, 

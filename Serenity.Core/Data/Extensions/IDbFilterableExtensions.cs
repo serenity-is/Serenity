@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Serenity.Data
 {
@@ -16,32 +17,24 @@ namespace Serenity.Data
         ///   Filter</param>
         /// <returns>
         ///   Query itself.</returns>
-        public static T Where<T>(this T self, Filter filter) where T: IDbFilterable
+        public static T Where<T>(this T self, Criteria filter) where T: IDbFilterable
         {
             if (!Object.ReferenceEquals(null, filter) && !filter.IsEmpty)
+            {
                 self.Where(filter.ToString());
-            return self;
-        }
 
-        /// <summary>
-        ///   Adds a filter to query</summary>
-        /// <typeparam name="T">
-        ///   Query class</typeparam>
-        /// <param name="self">
-        ///   Query</param>
-        /// <param name="filter">
-        ///   Filter</param>
-        /// <returns>
-        ///   Query itself.</returns>
-        public static T Where<T>(this T self, Func<IDbFilterable, Filter> filterFunc) where T : IDbFilterable
-        {
-            if (filterFunc == null)
-                throw new ArgumentNullException("filterFunc");
+                if (filter.Parameters != null)
+                    foreach (var param in filter.Parameters)
+                    {
+                        self.Params = self.Params ?? new Dictionary<string, object>();
+                        object oldValue;
+                        if (self.Params.TryGetValue(param.Key, out oldValue) &&
+                            !Object.Equals(oldValue, param.Value))
+                            throw new InvalidOperationException("Criteria has duplicate parameter with the query!");
 
-            var filter = filterFunc(self);
-
-            if (!Object.ReferenceEquals(null, filter) && !filter.IsEmpty)
-                self.Where(filter.ToString());
+                        self.Params[param.Key] = param.Value;
+                    }
+            }
             return self;
         }
 
@@ -55,7 +48,7 @@ namespace Serenity.Data
         ///   The new filter parameter.</returns>
         public static T WhereEqual<T>(this T self, Field field, object value) where T : IDbFilterable
         {
-            self.Where(new Filter(field) == self.Param(value));
+            self.Where(new Criteria(field) == self.Param(value));
             return self;
         }
 
@@ -75,7 +68,7 @@ namespace Serenity.Data
                 throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
             foreach (var field in row.GetFields())
                 if (row.IsAssigned(field))
-                    self.Where(q => new Filter(field) == q.Param(field.AsObject(row)));
+                    self.Where(new Criteria(field) == self.Param(field.AsObject(row)));
             return self;
         }
 

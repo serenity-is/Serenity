@@ -7,7 +7,7 @@ namespace Serenity.Data
 {
     public interface ISqlQuery
     {
-        IDictionary<string, object> Params { get; }
+        Dictionary<string, object> Params { get; set; }
         string Text { get; }
     }
 }

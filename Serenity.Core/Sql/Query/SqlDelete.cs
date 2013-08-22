@@ -1,6 +1,7 @@
 namespace Serenity.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
@@ -11,7 +12,6 @@ namespace Serenity.Data
         private string _tableName;
         private StringBuilder _where;
         private Dictionary _params;
-        private int _autoParam;
 
         private void Initialize(string tableName)
         {
@@ -108,19 +108,6 @@ namespace Serenity.Data
         /// <param name="value">
         ///   Parameter value</param>
         /// <returns>
-        ///   SqlSelect object itself.</returns>
-        public Parameter AutoParam()
-        {
-            return new Parameter((++_autoParam).IndexParam());
-        }
-
-        /// <summary>
-        ///   Sets a parameter value.</summary>
-        /// <param name="name">
-        ///   Parameter name.</param>
-        /// <param name="value">
-        ///   Parameter value</param>
-        /// <returns>
         ///   SqlDelete object itself.</returns>
         public SqlDelete SetParam(string name, object value)
         {
@@ -130,26 +117,13 @@ namespace Serenity.Data
             return this;
         }
 
-        /// <summary>
-        ///   Sets a parameter value.</summary>
-        /// <param name="name">
-        ///   Parameter name.</param>
-        /// <param name="value">
-        ///   Parameter value</param>
-        /// <returns>
-        ///   SqlDelete object itself.</returns>
-        void IDbParameterized.SetParam(string name, object value)
-        {
-            if (_params == null)
-                _params = new Dictionary();
-            _params[name] = value;
-        }
 
         /// <summary>
         ///   Gets params dictionary. May return null if no params set.</summary>
         public Dictionary Params
         {
             get { return _params; }
+            set { _params = value; }
         }
 
         /// <summary>

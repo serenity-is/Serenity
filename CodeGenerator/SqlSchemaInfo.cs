@@ -34,8 +34,8 @@ namespace Serenity.CodeGenerator
                 "KCU.TABLE_SCHEMA = TC.TABLE_SCHEMA AND " +
                 "KCU.TABLE_NAME = TC.TABLE_NAME")
             .Where(
-                new Filter("TC.CONSTRAINT_TYPE") == "PRIMARY KEY" &
-                new Filter("KCU.TABLE_NAME") == tableName)
+                new Criteria("TC.CONSTRAINT_TYPE") == "PRIMARY KEY" &
+                new Criteria("KCU.TABLE_NAME") == tableName)
             .OrderBy(
                 "KCU.ORDINAL_POSITION")
             .ForEach(connection, delegate(IDataReader reader)
@@ -58,9 +58,9 @@ namespace Serenity.CodeGenerator
                 "LEFT OUTER JOIN SYSOBJECTS T " +
                 "ON (C.id = T.id)")
             .Where(
-                new Filter("C.STATUS & 128") == 128 &
-                new Filter("T.NAME") == tableName &
-                new Filter("T.XTYPE") == "U")
+                new Criteria("C.STATUS & 128") == 128 &
+                new Criteria("T.NAME") == tableName &
+                new Criteria("T.XTYPE") == "U")
             .ForEach(connection, delegate(IDataReader reader)
             {
                 identityFields.Add(reader.GetString(0));
@@ -75,7 +75,7 @@ namespace Serenity.CodeGenerator
             var list = new List<string>();
 
             new SqlSelect().Select("COLUMN_NAME").From("INFORMATION_SCHEMA.COLUMNS")
-                .Where(new Filter("TABLE_NAME") == tableName)
+                .Where(new Criteria("TABLE_NAME") == tableName)
                 .OrderBy("ORDINAL_POSITION")
                 .ForEach(connection, delegate(IDataReader reader)
                 {
@@ -148,7 +148,7 @@ namespace Serenity.CodeGenerator
 
             new SqlSelect().Select("COLUMN_NAME, DATA_TYPE, IS_NULLABLE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE")
                 .From("INFORMATION_SCHEMA.COLUMNS")
-                .Where(new Filter("TABLE_NAME") == tableName)
+                .Where(new Criteria("TABLE_NAME") == tableName)
                 .OrderBy("ORDINAL_POSITION")
                 .ForEach(connection, delegate(IDataReader reader)
                 {

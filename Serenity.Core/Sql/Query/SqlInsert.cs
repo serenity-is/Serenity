@@ -13,7 +13,6 @@
         private string _tableName;
         private List<string> _nameValuePairs;
         private Dictionary _params;
-        private int _autoParam;
         private string _identityColumn;
         private string _cachedQuery;
 
@@ -103,19 +102,6 @@
         }
 
         /// <summary>
-        ///   Sets a parameter value.</summary>
-        /// <param name="name">
-        ///   Parameter name.</param>
-        /// <param name="value">
-        ///   Parameter value</param>
-        /// <returns>
-        ///   SqlSelect object itself.</returns>
-        public Parameter AutoParam()
-        {
-            return new Parameter((++_autoParam).IndexParam());
-        }
-
-        /// <summary>
         ///   Sets field value.</summary>
         /// <param name="meta">
         ///   Field (required).</param>
@@ -164,22 +150,6 @@
             return this;
         }
 
-        /// <summary>
-        ///   Sets a parameter value.</summary>
-        /// <param name="name">
-        ///   Parameter name.</param>
-        /// <param name="value">
-        ///   Parameter value</param>
-        /// <returns>
-        ///   SqlInsert object itself.</returns>
-        void IDbParameterized.SetParam(string name, object value)
-        {
-            if (_params == null)
-                _params = new Dictionary();
-            _params[name] = value;
-        }
-
-        /// <summary>
         ///   Clones the query.</summary>
         /// <returns>
         ///   Clone.</returns>
@@ -216,6 +186,7 @@
         public Dictionary Params
         {
             get { return _params; }
+            set { _params = value; }
         }
 
         /// <summary>

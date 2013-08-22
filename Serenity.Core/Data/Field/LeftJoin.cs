@@ -102,7 +102,7 @@ namespace Serenity.Data
         ///   Sorguya left outer join ile dahil edilen tabloya atanan alias (zorunlu).</param>
         /// <param name="joinCondition">
         ///   Left outer join iþleminin "ON(...)" kýsmýna karþýlýk gelen filtre nesnesi (zorunlu).</param>
-        public LeftJoin(RowFieldsBase fields, string joinTable, string joinAlias, Filter joinCondition)
+        public LeftJoin(RowFieldsBase fields, string joinTable, string joinAlias, Criteria joinCondition)
             : this(fields, joinTable, joinAlias, joinCondition.ToString())
         {
         }
@@ -117,7 +117,7 @@ namespace Serenity.Data
         ///   alias "T1" olur.</param>
         /// <param name="joinCondition">
         ///   Left outer join iþleminin "ON(...)" kýsmýna karþýlýk gelen filtre nesnesi (zorunlu).</param>
-        public LeftJoin(RowFieldsBase fields, string joinTable, int joinNumber, Filter joinCondition)
+        public LeftJoin(RowFieldsBase fields, string joinTable, int joinNumber, Criteria joinCondition)
             : this(fields, joinTable, joinNumber.TableAlias(), joinCondition.ToString())
         {
         }
@@ -186,6 +186,16 @@ namespace Serenity.Data
             {
                 return _joinKeyField;
             }
+        }
+
+        public string this[string field]
+        {
+            get { return this.JoinAlias + "." + field; }
+        }
+
+        public string this[Field field]
+        {
+            get { return this.JoinAlias + "." + field.Name; }
         }
     }
 }
