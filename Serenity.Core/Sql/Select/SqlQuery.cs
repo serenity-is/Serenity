@@ -297,7 +297,15 @@
             if (Object.ReferenceEquals(joinCondition, null))
                 throw new ArgumentNullException("joinCondition");
 
-            return LeftJoin(joinTable, joinNumber.TableAlias(), joinCondition.ToString());            
+            LeftJoin(joinTable, joinNumber.TableAlias(), joinCondition.ToString());
+            if (joinCondition.Parameters != null)
+            {
+                this._params = this._params ?? new Dictionary<string, object>();
+                foreach (var pair in joinCondition.Parameters)
+                    this._params.Add(pair.Key, pair.Value);
+            }
+
+            return this;
         }
 
         public SqlQuery Join(LeftJoin join)

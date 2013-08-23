@@ -48,7 +48,7 @@ namespace Serenity.Data
         ///   The new filter parameter.</returns>
         public static T WhereEqual<T>(this T self, Field field, object value) where T : IDbFilterable
         {
-            self.Where(new Criteria(field) == self.Param(value));
+            self.Where(new Criteria(field) == self.AddParam(value));
             return self;
         }
 
@@ -68,7 +68,7 @@ namespace Serenity.Data
                 throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
             foreach (var field in row.GetFields())
                 if (row.IsAssigned(field))
-                    self.Where(new Criteria(field) == self.Param(field.AsObject(row)));
+                    self.Where(new Criteria(field) == self.AddParam(field.AsObject(row)));
             return self;
         }
 

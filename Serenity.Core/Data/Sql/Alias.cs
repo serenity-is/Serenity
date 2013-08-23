@@ -37,6 +37,11 @@ namespace Serenity.Data
             this.aliasDot = alias + ".";
         }
 
+        public string Name
+        {
+            get { return alias; }
+        }
+
         public string this[string fieldName]
         {
             get { return this.aliasDot + fieldName; }

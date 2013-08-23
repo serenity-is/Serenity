@@ -49,8 +49,8 @@ namespace Serenity.Services
                 if (request.EntityTypeId != null &&
                     request.EntityId != null)
                 {
-                    var pEntityId = query.Param(request.EntityId);
-                    var pEntityTypeId = query.Param(request.EntityTypeId);
+                    var pEntityId = query.AddParam(request.EntityId);
+                    var pEntityTypeId = query.AddParam(request.EntityTypeId);
 
                     query.Where(~(
                         ~(

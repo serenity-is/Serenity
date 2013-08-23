@@ -40,7 +40,7 @@ namespace Serenity.Data
         ///   Creates a new criteria with given condition. This condition is usually a 
         ///   field name, but it can also be a criteria text pre-generated.</summary>
         /// <remarks>
-        ///   Usually used like: <c>new Filter("fieldname") >= 5</c>.</remarks>
+        ///   Usually used like: <c>new Criteria("fieldname") >= 5</c>.</remarks>
         /// <param name="criteria">
         ///   A field name or criteria condition (can be null)</param>
         public Criteria(string criteria)
@@ -106,6 +106,18 @@ namespace Serenity.Data
         public Criteria(LeftJoin join, string field)
             : this(join.JoinAlias, field)
         {           
+        }
+
+        /// <summary>
+        ///   Belirtilen numerik tablo alias'ý (baþýna T konarak) ve alanýn adýný aralarýna 
+        ///   nokta koyarak içeren yeni bir kriter oluþturur.</summary>
+        /// <param name="joinNumber">
+        ///   Join numarasý (T1 gibi kullanýlýr)</param>
+        /// <param name="field">
+        ///   Alan nesnesi (zorunlu).</param>
+        public Criteria(Alias alias, Field field)
+            : this(alias.Name, field.Name)
+        {
         }
 
         /// <summary>
