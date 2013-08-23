@@ -71,12 +71,12 @@
             }
         }
 
-        protected virtual void SelectField(SqlSelect query, Field field)
+        protected virtual void SelectField(SqlQuery query, Field field)
         {
             query.Select(field);
         }
 
-        protected virtual void SelectFields(SqlSelect query)
+        protected virtual void SelectFields(SqlQuery query)
         {
             foreach (var field in Row.GetFields())
             {
@@ -89,7 +89,7 @@
         {
         }
 
-        protected virtual void PrepareQuery(SqlSelect query)
+        protected virtual void PrepareQuery(SqlQuery query)
         {
             SelectFields(query);
         }
@@ -119,9 +119,9 @@
             }
         }
 
-        protected virtual SqlSelect CreateQuery()
+        protected virtual SqlQuery CreateQuery()
         {
-            var query = new SqlSelect()
+            var query = new SqlQuery()
                 .FromAs(Row, 0);
 
             query.WhereEqual((Field)(((IIdRow)Row).IdField), Request.EntityId.Value);

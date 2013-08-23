@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Serenity.Data
 {
-    public partial class SqlSelect
+    public partial class SqlQuery
     {
         private static class AppendUtils
         {

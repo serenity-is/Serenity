@@ -126,6 +126,7 @@
     <Compile Include="Data\BasicFilter\FilterOp.cs" />
     <Compile Include="Data\BasicFilter\JsonFilterLineConverter.cs" />
     <Compile Include="Data\BasicFilter\LogicalOp.cs" />
+    <Compile Include="Data\DataEnum\EnumMapper.cs" />
     <Compile Include="Data\DataEnum\DataEnum.cs" />
     <Compile Include="Data\DataEnum\DataEnumCache.cs" />
     <Compile Include="Data\DataEnum\DataEnumConverter.cs" />

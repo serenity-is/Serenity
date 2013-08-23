@@ -4,15 +4,15 @@
     using System.Text;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
-    public partial class SqlSelect
+    public partial class SqlQuery
     {
         /// <summary>
         ///   Sorgunun birebir kopyasını oluşturur.</summary>
         /// <returns>
         ///   Sorgunun yeni bir kopyası.</returns>
-        public SqlSelect Clone()
+        public SqlQuery Clone()
         {
-            SqlSelect clone = new SqlSelect();
+            SqlQuery clone = new SqlQuery();
 
             clone._skip = _skip;
             clone._take = _take;

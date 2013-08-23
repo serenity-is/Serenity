@@ -25,6 +25,7 @@ namespace Serenity
     {
         public static readonly Int64? AdminUserId;
         public static readonly string AdminUsername;
+        public static readonly string MasterPassword;
 
         static SecurityHelper()
         {
@@ -34,6 +35,7 @@ namespace Serenity
                 AdminUserId = i;
 
             AdminUsername = ConfigurationManager.AppSettings["AdminUsername"].TrimToNull();
+            MasterPassword = ConfigurationManager.AppSettings["MasterPassword"].TrimToNull();
         }
 
         /// <summary>

@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Serenity.Data
 {
-    public partial class SqlSelect
+    public partial class SqlQuery
     {
         /// <summary>
         ///   SQLSelect'in Select komutları için bir alana karşılık gelen bilgilerin tutulduğu yardımcı 

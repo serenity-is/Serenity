@@ -28,7 +28,7 @@ namespace Serenity
         {
             Dictionary<Int64, bool> result = new Dictionary<Int64, bool>();
 
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection, new SqlSelect().Select(
+            using (IDataReader reader = SqlHelper.ExecuteReader(connection, new SqlQuery().Select(
                 mBoundID)
             .FromAs(
                 tableName, 0)
@@ -71,7 +71,7 @@ namespace Serenity
             if (listBoundID == null)
                 throw new ArgumentNullException("listBoundID");
 
-            SqlSelect query = new SqlSelect().Select(
+            SqlQuery query = new SqlQuery().Select(
                 mID,
                 mBoundID)
             .FromAs(

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Serenity.Data
 {
-    public partial class SqlSelect
+    public partial class SqlQuery
     {
         /// <summary>
         ///   String elemanlarından oluşan generic liste</summary>

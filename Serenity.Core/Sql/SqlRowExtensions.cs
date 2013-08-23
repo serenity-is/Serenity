@@ -15,7 +15,7 @@ namespace Serenity.Data
         ///   Row with fields to be selected (required).</param>
         /// <param name="exclude">
         ///   Fields to be excluded (optional).</param>
-        public static SqlSelect SelectTableFields(this SqlSelect query, Row row, params Field[] exclude)
+        public static SqlQuery SelectTableFields(this SqlQuery query, Row row, params Field[] exclude)
         {
             if (query == null)
                 throw new ArgumentNullException("query");
@@ -50,7 +50,7 @@ namespace Serenity.Data
         ///   Row with fields to be selected (required).</param>
         /// <param name="exclude">
         ///   Fields to be excluded (optional).</param>
-        public static SqlSelect SelectForeignFields(this SqlSelect query, Row row, params Field[] exclude)
+        public static SqlQuery SelectForeignFields(this SqlQuery query, Row row, params Field[] exclude)
         {
             if (query == null)
                 throw new ArgumentNullException("query");
@@ -86,7 +86,7 @@ namespace Serenity.Data
         ///   Row with fields to be selected (required).</param>
         /// <param name="exclude">
         ///   Fields to be excluded (optional).</param>
-        public static SqlSelect SelectNonTableFields(this SqlSelect query)
+        public static SqlQuery SelectNonTableFields(this SqlQuery query)
         {
             if (query == null)
                 throw new ArgumentNullException("query");
@@ -110,14 +110,14 @@ namespace Serenity.Data
         ///   Query to select fields into (required).</param>
         /// <param name="exclude">
         ///   Fields to be excluded (optional).</param>
-        public static SqlSelect SelectTableFields(this SqlSelect query, params Field[] exclude)
+        public static SqlQuery SelectTableFields(this SqlQuery query, params Field[] exclude)
         {
             if (query == null)
                 throw new ArgumentNullException("query");
             return SelectTableFields(query, query.IntoRow, exclude);
         }
         
-        public static SqlSelect EnsureAllForeignJoins(this SqlSelect query, Row row)
+        public static SqlQuery EnsureAllForeignJoins(this SqlQuery query, Row row)
         {
             foreach (var field in row.GetFields())
                 if ((field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign)

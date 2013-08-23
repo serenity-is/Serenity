@@ -740,6 +740,11 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
         {
             return Query<DapperRow>(cnn, sql, param as object, transaction, buffered, commandTimeout, commandType);
         }
+
+        public static IEnumerable<dynamic> Query(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+        {
+            return Query<DapperRow>(cnn, sql.Text, sql.Params == null ? null : new DynamicParameters(sql.Params), null, buffered, commandTimeout, commandType);
+        }
 #else
         /// <summary>
         /// Return a list of dynamic objects, reader is closed after the call
@@ -3487,6 +3492,7 @@ string name, object value = null, DbType? dbType = null, ParameterDirection? dir
 
     public partial class SqlMapper
     {
+        
     }
 
     public partial class DynamicParameters

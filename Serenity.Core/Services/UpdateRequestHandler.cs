@@ -87,12 +87,12 @@ namespace Serenity.Services
             return auditRequest;
         }
 
-        protected virtual SqlSelect PrepareQuery()
+        protected virtual SqlQuery PrepareQuery()
         {
             var idField = (Field)(Row.IdField);
             var id = Row.IdField[Row].Value;
 
-            return new SqlSelect()
+            return new SqlQuery()
                 .FromAs(Old, 0)
                 .SelectTableFields()
                 .WhereEqual(idField, id);

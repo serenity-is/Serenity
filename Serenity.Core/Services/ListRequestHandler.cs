@@ -92,12 +92,12 @@
                 Request.IncludeColumns.Contains(column);
         }
 
-        protected virtual void SelectField(SqlSelect query, Field field)
+        protected virtual void SelectField(SqlQuery query, Field field)
         {
             query.Select(field);
         }
 
-        protected virtual void SelectFields(SqlSelect query)
+        protected virtual void SelectFields(SqlQuery query)
         {
             foreach (var field in Row.GetFields())
             {
@@ -106,19 +106,19 @@
             }
         }
     
-        protected virtual void PrepareQuery(SqlSelect query)
+        protected virtual void PrepareQuery(SqlQuery query)
         {
             SelectFields(query);
         }
 
-        protected virtual void ApplyKeyOrder(SqlSelect query)
+        protected virtual void ApplyKeyOrder(SqlQuery query)
         {
             var idRow = Row as IIdRow;
             if (idRow != null)
                 query.OrderBy((Field)idRow.IdField);
         }
 
-        protected virtual void ApplyContainsText(SqlSelect query, string containsText)
+        protected virtual void ApplyContainsText(SqlQuery query, string containsText)
         {
             var nameRow = Row as INameRow;
             var idRow = Row as IIdRow;
@@ -153,7 +153,7 @@
             return Row.GetFields().Filters;
         }
 
-        protected virtual void ApplyFilters(SqlSelect query)
+        protected virtual void ApplyFilters(SqlQuery query)
         {
             if (!Request.IncludeDeleted)
             {
@@ -175,9 +175,9 @@
             }
         }
 
-        protected virtual SqlSelect CreateQuery()
+        protected virtual SqlQuery CreateQuery()
         {
-            return new SqlSelect()
+            return new SqlQuery()
                 .FromAs(Row, 0);
         }
 

@@ -12,7 +12,7 @@
         void EnsureForeignJoin(Field field);
     }
 
-    public partial class SqlSelect : IDbFilterable, ISqlSelect, IFilterableQuery
+    public partial class SqlQuery : IDbFilterable, ISqlSelect, IFilterableQuery
     {
         private int _skip;
         private int _take;
@@ -32,11 +32,11 @@
         private Dictionary _params;
         private string _cachedQuery;
 
-        public SqlSelect()
+        public SqlQuery()
         {
         }
 
-        public SqlSelect Into(Row row)
+        public SqlQuery Into(Row row)
         {
             if (row == null)
                 _intoIndex = -1;
@@ -52,7 +52,7 @@
             return this;
         }
 
-        public SqlSelect Select(string expression)
+        public SqlQuery Select(string expression)
         {
             if (expression == null || expression.Length == 0)
                 throw new ArgumentNullException("expression");
@@ -62,14 +62,14 @@
             return this;
         }
 
-        public SqlSelect Select(params string[] expressions)
+        public SqlQuery Select(params string[] expressions)
         {
             foreach (var s in expressions)
                 Select(s);
             return this;
         }
 
-        public SqlSelect SelectOf(int joinAlias, string field)
+        public SqlQuery SelectOf(int joinAlias, string field)
         {
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
@@ -79,7 +79,7 @@
             return this;
         }
 
-        public SqlSelect SelectOf(int joinAlias, params string[] fields)
+        public SqlQuery SelectOf(int joinAlias, params string[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
@@ -89,7 +89,7 @@
             return this;
         }
 
-        public SqlSelect SelectOf(int joinAlias, params Field[] fields)
+        public SqlQuery SelectOf(int joinAlias, params Field[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
@@ -100,7 +100,7 @@
             return this;
         }
 
-        public SqlSelect SelectAs(string expression, string alias)
+        public SqlQuery SelectAs(string expression, string alias)
         {
             if (expression == null || expression.Length == 0)
                 throw new ArgumentNullException("expression");
@@ -112,7 +112,7 @@
             return this;
         }
 
-        public SqlSelect SelectAs(string expression, string alias, Action<IDataReader, int> getFromReader)
+        public SqlQuery SelectAs(string expression, string alias, Action<IDataReader, int> getFromReader)
         {
             if (expression == null || expression.Length == 0)
                 throw new ArgumentNullException("field");
@@ -126,7 +126,7 @@
             return this;
         }
 
-        public SqlSelect Select(Field field)
+        public SqlQuery Select(Field field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
@@ -144,7 +144,7 @@
             return this;
         }
 
-        public SqlSelect Select(params Field[] fields)
+        public SqlQuery Select(params Field[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
@@ -154,7 +154,7 @@
             return this;
         }
 
-        public SqlSelect SelectAs(string expression, Field alias)
+        public SqlQuery SelectAs(string expression, Field alias)
         {
             if (expression == null || expression.Length == 0)
                 throw new ArgumentNullException("field");
@@ -192,7 +192,7 @@
             }
         }
 
-        public SqlSelect EnsureForeignJoin(Field field)
+        public SqlQuery EnsureForeignJoin(Field field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
@@ -206,7 +206,7 @@
             return this;
         }
         
-        public SqlSelect From(string table)
+        public SqlQuery From(string table)
         {
             _cachedQuery = null;
             AppendUtils.AppendWithSeparator(ref _from, Consts.Comma, table);
@@ -215,7 +215,7 @@
             return this;
         }
 
-        public SqlSelect FromAs(string table, string tableAlias)
+        public SqlQuery FromAs(string table, string tableAlias)
         {
             if (tableAlias == null || tableAlias.Length == 0)
                 throw new ArgumentNullException("tableAlias");
@@ -233,7 +233,7 @@
             return this;
         }
 
-        public SqlSelect FromAs(Row row, string tableAlias)
+        public SqlQuery FromAs(Row row, string tableAlias)
         {
             if (row == null)
                 throw new ArgumentNullException("row");
@@ -241,7 +241,7 @@
             return FromAs(row.Table, tableAlias).Into(row);
         }
 
-        public SqlSelect FromAs(string table, int joinNumber)
+        public SqlQuery FromAs(string table, int joinNumber)
         {
             if (joinNumber >= 0)
                 return FromAs(table, joinNumber.TableAlias());
@@ -249,7 +249,7 @@
                 return From(table);
         }
 
-        public SqlSelect FromAs(Row row, int joinNumber)
+        public SqlQuery FromAs(Row row, int joinNumber)
         {
             if (row == null)
                 throw new ArgumentNullException("row");
@@ -260,7 +260,7 @@
                 return From(row.Table).Into(row);
         }
 
-        public SqlSelect LeftJoin(string joinTable, string joinAlias, string joinCondition)
+        public SqlQuery LeftJoin(string joinTable, string joinAlias, string joinCondition)
         {
             if (joinTable == null || joinTable.Length == 0)
                 throw new ArgumentNullException("joinTable");
@@ -292,7 +292,7 @@
             return this;
         }
 
-        public SqlSelect LeftJoin(string joinTable, int joinNumber, Criteria joinCondition)
+        public SqlQuery LeftJoin(string joinTable, int joinNumber, Criteria joinCondition)
         {
             if (Object.ReferenceEquals(joinCondition, null))
                 throw new ArgumentNullException("joinCondition");
@@ -300,12 +300,12 @@
             return LeftJoin(joinTable, joinNumber.TableAlias(), joinCondition.ToString());            
         }
 
-        public SqlSelect Join(LeftJoin join)
+        public SqlQuery Join(LeftJoin join)
         {
             return LeftJoin(join.JoinTable, join.JoinAlias, join.JoinCondition);
         }
 
-        public SqlSelect Where(string condition)
+        public SqlQuery Where(string condition)
         {
             if (condition == null || condition.Length == 0)
                 throw new ArgumentNullException(condition);
@@ -324,7 +324,7 @@
             AppendUtils.AppendWithSeparator(ref _where, Sql.Keyword.And, condition);
         }
 
-        public SqlSelect Where(params string[] conditions)
+        public SqlQuery Where(params string[] conditions)
         {
             if (conditions == null || conditions.Length == 0)
                 throw new ArgumentNullException("conditions");
@@ -334,7 +334,7 @@
             return this;
         }
 
-        public SqlSelect OrderBy(string field)
+        public SqlQuery OrderBy(string field)
         {
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
@@ -350,7 +350,7 @@
             return this;
         }
 
-        public SqlSelect OrderByOf(int joinAlias, string field)
+        public SqlQuery OrderByOf(int joinAlias, string field)
         {
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
@@ -367,7 +367,7 @@
         }
 
 
-        public SqlSelect OrderBy(Field field)
+        public SqlQuery OrderBy(Field field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
@@ -375,7 +375,7 @@
             return OrderBy(field.QueryExpression);
         }
 
-        public SqlSelect OrderBy(params Field[] fields)
+        public SqlQuery OrderBy(params Field[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
@@ -385,12 +385,12 @@
             return this;
         }
 
-        public SqlSelect OrderByFirstOf(int joinAlias, string field)
+        public SqlQuery OrderByFirstOf(int joinAlias, string field)
         {
             return OrderByFirst(joinAlias.TableAliasDot() + field);
         }
 
-        public SqlSelect OrderByFirst(string field)
+        public SqlQuery OrderByFirst(string field)
         {
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
@@ -425,7 +425,7 @@
             return this;
         }
 
-        public SqlSelect OrderByFirst(string field, bool descending)
+        public SqlQuery OrderByFirst(string field, bool descending)
         {
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
@@ -436,7 +436,7 @@
             return OrderByFirst(field);
         }
 
-        public SqlSelect OrderByDescending(string field)
+        public SqlQuery OrderByDescending(string field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
@@ -444,7 +444,7 @@
             return OrderBy(field + Sql.Keyword.Desc);
         }
 
-        public SqlSelect OrderByDescending(Field field)
+        public SqlQuery OrderByDescending(Field field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
@@ -452,7 +452,7 @@
             return OrderByDescending(field.QueryExpression);
         }
 
-        public SqlSelect OrderByDescending(params Field[] fields)
+        public SqlQuery OrderByDescending(params Field[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
@@ -462,21 +462,21 @@
             return this;
         }
 
-        public SqlSelect OrderBy(params string[] fields)
+        public SqlQuery OrderBy(params string[] fields)
         {
             foreach (string field in fields)
                 OrderBy(field);
             return this;
         }
 
-        public SqlSelect OrderByOf(int joinIndex, params string[] fields)
+        public SqlQuery OrderByOf(int joinIndex, params string[] fields)
         {
             foreach (string field in fields)
                 OrderByOf(joinIndex, field);
             return this;
         }
 
-        public SqlSelect GroupBy(string field)
+        public SqlQuery GroupBy(string field)
         {
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
@@ -487,7 +487,7 @@
             return this;
         }
 
-        public SqlSelect GroupBy(Field field)
+        public SqlQuery GroupBy(Field field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
@@ -495,7 +495,7 @@
             return GroupBy(field.QueryExpression);
         }
 
-        public SqlSelect GroupBy(params string[] fields)
+        public SqlQuery GroupBy(params string[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
@@ -505,7 +505,7 @@
             return this;
         }
 
-        public SqlSelect GroupBy(params Field[] fields)
+        public SqlQuery GroupBy(params Field[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
@@ -515,7 +515,7 @@
             return this;
         }
 
-        public SqlSelect Having(string condition)
+        public SqlQuery Having(string condition)
         {
             if (condition == null || condition.Length == 0)
                 throw new ArgumentNullException("condition");
@@ -536,7 +536,7 @@
             get { return _into; }
         }
 
-        public SqlSelect Skip(int skipRows)
+        public SqlQuery Skip(int skipRows)
         {
             if (_skip != skipRows)
             {
@@ -551,7 +551,7 @@
             return _skip;
         }
 
-        public SqlSelect Take(int rowCount)
+        public SqlQuery Take(int rowCount)
         {
             if (_take != rowCount)
             {
@@ -566,7 +566,7 @@
             return _take;
         }
 
-        public SqlSelect Distinct(bool distinct)
+        public SqlQuery Distinct(bool distinct)
         {
             if (_distinct != distinct)
             {
@@ -577,7 +577,7 @@
             return this;
         }
 
-        public SqlSelect UseRowNumber(bool useRowNumber)
+        public SqlQuery UseRowNumber(bool useRowNumber)
         {
             if (useRowNumber != _useRowNumber)
             {
@@ -587,7 +587,7 @@
             return this;
         }
 
-        public SqlSelect Limit(int skip, int take)
+        public SqlQuery Limit(int skip, int take)
         {
             _cachedQuery = null;
             _skip = skip;
@@ -595,7 +595,7 @@
             return this;
         }
 
-        public SqlSelect SetParam(string name, object value)
+        public SqlQuery SetParam(string name, object value)
         {
             if (_params == null)
                 _params = new Dictionary();

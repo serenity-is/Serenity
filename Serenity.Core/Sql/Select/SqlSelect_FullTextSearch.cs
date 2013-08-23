@@ -2,7 +2,7 @@
 
 namespace Serenity.Data
 {
-    public partial class SqlSelect
+    public partial class SqlQuery
     {
         /// <summary>
         ///   MSSQL'de full text araması için gerekli join'i oluşturur.</summary>
@@ -20,7 +20,7 @@ namespace Serenity.Data
         ///   Bağlama yapılan contains table'a atanacak alias (zorunlu, ör. CT).</param>
         /// <returns>
         ///   SqlSelect nesnesinin kendisi.</returns>
-        public SqlSelect InnerJoinContainsTable(
+        public SqlQuery InnerJoinContainsTable(
             string searchTable, string searchFields, string searchQuery,
             string searchTableAlias, string searchTableKey, string containsAlias)
         {

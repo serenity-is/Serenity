@@ -51,23 +51,23 @@ namespace Serenity.Services
             }
         }
 
-        public static void CheckRelatedOnDelete(IDbConnection connection, string tableName, Action<SqlSelect> filter)
+        public static void CheckRelatedOnDelete(IDbConnection connection, string tableName, Action<SqlQuery> filter)
         {
-            var query = new SqlSelect().Select("1").From(tableName);
+            var query = new SqlQuery().Select("1").From(tableName);
             filter(query);
             if (query.Take(1).Exists(connection))
                 throw DataValidation.RelatedRecordExist(tableName);
         }
 
-        public static void CheckParentNotDeleted(IDbConnection connection, string tableName, Action<SqlSelect> filter)
+        public static void CheckParentNotDeleted(IDbConnection connection, string tableName, Action<SqlQuery> filter)
         {
-            var query = new SqlSelect().Select("1").From(tableName);
+            var query = new SqlQuery().Select("1").From(tableName);
             filter(query);
             if (query.Take(1).Exists(connection))
                 throw DataValidation.ParentRecordDeleted(tableName);
         }
 
-        public static void SetSkipTakeTotal<T>(this ListResponse<T> response, SqlSelect query)
+        public static void SetSkipTakeTotal<T>(this ListResponse<T> response, SqlQuery query)
         {
             response.Skip = query.Skip();
             response.Take = query.Take();
@@ -113,7 +113,7 @@ namespace Serenity.Services
             var row = newRow.CreateNew();
             var newId = ((IIdRow)newRow).IdField[newRow];
 
-            var query = new SqlSelect().FromAs(row, 0).Select((Field)(((IIdRow)newRow).IdField));
+            var query = new SqlQuery().FromAs(row, 0).Select((Field)(((IIdRow)newRow).IdField));
             foreach (var field in indexFields)
                 query.WhereEqual(field, field.AsObject(newRow));
 

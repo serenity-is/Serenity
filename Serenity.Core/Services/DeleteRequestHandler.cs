@@ -64,7 +64,7 @@ namespace Serenity.Services
         {
         }
 
-        protected virtual void PrepareQuery(SqlSelect query)
+        protected virtual void PrepareQuery(SqlQuery query)
         {
             query.SelectTableFields();
         }
@@ -73,7 +73,7 @@ namespace Serenity.Services
         {
             var idField = (Field)Row.IdField;
 
-            var query = new SqlSelect().FromAs(Row, 0)
+            var query = new SqlQuery().FromAs(Row, 0)
                 .WhereEqual(idField, Request.EntityId.Value);
 
             PrepareQuery(query);

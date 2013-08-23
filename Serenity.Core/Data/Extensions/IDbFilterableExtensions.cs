@@ -72,7 +72,7 @@ namespace Serenity.Data
             return self;
         }
 
-        public static string FilterExpression(this Field field, SqlSelect query)
+        public static string FilterExpression(this Field field, SqlQuery query)
         {
             if (field == null)
                 throw new ArgumentNullException("field");

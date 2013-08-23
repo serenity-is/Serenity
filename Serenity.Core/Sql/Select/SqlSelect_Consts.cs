@@ -1,7 +1,7 @@
 ﻿
 namespace Serenity.Data
 {
-    public partial class SqlSelect
+    public partial class SqlQuery
     {
         /// <summary>
         ///   SQLSelect nesnesi içindeki işlemlerde kullanılan string sabitleri</summary>

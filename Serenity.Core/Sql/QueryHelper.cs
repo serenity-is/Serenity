@@ -6,7 +6,7 @@ namespace Serenity.Services
 {
     public static class QueryHelper
     {
-        public static SqlSelect ApplySort(this SqlSelect query, string sort, bool descending)
+        public static SqlQuery ApplySort(this SqlQuery query, string sort, bool descending)
         {
             if (query == null)
                 throw new ArgumentNullException("query");
@@ -35,7 +35,7 @@ namespace Serenity.Services
             return query;
         }
 
-        public static SqlSelect ApplySort(this SqlSelect query, SortBy sortBy)
+        public static SqlQuery ApplySort(this SqlQuery query, SortBy sortBy)
         {
             if (sortBy != null)
                 return ApplySort(query, sortBy.Field, sortBy.Descending);
@@ -43,7 +43,7 @@ namespace Serenity.Services
             return query;
         }
 
-        public static SqlSelect ApplySort(this SqlSelect query, IList<SortBy> sortByList, params SortBy[] defaultSortBy)
+        public static SqlQuery ApplySort(this SqlQuery query, IList<SortBy> sortByList, params SortBy[] defaultSortBy)
         {
             if (sortByList == null || sortByList.Count == 0)
                 sortByList = defaultSortBy;
@@ -61,7 +61,7 @@ namespace Serenity.Services
             return query;
         }
 
-        public static SqlSelect ApplySkipTakeAndCount(this SqlSelect query, int skip, int take,
+        public static SqlQuery ApplySkipTakeAndCount(this SqlQuery query, int skip, int take,
             bool excludeTotalCount)
         {
             query.Limit(skip, take);
@@ -71,7 +71,7 @@ namespace Serenity.Services
             return query;
         }
 
-        public static SqlSelect ApplyContainsText(this SqlSelect query, string containsText,
+        public static SqlQuery ApplyContainsText(this SqlQuery query, string containsText,
             Criteria idField, params Criteria[] fields)
         {
             var flt = GetContainsTextFilter(containsText, idField, fields);
@@ -114,7 +114,7 @@ namespace Serenity.Services
             return null;
         }
 
-        public static SqlSelect ApplyFilters(this SqlSelect query,
+        public static SqlQuery ApplyFilters(this SqlQuery query,
             BasicFilter filter,
             IList<FilterLine> filterLines,
             Row row,

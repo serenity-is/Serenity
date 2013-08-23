@@ -24,7 +24,7 @@ namespace Serenity.CodeGenerator
         {
             List<string> primaryFields = new List<string>();
 
-            new SqlSelect().Select(
+            new SqlQuery().Select(
                 "KCU.COLUMN_NAME")
             .From(
                 "INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC INNER JOIN " +
@@ -51,7 +51,7 @@ namespace Serenity.CodeGenerator
         {
             List<string> identityFields = new List<string>();
 
-            new SqlSelect().Select(
+            new SqlQuery().Select(
                 "C.NAME")
             .From(
                 "SYSCOLUMNS C " +
@@ -74,7 +74,7 @@ namespace Serenity.CodeGenerator
         {
             var list = new List<string>();
 
-            new SqlSelect().Select("COLUMN_NAME").From("INFORMATION_SCHEMA.COLUMNS")
+            new SqlQuery().Select("COLUMN_NAME").From("INFORMATION_SCHEMA.COLUMNS")
                 .Where(new Criteria("TABLE_NAME") == tableName)
                 .OrderBy("ORDINAL_POSITION")
                 .ForEach(connection, delegate(IDataReader reader)
@@ -146,7 +146,7 @@ namespace Serenity.CodeGenerator
             List<string> primaryFields = GetTablePrimaryFields(connection, tableName);
             List<string> identityFields = GetTableIdentityFields(connection, tableName);
 
-            new SqlSelect().Select("COLUMN_NAME, DATA_TYPE, IS_NULLABLE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE")
+            new SqlQuery().Select("COLUMN_NAME, DATA_TYPE, IS_NULLABLE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE")
                 .From("INFORMATION_SCHEMA.COLUMNS")
                 .Where(new Criteria("TABLE_NAME") == tableName)
                 .OrderBy("ORDINAL_POSITION")
