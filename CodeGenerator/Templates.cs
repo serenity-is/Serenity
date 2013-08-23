@@ -61,7 +61,7 @@ namespace Serenity.CodeGenerator
         {
             if (!Templates.CompiledTemplates.Contains(templateName))
                 CompileTemplate(templateName, typeof(T));
-            return Razor.Run(model, templateName);
+            return Razor.Run(templateName, model);
         }
     }
 }
