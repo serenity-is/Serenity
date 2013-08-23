@@ -16,12 +16,12 @@ namespace Serenity
         /// </summary>
         /// <param name="data">Sıkıştırılacak veri</param>
         /// <returns>Sıkıştırılmış veri</returns>
-        public static byte[] FastCompressString(string input)
+        public static byte[] CompressString(string input)
         {
             if (input == null)
                 return null;
 
-            return FastCompressBytes(Encoding.UTF8.GetBytes(input));
+            return CompressBytes(Encoding.UTF8.GetBytes(input));
         }
 
         /// <summary>
@@ -30,12 +30,12 @@ namespace Serenity
         /// </summary>
         /// <param name="data">Sıkıştırılacak veri</param>
         /// <returns>Sıkıştırılmış veri</returns>
-        public static string FastDecompressString(byte[] input)
+        public static string DecompressString(byte[] input)
         {
             if (input == null)
                 return null;
 
-            return Encoding.UTF8.GetString(FastDecompressBytes(input));
+            return Encoding.UTF8.GetString(DecompressBytes(input));
         }
 
         /// <summary>
@@ -44,10 +44,10 @@ namespace Serenity
         /// </summary>
         /// <param name="data">Sıkıştırılacak veri</param>
         /// <returns>Sıkıştırılmış veri</returns>
-        public static byte[] FastCompressBytes(byte[] input)
+        public static byte[] CompressBytes(byte[] input)
         {
             if (input == null)
-                return input;
+                throw new ArgumentNullException("input");
 
             using (var ms = new MemoryStream(input.Length))
             {
@@ -64,10 +64,10 @@ namespace Serenity
         /// </summary>
         /// <param name="data">Açılacak veri</param>
         /// <returns>Açılmış veri</returns>
-        public static byte[] FastDecompressBytes(byte[] input)
+        public static byte[] DecompressBytes(byte[] input)
         {
             if (input == null)
-                return null;
+                throw new ArgumentNullException("input");
 
             using (var ms = new MemoryStream(input))
             {
@@ -81,6 +81,43 @@ namespace Serenity
                     }
                 }
             }
+        }
+
+        public static byte[] CompressBytesIf(byte[] input, int minCompressLength = 4096)
+        {
+            if (input == null)
+                return input;
+
+            if (input.Length > minCompressLength)
+                using (var ms = new MemoryStream(input.Length + 1))
+                {
+                    ms.WriteByte(1);
+
+                    using (var cs = new LZ4.LZ4Stream(ms, System.IO.Compression.CompressionMode.Compress, false, 8192))
+                    {
+                        cs.Write(input, 0, input.Length);
+                    }
+                    return ms.ToArray();
+                }
+
+            byte[] result = new byte[input.Length + 1];
+            result[0] = 0;
+            input.CopyTo(result, 1);
+            return result;
+        }
+
+        public static byte[] DecompressBytesIf(byte[] input)
+        {
+            if (input == null || input.Length < 1)
+                throw new ArgumentOutOfRangeException("input");
+
+            bool compressed = input[0] == (byte)1;
+            byte[] data = new byte[input.Length - 1];
+            Array.Copy(input, 1, data, 0, input.Length - 1);
+            if (compressed)
+                return LZ4Compression.DecompressBytes(data);
+            else
+                return data;
         }
     }
 }

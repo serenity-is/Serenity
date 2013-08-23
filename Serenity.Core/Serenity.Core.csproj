@@ -75,6 +75,7 @@
     <Compile Include="Caching\BaseMirroredRowCache.cs" />
     <Compile Include="Caching\BaseOnDemandRowCache.cs" />
     <Compile Include="Caching\CacheExpiration.cs" />
+    <Compile Include="Caching\CacheSerialization.cs" />
     <Compile Include="Caching\CouchbaseDistributedCache.cs" />
     <Compile Include="Caching\LZ4Compression.cs" />
     <Compile Include="Caching\DistributedCache.cs" />
