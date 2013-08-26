@@ -157,8 +157,12 @@
     <Compile Include="Data\FieldTypes\Int64Field.cs" />
     <Compile Include="Data\FieldTypes\StreamField.cs" />
     <Compile Include="Data\FieldTypes\StringField.cs" />
-    <Compile Include="Data\Field\ReadPermissionAttribute.cs" />
-    <Compile Include="Data\Field\ModifyPermissionAttribute.cs" />
+    <Compile Include="Data\Permission\UpdatePermissionAttribute.cs" />
+    <Compile Include="Data\Permission\CreatePermissionAttribute.cs" />
+    <Compile Include="Data\Permission\OperationPermissionAttribute.cs" />
+    <Compile Include="Data\Permission\DeletePermissionAttribute.cs" />
+    <Compile Include="Data\Permission\ReadPermissionAttribute.cs" />
+    <Compile Include="Data\Permission\ModifyPermissionAttribute.cs" />
     <Compile Include="Data\Field\TwoLevelCached.cs" />
     <Compile Include="Data\Field\SchemaChangeSource.cs" />
     <Compile Include="Data\Field\Field.cs" />
@@ -316,8 +320,6 @@
     <Compile Include="Services\CreateRequestHandler.cs" />
     <Compile Include="Services\CustomField\CustomizableAttribute.cs" />
     <Compile Include="Services\DeleteRequestHandler.cs" />
-    <Compile Include="Services\GenericEntityController.cs" />
-    <Compile Include="Services\GenericEntityService.cs" />
     <Compile Include="Services\ListRequestHandler.cs" />
     <Compile Include="Services\Localization\ILocalizationRow.cs" />
     <Compile Include="Services\Localization\LocalizationHandler.cs" />

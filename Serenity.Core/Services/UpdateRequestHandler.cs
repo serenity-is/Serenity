@@ -340,13 +340,15 @@ namespace Serenity.Services
 
         protected virtual void ValidatePermissions()
         {
-            var modifyAttr = typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false);
-            if (modifyAttr != null)
+            var attr = (OperationPermissionAttribute)typeof(TRow).GetCustomAttribute<UpdatePermissionAttribute>(false) ??
+                typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false);
+
+            if (attr != null)
             {
-                if (modifyAttr.ModifyPermission.IsEmptyOrNull())
+                if (attr.Permission.IsEmptyOrNull())
                     SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
                 else
-                    SecurityHelper.EnsurePermission(modifyAttr.ModifyPermission, RightErrorHandling.ThrowException);
+                    SecurityHelper.EnsurePermission(attr.Permission, RightErrorHandling.ThrowException);
             }
         }
 
