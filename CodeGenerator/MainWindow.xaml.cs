@@ -39,7 +39,7 @@ namespace Serenity.CodeGenerator
 
 
             Templates.LocationRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Views");
-            ProjectRoot = System.IO.Path.GetFullPath(@"..\..\..\!!!Beni Sil!!!");
+            ProjectRoot = System.IO.Path.GetFullPath(@"..\..\..\..\!!!Beni Sil!!!");
         }
 
         public BindingList<string> Tables { get { return _tables; } }
