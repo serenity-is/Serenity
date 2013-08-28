@@ -1,112 +1,94 @@
-﻿
-using System;
+﻿using System;
+
 namespace Serenity.Data
 {
     public static class SqlSettings
     {
         public static readonly SqlDialect CurrentDialect = SqlDialect.MsSql;
 
-        public static bool IsCaseSensitive
+        public static bool IsCaseSensitive(this SqlDialect dialect)
         {
-            get { return CurrentDialect == SqlDialect.Firebird; }
+            return CurrentDialect.HasFlag(SqlDialect.Firebird);
         }
 
-        public static bool PrefixUnicodeStringsWithN
+        public static bool PrefixUnicodeStringsWithN(this SqlDialect dialect)
         {
-            get { return CurrentDialect == SqlDialect.MsSql; }
+            return CurrentDialect.HasFlag(SqlDialect.MsSql);
         }
 
-        public static bool UseReturningIdentity
+        public static bool UseReturningIdentity(this SqlDialect dialect)
         {
-            get { return CurrentDialect == SqlDialect.Firebird; }
+            return CurrentDialect.HasFlag(SqlDialect.Firebird);
         }
 
-        public static bool UseScopeIdentity
+        public static bool UseScopeIdentity(this SqlDialect dialect)
         {
-            get { return CurrentDialect == SqlDialect.MsSql; }
+            return CurrentDialect.HasFlag(SqlDialect.MsSql);
         }
 
-        public static bool MultipleResultsets
+        public static bool MultipleResultsets(this SqlDialect dialect)
         {
-            get { return CurrentDialect == SqlDialect.MsSql; }            
+            return CurrentDialect.HasFlag(SqlDialect.MsSql);
         }
 
-        public static bool CanUseRowNumber
+        public static bool CanUseRowNumber(this SqlDialect dialect)
         {
-            get { return CurrentDialect == SqlDialect.MsSql; }
+            return CurrentDialect.HasFlag(SqlDialect.MsSql);
         }
 
-        public static bool CanSkipRecords
+        public static bool CanUseSkipKeyword(this SqlDialect dialect)
         {
-            get { return CurrentDialect == SqlDialect.Firebird; }
+            return CurrentDialect.HasFlag(SqlDialect.UseSkipKeyword);
         }
 
-        public static bool NeedsExecuteBlockStatement
+        public static bool CanUseOffsetFetch(this SqlDialect dialect)
         {
-            get { return CurrentDialect == SqlDialect.Firebird; }
+            return CurrentDialect.HasFlag(SqlDialect.UseOffsetFetch);
         }
 
-        public static string TakeKeyword
+        public static bool NeedsExecuteBlockStatement(this SqlDialect dialect)
         {
-            get 
-            { 
-                switch (CurrentDialect)
-                {
-                    case SqlDialect.Firebird: return "FIRST";
-                    case SqlDialect.MsSql: return "TOP";
-                    default:
-                        throw new InvalidOperationException();
-                }
-            }
+            return CurrentDialect.HasFlag(SqlDialect.Firebird);
         }
 
-        public static string SkipKeyword
+        public static string TakeKeyword(this SqlDialect dialect)
         {
-            get 
-            { 
-                switch (CurrentDialect)
-                {
-                    case SqlDialect.Firebird: return "SKIP";
-                    default: throw new InvalidOperationException();
-                }
-            }
+            if (CurrentDialect.HasFlag(SqlDialect.Firebird))
+                return "FIRST";
+
+            if (CurrentDialect.HasFlag(SqlDialect.MsSql))
+                return "TOP";
+                        
+            throw new InvalidOperationException();
         }
 
-        public static string DateFormat
+        public static string SkipKeyword(this SqlDialect dialect)
         {
-            get
-            {
-                switch (CurrentDialect)
-                {
-                    case SqlDialect.Firebird:
-                        return "\\'yyyy'-'MM'-'dd\\'";
-                    default:
-                        return "\\'yyyyMMdd\\'";
-                }
-            }
+            if (CurrentDialect.HasFlag(SqlDialect.Firebird))
+                return "SKIP";
+
+            throw new InvalidOperationException();
         }
 
-        public static string DateTimeFormat
+        public static string DateFormat(this SqlDialect dialect)
         {
-            get
-            {
-                switch (CurrentDialect)
-                {
-                    case SqlDialect.Firebird:
-                        return "\\'yyyy'-'MM'-'dd HH':'mm':'ss'.'fff\\'";
-                    default:
-                        return "\\'yyyy'-'MM'-'ddTHH':'mm':'ss'.'fff\\'";
-                }
-            }
+            if (CurrentDialect.HasFlag(SqlDialect.Firebird))
+                return "\\'yyyy'-'MM'-'dd\\'";
+
+            return "\\'yyyyMMdd\\'";
         }
 
-        public static string TimeFormat
+        public static string DateTimeFormat(this SqlDialect dialect)
         {
-            get
-            {
-                return "\\'HH':'mm':'ss\\'";
-            }
+            if (CurrentDialect.HasFlag(SqlDialect.Firebird))
+                return "\\'yyyy'-'MM'-'dd HH':'mm':'ss'.'fff\\'";
+                    
+            return "\\'yyyy'-'MM'-'ddTHH':'mm':'ss'.'fff\\'";
         }
 
+        public static string TimeFormat(this SqlDialect dialect)
+        {
+            return "\\'HH':'mm':'ss\\'";
+        }
     }
 }

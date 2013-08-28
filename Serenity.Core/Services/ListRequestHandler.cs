@@ -181,6 +181,26 @@
                 .FromAs(Row, 0);
         }
 
+        protected virtual void ApplySortBy(SqlQuery query, SortBy sortBy)
+        {
+            query.ApplySort(sortBy.Field, sortBy.Descending);
+        }
+
+        protected virtual void ApplySort(SqlQuery query)
+        {
+            var sortByList = Request.Sort;
+
+            if (sortByList == null || sortByList.Length == 0)
+                sortByList = GetNativeSort();
+
+            if (sortByList != null)
+                for (var i = sortByList.Length - 1; i >= 0; i--)
+                {
+                    var sortBy = sortByList[i];
+                    ApplySortBy(query, sortBy);
+                }
+        }
+
         public TListResponse Process(IDbConnection connection, TListRequest request)
         {
             if (connection == null)
@@ -204,7 +224,7 @@
 
             ApplyContainsText(query, request.ContainsText);
 
-            query.ApplySort(request.Sort, GetNativeSort());
+            ApplySort(query);
 
             ApplyFilters(query);
 

@@ -16,7 +16,6 @@
     {
         private int _skip;
         private int _take;
-        private bool _useRowNumber;
         private bool _distinct;
         private bool _countRecords;
         private List<Row> _into = new List<Row>();
@@ -31,9 +30,11 @@
         private HashSet<string> _joinAliases = null;
         private Dictionary _params;
         private string _cachedQuery;
+        private SqlDialect _dialect;
 
         public SqlQuery()
         {
+            _dialect = SqlSettings.CurrentDialect;
         }
 
         public SqlQuery Into(Row row)
@@ -585,16 +586,6 @@
             return this;
         }
 
-        public SqlQuery UseRowNumber(bool useRowNumber)
-        {
-            if (useRowNumber != _useRowNumber)
-            {
-                _cachedQuery = null;
-                _useRowNumber = useRowNumber;
-            }
-            return this;
-        }
-
         public SqlQuery Limit(int skip, int take)
         {
             _cachedQuery = null;
@@ -699,10 +690,16 @@
             return si.Expression ?? si.AsAlias;
         }
 
+        public SqlDialect Dialect
+        {
+            get { return _dialect; }
+            set { _dialect = value; _cachedQuery = null; }
+        }
+
         public bool CountRecords
         {
             get { return _countRecords; }
-            set { _countRecords = value; }
+            set { _countRecords = value; _cachedQuery = null; }
         }
 
         public Dictionary<string, object> Params

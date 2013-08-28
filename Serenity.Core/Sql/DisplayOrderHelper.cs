@@ -321,7 +321,7 @@ namespace Serenity.Data
             // StringBuilder that will contain query(s)
             StringBuilder queries = new StringBuilder();
 
-            if (SqlSettings.NeedsExecuteBlockStatement)
+            if (SqlSettings.CurrentDialect.NeedsExecuteBlockStatement())
             {
                 queries.AppendLine("EXECUTE BLOCK AS");
                 queries.AppendLine("BEGIN");
@@ -466,7 +466,7 @@ namespace Serenity.Data
                         .ToString());
                 }
 
-                if (SqlSettings.NeedsExecuteBlockStatement)
+                if (SqlSettings.CurrentDialect.NeedsExecuteBlockStatement())
                     queries.AppendLine("END;");
 
                 SqlHelper.ExecuteNonQuery(connection, queries.ToString(), Object.ReferenceEquals(filter, null) ? null : filter.Parameters);

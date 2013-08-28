@@ -15,6 +15,7 @@
         private Dictionary _params;
         private string _identityColumn;
         private string _cachedQuery;
+        private SqlDialect _dialect;
 
         private void Initialize(string tableName)
         {
@@ -24,6 +25,13 @@
             _tableName = tableName;
             _nameValuePairs = new List<string>();
             _cachedQuery = null;
+            _dialect = SqlSettings.CurrentDialect;
+        }
+
+        public SqlDialect Dialect
+        {
+            get { return _dialect; }
+            set { _dialect = value; }
         }
 
         public string IdentityColumn()

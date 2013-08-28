@@ -31,7 +31,7 @@
         public static Int64? ExecuteAndGetID(this SqlInsert query, IDbConnection connection)
         {
             string queryText = query.ToString();
-            if (SqlSettings.UseReturningIdentity)
+            if (query.Dialect.UseReturningIdentity())
             {
                 string identityColumn = query.IdentityColumn();
                 if (identityColumn == null)
@@ -49,7 +49,7 @@
                     return Convert.ToInt64(param.Value);
                 }
             }
-            else if (SqlSettings.UseScopeIdentity)
+            else if (query.Dialect.UseScopeIdentity())
             {
                 queryText += ";\nSELECT SCOPE_IDENTITY() AS IDCOLUMNVALUE";
 
@@ -202,7 +202,7 @@
         {
             int count = 0;
 
-            if (SqlSettings.MultipleResultsets)
+            if (query.Dialect.MultipleResultsets())
             {
                 using (IDataReader reader = ExecuteReader(connection, query))
                 {
@@ -714,7 +714,7 @@
        {
            int count = 0;
 
-           if (SqlSettings.MultipleResultsets)
+           if (query.Dialect.MultipleResultsets())
            {
                using (IDataReader reader = ExecuteReader(connection, query))
                {
