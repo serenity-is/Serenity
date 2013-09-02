@@ -127,12 +127,12 @@
     <Compile Include="Data\BasicFilter\FilterOp.cs" />
     <Compile Include="Data\BasicFilter\JsonFilterLineConverter.cs" />
     <Compile Include="Data\BasicFilter\LogicalOp.cs" />
+    <Compile Include="Data\DataEnum\DataEnumAttribute.cs" />
     <Compile Include="Data\DataEnum\EnumMapper.cs" />
     <Compile Include="Data\DataEnum\DataEnum.cs" />
     <Compile Include="Data\DataEnum\DataEnumCache.cs" />
     <Compile Include="Data\DataEnum\DataEnumConverter.cs" />
     <Compile Include="Data\DataEnum\DataEnumRow.cs" />
-    <Compile Include="Data\DataEnum\EntityType.cs" />
     <Compile Include="Data\DateHelper.cs" />
     <Compile Include="Data\DictionaryHelper.cs" />
     <Compile Include="Data\Encoding\Base32.cs" />
