@@ -260,6 +260,27 @@
                 return From(row.Table).Into(row);
         }
 
+        public SqlQuery LeftJoin(string joinTable, Alias joinAlias, string joinCondition)
+        {
+            return LeftJoin(joinTable, joinAlias.Name, joinCondition);
+        }
+
+        public SqlQuery LeftJoin(string joinTable, Alias joinAlias, Criteria joinCondition)
+        {
+            if (Object.ReferenceEquals(joinCondition, null))
+                throw new ArgumentNullException("joinCondition");
+
+            LeftJoin(joinTable, joinAlias, joinCondition.ToString());
+            if (joinCondition.Parameters != null)
+            {
+                this._params = this._params ?? new Dictionary<string, object>();
+                foreach (var pair in joinCondition.Parameters)
+                    this._params.Add(pair.Key, pair.Value);
+            }
+
+            return this;
+        }
+
         public SqlQuery LeftJoin(string joinTable, string joinAlias, string joinCondition)
         {
             if (joinTable == null || joinTable.Length == 0)
