@@ -12,7 +12,7 @@
         void EnsureForeignJoin(Field field);
     }
 
-    public partial class SqlQuery : IDbFilterable, ISqlSelect, IFilterableQuery
+    public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery
     {
         private int _skip;
         private int _take;
@@ -266,18 +266,12 @@
             return LeftJoin(joinTable, joinAlias.Name, joinCondition);
         }
 
-        public SqlQuery LeftJoin(string joinTable, Alias joinAlias, Criteria joinCondition)
+        public SqlQuery LeftJoin(string joinTable, Alias joinAlias, BaseCriteria joinCondition)
         {
             if (Object.ReferenceEquals(joinCondition, null))
                 throw new ArgumentNullException("joinCondition");
 
-            LeftJoin(joinTable, joinAlias, joinCondition.ToString());
-            if (joinCondition.Parameters != null)
-            {
-                this._params = this._params ?? new Dictionary<string, object>();
-                foreach (var pair in joinCondition.Parameters)
-                    this._params.Add(pair.Key, pair.Value);
-            }
+            LeftJoin(joinTable, joinAlias, joinCondition.ToString(this));
 
             return this;
         }
@@ -314,18 +308,12 @@
             return this;
         }
 
-        public SqlQuery LeftJoin(string joinTable, int joinNumber, Criteria joinCondition)
+        public SqlQuery LeftJoin(string joinTable, int joinNumber, BaseCriteria joinCondition)
         {
             if (Object.ReferenceEquals(joinCondition, null))
                 throw new ArgumentNullException("joinCondition");
 
-            LeftJoin(joinTable, joinNumber.TableAlias(), joinCondition.ToString());
-            if (joinCondition.Parameters != null)
-            {
-                this._params = this._params ?? new Dictionary<string, object>();
-                foreach (var pair in joinCondition.Parameters)
-                    this._params.Add(pair.Key, pair.Value);
-            }
+            LeftJoin(joinTable, joinNumber.TableAlias(), joinCondition.ToString(this));
 
             return this;
         }
@@ -615,14 +603,6 @@
             return this;
         }
 
-        public SqlQuery SetParam(string name, object value)
-        {
-            if (_params == null)
-                _params = new Dictionary();
-            _params[name] = value;
-            return this;
-        }
-
         public string Text
         {
             get { return ToString(); }
@@ -721,17 +701,6 @@
         {
             get { return _countRecords; }
             set { _countRecords = value; _cachedQuery = null; }
-        }
-
-        public Dictionary<string, object> Params
-        {
-            get { return _params; }
-            set { _params = value; }
-        }
-
-        public int ParamCount
-        {
-            get { return _params == null ? 0 : _params.Count; }
         }
     }
 }

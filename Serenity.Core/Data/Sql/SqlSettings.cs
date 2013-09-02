@@ -4,7 +4,7 @@ namespace Serenity.Data
 {
     public static class SqlSettings
     {
-        public static readonly SqlDialect CurrentDialect = SqlDialect.MsSql;
+        public static SqlDialect CurrentDialect = SqlDialect.MsSql;
 
         public static bool IsCaseSensitive(this SqlDialect dialect)
         {

@@ -269,7 +269,7 @@ namespace Serenity.Data
                 sb.Append(_skip);
                 sb.Append(" ROWS FETCH NEXT ");
                 sb.Append(_take);
-                sb.Append(" ROWS");
+                sb.Append(" ROWS ONLY");
             }
 
             if (_countRecords)

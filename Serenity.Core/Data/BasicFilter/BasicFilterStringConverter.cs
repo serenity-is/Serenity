@@ -9,7 +9,7 @@ namespace Serenity.Data
     {
         private IFilterableQuery _query;
         private Row _row;
-        private Func<BasicCriteria, Criteria> _processCriteria;
+        private Func<BasicFilter, BaseCriteria> _processCriteria;
         private FilterFields filterFields;
 
         const string AND = " AND ";
@@ -18,7 +18,7 @@ namespace Serenity.Data
         const string RPAREN = ")";
 
         public BasicFilterStringConverter(IFilterableQuery query, 
-            Row row = null, Func<BasicCriteria, Criteria> processCriteria = null,
+            Row row = null, Func<BasicFilter, BaseCriteria> processCriteria = null,
             FilterFields filterFields = null)
         {
             _query = query;
@@ -70,7 +70,7 @@ namespace Serenity.Data
             return fieldExpr;
         }
 
-        public Criteria Convert(BasicFilter node)
+        public BaseCriteria Convert(BasicFilterBase node)
         {
             if (node == null)
                 throw new ArgumentNullException("node");
@@ -79,7 +79,7 @@ namespace Serenity.Data
             if (sub != null)
                 return Convert(sub);
             else
-                return Convert((BasicCriteria)node);
+                return Convert((BasicFilter)node);
         }
 
         private Double ParseDoubleValue(string valueText)
@@ -121,7 +121,7 @@ namespace Serenity.Data
             return d;
         }
 
-        private Criteria Convert(BasicCriteria filter)
+        private BaseCriteria Convert(BasicFilter filter)
         {
             if (filter == null)
                 throw new ArgumentNullException("criteria");
@@ -362,7 +362,7 @@ namespace Serenity.Data
             throw new InvalidOperationException();
         }
 
-        public Criteria Convert(BasicFilterGroup group)
+        public BaseCriteria Convert(BasicFilterGroup group)
         {
             if (group == null)
                 throw new ArgumentNullException("group");
@@ -370,7 +370,7 @@ namespace Serenity.Data
             if (group.Nodes.IsEmptyOrNull())
                 throw new ArgumentNullException("group.Nodes");
 
-            var result = new Criteria();
+            var result = Criteria.Empty;
 
             foreach (var node in group.Nodes)
             {

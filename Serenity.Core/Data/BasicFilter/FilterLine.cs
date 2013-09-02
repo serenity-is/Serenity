@@ -146,7 +146,7 @@ namespace Serenity.Data
         /// <remarks>
         ///   Invalid filter lines are simply skipped, no error occurs.</remarks>
         public static string ToWhereString(SqlQuery query, IEnumerable<FilterLine> lines, FilterFields filterFields, 
-            IDictionary<string, string> fieldExpressions = null, Row row = null, Func<FilterLine, Criteria> process = null)
+            IDictionary<string, string> fieldExpressions = null, Row row = null, Func<FilterLine, BaseCriteria> process = null)
         {
             if (lines == null)
                 throw new ArgumentNullException("lines");
@@ -216,7 +216,7 @@ namespace Serenity.Data
                             throw new ArgumentOutOfRangeException("EmptyFilterLine", line.ToJsonString());
                         }
                         else
-                            sb.Append(filter.ToString());
+                            sb.Append(filter.ToString()); // FIX!!!!
 
                         continue;
                     }

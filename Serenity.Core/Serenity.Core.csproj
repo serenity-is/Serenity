@@ -109,8 +109,8 @@
     <Compile Include="CustomField\CustomFieldExtensions.cs" />
     <Compile Include="CustomField\ICustomFieldListService.cs" />
     <Compile Include="CustomField\CustomFieldType.cs" />
-    <Compile Include="Data\BasicFilter\BasicCriteria.cs" />
     <Compile Include="Data\BasicFilter\BasicFilter.cs" />
+    <Compile Include="Data\BasicFilter\BasicFilterBase.cs" />
     <Compile Include="Data\BasicFilter\BasicFilterExtensions.cs" />
     <Compile Include="Data\BasicFilter\BasicFilterGroup.cs" />
     <Compile Include="Data\BasicFilter\BasicFilterStringConverter.cs">
@@ -220,8 +220,14 @@
     <Compile Include="Data\Parameter.cs" />
     <Compile Include="Data\RowHelper.cs" />
     <Compile Include="Data\Sql\Alias.cs" />
+    <Compile Include="Data\Sql\Criteria\BaseCriteria.cs" />
+    <Compile Include="Data\Sql\Criteria\BinaryCriteria.cs" />
+    <Compile Include="Data\Sql\Criteria\ParamCriteria.cs" />
+    <Compile Include="Data\Sql\Criteria\ValueCriteria.cs" />
+    <Compile Include="Data\Sql\Criteria\UnaryCriteria.cs" />
+    <Compile Include="Data\Sql\Criteria\CriteriaOperator.cs" />
     <Compile Include="Data\Sql\Dapper.cs" />
-    <Compile Include="Data\Sql\Criteria.cs" />
+    <Compile Include="Data\Sql\Criteria\Criteria.cs" />
     <Compile Include="Data\Sql\SqlConsts.cs" />
     <Compile Include="Data\Sql\SqlConversions.cs" />
     <Compile Include="Data\Sql\SqlDialect.cs" />
@@ -346,6 +352,7 @@
     <Compile Include="Sql\DummyTransaction.cs" />
     <Compile Include="Sql\Helpers\BoundTableHelper.cs" />
     <Compile Include="Sql\QueryHelper.cs" />
+    <Compile Include="Sql\Query\ParameterizedQuery.cs" />
     <Compile Include="Sql\Query\Sql.cs" />
     <Compile Include="Sql\Query\Sql.Format.cs" />
     <Compile Include="Sql\Query\Sql.Format.Select.cs" />

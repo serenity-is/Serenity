@@ -8,7 +8,7 @@
     /// <summary>
     ///   Class to generate queries of the form <c>INSERT INTO tablename (field1, field2..fieldN) 
     ///   VALUES (value1, value2..valueN)</c></summary>
-    public class SqlInsert : IDbSetFieldTo
+    public class SqlInsert : ParameterizedQuery, IDbSetFieldTo
     {
         private string _tableName;
         private List<string> _nameValuePairs;
@@ -142,22 +142,6 @@
             return this;
         }
 
-        /// <summary>
-        ///   Sets a parameter value.</summary>
-        /// <param name="name">
-        ///   Parameter name.</param>
-        /// <param name="value">
-        ///   Parameter value</param>
-        /// <returns>
-        ///   SqlInsert object itself.</returns>
-        public SqlInsert SetParam(string name, object value)
-        {
-            if (_params == null)
-                _params = new Dictionary();
-            _params[name] = value;
-            return this;
-        }
-
         ///   Clones the query.</summary>
         /// <returns>
         ///   Clone.</returns>
@@ -187,21 +171,6 @@
             _cachedQuery = Format(_tableName, _nameValuePairs);
 
             return _cachedQuery;           
-        }
-
-        /// <summary>
-        ///   Gets params dictionary. May return null if no params set.</summary>
-        public Dictionary Params
-        {
-            get { return _params; }
-            set { _params = value; }
-        }
-
-        /// <summary>
-        ///   Gets param count.</summary>
-        public int ParamCount
-        {
-            get { return _params == null ? 0 : _params.Count; }
         }
 
         /// <summary>

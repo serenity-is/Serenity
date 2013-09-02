@@ -32,7 +32,7 @@ namespace Serenity.Data
             }
         }
 
-        public BasicFilter Convert(Expression exp)
+        public BasicFilterBase Convert(Expression exp)
         {
             var parameters = new ParameterVisitor().GetParameters(exp);
             if (parameters.Count != 1)
@@ -41,7 +41,7 @@ namespace Serenity.Data
             return Visit(exp);
         }
 
-        protected BasicFilter Visit(Expression exp)
+        protected BasicFilterBase Visit(Expression exp)
         {
             if (exp == null)
                 return null;
@@ -137,7 +137,7 @@ namespace Serenity.Data
             return initializer;
         }*/
 
-        protected virtual BasicFilter VisitUnary(UnaryExpression u)
+        protected virtual BasicFilterBase VisitUnary(UnaryExpression u)
         {
             /*
             Expression operand = this.Visit(u.Operand);
@@ -188,7 +188,7 @@ namespace Serenity.Data
             return null;
         }
 
-        protected virtual BasicFilter VisitBinary(BinaryExpression b)
+        protected virtual BasicFilterBase VisitBinary(BinaryExpression b)
         {
             if (b.Left == null || b.Right == null)
                 throw new NotSupportedException("Left or Right is null!");
@@ -201,8 +201,8 @@ namespace Serenity.Data
                 case ExpressionType.AndAlso:
                 case ExpressionType.Or:
                 case ExpressionType.OrElse:
-                    BasicFilter leftNode = this.Visit(b.Left);
-                    BasicFilter rightNode = this.Visit(b.Right);
+                    BasicFilterBase leftNode = this.Visit(b.Left);
+                    BasicFilterBase rightNode = this.Visit(b.Right);
                     LogicalOp logical;
                     switch (b.NodeType)
                     {
@@ -251,7 +251,7 @@ namespace Serenity.Data
                         default: throw new NotSupportedException("Unexpected Node Type Error!");
                     }
 
-                    return new BasicCriteria()
+                    return new BasicFilter()
                     {
                         Field = "Dummy",
                         Operator = op,
@@ -263,7 +263,7 @@ namespace Serenity.Data
             }
         }
 
-        protected virtual BasicFilter VisitTypeIs(TypeBinaryExpression b)
+        protected virtual BasicFilterBase VisitTypeIs(TypeBinaryExpression b)
         {
             /*
             Expression expr = this.Visit(b.Expression);
@@ -275,7 +275,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitConstant(ConstantExpression c)
+        protected virtual BasicFilterBase VisitConstant(ConstantExpression c)
         {
             /*
             return c;
@@ -283,7 +283,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitConditional(ConditionalExpression c)
+        protected virtual BasicFilterBase VisitConditional(ConditionalExpression c)
         {
             /*
             Expression test = this.Visit(c.Test);
@@ -297,14 +297,14 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitParameter(ParameterExpression p)
+        protected virtual BasicFilterBase VisitParameter(ParameterExpression p)
         {
             /*
             return p;*/
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitMemberAccess(MemberExpression m)
+        protected virtual BasicFilterBase VisitMemberAccess(MemberExpression m)
         {
             /*
             Expression exp = this.Visit(m.Expression);
@@ -317,7 +317,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitMethodCall(MethodCallExpression m)
+        protected virtual BasicFilterBase VisitMethodCall(MethodCallExpression m)
         {
             /*
             Expression obj = this.Visit(m.Object);
@@ -446,7 +446,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitLambda(LambdaExpression lambda)
+        protected virtual BasicFilterBase VisitLambda(LambdaExpression lambda)
         {
             /*Expression body = this.Visit(lambda.Body);
             if (body != lambda.Body)
@@ -457,7 +457,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitNew(NewExpression nex)
+        protected virtual BasicFilterBase VisitNew(NewExpression nex)
         {
             /*IEnumerable<Expression> args = this.VisitExpressionList(nex.Arguments);
             if (args != nex.Arguments)
@@ -471,7 +471,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitMemberInit(MemberInitExpression init)
+        protected virtual BasicFilterBase VisitMemberInit(MemberInitExpression init)
         {
             /*NewExpression n = this.VisitNew(init.NewExpression);
             IEnumerable<MemberBinding> bindings = this.VisitBindingList(init.Bindings);
@@ -483,7 +483,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitListInit(ListInitExpression init)
+        protected virtual BasicFilterBase VisitListInit(ListInitExpression init)
         {
             /*NewExpression n = this.VisitNew(init.NewExpression);
             IEnumerable<ElementInit> initializers = this.VisitElementInitializerList(init.Initializers);
@@ -495,7 +495,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitNewArray(NewArrayExpression na)
+        protected virtual BasicFilterBase VisitNewArray(NewArrayExpression na)
         {
             /*IEnumerable<Expression> exprs = this.VisitExpressionList(na.Expressions);
             if (exprs != na.Expressions)
@@ -513,7 +513,7 @@ namespace Serenity.Data
             throw new NotImplementedException();
         }
 
-        protected virtual BasicFilter VisitInvocation(InvocationExpression iv)
+        protected virtual BasicFilterBase VisitInvocation(InvocationExpression iv)
         {
             /*IEnumerable<Expression> args = this.VisitExpressionList(iv.Arguments);
             Expression expr = this.Visit(iv.Expression);
