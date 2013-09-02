@@ -14,6 +14,7 @@
         {
             SqlQuery clone = new SqlQuery();
 
+            clone._dialect = _dialect;
             clone._skip = _skip;
             clone._take = _take;
             clone._countRecords = _countRecords;

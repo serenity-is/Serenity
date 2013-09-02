@@ -129,7 +129,7 @@ namespace Serenity.Web
                 if (twoLevel != null &&
                     twoLevel.GlobalGenerationKey != null)
                 {
-                    CurrentScript = TwoLevelCache.Get("DynamicScript_" + this.Name,
+                    CurrentScript = TwoLevelCache.Get("DynamicScript:" + this.Name,
                         twoLevel.LocalExpiration, twoLevel.RemoteExpiration, twoLevel.GlobalGenerationKey, GenerateCurrentScript);
                 }
                 else if (CurrentScript == null || CurrentScript.UncompressedBytes == null || NonCached)

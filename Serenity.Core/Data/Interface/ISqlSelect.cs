@@ -8,5 +8,6 @@ namespace Serenity.Data
         void GetFromReader(IDataReader reader);
         void GetFromReader(IDataReader reader, IList<Row> into);
         bool CountRecords { get; }
+        SqlDialect Dialect { get; }
     }
 }

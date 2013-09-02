@@ -18,24 +18,22 @@ namespace Serenity.Data
             // formatlamada kullanılacak StringBuilder nesnesi
             StringBuilder sb = new StringBuilder();
 
-            // kayıt atlama istenmiş ve anahtar sahalar belirtilmiş mi? kayıt atlama istense de sıralanan 
-            // alanların mevcut olması ve bu sıraya göre kayıtların unique olması gerekir.
-            // sıralama unique alanlara göre değilse tablonun primary  key'inin OrderBy listesinin sonuna 
-            // eklenmesi gerekir.
-            bool willSkipRecords = _skip != 0 && _orderBy != null &&
-                !SqlSettings.CanSkipRecords;
-
-            if (_skip > 0 && _orderBy == null)
+            if (_skip > 0 && _orderBy == null && !_dialect.CanUseSkipKeyword())
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
 
             // ek filtremiz şimdilik yok
             string extraWhere = null;
 
+            bool useSkipKeyword = _skip > 0 && _dialect.CanUseSkipKeyword();
+            bool useFetchNext = _skip > 0 && !useSkipKeyword && _dialect.CanUseOffsetFetch();
+            bool useRowNumber = _skip > 0 && !useSkipKeyword && !useFetchNext && _dialect.CanUseRowNumber();
+            bool useSecondQuery = _skip > 0 && !useSkipKeyword && !useFetchNext && !useRowNumber;
+
             // atlanması istenen kayıt var mı?
-            if (willSkipRecords)
+            if (useRowNumber || useSecondQuery)
             {
-                if (_useRowNumber)
+                if (useRowNumber)
                 {
                     sb.Append("SELECT * FROM (");
                 }
@@ -104,7 +102,7 @@ namespace Serenity.Data
                     if (_distinct)
                         sb.Append(Sql.Keyword.Distinct);
 
-                    sb.Append(SqlSettings.TakeKeyword);
+                    sb.Append(_dialect.TakeKeyword());
                     sb.Append(' ');
                     // Atlanacak kayıt sayısı kadar
                     sb.Append(_skip);
@@ -188,17 +186,17 @@ namespace Serenity.Data
             }
 
             // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (_take != 0)
+            if (_take != 0 && (!useFetchNext))
             {
-                sb.Append(SqlSettings.TakeKeyword);
+                sb.Append(_dialect.TakeKeyword());
                 sb.Append(' ');
-                sb.Append((willSkipRecords && _useRowNumber) ? (_skip + _take) : _take);
+                sb.Append(useRowNumber ? (_skip + _take) : _take);
                 sb.Append(' ');
             }
 
-            if (_skip > 0 && SqlSettings.CanSkipRecords)
+            if (useSkipKeyword)
             {
-                sb.Append(SqlSettings.SkipKeyword);
+                sb.Append(_dialect.SkipKeyword());
                 sb.Append(' ');
                 sb.Append(_skip);
             }
@@ -239,13 +237,11 @@ namespace Serenity.Data
                 }
             }
 
-            if (willSkipRecords && _useRowNumber)
+            if (useRowNumber)
             {
-                if (!SqlSettings.CanUseRowNumber)
-                    throw new InvalidOperationException();
-
                 if (_columns.Count > 0)
                     sb.Append(',');
+
                 sb.Append("ROW_NUMBER() OVER (ORDER BY ");
 
                 for (int i = 0; i < _orderBy.Count; i++)
@@ -259,17 +255,26 @@ namespace Serenity.Data
             }
 
             // select sorgusunun kalan kısımlarını yaz
-            AppendFromWhereOrderByGroupByHaving(sb, extraWhere, !(willSkipRecords && _useRowNumber));
+            AppendFromWhereOrderByGroupByHaving(sb, extraWhere, !useRowNumber);
 
-            if (willSkipRecords && _useRowNumber)
+            if (useRowNumber)
             {
                 sb.Append(") _row_number_results_ WHERE _row_number_ > ");
                 sb.Append(_skip);
             }
 
+            if (useFetchNext)
+            {
+                sb.Append(" OFFSET ");
+                sb.Append(_skip);
+                sb.Append(" ROWS FETCH NEXT ");
+                sb.Append(_take);
+                sb.Append(" ROWS");
+            }
+
             if (_countRecords)
             {
-                if (!SqlSettings.MultipleResultsets)
+                if (!_dialect.MultipleResultsets())
                     sb.Append("\n---\n"); // temporary fix till we find a better solution for firebird
                 else
                     sb.Append(";\n");

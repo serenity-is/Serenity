@@ -33,7 +33,8 @@ namespace Serenity
         /// <typeparam name="TItem">Cache ten getirilecek objenin tipi</typeparam>
         /// <typeparam name="TSerialized">Objenin distributed cache e gönderilmeden önce serialize edileceği tip (performans açısından byte[] ya da string olmalı)</typeparam>
         /// <param name="cacheKey">Hem local hem de distributed cache için kullanılacak item key i</param>
-        /// <param name="expiration">Hem local hem de distributed cache için kullanılacak expiration</param>
+        /// <param name="localExpiration">Local cache için kullanılacak expiration</param>
+        /// <param name="remoteExpiration">Distributed cache için kullanılacak expiration</param>
         /// <param name="globalGenerationKey">Global versiyon numarasının kontrol edileceği key. Bu tablo adı olabilir mesela. Bu key arttırılarak 
         /// tüm cache lerin yenilenmesi sağlanabilir.</param>
         /// <param name="loader">Hiçbir cache te item bulunamazsa yüklemeyi yapacak delegate</param>
@@ -41,7 +42,64 @@ namespace Serenity
         public static TItem Get<TItem>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration, string globalGenerationKey, Func<TItem> loader)
             where TItem : class
         {
-            return Get<TItem, TItem>(cacheKey, localExpiration, remoteExpiration, globalGenerationKey, loader, x => x, x => x);
+            return GetInternal<TItem, TItem>(cacheKey, localExpiration, remoteExpiration, globalGenerationKey, loader, x => x, x => x);
+        }
+
+        /// <summary>
+        /// Bir değeri varsa yerel cache'ten yoksa distributed cache'ten o da yoksa verilen fonksiyonu çağırarak getirir.
+        /// Veri, gerek local cache'te, gerekse distributed cache'te belirtilen "expiration" süresince saklanır.
+        /// Ancak, "globalGenerationKey" ile belirtilen bir versiyonlama keyi kullanılarak, distributed cache'te
+        /// bu jenerasyon değiştiğinde, gerek distributed cache'te gerekse local cache'te bulunan tüm item lar
+        /// expire edilebilir. Bu jenerasyon bilgisini sürekli kontrol etmemek için de performans açısından 1 dk boyunca versiyon 
+        /// bilgisi de cache lenir. Yani versiyon değiştiğinde, distributed cache resetlendiğinde, local cache ler bundan 1 dk sonra
+        /// haberdar olur.
+        /// </summary>
+        /// <typeparam name="TItem">Cache ten getirilecek objenin tipi</typeparam>
+        /// <typeparam name="TSerialized">Objenin distributed cache e gönderilmeden önce serialize edileceği tip (performans açısından byte[] ya da string olmalı)</typeparam>
+        /// <param name="cacheKey">Hem local hem de distributed cache için kullanılacak item key i</param>
+        /// <param name="localExpiration">Local cache için kullanılacak expiration</param>
+        /// <param name="remoteExpiration">Distributed cache için kullanılacak expiration</param>
+        /// <param name="globalGenerationKey">Global versiyon numarasının kontrol edileceği key. Bu tablo adı olabilir mesela. Bu key arttırılarak 
+        /// tüm cache lerin yenilenmesi sağlanabilir.</param>
+        /// <param name="loader">Hiçbir cache te item bulunamazsa yüklemeyi yapacak delegate</param>
+        /// <param name="serialize">Veriyi distributed cache e gönderilmeden serialize edecek fonksiyon</param>
+        /// <param name="deserialize">Veriyi distributed cache ten getirdikten sonra deserialize edecek fonksiyon</param>
+        /// <returns></returns>
+        public static TItem GetWithCustomSerializer<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration,
+            string globalGenerationKey, Func<TItem> loader, Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
+            where TItem : class
+            where TSerialized : class
+        {
+            if (serialize == null)
+                throw new ArgumentNullException("serialize");
+
+            if (deserialize == null)
+                throw new ArgumentNullException("deserialize");
+
+            return GetInternal<TItem, TSerialized>(cacheKey, localExpiration, remoteExpiration, globalGenerationKey, loader, serialize, deserialize);
+        }
+
+        /// <summary>
+        /// Bir değeri varsa yerel cache'ten, yoksa verilen fonksiyonu çağırarak getirir.
+        /// Veri, local cache'te belirtilen "expiration" süresince saklanır.
+        /// Ancak, "globalGenerationKey" ile belirtilen bir versiyonlama keyi kullanılarak, distributed cache'te
+        /// bu jenerasyon değiştiğinde, local cache'te bulunan tüm item lar expire edilebilir. Bu jenerasyon 
+        /// bilgisini sürekli kontrol etmemek için de performans açısından 1 dk boyunca versiyon 
+        /// bilgisi de cache lenir. Yani versiyon değiştiğinde, distributed cache resetlendiğinde, local cache ler bundan 1 dk sonra
+        /// haberdar olur.
+        /// </summary>
+        /// <typeparam name="TItem">Cache ten getirilecek objenin tipi</typeparam>
+        /// <param name="cacheKey">Hem local hem de distributed cache için kullanılacak item key i</param>
+        /// <param name="expiration">Hem local hem de distributed cache için kullanılacak expiration</param>
+        /// <param name="globalGenerationKey">Global versiyon numarasının kontrol edileceği key. Bu tablo adı olabilir mesela. Bu key arttırılarak 
+        /// tüm cache lerin yenilenmesi sağlanabilir.</param>
+        /// <param name="loader">Local cache te item bulunamazsa yüklemeyi yapacak delegate</param>
+        /// <returns></returns>
+        public static TItem GetLocalStoreOnly<TItem>(string cacheKey, TimeSpan localExpiration, 
+            string globalGenerationKey, Func<TItem> loader)
+            where TItem : class
+        {
+            return GetInternal<TItem, TItem>(cacheKey, localExpiration, TimeSpan.FromSeconds(0), globalGenerationKey, loader, null, null);
         }
 
         /// <summary>
@@ -63,7 +121,7 @@ namespace Serenity
         /// <param name="serialize">Veriyi distributed cache e gönderilmeden serialize edecek fonksiyon</param>
         /// <param name="deserialize">Veriyi distributed cache ten getirdikten sonra deserialize edecek fonksiyon</param>
         /// <returns></returns>
-        public static TItem Get<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration, 
+        private static TItem GetInternal<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration, 
             string globalGenerationKey, Func<TItem> loader, Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
             where TItem : class
             where TSerialized : class
@@ -136,43 +194,51 @@ namespace Serenity
                 cachedObj = null;
             }
 
-            // local cache te item yok ya da expire olmuştu, şimdi dist cache i sorgulayalım
-            var itemGeneration = DistributedCache.Get<ulong?>(itemGenerationKey);
-
-            // item ın dist cache te versiyonu varsa, bu global versiyonla eşitse
-            if (itemGeneration != null &&
-                itemGeneration.Value == getGlobalGenerationValue())
+            // serialize null ise bu dist cache te saklanmayacak, sadece local de tutulacak demektir
+            if (serialize != null)
             {
-                // distributed cache ten item ı al
-                var serialized = DistributedCache.Get<TSerialized>(cacheKey);
-                // eğer distributed cache te item da var ise
-                if (serialized != null)
+                // local cache te item yok ya da expire olmuştu, şimdi dist cache i sorgulayalım
+                var itemGeneration = DistributedCache.Get<ulong?>(itemGenerationKey);
+
+                // item ın dist cache te versiyonu varsa, bu global versiyonla eşitse
+                if (itemGeneration != null &&
+                    itemGeneration.Value == getGlobalGenerationValue())
                 {
-                    cachedObj = deserialize(serialized);
-                    LocalCache.AddToCacheWithExpiration(cacheKey, (object)cachedObj ?? DBNull.Value, localExpiration);
-                    LocalCache.AddToCacheWithExpiration(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
-                    return (TItem)cachedObj;
+                    // distributed cache ten item ı al
+                    var serialized = DistributedCache.Get<TSerialized>(cacheKey);
+                    // eğer distributed cache te item da var ise
+                    if (serialized != null)
+                    {
+                        cachedObj = deserialize(serialized);
+                        LocalCache.AddToCacheWithExpiration(cacheKey, (object)cachedObj ?? DBNull.Value, localExpiration);
+                        LocalCache.AddToCacheWithExpiration(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
+                        return (TItem)cachedObj;
+                    }
                 }
             }
 
             // ne local ne dist cache te geçerli bir sürüm bulamadık, normal item ı ürettir
             var item = loader();
-            var serializedItem = serialize(item);
 
             // item ı ve jenerasyonunu local cache e yaz
             LocalCache.AddToCacheWithExpiration(cacheKey, (object)item ?? DBNull.Value, localExpiration);
             LocalCache.AddToCacheWithExpiration(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
 
-            // item ı ve jenerasyonunu dist cache e yaz
-            if (remoteExpiration == CacheExpiration.Never)
+            if (serialize != null)
             {
-                DistributedCache.Set(cacheKey, serializedItem);
-                DistributedCache.Set(itemGenerationKey, getGlobalGenerationValue());
-            }
-            else
-            {
-                DistributedCache.Set(cacheKey, serializedItem, DateTime.Now.Add(remoteExpiration));
-                DistributedCache.Set(itemGenerationKey, getGlobalGenerationValue(), DateTime.Now.Add(remoteExpiration));
+                var serializedItem = serialize(item);
+
+                // item ı ve jenerasyonunu dist cache e yaz
+                if (remoteExpiration == CacheExpiration.Never)
+                {
+                    DistributedCache.Set(cacheKey, serializedItem);
+                    DistributedCache.Set(itemGenerationKey, getGlobalGenerationValue());
+                }
+                else
+                {
+                    DistributedCache.Set(cacheKey, serializedItem, DateTime.Now.Add(remoteExpiration));
+                    DistributedCache.Set(itemGenerationKey, getGlobalGenerationValue(), DateTime.Now.Add(remoteExpiration));
+                }
             }
 
             return item;

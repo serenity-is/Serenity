@@ -89,9 +89,9 @@ namespace Serenity.Data
             if (!value.HasValue)
                 return SqlConsts.Null;
             else if (value.Value.Date == value.Value)
-                return value.Value.ToString(SqlSettings.DateFormat, Invariants.DateTimeFormat);
+                return value.Value.ToString(SqlSettings.CurrentDialect.DateFormat(), Invariants.DateTimeFormat);
             else
-                return value.Value.ToString(SqlSettings.DateTimeFormat, Invariants.DateTimeFormat);
+                return value.Value.ToString(SqlSettings.CurrentDialect.DateTimeFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -107,9 +107,9 @@ namespace Serenity.Data
         public static string ToSql(this DateTime value)
         {
             if (value.Date == value)
-                return value.ToString(SqlSettings.DateFormat, Invariants.DateTimeFormat);
+                return value.ToString(SqlSettings.CurrentDialect.DateFormat(), Invariants.DateTimeFormat);
             else
-                return value.ToString(SqlSettings.DateTimeFormat, Invariants.DateTimeFormat);
+                return value.ToString(SqlSettings.CurrentDialect.DateTimeFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Serenity.Data
             if (!value.HasValue)
                 return SqlConsts.Null;
             else
-                return value.Value.ToString(SqlSettings.DateFormat, Invariants.DateTimeFormat);
+                return value.Value.ToString(SqlSettings.CurrentDialect.DateFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Serenity.Data
         ///   kullanılabilir.</p></remarks>
         public static string ToSqlDate(this DateTime value)
         {
-            return value.ToString(SqlSettings.DateFormat, Invariants.DateTimeFormat);
+            return value.ToString(SqlSettings.CurrentDialect.DateFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Serenity.Data
             if (!value.HasValue)
                 return SqlConsts.Null;
             else
-                return value.Value.ToString(SqlSettings.TimeFormat, Invariants.DateTimeFormat);
+                return value.Value.ToString(SqlSettings.CurrentDialect.TimeFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace Serenity.Data
         ///   kullanılabilir.</p></remarks>
         public static string ToSqlTime(this DateTime value)
         {
-            return value.ToString(SqlSettings.TimeFormat, Invariants.DateTimeFormat);
+            return value.ToString(SqlSettings.CurrentDialect.TimeFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace Serenity.Data
         {
             if (value == null)
                 return SqlConsts.Null;
-            else if (SqlSettings.PrefixUnicodeStringsWithN)
+            else if (SqlSettings.CurrentDialect.PrefixUnicodeStringsWithN())
             {
                 if (value.IndexOf('\'') >= 0)
                     return "N'" + value.Replace("'", "''") + "'";

@@ -9,6 +9,7 @@ namespace Serenity.Data
     /// <summary>
     ///   An object that is used to create criterias by employing operator overloading 
     ///   features of C# language, instead of using string based criterias.</summary>
+    [Serializable]
     public class Criteria
     {
         private string criteria;
@@ -354,7 +355,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("mask");
 
             var clone = this.Clone();
-            if (SqlSettings.IsCaseSensitive)
+            if (SqlSettings.CurrentDialect.IsCaseSensitive())
             {
                 mask = mask.ToUpper();
                 clone.criteria = "UPPER(" + this.criteria + ") LIKE " + clone.AddAutoParam(mask);
@@ -379,7 +380,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("mask");
 
             var clone = this.Clone();
-            if (SqlSettings.IsCaseSensitive)
+            if (SqlSettings.CurrentDialect.IsCaseSensitive())
             {
                 mask = mask.ToUpper();
                 clone.criteria = "UPPER(" + this.criteria + ") NOT LIKE " + clone.AddAutoParam(mask);
