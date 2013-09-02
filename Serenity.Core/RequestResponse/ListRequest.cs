@@ -19,7 +19,7 @@ namespace Serenity.Services
         public string ContainsText { get; set; }
         public List<FilterLine> FilterLines { get; set; }
         [JsonIgnore]
-        public BasicFilter Filter { get; set; }
+        public BasicFilterBase Filter { get; set; }
         public bool IncludeDeleted { get; set; }
         public bool ExcludeTotalCount { get; set; }
         public ColumnSelection ColumnSelection { get; set; }

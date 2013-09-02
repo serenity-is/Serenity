@@ -7,7 +7,7 @@ namespace Serenity.Data
 {
     public static class FilterLineExtensions
     {
-        public static BasicFilter ToBasicFilter(this IList<FilterLine> lines)
+        public static BasicFilterBase ToBasicFilter(this IList<FilterLine> lines)
         {
             if (lines == null)
                 throw new ArgumentNullException("lines");
@@ -20,7 +20,7 @@ namespace Serenity.Data
             // http://en.wikipedia.org/wiki/Shunting_yard_algorithm
             // http://en.wikipedia.org/wiki/Reverse_Polish_Notation
 
-            List<BasicCriteria> filters = new List<BasicCriteria>(lines.Count);
+            List<BasicFilter> filters = new List<BasicFilter>(lines.Count);
             List<int> rpnOutput = new List<int>(lines.Count * 2); // will contain negative or indexes of items
             Stack<int> rpnStack = new Stack<int>(lines.Count * 2);
 
@@ -89,13 +89,13 @@ namespace Serenity.Data
                 rpnOutput.Add(token);
             }
 
-            var evaluationStack = new Stack<BasicFilter>();
+            var evaluationStack = new Stack<BasicFilterBase>();
 
             foreach (var input in rpnOutput)
             {
                 if (input >= 0)
                 {
-                    BasicCriteria item = new BasicCriteria();
+                    BasicFilter item = new BasicFilter();
                     var line = lines[input];
                     item.Field = line.Field;
                     item.Operator = line.Op;
@@ -113,7 +113,7 @@ namespace Serenity.Data
 
                     var right = evaluationStack.Pop();
                     var left = evaluationStack.Pop();
-                    BasicFilter result = left.Merge(op, right);
+                    BasicFilterBase result = left.Merge(op, right);
                     evaluationStack.Push(result);
                 }
             }

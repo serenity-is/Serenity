@@ -143,7 +143,7 @@
             return row;
         }
 
-        protected virtual Criteria ProcessCriteria(BasicCriteria criteria)
+        protected virtual Criteria ProcessCriteria(BasicFilter criteria)
         {
             return null;
         }

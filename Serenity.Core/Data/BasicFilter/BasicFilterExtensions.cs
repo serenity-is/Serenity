@@ -4,10 +4,10 @@ namespace Serenity.Data
 {
     public static class BasicFilterExtensions
     {
-        public static BasicFilter Merge(this BasicFilter left, LogicalOp op, BasicFilter right)
+        public static BasicFilterBase Merge(this BasicFilterBase left, LogicalOp op, BasicFilterBase right)
         {
-            var leftCriteria = left as BasicCriteria;
-            var rightCriteria = right as BasicCriteria;
+            var leftCriteria = left as BasicFilter;
+            var rightCriteria = right as BasicFilter;
             var leftGroup = left as BasicFilterGroup;
             var rightGroup = right as BasicFilterGroup;
 
@@ -64,19 +64,19 @@ namespace Serenity.Data
             }
         }
 
-        public static BasicFilter Clone(this BasicFilter filter)
+        public static BasicFilterBase Clone(this BasicFilterBase filter)
         {
             if (filter == null)
                 return null;
 
-            var criteria = filter as BasicCriteria;
+            var criteria = filter as BasicFilter;
             if (criteria != null)
                 return Clone(criteria);
 
             return Clone((BasicFilterGroup)filter);
         }
 
-        private static BasicFilter Clone(this BasicFilterGroup group)
+        private static BasicFilterBase Clone(this BasicFilterGroup group)
         {
             var result = new BasicFilterGroup(group.Operator);
             foreach (var node in group.Nodes)
@@ -84,9 +84,9 @@ namespace Serenity.Data
             return result;
         }
 
-        private static BasicFilter Clone(this BasicCriteria criteria)
+        private static BasicFilterBase Clone(this BasicFilter criteria)
         {
-            return new BasicCriteria
+            return new BasicFilter
             {
                 Field = criteria.Field,
                 Operator = criteria.Operator,
@@ -96,21 +96,21 @@ namespace Serenity.Data
             };
         }
 
-        public static void ForEachCriteria(this BasicFilter filter,
-            Action<BasicCriteria> handler)
+        public static void ForEachCriteria(this BasicFilterBase filter,
+            Action<BasicFilter> handler)
         {
             if (filter == null)
                 return;
 
-            var c = filter as BasicCriteria;
+            var c = filter as BasicFilter;
             if (c != null)
                 handler(c);
             else foreach (var g in ((BasicFilterGroup)filter).Nodes)
                 ForEachCriteria(g, handler);
         }
 
-        public static void ForEach(this BasicFilter filter,
-            Action<BasicFilter> handler)
+        public static void ForEach(this BasicFilterBase filter,
+            Action<BasicFilterBase> handler)
         {
             if (filter == null)
                 return;
@@ -123,7 +123,7 @@ namespace Serenity.Data
                 handler(filter);
         }
 
-        public static bool IsSame(this BasicFilter filter, BasicFilter other)
+        public static bool IsSame(this BasicFilterBase filter, BasicFilterBase other)
         {
             if (filter == null)
                 return other == null;
@@ -144,8 +144,8 @@ namespace Serenity.Data
             }
             else
             {
-                BasicCriteria c = (BasicCriteria)filter;
-                BasicCriteria co = other as BasicCriteria;
+                BasicFilter c = (BasicFilter)filter;
+                BasicFilter co = other as BasicFilter;
                 if (co == null)
                     return false;
 

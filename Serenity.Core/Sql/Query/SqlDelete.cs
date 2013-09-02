@@ -7,11 +7,10 @@ namespace Serenity.Data
 
     /// <summary>
     ///   Class to generate queries of form <c>DELETE FROM tablename WHERE [conditions]</c>.</summary>
-    public sealed class SqlDelete : IDbFilterable
+    public sealed class SqlDelete : ParameterizedQuery, IDbFilterable
     {
         private string _tableName;
         private StringBuilder _where;
-        private Dictionary _params;
 
         private void Initialize(string tableName)
         {
@@ -99,38 +98,6 @@ namespace Serenity.Data
         public override string ToString()
         {
             return Format(_tableName, _where.ToString());
-        }
-
-        /// <summary>
-        ///   Sets a parameter value.</summary>
-        /// <param name="name">
-        ///   Parameter name.</param>
-        /// <param name="value">
-        ///   Parameter value</param>
-        /// <returns>
-        ///   SqlDelete object itself.</returns>
-        public SqlDelete SetParam(string name, object value)
-        {
-            if (_params == null)
-                _params = new Dictionary();
-            _params[name] = value;
-            return this;
-        }
-
-
-        /// <summary>
-        ///   Gets params dictionary. May return null if no params set.</summary>
-        public Dictionary Params
-        {
-            get { return _params; }
-            set { _params = value; }
-        }
-
-        /// <summary>
-        ///   Gets param count.</summary>
-        public int ParamCount 
-        { 
-            get { return _params == null ? 0 : _params.Count; }
         }
 
         /// <summary>

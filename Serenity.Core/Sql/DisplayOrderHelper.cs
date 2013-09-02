@@ -441,7 +441,7 @@ namespace Serenity.Data
                             tableName,
                             orderField.Name,
                             rs.oldOrder - rs.newOrder,
-                            Object.ReferenceEquals(filter, null) ? "1 = 1" : filter.ToString(),
+                            Object.ReferenceEquals(filter, null) ? "1 = 1" : filter.ToString(), // FIX!!
                             keyField.Name,
                             sb.ToString()));
                         updateCount++;
@@ -469,7 +469,14 @@ namespace Serenity.Data
                 if (SqlSettings.CurrentDialect.NeedsExecuteBlockStatement())
                     queries.AppendLine("END;");
 
-                SqlHelper.ExecuteNonQuery(connection, queries.ToString(), Object.ReferenceEquals(filter, null) ? null : filter.Parameters);
+                ParameterizedQuery parameterized = null;
+                if (!Object.ReferenceEquals(filter, null))
+                {
+                    parameterized = new ParameterizedQuery();
+                    filter.ToString(parameterized);
+                }
+
+                SqlHelper.ExecuteNonQuery(connection, queries.ToString(), Object.ReferenceEquals(filter, null) ? null : parameterized.Params);
                 // one ore more records has changed display order values
 
                 return true;

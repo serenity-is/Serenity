@@ -79,9 +79,9 @@ namespace Serenity.Services
             return query;
         }
 
-        public static Criteria GetContainsTextFilter(string containsText, Criteria idField, params Criteria[] fields)
+        public static BaseCriteria GetContainsTextFilter(string containsText, BaseCriteria idField, params Criteria[] fields)
         {
-            Criteria ctFilter = GetContainsTextFilter(containsText, fields);
+            var ctFilter = GetContainsTextFilter(containsText, fields);
             if (Object.ReferenceEquals(idField, null))
                 return ctFilter;
 
@@ -99,12 +99,12 @@ namespace Serenity.Services
             return ctFilter;
         }
 
-        public static Criteria GetContainsTextFilter(string containsText, params Criteria[] fields)
+        public static BaseCriteria GetContainsTextFilter(string containsText, params Criteria[] fields)
         {
             containsText = containsText.TrimToNull();
             if (containsText != null && fields.Length > 0)
             {
-                var flt = new Criteria();
+                var flt = Criteria.Empty;
                 foreach (var field in fields)
                     flt |= field.Contains(containsText);
                 flt = ~(flt);
@@ -115,10 +115,10 @@ namespace Serenity.Services
         }
 
         public static SqlQuery ApplyFilters(this SqlQuery query,
-            BasicFilter filter,
+            BasicFilterBase filter,
             IList<FilterLine> filterLines,
             Row row,
-            Func<BasicCriteria, Criteria> processCriteria,
+            Func<BasicFilter, BaseCriteria> processCriteria,
             FilterFields filterFields)
         {
             if (Object.ReferenceEquals(filter, null) &&
@@ -128,7 +128,7 @@ namespace Serenity.Services
 
             var converter = new BasicFilterStringConverter(query, row, processCriteria, filterFields);
 
-            Criteria where;
+            BaseCriteria where;
 
             if (!Object.ReferenceEquals(filter, null))
             {

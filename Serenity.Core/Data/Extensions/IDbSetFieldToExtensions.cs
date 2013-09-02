@@ -7,43 +7,6 @@ namespace Serenity.Data
     ///   Extension methods for classes implementing IDbSet interface</summary>
     public static class IDbSetExtensions
     {
-
-        /// <summary>
-        ///   Sets a field value with a parameter.</summary>
-        /// <param field="field">
-        ///   Field name.</param>
-        /// <param field="param">
-        ///   Parameter name</param>
-        /// <param field="value">
-        ///   Parameter value</param>
-        /// <returns>
-        ///   Object itself.</returns>
-        public static T Set<T>(this T self, string field, string param, object value) where T : IDbSetFieldTo
-        {
-            self.SetTo(field, param);
-            self.Params = self.Params ?? new Dictionary<string, object>();
-            self.Params[param] = value;
-            return self;
-        }
-
-        /// <summary>
-        ///   Sets a field value with a parameter.</summary>
-        /// <param field="field">
-        ///   Field name.</param>
-        /// <param field="param">
-        ///   Parameter name</param>
-        /// <param field="value">
-        ///   Parameter value</param>
-        /// <returns>
-        ///   Object itself.</returns>
-        public static T Set<T>(this T self, Field field, string param, object value) where T : IDbSetFieldTo
-        {
-            self.SetTo(field.Name, param);
-            self.Params = self.Params ?? new Dictionary<string, object>();
-            self.Params[param] = value;
-            return self;
-        }
-
         /// <summary>
         ///   Sets a field value with a parameter.</summary>
         /// <param field="field">
@@ -56,10 +19,8 @@ namespace Serenity.Data
         ///   Object itself.</returns>
         public static T Set<T>(this T self, string field, object value) where T : IDbSetFieldTo
         {
-            var param = Parameter.NextName();
-            self.SetTo(field, param);
-            self.Params = self.Params ?? new Dictionary<string, object>();
-            self.Params[param] = value;
+            var param = self.AddParam(value);
+            self.SetTo(field, param.Name);
             return self;
         }
 
@@ -75,10 +36,8 @@ namespace Serenity.Data
         ///   Object itself.</returns>
         public static T Set<T>(this T self, Field field, object value) where T : IDbSetFieldTo
         {
-            var param = Parameter.NextName();
-            self.SetTo(field.Name, param);
-            self.Params = self.Params ?? new Dictionary<string, object>();
-            self.Params[param] = value;
+            var param = self.AddParam(value);
+            self.SetTo(field.Name, param.Name);
             return self;
         }
 

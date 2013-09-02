@@ -10,7 +10,7 @@
     /// <remarks>
     ///   <p>To determine updated field values, Set(field, value) should be called several times.</p>
     ///   <p>Where expressions determines the record(s) to update.</p></remarks>   
-    public class SqlUpdate : IDbSetFieldTo, IDbFilterable
+    public class SqlUpdate : ParameterizedQuery, IDbSetFieldTo, IDbFilterable
     {
         private string _tableName;
         private List<string> _nameValuePairs;
@@ -265,30 +265,6 @@
             return Format(_tableName, _where.ToString(), _nameValuePairs);
         }
         
-        /// <summary>
-        ///   Sets a parameter value.</summary>
-        /// <param name="name">
-        ///   Parameter name.</param>
-        /// <param name="value">
-        ///   Parameter value</param>
-        /// <returns>
-        ///   SqlUpdate object itself.</returns>
-        public SqlUpdate SetParam(string name, object value)
-        {
-            if (_params == null)
-                _params = new Dictionary();
-            _params[name] = value;
-            return this;
-        }
-
-        /// <summary>
-        ///   Gets params dictionary. May return null if no params set.</summary>
-        public Dictionary Params
-        {
-            get { return _params; }
-            set { _params = value; }
-        }
-
         /// <summary>
         ///   Formats an SQL UPDATE statement.</summary>
         /// <param name="tableName">

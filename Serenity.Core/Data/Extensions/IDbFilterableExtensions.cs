@@ -17,23 +17,12 @@ namespace Serenity.Data
         ///   Filter</param>
         /// <returns>
         ///   Query itself.</returns>
-        public static T Where<T>(this T self, Criteria filter) where T: IDbFilterable
+        public static T Where<T>(this T self, BaseCriteria filter) where T: IDbFilterable
         {
             if (!Object.ReferenceEquals(null, filter) && !filter.IsEmpty)
             {
-                self.Where(filter.ToString());
-
-                if (filter.Parameters != null)
-                    foreach (var param in filter.Parameters)
-                    {
-                        self.Params = self.Params ?? new Dictionary<string, object>();
-                        object oldValue;
-                        if (self.Params.TryGetValue(param.Key, out oldValue) &&
-                            !Object.Equals(oldValue, param.Value))
-                            throw new InvalidOperationException("Criteria has duplicate parameter with the query!");
-
-                        self.Params[param.Key] = param.Value;
-                    }
+                var statement = filter.ToString(self);
+                self.Where(statement);
             }
             return self;
         }

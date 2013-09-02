@@ -8,6 +8,8 @@ namespace Serenity.Data
     ///   Type of the parameterized object itself.</typeparam>
     public interface IDbParameterized
     {
-        Dictionary<string, object> Params { get; set; }
+        void AddParam(string name, object value);
+        void SetParam(string name, object value);
+        Parameter AutoParam();
     }
 }
