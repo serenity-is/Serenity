@@ -32,7 +32,7 @@ namespace Serenity
             {
                 item = new EnumTypeItem();
 
-                foreach(var value in Enum.GetValues(enumType))
+                foreach (var value in Enum.GetValues(enumType))
                 {
                     string key = value.ToString();
                     item.stringToValue[key] = value;
