@@ -323,6 +323,8 @@
     <Compile Include="Services\CaptureLog\CaptureLogAttribute.cs" />
     <Compile Include="Services\CaptureLog\CaptureLogHandler.cs" />
     <Compile Include="Services\BatchGenerationUpdater.cs" />
+    <Compile Include="Services\Client\UriHelper.cs" />
+    <Compile Include="Services\Client\JsonServiceClient.cs" />
     <Compile Include="Services\CreateRequestHandler.cs" />
     <Compile Include="Services\CustomField\CustomizableAttribute.cs" />
     <Compile Include="Services\DeleteRequestHandler.cs" />
