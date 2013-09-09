@@ -186,5 +186,34 @@ namespace Serenity.Data
 
             return String.Format("AVG(T{0}.{1})", joinNumber.ToInvariant(), field);
         }
+
+        public static string Case(string condition, string[] whenThenPairs, string elseStatement)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("CASE ");
+            sb.Append(condition);
+
+            if (whenThenPairs.Length == 0 ||
+                whenThenPairs.Length % 2 == 1)
+                throw new ArgumentOutOfRangeException("whenThenPairs");
+
+            for (var i = 0; i < whenThenPairs.Length; i += 2)
+            {
+                sb.Append(" WHEN ");
+                sb.Append(whenThenPairs[i]);
+                sb.Append(" THEN ");
+                sb.Append(whenThenPairs[i + 1]);
+            }
+
+            if (elseStatement != null)
+            {
+                sb.Append(" ELSE ");
+                sb.Append(elseStatement);
+            }
+
+            sb.Append(" END");
+
+            return sb.ToString();
+        }
     }
 }

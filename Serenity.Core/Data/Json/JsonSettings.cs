@@ -1,9 +1,8 @@
-﻿using System.IO;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Serenity.Data;
 
-namespace Serenity.Data
+namespace Serenity
 {
     public static class JsonSettings
     {
