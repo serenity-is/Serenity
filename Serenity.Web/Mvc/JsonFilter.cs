@@ -47,7 +47,7 @@ namespace Serenity.Services
                         filterContext.HttpContext.Request.InputStream.Seek(0, SeekOrigin.Begin);
 
                     using (var sr = new StreamReader(filterContext.HttpContext.Request.InputStream,
-                        filterContext.HttpContext.Request.ContentEncoding))
+                        filterContext.HttpContext.Request.ContentEncoding, true, 4096, true))
                     {
                         var js = JsonSerializer.Create(JsonSettings.Strict);
                         using (var jr = new JsonTextReader(sr))

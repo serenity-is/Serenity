@@ -88,6 +88,7 @@
     <Compile Include="MvcFakes\FakePrincipal.cs" />
     <Compile Include="Mvc\AuditLogController.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
+    <Compile Include="Mvc\TokenAuthorizeFilter.cs" />
     <Compile Include="Mvc\DtoFilter.cs" />
     <Compile Include="Mvc\EndpointExtensions.cs" />
     <Compile Include="Mvc\JsonFilter.cs" />
