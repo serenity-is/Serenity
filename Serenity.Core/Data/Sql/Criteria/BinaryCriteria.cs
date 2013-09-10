@@ -38,13 +38,13 @@ namespace Serenity.Data
                     var mask = ((string)valueCriteria.Value).ToUpper();
                     sb.Append("UPPER(");
                     this.left.ToString(sb, query);
-                    sb.Append(") LIKE ");
+                    sb.Append(this.op == CriteriaOperator.Like ? ") LIKE " : ") NOT LIKE ");
                     this.right.ToString(sb, query);
                 }
                 else
                 {
                     this.left.ToString(sb, query);
-                    sb.Append(opText);
+                    sb.Append(this.op == CriteriaOperator.Like ? " LIKE " : " NOT LIKE ");
                     this.right.ToString(sb, query);
                 }
             }
