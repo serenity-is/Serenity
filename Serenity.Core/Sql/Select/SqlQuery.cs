@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Linq;
     using System.Text;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
@@ -274,6 +275,34 @@
             LeftJoin(joinTable, joinAlias, joinCondition.ToString(this));
 
             return this;
+        }
+
+        public SqlQuery LeftJoinOn(string thisField, RowFieldsBase joinTable, Alias joinAlias, Field field)
+        {
+            return LeftJoin(joinTable.TableName, joinAlias, new Criteria(joinAlias, field) == new Criteria(thisField));
+        }
+
+        public SqlQuery LeftJoinOn(Criteria thisField, RowFieldsBase joinTable, Alias joinAlias, Field field)
+        {
+            return LeftJoin(joinTable.TableName, joinAlias, new Criteria(joinAlias, field) == thisField);
+        }
+
+        public SqlQuery LeftJoinId(string thisField, RowFieldsBase joinTable, Alias joinAlias)
+        {
+            var idField = joinTable.FirstOrDefault(x => x.Flags.HasFlag(FieldFlags.PrimaryKey));
+            if (idField == null)
+                throw new ArgumentOutOfRangeException("joinTable", String.Format("Table {0} has no primary key!", joinTable.TableName));
+
+            return LeftJoin(joinTable.TableName, joinAlias, new Criteria(joinAlias, idField) == new Criteria(thisField));
+        }
+
+        public SqlQuery LeftJoinId(RowFieldsBase joinTable, Alias joinAlias, Criteria thisField)
+        {
+            var idField = joinTable.FirstOrDefault(x => x.Flags.HasFlag(FieldFlags.PrimaryKey));
+            if (idField == null)
+                throw new ArgumentOutOfRangeException("joinTable", String.Format("Table {0} has no primary key!", joinTable.TableName));
+
+            return LeftJoin(joinTable.TableName, joinAlias, new Criteria(joinAlias, idField) == thisField);
         }
 
         public SqlQuery LeftJoin(string joinTable, string joinAlias, string joinCondition)

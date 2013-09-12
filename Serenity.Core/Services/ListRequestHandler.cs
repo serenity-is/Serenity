@@ -206,6 +206,8 @@
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
+            ValidatePermissions();
+
             Connection = connection;
 
             Request = request;

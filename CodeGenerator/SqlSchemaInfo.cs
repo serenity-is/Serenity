@@ -161,26 +161,34 @@ namespace Serenity.CodeGenerator
                     fieldInfo.IsNullable = reader.GetString(2) == "YES";
                     fieldInfo.DataType = reader.GetString(1);
                     fieldInfo.Size = 0;
-                    
-                    if (!reader.IsDBNull(3))
-                    {
-                        fieldInfo.Size = reader.GetInt32(3);
-                        if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
-                            fieldInfo.Size = 0;
-                    }
 
-                    if (!reader.IsDBNull(4))
+                    if (fieldInfo.DataType != SqlInt &&
+                        fieldInfo.DataType != SqlReal &&
+                        fieldInfo.DataType != SqlFloat &&
+                        fieldInfo.DataType != SqlTinyInt &&
+                        fieldInfo.DataType != SqlSmallInt &&
+                        fieldInfo.DataType != SqlBigInt)
                     {
-                        fieldInfo.Size = Convert.ToInt32(reader.GetValue(4));
-                        if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
-                            fieldInfo.Size = 0;
-                    }
+                        if (!reader.IsDBNull(3))
+                        {
+                            fieldInfo.Size = reader.GetInt32(3);
+                            if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
+                                fieldInfo.Size = 0;
+                        }
 
-                    if (!reader.IsDBNull(5))
-                    {
-                        fieldInfo.Scale = Convert.ToInt32(reader.GetValue(5));
-                        if (fieldInfo.Scale < 0 || fieldInfo.Scale >= 1000000000)
-                            fieldInfo.Scale = 0;
+                        if (!reader.IsDBNull(4))
+                        {
+                            fieldInfo.Size = Convert.ToInt32(reader.GetValue(4));
+                            if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
+                                fieldInfo.Size = 0;
+                        }
+
+                        if (!reader.IsDBNull(5))
+                        {
+                            fieldInfo.Scale = Convert.ToInt32(reader.GetValue(5));
+                            if (fieldInfo.Scale < 0 || fieldInfo.Scale >= 1000000000)
+                                fieldInfo.Scale = 0;
+                        }
                     }
 
                     fieldInfos.Add(fieldInfo);
