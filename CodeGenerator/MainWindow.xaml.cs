@@ -213,8 +213,6 @@ namespace Serenity.CodeGenerator
             {
                 string tableName = (string)this.TablesCombo.SelectedItem; 
                 EntitySingular = "";
-                Module = "";
-                Permission = "";
                 GenerateCodeButton.IsEnabled = true;
                 GenerateRowCode();
             }
