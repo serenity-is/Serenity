@@ -108,7 +108,6 @@
     <Compile Include="Script\PropertyEditor\FormScript.cs" />
     <Compile Include="Script\PropertyEditor\ICustomizedFormScript.cs" />
     <Compile Include="Script\PropertyEditor\PropertyEditorHelper.cs" />
-    <Compile Include="Script\PropertyEditor\PropertyItem.cs" />
     <Compile Include="Script\RegisteredScripts.cs" />
     <Compile Include="Script\ScriptBundleManager.cs" />
     <Compile Include="Script\TemplateScript.cs" />

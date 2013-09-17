@@ -5,7 +5,11 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    public abstract class TemplatedDialog<TOptions> : TemplatedWidget<TOptions>
+    public interface IDialog
+    {
+    }
+
+    public abstract class TemplatedDialog<TOptions> : TemplatedWidget<TOptions>, IDialog
         where TOptions : class, new()
     {
         protected jQueryValidator validator;
@@ -16,8 +20,6 @@ namespace Serenity
             InitDialog();
             InitValidator();
         }
-
-        public string[] InitialPosition { get; set; }
 
         public override void Destroy()
         {
@@ -119,7 +121,7 @@ namespace Serenity
                 self.OnDialogOpen();
             };
 
-            opt.Position = InitialPosition ?? new string[] { "center", "center" };
+            opt.Position = new string[] { "center", "center" };
 
             return opt;
         }

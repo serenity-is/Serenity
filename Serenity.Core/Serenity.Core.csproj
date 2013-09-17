@@ -233,6 +233,7 @@
     <Compile Include="Data\Sql\SqlDialect.cs" />
     <Compile Include="Data\Sql\SqlFormats.cs" />
     <Compile Include="Data\Sql\SqlSettings.cs" />
+    <Compile Include="PropertyGrid\PropertyItem.cs" />
     <Compile Include="Reflection\DtoGenerator.cs" />
     <Compile Include="Extensibility\BaseRegistrarAttribute.cs" />
     <Compile Include="Extensibility\EnumRegistrarAttribute.cs" />
@@ -294,6 +295,17 @@
     <Compile Include="PropertyGrid\EditorRepository\PropertyEditorRepository.cs" />
     <Compile Include="PropertyGrid\EditorRepository\TypeConversions.cs" />
     <Compile Include="Reflection\ReflectionExtensions.cs" />
+    <Compile Include="Reporting\BaseReport.cs" />
+    <Compile Include="Reporting\ReportDesignItem.cs" />
+    <Compile Include="Reporting\ReportExportType.cs" />
+    <Compile Include="Reporting\RegisterReportAttribute.cs" />
+    <Compile Include="Reporting\IReportWithAdditionalData.cs" />
+    <Compile Include="Reporting\IReport.cs" />
+    <Compile Include="Reporting\ReportDesignListRequest.cs" />
+    <Compile Include="Reporting\ReportExecuteRequest.cs" />
+    <Compile Include="Reporting\ReportRetrieveRequest.cs" />
+    <Compile Include="Reporting\ReportRetrieveResponse.cs" />
+    <Compile Include="Reporting\RequiredPermissionAttribute.cs" />
     <Compile Include="RequestResponse\CreateResponse.cs" />
     <Compile Include="RequestResponse\DeleteRequest.cs" />
     <Compile Include="RequestResponse\DeleteResponse.cs" />

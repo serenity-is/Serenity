@@ -15,6 +15,7 @@ namespace Serenity
         protected jQueryObject saveButton;
         protected jQueryObject deleteButton;
         protected jQueryObject undeleteButton;
+        protected jQueryObject cloneButton;
 
         protected virtual void InitToolbar()
         {
@@ -33,6 +34,7 @@ namespace Serenity
             saveButton = toolbar.FindButton("save-button");
             deleteButton = toolbar.FindButton("delete-button");
             undeleteButton = toolbar.FindButton("undo-delete-button");
+            cloneButton = toolbar.FindButton("clone-button");
         }
 
         protected virtual List<ToolButton> GetToolbarButtons()
@@ -111,7 +113,37 @@ namespace Serenity
                 }
             });
 
+            list.Add(new ToolButton
+            {
+                Title = "Klonla",
+                CssClass = "clone-button",
+                OnClick = delegate
+                {
+                    if (!self.IsEditMode)
+                        return;
+
+                    var cloneEntity = GetCloningEntity();
+                    var cloneDialog = Activator.CreateInstance(this.GetType(), new object()).As<EntityDialog<TEntity, TOptions>>();
+                    cloneDialog.Cascade(this.element).LoadEntityAndOpenDialog(cloneEntity);
+                }
+            });
             return list;
+        }
+
+        protected virtual TEntity GetCloningEntity()
+        {
+            var clone = new TEntity();
+            clone = jQuery.Extend(clone, this.Entity).As<TEntity>().As<TEntity>();
+
+            var idField = entityIdField.Value;
+            if (!idField.IsEmptyOrNull())
+                Type.DeleteField(clone, idField);
+
+            var isActiveField = entityIsActiveField.Value;
+            if (!isActiveField.IsEmptyOrNull())
+                Type.DeleteField(clone, isActiveField);
+
+            return clone;
         }
 
         protected virtual void UpdateInterface()
@@ -130,6 +162,9 @@ namespace Serenity
 
             if (saveButton != null)
                 saveButton.Toggle(isLocalizationMode || !isDeleted);
+
+            if (cloneButton != null)
+                cloneButton.Toggle(IsEditMode);
 
             if (propertyGrid != null)
                 propertyGrid.Element.Toggle(!isLocalizationMode);
