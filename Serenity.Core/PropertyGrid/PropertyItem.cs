@@ -6,7 +6,7 @@ using System.ComponentModel;
 using Newtonsoft.Json;
 using Serenity.ComponentModel;
 
-namespace Serenity.Web.PropertyEditor
+namespace Serenity
 {
     public class PropertyItem
     {
