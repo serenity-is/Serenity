@@ -220,6 +220,7 @@
     <Compile Include="Data\Parameter.cs" />
     <Compile Include="Data\RowHelper.cs" />
     <Compile Include="Data\Sql\Alias.cs" />
+    <Compile Include="Data\Sql\ForXmlHelper.cs" />
     <Compile Include="Data\Sql\Criteria\BaseCriteria.cs" />
     <Compile Include="Data\Sql\Criteria\BinaryCriteria.cs" />
     <Compile Include="Data\Sql\Criteria\ParamCriteria.cs" />
