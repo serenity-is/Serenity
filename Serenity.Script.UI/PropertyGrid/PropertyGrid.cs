@@ -290,6 +290,11 @@ namespace Serenity
             get { return this.items.As<PropertyItem[]>(); }
         }
 
+        public string IdPrefix
+        {
+            get { return options.IdPrefix; }
+        }
+
         public PropertyGridMode Mode
         {
             get { return options.Mode; }
