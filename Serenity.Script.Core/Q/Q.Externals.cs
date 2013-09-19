@@ -82,6 +82,10 @@ namespace Serenity
                 return null;
             }
 
+            public static void PostToService(PostToServiceOptions options)
+            {
+            }
+
             public static jQueryValidatorOptions ValidateOptions(jQueryValidatorOptions options)
             {
                 return null;

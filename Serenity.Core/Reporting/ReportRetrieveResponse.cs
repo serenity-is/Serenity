@@ -7,7 +7,7 @@ namespace Serenity.Reporting
     {
         public string ReportKey { get; set; }
         public string Title { get; set; }
-        public PropertyItem[] Properties { get; set; }
+        public List<PropertyItem> Properties { get; set; }
         public List<ReportDesignItem> Designs { get; set; }
         public object InitialSettings { get; set; }
     }

@@ -304,6 +304,7 @@
     <Compile Include="Reporting\IReport.cs" />
     <Compile Include="Reporting\ReportDesignListRequest.cs" />
     <Compile Include="Reporting\ReportExecuteRequest.cs" />
+    <Compile Include="Reporting\ReportRegistry.cs" />
     <Compile Include="Reporting\ReportRetrieveRequest.cs" />
     <Compile Include="Reporting\ReportRetrieveResponse.cs" />
     <Compile Include="Reporting\RequiredPermissionAttribute.cs" />

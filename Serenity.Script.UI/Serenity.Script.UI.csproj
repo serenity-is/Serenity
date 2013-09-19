@@ -93,6 +93,10 @@
     <Compile Include="PropertyGrid\PropertyGrid.cs" />
     <Compile Include="PropertyGrid\Attributes\RequiredAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\UpdatableAttribute.cs" />
+    <Compile Include="Reporting\ReportModels.cs" />
+    <Compile Include="Reporting\ReportDesignModels.cs" />
+    <Compile Include="Reporting\ReportDesignPanel.cs" />
+    <Compile Include="Reporting\ReportDialog.cs" />
     <Compile Include="Widget\TemplatedDialog.cs" />
     <Compile Include="Widget\TemplatedWidget.cs" />
     <Compile Include="Widget\Toolbar.cs" />
