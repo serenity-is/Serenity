@@ -131,6 +131,6 @@ namespace Serenity
             this.element.Dialog().Close();
         }
 
-        protected string IdPrefix { get { return idPrefix; } }
+        public string IdPrefix { get { return idPrefix; } }
     }
 }

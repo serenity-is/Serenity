@@ -40,6 +40,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -78,6 +79,15 @@
     <Compile Include="Content\LocaleID.cs" />
     <Compile Include="Content\RegistrationHelper.cs" />
     <Compile Include="Content\TemplateHelper.cs" />
+    <Compile Include="Upload\FilesToDelete.cs" />
+    <Compile Include="Upload\ImageChecker.cs" />
+    <Compile Include="Upload\ImageCheckResult.cs" />
+    <Compile Include="Upload\SwfInfo.cs" />
+    <Compile Include="Upload\TemporaryFileUpload.cs" />
+    <Compile Include="Upload\TemporaryImageUpload.cs" />
+    <Compile Include="Upload\ThumbnailGenerator.cs" />
+    <Compile Include="Upload\ImageScaleMode.cs" />
+    <Compile Include="Upload\UploadHelper.cs" />
     <Compile Include="Content\UrlHelper.cs" />
     <Compile Include="MvcFakes\FakeController.cs" />
     <Compile Include="MvcFakes\FakeControllerContext.cs" />

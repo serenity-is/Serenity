@@ -29,7 +29,8 @@ namespace Serenity.Web
 
         public static void ScriptsChanged()
         {
-            string version = TemporaryFileHelper.RandomFileCode();
+            string version = 
+                TemporaryFileHelper.RandomFileCode();
             _versionPrefix = "v" + version  + "__";
             _cssVersionSuffix = "?v" + version;
             _jsVersionSuffix = "v" + version;

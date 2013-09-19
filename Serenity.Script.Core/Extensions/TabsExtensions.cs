@@ -55,6 +55,16 @@ namespace Serenity
                 tabs.Enable(index);
         }
 
+        public static string ActiveTabKey(this TabsObject tabs)
+        {
+            var href = tabs.As<jQueryObject>().Children("ul").Eq(tabs.Active.As<int>()).Children("li").Children("a").GetAttribute("href").ToString();
+            var prefix = "_Tab";
+            var lastIndex = href.LastIndexOf(prefix);
+            if (lastIndex >= 0)
+                href = href.Substr(lastIndex + prefix.Length);
+            return href;
+        }
+
         public static JsDictionary<string, int?> IndexByKey(this TabsObject tabs)
         {
             var indexByKey = tabs.As<jQueryObject>().GetDataValue("indexByKey").As<JsDictionary<string, int?>>();
