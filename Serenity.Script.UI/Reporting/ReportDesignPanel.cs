@@ -61,7 +61,7 @@
 
         public void RefreshDesignList()
         {
-            Q.ServiceCall(new ServiceCallOptions<ListResponse<ReportDesignEntity>>
+            Q.ServiceCall(new ServiceCallOptions<ListResponse<ReportDesignItem>>
             {
                 Service = "ReportDesign/List",
                 Request = new ReportDesignListRequest
@@ -75,13 +75,13 @@
             });
         }
 
-        public void SetDesignList(List<ReportDesignEntity> designs)
+        public void SetDesignList(List<ReportDesignItem> designs)
         {
             var dl = this.ById("DesignList");
             Q.ClearOptions(dl);
 
             foreach (var design in designs)
-                Q.AddOption(dl, design.ReportDesignId.ToString(), design.ReportDesign);
+                Q.AddOption(dl, design.DesignId, design.DesignId);
         }
 
         public String ReportKey { get; set; }

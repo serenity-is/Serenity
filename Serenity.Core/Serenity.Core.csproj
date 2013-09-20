@@ -240,7 +240,6 @@
     <Compile Include="Extensibility\EnumRegistrarAttribute.cs" />
     <Compile Include="Extensibility\ExtensibilityHelper.cs" />
     <Compile Include="Extensibility\RegisterFormAttribute.cs" />
-    <Compile Include="Extensibility\RegisterReportAttribute.cs" />
     <Compile Include="Extensibility\ScriptRegistrarAttribute.cs" />
     <Compile Include="Extensibility\SelfAssemblyAttribute.cs" />
     <Compile Include="Extensions\GenericExtensions.cs" />

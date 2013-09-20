@@ -11,11 +11,9 @@ namespace Serenity.Reporting
     }
 
     [Imported, Serializable, PreserveMemberCase]
-    public class ReportDesignEntity
+    public class ReportDesignItem
     {
-        public string ReportDesignId;
+        public string DesignId;
         public string ReportKey;
-        public string ReportDesign;
-        public string Filename;
     }
 }

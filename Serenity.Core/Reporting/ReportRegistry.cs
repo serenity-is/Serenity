@@ -14,12 +14,18 @@ namespace Serenity.Reporting
 
         private static string GetReportKey(Type type)
         {
-            var name = type.Name;
-            const string report = "Report";
-            if (name.EndsWith(report))
-                name = name.Substring(0, name.Length - report.Length);
+            var attr = type.GetCustomAttribute<RegisterReportAttribute>(false);
+            if (attr == null || attr.ReportKey.IsEmptyOrNull())
+            {
+                var name = type.Name;
+                const string report = "Report";
+                if (name.EndsWith(report))
+                    name = name.Substring(0, name.Length - report.Length);
 
-            return name;
+                return name;
+            }
+
+            return attr.ReportKey;
         }
 
         private static string GetReportCategory(Type type)
@@ -91,14 +97,20 @@ namespace Serenity.Reporting
             EnsureTypes();
 
             var list = new List<Report>();
+            var permissionService = IoC.Resolve<IPermissionService>();
 
-            List<Report> reports;
-            if (!reportsByCategory.TryGetValue(categoryKey, out reports))
-                return list;
-
-            foreach (var report in reports)
-                if (IoC.Resolve<IPermissionService>().HasPermission(report.Permission))
-                    list.Add(report);
+            foreach (var k in reportsByCategory)
+                if (categoryKey.IsEmptyOrNull() ||
+                    String.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
+                    (categoryKey ?? "").StartsWith(k.Key + "/", StringComparison.OrdinalIgnoreCase))
+                {
+                    foreach (var report in k.Value)
+                        if (report.Permission.IsEmptyOrNull() ||
+                            permissionService.HasPermission(report.Permission))
+                        {
+                            list.Add(report);
+                        }
+                }
 
             list.Sort((x, y) => (x.Title ?? "").CompareTo(y.Title ?? ""));
 

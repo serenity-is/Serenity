@@ -27,6 +27,6 @@ namespace Serenity.Reporting
         public List<PropertyItem> Properties;
         public string Title;
         public object InitialSettings;
-        public List<ReportDesignEntity> Designs;
+        public List<ReportDesignItem> Designs;
     }
 }
