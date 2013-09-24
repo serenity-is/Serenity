@@ -55,7 +55,7 @@ namespace Serenity
             return type.FullName.Replace(".", "_");
         }
 
-        public static bool HasOriginalEvent(jQueryEvent e)
+        public static bool HasOriginalEvent(this jQueryEvent e)
         {
             return !Script.IsUndefined(((dynamic)e).originalEvent);
         }

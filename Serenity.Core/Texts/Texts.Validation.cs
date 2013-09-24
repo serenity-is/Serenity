@@ -17,6 +17,7 @@
             public static LocalText DateInvalid = "Lütfen geçerli bir tarih giriniz.";
             public static LocalText IncorrectPassword = "Girilen şifre hatalı. Kontrol ediniz.";
             public static LocalText Integer = "Lütfen geçerli bir tamsayı değeri giriniz.";
+            public static LocalText MaxLength = "Lütfen en fazla {0} karakter giriniz.";
             public static LocalText MinLength = "Lütfen en az {0} karakter giriniz.";
             public static LocalText Range = "Lütfen {0} ile {1} arasında bir değer giriniz.";
             public static LocalText Username = "Kullanıcı adı '@' karakteri içeremez.";

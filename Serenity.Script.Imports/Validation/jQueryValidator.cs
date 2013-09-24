@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
 
 namespace jQueryApi
 {
     public delegate bool jQueryValidationHighlight(Element element, string errorClass, string validClass);
-    public delegate bool jQueryValidationMethod(string value, Element element, object[] parameters);
+    public delegate bool jQueryValidationMethod(string value, Element element);
+    public delegate bool jQueryValidationMethodWithParameters(string value, Element element, object[] parameters);
 
     [Imported, IgnoreNamespace]
     public sealed class jQueryValidator
@@ -131,6 +133,9 @@ namespace jQueryApi
         {
             return false;
         }
+
+        [ScriptAlias("$.validator.methods")]
+        public static JsDictionary<string, jQueryValidationMethod> Methods { get { return null; } }
     }
 
     [Imported, IgnoreNamespace, ScriptName("Object")]
