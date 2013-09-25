@@ -197,6 +197,24 @@ namespace Serenity
             return editor;
         }
 
+        private JsDictionary<string, int?> GetCategoryOrder()
+        {
+            var split = (options.CategoryOrder.TrimToNull() ?? options.DefaultCategory ?? "").Split(";");
+            int order = 0;
+            var result = new JsDictionary<string, int?>();
+
+            foreach (var s in split)
+            {
+                var x = s.TrimToNull();
+                if (x == null)
+                    continue;
+
+                result[x] = order++;
+            }
+
+            return result;
+        }
+
         private JsDictionary<string, int> CreateCategoryLinks(jQueryObject container, List<PropertyItem> items)
         {
             int idx = 0;
@@ -208,21 +226,33 @@ namespace Serenity
             }
 
             var self = this;
+            JsDictionary<string, int?> categoryOrder = null;
             
             items.Sort((x, y) => {
                 var c = 0;
+                
                 if (x.Category != y.Category)
                 {
-                    if (x.Category == self.options.DefaultCategory)
-                        c = -1;
-                    else if (y.Category == self.options.DefaultCategory)
-                        c = 1;
+                    if (categoryOrder != null || options.CategoryOrder != null)
+                    {
+                        categoryOrder = categoryOrder ?? GetCategoryOrder();
+                        var c1 = categoryOrder[x.Category];
+                        var c2 = categoryOrder[y.Category];
+                        if (c1 != null && c2 != null)
+                            c = c1.Value - c2.Value;
+                        else if (c1 != null)
+                            c = -1;
+                        else if (c2 != null)
+                            c = 1;
+                    }
                 }
 
                 if (c == 0)
                     c = String.Compare(x.Category, y.Category);
+
                 if (c == 0)
                     c = itemIndex[x.Name].CompareTo(itemIndex[y.Name]);
+
                 return c;
             });
 

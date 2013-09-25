@@ -11,6 +11,7 @@ namespace Serenity
         public string IdPrefix { get; set; }
         public List<PropertyItem> Items { get; set; }
         public bool UseCategories { get; set; }
+        public string CategoryOrder { get; set; }
         public string DefaultCategory { get; set; }
         public PropertyGridMode Mode { get; set; }
     }
