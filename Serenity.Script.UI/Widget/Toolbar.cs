@@ -32,7 +32,12 @@ namespace Serenity
 
                 var span = button.Find("span")
                         .AddClass(cssClass)
-                        .Click(b.OnClick);
+                        .Click(delegate(jQueryEvent e) {
+                            if (jQuery.FromElement(e.Target).Closest(".tool-button").HasClass("disabled"))
+                                return;
+
+                            b.OnClick(e);
+                        });
 
                 var text = b.Title;
                 if (b.HtmlEncode != false)
