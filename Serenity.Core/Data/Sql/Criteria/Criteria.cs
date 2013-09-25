@@ -82,17 +82,6 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Belirtilen join ve alan adýný aralarýna nokta koyarak içeren yeni bir kriter oluþturur.</summary>
-        /// <param name="join">
-        ///   Tablo alias bilgisini içeren LeftJoin nesnesi (zorunlu).</param>
-        /// <param name="field">
-        ///   Alan adý (zorunlu).</param>
-        public Criteria(LeftJoin join, string field)
-            : this(join.JoinAlias, field)
-        {
-        }
-
-        /// <summary>
         ///   Belirtilen numerik tablo alias'ý (baþýna T konarak) ve alanýn adýný aralarýna 
         ///   nokta koyarak içeren yeni bir kriter oluþturur.</summary>
         /// <param name="joinNumber">
@@ -111,20 +100,20 @@ namespace Serenity.Data
         ///   Join numarasý (T1 gibi kullanýlýr)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
-        public Criteria(int joinNumber, Field field)
-            : this(joinNumber, field.Name)
+        public Criteria(Alias alias, string field)
+            : this(alias.Name, field)
         {
         }
 
         /// <summary>
-        ///   Belirtilen join ve meta alanýn adýný aralarýna nokta koyarak içeren yeni bir 
-        ///   kriter oluþturur.</summary>
-        /// <param name="join">
-        ///   Tablo alias bilgisini içeren LeftJoin nesnesi (zorunlu).</param>
+        ///   Belirtilen numerik tablo alias'ý (baþýna T konarak) ve alanýn adýný aralarýna 
+        ///   nokta koyarak içeren yeni bir kriter oluþturur.</summary>
+        /// <param name="joinNumber">
+        ///   Join numarasý (T1 gibi kullanýlýr)</param>
         /// <param name="field">
-        ///   Field alan (zorunlu).</param>
-        public Criteria(LeftJoin join, Field field)
-            : this(join.JoinAlias, field.Name)
+        ///   Alan nesnesi (zorunlu).</param>
+        public Criteria(int joinNumber, Field field)
+            : this(joinNumber, field.Name)
         {
         }
 

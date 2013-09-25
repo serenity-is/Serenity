@@ -238,7 +238,7 @@ namespace Serenity.Data
         public static TField OfJoin<TField>(this TField field, LeftJoin join, string origin)
             where TField: Field
         {
-            field.Expression = join.JoinAlias + "." + origin;
+            field.Expression = join.Name + "." + origin;
             field.Flags = FieldFlags.Foreign;
             return field;
         }

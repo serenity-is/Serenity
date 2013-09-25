@@ -170,7 +170,6 @@
     <Compile Include="Data\Field\FieldFlags.cs" />
     <Compile Include="Data\Field\FieldSelectMode.cs" />
     <Compile Include="Data\Field\FieldType.cs" />
-    <Compile Include="Data\Field\Foreign.cs" />
     <Compile Include="Data\Field\InstanceNameAttribute.cs" />
     <Compile Include="Data\Field\JoinAliasLocator.cs" />
     <Compile Include="Data\Field\LeftJoin.cs" />

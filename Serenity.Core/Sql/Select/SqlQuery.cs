@@ -182,8 +182,8 @@
 
             LeftJoin join;
             if (fields.LeftJoins.TryGetValue(joinAlias, out join) &&
-                join.JoinAlias != null &&
-                !_joinAliases.Contains(join.JoinAlias))
+                join.Name != null &&
+                !_joinAliases.Contains(join.Name))
             {
                 var source = join.SourceAlias.TrimToNull();
                 if (source != null &&
@@ -215,6 +215,11 @@
             if (_mainTableName == null)
                 _mainTableName = table;
             return this;
+        }
+
+        public SqlQuery FromAs(string table, Alias tableAlias)
+        {
+            return FromAs(table, tableAlias.Name);
         }
 
         public SqlQuery FromAs(string table, string tableAlias)
@@ -262,9 +267,20 @@
                 return From(row.Table).Into(row);
         }
 
+
         public SqlQuery LeftJoin(string joinTable, Alias joinAlias, string joinCondition)
         {
             return LeftJoin(joinTable, joinAlias.Name, joinCondition);
+        }
+
+        public SqlQuery LeftJoin(string joinTable, string joinAlias, BaseCriteria joinCondition)
+        {
+            if (Object.ReferenceEquals(joinCondition, null))
+                throw new ArgumentNullException("joinCondition");
+
+            LeftJoin(joinTable, joinAlias, joinCondition.ToString(this));
+
+            return this;
         }
 
         public SqlQuery LeftJoin(string joinTable, Alias joinAlias, BaseCriteria joinCondition)
@@ -349,7 +365,47 @@
 
         public SqlQuery Join(LeftJoin join)
         {
-            return LeftJoin(join.JoinTable, join.JoinAlias, join.JoinCondition);
+            return LeftJoin(join.JoinTable, join.Name, join.JoinCondition);
+        }
+
+        public SqlQuery OuterApply(Alias joinAlias, string expression)
+        {
+            return OuterApply(joinAlias.Name, expression);
+        }
+
+        public SqlQuery SubQuery()
+        {
+            var subQuery = new SqlQuery();
+            this.Params = this.Params ?? new Dictionary<string, object>();
+            subQuery.Params = this.Params;
+            subQuery.parentQuery = this;
+            return subQuery;
+        }
+
+        public SqlQuery OuterApply(string joinAlias, string expression)
+        {
+            if (expression == null || expression.Length == 0)
+                throw new ArgumentNullException("expression");
+
+            if (joinAlias.IsEmptyOrNull())
+                throw new ArgumentNullException("joinAlias");
+
+            _cachedQuery = null;
+
+            // araya bir boşluk ve LEFT OUTER JOIN metnini ekle.
+            AppendUtils.AppendWithSeparator(ref _from, " ", "OUTER APPLY (");
+            // tablo adını ekle
+            _from.Append(expression);
+
+            _from.Append(") ");
+            _from.Append(joinAlias);
+
+            if (_joinAliases == null)
+                _joinAliases = new HashSet<string>();
+
+            _joinAliases.Add(joinAlias);
+
+            return this;
         }
 
         public SqlQuery Where(string condition)

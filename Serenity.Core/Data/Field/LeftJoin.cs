@@ -4,15 +4,12 @@ namespace Serenity.Data
 {
     /// <summary>
     ///   SQL sorgusundaki bir LEFT OUTER JOIN ile ilgili bilgileri tutan Field sýnýf.</summary>
-    public class LeftJoin
+    public class LeftJoin : Alias
     {
         /// <summary>Sorguya left outer join ile dahil edilen tablo adý (zorunlu).</summary>
         private string _joinTable;
-        /// <summary>Sorguya left outer join ile dahil edilen tabloya atanan alias (zorunlu).</summary>
-        private string _joinAlias;
         /// <summary>Left outer join iþleminin "ON (...)" kýsmýnda belirtilen ifade (zorunlu).</summary>
         private string _joinCondition;
-
         private string _sourceAlias;
         private string _sourceKeyField;
         private string _joinKeyField;
@@ -26,6 +23,7 @@ namespace Serenity.Data
         /// <param name="joinCondition">
         ///   Left outer join iþleminin "ON(...)" kýsmýnda belirtilen ifade (zorunlu).</param>
         public LeftJoin(RowFieldsBase fields, string joinTable, string joinAlias, string joinCondition)
+            : base(joinAlias)
         {
             if (joinTable == null)
                 throw new ArgumentNullException("joinTable");
@@ -35,10 +33,9 @@ namespace Serenity.Data
                 throw new ArgumentNullException("joinCondition");
 
             _joinTable = joinTable;
-            _joinAlias = joinAlias;
             _joinCondition = joinCondition;
 
-            if (IsValidIdentifier(_joinAlias))
+            if (IsValidIdentifier(this.Name))
             {
                 var c = _joinCondition.Split(new char[] { '=' });
                 if (c.Length == 2)
@@ -53,13 +50,13 @@ namespace Serenity.Data
                         IsValidIdentifier(p2[1].Trim()) &&
                         String.Compare(p1[0].Trim(), p2[0].Trim(), StringComparison.InvariantCultureIgnoreCase) != 0)
                     {
-                        if (String.Compare(p1[0].Trim(), _joinAlias, StringComparison.InvariantCultureIgnoreCase) == 0)
+                        if (String.Compare(p1[0].Trim(), this.Name, StringComparison.InvariantCultureIgnoreCase) == 0)
                         {
                             _joinKeyField = p1[1].Trim();
                             _sourceAlias = p2[0].Trim();
                             _sourceKeyField = p2[1].Trim();
                         }
-                        else if (String.Compare(p2[0].Trim(), _joinAlias, StringComparison.InvariantCultureIgnoreCase) == 0)
+                        else if (String.Compare(p2[0].Trim(), this.Name, StringComparison.InvariantCultureIgnoreCase) == 0)
                         {
                             _joinKeyField = p2[1].Trim();
                             _sourceAlias = p1[0].Trim();
@@ -69,7 +66,7 @@ namespace Serenity.Data
                 }
             }
 
-            fields._leftJoins.Add(_joinAlias, this);
+            fields._leftJoins.Add(this.Name, this);
         }
 
         public static bool IsValidIdentifier(string s)
@@ -145,16 +142,6 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Left outer join yapýlan tabloya atanan alias'ý verir.</summary>
-        public string JoinAlias
-        {
-            get
-            {
-                return _joinAlias;
-            }
-        }
-
-        /// <summary>
         ///   Left outer join'in "ON(...)" kýsmýnda yazýlan ifadeyi verir.</summary>
         public string JoinCondition
         {
@@ -186,16 +173,6 @@ namespace Serenity.Data
             {
                 return _joinKeyField;
             }
-        }
-
-        public string this[string field]
-        {
-            get { return this.JoinAlias + "." + field; }
-        }
-
-        public string this[Field field]
-        {
-            get { return this.JoinAlias + "." + field.Name; }
         }
     }
 }

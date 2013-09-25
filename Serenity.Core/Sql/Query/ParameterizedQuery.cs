@@ -8,6 +8,7 @@
     public class ParameterizedQuery : IDbParameterized
     {
         private Dictionary parameters;
+        protected ParameterizedQuery parentQuery;
         private int nextAutoParam;
 
         public void AddParam(string name, object value)
@@ -34,7 +35,7 @@
 
         public int NextAutoParam
         {
-            get { return nextAutoParam; }
+            get { if (parentQuery != null) return parentQuery.NextAutoParam; else return nextAutoParam; }
             set { nextAutoParam = value; }
         }
 
@@ -45,7 +46,10 @@
 
         public Parameter AutoParam()
         {
-            return new Parameter((nextAutoParam++).IndexParam());
+            if (parentQuery != null)
+                return parentQuery.AutoParam();
+            else
+                return new Parameter((nextAutoParam++).IndexParam());
         }
     }
 }
