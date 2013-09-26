@@ -327,7 +327,7 @@ namespace Serenity
         public static void EnsureLoggedIn(RightErrorHandling errorHandling)
         {
             if (!IsLoggedIn)
-                HandleRightError(RightErrorHandling.Redirect);
+                HandleRightError(errorHandling);
         }
 
         public static void EnsurePermission(string permission, RightErrorHandling errorHandling)
