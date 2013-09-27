@@ -35,6 +35,8 @@
     <Compile Include="Attribute\EntityTypeAttribute.cs" />
     <Compile Include="Attribute\IdPropertyAttribute.cs" />
     <Compile Include="Attribute\NamePropertyAttribute.cs" />
+    <Compile Include="Editor\URLEditor.cs" />
+    <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
     <Compile Include="PropertyDialog\PropertyDialog.cs" />
     <Compile Include="PropertyDialog\PropertyDialog_Inference.cs" />

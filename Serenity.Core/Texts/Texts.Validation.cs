@@ -20,6 +20,7 @@
             public static LocalText MaxLength = "Lütfen en fazla {0} karakter giriniz.";
             public static LocalText MinLength = "Lütfen en az {0} karakter giriniz.";
             public static LocalText Range = "Lütfen {0} ile {1} arasında bir değer giriniz.";
+            public static LocalText Url = "Lütfen geçerli bir URL giriniz (http://www.site.com formatında).";
             public static LocalText Username = "Kullanıcı adı '@' karakteri içeremez.";
             public static LocalText UsernameExists = "Bu kullanıcı adı müsait değil. Lütfen başka bir ad seçiniz.";
             public static LocalText Xss = "Geçersiz değer! ('&lt;' ve '&amp;' kullanmayın)";
