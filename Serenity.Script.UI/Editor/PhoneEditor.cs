@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Serenity
 {
-    [Editor("Metin")]
+    [Editor("Telefon", typeof(PhoneEditorOptions))]
     [Element("<input type=\"text\"/>")]
     public class PhoneEditor : Widget<PhoneEditorOptions>, IStringValue
     {
