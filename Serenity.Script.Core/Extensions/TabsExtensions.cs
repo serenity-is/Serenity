@@ -33,7 +33,7 @@ namespace Serenity
 
         public static string ActiveTabKey(this TabsObject tabs)
         {
-            var href = tabs.As<jQueryObject>().Children("ul").Eq(tabs.Active.As<int>()).Children("li").Children("a").GetAttribute("href").ToString();
+            var href = tabs.As<jQueryObject>().Children("ul").Children("li").Eq(tabs.Active.As<int>()).Children("a").GetAttribute("href").ToString();
             var prefix = "_Tab";
             var lastIndex = href.LastIndexOf(prefix);
             if (lastIndex >= 0)

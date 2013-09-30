@@ -69,8 +69,11 @@ namespace Serenity
             BindToSlickEvents();
             BindToViewEvents();
 
-            CreateIncludeDeletedButton();
-            CreateQuickSearchInput();
+            if (buttons != null)
+            {
+                CreateIncludeDeletedButton();
+                CreateQuickSearchInput();
+            }
 
             UpdateDisabledState();
 
@@ -616,6 +619,8 @@ namespace Serenity
 
             return "IsActive";
         }
+
+        public SlickRemoteView<TEntity> View { get { return view; } }
     }
 
     [Imported, Serializable]
