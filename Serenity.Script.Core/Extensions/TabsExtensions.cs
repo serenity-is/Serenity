@@ -1,8 +1,6 @@
 ﻿using jQueryApi;
 using jQueryApi.UI.Widgets;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -11,28 +9,6 @@ namespace Serenity
     /// </summary>
     public static class TabsExtensions
     {
-        //public static void SetDisabledTabs(this TabsObject tabs, params string[] disabled)
-        //{
-        //    var disabledIndexes = new List<int>();
-        //    var indexByKey = tabs.IndexByKey();
-        //    var active = (int)tabs.Active;
-        //    foreach (var d in disabled)
-        //    {
-        //        var index = indexByKey[d];
-        //        if (index != null)
-        //        {
-        //            disabledIndexes.Add(index.Value);
-        //            if (active == index.Value)
-        //                active = 0;
-        //        }
-        //    }
-
-        //    if ((int)tabs.Active != active)
-        //        tabs.Active = active;
-
-        //    tabs.Option("disabled", disabledIndexes);
-        //}
-
         public static void SetDisabled(this TabsObject tabs, string tabKey, bool isDisabled)
         {
             if (tabs == null)

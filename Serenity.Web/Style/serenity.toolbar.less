@@ -1,0 +1,77 @@
+﻿div.s-Toolbar {
+    background: #fafafa url(images/toolbar-bg.gif) repeat-x top;
+    position: relative;
+    border: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    overflow: hidden;
+    border-radius: 3px;
+}
+
+div.s-Toolbar .buttons-inner {
+    float: left;
+    padding: 1px;
+}
+
+div.s-Toolbar div.sep-button {
+    float: left;
+    height: 22px;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #fff;
+    margin: 1px;
+}
+
+div.s-Toolbar .tool-button {
+    float: left;
+    display: block;
+    cursor: pointer;
+    padding: 1px;
+}
+
+div.s-Toolbar .tool-button:hover {
+    padding: 0px;
+    border: 1px solid #ccc;
+}
+
+div.s-Toolbar .button-outer {
+    float: left;
+    padding: 1px 3px;
+}
+
+div.s-Toolbar .tool-button.disabled:hover {
+    padding: 1px;
+    border-width: 0px;
+}
+
+div.s-Toolbar .tool-button.disabled {
+    cursor: default;
+}
+
+div.s-Toolbar .tool-button.disabled span {
+    opacity: 0.4;
+}
+
+div.s-Toolbar .tool-button:hover > div.button-outer {
+    padding: 0px 2px;
+    border-left: 1px solid #fff;
+    border-top: 1px solid #fff;
+    border-right: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+div.s-Toolbar .tool-button.disabled:hover > div.button-outer {
+    padding: 1px 3px;
+    border: 0px none;
+}
+
+
+div.s-Toolbar span.button-inner {
+    float: left;
+    display: block;
+    padding: 3px 3px 3px 20px;
+    background-repeat: no-repeat;
+    background-position: center left;
+}
+
+div.s-Toolbar .buttons-inner {
+    min-height: 20px;
+}

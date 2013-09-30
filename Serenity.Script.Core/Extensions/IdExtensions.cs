@@ -5,9 +5,15 @@ namespace Serenity
 {
     /// <summary>
     /// Provides extension methods to work with identity values
+    /// <u>Identity değerleriyle çalışmak için uzantı metodları sunar.</u>
     /// </summary>
     public static class IdExtensions
     {
+        /// <summary>
+        /// Converts value to its 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static Int64? ConvertToId(this object value)
         {
             return Q.Externals.ToId(value);
