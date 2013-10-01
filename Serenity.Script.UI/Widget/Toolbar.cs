@@ -56,6 +56,10 @@ namespace Serenity
 
         public jQueryObject FindButton(string className)
         {
+            if (className != null &&
+                className.StartsWith("."))
+                className = className.Substr(1);
+
             return jQuery.Select("span.button-inner." + className, this.element)
                 .Closest("div.tool-button");
         }

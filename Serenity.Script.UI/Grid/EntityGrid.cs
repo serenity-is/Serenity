@@ -8,7 +8,12 @@ using System.Text.RegularExpressions;
 
 namespace Serenity
 {
-    public abstract class EntityGrid<TEntity, TOptions> : Widget<TOptions>
+    public interface IEntityGrid
+    {
+        SlickGrid SlickGrid { get; }
+    }
+
+    public abstract class EntityGrid<TEntity, TOptions> : Widget<TOptions>, IEntityGrid
         where TOptions: GridOptions, new()
         where TEntity: class, new()
     {
@@ -621,6 +626,7 @@ namespace Serenity
         }
 
         public SlickRemoteView<TEntity> View { get { return view; } }
+        public SlickGrid SlickGrid { get { return slickGrid; } }
     }
 
     [Imported, Serializable]
