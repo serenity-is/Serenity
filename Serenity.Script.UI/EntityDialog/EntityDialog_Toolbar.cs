@@ -45,7 +45,7 @@ namespace Serenity
 
             list.Add(new ToolButton 
             {
-                Title = "Kaydet ve çık",
+                Title = "Kaydet ve Çık",
                 CssClass = "save-and-close-button",
                 OnClick = delegate
                 {
@@ -74,6 +74,8 @@ namespace Serenity
                             self.LoadById(self.EntityId.As<long>(), null);
                         else
                             self.LoadById(Type.GetField(response, "EntityId").As<long>(), null);
+
+                        Q.NotifySuccess("Kayıt işlemi başarılı");
                     });
                 }
             });

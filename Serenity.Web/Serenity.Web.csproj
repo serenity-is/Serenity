@@ -130,7 +130,6 @@
     <Compile Include="WebApplicationSettings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Style\serenity.css" />
     <None Include="packages.config" />
     <None Include="Style\serenity.basic.less" />
     <None Include="Style\serenity.dialogs.less" />

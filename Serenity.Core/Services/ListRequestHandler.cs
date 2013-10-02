@@ -153,7 +153,7 @@
             return Row.GetFields().Filters;
         }
 
-        protected virtual void ApplyFilters(SqlQuery query)
+        protected virtual void ApplyIncludeDeletedFilter(SqlQuery query)
         {
             if (!Request.IncludeDeleted)
             {
@@ -161,6 +161,11 @@
                 if (isActiveRow != null)
                     query.Where(new Criteria(isActiveRow.IsActiveField) >= 0);
             }
+        }
+
+        protected virtual void ApplyFilters(SqlQuery query)
+        {
+            ApplyIncludeDeletedFilter(query);
         }
 
         protected virtual void ValidatePermissions()

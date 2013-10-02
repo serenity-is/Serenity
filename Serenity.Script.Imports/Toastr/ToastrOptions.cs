@@ -9,5 +9,7 @@ namespace Serenity
     [Imported, Serializable]
     public class ToastrOptions
     {
+        public object Target { get; set; }
+        public string PositionClass { get; set; }
     }
 }

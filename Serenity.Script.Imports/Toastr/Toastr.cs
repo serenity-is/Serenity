@@ -18,10 +18,27 @@ namespace Serenity
         }
 
         /// <summary>
+        /// Display a warning notification
+        /// </summary>
+        /// <param name="message">Message</param>
+        public static void Warning(string message, string title, ToastrOptions options)
+        {
+        }
+
+
+        /// <summary>
         /// Display a success notification
         /// </summary>
         /// <param name="message">Message</param>
         public static void Success(string message)
+        {
+        }
+
+        /// <summary>
+        /// Display a success notification
+        /// </summary>
+        /// <param name="message">Message</param>
+        public static void Success(string message, string title, ToastrOptions options)
         {
         }
 
@@ -34,10 +51,26 @@ namespace Serenity
         }
 
         /// <summary>
+        /// Display an information notification
+        /// </summary>
+        /// <param name="message">Message</param>
+        public static void Info(string message, string title, ToastrOptions options)
+        {
+        }
+
+        /// <summary>
         /// Display an error notification
         /// </summary>
         /// <param name="message">Message</param>
         public static void Error(string message)
+        {
+        }
+
+        /// <summary>
+        /// Display an error notification
+        /// </summary>
+        /// <param name="message">Message</param>
+        public static void Error(string message, string title, ToastrOptions options)
         {
         }
 
