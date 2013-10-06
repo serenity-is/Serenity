@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using jQueryApi;
+using System.Html;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -18,6 +20,24 @@ namespace Serenity
         public static T As<T>(this object value)
         {
             return default(T);
+        }
+
+        /// <summary>
+        /// Calls jQuery function ($) on object
+        /// </summary>
+        [InlineCode("$({input})")]
+        public static jQueryObject JQuery(this string input)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Calls jQuery function ($) on object
+        /// </summary>
+        [InlineCode("$({input})")]
+        public static jQueryObject JQuery(this Element input)
+        {
+            return null;
         }
     }
 }

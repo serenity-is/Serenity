@@ -27,18 +27,6 @@ namespace Serenity
         public string ErrorMsg { get; set; }
     }
 
-    [Imported, Serializable, PreserveMemberCase]
-    public class ListResponse<TEntity> : ServiceResponse
-    {
-        [PreserveCase]
-        public List<TEntity> Entities;
-        [PreserveCase]
-        public int TotalCount;
-        [PreserveCase]
-        public int Skip;
-        [PreserveCase]
-        public int Take;
-    }
 
     public delegate bool CancellableViewCallback<TEntity>(SlickRemoteView<TEntity> view);
     public delegate bool SlickRemoteViewAjaxCallback<TEntity>(SlickRemoteView<TEntity> view, jQueryAjaxOptions options);

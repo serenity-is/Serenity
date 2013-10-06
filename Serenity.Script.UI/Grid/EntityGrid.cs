@@ -164,7 +164,14 @@ namespace Serenity
                 return self.GetItemMetadata(item, index);
             });
 
-            return new SlickGrid(slickContainer, data: viewRows, columns: slickColumns, options: slickOptions);
+            var grid = new SlickGrid(slickContainer, data: viewRows, columns: slickColumns, options: slickOptions);
+
+            grid.RegisterPlugin(new SlickAutoTooltips(new SlickAutoTooltipsOptions
+            {
+                EnableForHeaderCells = true
+            }));
+
+            return grid;
         }
 
         protected virtual void CreateIncludeDeletedButton()

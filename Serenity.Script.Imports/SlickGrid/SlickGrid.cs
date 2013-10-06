@@ -60,6 +60,28 @@ namespace Serenity
         public int RightPx { get; set; }
     }
 
+
+    /// <summary>
+    /// Options for the Slick columns
+    /// </summary>
+    [Imported, ScriptNamespace("Slick"), ScriptName("AutoTooltips")]
+    public class SlickAutoTooltips
+    {
+        public SlickAutoTooltips(SlickAutoTooltipsOptions options)
+        {
+        }
+    }
+
+    [Imported, Serializable]
+    public class SlickAutoTooltipsOptions
+    {
+        
+
+        public bool EnableForHeaderCells { get; set; }
+        public bool EnableForCells { get; set; }
+        public int MaxToolTipLength { get; set; }
+    }
+
     /// <summary>
     /// Options for the Slick columns
     /// </summary>
@@ -413,6 +435,14 @@ namespace Serenity
         /// Resets active cell.
         /// </summary>
         public void ResetActiveCell()
+        {
+        }
+
+        /// <summary>
+        /// Registers a plugin
+        /// </summary>
+        /// <param name="plugin">An instance of plugin object to register.</param>
+        public void RegisterPlugin(object plugin)
         {
         }
 

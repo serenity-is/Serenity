@@ -75,5 +75,15 @@ namespace Serenity
                     }
                 });
         }
+
+        public static JsDate ParseDate(string value)
+        {
+            return Q.Externals.ParseDate(value);
+        }
+
+        public static JsDate ParseISODateTime(string value)
+        {
+            return Q.Externals.ParseISODateTime(value);
+        }
     }
 }

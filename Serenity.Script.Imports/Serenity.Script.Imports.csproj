@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NoStdLib>True</NoStdLib>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +41,8 @@
     <Compile Include="PropertyGrid\PropertyGridOptions.cs" />
     <Compile Include="PropertyGrid\PropertyItem.cs" />
     <Compile Include="Services\PostToServiceOptions.cs" />
+    <Compile Include="Services\ListRequest.cs" />
+    <Compile Include="Services\ListResponse.cs" />
     <Compile Include="Services\ServiceCallOptions.cs" />
     <Compile Include="Services\ServiceContracts.cs" />
     <Compile Include="Services\ServiceRequest.cs" />

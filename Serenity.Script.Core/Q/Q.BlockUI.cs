@@ -5,6 +5,20 @@ namespace Serenity
 {
     public static partial class Q
     {
+        private static int blockUICount = 0;
+
+        private static void BlockUIWithCheck(BlockUIOptions options)
+        {
+            if (blockUICount > 0)
+            {
+                blockUICount++;
+                return;
+            }
+
+            jQuery.Instance.blockUI(options);
+            blockUICount++;
+        }
+
         /// <summary>
         /// Uses jQuery BlockUI plugin to block access to whole page (default) or 
         /// a part of it, by using a transparent overlay covering the whole area.
@@ -34,12 +48,12 @@ namespace Serenity
                 Window.SetTimeout(
                     delegate
                     {
-                        jQuery.Instance.blockUI(options);
+                        BlockUIWithCheck(options);
                     }, 
                     0
                 );
             else
-                jQuery.Instance.blockUI(options);
+                BlockUIWithCheck(options);
         }
 
         /// <summary>
@@ -47,6 +61,13 @@ namespace Serenity
         /// </summary>
         public static void BlockUndo()
         {
+            if (blockUICount > 1)
+            {
+                blockUICount--;
+                return;
+            }
+
+            blockUICount--;
             jQuery.Instance.unblockUI(new { fadeOut = 0 });
         }
     }
