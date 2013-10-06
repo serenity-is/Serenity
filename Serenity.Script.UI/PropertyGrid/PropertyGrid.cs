@@ -173,6 +173,7 @@ namespace Serenity
 
             var element = jQuery.FromHtml(elementHtml)
                 .AddClass("editor")
+                .AddClass("flexify")
                 .Attribute("id", editorId)
                 .AppendTo(fieldDiv);
 

@@ -101,6 +101,10 @@
     <Compile Include="Reporting\ReportDesignPanel.cs" />
     <Compile Include="Reporting\ReportDialog.cs" />
     <Compile Include="Reporting\ReportsPage.cs" />
+    <Compile Include="Widget\DialogExtensions.cs" />
+    <Compile Include="Widget\Flexify.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Widget\TemplatedDialog.cs" />
     <Compile Include="Widget\TemplatedWidget.cs" />
     <Compile Include="Widget\Toolbar.cs" />

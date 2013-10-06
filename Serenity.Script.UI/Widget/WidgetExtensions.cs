@@ -43,7 +43,7 @@ namespace Serenity
 
             var widgetName = WidgetExtensions.GetWidgetName(widgetType);
             var widget = element.GetDataValue(widgetName);
-            
+
             if (widget != null && !widgetType.IsAssignableFrom(widget.GetType()))
                 return null;
 

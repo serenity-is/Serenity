@@ -286,7 +286,7 @@ namespace Serenity
         public static void ChangeGlobalGeneration(string globalGenerationKey)
         {
             HttpRuntime.Cache.Remove(globalGenerationKey);
-            DistributedCache.Set(globalGenerationKey, RandomGeneration());
+            DistributedCache.Set<object>(globalGenerationKey, null);
         }
 
         /// <summary>

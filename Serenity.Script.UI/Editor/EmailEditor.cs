@@ -16,7 +16,7 @@ namespace Serenity
         {
             RegisterValidationMethods();
 
-            input.AddClass("emailuser");
+            input.AddClass("emailuser").RemoveClass("flexify");
 
             var spanAt = jQuery.FromHtml("<span/>")
                 .Text("@")
@@ -25,6 +25,7 @@ namespace Serenity
 
             var domain = jQuery.FromHtml("<input type=\"text\"/>")
                 .AddClass("emaildomain")
+                .AddClass("flexify")
                 .InsertAfter(spanAt);
 
             domain.Bind("blur." + this.uniqueName, delegate

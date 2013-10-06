@@ -19,6 +19,11 @@ namespace Serenity
         private ICouchbaseClient cacheClient;
 
         /// <summary>
+        /// The secondary client (only used to remove keys)
+        /// </summary>
+        private ICouchbaseClient secondaryClient;
+
+        /// <summary>
         /// The configuration read from application settings
         /// </summary>
         private Configuration configuration;
@@ -49,6 +54,15 @@ namespace Serenity
             config.Urls.Add(new Uri(this.configuration.ServerAddress));
 
             this.cacheClient = new CouchbaseClient(config);
+
+            if (!this.configuration.SecondaryServerAddress.IsTrimmedEmpty())
+            {
+                var secondaryConfig = new CouchbaseClientConfiguration();
+                secondaryConfig.Bucket = config.Bucket;
+                secondaryConfig.BucketPassword = config.BucketPassword;
+                secondaryConfig.Urls.Add(new Uri(this.configuration.SecondaryServerAddress));
+                this.secondaryClient = new CouchbaseClient(secondaryConfig);
+            }
         }
 
         /// <summary>
@@ -96,7 +110,17 @@ namespace Serenity
         {
             key = this.configuration.KeyPrefix + key;
             if (Object.ReferenceEquals(null, value))
+            {
                 cacheClient.Remove(key);
+                if (secondaryClient != null)
+                    try
+                    {
+                        secondaryClient.Remove(key);
+                    }
+                    catch
+                    {
+                    }
+            }
             else
                 cacheClient.Store(StoreMode.Set, key, value);
         }
@@ -113,7 +137,17 @@ namespace Serenity
         {
             key = this.configuration.KeyPrefix + key;
             if (Object.ReferenceEquals(null, value))
+            {
                 cacheClient.Remove(key);
+                if (secondaryClient != null)
+                    try
+                    {
+                        secondaryClient.Remove(key);
+                    }
+                    catch
+                    {
+                    }
+            }
             else
                 cacheClient.Store(StoreMode.Set, key, value, expiresAt);
         }
@@ -139,6 +173,11 @@ namespace Serenity
             /// Gets or sets the Couchbase bucket pass
             /// </summary>
             public string BucketPass { get; set; }
+
+            /// <summary>
+            /// Gets or sets the alternate cache (not used for caching, only used to validate keys on removal)
+            /// </summary>
+            public string SecondaryServerAddress { get; set; }
 
             /// <summary>
             /// Gets or sets the key prefix for values stored in cache.

@@ -38,7 +38,12 @@ namespace Serenity
                     });
                 }
 
-                var dialog = element.Closest(".ui-dialog-content");
+                jQueryObject dialog;
+                if (element.HasClass("ui-dialog"))
+                    dialog = element.Children(".ui-dialog-content");
+                else
+                    dialog = element.Closest(".ui-dialog-content");
+
                 if (dialog.Length > 0)
                     dialog.Bind("dialogopen." + eventClass, delegate
                     {
