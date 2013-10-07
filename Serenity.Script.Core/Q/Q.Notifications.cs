@@ -48,6 +48,16 @@ namespace Serenity
         {
             var dialog = jQuery.FromElement(Window.Document.Body).Children(".ui-dialog").Last();
             var toastrDiv = jQuery.Select("#toast-container");
+
+            var options = new ToastrOptions
+            {
+                TimeOut = 3000,
+                FadeIn = 250,
+                FadeOut = 500,
+                ExtendedTimeOut = 500
+            };
+
+
             if (dialog.Length > 0)
             {
                 if (!toastrDiv.HasClass("dialog-toast") &&
@@ -56,11 +66,8 @@ namespace Serenity
                     toastrDiv.Remove();
                 }
 
-                return new ToastrOptions
-                {
-                    Target = dialog,
-                    PositionClass = "toast-top-full-width dialog-toast"
-                };
+                options.Target = dialog;
+                options.PositionClass = "toast-top-full-width dialog-toast";
             }
             else
             {
@@ -72,11 +79,11 @@ namespace Serenity
                     toastrDiv.Remove();
                 }
 
-                return new ToastrOptions
-                {
-                    PositionClass = "toast-top-full-width"
-                };
+                options.PositionClass = "toast-top-full-width";
             }
+
+            return options;
         }
+
     }
 }
