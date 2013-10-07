@@ -231,7 +231,7 @@ namespace Serenity.Web
 
             item.UnsafeEnsure();
 
-            return name + ".js?" + item.CurrentScript.Hash;
+            return name + ".js?v=" + item.CurrentScript.Hash;
         }
 
         public static void Reset()

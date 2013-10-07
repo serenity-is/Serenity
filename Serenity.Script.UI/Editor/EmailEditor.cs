@@ -54,6 +54,15 @@ namespace Serenity
                     }
                 }
             });
+
+            domain.Bind("keypress." + this.uniqueName, delegate(jQueryEvent e)
+            {
+                if (e.Which == (int)'@')
+                {
+                    e.PreventDefault();
+                }
+            });
+
         }
 
         [InlineCode("this.optional({element})")]

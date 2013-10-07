@@ -10,7 +10,8 @@ namespace Serenity
         public URLEditor(jQueryObject input)
             : base(input)
         {
-            input.AddClass("url");
+            input.AddClass("url").Attribute("title",
+                "URL 'http://www.site.com/sayfa' formatında girilmelidir.");
         }
     }
 }

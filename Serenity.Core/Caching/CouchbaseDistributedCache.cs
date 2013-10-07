@@ -60,7 +60,14 @@ namespace Serenity
                 var secondaryConfig = new CouchbaseClientConfiguration();
                 secondaryConfig.Bucket = config.Bucket;
                 secondaryConfig.BucketPassword = config.BucketPassword;
-                secondaryConfig.Urls.Add(new Uri(this.configuration.SecondaryServerAddress));
+                var secondaryServer = this.configuration.SecondaryServerAddress;
+                var pipeIndex = secondaryServer.IndexOf('|');
+                if (pipeIndex > 0)
+                {
+                    secondaryConfig.Bucket = secondaryServer.Substring(pipeIndex + 1);
+                    secondaryServer = secondaryServer.Substring(0, pipeIndex);
+                }
+                secondaryConfig.Urls.Add(new Uri(secondaryServer));
                 this.secondaryClient = new CouchbaseClient(secondaryConfig);
             }
         }

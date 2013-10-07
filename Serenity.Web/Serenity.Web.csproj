@@ -112,7 +112,7 @@
     <Compile Include="Script\DynamicScriptManager.cs" />
     <Compile Include="Script\HtmlScriptExtensions.cs" />
     <Compile Include="Script\JsConfigHelper.cs" />
-    <Compile Include="Script\JSHelper.cs" />
+    <Compile Include="Script\ContentHashCache.cs" />
     <Compile Include="Script\LocalInitScript.cs" />
     <Compile Include="Script\LocalTextScript.cs" />
     <Compile Include="Script\DbLookupScript.cs" />

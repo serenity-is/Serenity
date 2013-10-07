@@ -17,8 +17,20 @@ namespace Serenity
             RegisterValidationMethods();
 
             input.AddClass(options.Multiple ? 
-                (options.Internal ? "phoneInternalMulti" : "phoneTurkeyMulti") :
-                (options.Internal ? "phoneInternal" : "phoneTurkey"));
+                (options.Internal ? "phoneInternalMulti" : (options.Mobile ? "mobileTurkeyMulti" : "phoneTurkeyMulti")) :
+                (options.Internal ? "phoneInternal" : (options.Mobile ? "mobileTurkey" : "phoneTurkey")));
+
+            string hint = options.Internal ? 
+                "Dahili telefon numarası '456, 8930, 12345' formatlarında" :
+                (options.Mobile ? "Cep telefonu numarası '(533) 342 01 89' formatında" :
+                    "Telefon numarası '(216) 432 10 98' formatında ");
+
+            if (options.Multiple)
+                hint = hint.Replace("numarası", "numaraları") + " ve birden fazlaysa virgülle ayrılarak ";
+            
+            hint += " girilmelidir.";
+
+            input.Attribute("title", hint);
 
             input.Bind("change", delegate(jQueryEvent e)
             {
@@ -26,6 +38,14 @@ namespace Serenity
                     return;
 
                 FormatValue();
+            });
+
+            input.Bind("blur", delegate(jQueryEvent e)
+            {
+                if (this.element.HasClass("valid"))
+                {
+                    FormatValue();
+                }
             });
         }
 
@@ -40,14 +60,26 @@ namespace Serenity
             var value = this.element.GetValue();
 
             if (!options.Multiple &&
-                !options.Internal)
+                !options.Internal &&
+                !options.Mobile)
             {
                 this.element.Value(FormatPhoneTurkey(value));
             }
             else if (options.Multiple &&
+                !options.Mobile &&
                 !options.Internal)
             {
                 this.element.Value(FormatPhoneTurkeyMulti(value));
+            }
+            else if (options.Mobile &&
+                !options.Multiple)
+            {
+                this.element.Value(FormatMobileTurkey(value));
+            }
+            else if (options.Mobile &&
+                options.Multiple)
+            {
+                this.element.Value(FormatMobileTurkeyMulti(value));
             }
             else if (options.Internal &&
                 !options.Multiple)
@@ -60,6 +92,50 @@ namespace Serenity
                 this.element.Value(FormatPhoneInternalMulti(value));
             }
         }
+
+        private static bool IsValidMulti(string phone, Func<string, bool> check)
+        {
+            if (phone.IsEmptyOrNull())
+                return false;
+
+            var phones = phone.Replace(';', ',').Split(',');
+            bool anyValid = false;
+            foreach (var x in phones)
+            {
+                string s = x.TrimToNull();
+                if (s == null)
+                    continue;
+
+                if (!check(s))
+                    return false;
+
+                anyValid = true;
+            }
+
+            if (!anyValid)
+                return false;
+
+            return true;
+        }
+
+        private static string FormatMulti(string phone, Func<string, string> format)
+        {
+            var phones = phone.Replace(';', ',').Split(',');
+            string result = "";
+            foreach (var x in phones)
+            {
+                string s = x.TrimToNull();
+                if (s == null)
+                    continue;
+
+                if (result.Length > 0)
+                    result += ", ";
+
+                result += format(s);
+            }
+            return result;
+        }
+
 
         private static string FormatPhoneTurkey(string phone)
         {
@@ -117,50 +193,57 @@ namespace Serenity
             if (!IsValidPhoneTurkeyMulti(phone))
                 return phone;
 
-            var phones = phone.Replace(';', ',').Split(',');
-            string result = "";
-            foreach (var x in phones)
-            {
-                string s = x.TrimToNull();
-                if (s == null)
-                    continue;
+            return FormatMulti(phone, FormatPhoneTurkey);
+        }
 
-                if (result.Length > 0)
-                    result += ", ";
+        private static string FormatMobileTurkey(string phone)
+        {
+            if (!IsValidMobileTurkey(phone))
+                return phone;
 
-                result += FormatPhoneTurkey(s);
-            }
-            return result;
+            return FormatPhoneTurkey(phone);
         }
 
         private static bool IsValidPhoneTurkeyMulti(string phone)
         {
-            if (phone.IsEmptyOrNull())
+            return IsValidMulti(phone, IsValidPhoneTurkey);
+        }
+
+        private static bool IsValidMobileTurkey(string phone)
+        {
+            if (!IsValidPhoneTurkey(phone))
                 return false;
 
-            var phones = phone.Replace(';', ',').Split(',');
-            bool anyValid = false;
-            foreach (var x in phones)
-            {
-                string s = x.TrimToNull();
-                if (s == null)
-                    continue;
+            phone = phone.TrimStart();
+            phone = phone.Replace(" ", "");
+            
+            int lookIndex = 0;
+            if (phone.StartsWith('0'))
+                lookIndex++;
 
-                if (!IsValidPhoneTurkey(s))
-                    return false;
+            if (phone.CharAt(lookIndex) == "5" ||
+                phone.CharAt(lookIndex) == "(" && phone.CharAt(lookIndex + 1) == "5")
+                return true;
 
-                anyValid = true;
-            }
+            return false;
+        }
 
-            if (!anyValid)
-                return false;
+        private static string FormatMobileTurkeyMulti(string phone)
+        {
+            if (!IsValidMobileTurkeyMulti(phone))
+                return phone;
 
-            return true;
+            return FormatPhoneTurkeyMulti(phone);
+        }
+
+        private static bool IsValidMobileTurkeyMulti(string phone)
+        {
+            return IsValidMulti(phone, IsValidMobileTurkey);
         }
 
         private static string FormatPhoneInternal(string phone)
         {
-            if (!IsValidPhoneTurkey(phone))
+            if (!IsValidPhoneInternal(phone))
                 return phone;
 
             return phone.Trim();
@@ -191,45 +274,12 @@ namespace Serenity
             if (!IsValidPhoneInternalMulti(phone))
                 return phone;
 
-            var phones = phone.Replace(';', ',').Split(',');
-            string result = "";
-            foreach (var x in phones)
-            {
-                string s = x.TrimToNull();
-                if (s == null)
-                    continue;
-
-                if (result.Length > 0)
-                    result += ", ";
-
-                result += FormatPhoneInternal(s);
-            }
-            return result;
+            return FormatMulti(phone, FormatPhoneInternal);
         }
 
         private static bool IsValidPhoneInternalMulti(string phone)
         {
-            if (phone.IsEmptyOrNull())
-                return false;
-
-            var phones = phone.Replace(';', ',').Split(',');
-            bool anyValid = false;
-            foreach (var x in phones)
-            {
-                string s = x.TrimToNull();
-                if (s == null)
-                    continue;
-
-                if (!IsValidPhoneInternal(s))
-                    return false;
-
-                anyValid = true;
-            }
-
-            if (!anyValid)
-                return false;
-
-            return true;
+            return IsValidMulti(phone, IsValidPhoneInternal);
         }
 
 
@@ -239,13 +289,25 @@ namespace Serenity
                 jQueryValidator.AddMethod("phoneTurkey", (value, element) =>
                 {
                     return ValidatorIsOptional(element) || IsValidPhoneTurkey(value);
-                }, "Telefon numarası '(533) 432 10 98' formatında girilmelidir!");
+                }, "Telefon numarası '(216) 432 10 98' formatında girilmelidir!");
 
             if (jQueryValidator.Methods["phoneTurkeyMulti"] == null)
                 jQueryValidator.AddMethod("phoneTurkeyMulti", (value, element) =>
                 {
                     return ValidatorIsOptional(element) || IsValidPhoneTurkeyMulti(value);
-                }, "Telefon numaraları '(533) 432 10 98' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!");
+                }, "Telefon numaraları '(216) 432 10 98' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!");
+
+            if (jQueryValidator.Methods["mobileTurkey"] == null)
+                jQueryValidator.AddMethod("mobileTurkey", (value, element) =>
+                {
+                    return ValidatorIsOptional(element) || IsValidMobileTurkey(value);
+                }, "Telefon numarası '(533) 342 01 89' formatında girilmelidir!");
+
+            if (jQueryValidator.Methods["mobileTurkeyMulti"] == null)
+                jQueryValidator.AddMethod("mobileTurkeyMulti", (value, element) =>
+                {
+                    return ValidatorIsOptional(element) || IsValidMobileTurkeyMulti(value);
+                }, "Telefon numaraları '(533) 342 01 89' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!");
 
             if (jQueryValidator.Methods["phoneInternal"] == null)
                 jQueryValidator.AddMethod("phoneInternal", (value, element) =>
@@ -281,5 +343,7 @@ namespace Serenity
         public bool Multiple { get; set; }
         [DisplayName("Dahili Telefon")]
         public bool Internal { get; set; }
+        [DisplayName("Cep Telefonu")]
+        public bool Mobile { get; set; }
     }
 }
