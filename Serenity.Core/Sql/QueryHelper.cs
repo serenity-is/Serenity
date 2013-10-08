@@ -72,40 +72,30 @@ namespace Serenity.Services
         }
 
         public static SqlQuery ApplyContainsText(this SqlQuery query, string containsText,
-            Criteria idField, params Criteria[] fields)
+            Action<string, Int64?> filter)
         {
-            var flt = GetContainsTextFilter(containsText, idField, fields);
-            query.Where(flt);
+            containsText = containsText.TrimToNull();
+            if (containsText == null)
+                return query;
+
+            Int64? parsedId;
+            Int64 l;
+            if (Int64.TryParse(containsText, out l))
+                parsedId = l;
+            else
+                parsedId = null;
+
+            filter(containsText, parsedId);
             return query;
         }
 
-        public static BaseCriteria GetContainsTextFilter(string containsText, BaseCriteria idField, params Criteria[] fields)
-        {
-            var ctFilter = GetContainsTextFilter(containsText, fields);
-            if (Object.ReferenceEquals(idField, null))
-                return ctFilter;
-
-            containsText = containsText.TrimToNull();
-            if (containsText == null)
-                return ctFilter;
-
-            Int64 idValue;
-            if (Int64.TryParse(containsText, out idValue))
-                if (Object.ReferenceEquals(null, ctFilter) || ctFilter.IsEmpty)
-                    ctFilter = idField == idValue;
-                else
-                    ctFilter = ~(idField == idValue | ~(ctFilter));
-
-            return ctFilter;
-        }
-
-        public static BaseCriteria GetContainsTextFilter(string containsText, params Criteria[] fields)
+        public static BaseCriteria GetContainsTextFilter(string containsText, Criteria[] textFields)
         {
             containsText = containsText.TrimToNull();
-            if (containsText != null && fields.Length > 0)
+            if (containsText != null && textFields.Length > 0)
             {
                 var flt = Criteria.Empty;
-                foreach (var field in fields)
+                foreach (var field in textFields)
                     flt |= field.Contains(containsText);
                 flt = ~(flt);
 

@@ -3,6 +3,7 @@ namespace Serenity
 {
     using jQueryApi;
     using System;
+    using System.Collections.Generic;
     using System.Html;
     using System.Runtime.CompilerServices;
 
@@ -10,13 +11,14 @@ namespace Serenity
     {
         private string lastValue;
         private int timer;
+        private QuickSearchField field;
+        private bool fieldChanged;
 
         public QuickSearchInput(jQueryObject input, QuickSearchInputOptions opt)
             : base(input, opt)
         {
             input.Attribute("title", "aranacak kelimeyi giriniz")
                 .Attribute("placeholder", "hızlı arama");
-
 
             lastValue = Q.Trim(input.GetValue() ?? "");
 
@@ -30,13 +32,65 @@ namespace Serenity
             {
                 self.CheckIfValueChanged();
             });
+
+            if (options.Fields != null && options.Fields.Count > 0)
+            {
+                var a = jQuery.FromHtml("<a/>").AddClass("quick-search-field")
+                    .Attribute("title", "arama yapılacak alanı seç")
+                    .InsertBefore(input);
+
+                var menu = jQuery.FromHtml("<ul></ul>").CSS("width", "120px");
+                foreach (var item in options.Fields)
+                {
+                    var field = item;
+                    jQuery.FromHtml("<li><a/></li>").AppendTo(menu)
+                        .Children().Attribute("href", "#")
+                        .Text(item.Title ?? "")
+                        .Click(delegate(jQueryEvent e) {
+                            e.PreventDefault();
+                            fieldChanged = self.field != field;
+                            self.field = field;
+                            UpdateInputPlaceHolder();
+                            CheckIfValueChanged();
+                        });
+                }
+
+                new PopupMenuButton(a, new PopupMenuButtonOptions
+                {
+                    PositionMy = "right top",
+                    PositionAt = "right bottom",
+                    Menu = menu
+                });
+
+                this.field = options.Fields[0];
+                UpdateInputPlaceHolder();
+            }
+        }
+
+        private void UpdateInputPlaceHolder()
+        {
+            var qsf = this.element.PrevAll(".quick-search-field");
+
+            if (field != null)
+            {
+                qsf.Text(field.Title + ":");
+            }
+            else
+            {
+                qsf.Text("");
+            }
         }
 
         protected void CheckIfValueChanged()
         {
             var value = Q.Trim(this.element.GetValue() ?? "");
-            if (value == this.lastValue)
+            if (value == this.lastValue && (!fieldChanged || value.IsEmptyOrNull()))
+            {
+                fieldChanged = false;
                 return;
+            }
+
+            fieldChanged = false;
 
             this.element.Parent().ToggleClass(this.options.FilteredParentClass ?? "", Q.IsTrue(value.Length > 0));
             this.element.AddClass(this.options.LoadingParentClass ?? "");
@@ -48,7 +102,7 @@ namespace Serenity
             this.timer = Window.SetTimeout(delegate
             {
                 if (self.options.OnSearch != null)
-                    self.options.OnSearch(value);
+                    self.options.OnSearch(field != null && !field.Name.IsEmptyOrNull() ? field.Name : null, value);
 
                 self.element.RemoveClass(self.options.LoadingParentClass ?? "");
 
@@ -74,6 +128,14 @@ namespace Serenity
         public int TypeDelay { get; set; }
         public string LoadingParentClass { get; set; }
         public string FilteredParentClass { get; set; }
-        public Action<string> OnSearch { get; set; }
+        public Action<string, string> OnSearch { get; set; }
+        public List<QuickSearchField> Fields { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class QuickSearchField
+    {
+        public string Name { get; set; }
+        public string Title { get; set; }
     }
 }

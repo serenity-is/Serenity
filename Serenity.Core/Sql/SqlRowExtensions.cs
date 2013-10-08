@@ -121,7 +121,7 @@ namespace Serenity.Data
         {
             foreach (var field in row.GetFields())
                 if ((field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign)
-                    query.EnsureForeignJoin(field);
+                    query.EnsureJoinOf(field);
             return query;
         }
     }

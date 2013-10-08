@@ -179,9 +179,14 @@ namespace Serenity
             GridUtils.AddIncludeDeletedToggle(toolbar.Element, view);
         }
 
+        protected virtual List<QuickSearchField> GetQuickSearchFields()
+        {
+            return null;
+        }
+
         protected virtual void CreateQuickSearchInput()
         {
-            GridUtils.AddQuickSearchInput(toolbar.Element, view);
+            GridUtils.AddQuickSearchInput(toolbar.Element, view, GetQuickSearchFields());
         }
 
         public List<TEntity> Items
@@ -485,14 +490,14 @@ namespace Serenity
         }
 
         protected SlickFormatter ItemLink(string itemClass = null, string idField = null,
-            Func<SlickFormatterContext, string> text = null)
+            Func<SlickFormatterContext, string> text = null, bool symbol = false)
         {
             itemClass = itemClass ?? entityType.Value.Replace('.', '-');
             idField = idField ?? entityIdField.Value;
 
             return text == null ?
-                SlickFormatting.ItemLink(itemClass, idField) :
-                SlickFormatting.ItemLink(itemClass, idField, text);
+                SlickFormatting.ItemLink(itemClass, idField, symbol) :
+                SlickFormatting.ItemLink(itemClass, idField, text, symbol);
         }
 
         protected virtual List<SlickColumn> GetColumns()

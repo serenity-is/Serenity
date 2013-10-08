@@ -80,7 +80,7 @@ namespace Serenity.Data
                     fieldExpr = (0).TableAliasDot() + field.Name;
 
                 if (query != null)
-                    query.EnsureForeignJoin(field);
+                    query.EnsureJoinOf(field);
             }
 
             return fieldExpr;

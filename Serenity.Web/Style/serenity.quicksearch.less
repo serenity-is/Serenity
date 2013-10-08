@@ -1,6 +1,44 @@
 ﻿@import-once "serenity.mixins.less";
 
-.s-QuickSearchBar { float: right; margin: 3px 4px 0 0; width: 70px; height: 15px; padding: 2px 16px 0 2px; border: 1px solid #aaa; background: #fff url(images/magnifier-medium.png) no-repeat right center; }
-.s-QuickSearchBar input { width: 68px; border: 0px none; font-size: 11px; padding: 0px; .border-radius(0); line-height: 11px; .box-shadow(none); }
-.s-QuickSearchBar.s-QuickSearchLoading, .s-QuickSearchBar.s-QuickSearchLoading input { cursor: wait; }
-.s-QuickSearchBar.s-QuickSearchFiltered, .s-QuickSearchBar.s-QuickSearchFiltered input { background-color: #ffa; }
+.s-QuickSearchBar {
+    float: right;
+    margin: 3px 4px 0 0;
+    padding: 0 16px 0 0;
+    border: 1px solid #aaa;
+    background: #fff url(images/magnifier-medium.png) no-repeat right center;
+}
+
+.s-QuickSearchBar input {
+    width: 68px;
+    border: 0px none;
+    font-size: 11px;
+    padding: 0 2px 0 2px;
+    .border-radius(0);
+    line-height: 16px;
+    .box-shadow(none);
+    float: left;
+}
+
+.s-QuickSearchBar.s-QuickSearchLoading, .s-QuickSearchBar.s-QuickSearchLoading input {
+    cursor: wait;
+}
+
+.s-QuickSearchBar.s-QuickSearchFiltered, .s-QuickSearchBar.s-QuickSearchFiltered input {
+    background-color: #ffa;
+}
+
+.s-QuickSearchBar a.quick-search-field {
+    padding: 0 2px 0 2px;
+    float: left;
+    font-size: 11px;
+    line-height: 16px;
+    cursor: pointer;
+    margin-right: 1px;
+    color: #333;
+    background-color: #dcdcdc;
+    border-right: 1px solid #ccc;
+}
+
+.s-QuickSearchBar a.quick-search-field:hover {
+    background-color: #ffa;
+}

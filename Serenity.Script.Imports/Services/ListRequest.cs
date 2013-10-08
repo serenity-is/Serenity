@@ -11,6 +11,7 @@
         public int Take { get; set; }
         public string[] Sort { get; set; }
         public string ContainsText { get; set; }
+        public string ContainsField { get; set; }
         public List<object> FilterLines { get; set; }
         public bool IncludeDeleted { get; set; }
         public bool ExcludeTotalCount { get; set; }

@@ -124,10 +124,17 @@
             var idRow = Row as IIdRow;
             var idField = idRow != null ? (Field)idRow.IdField : null;
             var idFieldFilter = idField == null ? null : new Criteria(idField);
-            if (nameRow != null)
-                query.ApplyContainsText(containsText, idFieldFilter, new Criteria(0, nameRow.NameField));
-            else if (idField != null)
-                query.ApplyContainsText(containsText, idFieldFilter, new Criteria[] { });
+            query.ApplyContainsText(containsText, (text, id) => {
+                var criteria = Criteria.Empty;
+                if (nameRow != null)
+                    criteria |= new Criteria((Field)nameRow.NameField).Contains(text);
+
+                if (id != null && idRow != null)
+                    criteria |= new Criteria(((Field)idRow.IdField)) == id.Value.ToInvariant();
+
+                if (!criteria.IsEmpty)
+                    query.Where(criteria);
+            });
         }
 
         protected virtual void OnBeforeExecuteQuery()

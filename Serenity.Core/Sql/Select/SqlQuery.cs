@@ -139,7 +139,7 @@
                 _columns.Add(new Column(field.QueryExpression, field.Name, _intoIndex, field));
             else
             {
-                EnsureForeignJoin(field);
+                EnsureJoinOf(field);
                 _columns.Add(new Column(field.Expression, field.Name, _intoIndex, field));
             }
 
@@ -170,7 +170,7 @@
 
         void IFilterableQuery.EnsureForeignJoin(Field field)
         {
-            this.EnsureForeignJoin(field);
+            this.EnsureJoinOf(field);
         }
 
         private void EnsureForeignJoin(RowFieldsBase fields, string joinAlias)
@@ -194,7 +194,13 @@
             }
         }
 
-        public SqlQuery EnsureForeignJoin(Field field)
+        public SqlQuery EnsureJoin(LeftJoin join)
+        {
+            EnsureForeignJoin(IntoRow.GetFields(), join.Name);
+            return this;
+        }
+
+        public SqlQuery EnsureJoinOf(Field field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");

@@ -82,6 +82,9 @@
     <Compile Include="Content\RegistrationHelper.cs" />
     <Compile Include="Content\TemplateHelper.cs" />
     <Compile Include="Mvc\ServiceAuthorizeFilter.cs" />
+    <Compile Include="Script\DataScript.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Upload\FilesToDelete.cs" />
     <Compile Include="Upload\ImageChecker.cs" />
     <Compile Include="Upload\ImageCheckResult.cs" />

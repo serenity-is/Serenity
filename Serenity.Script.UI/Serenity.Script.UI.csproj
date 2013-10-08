@@ -40,6 +40,8 @@
     <Compile Include="Editor\URLEditor.cs" />
     <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
+    <Compile Include="Grid\PopupToolButton.cs" />
+    <Compile Include="Grid\PopupMenuButton.cs" />
     <Compile Include="PropertyDialog\PropertyDialog.cs" />
     <Compile Include="PropertyDialog\PropertyDialog_Inference.cs" />
     <Compile Include="PropertyDialog\PropertyDialog_PropertyGrid.cs" />

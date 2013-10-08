@@ -17,6 +17,7 @@ namespace Serenity.Services
         public int Take { get; set; }
         public SortBy[] Sort { get; set; }
         public string ContainsText { get; set; }
+        public string ContainsField { get; set; }
         public List<FilterLine> FilterLines { get; set; }
         [JsonIgnore]
         public BasicFilterBase Filter { get; set; }

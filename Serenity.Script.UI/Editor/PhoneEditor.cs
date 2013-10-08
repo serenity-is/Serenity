@@ -23,7 +23,7 @@ namespace Serenity
             string hint = options.Internal ? 
                 "Dahili telefon numarası '456, 8930, 12345' formatlarında" :
                 (options.Mobile ? "Cep telefonu numarası '(533) 342 01 89' formatında" :
-                    "Telefon numarası '(216) 432 10 98' formatında ");
+                    "Telefon numarası '(216) 432 10 98' formatında");
 
             if (options.Multiple)
                 hint = hint.Replace("numarası", "numaraları") + " ve birden fazlaysa virgülle ayrılarak ";

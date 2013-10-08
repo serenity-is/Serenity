@@ -189,20 +189,20 @@ namespace Serenity
             return href.ConvertToId();
         }
 
-        public static SlickFormatter ItemLink(string itemClass, string idField, Func<SlickFormatterContext, string> getText)
+        public static SlickFormatter ItemLink(string itemClass, string idField, Func<SlickFormatterContext, string> getText, bool symbol = false)
         {
             return delegate(SlickFormatterContext ctx)
             {
-                return Script.IsValue(ctx.Item[idField]) ? ("<a href=\"#" + itemClass + "/" + ctx.Item[idField] + "\" class=\"" + ItemLinkClass(itemClass) + "\">" +
+                return Script.IsValue(ctx.Item[idField]) ? ("<a href=\"#" + itemClass + "/" + ctx.Item[idField] + "\" class=\"" + ItemLinkClass(itemClass) + (symbol ? " symbol" : "") + "\">" +
                     Q.HtmlEncode(getText(ctx) ?? "") + "</a>") : Q.HtmlEncode(getText(ctx) ?? "");
             };
         }
 
-        public static SlickFormatter ItemLink(string itemClass, string idField)
+        public static SlickFormatter ItemLink(string itemClass, string idField, bool symbol = false)
         {
             return delegate(SlickFormatterContext ctx)
             {
-                return Script.IsValue(ctx.Item[idField]) ? ("<a href=\"#" + itemClass + "/" + ctx.Item[idField] + "\" class=\"" + ItemLinkClass(itemClass) + "\">" +
+                return Script.IsValue(ctx.Item[idField]) ? ("<a href=\"#" + itemClass + "/" + ctx.Item[idField] + "\" class=\"" + ItemLinkClass(itemClass) + (symbol ? " symbol" : "") + "\">" +
                     Q.HtmlEncode(ctx.Value.As<string>() ?? "") + "</a>") : "";
             };
         }

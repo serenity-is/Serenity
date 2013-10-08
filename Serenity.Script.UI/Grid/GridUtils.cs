@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
 
@@ -63,10 +64,11 @@ namespace Serenity
         }
 
         public static void AddQuickSearchInput<TEntity>(jQueryObject toolDiv,
-            SlickRemoteView<TEntity> view)
+            SlickRemoteView<TEntity> view, List<QuickSearchField> fields = null)
         {
             var oldSubmit = view.OnSubmit;
             var searchText = "";
+            var searchField = "";
             
             view.OnSubmit = (v) =>
             {
@@ -75,21 +77,28 @@ namespace Serenity
                 else
                     Type.DeleteField(v.Params, "ContainsText");
 
+                if (searchField != null && searchField.Length > 0)
+                    v.Params.ContainsField = searchField;
+                else
+                    Type.DeleteField(v.Params, "ContainsField");
+
                 if (oldSubmit != null)
                     return oldSubmit(v);
 
                 return true;
             };
 
-            AddQuickSearchInputCustom(toolDiv, delegate(string query)
+            AddQuickSearchInputCustom(toolDiv, delegate(string field, string query)
             {
                 searchText = query;
+                searchField = field;
                 view.SeekToPage = 1;
                 view.Populate();
-            });
+            }, fields);
         }
 
-        private static void AddQuickSearchInputCustom(jQueryObject container, Action<string> onSearch)
+        private static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string> onSearch,
+            List<QuickSearchField> fields = null)
         {
             var input = jQuery.FromHtml("<div><input type=\"text\"/></div>")
                 .AddClass("s-QuickSearchBar")
@@ -98,6 +107,7 @@ namespace Serenity
 
             new QuickSearchInput(input, new QuickSearchInputOptions
             {
+                Fields = fields,
                 OnSearch = onSearch
             });
         }
