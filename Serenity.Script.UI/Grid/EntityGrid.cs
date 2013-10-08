@@ -462,7 +462,7 @@ namespace Serenity
             if (options.HidePager)
                 opt.RowsPerPage = 0;
             else
-                opt.RowsPerPage = 20;
+                opt.RowsPerPage = 100;
 
             return opt;
         }
