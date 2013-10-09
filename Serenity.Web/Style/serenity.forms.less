@@ -37,12 +37,13 @@
 }
 
 .s-Form select {
-    padding: 0px 0px;
-    height: 17px;
+    padding: 2px 2px 2px 0px;
+    margin: 0;
+    .border-radius(3px, 3px, 3px, 3px);
 }
 
 .s-Form input, .s-Form select, .s-Form textarea {
-    border: 1px solid #9bbdcf;
+    border: 1px solid #ccc;
 }
 
 .s-Form .caption {
@@ -50,6 +51,13 @@
     text-align: right;
     padding: 0 6px 0 0;
 }
+
+.s-Form .caption sup {
+    color: red;
+    padding-right: 2px;
+    vertical-align: top;
+}
+
 
 .s-Form .caption, .s-Form .editor {
     float: left;

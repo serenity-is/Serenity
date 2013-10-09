@@ -160,12 +160,17 @@ namespace Serenity
 
             string editorId = options.IdPrefix + item.Name;
 
-            jQuery.FromHtml("<label/>")
+            var label = jQuery.FromHtml("<label/>")
                 .AddClass("caption")
                 .Attribute("for", editorId)
                 .Attribute("title", item.Hint ?? item.Title ?? "")
                 .Html(item.Title)
                 .AppendTo(fieldDiv);
+
+            if (item.Required)
+                jQuery.FromHtml("<sup>*</sup>")
+                    .Attribute("title", "Bu alan zorunludur")
+                    .PrependTo(label);
 
             var editorType = GetEditorType(item.EditorType);
             var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
