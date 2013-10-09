@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 
 namespace Serenity.Web
 {
@@ -75,11 +76,7 @@ namespace Serenity.Web
                 MD5 md5 = new MD5CryptoServiceProvider();
                 byte[] result = md5.ComputeHash(bytes);
 
-                StringBuilder sb = new StringBuilder();
-                foreach (var c in result)
-                    sb.Append(c.ToString("X2"));
-
-                return sb.ToString();
+                return HttpServerUtility.UrlTokenEncode(result);
             }
 
             private Script GenerateCurrentScript()

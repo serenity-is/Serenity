@@ -33,10 +33,7 @@ namespace Serenity.Web
             using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
             {
                 byte[] hash = md5.ComputeHash(bs);
-                var formatted = new StringBuilder(2 * hash.Length);
-                foreach (byte b in hash)
-                    formatted.AppendFormat("{0:X2}", b);
-                return formatted.ToString();
+                return HttpServerUtility.UrlTokenEncode(hash);
             }
         }
 
