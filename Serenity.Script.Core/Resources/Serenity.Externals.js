@@ -899,7 +899,7 @@ Q$Externals.validateOptions = function(options) {
             return false;
         },
         invalidHandler: function() {
-            Q.notifyError('Lütfen formda kırmızı renkle işaretlenmiş olan hatalı alanları düzeltiniz.', "error");
+            Q.notifyError('Lütfen formda kırmızı renkle işaretlenmiş olan eksik ya da hatalı alanları düzeltiniz.', "error");
         },          
         success: function(label) {
             label.addClass('checked');
