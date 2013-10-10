@@ -343,7 +343,7 @@ namespace Serenity
         protected virtual void OnClick(jQueryEvent e, int row, int cell)
         {
             var target = jQuery.FromElement(e.Target);
-            if (target.HasClass(SlickFormatting.ItemLinkClass(GetItemClass())))
+            if (target.HasClass("s-" + GetItemType() + "Link"))
             {
                 e.PreventDefault();
                 EditItem(SlickFormatting.GetItemId(target));
@@ -484,20 +484,18 @@ namespace Serenity
             titleDiv.Children().Text(title);
         }
 
-        protected virtual string GetItemClass()
+        protected virtual string GetItemType()
         {
             return entityType.Value.Replace('.', '-');
         }
 
-        protected SlickFormatter ItemLink(string itemClass = null, string idField = null,
-            Func<SlickFormatterContext, string> text = null, bool symbol = false)
+        protected SlickFormatter ItemLink(string itemType = null, string idField = null,
+            Func<SlickFormatterContext, string> text = null, Func<SlickFormatterContext, string> cssClass = null)
         {
-            itemClass = itemClass ?? entityType.Value.Replace('.', '-');
+            itemType = itemType ?? GetItemType();
             idField = idField ?? entityIdField.Value;
 
-            return text == null ?
-                SlickFormatting.ItemLink(itemClass, idField, symbol) :
-                SlickFormatting.ItemLink(itemClass, idField, text, symbol);
+            return SlickFormatting.ItemLink(itemType, idField, text, cssClass);
         }
 
         protected virtual List<SlickColumn> GetColumns()

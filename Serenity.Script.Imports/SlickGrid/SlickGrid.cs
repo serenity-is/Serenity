@@ -523,6 +523,12 @@ namespace Serenity
             return null;
         }
 
+        [AlternateSignature]
+        public SlickRangeInfo GetViewport()
+        {
+            return null;
+        }
+
         /// <summary>
         /// Redraws the grid. Invalidates all rows and calls render().
         /// </summary>

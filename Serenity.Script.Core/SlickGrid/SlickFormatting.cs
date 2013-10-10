@@ -144,17 +144,12 @@ namespace Serenity
             };
         }
 
-        public static string ItemLinkClass(string itemClass)
+        public static string GetItemType(jQueryObject link)
         {
-            return "s-" + itemClass + "Link";
+            return GetItemType(link.GetAttribute("href"));
         }
 
-        public static string GetItemClass(jQueryObject link)
-        {
-            return GetItemClass(link.GetAttribute("href"));
-        }
-
-        public static string GetItemClass(string href)
+        public static string GetItemType(string href)
         {
             if (href.IsEmptyOrNull())
                 return null;
@@ -189,21 +184,21 @@ namespace Serenity
             return href.ConvertToId();
         }
 
-        public static SlickFormatter ItemLink(string itemClass, string idField, Func<SlickFormatterContext, string> getText, bool symbol = false)
+        public static string ItemLinkText(string itemType, object id, object text, string extraClass)
         {
-            return delegate(SlickFormatterContext ctx)
-            {
-                return Script.IsValue(ctx.Item[idField]) ? ("<a href=\"#" + itemClass + "/" + ctx.Item[idField] + "\" class=\"" + ItemLinkClass(itemClass) + (symbol ? " symbol" : "") + "\">" +
-                    Q.HtmlEncode(getText(ctx) ?? "") + "</a>") : Q.HtmlEncode(getText(ctx) ?? "");
-            };
+            return "<a" + (Script.IsValue(id) ? (" href=\"#" + itemType + "/" + id + "\"") : "") +
+                " class=\"s-" + itemType + "Link" + (extraClass.IsEmptyOrNull() ? "" : (" " + extraClass)) + "\">" +
+                Q.HtmlEncode(text ?? "") + "</a>";
         }
 
-        public static SlickFormatter ItemLink(string itemClass, string idField, bool symbol = false)
+        public static SlickFormatter ItemLink(string itemType, string idField, 
+            Func<SlickFormatterContext, string> getText, Func<SlickFormatterContext, string> cssClass = null)
         {
             return delegate(SlickFormatterContext ctx)
             {
-                return Script.IsValue(ctx.Item[idField]) ? ("<a href=\"#" + itemClass + "/" + ctx.Item[idField] + "\" class=\"" + ItemLinkClass(itemClass) + (symbol ? " symbol" : "") + "\">" +
-                    Q.HtmlEncode(ctx.Value.As<string>() ?? "") + "</a>") : "";
+                return ItemLinkText(itemType, ctx.Item[idField], 
+                    getText == null ? ctx.Value : getText(ctx),
+                    cssClass == null ? "" : cssClass(ctx));
             };
         }
 

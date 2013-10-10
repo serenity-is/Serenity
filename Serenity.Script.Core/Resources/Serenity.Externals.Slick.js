@@ -387,42 +387,18 @@ function EventHelper() {
                 data: request,
                 dataType: dt,
                 success: function (response) {
-                    try {
-                        loading = false;
-                        if (response.Error)
-                            Q.notifyError(response.Error.Message || response.Error.Code, 'error');
-                        else
-                            addData(response);
-                        onDataLoaded.notify(this);
-                    } catch (e) {
-                        var stacktrace;
-                        if (e.stack)
-                            stacktrace = e.stack;
-                        else try {
-                            throw "!";
-                        } catch (e) {
-                            var stacktrace = e.stack || e.stacktrace || "";
-                        }
-                        window.console && window.console.log(stacktrace || e.message || e);
-                    }
+                    loading = false;
+                    if (response.Error)
+                        Q.notifyError(response.Error.Message || response.Error.Code, 'error');
+                    else
+                        addData(response);
+                    onDataLoaded.notify(this);
                 },
                 error: function (info) {
-                    try {
-                        loading = false;
-                        errorMessage = info.errormsg;
-                        onPagingInfoChanged.notify(getPagingInfo());
-                        onDataLoaded.notify(this);
-                    } catch (e) {
-                        var stacktrace;
-                        if (e.stack)
-                            stacktrace = e.stack;
-                        else try {
-                            throw "!";
-                        } catch (e) {
-                            var stacktrace = e.stack || e.stacktrace || "";
-                        }
-                        window.console && window.console.log(stacktrace || e.message || e);
-                    }
+                    loading = false;
+                    errorMessage = info.errormsg;
+                    onPagingInfoChanged.notify(getPagingInfo());
+                    onDataLoaded.notify(this);
                 },
                 complete: function() {
                     loading = false;
