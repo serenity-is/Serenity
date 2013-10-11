@@ -10,7 +10,6 @@ namespace Serenity.Web
         where TData: class
     {
         private string _scriptName;
-        private string _lookup;
         private bool _authorize;
         private Func<TData> _getData;
         private string _right;
