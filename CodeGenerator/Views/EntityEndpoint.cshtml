@@ -7,7 +7,7 @@ namespace @(Model.RootNamespace).@(Model.Module).Endpoints
     using MyRepository = Repositories.@(Model.ClassName)Repository;
     using MyRow = Entities.@(Model.RowClassName);
 
-    [Authorize]
+    [ServiceAuthorize]
     public class @(Model.ClassName)Controller : Controller
     {
         [AcceptVerbs("POST"), JsonFilter]
