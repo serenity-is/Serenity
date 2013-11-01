@@ -8,6 +8,14 @@ namespace Serenity
 
     public class PopupMenuButton : Widget<PopupMenuButtonOptions>
     {
+        public override void Destroy()
+        {
+            if (this.options.Menu != null)
+                this.options.Menu.Remove();
+
+            base.Destroy();
+        }
+
         public PopupMenuButton(jQueryObject div, PopupMenuButtonOptions opt)
             : base(div, opt)
         {

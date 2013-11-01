@@ -52,6 +52,8 @@ namespace Serenity
                 
                 if (categoryIndexes.Count > 1)
                     linkContainer.AppendTo(div);
+                else
+                    linkContainer.Find("a.category-link").Unbind("click", CategoryLinkClick).Remove();
 
                 categoriesDiv = jQuery.FromHtml("<div/>")
                     .AddClass("categories")
@@ -94,7 +96,7 @@ namespace Serenity
                 editors = null;
             }
 
-            this.element.Find("a.category-link").Remove().Unbind("click", CategoryLinkClick);
+            this.element.Find("a.category-link").Unbind("click", CategoryLinkClick).Remove();
 
             base.Destroy();
         }

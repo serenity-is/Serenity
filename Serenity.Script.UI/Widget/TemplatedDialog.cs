@@ -34,12 +34,12 @@ namespace Serenity
             var self = this;
             element.Bind("dialogopen." + this.uniqueName, delegate
             {
-                this.DialogOpen();
+                self.OnDialogOpen();
             });
 
             element.Bind("dialogclose." + this.uniqueName, delegate
             {
-                this.DialogClose();
+                self.OnDialogClose();
             });
         }
 

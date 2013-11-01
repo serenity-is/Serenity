@@ -1,4 +1,5 @@
-﻿using System;
+﻿using jQueryApi;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -12,7 +13,6 @@ namespace Serenity
     {
         private List<TItem> items;
         private JsDictionary<object, TItem> itemById;
-        private EventHandler change;
         private LookupOptions<TItem> options;
 
         public Lookup(LookupOptions<TItem> options,
@@ -72,14 +72,7 @@ namespace Serenity
 
         public void RaiseChange()
         {
-            if (change != null)
-                change(this, new EventArgs());
-        }
-
-        public event EventHandler Change
-        {
-            add { change += value; }
-            remove { change -= value; }
+            jQuery.FromObject(this).Trigger("change");
         }
 
         public List<TItem> Items

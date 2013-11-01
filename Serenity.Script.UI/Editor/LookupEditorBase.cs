@@ -9,17 +9,30 @@ namespace Serenity
     public abstract class LookupEditorBase<TOptions, TItem> : Widget<TOptions>, IStringValue
         where TOptions: class, new()
     {
+        private Lookup<TItem> lookup;
+
         public LookupEditorBase(jQueryObject select, TOptions opt)
             : base(select, opt)
         {
             UpdateItems();
 
-            var lookup = GetLookup();
+            lookup = GetLookup();
             var self = this;
             if (lookup != null)
-                lookup.Change += (s, e) => {
+                jQuery.FromObject(lookup).As<dynamic>().bind("change." + this.uniqueName, new jQueryEventHandler(e => {
                     self.UpdateItems();
-                };
+                }));
+        }
+
+        public override void Destroy()
+        {
+            if (lookup != null)
+            {
+                jQuery.FromObject(lookup).Unbind("change." + this.uniqueName);
+                lookup = null;
+            }
+
+            base.Destroy();
         }
 
         protected virtual Lookup<TItem> GetLookup()
