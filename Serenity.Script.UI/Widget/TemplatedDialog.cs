@@ -30,6 +30,17 @@ namespace Serenity
         protected virtual void InitDialog()
         {
             element.Dialog(GetDialogOptions());
+
+            var self = this;
+            element.Bind("dialogopen." + this.uniqueName, delegate
+            {
+                this.DialogOpen();
+            });
+
+            element.Bind("dialogclose." + this.uniqueName, delegate
+            {
+                this.DialogClose();
+            });
         }
 
         protected virtual jQueryValidatorOptions GetValidatorOptions()
@@ -109,18 +120,6 @@ namespace Serenity
             opt.AutoOpen = false;
             opt.Resizable = false;
             opt.Modal = true;
-
-            var self = this;
-            opt.OnClose = delegate
-            {
-                self.OnDialogClose();
-            };
-
-            opt.OnOpen = delegate
-            {
-                self.OnDialogOpen();
-            };
-
             opt.Position = new string[] { "center", "center" };
 
             return opt;

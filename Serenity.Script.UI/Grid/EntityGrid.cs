@@ -45,7 +45,7 @@ namespace Serenity
 
             this.element.AddClass("s-DataGrid").Html("");
             this.element.AddClass("s-" + this.GetType().Name);
-            this.element.Bind("layout", delegate 
+            this.element.AddClass("require-layout").Bind("layout", delegate 
             {
                 Q.LayoutFillHeight(self.slickContainer);
                 self.slickGrid.ResizeCanvas();

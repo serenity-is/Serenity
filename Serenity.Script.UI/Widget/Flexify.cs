@@ -19,7 +19,7 @@ namespace Serenity
                 self.StoreInitialSize();
             });
         }
-
+ 
         private void StoreInitialSize()
         {
             if (Q.IsTrue(element.GetDataValue("flexify-init")))
@@ -30,15 +30,22 @@ namespace Serenity
             element.Data("flexify-init", true);
 
             var self = this;
-            element.As<dynamic>().bind("resize", new Action<jQueryEvent, dynamic>(delegate(jQueryEvent e, dynamic ui)
+            element.As<dynamic>().bind("resize." + this.uniqueName, new Action<jQueryEvent, dynamic>(delegate(jQueryEvent e, dynamic ui)
             {
                 self.ResizeElements();
             }));
 
-            element.As<dynamic>().bind("resizestop", new Action<jQueryEvent, dynamic>(delegate(jQueryEvent e, dynamic ui)
+            element.As<dynamic>().bind("resizestop." + this.uniqueName, new Action<jQueryEvent, dynamic>(delegate(jQueryEvent e, dynamic ui)
             {
                 self.ResizeElements();
             }));
+
+            var tabs = element.Find(".ui-tabs");
+            if (tabs.Length > 0)
+                tabs.Bind("tabsactivate." + this.uniqueName, delegate
+                {
+                    self.ResizeElements();
+                });
 
             if (options.DesignWidth != null ||
                 options.DesignHeight != null)
@@ -91,7 +98,15 @@ namespace Serenity
             yDifference = height - initialHeight.Value;
 
             var self = this;
-            element.Find(".flexify").Each((i, e) => {
+
+            jQueryObject containers = element;
+
+            var tabPanels = element.Find(".ui-tabs-panel");
+            if (tabPanels.Length > 0)
+                containers = tabPanels.Filter(":visible");
+            
+            containers.Find(".flexify").Each((i, e) =>
+            {
                 self.ResizeElement(jQuery.FromElement(e));
             });
         }
@@ -125,6 +140,9 @@ namespace Serenity
 
                 element.Height(Math.Truncate(initialHeight.Value + yFactor * yDifference));
             }
+
+            if (element.HasClass("require-layout"))
+                element.TriggerHandler("layout");
         }
     }
 
@@ -133,6 +151,26 @@ namespace Serenity
         public static jQueryObject FlexHeightOnly(this jQueryObject element, double flexY = 1)
         {
             return element.AddClass("flexify").Data("flex-y", flexY).Data("flex-x", 0);
+        }
+
+        public static jQueryObject FlexWidthOnly(this jQueryObject element, double flexX = 1)
+        {
+            return element.AddClass("flexify").Data("flex-x", flexX).Data("flex-y", 0);
+        }
+
+        public static jQueryObject FlexWidthHeight(this jQueryObject element, double flexX = 1, double flexY = 1)
+        {
+            return element.AddClass("flexify").Data("flex-x", flexX).Data("flex-y", flexY);
+        }
+
+        public static jQueryObject FlexXFactor(this jQueryObject element, double flexX)
+        {
+            return element.Data("flex-x", flexX);
+        }
+
+        public static jQueryObject FlexYFactor(this jQueryObject element, double flexY)
+        {
+            return element.Data("flex-y", flexY);
         }
     }
 
