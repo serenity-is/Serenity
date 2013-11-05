@@ -134,7 +134,7 @@ namespace Serenity
         {
             var value = Type.GetField(entity, entityIsActiveField.Value).As<Int32?>();
             if (value == null)
-                return false;
+                return new object();
 
             if (Type.GetScriptType(value) == "number")
             {
