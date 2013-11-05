@@ -5,14 +5,10 @@
     font-size: 11px;
 }
 
-.s-Form fieldset {
+.s-Form .fieldset {
     padding: 3px 6px 6px 8px;
     -moz-border-radius: 0px;
     border-radius: 0px;
-}
-
-.s-Form fieldset legend {
-    padding: 3px 10px;
 }
 
 .s-Form input.checkbox {
@@ -57,7 +53,6 @@
     padding-right: 2px;
     vertical-align: top;
 }
-
 
 .s-Form .caption, .s-Form .editor {
     float: left;
@@ -112,7 +107,7 @@
     margin-top: 2px;
 }
 
-.s-Form fieldset {
+.s-Form .fieldset {
     .gradient(#f7fafc, #ffffff, #f7fafc);
     border-color: #d7d7d7;
     border-radius: 3px;
@@ -183,11 +178,21 @@ textarea,
 	display: inline-block;
 	padding: 3px 3px;
 	font-size: 11px;
-	line-height: 14px;
 	border: 1px solid #ccc;
 	-webkit-border-radius: 3px; /* Safari 4 */
 	-moz-border-radius: 3px; /* Firefox 3.6 */
 	border-radius: 3px;
+}
+
+.s-Form input[type="text"],
+.s-Form input[type="email"],
+.s-Form input[type="tel"],
+.s-Form input[type="search"],
+.s-Form input[type="url"],
+.s-Form input[type="password"] {
+    line-height: 14px;
+    height: 22px;
+    .box-sizing();
 }
 
 .uneditable-input {
