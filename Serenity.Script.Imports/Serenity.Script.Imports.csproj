@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Select2\Select2.cs" />
     <Compile Include="Dialogs\AlertOptions.cs" />
     <Compile Include="Dialogs\BlockUIOptions.cs" />
     <Compile Include="CastExtensions.cs" />
@@ -52,8 +53,6 @@
     <Compile Include="SlickGrid\SlickGrid.cs" />
     <Compile Include="SlickGrid\SlickGridOptions.cs" />
     <Compile Include="SlickGrid\SlickRemoteView.cs" />
-    <Compile Include="StackTrace\StackTrace.cs" />
-    <Compile Include="StackTrace\StackTraceOptions.cs" />
     <Compile Include="Toastr\Toastr.cs" />
     <Compile Include="Toastr\ToastrOptions.cs" />
     <Compile Include="Validation\jQueryValidator.cs" />

@@ -13,6 +13,8 @@ namespace Serenity
         public SelectEditor(jQueryObject select, SelectEditorOptions opt)
             : base(select, opt)
         {
+            select.Select2();
+
             UpdateItems();
         }
 

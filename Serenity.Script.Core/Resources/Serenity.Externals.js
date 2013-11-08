@@ -942,6 +942,23 @@ else
             Q$Externals.jQueryDatepickerInitialization();
     });
 
+Q$Externals.jQuerySelect2Initialization = function () {
+    $.ui.dialog.prototype._allowInteraction = function( event ) {
+        if ( $( event.target ).closest(".ui-dialog").length ) {
+            return true;
+        }
+        return !!$( event.target ).closest(".ui-datepicker, .select2-drop").length;
+    }
+}
+
+if (window.jQuery && window.jQuery.ui)
+    Q$Externals.jQuerySelect2Initialization();
+else
+    jQuery(function ($) {
+        if (window.jQuery.ui)
+            Q$Externals.jQueryDatepickerInitialization();
+    });
+
 Q$Externals.postToService = function (options) {
     var form = $('<form/>')
         .attr('method', 'POST')

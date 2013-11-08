@@ -14,6 +14,8 @@ namespace Serenity
         public LookupEditorBase(jQueryObject select, TOptions opt)
             : base(select, opt)
         {
+            select.Select2();
+
             UpdateItems();
 
             lookup = GetLookup();
