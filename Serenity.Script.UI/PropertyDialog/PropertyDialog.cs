@@ -22,8 +22,14 @@ namespace Serenity
         protected PropertyDialog(TOptions opt)
             : base(Q.NewBodyDiv(), opt)
         {
-            InitInferences();
             InitPropertyGrid();
+            LoadInitialEntity();
+        }
+
+        protected virtual void LoadInitialEntity()
+        {
+            if (propertyGrid != null)
+                propertyGrid.Load(new object());
         }
 
         protected override DialogOptions GetDialogOptions()
@@ -37,12 +43,12 @@ namespace Serenity
 
         protected virtual string GetDialogTitle()
         {
-            return this.entityType.Value;
+            return "";
         }
 
         protected virtual void OkClick()
         {
-            if (!this.validator.ValidateForm())
+            if (!ValidateBeforeSave())
                 return;
 
             OkClickValidated();
@@ -119,6 +125,64 @@ namespace Serenity
                 return "PropertyDialog";
 
             return templateName;
+        }
+
+        protected PropertyGrid propertyGrid;
+
+        private void InitPropertyGrid()
+        {
+            var pgDiv = this.ById("PropertyGrid");
+            if (pgDiv.Length <= 0)
+                return;
+
+            var pgOptions = GetPropertyGridOptions();
+
+            propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+        }
+
+        protected virtual string GetFormKey()
+        {
+            var name = this.GetType().FullName;
+            var px = name.IndexOf(".");
+            if (px >= 0)
+                name = name.Substring(px + 1);
+
+            if (name.EndsWith("Dialog"))
+                name = name.Substr(0, name.Length - 6);
+
+            return name;
+        }
+
+        protected virtual List<PropertyItem> GetPropertyItems()
+        {
+            var formKey = GetFormKey();
+            return Q.GetForm(formKey);
+        }
+
+        protected virtual PropertyGridOptions GetPropertyGridOptions()
+        {
+            return new PropertyGridOptions
+            {
+                IdPrefix = this.idPrefix,
+                Items = GetPropertyItems(),
+                Mode = PropertyGridMode.Insert,
+                UseCategories = false
+            };
+        }
+
+        protected virtual bool ValidateBeforeSave()
+        {
+            return this.validator.ValidateForm();
+        }
+
+        protected virtual TEntity GetSaveEntity()
+        {
+            var entity = new TEntity();
+
+            if (this.propertyGrid != null)
+                this.propertyGrid.Save(entity);
+
+            return entity;
         }
     }
 }
