@@ -185,10 +185,13 @@
                 join.Name != null &&
                 !_joinAliases.Contains(join.Name))
             {
-                var source = join.SourceAlias.TrimToNull();
-                if (source != null &&
-                    source.ToLowerInvariant() != joinAlias.ToLowerInvariant())
-                    EnsureForeignJoin(fields, source);
+                if (join.OnCriteriaAliases != null)
+                    foreach (var alias in join.OnCriteriaAliases)
+                    {
+                        if (alias != null &&
+                            String.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) != 0)
+                            EnsureForeignJoin(fields, alias);
+                    }
                     
                 Join(join);
             }
@@ -196,7 +199,7 @@
 
         public SqlQuery EnsureJoin(LeftJoin join)
         {
-            EnsureForeignJoin(IntoRow.GetFields(), join.Name);
+            EnsureForeignJoin(join.Fields, join.Name);
             return this;
         }
 
@@ -371,7 +374,7 @@
 
         public SqlQuery Join(LeftJoin join)
         {
-            return LeftJoin(join.JoinTable, join.Name, join.JoinCondition);
+            return LeftJoin(join.ToTable, join.Name, join.OnCriteria);
         }
 
         public SqlQuery OuterApply(Alias joinAlias, string expression)

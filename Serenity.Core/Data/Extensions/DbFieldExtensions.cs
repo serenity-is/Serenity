@@ -222,7 +222,7 @@ namespace Serenity.Data
                     foreach (var field in idField.Fields)
                     {
                         if (field.Join != null &&
-                            field.Join.SourceKeyField == idField.Name &&
+                            field.Join.ToTable == idField.ForeignTable &&
                             field.Type == FieldType.String)
                         {
                             textual = field;

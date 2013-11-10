@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Serenity.Data
 {
@@ -6,173 +7,106 @@ namespace Serenity.Data
     ///   SQL sorgusundaki bir LEFT OUTER JOIN ile ilgili bilgileri tutan Field sýnýf.</summary>
     public class LeftJoin : Alias
     {
-        /// <summary>Sorguya left outer join ile dahil edilen tablo adý (zorunlu).</summary>
-        private string _joinTable;
-        /// <summary>Left outer join iþleminin "ON (...)" kýsmýnda belirtilen ifade (zorunlu).</summary>
-        private string _joinCondition;
-        private string _sourceAlias;
-        private string _sourceKeyField;
-        private string _joinKeyField;
+        private RowFieldsBase fields;
+        private string toTable;
+        private string onCriteria;
+        private HashSet<string> onCriteriaAliases;
 
         /// <summary>
         ///   Verilen tablo adý, alias ve baðlantý koþuluna sahip yeni bir LeftJoin oluþturur.</summary>
-        /// <param name="joinTable">
+        /// <param name="toTable">
         ///   Sorguya left outer join ile dahil edilen tablo adý (zorunlu).</param>
-        /// <param name="joinAlias">
+        /// <param name="alias">
         ///   Sorguya left outer join ile dahil edilen tabloya atanan alias (zorunlu).</param>
-        /// <param name="joinCondition">
+        /// <param name="onCriteria">
         ///   Left outer join iþleminin "ON(...)" kýsmýnda belirtilen ifade (zorunlu).</param>
-        public LeftJoin(RowFieldsBase fields, string joinTable, string joinAlias, string joinCondition)
-            : base(joinAlias)
+        public LeftJoin(RowFieldsBase fields, string toTable, string alias, string onCriteria)
+            : base(alias)
         {
-            if (joinTable == null)
-                throw new ArgumentNullException("joinTable");
-            if (joinAlias == null)
-                throw new ArgumentNullException("joinAlias");           
-            if (joinCondition == null)
-                throw new ArgumentNullException("joinCondition");
+            if (toTable == null)
+                throw new ArgumentNullException("toTable");
 
-            _joinTable = joinTable;
-            _joinCondition = joinCondition;
+            if (onCriteria == null)
+                throw new ArgumentNullException("onCriteria");
 
-            if (IsValidIdentifier(this.Name))
+            this.fields = fields;
+            this.toTable = toTable;
+            this.onCriteria = onCriteria.TrimToNull();
+
+            if (onCriteria != null)
             {
-                var c = _joinCondition.Split(new char[] { '=' });
-                if (c.Length == 2)
-                {
-                    var p1 = c[0].Trim().Split(new char[] { '.' });
-                    var p2 = c[1].Trim().Split(new char[] { '.' });
-                    if (p1.Length == 2 &&
-                        p2.Length == 2 &&
-                        IsValidIdentifier(p1[0].Trim()) &&
-                        IsValidIdentifier(p1[1].Trim()) &&
-                        IsValidIdentifier(p2[0].Trim()) &&
-                        IsValidIdentifier(p2[1].Trim()) &&
-                        String.Compare(p1[0].Trim(), p2[0].Trim(), StringComparison.InvariantCultureIgnoreCase) != 0)
-                    {
-                        if (String.Compare(p1[0].Trim(), this.Name, StringComparison.InvariantCultureIgnoreCase) == 0)
-                        {
-                            _joinKeyField = p1[1].Trim();
-                            _sourceAlias = p2[0].Trim();
-                            _sourceKeyField = p2[1].Trim();
-                        }
-                        else if (String.Compare(p2[0].Trim(), this.Name, StringComparison.InvariantCultureIgnoreCase) == 0)
-                        {
-                            _joinKeyField = p2[1].Trim();
-                            _sourceAlias = p1[0].Trim();
-                            _sourceKeyField = p1[1].Trim();
-                        }
-                    }
-                }
+                var aliases = JoinAliasLocator.Locate(onCriteria);
+                if (aliases.Count > 0)
+                    onCriteriaAliases = aliases;
             }
 
             fields._leftJoins.Add(this.Name, this);
         }
 
-        public static bool IsValidIdentifier(string s)
-        {
-            if (s == null || s.Length == 0)
-                return false;
-
-            var c = Char.ToUpperInvariant(s[0]);
-            if (c != '_' && (c < 'A' || c > 'Z'))
-                return false;
-
-            for (var i = 1; i < s.Length; i++)
-            {
-                c = Char.ToUpperInvariant(s[i]);
-                if (c != '_' &&
-                    !((c >= '0' && c <= '9') ||
-                      (c >= 'A' && c <= 'Z')))
-                    return false;
-            }
-
-            return true;
-        }
-
         /// <summary>
         ///   Verilen tablo adý, alias ve baðlantý koþulu filtresine sahip yeni bir 
         ///   LeftJoin oluþturur.</summary>
-        /// <param name="joinTable">
+        /// <param name="toTable">
         ///   Sorguya left outer join ile dahil edilen tablo adý (zorunlu).</param>
-        /// <param name="joinAlias">
+        /// <param name="alias">
         ///   Sorguya left outer join ile dahil edilen tabloya atanan alias (zorunlu).</param>
-        /// <param name="joinCondition">
+        /// <param name="onCriteria">
         ///   Left outer join iþleminin "ON(...)" kýsmýna karþýlýk gelen filtre nesnesi (zorunlu).</param>
-        public LeftJoin(RowFieldsBase fields, string joinTable, string joinAlias, BaseCriteria joinCondition)
-            : this(fields, joinTable, joinAlias, joinCondition.ToStringCheckNoParams())
+        public LeftJoin(RowFieldsBase fields, string toTable, string alias, BaseCriteria onCriteria)
+            : this(fields, toTable, alias, onCriteria.ToStringCheckNoParams())
         {
         }
 
         /// <summary>
         ///   Verilen tablo adý, join indeksi ve baðlantý koþuluna sahip yeni bir 
         ///   LeftJoin oluþturur.</summary>
-        /// <param name="joinTable">
+        /// <param name="toTable">
         ///   Sorguya left outer join ile dahil edilen tablo adý (zorunlu).</param>
-        /// <param name="joinNumber">
+        /// <param name="alias">
         ///   Sorguya left outer join ile dahil edilen tabloya atanacak join indeksi. Ör. "1" verilirse join
         ///   alias "T1" olur.</param>
-        /// <param name="joinCondition">
+        /// <param name="onCriteria">
         ///   Left outer join iþleminin "ON(...)" kýsmýna karþýlýk gelen filtre nesnesi (zorunlu).</param>
-        public LeftJoin(RowFieldsBase fields, string joinTable, int joinNumber, BaseCriteria joinCondition)
-            : this(fields, joinTable, joinNumber.TableAlias(), joinCondition.ToStringCheckNoParams())
+        public LeftJoin(RowFieldsBase fields, string toTable, int alias, BaseCriteria onCriteria)
+            : this(fields, toTable, alias.TableAlias(), onCriteria.ToStringCheckNoParams())
         {
         }
 
-        //public FieldMeta Foreign(string joinField, string name)
-        //{
-        //    var meta = new FieldMeta(name, FieldFlags.Foreign) { Expression = this.JoinAlias + "." + joinField };
-        //    return meta;
-        //}
-
-        //public FieldMeta Foreign(string joinField)
-        //{
-        //    var meta = new FieldMeta(joinField, FieldFlags.Foreign) { Expression = this.JoinAlias + "." + joinField };
-        //    return meta;
-        //}
-
         /// <summary>
         ///   Left outer join yapýlan tablo adýný verir.</summary>
-        public string JoinTable
+        public string ToTable
         {
             get
             {
-                return _joinTable;
+                return toTable;
             }
         }
 
         /// <summary>
         ///   Left outer join'in "ON(...)" kýsmýnda yazýlan ifadeyi verir.</summary>
-        public string JoinCondition
+        public string OnCriteria
         {
             get
             {
-                return _joinCondition;
+                return onCriteria;
             }
         }
 
-        public string SourceAlias
+
+        /// <summary>
+        ///   Left outer join'in "ON(...)" kýsmýnda yazýlan ifadedeki alias larýn listesini verir.</summary>
+        public HashSet<string> OnCriteriaAliases
         {
             get
             {
-                return _sourceAlias;
+                return onCriteriaAliases;
             }
         }
 
-        public string SourceKeyField
+        public RowFieldsBase Fields
         {
-            get
-            {
-                return _sourceKeyField;
-            }
+            get { return fields; }
         }
 
-        public string JoinKeyField
-        {
-            get
-            {
-                return _joinKeyField;
-            }
-        }
     }
 }

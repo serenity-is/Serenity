@@ -164,7 +164,7 @@ namespace Serenity.Data
                                 var split = _expression.Split('.');
                                 if (split.Length == 2 &&
                                     split[0] == join &&
-                                    LeftJoin.IsValidIdentifier(split[1]))
+                                    IsValidIdentifier(split[1]))
                                 {
                                     _joinAlias = join;
                                     _origin = split[1];
@@ -174,6 +174,27 @@ namespace Serenity.Data
                     }
                 }
             }
+        }
+
+        public static bool IsValidIdentifier(string s)
+        {
+            if (s == null || s.Length == 0)
+                return false;
+
+            var c = Char.ToUpperInvariant(s[0]);
+            if (c != '_' && (c < 'A' || c > 'Z'))
+                return false;
+
+            for (var i = 1; i < s.Length; i++)
+            {
+                c = Char.ToUpperInvariant(s[i]);
+                if (c != '_' &&
+                    !((c >= '0' && c <= '9') ||
+                      (c >= 'A' && c <= 'Z')))
+                    return false;
+            }
+
+            return true;
         }
 
         public string QueryExpression

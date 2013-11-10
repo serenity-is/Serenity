@@ -200,7 +200,7 @@
             if (index == 0)
             {
                 string rest = expression.Substring(3);
-                if (LeftJoin.IsValidIdentifier(rest))
+                if (Field.IsValidIdentifier(rest))
                     return rest;
             }
 

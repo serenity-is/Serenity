@@ -201,7 +201,7 @@ namespace Serenity.Services
 
         public static ValidationError EntityNotFoundError(Row row, Int64 id)
         {
-            return new ValidationError("EntityNotFound", null, "{0} numaralı {1} kaydı bulunamadı, silinmiş olabilir!",
+            return new ValidationError("EntityNotFound", null, "İstenen kayıt bulunamadı. Kayıt silinmiş ya da erişim hakkınız yok!",
                 Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));
         }
 
