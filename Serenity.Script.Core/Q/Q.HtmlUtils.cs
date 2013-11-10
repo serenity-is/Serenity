@@ -28,7 +28,7 @@ namespace Serenity
         /// <returns>Newly created div</returns>
         public static jQueryObject NewBodyDiv()
         {
-            return jQuery.FromHtml("<div/>").AppendTo(Document.Body);
+            return J("<div/>").AppendTo(Document.Body);
         }
 
         private static string HtmlEncodeReplacer(string a)
@@ -54,7 +54,7 @@ namespace Serenity
 
         public static void AddOption(jQueryObject select, string key, string text)
         {
-            jQuery.FromHtml("<option/>")
+            J("<option/>")
                 .Value(key)
                 .Text(text)
                 .AppendTo(select);
@@ -65,13 +65,13 @@ namespace Serenity
             var elementId = element.GetAttribute("id");
 
             if (elementId.IsEmptyOrNull())
-                return jQuery.Select("#" + relativeId);
+                return J("#" + relativeId);
 
-            var result = jQuery.Select(elementId + relativeId);
+            var result = J(elementId + relativeId);
             if (result.Length > 0)
                 return result;
 
-            result = jQuery.Select(elementId + "_" + relativeId);
+            result = J(elementId + "_" + relativeId);
             if (result.Length > 0)
                 return result;
 
@@ -79,11 +79,11 @@ namespace Serenity
             {
                 var idx = elementId.LastIndexOf('_');
                 if (idx <= 0)
-                    return jQuery.Select("#" + relativeId);
+                    return J("#" + relativeId);
 
                 elementId = elementId.Substring(0, idx);
 
-                result = jQuery.Select("#" + elementId + "_" + relativeId);
+                result = J("#" + elementId + "_" + relativeId);
                 if (result.Length > 0)
                     return result;
             }

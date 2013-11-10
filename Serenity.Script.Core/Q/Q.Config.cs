@@ -19,7 +19,7 @@ namespace Serenity
 
             static Config()
             {
-                var pathLink = jQuery.Select("link#ApplicationPath");
+                var pathLink = J("link#ApplicationPath");
                 if (pathLink.Length > 0)
                     ApplicationPath = pathLink.GetAttribute("href");
 

@@ -45,7 +45,7 @@ namespace Serenity
 
             if (options.UseCategories)
             {
-                var linkContainer = jQuery.FromHtml("<div/>")
+                var linkContainer = J("<div/>")
                     .AddClass("category-links");
 
                 categoryIndexes = CreateCategoryLinks(linkContainer, items);
@@ -55,7 +55,7 @@ namespace Serenity
                 else
                     linkContainer.Find("a.category-link").Unbind("click", CategoryLinkClick).Remove();
 
-                categoriesDiv = jQuery.FromHtml("<div/>")
+                categoriesDiv = J("<div/>")
                     .AddClass("categories")
                     .AppendTo(div);
             }
@@ -135,13 +135,13 @@ namespace Serenity
 
         private jQueryObject CreateCategoryDiv(jQueryObject categoriesDiv, JsDictionary<string, int> categoryIndexes, string category)
         {
-            var categoryDiv = jQuery.FromHtml("<div/>")
+            var categoryDiv = J("<div/>")
                 .AddClass("category")
                 .AppendTo(categoriesDiv);
 
-            jQuery.FromHtml("<div/>")
+            J("<div/>")
                 .AddClass("category-title")
-                .Append(jQuery.FromHtml("<a/>")
+                .Append(J("<a/>")
                     .AddClass("category-anchor")
                     .Text(category)
                     .Attribute("name", options.IdPrefix + "Category" + categoryIndexes[category].ToString()))
@@ -152,7 +152,7 @@ namespace Serenity
 
         private Widget CreateField(jQueryObject container, PropertyItem item)
         {
-            var fieldDiv = jQuery.FromHtml("<div/>")
+            var fieldDiv = J("<div/>")
                 .AddClass("field")
                 .AddClass(item.Name)
                 .Data("PropertyItem", item);
@@ -162,7 +162,7 @@ namespace Serenity
 
             string editorId = options.IdPrefix + item.Name;
 
-            var label = jQuery.FromHtml("<label/>")
+            var label = J("<label/>")
                 .AddClass("caption")
                 .Attribute("for", editorId)
                 .Attribute("title", item.Hint ?? item.Title ?? "")
@@ -170,7 +170,7 @@ namespace Serenity
                 .AppendTo(fieldDiv);
 
             if (item.Required)
-                jQuery.FromHtml("<sup>*</sup>")
+                J("<sup>*</sup>")
                     .Attribute("title", "Bu alan zorunludur")
                     .PrependTo(label);
 
@@ -178,7 +178,7 @@ namespace Serenity
             var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
             string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
 
-            var element = jQuery.FromHtml(elementHtml)
+            var element = J(elementHtml)
                 .AddClass("editor")
                 .AddClass("flexify")
                 .Attribute("id", editorId)
@@ -192,11 +192,11 @@ namespace Serenity
             if (Script.IsValue(item.MaxLength))
                 SetMaxLength(editor, item.MaxLength.Value);
 
-            jQuery.FromHtml("<div/>")
+            J("<div/>")
                 .AddClass("vx")
                 .AppendTo(fieldDiv);
 
-            jQuery.FromHtml("<div/>")
+            J("<div/>")
                 .AddClass("clear")
                 .AppendTo(fieldDiv);
 
@@ -276,12 +276,12 @@ namespace Serenity
                     categoryIndexes[item.Category] = index;
 
                     if (index > 1)
-                        jQuery.FromHtml("<span/>")
+                        J("<span/>")
                             .AddClass("separator")
                             .Text("|")
                             .PrependTo(container);
 
-                    jQuery.FromHtml("<a/>")
+                    J("<a/>")
                         .AddClass("category-link")
                         .Text(item.Category)
                         .Attribute("href", "#" + options.IdPrefix + "Category" + index.ToString())
@@ -290,7 +290,7 @@ namespace Serenity
                 }
             }
 
-            jQuery.FromHtml("<div/>")
+            J("<div/>")
                 .AddClass("clear")
                 .AppendTo(container);
 
@@ -301,7 +301,7 @@ namespace Serenity
         {
             e.PreventDefault();
 
-            var title = jQuery.Select("a[name=" + e.Target.GetAttribute("href").ToString().Substr(1) + "]");
+            var title = J("a[name=" + e.Target.GetAttribute("href").ToString().Substr(1) + "]");
 
             Action animate = delegate {
                 title.FadeTo(100, 0.5, () => title.FadeTo(100, 1, () => { }));
@@ -513,7 +513,7 @@ namespace Serenity
         {
             elements.Each(delegate(int index, Element el)
             {
-                jQueryObject elx = jQuery.FromElement(el);
+                jQueryObject elx = J(el);
 
                 string type = elx.GetAttribute("type");
 

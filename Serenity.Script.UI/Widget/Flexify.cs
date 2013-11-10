@@ -107,7 +107,7 @@ namespace Serenity
             
             containers.Find(".flexify").Each((i, e) =>
             {
-                self.ResizeElement(jQuery.FromElement(e));
+                self.ResizeElement(J(e));
             });
         }
 

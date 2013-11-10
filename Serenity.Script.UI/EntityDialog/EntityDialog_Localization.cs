@@ -27,7 +27,7 @@ namespace Serenity
             if (!anyLocalizable)
                 return;
 
-            var localGridDiv = jQuery.FromHtml("<div/>")
+            var localGridDiv = J("<div/>")
                 .Attribute("id", this.IdPrefix + "LocalizationGrid")
                 .Hide()
                 .InsertAfter(pgDiv);
@@ -53,7 +53,7 @@ namespace Serenity
             localGridDiv.AddClass("s-LocalizationGrid");
 
             var self = this;
-            localizationSelect = jQuery.FromHtml("<select/>")
+            localizationSelect = J("<select/>")
                 .AddClass("s-LocalizationSelect")
                 .AppendTo(toolbar.Element)
                 .Change((e) => self.LocalizationSelectChange(e));

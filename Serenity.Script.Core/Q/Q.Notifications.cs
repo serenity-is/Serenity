@@ -46,8 +46,8 @@ namespace Serenity
 
         private static ToastrOptions GetToastrOptions()
         {
-            var dialog = jQuery.FromElement(Window.Document.Body).Children(".ui-dialog").Last();
-            var toastrDiv = jQuery.Select("#toast-container");
+            var dialog = J(Window.Document.Body).Children(".ui-dialog").Last();
+            var toastrDiv = J("#toast-container");
 
             var options = new ToastrOptions
             {

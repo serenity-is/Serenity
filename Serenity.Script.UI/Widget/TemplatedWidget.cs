@@ -21,7 +21,7 @@ namespace Serenity
 
         public jQueryObject ById(string id)
         {
-            return jQuery.Select("#" + idPrefix + id);
+            return J("#" + idPrefix + id);
         }
 
         protected virtual string GetTemplateName()
@@ -34,7 +34,7 @@ namespace Serenity
             string templateName = this.GetTemplateName();
             string template;
             
-            var script = jQuery.Select("script#Template_" + templateName);
+            var script = J("script#Template_" + templateName);
             if (script.Length > 0)
                 template = script.GetHtml();
             else

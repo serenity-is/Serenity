@@ -258,7 +258,7 @@ namespace Serenity
 
         protected void CreatePager()
         {
-            var pagerDiv = jQuery.FromHtml("<div></div>")
+            var pagerDiv = J("<div></div>")
                 .AppendTo(this.element);
 
             ((dynamic)pagerDiv).slickPager(new { 
@@ -342,7 +342,7 @@ namespace Serenity
 
         protected virtual void OnClick(jQueryEvent e, int row, int cell)
         {
-            var target = jQuery.FromElement(e.Target);
+            var target = J(e.Target);
             if (target.HasClass("s-" + GetItemType() + "Link"))
             {
                 e.PreventDefault();
@@ -437,7 +437,7 @@ namespace Serenity
 
         protected jQueryObject CreateSlickContainer()
         {
-            return jQuery.FromHtml("<div class=\"grid-container\"></div>")
+            return J("<div class=\"grid-container\"></div>")
                 .AppendTo(this.element);
         }
 
@@ -469,7 +469,7 @@ namespace Serenity
 
         protected void CreateToolbar(List<ToolButton> buttons)
         {
-            var toolbarDiv = jQuery.FromHtml("<div class=\"grid-toolbar\"></div>")
+            var toolbarDiv = J("<div class=\"grid-toolbar\"></div>")
                 .AppendTo(this.Element);
             toolbar = new Toolbar(toolbarDiv, new ToolbarOptions
             {
@@ -479,7 +479,7 @@ namespace Serenity
 
         protected void CreateTitleBar(string title)
         {
-            var titleDiv = jQuery.FromHtml("<div class=\"grid-title\"><div class=\"title-text\"></div></div>")
+            var titleDiv = J("<div class=\"grid-title\"><div class=\"title-text\"></div></div>")
                 .AppendTo(this.Element);
             titleDiv.Children().Text(title);
         }

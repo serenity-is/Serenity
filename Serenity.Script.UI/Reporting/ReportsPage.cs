@@ -10,7 +10,7 @@
             //Nt.resizeDivToWindow(div, 500, 10);
             //InitAutoLayout();
 
-            jQuery.Select(".report-link").Click(ReportLinkClick);
+            J(".report-link").Click(ReportLinkClick);
         }
 
         private void ReportLinkClick(jQueryEvent e)
@@ -19,7 +19,7 @@
 
             var dialog = new ReportDialog(new ReportDialogOptions
             {
-                ReportKey = jQuery.FromElement(e.Target).GetDataValue("key").As<string>()
+                ReportKey = J(e.Target).GetDataValue("key").As<string>()
             });
         }
     }

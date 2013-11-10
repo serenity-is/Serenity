@@ -1,4 +1,5 @@
-﻿using System;
+﻿using jQueryApi;
+using System;
 using System.Html;
 using System.Runtime.CompilerServices;
 
@@ -41,6 +42,18 @@ namespace Serenity
         public static bool IsFalse(object value)
         {
             return false;
+        }
+
+        [InlineCode("$({p})")]
+        private static jQueryObject J(object p)
+        {
+            return null;
+        }
+
+        [InlineCode("$({p}, {context})")]
+        private static jQueryObject J(object p, object context)
+        {
+            return null;
         }
     }
 }

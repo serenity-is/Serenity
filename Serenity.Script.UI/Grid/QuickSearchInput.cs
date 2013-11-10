@@ -35,15 +35,15 @@ namespace Serenity
 
             if (options.Fields != null && options.Fields.Count > 0)
             {
-                var a = jQuery.FromHtml("<a/>").AddClass("quick-search-field")
+                var a = J("<a/>").AddClass("quick-search-field")
                     .Attribute("title", "arama yapılacak alanı seç")
                     .InsertBefore(input);
 
-                var menu = jQuery.FromHtml("<ul></ul>").CSS("width", "120px");
+                var menu = J("<ul></ul>").CSS("width", "120px");
                 foreach (var item in options.Fields)
                 {
                     var field = item;
-                    jQuery.FromHtml("<li><a/></li>").AppendTo(menu)
+                    J("<li><a/></li>").AppendTo(menu)
                         .Children().Attribute("href", "#")
                         .Text(item.Title ?? "")
                         .Click(delegate(jQueryEvent e) {

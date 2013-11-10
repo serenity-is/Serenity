@@ -3,7 +3,7 @@ using System;
 
 namespace Serenity
 {
-    public abstract class Widget
+    public abstract class Widget : ScriptContext
     {
         private static int NextWidgetNumber = 0;
         protected string widgetName;
