@@ -93,6 +93,11 @@ namespace Serenity
             return request;
         }
 
+        public void ReloadById()
+        {
+            LoadById(this.EntityId.Value, null);
+        }
+
         public void LoadById(long id, Action<RetrieveResponse<TEntity>> callback)
         {
             var baseOptions = new ServiceCallOptions<RetrieveResponse<TEntity>>();

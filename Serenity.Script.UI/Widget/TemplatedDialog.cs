@@ -76,7 +76,7 @@ namespace Serenity
 
         protected virtual void OnDialogOpen()
         {
-            jQuery.Select(":input:eq(0)", element).Focus();
+            J(":input:eq(0)", element).Focus();
             this.Arrange();
         }
 
@@ -96,9 +96,9 @@ namespace Serenity
 
             if (GetQTipPlugin() != null)
             {
-                jQuery.FromElement(Document.Body).Children(".qtip").Each(delegate(int index, Element el)
+                J(Document.Body).Children(".qtip").Each(delegate(int index, Element el)
                 {
-                    ((dynamic)jQuery.FromElement(el)).qtip("hide");
+                    ((dynamic)J(el)).qtip("hide");
                 });
             }
 

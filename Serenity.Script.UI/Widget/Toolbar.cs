@@ -14,7 +14,7 @@ namespace Serenity
             this.element.AddClass("s-Toolbar")
                 .Html("<div class=\"tool-buttons\"><div class=\"buttons-outer\"><div class=\"buttons-inner\"></div></div></div>");
 
-            var container = jQuery.Select("div.buttons-inner", this.element);
+            var container = J("div.buttons-inner", this.element);
         
             for (var i = 0; i < this.options.Buttons.Count; i++) 
             {
@@ -22,7 +22,7 @@ namespace Serenity
 
                 var cssClass = b.CssClass ?? "";
 
-                var button = jQuery.FromHtml(
+                var button = J(
                         "<div class=\"tool-button\">" + 
                             "<div class=\"button-outer\">" + 
                                 "<span class=\"button-inner\"></span>" + 
@@ -33,7 +33,7 @@ namespace Serenity
                 var span = button.Find("span")
                         .AddClass(cssClass)
                         .Click(delegate(jQueryEvent e) {
-                            if (jQuery.FromElement(e.Target).Closest(".tool-button").HasClass("disabled"))
+                            if (J(e.Target).Closest(".tool-button").HasClass("disabled"))
                                 return;
 
                             b.OnClick(e);
@@ -60,7 +60,7 @@ namespace Serenity
                 className.StartsWith("."))
                 className = className.Substr(1);
 
-            return jQuery.Select("span.button-inner." + className, this.element)
+            return J("span.button-inner." + className, this.element)
                 .Closest("div.tool-button");
         }
     }

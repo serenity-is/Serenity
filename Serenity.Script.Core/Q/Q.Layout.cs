@@ -15,7 +15,7 @@ namespace Serenity
                 .Not(element)
                     .Each((i, e) =>
                     {
-                        var q = jQuery.FromElement(e);
+                        var q = J(e);
                         if (q.Is(":visible"))
                             h += q.GetOuterHeight(true);
                     });
@@ -35,7 +35,7 @@ namespace Serenity
 
         public static void InitFullHeightGridPage(jQueryObject gridDiv)
         {
-            jQuery.Select("body")
+            J("body")
                 .AddClass("full-height-page");
 
             jQueryEventHandler layout = delegate 

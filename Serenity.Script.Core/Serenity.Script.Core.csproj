@@ -56,6 +56,7 @@
     <Compile Include="Q\Q.StringHelper.cs" />
     <Compile Include="Q\Q.Text.cs" />
     <Compile Include="Q\Q.UrlUtils.cs" />
+    <Compile Include="ScriptContext.cs" />
     <Compile Include="SlickGrid\SlickTreeHelper.cs" />
     <Compile Include="SlickGrid\LazyLoadHelper.cs" />
     <Compile Include="SlickGrid\SlickColumnHelper.cs" />

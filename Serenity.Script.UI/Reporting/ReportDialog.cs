@@ -19,7 +19,7 @@ namespace Serenity.Reporting
             CreateToolbar();
 
             designPanel = new ReportDesignPanel(
-                jQuery.FromHtml("<div/>")
+                J("<div/>")
                     .AddClass("design-panel")
                     .PrependTo(this.ById("Toolbar").Find(".tool-buttons")),
                 new ReportDesignPanelOptions

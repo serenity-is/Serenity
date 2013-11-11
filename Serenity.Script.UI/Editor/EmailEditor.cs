@@ -18,12 +18,12 @@ namespace Serenity
 
             input.AddClass("emailuser").RemoveClass("flexify");
 
-            var spanAt = jQuery.FromHtml("<span/>")
+            var spanAt = J("<span/>")
                 .Text("@")
                 .AddClass("emailat")
                 .InsertAfter(input);
 
-            var domain = jQuery.FromHtml("<input type=\"text\"/>")
+            var domain = J("<input type=\"text\"/>")
                 .AddClass("emaildomain")
                 .AddClass("flexify")
                 .InsertAfter(spanAt);
@@ -76,7 +76,7 @@ namespace Serenity
             if (jQueryValidator.Methods["emailuser"] == null)
                 jQueryValidator.AddMethod("emailuser", (value, element) =>
                 {
-                    var domain = jQuery.FromElement(element).NextAll(".emaildomain");
+                    var domain = J(element).NextAll(".emaildomain");
                     if (domain.Length > 0 && domain.GetAttribute("readonly") == null)
                     {
                         if (ValidatorIsOptional(element) &&

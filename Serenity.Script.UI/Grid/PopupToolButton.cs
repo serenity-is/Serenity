@@ -12,7 +12,7 @@ namespace Serenity
             : base(div, opt)
         {
             div.AddClass("s-PopupToolButton");
-            jQuery.FromHtml("<b/>").AppendTo(div.Children(".button-outer").Children("span"));
+            J("<b/>").AppendTo(div.Children(".button-outer").Children("span"));
         }
 
         protected override PopupMenuButtonOptions GetDefaults()

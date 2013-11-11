@@ -8,6 +8,11 @@ namespace Serenity.Services
         public ValidationError(string message) : base(message) { }
         public ValidationError(string message, Exception innerException) { }
 
+        public ValidationError(string errorCode, string errorMessage)
+            : this(errorCode, null, errorMessage)
+        {
+        }
+
         public ValidationError(string errorCode, string arguments, string errorMessage) : base(errorMessage)
         {
             ErrorCode = errorCode;
