@@ -218,11 +218,10 @@
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
+            Connection = connection;
+            Request = request;
             ValidatePermissions();
 
-            Connection = connection;
-
-            Request = request;
             Response = new TListResponse();
             Response.Entities = new List<TRow>();
 
