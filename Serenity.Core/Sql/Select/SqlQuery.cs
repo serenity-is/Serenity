@@ -13,7 +13,7 @@
         void EnsureForeignJoin(Field field);
     }
 
-    public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery
+    public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery, IDbEnsureJoin
     {
         private int _skip;
         private int _take;
@@ -195,6 +195,12 @@
                     
                 Join(join);
             }
+        }
+
+        void IDbEnsureJoin.EnsureJoin(string alias)
+        {
+            if (this.IntoRow != null)
+                EnsureForeignJoin(this.IntoRow.GetFields(), alias);
         }
 
         public SqlQuery EnsureJoin(LeftJoin join)

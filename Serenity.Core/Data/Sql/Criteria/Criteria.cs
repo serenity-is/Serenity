@@ -1,8 +1,8 @@
 namespace Serenity.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
-
 
     /// <summary>
     ///   An object that is used to create criterias by employing operator overloading 
@@ -13,6 +13,8 @@ namespace Serenity.Data
         public static readonly BaseCriteria Empty = new Criteria();
 
         private string expression;
+        private string referencedJoin;
+        private HashSet<string> referencedJoins;
 
         /// <summary>
         ///   Creates an empty criteria</summary>
@@ -30,6 +32,9 @@ namespace Serenity.Data
         public Criteria(string text)
         {
             this.expression = text;
+
+            if (text != null && text.IndexOf('.') >= 0)
+                referencedJoins = JoinAliasLocator.Locate(text);
         }
 
         /// <summary>
@@ -42,6 +47,10 @@ namespace Serenity.Data
                 throw new ArgumentNullException("field");
 
             this.expression = field.QueryExpression;
+
+            if (!field.Expression.IsEmptyOrNull() &&
+                field.Expression.IndexOf('.') >= 0)
+                referencedJoins = JoinAliasLocator.Locate(field.Expression);
         }
 
         /// <summary>
@@ -51,15 +60,16 @@ namespace Serenity.Data
         ///   Tablo alias'ý. Null ya da boþ olursa önemsenmez.</param>
         /// <param name="field">
         ///   Alan adý (zorunlu).</param>
-        public Criteria(string joinAlias, string field)
+        public Criteria(string alias, string field)
         {
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            if (joinAlias == null || joinAlias.Length == 0)
-                this.expression = field;
-            else
-                this.expression = joinAlias + "." + field;
+            if (alias == null || alias.Length == 0)
+                throw new ArgumentNullException("alias");
+
+            this.expression = alias + "." + field;
+            this.referencedJoin = alias;
         }
 
         /// <summary>
@@ -79,6 +89,7 @@ namespace Serenity.Data
                 throw new ArgumentOutOfRangeException("joinNumber");
 
             this.expression = joinNumber.TableAliasDot() + field;
+            this.referencedJoin = joinNumber.TableAlias();
         }
 
         /// <summary>
