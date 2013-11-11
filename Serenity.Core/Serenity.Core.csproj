@@ -159,7 +159,6 @@
     <Compile Include="Data\FieldTypes\Int64Field.cs" />
     <Compile Include="Data\FieldTypes\StreamField.cs" />
     <Compile Include="Data\FieldTypes\StringField.cs" />
-    <Compile Include="Data\Interface\IDbEnsureJoin.cs" />
     <Compile Include="Data\Permission\UpdatePermissionAttribute.cs" />
     <Compile Include="Data\Permission\CreatePermissionAttribute.cs" />
     <Compile Include="Data\Permission\OperationPermissionAttribute.cs" />

@@ -36,7 +36,7 @@ namespace Serenity.Data
             if (onCriteria != null)
             {
                 var aliases = JoinAliasLocator.Locate(onCriteria);
-                if (aliases.Count > 0)
+                if (aliases != null && aliases.Count > 0)
                     onCriteriaAliases = aliases;
             }
 

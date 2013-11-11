@@ -11,10 +11,7 @@ namespace Serenity.Data
     public class Criteria : BaseCriteria
     {
         public static readonly BaseCriteria Empty = new Criteria();
-
         private string expression;
-        private string referencedJoin;
-        private HashSet<string> referencedJoins;
 
         /// <summary>
         ///   Creates an empty criteria</summary>
@@ -32,9 +29,6 @@ namespace Serenity.Data
         public Criteria(string text)
         {
             this.expression = text;
-
-            if (text != null && text.IndexOf('.') >= 0)
-                referencedJoins = JoinAliasLocator.Locate(text);
         }
 
         /// <summary>
@@ -47,10 +41,6 @@ namespace Serenity.Data
                 throw new ArgumentNullException("field");
 
             this.expression = field.QueryExpression;
-
-            if (!field.Expression.IsEmptyOrNull() &&
-                field.Expression.IndexOf('.') >= 0)
-                referencedJoins = JoinAliasLocator.Locate(field.Expression);
         }
 
         /// <summary>
@@ -67,9 +57,7 @@ namespace Serenity.Data
 
             if (alias == null || alias.Length == 0)
                 throw new ArgumentNullException("alias");
-
             this.expression = alias + "." + field;
-            this.referencedJoin = alias;
         }
 
         /// <summary>
@@ -89,7 +77,6 @@ namespace Serenity.Data
                 throw new ArgumentOutOfRangeException("joinNumber");
 
             this.expression = joinNumber.TableAliasDot() + field;
-            this.referencedJoin = joinNumber.TableAlias();
         }
 
         /// <summary>

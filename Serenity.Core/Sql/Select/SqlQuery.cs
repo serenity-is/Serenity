@@ -13,7 +13,7 @@
         void EnsureForeignJoin(Field field);
     }
 
-    public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery, IDbEnsureJoin
+    public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery
     {
         private int _skip;
         private int _take;
@@ -181,9 +181,8 @@
                 return;
 
             LeftJoin join;
-            if (fields.LeftJoins.TryGetValue(joinAlias, out join) &&
-                join.Name != null &&
-                !_joinAliases.Contains(join.Name))
+            if (!_joinAliases.Contains(joinAlias) &&
+                fields.LeftJoins.TryGetValue(joinAlias, out join))
             {
                 if (join.OnCriteriaAliases != null)
                     foreach (var alias in join.OnCriteriaAliases)
@@ -195,12 +194,6 @@
                     
                 Join(join);
             }
-        }
-
-        void IDbEnsureJoin.EnsureJoin(string alias)
-        {
-            if (this.IntoRow != null)
-                EnsureForeignJoin(this.IntoRow.GetFields(), alias);
         }
 
         public SqlQuery EnsureJoin(LeftJoin join)
@@ -423,6 +416,26 @@
             return this;
         }
 
+        private void EnsureJoinsInCriteria(string criteria)
+        {
+            if (criteria.IsEmptyOrNull())
+                return;
+
+            if (this.IntoRow == null)
+                return;
+
+            var fields = this.IntoRow.GetFields();
+
+            string referencedJoin;
+            var referencedJoins = JoinAliasLocator.LocateOptimized(criteria, out referencedJoin);
+            if (referencedJoin != null)
+                EnsureForeignJoin(fields, referencedJoin);
+
+            if (referencedJoins != null)
+                foreach (var alias in referencedJoins)
+                    EnsureForeignJoin(fields, alias);
+        }
+
         public SqlQuery Where(string condition)
         {
             if (condition == null || condition.Length == 0)
@@ -430,6 +443,9 @@
 
             _cachedQuery = null;
             AppendUtils.AppendWithSeparator(ref _where, Sql.Keyword.And, condition);
+
+            EnsureJoinsInCriteria(condition);
+
             return this;
         }
 
@@ -440,6 +456,8 @@
 
             _cachedQuery = null;
             AppendUtils.AppendWithSeparator(ref _where, Sql.Keyword.And, condition);
+
+            EnsureJoinsInCriteria(condition);
         }
 
         public SqlQuery Where(params string[] conditions)
@@ -449,6 +467,10 @@
 
             _cachedQuery = null;
             AppendUtils.AppendWithSeparator(ref _where, Sql.Keyword.And, conditions);
+
+            foreach (var s in conditions)
+                EnsureJoinsInCriteria(s);
+
             return this;
         }
 
@@ -465,6 +487,8 @@
 
             _orderBy.Add(field);
 
+            EnsureJoinsInCriteria(field);
+
             return this;
         }
 
@@ -473,13 +497,7 @@
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            _cachedQuery = null;
-
-            // sıralama listesi boşsa yeni oluştur
-            if (_orderBy == null)
-                _orderBy = new StringList();
-
-            _orderBy.Add(joinAlias.TableAliasDot() + field);
+            OrderBy(joinAlias.TableAliasDot() + field);
 
             return this;
         }
@@ -500,6 +518,7 @@
 
             foreach (Field field in fields)
                 OrderBy(field);
+
             return this;
         }
 
@@ -540,6 +559,9 @@
                 _orderBy.Insert(0, field);
             else
                 _orderBy.Add(field);
+
+            EnsureJoinsInCriteria(field);
+
             return this;
         }
 
@@ -602,6 +624,9 @@
             _cachedQuery = null;
 
             AppendUtils.AppendWithSeparator(ref _groupBy, Consts.Comma, field);
+
+            EnsureJoinsInCriteria(field);
+
             return this;
         }
 
