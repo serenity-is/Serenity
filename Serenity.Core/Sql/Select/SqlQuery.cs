@@ -337,7 +337,7 @@
             _cachedQuery = null;
 
             // araya bir boşluk ve LEFT OUTER JOIN metnini ekle.
-            AppendUtils.AppendWithSeparator(ref _from, " ", "LEFT OUTER JOIN ");
+            AppendUtils.AppendWithSeparator(ref _from, " \n", "LEFT OUTER JOIN ");
             // tablo adını ekle
             _from.Append(joinTable);
             // joinAlias belirtilmişse ekle

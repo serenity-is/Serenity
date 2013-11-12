@@ -35,7 +35,7 @@ namespace Serenity.Data
             {
                 if (useRowNumber)
                 {
-                    sb.Append("SELECT * FROM (");
+                    sb.Append("SELECT * FROM (\n");
                 }
                 else
                 {
@@ -205,6 +205,7 @@ namespace Serenity.Data
             if (_distinct)
                 selCount = new StringBuilder();
 
+            sb.Append('\n');
             // seçilecek alan listesini dolaş
             for (int i = 0; i < _columns.Count; i++)
             {
@@ -213,7 +214,7 @@ namespace Serenity.Data
                 // ilk alan adından sonra araya virgül konmalı
                 if (i > 0)
                 {
-                    sb.Append(',');
+                    sb.Append(",\n");
                     if (_distinct)
                         selCount.Append(',');
                 }
