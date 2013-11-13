@@ -170,5 +170,23 @@ namespace Serenity
         {
             return null;
         }
+
+        [InstanceMethodOnFirstArgument]
+        public static jQueryObject Select2(this jQueryObject element, string action)
+        {
+            return null;
+        }
+
+        [InstanceMethodOnFirstArgument]
+        public static jQueryObject Select2(this jQueryObject element, string option, object value)
+        {
+            return null;
+        }
+
+        [InstanceMethodOnFirstArgument, ScriptName("select2")]
+        public static object Select2Get(this jQueryObject element, string option)
+        {
+            return null;
+        }
     }
 }

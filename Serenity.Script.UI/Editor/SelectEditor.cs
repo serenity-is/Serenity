@@ -62,8 +62,15 @@ namespace Serenity
 
         public string Value
         {
-            get { return this.element.GetValue(); }
-            set { this.element.Value(value); }
+            get 
+            { 
+                return this.element.GetValue(); 
+            }
+            set
+            {
+                if (value != Value)
+                    this.element.Value(value).TriggerHandler("change");
+            }
         }
     }
 
