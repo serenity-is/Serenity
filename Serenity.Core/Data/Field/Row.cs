@@ -1,16 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace Serenity.Data
 {
-    public interface ISupportAttached
-    {
-        Hashtable AttachedProperties { get; set; }
-    }
-
     public abstract class Row : INotifyPropertyChanged, IEditableObject, IDataErrorInfo, ISupportAttached
     {
         internal RowFieldsBase _fields;
@@ -24,14 +19,6 @@ namespace Serenity.Data
         internal PropertyChangedEventHandler _propertyChanged;
         internal Action<Row> _postHandler;
         private Dictionary<String, String> _validationErrors;
-        //internal static object _initializationLock = new object();
-
-        /*
-            #if SILVERLIGHT
-            #endif
-
-            }
-        }*/
 
         protected Row(RowFieldsBase fields)
         {
@@ -42,90 +29,94 @@ namespace Serenity.Data
 
             if (!_fields._isLocked)
             {
-                foreach (var fieldInfo in _fields.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
-                {
-                    if (fieldInfo.FieldType.IsSubclassOf(typeof(Field)))
-                    {
-                        var field = fieldInfo.GetValue(_fields) as Field;
-                        if (field != null)
-                            field._propertyName = fieldInfo.Name;
-                    }
-                }
-
-                var byPropertyName = new Dictionary<string, Field>();
-
-                foreach (var field in _fields)
-                {
-                    field._propertyName = field._propertyName ?? field._name;
-                    byPropertyName[field._propertyName ?? field._name] = field;
-                }
-
-                _fields._byPropertyName = byPropertyName;
-
-                PropertyDescriptor[] properties = new PropertyDescriptor[_fields.Count];
-                for (int i = 0; i < _fields.Count; i++)
-                {
-                    Field field = _fields[i];
-                    field._rowType = this.GetType();
-                    properties[i] = new FieldDescriptor(field);
-                }
-
-                _fields._propertyDescriptors = new PropertyDescriptorCollection(properties);
-
-                var schemaAttr = this.GetType().GetCustomAttribute<SchemaAttribute>();
-                if (schemaAttr != null)
-                    _fields._schema = schemaAttr.Schema;
-                else
-                    _fields._schema = "Default";
-
+                InitFields();
                 _fields._isLocked = true;
             }
+        }
 
+        private void InitFields()
+        {
+            InitFields_PropertyNames();
+            InitFields_ByPropertyName();
+            InitFields_PropertyDescriptors();
+            InitFields_Schema();
+            InitFields_InferTextualFields();
+        }
 
-        /* _getValue ve _setValue bu şekilde dinamik oluşturulabilir ancak Silverlight gibi platformlarda private member lara erişmek
-         * mümkün değil, o nedenle iptal edildi, delegate olarak verilmeleri zorunlu malesef
-
-            if (!_fields._isLocked)
+        private void InitFields_PropertyNames()
+        {
+            foreach (var fieldInfo in _fields.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
-                lock (_initializationLock)
+                if (fieldInfo.FieldType.IsSubclassOf(typeof(Field)))
                 {
-                    if (_fields._isLocked)
-                        return;
-
-                    Dictionary<string, FieldInfo> valueInfo = new Dictionary<string, FieldInfo>();
-                    var values = this.GetType().GetMembers(BindingFlags.NonPublic | BindingFlags.Instance);
-                    foreach (var value in values)
-                    {
-                        var fi = value as FieldInfo;
-                        if (fi != null)
-                            valueInfo[fi.Name] = fi;
-                    }
-
-                    var members = _fields.GetType().GetMembers(BindingFlags.Public | BindingFlags.Instance);
-                    foreach (var member in members)
-                    {
-                        var fi = member as FieldInfo;
-                        if (fi != null && 
-                            fi.FieldType.IsSubclassOf(typeof(Field)))
-                        {
-                            Field f = (Field)fi.GetValue(_fields);
-                            if (f != null)
-                            {
-                                f._fieldProperty = fi;
-
-                                FieldInfo valueProperty;
-                                if (valueInfo.TryGetValue("_" + fi.Name, out valueProperty))
-                                    f._valueProperty = valueProperty;
-                            }
-                        }
-                    }
-
-                    foreach (var field in _fields)
-                        field.OnRowInitialization();
-
-                    _fields._isLocked = true;
+                    var field = fieldInfo.GetValue(_fields) as Field;
+                    if (field != null)
+                        field._propertyName = fieldInfo.Name;
                 }
-            }*/
+            }
+        }
+
+        private void InitFields_Schema()
+        {
+            var schemaAttr = this.GetType().GetCustomAttribute<SchemaAttribute>();
+            if (schemaAttr != null)
+                _fields._schema = schemaAttr.Schema;
+            else
+                _fields._schema = "Default";
+        }
+
+        private void InitFields_ByPropertyName()
+        {
+            var byPropertyName = new Dictionary<string, Field>();
+
+            foreach (var field in _fields)
+            {
+                field._propertyName = field._propertyName ?? field._name;
+                byPropertyName[field._propertyName ?? field._name] = field;
+            }
+
+            _fields._byPropertyName = byPropertyName;
+        }
+
+        private void InitFields_PropertyDescriptors()
+        {
+            PropertyDescriptor[] properties = new PropertyDescriptor[_fields.Count];
+            for (int i = 0; i < _fields.Count; i++)
+            {
+                Field field = _fields[i];
+                field._rowType = this.GetType();
+                properties[i] = new FieldDescriptor(field);
+            }
+
+            _fields._propertyDescriptors = new PropertyDescriptorCollection(properties);
+        }
+
+        private void InitFields_InferTextualFields()
+        {
+            foreach (var field in _fields)
+            {
+                if (!field.ForeignTable.IsEmptyOrNull() &&
+                    field.TextualField == null)
+                {
+                    foreach (var join in _fields._leftJoins)
+                    {
+                        if (String.Compare(field.ForeignTable, join.Value.ToTable) == 0 &&
+                            join.Value.OnCriteria.IndexOf(field.QueryExpression, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            foreach (var f in _fields)
+                                if (String.Compare(f.JoinAlias, join.Value.Name, StringComparison.OrdinalIgnoreCase) == 0 &&
+                                    f is StringField)
+                                {
+                                    field.TextualField = f.Name;
+                                    break;
+                                }
+                        }
+
+                        if (field.TextualField != null)
+                            break;
+                    }
+                }
+            }
         }
 
         public void CloneInto(Row clone, 
@@ -257,7 +248,6 @@ namespace Serenity.Data
                     }
                     else
                     {
-                        //EndEdit();
                         _tracking = false;
                         _assignedFields = null;
                     }
@@ -431,7 +421,6 @@ namespace Serenity.Data
                     if (HasErrors)
                         throw new Exception("Lütfen satırdaki işaretli alanları düzeltiniz.");
                     _originalValues = null;
-                    //_assignedFields = null;
                 }
                 finally
                 {
@@ -443,7 +432,6 @@ namespace Serenity.Data
             }
             else
             {
-                //_assignedFields = null;
                 _originalValues = null;
                 ClearValidationErrors();
             }

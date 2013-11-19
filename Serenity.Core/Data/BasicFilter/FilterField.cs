@@ -94,21 +94,22 @@ namespace Serenity.Data
             Initialize(field.Name, field.Caption ?? field.Title, type, 
                 (field.Flags & FieldFlags.NotNull) == FieldFlags.NotNull);
 
-            TryGuessingTextualField(field);
+            ConsiderTextualField(field);
         }
 
-        protected void TryGuessingTextualField(Field field)
+        protected void ConsiderTextualField(Field field)
         {
-            if (field.ForeignTable != null &&
-                field.ForeignField != null)
-            {
-                var textualField = DbFieldExtensions.TryGuessingTextualFieldForIdField(field);
-                if (textualField != null)
-                {
-                    _textual = textualField.Name;
-                    _title = textualField.Title ?? _title;
-                }
-            }
+            if (field.TextualField == null)
+                return;
+
+            var textualField = field.Fields.FindFieldByPropertyName(field.TextualField) ??
+                field.Fields.FindField(field.TextualField);
+
+            if (textualField == null)
+                return;
+
+            _textual = textualField.Name;
+            _title = textualField.Title ?? _title;
         }
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace Serenity.Data
             Initialize(field.Name, field.Caption ?? field.Title, ToFilterHandlerType(field),
                 (field.Flags & FieldFlags.NotNull) == FieldFlags.NotNull);
 
-            TryGuessingTextualField(field);
+            ConsiderTextualField(field);
         }
 
         /// <summary>

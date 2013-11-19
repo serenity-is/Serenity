@@ -196,48 +196,12 @@ namespace Serenity.Data
             }
         }
 
-        public static Field TryGuessingTextualFieldForIdField(Field idField)
-        {
-            if (idField == null)
-                throw new ArgumentOutOfRangeException("idField");
-
-            Field textual = null;
-
-            if (idField.Name.EndsWith("_ObjId"))
-            {
-                var actualFieldName = idField.Name.Substring(0, idField.Name.Length - 6);
-                textual = idField.Fields.FindField(actualFieldName) ?? idField.Fields.FindFieldByPropertyName(actualFieldName);
-
-                // şu an için aşağıdaki foreign key ile aramayı _ObjId'lere uygulamıyoruz!
-            }
-            else if (idField.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
-            {
-                var actualFieldName = idField.Name.Substring(0, idField.Name.Length - 2);
-                textual = idField.Fields.FindField(actualFieldName) ?? idField.Fields.FindFieldByPropertyName(actualFieldName);
-
-                if (textual == null &&
-                    idField.ForeignTable != null &&
-                    idField.ForeignField != null)
-                {
-                    foreach (var field in idField.Fields)
-                    {
-                        if (field.Join != null &&
-                            field.Join.ToTable == idField.ForeignTable &&
-                            field.Type == FieldType.String)
-                        {
-                            textual = field;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return textual;
-        }
-
         public static TField OfJoin<TField>(this TField field, LeftJoin join, string origin)
             where TField: Field
         {
+            if (join == null)
+                throw new ArgumentNullException("join");
+
             field.Expression = join.Name + "." + origin;
             field.Flags = FieldFlags.Foreign;
             return field;

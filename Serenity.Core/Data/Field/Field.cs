@@ -29,6 +29,7 @@ namespace Serenity.Data
         internal object _defaultValue;
         internal SelectLevel _minSelectLevel;
         internal int _naturalOrder;
+        internal string _textualField;
         
         protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
         {
@@ -253,6 +254,12 @@ namespace Serenity.Data
         {
             get { return _naturalOrder; }
             set { _naturalOrder = value; }
+        }
+
+        public string TextualField
+        {
+            get { return _textualField; }
+            set { _textualField = value; }
         }
 
         public LeftJoin ForeignJoin(Int32? foreignIndex = null)

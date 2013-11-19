@@ -102,9 +102,12 @@ namespace Serenity.Web.PropertyEditor
                 {
                     if (basedOnField != null)
                     {
-                        var actualField = DbFieldExtensions.TryGuessingTextualFieldForIdField(basedOnField);
-                        if (actualField != null)
-                            pi.Title = actualField.Title;
+                        Field textualField = null;
+                        if (basedOnField.TextualField != null)
+                            textualField = basedOnField.Fields.FindFieldByPropertyName(basedOnField.TextualField) ?? basedOnField.Fields.FindField(basedOnField.TextualField);
+
+                        if (textualField != null)
+                            pi.Title = textualField.Title;
                         else
                             pi.Title = basedOnField.Title;
                     }
