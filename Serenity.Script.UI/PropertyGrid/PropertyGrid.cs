@@ -284,6 +284,7 @@ namespace Serenity
                     J("<a/>")
                         .AddClass("category-link")
                         .Text(item.Category)
+                        .Attribute("tabindex", "-1")
                         .Attribute("href", "#" + options.IdPrefix + "Category" + index.ToString())
                         .Click(CategoryLinkClick)
                         .PrependTo(container);

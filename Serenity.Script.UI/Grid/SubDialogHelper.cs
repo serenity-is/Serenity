@@ -30,6 +30,21 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
+        public static TDialog TriggerDataChange<TDialog>(this TDialog dialog)
+            where TDialog : Widget
+        {
+            dialog.Element.TriggerHandler("ondatachange");
+            return dialog;
+        }
+
+        [IncludeGenericArguments(false)]
+        public static jQueryObject TriggerDataChange(this jQueryObject element)
+        {
+            element.TriggerHandler("ondatachange");
+            return element;
+        }
+
+        [IncludeGenericArguments(false)]
         public static TDialog BubbleDataChange<TDialog>(this TDialog dialog, Widget owner, bool useTimeout = true)
             where TDialog : Widget
         {

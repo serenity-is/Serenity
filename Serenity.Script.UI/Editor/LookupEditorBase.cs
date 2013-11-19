@@ -84,7 +84,10 @@ namespace Serenity
 
         public string Value
         {
-            get { return this.element.GetValue(); }
+            get 
+            { 
+                return this.element.GetValue(); 
+            }
             set 
             {
                 if (value != Value)

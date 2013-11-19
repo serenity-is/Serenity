@@ -43,9 +43,6 @@
     <Compile Include="Grid\PopupToolButton.cs" />
     <Compile Include="Grid\PopupMenuButton.cs" />
     <Compile Include="PropertyDialog\PropertyDialog.cs" />
-    <Compile Include="PropertyDialog\PropertyDialog_Inference.cs" />
-    <Compile Include="PropertyDialog\PropertyDialog_PropertyGrid.cs" />
-    <Compile Include="PropertyDialog\PropertyDialog_Save.cs" />
     <Compile Include="Editor\BooleanEditor.cs" />
     <Compile Include="Editor\EditorTypeEditor.cs" />
     <Compile Include="Editor\EmailEditor.cs" />

@@ -134,15 +134,16 @@
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
-            Connection = connection;
-
-            Request = request;
-            Response = new TRetrieveResponse();
-
-            Row = new TRow();
-
+            request.CheckNotNull();
             if (request.EntityId == null)
-                throw DataValidation.RequiredError("EntityId");
+                throw DataValidation.RequiredError("entityId");
+
+            Connection = connection;
+            Request = request;
+            ValidatePermissions();
+
+            Response = new TRetrieveResponse();
+            Row = new TRow();
 
             var query = CreateQuery();
 

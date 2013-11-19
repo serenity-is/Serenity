@@ -1,8 +1,8 @@
 namespace Serenity.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
-
 
     /// <summary>
     ///   An object that is used to create criterias by employing operator overloading 
@@ -11,7 +11,6 @@ namespace Serenity.Data
     public class Criteria : BaseCriteria
     {
         public static readonly BaseCriteria Empty = new Criteria();
-
         private string expression;
 
         /// <summary>
@@ -51,15 +50,14 @@ namespace Serenity.Data
         ///   Tablo alias'ý. Null ya da boþ olursa önemsenmez.</param>
         /// <param name="field">
         ///   Alan adý (zorunlu).</param>
-        public Criteria(string joinAlias, string field)
+        public Criteria(string alias, string field)
         {
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            if (joinAlias == null || joinAlias.Length == 0)
-                this.expression = field;
-            else
-                this.expression = joinAlias + "." + field;
+            if (alias == null || alias.Length == 0)
+                throw new ArgumentNullException("alias");
+            this.expression = alias + "." + field;
         }
 
         /// <summary>

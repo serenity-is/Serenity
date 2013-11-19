@@ -75,10 +75,7 @@ namespace Serenity
             BindToViewEvents();
 
             if (buttons != null)
-            {
-                CreateIncludeDeletedButton();
-                CreateQuickSearchInput();
-            }
+                CreateToolbarExtensions();
 
             UpdateDisabledState();
 
@@ -90,6 +87,12 @@ namespace Serenity
             }
             else
                 view.Populate();
+        }
+
+        protected virtual void CreateToolbarExtensions()
+        {
+            CreateIncludeDeletedButton();
+            CreateQuickSearchInput();
         }
 
         public override void Destroy()

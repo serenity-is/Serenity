@@ -153,7 +153,7 @@ namespace Serenity.Data
                     if (value != null)
                     {
                         var aliases = JoinAliasLocator.Locate(value);
-                        if (aliases.Count > 0)
+                        if (aliases != null && aliases.Count > 0)
                         {
                             _referencedJoins = aliases;
 
