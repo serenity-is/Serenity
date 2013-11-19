@@ -129,6 +129,7 @@ namespace Serenity
                     cloneDialog.Cascade(this.element).LoadEntityAndOpenDialog(cloneEntity);
                 }
             });
+            
             return list;
         }
 
@@ -165,8 +166,7 @@ namespace Serenity
             if (saveButton != null)
                 saveButton.Toggle(isLocalizationMode || !isDeleted);
 
-            if (cloneButton != null)
-                cloneButton.Toggle(IsEditMode);
+            cloneButton.Toggle(false);
 
             if (propertyGrid != null)
                 propertyGrid.Element.Toggle(!isLocalizationMode);
