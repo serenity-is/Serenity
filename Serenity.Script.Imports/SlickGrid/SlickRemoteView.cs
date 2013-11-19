@@ -17,8 +17,7 @@ namespace Serenity
         public dynamic Params { get; set; }
         public SlickEvent OnSubmit { get; set; }
         public string Url { get; set; }
-        public string SortBy { get; set; }
-        public string SortOrder { get; set; }
+        public string[] SortBy { get; set; }
         public int RowsPerPage { get; set; }
         public int SeekToPage { get; set; }
         public SlickEvent OnProcessData { get; set; }
@@ -114,10 +113,7 @@ namespace Serenity
         public Int32? RowsPerPage;
 
         [IntrinsicProperty]
-        public string SortOrder { get; set; }
-
-        [IntrinsicProperty]
-        public string SortBy { get; set; }
+        public string[] SortBy { get; set; }
 
         public CancellableViewCallback<TEntity> OnSubmit;
         public SlickRemoteViewAjaxCallback<TEntity> OnAjaxCall;

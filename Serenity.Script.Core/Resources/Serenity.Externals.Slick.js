@@ -357,14 +357,11 @@ function EventHelper() {
             if (intf.rowsPerPage)
                 request.Take = intf.rowsPerPage;
 
-            if (intf.sortBy) {
+            if (intf.sortBy && intf.sortBy.length) {
                 if ($.isArray(intf.sortBy))
-                    request.Sort = [s];
+                    request.Sort = intf.sortBy;
                 else {
-                    var s = intf.sortBy;
-                    if (intf.sortOrder == 'desc')
-                        s += ' DESC';
-                    request.Sort = [s];
+                    request.Sort = [intf.sortBy];
                 }
             }
 
@@ -590,14 +587,13 @@ function EventHelper() {
         intf.params = options.params || {};
         intf.onSubmit = options.onSubmit || null;
         intf.url = options.url || null;
-        intf.sortBy = options.sortBy || null;
-        intf.sortOrder = options.sortOrder || null;
         intf.rowsPerPage = options.rowsPerPage || 0;
         intf.seekToPage = options.seekToPage || 1;
         intf.onAjaxCall = options.onAjaxCall || null;
         intf.onProcessData = options.onProcessData || null;
         intf.method = options.method || 'POST';
         intf.errormsg = intf.errormsg || 'Kayıtlar alınırken hata oluştu!';
+        intf.sortBy = options.sortBy || [];
 
         if (options.url && options.autoLoad) {
             populate();

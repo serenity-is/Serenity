@@ -174,6 +174,21 @@ namespace Serenity
                 EnableForHeaderCells = true
             }));
 
+            grid.SetSortColumns(GetDefaultSortBy().Map<SlickColumnSort>(s => {
+                var x = new SlickColumnSort();
+                if (s != null && s.ToLower().EndsWith(" DESC"))
+                {
+                    x.ColumnId = s.Substr(0, s.Length - 5);
+                    x.SortAsc = false;
+                }
+                else
+                {
+                    x.ColumnId = s;
+                    x.SortAsc = true;
+                }
+                return x;
+            }));
+
             return grid;
         }
 
@@ -278,8 +293,23 @@ namespace Serenity
                 self.view.PopulateLock();
                 try
                 {
-                    self.view.SortOrder = p.sortAsc ? "" : "desc";
-                    self.view.SortBy = (p.sortCol ?? new SlickColumn()).field;
+                    List<string> sortBy = new List<string>();
+                    if (p.multiColumnSort)
+                    {  
+                        for (var i = 0; i < p.sortCols.length; i++) 
+                        {
+                            var x = p.sortCols[i];
+                            var col = x.sortCol ?? new SlickColumn();
+                            sortBy.Add(col.field + (x.sortAsc ? "" : " DESC"));
+                        }
+                    }
+                    else
+                    {
+                        var col = p.sortCol ?? new SlickColumn();
+                        sortBy.Add(col.field + (p.sortAsc ? "" : " DESC"));
+                    }
+
+                    self.view.SortBy = sortBy.As<string[]>();
                 }
                 finally
                 {
@@ -450,9 +480,9 @@ namespace Serenity
             return new SlickRemoteView<TEntity>(opt);
         }
 
-        protected virtual string GetDefaultSortBy()
+        protected virtual List<string> GetDefaultSortBy()
         {
-            return "ID";
+            return new List<string> { entityIdField.Value };
         }
 
         protected virtual SlickRemoteViewOptions GetViewOptions()
@@ -460,7 +490,7 @@ namespace Serenity
             var opt = new SlickRemoteViewOptions();
             opt.IdField = entityIdField.Value;
             opt.Url = Q.ResolveUrl("~/Services/" + entityType.Value.Replace('.', '/') + "/List");
-            opt.SortBy = GetDefaultSortBy();
+            opt.SortBy = GetDefaultSortBy().As<string[]>();
             
             if (options.HidePager)
                 opt.RowsPerPage = 0;
@@ -510,6 +540,7 @@ namespace Serenity
         {
             SlickGridOptions opt = new SlickGridOptions();
             opt.MultiSelect = false;
+            opt.MultiColumnSort = true;
             opt.EnableCellNavigation = false;
             return opt;
         }
