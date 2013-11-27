@@ -5,17 +5,15 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Element("<select/>")]
-    public abstract class LookupEditorBase<TOptions, TItem> : Widget<TOptions>, IStringValue
+    [Element("<input type=\"hidden\"/>")]
+    public abstract class LookupEditorBase<TOptions, TItem> : Select2Editor<TOptions, TItem>
         where TOptions: class, new()
     {
         private Lookup<TItem> lookup;
 
-        public LookupEditorBase(jQueryObject select, TOptions opt)
-            : base(select, opt)
+        public LookupEditorBase(jQueryObject hidden, TOptions opt)
+            : base(hidden, opt)
         {
-            select.Select2();
-
             UpdateItems();
 
             lookup = GetLookup();
@@ -34,6 +32,8 @@ namespace Serenity
                 lookup = null;
             }
 
+            element.Select2("destroy");
+
             base.Destroy();
         }
 
@@ -50,11 +50,6 @@ namespace Serenity
             return Q.GetLookup<TItem>(key);
         }
 
-        protected virtual string EmptyItemText()
-        {
-            return "--seçiniz--";
-        }
-
         protected virtual IEnumerable<TItem> GetItems(Lookup<TItem> lookup)
         {
             return lookup.Items;
@@ -63,11 +58,8 @@ namespace Serenity
         protected virtual void UpdateItems()
         {
             var lookup = GetLookup();
-            Q.ClearOptions(element);
 
-            var emptyItemText = EmptyItemText();
-            if (emptyItemText != null)
-                Q.AddOption(element, "", emptyItemText);
+            ClearItems();
 
             var items = GetItems(lookup);
             foreach (dynamic item in items)
@@ -78,20 +70,7 @@ namespace Serenity
                 object idValue = item[lookup.IdField];
                 string id = idValue == null ? "" : idValue.ToString();
 
-                Q.AddOption(element, id, text);
-            }
-        }
-
-        public string Value
-        {
-            get 
-            { 
-                return this.element.GetValue(); 
-            }
-            set 
-            {
-                if (value != Value)
-                    this.element.Value(value).TriggerHandler("change");
+                AddItem(id, text);
             }
         }
     }

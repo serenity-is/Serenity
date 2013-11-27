@@ -7,14 +7,12 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Editor("Açılır Liste", typeof(SelectEditorOptions))]
-    [Element("<select/>")]
-    public abstract class SelectEditor : Widget<SelectEditorOptions>, IStringValue
+    [Element("<input type=\"hidden\"/>")]
+    public abstract class SelectEditor : Select2Editor<SelectEditorOptions, Select2Item>, IStringValue
     {
-        public SelectEditor(jQueryObject select, SelectEditorOptions opt)
-            : base(select, opt)
+        public SelectEditor(jQueryObject hidden, SelectEditorOptions opt)
+            : base(hidden, opt)
         {
-            select.Select2();
-
             UpdateItems();
         }
 
@@ -32,7 +30,7 @@ namespace Serenity
             return options.Items ?? new List<object>();
         }
 
-        protected virtual string EmptyItemText()
+        protected override string EmptyItemText()
         {
             return options.EmptyOptionText;
         }
@@ -41,11 +39,7 @@ namespace Serenity
         {
             var items = GetItems();
             
-            Q.ClearOptions(element);
-
-            var emptyItemText = EmptyItemText();
-            if (emptyItemText != null)
-                Q.AddOption(element, "", emptyItemText);
+            ClearItems();
 
             if (items.Count > 0)
             {
@@ -55,21 +49,8 @@ namespace Serenity
                 {
                     string key = isStrings ? item : item[0];
                     string text = isStrings ? item : item[1] ?? item[0];
-                    Q.AddOption(element, key, text);
+                    AddItem(key, text);
                 }
-            }
-        }
-
-        public string Value
-        {
-            get 
-            { 
-                return this.element.GetValue(); 
-            }
-            set
-            {
-                if (value != Value)
-                    this.element.Value(value).TriggerHandler("change");
             }
         }
     }

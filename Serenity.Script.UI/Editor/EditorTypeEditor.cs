@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Editor("Editör Tipi")]
-    [Element("<select />")]
+    [Element("<input type=\"hidden\" />")]
     public class EditorTypeEditor : SelectEditor, IStringValue
     {
         private static List<object> editorTypeList;

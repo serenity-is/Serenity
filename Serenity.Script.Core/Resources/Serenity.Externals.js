@@ -869,6 +869,7 @@ Q$Externals.validateOptions = function(options) {
     $.validator.prototype.showLabel = Q$Externals.validateShowLabel;
                 
     return $.extend({
+        ignore: ":hidden",
         meta: 'v',
         errorClass: 'error',
         errorPlacement: function(error, element) {

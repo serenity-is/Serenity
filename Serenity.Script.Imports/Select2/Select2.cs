@@ -107,7 +107,7 @@ namespace Serenity
         public Func<jQueryObject, Func<object>> InitSelection { get; set; }
         public Func<string, dynamic[], Func<object, object>, dynamic, string> Tokenizer { get; set; }
         public string[] TokenSeparators { get; set; }
-        public Func<Select2QueryOptions> Query { get; set; }
+        public Action<Select2QueryOptions> Query { get; set; }
         public Select2AjaxOptions Ajax { get; set; }
         public TypeOption<object, Func<object>> Data { get; set; }
         public TypeOption<string[], Func<string[]>> Tags { get; set; }
@@ -131,7 +131,7 @@ namespace Serenity
         public string Term { get; set; }
         public Int32 Page { get; set; }
         public object Context { get; set; }
-        public Func<Select2Result> Callback { get; set; }
+        public Action<Select2Result> Callback { get; set; }
     }
 
     [Imported, Serializable]

@@ -501,7 +501,7 @@ namespace Serenity
                 widget.Element.ToggleClass("required", Q.IsTrue(isRequired));
         }
 
-        private static void SetReadOnly(Widget widget, bool isReadOnly)
+        public static void SetReadOnly(Widget widget, bool isReadOnly)
         {
             var readOnly = widget as IReadOnly;
             if (readOnly != null)

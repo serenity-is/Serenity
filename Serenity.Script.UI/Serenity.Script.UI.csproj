@@ -37,6 +37,7 @@
     <Compile Include="Attribute\EntityTypeAttribute.cs" />
     <Compile Include="Attribute\IdPropertyAttribute.cs" />
     <Compile Include="Attribute\NamePropertyAttribute.cs" />
+    <Compile Include="Editor\Select2Editor.cs" />
     <Compile Include="Editor\URLEditor.cs" />
     <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
