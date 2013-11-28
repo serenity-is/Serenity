@@ -70,12 +70,27 @@ namespace Serenity
                             StripDiacritics(item.Text ?? "").ToUpperCase().IndexOf(term) >= 0;
                     }));
 
-                    
                     query.Callback(new Select2Result
                     {
                         Results = results.Slice((query.Page - 1) * pageSize, query.Page * pageSize),
                         More = results.Count >= query.Page * pageSize
                     });
+                },
+                InitSelection = delegate(jQueryObject element, Action<object> callback)
+                {
+                    var val = element.GetValue();
+                    Select2Item item = null;
+                    for (var i = 0; i < this.items.Count; i++)
+                    {
+                        var x = items[i];
+                        if (x.Id == val)
+                        {
+                            item = x;
+                            break;
+                        }
+                    }
+
+                    callback(item);
                 }
             };
         }
@@ -103,7 +118,7 @@ namespace Serenity
             set
             {
                 if (value != Value)
-                    this.element.Select2("val", value);
+                    this.element.Select2("val", value).TriggerHandler("change");
             }
         }
     }

@@ -45,7 +45,7 @@ namespace Serenity.Data
                         field = new Int32Field(collection, name, caption, item.Size, flags);
                         break;
                     case CustomFieldType.Int64:
-                        field = new Int32Field(collection, name, caption, item.Size, flags);
+                        field = new Int64Field(collection, name, caption, item.Size, flags);
                         break;
                     default:
                         field = new StringField(collection, name, caption, item.Size, flags);
