@@ -11,6 +11,7 @@ namespace Serenity
         public BooleanEditor(jQueryObject input)
             : base(input, new object())
         {
+            input.RemoveClass("flexify");
         }
 
         public bool Value
