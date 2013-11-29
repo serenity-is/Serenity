@@ -105,7 +105,18 @@ namespace Serenity
 
             if (this.slickGrid != null)
             {
-                this.slickGrid.SetData((new object[0]).As<List<dynamic>>(), false);
+                if (this.slickGridOnSort != null)
+                {
+                    this.slickGrid.OnSort.Unsubscribe(this.slickGridOnSort);
+                    this.slickGridOnSort = null;
+                }
+
+                if (this.slickGridOnClick != null)
+                {
+                    this.slickGrid.OnSort.Unsubscribe(this.slickGridOnClick);
+                    this.slickGridOnClick = null;
+                }
+
                 this.slickGrid.Destroy();
                 this.slickGrid = null;
             }
@@ -286,17 +297,21 @@ namespace Serenity
             });
         }
 
+        private Action<jQueryEvent, dynamic> slickGridOnSort;
+        private Action<jQueryEvent, dynamic> slickGridOnClick;
+
         protected void BindToSlickEvents()
         {
             var self = this;
-            this.slickGrid.OnSort.Subscribe((e, p) => {
+            slickGridOnSort = (e, p) =>
+            {
                 self.view.PopulateLock();
                 try
                 {
                     List<string> sortBy = new List<string>();
                     if (p.multiColumnSort)
-                    {  
-                        for (var i = 0; i < p.sortCols.length; i++) 
+                    {
+                        for (var i = 0; i < p.sortCols.length; i++)
                         {
                             var x = p.sortCols[i];
                             var col = x.sortCol ?? new SlickColumn();
@@ -316,12 +331,16 @@ namespace Serenity
                     self.view.PopulateUnlock();
                 }
                 self.view.Populate();
-            });
+            };
 
-            this.slickGrid.OnClick.Subscribe((e, p) =>
+            this.slickGrid.OnSort.Subscribe(slickGridOnSort);
+
+            slickGridOnClick = (e, p) =>
             {
                 self.OnClick(e, p.row, p.cell);
-            });
+            };
+
+            this.slickGrid.OnClick.Subscribe(slickGridOnClick);
         }
 
         protected virtual string GetAddButtonCaption()
