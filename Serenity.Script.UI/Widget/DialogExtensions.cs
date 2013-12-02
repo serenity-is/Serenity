@@ -77,7 +77,10 @@ namespace Serenity
 
                 var button = buttons.Eq(0);
                 if (!button.Is(":disabled"))
+                {
+                    e.PreventDefault();
                     button.Trigger("click");
+                }
             });
 
             return dialog;
