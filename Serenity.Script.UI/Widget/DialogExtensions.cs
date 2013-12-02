@@ -43,5 +43,44 @@ namespace Serenity
 
             return dialog;
         }
+
+        private const int EnterKeyCode = 13;
+
+        public static jQueryObject DialogCloseOnEnter(this jQueryObject dialog)
+        {
+            dialog.Bind("keydown", delegate(jQueryEvent e)
+            {
+                if (e.Which != EnterKeyCode)
+                    return;
+
+                var tagName = e.Target.TagName.ToLowerCase();
+
+                if (tagName == "button" ||
+                    tagName == "select" || // dropdown popup açık olabilir?
+                    tagName == "textarea" ||
+                    tagName == "input" && (string)e.Target.GetAttribute("type") == "button")
+                    return;
+
+                var dlg = jQuery.FromObject(Script.This);
+                if (!dlg.HasClass("ui-dialog"))
+                    dlg = dlg.Closest(".ui-dialog");
+
+                var buttons = dlg.Children(".ui-dialog-buttonpane")
+                    .Find("button");
+
+                if (buttons.Length > 0)
+                {
+                    var defaultButton = buttons.Find(".default-button");
+                    if (defaultButton.Length > 0)
+                        buttons = defaultButton;
+                }
+
+                var button = buttons.Eq(0);
+                if (!button.Is(":disabled"))
+                    button.Trigger("click");
+            });
+
+            return dialog;
+        }
     }
 }
