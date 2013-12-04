@@ -2,9 +2,9 @@
 {
     using jQueryApi;
 
-    public class ReportsPage : Widget
+    public class ReportPage : Widget
     {
-        public ReportsPage(jQueryObject div)
+        public ReportPage(jQueryObject div)
             : base(div)
         {
             //Nt.resizeDivToWindow(div, 500, 10);

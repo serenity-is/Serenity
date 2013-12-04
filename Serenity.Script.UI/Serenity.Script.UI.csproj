@@ -102,7 +102,7 @@
     <Compile Include="Reporting\ReportDesignModels.cs" />
     <Compile Include="Reporting\ReportDesignPanel.cs" />
     <Compile Include="Reporting\ReportDialog.cs" />
-    <Compile Include="Reporting\ReportsPage.cs" />
+    <Compile Include="Reporting\ReportPage.cs" />
     <Compile Include="Widget\DialogExtensions.cs" />
     <Compile Include="Widget\Flexify.cs">
       <SubType>Code</SubType>
