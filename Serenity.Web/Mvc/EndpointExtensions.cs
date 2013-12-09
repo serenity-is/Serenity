@@ -80,7 +80,7 @@ namespace Serenity.Services
             return response;
         }
 
-        public static Result<TResponse> Execute<TResponse>(this Controller controller, Func<TResponse> handler)
+        public static Result<TResponse> ExecuteMethod<TResponse>(this Controller controller, Func<TResponse> handler)
             where TResponse: ServiceResponse, new()
         {
             TResponse response;

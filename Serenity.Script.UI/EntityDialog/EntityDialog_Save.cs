@@ -16,7 +16,7 @@ namespace Serenity
         {
             var self = this;
             var opt = new ServiceCallOptions();
-            opt.Service = this.entityType.Value.Replace('.', '/') + "/" + (this.IsEditMode ? "Update" : "Create");
+            opt.Service = this.GetEntityType().Replace('.', '/') + "/" + (this.IsEditMode ? "Update" : "Create");
             opt.OnSuccess = delegate(ServiceResponse response)
             {
                 self.OnSaveSuccess(response);
@@ -42,7 +42,7 @@ namespace Serenity
 
             if (this.IsEditMode)
             {
-                string idField = entityIdField.Value;
+                string idField = GetEntityIdField();
                 if (idField != null)
                     Type.SetField(entity, idField, this.EntityId);
             }

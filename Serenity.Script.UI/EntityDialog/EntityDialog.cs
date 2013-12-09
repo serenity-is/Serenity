@@ -14,7 +14,6 @@ namespace Serenity
         protected EntityDialog(TOptions opt)
             : base(Q.NewBodyDiv(), opt)
         {
-            InitInferences();
             InitTabs();
             InitToolbar();
             InitPropertyGrid();
@@ -79,24 +78,19 @@ namespace Serenity
             set { entityId = value; }
         }
 
-        protected virtual string GetLocalTextPrefix()
-        {
-            return "Db." + entityType.Value + ".";
-        }
-
         protected virtual string GetEntityNameFieldValue()
         {
-            return (Type.GetField(Entity, entityNameField.Value) ?? "").ToString();
+            return (Type.GetField(Entity, GetEntityNameField()) ?? "").ToString();
         }
 
         protected virtual string GetEntityTitle()
         {
             if (!(this.IsEditMode))
-                return "Yeni " + entitySingular.Value;
+                return "Yeni " + GetEntitySingular();
             else
             {
                 string title = (GetEntityNameFieldValue() ?? "") + " - #" + (this.EntityId.As<long>().ToString());
-                return entitySingular.Value + " Düzenle (" + title + ")";
+                return GetEntitySingular() + " Düzenle (" + title + ")";
             }
         }
 
@@ -152,7 +146,7 @@ namespace Serenity
                 if (EntityId == null)
                     return false;
 
-                var value = Type.GetField(Entity, entityIsActiveField.Value).As<Int32?>();
+                var value = Type.GetField(Entity, GetEntityIsActiveField()).As<Int32?>();
                 if (value == null)
                     return false;
 

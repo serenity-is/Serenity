@@ -41,7 +41,7 @@ namespace Serenity
 
         protected virtual void LoadEntity(TEntity entity)
         {
-            string idField = entityIdField.Value;
+            string idField = GetEntityIdField();
             if (idField != null)
                 this.EntityId = (long?)(Type.GetField(entity, idField).ConvertToId());
 
@@ -101,7 +101,7 @@ namespace Serenity
         public void LoadById(long id, Action<RetrieveResponse<TEntity>> callback)
         {
             var baseOptions = new ServiceCallOptions<RetrieveResponse<TEntity>>();
-            baseOptions.Service = this.entityType.Value.Replace('.', '/') + "/Retrieve";
+            baseOptions.Service = this.GetEntityType().Replace('.', '/') + "/Retrieve";
             baseOptions.BlockUI = false;
 
             baseOptions.Request = GetLoadByIdRequest(id);

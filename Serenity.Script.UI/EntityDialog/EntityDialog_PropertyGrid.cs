@@ -23,7 +23,7 @@ namespace Serenity
 
         protected virtual string GetFormKey()
         {
-            return this.entityType.Value;
+            return this.GetEntityType();
         }
 
         protected virtual List<PropertyItem> GetPropertyItems()
