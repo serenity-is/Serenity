@@ -109,6 +109,11 @@ namespace Serenity
             });
         }
 
+        public List<Select2Item> Items
+        {
+            get { return this.items; }
+        }
+
         public string Value
         {
             get
