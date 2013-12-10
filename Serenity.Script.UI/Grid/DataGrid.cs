@@ -1,4 +1,5 @@
 ﻿using jQueryApi;
+using Serenity.ComponentModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -459,6 +460,8 @@ namespace Serenity
             opt.MultiSelect = false;
             opt.MultiColumnSort = true;
             opt.EnableCellNavigation = false;
+            opt.HeaderRowHeight = 23;
+            opt.RowHeight = 23;
             return opt;
         }
 
@@ -580,9 +583,13 @@ namespace Serenity
     [Imported, Serializable]
     public class GridOptions
     {
+        [Hidden]
         public string Title { get; set; }
+        [Hidden]
         public string Height { get; set; }
+        [Hidden]
         public bool HidePager { get; set; }
+        [Hidden]
         public bool PopulateWhenVisible { get; set; }
     }
 }

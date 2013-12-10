@@ -51,6 +51,11 @@ namespace Serenity
                     item._collapsed = collapsed;
         }
 
+        public static void SetCollapsedFlag(object item, bool collapsed)
+        {
+            ((dynamic)item)._collapsed = collapsed;
+        }
+
         [IncludeGenericArguments(false)]
         public static void SetIndents<TEntity>(IList<TEntity> items, Func<TEntity, object> getId, Func<TEntity, object> getParentId, 
             bool? setCollapsed = true)

@@ -240,7 +240,19 @@ function EventHelper() {
             for (var i = 0,l = items.length; i < l; i++) {
                 var id = items[i][idField];
                 if (id == undefined || idxById[id] != undefined)
-                    throw "Each data element must implement a unique 'id' property";
+                {
+                    var msg = "Each data element must implement a unique '" +
+                        idField + "' property. Object at index '" + i + "' ";
+
+                    if (id == undefined)
+                        msg += "has no identity value: ";
+                    else
+                        msg += "has repeated identity value '" +
+                            id + "': ";
+
+                    msg += $.toJSON(items[i]);
+                    throw msg;
+                }
                 idxById[id] = i;
             }
         }

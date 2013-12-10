@@ -15,7 +15,7 @@
     white-space: nowrap; 
 }
 
-.s-DataGrid div.s-Toolbar { border-radius: 0; }
+.s-DataGrid div.s-Toolbar { border-radius: 0; border-bottom-style: none; }
 
 .s-DataGrid > .grid-container {
     overflow: hidden; 
@@ -89,11 +89,11 @@
     filter: alpha(opacity=50);
 }
 
-.slick-cell, .ui-widget-content .slick-cell {
+.slick-cell, .ui-widget-content .slick-cell, .s-DataGrid .grid-container .slick-cell {
     border-style: none solid solid none; 
     border-color: transparent #dddddd #dddddd transparent;
     border-width: 1px;
-    padding: 1px 4px 2px 4px;
+    padding: 1px 4px 1px 4px;
 }
 
 .slick-row.ui-state-active {
@@ -103,4 +103,22 @@
 .slick-row.deleted, .ui-widget-content .slick-row-deleted { text-decoration: none !important; }
 .slick-viewport, .ui-widget-content .slick-viewport { background-color: #ffffff; }
 .ui-widget-content .slick-header-column:hover, .ui-widget-content .slick-header-column-active { background: white url(images/header-columns-over-bg.gif) repeat-x center bottom; }
-.s-DataGrid .grid-container { border: 1px solid #cccccc; border-style: none solid solid solid; background: #fff; }
+.s-DataGrid .grid-container { border: 1px solid #cccccc; border-style: solid solid solid solid; background: #fff; }
+
+
+.slick-hide-header .slick-header-columns { height: 0px; } 
+.slick-hide-header .slick-header.ui-state-default { border: none; }
+
+.slick-no-cell-border .grid-container .slick-viewport .slick-cell,
+.s-DataGrid.slick-no-cell-border .grid-container .slick-viewport .slick-cell {
+    border-width: 0px;
+}
+
+.slick-no-cell-border .grid-container .slick-viewport .slick-header-columns .slick-header-column,
+.s-DataGrid.slick-no-cell-border .grid-container .slick-viewport .slick-header-columns .slick-header-column {
+    border-width: 0px;
+}
+
+.slick-no-odd-even .slick-row.odd {
+    background-color: #fff;
+}

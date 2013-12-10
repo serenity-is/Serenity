@@ -101,6 +101,8 @@ namespace Serenity
 
         protected override void OnDialogOpen()
         {
+            base.OnDialogOpen();
+
             if (tabs != null)
                 tabs.Active = 0;
         }
