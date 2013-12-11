@@ -109,6 +109,11 @@ namespace Serenity
             });
         }
 
+        protected jQueryObject Select2Container
+        {
+            get { return this.element.PrevAll(".select2-container"); }
+        }
+
         public string Value
         {
             get

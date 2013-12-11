@@ -116,42 +116,6 @@
     padding: 2px 0px 2px 20px; background: url("images/@{image}.png") no-repeat 0px center;
 }
 
-.dialog-styles (@h, @l, @e) {
-    .tab-pane {
-        height: @h;
-    }
-
-    .caption {
-        width: @l;
-    }
-
-    .editor {
-        width: @e;
-    }
-
-    input.editor[type=checkbox] {
-        width: auto;
-    }
-
-    .s-Form .editor.dateQ {
-        width: @e - 17;
-    }
-
-    .s-Form .editor.emailuser {
-        width: 130px;
-    }
-
-    .s-Form .emaildomain {
-        width: @e - 145;
-    }
-}
-
-.tabless-dialog-styles (@h, @l, @e) {
-    .caption { width: @l; }
-    .editor { width: @e; }
-    .s-Form .editor.dateQ { width: @e - 17; }
-}
-
 .form-styles (@l, @e) {
     .caption {
         width: @l;
@@ -173,7 +137,22 @@
         width: 130px;
     }
 
-    .s-Form .emaildomain {
-        width: @e - 153;
+    .s-Form .editor.has-inplace-create {
+        width: @e - 22;
     }
+
+    .s-Form .emaildomain {
+        width: @e - 145;
+    }
+}
+
+.dialog-styles (@h, @l, @e) {
+    .tab-pane { height: @h; }
+    .form-styles(@l, @e);
+}
+
+.tabless-dialog-styles (@h, @l, @e) {
+    .form-styles(@l, @e);
+    .caption { width: @l; }
+    .editor { width: @e; }
 }

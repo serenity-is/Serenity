@@ -625,7 +625,7 @@ namespace Serenity
         protected virtual void InitEntityDialog(Widget dialog)
         {
             var self = this;
-            dialog.BindToDataChange(this, () => self.SubDialogDataChange());
+            dialog.BindToDataChange(this, (e, dci) => self.SubDialogDataChange());
         }
 
         protected virtual Widget CreateEntityDialog()

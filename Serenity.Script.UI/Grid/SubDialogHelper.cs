@@ -12,19 +12,21 @@ namespace Serenity
     public static class SubDialogHelper
     {
         [IncludeGenericArguments(false)]
-        public static TDialog BindToDataChange<TDialog>(this TDialog dialog, Widget owner, Action dataChange, bool useTimeout = true)
+        public static TDialog BindToDataChange<TDialog>(this TDialog dialog, Widget owner, Action<jQueryEvent, DataChangeInfo> dataChange, bool useTimeout = true)
             where TDialog: Widget
         {
             var widgetName = owner.WidgetName;
-            dialog.Element.Bind("ondatachange." + widgetName, (e) => {
+            dialog.Element.As<dynamic>().bind("ondatachange." + widgetName, new Action<jQueryEvent, DataChangeInfo>((e, dci) => {
                 if (useTimeout)
-                    Window.SetTimeout(dataChange, 0);
+                    Window.SetTimeout(delegate() {
+                        dataChange(e, dci);
+                    }, 0);
                 else
-                    dataChange();
-            }).Bind("remove." + widgetName, delegate
+                    dataChange(e, dci);
+            })).bind("remove." + widgetName, new Action(delegate
             {
                 dialog.Element.Unbind("ondatachange." + widgetName);
-            });
+            }));
 
             return dialog;
         }
@@ -48,7 +50,7 @@ namespace Serenity
         public static TDialog BubbleDataChange<TDialog>(this TDialog dialog, Widget owner, bool useTimeout = true)
             where TDialog : Widget
         {
-            return BindToDataChange(dialog, owner, () => owner.Element.TriggerHandler("ondatachange"), useTimeout);
+            return BindToDataChange(dialog, owner, (e, dci) => owner.Element.TriggerHandler("ondatachange"), useTimeout);
         }
 
         [IncludeGenericArguments(false)]

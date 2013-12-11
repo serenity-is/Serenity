@@ -41,7 +41,7 @@ namespace Serenity
             jQueryEventHandler layout = delegate 
             {
                 Q.LayoutFillHeight(gridDiv);
-                gridDiv.Trigger("layout");
+                gridDiv.TriggerHandler("layout");
             };
 
             jQuery.Window.Resize(layout);

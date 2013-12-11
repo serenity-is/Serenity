@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -22,7 +23,15 @@ namespace Serenity
                 self.OnSaveSuccess(response);
                 if (callback != null)
                     callback(response);
-                self.element.Trigger("ondatachange", new object[] { self.IsEditMode ? "update" : "create" });
+
+                var dci = new DataChangeInfo
+                {
+                    Type = self.IsEditMode ? "update" : "create",
+                    Entity = (opt.Request ?? new object()).As<SaveRequest<object>>().Entity,
+                    EntityId = self.IsEditMode ? this.EntityId : (response ?? new object()).As<CreateResponse>().EntityId
+                };
+
+                self.element.TriggerHandler("ondatachange", new object[] { dci });
             };
             opt.OnCleanup = delegate()
             {
@@ -91,5 +100,13 @@ namespace Serenity
         {
             Q.ServiceCall(options);
         }
+    }
+
+    [Imported, Serializable]
+    public class DataChangeInfo
+    {
+        public string Type { get; set; }
+        public Int64? EntityId { get; set; }
+        public object Entity { get; set; }
     }
 }

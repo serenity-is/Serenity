@@ -31,7 +31,9 @@ namespace Serenity
             {
                 if (callback != null)
                     callback(response);
-                self.element.Trigger("ondatachange", new object[] { "delete" });
+                self.element.TriggerHandler("ondatachange", new object[] { 
+                    new DataChangeInfo { EntityId = request.EntityId, Entity = this.entity, Type = "delete" } 
+                });
             };
 
             var thisOptions = GetDeleteOptions(callback);
