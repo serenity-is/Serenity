@@ -6,79 +6,93 @@ namespace Serenity
         where TEntity : class, new()
         where TOptions: class, new()
     {
-        private Lazy<string> entityType;
-        private Lazy<string> localTextPrefix;
-        private Lazy<string> entitySingular;
-        private Lazy<string> entityIdField;
-        private Lazy<string> entityNameField;
-        private Lazy<string> entityIsActiveField;
+        private string entityType;
+        private string localTextPrefix;
+        private string entitySingular;
+        private string entityIdField;
+        private string entityNameField;
+        private string entityIsActiveField;
 
-        protected void InitInferences()
+        protected virtual string GetEntityType()
         {
-            var self = this;
-            entityType = new Lazy<string>(() => self.InferEntityType());
-            localTextPrefix = new Lazy<string>(() => self.InferLocalTextPrefix());
-            entitySingular = new Lazy<string>(() => self.InferEntitySingular());
-            entityIdField = new Lazy<string>(() => self.InferEntityIdField());
-            entityNameField = new Lazy<string>(() => self.InferEntityNameField());
-            entityIsActiveField = new Lazy<string>(() => self.InferEntityIsActiveField());
+            if (entityType == null)
+            {
+                var typeAttributes = this.GetType().GetCustomAttributes(typeof(EntityTypeAttribute), true);
+                if (typeAttributes.Length == 1)
+                {
+                    entityType = typeAttributes[0].As<EntityTypeAttribute>().EntityType;
+                    return null;
+                }
+
+                // typeof(TEntity).Name'i kullanamayız, TEntity genelde Serializable ve Imported olduğundan dolayı tipi Object e karşılık geliyor!
+
+                // remove global namespace
+                var name = this.GetType().FullName;
+                var px = name.IndexOf(".");
+                if (px >= 0)
+                    name = name.Substring(px + 1);
+
+                if (name.EndsWith("Dialog"))
+                    name = name.Substr(0, name.Length - 6);
+
+                entityType = name;
+            }
+
+            return entityType;
         }
 
-        protected virtual string InferEntityType()
+        protected virtual string GetLocalTextPrefix()
         {
-            var typeAttributes = this.GetType().GetCustomAttributes(typeof(EntityTypeAttribute), true);
-            if (typeAttributes.Length == 1)
-                return typeAttributes[0].As<EntityTypeAttribute>().EntityType;
-
-            // typeof(TEntity).Name'i kullanamayız, TEntity genelde Serializable ve Imported olduğundan dolayı tipi Object e karşılık geliyor!
-
-            // remove global namespace
-            var name = this.GetType().FullName;
-            var px = name.IndexOf(".");
-            if (px >= 0)
-                name = name.Substring(px + 1);
-
-            if (name.EndsWith("Dialog"))
-                name = name.Substr(0, name.Length - 6);
-
-            return name;
+            localTextPrefix = localTextPrefix ?? ("Db." + GetEntityType() + ".");
+            return localTextPrefix;
         }
 
-        protected virtual string InferLocalTextPrefix()
+        protected virtual string GetEntitySingular()
         {
-            return "Db." + entityType.Value + ".";
+            entitySingular = entitySingular ?? (Q.TryGetText(GetLocalTextPrefix() + "EntitySingular") ?? GetEntityType());
+            return entitySingular;
         }
 
-        protected virtual string InferEntitySingular()
+        protected virtual string GetEntityNameField()
         {
-            return Q.TryGetText(localTextPrefix.Value + "EntitySingular") ?? entityType.Value;
+            if (entityNameField == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(NamePropertyAttribute), true);
+                if (attributes.Length == 1)
+                    entityNameField = attributes[0].As<NamePropertyAttribute>().NameProperty;
+                else
+                    entityNameField = "Name";
+            }
+
+            return entityNameField;
         }
 
-        protected virtual string InferEntityNameField()
+        protected virtual string GetEntityIdField()
         {
-            var attributes = this.GetType().GetCustomAttributes(typeof(NamePropertyAttribute), true);
-            if (attributes.Length == 1)
-                return attributes[0].As<NamePropertyAttribute>().NameProperty;
+            if (entityIdField == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(IdPropertyAttribute), true);
+                if (attributes.Length == 1)
+                    entityIdField = attributes[0].As<IdPropertyAttribute>().IdProperty;
+                else
+                    entityIdField = "ID";
+            }
 
-            return "Name";
+            return entityIdField;
         }
 
-        protected virtual string InferEntityIdField()
+        protected virtual string GetEntityIsActiveField()
         {
-            var attributes = this.GetType().GetCustomAttributes(typeof(IdPropertyAttribute), true);
-            if (attributes.Length == 1)
-                return attributes[0].As<IdPropertyAttribute>().IdProperty;
+            if (entityIsActiveField == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(IsActivePropertyAttribute), true);
+                if (attributes.Length == 1)
+                    entityIsActiveField = attributes[0].As<IsActivePropertyAttribute>().IsActiveProperty;
+                else
+                    entityIsActiveField = "IsActive";
+            }
 
-            return "ID";
-        }
-
-        protected virtual string InferEntityIsActiveField()
-        {
-            var attributes = this.GetType().GetCustomAttributes(typeof(IsActivePropertyAttribute), true);
-            if (attributes.Length == 1)
-                return attributes[0].As<IsActivePropertyAttribute>().IsActiveProperty;
-
-            return "IsActive";
+            return entityIsActiveField;
         }
     }
 }

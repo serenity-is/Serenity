@@ -114,6 +114,11 @@ namespace Serenity
             get { return this.element.PrevAll(".select2-container"); }
         }
 
+        public List<Select2Item> Items
+        {
+            get { return this.items; }
+        }
+
         public string Value
         {
             get

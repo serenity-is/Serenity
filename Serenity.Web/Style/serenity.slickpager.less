@@ -1,4 +1,6 @@
-﻿.s-SlickPager {
+﻿@import-once "serenity.mixins.less";
+
+.s-SlickPager {
     background: url(images/pager-bg.gif) repeat-x 0 -1px;
     border: 1px solid #ccc;
     border-top: 0px;
@@ -40,10 +42,20 @@
     border-radius: 0;
     box-shadow: none;
     padding: 1px 2px;
+    border-color: #ccc;
+    .box-sizing(content-box);
+    .border-radius(0, 0, 0, 0);
+    height: auto;
 }
 
 .s-SlickPager .slick-pg-size {
     margin-top: 3px;
+    .box-sizing(content-box);
+    padding: 0 0 0 0;
+    line-height: 14px;
+    height: auto;
+    border-color: #ccc;
+    .border-radius(0, 0, 0, 0);
 }
 
 .s-SlickPager .slick-pg-btn {

@@ -1,35 +1,24 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Web.Mvc;
-using Newtonsoft.Json;
-using Serenity.Data;
 
 namespace Serenity.Services
 {
     public class JsonFilter : ActionFilterAttribute
     {
-        public string Param { get; set; }
-
-        public JsonFilter()
-        {
-            Param = "request";
-        }
-
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             var request = filterContext.HttpContext.Request;
             string method = request.HttpMethod ?? "";
 
-            Type prmType = null;
-            if (!Param.IsEmptyOrNull())
-            {
-                foreach (var desc in filterContext.ActionDescriptor.GetParameters())
-                    if (desc.ParameterName == Param)
-                        prmType = desc.ParameterType;
-            }
+            var prms = filterContext.ActionDescriptor.GetParameters();
+            if (prms.Length != 1)
+                throw new ArgumentOutOfRangeException(String.Format(
+                    "Method {0} has {1} parameters. JsonFilter requires an action method with only one parameter!",
+                        filterContext.ActionDescriptor.ActionName, prms.Length));
 
-            if (prmType == null)
-                throw new ArgumentOutOfRangeException("JsonFilter.Param");
+            var prm = prms[0];
 
             if (method.Equals("POST", StringComparison.InvariantCultureIgnoreCase) ||
                 method.Equals("PUT", StringComparison.InvariantCultureIgnoreCase))
@@ -52,28 +41,31 @@ namespace Serenity.Services
                         var js = JsonSerializer.Create(JsonSettings.Strict);
                         using (var jr = new JsonTextReader(sr))
                         {
-                            var obj = js.Deserialize(jr, prmType);
-                            filterContext.ActionParameters[Param] = obj;
+                            var obj = js.Deserialize(jr, prm.ParameterType);
+                            filterContext.ActionParameters[prm.ParameterName] = obj;
                         }
                     }
                 }
                 else
                 {
-                    string req = request.Form[Param] ?? request.QueryString[Param];
+                    string req = request.Form[prm.ParameterName] ?? request.QueryString[prm.ParameterName] ??
+                            request.Form["request"] ?? request.QueryString["request"];
                     if (req != null)
                     {
-                        var obj = JsonConvert.DeserializeObject(req, prmType, JsonSettings.Strict);
-                        filterContext.ActionParameters[Param] = obj;
+                        var obj = JsonConvert.DeserializeObject(req, prm.ParameterType, JsonSettings.Strict);
+                        filterContext.ActionParameters[prm.ParameterName] = obj;
                     }
                 }
             }
             else
             {
-                string req = request.QueryString[Param];
+                string req = request.Form[prm.ParameterName] ?? request.QueryString[prm.ParameterName] ??
+                        request.Form["request"] ?? request.QueryString["request"];
+
                 if (req != null)
                 {
-                    var obj = JsonConvert.DeserializeObject(req, prmType, JsonSettings.Strict);
-                    filterContext.ActionParameters[Param] = obj;
+                    var obj = JsonConvert.DeserializeObject(req, prm.ParameterType, JsonSettings.Strict);
+                    filterContext.ActionParameters[prm.ParameterName] = obj;
                 }
             }
         }

@@ -114,6 +114,7 @@ namespace Serenity
 
         protected override void OnDialogOpen()
         {
+            base.OnDialogOpen();
         }
 
         protected override string GetTemplateName()

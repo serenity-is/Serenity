@@ -48,12 +48,12 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Increments the value with specified key in cache and returns the incremented value. 
-        /// If key doesn't exist in the cache sets it to one.
+        /// Cache'teki belirtilen anahtara sahip değeri arttırır ve arttırılmış değeri döner.
+        /// Eğer cache'te yoksa değer 1 e set edilir.
         /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="amount">The amount.</param>
-        /// <returns>Incremented value or 1 if the key not in cache</returns>
+        /// <param name="key">Anahtar.</param>
+        /// <param name="amount">Artım miktarı.</param>
+        /// <returns>Arttırılmış değer, ya da yoksa 1</returns>
         public long Increment(string key, int amount = 1)
         {
             key = this.configuration.KeyPrefix + key;
@@ -62,13 +62,13 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Gets the value with specified key. Returns default(T) 
-        /// if the key is not in cache or expired.
+        /// Cache ten belirtilen anahtara sahip değeri okur. Eğer cache te
+        /// değer yok ya da expire olduysa default(T) değerini döndürür. 
         /// </summary>
-        /// <typeparam name="TValue">Type of the value</typeparam>
-        /// <param name="key">The key.</param>
-        /// <returns>The value with specified key, or default(T) if not exists.</returns>
-        /// <remarks>May raise an exception if value is not of type TValue.</remarks>
+        /// <typeparam name="TValue">Değerin tipi</typeparam>
+        /// <param name="key">Anahtar.</param>
+        /// <remarks>Okunan değer belirtilen TValue tipinde değilse
+        /// bir exception üretebilir.</remarks>
         public TValue Get<TValue>(string key)
         {
             key = this.configuration.KeyPrefix + key;
@@ -77,11 +77,11 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Sets the specified key.
+        /// Anahtarı verilen değeri cache e yazar.
         /// </summary>
-        /// <typeparam name="TValue">The type of the value.</typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
+        /// <typeparam name="TValue">Değer tipi.</typeparam>
+        /// <param name="key">Anahtar</param>
+        /// <param name="value">Değer.</param>
         public void Set<TValue>(string key, TValue value)
         {
             key = this.configuration.KeyPrefix + key;
@@ -90,13 +90,13 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Sets the specified key.
+        /// Anahtarı verilen değeri, belli bir tarihte expire olmak
+        /// üzere cache e yazar.
         /// </summary>
-        /// <typeparam name="TValue">The type of the value.</typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="expiresAt">The time when the value will expire at.</param>
-        /// <remarks>Need a better implementation for expirations.</remarks>
+        /// <typeparam name="TValue">Değer tipi.</typeparam>
+        /// <param name="key">Anahtar.</param>
+        /// <param name="value">Değer.</param>
+        /// <param name="expiresAt">Değerin expire olacağı tarih.</param>
         public void Set<TValue>(string key, TValue value, DateTime expiresAt)
         {
             key = this.configuration.KeyPrefix + key;

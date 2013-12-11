@@ -95,7 +95,7 @@ namespace Serenity
         {
             var self = this;
             var opt = new ServiceCallOptions<RetrieveResponse<TEntity>>();
-            opt.Service = this.entityType.Value.Replace('.', '/') + "/RetrieveLocalization";
+            opt.Service = this.GetEntityType().Replace('.', '/') + "/RetrieveLocalization";
             opt.BlockUI = true;
             opt.Request = new RetrieveLocalizationRequest
             {
@@ -137,7 +137,7 @@ namespace Serenity
                 return;
 
             var opt = new ServiceCallOptions();
-            opt.Service = this.entityType.Value.Replace('.', '/') + "/UpdateLocalization";
+            opt.Service = this.GetEntityType().Replace('.', '/') + "/UpdateLocalization";
             opt.OnSuccess = delegate(ServiceResponse response)
             {
             };
@@ -145,7 +145,7 @@ namespace Serenity
             var entity = new TEntity();
             this.localizationGrid.Save(entity);
 
-            string idField = entityIdField.Value;
+            string idField = GetEntityIdField();
             if (idField != null)
                 Type.SetField(entity, idField, this.EntityId);
 

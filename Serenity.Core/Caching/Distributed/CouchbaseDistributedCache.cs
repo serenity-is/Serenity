@@ -1,41 +1,50 @@
-﻿using Couchbase;
-using Couchbase.Configuration;
-using Enyim.Caching.Memcached;
-using Newtonsoft.Json;
-using Serenity.Data;
-using System;
-using System.Configuration;
-
+﻿
 namespace Serenity
 {
+    using Couchbase;
+    using Couchbase.Configuration;
+    using Enyim.Caching.Memcached;
+    using Newtonsoft.Json;
+    using System;
+    using System.Configuration;
+
     /// <summary>
-    /// Couchbase distributed cache implementation.
+    /// Couchbase distributed cache implementasyonu.
     /// </summary>
     public class CouchbaseDistributedCache : IDistributedCache, IDisposable
     {
         /// <summary>
-        /// The memcached client
+        /// Asıl couchbase client'ını içerir.
         /// </summary>
         private ICouchbaseClient cacheClient;
 
         /// <summary>
-        /// The secondary client (only used to remove keys)
+        /// Eğer varsa ikincil couchbase client'ını içerir. Bu özellik load balancer ile tek/çift IP ler için
+        /// farklı cache sunucu kullanan, ancak birinde cache resetleme (ör. TwoLevelCache için generasyon değişikliği)
+        /// olduğunda diğer sunucunun da resetlenmesinin istendiği durumlar için geliştirildi. Standart ortamlarda
+        /// tek sunucu olmalı, ya da mirrored çalışmalı.
         /// </summary>
         private ICouchbaseClient secondaryClient;
 
         /// <summary>
-        /// The configuration read from application settings
+        /// Uygulama ayarlarından okunan ayarları içerir. Bu ayarlar constructor'da tek bir kez okunur.
         /// </summary>
         private Configuration configuration;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CouchbaseDistributedCache"/> class.
+        /// Yeni bir CouchbaseDistributedCache instance ı oluşturur. Bu objenin oluşturulabilmesi için config dosyasında
+        /// DistributedCache ayarları yapılmış olamlı. Bu ayarın içeriğinin
+        /// { "ServerAddress": "http://sunucu.com", BucketName: "default", "SecondaryServerAdress": "http://sunucu2.com|bucket2" } 
+        /// gibi JSON formatında olması gerekli. ServerAddress ve BucketName alanları zorunludur. SecondaryServerAdress, varsa
+        /// mirrorlama için kullanılacak ikincil bir sunucu (bu sunucuya sadece veri silme işlemleri mirror lanır) adresi
+        /// "sunucu | bucket adı" formatında girilebilir.
         /// </summary>
         /// <exception cref="System.InvalidOperationException">Lutfen uygulama icin AppSettings -> DistributedCache -> 
         /// ServerAddress ayarini yapiniz!</exception>
         public CouchbaseDistributedCache()
         {
-            this.configuration = JsonConvert.DeserializeObject<Configuration>(ConfigurationManager.AppSettings["DistributedCache"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
+            this.configuration = JsonConvert.DeserializeObject<Configuration>(
+                ConfigurationManager.AppSettings["DistributedCache"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
 
             if (this.configuration.ServerAddress.IsTrimmedEmpty())
                 throw new InvalidOperationException(
@@ -55,6 +64,7 @@ namespace Serenity
 
             this.cacheClient = new CouchbaseClient(config);
 
+            // ikinci mirror sunucusu sadece konfigürasyonda belirtilmişse kullanılır
             if (!this.configuration.SecondaryServerAddress.IsTrimmedEmpty())
             {
                 var secondaryConfig = new CouchbaseClientConfiguration();
@@ -73,19 +83,30 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Unmanaged kaynakları boşaltır (Couchbase bağlantılarını).
         /// </summary>
         public void Dispose()
         {
+            if (cacheClient != null)
+            {
+                cacheClient.Dispose();
+                cacheClient = null;
+            }
+
+            if (secondaryClient != null)
+            {
+                secondaryClient.Dispose();
+                secondaryClient = null;
+            }
         }
 
         /// <summary>
-        /// Increments the value with specified key in cache and returns the incremented value. 
-        /// If key doesn't exist in the cache sets it to one.
+        /// Cache'teki belirtilen anahtara sahip değeri arttırır ve arttırılmış değeri döner.
+        /// Eğer cache'te yoksa değer 1 e set edilir.
         /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="amount">The amount.</param>
-        /// <returns>Incremented value or 1 if the key not in cache</returns>
+        /// <param name="key">Anahtar.</param>
+        /// <param name="amount">Artım miktarı.</param>
+        /// <returns>Arttırılmış değer, ya da yoksa 1</returns>
         public long Increment(string key, int amount = 1)
         {
             key = this.configuration.KeyPrefix + key;
@@ -94,13 +115,13 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Gets the value with specified key. Returns default(T) 
-        /// if the key is not in cache or expired.
+        /// Cache ten belirtilen anahtara sahip değeri okur. Eğer cache te
+        /// değer yok ya da expire olduysa default(T) değerini döndürür. 
         /// </summary>
-        /// <typeparam name="TValue">Type of the value</typeparam>
-        /// <param name="key">The key.</param>
-        /// <returns>The value with specified key, or default(T) if not exists.</returns>
-        /// <remarks>May raise an exception if value is not of type TValue.</remarks>
+        /// <typeparam name="TValue">Değerin tipi</typeparam>
+        /// <param name="key">Anahtar.</param>
+        /// <remarks>Okunan değer belirtilen TValue tipinde değilse
+        /// bir exception üretebilir.</remarks>
         public TValue Get<TValue>(string key)
         {
             key = this.configuration.KeyPrefix + key;
@@ -108,11 +129,11 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Sets the specified key.
+        /// Anahtarı verilen değeri cache e yazar.
         /// </summary>
-        /// <typeparam name="TValue">The type of the value.</typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
+        /// <typeparam name="TValue">Değer tipi.</typeparam>
+        /// <param name="key">Anahtar</param>
+        /// <param name="value">Değer.</param>
         public void Set<TValue>(string key, TValue value)
         {
             key = this.configuration.KeyPrefix + key;
@@ -133,13 +154,13 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Sets the specified key.
+        /// Anahtarı verilen değeri, belli bir tarihte expire olmak
+        /// üzere cache e yazar.
         /// </summary>
-        /// <typeparam name="TValue">The type of the value.</typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="expiresAt">The time when the value will expire at.</param>
-        /// <remarks>Need a better implementation for expirations.</remarks>
+        /// <typeparam name="TValue">Değer tipi.</typeparam>
+        /// <param name="key">Anahtar.</param>
+        /// <param name="value">Değer.</param>
+        /// <param name="expiresAt">Değerin expire olacağı tarih.</param>
         public void Set<TValue>(string key, TValue value, DateTime expiresAt)
         {
             key = this.configuration.KeyPrefix + key;
@@ -160,43 +181,35 @@ namespace Serenity
         }
 
         /// <summary>
-        /// Configuration settings
+        /// Couchbase e özel konfigürasyon ayarları
         /// </summary>
         private class Configuration
         {
             /// <summary>
-            /// Gets or sets the Couchbase server address.
+            /// Couchbase sunucu adresi
             /// </summary>
-            /// <value>
-            /// The server address.
-            /// </value>
             public string ServerAddress { get; set; }
 
             /// <summary>
-            /// Gets or sets the Couchbase bucket name
+            /// Bucket adı
             /// </summary>
             public string BucketName { get; set; }
             /// <summary>
-            /// Gets or sets the Couchbase bucket pass
+            /// Bucket şifresi
             /// </summary>
             public string BucketPass { get; set; }
 
             /// <summary>
-            /// Gets or sets the alternate cache (not used for caching, only used to validate keys on removal)
+            /// Alternatif sunucu adresi (cache leme için kullanılmaz, sadece silme 
+            /// işlemlerinde aynı işlem bu alternatif sunucuda da tekrarlanır).
             /// </summary>
             public string SecondaryServerAddress { get; set; }
 
             /// <summary>
-            /// Gets or sets the key prefix for values stored in cache.
+            /// Key lerin başına eklenecek prefix. Opsiyonel olup, belirtildiğinde tek bir sunucuda bağımsız 
+            /// birden fazla uygulamanın çalışabilmesi için kullanılabilir. Aynı veri grubunu kullanan
+            /// (aynı veritabanı) tüm uygulamaların tek bir prefix i olmalı.
             /// </summary>
-            /// <value>
-            /// The key prefix.
-            /// </value>
-            /// <remarks>
-            /// The key prefix should be unique per database (or applications using same set of data).
-            /// Otherwise, if a group of applications use the same server, they may override
-            /// their distinct data by using the same keys.
-            /// </remarks>
             public string KeyPrefix { get; set; }
         }
     }

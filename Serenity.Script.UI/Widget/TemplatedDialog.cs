@@ -82,6 +82,7 @@ namespace Serenity
 
         protected virtual void Arrange()
         {
+            this.element.Find(".require-layout").TriggerHandler("layout");
         }
 
         [InlineCode("$.qtip")]

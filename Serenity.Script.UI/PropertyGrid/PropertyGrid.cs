@@ -155,7 +155,8 @@ namespace Serenity
             var fieldDiv = J("<div/>")
                 .AddClass("field")
                 .AddClass(item.Name)
-                .Data("PropertyItem", item);
+                .Data("PropertyItem", item)
+                .AppendTo(container);
 
             if (!String.IsNullOrEmpty(item.CssClass))
                 fieldDiv.AddClass(item.CssClass);
@@ -199,8 +200,6 @@ namespace Serenity
             J("<div/>")
                 .AddClass("clear")
                 .AppendTo(fieldDiv);
-
-            fieldDiv.AppendTo(container);
 
             return editor;
         }

@@ -33,14 +33,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Attribute\IsActivePropertyAttribute.cs" />
-    <Compile Include="Attribute\EntityTypeAttribute.cs" />
-    <Compile Include="Attribute\IdPropertyAttribute.cs" />
-    <Compile Include="Attribute\NamePropertyAttribute.cs" />
+    <Compile Include="Editor\CheckListEditor.cs" />
+    <Compile Include="Editor\CheckTreeEditor.cs" />
     <Compile Include="Editor\Select2Editor.cs" />
     <Compile Include="Editor\URLEditor.cs" />
     <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
+    <Compile Include="Grid\DataGrid.cs" />
     <Compile Include="Grid\PopupToolButton.cs" />
     <Compile Include="Grid\PopupMenuButton.cs" />
     <Compile Include="PropertyDialog\PropertyDialog.cs" />
@@ -80,12 +79,10 @@
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
     <Compile Include="PropertyGrid\Attributes\InsertableAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\ReadOnlyAttribute.cs" />
-    <Compile Include="PropertyGrid\EditorAttribute.cs" />
     <Compile Include="PropertyGrid\EditorTypeCache.cs" />
     <Compile Include="PropertyGrid\Attributes\HiddenAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\HintAttribute.cs" />
     <Compile Include="PropertyGrid\IDoubleValue.cs" />
-    <Compile Include="PropertyGrid\ElementAttribute.cs" />
     <Compile Include="PropertyGrid\IBooleanValue.cs" />
     <Compile Include="PropertyGrid\IGetEditValue.cs" />
     <Compile Include="PropertyGrid\IReadOnly.cs" />
@@ -102,7 +99,7 @@
     <Compile Include="Reporting\ReportDesignModels.cs" />
     <Compile Include="Reporting\ReportDesignPanel.cs" />
     <Compile Include="Reporting\ReportDialog.cs" />
-    <Compile Include="Reporting\ReportsPage.cs" />
+    <Compile Include="Reporting\ReportPage.cs" />
     <Compile Include="Widget\DialogExtensions.cs" />
     <Compile Include="Widget\Flexify.cs">
       <SubType>Code</SubType>

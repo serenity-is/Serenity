@@ -405,3 +405,65 @@ a.s-LinkDropDown input {
     background-position: center 2px;
     cursor: pointer;
 }
+
+.check-box {
+    background-image: url(images/checkbox-states.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    display: block;
+    float: left;
+    width: 15px;
+    height: 15px;
+    margin: 2px 3px 0 0;
+    cursor: pointer;
+}
+
+.check-box.disabled {
+    background-position: -60px 0px;
+}
+
+.check-box.checked {
+    background-position: -15px 0px;
+}
+
+.check-box.checked.disabled {
+    background-position: -75px 0px;
+}
+
+.check-box.partial {
+    background-position: -30px 0px;
+}
+
+.check-box.partial.disabled {
+    background-position: -90px 0px;
+}
+
+.check-box.indeterminate {
+    background-position: -45px 0px;
+}
+
+.check-box.indeterminate.disabled {
+    background-position: -105px 0px;
+}
+
+.s-CheckTreeEditor.s-DataGrid .grid-container {
+    height: 100px;
+}
+
+.s-CheckTreeEditor.s-DataGrid .s-TreeIndent {
+    float: left;
+}
+
+.s-CheckTreeEditor.s-DataGrid .s-TreeToggle {
+    float: left;
+    display: block;
+    width: 11px;
+    height: 11px;
+    padding: 0;
+    background-position: -2px center;
+    margin: 5px 0px 0 0;
+    background-image: none;
+}
+
+.s-CheckTreeEditor.s-DataGrid .s-TreeExpand { background-image: url(images/toggle-small-expand.png); cursor: pointer; }
+.s-CheckTreeEditor.s-DataGrid .s-TreeCollapse { background-image: url(images/toggle-small.png); cursor: pointer; }

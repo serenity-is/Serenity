@@ -74,20 +74,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Caching\BaseMirroredRowCache.cs" />
-    <Compile Include="Caching\BaseOnDemandRowCache.cs" />
     <Compile Include="Caching\CacheExpiration.cs" />
-    <Compile Include="Caching\CacheSerialization.cs" />
-    <Compile Include="Caching\CouchbaseDistributedCache.cs" />
-    <Compile Include="Caching\LZ4Compression.cs" />
-    <Compile Include="Caching\DistributedCache.cs" />
-    <Compile Include="Caching\TwoLevelCache.cs" />
-    <Compile Include="Caching\DistributedCacheEmulator.cs" />
+    <Compile Include="Caching\Distributed\CacheSerialization.cs" />
+    <Compile Include="Caching\Distributed\CouchbaseDistributedCache.cs" />
+    <Compile Include="Caching\Distributed\LZ4Compression.cs" />
+    <Compile Include="Caching\Distributed\DistributedCache.cs" />
+    <Compile Include="Caching\Distributed\TwoLevelCache.cs" />
+    <Compile Include="Caching\Distributed\DistributedCacheEmulator.cs" />
     <Compile Include="Caching\IByIdCache.cs" />
-    <Compile Include="Caching\IDistributedCache.cs" />
+    <Compile Include="Caching\Distributed\IDistributedCache.cs" />
     <Compile Include="Caching\LocalCache.cs" />
     <Compile Include="Caching\LocalUserStateCache.cs" />
-    <Compile Include="Caching\RedisDistributedCache.cs" />
+    <Compile Include="Caching\Distributed\RedisDistributedCache.cs" />
     <Compile Include="Caching\SiteStateCache.cs" />
     <Compile Include="Contracts\ICreateService.cs" />
     <Compile Include="Contracts\IDeleteService.cs" />
