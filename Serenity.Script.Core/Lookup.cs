@@ -75,6 +75,11 @@ namespace Serenity
             jQuery.FromObject(this).Trigger("change");
         }
 
+        public JsDictionary<object, TItem> ItemById
+        {
+            get { return itemById; }
+        }
+
         public List<TItem> Items
         {
             get { return items; }
