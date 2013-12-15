@@ -35,6 +35,9 @@ namespace Serenity
             this.element.AddClass("s-" + this.GetType().Name);
             this.element.AddClass("require-layout").Bind("layout", delegate 
             {
+                if (!this.element.Is(":visible"))
+                    return;
+
                 Q.LayoutFillHeight(self.slickContainer);
                 self.slickGrid.ResizeCanvas();
             });
