@@ -59,11 +59,17 @@ namespace Serenity
 
         void IGetEditValue.GetEditValue(PropertyItem property, dynamic target)
         {
+            target[property.Name] = this.Value;
         }
 
         void ISetEditValue.SetEditValue(dynamic source, PropertyItem property)
         {
+            var list = source[property.Name] as List<string>;
+            if (list != null)
+                this.Value = list;
         }
+
+
 
         protected override List<ToolButton> GetButtons()
         {
@@ -75,31 +81,12 @@ namespace Serenity
 
             return new List<ToolButton>
             {
-                new ToolButton 
-                {
-                    Title = selectAllText,
-                    CssClass = "select-all-button",
-                    OnClick = delegate 
-                    {
-                        var view = self.view;
-                        var btn = self.toolbar.FindButton("select-all-button").Find(".button-inner");
-                        var makeSelected = !btn.HasClass("checked");
-                        view.BeginUpdate();
-                        try
-                        {
-                            foreach (var item in view.GetItems())
-                            {
-                                item.IsSelected = makeSelected;
-                                view.UpdateItem(item.Id, item);
-                            }
-                        }
-                        finally
-                        {
-                            view.EndUpdate();
-                        }
-                        btn.ToggleClass("checked");
-                    }
-                }
+                GridSelectAllButtonHelper.Define<CheckTreeItem>(
+                    () => self,
+                    x => x.Id,
+                    x => x.IsSelected,
+                    (x, v) => x.IsSelected = v
+                )
             };
         }
 
@@ -178,12 +165,13 @@ namespace Serenity
             {
                 bool checkedOrPartial = target.HasClass("checked") || target.HasClass("partial");
                 var item = view.Rows[row];
+                var anyChanged = item.IsSelected != (!checkedOrPartial);
                 view.BeginUpdate();
                 try
                 {
                     item.IsSelected = !checkedOrPartial;
                     view.UpdateItem(item.Id, item);
-                    SetAllSubTreeSelected(item, item.IsSelected);
+                    anyChanged = SetAllSubTreeSelected(item, item.IsSelected) | anyChanged;
                     UpdateSelectAll();
                     UpdateFlags();
                 }
@@ -191,16 +179,15 @@ namespace Serenity
                 {
                     view.EndUpdate();
                 }
-            }
 
+                if (anyChanged)
+                    this.element.TriggerHandler("change");
+            }
         }
 
         protected void UpdateSelectAll()
         {
-            if (toolbar == null)
-                return;
-
-            toolbar.FindButton("select-all-button").Find(".button-inner").ToggleClass("checked", AllItemsSelected());
+            GridSelectAllButtonHelper.Update<CheckTreeItem>(this, x => x.IsSelected);
         }
 
         private void UpdateFlags()
@@ -239,19 +226,22 @@ namespace Serenity
             }
         }
 
-        private void SetAllSubTreeSelected(CheckTreeItem item, bool selected)
+        private bool SetAllSubTreeSelected(CheckTreeItem item, bool selected)
         {
+            var result = false;
             for (int i = 0; i < item.Children.Count; i++)
             {
                 var sub = item.Children[i];
                 if (sub.IsSelected != selected)
                 {
+                    result = true;
                     sub.IsSelected = selected;
                     view.UpdateItem(sub.Id, sub);
                 }
                 if (sub.Children.Count > 0)
-                    SetAllSubTreeSelected(sub, selected);
+                    result = SetAllSubTreeSelected(sub, selected) | result;
             }
+            return result;
         }
 
         private bool AllChildSelected(CheckTreeItem item)
@@ -322,6 +312,105 @@ namespace Serenity
             var opt = base.GetSlickOptions();
             opt.ForceFitColumns = true;
             return opt;
+        }
+
+        public List<string> Value
+        {
+            get
+            {
+                List<string> list = new List<string>();
+                var items = this.View.GetItems();
+                for (var i = 0; i < items.Count; i++)
+                    if (items[i].IsSelected)
+                        list.Add(items[i].Id);
+                return list;
+            }
+            set
+            {
+                JsDictionary<string, bool> selected = new JsDictionary<string,bool>();
+                if (value != null)
+                    for (var i = 0; i < value.Count; i++)
+                        selected[value[i]] = true;
+
+                view.BeginUpdate();
+                try
+                {
+                    var items = this.View.GetItems();
+                    for (var i = 0; i < items.Count; i++)
+                    {
+                        var item = items[i];
+                        bool select = selected[item.Id];
+                        if (select != item.IsSelected)
+                        {
+                            item.IsSelected = select;
+                            view.UpdateItem(item.Id, item);
+                        }
+                    }
+
+                    UpdateSelectAll();
+                    UpdateFlags();
+                }
+                finally
+                {
+                    view.EndUpdate();
+                }
+            }
+        }
+    }
+
+    public static class GridSelectAllButtonHelper
+    {
+        public static void Update<TItem>(IDataGrid grid,
+            Func<TItem, bool> getSelected)
+            where TItem: class, new()
+        {
+            var grd = grid.As<DataGrid<TItem, GridOptions>>();
+            var toolbar = grd.Element.Children(".s-Toolbar");
+            if (toolbar.Length == 0)
+                return;
+
+            var btn = toolbar.GetWidget<Toolbar>()
+                .FindButton("select-all-button").Find(".button-inner");
+
+            var items = grd.View.GetItems();
+            btn.ToggleClass("checked", items.Count > 0 && !items.Some(x => !getSelected(x)));
+        }
+
+        public static ToolButton Define<TItem>(
+            Func<IDataGrid> getGrid,
+            Func<TItem, object> getId,
+            Func<TItem, bool> getSelected,
+            Action<TItem, bool> setSelected,
+            string text = null)
+            where TItem : class, new()
+        {
+            return new ToolButton
+            {
+                Title = text ?? "Tümünü Seç",
+                CssClass = "select-all-button",
+                OnClick = delegate
+                {
+                    var grid = getGrid().As<DataGrid<TItem, GridOptions>>();
+                    var view = grid.View;
+                    var btn = grid.Element.Children(".s-Toolbar").GetWidget<Toolbar>()
+                        .FindButton("select-all-button").Find(".button-inner");
+                    var makeSelected = !btn.HasClass("checked");
+                    view.BeginUpdate();
+                    try
+                    {
+                        foreach (var item in view.GetItems())
+                        {
+                            setSelected(item, makeSelected);
+                            view.UpdateItem(getId(item), item);
+                        }
+                    }
+                    finally
+                    {
+                        view.EndUpdate();
+                    }
+                    btn.ToggleClass("checked", makeSelected);
+                }
+            };
         }
     }
 

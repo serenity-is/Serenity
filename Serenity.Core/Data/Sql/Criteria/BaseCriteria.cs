@@ -67,12 +67,28 @@ namespace Serenity.Data
             return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values));
         }
 
+        public BaseCriteria InStatement(BaseCriteria statement)
+        {
+            if (Object.ReferenceEquals(null, statement) || statement.IsEmpty)
+                throw new ArgumentNullException("statement");
+
+            return new BinaryCriteria(this, CriteriaOperator.In, statement); 
+        }
+
         public BaseCriteria NotIn<T>(params T[] values)
         {
             if (values == null || values.Length == 0)
                 throw new ArgumentNullException("values");
 
             return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values));
+        }
+
+        public BaseCriteria NotInStatement(BaseCriteria statement)
+        {
+            if (Object.ReferenceEquals(null, statement) || statement.IsEmpty)
+                throw new ArgumentNullException("statement");
+
+            return new BinaryCriteria(this, CriteriaOperator.NotIn, statement);
         }
 
         public static BaseCriteria operator !(BaseCriteria criteria)
