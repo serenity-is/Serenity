@@ -95,6 +95,11 @@ namespace Serenity
             {
                 return 0;
             }
+
+            public static string TurkishLocaleToUpper(string a)
+            {
+                return null;
+            }
         }
     }
 }

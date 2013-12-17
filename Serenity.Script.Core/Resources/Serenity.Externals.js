@@ -465,6 +465,12 @@ Q$Externals.turkishLocaleCompare = function(a, b) {
     }
 }
 
+Q$Externals.turkishLocaleToUpper = function (a) {
+    if (!a)
+        return a;
+
+    return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+}
 
 // --- DIALOGS ---
 
