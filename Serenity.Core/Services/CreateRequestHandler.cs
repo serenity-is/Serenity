@@ -291,8 +291,6 @@ namespace Serenity.Services
             if (unitOfWork == null)
                 throw new ArgumentNullException("unitOfWork");
 
-            ValidatePermissions();
-
             UnitOfWork = unitOfWork;
 
             Request = request;
@@ -302,6 +300,7 @@ namespace Serenity.Services
             if (Row == null)
                 throw new ArgumentNullException("Entity");
 
+            ValidatePermissions();
             ValidateRequest();
             SetInternalFields();
             OnBeforeInsert();

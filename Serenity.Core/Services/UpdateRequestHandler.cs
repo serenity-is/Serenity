@@ -368,8 +368,6 @@ namespace Serenity.Services
             if (unitOfWork == null)
                 throw new ArgumentNullException("unitOfWork");
 
-            ValidatePermissions();
-
             UnitOfWork = unitOfWork;
 
             Request = request;
@@ -382,7 +380,10 @@ namespace Serenity.Services
             ValidateAndClearIdField();
             Old = new TRow();
             LoadOldEntity();
+
+            ValidatePermissions();
             ValidateRequest();
+
             SetInternalFields();
             OnBeforeUpdate();
             ClearNonTableAssignments();
