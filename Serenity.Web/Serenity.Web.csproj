@@ -77,7 +77,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Content\CsvContentResult.cs" />
     <Compile Include="Content\CsvWriter.cs" />
+    <Compile Include="Content\ExcelContentResult.cs" />
     <Compile Include="Content\LocaleID.cs" />
     <Compile Include="Content\RegistrationHelper.cs" />
     <Compile Include="Content\TemplateHelper.cs" />
