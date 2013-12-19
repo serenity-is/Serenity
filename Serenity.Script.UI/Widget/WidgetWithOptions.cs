@@ -11,13 +11,7 @@ namespace Serenity
         protected Widget(jQueryObject element, TOptions opt)
             : base(element)
         {
-            var elementOptions = element.GetDataValue(this.GetType().Name).As<TOptions>();
-            this.options = jQuery.ExtendObject(new TOptions(), GetDefaults(), elementOptions, opt);
-        }
-
-        protected virtual TOptions GetDefaults()
-        {
-            return new TOptions();
+            this.options = jQuery.ExtendObject(new TOptions(), opt);
         }
     }
 }

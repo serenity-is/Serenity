@@ -1,17 +1,54 @@
-//! Script# Core Runtime
-//! More information at http://projects.nikhilk.net/ScriptSharp
-//!
+// SaltarelleCompiler Runtime (http://www.saltarelle-compiler.com)
+// Modified version of Script# Core Runtime (http://projects.nikhilk.net/ScriptSharp)
+
 if (typeof(global) === "undefined")
 	global = window;
+(function(global) {
+"use strict";
 
-var ss = {};
+var ss = { __assemblies: {} };
 
-ss.isUndefined = function ss$isUndefined(o) {
-	return (o === undefined);
+ss.initAssembly = function assembly(obj, name, res) {
+	res = res || {};
+	obj.name = name;
+	obj.toString = function() { return this.name; };
+	obj.__types = {};
+	obj.getResourceNames = function() { return Object.keys(res); };
+	obj.getResourceDataBase64 = function(name) { return res[name] || null; };
+	obj.getResourceData = function(name) { var r = res[name]; return r ? ss.dec64(r) : null; };
+	ss.__assemblies[name] = obj;
+};
+ss.initAssembly(ss, 'mscorlib');
+
+ss.load = function ss$load(name) {
+	return ss.__assemblies[name] || require(name);
 };
 
-ss.isNull = function ss$isNull(o) {
-	return (o === null);
+var enc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/', dec;
+ss.enc64 = function(a, b) {
+	var s = '', i;
+	for (i = 0; i < a.length; i += 3) {
+		var c1 = a[i], c2 = a[i+1], c3 = a[i+2];
+		s += (b && i && !(i%57) ? '\n' : '') + enc[c1 >> 2] + enc[((c1 & 3) << 4) | (c2 >> 4)] + (i < a.length - 1 ? enc[((c2 & 15) << 2) | (c3 >> 6)] : '=') + (i < a.length - 2 ? enc[c3 & 63] : '=');
+	}
+	return s;
+};
+
+ss.dec64 = function(s) {
+	s = s.replace(/\s/g, '');
+	dec = dec || (function() { var o = {'=':-1}; for (var i = 0; i < 64; i++) o[enc[i]] = i; return o; })();
+	var a = Array(Math.max(s.length * 3 / 4 - 2, 0)), i;
+	for (i = 0; i < s.length; i += 4) {
+		var j = i * 3 / 4, c1 = dec[s[i]], c2 = dec[s[i+1]], c3 = dec[s[i+2]], c4 = dec[s[i+3]];
+		a[j] = (c1 << 2) | (c2 >> 4);
+		if (c3 >= 0) a[j+1] = ((c2 & 15) << 4) | (c3 >> 2);
+		if (c4 >= 0) a[j+2] = ((c3 & 3) << 6) | c4;
+	}
+	return a;
+};
+
+ss.getAssemblies = function ss$getAssemblies() {
+	return Object.keys(ss.__assemblies).map(function(n) { return ss.__assemblies[n]; });
 };
 
 ss.isNullOrUndefined = function ss$isNullOrUndefined(o) {
@@ -57,7 +94,7 @@ ss.isArrayOrTypedArray = function ss$isArray(obj) {
 
 ss.getHashCode = function ss$getHashCode(obj) {
 	if (!ss.isValue(obj))
-		throw 'Cannot get hash code of null';
+		throw new ss_NullReferenceException('Cannot get hash code of null');
 	else if (typeof(obj.getHashCode) === 'function')
 		return obj.getHashCode();
 	else if (typeof(obj) === 'boolean') {
@@ -88,8 +125,8 @@ ss.defaultHashCode = function ss$defaultHashCode(obj) {
 
 ss.equals = function ss$equals(a, b) {
 	if (!ss.isValue(a))
-		throw 'Object is null';
-	else if (typeof(a.equals) === 'function')
+		throw new ss_NullReferenceException('Object is null');
+	else if (a !== ss && typeof(a.equals) === 'function')
 		return a.equals(b);
 	if (ss.isDate(a) && ss.isDate(b))
 		return a.valueOf() === b.valueOf();
@@ -103,7 +140,7 @@ ss.equals = function ss$equals(a, b) {
 
 ss.compare = function ss$compare(a, b) {
 	if (!ss.isValue(a))
-		throw 'Object is null';
+		throw new ss_NullReferenceException('Object is null');
 	else if (typeof(a) === 'number' || typeof(a) === 'string' || typeof(a) === 'boolean')
 		return a < b ? -1 : (a > b ? 1 : 0);
 	else if (ss.isDate(a))
@@ -114,7 +151,7 @@ ss.compare = function ss$compare(a, b) {
 
 ss.equalsT = function ss$equalsT(a, b) {
 	if (!ss.isValue(a))
-		throw 'Object is null';
+		throw new ss_NullReferenceException('Object is null');
 	else if (typeof(a) === 'number' || typeof(a) === 'string' || typeof(a) === 'boolean')
 		return a === b;
 	else if (ss.isDate(a))
@@ -137,6 +174,16 @@ ss.shallowCopy = function ss$shallowCopy(source, target) {
 	}
 };
 
+ss.isLower = function ss$isLower(c) {
+	var s = String.fromCharCode(c);
+	return s === s.toLowerCase() && s !== s.toUpperCase();
+};
+
+ss.isUpper = function ss$isUpper(c) {
+	var s = String.fromCharCode(c);
+	return s !== s.toLowerCase() && s === s.toUpperCase();
+};
+
 if (typeof(window) == 'object') {
 	// Browser-specific stuff that could go into the Web assembly, but that assembly does not have an associated JS file.
 	if (!window.Element) {
@@ -145,7 +192,6 @@ if (typeof(window) == 'object') {
 		window.Element.isInstanceOfType = function(instance) { return instance && typeof instance.constructor === 'undefined' && typeof instance.tagName === 'string'; };
 	}
 	window.Element.__typeName = 'Element';
-	window.Element.__baseType = Object;
 	
 	if (!window.XMLHttpRequest) {
 		window.XMLHttpRequest = function() {
@@ -192,27 +238,12 @@ if (typeof(window) == 'object') {
 ///////////////////////////////////////////////////////////////////////////////
 // Type System Implementation
 
-ss.registerType = function Type$registerType(root, typeName, type) {
-	var ns = root;
-	var nameParts = typeName.split('.');
-
-	for (var i = 0; i < nameParts.length - 1; i++) {
-		var part = nameParts[i];
-		var nso = ns[part];
-		if (!nso) {
-			ns[part] = nso = {};
-		}
-		ns = nso;
-	}
-	ns[nameParts[nameParts.length - 1]] = type;
-};
-
 ss.__genericCache = {};
 
 ss._makeGenericTypeName = function ss$_makeGenericTypeName(genericType, typeArguments) {
 	var result = genericType.__typeName;
 	for (var i = 0; i < typeArguments.length; i++)
-		result += (i === 0 ? '[' : ',') + ss.getTypeFullName(typeArguments[i]);
+		result += (i === 0 ? '[' : ',') + '[' + ss.getTypeQName(typeArguments[i]) + ']';
 	result += ']';
 	return result;
 };
@@ -222,20 +253,22 @@ ss.makeGenericType = function ss$makeGenericType(genericType, typeArguments) {
 	return ss.__genericCache[name] || genericType.apply(null, typeArguments);
 };
 
-ss.registerGenericClassInstance = function ss$registerGenericClassInstance(instance, genericType, typeArguments, baseType, interfaceTypes, metadata) {
+ss.registerGenericClassInstance = function ss$registerGenericClassInstance(instance, genericType, typeArguments, members, baseType, interfaceTypes) {
 	var name = ss._makeGenericTypeName(genericType, typeArguments);
 	ss.__genericCache[name] = instance;
+	instance.__typeName = name;
 	instance.__genericTypeDefinition = genericType;
 	instance.__typeArguments = typeArguments;
-	ss.registerClass(null, name, instance, baseType(), interfaceTypes(), metadata);
+	ss.initClass(instance, genericType.__assembly, members, baseType(), interfaceTypes());
 };
 
-ss.registerGenericInterfaceInstance = function ss$registerGenericInterfaceInstance(instance, genericType, typeArguments, baseInterfaces, metadata) {
+ss.registerGenericInterfaceInstance = function ss$registerGenericInterfaceInstance(instance, genericType, typeArguments, members, baseInterfaces) {
 	var name = ss._makeGenericTypeName(genericType, typeArguments);
 	ss.__genericCache[name] = instance;
+	instance.__typeName = name;
 	instance.__genericTypeDefinition = genericType;
 	instance.__typeArguments = typeArguments;
-	ss.registerInterface(null, name, instance, baseInterfaces(), metadata);
+	ss.initInterface(instance, genericType.__assembly, members, baseInterfaces());
 };
 
 ss.isGenericTypeDefinition = function ss$isGenericTypeDefinition(type) {
@@ -254,7 +287,7 @@ ss.getGenericArguments = function ss$getGenericArguments(type) {
 	return type.__typeArguments || null;
 };
 
-ss._setMetadata = function ss$_setMetadata(type, metadata) {
+ss.setMetadata = function ss$_setMetadata(type, metadata) {
 	if (metadata.members) {
 		for (var i = 0; i < metadata.members.length; i++) {
 			var m = metadata.members[i];
@@ -266,97 +299,116 @@ ss._setMetadata = function ss$_setMetadata(type, metadata) {
 		}
 	}
 	type.__metadata = metadata;
+	if (metadata.variance) {
+		type.isAssignableFrom = function(source) {
+			var check = function(target, type) {
+				if (type.__genericTypeDefinition === target.__genericTypeDefinition && type.__typeArguments.length == target.__typeArguments.length) {
+					for (var i = 0; i < target.__typeArguments.length; i++) {
+						var v = target.__metadata.variance[i], t = target.__typeArguments[i], s = type.__typeArguments[i];
+						switch (v) {
+							case 1: if (!ss.isAssignableFrom(t, s)) return false; break;
+							case 2: if (!ss.isAssignableFrom(s, t)) return false; break;
+							default: if (s !== t) return false;
+						}
+					}
+					return true;
+				}
+				return false;
+			};
+
+			if (source.__interface && check(this, source))
+				return true;
+			var ifs = ss.getInterfaces(source);
+			for (var i = 0; i < ifs.length; i++) {
+				if (ifs[i] === this || check(this, ifs[i]))
+					return true;
+			}
+			return false;
+		};
+	}
 }
 
-ss.registerClass = function ss$registerClass(root, name, ctor, baseType, interfaces, metadata) {
-	if (root)
-		ss.registerType(root, name, ctor);
-
-	ctor.prototype.constructor = ctor;
-	ctor.__typeName = name;
+ss.initClass = function ss$initClass(ctor, asm, members, baseType, interfaces) {
 	ctor.__class = true;
-	ctor.__baseType = baseType || Object;
+	ctor.__assembly = asm;
+	if (!ctor.__typeArguments)
+		asm.__types[ctor.__typeName] = ctor;
+	if (baseType && baseType !== Object) {
+		var f = function(){};
+		f.prototype = baseType.prototype;
+		ctor.prototype = new f();
+		ctor.prototype.constructor = ctor;
+	}
+	ss.shallowCopy(members, ctor.prototype);
 	if (interfaces)
 		ctor.__interfaces = interfaces;
-	if (metadata)
-		ss._setMetadata(ctor, metadata);
-
-	if (baseType) {
-		ss.setupBase(ctor);
-	}
 };
 
-ss.registerGenericClass = function ss$registerGenericClass(root, name, ctor, typeArgumentCount, metadata) {
-	if (root)
-		ss.registerType(root, name, ctor);
-
-	ctor.prototype.constructor = ctor;
-	ctor.__typeName = name;
+ss.initGenericClass = function ss$initGenericClass(ctor, asm, typeArgumentCount) {
 	ctor.__class = true;
+	ctor.__assembly = asm;
+	asm.__types[ctor.__typeName] = ctor;
 	ctor.__typeArgumentCount = typeArgumentCount;
 	ctor.__isGenericTypeDefinition = true;
-	ctor.__baseType = Object;
-	if (metadata)
-		ss._setMetadata(ctor, metadata);
 };
 
-ss.registerInterface = function ss$createInterface(root, name, ctor, baseInterfaces, metadata) {
-	if (root)
-		ss.registerType(root, name, ctor);
-
-	ctor.__typeName = name;
+ss.initInterface = function ss$initInterface(ctor, asm, members, baseInterfaces) {
 	ctor.__interface = true;
+	ctor.__assembly = asm;
+	if (!ctor.__typeArguments)
+		asm.__types[ctor.__typeName] = ctor;
 	if (baseInterfaces)
 		ctor.__interfaces = baseInterfaces;
-	if (metadata)
-		ss._setMetadata(ctor, metadata);
+	ss.shallowCopy(members, ctor.prototype);
+	ctor.isAssignableFrom = function(type) { return ss.contains(ss.getInterfaces(type), this); };
 };
 
-ss.registerGenericInterface = function ss$registerGenericClass(root, name, ctor, typeArgumentCount, metadata) {
-	if (root)
-		ss.registerType(root, name, ctor);
-
-	ctor.prototype.constructor = ctor;
-	ctor.__typeName = name;
-	ctor.__interface = true;;
+ss.initGenericInterface = function ss$initGenericClass(ctor, asm, typeArgumentCount) {
+	ctor.__interface = true;
+	ctor.__assembly = asm;
+	asm.__types[ctor.__typeName] = ctor;
 	ctor.__typeArgumentCount = typeArgumentCount;
 	ctor.__isGenericTypeDefinition = true;
-	if (metadata)
-		ss._setMetadata(ctor, metadata);
 };
 
-ss.registerEnum = function ss$registerEnum(root, name, ctor, metadata) {
-	if (root)
-		ss.registerType(root, name, ctor);
-
-	for (var field in ctor.prototype)
-		ctor[field] = ctor.prototype[field];
-
-	ctor.__typeName = name;
+ss.initEnum = function ss$initEnum(ctor, asm, members, namedValues) {
 	ctor.__enum = true;
-	if (metadata)
-		ss._setMetadata(ctor, metadata);
-	ctor.getDefaultValue = ctor.createInstance = function() { return 0; };
-	ctor.isInstanceOfType = function(instance) { return typeof(instance) == 'number'; };
-};
-
-ss.setupBase = function Type$setupBase(type) {
-	var baseType = type.__baseType;
-
-	for (var memberName in baseType.prototype) {
-		var memberValue = baseType.prototype[memberName];
-		if (!type.prototype[memberName]) {
-			type.prototype[memberName] = memberValue;
-		}
-	}
+	ctor.__assembly = asm;
+	asm.__types[ctor.__typeName] = ctor;
+	ss.shallowCopy(members, ctor.prototype);
+	ctor.getDefaultValue = ctor.createInstance = function() { return namedValues ? null : 0; };
+	ctor.isInstanceOfType = function(instance) { return typeof(instance) == (namedValues ? 'string' : 'number'); };
 };
 
 ss.getBaseType = function ss$getBaseType(type) {
-	return type.__baseType || (type === Object ? null : Object);
+	if (type === Object || type.__interface) {
+		return null;
+	}
+	else if (Object.getPrototypeOf) {
+		return Object.getPrototypeOf(type.prototype).constructor;
+	}
+	else {
+		var p = type.prototype;
+		if (Object.prototype.hasOwnProperty.call(p, 'constructor')) {
+			try {
+				var ownValue = p.constructor;
+				delete p.constructor;
+				return p.constructor;
+			}
+			finally {
+				p.constructor = ownValue;
+			}
+		}
+		return p.constructor;
+	}
 };
 
 ss.getTypeFullName = function ss$getTypeFullName(type) {
 	return type.__typeName || type.name || (type.toString().match(/^\s*function\s*([^\s(]+)/) || [])[1] || 'Object';
+};
+
+ss.getTypeQName = function ss$getTypeFullName(type) {
+	return ss.getTypeFullName(type) + (type.__assembly ? ', ' + type.__assembly.name : '');
 };
 
 ss.getTypeName = function ss$getTypeName(type) {
@@ -364,6 +416,65 @@ ss.getTypeName = function ss$getTypeName(type) {
 	var bIndex = fullName.indexOf('[');
 	var nsIndex = fullName.lastIndexOf('.', bIndex >= 0 ? bIndex : fullName.length);
 	return nsIndex > 0 ? fullName.substr(nsIndex + 1) : fullName;
+};
+
+ss.getTypeNamespace = function ss$getTypeNamespace(type) {
+	var fullName = ss.getTypeFullName(type);
+	var bIndex = fullName.indexOf('[');
+	var nsIndex = fullName.lastIndexOf('.', bIndex >= 0 ? bIndex : fullName.length);
+	return nsIndex > 0 ? fullName.substr(0, nsIndex) : '';
+};
+
+ss.getTypeAssembly = function ss$getTypeAssembly(type) {
+	if (ss.contains([Date, Number, Boolean, String, Function, Array], type))
+		return ss;
+	else
+		return type.__assembly || null;
+};
+
+ss.getAssemblyType = function ss$getAssemblyTypes(asm, name) {
+	var result = [];
+	if (asm.__types) {
+		return asm.__types[name] || null;
+	}
+	else {
+		var a = name.split('.');
+		for (var i = 0; i < a.length; i++) {
+			asm = asm[a[i]];
+			if (!ss.isValue(asm))
+				return null;
+		}
+		if (typeof asm !== 'function')
+			return null;
+		return asm;
+	}
+};
+
+ss.getAssemblyTypes = function ss$getAssemblyTypes(asm) {
+	var result = [];
+	if (asm.__types) {
+		for (var t in asm.__types) {
+			if (asm.__types.hasOwnProperty(t))
+				result.push(asm.__types[t]);
+		}
+	}
+	else {
+		var traverse = function(s, n) {
+			for (var c in s) {
+				if (s.hasOwnProperty(c))
+					traverse(s[c], c);
+			}
+			if (typeof(s) === 'function' && ss.isUpper(n.charCodeAt(0)))
+				result.push(s);
+		};
+		traverse(asm, '');
+	}
+	return result;
+};
+
+ss.createAssemblyInstance = function ss$createAssemblyInstance(asm, typeName) {
+	var t = ss.getAssemblyType(asm, typeName);
+	return t ? ss.createInstance(t) : null;
 };
 
 ss.getInterfaces = function ss$getInterfaces(type) {
@@ -386,46 +497,11 @@ ss.isInstanceOfType = function ss$isInstanceOfType(instance, type) {
 	if (typeof(type.isInstanceOfType) === 'function')
 		return type.isInstanceOfType(instance);
 
-	if ((type == Object) || (instance instanceof type)) {
-		return true;
-	}
-
 	return ss.isAssignableFrom(type, ss.getInstanceType(instance));
 };
 
 ss.isAssignableFrom = function ss$isAssignableFrom(target, type) {
-	if ((target == Object) || (target == type)) {
-		return true;
-	}
-	if (target.__class) {
-		var baseType = type.__baseType;
-		while (baseType) {
-			if (target == baseType) {
-				return true;
-			}
-			baseType = baseType.__baseType;
-		}
-	}
-	else if (target.__interface) {
-		var interfaces = ss.getInterfaces(type);
-		if (interfaces && ss.contains(interfaces, target)) {
-			return true;
-		}
-
-		var baseType = ss.getBaseType(type);
-		while (baseType) {
-			interfaces = ss.getInterfaces(baseType);
-			if (interfaces && ss.contains(interfaces, target)) {
-				return true;
-			}
-			baseType = ss.getBaseType(baseType);
-		}
-	}
-	return false;
-};
-
-ss.hasProperty = function ss$hasProperty(instance, name) {
-	return typeof(instance['get_' + name]) === 'function' || typeof(instance['set_' + name]) === 'function';
+	return target === type || (typeof(target.isAssignableFrom) === 'function' && target.isAssignableFrom(type)) || type.prototype instanceof target;
 };
 
 ss.isClass = function Type$isClass(type) {
@@ -433,15 +509,15 @@ ss.isClass = function Type$isClass(type) {
 };
 
 ss.isEnum = function Type$isEnum(type) {
-	return (type.__enum == true);
+	return !!type.__enum;
 };
 
 ss.isFlags = function Type$isFlags(type) {
-	return type.__metadata && type.__metadata.enumFlags;
+	return type.__metadata && type.__metadata.enumFlags || false;
 };
 
 ss.isInterface = function Type$isInterface(type) {
-	return (type.__interface == true);
+	return !!type.__interface;
 };
 
 ss.safeCast = function ss$safeCast(instance, type) {
@@ -454,56 +530,34 @@ ss.safeCast = function ss$safeCast(instance, type) {
 };
 
 ss.cast = function ss$cast(instance, type) {
-	if (instance === null || type === false)
-		return null;
-	else if (typeof(instance) === "undefined" || type === true || ss.isInstanceOfType(instance, type)) {
+	if (instance === null || typeof(instance) === 'undefined')
 		return instance;
-	}
-	throw 'Cannot cast object to type ' + ss.getTypeFullName(type);
+	else if (type === true || (type !== false && ss.isInstanceOfType(instance, type)))
+		return instance;
+	throw new ss_InvalidCastException('Cannot cast object to type ' + ss.getTypeFullName(type));
 };
 
 ss.getInstanceType = function ss$getInstanceType(instance) {
-	if (instance === null)
-		throw 'Cannot get type of null';
-	if (typeof(instance) === "undefined")
-		throw 'Cannot get type of undefined';
-
-	var ctor = null;
+	if (!ss.isValue(instance))
+		throw new ss_NullReferenceException('Cannot get type of null');
 
 	// NOTE: We have to catch exceptions because the constructor
 	//       cannot be looked up on native COM objects
 	try {
-		ctor = instance.constructor;
+		return instance.constructor;
 	}
 	catch (ex) {
+		return Object;
 	}
-	return ctor || Object;
 };
 
 ss.getType = function ss$getType(typeName) {
-	if (!typeName) {
+	if (!typeName)
 		return null;
-	}
 
-	if (!ss.__typeCache) {
-		ss.__typeCache = {};
-	}
-
-	var type = ss.__typeCache[typeName];
-	if (!type) {
-		var arr = typeName.split(',');
-		var type = (arr.length > 1 ? require(arr[1].trim) : global);
-
-		var parts = arr[0].trim().split('.');
-		for (var i = 0; i < parts.length; i++) {
-			type = type[parts[i]];
-			if (!type)
-				break;
-		}
-
-		ss.__typeCache[typeName] = type || null;
-	}
-	return type;
+	var arr = typeName.split(',');
+	var module = (arr.length > 1 ? ss.__assemblies[arr[1].trim()] : global);
+	return module ? ss.getAssemblyType(module, arr[0].trim()) : null;
 };
 
 ss.getDefaultValue = function ss$getDefaultValue(type) {
@@ -542,7 +596,12 @@ ss.applyConstructor = function ss$applyConstructor(constructor, args) {
 };
 
 ss.getAttributes = function ss$getAttributes(type, attrType, inherit) {
-	var result = inherit && type.__baseType ? ss.getAttributes(type.__baseType, attrType, true).filter(function(a) { var t = ss.getInstanceType(a); return !t.__metadata || !t.__metadata.attrNoInherit; }) : [];
+	var result = [];
+	if (inherit) {
+		var b = ss.getBaseType(type);
+		if (b)
+			result = ss.getAttributes(b, attrType, true).filter(function(a) { var t = ss.getInstanceType(a); return !t.__metadata || !t.__metadata.attrNoInherit; });
+	}
 	if (type.__metadata && type.__metadata.attr) {
 		for (var i = 0; i < type.__metadata.attr.length; i++) {
 			var a = type.__metadata.attr[i];
@@ -557,8 +616,13 @@ ss.getAttributes = function ss$getAttributes(type, attrType, inherit) {
 	return result;
 };
 
-ss.getMembers = function ss$getAttributes(type, memberTypes, bindingAttr, name, params) {
-	var result = type.__baseType && ((bindingAttr & 72) == 72 || (bindingAttr & 6) == 4) ? ss.getMembers(type.__baseType, memberTypes & ~1, bindingAttr & (bindingAttr & 64 ? 255 : 247) & (bindingAttr & 2 ? 251 : 255), name, params) : [];
+ss.getMembers = function ss$getMembers(type, memberTypes, bindingAttr, name, params) {
+	var result = [];
+	if ((bindingAttr & 72) == 72 || (bindingAttr & 6) == 4) {
+		var b = ss.getBaseType(type);
+		if (b)
+			result = ss.getMembers(b, memberTypes & ~1, bindingAttr & (bindingAttr & 64 ? 255 : 247) & (bindingAttr & 2 ? 251 : 255), name, params);
+	}
 
 	var f = function(m) {
 		if ((memberTypes & m.type) && (((bindingAttr & 4) && !m.isStatic) || ((bindingAttr & 8) && m.isStatic)) && (!name || m.name === name)) {
@@ -586,10 +650,10 @@ ss.getMembers = function ss$getAttributes(type, memberTypes, bindingAttr, name, 
 		while (type) {
 			var r = result.filter(function(m) { return m.typeDef === type; });
 			if (r.length > 1)
-				throw 'Ambiguous match';
+				throw new ss_AmbiguousMatchException('Ambiguous match');
 			else if (r.length === 1)
 				return r[0];
-			type = type.__baseType;
+			type = ss.getBaseType(type);
 		}
 		return null;
 	}
@@ -599,9 +663,9 @@ ss.getMembers = function ss$getAttributes(type, memberTypes, bindingAttr, name, 
 
 ss.midel = function ss$midel(mi, target, typeArguments) {
 	if (mi.isStatic && !!target)
-		throw 'Cannot specify target for static method';
+		throw new ss_ArgumentException('Cannot specify target for static method');
 	else if (!mi.isStatic && !target)
-		throw 'Must specify target for instance method';
+		throw new ss_ArgumentException('Must specify target for instance method');
 
 	var method;
 	if (mi.fget) {
@@ -615,12 +679,12 @@ ss.midel = function ss$midel(mi, target, typeArguments) {
 
 		if (mi.tpcount) {
 			if (!typeArguments || typeArguments.length !== mi.tpcount)
-				throw 'Wrong number of type arguments';
+				throw new ss_ArgumentException('Wrong number of type arguments');
 			method = method.apply(null, typeArguments);
 		}
 		else {
 			if (typeArguments && typeArguments.length)
-				throw 'Cannot specify type arguments for non-generic method';
+				throw new ss_ArgumentException('Cannot specify type arguments for non-generic method');
 		}
 		if (mi.exp) {
 			var _m1 = method;
@@ -648,9 +712,9 @@ ss.invokeCI = function ss$invokeCI(ci, args) {
 
 ss.fieldAccess = function ss$fieldAccess(fi, obj) {
 	if (fi.isStatic && !!obj)
-		throw 'Cannot specify target for static field';
+		throw new ss_ArgumentException('Cannot specify target for static field');
 	else if (!fi.isStatic && !obj)
-		throw 'Must specify target for instance field';
+		throw new ss_ArgumentException('Must specify target for instance field');
 	obj = fi.isStatic ? fi.typeDef : obj;
 	if (arguments.length === 3)
 		obj[fi.sname] = arguments[2];
@@ -662,11 +726,10 @@ ss.fieldAccess = function ss$fieldAccess(fi, obj) {
 // IFormattable
 
 var ss_IFormattable = function IFormattable$() { };
-ss_IFormattable.prototype = {
-	format: null
-};
 
-ss.registerInterface(global, 'ss.IFormattable', ss_IFormattable);
+ss_IFormattable.__typeName = 'ss.IFormattable';
+ss.IFormattable = ss_IFormattable;
+ss.initInterface(ss_IFormattable, ss, { format: null });
 
 ss.format = function ss$format(obj, fmt) {
 	if (typeof(obj) === 'number')
@@ -681,21 +744,19 @@ ss.format = function ss$format(obj, fmt) {
 // IComparable
 
 var ss_IComparable = function IComparable$() { };
-ss_IComparable.prototype = {
-	compareTo: null
-};
 
-ss.registerInterface(global, 'ss.IComparable', ss_IComparable);
+ss_IComparable.__typeName = 'ss.IComparable';
+ss.IComparable = ss_IComparable;
+ss.initInterface(ss_IComparable, ss, { compareTo: null });
 
 ///////////////////////////////////////////////////////////////////////////////
 // IEquatable
 
 var ss_IEquatable = function IEquatable$() { };
-ss_IEquatable.prototype = {
-	equalsT: null
-};
 
-ss.registerInterface(global, 'ss.IEquatable', ss_IEquatable);
+ss_IEquatable.__typeName = 'ss.IEquatable';
+ss.IEquatable = ss_IEquatable;
+ss.initInterface(ss_IEquatable, ss, { equalsT: null });
 
 ///////////////////////////////////////////////////////////////////////////////
 // Object Extensions
@@ -712,29 +773,41 @@ ss.keyExists = function ss$keyExists(d, key) {
 };
 
 if (!Object.keys) {
-	Object.keys = function Object$keys(d) {
-		var keys = [];
-		for (var n in d) {
-			if (d.hasOwnProperty(n))
-				keys.push(n);
-		}
-		return keys;
-	};
+	Object.keys = (function() {
+		'use strict';
+		var hasOwnProperty = Object.prototype.hasOwnProperty,
+			hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
+			dontEnums = ['toString','toLocaleString','valueOf','hasOwnProperty','isPrototypeOf','propertyIsEnumerable','constructor'],
+			dontEnumsLength = dontEnums.length;
 
-	ss.getKeyCount = function ss$getKeyCount(d) {
-		var count = 0;
-		for (var n in d) {
-			if (d.hasOwnProperty(n))
-				count++;
-		}
-		return count;
-	};
+		return function (obj) {
+			if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+				throw new TypeError('Object.keys called on non-object');
+			}
+
+			var result = [], prop, i;
+
+			for (prop in obj) {
+				if (hasOwnProperty.call(obj, prop)) {
+					result.push(prop);
+				}
+			}
+
+			if (hasDontEnumBug) {
+				for (i = 0; i < dontEnumsLength; i++) {
+					if (hasOwnProperty.call(obj, dontEnums[i])) {
+						result.push(dontEnums[i]);
+					}
+				}
+			}
+			return result;
+		};
+	}());
 }
-else {
-	ss.getKeyCount = function ss$getKeyCount2(d) {
-		return Object.keys(d).length;
-	};
-}
+
+ss.getKeyCount = function ss$getKeyCount(d) {
+	return Object.keys(d).length;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Number Extensions
@@ -743,14 +816,14 @@ ss.formatNumber = function ss$formatNumber(num, format) {
 	if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
 		return num.toString();
 	}
-	return ss._netFormatNumber(num, format, false);
+	return ss.netFormatNumber(num, format, ss_CultureInfo.invariantCulture.numberFormat);
 };
 
 ss.localeFormatNumber = function ss$localeFormatNumber(num, format) {
 	if (ss.isNullOrUndefined(format) || (format.length == 0) || (format == 'i')) {
 		return num.toLocaleString();
 	}
-	return ss._netFormatNumber(num, format, true);
+	return ss.netFormatNumber(num, format, ss_CultureInfo.currentCulture.numberFormat);
 };
 
 ss._commaFormatNumber = function ss$_commaFormat(number, groups, decimal, comma) {
@@ -809,8 +882,8 @@ ss._commaFormatNumber = function ss$_commaFormat(number, groups, decimal, comma)
 	return decimalPart ? s + decimalPart : s;
 };
 
-ss._netFormatNumber = function ss$_netFormatNumber(num, format, useLocale) {
-	var nf = useLocale ? ss_CultureInfo.CurrentCulture.numberFormat : ss_CultureInfo.InvariantCulture.numberFormat;
+ss.netFormatNumber = function ss$netFormatNumber(num, format, numberFormat) {
+	var nf = (numberFormat && numberFormat.getFormat(ss_NumberFormatInfo)) || ss_CultureInfo.currentCulture.numberFormat;
 
 	var s = '';    
 	var precision = -1;
@@ -905,6 +978,26 @@ ss._netFormatNumber = function ss$_netFormatNumber(num, format, useLocale) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // String Extensions
+ss.netSplit = function ss$netSplit(s, strings, limit, options) {
+	var re = new RegExp(strings.map(ss.regexpEscape).join('|'), 'g'), res = [], m, i;
+	for (i = 0;; i = re.lastIndex) {
+		if (m = re.exec(s)) {
+			if (options !== 1 || m.index > i) {
+				if (res.length === limit - 1) {
+					res.push(s.substr(i));
+					return res;
+				}
+				else
+					res.push(s.substring(i, m.index));
+			}
+		}
+		else {
+			if (options !== 1 || i !== s.length)
+				res.push(s.substr(i));
+			return res;
+		}
+	}
+};
 
 ss.compareStrings = function ss$compareStrings(s1, s2, ignoreCase) {
 	if (ignoreCase) {
@@ -939,28 +1032,30 @@ ss.endsWithString = function ss$endsWithString(s, suffix) {
 
 ss._formatString = function ss$_formatString(format, values, useLocale) {
 	if (!ss._formatRE) {
-		ss._formatRE = /(\{[^\}^\{]+\})/g;
+		ss._formatRE = /\{\{|\}\}|\{[^\}\{]+\}/g;
 	}
 
 	return format.replace(ss._formatRE,
-						  function(str, m) {
-							  var index = parseInt(m.substr(1));
-							  var value = values[index + 1];
-							  if (ss.isNullOrUndefined(value)) {
-								  return '';
-							  }
-							  if (ss.isInstanceOfType(value, ss_IFormattable)) {
-								  var formatSpec = null;
-								  var formatIndex = m.indexOf(':');
-								  if (formatIndex > 0) {
-									  formatSpec = m.substring(formatIndex + 1, m.length - 1);
-								  }
-								  return ss.format(value, formatSpec);
-							  }
-							  else {
-								  return useLocale ? value.toLocaleString() : value.toString();
-							  }
-						  });
+		function(m) {
+			if (m === '{{' || m === '}}')
+				return m.charAt(0);
+			var index = parseInt(m.substr(1));
+			var value = values[index + 1];
+			if (ss.isNullOrUndefined(value)) {
+				return '';
+			}
+			if (ss.isInstanceOfType(value, ss_IFormattable)) {
+				var formatSpec = null;
+				var formatIndex = m.indexOf(':');
+				if (formatIndex > 0) {
+					formatSpec = m.substring(formatIndex + 1, m.length - 1);
+				}
+				return ss.format(value, formatSpec);
+			}
+			else {
+				return useLocale ? value.toLocaleString() : value.toString();
+			}
+		});
 };
 
 ss.formatString = function String$format(format) {
@@ -1153,23 +1248,194 @@ ss.round = function ss$round(n, d, rounding) {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// IFormatProvider
+
+var ss_IFormatProvider = function IFormatProvider$() { };
+
+ss_IFormatProvider.__typeName = 'ss.IFormatProvider';
+ss.IFormatProvider = ss_IFormatProvider;
+ss.initInterface(ss_IFormatProvider, ss, { getFormat: null });
+
+///////////////////////////////////////////////////////////////////////////////
+// NumberFormatInfo
+
+var ss_NumberFormatInfo = function NumberFormatInfo$() {
+};
+
+ss_NumberFormatInfo.__typeName = 'ss.NumberFormatInfo';
+ss.NumberFormatInfo = ss_NumberFormatInfo;
+ss.initClass(ss_NumberFormatInfo, ss, {
+	getFormat:  function NumberFormatInfo$getFormat(type) {
+		return (type === ss_NumberFormatInfo) ? this : null;
+	}
+}, null, [ss_IFormatProvider]);
+
+ss_NumberFormatInfo.invariantInfo = new ss_NumberFormatInfo();
+ss.shallowCopy({
+	naNSymbol: 'NaN',
+	negativeSign: '-',
+	positiveSign: '+',
+	negativeInfinitySymbol: '-Infinity',
+	positiveInfinitySymbol: 'Infinity',
+
+	percentSymbol: '%',
+	percentGroupSizes: [3],
+	percentDecimalDigits: 2,
+	percentDecimalSeparator: '.',
+	percentGroupSeparator: ',',
+	percentPositivePattern: 0,
+	percentNegativePattern: 0,
+
+	currencySymbol: '$',
+	currencyGroupSizes: [3],
+	currencyDecimalDigits: 2,
+	currencyDecimalSeparator: '.',
+	currencyGroupSeparator: ',',
+	currencyNegativePattern: 0,
+	currencyPositivePattern: 0,
+
+	numberGroupSizes: [3],
+	numberDecimalDigits: 2,
+	numberDecimalSeparator: '.',
+	numberGroupSeparator: ','
+}, ss_NumberFormatInfo.invariantInfo);
+
+///////////////////////////////////////////////////////////////////////////////
+// DateTimeFormatInfo
+
+var ss_DateTimeFormatInfo = function DateTimeFormatInfo$() {
+};
+
+ss_DateTimeFormatInfo.__typeName = 'ss.DateTimeFormatInfo';
+ss.DateTimeFormatInfo = ss_DateTimeFormatInfo;
+ss.initClass(ss_DateTimeFormatInfo, ss, {
+	getFormat: function DateTimeFormatInfo$getFormat(type) {
+		return type === ss_DateTimeFormatInfo ? this : null;
+	}
+}, null, [ss_IFormatProvider]);
+
+ss_DateTimeFormatInfo.invariantInfo = new ss_DateTimeFormatInfo();
+ss.shallowCopy({
+	amDesignator: 'AM',
+	pmDesignator: 'PM',
+
+	dateSeparator: '/',
+	timeSeparator: ':',
+
+	gmtDateTimePattern: 'ddd, dd MMM yyyy HH:mm:ss \'GMT\'',
+	universalDateTimePattern: 'yyyy-MM-dd HH:mm:ssZ',
+	sortableDateTimePattern: 'yyyy-MM-ddTHH:mm:ss',
+	dateTimePattern: 'dddd, MMMM dd, yyyy h:mm:ss tt',
+
+	longDatePattern: 'dddd, MMMM dd, yyyy',
+	shortDatePattern: 'M/d/yyyy',
+
+	longTimePattern: 'h:mm:ss tt',
+	shortTimePattern: 'h:mm tt',
+
+	firstDayOfWeek: 0,
+	dayNames: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+	shortDayNames: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+	minimizedDayNames: ['Su','Mo','Tu','We','Th','Fr','Sa'],
+
+	monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December',''],
+	shortMonthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','']
+}, ss_DateTimeFormatInfo.invariantInfo);
+
+///////////////////////////////////////////////////////////////////////////////
+// Stopwatch
+
+var ss_Stopwatch = function Stopwatch$() {
+	this._stopTime = 0;
+	this._startTime = 0;
+	this.isRunning = false;
+};
+
+ss_Stopwatch.startNew = function  Stopwatch$startNew() {
+	var s = new ss_Stopwatch();
+	s.start();
+	return s;
+};
+
+if (typeof(window) !== 'undefined' && window.performance && window.performance.now) {
+	ss_Stopwatch.frequency = 1e6;
+	ss_Stopwatch.isHighResolution = true;
+	ss_Stopwatch.getTimestamp = function() { return Math.round(window.performance.now() * 1000); };
+}
+else if (typeof(process) !== 'undefined' && process.hrtime) {
+	ss_Stopwatch.frequency = 1e9;
+	ss_Stopwatch.isHighResolution = true;
+	ss_Stopwatch.getTimestamp = function() { var hr = process.hrtime(); return hr[0] * 1e9 + hr[1]; };
+}
+else {
+	ss_Stopwatch.frequency = 1e3;
+	ss_Stopwatch.isHighResolution = false;
+	ss_Stopwatch.getTimestamp = function() { return new Date().valueOf(); };
+}
+
+ss_Stopwatch.__typeName = 'ss.Stopwatch';
+ss.Stopwatch = ss_Stopwatch;
+ss.initClass(ss_Stopwatch, ss, {
+	reset: function Stopwatch$reset() {
+		this._stopTime = this._startTime = ss_Stopwatch.getTimestamp();
+		this.isRunning = false;
+	},
+
+	ticks: function Stopwatch$ticks() {
+		return (this.isRunning ? ss_Stopwatch.getTimestamp() : this._stopTime) - this._startTime;
+	},
+
+	milliseconds: function Stopwatch$milliseconds() {
+		return Math.round(this.ticks() / ss_Stopwatch.frequency * 1000);
+	},
+
+	timeSpan: function Stopwatch$timeSpan() {
+		return new ss_TimeSpan(this.milliseconds() * 10000);
+	},
+
+	start: function Stopwatch$start() {
+		if (this.isRunning)
+			return;
+		this._startTime = ss_Stopwatch.getTimestamp();
+		this.isRunning = true;
+	},
+
+	stop: function Stopwatch$stop() {
+		if (!this.isRunning)
+			return;
+		this._stopTime = ss_Stopwatch.getTimestamp();
+		this.isRunning = false;
+	},
+
+	restart: function Stopwatch$restart() {
+		this.isRunning = false;
+		this.start();
+	}
+});
+
+///////////////////////////////////////////////////////////////////////////////
 // Array Extensions
 
-ss.arrayGet2 = function ss$arrayGet2(arr, indices) {
+ss._flatIndex = function ss$_flatIndex(arr, indices) {
 	if (indices.length != (arr._sizes ? arr._sizes.length : 1))
-		throw 'Invalid number of indices';
+		throw new ss_ArgumentException('Invalid number of indices');
 
 	if (indices[0] < 0 || indices[0] >= (arr._sizes ? arr._sizes[0] : arr.length))
-		throw 'Index 0 out of range';
+		throw new ss_ArgumentException('Index 0 out of range');
 
 	var idx = indices[0];
 	if (arr._sizes) {
 		for (var i = 1; i < arr._sizes.length; i++) {
 			if (indices[i] < 0 || indices[i] >= arr._sizes[i])
-				throw 'Index ' + i + ' out of range';
+				throw new ss_ArgumentException('Index ' + i + ' out of range');
 			idx = idx * arr._sizes[i] + indices[i];
 		}
 	}
+	return idx;
+};
+
+ss.arrayGet2 = function ss$arrayGet2(arr, indices) {
+	var idx = ss._flatIndex(arr, indices);
 	var r = arr[idx];
 	return typeof r !== 'undefined' ? r : arr._defvalue;
 };
@@ -1179,20 +1445,7 @@ ss.arrayGet = function ss$arrayGet(arr) {
 }
 
 ss.arraySet2 = function ss$arraySet2(arr, value, indices) {
-	if (indices.length != (arr._sizes ? arr._sizes.length : 1))
-		throw 'Invalid number of indices';
-
-	if (indices[0] < 0 || indices[0] >= (arr._sizes ? arr._sizes[0] : arr.length))
-		throw 'Index 0 out of range';
-
-	var idx = indices[0];
-	if (arr._sizes) {
-		for (var i = 1; i < arr._sizes.length; i++) {
-			if (indices[i] < 0 || indices[i] >= arr._sizes[i])
-				throw 'Index ' + i + ' out of range';
-			idx = idx * arr._sizes[i] + indices[i];
-		}
-	}
+	var idx = ss._flatIndex(arr, indices);
 	arr[idx] = value;
 };
 
@@ -1206,7 +1459,7 @@ ss.arrayRank = function ss$arrayRank(arr) {
 
 ss.arrayLength = function ss$arrayLength(arr, dimension) {
 	if (dimension >= (arr._sizes ? arr._sizes.length : 1))
-		throw 'Invalid dimension';
+		throw new ss_ArgumentException('Invalid dimension');
 	return arr._sizes ? arr._sizes[dimension] : arr.length;
 };
 
@@ -1248,13 +1501,13 @@ ss.arrayClone = function ss$arrayClone(arr) {
 ss.arrayPeekFront = function ss$arrayPeekFront(arr) {
 	if (arr.length)
 		return arr[0];
-	throw 'Array is empty';
+	throw new ss_InvalidOperationException('Array is empty');
 };
 
 ss.arrayPeekBack = function ss$arrayPeekBack(arr) {
 	if (arr.length)
 		return arr[arr.length - 1];
-	throw 'Array is empty';
+	throw new ss_InvalidOperationException('Array is empty');
 };
 
 if (!Array.prototype.every) {
@@ -1363,6 +1616,9 @@ if (!Array.prototype.some) {
 }
 
 ss.arrayFromEnumerable = function ss$arrayFromEnumerable(enm) {
+	if (!ss.isValue(enm))
+		return null;
+
 	var e = ss.getEnumerator(enm), r = [];
 	try {
 		while (e.moveNext())
@@ -1399,6 +1655,14 @@ ss.repeat = function ss$repeat(value, count) {
 
 ss.utcNow = function ss$utcNow() {
 	var d = new Date();
+	return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds());
+};
+
+ss.toUTC = function ss$toUniversalTime(d) {
+	return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds(), d.getUTCMilliseconds());
+};
+
+ss.fromUTC = function ss$toLocalTime(d) {
 	return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(), d.getMilliseconds()));
 };
 
@@ -1436,7 +1700,7 @@ ss.localeFormatDate = function ss$localeFormatDate(date, format) {
 };
 
 ss._netFormatDate = function ss$_netFormatDate(dt, format, useLocale) {
-	var dtf = useLocale ? ss_CultureInfo.CurrentCulture.dateFormat : ss_CultureInfo.InvariantCulture.dateFormat;
+	var dtf = useLocale ? ss_CultureInfo.currentCulture.dateTimeFormat : ss_CultureInfo.invariantCulture.dateTimeFormat;
 
 	if (format.length == 1) {
 		switch (format) {
@@ -1453,7 +1717,7 @@ ss._netFormatDate = function ss$_netFormatDate(dt, format, useLocale) {
 			case 'G': format = dtf.shortDatePattern + ' ' + dtf.longTimePattern; break;
 
 			case 'R': case 'r':
-				dtf = ss_CultureInfo.InvariantCulture.dateFormat;
+				dtf = ss_CultureInfo.InvariantCulture.dateTimeFormat;
 				format = dtf.gmtDateTimePattern;
 				break;
 			case 'u': format = dtf.universalDateTimePattern; break;
@@ -1589,9 +1853,9 @@ ss._netFormatDate = function ss$_netFormatDate(dt, format, useLocale) {
 	return sb.toString();
 };
 
-ss._parseExactDate = function ss$_parseExactDate(val, format, culture, utc) {
-	culture = culture || ss_CultureInfo.CurrentCulture;
-	var AM = culture.amDesignator, PM = culture.pmDesignator;
+ss._parseExactDate = function ss$_parseExactDate(val, format, provider, utc) {
+	provider = (provider && provider.getFormat(ss_DateTimeFormatInfo)) || ss_CultureInfo.currentCulture.dateTimeFormat;
+	var AM = provider.amDesignator, PM = provider.pmDesignator;
 
 	var _isInteger = function(val) {
 		var digits="1234567890";
@@ -1748,12 +2012,12 @@ ss._parseExactDate = function ss$_parseExactDate(val, format, culture, utc) {
 		return new Date(year, month - 1, date, hh, mm, _ss);
 };
 
-ss.parseExactDate = function ss$parseExactDate(val, format, culture) {
-	return ss._parseExactDate(val, format, culture, false);
+ss.parseExactDate = function ss$parseExactDate(val, format, provider) {
+	return ss._parseExactDate(val, format, provider, false);
 };
 
-ss.parseExactDateUTC = function ss$parseExactDateUTC(val, format, culture) {
-	return ss._parseExactDate(val, format, culture, true);
+ss.parseExactDateUTC = function ss$parseExactDateUTC(val, format, provider) {
+	return ss._parseExactDate(val, format, provider, true);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1886,6 +2150,12 @@ ss.getInvocationList = function ss$getInvocationList(delegate) {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// RegExp Extensions
+ss.regexpEscape = function ss$regexpEscape(s) {
+	return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // Debug Extensions
 
 ss.Debug = global.Debug || function() {};
@@ -1913,7 +2183,7 @@ if (!ss.Debug.writeln) {
 
 ss.Debug._fail = function Debug$_fail(message) {
 	ss.Debug.writeln(message);
-	eval('debugger;');
+	debugger;
 };
 
 ss.Debug.assert = function Debug$assert(condition, message) {
@@ -1934,7 +2204,9 @@ ss.Debug.fail = function Debug$fail(message) {
 
 var ss_Enum = function Enum$() {
 };
-ss.registerClass(global, 'ss.Enum', ss_Enum);
+ss_Enum.__typeName = 'ss.Enum';
+ss.Enum = ss_Enum;
+ss.initClass(ss_Enum, ss, {});
 
 ss_Enum.parse = function Enum$parse(enumType, s) {
 	var values = enumType.prototype;
@@ -1971,7 +2243,7 @@ ss_Enum.parse = function Enum$parse(enumType, s) {
 			return value;
 		}
 	}
-	throw 'Invalid Enumeration Value';
+	throw new ss_ArgumentException('Invalid Enumeration Value');
 };
 
 ss_Enum.toString = function  Enum$toString(enumType, value) {
@@ -1982,7 +2254,7 @@ ss_Enum.toString = function  Enum$toString(enumType, value) {
 				return i;
 			}
 		}
-		throw 'Invalid Enumeration Value';
+		throw new ss_ArgumentException('Invalid Enumeration Value');
 	}
 	else {
 		var parts = [];
@@ -1992,101 +2264,63 @@ ss_Enum.toString = function  Enum$toString(enumType, value) {
 			}
 		}
 		if (!parts.length) {
-			throw 'Invalid Enumeration Value';
+			throw new ss_ArgumentException('Invalid Enumeration Value');
 		}
 		return parts.join(' | ');
 	}
 };
 
+ss_Enum.getValues = function Enum$getValues(enumType) {
+	var parts = [];
+	var values = enumType.prototype;
+	for (var i in values) {
+		if (values.hasOwnProperty(i))
+			parts.push(values[i]);
+	}
+	return parts;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // CultureInfo
 
-var ss_CultureInfo = function CultureInfo$(name, numberFormat, dateFormat) {
+var ss_CultureInfo = function CultureInfo$(name, numberFormat, dateTimeFormat) {
 	this.name = name;
 	this.numberFormat = numberFormat;
-	this.dateFormat = dateFormat;
+	this.dateTimeFormat = dateTimeFormat;
 };
-ss.registerClass(global, 'ss.CultureInfo', ss_CultureInfo);
 
-ss_CultureInfo.InvariantCulture = new ss_CultureInfo('en-US',
-	{
-		naNSymbol: 'NaN',
-		negativeSign: '-',
-		positiveSign: '+',
-		negativeInfinityText: '-Infinity',
-		positiveInfinityText: 'Infinity',
-		
-		percentSymbol: '%',
-		percentGroupSizes: [3],
-		percentDecimalDigits: 2,
-		percentDecimalSeparator: '.',
-		percentGroupSeparator: ',',
-		percentPositivePattern: '{0} %',
-		percentNegativePattern: '-{0} %',
+ss_CultureInfo.__typeName = 'ss.CultureInfo';
+ss.CultureInfo = ss_CultureInfo;
+ss.initClass(ss_CultureInfo, ss, {
+	getFormat:  function CultureInfo$getFormat(type) {
+		switch (type) {
+			case ss_NumberFormatInfo: return this.numberFormat;
+			case ss_DateTimeFormatInfo: return this.dateTimeFormat;
+			default: return null;
+		}
+	}
+}, null, [ss_IFormatProvider]);
 
-		currencySymbol:'$',
-		currencyGroupSizes: [3],
-		currencyDecimalDigits: 2,
-		currencyDecimalSeparator: '.',
-		currencyGroupSeparator: ',',
-		currencyNegativePattern: '(${0})',
-		currencyPositivePattern: '${0}',
-
-		numberGroupSizes: [3],
-		numberDecimalDigits: 2,
-		numberDecimalSeparator: '.',
-		numberGroupSeparator: ','
-	},
-	{
-		amDesignator: 'AM',
-		pmDesignator: 'PM',
-
-		dateSeparator: '/',
-		timeSeparator: ':',
-
-		gmtDateTimePattern: 'ddd, dd MMM yyyy HH:mm:ss \'GMT\'',
-		universalDateTimePattern: 'yyyy-MM-dd HH:mm:ssZ',
-		sortableDateTimePattern: 'yyyy-MM-ddTHH:mm:ss',
-		dateTimePattern: 'dddd, MMMM dd, yyyy h:mm:ss tt',
-
-		longDatePattern: 'dddd, MMMM dd, yyyy',
-		shortDatePattern: 'M/d/yyyy',
-
-		longTimePattern: 'h:mm:ss tt',
-		shortTimePattern: 'h:mm tt',
-
-		firstDayOfWeek: 0,
-		dayNames: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-		shortDayNames: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-		minimizedDayNames: ['Su','Mo','Tu','We','Th','Fr','Sa'],
-
-		monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December',''],
-		shortMonthNames: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','']
-	});
-ss_CultureInfo.CurrentCulture = ss_CultureInfo.InvariantCulture;
+ss_CultureInfo.invariantCulture = new ss_CultureInfo('en-US', ss_NumberFormatInfo.invariantInfo, ss_DateTimeFormatInfo.invariantInfo);
+ss_CultureInfo.currentCulture = ss_CultureInfo.invariantCulture;
 
 ///////////////////////////////////////////////////////////////////////////////
 // IEnumerator
 
 var ss_IEnumerator = function IEnumerator$() { };
-ss_IEnumerator.prototype = {
-	current: null,
-	moveNext: null,
-	reset: null
-};
 
-ss.registerInterface(global, 'ss.IEnumerator', ss_IEnumerator, [ss_IDisposable]);
+ss_IEnumerator.__typeName = 'ss.IEnumerator';
+ss.IEnumerator = ss_IEnumerator;
+ss.initInterface(ss_IEnumerator, ss, { current: null, moveNext: null, reset: null }, [ss_IDisposable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IEnumerable
 
 var ss_IEnumerable = function IEnumerable$() { };
-ss_IEnumerable.prototype = {
-	getEnumerator: null
-};
 
-ss.registerInterface(global, 'ss.IEnumerable', ss_IEnumerable);
-
+ss_IEnumerable.__typeName = 'ss.IEnumerable';
+ss.IEnumerable = ss_IEnumerable;
+ss.initInterface(ss_IEnumerable, ss, { getEnumerator: null });
 ss.getEnumerator = function ss$getEnumerator(obj) {
 	return obj.getEnumerator ? obj.getEnumerator() : new ss_ArrayEnumerator(obj);
 };
@@ -2095,15 +2329,10 @@ ss.getEnumerator = function ss$getEnumerator(obj) {
 // ICollection
 
 var ss_ICollection = function ICollection$() { };
-ss_ICollection.prototype = {
-	get_count: null,
-	add: null,
-	clear: null,
-	contains: null,
-	remove: null
-};
 
-ss.registerInterface(global, 'ss.ICollection', ss_ICollection);
+ss_ICollection.__typeName = 'ss.ICollection';
+ss.ICollection = ss_ICollection;
+ss.initInterface(ss_ICollection, ss, { get_count: null, add: null, clear: null, contains: null, remove: null });
 
 ss.count = function ss$count(obj) {
 	return obj.get_count ? obj.get_count() : obj.length;
@@ -2156,15 +2385,13 @@ var ss_TimeSpan = function TimeSpan$(ticks) {
 	this.ticks = ticks || 0;
 };
 
-ss_TimeSpan.fromValues = function TimeSpan$fromValues(days, hours, minutes, seconds, milliseconds) {
-	return new ss_TimeSpan((days * 86400000 + hours * 3600000 + minutes * 60000 + seconds * 1000 + milliseconds) * 10000);
-};
-
 ss_TimeSpan.getDefaultValue = ss_TimeSpan.createInstance = function TimeSpan$default() {
 	return new ss_TimeSpan(0);
 };
 
-ss_TimeSpan.prototype = {
+ss_TimeSpan.__typeName = 'ss.TimeSpan';
+ss.TimeSpan = ss_TimeSpan;
+ss.initClass(ss_TimeSpan, ss, {
 	compareTo: function TimeSpan$compareTo(other) {
 		return this.ticks < other.ticks ? -1 : (this.ticks > other.ticks ? 1 : 0);
 	},
@@ -2172,7 +2399,7 @@ ss_TimeSpan.prototype = {
 		return ss.isInstanceOfType(other, ss_TimeSpan) && other.ticks === this.ticks;
 	},
 	equalsT: function TimeSpan$equalsT(other) {
-		return this.equals(other);
+		return other.ticks === this.ticks;
 	},
 	toString: function TimeSpan$toString() {
 		var d = function(s, n) { return ss.padLeftString(s + '', n || 2, 48); };
@@ -2193,115 +2420,119 @@ ss_TimeSpan.prototype = {
 			result += '.' + d(ticks, 7);
 		return result;
 	}
-};
-
-ss.registerClass(global, 'ss.TimeSpan', ss_TimeSpan, null, [ss_IComparable, ss_IEquatable]);
+}, null, [ss_IComparable, ss_IEquatable]);
 ss_TimeSpan.__class = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 // IEqualityComparer
 
 var ss_IEqualityComparer = function IEqualityComparer$() { };
-ss_IEqualityComparer.prototype = {
-	areEqual: null,
-	getObjectHashCode: null
-};
 
-ss.registerInterface(global, 'ss.IEqualityComparer', ss_IEqualityComparer);
+ss_IEqualityComparer.__typeName = 'ss.IEqualityComparer';
+ss.IEqualityComparer = ss_IEqualityComparer;
+ss.initInterface(ss_IEqualityComparer, ss, { areEqual: null, getObjectHashCode: null });
 
 ///////////////////////////////////////////////////////////////////////////////
 // IComparer
 
 var ss_IComparer = function IComparer$() { };
-ss_IComparer.prototype = {
-	compare: null
-};
 
-ss.registerInterface(global, 'ss.IComparer', ss_IComparer);
+ss_IComparer.__typeName = 'ss.IComparer';
+ss.IComparer = ss_IComparer;
+ss.initInterface(ss_IComparer, ss, { compare: null });
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nullable
 
-var ss_Nullable = function Nullable$() {
-};
-
-ss.registerClass(global, 'ss.Nullable', ss_Nullable);
-
-ss_Nullable.unbox = function Nullable$unbox(instance) {
+ss.unbox = function ss$unbox(instance) {
 	if (!ss.isValue(instance))
-		throw 'Instance is null';
+		throw new ss_InvalidOperationException('Nullable object must have a value.');
 	return instance;
 };
 
-ss_Nullable.eq = function Nullable$eq(a, b) {
+var ss_Nullable$1 = function Nullable$1$(T) {
+	var $type = function() {
+	};
+	$type.isInstanceOfType = function(instance) {
+		return ss.isInstanceOfType(instance, T);
+	};
+	ss.registerGenericClassInstance($type, ss_Nullable$1, [T], {}, function() { return null; }, function() { return []; });
+	return $type;
+};
+
+ss_Nullable$1.__typeName = 'ss.Nullable$1';
+ss.Nullable$1 = ss_Nullable$1;
+ss.initGenericClass(ss_Nullable$1, ss, 1);
+
+ss_Nullable$1.eq = function Nullable$eq(a, b) {
 	return !ss.isValue(a) ? !ss.isValue(b) : (a === b);
 };
 
-ss_Nullable.ne = function Nullable$eq(a, b) {
+ss_Nullable$1.ne = function Nullable$eq(a, b) {
 	return !ss.isValue(a) ? ss.isValue(b) : (a !== b);
 };
 
-ss_Nullable.le = function Nullable$le(a, b) {
+ss_Nullable$1.le = function Nullable$le(a, b) {
 	return ss.isValue(a) && ss.isValue(b) && a <= b;
 };
 
-ss_Nullable.ge = function Nullable$ge(a, b) {
+ss_Nullable$1.ge = function Nullable$ge(a, b) {
 	return ss.isValue(a) && ss.isValue(b) && a >= b;
 };
 
-ss_Nullable.lt = function Nullable$lt(a, b) {
+ss_Nullable$1.lt = function Nullable$lt(a, b) {
 	return ss.isValue(a) && ss.isValue(b) && a < b;
 };
 
-ss_Nullable.gt = function Nullable$gt(a, b) {
+ss_Nullable$1.gt = function Nullable$gt(a, b) {
 	return ss.isValue(a) && ss.isValue(b) && a > b;
 };
 
-ss_Nullable.sub = function Nullable$sub(a, b) {
+ss_Nullable$1.sub = function Nullable$sub(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a - b : null;
 };
 
-ss_Nullable.add = function Nullable$add(a, b) {
+ss_Nullable$1.add = function Nullable$add(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a + b : null;
 };
 
-ss_Nullable.mod = function Nullable$mod(a, b) {
+ss_Nullable$1.mod = function Nullable$mod(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a % b : null;
 };
 
-ss_Nullable.div = function Nullable$divf(a, b) {
+ss_Nullable$1.div = function Nullable$divf(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a / b : null;
 };
 
-ss_Nullable.mul = function Nullable$mul(a, b) {
+ss_Nullable$1.mul = function Nullable$mul(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a * b : null;
 };
 
-ss_Nullable.band = function Nullable$band(a, b) {
+ss_Nullable$1.band = function Nullable$band(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a & b : null;
 };
 
-ss_Nullable.bor = function Nullable$bor(a, b) {
+ss_Nullable$1.bor = function Nullable$bor(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a | b : null;
 };
 
-ss_Nullable.xor = function Nullable$xor(a, b) {
+ss_Nullable$1.xor = function Nullable$xor(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a ^ b : null;
 };
 
-ss_Nullable.shl = function Nullable$shl(a, b) {
+ss_Nullable$1.shl = function Nullable$shl(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a << b : null;
 };
 
-ss_Nullable.srs = function Nullable$srs(a, b) {
+ss_Nullable$1.srs = function Nullable$srs(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a >> b : null;
 };
 
-ss_Nullable.sru = function Nullable$sru(a, b) {
+ss_Nullable$1.sru = function Nullable$sru(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a >>> b : null;
 };
 
-ss_Nullable.and = function Nullable$and(a, b) {
+ss_Nullable$1.and = function Nullable$and(a, b) {
 	if (a === true && b === true)
 		return true;
 	else if (a === false || b === false)
@@ -2310,7 +2541,7 @@ ss_Nullable.and = function Nullable$and(a, b) {
 		return null;
 };
 
-ss_Nullable.or = function Nullable$or(a, b) {
+ss_Nullable$1.or = function Nullable$or(a, b) {
 	if (a === true || b === true)
 		return true;
 	else if (a === false && b === false)
@@ -2319,19 +2550,19 @@ ss_Nullable.or = function Nullable$or(a, b) {
 		return null;
 };
 
-ss_Nullable.not = function Nullable$not(a) {
+ss_Nullable$1.not = function Nullable$not(a) {
 	return ss.isValue(a) ? !a : null;
 };
 
-ss_Nullable.neg = function Nullable$neg(a) {
+ss_Nullable$1.neg = function Nullable$neg(a) {
 	return ss.isValue(a) ? -a : null;
 };
 
-ss_Nullable.pos = function Nullable$pos(a) {
+ss_Nullable$1.pos = function Nullable$pos(a) {
 	return ss.isValue(a) ? +a : null;
 };
 
-ss_Nullable.cpl = function Nullable$cpl(a) {
+ss_Nullable$1.cpl = function Nullable$cpl(a) {
 	return ss.isValue(a) ? ~a : null;
 };
 
@@ -2339,15 +2570,10 @@ ss_Nullable.cpl = function Nullable$cpl(a) {
 // IList
 
 var ss_IList = function IList$() { };
-ss_IList.prototype = {
-	get_item: null,
-	set_item: null,
-	indexOf: null,
-	insert: null,
-	removeAt: null
-};
 
-ss.registerInterface(global, 'ss.IList', ss_IList, [ss_ICollection, ss_IEnumerable]);
+ss_IList.__typeName = 'ss.IList';
+ss.IList = ss_IList;
+ss.initInterface(ss_IList, ss, { get_item: null, set_item: null, indexOf: null, insert: null, removeAt: null }, [ss_ICollection, ss_IEnumerable]);
 
 ss.getItem = function ss$getItem(obj, index) {
 	return obj.get_item ? obj.get_item(index) : obj[index];
@@ -2392,25 +2618,19 @@ ss.removeAt = function ss$removeAt(obj, index) {
 // IDictionary
 
 var ss_IDictionary = function IDictionary$() { };
-ss_IDictionary.prototype = {
-	get_item: null,
-	set_item: null,
-	get_keys: null,
-	get_values: null,
-	containsKey: null,
-	add: null,
-	remove: null,
-	tryGetValue: null
-};
 
-ss.registerInterface(global, 'ss.IDictionary', ss_IDictionary, [ss_IEnumerable]);
+ss_IDictionary.__typeName = 'ss.IDictionary';
+ss.IDictionary = ss_IDictionary;
+ss.initInterface(ss_IDictionary, ss, { get_item: null, set_item: null, get_keys: null, get_values: null, containsKey: null, add: null, remove: null, tryGetValue: null }, [ss_IEnumerable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Int32
 
 var ss_Int32 = function Int32$() { };
 
-ss.registerClass(global, 'ss.Int32', ss_Int32, Object, [ ss_IEquatable, ss_IComparable, ss_IFormattable ]);
+ss_Int32.__typeName = 'ss.Int32';
+ss.Int32 = ss_Int32;
+ss.initClass(ss_Int32, ss, {}, Object, [ ss_IEquatable, ss_IComparable, ss_IFormattable ]);
 ss_Int32.__class = false;
 
 ss_Int32.isInstanceOfType = function Int32$isInstanceOfType(instance) {
@@ -2422,7 +2642,9 @@ ss_Int32.getDefaultValue = ss_Int32.createInstance = function Int32$getDefaultVa
 };
 
 ss_Int32.div = function Int32$div(a, b) {
-	return ss.isValue(a) && ss.isValue(b) ? (a / b) | 0 : null;
+	if (!ss.isValue(a) || !ss.isValue(b)) return null;
+	if (b === 0) throw new ss_DivideByZeroException();
+	return a / b | 0;
 };
 
 ss_Int32.trunc = function Int32$trunc(n) {
@@ -2445,7 +2667,9 @@ ss_Int32.tryParse = function Int32$tryParse(s, result, min, max) {
 
 var ss_JsDate = function JsDate$() { };
 
-ss.registerClass(global, 'ss.JsDate', ss_JsDate, Object, [ ss_IEquatable, ss_IComparable ]);
+ss_JsDate.__typeName = 'ss.JsDate';
+ss.JsDate = ss_JsDate;
+ss.initClass(ss_JsDate, ss, {}, Object, [ ss_IEquatable, ss_IComparable ]);
 
 ss_JsDate.createInstance = function JsDate$createInstance() {
 	return new Date();
@@ -2462,7 +2686,9 @@ var ss_ArrayEnumerator = function ArrayEnumerator$(array) {
 	this._array = array;
 	this._index = -1;
 };
-ss_ArrayEnumerator.prototype = {
+ss_ArrayEnumerator.__typeName = 'ss.ArrayEnumerator';
+ss.ArrayEnumerator = ss_ArrayEnumerator;
+ss.initClass(ss_ArrayEnumerator, ss, {
 	moveNext: function ArrayEnumerator$moveNext() {
 		this._index++;
 		return (this._index < this._array.length);
@@ -2477,9 +2703,7 @@ ss_ArrayEnumerator.prototype = {
 	},
 	dispose: function ArrayEnumerator$dispose() {
 	}
-};
-
-ss.registerClass(global, 'ss.ArrayEnumerator', ss_ArrayEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
+}, null, [ss_IEnumerator, ss_IDisposable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // ObjectEnumerator
@@ -2489,7 +2713,10 @@ var ss_ObjectEnumerator = function ObjectEnumerator$(o) {
 	this._index = -1;
 	this._object = o;
 };
-ss_ObjectEnumerator.prototype = {
+
+ss_ObjectEnumerator.__typeName = 'ss.ObjectEnumerator';
+ss.ObjectEnumerator = ss_ObjectEnumerator;
+ss.initClass(ss_ObjectEnumerator, ss, {
 	moveNext: function ObjectEnumerator$moveNext() {
 		this._index++;
 		return (this._index < this._keys.length);
@@ -2499,28 +2726,29 @@ ss_ObjectEnumerator.prototype = {
 	},
 	current: function ObjectEnumerator$current() {
 		if (this._index < 0 || this._index >= this._keys.length)
-			throw 'Invalid operation';
+			throw new ss_InvalidOperationException('Invalid operation');
 		var k = this._keys[this._index];
 		return { key: k, value: this._object[k] };
 	},
 	dispose: function ObjectEnumerator$dispose() {
 	}
-};
-
-ss.registerClass(global, 'ss.ObjectEnumerator', ss_ObjectEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
+}, null, [ss_IEnumerator, ss_IDisposable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // EqualityComparer
 
 var ss_EqualityComparer = function EqualityComparer$() {
 };
-ss_EqualityComparer.prototype.areEqual = function EqualityComparer$areEqual(x, y) {
-	return ss.staticEquals(x, y);
-};
-ss_EqualityComparer.prototype.getObjectHashCode = function EqualityComparer$getObjectHashCode(obj) {
-	return ss.isValue(obj) ? ss.getHashCode(obj) : 0;
-};
-ss.registerClass(global, 'ss.EqualityComparer', ss_EqualityComparer, null, [ss_IEqualityComparer]);
+ss_EqualityComparer.__typeName = 'ss.EqualityComparer';
+ss.EqualityComparer = ss_EqualityComparer;
+ss.initClass(ss_EqualityComparer, ss, {
+	areEqual: function EqualityComparer$areEqual(x, y) {
+		return ss.staticEquals(x, y);
+	},
+	getObjectHashCode: function EqualityComparer$getObjectHashCode(obj) {
+		return ss.isValue(obj) ? ss.getHashCode(obj) : 0;
+	}
+}, null, [ss_IEqualityComparer]);
 ss_EqualityComparer.def = new ss_EqualityComparer();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2529,13 +2757,14 @@ ss_EqualityComparer.def = new ss_EqualityComparer();
 var ss_Comparer = function Comparer$(f) {
 	this.f = f;
 };
-ss_Comparer.prototype.compare = function Comparer$compare(x, y) {
-	return this.f(x, y);
-};
-ss_Comparer.create = function Comparer$create(f) {
-	return new ss_Comparer(f);
-};
-ss.registerClass(global, 'ss.Comparer', ss_Comparer, null, [ss_IComparer]);
+
+ss_Comparer.__typeName = 'ss.Comparer';
+ss.Comparer = ss_Comparer;
+ss.initClass(ss_Comparer, ss, {
+	compare: function Comparer$compare(x, y) {
+		return this.f(x, y);
+	}
+}, null, [ss_IComparer]);
 ss_Comparer.def = new ss_Comparer(ss.compare);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2543,40 +2772,6 @@ ss_Comparer.def = new ss_Comparer(ss.compare);
 var ss_$DictionaryCollection = function $DictionaryCollection$(dict, isKeys) {
 	this._dict = dict;
 	this._isKeys = isKeys;
-};
-ss_$DictionaryCollection.prototype = {
-	get_count: function $DictionaryCollection$get_count() {
-		return this._dict.get_count();
-	},
-	contains: function $DictionaryCollection$contains(v) {
-		if (this._isKeys) {
-			return this._dict.containsKey(v);
-		}
-		else {
-			for (var e in this._dict.buckets) {
-				if (this._dict.buckets.hasOwnProperty(e)) {
-					var bucket = this._dict.buckets[e];
-					for (var i = 0; i < bucket.length; i++) {
-						if (this._dict.comparer.areEqual(bucket[i].value, v))
-							return true;
-					}
-				}
-			}
-			return false;
-		}
-	},
-	getEnumerator: function $DictionaryCollection$getEnumerator(v) {
-		return this._dict._getEnumerator(this._isKeys ? function(e) { return e.key; } : function(e) { return e.value; });
-	},
-	add: function $DictionaryCollection$add(v) {
-		throw 'Collection is read-only';
-	},
-	clear: function $DictionaryCollection$clear() {
-		throw 'Collection is read-only';
-	},
-	remove: function $DictionaryCollection$remove() {
-		throw 'Collection is read-only';
-	}
 };
 
 var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
@@ -2608,7 +2803,7 @@ var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 		}
 	};
 
-	$type.prototype = {
+	ss.registerGenericClassInstance($type, ss_Dictionary$2, [TKey, TValue], {
 		_setOrAdd: function(key, value, add) {
 			var hash = this.comparer.getObjectHashCode(key);
 			var entry = { key: key, value: value };
@@ -2617,7 +2812,7 @@ var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 				for (var i = 0; i < array.length; i++) {
 					if (this.comparer.areEqual(array[i].key, key)) {
 						if (add)
-							throw 'Key ' + key + ' already exists.';
+							throw new ss_ArgumentException('Key ' + key + ' already exists.');
 						array[i] = entry;
 						return;
 					}
@@ -2653,7 +2848,7 @@ var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 		get_item: function(key) {
 			var v = this._get(key);
 			if (v === undefined)
-				throw 'Key ' + key + ' does not exist.';
+				throw new ss_KeyNotFoundException('Key ' + key + ' does not exist.');
 			return v;
 		},
 
@@ -2733,36 +2928,74 @@ var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 		getEnumerator: function() {
 			return this._getEnumerator(function(e) { return e; });
 		}
-	};
-
-	ss.registerGenericClassInstance($type, ss_Dictionary$2, [TKey, TValue], function() { return null; }, function() { return [ ss_IDictionary, ss_IEnumerable ]; });
+	}, function() { return null; }, function() { return [ ss_IDictionary, ss_IEnumerable ]; });
 	return $type;
 };
 
-ss.registerGenericClass(global, 'ss.Dictionary$2', ss_Dictionary$2, 2);
-ss.registerClass(global, 'ss.$DictionaryCollection', ss_$DictionaryCollection, null, [ss_IEnumerable, ss_ICollection]);
+ss_Dictionary$2.__typeName = 'ss.Dictionary$2';
+ss.Dictionary$2 = ss_Dictionary$2;
+ss.initGenericClass(ss_Dictionary$2, ss, 2);
+ss_$DictionaryCollection.__typeName = 'ss.$DictionaryCollection';
+ss.$DictionaryCollection = ss_$DictionaryCollection;
+ss.initClass(ss_$DictionaryCollection, ss, {
+	get_count: function $DictionaryCollection$get_count() {
+		return this._dict.get_count();
+	},
+	contains: function $DictionaryCollection$contains(v) {
+		if (this._isKeys) {
+			return this._dict.containsKey(v);
+		}
+		else {
+			for (var e in this._dict.buckets) {
+				if (this._dict.buckets.hasOwnProperty(e)) {
+					var bucket = this._dict.buckets[e];
+					for (var i = 0; i < bucket.length; i++) {
+						if (this._dict.comparer.areEqual(bucket[i].value, v))
+							return true;
+					}
+				}
+			}
+			return false;
+		}
+	},
+	getEnumerator: function $DictionaryCollection$getEnumerator(v) {
+		return this._dict._getEnumerator(this._isKeys ? function(e) { return e.key; } : function(e) { return e.value; });
+	},
+	add: function $DictionaryCollection$add(v) {
+		throw new ss_InvalidOperationException('Collection is read-only');
+	},
+	clear: function $DictionaryCollection$clear() {
+		throw new ss_InvalidOperationException('Collection is read-only');
+	},
+	remove: function $DictionaryCollection$remove() {
+		throw new ss_InvalidOperationException('Collection is read-only');
+	}
+}, null, [ss_IEnumerable, ss_ICollection]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IDisposable
 
 var ss_IDisposable = function IDisposable$() { };
-ss_IDisposable.prototype = {
-	dispose: null
-};
-ss.registerInterface(global, 'ss.IDisposable', ss_IDisposable);
+ss_IDisposable.__typeName = 'ss.IDisposable';
+ss.IDisposable = ss_IDisposable;
+ss.initInterface(ss_IDisposable, ss, { dispose: null });
 
 ///////////////////////////////////////////////////////////////////////////////
 // StringBuilder
 
 var ss_StringBuilder = function StringBuilder$(s) {
-	this._parts = ss.isNullOrUndefined(s) || s === '' ? [] : [s];
-	this.isEmpty = this._parts.length == 0;
+	this._parts = (ss.isValue(s) && s != '') ? [s] : [];
+	this.length = ss.isValue(s) ? s.length : 0;
 }
-ss_StringBuilder.prototype = {
-	append: function StringBuilder$append(s) {
-		if (!ss.isNullOrUndefined(s) && s !== '') {
+
+ss_StringBuilder.__typeName = 'ss.StringBuilder';
+ss.StringBuilder = ss_StringBuilder;
+ss.initClass(ss_StringBuilder, ss, {
+	append: function StringBuilder$append(o) {
+		if (ss.isValue(o)) {
+			var s = o.toString();
 			ss.add(this._parts, s);
-			this.isEmpty = false;
+			this.length += s.length;
 		}
 		return this;
 	},
@@ -2774,7 +3007,6 @@ ss_StringBuilder.prototype = {
 	appendLine: function StringBuilder$appendLine(s) {
 		this.append(s);
 		this.append('\r\n');
-		this.isEmpty = false;
 		return this;
 	},
 
@@ -2784,15 +3016,13 @@ ss_StringBuilder.prototype = {
 
 	clear: function StringBuilder$clear() {
 		this._parts = [];
-		this.isEmpty = true;
+		this.length = 0;
 	},
 
 	toString: function StringBuilder$toString() {
 		return this._parts.join('');
 	}
-};
-
-ss.registerClass(global, 'ss.StringBuilder', ss_StringBuilder);
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // Random
@@ -2828,7 +3058,9 @@ var ss_Random = function Random$(seed) {
 	}
 };
 
-ss_Random.prototype = {
+ss_Random.__typeName = 'ss.Random';
+ss.Random = ss_Random;
+ss.initClass(ss_Random, ss, {
 	next: function Random$next() {
 		return this.sample() * 2147483648 | 0;
 	},
@@ -2860,16 +3092,16 @@ ss_Random.prototype = {
 
 		return retVal * (1.0 / 2147483648);
 	}
-};
-
-ss.registerClass(global, 'ss.Random', ss_Random);
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // EventArgs
 
 var ss_EventArgs = function EventArgs$() {
 }
-ss.registerClass(global, 'ss.EventArgs', ss_EventArgs);
+ss_EventArgs.__typeName = 'ss.EventArgs';
+ss.EventArgs = ss_EventArgs;
+ss.initClass(ss_EventArgs, ss, {});
 
 ss_EventArgs.Empty = new ss_EventArgs();
 
@@ -2877,23 +3109,32 @@ ss_EventArgs.Empty = new ss_EventArgs();
 // Exception
 
 var ss_Exception = function Exception$(message, innerException) {
-	this._message = message || null;
+	this._message = message || 'An error occurred.';
 	this._innerException = innerException || null;
 }
-ss.registerClass(global, 'ss.Exception', ss_Exception);
 
-ss_Exception.prototype = {
+ss_Exception.__typeName = 'ss.Exception';
+ss.Exception = ss_Exception;
+ss.initClass(ss_Exception, ss, {
 	get_message: function Exception$get_message() {
 		return this._message;
 	},
 	get_innerException: function Exception$get_innerException() {
 		return this._innerException;
 	}
-};
+});
 
 ss_Exception.wrap = function Exception$wrap(o) {
 	if (ss.isInstanceOfType(o, ss_Exception)) {
 		return o;
+	}
+	else if (o instanceof TypeError) {
+		// TypeError can either be 'cannot read property blah of null/undefined' (proper NullReferenceException), or it can be eg. accessing a non-existent method of an object.
+		// As long as all code is compiled, they should with a very high probability indicate the use of a null reference.
+		return new ss_NullReferenceException(o.message);
+	}
+	else if (o instanceof RangeError) {
+		return new ss_ArgumentOutOfRangeException(null, o.message);
 	}
 	else if (o instanceof Error) {
 		return new ss_JsErrorException(o);
@@ -2904,60 +3145,180 @@ ss_Exception.wrap = function Exception$wrap(o) {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+// NotImplementedException
+
+var ss_NotImplementedException = function NotImplementedException$(message, innerException) {
+	ss_Exception.call(this, message || 'The method or operation is not implemented.', innerException);
+};
+ss_NotImplementedException.__typeName = 'ss.NotImplementedException';
+ss.NotImplementedException = ss_NotImplementedException;
+ss.initClass(ss_NotImplementedException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
 // NotSupportedException
 
 var ss_NotSupportedException = function NotSupportedException$(message, innerException) {
-	ss_Exception.call(this, message, innerException);
+	ss_Exception.call(this, message || 'Specified method is not supported.', innerException);
 };
-ss.registerClass(global, 'ss.NotSupportedException', ss_NotSupportedException, ss_Exception);
+ss_NotSupportedException.__typeName = 'ss.NotSupportedException';
+ss.NotSupportedException = ss_NotSupportedException;
+ss.initClass(ss_NotSupportedException, ss, {}, ss_Exception);
 
 ////////////////////////////////////////////////////////////////////////////////
 // AggregateException
 
 var ss_AggregateException = function AggregateException$(message, innerExceptions) {
-	if (typeof(message) !== 'string') {
-		innerExceptions = message;
-		message = 'One or more errors occurred.';
-	}
-	innerExceptions = ss.isValue(innerExceptions) ? ss.arrayFromEnumerable(innerExceptions) : null;
+	this.innerExceptions = ss.isValue(innerExceptions) ? ss.arrayFromEnumerable(innerExceptions) : [];
+	ss_Exception.call(this, message || 'One or more errors occurred.', this.innerExceptions.length ? this.innerExceptions[0] : null);
+};
 
-	ss_Exception.call(this, message, innerExceptions && innerExceptions.length ? innerExceptions[0] : null);
-	this._innerExceptions = innerExceptions;
-};
-ss_AggregateException.prototype = {
-	get_innerExceptions: function AggregateException$get_innerExceptions() {
-		return this._innerExceptions;
-	}
-};
-ss.registerClass(global, 'ss.AggregateException', ss_AggregateException, ss_Exception);
+ss_AggregateException.__typeName = 'ss.AggregateException';
+ss.AggregateException = ss_AggregateException;
+ss.initClass(ss_AggregateException, ss, {}, ss_Exception);
 
 ////////////////////////////////////////////////////////////////////////////////
 // PromiseException
 
-var ss_PromiseException = function PromiseException(args) {
-	ss_Exception.call(this, args[0] ? args[0].toString() : 'An error occurred');
-	this._arguments = ss.arrayClone(args);
+var ss_PromiseException = function PromiseException(args, message, innerException) {
+	ss_Exception.call(this, message || (args.length && args[0] ? args[0].toString() : 'An error occurred'), innerException);
+	this.arguments = ss.arrayClone(args);
 };
-ss_PromiseException.prototype = {
+
+ss_PromiseException.__typeName = 'ss.PromiseException';
+ss.PromiseException = ss_PromiseException;
+ss.initClass(ss_PromiseException, ss, {
 	get_arguments: function PromiseException$get_arguments() {
 		return this._arguments;
 	}
-};
-ss.registerClass(global, 'ss.PromiseException', ss_PromiseException, ss_Exception);
+}, ss_Exception);
 
 ////////////////////////////////////////////////////////////////////////////////
 // JsErrorException
 
-var ss_JsErrorException = function JsErrorException$(error) {
-	ss_Exception.call(this, error.message);
-	this._error = error;
+var ss_JsErrorException = function JsErrorException$(error, message, innerException) {
+	ss_Exception.call(this, message || error.message, innerException);
+	this.error = error;
 };
-ss_JsErrorException.prototype = {
-	get_error: function JsErrorException$get_error() {
-		return this._error;
+ss_JsErrorException.__typeName = 'ss.JsErrorException';
+ss.JsErrorException = ss_JsErrorException;
+ss.initClass(ss_JsErrorException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// ArgumentException
+
+var ss_ArgumentException = function ArgumentException$(message, paramName, innerException) {
+	ss_Exception.call(this, message || 'Value does not fall within the expected range.', innerException);
+	this.paramName = paramName || null;
+};
+
+ss_ArgumentException.__typeName = 'ss.ArgumentException';
+ss.ArgumentException = ss_ArgumentException;
+ss.initClass(ss_ArgumentException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// ArgumentNullException
+
+var ss_ArgumentNullException = function ArgumentNullException$(paramName, message, innerException) {
+	if (!message) {
+		message = 'Value cannot be null.';
+		if (paramName)
+			message += '\nParameter name: ' + paramName;
 	}
+
+	ss_ArgumentException.call(this, message, paramName, innerException);
 };
-ss.registerClass(global, 'ss.JsErrorException', ss_JsErrorException, ss_Exception);
+
+ss_ArgumentNullException.__typeName = 'ss.ArgumentNullException';
+ss.ArgumentNullException = ss_ArgumentNullException;
+ss.initClass(ss_ArgumentNullException, ss, {}, ss_ArgumentException);
+
+////////////////////////////////////////////////////////////////////////////////
+// ArgumentNullException
+
+var ss_ArgumentOutOfRangeException = function ArgumentOutOfRangeException$(paramName, message, innerException, actualValue) {
+	if (!message) {
+		message = 'Value is out of range.';
+		if (paramName)
+			message += '\nParameter name: ' + paramName;
+	}
+
+	ss_ArgumentException.call(this, message, paramName, innerException);
+	this.actualValue = actualValue || null;
+};
+
+ss_ArgumentOutOfRangeException.__typeName = 'ss.ArgumentOutOfRangeException';
+ss.ArgumentOutOfRangeException = ss_ArgumentOutOfRangeException;
+ss.initClass(ss_ArgumentOutOfRangeException, ss, {}, ss_ArgumentException);
+
+////////////////////////////////////////////////////////////////////////////////
+// FormatException
+
+var ss_FormatException = function FormatException$(message, innerException) {
+	ss_Exception.call(this, message || 'Invalid format.', innerException);
+};
+ss_FormatException.__typeName = 'ss.FormatException';
+ss.FormatException = ss_FormatException;
+ss.initClass(ss_FormatException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// DivideByZeroException
+
+var ss_DivideByZeroException = function DivideByZeroException$(message, innerException) {
+	ss_Exception.call(this, message || 'Division by 0.', innerException);
+};
+ss_DivideByZeroException.__typeName = 'ss.DivideByZeroException';
+ss.DivideByZeroException = ss_DivideByZeroException;
+ss.initClass(ss_DivideByZeroException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// InvalidCastException
+
+var ss_InvalidCastException = function InvalidCastException$(message, innerException) {
+	ss_Exception.call(this, message || 'The cast is not valid.', innerException);
+};
+ss_InvalidCastException.__typeName = 'ss.InvalidCastException';
+ss.InvalidCastException = ss_InvalidCastException;
+ss.initClass(ss_InvalidCastException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// InvalidOperationException
+
+var ss_InvalidOperationException = function InvalidOperationException$(message, innerException) {
+	ss_Exception.call(this, message || 'Operation is not valid due to the current state of the object.', innerException);
+};
+ss_InvalidOperationException.__typeName = 'ss.InvalidOperationException';
+ss.InvalidOperationException = ss_InvalidOperationException;
+ss.initClass(ss_InvalidOperationException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// NullReferenceException
+
+var ss_NullReferenceException = function NullReferenceException$(message, innerException) {
+	ss_Exception.call(this, message || 'Object is null.', innerException);
+};
+ss_NullReferenceException.__typeName = 'ss.NullReferenceException';
+ss.NullReferenceException = ss_NullReferenceException;
+ss.initClass(ss_NullReferenceException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// KeyNotFoundException
+
+var ss_KeyNotFoundException = function KeyNotFoundException$(message, innerException) {
+	ss_Exception.call(this, message || 'Key not found.', innerException);
+};
+ss_KeyNotFoundException.__typeName = 'ss.KeyNotFoundException';
+ss.KeyNotFoundException = ss_KeyNotFoundException;
+ss.initClass(ss_KeyNotFoundException, ss, {}, ss_Exception);
+
+////////////////////////////////////////////////////////////////////////////////
+// InvalidOperationException
+
+var ss_AmbiguousMatchException = function AmbiguousMatchException$(message, innerException) {
+	ss_Exception.call(this, message || 'Ambiguous match.', innerException);
+};
+ss_AmbiguousMatchException.__typeName = 'ss.AmbiguousMatchException';
+ss.AmbiguousMatchException = ss_AmbiguousMatchException;
+ss.initClass(ss_AmbiguousMatchException, ss, {}, ss_Exception);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IteratorBlockEnumerable
@@ -2967,13 +3328,13 @@ var ss_IteratorBlockEnumerable = function IteratorBlockEnumerable$(getEnumerator
 	this._this = $this;
 };
 
-ss_IteratorBlockEnumerable.prototype = {
+ss_IteratorBlockEnumerable.__typeName = 'ss.IteratorBlockEnumerable';
+ss.IteratorBlockEnumerable = ss_IteratorBlockEnumerable;
+ss.initClass(ss_IteratorBlockEnumerable, ss, {
 	getEnumerator: function IteratorBlockEnumerable$getEnumerator() {
 		return this._getEnumerator.call(this._this);
 	}
-};
-
-ss.registerClass(global, 'ss.IteratorBlockEnumerable', ss_IteratorBlockEnumerable, null, [ss_IEnumerable]);
+}, null, [ss_IEnumerable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // IteratorBlockEnumerator
@@ -2985,7 +3346,9 @@ var ss_IteratorBlockEnumerator = function IteratorBlockEnumerator$(moveNext, get
 	this._this = $this;
 };
 
-ss_IteratorBlockEnumerator.prototype = {
+ss_IteratorBlockEnumerator.__typeName = 'ss.IteratorBlockEnumerator';
+ss.IteratorBlockEnumerator = ss_IteratorBlockEnumerator;
+ss.initClass(ss_IteratorBlockEnumerator, ss, {
 	moveNext: function IteratorBlockEnumerator$moveNext() {
 		try {
 			return this._moveNext.call(this._this);
@@ -3006,9 +3369,7 @@ ss_IteratorBlockEnumerator.prototype = {
 		if (this._dispose)
 			this._dispose.call(this._this);
 	}
-};
-
-ss.registerClass(global, 'ss.IteratorBlockEnumerator', ss_IteratorBlockEnumerator, null, [ss_IEnumerator, ss_IDisposable]);
+}, null, [ss_IEnumerator, ss_IDisposable]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Lazy
@@ -3017,16 +3378,18 @@ var ss_Lazy = function Lazy$(valueFactory) {
 	this._valueFactory = valueFactory;
 	this.isValueCreated = false;
 };
-ss_Lazy.prototype.value = function Lazy$value() {
-	if (!this.isValueCreated) {
-		this._value = this._valueFactory();
-		delete this._valueFactory;
-		this.isValueCreated = true;
+ss_Lazy.__typeName = 'ss.Lazy';
+ss.Lazy = ss_Lazy;
+ss.initClass(ss_Lazy, ss, {
+	value: function Lazy$value() {
+		if (!this.isValueCreated) {
+			this._value = this._valueFactory();
+			delete this._valueFactory;
+			this.isValueCreated = true;
+		}
+		return this._value;
 	}
-	return this._value;
-};
-ss.registerClass(global, 'ss.Lazy', ss_Lazy);
-
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // Task
@@ -3038,96 +3401,6 @@ var ss_Task = function Task$(action, state) {
 	this.status = 0;
 	this._thens = [];
 	this._result = null;
-};
-
-ss_Task.prototype = {
-	continueWith: function Task$continueWith(continuation) {
-		var tcs = new ss_TaskCompletionSource();
-		var _this = this;
-		var fn = function() {
-			try {
-				tcs.setResult(continuation(_this));
-			}
-			catch (e) {
-				tcs.setException(ss_Exception.wrap(e));
-			}
-		};
-		if (this.isCompleted()) {
-			setTimeout(fn, 0);
-		}
-		else {
-			this._thens.push(fn);
-		}
-		return tcs.task;
-	},
-	start: function Task$start() {
-		if (this.status !== 0)
-			throw 'Task was already started.';
-		var _this = this;
-		this.status = 3;
-		setTimeout(function() {
-			try {
-				var result = _this._action(_this._state);
-				delete _this._action;
-				delete _this._state;
-				_this._complete(result);
-			}
-			catch (e) {
-				_this._fail(new ss_AggregateException([ss_Exception.wrap(e)]));
-			}
-		}, 0);
-	},
-	_runCallbacks: function Task$_runCallbacks() {
-		for (var i = 0; i < this._thens.length; i++)
-			this._thens[i](this);
-		delete this._thens;
-	},
-	_complete: function Task$_complete(result) {
-		if (this.isCompleted())
-			return false;
-		this._result = result;
-		this.status = 5;
-		this._runCallbacks();
-		return true;
-	},
-	_fail: function Task$_fail(exception) {
-		if (this.isCompleted())
-			return false;
-		this.exception = exception;
-		this.status = 7;
-		this._runCallbacks();
-		return true;
-	},
-	_cancel: function Task$_cancel() {
-		if (this.isCompleted())
-			return false;
-		this.status = 6;
-		this._runCallbacks();
-		return true;
-	},
-	isCanceled: function Task$isCanceled() {
-		return this.status === 6;
-	},
-	isCompleted: function Task$isCompleted() {
-		return this.status >= 5;
-	},
-	isFaulted: function Task$isFaulted() {
-		return this.status === 7;
-	},
-	getResult: function Task$getResult() {
-		switch (this.status) {
-			case 5:
-				return this._result;
-			case 6:
-				throw 'Task was cancelled.';
-			case 7:
-				throw this.exception;
-			default:
-				throw 'Task is not yet completed.';
-		}
-	},
-	dispose: function Task$dispose() {
-	}
 };
 
 ss_Task.delay = function Task$delay(delay) {
@@ -3176,10 +3449,10 @@ ss_Task.whenAll = function Task$whenAll(tasks) {
 							cancelled = true;
 							break;
 						case 7:
-							ss.arrayAddRange(exceptions, t.exception.get_innerExceptions());
+							ss.arrayAddRange(exceptions, t.exception.innerExceptions);
 							break;
 						default:
-							throw 'Invalid task status ' + t.status;
+							throw new ss_InvalidOperationException('Invalid task status ' + t.status);
 					}
 					if (--remaining === 0) {
 						if (exceptions.length > 0)
@@ -3198,7 +3471,7 @@ ss_Task.whenAll = function Task$whenAll(tasks) {
 
 ss_Task.whenAny = function Task$whenAny(tasks) {
 	if (!tasks.length)
-		throw 'Must wait for at least one task';
+		throw new ss_ArgumentException('Must wait for at least one task', 'tasks');
 
 	var tcs = new ss_TaskCompletionSource();
 	for (var i = 0; i < tasks.length; i++) {
@@ -3211,10 +3484,10 @@ ss_Task.whenAny = function Task$whenAny(tasks) {
 					tcs.trySetCanceled();
 					break;
 				case 7:
-					tcs.trySetException(t.exception.get_innerExceptions());
+					tcs.trySetException(t.exception.innerExceptions);
 					break;
 				default:
-					throw 'Invalid task status ' + t.status;
+					throw new ss_InvalidOperationException('Invalid task status ' + t.status);
 			}
 		});
 	}
@@ -3223,22 +3496,22 @@ ss_Task.whenAny = function Task$whenAny(tasks) {
 
 ss_Task.fromDoneCallback = function Task$fromDoneCallback(t, i, m) {
 	var tcs = new ss_TaskCompletionSource(), args;
-    if (typeof(i) === 'number') {
-        args = Array.prototype.slice.call(arguments, 3);
-        if (i < 0)
-            i += args.length + 1;
-    }
-    else {
-        args = Array.prototype.slice.call(arguments, 2);
-        m = i;
-        i = args.length;
-    }
+	if (typeof(i) === 'number') {
+		args = Array.prototype.slice.call(arguments, 3);
+		if (i < 0)
+			i += args.length + 1;
+	}
+	else {
+		args = Array.prototype.slice.call(arguments, 2);
+		m = i;
+		i = args.length;
+	}
 
 	var cb = function(v) {
 		tcs.setResult(v);
 	};
 	
-    args = args.slice(0, i).concat(cb, args.slice(i));
+	args = args.slice(0, i).concat(cb, args.slice(i));
 
 	t[m].apply(t, args);
 	return tcs.task;
@@ -3248,8 +3521,8 @@ ss_Task.fromPromise = function Task$fromPromise(p, f) {
 	var tcs = new ss_TaskCompletionSource();
 	if (typeof(f) === 'number')
 		f = (function(i) { return function() { return arguments[i >= 0 ? i : (arguments.length + i)]; }; })(f);
-    else if (typeof(f) !== 'function')
-        f = function() { return Array.prototype.slice.call(arguments, 0); };
+	else if (typeof(f) !== 'function')
+		f = function() { return Array.prototype.slice.call(arguments, 0); };
 
 	p.then(function() {
 		tcs.setResult(typeof(f) === 'function' ? f.apply(null, arguments) : null);
@@ -3261,14 +3534,14 @@ ss_Task.fromPromise = function Task$fromPromise(p, f) {
 
 ss_Task.fromNode = function  Task$fromNode(t, f, m) {
 	var tcs = new ss_TaskCompletionSource(), args;
-    if (typeof(f) === 'function') {
-        args = Array.prototype.slice.call(arguments, 3);
-    }
-    else {
-        args = Array.prototype.slice.call(arguments, 2);
-        m = f;
+	if (typeof(f) === 'function') {
+		args = Array.prototype.slice.call(arguments, 3);
+	}
+	else {
+		args = Array.prototype.slice.call(arguments, 2);
+		m = f;
 		f = function() { return arguments[0]; };
-    }
+	}
 
 	var cb = function(e) {
 		if (e)
@@ -3283,14 +3556,105 @@ ss_Task.fromNode = function  Task$fromNode(t, f, m) {
 	return tcs.task;
 };
 
-ss.registerClass(global, 'ss.Task', ss_Task, null, [ss_IDisposable]);
+ss_Task.__typeName = 'ss.Task';
+ss.Task = ss_Task;
+ss.initClass(ss_Task, ss, {
+	continueWith: function Task$continueWith(continuation) {
+		var tcs = new ss_TaskCompletionSource();
+		var _this = this;
+		var fn = function() {
+			try {
+				tcs.setResult(continuation(_this));
+			}
+			catch (e) {
+				tcs.setException(ss_Exception.wrap(e));
+			}
+		};
+		if (this.isCompleted()) {
+			setTimeout(fn, 0);
+		}
+		else {
+			this._thens.push(fn);
+		}
+		return tcs.task;
+	},
+	start: function Task$start() {
+		if (this.status !== 0)
+			throw new ss_InvalidOperationException('Task was already started.');
+		var _this = this;
+		this.status = 3;
+		setTimeout(function() {
+			try {
+				var result = _this._action(_this._state);
+				delete _this._action;
+				delete _this._state;
+				_this._complete(result);
+			}
+			catch (e) {
+				_this._fail(new ss_AggregateException(null, [ss_Exception.wrap(e)]));
+			}
+		}, 0);
+	},
+	_runCallbacks: function Task$_runCallbacks() {
+		for (var i = 0; i < this._thens.length; i++)
+			this._thens[i](this);
+		delete this._thens;
+	},
+	_complete: function Task$_complete(result) {
+		if (this.isCompleted())
+			return false;
+		this._result = result;
+		this.status = 5;
+		this._runCallbacks();
+		return true;
+	},
+	_fail: function Task$_fail(exception) {
+		if (this.isCompleted())
+			return false;
+		this.exception = exception;
+		this.status = 7;
+		this._runCallbacks();
+		return true;
+	},
+	_cancel: function Task$_cancel() {
+		if (this.isCompleted())
+			return false;
+		this.status = 6;
+		this._runCallbacks();
+		return true;
+	},
+	isCanceled: function Task$isCanceled() {
+		return this.status === 6;
+	},
+	isCompleted: function Task$isCompleted() {
+		return this.status >= 5;
+	},
+	isFaulted: function Task$isFaulted() {
+		return this.status === 7;
+	},
+	getResult: function Task$getResult() {
+		switch (this.status) {
+			case 5:
+				return this._result;
+			case 6:
+				throw new ss_InvalidOperationException('Task was cancelled.');
+			case 7:
+				throw this.exception;
+			default:
+				throw new ss_InvalidOperationException('Task is not yet completed.');
+		}
+	},
+	dispose: function Task$dispose() {
+	}
+}, null, [ss_IDisposable]);
 
 ////////////////////////////////////////////////////////////////////////////////
 // TaskStatus
 var ss_TaskStatus = function() {
 };
-ss_TaskStatus.prototype = { created: 0, running: 3, ranToCompletion: 5, canceled: 6, faulted: 7 };
-ss.registerEnum(global, 'ss.TaskStatus', ss_TaskStatus, false);
+ss_TaskStatus.__typeName = 'ss.TaskStatus';
+ss.TaskStatus = ss_TaskStatus;
+ss.initEnum(ss_TaskStatus, ss, { created: 0, running: 3, ranToCompletion: 5, canceled: 6, faulted: 7 });
 
 ///////////////////////////////////////////////////////////////////////////////
 // TaskCompletionSource
@@ -3299,18 +3663,21 @@ var ss_TaskCompletionSource = function TaskCompletionSource$() {
 	this.task = new ss_Task();
 	this.task.status = 3;
 };
-ss_TaskCompletionSource.prototype = {
+
+ss_TaskCompletionSource.__typeName = 'ss.TaskCompletionSource';
+ss.TaskCompletionSource = ss_TaskCompletionSource;
+ss.initClass(ss_TaskCompletionSource, ss, {
 	setCanceled: function TaskCompletionSource$setCanceled() {
 		if (!this.task._cancel())
-			throw 'Task was already completed.';
+			throw new ss_InvalidOperationException('Task was already completed.');
 	},
 	setResult: function TaskCompletionSource$setResult(result) {
 		if (!this.task._complete(result))
-			throw 'Task was already completed.';
+			throw new ss_InvalidOperationException('Task was already completed.');
 	},
 	setException: function TaskCompletionSource$setException(exception) {
 		if (!this.trySetException(exception))
-			throw 'Task was already completed.';
+			throw new ss_InvalidOperationException('Task was already completed.');
 	},
 	trySetCanceled: function TaskCompletionSource$trySetCanceled() {
 		return this.task._cancel();
@@ -3322,22 +3689,117 @@ ss_TaskCompletionSource.prototype = {
 		if (!ss.isInstanceOfType(exception, ss_AggregateException)) {
 			if (ss.isInstanceOfType(exception, ss_Exception))
 				exception = [exception];
-			exception = new ss_AggregateException(exception);
+			exception = new ss_AggregateException(null, exception);
 		}
 		return this.task._fail(exception);
 	}
-};
-
-ss.registerClass(global, 'ss.TaskCompletionSource', ss_TaskCompletionSource);
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // CancelEventArgs
 
 var ss_CancelEventArgs = function CancelEventArgs$() {
-	ss_CancelEventArgs.call(this);
+	ss_EventArgs.call(this);
 	this.cancel = false;
 }
-ss.registerClass(global, 'ss.CancelEventArgs', ss_CancelEventArgs, ss_EventArgs);
+
+ss_CancelEventArgs.__typeName = 'ss.CancelEventArgs';
+ss.CancelEventArgs = ss_CancelEventArgs;
+ss.initClass(ss_CancelEventArgs, ss, {}, ss_EventArgs);
+
+///////////////////////////////////////////////////////////////////////////////
+// Guid
+
+var ss_Guid = function Guid$() {
+};
+ss_Guid.$valid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/ig;
+ss_Guid.$split = /^(.{8})(.{4})(.{4})(.{4})(.{12})$/;
+ss_Guid.empty = '00000000-0000-0000-0000-000000000000';
+ss_Guid.$rng = new ss_Random();
+
+ss_Guid.__typeName = 'ss.Guid';
+ss.Guid = ss_Guid;
+ss.initClass(ss_Guid, ss, {}, Object, [ ss_IEquatable, ss_IComparable ]);
+ss_Guid.__class = false;
+
+ss_Guid.isInstanceOfType = function Guid$isInstanceOfType(instance) {
+	return typeof(instance) === 'string' && instance.match(ss_Guid.$valid);
+};
+
+ss_Guid.getDefaultValue = ss_Guid.createInstance = function Guid$default() {
+	return ss_Guid.empty;
+};
+
+ss_Guid.parse = function Guid$parse(uuid, format) {
+	var r = {};
+	if (ss_Guid.tryParse(uuid, format, r))
+		return r.$;
+	throw new ss_FormatException('Unable to parse UUID');
+};
+
+ss_Guid.tryParse = function Guid$tryParse(uuid, format, r) {
+	r.$ = ss_Guid.empty;
+	if (!ss.isValue(uuid)) throw new ss_ArgumentNullException('uuid');
+	if (!format) {
+		var m = /^[{(]?([0-9a-f]{8})-?([0-9a-f]{4})-?([0-9a-f]{4})-?([0-9a-f]{4})-?([0-9a-f]{12})[)}]?$/ig.exec(uuid);
+		if (m) {
+			r.$ = m.slice(1).join('-').toLowerCase();
+			return true;
+		}
+	}
+	else {
+		if (format === 'N') {
+			var m = ss_Guid.$split.exec(uuid);
+			if (!m)
+				return false;
+			uuid = m.slice(1).join('-');
+		}
+		else if (format === 'B' || format === 'P') {
+			var b = format === 'B';
+			if (uuid[0] !== (b ? '{' : '(') || uuid[uuid.length - 1] !== (b ? '}' : ')'))
+				return false;
+			uuid = uuid.substr(1, uuid.length - 2);
+		}
+		if (uuid.match(ss_Guid.$valid)) {
+			r.$ = uuid.toLowerCase();
+			return true;
+		}
+	}
+	return false;
+};
+
+ss_Guid.format = function Guid$format(uuid, format) {
+	switch (format) {
+		case 'N': return uuid.replace(/-/g, '');
+		case 'B': return '{' + uuid + '}';
+		case 'P': return '(' + uuid + ')';
+		default : return uuid;
+	}
+}
+
+ss_Guid.fromBytes = function Guid$fromBytes(b) {
+	if (!b || b.length !== 16)
+		throw new ss_ArgumentException('b', 'Must be 16 bytes');
+	var s = b.map(function(x) { return ss.formatNumber(x & 0xff, 'x2'); }).join('');
+	return ss_Guid.$split.exec(s).slice(1).join('-');
+}
+
+ss_Guid.newGuid = function Guid$newGuid() {
+	var a = Array(16);
+	ss_Guid.$rng.nextBytes(a);
+	a[6] = a[6] & 0x0f | 0x40;
+	a[8] = a[8] & 0xbf | 0x80;
+	return ss_Guid.fromBytes(a);
+};
+
+ss_Guid.getBytes = function Guid$getBytes(uuid) {
+	var a = Array(16);
+	var s = uuid.replace(/-/g, '');
+	for (var i = 0; i < 16; i++) {
+		a[i] = parseInt(s.substr(i * 2, 2), 16);
+	}
+	return a;
+};
 
 if (global.ss) {
 	for (var n in ss) {
@@ -3348,3 +3810,4 @@ if (global.ss) {
 else {
 	global.ss = ss;
 }
+})(global);

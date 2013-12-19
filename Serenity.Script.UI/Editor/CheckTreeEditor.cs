@@ -90,21 +90,6 @@ namespace Serenity
             };
         }
 
-        protected override TOptions GetDefaults()
-        {
-            var opt = base.GetDefaults();
-            opt.HidePager = true;
-            opt.SelectAllOptionText = "Tümünü Seç";
-            opt.Items = new List<CheckTreeItem>
-            {
-                new CheckTreeItem { Id = "1", ParentId = null, Text = "Dummy 1" },
-                new CheckTreeItem { Id = "2", ParentId = "1", Text = "Dummy 1.2" },
-                new CheckTreeItem { Id = "3", ParentId = "1", Text = "Dummy 1.3" },
-                new CheckTreeItem { Id = "4", ParentId = null, Text = "Dummy 4" },
-            };
-            return opt;
-        }
-
         protected override SlickGrid CreateSlickGrid()
         {
             this.element.AddClass("slick-no-cell-border").AddClass("slick-no-odd-even");
@@ -426,9 +411,15 @@ namespace Serenity
         public List<CheckTreeItem> Children { get; set; }
     }
 
-    [Imported, Serializable, Reflectable]
+    [Serializable, Reflectable]
     public class CheckTreeEditorOptions : GridOptions
     {
+        public CheckTreeEditorOptions()
+        {
+            HidePager = true;
+            SelectAllOptionText = "Tümünü Seç";
+        }
+
         [Hidden]
         public List<CheckTreeItem> Items { get; set; }
         [DisplayName("Tümünü Seç Metni")]

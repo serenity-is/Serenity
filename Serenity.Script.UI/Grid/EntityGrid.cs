@@ -119,7 +119,7 @@ namespace Serenity
         protected override void EditItem(object entityOrId)
         {
             dynamic dialog = CreateEntityDialog();
-            var scriptType = Type.GetScriptType(entityOrId);
+            var scriptType = Script.TypeOf(entityOrId);
             if (scriptType == "string" || scriptType == "number")
                 dialog.loadByIdAndOpenDialog(entityOrId.As<long>());
             else

@@ -29,15 +29,6 @@ namespace Serenity
             ((dynamic)input).autoNumeric(numericOptions);
         }
 
-        protected override DecimalEditorOptions GetDefaults()
-        {
-            return new DecimalEditorOptions
-            {
-                MinValue = "0.00",
-                MaxValue = "999999999999.99"
-            };
-        }
-
         public Double? Value
         {
             get
@@ -72,6 +63,12 @@ namespace Serenity
     [Serializable, Reflectable]
     public class DecimalEditorOptions
     {
+        public DecimalEditorOptions()
+        {
+            MinValue = "0.00";
+            MaxValue = "999999999999.99";
+        }
+
         [DisplayName("Min Değer")]
         public string MinValue { get; set; }
         [DisplayName("Max Değer")]

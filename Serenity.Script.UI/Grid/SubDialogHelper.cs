@@ -16,12 +16,12 @@ namespace Serenity
             where TDialog: Widget
         {
             var widgetName = owner.WidgetName;
-            dialog.Element.Bind("ondatachange." + widgetName, (e) => {
+            dialog.Element.Bind("ondatachange." + widgetName, new jQueryEventHandler((e) => {
                 if (useTimeout)
-                    Window.SetTimeout(dataChange, 0);
+                    Window.SetTimeout((Function)dataChange, 0);
                 else
                     dataChange();
-            }).Bind("remove." + widgetName, delegate
+            })).Bind("remove." + widgetName, delegate
             {
                 dialog.Element.Unbind("ondatachange." + widgetName);
             });

@@ -14,8 +14,8 @@ namespace Serenity
         {
             var validator = form.As<jQueryValidationObject>().Validate();
 
-            object valSettings = Type.GetField(validator, "settings");
-            if (Type.GetField(valSettings, "abortHandler") != null)
+            dynamic valSettings = validator.As<dynamic>().settings;
+            if (valSettings.abortHandler != null)
                 return false;
 
             if (validateBeforeSave != null &&

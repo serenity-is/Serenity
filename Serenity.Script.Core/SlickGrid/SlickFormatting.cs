@@ -89,9 +89,9 @@ namespace Serenity
 
             JsDate date;
 
-            if (Type.GetScriptType(value) == "date")
+            if (Script.TypeOf(value) == "date")
                 date = value.As<JsDate>();
-            else if (Type.GetScriptType(value) == "string")
+            else if (Script.TypeOf(value) == "string")
             {
                 date = Q.Externals.ParseISODateTime(value.As<string>());
                 if (date == null)
@@ -133,7 +133,7 @@ namespace Serenity
                     Double.IsNaN(value.As<double>()))
                     return "";
 
-                if (Type.GetScriptType(value) == "number")
+                if (Script.TypeOf(value) == "number")
                     return Q.HtmlEncode(Q.FormatNumber(value.As<double>(), format));
 
                 var dbl = Q.ParseDecimal(value.ToString());

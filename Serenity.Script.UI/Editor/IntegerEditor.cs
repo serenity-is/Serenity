@@ -23,15 +23,6 @@ namespace Serenity
             ((dynamic)input).autoNumeric(numericOptions);
         }
 
-        protected override IntegerEditorOptions GetDefaults()
-        {
-            return new IntegerEditorOptions
-            {
-                MinValue = 0,
-                MaxValue = 2147483647
-            };
-        }
-
         public Int32? Value
         {
             get
@@ -67,6 +58,12 @@ namespace Serenity
     [Serializable, Reflectable]
     public class IntegerEditorOptions
     {
+        public IntegerEditorOptions()
+        {
+            MinValue = 0;
+            MaxValue = 2147483647;
+        }
+
         [DisplayName("Min Değer")]
         public Int64 MinValue { get; set; }
         [DisplayName("Max Değer")]

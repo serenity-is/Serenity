@@ -18,15 +18,6 @@ namespace Serenity
             });
         }
 
-        protected override MaskedEditorOptions GetDefaults()
-        {
-            return new MaskedEditorOptions
-            {
-                Mask = "",
-                Placeholder = "_"
-            };
-        }
-
         public String Value
         {
             get
@@ -44,6 +35,12 @@ namespace Serenity
     [Serializable, Reflectable]
     public class MaskedEditorOptions
     {
+        public MaskedEditorOptions()
+        {
+            Mask = "";
+            Placeholder = "_";
+        }
+
         [DisplayName("Giriş Maskesi")]
         public string Mask { get; set; }
         [DisplayName("Yer Tutucu Karakter")]

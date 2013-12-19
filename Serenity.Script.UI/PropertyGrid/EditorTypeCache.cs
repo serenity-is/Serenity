@@ -24,7 +24,7 @@ namespace Serenity
             if (nsObj == null)
                 return;
 
-            foreach (var k in Type.GetOwnPropertyNames(nsObj))
+            foreach (var k in Object.Keys(nsObj))
             {
                 var obj = nsObj.As<JsDictionary<string, object>>()[k];
 
@@ -39,7 +39,7 @@ namespace Serenity
                 if (type == null)
                     continue;
 
-                if (Type.GetScriptType(obj) == "function")
+                if (Script.TypeOf(obj) == "function")
                 {
                     var attr = type.GetCustomAttributes(typeof(EditorAttribute), false);
                     if (attr != null && attr.Length > 0)

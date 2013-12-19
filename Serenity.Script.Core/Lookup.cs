@@ -41,7 +41,7 @@ namespace Serenity
                 for (var i = 0; i < this.items.Count; i++)
                 {
                     var r = this.items[i];
-                    var v = Type.GetField(r, idField) ?? Type.GetProperty(r, idField);
+                    var v = r.As<JsDictionary<string, object>>()[idField];// ?? Type.GetProperty(r, idField);
                     if (v != null)
                         this.itemById[v] = r;
                 }

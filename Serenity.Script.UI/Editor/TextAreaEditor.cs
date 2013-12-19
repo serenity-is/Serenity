@@ -19,15 +19,6 @@ namespace Serenity
                 input.Attribute("Rows", options.Rows.Value.ToString());
         }
 
-        protected override TextAreaEditorOptions GetDefaults()
-        {
-            return new TextAreaEditorOptions
-            {
-                Cols = 80,
-                Rows = 6
-            };
-        }
-
         public string Value
         {
             get { return this.element.GetValue(); }
@@ -38,6 +29,12 @@ namespace Serenity
     [Serializable, Reflectable]
     public class TextAreaEditorOptions
     {
+        public TextAreaEditorOptions()
+        {
+            Cols = 80;
+            Rows = 6;
+        }
+
         [Hidden]
         public int? Cols { get; set; }
         [Hidden]

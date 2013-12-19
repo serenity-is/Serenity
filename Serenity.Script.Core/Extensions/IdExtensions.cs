@@ -23,7 +23,7 @@ namespace Serenity
         {
             if (!Script.IsValue(id))
                 return false;
-            else if (Type.GetScriptType(id) == "string")
+            else if (Script.TypeOf(id) == "string")
             {
                 string idStr = id.As<string>();
                 if (idStr.StartsWith("-"))
@@ -31,7 +31,7 @@ namespace Serenity
 
                 return idStr.Length > 0;
             }
-            else if (Type.GetScriptType(id) == "number")
+            else if (Script.TypeOf(id) == "number")
                 return id.As<long>() > 0;
             else
                 return true;
@@ -41,14 +41,14 @@ namespace Serenity
         {
             if (!Script.IsValue(id))
                 return false;
-            else if (Type.GetScriptType(id) == "string")
+            else if (Script.TypeOf(id) == "string")
             {
                 string idStr = id.As<string>();
                 if (idStr.StartsWith("-"))
                     return true;
                 return false;
             }
-            else if (Type.GetScriptType(id) == "number")
+            else if (Script.TypeOf(id) == "number")
                 return id.As<long>() < 0;
             else
                 return false;

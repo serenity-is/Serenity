@@ -147,7 +147,7 @@ namespace Serenity
 
             string idField = GetEntityIdField();
             if (idField != null)
-                Type.SetField(entity, idField, this.EntityId);
+                entity.As<JsDictionary<string, object>>()[idField] = this.EntityId;
 
             opt.Request = new UpdateLocalizationRequest<TEntity> 
             {

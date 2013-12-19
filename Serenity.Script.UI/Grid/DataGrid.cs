@@ -154,18 +154,18 @@ namespace Serenity
             if (activeFieldName.IsEmptyOrNull())
                 return new object();
 
-            var value = Type.GetField(entity, activeFieldName).As<Int32?>();
+            var value = entity.As<JsDictionary<string, object>>()[activeFieldName].As<Int32?>();
             if (value == null)
                 return new object();
 
-            if (Type.GetScriptType(value) == "number")
+            if (Script.TypeOf(value) == "number")
             {
                 if (IdExtensions.IsNegativeId(value.As<Int64>()))
                     return new { cssClasses = "deleted" };
                 else if (value.As<Int32>() == 0)
                     return new { cssClasses = "inactive" };
             }
-            else if (Type.GetScriptType(value) == "boolean")
+            else if (Script.TypeOf(value) == "boolean")
             {
                 if (value.As<Boolean>() == false)
                     return new { cssClasses = "deleted" };

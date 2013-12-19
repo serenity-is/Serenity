@@ -75,16 +75,22 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.2.0\tools\Assemblies\mscorlib.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.4.0\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="Saltarelle.jQuery">
-      <HintPath>..\..\packages\Saltarelle.jQuery.1.9.0\lib\Saltarelle.jQuery.dll</HintPath>
+    <Reference Include="Saltarelle.jQuery, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a4048e8fcc593f14, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Saltarelle.jQuery.1.10.1\lib\Saltarelle.jQuery.dll</HintPath>
     </Reference>
-    <Reference Include="Saltarelle.jQuery.UI">
-      <HintPath>..\..\packages\Saltarelle.jQuery.UI.1.9.3\lib\Saltarelle.jQuery.UI.dll</HintPath>
+    <Reference Include="Saltarelle.jQuery.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a4048e8fcc593f14, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Saltarelle.jQuery.UI.1.10.1\lib\Saltarelle.jQuery.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Saltarelle.Web">
-      <HintPath>..\..\packages\Saltarelle.Web.2.2.0\lib\Saltarelle.Web.dll</HintPath>
+    <Reference Include="Saltarelle.Linq">
+      <HintPath>..\..\packages\Saltarelle.Linq.2.4.0\lib\Saltarelle.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a4048e8fcc593f14, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Saltarelle.Web.3.0.1\lib\Saltarelle.Web.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -101,8 +107,8 @@
     <None Include="Resources\linq.js" />
     <None Include="Resources\mscorlib.js" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.2.0\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.2.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.2.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

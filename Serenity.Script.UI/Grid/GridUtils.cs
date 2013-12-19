@@ -75,12 +75,12 @@ namespace Serenity
                 if (searchText != null && searchText.Length > 0)
                     v.Params.ContainsText = searchText;
                 else
-                    Type.DeleteField(v.Params, "ContainsText");
+                    Script.Delete(v.Params, "ContainsText");
 
                 if (searchField != null && searchField.Length > 0)
                     v.Params.ContainsField = searchField;
                 else
-                    Type.DeleteField(v.Params, "ContainsField");
+                    Script.Delete(v.Params, "ContainsField");
 
                 if (oldSubmit != null)
                     return oldSubmit(v);
