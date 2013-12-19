@@ -8,10 +8,10 @@ namespace Serenity
     {
         protected readonly TOptions options;
 
-        protected Widget(jQueryObject element, TOptions opt)
+        protected Widget(jQueryObject element, TOptions opt = null)
             : base(element)
         {
-            this.options = jQuery.ExtendObject(new TOptions(), opt);
+            this.options = (opt ?? new TOptions());
         }
     }
 }

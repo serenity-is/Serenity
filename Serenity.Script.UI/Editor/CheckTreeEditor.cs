@@ -69,8 +69,6 @@ namespace Serenity
                 this.Value = list;
         }
 
-
-
         protected override List<ToolButton> GetButtons()
         {
             string selectAllText = options.As<CheckTreeEditorOptions>().SelectAllOptionText;
@@ -349,7 +347,7 @@ namespace Serenity
             Func<TItem, bool> getSelected)
             where TItem: class, new()
         {
-            var grd = grid.As<DataGrid<TItem, GridOptions>>();
+            var grd = grid.As<DataGrid<TItem, object>>();
             var toolbar = grd.Element.Children(".s-Toolbar");
             if (toolbar.Length == 0)
                 return;
@@ -375,7 +373,7 @@ namespace Serenity
                 CssClass = "select-all-button",
                 OnClick = delegate
                 {
-                    var grid = getGrid().As<DataGrid<TItem, GridOptions>>();
+                    var grid = getGrid().As<DataGrid<TItem, object>>();
                     var view = grid.View;
                     var btn = grid.Element.Children(".s-Toolbar").GetWidget<Toolbar>()
                         .FindButton("select-all-button").Find(".button-inner");
@@ -412,11 +410,10 @@ namespace Serenity
     }
 
     [Serializable, Reflectable]
-    public class CheckTreeEditorOptions : GridOptions
+    public class CheckTreeEditorOptions
     {
         public CheckTreeEditorOptions()
         {
-            HidePager = true;
             SelectAllOptionText = "Tümünü Seç";
         }
 

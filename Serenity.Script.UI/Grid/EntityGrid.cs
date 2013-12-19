@@ -5,17 +5,22 @@ using System.Collections.Generic;
 namespace Serenity
 {
     public abstract class EntityGrid<TEntity, TOptions> : DataGrid<TEntity, TOptions>
-        where TOptions: GridOptions, new()
         where TEntity: class, new()
+        where TOptions: class, new()
     {
         private string entityType;
         private string entityPlural;
         private string entitySingular;
         private Type entityDialogType;
 
-        public EntityGrid(jQueryObject container, TOptions opt)
+        public EntityGrid(jQueryObject container, TOptions opt = null)
             : base(container, opt)
         {
+        }
+
+        protected override bool UsePager()
+        {
+            return true;
         }
 
         protected override void CreateToolbarExtensions()
@@ -24,11 +29,8 @@ namespace Serenity
             CreateQuickSearchInput();
         }
 
-        protected override string GetTitle()
+        protected override string GetInitialTitle()
         {
-            if (options.Title != null)
-                return options.Title;
-
             return GetEntityPlural();
         }
 

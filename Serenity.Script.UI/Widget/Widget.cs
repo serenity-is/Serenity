@@ -22,6 +22,12 @@ namespace Serenity
             var self = this;
             element.Bind("remove." + widgetName, (e) => self.Destroy())
                 .Data(widgetName, this);
+
+            OnInit();
+        }
+
+        protected virtual void OnInit()
+        {
         }
 
         public virtual void Destroy()
