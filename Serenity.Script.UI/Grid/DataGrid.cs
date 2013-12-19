@@ -27,7 +27,7 @@ namespace Serenity
         protected string localTextPrefix;
         private bool isDisabled;
 
-        public DataGrid(jQueryObject container, TOptions opt)
+        public DataGrid(jQueryObject container, TOptions opt = null)
             : base(container, opt)
         {
             var self = this;

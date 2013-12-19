@@ -12,7 +12,7 @@ namespace Serenity
         private Int64? entityId;
         protected TabsObject tabs;
 
-        protected EntityDialog(TOptions opt)
+        protected EntityDialog(TOptions opt = null)
             : base(Q.NewBodyDiv(), opt)
         {
             InitTabs();

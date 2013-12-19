@@ -15,8 +15,8 @@ namespace Serenity
     {
         protected jQueryValidator validator;
 
-        protected TemplatedDialog(jQueryObject element, TOptions options)
-            : base(element ?? Q.NewBodyDiv(), options)
+        protected TemplatedDialog(jQueryObject element, TOptions opt = null)
+            : base(element ?? Q.NewBodyDiv(), opt)
         {
             InitDialog();
             InitValidator();

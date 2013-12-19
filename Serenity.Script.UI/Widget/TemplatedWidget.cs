@@ -9,8 +9,8 @@ namespace Serenity
     {
         protected string idPrefix;
 
-        protected TemplatedWidget(jQueryObject element, TOptions options)
-            : base(element, options)
+        protected TemplatedWidget(jQueryObject element, TOptions opt = null)
+            : base(element, opt)
         {
             idPrefix = this.uniqueName + "_";
 
