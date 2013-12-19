@@ -34,10 +34,6 @@ namespace Serenity
 
         public jQueryObject Element { get { return element; } }
         
-        public static void Create()
-        {
-        }
-
         public string WidgetName
         {
             get { return widgetName; }
