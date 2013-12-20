@@ -14,7 +14,7 @@ namespace Serenity.Reporting
         private string reportKey;
 
         public ReportDialog(ReportDialogOptions opt)
-            : base(null, opt)
+            : base(opt)
         {
             CreateToolbar();
 

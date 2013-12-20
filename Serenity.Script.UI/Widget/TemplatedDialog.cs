@@ -15,8 +15,8 @@ namespace Serenity
     {
         protected jQueryValidator validator;
 
-        protected TemplatedDialog(jQueryObject element, TOptions opt = null)
-            : base(element ?? Q.NewBodyDiv(), opt)
+        protected TemplatedDialog(TOptions opt = null)
+            : base(Q.NewBodyDiv(), opt)
         {
             InitDialog();
             InitValidator();
@@ -136,5 +136,13 @@ namespace Serenity
         }
 
         public string IdPrefix { get { return idPrefix; } }
+    }
+
+    public abstract class TemplatedDialog : TemplatedDialog<object>
+    {
+        public TemplatedDialog()
+            : base(null)
+        {
+        }
     }
 }

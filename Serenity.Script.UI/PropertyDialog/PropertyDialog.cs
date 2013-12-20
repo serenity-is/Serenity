@@ -20,7 +20,7 @@ namespace Serenity
         private Int64? entityId;
 
         protected PropertyDialog(TOptions opt = null)
-            : base(Q.NewBodyDiv(), opt)
+            : base(opt)
         {
             InitPropertyGrid();
             LoadInitialEntity();
@@ -184,6 +184,15 @@ namespace Serenity
                 this.propertyGrid.Save(entity);
 
             return entity;
+        }
+    }
+
+    public abstract partial class PropertyDialog<TEntity> : PropertyDialog<TEntity, object>
+        where TEntity : class, new()
+    {
+        public PropertyDialog()
+            : base(null)
+        {
         }
     }
 }

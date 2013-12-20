@@ -14,7 +14,7 @@ namespace Serenity
         protected TabsObject tabs;
 
         protected EntityDialog(TOptions opt = null)
-            : base(Q.NewBodyDiv(), opt)
+            : base(opt)
         {
             InitTabs();
             InitToolbar();
