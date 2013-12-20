@@ -73,5 +73,24 @@ namespace Serenity
                 AddItem(id, text);
             }
         }
+
+        protected void AddInplaceCreate(string title)
+        {
+            var self = this;
+
+            J("<a><b/></a>").AddClass("inplace-create")
+                .Attribute("title", title)
+                .InsertAfter(this.element)
+                .Click(e =>
+                {
+                    self.InplaceCreateClick(e);
+                });
+
+            this.Select2Container.Add(this.element).AddClass("has-inplace-create");
+        }
+
+        protected virtual void InplaceCreateClick(jQueryEvent e)
+        {
+        }
     }
 }
