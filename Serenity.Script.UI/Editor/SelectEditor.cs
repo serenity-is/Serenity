@@ -16,15 +16,6 @@ namespace Serenity
             UpdateItems();
         }
 
-        protected override SelectEditorOptions GetDefaults()
-        {
-            return new SelectEditorOptions
-            {
-                EmptyOptionText = "--seçiniz--",
-                Items = new List<object>()
-            };
-        }
-
         protected virtual List<object> GetItems()
         {
             return options.Items ?? new List<object>();
@@ -43,7 +34,7 @@ namespace Serenity
 
             if (items.Count > 0)
             {
-                bool isStrings = Type.GetScriptType(items[0]) == "string";
+                bool isStrings = Script.TypeOf(items[0]) == "string";
 
                 foreach (dynamic item in items)
                 {
@@ -58,6 +49,12 @@ namespace Serenity
     [Serializable, Reflectable]
     public class SelectEditorOptions
     {
+        public SelectEditorOptions()
+        {
+            EmptyOptionText = "--seçiniz--";
+            Items = new List<object>();
+        }
+
         [Hidden]
         public List<object> Items { get; set; }
         [DisplayName("Boş Eleman Metni")]

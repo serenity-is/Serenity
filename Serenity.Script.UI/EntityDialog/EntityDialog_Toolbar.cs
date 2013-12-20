@@ -73,7 +73,7 @@ namespace Serenity
                         if (self.IsEditMode)
                             self.LoadById(self.EntityId.As<long>(), null);
                         else
-                            self.LoadById(Type.GetField(response, "EntityId").As<long>(), null);
+                            self.LoadById(((object)(response.As<dynamic>().EntityId)).As<long>(), null);
 
                         Q.NotifySuccess("Kayıt işlemi başarılı");
                     });
@@ -140,11 +140,11 @@ namespace Serenity
 
             var idField = GetEntityIdField();
             if (!idField.IsEmptyOrNull())
-                Type.DeleteField(clone, idField);
+                Script.Delete(clone, idField);
 
             var isActiveField = GetEntityIsActiveField();
             if (!isActiveField.IsEmptyOrNull())
-                Type.DeleteField(clone, isActiveField);
+                Script.Delete(clone, isActiveField);
 
             return clone;
         }

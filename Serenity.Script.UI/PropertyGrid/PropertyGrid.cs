@@ -15,15 +15,6 @@ namespace Serenity
             KnownEditorTypes = new JsDictionary<string, Type>();
         }
 
-        protected override PropertyGridOptions GetDefaults()
-        {
-            return new PropertyGridOptions
-            {
-                UseCategories = true,
-                DefaultCategory = "Özellikler"
-            };
-        }
-
         private List<Widget> editors;
         private List<PropertyItem> items;
 
@@ -188,7 +179,13 @@ namespace Serenity
             if (element.Is(":input"))
                 element.Attribute("name", item.Name ?? "");
 
-            Widget editor = (Widget)(Activator.CreateInstance(editorType, element, item.EditorParams));
+            object editorParams = item.EditorParams;
+            var editorAttribute = editorType.GetCustomAttributes(typeof(EditorAttribute), false);
+            if (editorAttribute != null && editorAttribute.Length == 1 && editorAttribute[0].As<EditorAttribute>().OptionsType != null)
+                editorParams = jQuery.ExtendObject(Activator.CreateInstance(editorAttribute[0].As<EditorAttribute>().OptionsType),
+                    item.EditorParams);
+
+            Widget editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
 
             if (Script.IsValue(item.MaxLength))
                 SetMaxLength(editor, item.MaxLength.Value);
@@ -376,7 +373,7 @@ namespace Serenity
                     if (booleanValue != null)
                     {
                         object value = source[item.Name];
-                        if (Type.GetScriptType(value) == "number")
+                        if (Script.TypeOf(value) == "number")
                             booleanValue.Value = IdExtensions.IsPositiveId(value.As<Int64>());
                         else
                             booleanValue.Value = Q.IsTrue(value);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -49,7 +50,7 @@ namespace Serenity
         ///   Local text.</param>
         /// <returns>
         ///   Textual representation of the local text key.</returns>
-        [InlineCode("{lt}.get();")]
+        [InlineCode("{lt}.get()")]
         public static implicit operator string(LocalText lt)
         {
             return lt.ToString();
@@ -88,12 +89,12 @@ namespace Serenity
 
             prefix = prefix ?? "";
 
-            foreach (var k in obj.As<JsDictionary<string, object>>().Keys)
+            foreach (var k in obj.As<JsDictionary>().Keys)
             {
                 var actual = prefix + k;
                 var o = obj[k];
-                if (Type.GetScriptType(o) == "object")
-                    Add(o.As<JsDictionary<string, object>>(), actual + ".");
+                if (Script.TypeOf(o) == "object")
+                    Add(o.As<JsDictionary>(), actual + ".");
                 else
                     table[actual] = o.As<string>();
             }
@@ -111,8 +112,10 @@ namespace Serenity
         {
             dynamic t = type;
 
-            foreach (var member in Type.GetOwnPropertyNames(type).Clone())
+            foreach (var member in Object.Keys((type)).Clone())
             {
+
+                
                 object value = t[member];
                 if (Type.IsInstanceOfType(value, typeof(LocalText)))
                 {

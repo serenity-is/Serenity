@@ -51,13 +51,6 @@ namespace Serenity
             self.options.Menu.Hide().AppendTo(Document.Body).AddClass("s-PopupMenu")
                 .As<dynamic>().menu();
         }
-
-        protected override PopupMenuButtonOptions GetDefaults()
-        {
-            return new PopupMenuButtonOptions
-            {
-            };
-        }
     }
 
     [Imported, Serializable]

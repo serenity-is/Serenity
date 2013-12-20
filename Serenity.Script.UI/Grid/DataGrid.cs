@@ -14,9 +14,10 @@ namespace Serenity
     }
 
     public abstract class DataGrid<TItem, TOptions> : Widget<TOptions>, IDataGrid
-        where TOptions: GridOptions, new()
-        where TItem: class, new()
+        where TItem : class, new()
+        where TOptions : class, new()
     {
+        protected jQueryObject titleDiv;
         protected Toolbar toolbar;
         protected SlickRemoteView<TItem> view;
         protected jQueryObject slickContainer;
@@ -26,25 +27,19 @@ namespace Serenity
         protected string localTextPrefix;
         private bool isDisabled;
 
-        public DataGrid(jQueryObject container, TOptions opt)
+        public DataGrid(jQueryObject container, TOptions opt = null)
             : base(container, opt)
         {
             var self = this;
 
             this.element.AddClass("s-DataGrid").Html("");
             this.element.AddClass("s-" + this.GetType().Name);
-            this.element.AddClass("require-layout").Bind("layout", delegate 
+            this.element.AddClass("require-layout").Bind("layout", delegate
             {
-                Q.LayoutFillHeight(self.slickContainer);
-                self.slickGrid.ResizeCanvas();
+                self.Layout();
             });
 
-            if (options.Height != null)
-                this.element.CSS("height", options.Height);
-
-            var title = GetTitle();
-            if (title != null)
-                CreateTitleBar(title);
+            Title = GetInitialTitle();
 
             var buttons = GetButtons();
             if (buttons != null)
@@ -56,7 +51,7 @@ namespace Serenity
 
             this.slickGrid = CreateSlickGrid();
 
-            if (!options.HidePager)
+            if (UsePager())
                 CreatePager();
 
             BindToSlickEvents();
@@ -67,7 +62,7 @@ namespace Serenity
 
             UpdateDisabledState();
 
-            if (options.PopulateWhenVisible)
+            if (PopulateWhenVisible())
             {
                 LazyLoadHelper.ExecuteEverytimeWhenShown(element, () => self.RefreshIfNeeded(), false);
                 if (element.Is(":visible"))
@@ -75,6 +70,25 @@ namespace Serenity
             }
             else
                 view.Populate();
+        }
+
+        protected void Layout()
+        {
+            if (!this.element.Is(":visible"))
+                return;
+
+            if (this.slickContainer == null)
+                return;
+
+            Q.LayoutFillHeight(this.slickContainer);
+
+            if (this.slickGrid != null)
+                this.slickGrid.ResizeCanvas();
+        }
+
+        protected virtual string GetInitialTitle()
+        {
+            return null;
         }
 
         protected virtual void CreateToolbarExtensions()
@@ -134,15 +148,9 @@ namespace Serenity
                 this.view = null;
             }
 
+            this.titleDiv = null;
+
             base.Destroy();
-        }
-
-        protected virtual string GetTitle()
-        {
-            if (options.Title != null)
-                return options.Title;
-
-            return null;
         }
 
         protected virtual dynamic GetItemMetadata(TItem entity, int index)
@@ -151,18 +159,18 @@ namespace Serenity
             if (activeFieldName.IsEmptyOrNull())
                 return new object();
 
-            var value = Type.GetField(entity, activeFieldName).As<Int32?>();
+            var value = entity.As<JsDictionary>()[activeFieldName].As<Int32?>();
             if (value == null)
                 return new object();
 
-            if (Type.GetScriptType(value) == "number")
+            if (Script.TypeOf(value) == "number")
             {
                 if (IdExtensions.IsNegativeId(value.As<Int64>()))
                     return new { cssClasses = "deleted" };
                 else if (value.As<Int32>() == 0)
                     return new { cssClasses = "inactive" };
             }
-            else if (Type.GetScriptType(value) == "boolean")
+            else if (Script.TypeOf(value) == "boolean")
             {
                 if (value.As<Boolean>() == false)
                     return new { cssClasses = "deleted" };
@@ -190,7 +198,8 @@ namespace Serenity
                 EnableForHeaderCells = true
             }));
 
-            grid.SetSortColumns(GetDefaultSortBy().Map<SlickColumnSort>(s => {
+            grid.SetSortColumns(GetDefaultSortBy().Map<SlickColumnSort>(s =>
+            {
                 var x = new SlickColumnSort();
                 if (s != null && s.ToLower().EndsWith(" DESC"))
                 {
@@ -220,17 +229,6 @@ namespace Serenity
             }
         }
 
-        protected void CreatePager()
-        {
-            var pagerDiv = J("<div></div>")
-                .AppendTo(this.element);
-
-            ((dynamic)pagerDiv).slickPager(new { 
-                view = this.view.As<object>(), 
-                rowsPerPage = 20, 
-                rowsPerPageOptions = new int[] { 20, 100, 500, 2500 } 
-            });
-        }
 
         private Action<jQueryEvent, dynamic> slickGridOnSort;
         private Action<jQueryEvent, dynamic> slickGridOnClick;
@@ -364,7 +362,7 @@ namespace Serenity
                 array = new List<string>();
                 foreach (var key in include.Keys)
                     array.Add(key);
-                
+
             }
 
             view.Params.IncludeColumns = array;
@@ -404,13 +402,36 @@ namespace Serenity
             return new List<string> { GetIdFieldName() };
         }
 
+        protected virtual bool UsePager()
+        {
+            return false;
+        }
+
+        protected virtual bool PopulateWhenVisible()
+        {
+            return false;
+        }
+
+        protected void CreatePager()
+        {
+            var pagerDiv = J("<div></div>")
+                .AppendTo(this.element);
+
+            ((dynamic)pagerDiv).slickPager(new
+            {
+                view = this.view.As<object>(),
+                rowsPerPage = 20,
+                rowsPerPageOptions = new int[] { 20, 100, 500, 2500 }
+            });
+        }
+
         protected virtual SlickRemoteViewOptions GetViewOptions()
         {
             var opt = new SlickRemoteViewOptions();
             opt.IdField = GetIdFieldName();
             opt.SortBy = GetDefaultSortBy().As<string[]>();
-            
-            if (options.HidePager)
+
+            if (!UsePager())
                 opt.RowsPerPage = 0;
             else
                 opt.RowsPerPage = 100;
@@ -428,11 +449,41 @@ namespace Serenity
             });
         }
 
-        protected void CreateTitleBar(string title)
+        protected string Title
         {
-            var titleDiv = J("<div class=\"grid-title\"><div class=\"title-text\"></div></div>")
-                .AppendTo(this.Element);
-            titleDiv.Children().Text(title);
+            get
+            {
+                if (titleDiv == null)
+                    return null;
+
+                return titleDiv.Children().GetText();
+            }
+            set
+            {
+                if (value != Title)
+                {
+                    if (value == null)
+                    {
+                        if (titleDiv != null)
+                        {
+                            titleDiv.Remove();
+                            titleDiv = null;
+                        }
+                    }
+                    else
+                    {
+                        if (titleDiv == null)
+                        {
+                            titleDiv = J("<div class=\"grid-title\"><div class=\"title-text\"></div></div>")
+                                .PrependTo(this.Element);
+
+                            titleDiv.Children().Text(value);
+                        }
+                    }
+
+                    Layout();
+                }
+            }
         }
 
         protected virtual string GetItemType()
@@ -482,7 +533,7 @@ namespace Serenity
 
         public void Refresh()
         {
-            if (!options.PopulateWhenVisible)
+            if (!PopulateWhenVisible())
             {
                 InternalRefresh();
                 return;
@@ -580,16 +631,12 @@ namespace Serenity
         public SlickGrid SlickGrid { get { return slickGrid; } }
     }
 
-    [Imported, Serializable]
-    public class GridOptions
+    public abstract class DataGrid<TItem> : DataGrid<TItem, object>
+        where TItem : class, new()
     {
-        [Hidden]
-        public string Title { get; set; }
-        [Hidden]
-        public string Height { get; set; }
-        [Hidden]
-        public bool HidePager { get; set; }
-        [Hidden]
-        public bool PopulateWhenVisible { get; set; }
-    }
+        public DataGrid(jQueryObject container)
+            : base(container, null)
+        {
+        }
+   }
 }

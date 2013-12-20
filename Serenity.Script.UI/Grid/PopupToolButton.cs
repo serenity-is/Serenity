@@ -14,13 +14,6 @@ namespace Serenity
             div.AddClass("s-PopupToolButton");
             J("<b/>").AppendTo(div.Children(".button-outer").Children("span"));
         }
-
-        protected override PopupMenuButtonOptions GetDefaults()
-        {
-            return new PopupToolButtonOptions
-            {
-            };
-        }
     }
 
     [Imported, Serializable]

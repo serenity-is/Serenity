@@ -1,5 +1,7 @@
 ﻿using jQueryApi.UI.Widgets;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Serenity
 {
@@ -11,7 +13,7 @@ namespace Serenity
         private Int64? entityId;
         protected TabsObject tabs;
 
-        protected EntityDialog(TOptions opt)
+        protected EntityDialog(TOptions opt = null)
             : base(Q.NewBodyDiv(), opt)
         {
             InitTabs();
@@ -80,7 +82,7 @@ namespace Serenity
 
         protected virtual string GetEntityNameFieldValue()
         {
-            return (Type.GetField(Entity, GetEntityNameField()) ?? "").ToString();
+            return (Entity.As<JsDictionary>()[GetEntityNameField()] ?? "").ToString();
         }
 
         protected virtual string GetEntityTitle()
@@ -148,7 +150,7 @@ namespace Serenity
                 if (EntityId == null)
                     return false;
 
-                var value = Type.GetField(Entity, GetEntityIsActiveField()).As<Int32?>();
+                var value = Entity.As<JsDictionary>()[GetEntityIsActiveField()].As<Int32?>();
                 if (value == null)
                     return false;
 
@@ -164,6 +166,15 @@ namespace Serenity
         protected bool IsNewOrDeleted
         {
             get { return IsNew || this.IsDeleted; }
+        }
+    }
+
+    public abstract class EntityDialog<TEntity> : EntityDialog<TEntity, object>
+        where TEntity : class, new()
+    {
+        public EntityDialog()
+            : base(null)
+        {
         }
     }
 }

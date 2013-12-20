@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using jQueryApi.UI.Widgets;
+using System;
 using System.Html;
 using System.Runtime.CompilerServices;
 
@@ -14,8 +15,8 @@ namespace Serenity
     {
         protected jQueryValidator validator;
 
-        protected TemplatedDialog(jQueryObject element, TOptions options)
-            : base(element ?? Q.NewBodyDiv(), options)
+        protected TemplatedDialog(jQueryObject element, TOptions opt = null)
+            : base(element ?? Q.NewBodyDiv(), opt)
         {
             InitDialog();
             InitValidator();
@@ -82,7 +83,10 @@ namespace Serenity
 
         protected virtual void Arrange()
         {
-            this.element.Find(".require-layout").TriggerHandler("layout");
+            this.element.Find(".require-layout").Filter(":visible").Each((i, e) =>
+            {
+                J(e).TriggerHandler("layout");
+            });
         }
 
         [InlineCode("$.qtip")]
@@ -104,12 +108,12 @@ namespace Serenity
             }
 
             var self = this;
-            Window.SetTimeout(delegate()
+            Window.SetTimeout((Function)new Action(delegate()
             {
                 var element = self.element;
                 self.Destroy();
                 element.Remove();
-            }, 0);
+            }), 0);
         }
 
         protected virtual DialogOptions GetDialogOptions()

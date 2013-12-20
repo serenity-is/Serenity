@@ -19,7 +19,7 @@ namespace Serenity
         private TEntity entity;
         private Int64? entityId;
 
-        protected PropertyDialog(TOptions opt)
+        protected PropertyDialog(TOptions opt = null)
             : base(Q.NewBodyDiv(), opt)
         {
             InitPropertyGrid();

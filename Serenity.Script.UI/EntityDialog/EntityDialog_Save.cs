@@ -1,6 +1,8 @@
 ﻿using jQueryApi;
 using System;
 using System.Runtime.CompilerServices;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Serenity
 {
@@ -53,7 +55,7 @@ namespace Serenity
             {
                 string idField = GetEntityIdField();
                 if (idField != null)
-                    Type.SetField(entity, idField, this.EntityId);
+                    entity.As<JsDictionary>()[idField] = this.EntityId;
             }
 
             return entity;

@@ -22,15 +22,6 @@ namespace Serenity
             UpdateItems();
         }
 
-        protected override CheckListEditorOptions GetDefaults()
-        {
-            return new CheckListEditorOptions
-            {
-                SelectAllOptionText = "Tümünü Seç",
-                Items = new List<CheckListItem>()
-            };
-        }
-
         protected virtual List<CheckListItem> GetItems()
         {
             return options.Items ?? new List<CheckListItem>();
@@ -44,7 +35,7 @@ namespace Serenity
 
             if (items.Count > 0)
             {
-                bool isStrings = Type.GetScriptType(items[0]) == "string";
+                bool isStrings = Script.TypeOf(items[0]) == "string";
 
                 foreach (dynamic item in items)
                 {
@@ -75,6 +66,12 @@ namespace Serenity
     [Serializable, Reflectable]
     public class CheckListEditorOptions
     {
+        public CheckListEditorOptions()
+        {
+            SelectAllOptionText = "Tümünü Seç";
+            Items = new List<CheckListItem>();
+        }
+
         [Hidden]
         public List<CheckListItem> Items { get; set; }
         [DisplayName("Tümünü Seç Metni")]

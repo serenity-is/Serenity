@@ -14,21 +14,21 @@ namespace Serenity
         {
             var validator = form.As<jQueryValidationObject>().Validate();
 
-            object valSettings = Type.GetField(validator, "settings");
-            if (Type.GetField(valSettings, "abortHandler") != null)
+            dynamic valSettings = validator.As<dynamic>().settings;
+            if (valSettings.abortHandler != null)
                 return false;
 
             if (validateBeforeSave != null &&
                 validateBeforeSave() == false)
                 return false;
 
-            Type.SetField(valSettings, "abortHandler", new Action<jQueryValidator>(Q.Externals.ValidatorAbortHandler));
-            Type.SetField(valSettings, "submitHandler", new Func<bool>(delegate()
+            valSettings["abortHandler"] = new Action<jQueryValidator>(Q.Externals.ValidatorAbortHandler);
+            valSettings["submitHandler"] = new Func<bool>(delegate()
             {
                 if (submitHandler != null)
                     submitHandler();
                 return false;
-            }));
+            });
 
             form.Trigger("submit");
             return true;

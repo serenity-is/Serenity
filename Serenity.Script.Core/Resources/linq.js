@@ -151,7 +151,9 @@
             }
         };
     };
-    ss.registerClass(null, '$IEnumerator', IEnumerator, null, [ss.IDisposable]);
+    var $asm = {};
+    ss.initAssembly($asm, 'linq');
+    ss.initClass(IEnumerator, $asm, {}, null, [ss.IDisposable]);
 
     // for tryGetNext
     var Yielder = function () {
@@ -170,7 +172,7 @@
     var Enumerable = function (getEnumerator) {
         this.getEnumerator = getEnumerator;
     };
-    ss.registerClass(null, 'Enumerable', Enumerable, null, [ss.IEnumerable]);
+    ss.initClass(Enumerable, $asm, {}, null, [ss.IEnumerable]);
 
     // Utility
 
@@ -2814,7 +2816,7 @@
             return this.toEnumerable().getEnumerator();
         };
     };
-    ss.registerClass(null, '$Lookup', Lookup, null, [ss.IEnumerable]);
+    ss.initClass(Lookup, $asm, {}, null, [ss.IEnumerable]);
 
     var Grouping = function (groupKey, elements) {
         this.key = function () {

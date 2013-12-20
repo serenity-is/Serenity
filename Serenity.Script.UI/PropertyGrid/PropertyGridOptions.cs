@@ -5,9 +5,15 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Imported, Serializable]
+    [Serializable]
     public class PropertyGridOptions
     {
+        public PropertyGridOptions()
+        {
+            UseCategories = true;
+            DefaultCategory = "Özellikler";
+        }
+
         public string IdPrefix { get; set; }
         public List<PropertyItem> Items { get; set; }
         public bool UseCategories { get; set; }

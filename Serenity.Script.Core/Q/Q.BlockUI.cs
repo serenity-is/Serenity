@@ -1,5 +1,6 @@
 ﻿using System.Html;
 using jQueryApi;
+using System;
 
 namespace Serenity
 {
@@ -45,13 +46,9 @@ namespace Serenity
                 options);
 
             if (options.UseTimeout)
-                Window.SetTimeout(
-                    delegate
-                    {
+                Window.SetTimeout((System.Function)new Action(delegate {
                         BlockUIWithCheck(options);
-                    }, 
-                    0
-                );
+                    }), 0);
             else
                 BlockUIWithCheck(options);
         }

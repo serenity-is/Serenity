@@ -99,32 +99,29 @@ namespace Serenity
                 Window.ClearTimeout(this.timer);
             
             var self = this;
-            this.timer = Window.SetTimeout(delegate
+            this.timer = Window.SetTimeout((Function)new Action(delegate
             {
                 if (self.options.OnSearch != null)
                     self.options.OnSearch(field != null && !field.Name.IsEmptyOrNull() ? field.Name : null, value);
 
                 self.element.RemoveClass(self.options.LoadingParentClass ?? "");
 
-            }, this.options.TypeDelay);
+            }), this.options.TypeDelay);
 
             this.lastValue = value;
-        }
-
-        protected override QuickSearchInputOptions GetDefaults()
-        {
-            return new QuickSearchInputOptions
-            {
-                TypeDelay = 1000,
-                LoadingParentClass = "s-QuickSearchLoading",
-                FilteredParentClass = "s-QuickSearchFiltered"
-            };
         }
     }
 
     [Imported, Serializable]
     public class QuickSearchInputOptions
     {
+        public QuickSearchInputOptions()
+        {
+            TypeDelay = 1000;
+            LoadingParentClass = "s-QuickSearchLoading";
+            FilteredParentClass = "s-QuickSearchFiltered";
+        }
+
         public int TypeDelay { get; set; }
         public string LoadingParentClass { get; set; }
         public string FilteredParentClass { get; set; }
