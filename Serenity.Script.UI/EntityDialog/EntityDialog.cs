@@ -1,5 +1,6 @@
 ﻿using jQueryApi.UI.Widgets;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Serenity
@@ -81,7 +82,7 @@ namespace Serenity
 
         protected virtual string GetEntityNameFieldValue()
         {
-            return (Entity.As<JsDictionary<string, object>>()[GetEntityNameField()] ?? "").ToString();
+            return (Entity.As<JsDictionary>()[GetEntityNameField()] ?? "").ToString();
         }
 
         protected virtual string GetEntityTitle()
@@ -149,7 +150,7 @@ namespace Serenity
                 if (EntityId == null)
                     return false;
 
-                var value = Entity.As<JsDictionary<string, object>>()[GetEntityIsActiveField()].As<Int32?>();
+                var value = Entity.As<JsDictionary>()[GetEntityIsActiveField()].As<Int32?>();
                 if (value == null)
                     return false;
 

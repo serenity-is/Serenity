@@ -22,13 +22,13 @@ namespace Serenity
                 validateBeforeSave() == false)
                 return false;
 
-            Type.SetField(valSettings, "abortHandler", new Action<jQueryValidator>(Q.Externals.ValidatorAbortHandler));
-            Type.SetField(valSettings, "submitHandler", new Func<bool>(delegate()
+            valSettings["abortHandler"] = new Action<jQueryValidator>(Q.Externals.ValidatorAbortHandler);
+            valSettings["submitHandler"] = new Func<bool>(delegate()
             {
                 if (submitHandler != null)
                     submitHandler();
                 return false;
-            }));
+            });
 
             form.Trigger("submit");
             return true;

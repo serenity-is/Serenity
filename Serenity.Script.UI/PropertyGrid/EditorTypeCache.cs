@@ -26,7 +26,7 @@ namespace Serenity
 
             foreach (var k in Object.Keys(nsObj))
             {
-                var obj = nsObj.As<JsDictionary<string, object>>()[k];
+                var obj = nsObj.As<JsDictionary>()[k];
 
                 if (obj == null)
                     continue;

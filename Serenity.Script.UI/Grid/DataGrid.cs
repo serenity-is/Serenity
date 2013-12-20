@@ -159,7 +159,7 @@ namespace Serenity
             if (activeFieldName.IsEmptyOrNull())
                 return new object();
 
-            var value = entity.As<JsDictionary<string, object>>()[activeFieldName].As<Int32?>();
+            var value = entity.As<JsDictionary>()[activeFieldName].As<Int32?>();
             if (value == null)
                 return new object();
 

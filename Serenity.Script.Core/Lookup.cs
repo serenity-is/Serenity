@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -41,7 +42,7 @@ namespace Serenity
                 for (var i = 0; i < this.items.Count; i++)
                 {
                     var r = this.items[i];
-                    var v = r.As<JsDictionary<string, object>>()[idField];// ?? Type.GetProperty(r, idField);
+                    var v = r.As<JsDictionary>()[idField];// ?? Type.GetProperty(r, idField);
                     if (v != null)
                         this.itemById[v] = r;
                 }

@@ -10,7 +10,7 @@ namespace Serenity
     [Element("<div/>")]
     [IdProperty("id")]
     public abstract class CheckTreeEditor<TOptions> : DataGrid<CheckTreeItem, TOptions>, IGetEditValue, ISetEditValue
-        where TOptions: CheckTreeEditorOptions, new()
+        where TOptions: class, new()
     {
         private JsDictionary<string, CheckTreeItem> byId;
 
@@ -24,7 +24,7 @@ namespace Serenity
 
         protected virtual List<CheckTreeItem> GetItems()
         {
-            return options.Items ?? new List<CheckTreeItem>();
+            return new List<CheckTreeItem>();
         }
 
         protected virtual void UpdateItems()
@@ -71,7 +71,7 @@ namespace Serenity
 
         protected override List<ToolButton> GetButtons()
         {
-            string selectAllText = options.As<CheckTreeEditorOptions>().SelectAllOptionText;
+            string selectAllText = GetSelectAllText();
             if (selectAllText.IsEmptyOrNull())
                 return null;
 
@@ -86,6 +86,16 @@ namespace Serenity
                     (x, v) => x.IsSelected = v
                 )
             };
+        }
+
+        protected virtual string GetSelectAllText()
+        {
+            return "Tümünü Seç";
+        }
+
+        protected virtual bool IsThreeStateHierarchy()
+        {
+            return false;
         }
 
         protected override SlickGrid CreateSlickGrid()
@@ -177,7 +187,7 @@ namespace Serenity
         {
             var view = this.view;
             var items = view.GetItems();
-            bool threeState = options.As<CheckTreeEditorOptions>().ThreeStateHierarchy;
+            bool threeState = IsThreeStateHierarchy();
 
             if (!threeState)
                 return;
@@ -274,7 +284,7 @@ namespace Serenity
                         var cls = "check-box";
                         var item = (CheckTreeItem)ctx.Item;
 
-                        bool threeState = options.As<CheckTreeEditorOptions>().ThreeStateHierarchy;
+                        bool threeState = IsThreeStateHierarchy();
                         if (item.IsSelected)
                         {
                             if (threeState && !item.IsDescendantsSelected)
@@ -407,21 +417,5 @@ namespace Serenity
         public string Text { get; set; }
         public string ParentId { get; set; }
         public List<CheckTreeItem> Children { get; set; }
-    }
-
-    [Serializable, Reflectable]
-    public class CheckTreeEditorOptions
-    {
-        public CheckTreeEditorOptions()
-        {
-            SelectAllOptionText = "Tümünü Seç";
-        }
-
-        [Hidden]
-        public List<CheckTreeItem> Items { get; set; }
-        [DisplayName("Tümünü Seç Metni")]
-        public string SelectAllOptionText { get; set; }
-        [DisplayName("Üç Durumlu Hiyerarşi")]
-        public bool ThreeStateHierarchy { get; set; }
     }
 }

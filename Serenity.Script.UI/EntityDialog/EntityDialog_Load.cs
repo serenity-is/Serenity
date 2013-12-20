@@ -1,7 +1,7 @@
 ﻿using jQueryApi;
 using jQueryApi.UI.Widgets;
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Html;
 
 namespace Serenity
@@ -43,7 +43,7 @@ namespace Serenity
         {
             string idField = GetEntityIdField();
             if (idField != null)
-                this.EntityId = (long?)(entity.As<JsDictionary<string, object>>()[idField]).ConvertToId();
+                this.EntityId = (long?)(entity.As<JsDictionary>()[idField]).ConvertToId();
 
             this.Entity = entity;
             //SetInputsDisabled(this.Form[0], Type.GetField(ent, "IsActive") == (object)false);
