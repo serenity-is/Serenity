@@ -196,7 +196,7 @@ namespace Serenity.Data
             }
         }
 
-        public static TField OfJoin<TField>(this TField field, LeftJoin join, string origin)
+        public static TField OfJoin<TField>(this TField field, Join join, string origin)
             where TField: Field
         {
             if (join == null)

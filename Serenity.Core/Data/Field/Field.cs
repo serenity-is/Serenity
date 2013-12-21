@@ -19,7 +19,7 @@ namespace Serenity.Data
         internal string _queryExpression;
         internal HashSet<string> _referencedJoins;
         internal string _joinAlias;
-        internal LeftJoin _join;
+        internal Join _join;
         internal string _origin;
         internal string _foreignTable;
         internal string _foreignField;
@@ -214,15 +214,15 @@ namespace Serenity.Data
             get { return _joinAlias; }
         }
 
-        public LeftJoin Join
+        public Join Join
         {
             get
             {
                 if (_join == null &&
                     _joinAlias != null)
                 {
-                    LeftJoin join;
-                    if (_fields.LeftJoins.TryGetValue(_joinAlias, out join))
+                    Join join;
+                    if (_fields.Joins.TryGetValue(_joinAlias, out join))
                         _join = join;
                 }
 

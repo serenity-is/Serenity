@@ -98,13 +98,15 @@ namespace Serenity.Data
                 if (!field.ForeignTable.IsEmptyOrNull() &&
                     field.TextualField == null)
                 {
-                    foreach (var join in _fields._leftJoins)
+                    foreach (var join in _fields._joins.Values)
                     {
-                        if (String.Compare(field.ForeignTable, join.Value.ToTable) == 0 &&
-                            join.Value.OnCriteria.IndexOf(field.QueryExpression, StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (String.Compare(field.ForeignTable, join.ToTable) == 0 &&
+                            join is LeftJoin &&
+                            !join.OnCriteriaString.IsEmptyOrNull() &&
+                            join.OnCriteriaString.IndexOf(field.QueryExpression, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             foreach (var f in _fields)
-                                if (String.Compare(f.JoinAlias, join.Value.Name, StringComparison.OrdinalIgnoreCase) == 0 &&
+                                if (String.Compare(f.JoinAlias, join.Name, StringComparison.OrdinalIgnoreCase) == 0 &&
                                     f is StringField)
                                 {
                                     field.TextualField = f.Name;

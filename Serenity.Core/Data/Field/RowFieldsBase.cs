@@ -10,7 +10,7 @@ namespace Serenity.Data
         public readonly string TableName;
         internal Dictionary<string, Field> _byName;
         internal Dictionary<string, Field> _byPropertyName;
-        internal Dictionary<string, LeftJoin> _leftJoins;
+        internal Dictionary<string, Join> _joins;
         internal FilterFields _filters;
         internal bool _isLocked;
         internal PropertyChangedEventArgs[] _propertyChangedEventArgs;
@@ -25,7 +25,7 @@ namespace Serenity.Data
             TableName = tableName;
             FieldPrefix = fieldPrefix;
             _byName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
-            _leftJoins = new Dictionary<string, LeftJoin>(StringComparer.OrdinalIgnoreCase);
+            _joins = new Dictionary<string, Join>(StringComparer.OrdinalIgnoreCase);
             _filters = new FilterFields();
         }
 
@@ -140,9 +140,9 @@ namespace Serenity.Data
                 return null;
         }
 
-        public IDictionary<string, LeftJoin> LeftJoins
+        public IDictionary<string, Join> Joins
         {
-            get { return _leftJoins; }
+            get { return _joins; }
         }
 
         public FilterFields Filters

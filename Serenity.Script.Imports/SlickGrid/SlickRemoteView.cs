@@ -32,18 +32,18 @@ namespace Serenity
     public delegate ListResponse<TEntity> SlickRemoteViewProcessCallback<TEntity>(ListResponse<TEntity> data, SlickRemoteView<TEntity> view);
     public delegate bool SlickRemoteViewFilter<TEntity>(TEntity item, SlickRemoteView<TEntity> view);
 
-    [Imported, ScriptNamespace("Slick.Data"), ScriptName("RemoteView"), IncludeGenericArguments(false)]
-    public class SlickRemoteView<TEntity>
+    [Imported, ScriptNamespace("Slick.Data"), ScriptName("RemoteView")]
+    public class SlickRemoteView
     {
         public SlickRemoteView(SlickRemoteViewOptions options)
         {
         }
 
-        public void AddData(ListResponse<TEntity> data)
+        public void AddData(List<dynamic> data)
         {
         }
 
-        public List<TEntity> GetItems()
+        public List<dynamic> GetItems()
         {
             return null;
         }
@@ -60,11 +60,11 @@ namespace Serenity
         {
         }
 
-        public void SetFilter(SlickRemoteViewFilter<TEntity> filter)
+        public void SetFilter(SlickRemoteViewFilter<dynamic> filter)
         {
         }
 
-        public void SetItems(List<TEntity> items, bool fullReset)
+        public void SetItems(List<dynamic> items, bool fullReset)
         {
         }
 
@@ -98,16 +98,16 @@ namespace Serenity
             return null;
         }
 
-        public TEntity GetItemByIdx(int index)
+        public dynamic GetItemByIdx(int index)
         {
-            return default(TEntity);
+            return null;
         }
 
         [IntrinsicProperty]
         public dynamic Params { get { return null; } }
 
         [IntrinsicProperty]
-        public List<TEntity> Rows { get { return null; } }
+        public List<dynamic> Rows { get { return null; } }
 
         [ScriptName("rowsPerPage")]
         public Int32? RowsPerPage;
@@ -115,14 +115,70 @@ namespace Serenity
         [IntrinsicProperty]
         public string[] SortBy { get; set; }
 
-        public CancellableViewCallback<TEntity> OnSubmit;
-        public SlickRemoteViewAjaxCallback<TEntity> OnAjaxCall;
-        public SlickRemoteViewProcessCallback<TEntity> OnProcessData;
+        public CancellableViewCallback<dynamic> OnSubmit;
+        public SlickRemoteViewAjaxCallback<dynamic> OnAjaxCall;
+        public SlickRemoteViewProcessCallback<dynamic> OnProcessData;
         public RemoteViewEvent OnRowCountChanged;
         public RemoteViewEvent OnRowsChanged;
 
         [ScriptName("seekToPage")]
         public Int32? SeekToPage;
+    }
+
+    [Imported, ScriptNamespace("Slick.Data"), ScriptName("RemoteView"), IncludeGenericArguments(false)]
+    public class SlickRemoteView<TEntity> : SlickRemoteView
+    {
+        public SlickRemoteView(SlickRemoteViewOptions options)
+            : base(options)
+        {
+        }
+
+        public void AddData(ListResponse<TEntity> data)
+        {
+        }
+
+        public new List<TEntity> GetItems()
+        {
+            return null;
+        }
+
+        public void SetFilter(SlickRemoteViewFilter<TEntity> filter)
+        {
+        }
+
+        public void SetItems(List<TEntity> items, bool fullReset)
+        {
+        }
+
+        public new TEntity GetItemById(object id)
+        {
+            return default(TEntity);
+        }
+
+        public void UpdateItem(object id, TEntity item)
+        {
+        }
+
+        public void AddItem(TEntity item)
+        {
+        }
+
+        public int? GetIdxById(TEntity id)
+        {
+            return null;
+        }
+
+        public new TEntity GetItemByIdx(int index)
+        {
+            return default(TEntity);
+        }
+
+        [IntrinsicProperty]
+        public new List<TEntity> Rows { get { return null; } }
+
+        public new CancellableViewCallback<TEntity> OnSubmit;
+        public new SlickRemoteViewAjaxCallback<TEntity> OnAjaxCall;
+        public new SlickRemoteViewProcessCallback<TEntity> OnProcessData;
     }
 
     [Imported, IncludeGenericArguments(false)]

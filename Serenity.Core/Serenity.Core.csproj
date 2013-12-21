@@ -157,6 +157,11 @@
     <Compile Include="Data\FieldTypes\Int64Field.cs" />
     <Compile Include="Data\FieldTypes\StreamField.cs" />
     <Compile Include="Data\FieldTypes\StringField.cs" />
+    <Compile Include="Data\Join\OuterApply.cs" />
+    <Compile Include="Data\Join\CrossApply.cs" />
+    <Compile Include="Data\Join\InnerJoin.cs" />
+    <Compile Include="Data\Join\RightJoin.cs" />
+    <Compile Include="Data\Join\Join.cs" />
     <Compile Include="Data\Interface\ISupportAttached.cs" />
     <Compile Include="Data\Permission\UpdatePermissionAttribute.cs" />
     <Compile Include="Data\Permission\CreatePermissionAttribute.cs" />
@@ -172,13 +177,13 @@
     <Compile Include="Data\Field\FieldSelectMode.cs" />
     <Compile Include="Data\Field\FieldType.cs" />
     <Compile Include="Data\Field\InstanceNameAttribute.cs" />
-    <Compile Include="Data\Field\JoinAliasLocator.cs" />
-    <Compile Include="Data\Field\LeftJoin.cs" />
+    <Compile Include="Data\Join\JoinAliasLocator.cs" />
+    <Compile Include="Data\Join\LeftJoin.cs" />
     <Compile Include="Data\Field\Row.cs" />
     <Compile Include="Data\Field\RowFieldsBase.cs" />
     <Compile Include="Data\Field\RowRegistry.cs" />
     <Compile Include="Data\Field\SchemaAttribute.cs" />
-    <Compile Include="Data\Field\T0ReferenceRemover.cs" />
+    <Compile Include="Data\Join\T0ReferenceRemover.cs" />
     <Compile Include="Data\GroupingHelper.cs" />
     <Compile Include="Data\Index\DbIndex.cs" />
     <Compile Include="Data\Index\DbIndexFlags.cs" />
@@ -375,6 +380,8 @@
     <Compile Include="Sql\Query\SqlDelete.cs" />
     <Compile Include="Sql\Query\SqlInsert.cs" />
     <Compile Include="Sql\Query\SqlUpdate.cs" />
+    <Compile Include="Sql\Select\SqlQuery_Join.cs" />
+    <Compile Include="Sql\Select\SqlQuery_EnsureJoin.cs" />
     <Compile Include="Sql\Select\SqlQuery_From.cs" />
     <Compile Include="Sql\Select\SqlQuery_Select.cs" />
     <Compile Include="Sql\Select\SqlQuery.cs" />
