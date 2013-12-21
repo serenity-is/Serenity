@@ -6,10 +6,10 @@ namespace @(Model.RootNamespace).@(Model.Module)
     using System.Collections.Generic;
 
     [IdProperty("@Model.Identity")@if (Model.NameField != null) {<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
-    public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName), GridOptions>
+    public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>
     {
-        public @(Model.ClassName)Grid(jQueryObject container, GridOptions options)
-            : base(container, options)
+        public @(Model.ClassName)Grid(jQueryObject container)
+            : base(container)
         {
         }
 

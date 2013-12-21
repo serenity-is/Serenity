@@ -47,7 +47,7 @@ namespace Serenity.CodeGenerator
             Directory.CreateDirectory(scriptPath);
 
             GenerateRow();
-            GenerateCss();
+            //GenerateCss();
             GenerateForm();
             GenerateRepository();
             GenerateEndpoint();
@@ -99,7 +99,7 @@ namespace Serenity.CodeGenerator
                 Path.Combine(@"Modules\", Path.Combine(model.Module, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
         }
 
-        private void GenerateCss()
+        /*private void GenerateCss()
         {
             string relativeFile = Path.Combine(@"Content\site\", "site.module." + model.Module.ToLowerInvariant() + ".less");
             string file = Path.Combine(siteWebPath, relativeFile);
@@ -116,7 +116,7 @@ namespace Serenity.CodeGenerator
             }
 
             AddFileToProject(siteWebProj, relativeFile);
-        }
+        }*/
 
         private void GenerateForm()
         {
