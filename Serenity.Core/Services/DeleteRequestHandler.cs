@@ -73,7 +73,7 @@ namespace Serenity.Services
         {
             var idField = (Field)Row.IdField;
 
-            var query = new SqlQuery().FromAs(Row, 0)
+            var query = new SqlQuery().From(Row)
                 .WhereEqual(idField, Request.EntityId.Value);
 
             PrepareQuery(query);

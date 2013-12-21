@@ -113,7 +113,7 @@ namespace Serenity.Services
             var row = newRow.CreateNew();
             var newId = ((IIdRow)newRow).IdField[newRow];
 
-            var query = new SqlQuery().FromAs(row, 0).Select((Field)(((IIdRow)newRow).IdField));
+            var query = new SqlQuery().From(row).Select((Field)(((IIdRow)newRow).IdField));
             foreach (var field in indexFields)
                 query.WhereEqual(field, field.AsObject(newRow));
 

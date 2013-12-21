@@ -190,7 +190,7 @@
         protected virtual SqlQuery CreateQuery()
         {
             return new SqlQuery()
-                .FromAs(Row, 0);
+                .From(Row);
         }
 
         protected virtual void ApplySortBy(SqlQuery query, SortBy sortBy)

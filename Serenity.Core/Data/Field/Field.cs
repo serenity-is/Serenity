@@ -16,6 +16,7 @@ namespace Serenity.Data
         internal int _size;
         internal FieldFlags _flags;
         internal string _expression;
+        internal string _queryExpression;
         internal HashSet<string> _referencedJoins;
         internal string _joinAlias;
         internal LeftJoin _join;
@@ -34,6 +35,7 @@ namespace Serenity.Data
         protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
         {
             _name = name;
+            _queryExpression = "T0." + name;
             _size = size;
             _flags = flags;
             _type = type;
@@ -145,6 +147,7 @@ namespace Serenity.Data
                 if (_expression != value)
                 {
                     _expression = value;
+                    _queryExpression = value ?? ("T0." + _name);
                     _referencedJoins = null;
                     _joinAlias = null;
                     _origin = null;
@@ -202,7 +205,7 @@ namespace Serenity.Data
         {
             get
             {
-                return Expression ?? ("T0." + this.Name);
+                return _queryExpression;
             }
         }
 

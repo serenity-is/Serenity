@@ -54,7 +54,7 @@ namespace Serenity.Data
                     var row = new DataEnumRow();
                     var fld = DataEnumRow.Fields;
 
-                    list = new SqlSelect().FromAs(row, 0).Select(
+                    list = new SqlSelect().FromAsT0(row).Select(
                         fld.EnumType,
                         fld.ValueKey,
                         fld.ValueId)

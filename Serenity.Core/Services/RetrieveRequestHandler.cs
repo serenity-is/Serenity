@@ -122,7 +122,7 @@
         protected virtual SqlQuery CreateQuery()
         {
             var query = new SqlQuery()
-                .FromAs(Row, 0);
+                .From(Row);
 
             query.WhereEqual((Field)(((IIdRow)Row).IdField), Request.EntityId.Value);
 

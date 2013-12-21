@@ -375,6 +375,8 @@
     <Compile Include="Sql\Query\SqlDelete.cs" />
     <Compile Include="Sql\Query\SqlInsert.cs" />
     <Compile Include="Sql\Query\SqlUpdate.cs" />
+    <Compile Include="Sql\Select\SqlQuery_From.cs" />
+    <Compile Include="Sql\Select\SqlQuery_Select.cs" />
     <Compile Include="Sql\Select\SqlQuery.cs" />
     <Compile Include="Sql\Select\SqlQuery_AppendUtils.cs" />
     <Compile Include="Sql\Select\SqlQuery_Clone.cs" />

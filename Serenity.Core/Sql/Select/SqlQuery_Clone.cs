@@ -27,7 +27,6 @@
             {
                 s = _columns[i];
                 var si = new Column(s.Expression, s.AsAlias, s.IntoRow, s.IntoField);
-                si.GetFromReader = s.GetFromReader;
                 clone._columns.Add(si);
             }
 

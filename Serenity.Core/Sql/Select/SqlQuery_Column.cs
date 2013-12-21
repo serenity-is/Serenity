@@ -25,9 +25,6 @@ namespace Serenity.Data
             /// <summary>
             ///   Alan IDataReader'dan hangi Field nesnesinin içine yüklenecek</summary>
             public Field IntoField;
-            /// <summary>
-            ///   A delegate to get data from reader</summary>
-            public Action<IDataReader, int> GetFromReader;
 
             public Column(string expression, string asAlias, int intoRow, Field intoField)
             {

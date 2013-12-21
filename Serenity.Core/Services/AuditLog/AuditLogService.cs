@@ -28,7 +28,7 @@ namespace Serenity.Services
                     request.Sort.Length == 0)
                     request.Sort = new SortBy[] { new SortBy(fld.DateField.Name, true) };
 
-                var query = new SqlQuery().FromAs(row, 0)
+                var query = new SqlQuery().From(row)
                     .Select(
                         (Field)fld.IdField,
                         fld.EntityTypeIdField,

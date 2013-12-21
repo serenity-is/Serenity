@@ -38,7 +38,7 @@ namespace Serenity.Data
                 new SqlQuery().Select(
                     Sql.Max(orderField.Name))
                 .FromAs(
-                    tableName, 0)
+                    tableName, Alias.T0)
                 .Where(
                     filter)))
             {
@@ -106,8 +106,8 @@ namespace Serenity.Data
 
             using (IDataReader reader = SqlHelper.ExecuteReader(connection,
                 new SqlQuery()
-                    .SelectOf(0, orderField.Name)
-                    .FromAs(tableName, 0)
+                    .Select(Alias.T0[orderField.Name])
+                    .FromAs(tableName, Alias.T0)
                     .Where(new Criteria(keyField) == recordID)))
             {
                 if (reader.Read())
@@ -160,12 +160,9 @@ namespace Serenity.Data
             int order = 0;
 
             SqlQuery query = new SqlQuery()
-                .SelectOf(0,
-                    keyField)
-                .FromAs(
-                    tableName, 0)
-                .Where(
-                    filter)
+                .Select(Alias.T0[keyField])
+                .FromAs(tableName, Alias.T0)
+                .Where(filter)
                 .OrderBy(
                     orderField);
 
@@ -247,7 +244,7 @@ namespace Serenity.Data
                     keyField,
                     orderField)
                 .FromAs(
-                    tableName, 0)
+                    tableName, Alias.T0)
                 .Where(
                     filter)
                 .OrderBy(

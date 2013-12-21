@@ -30,8 +30,7 @@ namespace Serenity
 
             using (IDataReader reader = SqlHelper.ExecuteReader(connection, new SqlQuery().Select(
                 mBoundID)
-            .FromAs(
-                tableName, 0)
+            .FromAs(tableName, Alias.T0)
             .Where(
                 new Criteria(mKeyID) == keyID)))
             {
@@ -75,7 +74,7 @@ namespace Serenity
                 mID,
                 mBoundID)
             .FromAs(
-                tableName, 0)
+                tableName, Alias.T0)
             .Where(
                 new Criteria(mKeyID) == keyID);
 

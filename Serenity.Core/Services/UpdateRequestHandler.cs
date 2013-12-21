@@ -93,7 +93,7 @@ namespace Serenity.Services
             var id = Row.IdField[Row].Value;
 
             return new SqlQuery()
-                .FromAs(Old, 0)
+                .From(Old)
                 .SelectTableFields()
                 .WhereEqual(idField, id);
         }

@@ -54,120 +54,6 @@
             return this;
         }
 
-        public SqlQuery Select(string expression)
-        {
-            if (expression == null || expression.Length == 0)
-                throw new ArgumentNullException("expression");
-
-            _cachedQuery = null;
-            _columns.Add(new Column(expression, null, _intoIndex, null));
-            return this;
-        }
-
-        public SqlQuery Select(params string[] expressions)
-        {
-            foreach (var s in expressions)
-                Select(s);
-            return this;
-        }
-
-        public SqlQuery SelectOf(int joinAlias, string field)
-        {
-            if (field == null || field.Length == 0)
-                throw new ArgumentNullException("field");
-
-            _cachedQuery = null;
-            _columns.Add(new Column(joinAlias.TableAliasDot() + field, field, _intoIndex, null));
-            return this;
-        }
-
-        public SqlQuery SelectOf(int joinAlias, params string[] fields)
-        {
-            if (fields == null)
-                throw new ArgumentNullException("fields");
-
-            foreach (string field in fields)
-                SelectOf(joinAlias, field);
-            return this;
-        }
-
-        public SqlQuery SelectOf(int joinAlias, params Field[] fields)
-        {
-            if (fields == null)
-                throw new ArgumentNullException("fields");
-
-            foreach (var field in fields)
-                SelectAs(joinAlias.TableAliasDot() + field.Name, field);
-
-            return this;
-        }
-
-        public SqlQuery SelectAs(string expression, string alias)
-        {
-            if (expression == null || expression.Length == 0)
-                throw new ArgumentNullException("expression");
-            if (alias == null || alias.Length == 0)
-                throw new ArgumentNullException("alias");
-
-            _cachedQuery = null;
-            _columns.Add(new Column(expression, alias, _intoIndex, null));
-            return this;
-        }
-
-        public SqlQuery SelectAs(string expression, string alias, Action<IDataReader, int> getFromReader)
-        {
-            if (expression == null || expression.Length == 0)
-                throw new ArgumentNullException("field");
-            if (alias == null || alias.Length == 0)
-                throw new ArgumentNullException("alias");
-
-            var info = new Column(expression, alias, _intoIndex, null);
-            info.GetFromReader = getFromReader;
-            _cachedQuery = null;
-            _columns.Add(info);
-            return this;
-        }
-
-        public SqlQuery Select(Field field)
-        {
-            if (field == null)
-                throw new ArgumentNullException("field");
-
-            _cachedQuery = null;
-
-            if (field.Expression == null)
-                _columns.Add(new Column(field.QueryExpression, field.Name, _intoIndex, field));
-            else
-            {
-                EnsureJoinOf(field);
-                _columns.Add(new Column(field.Expression, field.Name, _intoIndex, field));
-            }
-
-            return this;
-        }
-
-        public SqlQuery Select(params Field[] fields)
-        {
-            if (fields == null)
-                throw new ArgumentNullException("fields");
-
-            foreach (Field field in fields)
-                Select(field);
-            return this;
-        }
-
-        public SqlQuery SelectAs(string expression, Field alias)
-        {
-            if (expression == null || expression.Length == 0)
-                throw new ArgumentNullException("field");
-            if (alias == null)
-                throw new ArgumentNullException("alias");
-
-            _cachedQuery = null;
-            _columns.Add(new Column(expression, alias.Name, _intoIndex, alias));
-            return this;
-        }
-
         void IFilterableQuery.EnsureForeignJoin(Field field)
         {
             this.EnsureJoinOf(field);
@@ -216,64 +102,6 @@
             return this;
         }
         
-        public SqlQuery From(string table)
-        {
-            _cachedQuery = null;
-            AppendUtils.AppendWithSeparator(ref _from, Consts.Comma, table);
-            if (_mainTableName == null)
-                _mainTableName = table;
-            return this;
-        }
-
-        public SqlQuery FromAs(string table, Alias tableAlias)
-        {
-            return FromAs(table, tableAlias.Name);
-        }
-
-        public SqlQuery FromAs(string table, string tableAlias)
-        {
-            if (tableAlias == null || tableAlias.Length == 0)
-                throw new ArgumentNullException("tableAlias");
-
-            From(table);
-
-            _from.Append(' ');
-            _from.Append(tableAlias);
-
-            if (_joinAliases == null)
-                _joinAliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            _joinAliases.Add(tableAlias);
-
-            return this;
-        }
-
-        public SqlQuery FromAs(Row row, string tableAlias)
-        {
-            if (row == null)
-                throw new ArgumentNullException("row");
-
-            return FromAs(row.Table, tableAlias).Into(row);
-        }
-
-        public SqlQuery FromAs(string table, int joinNumber)
-        {
-            if (joinNumber >= 0)
-                return FromAs(table, joinNumber.TableAlias());
-            else
-                return From(table);
-        }
-
-        public SqlQuery FromAs(Row row, int joinNumber)
-        {
-            if (row == null)
-                throw new ArgumentNullException("row");
-
-            if (joinNumber >= 0)
-                return FromAs(row.Table, "T" + joinNumber.ToString()).Into(row);
-            else
-                return From(row.Table).Into(row);
-        }
 
 
         public SqlQuery LeftJoin(string joinTable, Alias joinAlias, string joinCondition)
@@ -753,8 +581,6 @@
                     var row = into[info.IntoRow];
                     info.IntoField.GetFromReader(reader, index, row);
                 }
-                else if (info.GetFromReader != null)
-                    info.GetFromReader(reader, index);
                 else if (info.IntoRow != -1)
                 {
                     var row = into[info.IntoRow];

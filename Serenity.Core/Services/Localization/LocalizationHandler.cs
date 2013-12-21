@@ -121,7 +121,7 @@ namespace Serenity.Data
 
             var row = info.localRowInstance.CreateNew();
             if (new SqlQuery()
-                    .FromAs(row, 0)
+                    .From(row)
                     .Select((Field)info.localRowInterface.IdField)
                     .WhereEqual((Field)info.mappedIdField, recordId)
                     .WhereEqual(info.localRowInterface.CultureIdField, cultureId)
@@ -196,7 +196,7 @@ namespace Serenity.Data
 
             var row = info.localRowInstance.CreateNew();
             if (new SqlQuery()
-                    .FromAs(row, 0)
+                    .From(row)
                     .SelectTableFields()
                     .WhereEqual((Field)info.mappedIdField, recordId)
                     .WhereEqual(info.localRowInterface.CultureIdField, cultureId)
