@@ -43,30 +43,15 @@
             return this;
         }
 
-        //public SqlQuery LeftJoin(string joinTable, Alias joinAlias, string joinCondition)
-        //{
-        //    return LeftJoin(joinTable, joinAlias.Name, joinCondition);
-        //}
+        public SqlQuery LeftJoin(string joinTable, Alias joinAlias, BaseCriteria onCriteria)
+        {
+            if (joinAlias == null)
+                throw new ArgumentNullException("joinAlias");
 
-        //public SqlQuery LeftJoin(string joinTable, string joinAlias, BaseCriteria joinCondition)
-        //{
-        //    if (Object.ReferenceEquals(joinCondition, null))
-        //        throw new ArgumentNullException("joinCondition");
+            var join = new LeftJoin(joinTable, joinAlias.Name, onCriteria);
 
-        //    LeftJoin(joinTable, joinAlias, joinCondition.ToString(this));
-
-        //    return this;
-        //}
-
-        //public SqlQuery LeftJoin(string joinTable, Alias joinAlias, BaseCriteria joinCondition)
-        //{
-        //    if (Object.ReferenceEquals(joinCondition, null))
-        //        throw new ArgumentNullException("joinCondition");
-
-        //    LeftJoin(joinTable, joinAlias, joinCondition.ToString(this));
-
-        //    return this;
-        //}
+            return this;
+        }
 
         //public SqlQuery LeftJoinOn(string thisField, RowFieldsBase joinTable, Alias joinAlias, Field field)
         //{
@@ -95,8 +80,6 @@
 
         //    return LeftJoin(joinTable.TableName, joinAlias, new Criteria(joinAlias, idField) == thisField);
         //}
-
-
 
         //public SqlQuery LeftJoin(string joinTable, int joinNumber, BaseCriteria joinCondition)
         //{
