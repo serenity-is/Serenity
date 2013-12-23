@@ -23,13 +23,13 @@ namespace Serenity.Data
 
             this.fields = fields;
             this.toTable = toTable;
-            this.onCriteria = OnCriteria;
+            this.onCriteria = onCriteria;
 
-            if (!Object.ReferenceEquals(onCriteria, null))
+            if (!Object.ReferenceEquals(this.onCriteria, null))
             {
                 this.onCriteriaString = this.onCriteria.ToString();
 
-                var aliases = JoinAliasLocator.Locate(onCriteria.ToString());
+                var aliases = JoinAliasLocator.Locate(this.onCriteriaString);
                 if (aliases != null && aliases.Count > 0)
                     referencedAliases = aliases;
             }
