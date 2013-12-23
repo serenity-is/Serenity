@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ namespace Serenity.CodeGenerator
         private string siteWebProj;
         private string scriptPath;
         private string scriptProject;
+        private string kdiff3Path;
         private Encoding utf8 = new UTF8Encoding(true);
 
         private void AppendComment(StreamWriter sw)
@@ -33,6 +35,7 @@ namespace Serenity.CodeGenerator
         {
             this.model = model;
             projectPath = projectRoot;
+            kdiff3Path = ConfigurationManager.AppSettings["KDiff3Path"];
             siteWebPath = Path.Combine(projectPath, ConfigurationManager.AppSettings["WebPath"]);
             siteWebProj = Path.Combine(projectPath, ConfigurationManager.AppSettings["WebProject"]);
             scriptPath = Path.Combine(projectPath, ConfigurationManager.AppSettings["ScriptPath"]);
@@ -58,38 +61,108 @@ namespace Serenity.CodeGenerator
             GenerateScriptDialog();
         }
 
-        private void CreateDirectoryOrBackupFile(string file)
+        private string CreateDirectoryOrBackupFile(string file)
         {
             if (File.Exists(file))
-                BackupFile(file);
+                return BackupFile(file);
             else
+            {
                 Directory.CreateDirectory(Path.GetDirectoryName(file));
+                return null;
+            }
         }
 
-        private void BackupFile(string file)
+        private void MergeChanges(string backup, string file)
+        {
+            if (backup == null || !File.Exists(backup) || !File.Exists(file))
+                return;
+
+            bool isEqual;
+            using (var fs1 = new FileStream(backup, FileMode.Open))
+            using (var fs2 = new FileStream(file, FileMode.Open))
+                isEqual = StreamsContentsAreEqual(fs1, fs2);
+
+            if (isEqual)
+            {
+                File.Delete(backup);
+                return;
+            }
+
+            var generated = Path.ChangeExtension(file, Path.GetExtension(file) + ".gen.bak");
+            File.Copy(file, generated, true);
+            File.Copy(backup, file, true);
+
+            if (kdiff3Path.IsEmptyOrNull() ||
+                !File.Exists(kdiff3Path))
+            {
+                throw new InvalidOperationException(String.Format("KDiff3, verilen '{0}' konumunda bulunamadı!",
+                    kdiff3Path ?? ""));
+            }
+
+            Process.Start(kdiff3Path, "--auto " + file + " " + file + " " + generated + " -o " + file);
+        }
+
+        private static bool StreamsContentsAreEqual(Stream stream1, Stream stream2)
+        {
+            const int bufferSize = 2048 * 2;
+            var buffer1 = new byte[bufferSize];
+            var buffer2 = new byte[bufferSize];
+
+            while (true)
+            {
+                int count1 = stream1.Read(buffer1, 0, bufferSize);
+                int count2 = stream2.Read(buffer2, 0, bufferSize);
+
+                if (count1 != count2)
+                {
+                    return false;
+                }
+
+                if (count1 == 0)
+                {
+                    return true;
+                }
+
+                int iterations = (int)Math.Ceiling((double)count1 / sizeof(Int64));
+                for (int i = 0; i < iterations; i++)
+                {
+                    if (BitConverter.ToInt64(buffer1, i * sizeof(Int64)) != BitConverter.ToInt64(buffer2, i * sizeof(Int64)))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        private string BackupFile(string file)
         {
             if (File.Exists(file))
             {
                 var backupFile = string.Format("{0}.{1}.bak", file, DateTime.Now.ToString("yyyyMMdd_HHmmss"));
                 File.Move(file, backupFile);
+                return backupFile;
             }
+
+            return null;
         }
 
         private void CreateNewSiteWebFile(string code, string relativeFile)
         {
             string file = Path.Combine(siteWebPath, relativeFile);
-            CreateDirectoryOrBackupFile(file);
+            var backup = CreateDirectoryOrBackupFile(file);
             using (var sw = new StreamWriter(file, false, utf8))
                 sw.Write(code);
+            MergeChanges(backup, file);
             AddFileToProject(siteWebProj, relativeFile);
         }
 
         private void CreateNewSiteScriptFile(string code, string relativeFile)
         {
             string file = Path.Combine(scriptPath, relativeFile);
-            CreateDirectoryOrBackupFile(file);
+            var backup = CreateDirectoryOrBackupFile(file);
             using (var sw = new StreamWriter(file, false, utf8))
                 sw.Write(code);
+            MergeChanges(backup, file);
             AddFileToProject(scriptProject, relativeFile);
         }
 
