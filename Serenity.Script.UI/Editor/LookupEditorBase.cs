@@ -93,4 +93,12 @@ namespace Serenity
         {
         }
     }
+
+    public abstract class LookupEditorBase<TItem> : LookupEditorBase<object, TItem>
+    {
+        public LookupEditorBase(jQueryObject hidden)
+            : base(hidden, null)
+        {
+        }
+    }
 }
