@@ -18,7 +18,7 @@ namespace @(Model.RootNamespace).@(Model.Module).Entities
 
     /// <summary>
     ///   Entity class for "@Model.Tablename" table</summary>
-    [Schema("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), AuditLog]
+    [Schema("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename")]
     [ReadPermission("@Model.Permission")]
     [ModifyPermission("@Model.Permission")]
     [JsonConverter(typeof(JsonRowConverter))]
