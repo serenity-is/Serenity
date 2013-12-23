@@ -50,6 +50,8 @@
 
             var join = new LeftJoin(joinTable, joinAlias.Name, onCriteria);
 
+            Join(join);
+
             return this;
         }
 
