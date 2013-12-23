@@ -99,7 +99,7 @@ namespace Serenity.CodeGenerator
                     kdiff3Path ?? ""));
             }
 
-            Process.Start(kdiff3Path, "--auto " + file + " " + file + " " + generated + " -o " + file);
+            Process.Start(kdiff3Path, "--auto " + file + " " + generated + " -o " + file);
         }
 
         private static bool StreamsContentsAreEqual(Stream stream1, Stream stream2)
