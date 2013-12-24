@@ -13,7 +13,7 @@ namespace Serenity
             : base(input, new object())
         {
             input.AddClass("dateQ");
-            input.DatePicker(new DatePickerOptions());
+            input.DatePicker(new DatePickerOptions { ShowOn = "button" });
         }
 
         public String Value
