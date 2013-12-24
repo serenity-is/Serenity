@@ -43,7 +43,8 @@ namespace Serenity.Data
                     referencedAliases.AddRange(toTableAliases);
             }
 
-            fields._joins.Add(this.Name, this);
+            if (fields != null)
+                fields._joins.Add(this.Name, this);
         }
 
         /// <summary>
