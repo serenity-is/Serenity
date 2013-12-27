@@ -9,7 +9,7 @@ namespace Serenity.Test
     public class QConfigTests
     {
         [Test]
-        public void ConfigApplicationPathCanBeSet()
+        public void ApplicationPathCanBeSet()
         {
             // to check script name safety
             var qConfig = Window.Instance.As<dynamic>()["Q$Config"];
@@ -26,6 +26,22 @@ namespace Serenity.Test
             {
                 Q.Config.ApplicationPath = backup;
             }
+        }
+
+        [Test]
+        public void RootNamespacesListWorks()
+        {
+            Assert.IsNotNull(Q.Config.RootNamespaces, "The list is initialized");
+            
+            var count = Q.Config.RootNamespaces.Count;
+            Assert.IsTrue(count > 0 && Q.Config.RootNamespaces.Contains("Serenity"),
+                "The list should contain 'Serenity'");
+
+            Q.Config.RootNamespaces.Add("SomeDummyNamespace");
+            Assert.IsTrue(Q.Config.RootNamespaces.Contains("SomeDummyNamespace"), "Can add a new root namespace to list");
+
+            Q.Config.RootNamespaces.Remove("SomeDummyNamespace");
+            Assert.IsTrue(!Q.Config.RootNamespaces.Contains("SomeDummyNamespace"), "Can remove namespace from the list");
         }
     }
 }
