@@ -15,4 +15,5 @@ ErrorLog.db
 *.dcp
 *.dsk
 *.suo
+*.user
 StyleCop.Cache

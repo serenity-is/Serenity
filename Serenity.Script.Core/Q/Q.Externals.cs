@@ -100,6 +100,11 @@ namespace Serenity
             {
                 return null;
             }
+
+            public static string FormatISODateTimeUTC(JsDate date)
+            {
+                return null;
+            }
         }
     }
 }

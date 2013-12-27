@@ -25,7 +25,10 @@ namespace Serenity.Test
         [Test]
         public void ConfirmDialogWorks()
         {
-            Q.Confirm("Test", delegate { });
+            var confirmed = false;
+
+            Q.Confirm("Test", delegate { confirmed = true; });
+
             Assert.IsTrue(jQuery.Select("div.s-ConfirmDialog.ui-dialog:visible").Length > 0,
                 "Check confirmation dialog exists and visible.");
 
@@ -33,6 +36,15 @@ namespace Serenity.Test
 
             Assert.IsTrue(jQuery.Select("div.s-ConfirmDialog.ui-dialog:visible").Length == 0,
                 "Check confirmation dialog is closed.");
+
+            var yesButton = jQuery.Select(".ui-dialog-buttonset button:contains('"  + Texts.Dialogs.YesButton.Get() + "')");
+            Assert.IsTrue(yesButton.Length == 1, "Check that dialog has Yes button");
+
+            var noButton = jQuery.Select(".ui-dialog-buttonset button:contains('"  + Texts.Dialogs.NoButton.Get() + "')");
+            Assert.IsTrue(noButton.Length == 1, "Check that dialog has No button");
+
+            yesButton.Click();
+            Assert.IsTrue(confirmed, "Ensure yes button click called success delegate");
         }
 
         [Test]
