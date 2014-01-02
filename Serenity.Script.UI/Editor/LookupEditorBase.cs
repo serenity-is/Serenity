@@ -8,6 +8,7 @@ namespace Serenity
     [Element("<input type=\"hidden\"/>")]
     public abstract class LookupEditorBase<TOptions, TItem> : Select2Editor<TOptions, TItem>
         where TOptions: class, new()
+        where TItem: class, new()
     {
         private Lookup<TItem> lookup;
 
@@ -70,12 +71,13 @@ namespace Serenity
                 object idValue = item[lookup.IdField];
                 string id = idValue == null ? "" : idValue.ToString();
 
-                AddItem(id, text);
+                AddItem(id, text, item);
             }
         }
     }
 
     public abstract class LookupEditorBase<TItem> : LookupEditorBase<object, TItem>
+        where TItem: class, new()
     {
         public LookupEditorBase(jQueryObject hidden)
             : base(hidden, null)

@@ -40,7 +40,7 @@ namespace Serenity
                 {
                     string key = isStrings ? item : item[0];
                     string text = isStrings ? item : item[1] ?? item[0];
-                    AddItem(key, text);
+                    AddItem(key, text, item);
                 }
             }
         }
