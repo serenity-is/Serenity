@@ -22,6 +22,8 @@ namespace Serenity.Services
         protected static CaptureLogHandler<TRow> captureLogHandler;
         protected static bool hasAuditLogAttribute;
 
+        private bool _displayOrderFix;
+
         protected IDbConnection Connection 
         { 
             get { return UnitOfWork.Connection; } 
@@ -45,6 +47,8 @@ namespace Serenity.Services
 
         protected virtual void SetInternalFields()
         {
+            SetDisplayOrderField();
+
             var loggingRow = Row as ILoggingRow;
             if (loggingRow != null)
             {
@@ -86,6 +90,12 @@ namespace Serenity.Services
 
         protected virtual void OnAfterInsert()
         {
+            if (_displayOrderFix)
+            {
+                var displayOrderRow = Row as IDisplayOrderRow;
+                DisplayOrderHelper.FixRecordOrdering(Connection, displayOrderRow,
+                    GetDisplayOrderFilter(), Response.EntityId, displayOrderRow.DisplayOrderField[Row].Value, false);
+            }
         }
 
         protected virtual void OnReturn()
@@ -286,6 +296,28 @@ namespace Serenity.Services
             }
         }
 
+        protected virtual BaseCriteria GetDisplayOrderFilter()
+        {
+            return DisplayOrderFilterHelper.GetDisplayOrderFilterFor(Row);
+        }
+
+        protected virtual void SetDisplayOrderField()
+        {
+            var displayOrderRow = Row as IDisplayOrderRow;
+            if (displayOrderRow != null)
+            {
+                var value = displayOrderRow.DisplayOrderField.AsObject(Row);
+                if (value == null || Convert.ToInt32(value) <= 0)
+                {
+                    var filter = GetDisplayOrderFilter();
+                    displayOrderRow.DisplayOrderField.AsObject(Row,
+                        DisplayOrderHelper.GetNextDisplayOrderValue(Connection, displayOrderRow, filter));
+                }
+                else
+                    _displayOrderFix = true;
+            }
+        }
+
         public TCreateResponse Process(IUnitOfWork unitOfWork, TCreateRequest request)
         {
             if (unitOfWork == null)
@@ -317,5 +349,22 @@ namespace Serenity.Services
     public class CreateRequestHandler<TRow> : CreateRequestHandler<TRow, SaveRequest<TRow>, CreateResponse>
         where TRow : Row, IIdRow, new()
     {
+    }
+
+    public class DisplayOrderFilterHelper
+    {
+        public static BaseCriteria GetDisplayOrderFilterFor(Row row)
+        {
+            var flt = Criteria.Empty;
+            var parentIdRow = row as IParentIdRow;
+            if (parentIdRow != null)
+                flt = flt & (new Criteria((Field)parentIdRow.ParentIdField) == Convert.ToInt64(((Field)parentIdRow.ParentIdField).AsObject(row)));
+
+            var activeRow = row as IIsActiveRow;
+            if (activeRow != null)
+                flt = flt & new Criteria((Field)activeRow.IsActiveField) >= 0;
+
+            return flt;
+        }
     }
 }

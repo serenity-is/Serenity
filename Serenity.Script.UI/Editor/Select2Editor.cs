@@ -10,11 +10,13 @@ namespace Serenity
     {
         public string Id { get; set; }
         public string Text { get; set; }
+        public object Source { get; set; }
     }
 
     [Element("<input type=\"hidden\"/>")]
     public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, IStringValue
         where TOptions : class, new()
+        where TItem: class, new()
     {
         protected List<Select2Item> items;
         protected int pageSize = 100;
@@ -100,12 +102,13 @@ namespace Serenity
             this.items.Clear();
         }
 
-        protected void AddItem(string key, string text)
+        protected void AddItem(string key, string text, TItem source = null)
         {
             this.items.Add(new Select2Item
             {
                 Id = key,
-                Text = text
+                Text = text,
+                Source = source
             });
         }
 

@@ -25,7 +25,7 @@ namespace Serenity.Data
         ///   One more of maximum display order values of records in the group. 
         ///   If none, 1.</returns>
         public static int GetNextDisplayOrderValue(IDbConnection connection, string tableName, 
-            Field orderField, Criteria filter)
+            Field orderField, BaseCriteria filter)
         {
             if (connection == null)
                 throw new ArgumentNullException("connection");
@@ -60,7 +60,7 @@ namespace Serenity.Data
         /// <returns>
         ///   One more of maximum display order values of records in the group. 
         ///   If none, 1.</returns>
-        public static int GetNextDisplayOrderValue(IDbConnection connection, IDisplayOrderRow row, Criteria filter)
+        public static int GetNextDisplayOrderValue(IDbConnection connection, IDisplayOrderRow row, BaseCriteria filter)
         {
             return GetNextDisplayOrderValue(connection, ((Row)row).Table, row.DisplayOrderField, filter);
         }
@@ -216,7 +216,7 @@ namespace Serenity.Data
         ///   If any of the display order values is changed true.</returns>
         public static bool FixRecordOrdering(IDbConnection connection, string tableName,
             Field keyField, Field baseKeyField, Field orderField, 
-            Criteria filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder,
+            BaseCriteria filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder,
             bool hasUniqueConstraint = false)
         {
             if (connection == null)
@@ -507,7 +507,7 @@ namespace Serenity.Data
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
         public static bool FixRecordOrdering(IDbConnection connection, IDisplayOrderRow row,
-            Criteria filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint = false)
+            BaseCriteria filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint = false)
         {
             return FixRecordOrdering(connection, ((Row)row).Table, (Field)((IIdRow)row).IdField, (row is IStagingRow) ?
                 ((IStagingRow)row).StagingBaseIdField : null, row.DisplayOrderField, filter, recordID, 

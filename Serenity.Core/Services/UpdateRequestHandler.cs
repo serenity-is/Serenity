@@ -56,8 +56,26 @@ namespace Serenity.Services
         {
         }
 
+        protected virtual void SetDisplayOrderField()
+        {
+            var displayOrderRow = Row as IDisplayOrderRow;
+            if (displayOrderRow != null &&
+                displayOrderRow.DisplayOrderField[Old] != displayOrderRow.DisplayOrderField[Row])
+            {
+                var filter = GetDisplayOrderFilter();
+                DisplayOrderHelper.FixRecordOrdering(Connection, displayOrderRow, filter, Row.IdField[Row].Value,
+                    displayOrderRow.DisplayOrderField[Row].Value, false);
+            }
+        }
+
+        protected virtual BaseCriteria GetDisplayOrderFilter()
+        {
+            return DisplayOrderFilterHelper.GetDisplayOrderFilterFor(Row);
+        }
+
         protected virtual void OnAfterUpdate()
         {
+            SetDisplayOrderField();
         }
 
         protected virtual void OnReturn()
