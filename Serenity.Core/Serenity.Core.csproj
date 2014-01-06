@@ -390,7 +390,6 @@
     <Compile Include="Sql\Select\SqlQuery_Column.cs" />
     <Compile Include="Sql\Select\SqlQuery_Consts.cs" />
     <Compile Include="Sql\Select\SqlQuery_FullTextSearch.cs" />
-    <Compile Include="Sql\Select\SqlQuery_StringList.cs" />
     <Compile Include="Sql\Select\SqlQuery_ToString.cs" />
     <Compile Include="Sql\SqlConnections.cs" />
     <Compile Include="Sql\SqlHelper.cs" />

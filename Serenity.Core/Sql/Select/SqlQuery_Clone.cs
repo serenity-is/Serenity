@@ -36,7 +36,7 @@
                 clone._where = new StringBuilder(_where.ToString());
             if (_orderBy != null)
             {
-                clone._orderBy = new StringList();
+                clone._orderBy = new List<string>();
                 clone._orderBy.AddRange(_orderBy);
             }
             if (_groupBy != null)

@@ -25,7 +25,7 @@
         private StringBuilder _from = new StringBuilder();
         private string _mainTableName;
         private StringBuilder _where;
-        private StringList _orderBy;
+        private List<string> _orderBy;
         private StringBuilder _groupBy;
         private StringBuilder _having;
         private HashSet<string> _joinAliases = null;
@@ -79,13 +79,7 @@
 
         void IDbFilterable.Where(string condition)
         {
-            if (condition == null || condition.Length == 0)
-                throw new ArgumentNullException(condition);
-
-            _cachedQuery = null;
-            AppendUtils.AppendWithSeparator(ref _where, Sql.Keyword.And, condition);
-
-            EnsureJoinsInCriteria(condition);
+            this.Where(condition);
         }
 
         public SqlQuery Where(params string[] conditions)
@@ -93,11 +87,8 @@
             if (conditions == null || conditions.Length == 0)
                 throw new ArgumentNullException("conditions");
 
-            _cachedQuery = null;
-            AppendUtils.AppendWithSeparator(ref _where, Sql.Keyword.And, conditions);
-
             foreach (var s in conditions)
-                EnsureJoinsInCriteria(s);
+                Where(conditions);
 
             return this;
         }
@@ -111,7 +102,7 @@
 
             // sıralama listesi boşsa yeni oluştur
             if (_orderBy == null)
-                _orderBy = new StringList();
+                _orderBy = new List<string>();
 
             _orderBy.Add(field);
 
@@ -164,7 +155,7 @@
 
             // sıralama listesi boşsa yeni oluştur
             if (_orderBy == null)
-                _orderBy = new StringList();
+                _orderBy = new List<string>();
 
             //field = PlaceContextLanguage(field);
 
