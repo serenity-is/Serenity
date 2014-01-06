@@ -157,6 +157,7 @@
     <Compile Include="Data\FieldTypes\Int64Field.cs" />
     <Compile Include="Data\FieldTypes\StreamField.cs" />
     <Compile Include="Data\FieldTypes\StringField.cs" />
+    <Compile Include="Data\DeltaLister.cs" />
     <Compile Include="Data\Join\OuterApply.cs" />
     <Compile Include="Data\Join\CrossApply.cs" />
     <Compile Include="Data\Join\InnerJoin.cs" />
