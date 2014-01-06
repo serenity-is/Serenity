@@ -16,6 +16,7 @@ namespace Serenity.Data
         internal Row _originalValues;
         internal Row _previousValues;
         internal Hashtable _dictionaryData;
+        internal object[] _indexedData;
         internal PropertyChangedEventHandler _propertyChanged;
         internal Action<Row> _postHandler;
         private Dictionary<String, String> _validationErrors;
@@ -147,6 +148,15 @@ namespace Serenity.Data
                 clone._dictionaryData = (Hashtable)this._dictionaryData.Clone();
             else
                 clone._dictionaryData = null;
+
+            if (_indexedData != null)
+            {
+                clone._indexedData = new object[_indexedData.Length];
+                for (var i = 0; i < _indexedData.Length; i++)
+                    clone._indexedData[i] = _indexedData[i];
+            }
+            else
+                clone._indexedData = null;
 
             if (_previousValues != null)
                 clone._previousValues = _previousValues.CloneRow();
@@ -292,6 +302,32 @@ namespace Serenity.Data
                     _dictionaryData = new Hashtable();
                 _dictionaryData[key] = value;
             }
+        }
+
+        public void SetIndexedData(int index, object value)
+        {
+            if (value == null)
+            {
+                if (_indexedData == null)
+                    return;
+
+                _indexedData[index] = null;
+            }
+            else
+            {
+                if (_indexedData == null)
+                    _indexedData = new object[this.FieldCount];
+
+                _indexedData[index] = value;
+            }
+        }
+
+        public object GetIndexedData(int index)
+        {
+            if (_indexedData != null)
+                return _indexedData[index];
+
+            return null;
         }
 
         public object GetDictionaryData(object key)
