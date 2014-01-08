@@ -13,10 +13,10 @@ namespace Serenity
             : base(input, opt)
         {
             if (options.Cols != null)
-                input.Attribute("Cols", options.Cols.Value.ToString());
+                input.Attribute("cols", options.Cols.Value.ToString());
 
             if (options.Rows != null)
-                input.Attribute("Rows", options.Rows.Value.ToString());
+                input.Attribute("rows", options.Rows.Value.ToString());
         }
 
         public string Value

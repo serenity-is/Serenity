@@ -118,8 +118,8 @@ namespace Serenity.ComponentModel
 
         public override void SetParams(IDictionary<string, object> editorParams)
         {
-            editorParams["Cols"] = Cols;
-            editorParams["Rows"] = Rows;
+            editorParams["cols"] = Cols;
+            editorParams["rows"] = Rows;
         }
 
         public int Cols { get; private set; }
