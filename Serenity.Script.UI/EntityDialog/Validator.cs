@@ -10,7 +10,7 @@ namespace Serenity
 {
     public static class ValidationHelper
     {
-        public static bool TriggerSubmit(jQueryObject form, Func<bool> validateBeforeSave, Action submitHandler)
+        public static bool AsyncSubmit(jQueryObject form, Func<bool> validateBeforeSave, Action submitHandler)
         {
             var validator = form.As<jQueryValidationObject>().Validate();
 
@@ -31,6 +31,27 @@ namespace Serenity
             });
 
             form.Trigger("submit");
+            return true;
+        }
+
+        public static bool Submit(jQueryObject form, Func<bool> validateBeforeSave, Action submitHandler)
+        {
+            var validator = form.As<jQueryValidationObject>().Validate();
+
+            dynamic valSettings = validator.As<dynamic>().settings;
+            if (valSettings.abortHandler != null)
+                return false;
+
+            if (validateBeforeSave != null &&
+                validateBeforeSave() == false)
+                return false;
+
+            if (!validator.ValidateForm())
+                return false;
+                
+            if (submitHandler != null)
+                submitHandler();
+
             return true;
         }
     }

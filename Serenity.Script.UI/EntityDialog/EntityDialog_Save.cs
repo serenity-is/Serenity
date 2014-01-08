@@ -92,7 +92,7 @@ namespace Serenity
         protected virtual bool Save(Action<ServiceResponse> callback)
         {
             var self = this;
-            return ValidationHelper.TriggerSubmit(this.ById("Form"), () => self.ValidateBeforeSave(), delegate
+            return ValidationHelper.Submit(this.ById("Form"), () => self.ValidateBeforeSave(), delegate
             {
                 self.Save_SubmitHandler(callback);
             });
