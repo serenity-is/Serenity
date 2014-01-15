@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CKEditor\CKEditor.cs" />
     <Compile Include="Select2\Select2.cs" />
     <Compile Include="Dialogs\AlertOptions.cs" />
     <Compile Include="Dialogs\BlockUIOptions.cs" />
