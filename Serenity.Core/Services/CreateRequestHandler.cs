@@ -52,7 +52,7 @@ namespace Serenity.Services
             var loggingRow = Row as ILoggingRow;
             if (loggingRow != null)
             {
-                loggingRow.InsertDateField[Row] = DateTime.UtcNow;
+                loggingRow.InsertDateField[Row] = DateTimeField.ToDateTimeKind(DateTime.Now, loggingRow.InsertDateField.DateTimeKind);
                 loggingRow.InsertUserIdField[Row] = SecurityHelper.CurrentUserId;
             }
 
