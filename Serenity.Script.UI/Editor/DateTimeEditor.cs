@@ -80,7 +80,7 @@ namespace Serenity
 
                 var datePart = Q.FormatDate(Q.Externals.ParseDate(value), "yyyy-MM-dd");
                 var timePart = this.time.GetValue();
-                return datePart + "T" + timePart;
+                return datePart + "T" + timePart + ":00.000";
             }
             set
             {
