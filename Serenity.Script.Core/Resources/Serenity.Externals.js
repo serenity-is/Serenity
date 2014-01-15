@@ -954,7 +954,7 @@ Q$Externals.jQuerySelect2Initialization = function () {
         if ( $( event.target ).closest(".ui-dialog").length ) {
             return true;
         }
-        return !!$( event.target ).closest(".ui-datepicker, .select2-drop").length;
+        return !!$( event.target ).closest(".ui-datepicker, .select2-drop, .cke").length;
     }
 }
 
@@ -963,7 +963,7 @@ if (window.jQuery && window.jQuery.ui)
 else
     jQuery(function ($) {
         if (window.jQuery.ui)
-            Q$Externals.jQueryDatepickerInitialization();
+            Q$Externals.jQuerySelect2Initialization();
     });
 
 Q$Externals.postToService = function (options) {
