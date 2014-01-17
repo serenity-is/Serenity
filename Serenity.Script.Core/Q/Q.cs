@@ -21,17 +21,6 @@ namespace Serenity
             return null;
         }
 
-        [ScriptSkip]
-        public static Exception AsException(this string s)
-        {
-            return null;
-        }
-
-        public static Exception ArgumentNull(this string s)
-        {
-            return String.Format("{0} is null!", s).AsException();
-        }
-
         [InlineCode("!!({value})")]
         public static bool IsTrue(object value)
         {

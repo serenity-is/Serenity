@@ -95,7 +95,7 @@ namespace Serenity
         private static Type GetEditorType(string editorTypeKey)
         {
             if (editorTypeKey == null)
-                throw "editorTypeKey".ArgumentNull();
+                throw new ArgumentNullException("editorTypeKey");
 
             if (!KnownEditorTypes.ContainsKey(editorTypeKey))
             {
@@ -110,14 +110,14 @@ namespace Serenity
                 if (editorType != null)
                 {
                     if (!typeof(Widget).IsAssignableFrom(editorType))
-                        throw String.Format("{0} editor type is not a subclass of Widget", editorType.FullName).AsException();
+                        throw new Exception(String.Format("{0} editor type is not a subclass of Widget", editorType.FullName));
 
                     KnownEditorTypes[editorTypeKey] = editorType;
 
                     return editorType;
                 }
                 else
-                    throw String.Format("PropertyGrid: Can't find {0} editor type!", editorTypeKey).AsException();
+                    throw new Exception(String.Format("PropertyGrid: Can't find {0} editor type!", editorTypeKey));
             }
             else
                 return KnownEditorTypes[editorTypeKey];
