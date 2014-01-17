@@ -44,7 +44,6 @@
     <Compile Include="LocalText.cs" />
     <Compile Include="Lookup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Q\Q.Extensibility.cs" />
     <Compile Include="Q\Q.BlockUI.cs" />
     <Compile Include="Q\Q.Config.cs" />
     <Compile Include="Q\Q.cs" />
