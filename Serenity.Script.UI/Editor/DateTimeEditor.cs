@@ -55,7 +55,7 @@ namespace Serenity
                     (hour == toHour && min > toMin))
                     break;
 
-                var t = (hour > 10 ? "" : "0") + hour + ":" + (min > 10 ? "" : "0") + min;
+                var t = (hour >= 10 ? "" : "0") + hour + ":" + (min >= 10 ? "" : "0") + min;
                 list.Add(t);
 
                 min += stepMins;
