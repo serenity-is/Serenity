@@ -9,6 +9,7 @@ namespace Serenity
         {
             /// <summary>
             /// Variable that holds web applications root path. Should be set when page is loaded.
+            /// It can be also set by a link in page header like link id="ApplicationPath" value="/MyApplication/"
             /// </summary>
             public static string ApplicationPath = "/";
 

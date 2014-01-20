@@ -178,7 +178,7 @@ namespace Serenity
                 }
 
                 if (dialogType == null)
-                    throw (typeName + " dialog sınıfı bulunamadı!").AsException();
+                    throw new Exception(typeName + " dialog sınıfı bulunamadı!");
 
                 entityDialogType = dialogType;
             }

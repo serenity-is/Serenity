@@ -29,5 +29,30 @@ namespace Serenity.Test
             o.As<dynamic>().date = Q.Externals.FormatISODateTimeUTC(date);
             Assert.AreEqual(deserialized, o, "Compare original object and deserialization");
         }
+
+        [Test]
+        public void IsTrueWorks()
+        {
+            Assert.AreEqual(Q.IsTrue(1), true, "1 is true");
+            Assert.AreEqual(Q.IsTrue(0), false, "0 is false");
+            Assert.AreEqual(Q.IsTrue(null), false, "null is false");
+            Assert.AreEqual(Q.IsTrue(Script.Undefined), false, "undefined is false");
+            Assert.AreEqual(Q.IsTrue("0"), true, "'0' is true");
+            Assert.AreEqual(Q.IsTrue("1"), true, "'1' is true");
+            Assert.AreEqual(Q.IsTrue("-1"), true, "'-1' is true");
+            Assert.AreEqual(Q.IsTrue("xysa"), true, "any other value is true");
+        }
+
+        [Test]
+        public void IsFalseWorks()
+        {
+            Assert.AreEqual(Q.IsFalse(1), false, "1 is false");
+            Assert.AreEqual(Q.IsFalse(0), true, "0 is true");
+            Assert.AreEqual(Q.IsFalse(null), true, "null is true");
+            Assert.AreEqual(Q.IsFalse(Script.Undefined), true, "undefined is true");
+            Assert.AreEqual(Q.IsFalse("0"), false, "'0' is false");
+            Assert.AreEqual(Q.IsFalse("-1"), false, "-1 is false");
+            Assert.AreEqual(Q.IsFalse("xysa"), false, "any other value is false");
+        }
     }
 }

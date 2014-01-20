@@ -17,7 +17,7 @@ namespace Serenity
             private static void LoadScriptData(string name)
             {
                 if (!registered.ContainsKey(name))
-                    throw String.Format("Script data {0} is not found in registered script list!", name).AsException();
+                    throw new Exception(String.Format("Script data {0} is not found in registered script list!", name));
 
                 name = name + ".js?" + registered[name];
 

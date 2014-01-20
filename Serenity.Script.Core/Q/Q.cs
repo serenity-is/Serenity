@@ -1,6 +1,4 @@
 ﻿using jQueryApi;
-using System;
-using System.Html;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -15,29 +13,35 @@ namespace Serenity
         {
         }
 
+        /// <summary>
+        /// Converts object to its JSON representation (serializes it)
+        /// </summary>
+        /// <param name="o">Object to convert to JSON</param>
+        /// <returns>JSON serialized string</returns>
         [InlineCode("$.toJSON({o})")]
         public static string ToJSON(object o)
         {
             return null;
         }
 
-        [ScriptSkip]
-        public static Exception AsException(this string s)
-        {
-            return null;
-        }
-
-        public static Exception ArgumentNull(this string s)
-        {
-            return String.Format("{0} is null!", s).AsException();
-        }
-
+        /// <summary>
+        /// Returns true for any other value than false, 0 (number) or null / undefined. 
+        /// String '0' also considered true, unlike numeric 0.
+        /// </summary>
+        /// <param name="value">Value to be checked</param>
+        /// <returns>true, if value is something other than false, 0 or null / undefined, otherwise false</returns>
         [InlineCode("!!({value})")]
         public static bool IsTrue(object value)
         {
             return false;
         }
 
+        /// <summary>
+        /// Returns true for only false, 0 (number) or null / undefined. 
+        /// String '0' also returns false, unlike numeric 0.
+        /// </summary>
+        /// <param name="value">Value to be checked</param>
+        /// <returns>true  if value is false, 0 or null / undefined, otherwise false</returns>
         [InlineCode("!({value})")]
         public static bool IsFalse(object value)
         {

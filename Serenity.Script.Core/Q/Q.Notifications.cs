@@ -1,8 +1,4 @@
-﻿using jQueryApi;
-using System;
-using System.Html;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
+﻿using System.Html;
 
 namespace Serenity
 {
