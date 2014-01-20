@@ -35,6 +35,7 @@
   <ItemGroup>
     <Compile Include="Editor\CheckListEditor.cs" />
     <Compile Include="Editor\CheckTreeEditor.cs" />
+    <Compile Include="Editor\HtmlReportContentEditor.cs" />
     <Compile Include="Editor\HtmlContentEditor.cs" />
     <Compile Include="Editor\DateTimeEditor.cs" />
     <Compile Include="Editor\Select2Editor.cs" />

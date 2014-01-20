@@ -1,15 +1,19 @@
 ﻿using jQueryApi;
 using Serenity.ComponentModel;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Çok Satırlı Metin", typeof(HtmlContentEditorOptions))]
+    [Editor("Html İçerik", typeof(HtmlContentEditorOptions))]
     [Element("<textarea />")]
     public class HtmlContentEditor : Widget<HtmlContentEditorOptions>, IStringValue
     {
+        private bool instanceReady;
+
         public HtmlContentEditor(jQueryObject textArea, HtmlContentEditorOptions opt)
             : base(textArea, opt)
         {
@@ -28,24 +32,63 @@ namespace Serenity
             if (options.Rows != null)
                 textArea.Attribute("rows", options.Rows.Value.ToString());
 
-            CKEditor.Replace(id, new CKEditorConfig
+            var self = this;
+
+            var config = GetConfig();
+            CKEditor.Replace(id, config);
+        }
+
+        protected virtual void InstanceReady(CKEditorEventArgs x)
+        {
+            instanceReady = true;
+            J(x.Editor.Container.Element).AddClass(this.element.GetAttribute("class"));
+            x.Editor.SetData(this.element.GetValue());
+        }
+
+        protected virtual CKEditorConfig GetConfig()
+        {
+            var self = this;
+
+            return new CKEditorConfig
             {
                 CustomConfig = "",
                 Language = "tr",
-                BodyClass = "s-HtmlContentBody"
-            });
+                BodyClass = "s-HtmlContentBody",
+                On = new CKEditorEvents
+                {
+                    InstanceReady = x => self.InstanceReady(x)
+                },
+                ToolbarGroups = new CKToolbarGroup[] 
+                {
+                    new CKToolbarGroup { Name = "clipboard", Groups = new string[] { "clipboard", "undo" } },
+                    new CKToolbarGroup { Name = "editing", Groups = new string[] { "find", "selection", "spellchecker" } },
+                    new CKToolbarGroup { Name = "insert", Groups = new string[] { "links", "insert", "blocks", "bidi", "list", "indent" } },
+                    new CKToolbarGroup { Name = "forms", Groups = new string[] { "forms", "mode", "document", "doctools", "others", "about", "tools" } },
+                    new CKToolbarGroup { Name = "colors" },
+                    new CKToolbarGroup { Name = "basicstyles", Groups = new string[] { "basicstyles", "cleanup" } },
+                    new CKToolbarGroup { Name = "align" },
+                    new CKToolbarGroup { Name = "styles" }
+                },
+                RemoveButtons = "SpecialChar,Anchor,Subscript,Styles",
+                FormatTags = "p;h1;h2;h3;pre",
+                RemoveDialogTabs = "image:advanced;link:advanced",
+                ContentsCss = Q.ResolveUrl("~/content/site/site.htmlcontent.css"),
+                Entities = false,
+                EntitiesLatin = false,
+                EntitiesGreek = false,
+                Height = (options.Rows == null || options.Rows == 0) ? null : ((options.Rows * 20) + "px")
+            };
+        }
 
-            CKEditor.On("instanceReady", delegate
-            {
-                CKEditorInstance instance = CKEditor.Instances[id];
-                J(instance.Container.Element).AddClass(textArea.GetAttribute("class"));
-            });
+        private CKEditorInstance GetEditorInstance()
+        {
+            string id = this.element.GetAttribute("id");
+            return CKEditor.Instances[id];
         }
 
         public override void Destroy()
         {
-            string id = this.element.GetAttribute("id");
-            CKEditorInstance instance = CKEditor.Instances[id];
+            var instance = GetEditorInstance();
             if (instance != null)
                 instance.Destroy();
 
@@ -54,8 +97,22 @@ namespace Serenity
 
         public string Value
         {
-            get { return this.element.GetValue(); }
-            set { this.element.Value(value); }
+            get 
+            {
+                var instance = GetEditorInstance();
+                if (instanceReady && instance != null)
+                    return instance.GetData();
+                else
+                    return this.element.GetValue();
+            }
+            set 
+            {
+                var instance = GetEditorInstance();
+                if (instanceReady && instance != null)
+                    instance.SetData(value);
+                else
+                    this.element.Value(value); 
+            }
         }
 
         private static void IncludeCKEditor()
@@ -74,21 +131,6 @@ namespace Serenity
                 .Attribute("src", Q.ResolveUrl("~/Scripts/CKEditor/ckeditor.js"))
                 .AppendTo(Window.Document.Head);
 
-            CKEditor.Config.ToolbarGroups = new CKToolbarGroup[] 
-            {
-                new CKToolbarGroup { Name = "clipboard", Groups = new string[] { "clipboard", "undo" } },
-                new CKToolbarGroup { Name = "editing", Groups = new string[] { "find", "selection", "spellchecker" } },
-                new CKToolbarGroup { Name = "insert", Groups = new string[] { "links", "insert", "blocks", "bidi", "list", "indent" } },
-                new CKToolbarGroup { Name = "forms", Groups = new string[] { "forms", "mode", "document", "doctools", "others", "about", "tools" } },
-                new CKToolbarGroup { Name = "colors" },
-                new CKToolbarGroup { Name = "basicstyles", Groups = new string[] { "basicstyles", "cleanup" } },
-                new CKToolbarGroup { Name = "align" },
-                new CKToolbarGroup { Name = "styles" }
-            };
-
-            CKEditor.Config.RemoveButtons = "SpecialChar,Anchor,Subscript,Styles";
-            CKEditor.Config.FormatTags = "p;h1;h2;h3;pre";
-            CKEditor.Config.RemoveDialogTabs = "image:advanced;link:advanced";
         }
     }
 
