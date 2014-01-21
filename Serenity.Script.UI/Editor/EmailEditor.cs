@@ -103,7 +103,7 @@ namespace Serenity
                 var domainValue = domain.GetValue();
                 if (value.IsEmptyOrNull())
                 {
-                    if (domainValue.IsEmptyOrNull())
+                    if (options.ReadOnlyDomain || domainValue.IsEmptyOrNull())
                         return "";
 
                     return "@" + domainValue;
