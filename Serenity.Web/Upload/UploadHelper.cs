@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Drawing;
 using System.IO;
 using System.Web;
 
@@ -98,7 +100,8 @@ namespace Serenity.Web
             string temporaryFilePath = Path.Combine(UploadHelper.TemporaryPath(uploadRoot), temporaryFileName);
             UploadHelper.CopyFileAndRelated(temporaryFilePath, dbFilePath);
             long size = new FileInfo(dbFilePath).Length;
-            bool hasThumbnail = File.Exists(TemporaryImageUpload.GetThumbFileName(dbFilePath, null));
+            bool hasThumbnail = File.Exists(GetThumbFileName(dbFilePath));
+
             return new CopyTemporaryFileResult()
             {
                 FileSize = size,
@@ -300,7 +303,7 @@ namespace Serenity.Web
                 return null;
 
             if (thumbnailUrl)
-                fileName = TemporaryImageUpload.GetThumbFileName(fileName, null);
+                fileName = UploadHelper.GetThumbFileName(fileName);
 
             return UploadUrl(subFolder) + ToUrl(fileName);
         }
@@ -407,6 +410,132 @@ namespace Serenity.Web
                 fileName.EndsWith("/") ||
                 fileName.EndsWith("\\"))
                 throw new HttpException(0x194, "Invalid_Request");
+        }
+
+        /// <summary>
+        ///   Find thumbnail file name from image file name.</summary>
+        /// <param name="fileName">
+        ///   Image file name (if passed as null or empty result is also empty)</param>
+        /// <param name="thumbSuffix">
+        ///   Thumbnail extension (can be null, default "_t.jpg")</param>
+        /// <returns>
+        ///   Thumbnail file name.</returns>
+        public static string GetThumbFileName(string fileName, string thumbSuffix = "_t.jpg")
+        {
+            if (fileName != null && fileName.Length > 0)
+            {
+                if (fileName.IndexOf('/') >= 0)
+                    fileName = fileName.Replace('/', '\\');
+                string path = Path.GetDirectoryName(fileName);
+                return Path.Combine(path, Path.GetFileNameWithoutExtension(fileName) + thumbSuffix);
+            }
+            else
+                return fileName;
+        }
+
+        public static string FileNameSizeDisplay(string name, int bytes)
+        {
+            return name + " (" + FileSizeDisplay(bytes) + ')';
+        }
+
+        public static string FileSizeDisplay(int bytes)
+        {
+            var byteSize = (Math.Round((Decimal)bytes * 100m / 1024m) * 0.01m);
+            var suffix = "KB";
+            if (byteSize > 1000)
+            {
+                byteSize = (Math.Round((Decimal)byteSize * 0.001m * 100m) * 0.01m);
+                suffix = "MB";
+            }
+            var sizeParts = byteSize.ToString(Invariants.NumberFormat).Split('.');
+            string value;
+            if (sizeParts.Length > 1)
+            {
+                value = sizeParts[0] + "." + sizeParts[1].Substring(0, 2);
+            }
+            else
+            {
+                value = sizeParts[0];
+            }
+            return value + " " + suffix;
+        }
+
+        public static void RegisterFilesToDelete(IUnitOfWork unitOfWork, FilesToDelete filesToDelete)
+        {
+            unitOfWork.OnCommit += delegate()
+            {
+                try
+                {
+                    filesToDelete.KeepNewFiles();
+                    filesToDelete.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    ex.Log();
+                }
+            };
+
+            unitOfWork.OnRollback += delegate()
+            {
+                try
+                {
+                    filesToDelete.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    ex.Log();
+                }
+            };
+        }
+
+        /// <summary>
+        ///   (extension -> mime type) pairs for known mime types.</summary>
+        private static Dictionary<string, string> KnownMimeTypes = new Dictionary<string, string>() 
+        {
+            { ".bmp", "image/bmp" },
+            { ".css", "text/css" },
+            { ".gif", "image/gif" },
+            { ".jpg", "image/jpeg" },
+            { ".jpeg", "image/jpeg" },
+            { ".jpe", "image/jpeg" },
+            { ".js", "text/javascript" },
+            { ".htm", "text/html" },
+            { ".html", "text/html" },
+            { ".pdf", "application/pdf" },
+            { ".png", "image/png" },
+            { ".swf", "application/x-shockwave-flash" },          
+            { ".tiff", "image/tiff" },
+            { ".txt", "text/plain" }
+        };
+
+        /// <summary>
+        ///   Gets MIME type for a given file using information in Win32 HKEY_CLASSES_ROOT 
+        ///   registry key.</summary>
+        /// <param name="fileName">
+        ///   File name whose MIME type will be determined. Its only extension part will be used.</param>
+        /// <returns>
+        ///   Determined mime type for given file. "application/unknown" otherwise.</returns>
+        public static string GetMimeType(string fileName)
+        {
+            string mimeType;
+            string ext = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
+            if (KnownMimeTypes.TryGetValue(ext, out mimeType))
+                return mimeType;
+            else
+                mimeType = "application/unknown";
+
+            try
+            {
+                Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);
+                if (regKey != null && regKey.GetValue("Content Type") != null)
+                    mimeType = regKey.GetValue("Content Type").ToString();
+            }
+            catch (Exception)
+            {
+                return "application/unknown";
+            }
+
+            return mimeType;
         }
     }
 

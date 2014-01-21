@@ -743,9 +743,12 @@ Q$Externals.jQueryValidationInitialization = function () {
         $.validator.prototype.oldinit.call(this);
 
         function changeDelegate(event) {
+            if (this.form == null)
+                return;
+
             var validator = $.data(this.form, "validator"),
                 eventType = "on" + event.type.replace(/^validate/, "");
-            validator.settings[eventType] && validator.settings[eventType].call(validator, this);
+            validator && validator.settings[eventType] && validator.settings[eventType].call(validator, this);
         }
 
         function delegate(event) {

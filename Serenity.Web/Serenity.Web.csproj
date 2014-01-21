@@ -87,12 +87,13 @@
     <Compile Include="Script\DataScript.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Upload\ImageUploadEditorAttribute.cs" />
+    <Compile Include="Upload\FileUploadEditorAttribute.cs" />
     <Compile Include="Upload\FilesToDelete.cs" />
     <Compile Include="Upload\ImageChecker.cs" />
     <Compile Include="Upload\ImageCheckResult.cs" />
     <Compile Include="Upload\SwfInfo.cs" />
-    <Compile Include="Upload\TemporaryFileUpload.cs" />
-    <Compile Include="Upload\TemporaryImageUpload.cs" />
+    <Compile Include="Upload\UploadProcessor.cs" />
     <Compile Include="Upload\ThumbnailGenerator.cs" />
     <Compile Include="Upload\ImageScaleMode.cs" />
     <Compile Include="Upload\UploadHelper.cs" />
