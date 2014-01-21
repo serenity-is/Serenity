@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
@@ -12,6 +13,7 @@ namespace Serenity
     public class CKEditorConfig
     {
         public string CustomConfig { get; set; }
+        public string ContentsCss { get; set; }
         public bool AutoUpdateElement { get; set; }
         public string DefaultLanguage { get; set; }
         public String Height { get; set; }
@@ -28,6 +30,27 @@ namespace Serenity
         [ScriptName("format_tags")]
         public string FormatTags { get; set; }
         public string RemoveDialogTabs { get; set; }
+        public CKEditorEvents On { get; set; }
+
+        public bool Entities { get; set; }
+        [ScriptName("entities_latin")]
+        public bool EntitiesLatin { get; set; }
+        [ScriptName("entities_greek")]
+        public bool EntitiesGreek { get; set; }
+        [ScriptName("entities_additional")]
+        public string EntitiesAdditional { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class CKEditorEvents
+    {
+        public Action<CKEditorEventArgs> InstanceReady;
+    }
+
+    [Imported, Serializable]
+    public class CKEditorEventArgs
+    {
+        public CKEditorInstance Editor;
     }
 
     [Imported, Serializable]
@@ -61,15 +84,24 @@ namespace Serenity
     /// <summary>
     /// CKEDITOR import
     /// </summary>
-    [Imported, Serializable]
+    [Imported, ScriptNamespace("CKEDITOR"), ScriptName("editor")]
     public class CKEditorInstance
     {
-        public CKElement Container { get { return null; } }
-        public Element Element { get { return null; } }
-        public string Id { get { return null; } }
-        public string Name { get { return null; } }
+        public CKElement Container;
+        public Element Element;
+        public string Id;
+        public string Name;
 
         public void Destroy()
+        {
+        }
+
+        public string GetData()
+        {
+            return null;
+        }
+
+        public void SetData(string data)
         {
         }
     }

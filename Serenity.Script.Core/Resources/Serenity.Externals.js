@@ -954,7 +954,7 @@ Q$Externals.jQuerySelect2Initialization = function () {
         if ( $( event.target ).closest(".ui-dialog").length ) {
             return true;
         }
-        return !!$( event.target ).closest(".ui-datepicker, .select2-drop, .cke").length;
+        return !!$( event.target ).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog").length;
     }
 }
 

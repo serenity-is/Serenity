@@ -287,10 +287,13 @@ namespace Serenity.CodeGenerator
                 XElement g = null;
                 foreach (var group in doc.Elements(ns + "ItemGroup"))
                 {
-                    var compiles = group.Elements(ns + "Compile");
-                    foreach (var c in compiles)
+                    foreach (var c in group.Elements(ns + "Compile")
+                                .Concat(group.Elements(ns + "Content"))
+                                .Concat(group.Elements(ns + "None")))
                         if (c.Attribute("Include").Value.ToLowerInvariant() == codeFile.ToLowerInvariant())
-                            return;
+                        {
+                            return; // already in project file
+                        }
                 }
 
                 string contentType;
