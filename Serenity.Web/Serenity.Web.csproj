@@ -139,20 +139,46 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Style\serenity.override.uibutton.less" />
+    <None Include="Style\serenity.override.uidialog.less" />
+    <None Include="Style\serenity.override.uimenu.less" />
+    <None Include="Style\serenity.override.dropdownchecklist.less" />
+    <None Include="Style\serenity.grid.datagrid.less" />
+    <None Include="Style\serenity.override.slickgrid.less" />
+    <None Include="Style\serenity.grid.grouping.less" />
+    <None Include="Style\serenity.widget.toolfilter.less" />
+    <None Include="Style\serenity.grid.tree.less" />
+    <None Include="Style\serenity.grid.applytreeordering.less" />
+    <None Include="Style\serenity.form.editoritemlink.less" />
+    <None Include="Style\serenity.override.toastr.less" />
+    <None Include="Style\serenity.form.email.less" />
+    <None Include="Style\serenity.widget.maximizebutton.less" />
+    <None Include="Style\serenity.grid.includedeleted.less" />
+    <None Include="Style\serenity.widget.quicktextsearch.less" />
+    <None Include="Style\serenity.form.uploadprogress.less" />
+    <None Include="Style\serenity.form.inplacecreate.less" />
+    <None Include="Style\serenity.widget.linkdropdown.less" />
+    <None Include="Style\serenity.form.bootstrapstyle.less" />
+    <None Include="Style\serenity.form.base.less" />
+    <None Include="Style\serenity.widget.checkbox.less" />
+    <None Include="Style\serenity.override.select2.less" />
+    <None Include="Style\serenity.overrides.less" />
+    <None Include="Style\serenity.widget.checktreeeditor.less" />
+    <None Include="Style\serenity.widgets.less" />
     <None Include="Style\serenity.basic.less" />
     <None Include="Style\serenity.dialogs.less" />
-    <None Include="Style\serenity.filterpanel.less" />
+    <None Include="Style\serenity.widget.filterpanel.less" />
     <None Include="Style\serenity.forms.less" />
     <None Include="Style\serenity.grids.less" />
-    <None Include="Style\serenity.jqueryui.less" />
+    <None Include="Style\serenity.override.uibasic.less" />
     <None Include="Style\serenity.less" />
     <None Include="Style\serenity.mixins.less" />
-    <None Include="Style\serenity.propertygrid.less" />
-    <None Include="Style\serenity.quicksearch.less" />
+    <None Include="Style\serenity.widget.propertygrid.less" />
+    <None Include="Style\serenity.widget.quicksearchbar.less" />
     <None Include="Style\serenity.reset.less" />
-    <None Include="Style\serenity.slickpager.less" />
-    <None Include="Style\serenity.togglebutton.less" />
-    <None Include="Style\serenity.toolbar.less" />
+    <None Include="Style\serenity.widget.slickpager.less" />
+    <None Include="Style\serenity.widget.togglebutton.less" />
+    <None Include="Style\serenity.widget.toolbar.less" />
     <None Include="Style\serenity.toolbuttons.less" />
   </ItemGroup>
   <ItemGroup>

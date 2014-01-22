@@ -1,0 +1,8 @@
+﻿@import-once "serenity.mixins.less";
+
+.s-MaximizeButton { float: right; margin: 3px 4px 0 2px; width: 18px; height: 18px; padding: 1px; }
+.s-MaximizeButton.hover { padding: 0px; border: 1px solid #aaa; }
+.s-MaximizeButton a { width: 18px; height: 18px; display: block; background: transparent url(images/application-resize-full.png) no-repeat center center; opacity: 0.7; }
+.s-MaximizeButton.active { padding: 0px; border: 1px solid #aaa; } 
+.s-MaximizeButton.active a { opacity: 1; background-color: #fe7; background-image: url(images/application-resize-actual.png); }
+.s-Maximized { position: absolute !important; left: 8px !important; top: 8px !important; bottom: 8px !important; right: 8px !important; border: 2px solid #333; }
