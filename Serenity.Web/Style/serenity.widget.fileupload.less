@@ -1,0 +1,90 @@
+﻿@import-once "serenity.mixins.less";
+
+.fileinput-button input:disabled {
+    cursor: default;
+}
+
+.upload-progress {
+    width: 120px;
+    height: 11px;
+    margin: 4px 4px 0 0;
+    border: 1px solid #aaa;
+    padding: 2px;
+    background-color: #fff;
+    display: none;
+}
+
+.upload-progress div {
+    background-color: #ff7060;
+    height: 100%;
+}
+
+.s-Toolbar .upload-progress {
+    float: right;
+}
+
+.file-item {
+    border: 1px solid #ccc;
+    padding: 1px;
+    width: 128px;
+
+    .deleted {
+        text-decoration: overline;
+    }
+
+    .thumb {
+        background-repeat: no-repeat;
+        background-position: left top;
+        display: block;
+        width: 128px;
+        height: 96px;
+    }
+
+    .download {
+        padding: 4px 0 4px 38px;
+        background: url(site/paper-clip.png) no-repeat 18px 4px;
+    }
+
+    .download a {
+        color: #48c;
+    }
+
+    .filename {
+        height: 16px;
+        line-height: 16px;
+        display: block;
+        width: 128px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        text-align: center;
+        font-size: 9px;
+    }
+
+    .file-binary {
+        background-image: url(images/thumb-file-72.png);
+    }
+}
+
+.s-ImageUploadEditor {
+    ul {
+        border-width: 1px;
+        border-style: none solid solid solid;
+        border-color: #ccc;
+        padding: 3px;
+        overflow-y: auto;
+        background-color: #fff;
+        min-height: 116px;
+    }
+
+    .file-item {
+        box-shadow: 1px 1px 4px rgba(4, 4, 4, 0.2);
+    }
+
+    .s-Toolbar {
+        border-radius: 0px;
+    }
+}
+
+.s-ImageUploadEditor.hide-original-name ul {
+    min-height: 100px;
+}

@@ -12,12 +12,17 @@ namespace Serenity
     {
         private UploadedFile entity;
         private Toolbar toolbar;
-        private jQueryObject symbolDiv;
+        private jQueryObject fileSymbols;
         private jQueryObject uploadInput;
 
-        public ImageUploadEditor(jQueryObject input, ImageUploadEditorOptions opt)
-            : base(input, opt)
+        public ImageUploadEditor(jQueryObject div, ImageUploadEditorOptions opt)
+            : base(div, opt)
         {
+            div.AddClass("s-ImageUploadEditor");
+
+            if (options.OriginalNameProperty.IsEmptyOrNull())
+                div.AddClass("hide-original-name");
+
             var self = this;
 
             toolbar = new Toolbar(J("<div/>").AppendTo(this.Element), new ToolbarOptions
@@ -58,8 +63,7 @@ namespace Serenity
 
                     var newEntity = new UploadedFile
                     {
-                        Title = name,
-                        OriginalFile = name,
+                        OriginalName = name,
                         Filename = response.TemporaryFile
                     };
                     
@@ -69,11 +73,20 @@ namespace Serenity
                 }
             });
 
+            fileSymbols = jQuery.FromHtml("<ul/>")
+                .AppendTo(this.element);
+
             this.UpdateInterface();
         }
 
         private void Populate()
         {
+            bool displayOriginalName = !options.OriginalNameProperty.IsTrimmedEmpty();
+
+            if (entity == null)
+                UploadHelper.PopulateFileSymbols(fileSymbols, null, displayOriginalName);
+            else
+                UploadHelper.PopulateFileSymbols(fileSymbols, new List<UploadedFile> { entity }, displayOriginalName);
         }
 
         private void UpdateInterface()
@@ -113,7 +126,12 @@ namespace Serenity
             set
             {
                 if (value != null)
-                    this.entity = jQuery.ExtendObject(new UploadedFile(), value);
+                {
+                    if (Script.IsNullOrUndefined(value.Filename))
+                        this.entity = null;
+                    else
+                        this.entity = jQuery.ExtendObject(new UploadedFile(), value);
+                }
                 else
                     this.entity = null;
 
@@ -124,19 +142,22 @@ namespace Serenity
 
         void IGetEditValue.GetEditValue(PropertyItem property, dynamic target)
         {
-            target[property.Name] = this.Value;
+            target[property.Name] = this.entity == null ? null : this.entity.Filename.TrimToNull();
         }
 
         void ISetEditValue.SetEditValue(dynamic source, PropertyItem property)
         {
+            var value = new UploadedFile();
+            value.Filename = source[property.Name];
+            value.OriginalName = source[options.OriginalNameProperty];
+            this.Value = value;
         }
     }
 
     public class UploadedFile
     {
-        public string Title { get; set; }
         public string Filename { get; set; }
-        public string OriginalFile { get; set; }
+        public string OriginalName { get; set; }
     }
 
     [Serializable, Reflectable]
@@ -154,6 +175,7 @@ namespace Serenity
         public int MinSize { get; set; }
         [DisplayName("Maksimum Boyut")]
         public int MaxSize { get; set; }
+        [DisplayName("Orjinal Dosya Adı Alanı")]
+        public string OriginalNameProperty { get; set; }
     }
-
 }

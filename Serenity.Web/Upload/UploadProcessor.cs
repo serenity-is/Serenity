@@ -77,7 +77,7 @@ namespace Serenity.Web
 
             var success = false;
 
-            var temporaryPath = UploadHelper.TemporaryPath(UploadRoot.Default);
+            var temporaryPath = UploadHelper.TemporaryPath;
             Directory.CreateDirectory(temporaryPath);
             TemporaryFileHelper.PurgeDirectoryDefault(temporaryPath);
             string baseFileName = System.IO.Path.Combine(temporaryPath, Guid.NewGuid().ToString("N"));
@@ -146,7 +146,7 @@ namespace Serenity.Web
                     extension = (CheckResult == ImageCheckResult.PNGImage ? ".png" :
                         (CheckResult == ImageCheckResult.GIFImage ? ".gif" : ".jpg"));
 
-                    var temporaryPath = UploadHelper.TemporaryPath(UploadRoot.Default);
+                    var temporaryPath = UploadHelper.TemporaryPath;
                     Directory.CreateDirectory(temporaryPath);
                     TemporaryFileHelper.PurgeDirectoryDefault(temporaryPath);
                             

@@ -84,11 +84,11 @@ namespace Serenity.Services
                 }
         }
 
-        protected virtual void OnBeforeInsert()
+        protected virtual void BeforeInsert()
         {
         }
 
-        protected virtual void OnAfterInsert()
+        protected virtual void AfterInsert()
         {
             if (_displayOrderFix)
             {
@@ -335,10 +335,10 @@ namespace Serenity.Services
             ValidatePermissions();
             ValidateRequest();
             SetInternalFields();
-            OnBeforeInsert();
+            BeforeInsert();
             ClearNonTableAssignments();
             ExecuteInsert();
-            OnAfterInsert();
+            AfterInsert();
             DoAudit();
             OnReturn();
 

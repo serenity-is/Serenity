@@ -10,20 +10,21 @@ namespace Serenity.ComponentModel
 {
     public class ImageUploadEditorAttribute : FileUploadEditorAttribute
     {
-        public ImageUploadEditorAttribute()
+        public ImageUploadEditorAttribute(string originalNameProperty)
             : base("ImageUpload", 0, 0)
         {
             ScaleMode = ImageScaleMode.CropSourceImage;
             ThumbMode = ImageScaleMode.CropSourceImage;
         }
 
-        public ImageUploadEditorAttribute(
+        public ImageUploadEditorAttribute(string originalNameProperty = null,
             int minBytes = 0, int maxBytes = 0, int minWidth = 0, int maxWidth = 0, int minHeight = 0, int maxHeight = 0, 
             bool allowFlash = false, int scaleWidth = 0, int scaleHeight = 0, bool scaleSmaller = true, 
             ImageScaleMode scaleMode = ImageScaleMode.CropSourceImage, string thumbSizes = null, 
             ImageScaleMode thumbMode = ImageScaleMode.CropSourceImage, int thumbQuality = 0)
             : base("ImageUpload", minBytes, maxBytes)
         {
+            OriginalNameProperty = originalNameProperty;
             MinWidth = minWidth;
             MaxWidth = maxWidth;
             MinHeight = minHeight;
@@ -40,12 +41,15 @@ namespace Serenity.ComponentModel
         public override void SetParams(IDictionary<string, object> editorParams)
         {
             base.SetParams(editorParams);
-            editorParams["MinWidth"] = MinWidth;
-            editorParams["MaxWidth"] = MaxWidth;
-            editorParams["MinHeight"] = MinHeight;
-            editorParams["MaxHeight"] = MaxHeight;
+
+            editorParams["originalNameProperty"] = OriginalNameProperty;
+            editorParams["minWidth"] = MinWidth;
+            editorParams["maxWidth"] = MaxWidth;
+            editorParams["minHeight"] = MinHeight;
+            editorParams["maxHeight"] = MaxHeight;
         }
 
+        public string OriginalNameProperty { get; private set; }
         public int MinWidth { get; private set; }
         public int MaxWidth { get; private set; }
         public int MinHeight { get; private set; }
@@ -77,7 +81,7 @@ namespace Serenity.ComponentModel
             Image image = null;
             try
             {
-                var temporaryPath = Path.Combine(UploadHelper.TemporaryPath(UploadRoot.Default), temporaryFile);
+                var temporaryPath = Path.Combine(UploadHelper.TemporaryPath, temporaryFile);
                 using (var fs = new FileStream(temporaryPath, FileMode.Open))
                 {
                     if (this.MinBytes != 0 && fs.Length < this.MinBytes)
@@ -108,7 +112,7 @@ namespace Serenity.ComponentModel
 
                     if (result != ImageCheckResult.FlashMovie)
                     {
-                        string basePath = UploadHelper.TemporaryPath(UploadRoot.Default);
+                        string basePath = UploadHelper.TemporaryPath;
                         string baseFile = Path.GetFileNameWithoutExtension(temporaryFile);
 
                         TemporaryFileHelper.PurgeDirectoryDefault(basePath);

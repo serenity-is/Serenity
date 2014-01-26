@@ -196,14 +196,19 @@ namespace Serenity.Data
             }
         }
 
-        public static TField OfJoin<TField>(this TField field, Join join, string origin)
+        public static TField OfJoin<TField>(this TField field, Join join, string origin, FieldFlags extraFlags = FieldFlags.Internal)
             where TField: Field
         {
             if (join == null)
                 throw new ArgumentNullException("join");
 
             field.Expression = join.Name + "." + origin;
-            field.Flags = FieldFlags.Foreign;
+
+            if (field.Flags == FieldFlags.Default)
+                field.Flags = FieldFlags.Foreign | extraFlags;
+            else
+                field.Flags = field.Flags | FieldFlags.Foreign | extraFlags;
+
             return field;
         }
 

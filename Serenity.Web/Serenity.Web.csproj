@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Style\serenity.widget.fileupload.less" />
     <None Include="Style\serenity.override.uibutton.less" />
     <None Include="Style\serenity.override.uidialog.less" />
     <None Include="Style\serenity.override.uimenu.less" />
@@ -155,7 +156,6 @@
     <None Include="Style\serenity.widget.maximizebutton.less" />
     <None Include="Style\serenity.grid.includedeleted.less" />
     <None Include="Style\serenity.widget.quicktextsearch.less" />
-    <None Include="Style\serenity.form.uploadprogress.less" />
     <None Include="Style\serenity.form.inplacecreate.less" />
     <None Include="Style\serenity.widget.linkdropdown.less" />
     <None Include="Style\serenity.form.bootstrapstyle.less" />

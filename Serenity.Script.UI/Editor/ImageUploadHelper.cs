@@ -136,8 +136,103 @@ namespace Serenity
             }
             return value + " " + suffix;
         }
-    }
 
+        public static bool HasImageExtension(string filename)
+        {
+            if (filename == null)
+                return false;
+
+            filename = filename.ToLower();
+
+            return
+                filename.EndsWith(".jpg") ||
+                filename.EndsWith(".jpeg") ||
+                filename.EndsWith(".gif") ||
+                filename.EndsWith(".png");
+        }
+
+        public static string ThumbFileName(string filename)
+        {
+            filename = filename ?? "";
+            var idx = filename.LastIndexOf(".");
+            if (idx >= 0)
+                filename = filename.Substr(0, idx);
+
+            return filename + "_t.jpg";
+        }
+
+        public static string DbFileUrl(string filename)
+        {
+            filename = (filename ?? "").Replace("\\", "/");
+            return Q.ResolveUrl("~/upload/") + filename;
+        }
+
+        public static void ColorBox(jQueryObject link, dynamic options)
+        {
+            link.As<dynamic>().colorbox(new 
+            {
+                current = "resim {current} / {total}",
+                previous = "önceki",
+                next = "sonraki",
+                close = "kapat"
+            });
+        }
+
+        public static void PopulateFileSymbols(
+            jQueryObject container,
+            List<UploadedFile> items,
+            bool displayOriginalName = false)
+        {
+            items = items ?? new List<UploadedFile>();
+            container.Html("");
+
+            for (var index = 0; index < items.Count; index++)
+            {
+                var item = items[index];
+                var li = jQuery.FromHtml("<li/>")
+                    .AddClass("file-item")
+                    .Data("index", index);
+
+                bool isImage = HasImageExtension(item.Filename);
+
+                if (isImage)
+                    li.AddClass("file-image");
+                else
+                    li.AddClass("file-binary");
+
+                var editLink = "#" + index;
+
+                var thumb = jQuery.FromHtml("<a/>")
+                    .AddClass("thumb")
+                    .AppendTo(li);
+
+                string originalName = item.OriginalName ?? "";
+
+                if (isImage)
+                {
+                    thumb.Attribute("href", DbFileUrl(item.Filename));
+                    thumb.Attribute("target", "_blank");
+
+                    if (!originalName.IsEmptyOrNull())
+                        thumb.Attribute("title", (originalName));
+
+                    thumb.CSS("backgroundImage", "url(" + DbFileUrl(ThumbFileName(item.Filename)) + ")");
+                    ColorBox(thumb, new object());
+                }
+
+                if (displayOriginalName)
+                {
+                    jQuery.FromHtml("<div/>")
+                        .AddClass("filename")
+                        .Text(originalName)
+                        .Attribute("title", originalName)
+                        .AppendTo(li);
+                }
+
+                li.AppendTo(container);
+            };
+        }
+    }
 
     [Imported, Serializable, PreserveMemberCase]
     public class UploadResponse
@@ -148,5 +243,4 @@ namespace Serenity
         public int Width { get; set; }
         public int Height { get; set; }
     }
-
 }
