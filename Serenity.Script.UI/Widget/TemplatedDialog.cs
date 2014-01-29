@@ -116,6 +116,11 @@ namespace Serenity
             }), 0);
         }
 
+        protected override void AddCssClass()
+        {
+            // will add css class to ui-dialog container, not content element
+        }
+
         protected virtual DialogOptions GetDialogOptions()
         {
             DialogOptions opt = new DialogOptions();

@@ -23,7 +23,14 @@ namespace Serenity
             element.Bind("remove." + widgetName, (e) => self.Destroy())
                 .Data(widgetName, this);
 
+            AddCssClass();
+
             OnInit();
+        }
+
+        protected virtual void AddCssClass()
+        {
+            this.element.AddClass("s-" + this.GetType().Name);
         }
 
         protected virtual void OnInit()
@@ -32,6 +39,8 @@ namespace Serenity
 
         public virtual void Destroy()
         {
+            this.element.RemoveClass("s-" + this.GetType().Name);
+
             element.Unbind("." + widgetName)
                 .RemoveData(widgetName);
 

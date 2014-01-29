@@ -16,7 +16,7 @@ namespace Serenity
 
             var container = J("div.buttons-inner", this.element);
         
-            for (var i = 0; i < this.options.Buttons.Count; i++) 
+            for (var i = 0; i < this.options.Buttons.Count; i++)
             {
                 var b = this.options.Buttons[i];
 

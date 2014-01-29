@@ -28,8 +28,6 @@ namespace Serenity
 
             editors = new List<Widget>();
 
-            div.AddClass("s-PropertyGrid");
-
             var categoryIndexes = new JsDictionary<string, int>();
 
             var categoriesDiv = div;
