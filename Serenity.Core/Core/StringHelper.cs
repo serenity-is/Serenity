@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Text;
 using Serenity.Data;
+using System.Globalization;
 
 namespace Serenity
 {
@@ -271,6 +272,34 @@ namespace Serenity
                 return value.Substring(startIndex);
 
             return value.Substring(startIndex, maxLength);
+        }
+
+        public static String SanitizeFilename(string s)
+        {
+            if (s == null)
+                throw new ArgumentNullException("s");
+
+            s = RemoveDiacritics(s);
+            s = s.Replace("/", "_");
+            s = s.Replace(":", "_");
+            s = s.Replace("&", "_");
+            s = s.Replace("ý", "i");
+            return s.TrimToEmpty();
+        }
+
+        public static String RemoveDiacritics(string s)
+        {
+            var normalizedString = s.Normalize(NormalizationForm.FormKD);
+            var stringBuilder = new StringBuilder();
+
+            for (int i = 0; i < normalizedString.Length; i++)
+            {
+                Char c = normalizedString[i];
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                    stringBuilder.Append(c);
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

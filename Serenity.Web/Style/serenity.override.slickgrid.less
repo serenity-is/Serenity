@@ -1,0 +1,92 @@
+﻿@import-once "serenity.mixins.less";
+
+.slick-cell > a {
+  color: #575790;
+  text-decoration: none;
+}
+
+.slick-header.ui-state-default {
+    border-bottom: 0px;
+}
+
+.slick-header-columns, .slick-headerrow-columns {
+    border-bottom: 0px;
+}
+
+.ui-widget-content .slick-header-column, 
+.slick-header-column {
+    border-right: 1px solid silver;
+    background: transparent url(images/table-header.gif) repeat-x scroll center bottom; color: #000; font-weight: normal;
+}
+
+.ui-widget-content .slick-header-column.ui-state-default,
+ .slick-header-column.ui-state-default {
+    padding: 4px 3px 4px 4px;
+    border-right: 1px solid #dddddd;
+    border-left: 1px solid #f7f7f7;
+}
+
+.slick-header-column:hover, .slick-header-column-active {
+    background: white url(images/slick-header-columns-over-bg.gif) repeat-x center bottom;
+}
+
+.slick-sort-indicator, .ui-widget-content .slick-sort-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 5px;
+    margin-left: 4px;
+    float: right;
+}
+
+.slick-row {
+    line-height: 20px;
+}
+
+.slick-row.odd {
+    background-color: #f3f5f7;
+}
+
+.slick-row.ui-widget-content, .slick-row.ui-state-active {
+    border: 0px;
+}
+
+.slick-row.ui-state-active {
+    background: #F5F7D7;
+}
+
+.slick-row.loading {
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+
+.slick-cell, .ui-widget-content .slick-cell, .s-DataGrid .grid-container .slick-cell {
+    border-style: none solid solid none; 
+    border-color: transparent #dddddd #dddddd transparent;
+    border-width: 1px;
+    padding: 1px 4px 1px 4px;
+}
+
+.slick-row.ui-state-active {
+    background: #F5F7D7;
+}
+
+.slick-row.deleted, .ui-widget-content .slick-row-deleted { text-decoration: none !important; }
+.slick-viewport, .ui-widget-content .slick-viewport { background-color: #ffffff; }
+.ui-widget-content .slick-header-column:hover, .ui-widget-content .slick-header-column-active { background: white url(images/header-columns-over-bg.gif) repeat-x center bottom; }
+
+.slick-hide-header .slick-header-columns { height: 0px; } 
+.slick-hide-header .slick-header.ui-state-default { border: none; }
+
+.slick-no-cell-border .grid-container .slick-viewport .slick-cell,
+.s-DataGrid.slick-no-cell-border .grid-container .slick-viewport .slick-cell {
+    border-width: 0px;
+}
+
+.slick-no-cell-border .grid-container .slick-viewport .slick-header-columns .slick-header-column,
+.s-DataGrid.slick-no-cell-border .grid-container .slick-viewport .slick-header-columns .slick-header-column {
+    border-width: 0px;
+}
+
+.slick-no-odd-even .slick-row.odd {
+    background-color: #fff;
+}

@@ -52,7 +52,7 @@ namespace Serenity.Services
             }
         }
 
-        protected virtual void OnBeforeUpdate()
+        protected virtual void BeforeUpdate()
         {
         }
 
@@ -73,7 +73,7 @@ namespace Serenity.Services
             return DisplayOrderFilterHelper.GetDisplayOrderFilterFor(Row);
         }
 
-        protected virtual void OnAfterUpdate()
+        protected virtual void AfterUpdate()
         {
             SetDisplayOrderField();
         }
@@ -403,10 +403,10 @@ namespace Serenity.Services
             ValidateRequest();
 
             SetInternalFields();
-            OnBeforeUpdate();
+            BeforeUpdate();
             ClearNonTableAssignments();
             ExecuteUpdate();
-            OnAfterUpdate();
+            AfterUpdate();
             DoAudit();
             OnReturn();
 

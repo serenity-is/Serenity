@@ -22,10 +22,9 @@ namespace Serenity.Web
 
         public void Register(CopyTemporaryFileResult result)
         {
-            RegisterNewFile(result.DbFilePath);
+            RegisterNewFile(result.FilePath);
             RegisterOldFile(result.TemporaryFilePath);
         }
-
 
         public void RegisterNewFile(string file)
         {
@@ -35,13 +34,6 @@ namespace Serenity.Web
         public void RegisterOldFile(string file)
         {
             OldFiles.Add(file);
-        }
-
-        public void RegisterOldFile(UploadHelper helper, string dbFileName)
-        {
-            dbFileName = dbFileName.TrimToNull();
-            if (dbFileName != null)
-                OldFiles.Add(helper.DbFilePath(dbFileName));
         }
 
         public void KeepNewFiles()
