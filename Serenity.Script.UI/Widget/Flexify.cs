@@ -105,7 +105,7 @@ namespace Serenity
             if (tabPanels.Length > 0)
                 containers = tabPanels.Filter(":visible");
             
-            containers.Find(".flexify").Each((i, e) =>
+            containers.Find(".flexify").Add(tabPanels.Filter(".flexify:visible")).Each((i, e) =>
             {
                 self.ResizeElement(J(e));
             });
