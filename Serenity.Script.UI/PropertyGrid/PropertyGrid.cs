@@ -26,6 +26,8 @@ namespace Serenity
 
             items = options.Items ?? new List<PropertyItem>();
 
+            div.AddClass("s-PropertyGrid");
+
             editors = new List<Widget>();
 
             var categoryIndexes = new JsDictionary<string, int>();

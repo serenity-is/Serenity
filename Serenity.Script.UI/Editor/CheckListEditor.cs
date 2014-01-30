@@ -15,6 +15,8 @@ namespace Serenity
         public CheckListEditor(jQueryObject div, CheckListEditorOptions opt)
             : base(div, opt)
         {
+            div.AddClass("s-CheckListEditor");
+
             this.list = J("<ul/>").AppendTo(div);
 
             UpdateItems();

@@ -17,6 +17,8 @@ namespace Serenity
         public CheckTreeEditor(jQueryObject div, TOptions opt)
             : base(div, opt)
         {
+            div.AddClass("s-CheckTreeEditor");
+
             UpdateItems();
         }
 
