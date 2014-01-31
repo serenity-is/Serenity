@@ -38,8 +38,9 @@
     <Reference Include="Enyim.Caching">
       <HintPath>..\References\Couchbase\Enyim.Caching.dll</HintPath>
     </Reference>
-    <Reference Include="LZ4">
-      <HintPath>..\References\LZ4\LZ4.dll</HintPath>
+    <Reference Include="LZ4, Version=1.0.3.93, Culture=neutral, PublicKeyToken=fd2bda0a70c5a705, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\lz4net.1.0.3.93\lib\net40-client\LZ4.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(SolutionDir)packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>

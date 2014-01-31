@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://raw.github.com/volkanceylan/Serenity/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/volkanceylan/Serenity</projectUrl>
+    <iconUrl>https://raw.github.com/volkanceylan/Serenity/master/build/serenitylogo.jpg</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2014 Volkan Ceylan</copyright>
+    <tags>serenity, platform, application</tags>
+  </metadata>
+</package>
