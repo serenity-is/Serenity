@@ -33,7 +33,7 @@ namespace Serenity.Web
         /// <returns>
         ///   Generated thumbnail image. Should be disposed by caller.</returns>
         public static Image Generate(Image image, int thumbWidth, int thumbHeight, 
-            ImageScaleMode mode, Color backgroundColor)
+            ImageScaleMode mode, Color backgroundColor, float xDPI = 0, float yDPI = 0)
         {
             if (image == null)
                 throw new ArgumentNullException("image");
@@ -134,6 +134,12 @@ namespace Serenity.Web
             Bitmap thumb = new Bitmap(thumbWidth, thumbHeight, PixelFormat.Format24bppRgb);
             try 
             {
+                if ((xDPI != 0 && (thumb.HorizontalResolution != xDPI)) ||
+                    (yDPI != 0 && (thumb.VerticalResolution != yDPI)))
+                {
+                    thumb.SetResolution(xDPI, yDPI);
+                }
+
                 using (Graphics g = Graphics.FromImage(thumb))
                 {
                     // high quality parameters
