@@ -38,10 +38,16 @@ namespace Serenity.Data
                 throw new ArgumentNullException("containsAlias");
 
             cachedQuery = null;
-            AppendUtils.AppendWithSeparator(ref from, " ", "INNER JOIN CONTAINSTABLE(");
+
+            if (from.Length > 0)
+                from.Append(" \n");
+
+            from.Append("INNER JOIN CONTAINSTABLE(");
+
             from.AppendFormat(
                 "{0}, ({1}), '{2}') AS {5} ON ({5}.[key] = {3}.{4})",
                 searchTable, searchFields, searchQuery.Replace("'", "''"), searchTableAlias, searchTableKey, containsAlias);
+
             return this;
         }
     }

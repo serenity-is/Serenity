@@ -147,6 +147,7 @@
     <Compile Include="Data\FieldTypes\StreamField.cs" />
     <Compile Include="Data\FieldTypes\StringField.cs" />
     <Compile Include="Data\DeltaLister.cs" />
+    <Compile Include="Data\Interface\IDbGetExpression.cs" />
     <Compile Include="Data\Join\OuterApply.cs" />
     <Compile Include="Data\Join\CrossApply.cs" />
     <Compile Include="Data\Join\InnerJoin.cs" />
@@ -201,7 +202,6 @@
     <Compile Include="Data\Interface\IOrderedDictionary.cs" />
     <Compile Include="Data\Interface\IParentIdRow.cs" />
     <Compile Include="Data\Interface\ISqlQuery.cs" />
-    <Compile Include="Data\Interface\ISqlSelect.cs" />
     <Compile Include="Data\Interface\IStagingRow.cs" />
     <Compile Include="Data\Interface\IUnitOfWork.cs" />
     <Compile Include="Data\Interface\SortingOrder.cs" />
@@ -372,15 +372,9 @@
     <Compile Include="Sql\Query\SqlInsert.cs" />
     <Compile Include="Sql\Query\SqlUpdate.cs" />
     <Compile Include="Sql\Select\SqlQuery_Join.cs" />
-    <Compile Include="Sql\Select\SqlQuery_EnsureJoin.cs" />
-    <Compile Include="Sql\Select\SqlQuery_From.cs" />
-    <Compile Include="Sql\Select\SqlQuery_EntityExtensions.cs" />
-    <Compile Include="Sql\Select\SqlQuery_Select.cs" />
+    <Compile Include="Sql\Select\SqlQuery_Entity.cs" />
     <Compile Include="Sql\Select\SqlQuery.cs" />
-    <Compile Include="Sql\Select\SqlQuery_AppendUtils.cs" />
     <Compile Include="Sql\Select\SqlQuery_Clone.cs" />
-    <Compile Include="Sql\Select\SqlQuery_Column.cs" />
-    <Compile Include="Sql\Select\SqlQuery_Consts.cs" />
     <Compile Include="Sql\Select\SqlQuery_FullTextSearch.cs" />
     <Compile Include="Sql\Select\SqlQuery_ToString.cs" />
     <Compile Include="Sql\SqlConnections.cs" />

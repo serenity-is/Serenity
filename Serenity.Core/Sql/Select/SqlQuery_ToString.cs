@@ -39,6 +39,12 @@ namespace Serenity.Data
                 }
                 else
                 {
+                    const string AssignCmd = "@Value{0} = {1}";
+                    const string DeclareCmd = "DECLARE @Value{0} SQL_VARIANT\n";
+                    const string Equality = "(({0} IS NULL AND @Value{1} IS NULL) OR ({0} = @Value{1}))";
+                    const string Greater = "(({0} IS NOT NULL AND @Value{1} IS NULL) OR ({0} > @Value{1}))";
+                    const string LessThan = "(({0} IS NULL AND @Value{1} IS NOT NULL) OR ({0} < @Value{1}))";
+
                     // atlanması istenen kayıtları geçip geri kalanları getirebilmek için öncelikle sorguyu 
                     // sadece anahtar sahaları seçecek şekilde çalıştırıyor, atlanması istenen kayıt kadar 
                     // ilerliyor, bu son kaydın sıralanan alanlarının değerlerini buluyoruz.
@@ -82,7 +88,7 @@ namespace Serenity.Data
                     for (int i = 0; i < orderBy.Count; i++)
                     {
                         // her sıralı saha için bir SQL_VARIANT değişkeni tanımla
-                        sb.AppendFormat(Consts.DeclareCmd, i);
+                        sb.AppendFormat(DeclareCmd, i);
 
                         // sıralanan alanı oku
                         string o = orderBy[i];
@@ -114,7 +120,7 @@ namespace Serenity.Data
                     {
                         if (i > 0)
                             sb.Append(',');
-                        sb.AppendFormat(Consts.AssignCmd, i, order[i]);
+                        sb.AppendFormat(AssignCmd, i, order[i]);
                     }
 
                     // SqlSelect'in diğer kısımlarını sorguya ekle
@@ -151,7 +157,7 @@ namespace Serenity.Data
                                 check.Append(" AND ");
 
                             // null durumunu da gözönüne alan eşitlik karşılaştırmasını yaz
-                            check.AppendFormat(Consts.Equality, order[equality], equality);
+                            check.AppendFormat(Equality, order[equality], equality);
                         }
 
                         // büyüklük ya da küçüklük koşulundan önce araya AND koy. 
@@ -162,9 +168,9 @@ namespace Serenity.Data
                         // sıralamanın ters olup olmamasına göre bu satır için büyüklük 
                         // ya da küçüklük koşulunu null durumunu da gözönüne alarak ekle
                         if (desc[statement])
-                            check.AppendFormat(Consts.LessThan, order[statement], statement);
+                            check.AppendFormat(LessThan, order[statement], statement);
                         else
-                            check.AppendFormat(Consts.Greater, order[statement], statement);
+                            check.AppendFormat(Greater, order[statement], statement);
 
                         // bu satırın kapanış parantezi
                         check.Append(')');
@@ -380,7 +386,7 @@ namespace Serenity.Data
                 for (int i = 0; i < orderBy.Count; i++)
                 {
                     if (i > 0)
-                        sb.Append(',');
+                        sb.Append(", ");
 
                     sb.Append(orderBy[i].ToString());
                 }

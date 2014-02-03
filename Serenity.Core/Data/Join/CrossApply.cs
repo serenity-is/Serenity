@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 namespace Serenity.Data
 {
     public class CrossApply : Join
@@ -8,8 +9,8 @@ namespace Serenity.Data
         {
         }
 
-        public CrossApply(RowFieldsBase fields, string toTable, string alias)
-            : base(fields, toTable.IsEmptyOrNull() ? toTable : "(" + toTable + ")", alias, null)
+        public CrossApply(IDictionary<string, Join> joins, string toTable, string alias)
+            : base(joins, toTable.IsEmptyOrNull() ? toTable : "(" + toTable + ")", alias, null)
         {
         }
 

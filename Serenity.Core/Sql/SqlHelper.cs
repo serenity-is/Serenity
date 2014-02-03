@@ -144,60 +144,60 @@
 
 
         /// <summary>
-        ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
+        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
         /// <remarks>
         ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
         ///   çalıştırılabilir.</p>
-        ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+        ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
         ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
-        ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+        ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
         /// <returns>
         ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
-        public static IDataReader Execute(this ISqlSelect query, IDbConnection connection)
+        public static IDataReader Execute(this SqlQuery query, IDbConnection connection)
         {
             return ExecuteReader(connection, query.ToString(), query.Params);
         }
 
         /// <summary>
-        ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
+        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
         /// <remarks>
         ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
         ///   çalıştırılabilir.</p>
-        ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+        ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
         ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
-        ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+        ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
         /// <returns>
         ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
-        public static IDataReader Execute(this ISqlSelect query, IDbConnection connection, Dictionary param)
+        public static IDataReader Execute(this SqlQuery query, IDbConnection connection, Dictionary param)
         {
             return ExecuteReader(connection, query.ToString(), param);
         }
 
         /// <summary>
-        ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
         ///   sorgunun döndürdüğü her bir kayıt için parametresiz bir callback fonksiyonunu çağırır.</summary>
         /// <remarks>
         ///   <p>Bu bir extension metodu olduğundan direk <c>query.ForEach(connection, delegate() {...})</c> 
         ///   şeklinde de çalıştırılabilir.</p>
         ///   <p><c>query.GetFromReader(reader)</c> işlemi her satır için callback çağrılmadan 
         ///   önce çalıştırılır.</p>
-        ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+        ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
         ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
-        ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+        ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
         /// <param name="callBack">
         ///   Her kayıt için çağrılacak olan callback fonksiyonu.</param>
         /// <returns>
         ///   query.CountRecords true ise toplam kayıt sayısı, değilse 0.</returns>
-        public static int ForEach(this ISqlSelect query, IDbConnection connection,
+        public static int ForEach(this SqlQuery query, IDbConnection connection,
             Action callBack)
         {
             int count = 0;
@@ -514,14 +514,14 @@
        }
 
        /// <summary>
-       ///   Bağlantı üzerinde tek değer döndüren bir <see cref="ISqlSelect"/> sorgusunu çalıştırır.</summary>
+       ///   Bağlantı üzerinde tek değer döndüren bir <see cref="SqlQuery"/> sorgusunu çalıştırır.</summary>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı.</param>
        /// <param name="selectQuery">
-       ///   Çalıştırılacak sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Çalıştırılacak sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <returns>
        ///   Sorgunun döndürdüğü skalar değer.</returns>
-       public static object ExecuteScalar(IDbConnection connection, ISqlSelect selectQuery)
+       public static object ExecuteScalar(IDbConnection connection, SqlQuery selectQuery)
        {
            if (selectQuery == null)
                throw new ArgumentNullException("selectQuery");
@@ -530,14 +530,14 @@
        }
 
        /// <summary>
-       ///   Bağlantı üzerinde tek değer döndüren bir <see cref="ISqlSelect"/> sorgusunu çalıştırır.</summary>
+       ///   Bağlantı üzerinde tek değer döndüren bir <see cref="SqlQuery"/> sorgusunu çalıştırır.</summary>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı.</param>
        /// <param name="selectQuery">
-       ///   Çalıştırılacak sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Çalıştırılacak sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <returns>
        ///   Sorgunun döndürdüğü skalar değer.</returns>
-       public static object ExecuteScalar(IDbConnection connection, ISqlSelect selectQuery, Dictionary param)
+       public static object ExecuteScalar(IDbConnection connection, SqlQuery selectQuery, Dictionary param)
        {
            if (selectQuery == null)
                throw new ArgumentNullException("selectQuery");
@@ -659,39 +659,39 @@
        }
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
        /// <remarks>
-       ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>       
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="query">
-       ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <returns>
        ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
-       public static IDataReader ExecuteReader(IDbConnection connection, ISqlSelect query)
+       public static IDataReader ExecuteReader(IDbConnection connection, SqlQuery query)
        {
            return ExecuteReader(connection, query.ToString(), query.Params);
        }
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
        /// <remarks>
-       ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>       
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="query">
-       ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <returns>
        ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
-       public static IDataReader ExecuteReader(IDbConnection connection, ISqlSelect query, Dictionary param)
+       public static IDataReader ExecuteReader(IDbConnection connection, SqlQuery query, Dictionary param)
        {
            return ExecuteReader(connection, query.ToString(), param);
        }
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
        ///   sorgunun döndürdüğü her bir kayıt için <see cref="IDataReader"/> parametresi alan bir 
        ///   callback fonksiyonunu çağırır.</summary>
        /// <remarks>
@@ -699,17 +699,17 @@
        ///   şeklinde de çalıştırılabilir.</p>
        ///   <p><c>query.GetFromReader(reader)</c> işlemi her satır için callback çağrılmadan 
        ///   önce çalıştırılır.</p>
-       ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="query">
-       ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <param name="callBack">
        ///   Her kayıt için çağrılacak olan callback fonksiyonu.</param>
        /// <returns>
        ///   query.CountRecords true ise toplam kayıt sayısı, değilse 0.</returns>
-       public static int ForEach(this ISqlSelect query, IDbConnection connection,
+       public static int ForEach(this SqlQuery query, IDbConnection connection,
            ReaderCallBack callBack)
        {
            int count = 0;
@@ -748,21 +748,21 @@
        }
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
        ///   varsa sorgunun döndürdüğü ilk kaydı yükler.</summary>
        /// <remarks>
        ///   <p>Bu bir extension metodu olduğundan direk <c>query.ForFirst(connection)</c> 
        ///   şeklinde de çalıştırılabilir.</p>
        ///   <p><c>query.GetFromReader(reader)</c> işlemi ilk satır için çalıştırılır.</p>
-       ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="query">
-       ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <returns>
        ///   Eğer en azından bir sonuç alındıysa <c>true</c></returns>
-       public static bool GetFirst(this ISqlSelect query, IDbConnection connection)
+       public static bool GetFirst(this SqlQuery query, IDbConnection connection)
        {
            using (IDataReader reader = ExecuteReader(connection, query))
            {
@@ -777,21 +777,21 @@
        }
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
        ///   varsa sorgunun döndürdüğü ilk kaydı yükler.</summary>
        /// <remarks>
        ///   <p>Bu bir extension metodu olduğundan direk <c>query.ForFirst(connection)</c> 
        ///   şeklinde de çalıştırılabilir.</p>
        ///   <p><c>query.GetFromReader(reader)</c> işlemi ilk satır için çalıştırılır.</p>
-       ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="query">
-       ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <returns>
        ///   Eğer en azından bir sonuç alındıysa <c>true</c></returns>
-       public static bool GetFirst(this ISqlSelect query, IDbConnection connection, Row row, Dictionary param)
+       public static bool GetFirst(this SqlQuery query, IDbConnection connection, Row row, Dictionary param)
        {
            using (IDataReader reader = ExecuteReader(connection, query, param))
            {
@@ -807,24 +807,24 @@
 
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
        ///   varsa sorgunun döndürdüğü ilk kayıt için parametresiz bir callback fonksiyonunu çağırır.</summary>
        /// <remarks>
        ///   <p>Bu bir extension metodu olduğundan direk <c>query.ForFirst(connection, delegate() {...})</c> 
        ///   şeklinde de çalıştırılabilir.</p>
        ///   <p><c>query.GetFromReader(reader)</c> işlemi her satır için callback çağrılmadan 
        ///   önce çalıştırılır.</p>
-       ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="query">
-       ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <param name="callBack">
        ///   Her kayıt için çağrılacak olan callback fonksiyonu.</param>
        /// <returns>
        ///   Eğer en azından bir sonuç alındıysa <c>true</c></returns>
-       public static bool ForFirst(this ISqlSelect query, IDbConnection connection,
+       public static bool ForFirst(this SqlQuery query, IDbConnection connection,
            Action callBack)
        {
            using (IDataReader reader = ExecuteReader(connection, query))
@@ -841,7 +841,7 @@
        }
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
        ///   varsa sorgunun döndürdüğü ilk kayıt için <see cref="IDataReader"/> parametresi alan bir 
        ///   callback fonksiyonunu çağırır.</summary>
        /// <remarks>
@@ -849,17 +849,17 @@
        ///   şeklinde de çalıştırılabilir.</p>
        ///   <p><c>query.GetFromReader(reader)</c> işlemi ilk satır için callback çağrılmadan 
        ///   önce çalıştırılır.</p>
-       ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
        /// <param name="query">
-       ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="callBack">
        ///   İlk kayıt için çağrılacak olan callback fonksiyonu.</param>
        /// <returns>
        ///   Eğer en azından bir sonuç alındıysa <c>true</c></returns>
-       public static bool ForFirst(this ISqlSelect query, IDbConnection connection,
+       public static bool ForFirst(this SqlQuery query, IDbConnection connection,
            ReaderCallBack callBack)
        {
            using (IDataReader reader = ExecuteReader(connection, query))
@@ -876,41 +876,41 @@
        }
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
        ///   en azından 1 sonuç göndermesini kontrol eder.</summary>
        /// <remarks>
        ///   <p>Bu bir extension metodu olduğundan direk <c>query.Exists(connection)</c> 
        ///   şeklinde de çalıştırılabilir.</p>
-       ///   <p>Eğer <see cref="ISqlSelect.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="query">
-       ///   Sorguyu içeren <see cref="ISqlSelect"/> nesnesi.</param>
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
        /// <returns>
        ///   Eğer en azından bir sonuç alındıysa <c>true</c></returns>
-       public static bool Exists(this ISqlSelect query, IDbConnection connection)
+       public static bool Exists(this SqlQuery query, IDbConnection connection)
        {
            using (IDataReader reader = ExecuteReader(connection, query))
                return reader.Read();
        }
 
        /// <summary>
-       ///   <see cref="ISqlSelect"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
        ///   sonuçları <typeparamref name="TRow"/> tipinde row'lardan oluşan bir liste halinde döndürür.
        /// </summary>
        ///   <typeparamref name="TRow"/><see cref="Row"/>'dan türemiş bir row sınıfı.
        /// <param name="query">
-       ///   Çalıştırılacak sorguyu içeren <see cref="ISqlSelect"/> nesnesi</param>
+       ///   Çalıştırılacak sorguyu içeren <see cref="SqlQuery"/> nesnesi</param>
        /// <param name="connection">
        ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
        /// <param name="loaderRow">
-       ///   <paramref name="ISqlSelect"/> sorgusunun döndürdüğü sonuçların GetFromReader ile içine yazılacağı
+       ///   <paramref name="SqlQuery"/> sorgusunun döndürdüğü sonuçların GetFromReader ile içine yazılacağı
        ///   <typeparamref name="TRow"/> tipindeki nesne. Her satırın alan değerleri öncelikle bu row'a yüklenir ve 
        ///   kopyası çıkarılıp sonuç listesine eklenir.</param>
        /// <returns>
        ///   Sorgudan dönen kayıtların <typeparamref name="TRow"/> tipinde bir listesi</returns>
-       public static List<TRow> List<TRow>(this ISqlSelect query,
+       public static List<TRow> List<TRow>(this SqlQuery query,
            IDbConnection connection, TRow loaderRow = null) where TRow : Row
        {
            var list = new List<TRow>();

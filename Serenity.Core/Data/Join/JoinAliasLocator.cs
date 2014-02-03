@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using NQuery;
 using NQuery.Compilation;
 using System;
+using System.Collections.Generic;
 
 namespace Serenity.Data
 {

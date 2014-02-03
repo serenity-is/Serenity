@@ -7,7 +7,7 @@ namespace Serenity.Data
 {
     public class BasicFilterStringConverter
     {
-        private IFilterableQuery _query;
+        private IDbGetExpression _query;
         private Row _row;
         private Func<BasicFilter, BaseCriteria> _processCriteria;
         private FilterFields filterFields;
@@ -17,7 +17,7 @@ namespace Serenity.Data
         const string LPAREN = "(";
         const string RPAREN = ")";
 
-        public BasicFilterStringConverter(IFilterableQuery query, 
+        public BasicFilterStringConverter(IDbGetExpression query, 
             Row row = null, Func<BasicFilter, BaseCriteria> processCriteria = null,
             FilterFields filterFields = null)
         {
@@ -62,9 +62,6 @@ namespace Serenity.Data
                     fieldExpr = field._expression;
                 else
                     fieldExpr = (0).TableAliasDot() + field.Name;
-
-                if (_query != null)
-                    _query.EnsureForeignJoin(field);
             }
 
             return fieldExpr;

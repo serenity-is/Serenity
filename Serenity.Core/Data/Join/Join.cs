@@ -7,17 +7,17 @@ namespace Serenity.Data
     ///   SQL sorgusundaki bir JOIN ifadesine karþýlýk gelir (INNER, OUTER, CROSS vs.)</summary>
     public abstract class Join : Alias
     {
-        private RowFieldsBase fields;
+        private Dictionary<string, Join> joins;
         private BaseCriteria onCriteria;
         private string onCriteriaString;
         private HashSet<string> referencedAliases;
 
         public abstract string GetKeyword();
 
-        protected Join(RowFieldsBase fields, string toTable, string alias, BaseCriteria onCriteria)
+        protected Join(IDictionary<string, Join> joins, string toTable, string alias, BaseCriteria onCriteria)
             : base(alias, toTable)
         {
-            this.fields = fields;
+            this.joins = new Dictionary<string, Join>();
             this.onCriteria = onCriteria;
 
             if (!Object.ReferenceEquals(this.onCriteria, null))
@@ -38,8 +38,8 @@ namespace Serenity.Data
                     referencedAliases.AddRange(toTableAliases);
             }
 
-            if (fields != null)
-                fields._joins.Add(this.Name, this);
+            if (joins != null)
+                joins.Add(this.Name, this);
         }
 
         /// <summary>
@@ -72,10 +72,9 @@ namespace Serenity.Data
             }
         }
 
-        public RowFieldsBase Fields
+        public IDictionary<string, Join> Joins
         {
-            get { return fields; }
+            get { return joins; }
         }
-
     }
 }

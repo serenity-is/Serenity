@@ -289,7 +289,7 @@ namespace Serenity.Data
             var joinKeyField = ForeignField ?? Name;
             var sourceAlias = "T0";
             var sourceKeyField = Name;
-            return new LeftJoin(this.Fields, ForeignTable, foreignJoin,
+            return new LeftJoin(this.Fields.Joins, ForeignTable, foreignJoin,
                 new Criteria(foreignJoin, joinKeyField) == new Criteria(sourceAlias, sourceKeyField));
         }
 

@@ -2,11 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
-    using System.Linq;
-    using System.Text;
 
-    public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery
+    public partial class SqlQuery : ParameterizedQuery, IDbFilterable, IDbGetExpression
     {
         public SqlQuery Join(Join join)
         {
@@ -15,8 +12,10 @@
 
             cachedQuery = null;
 
-            AppendUtils.AppendWithSeparator(ref from, " \n", join.GetKeyword());
+            if (from.Length > 0)
+                from.Append(" \n");
 
+            from.Append(join.GetKeyword());
             from.Append(' ');
             from.Append(join.Table);
 
@@ -26,10 +25,10 @@
                 from.Append(' ');
                 from.Append(join.Name);
 
-                if (joinAliases == null)
-                    joinAliases = new HashSet<string>();
+                if (aliases == null)
+                    aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                joinAliases.Add(join.Name);
+                aliases.Add(join.Name);
             }
 
             if (!Object.ReferenceEquals(null, join.OnCriteria) &&

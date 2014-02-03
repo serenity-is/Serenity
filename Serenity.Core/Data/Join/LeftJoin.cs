@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 
 namespace Serenity.Data
 {
@@ -8,8 +9,14 @@ namespace Serenity.Data
         {
         }
         
+        public LeftJoin(IDictionary<string, Join> joins, string toTable, string alias, BaseCriteria onCriteria)
+            : base(joins, toTable, alias, onCriteria)
+        {
+        }
+
+        // remove this overload
         public LeftJoin(RowFieldsBase fields, string toTable, string alias, BaseCriteria onCriteria)
-            : base(fields, toTable, alias, onCriteria)
+            : base(fields.Joins, toTable, alias, onCriteria)
         {
         }
 

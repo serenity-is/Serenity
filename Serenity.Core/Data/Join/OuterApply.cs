@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 namespace Serenity.Data
 {
     public class OuterApply : Join
@@ -8,8 +9,8 @@ namespace Serenity.Data
         {
         }
 
-        public OuterApply(RowFieldsBase fields, string innerQuery, string alias)
-            : base(fields, innerQuery.IsEmptyOrNull() ? innerQuery : "(" + innerQuery + ")", alias, null)
+        public OuterApply(IDictionary<string, Join> joins, string innerQuery, string alias)
+            : base(joins, innerQuery.IsEmptyOrNull() ? innerQuery : "(" + innerQuery + ")", alias, null)
         {
         }
 

@@ -33,13 +33,16 @@
             clone.from = new StringBuilder(from.ToString());
             if (where != null)
                 clone.where = new StringBuilder(where.ToString());
+
             if (orderBy != null)
             {
                 clone.orderBy = new List<string>();
                 clone.orderBy.AddRange(orderBy);
             }
+
             if (groupBy != null)
                 clone.groupBy = new StringBuilder(groupBy.ToString());
+
             if (having != null)
                 clone.having = new StringBuilder(having.ToString());
 

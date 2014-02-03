@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 namespace Serenity.Data
 {
     public class InnerJoin : Join
@@ -8,8 +9,8 @@ namespace Serenity.Data
         {
         }
 
-        public InnerJoin(RowFieldsBase fields, string toTable, string alias, BaseCriteria onCriteria)
-            : base(fields, toTable, alias, onCriteria)
+        public InnerJoin(IDictionary<string, Join> joins, string toTable, string alias, BaseCriteria onCriteria)
+            : base(joins, toTable, alias, onCriteria)
         {
         }
 

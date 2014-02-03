@@ -1,4 +1,5 @@
 
+using System.Collections.Generic;
 namespace Serenity.Data
 {
     public class RightJoin : Join
@@ -8,8 +9,8 @@ namespace Serenity.Data
         {
         }
 
-        public RightJoin(RowFieldsBase fields, string toTable, string alias, BaseCriteria onCriteria)
-            : base(fields, toTable, alias, onCriteria)
+        public RightJoin(IDictionary<string, Join> joins, string toTable, string alias, BaseCriteria onCriteria)
+            : base(joins, toTable, alias, onCriteria)
         {
         }
 
