@@ -38,30 +38,27 @@
     <Reference Include="Enyim.Caching">
       <HintPath>..\References\Couchbase\Enyim.Caching.dll</HintPath>
     </Reference>
-    <Reference Include="LZ4">
-      <HintPath>..\References\LZ4\LZ4.dll</HintPath>
+    <Reference Include="LZ4, Version=1.0.3.93, Culture=neutral, PublicKeyToken=fd2bda0a70c5a705, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\lz4net.1.0.3.93\lib\net40-client\LZ4.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NQuery">
       <HintPath>..\References\NQuery\NQuery.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceStack.Common, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ServiceStack.Common.3.9.56\lib\net35\ServiceStack.Common.dll</HintPath>
-    </Reference>
     <Reference Include="ServiceStack.Interfaces, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ServiceStack.Common.3.9.56\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ServiceStack.Common.3.9.56\lib\net35\ServiceStack.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Redis, Version=3.9.57.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ServiceStack.Redis.3.9.57\lib\net35\ServiceStack.Redis.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ServiceStack.Redis.3.9.57\lib\net35\ServiceStack.Redis.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Text, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\ServiceStack.Text.3.9.56\lib\net35\ServiceStack.Text.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\ServiceStack.Text.3.9.56\lib\net35\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -87,12 +84,6 @@
     <Compile Include="Caching\LocalUserStateCache.cs" />
     <Compile Include="Caching\Distributed\RedisDistributedCache.cs" />
     <Compile Include="Caching\SiteStateCache.cs" />
-    <Compile Include="Contracts\ICreateService.cs" />
-    <Compile Include="Contracts\IDeleteService.cs" />
-    <Compile Include="Contracts\IGenericService.cs" />
-    <Compile Include="Contracts\IListService.cs" />
-    <Compile Include="Contracts\IRetrieveService.cs" />
-    <Compile Include="Contracts\IUpdateService.cs" />
     <Compile Include="Core\ContextItems.cs" />
     <Compile Include="Core\DeleteType.cs" />
     <Compile Include="Core\Helpers\PrefixHelper.cs" />
@@ -101,7 +92,6 @@
     <Compile Include="Core\LocalText.cs" />
     <Compile Include="Core\LruCache.cs" />
     <Compile Include="Core\LruCacheNode.cs" />
-    <Compile Include="Core\RelativePathBase.cs" />
     <Compile Include="Core\StringHelper.cs" />
     <Compile Include="Core\TemporaryFileHelper.cs" />
     <Compile Include="CustomField\ICustomFieldDefinition.cs" />
@@ -123,7 +113,6 @@
     <Compile Include="Data\BasicFilter\FilterFieldType.cs" />
     <Compile Include="Data\BasicFilter\FilterLine.cs" />
     <Compile Include="Data\BasicFilter\FilterLineExtensions.cs" />
-    <Compile Include="Data\BasicFilter\FilterLineJsonConverter.cs" />
     <Compile Include="Data\BasicFilter\FilterOp.cs" />
     <Compile Include="Data\BasicFilter\JsonFilterLineConverter.cs" />
     <Compile Include="Data\BasicFilter\LogicalOp.cs" />
