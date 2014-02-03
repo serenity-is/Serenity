@@ -43,6 +43,21 @@
             return this;
         }
 
+        public SqlQuery LeftJoin(string toTable, Alias alias, BaseCriteria onCriteria)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (toTable.IsEmptyOrNull())
+                throw new ArgumentNullException("alias.table");
+
+            var join = new LeftJoin(toTable, alias.Name, onCriteria);
+
+            Join(join);
+
+            return this;
+        }
+
         public SqlQuery LeftJoin(Alias alias, BaseCriteria onCriteria)
         {
             if (alias == null)
