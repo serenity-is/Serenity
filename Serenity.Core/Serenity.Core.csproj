@@ -46,11 +46,7 @@
       <HintPath>$(SolutionDir)packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NQuery">
-      <HintPath>$(SolutionDir)References\NQuery\NQuery.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Common, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)ServiceStack.Common.3.9.56\lib\net35\ServiceStack.Common.dll</HintPath>
+      <HintPath>..\References\NQuery\NQuery.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Interfaces, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
