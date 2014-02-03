@@ -942,7 +942,7 @@ Q$Externals.jQueryDatepickerInitialization = function() {
     changeMonth: true,
     changeYear: true
   });
-}
+};
 
 if (window.jQuery && window.jQuery.datepicker)
     Q$Externals.jQueryDatepickerInitialization();
@@ -990,5 +990,20 @@ Q$Externals.postToService = function (options) {
     form.submit();
     window.setTimeout(function () { form.remove(); }, 0);
 };
+
+
+Q$Externals.ssExceptionInitialization = function() {
+    window.ss.Exception.prototype.toString = function() {
+        return this.get_message();
+    };
+};
+
+if (window.ss && window.ss.Exception)
+    Q$Externals.ssExceptionInitialization();
+else
+    jQuery(function ($) {
+        if (window.ss && window.ss.Exception)
+            Q$Externals.ssExceptionInitialization();
+    });
 
 global.Q$Externals = Q$Externals;
