@@ -1,4 +1,4 @@
-﻿# SqlQuery Nesnesi
+# SqlQuery Nesnesi
 Dinamik SQL SELECT sorguları hazırlamanız için StringBuilder benzeri bir nesnedir (aslında bu nesne kendi içinde birçok StringBuilder’dan faydalanır).
 
 
@@ -172,7 +172,7 @@ namespace Samples
 }
 ```
 
-FROM METODU
+##FROM METODU
 
 ```csharp
 public SqlQuery From(string table);
@@ -211,15 +211,9 @@ Oluşan sorgu aşağıdaki gibi olacaktır:
 SELECT Firstname, Surname FROM People, City, Country ORDER BY Age
 ```
 
-##FROM AS METODU
+##ALIAS NESNESİ ve SQLQUERY İLE KULLANIMI
 
-```csharp
-public SqlQuery FromAs(string table, string tableAlias);
-```
-
-Sorgularımız uzadıkça ve içindeki JOIN sayısı arttıkça, tablolarımıza kısa adlar (alias) vermeye başlarız. 
-
-Bunun için SqlQuery’nin FromAs metodundan faydalanabiliriz.
+Sorgularımız uzadıkça ve içindeki JOIN sayısı arttıkça, hem alan adı çakışmalarını engellemek, hem de istenen alanlara daha kolay ulaşmak için, kullandığımız tablolara aşağıdaki gibi kısa adlar (alias) vermeye başlarız. 
 
 ```csharp
 namespace Samples
@@ -229,16 +223,16 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing6_FromAs()
+        public static string Sample1_Listing6_From()
         {
             return new SqlQuery()
                 .Select("p.Firstname")
                 .Select("p.Surname")
-                .Select("c.CityName")
-                .Select("o.CountryName")
-                .FromAs("People", "p")
-                .FromAs("City", "c")
-                .FromAs("Country", "o")
+                .Select("p.CityName")
+                .Select("p.CountryName")
+                .From("Person p")
+                .From("City c")
+                .From("Country o")
                 .OrderBy("p.Age")
                 .ToString();
         }
@@ -252,24 +246,23 @@ SELECT p.Firstname, p.Surname, c.CityName, o.CountryName FROM People p, City c, 
 
 Görüleceği üzere alanları seçerken de başlarına tablolarına atadığımız kısa adları (p.Surname gibi) getirdik. Bu sayede tablolardaki alan isimleri çakışsa da (aynı alan adı People, City, Country tablolarında olsa da) sorun çıkmasını engellemiş olduk.
 
-
-##ALIAS NESNESİ ve SQLQUERY İLE KULLANIMI
-
-Kod Listesi 1.6’daki örnek sorgumuzda tablolara kısa adlar atamıştık. Bu kısa adları SqlQuery ile birlikte kullanabileceğimiz Alias nesnesleri olarak ta tanımlayabiliriz.
+Sorgu içinde kullandığımız bu kısa adları, dilersek SqlQuery ile birlikte kullanabileceğimiz Alias nesnesleri olarak ta tanımlayabiliriz.
 
 ```csharp
-var p = new Alias("p");
+var p = new Alias("Person", "p");
 ```
 
-Alias aslında bir string e verdiğiniz ad gibidir. Fakat string ten farklı olarak, SQL ifadelerinde kullanacabileceğimiz “kısa ad”.”alan adı” şeklinde metinleri, indeksleyicisi (indexer’ı) aracılığıyla üretmemize yardımcı olur:
+Alias aslında bir string e verdiğiniz ad gibidir. Fakat string ten farklı olarak, SQL ifadelerinde kullanacabileceğimiz “kısa ad”.”alan adı” şeklinde metinleri, "+" operatörü aracılığıyla üretmemize yardımcı olur:
 
 ```csharp
-p["Surname"]
+p + "Surname"
 ```
 
-```
-p.Surname
-```
+>p.Surname
+
+Bu işlem C#'ın "+" operatörünün overload edilmesi sayesinde gerçekleşmektedir. Bir alias'ı bir alan adı ile topladığınızda, alias'ın kısa adı ve alan adı, aralarına "." konarak birleştirilir 
+
+> ne yazık ki C#'ın member access operatorünü (".") overload edemiyoruz, bu yüzden "+" kullanılmak durumunda.
 
 Sorgumuzu Alias nesnesinden faydalanarak düzenleyelim:
 
@@ -283,19 +276,19 @@ namespace Samples
     {
         public static string Sample1_Listing7_FromAsAlias()
         {
-            var p = new Alias("p");
-            var c = new Alias("c");
-            var o = new Alias("o");
+            var p = new Alias("People", "p");
+            var c = new Alias("City", "c");
+            var o = new Alias("Country", "o");
 
             return new SqlQuery()
-                .Select(p["Firstname"])
-                .Select(p["Surname"])
-                .Select(c["CityName"])
-                .Select(o["CountryName"])
-                .FromAs("People", p)
-                .FromAs("City", c)
-                .FromAs("Country", o)
-                .OrderBy(p["Age"])
+                .Select(p + "Firstname")
+                .Select(p + "Surname")
+                .Select(c + "CityName")
+                .Select(o + "CountryName")
+                .From(p)
+                .From(c)
+                .From(o)
+                .OrderBy(p + "Age")
                 .ToString();
         }
     }
@@ -318,7 +311,6 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        const string People = "People";
         const string Firstname = "Firstname";
         const string Surname = "Surname";
         const string Age = "Age";
@@ -327,19 +319,19 @@ namespace Samples
 
         public static string Sample1_Listing8_UsingFieldNameConsts()
         {
-            var p = new Alias("p");
-            var c = new Alias("c");
-            var o = new Alias("o");
+            var p = new Alias("People", "p");
+            var c = new Alias("City", "c");
+            var o = new Alias("Country", "o");
 
             return new SqlQuery()
-                .Select(p[Firstname])
-                .Select(p[Surname])
-                .Select(c[CityName])
-                .Select(o[CountryName])
-                .FromAs("People", p)
-                .FromAs("City", c)
-                .FromAs("Country", o)
-                .OrderBy(p[Age])
+                .Select(p + Firstname)
+                .Select(p + Surname)
+                .Select(c + CityName)
+                .Select(o + CountryName)
+                .From(p)
+                .From(c)
+                .From(o)
+                .OrderBy(p + Age)
                 .ToString();
         }
     }
@@ -349,4 +341,13 @@ namespace Samples
 …Visual Studio’nun IntelliSense özelliğinden daha çok faydalanmış ve birçok yazım hatasını derleme anında yakalamış olabilirdik.
 
 Tabi örnekteki gibi, her sorguyu yazmadan önce, alan isimlerini sabit olarak tanımlamak çok ta mantıklı ve kolay değil. Dolayısıyla bunların merkezi bir yerde tanımlanmış olması lazım (hatta, direk entity tanımımızdan bulunması, ki buna daha sonra değineceğiz)
+
+Bu örnekte ayrıca SqlQuery.From'un aşağıdaki gibi Alias parametresi alan overload'ından faydalandık:
+
+```csharp
+public SqlQuery From(Alias alias)
+```
+
+Bu fonksiyon çağrıldığında, SQL sorgusunun FROM ifadesine, alias oluşturulurken tanımlanan tablo, kısa adıyla birlikte eklenir.
+
 
