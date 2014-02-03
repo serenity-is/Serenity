@@ -6,70 +6,65 @@
     public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery
     {
         /// <summary>
-        /// Tabloyu FROM listesine ekler. Birden fazla kez çağrıldığında tablo isimlerinin
-        /// arasına virgül konur (CROSS JOIN).
+        /// Adds a table to the FROM statement. When it is called more than once, puts a comma
+        /// between table names (cross join)
         /// </summary>
-        /// <param name="table">Tablo adı</param>
-        /// <returns>Sorgunun kendisi</returns>
+        /// <param name="table">Table name</param>
+        /// <returns>The query itself.</returns>
         public SqlQuery From(string table)
         {
             if (table.IsEmptyOrNull())
                 throw new ArgumentNullException("table");
 
-            _cachedQuery = null;
-            AppendUtils.AppendWithSeparator(ref _from, Consts.Comma, table);
-
-            if (_mainTableName == null)
-                _mainTableName = table;
+            cachedQuery = null;
+            AppendUtils.AppendWithSeparator(ref from, Consts.Comma, table);
 
             return this;
         }
 
         /// <summary>
-        /// Tabloyu FROM listesine, bir alias atayarak ekler.
+        /// Adds a table to the FROM statement with an alias. 
+        /// When it is called more than once, puts a comma between table names (cross join)
         /// </summary>
-        /// <param name="table">Tablo adı</param>
-        /// <param name="alias">Tabloya atanacak kısa ad (alias)</param>
-        /// <returns>Sorgunun kendisi</returns>
-        public SqlQuery FromAs(string table, Alias alias)
+        /// <param name="table">Table</param>
+        /// <param name="alias">Alias for the table</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery From(string table, Alias alias)
         {
             if (alias == null)
-                throw new ArgumentNullException("tableAlias");
+                throw new ArgumentNullException("alias");
 
-            if (_joinAliases != null &&
-                _joinAliases.Contains(alias.Name))
-                throw new ArgumentOutOfRangeException("{0} alias'ı sorguda ikinci kez kullanılmaya çalışıldı!");
+            if (joinAliases != null &&
+                joinAliases.Contains(alias.Name))
+                throw new ArgumentOutOfRangeException("{0} alias is used more than once in the query!");
 
             From(table);
 
-            _from.Append(' ');
-            _from.Append(alias.Name);
+            from.Append(' ');
+            from.Append(alias.Name);
 
-            if (_joinAliases == null)
-                _joinAliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (joinAliases == null)
+                joinAliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            _joinAliases.Add(alias.Name);
+            joinAliases.Add(alias.Name);
 
             return this;
         }
 
-        public SqlQuery From(Row row)
-        {
-            if (row == null)
-                throw new ArgumentNullException("row");
-
-            return FromAs(row.Table, Alias.T0).Into(row);
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
         public SqlQuery From(Alias alias)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
             if (alias.Table.IsEmptyOrNull())
-                throw new ArgumentNullException("alias.ToTable");
+                throw new ArgumentNullException("alias.table");
 
-            return FromAs(alias.Table, alias);
+            return From(alias.Table, alias);
         }
     }
 }

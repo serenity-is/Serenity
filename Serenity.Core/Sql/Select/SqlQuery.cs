@@ -15,40 +15,39 @@
 
     public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery
     {
-        private int _skip;
-        private int _take;
-        private bool _distinct;
-        private bool _countRecords;
-        private List<Row> _into = new List<Row>();
-        private int _intoIndex = -1;
-        private List<Column> _columns = new List<Column>();
-        private StringBuilder _from = new StringBuilder();
-        private string _mainTableName;
-        private StringBuilder _where;
-        private List<string> _orderBy;
-        private StringBuilder _groupBy;
-        private StringBuilder _having;
-        private HashSet<string> _joinAliases = null;
-        private Dictionary _params;
-        private string _cachedQuery;
-        private SqlDialect _dialect;
+        private int skip;
+        private int take;
+        private bool distinct;
+        private bool countRecords;
+        private List<Row> into = new List<Row>();
+        private int intoIndex = -1;
+        private List<Column> columns = new List<Column>();
+        private StringBuilder from = new StringBuilder();
+        private StringBuilder where;
+        private List<string> orderBy;
+        private StringBuilder groupBy;
+        private StringBuilder having;
+        private HashSet<string> joinAliases = null;
+        private Dictionary parameters;
+        private string cachedQuery;
+        private SqlDialect dialect;
 
         public SqlQuery()
         {
-            _dialect = SqlSettings.CurrentDialect;
+            dialect = SqlSettings.CurrentDialect;
         }
 
         public SqlQuery Into(Row row)
         {
             if (row == null)
-                _intoIndex = -1;
+                intoIndex = -1;
             else
             {
-                _intoIndex = _into.IndexOf(row);
-                if (_intoIndex == -1)
+                intoIndex = into.IndexOf(row);
+                if (intoIndex == -1)
                 {
-                    _into.Add(row);
-                    _intoIndex = _into.Count - 1;
+                    into.Add(row);
+                    intoIndex = into.Count - 1;
                 }
             }
             return this;
@@ -69,8 +68,8 @@
             if (condition == null || condition.Length == 0)
                 throw new ArgumentNullException(condition);
 
-            _cachedQuery = null;
-            AppendUtils.AppendWithSeparator(ref _where, Sql.Keyword.And, condition);
+            cachedQuery = null;
+            AppendUtils.AppendWithSeparator(ref where, Sql.Keyword.And, condition);
 
             EnsureJoinsInCriteria(condition);
 
@@ -98,13 +97,13 @@
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            _cachedQuery = null;
+            cachedQuery = null;
 
             // sıralama listesi boşsa yeni oluştur
-            if (_orderBy == null)
-                _orderBy = new List<string>();
+            if (orderBy == null)
+                orderBy = new List<string>();
 
-            _orderBy.Add(field);
+            orderBy.Add(field);
 
             EnsureJoinsInCriteria(field);
 
@@ -151,33 +150,33 @@
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            _cachedQuery = null;
+            cachedQuery = null;
 
             // sıralama listesi boşsa yeni oluştur
-            if (_orderBy == null)
-                _orderBy = new List<string>();
+            if (orderBy == null)
+                orderBy = new List<string>();
 
             //field = PlaceContextLanguage(field);
 
-            if (_orderBy.Contains(field))
-                _orderBy.Remove(field);
+            if (orderBy.Contains(field))
+                orderBy.Remove(field);
             else if (field.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
             {
                 string s = field.Substring(0, field.Length - 5);
-                if (_orderBy.Contains(s))
-                    _orderBy.Remove(s);
+                if (orderBy.Contains(s))
+                    orderBy.Remove(s);
             }
             else
             {
                 string s = field + " DESC";
-                if (_orderBy.Contains(s))
-                    _orderBy.Remove(s);
+                if (orderBy.Contains(s))
+                    orderBy.Remove(s);
             }
           
-            if (_orderBy.Count > 0)
-                _orderBy.Insert(0, field);
+            if (orderBy.Count > 0)
+                orderBy.Insert(0, field);
             else
-                _orderBy.Add(field);
+                orderBy.Add(field);
 
             EnsureJoinsInCriteria(field);
 
@@ -240,9 +239,9 @@
             if (field == null || field.Length == 0)
                 throw new ArgumentNullException("field");
 
-            _cachedQuery = null;
+            cachedQuery = null;
 
-            AppendUtils.AppendWithSeparator(ref _groupBy, Consts.Comma, field);
+            AppendUtils.AppendWithSeparator(ref groupBy, Consts.Comma, field);
 
             EnsureJoinsInCriteria(field);
 
@@ -282,58 +281,58 @@
             if (condition == null || condition.Length == 0)
                 throw new ArgumentNullException("condition");
 
-            _cachedQuery = null;
+            cachedQuery = null;
 
-            AppendUtils.AppendWithSeparator(ref _having, Sql.Keyword.And, condition);
+            AppendUtils.AppendWithSeparator(ref having, Sql.Keyword.And, condition);
             return this;
         }
 
         public Row IntoRow
         {
-            get { return _into.Count > 0 ? _into[0] : null; }
+            get { return into.Count > 0 ? into[0] : null; }
         }
 
         public List<Row> IntoRows
         {
-            get { return _into; }
+            get { return into; }
         }
 
         public SqlQuery Skip(int skipRows)
         {
-            if (_skip != skipRows)
+            if (skip != skipRows)
             {
-                _skip = skipRows;
-                _cachedQuery = null;
+                skip = skipRows;
+                cachedQuery = null;
             }
             return this;
         }
 
         public int Skip()
         {
-            return _skip;
+            return skip;
         }
 
         public SqlQuery Take(int rowCount)
         {
-            if (_take != rowCount)
+            if (take != rowCount)
             {
-                _cachedQuery = null;
-                _take = rowCount;
+                cachedQuery = null;
+                take = rowCount;
             }
             return this;
         }
 
         public int Take()
         {
-            return _take;
+            return take;
         }
 
         public SqlQuery Distinct(bool distinct)
         {
-            if (_distinct != distinct)
+            if (this.distinct != distinct)
             {
-                _cachedQuery = null;
-                _distinct = distinct;
+                cachedQuery = null;
+                this.distinct = distinct;
             }
 
             return this;
@@ -341,9 +340,9 @@
 
         public SqlQuery Limit(int skip, int take)
         {
-            _cachedQuery = null;
-            _skip = skip;
-            _take = take;
+            cachedQuery = null;
+            this.skip = skip;
+            this.take = take;
             return this;
         }
 
@@ -352,20 +351,15 @@
             get { return ToString(); }
         }
 
-        public string MainTableName
-        {
-            get { return _mainTableName; }
-        }
-
         public void GetFromReader(IDataReader reader)
         {
-            GetFromReader(reader, _into);
+            GetFromReader(reader, into);
         }
 
         public void GetFromReader(IDataReader reader, IList<Row> into)
         {
             int index = 0;
-            foreach (var info in _columns)
+            foreach (var info in columns)
             {
                 if (info.IntoField != null && info.IntoRow != -1)
                 {
@@ -400,7 +394,7 @@
 
         public int GetSelectIntoIndex(Field field)
         {
-            return _columns.FindIndex(
+            return columns.FindIndex(
                 delegate(Column s) { return s.IntoField == field; });
         }
 
@@ -409,7 +403,7 @@
             if (fieldAlias == null || fieldAlias.Length == 0)
                 return null;
 
-            Column fieldInfo = _columns.Find(
+            Column fieldInfo = columns.Find(
                 delegate(Column s) {
                     return
                         (s.AsAlias != null && s.AsAlias == fieldAlias) ||
@@ -426,23 +420,23 @@
 
         public string GetExpression(int selectIndex)
         {
-            if (selectIndex < 0 || selectIndex >= _columns.Count)
+            if (selectIndex < 0 || selectIndex >= columns.Count)
                 throw new ArgumentOutOfRangeException("selectIndex");
 
-            Column si = _columns[selectIndex];
+            Column si = columns[selectIndex];
             return si.Expression ?? si.AsAlias;
         }
 
         public SqlDialect Dialect
         {
-            get { return _dialect; }
-            set { _dialect = value; _cachedQuery = null; }
+            get { return dialect; }
+            set { dialect = value; cachedQuery = null; }
         }
 
         public bool CountRecords
         {
-            get { return _countRecords; }
-            set { _countRecords = value; _cachedQuery = null; }
+            get { return countRecords; }
+            set { countRecords = value; cachedQuery = null; }
         }
     }
 }

@@ -5,21 +5,17 @@
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing6_FromAs()
+        public static string Sample1_Listing6_From()
         {
-            var p = new Alias("People", "p");
-            var c = new Alias("City", "c");
-            var o = new Alias("Country", "o");
-
             return new SqlQuery()
-                .Select(p, "Firstname")
-                .Select(p, "Surname")
-                .Select(c, "CityName")
-                .Select(o, "CountryName")
-                .From(p)
-                .From(c)
-                .From(o)
-                .OrderBy(p["Age"])
+                .Select("p.Firstname")
+                .Select("p.Surname")
+                .Select("p.CityName")
+                .Select("p.CountryName")
+                .From("Person p")
+                .From("City c")
+                .From("Country o")
+                .OrderBy("p.Age")
                 .ToString();
         }
     }

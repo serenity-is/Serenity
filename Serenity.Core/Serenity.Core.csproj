@@ -374,6 +374,7 @@
     <Compile Include="Sql\Select\SqlQuery_Join.cs" />
     <Compile Include="Sql\Select\SqlQuery_EnsureJoin.cs" />
     <Compile Include="Sql\Select\SqlQuery_From.cs" />
+    <Compile Include="Sql\Select\SqlQuery_EntityExtensions.cs" />
     <Compile Include="Sql\Select\SqlQuery_Select.cs" />
     <Compile Include="Sql\Select\SqlQuery.cs" />
     <Compile Include="Sql\Select\SqlQuery_AppendUtils.cs" />

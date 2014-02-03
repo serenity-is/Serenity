@@ -53,7 +53,7 @@ namespace Serenity.Services
 
         public static void CheckRelatedOnDelete(IDbConnection connection, string tableName, Action<SqlQuery> filter)
         {
-            var query = new SqlQuery().Select("1").FromAs(tableName, Alias.T0);
+            var query = new SqlQuery().Select("1").From(tableName, Alias.T0);
             filter(query);
             if (query.Take(1).Exists(connection))
                 throw DataValidation.RelatedRecordExist(tableName);
@@ -61,7 +61,7 @@ namespace Serenity.Services
 
         public static void CheckParentNotDeleted(IDbConnection connection, string tableName, Action<SqlQuery> filter)
         {
-            var query = new SqlQuery().Select("1").FromAs(tableName, Alias.T0);
+            var query = new SqlQuery().Select("1").From(tableName, Alias.T0);
             filter(query);
             if (query.Take(1).Exists(connection))
                 throw DataValidation.ParentRecordDeleted(tableName);

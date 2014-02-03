@@ -49,7 +49,7 @@ namespace Samples
 
         private void button6_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(SqlQuerySamples.Sample1_Listing6_FromAs());
+            MessageBox.Show(SqlQuerySamples.Sample1_Listing6_From());
         }
 
         private void button7_Click(object sender, EventArgs e)

@@ -14,44 +14,43 @@
         {
             SqlQuery clone = new SqlQuery();
 
-            clone._dialect = _dialect;
-            clone._skip = _skip;
-            clone._take = _take;
-            clone._countRecords = _countRecords;
+            clone.dialect = dialect;
+            clone.skip = skip;
+            clone.take = take;
+            clone.countRecords = countRecords;
 
-            clone._into = new List<Row>(_into);
-            clone._intoIndex = _intoIndex;
+            clone.into = new List<Row>(into);
+            clone.intoIndex = intoIndex;
 
             Column s;
-            for (int i = 0; i < _columns.Count; i++)
+            for (int i = 0; i < columns.Count; i++)
             {
-                s = _columns[i];
+                s = columns[i];
                 var si = new Column(s.Expression, s.AsAlias, s.IntoRow, s.IntoField);
-                clone._columns.Add(si);
+                clone.columns.Add(si);
             }
 
-            clone._from = new StringBuilder(_from.ToString());
-            clone._mainTableName = _mainTableName;
-            if (_where != null)
-                clone._where = new StringBuilder(_where.ToString());
-            if (_orderBy != null)
+            clone.from = new StringBuilder(from.ToString());
+            if (where != null)
+                clone.where = new StringBuilder(where.ToString());
+            if (orderBy != null)
             {
-                clone._orderBy = new List<string>();
-                clone._orderBy.AddRange(_orderBy);
+                clone.orderBy = new List<string>();
+                clone.orderBy.AddRange(orderBy);
             }
-            if (_groupBy != null)
-                clone._groupBy = new StringBuilder(_groupBy.ToString());
-            if (_having != null)
-                clone._having = new StringBuilder(_having.ToString());
+            if (groupBy != null)
+                clone.groupBy = new StringBuilder(groupBy.ToString());
+            if (having != null)
+                clone.having = new StringBuilder(having.ToString());
 
-            if (this._params != null)
+            if (this.parameters != null)
             {
-                clone._params = new Dictionary();
-                foreach (var pair in this._params)
-                    clone._params.Add(pair.Key, pair.Value);
+                clone.parameters = new Dictionary();
+                foreach (var pair in this.parameters)
+                    clone.parameters.Add(pair.Key, pair.Value);
             }
 
-            clone._cachedQuery = _cachedQuery;
+            clone.cachedQuery = cachedQuery;
 
             return clone;
         }

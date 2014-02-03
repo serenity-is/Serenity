@@ -12,23 +12,23 @@ namespace Serenity.Data
         ///   Formatlanmış SELECT ifadesi</returns>
         public override string ToString()
         {
-            if (_cachedQuery != null)
-                return _cachedQuery;
+            if (cachedQuery != null)
+                return cachedQuery;
 
             // formatlamada kullanılacak StringBuilder nesnesi
             StringBuilder sb = new StringBuilder();
 
-            if (_skip > 0 && _orderBy == null && !_dialect.CanUseSkipKeyword())
+            if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword())
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
 
             // ek filtremiz şimdilik yok
             string extraWhere = null;
 
-            bool useSkipKeyword = _skip > 0 && _dialect.CanUseSkipKeyword();
-            bool useFetchNext = _skip > 0 && !useSkipKeyword && _dialect.CanUseOffsetFetch();
-            bool useRowNumber = _skip > 0 && !useSkipKeyword && !useFetchNext && _dialect.CanUseRowNumber();
-            bool useSecondQuery = _skip > 0 && !useSkipKeyword && !useFetchNext && !useRowNumber;
+            bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword();
+            bool useFetchNext = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch();
+            bool useRowNumber = skip > 0 && !useSkipKeyword && !useFetchNext && dialect.CanUseRowNumber();
+            bool useSecondQuery = skip > 0 && !useSkipKeyword && !useFetchNext && !useRowNumber;
 
             // atlanması istenen kayıt var mı?
             if (useRowNumber || useSecondQuery)
@@ -73,19 +73,19 @@ namespace Serenity.Data
                     StringBuilder check = new StringBuilder();
 
                     // sıralanan alan adlarını sonlarındaki DESC atılmış şekilde tutacak dizi
-                    string[] order = new string[_orderBy.Count];
+                    string[] order = new string[orderBy.Count];
 
                     // alanların ters sıralı olma durumlarını tutacak dizi
-                    bool[] desc = new bool[_orderBy.Count];
+                    bool[] desc = new bool[orderBy.Count];
 
                     // tüm sıralama listesini tara
-                    for (int i = 0; i < _orderBy.Count; i++)
+                    for (int i = 0; i < orderBy.Count; i++)
                     {
                         // her sıralı saha için bir SQL_VARIANT değişkeni tanımla
                         sb.AppendFormat(Consts.DeclareCmd, i);
 
                         // sıralanan alanı oku
-                        string o = _orderBy[i];
+                        string o = orderBy[i];
 
                         // eğer DESC ile bitiyorsa bu ters sıralamadır, karşılaştırmalarda gözönüne alınmalı
                         desc[i] = o.EndsWith(Sql.Keyword.Desc, StringComparison.OrdinalIgnoreCase);
@@ -99,13 +99,13 @@ namespace Serenity.Data
 
                     // SELECT TOP...
                     sb.Append(Sql.Keyword.Select);
-                    if (_distinct)
+                    if (distinct)
                         sb.Append(Sql.Keyword.Distinct);
 
-                    sb.Append(_dialect.TakeKeyword());
+                    sb.Append(dialect.TakeKeyword());
                     sb.Append(' ');
                     // Atlanacak kayıt sayısı kadar
-                    sb.Append(_skip);
+                    sb.Append(skip);
                     sb.Append(' ');
 
                     // Alan listesini SqlSelect in kendi seçilecek alan listesi yerine
@@ -180,49 +180,49 @@ namespace Serenity.Data
             // asıl SELECT sorugusu başlangıcı
             sb.Append(Sql.Keyword.Select);
 
-            if (_distinct)
+            if (distinct)
             {
                 sb.Append(Sql.Keyword.Distinct);
             }
 
             // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (_take != 0 && (!useFetchNext))
+            if (take != 0 && (!useFetchNext))
             {
-                sb.Append(_dialect.TakeKeyword());
+                sb.Append(dialect.TakeKeyword());
                 sb.Append(' ');
-                sb.Append(useRowNumber ? (_skip + _take) : _take);
+                sb.Append(useRowNumber ? (skip + take) : take);
                 sb.Append(' ');
             }
 
             if (useSkipKeyword)
             {
-                sb.Append(_dialect.SkipKeyword());
+                sb.Append(dialect.SkipKeyword());
                 sb.Append(' ');
-                sb.Append(_skip);
+                sb.Append(skip);
             }
 
             StringBuilder selCount = null;
-            if (_distinct)
+            if (distinct)
                 selCount = new StringBuilder();
 
             sb.Append('\n');
             // seçilecek alan listesini dolaş
-            for (int i = 0; i < _columns.Count; i++)
+            for (int i = 0; i < columns.Count; i++)
             {
-                Column s = _columns[i];
+                Column s = columns[i];
 
                 // ilk alan adından sonra araya virgül konmalı
                 if (i > 0)
                 {
                     sb.Append(",\n");
-                    if (_distinct)
+                    if (distinct)
                         selCount.Append(',');
                 }
 
                 // alan adını yaz
                 sb.Append(s.Expression);
 
-                if (_distinct)
+                if (distinct)
                     selCount.Append(s.Expression);
 
                 // alana bir alias atanmışsa bunu yaz
@@ -230,7 +230,7 @@ namespace Serenity.Data
                 {
                     sb.Append(Sql.Keyword.As);
                     sb.Append(s.AsAlias);
-                    if (_distinct)
+                    if (distinct)
                     {
                         selCount.Append(Sql.Keyword.As);
                         selCount.Append(s.AsAlias);
@@ -240,17 +240,17 @@ namespace Serenity.Data
 
             if (useRowNumber)
             {
-                if (_columns.Count > 0)
+                if (columns.Count > 0)
                     sb.Append(',');
 
                 sb.Append("ROW_NUMBER() OVER (ORDER BY ");
 
-                for (int i = 0; i < _orderBy.Count; i++)
+                for (int i = 0; i < orderBy.Count; i++)
                 {
                     if (i > 0)
                         sb.Append(',');
 
-                    sb.Append(_orderBy[i].ToString());
+                    sb.Append(orderBy[i].ToString());
                 }
                 sb.Append(") AS _row_number_");
             }
@@ -261,28 +261,28 @@ namespace Serenity.Data
             if (useRowNumber)
             {
                 sb.Append(") _row_number_results_ WHERE _row_number_ > ");
-                sb.Append(_skip);
+                sb.Append(skip);
             }
 
             if (useFetchNext)
             {
                 sb.Append(" OFFSET ");
-                sb.Append(_skip);
+                sb.Append(skip);
                 sb.Append(" ROWS FETCH NEXT ");
-                sb.Append(_take);
+                sb.Append(take);
                 sb.Append(" ROWS ONLY");
             }
 
-            if (_countRecords)
+            if (countRecords)
             {
-                if (!_dialect.MultipleResultsets())
+                if (!dialect.MultipleResultsets())
                     sb.Append("\n---\n"); // temporary fix till we find a better solution for firebird
                 else
                     sb.Append(";\n");
                 sb.Append(Sql.Keyword.Select);
                 sb.Append("count(*) ");
 
-                if (_distinct)
+                if (distinct)
                 {
                     sb.Append(Sql.Keyword.From);
                     sb.Append('(');
@@ -290,7 +290,7 @@ namespace Serenity.Data
                     sb.Append(Sql.Keyword.Distinct);
                     sb.Append(selCount.ToString());
                 }
-                else if (_groupBy != null && _groupBy.Length > 0)
+                else if (groupBy != null && groupBy.Length > 0)
                 {
                     sb.Append(Sql.Keyword.From);
                     sb.Append('(');
@@ -300,16 +300,16 @@ namespace Serenity.Data
 
                 AppendFromWhereOrderByGroupByHaving(sb, null, false);
 
-                if (_distinct || (_groupBy != null && _groupBy.Length > 0))
+                if (distinct || (groupBy!= null && groupBy.Length > 0))
                 {
                     sb.Append(") _alias_");
                 }
             }
 
-            _cachedQuery = sb.ToString();
+            cachedQuery = sb.ToString();
 
             // select sorgusunu döndür
-            return _cachedQuery;
+            return cachedQuery;
         }
 
         /// <summary>
@@ -332,24 +332,24 @@ namespace Serenity.Data
             // FROM yaz
             sb.Append(Sql.Keyword.From);
             // tablo listesini yaz ("A LEFT OUTER JOIN B ON (...) ....")
-            sb.Append(_from.ToString());
+            sb.Append(from.ToString());
 
             // ekstra filtre belirtilmişse ya da mevcut bir filtre varsa sorgunun
             // WHERE kısmı olacaktır
-            if (extraWhere != null || _where != null)
+            if (extraWhere != null || where != null)
             {
                 // WHERE yaz
                 sb.Append(Sql.Keyword.Where);
 
                 // Varsa, SqlSelect'te hazırlanmış filtreleri yaz
-                if (_where != null)
-                    sb.Append(_where.ToString());
+                if (where != null)
+                    sb.Append(where.ToString());
 
                 // Ekstra filtre belirtilmişse...
                 if (extraWhere != null)
                 {
                     // SqlSelect'in kendi filtresi de varsa araya AND koyulmalı
-                    if (_where != null)
+                    if (where != null)
                         sb.Append(" AND ");
                     // Ekstra filtreyi ekle
                     sb.Append(extraWhere);
@@ -357,32 +357,32 @@ namespace Serenity.Data
             }
 
             // Gruplama varsa ekle
-            if (_groupBy != null)
+            if (groupBy != null)
             {
                 sb.Append(Sql.Keyword.GroupBy);
-                sb.Append(_groupBy.ToString());
+                sb.Append(groupBy.ToString());
             }
 
             // Grup koşulu varsa ekle
-            if (_having != null)
+            if (having != null)
             {
                 sb.Append(Sql.Keyword.Having);
-                sb.Append(_having.ToString());
+                sb.Append(having.ToString());
             }
 
             // Sıralanmış alanlar varsa
-            if (includeOrderBy && _orderBy != null)
+            if (includeOrderBy && orderBy != null)
             {
                 // ORDER BY yaz
                 sb.Append(Sql.Keyword.OrderBy);
 
                 // Sıralanan tüm alanları aralarına "," koyarak ekle
-                for (int i = 0; i < _orderBy.Count; i++)
+                for (int i = 0; i < orderBy.Count; i++)
                 {
                     if (i > 0)
                         sb.Append(',');
 
-                    sb.Append(_orderBy[i].ToString());
+                    sb.Append(orderBy[i].ToString());
                 }
             }
         }

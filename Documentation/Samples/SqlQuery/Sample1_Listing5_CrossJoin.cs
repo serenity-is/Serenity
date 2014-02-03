@@ -13,7 +13,7 @@
                 .From("People")
                 .From("City")
                 .From("Country")
-                .OrderBy("p.Age")
+                .OrderBy("Age")
                 .ToString();
         }
     }

@@ -1,10 +1,6 @@
 ﻿namespace Serenity.Data
 {
     using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Linq;
-    using System.Text;
 
     public partial class SqlQuery : ParameterizedQuery, IDbFilterable, ISqlSelect, IFilterableQuery
     {
@@ -16,7 +12,7 @@
                 return;
 
             Join join;
-            if (!_joinAliases.Contains(joinAlias) &&
+            if (!joinAliases.Contains(joinAlias) &&
                 fields.Joins.TryGetValue(joinAlias, out join))
             {
                 if (join.ReferencedAliases != null)

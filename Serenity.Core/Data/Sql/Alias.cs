@@ -67,7 +67,26 @@ namespace Serenity.Data
 
         public string this[Field field]
         {
-            get { return this.aliasDot + field.Name; }
+            get
+            {
+                if (field == null)
+                    throw new ArgumentNullException("field");
+
+                return this.aliasDot + field.Name; 
+            }
+        }
+
+        public static string operator +(Alias alias, string fieldName)
+        {
+            return alias.aliasDot + fieldName;
+        }
+
+        public static string operator +(Alias alias, Field field)
+        {
+            if (field == null)
+                throw new ArgumentNullException("field");
+
+            return alias.aliasDot + field.Name;
         }
     }
 }

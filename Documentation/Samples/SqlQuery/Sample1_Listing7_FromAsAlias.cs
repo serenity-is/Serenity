@@ -12,14 +12,14 @@
             var o = new Alias("Country", "o");
 
             return new SqlQuery()
-                .Select(p, "Firstname")
-                .Select(p, "Surname")
-                .Select(c, "CityName")
-                .Select(o, "CountryName")
+                .Select(p + "Firstname")
+                .Select(p + "Surname")
+                .Select(c + "CityName")
+                .Select(o + "CountryName")
                 .From(p)
                 .From(c)
                 .From(o)
-                .OrderBy(p["Age"])
+                .OrderBy(p + "Age")
                 .ToString();
         }
     }

@@ -13,31 +13,31 @@
             if (join == null)
                 throw new ArgumentNullException("join");
 
-            _cachedQuery = null;
+            cachedQuery = null;
 
-            AppendUtils.AppendWithSeparator(ref _from, " \n", join.GetKeyword());
+            AppendUtils.AppendWithSeparator(ref from, " \n", join.GetKeyword());
 
-            _from.Append(' ');
-            _from.Append(join.Table);
+            from.Append(' ');
+            from.Append(join.Table);
 
             // joinAlias belirtilmişse ekle
             if (!join.Name.IsEmptyOrNull())
             {
-                _from.Append(' ');
-                _from.Append(join.Name);
+                from.Append(' ');
+                from.Append(join.Name);
 
-                if (_joinAliases == null)
-                    _joinAliases = new HashSet<string>();
+                if (joinAliases == null)
+                    joinAliases = new HashSet<string>();
 
-                _joinAliases.Add(join.Name);
+                joinAliases.Add(join.Name);
             }
 
             if (!Object.ReferenceEquals(null, join.OnCriteria) &&
                 !join.OnCriteria.IsEmpty)
             {
-                _from.Append(" ON (");
-                _from.Append(join.OnCriteria.ToString(this));
-                _from.Append(')');
+                from.Append(" ON (");
+                from.Append(join.OnCriteria.ToString(this));
+                from.Append(')');
             }
 
             return this;
