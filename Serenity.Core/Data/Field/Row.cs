@@ -101,7 +101,7 @@ namespace Serenity.Data
                 {
                     foreach (var join in _fields._joins.Values)
                     {
-                        if (String.Compare(field.ForeignTable, join.ToTable) == 0 &&
+                        if (String.Compare(field.ForeignTable, join.Table) == 0 &&
                             join is LeftJoin &&
                             !join.OnCriteriaString.IsEmptyOrNull() &&
                             join.OnCriteriaString.IndexOf(field.QueryExpression, StringComparison.OrdinalIgnoreCase) >= 0)

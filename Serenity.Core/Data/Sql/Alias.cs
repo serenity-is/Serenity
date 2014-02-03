@@ -21,6 +21,7 @@ namespace Serenity.Data
 
         private string alias;
         private string aliasDot;
+        private string table;
 
         public Alias(int alias)
         {
@@ -37,9 +38,26 @@ namespace Serenity.Data
             this.aliasDot = alias + ".";
         }
 
+        public Alias(string table, int alias)
+            : this(alias)
+        {
+            this.table = table;
+        }
+
+        public Alias(string table, string alias)
+            : this(alias)
+        {
+            this.table = table;
+        }
+
         public string Name
         {
             get { return alias; }
+        }
+
+        public string Table
+        {
+            get { return table; }
         }
 
         public string this[string fieldName]

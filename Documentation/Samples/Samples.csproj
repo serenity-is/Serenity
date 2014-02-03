@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Text.txt" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

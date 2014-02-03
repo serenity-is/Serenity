@@ -8,7 +8,6 @@ namespace Serenity.Data
     public abstract class Join : Alias
     {
         private RowFieldsBase fields;
-        private string toTable;
         private BaseCriteria onCriteria;
         private string onCriteriaString;
         private HashSet<string> referencedAliases;
@@ -16,13 +15,9 @@ namespace Serenity.Data
         public abstract string GetKeyword();
 
         protected Join(RowFieldsBase fields, string toTable, string alias, BaseCriteria onCriteria)
-            : base(alias)
+            : base(alias, toTable)
         {
-            if (toTable == null)
-                throw new ArgumentNullException("toTable");
-
             this.fields = fields;
-            this.toTable = toTable;
             this.onCriteria = onCriteria;
 
             if (!Object.ReferenceEquals(this.onCriteria, null))
@@ -34,7 +29,7 @@ namespace Serenity.Data
                     referencedAliases = aliases;
             }
 
-            var toTableAliases = JoinAliasLocator.Locate(ToTable);
+            var toTableAliases = JoinAliasLocator.Locate(this.Table);
             if (toTableAliases != null && toTableAliases.Count > 0)
             {
                 if (referencedAliases == null)
@@ -45,16 +40,6 @@ namespace Serenity.Data
 
             if (fields != null)
                 fields._joins.Add(this.Name, this);
-        }
-
-        /// <summary>
-        ///   Left outer join yapýlan tablo adýný verir.</summary>
-        public string ToTable
-        {
-            get
-            {
-                return toTable;
-            }
         }
 
         /// <summary>

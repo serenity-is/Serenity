@@ -61,12 +61,15 @@
             return FromAs(row.Table, Alias.T0).Into(row);
         }
 
-        public SqlQuery FromAs(Row row, Alias alias)
+        public SqlQuery From(Alias alias)
         {
-            if (row == null)
-                throw new ArgumentNullException("row");
+            if (alias == null)
+                throw new ArgumentNullException("alias");
 
-            return FromAs(row.Table, alias).Into(row);
+            if (alias.Table.IsEmptyOrNull())
+                throw new ArgumentNullException("alias.ToTable");
+
+            return FromAs(alias.Table, alias);
         }
     }
 }
