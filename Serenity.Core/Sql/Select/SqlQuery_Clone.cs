@@ -46,12 +46,9 @@
             if (having != null)
                 clone.having = new StringBuilder(having.ToString());
 
-            if (this.parameters != null)
-            {
-                clone.parameters = new Dictionary();
-                foreach (var pair in this.parameters)
-                    clone.parameters.Add(pair.Key, pair.Value);
-            }
+            if (this.Params != null)
+                foreach (var pair in this.Params)
+                    clone.Params.Add(pair.Key, pair.Value);
 
             clone.cachedQuery = cachedQuery;
 

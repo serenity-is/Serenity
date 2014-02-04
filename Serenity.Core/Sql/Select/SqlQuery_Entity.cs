@@ -130,7 +130,7 @@
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return OrderByDescending(field.QueryExpression);
+            return OrderBy(field.QueryExpression, desc: true);
         }
 
         public SqlQuery OrderByDescending(params Field[] fields)
@@ -261,9 +261,9 @@
             return this;
         }
 
-        private void EnsureJoinsInCriteria(string criteria)
+        partial void EnsureJoinsInExpression(string expression)
         {
-            if (criteria.IsEmptyOrNull())
+            if (expression.IsEmptyOrNull())
                 return;
 
             if (this.IntoRow == null)
@@ -272,7 +272,7 @@
             var fields = this.IntoRow.GetFields();
 
             string referencedJoin;
-            var referencedJoins = JoinAliasLocator.LocateOptimized(criteria, out referencedJoin);
+            var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out referencedJoin);
             if (referencedJoin != null)
                 EnsureForeignJoin(fields.Joins, referencedJoin);
 

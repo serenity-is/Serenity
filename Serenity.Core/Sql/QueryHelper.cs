@@ -64,7 +64,7 @@ namespace Serenity.Services
         public static SqlQuery ApplySkipTakeAndCount(this SqlQuery query, int skip, int take,
             bool excludeTotalCount)
         {
-            query.Limit(skip, take);
+            query.Skip(skip).Take(take);
             if (!excludeTotalCount &&
                 query.Take() > 0)
                 query.CountRecords = true;

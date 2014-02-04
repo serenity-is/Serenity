@@ -8,11 +8,17 @@
     public class ParameterizedQuery : IDbParameterized
     {
         private Dictionary parameters;
-        protected ParameterizedQuery parentQuery;
+        protected ParameterizedQuery parent;
         private int nextAutoParam;
 
         public void AddParam(string name, object value)
         {
+            if (parent != null)
+            {
+                parent.AddParam(name, value);
+                return;
+            }
+
             if (parameters == null)
                 parameters = new Dictionary();
 
@@ -21,35 +27,46 @@
 
         public void SetParam(string name, object value)
         {
+            if (parent != null)
+            {
+                parent.SetParam(name, value);
+                return;
+            }
+
             if (parameters == null)
                 parameters = new Dictionary();
 
             parameters[name] = value;
         }
 
-        public Dictionary<string, object> Params
+        public IDictionary<string, object> Params
         {
-            get { return parameters; }
-            set { parameters = value; }
-        }
+            get 
+            {
+                if (parent != null)
+                    return parent.Params;
 
-        public int NextAutoParam
-        {
-            get { if (parentQuery != null) return parentQuery.NextAutoParam; else return nextAutoParam; }
-            set { nextAutoParam = value; }
+                return parameters; 
+            }
         }
 
         public int ParamCount
         {
-            get { return parameters == null ? 0 : parameters.Count; }
+            get 
+            {
+                if (parent != null)
+                    return parent.ParamCount;
+
+                return parameters == null ? 0 : parameters.Count; 
+            }
         }
 
         public Parameter AutoParam()
         {
-            if (parentQuery != null)
-                return parentQuery.AutoParam();
-            else
-                return new Parameter((nextAutoParam++).IndexParam());
+            if (parent != null)
+                return parent.AutoParam();
+
+            return new Parameter((nextAutoParam++).IndexParam());
         }
     }
 }

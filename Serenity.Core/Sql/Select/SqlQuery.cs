@@ -16,17 +16,42 @@
         private StringBuilder having;
         private StringBuilder groupBy;       
         private List<string> orderBy;
-        private Dictionary<string, object> parameters;
         private int skip;
         private int take;
         private StringBuilder where;              
 
+        /// <summary>
+        /// Creates a new SqlQuery instance.
+        /// </summary>
         public SqlQuery()
         {
             dialect = SqlSettings.CurrentDialect;
             columns = new List<Column>();
             from = new StringBuilder();
         }
+
+        /// <summary>
+        /// Sets DISTINCT flag.
+        /// </summary>
+        /// <param name="distinct">Distinct flag.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery Distinct(bool distinct)
+        {
+            if (this.distinct != distinct)
+            {
+                cachedQuery = null;
+                this.distinct = distinct;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// A hook for Serenity entity system, to ensure related joins in 
+        /// defined in row when a field is used in query. 
+        /// </summary>
+        /// <param name="expression">An expression</param>
+        partial void EnsureJoinsInExpression(string expression);
 
         /// <summary>
         /// Adds a table to the FROM statement. When it is called more than once, puts a comma
@@ -79,10 +104,11 @@
         }
 
         /// <summary>
-        /// 
+        /// Adds a table to the FROM statement, with given short name.
         /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
+        /// <param name="alias">Alias that contains table name and short name.</param>
+        /// <returns>The query itself.</returns>
+        /// <remarks>This overload requires that alias has a table name.</remarks>
         public SqlQuery From(Alias alias)
         {
             if (alias == null)
@@ -95,7 +121,192 @@
         }
 
         /// <summary>
-        /// Adds a field name or a SQL expression to the SELECT statement.
+        /// Gets a field source expression given its alias in query.
+        /// </summary>
+        /// <param name="fieldAlias">Field alias.</param>
+        /// <returns>Field expression or null if not found.</returns>
+        /// <remarks>This function uses a linear search in column list, so use with caution.</remarks>
+        public string GetExpression(string fieldAlias)
+        {
+            if (fieldAlias == null || fieldAlias.Length == 0)
+                return null;
+
+            Column fieldInfo = columns.Find(
+                delegate(Column s)
+                {
+                    return
+                        (s.AsAlias != null && s.AsAlias == fieldAlias) ||
+                        (String.IsNullOrEmpty(s.AsAlias) && s.Expression == fieldAlias);
+                });
+
+            if (fieldInfo == null)
+                return null;
+            else
+            {
+                return fieldInfo.Expression ?? fieldInfo.AsAlias;
+            }
+        }
+
+        /// <summary>
+        /// Gets a column expression given its select index.
+        /// </summary>
+        /// <param name="selectIndex">Index of column in SELECT clause.</param>
+        /// <returns>Field expression or null if not found.</returns>
+        public string GetExpression(int selectIndex)
+        {
+            if (selectIndex < 0 || selectIndex >= columns.Count)
+                throw new ArgumentOutOfRangeException("selectIndex");
+
+            Column si = columns[selectIndex];
+            return si.Expression ?? si.AsAlias;
+        }
+
+        /// <summary>
+        /// Adds a field name or an SQL expression to the GROUP BY clause.
+        /// </summary>
+        /// <param name="expression">Array of fields or expressions.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery GroupBy(string expression)
+        {
+            if (expression == null || expression.Length == 0)
+                throw new ArgumentNullException("field");
+
+            cachedQuery = null;
+
+            if (groupBy == null || groupBy.Length == 0)
+                groupBy = new StringBuilder(expression);
+            else
+                groupBy.Append(", ").Append(expression);
+
+            EnsureJoinsInExpression(expression);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds field names or SQL expressions to the GROUP BY clause.
+        /// </summary>
+        /// <param name="expressions">Array of fields or expressions.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery GroupBy(params string[] expressions)
+        {
+            if (expressions == null)
+                throw new ArgumentNullException("expressions");
+
+            foreach (string expression in expressions)
+                GroupBy(expression);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds an SQL expression to the GROUP BY clause.
+        /// </summary>
+        /// <param name="expression">Array of fields or expressions.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery Having(string expression)
+        {
+            if (expression == null || expression.Length == 0)
+                throw new ArgumentNullException("expression");
+
+            cachedQuery = null;
+
+            if (having == null || having.Length == 0)
+                having = new StringBuilder(expression);
+            else
+                having.Append(Sql.Keyword.And).Append(expression);
+
+            return this;
+        }
+
+
+        /// <summary>
+        /// Adds a field name or an SQL expression to the ORDER BY clause.
+        /// </summary>
+        /// <param name="expression">A field or an SQL expression.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery OrderBy(string expression, bool desc = false)
+        {
+            if (expression == null || expression.Length == 0)
+                throw new ArgumentNullException("field");
+
+            cachedQuery = null;
+
+            if (orderBy == null)
+                orderBy = new List<string>();
+
+            orderBy.Add(expression);
+
+            EnsureJoinsInExpression(expression);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds field names or SQL expressions to the ORDER BY clause.
+        /// </summary>
+        /// <param name="expression">Array of fields or expressions.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery OrderBy(params string[] expressions)
+        {
+            foreach (string expression in expressions)
+                OrderBy(expression);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Inserts a field name or an SQL expression to the start of ORDER BY clause.
+        /// </summary>
+        /// <param name="expression">A field or an SQL expression.</param>
+        /// <param name="desc">True to add a " DESC" suffix.</param>
+        /// <returns>The query itself.</returns>
+        /// <remarks>This method is designed to help apply user defined orders 
+        /// (for example by clicking headers on a grid) to a query with
+        /// existing order.</remarks>
+        public SqlQuery OrderByFirst(string expression, bool desc = false)
+        {
+            if (expression == null || expression.Length == 0)
+                throw new ArgumentNullException("field");
+
+            cachedQuery = null;
+
+            if (desc)
+                expression += Sql.Keyword.Desc;
+
+            if (orderBy == null)
+                orderBy = new List<string>();
+
+            if (orderBy.Contains(expression))
+            {
+                orderBy.Remove(expression);
+            }
+            else if (expression.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
+            {
+                string s = expression.Substring(0, expression.Length - 5);
+
+                if (orderBy.Contains(s))
+                    orderBy.Remove(s);
+            }
+            else
+            {
+                string s = expression + " DESC";
+                if (orderBy.Contains(s))
+                    orderBy.Remove(s);
+            }
+
+            if (orderBy.Count > 0)
+                orderBy.Insert(0, expression);
+            else
+                orderBy.Add(expression);
+
+            EnsureJoinsInExpression(expression);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a field name or an SQL expression to the SELECT statement.
         /// </summary>
         /// <param name="expression">A field or an SQL expression.</param>
         /// <returns>The query itself.</returns>
@@ -144,139 +355,11 @@
             return this;
         }
 
-        public SqlQuery OrderBy(string field)
-        {
-            if (field == null || field.Length == 0)
-                throw new ArgumentNullException("field");
-
-            cachedQuery = null;
-
-            // sıralama listesi boşsa yeni oluştur
-            if (orderBy == null)
-                orderBy = new List<string>();
-
-            orderBy.Add(field);
-
-            EnsureJoinsInCriteria(field);
-
-            return this;
-        }
-
-        public SqlQuery OrderByFirst(string field)
-        {
-            if (field == null || field.Length == 0)
-                throw new ArgumentNullException("field");
-
-            cachedQuery = null;
-
-            // sıralama listesi boşsa yeni oluştur
-            if (orderBy == null)
-                orderBy = new List<string>();
-
-            if (orderBy.Contains(field))
-            {
-                orderBy.Remove(field);
-            }
-            else if (field.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
-            {
-                string s = field.Substring(0, field.Length - 5);
-                if (orderBy.Contains(s))
-                    orderBy.Remove(s);
-            }
-            else
-            {
-                string s = field + " DESC";
-                if (orderBy.Contains(s))
-                    orderBy.Remove(s);
-            }
-          
-            if (orderBy.Count > 0)
-                orderBy.Insert(0, field);
-            else
-                orderBy.Add(field);
-
-            EnsureJoinsInCriteria(field);
-
-            return this;
-        }
-
-        public SqlQuery OrderByFirst(string field, bool descending)
-        {
-            if (field == null || field.Length == 0)
-                throw new ArgumentNullException("field");
-
-            if (descending)
-                field += Sql.Keyword.Desc;
-
-            return OrderByFirst(field);
-        }
-
-        public SqlQuery OrderByDescending(string field)
-        {
-            if (field == null)
-                throw new ArgumentNullException("field");
-
-            return OrderBy(field + Sql.Keyword.Desc);
-        }
-
-        public SqlQuery OrderBy(params string[] fields)
-        {
-            foreach (string field in fields)
-                OrderBy(field);
-            return this;
-        }
-
-        public SqlQuery GroupBy(string field)
-        {
-            if (field == null || field.Length == 0)
-                throw new ArgumentNullException("field");
-
-            cachedQuery = null;
-
-            if (groupBy == null || groupBy.Length == 0)
-                groupBy = new StringBuilder(field);
-            else
-                groupBy.Append(", ").Append(field);
-
-            EnsureJoinsInCriteria(field);
-
-            return this;
-        }
-
-        public SqlQuery GroupBy(params string[] fields)
-        {
-            if (fields == null)
-                throw new ArgumentNullException("fields");
-
-            foreach (string field in fields)
-                GroupBy(field);
-            return this;
-        }
-
-        public SqlQuery Having(string condition)
-        {
-            if (condition == null || condition.Length == 0)
-                throw new ArgumentNullException("condition");
-
-            cachedQuery = null;
-
-            if (having == null || having.Length == 0)
-                having = new StringBuilder(condition);
-            else
-                having.Append(Sql.Keyword.And).Append(condition);
-            
-            return this;
-        }
-
-        public SqlQuery SubQuery()
-        {
-            var subQuery = new SqlQuery();
-            this.Params = this.Params ?? new Dictionary<string, object>();
-            subQuery.Params = this.Params;
-            subQuery.parentQuery = this;
-            return subQuery;
-        }
-
+        /// <summary>
+        /// Sets SKIP value. Used for paging.
+        /// </summary>
+        /// <param name="skipRows">Number of rows to skip (server dependant implementation)</param>
+        /// <returns>The query itself.</returns>
         public SqlQuery Skip(int skipRows)
         {
             if (skip != skipRows)
@@ -284,14 +367,45 @@
                 skip = skipRows;
                 cachedQuery = null;
             }
+
             return this;
         }
 
+        /// <summary>
+        /// Gets current SKIP value.
+        /// </summary>
+        /// <returns>SKIP value.</returns>
         public int Skip()
         {
             return skip;
         }
 
+        /// <summary>
+        /// Creates a new query that shares parameter dictionary with this query.
+        /// </summary>
+        /// <returns>
+        /// A new query that shares parameters.</returns>
+        public SqlQuery SubQuery()
+        {
+            var subQuery = new SqlQuery();
+            subQuery.parent = this;
+            return subQuery;
+        }
+
+        /// <summary>
+        /// Gets TAKE/TOP value.
+        /// </summary>
+        /// <returns>TAKE/TOP value.</returns>
+        public int Take()
+        {
+            return take;
+        }
+
+        /// <summary>
+        /// Sets TAKE/TOP value. Used for paging.
+        /// </summary>
+        /// <param name="rowCount">Number of rows to take.</param>
+        /// <returns>The query itself.</returns>
         public SqlQuery Take(int rowCount)
         {
             if (take != rowCount)
@@ -299,106 +413,81 @@
                 cachedQuery = null;
                 take = rowCount;
             }
-            return this;
-        }
-
-        public int Take()
-        {
-            return take;
-        }
-
-        public SqlQuery Distinct(bool distinct)
-        {
-            if (this.distinct != distinct)
-            {
-                cachedQuery = null;
-                this.distinct = distinct;
-            }
 
             return this;
         }
 
-        public SqlQuery Limit(int skip, int take)
-        {
-            cachedQuery = null;
-            this.skip = skip;
-            this.take = take;
-            return this;
-        }
-
+        /// <summary>
+        /// Gets current query text.
+        /// </summary>
         public string Text
         {
             get { return ToString(); }
         }
 
-        public string GetExpression(string fieldAlias)
+        /// <summary>
+        /// Adds an expression to WHERE clause. If query already has a WHERE
+        /// clause, inserts AND between existing one and new one.
+        /// </summary>
+        /// <param name="expression">An expression</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery Where(string expression)
         {
-            if (fieldAlias == null || fieldAlias.Length == 0)
-                return null;
-
-            Column fieldInfo = columns.Find(
-                delegate(Column s) {
-                    return
-                        (s.AsAlias != null && s.AsAlias == fieldAlias) ||
-                        (String.IsNullOrEmpty(s.AsAlias) && s.Expression == fieldAlias);
-                });
-
-            if (fieldInfo == null)
-                return null;
-            else
-            {
-                return fieldInfo.Expression ?? fieldInfo.AsAlias;
-            }
-        }
-
-        public string GetExpression(int selectIndex)
-        {
-            if (selectIndex < 0 || selectIndex >= columns.Count)
-                throw new ArgumentOutOfRangeException("selectIndex");
-
-            Column si = columns[selectIndex];
-            return si.Expression ?? si.AsAlias;
-        }
-
-        public SqlQuery Where(string condition)
-        {
-            if (condition.IsEmptyOrNull())
-                throw new ArgumentNullException(condition);
+            if (expression.IsEmptyOrNull())
+                throw new ArgumentNullException(expression);
 
             cachedQuery = null;
 
             if (where == null || where.Length == 0)
-                where = new StringBuilder(condition);
+                where = new StringBuilder(expression);
             else
-                where.Append(Sql.Keyword.And).Append(condition);
+                where.Append(Sql.Keyword.And).Append(expression);
 
-            EnsureJoinsInCriteria(condition);
-
-            return this;
-        }
-
-        void IDbFilterable.Where(string condition)
-        {
-            this.Where(condition);
-        }
-
-        public SqlQuery Where(params string[] conditions)
-        {
-            if (conditions == null || conditions.Length == 0)
-                throw new ArgumentNullException("conditions");
-
-            foreach (var s in conditions)
-                Where(conditions);
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
 
+        /// <summary>
+        /// Adds expressions to WHERE clause, inserting AND between them.
+        /// </summary>
+        /// <param name="expressions">An array of expressions</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery Where(params string[] expressions)
+        {
+            if (expressions == null || expressions.Length == 0)
+                throw new ArgumentNullException("expressions");
+
+            foreach (var expression in expressions)
+                Where(expression);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Implements IDBFilterable.Where, by calling original Where method.
+        /// </summary>
+        /// <param name="expression">An expression</param>
+        void IDbFilterable.Where(string expression)
+        {
+            this.Where(expression);
+        }
+
+        /// <summary>
+        /// Gets/sets the dialect (SQL server type / version) for query.
+        /// </summary>
+        /// <remarks>TODO: SqlDialect system should be improved.</remarks>
         public SqlDialect Dialect
         {
             get { return dialect; }
             set { dialect = value; cachedQuery = null; }
         }
 
+        /// <summary>
+        /// Gets/sets the flag to get the total record count when paging is used by SKIP/TAKE. 
+        /// A secondary query without SKIP/TAKE is generated to get total record count, 
+        /// when this property is true.
+        /// </summary>
         public bool CountRecords
         {
             get { return countRecords; }
@@ -406,17 +495,17 @@
         }
 
         /// <summary>
-        ///   SQLSelect'in Select komutları için bir alana karşılık gelen bilgilerin tutulduğu yardımcı 
-        ///   sınıf.</summary>
+        /// Holds information about a column in SELECT clause.
+        /// </summary>
         private class Column
         {
-            /// <summary>Alanın adı</summary>
+            /// <summary>Field or expression</summary>
             public string Expression;
-            /// <summary>Varsa alana atanan alias</summary>
+            /// <summary>Field alias</summary>
             public string AsAlias;
-            /// <summary>Alan IDataReader'dan hangi Row nesnesinin içine yüklenecek</summary>
+            /// <summary>Used by entity system when more than one entity is used as a target</summary>
             public int IntoRow;
-            /// <summary>Alan IDataReader'dan hangi Field nesnesinin içine yüklenecek</summary>
+            /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
             public Field IntoField;
 
             public Column(string expression, string asAlias, int intoRow, Field intoField)

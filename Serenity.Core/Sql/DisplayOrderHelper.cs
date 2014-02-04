@@ -170,7 +170,7 @@ namespace Serenity.Data
                 query.Where(new Criteria(baseKeyField).IsNull());
 
             if (descendingKeyOrder)
-                query.OrderByDescending(keyField.Name);
+                query.OrderBy(keyField.Name, desc: true);
             else
                 query.OrderBy(keyField);
 
@@ -255,10 +255,7 @@ namespace Serenity.Data
 
             // determine display order for records with same display order values 
             // based on ID ordering set
-            if (descendingKeyOrder)
-                query.OrderByDescending(keyField.Name);
-            else
-                query.OrderBy(keyField.Name);
+            query.OrderBy(keyField.Name, desc: descendingKeyOrder);
 
             // read all existing records
             using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
