@@ -15,7 +15,7 @@ namespace Serenity.Data
         public abstract string GetKeyword();
 
         protected Join(IDictionary<string, Join> joins, string toTable, string alias, BaseCriteria onCriteria)
-            : base(alias, toTable)
+            : base(toTable, alias)
         {
             this.joins = new Dictionary<string, Join>();
             this.onCriteria = onCriteria;
