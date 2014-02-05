@@ -620,7 +620,9 @@ Sayfalama işlemlerindeki örneğimizde, SqlQuery, Microsoft SQL Server 2008'e u
 
 Dialect metodu ile SQL query nin kullandığı DIALECT ya da sunucu tipini değiştirebiliriz:
 
+```csharp
 public SqlQuery Dialect(SqlDialect dialect)
+```
 
 Şu an için aşağıdaki sunucu tipleri desteklenmektedir:
 
