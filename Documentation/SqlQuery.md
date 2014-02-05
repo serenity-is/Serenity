@@ -2,7 +2,7 @@
 Dinamik SQL SELECT sorguları hazırlamanız için StringBuilder benzeri bir nesnedir (aslında bu nesne kendi içinde birçok StringBuilder’dan faydalanır).
 
 
-## SAĞLADIĞI FAYDA ve KOLAYLIKLAR
+## Sağladığı Fayda ve Kolaylıklar
 
 Öncelikle bu nesneyi kullanmanın bize sağlayacağı bazı avantajları sıralayalım:
 
@@ -29,7 +29,7 @@ Dinamik SQL SELECT sorguları hazırlamanız için StringBuilder benzeri bir nes
 * Yine Serenity entity yapısıyla kullanıldığında, entity içinde tanımlı LEFT JOIN ifadelerini ilk gerektiğinde sorguya otomatik olarak ekler, sizin hatırlamanız gerekmez.
 
 
-## ÖRNEK 1 - BASİT BİR SQL İFADESİ
+## Basit Bir SELECT Sorgusu
 
 ```csharp
 namespace Samples
@@ -39,7 +39,7 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing1_SimpleSelectFromOrderBy()
+        public static string SimpleSelectFromOrderBy()
         {
             var query = new SqlQuery();
             query.Select("Firstname");
@@ -86,7 +86,7 @@ SELECT Firstname, Surname FROM People ORDER BY Age
 ```
 
 
-##METOD ÇAĞIRIM SIRASI ve ETKİSİ
+##Metod Çağırım Sırası ve Etkisi
 
 Örnek koddaki “From”, “OrderBy” ve “Select” içeren satırları hangi sırada yazarsak yazalım sonuç değişmeyecekti. Ancak aşağıdaki gibi Select çağrılarının sırası değişirse yani Surname alanını Firstname’den önce seçseydik...
 
@@ -98,7 +98,7 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing2_SimpleSelectReordered()
+        public static string ReorderedQuery()
         {
             var query = new SqlQuery();
             query.OrderBy("Age");
@@ -119,7 +119,7 @@ SELECT Surname, Firstname FROM People ORDER BY Age
 ```
 
 
-##ZİNCİRLEME METOD ÇAĞIRIMI (METHOD CHAINING)
+##Zincirleme Metod Çağrımı (Method Chaining)
 
 Yukarıdaki kod listelerine dikkatli bakınca sorgumuzu düzenlediğimiz her satıra “query.” ile başladığımızı ve bunun göze pek de hoş gelmediğini farkedebilirsiniz. 
 
@@ -133,7 +133,7 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing3_SimpleSelectMethodChaining()
+        public static string MethodChaining()
         {
             var query = new SqlQuery()
                 .Select("Firstname")
@@ -159,7 +159,7 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing4_SimpleSelectRemoveVariable()
+        public static string SimpleSelectRemoveVariable()
         {
             return new SqlQuery()
                 .Select("Firstname")
@@ -172,10 +172,79 @@ namespace Samples
 }
 ```
 
+##SELECT METODU
+
+```csharp
+public SqlQuery Select(string expression)
+```
+
+Şu ana kadar verdiğimiz örneklerde, Select metodunun yukarıdaki overload'ını kullandık. Expression (ifade) parametresi, bir alan adı ya da (Adi + Soyadi) gibi bir SQL ifadesi olabilir. Bu metodu her çağırdığınızda sorgunun SELECT listesine, verdiğiniz alan adı ya da ifade eklenir (araya virgül konarak).
+
+Tek bir çağırımda, birden fazla alan seçmek isterseniz, şu overload'ı kullanabilirsiniz:
+
+```csharp
+public SqlQuery Select(params string[] expressions)
+```
+
+Örneğin:
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string SelectMultipleFieldsInOneCall()
+        {
+            return new SqlQuery()
+                .Select("Firstname", "Surname", "Age", "Gender")
+                .From("People")
+                .ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT Firstname, Surname, Age, Gender FROM People
+```
+
+Seçtiğiniz bir alana kısa ad (column alias) atamak isterseniz SelectAs metodundan faydalanabilirsiniz:
+
+```csharp
+public SqlQuery SelectAs(string expression, string alias)
+```
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string SelectAs()
+        {
+            return new SqlQuery()
+                .SelectAs("(Firstname + Surname)", "Fullname")
+                .From("People")
+                .ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT (Firstname + Surname) Fullname FROM People
+```
+
+
 ##FROM METODU
 
 ```csharp
-public SqlQuery From(string table);
+public SqlQuery From(string table)
 ```
 
 SqlQuery’nin From metodu, sorgunun FROM ifadesini üretmek için en az (ve genellikle) bir kez çağrılmalıdır. İlk çağırdığınızda sorgunuzun ana tablo ismini belirlemiş olursunuz.
@@ -190,7 +259,7 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing5_CrossJoin()
+        public static string CrossJoinWithFrom()
         {
             return new SqlQuery()
                 .Select("Firstname")
@@ -223,7 +292,7 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing6_From()
+        public static string FromWithStringAliases()
         {
             return new SqlQuery()
                 .Select("p.Firstname")
@@ -274,7 +343,7 @@ namespace Samples
 
     public partial class SqlQuerySamples
     {
-        public static string Sample1_Listing7_FromAsAlias()
+        public static string FromUsingAlias()
         {
             var p = new Alias("People", "p");
             var c = new Alias("City", "c");
@@ -317,7 +386,7 @@ namespace Samples
         const string CityName = "CityName";
         const string CountryName = "CountryName";
 
-        public static string Sample1_Listing8_UsingFieldNameConsts()
+        public static string UsingFieldNameConsts()
         {
             var p = new Alias("People", "p");
             var c = new Alias("City", "c");
@@ -351,3 +420,62 @@ public SqlQuery From(Alias alias)
 Bu fonksiyon çağrıldığında, SQL sorgusunun FROM ifadesine, alias oluşturulurken tanımlanan tablo, kısa adıyla birlikte eklenir.
 
 
+Eğer alias'ınızı oluştururken bir tablo adı belirtmediyseniz (new Alias("c") gibi) şu overload'ı kullanabilirsiniz:
+
+```csharp
+public SqlQuery From(string table, Alias alias)
+```
+
+##ORDERBY METODU
+
+```csharp
+public SqlQuery OrderBy(string expression, bool desc = false)
+```
+
+OrderBy metodu da Select gibi bir alan adı ya da ifadesiyle çağrılabilir. "Desc" opsiyonel parametresine true atarsanız, alan adı ya da ifadenizin sonuna " DESC" getirilir.
+
+OrderBy'ın bir başka overload'ı tek çağırımda birden fazla alana göre sıralama yapmanıza imkan verir:
+
+```csharp
+public SqlQuery OrderBy(params string[] expressions)
+```
+
+OrderBy metodu, verdiğiniz ifadeleri ORDER BY deyiminin sonuna ekler. Bazen alanı listenin başına getirmek te isteyebiliriz. Örneğin çeşitli alanlara göre sıralanmış bir sorgu hazırladıktan sonra, kullanıcı arayüzünde tıklanan kolona göre sıralamanın değişmesi (önceki sıralamayı tümüyle kaybetmeden) gerekebilir. Bunun için SqlQuery, OrderByFirst metodunu sağlar:
+
+
+```csharp
+public SqlQuery OrderByFirst(string expression, bool desc = false)
+```
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string OrderByFirst()
+        {
+            var query = new SqlQuery()
+                .Select("Firstname")
+                .Select("Surname")
+                .From("Person")
+                .OrderBy("PersonID");
+
+			return query.OrderByFirst("Age")
+                .ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT Firstname, Surname FROM Person ORDER BY Age, PersonID
+```
+
+Order by kullanmış olsaydık şunu elde edecektik:
+
+```sql
+SELECT Firstname, Surname FROM Person ORDER BY PersonID, Age
+```
