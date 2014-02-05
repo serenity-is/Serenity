@@ -172,10 +172,79 @@ namespace Samples
 }
 ```
 
+##SELECT METODU
+
+```csharp
+public SqlQuery Select(string expression)
+```
+
+Şu ana kadar verdiğimiz örneklerde, Select metodunun yukarıdaki overload'ını kullandık. Expression (ifade) parametresi, bir alan adı ya da (Adi + Soyadi) gibi bir SQL ifadesi olabilir. Bu metodu her çağırdığınızda sorgunun SELECT listesine, verdiğiniz alan adı ya da ifade eklenir (araya virgül konarak).
+
+Tek bir çağırımda, birden fazla alan seçmek isterseniz, şu overload'ı kullanabilirsiniz:
+
+```csharp
+public SqlQuery Select(params string[] expressions)
+```
+
+Örneğin:
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string Sample1_Listing5_CrossJoin()
+        {
+            return new SqlQuery()
+                .Select("Firstname", "Surname", "Age", "Gender")
+                .From("People")
+                .ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT Firstname, Surname, Age, Gender FROM People
+```
+
+Seçtiğiniz bir alana kısa ad (column alias) atamak isterseniz SelectAs metodundan faydalanabilirsiniz:
+
+```csharp
+public SqlQuery SelectAs(string expression, string alias)
+```
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string Sample1_Listing5_CrossJoin()
+        {
+            return new SqlQuery()
+                .SelectAs("(Firstname + Surname)", "Fullname")
+                .From("People")
+                .ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT (Firstname + Surname) Fullname FROM People
+```
+
+
 ##FROM METODU
 
 ```csharp
-public SqlQuery From(string table);
+public SqlQuery From(string table)
 ```
 
 SqlQuery’nin From metodu, sorgunun FROM ifadesini üretmek için en az (ve genellikle) bir kez çağrılmalıdır. İlk çağırdığınızda sorgunuzun ana tablo ismini belirlemiş olursunuz.
@@ -351,3 +420,52 @@ public SqlQuery From(Alias alias)
 Bu fonksiyon çağrıldığında, SQL sorgusunun FROM ifadesine, alias oluşturulurken tanımlanan tablo, kısa adıyla birlikte eklenir.
 
 
+Eğer alias'ınızı oluştururken bir tablo adı belirtmediyseniz (new Alias("c") gibi) şu overload'ı kullanabilirsiniz:
+
+```csharp
+public SqlQuery From(string table, Alias alias)
+```
+
+##ORDERBY METODU
+
+```csharp
+public SqlQuery OrderBy(string expression, bool desc = false)
+```
+
+OrderBy metodu da Select gibi bir alan adı ya da ifadesiyle çağrılabilir. "Desc" opsiyonel parametresine true atarsanız, alan adı ya da ifadenizin sonuna " DESC" getirilir.
+
+OrderBy'ın bir başka overload'ı tek çağırımda birden fazla alana göre sıralama yapmanıza imkan verir:
+
+```csharp
+public SqlQuery OrderBy(params string[] expressions)
+```
+
+OrderBy metodu, verdiğiniz ifadeleri hep ORDER BY deyiminin sonuna ekler. 
+
+
+Örneğin:
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string Sample1_Listing5_CrossJoin()
+        {
+            return new SqlQuery()
+                .Select("Firstname", "Surname", "Age", "Gender")
+                .From("People")
+                .ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT Firstname, Surname, Age, Gender FROM People
+```
+
+Seçtiğiniz bir alana kısa ad (column alias) atamak isterseniz SelectAs metodundan faydalanabilirsiniz:
