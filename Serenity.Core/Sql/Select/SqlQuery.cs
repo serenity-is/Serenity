@@ -14,11 +14,11 @@
         private bool distinct;
         private StringBuilder from;
         private StringBuilder having;
-        private StringBuilder groupBy;       
+        private StringBuilder groupBy;
         private List<string> orderBy;
         private int skip;
         private int take;
-        private StringBuilder where;              
+        private StringBuilder where;
 
         /// <summary>
         /// Creates a new SqlQuery instance.
