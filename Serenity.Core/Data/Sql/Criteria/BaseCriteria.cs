@@ -453,6 +453,11 @@ namespace Serenity.Data
             {
                 throw new InvalidOperationException("Criteria should not have parameters!");
             }
+
+            public SqlDialect Dialect
+            {
+                get { return SqlSettings.CurrentDialect; }
+            }
         }
 
         private class IgnoreParams : IDbParameterized
@@ -470,6 +475,11 @@ namespace Serenity.Data
             public Parameter AutoParam()
             {
                 return new Parameter((next++).IndexParam());
+            }
+
+            public SqlDialect Dialect
+            {
+                get { return SqlSettings.CurrentDialect; }
             }
         }
     }

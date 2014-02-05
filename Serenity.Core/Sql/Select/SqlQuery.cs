@@ -10,7 +10,6 @@
         private string cachedQuery;
         private List<Column> columns;
         private bool countRecords;
-        private SqlDialect dialect;
         private bool distinct;
         private StringBuilder from;
         private StringBuilder having;
@@ -25,7 +24,6 @@
         /// </summary>
         public SqlQuery()
         {
-            dialect = SqlSettings.CurrentDialect;
             columns = new List<Column>();
             from = new StringBuilder();
         }
@@ -184,22 +182,6 @@
         }
 
         /// <summary>
-        /// Adds field names or SQL expressions to the GROUP BY clause.
-        /// </summary>
-        /// <param name="expressions">Array of fields or expressions.</param>
-        /// <returns>The query itself.</returns>
-        public SqlQuery GroupBy(params string[] expressions)
-        {
-            if (expressions == null)
-                throw new ArgumentNullException("expressions");
-
-            foreach (string expression in expressions)
-                GroupBy(expression);
-
-            return this;
-        }
-
-        /// <summary>
         /// Adds an SQL expression to the GROUP BY clause.
         /// </summary>
         /// <param name="expression">Array of fields or expressions.</param>
@@ -238,19 +220,6 @@
             orderBy.Add(expression);
 
             EnsureJoinsInExpression(expression);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Adds field names or SQL expressions to the ORDER BY clause.
-        /// </summary>
-        /// <param name="expression">Array of fields or expressions.</param>
-        /// <returns>The query itself.</returns>
-        public SqlQuery OrderBy(params string[] expressions)
-        {
-            foreach (string expression in expressions)
-                OrderBy(expression);
 
             return this;
         }
@@ -356,6 +325,15 @@
         }
 
         /// <summary>
+        /// Gets current SKIP value.
+        /// </summary>
+        /// <returns>SKIP value.</returns>
+        public int Skip()
+        {
+            return skip;
+        }
+
+        /// <summary>
         /// Sets SKIP value. Used for paging.
         /// </summary>
         /// <param name="skipRows">Number of rows to skip (server dependant implementation)</param>
@@ -371,14 +349,6 @@
             return this;
         }
 
-        /// <summary>
-        /// Gets current SKIP value.
-        /// </summary>
-        /// <returns>SKIP value.</returns>
-        public int Skip()
-        {
-            return skip;
-        }
 
         /// <summary>
         /// Creates a new query that shares parameter dictionary with this query.
@@ -474,13 +444,26 @@
         }
 
         /// <summary>
-        /// Gets/sets the dialect (SQL server type / version) for query.
+        /// Gets the dialect (SQL server type / version) for query.
+        /// </summary>
+        public SqlDialect Dialect()
+        {
+            return this.dialect;
+        }
+
+        /// <summary>
+        /// Sets the dialect (SQL server type / version) for query.
         /// </summary>
         /// <remarks>TODO: SqlDialect system should be improved.</remarks>
-        public SqlDialect Dialect
+        public SqlQuery Dialect(SqlDialect dialect)
         {
-            get { return dialect; }
-            set { dialect = value; cachedQuery = null; }
+            if (this.dialect != dialect)
+            {
+                this.dialect = dialect;
+                cachedQuery = null;
+            }
+
+            return this;
         }
 
         /// <summary>

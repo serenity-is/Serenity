@@ -31,7 +31,7 @@ namespace Serenity.Data
                 this.op == CriteriaOperator.NotLike)
             {
                 var valueCriteria = this.right as ValueCriteria;
-                if (SqlSettings.CurrentDialect.IsCaseSensitive() &&
+                if (query.Dialect.IsCaseSensitive() &&
                     !Object.ReferenceEquals(null, valueCriteria) &&
                     valueCriteria.Value is string)
                 {

@@ -1,4 +1,4 @@
-# SqlQuery Nesnesi
+﻿# SqlQuery Nesnesi
 Dinamik SQL SELECT sorguları hazırlamanız için StringBuilder benzeri bir nesnedir (aslında bu nesne kendi içinde birçok StringBuilder’dan faydalanır).
 
 
@@ -172,7 +172,7 @@ namespace Samples
 }
 ```
 
-##SELECT METODU
+##Select Metodu
 
 ```csharp
 public SqlQuery Select(string expression)
@@ -241,7 +241,7 @@ SELECT (Firstname + Surname) Fullname FROM People
 ```
 
 
-##FROM METODU
+##From Metodu
 
 ```csharp
 public SqlQuery From(string table)
@@ -280,7 +280,7 @@ Oluşan sorgu aşağıdaki gibi olacaktır:
 SELECT Firstname, Surname FROM People, City, Country ORDER BY Age
 ```
 
-##ALIAS NESNESİ ve SQLQUERY İLE KULLANIMI
+##Alias Nesnesi ve SqlQuery ile Kullanımı
 
 Sorgularımız uzadıkça ve içindeki JOIN sayısı arttıkça, hem alan adı çakışmalarını engellemek, hem de istenen alanlara daha kolay ulaşmak için, kullandığımız tablolara aşağıdaki gibi kısa adlar (alias) vermeye başlarız. 
 
@@ -426,19 +426,13 @@ Eğer alias'ınızı oluştururken bir tablo adı belirtmediyseniz (new Alias("c
 public SqlQuery From(string table, Alias alias)
 ```
 
-##ORDERBY METODU
+##OrderBy Metodu
 
 ```csharp
 public SqlQuery OrderBy(string expression, bool desc = false)
 ```
 
 OrderBy metodu da Select gibi bir alan adı ya da ifadesiyle çağrılabilir. "Desc" opsiyonel parametresine true atarsanız, alan adı ya da ifadenizin sonuna " DESC" getirilir.
-
-OrderBy'ın bir başka overload'ı tek çağırımda birden fazla alana göre sıralama yapmanıza imkan verir:
-
-```csharp
-public SqlQuery OrderBy(params string[] expressions)
-```
 
 OrderBy metodu, verdiğiniz ifadeleri ORDER BY deyiminin sonuna ekler. Bazen alanı listenin başına getirmek te isteyebiliriz. Örneğin çeşitli alanlara göre sıralanmış bir sorgu hazırladıktan sonra, kullanıcı arayüzünde tıklanan kolona göre sıralamanın değişmesi (önceki sıralamayı tümüyle kaybetmeden) gerekebilir. Bunun için SqlQuery, OrderByFirst metodunu sağlar:
 
@@ -479,3 +473,212 @@ Order by kullanmış olsaydık şunu elde edecektik:
 ```sql
 SELECT Firstname, Surname FROM Person ORDER BY PersonID, Age
 ```
+
+##Distinct Metodu
+
+```csharp
+public SqlQuery Distinct(bool distinct)
+```
+
+DISTINCT deyimini içeren bir sorgu üretmek istediğinizde bu metodu kullanabilirsiniz:
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string DistinctMethod()
+        {
+			return new SqlQuery()
+				.From("Person")
+				.Distinct(true)
+				.Select("Firstname")
+				.ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT DISTINCT Firstname FROM Person 
+```
+
+##Group By Metodu
+
+```csharp
+public SqlQuery GroupBy(string expression)
+```
+
+GroupBy metodu bir alan adı ya da ifadesiyle çağrılır ve bu ifadeyi sorgunun GROUP BY deyiminin sonuna ekler.
+
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string GroupByMethod()
+        {
+			new SqlQuery()
+				.From("Person")
+				.Select("Firstname", "Lastname", "Count(*)")
+				.GroupBy("Firstname")
+				.GroupBy("LastName")
+				.ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT Firstname, Lastname, Count(*) FROM Person GROUP BY Firstname, LastName
+```
+
+
+##Having Metodu
+
+```csharp
+public SqlQuery Having(string expression)
+```
+
+GroupBy metodu ile birlikte kullanabileceğiniz Having metodu, mantıksal bir ifadeyle çağrılır ve bu ifadeyi sorgunun HAVING deyiminin sonuna ekler.
+
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string HavingMethod()
+        {
+			new SqlQuery()
+				.From("Person")
+				.Select("Firstname", "Lastname", "Count(*)")
+				.GroupBy("Firstname")
+				.GroupBy("LastName")
+				.Having("Count(*) > 5")
+				.ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT Firstname, Lastname, Count(*) FROM Person GROUP BY Firstname, LastName HAVING Count(*) > 5
+```
+
+##Sayfalama İşlemleri (SKIP / TAKE / TOP / LIMIT)
+
+```csharp
+public SqlQuery Skip(int skipRows)
+
+public SqlQuery Take(int rowCount)
+```
+
+SqlQuery, LINQ'de Take ve Skip olarak geçen sayfalama metodlarını destekler. Bunlardan Take, Microsoft SQL Server'da TOP'a karşılık gelirken, SKIP'in direk bir karşılığı olmadığından SqlQuery, ROW_NUMBER() fonksiyonundan faydalanır. Bu nedenle SQL server için SKIP kullanmak istediğinizde, sorgunuzda en az bir ORDER BY ifadesinin de olması gerekir.
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string SkipTakePaging()
+        {
+        	new SqlQuery()
+        		.From("Person")
+        		.Select("Firstname", "Lastname")
+        		.OrderBy("PersonId")
+        		.Skip(300)
+        		.Take(100)
+        		.ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT * FROM (
+    SELECT TOP 400 Firstname, Lastname, ROW_NUMBER() OVER (ORDER BY PersonId) AS _row_number_ FROM Person
+) _row_number_results_ WHERE _row_number_ > 300
+```
+
+##Farklı Veritabanları Desteği
+
+Sayfalama işlemlerindeki örneğimizde, SqlQuery, Microsoft SQL Server 2008'e uygun bir sayfalama metodu kullandı.
+
+Dialect metodu ile SQL query nin kullandığı DIALECT ya da sunucu tipini değiştirebiliriz:
+
+public SqlQuery Dialect(SqlDialect dialect)
+
+Şu an için aşağıdaki sunucu tipleri desteklenmektedir:
+
+```csharp
+[Flags]
+public enum SqlDialect
+{
+    MsSql = 1,
+    Firebird = 2,
+    UseSkipKeyword = 512,
+    UseRowNumber = 1024,
+    UseOffsetFetch = 2048,
+    MsSql2005 = MsSql | UseRowNumber,
+    MsSql2012 = MsSql | UseOffsetFetch | UseRowNumber
+}
+```
+
+Örneğin SqlDialect.MsSql2012'yi seçip, SQL Server 2012 ile gelen OFFSET FETCH deyimlerinden faydalanmak isteseydik:
+
+```csharp
+namespace Samples
+{
+    using Serenity;
+    using Serenity.Data;
+
+    public partial class SqlQuerySamples
+    {
+        public static string SkipTakePaging()
+        {
+        	new SqlQuery()
+        	    .Dialect(SqlDialect.MsSql2012)
+        		.From("Person")
+        		.Select("Firstname", "Lastname")
+        		.OrderBy("PersonId")
+        		.Skip(300)
+        		.Take(100)
+        		.ToString();
+        }
+    }
+}
+```
+
+```sql
+SELECT Firstname, Lastname FROM Person ORDER BY PersonId 
+OFFSET 300 ROWS FETCH NEXT 100 ROWS ONLY
+```
+
+SqlDialect.Firebird'ü tercih etseydik şu şekilde bir sorgu oluşurdu:
+
+```sql
+SELECT FIRST 100 SKIP 300 Firstname, Lastname FROM Person ORDER BY PersonId
+```
+
+SqlQuery'nin Sunucu/Dialect desteği henüz mükemmel olmasa da, temel işlemlerde sorun çıkarmayacak düzeydedir.
+
+Uygulamanızda tek tipte sunucu kullanıyorsanız, her sorgunuzda, dialect ayarlamak istemeyebilirsiniz. Bunun için SqlSettings.CurrentDialect'i değiştirmelisiniz. Örneğin aşağıdaki kodu program başlangıcında, ya da global.asax dosyanızdan çağırabilirsiniz: 
+
+```csharp
+SqlSettings.CurrentDialect = SqlDialect.MsSql2012;
+```
+

@@ -7,9 +7,15 @@
 
     public class ParameterizedQuery : IDbParameterized
     {
-        private Dictionary parameters;
+        protected SqlDialect dialect;
         protected ParameterizedQuery parent;
+        private Dictionary parameters;
         private int nextAutoParam;
+
+        public ParameterizedQuery()
+        {
+            dialect = SqlSettings.CurrentDialect;
+        }
 
         public void AddParam(string name, object value)
         {
@@ -67,6 +73,26 @@
                 return parent.AutoParam();
 
             return new Parameter((nextAutoParam++).IndexParam());
+        }
+
+        void IDbParameterized.AddParam(string name, object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDbParameterized.SetParam(string name, object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        Parameter IDbParameterized.AutoParam()
+        {
+            throw new NotImplementedException();
+        }
+
+        SqlDialect IDbParameterized.Dialect
+        {
+            get { return dialect; }
         }
     }
 }
