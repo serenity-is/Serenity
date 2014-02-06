@@ -64,26 +64,38 @@ namespace Serenity.Data
                 sbCommandText.AppendLine(sqc.CommandText);
             }
 
-            sbCommandText.AppendLine("-- RESULTS");
-            sbCommandText.Append("SELECT 1 as Executed");
-            for (int i = 0; i < sqc.Parameters.Count; i++)
-            {
-                var cParam = sqc.Parameters[i];
+            bool anyOut = false;
+            foreach (SqlParameter p in sqc.Parameters)
+                if (p.Direction == ParameterDirection.ReturnValue ||
+                    p.Direction == ParameterDirection.Output)
+                {
+                    anyOut = true;
+                    break;
+                }
 
-                if (cParam.Direction == ParameterDirection.ReturnValue)
+            if (anyOut)
+            {
+                sbCommandText.AppendLine("-- RESULTS");
+                sbCommandText.Append("SELECT 1 as Executed");
+                for (int i = 0; i < sqc.Parameters.Count; i++)
                 {
-                    sbCommandText.Append(", @returnValue as ReturnValue");
+                    var cParam = sqc.Parameters[i];
+
+                    if (cParam.Direction == ParameterDirection.ReturnValue)
+                    {
+                        sbCommandText.Append(", @returnValue as ReturnValue");
+                    }
+                    else if (cParam.Direction.HasFlag(ParameterDirection.Output))
+                    {
+                        sbCommandText.Append(", ");
+                        sbCommandText.Append(cParam.ParameterName);
+                        sbCommandText.Append(" as [");
+                        sbCommandText.Append(cParam.ParameterName);
+                        sbCommandText.Append(']');
+                    }
                 }
-                else if (cParam.Direction.HasFlag(ParameterDirection.Output))
-                {
-                    sbCommandText.Append(", ");
-                    sbCommandText.Append(cParam.ParameterName);
-                    sbCommandText.Append(" as [");
-                    sbCommandText.Append(cParam.ParameterName);
-                    sbCommandText.Append(']');
-                }
+                sbCommandText.AppendLine(";");
             }
-            sbCommandText.AppendLine(";");
 
             sbCommandText.AppendLine("-- END COMMAND");
             return sbCommandText.ToString();
