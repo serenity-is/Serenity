@@ -416,7 +416,7 @@
            using (IDbCommand command = NewCommand(connection, commandText, param))
            {
                if (Log.DebugLevel)
-                   LogCommand("ExecuteNonQuery", commandText, param);
+                   LogCommand("ExecuteNonQuery", command);
 
                var result = ExecuteNonQuery(command);
 
@@ -440,7 +440,7 @@
            using (IDbCommand command = NewCommand(connection, commandText))
            {
                if (Log.DebugLevel)
-                   LogCommand("ExecuteNonQuery", commandText, null);
+                   LogCommand("ExecuteNonQuery", command);
 
                var result = ExecuteNonQuery(command);
 
@@ -475,7 +475,7 @@
                    try
                    {
                        if (Log.DebugLevel)
-                           LogCommand("ExecuteScalar", commandText, param);
+                           LogCommand("ExecuteScalar", command);
 
                        var result = command.ExecuteScalar();
 
@@ -545,27 +545,42 @@
            return ExecuteScalar(connection, selectQuery.ToString(), param);
        }
 
-       private static void LogCommand(string commandType, string commandText, IDictionary<string, object> param)
+       private static void LogCommand(string type, IDbCommand command)
        {
-           StringBuilder sb = new StringBuilder(commandType.Length + commandText.Length + 100);
-           sb.Append(commandType);
-           sb.Append(" - ");
-           sb.Append(commandText);
-           if (param != null)
+           try
            {
-               sb.Append(" --- PARAMS --- ");
-               foreach (var p in param)
+               var sqlCmd = command as SqlCommand;
+               if (sqlCmd != null)
                {
-                   sb.Append(p.Key);
-                   sb.Append("=");
-                   if (p.Value == null)
-                       sb.Append("<NULL>");
-                   else
-                       sb.Append(p.Value.ToString());
-                   sb.Append(" ");
+                   Log.Debug(type + "\r\n" + SqlCommandDumper.GetCommandText(sqlCmd));
+                   return;
                }
+
+               StringBuilder sb = new StringBuilder((command.CommandText ?? "").Length + 1000);
+               sb.Append(type);
+               sb.Append("\r\n");
+               sb.Append(command.CommandText);
+               if (command.Parameters != null && command.Parameters.Count > 0)
+               {
+                   sb.Append(" --- PARAMS --- ");
+                   foreach (DbParameter p in command.Parameters)
+                   {
+                       sb.Append(p.ParameterName);
+                       sb.Append("=");
+                       if (p.Value == null || p.Value == DBNull.Value)
+                           sb.Append("<NULL>");
+                       else
+                           sb.Append(p.Value.ToString());
+                       sb.Append(" ");
+                   }
+               }
+
+               Log.Debug(sb.ToString());
            }
-           Log.Debug(sb.ToString());
+           catch (Exception ex)
+           {
+               Log.Debug("Error logging command: " + ex.ToString());
+           }
        }
 
        /// <summary>
@@ -590,12 +605,12 @@
            {
                //using (new Tracer(commandText))
                {
-                   if (Log.DebugLevel)
-                       LogCommand("ExecuteReader", commandText, param);
-
                    IDbCommand command = NewCommand(connection, commandText, param);
                    try
                    {
+                       if (Log.DebugLevel)
+                           LogCommand("ExecuteReader", command);
+
                        var result = command.ExecuteReader();
 
                        if (Log.DebugLevel)

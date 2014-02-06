@@ -216,6 +216,7 @@
     <Compile Include="Data\RowHelper.cs" />
     <Compile Include="Data\Sql\Alias.cs" />
     <Compile Include="Data\Sql\AliasWithFields.cs" />
+    <Compile Include="Data\Sql\SqlCommandDumper.cs" />
     <Compile Include="Data\Sql\ForXmlHelper.cs" />
     <Compile Include="Data\Sql\Criteria\BaseCriteria.cs" />
     <Compile Include="Data\Sql\Criteria\BinaryCriteria.cs" />
