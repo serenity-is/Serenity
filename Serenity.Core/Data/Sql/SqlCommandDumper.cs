@@ -276,7 +276,7 @@ namespace Serenity.Data
                 case SqlDbType.NChar:
                 case SqlDbType.Binary:
                     {
-                        sbCommandText.Append(param.SqlDbType.ToString().ToUpper());
+                        sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
                         sbCommandText.Append('(');
                         sbCommandText.Append(param.Size);
                         sbCommandText.Append(')');
@@ -286,7 +286,7 @@ namespace Serenity.Data
                 case SqlDbType.NVarChar:
                 case SqlDbType.VarBinary:
                     {
-                        sbCommandText.Append(param.SqlDbType.ToString().ToUpper());
+                        sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
                         sbCommandText.Append("(MAX /* Specified as ");
                         sbCommandText.Append(param.Size);
                         sbCommandText.Append(" */)");
@@ -312,7 +312,7 @@ namespace Serenity.Data
                 case SqlDbType.UniqueIdentifier:
                 case SqlDbType.Image:
                     {
-                        sbCommandText.Append(param.SqlDbType.ToString().ToUpper());
+                        sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
                     }
                     break;
                 // Unknown
@@ -320,9 +320,9 @@ namespace Serenity.Data
                 default:
                     {
                         sbCommandText.Append("/* UNKNOWN DATATYPE: ");
-                        sbCommandText.Append(param.SqlDbType.ToString().ToUpper());
+                        sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
                         sbCommandText.Append(" *" + "/ ");
-                        sbCommandText.Append(param.SqlDbType.ToString().ToUpper());
+                        sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
                     }
                     break;
             }
