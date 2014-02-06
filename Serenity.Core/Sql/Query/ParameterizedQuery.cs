@@ -75,21 +75,6 @@
             return new Parameter((nextAutoParam++).IndexParam());
         }
 
-        void IDbParameterized.AddParam(string name, object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IDbParameterized.SetParam(string name, object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        Parameter IDbParameterized.AutoParam()
-        {
-            throw new NotImplementedException();
-        }
-
         SqlDialect IDbParameterized.Dialect
         {
             get { return dialect; }
