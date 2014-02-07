@@ -128,7 +128,7 @@
         ///   SqlUpdate object itself.</returns>
         public SqlUpdate Inc(string field, int value)
         {
-            return SetTo(field, field + (value >= 0 ? "+" : "") + value.ToInvariant());
+            return SetTo(field, field + (value >= 0 ? " + " : "") + value.ToInvariant());
         }
 
         /// <summary>
@@ -295,9 +295,9 @@
             for (int i = 0; i < nameValuePairs.Count - 1; i += 2)
             {
                 if (i > 0)
-                    sb.Append(',');
+                    sb.Append(", ");
                 sb.Append(nameValuePairs[i]);
-                sb.Append('=');
+                sb.Append(" = ");
                 sb.Append(nameValuePairs[i + 1]);
             }
 

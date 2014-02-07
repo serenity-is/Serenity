@@ -14,12 +14,11 @@ namespace Serenity.Data
         {
             var sbCommandText = new StringBuilder();
 
-            sbCommandText.AppendLine("-- BEGIN COMMAND");
-
             // params
             for (int i = 0; i < sqc.Parameters.Count; i++)
                 logParameterToSqlBatch(sqc.Parameters[i], sbCommandText);
-            sbCommandText.AppendLine("-- END PARAMS");
+            
+            sbCommandText.AppendLine("");
 
             // command
             if (sqc.CommandType == CommandType.StoredProcedure)
@@ -97,7 +96,6 @@ namespace Serenity.Data
                 sbCommandText.AppendLine(";");
             }
 
-            sbCommandText.AppendLine("-- END COMMAND");
             return sbCommandText.ToString();
         }
 
@@ -287,9 +285,12 @@ namespace Serenity.Data
                 case SqlDbType.VarBinary:
                     {
                         sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
-                        sbCommandText.Append("(MAX /* Specified as ");
+                        sbCommandText.Append("(");
                         sbCommandText.Append(param.Size);
-                        sbCommandText.Append(" */)");
+                        sbCommandText.Append(")");
+                        //sbCommandText.Append("(MAX /* Specified as ");
+                        //sbCommandText.Append(param.Size);
+                        //sbCommandText.Append(" */)");
                     }
                     break;
                 // fixed length

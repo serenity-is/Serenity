@@ -72,7 +72,7 @@
             if (parent != null)
                 return parent.AutoParam();
 
-            return new Parameter((nextAutoParam++).IndexParam());
+            return new Parameter((++nextAutoParam).IndexParam());
         }
 
         SqlDialect IDbParameterized.Dialect

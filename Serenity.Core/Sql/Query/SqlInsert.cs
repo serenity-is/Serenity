@@ -191,14 +191,14 @@
             for (int i = 0; i < nameValuePairs.Count; i += 2)
             {
                 if (i > 0)
-                    sb.Append(',');
+                    sb.Append(", ");
                 sb.Append(nameValuePairs[i]);
             }
             sb.Append(") VALUES (");
             for (int i = 1; i < nameValuePairs.Count; i += 2)
             {
                 if (i > 1)
-                    sb.Append(',');
+                    sb.Append(", ");
                 sb.Append(nameValuePairs[i]);
             }
             sb.Append(')');
