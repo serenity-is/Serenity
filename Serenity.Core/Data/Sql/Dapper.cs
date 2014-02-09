@@ -743,7 +743,7 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
 
         public static IEnumerable<dynamic> Query(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
         {
-            return Query<DapperRow>(cnn, sql.Text, sql.Params == null ? null : new DynamicParameters(sql.Params), null, buffered, commandTimeout, commandType);
+            return Query<DapperRow>(cnn, sql.ToString(), sql.Params == null ? null : new DynamicParameters(sql.Params), null, buffered, commandTimeout, commandType);
         }
 #else
         /// <summary>
@@ -793,7 +793,7 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
 #if CSHARP30
             this IDbConnection cnn, string sql, object param, IDbTransaction transaction, bool buffered, int? commandTimeout, CommandType? commandType
 #else
-this IDbConnection cnn, SqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null
+this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null
 #endif
 )
         {

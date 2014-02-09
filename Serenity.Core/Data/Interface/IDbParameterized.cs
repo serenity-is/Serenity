@@ -12,5 +12,6 @@ namespace Serenity.Data
         void SetParam(string name, object value);
         Parameter AutoParam();
         SqlDialect Dialect { get; }
+        IDictionary<string, object> Params { get; }
     }
 }

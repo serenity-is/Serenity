@@ -127,6 +127,16 @@ namespace Serenity.Data
         {
         }
 
+        /// <summary>
+        ///   Belirtilen SqlQuery i içeren yeni bir 
+        ///   kriter oluþturur.</summary>
+        /// <param name="query">
+        ///   Query nesnesi (genellikle sub query).</param>
+        public Criteria(ISqlQuery query)
+            : this(query.ToString())
+        {
+        }
+
 
         /// <summary>
         ///   Verilen alan adýný köþeli parantez içine alarak yeni bir kriter oluþturur.

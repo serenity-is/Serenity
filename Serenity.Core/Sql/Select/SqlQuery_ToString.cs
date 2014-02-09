@@ -18,6 +18,10 @@ namespace Serenity.Data
             // formatlamada kullanılacak StringBuilder nesnesi
             StringBuilder sb = new StringBuilder();
 
+            // sub queries should be enclosed in paranthesis
+            if (this.parent != null)
+                sb.Append("(");
+
             if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword())
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
@@ -311,6 +315,10 @@ namespace Serenity.Data
                     sb.Append(") _alias_");
                 }
             }
+
+            // sub queries should be enclosed in paranthesis
+            if (this.parent != null)
+                sb.Append(")");
 
             cachedQuery = sb.ToString();
 

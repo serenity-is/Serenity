@@ -31,11 +31,6 @@ namespace Serenity
                 list.Add(value);
         }
 
-        public static void With<T>(this T obj, Action<T> act) where T: class
-        { 
-            act(obj);
-        }
-
         public static void IfNotNull<T>(this T obj, Action<T> action) where T: class
         {
             if (obj != null)

@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Text;
 
-    public partial class SqlQuery : ParameterizedQuery, IDbFilterable, IDbGetExpression
+    public partial class SqlQuery : ParameterizedQuery, ISqlQuery, IDbFilterable, IDbGetExpression
     {
         private HashSet<string> aliases;
         private string cachedQuery;

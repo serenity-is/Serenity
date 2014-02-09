@@ -1,6 +1,7 @@
 namespace Serenity.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
 
     public abstract class BaseCriteria
@@ -454,6 +455,11 @@ namespace Serenity.Data
                 throw new InvalidOperationException("Criteria should not have parameters!");
             }
 
+            public IDictionary<string, object> Params
+            {
+                get { return null; }
+            }
+
             public SqlDialect Dialect
             {
                 get { return SqlSettings.CurrentDialect; }
@@ -475,6 +481,11 @@ namespace Serenity.Data
             public Parameter AutoParam()
             {
                 return new Parameter((next++).IndexParam());
+            }
+
+            public IDictionary<string, object> Params
+            {
+                get { return null; }
             }
 
             public SqlDialect Dialect
