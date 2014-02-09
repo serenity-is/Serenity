@@ -426,6 +426,33 @@ Eğer alias'ınızı oluştururken bir tablo adı belirtmediyseniz (new Alias("c
 public SqlQuery From(string table, Alias alias)
 ```
 
+##With Uzantı (Extension) Metodu
+Örneğimizde, kısa adlarımızı (alias) önceden değişken olarak tanımlamamız gerekli oldu. Eğer bunu SQL query'nin zincirleme akışını bozmadan yapmak isteseydik, With extension metodundan faydalanabilirdik:
+
+```csharp
+    public static string UsingWithExtension()
+    {
+        return new SqlQuery().With(
+            new Alias("People", "p"), 
+            new Alias("City", "c"), 
+            new Alias("Country", "o"), 
+            (me, p, c, o) => me
+                .Select(p + Firstname)
+                .Select(p + Surname)
+                .Select(c + CityName)
+                .Select(o + CountryName)
+                .From(p)
+                .From(c)
+                .From(o)
+                .OrderBy(p + Age))
+        .ToString();
+    }
+```
+
+ChainingExtensions altında statik bir uzantı (extension) metodu olarak tanımlanmış olan With metodu, sorgunuzun akışını bozmadan, inline olarak değişkenler tanımlamanıza imkan verir. With metoduna geçirdiğiniz parametreler, son parametre verdiğiniz lambda metoduna, sırasıyla geçirilir. Metoda ilk geçirilen parametre (me) ise sorgunun kendisidir.
+
+Inline değişken tanımlamak, sorgumuzu daha akışkan hale getirse de, bir miktar okunurluluğu azaltmış olabilir. Fonksiyonalite ve akıcılık arasında ne tercih yapacağına siz karar vermelisiniz.
+
 ##OrderBy Metodu
 
 ```csharp
@@ -457,7 +484,7 @@ namespace Samples
                 .From("Person")
                 .OrderBy("PersonID");
 
-			return query.OrderByFirst("Age")
+            return query.OrderByFirst("Age")
                 .ToString();
         }
     }
@@ -492,11 +519,11 @@ namespace Samples
     {
         public static string DistinctMethod()
         {
-			return new SqlQuery()
-				.From("Person")
-				.Distinct(true)
-				.Select("Firstname")
-				.ToString();
+            return new SqlQuery()
+                .From("Person")
+                .Distinct(true)
+                .Select("Firstname")
+                .ToString();
         }
     }
 }
@@ -525,12 +552,12 @@ namespace Samples
     {
         public static string GroupByMethod()
         {
-			new SqlQuery()
-				.From("Person")
-				.Select("Firstname", "Lastname", "Count(*)")
-				.GroupBy("Firstname")
-				.GroupBy("LastName")
-				.ToString();
+            new SqlQuery()
+                .From("Person")
+                .Select("Firstname", "Lastname", "Count(*)")
+                .GroupBy("Firstname")
+                .GroupBy("LastName")
+                .ToString();
         }
     }
 }
@@ -560,13 +587,13 @@ namespace Samples
     {
         public static string HavingMethod()
         {
-			new SqlQuery()
-				.From("Person")
-				.Select("Firstname", "Lastname", "Count(*)")
-				.GroupBy("Firstname")
-				.GroupBy("LastName")
-				.Having("Count(*) > 5")
-				.ToString();
+            new SqlQuery()
+                .From("Person")
+                .Select("Firstname", "Lastname", "Count(*)")
+                .GroupBy("Firstname")
+                .GroupBy("LastName")
+                .Having("Count(*) > 5")
+                .ToString();
         }
     }
 }
@@ -596,13 +623,13 @@ namespace Samples
     {
         public static string SkipTakePaging()
         {
-        	new SqlQuery()
-        		.From("Person")
-        		.Select("Firstname", "Lastname")
-        		.OrderBy("PersonId")
-        		.Skip(300)
-        		.Take(100)
-        		.ToString();
+            new SqlQuery()
+                .From("Person")
+                .Select("Firstname", "Lastname")
+                .OrderBy("PersonId")
+                .Skip(300)
+                .Take(100)
+                .ToString();
         }
     }
 }
@@ -652,14 +679,14 @@ namespace Samples
     {
         public static string SkipTakePaging()
         {
-        	new SqlQuery()
-        	    .Dialect(SqlDialect.MsSql2012)
-        		.From("Person")
-        		.Select("Firstname", "Lastname")
-        		.OrderBy("PersonId")
-        		.Skip(300)
-        		.Take(100)
-        		.ToString();
+            new SqlQuery()
+                .Dialect(SqlDialect.MsSql2012)
+                .From("Person")
+                .Select("Firstname", "Lastname")
+                .OrderBy("PersonId")
+                .Skip(300)
+                .Take(100)
+                .ToString();
         }
     }
 }
