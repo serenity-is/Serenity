@@ -6,15 +6,61 @@ namespace Serenity.Data.Test
     public partial class SqlQueryTests
     {
         [Fact]
-        public void SubQueryShouldBeEnclosedInParen()
+        public void DistinctAddsKeyword()
         {
-            var sub = new SqlQuery().SubQuery()
-                .Select("SampleColumn")
-                .From("SampleTable");
+            var query = new SqlQuery()
+                .Distinct(true)
+                .Select("TestColumn")
+                .From("TestTable");
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "(SELECT SampleColumn FROM SampleTable)"),
+                    "SELECT DISTINCT TestColumn FROM TestTable"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void DistinctCanBeTurnedOff()
+        {
+            var query = new SqlQuery()
+                .Distinct(true)
+                .Select("TestColumn")
+                .From("TestTable")
+                .Distinct(false);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT TestColumn FROM TestTable"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void FromMultipleCallsDoesCrossJoin()
+        {
+            var query = new SqlQuery()
+                .From("TestTable1")
+                .From("TestTable2")
+                .Select("TestColumn");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT TestColumn FROM TestTable1, TestTable2"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void SubQueryShouldBeEnclosedInParen()
+        {
+            var sub = new SqlQuery().SubQuery()
+                .Select("TestColumn")
+                .From("TestTable");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "(SELECT TestColumn FROM TestTable)"),
                 TestSqlHelper.Normalize(
                     sub.ToString()));
         }
