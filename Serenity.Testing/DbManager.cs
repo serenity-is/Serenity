@@ -54,7 +54,17 @@ namespace Serenity.Testing
         {
             var parts = script.Replace("\r", "").Split(new string[] { "GO\n" }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var part in parts)
-                SqlHelper.ExecuteNonQuery(connection, part);
+            {
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(connection, part);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(String.Format("Error executing script: {1}\n\n{0}",
+                        part, ex.ToString()), ex);
+                }
+            }
         }
 
         public static void CreateDb(string dbAlias, string mdfFilePath, string script)
@@ -83,9 +93,18 @@ namespace Serenity.Testing
             string connectionString = String.Format(DbSettings.ConnectionStringFormat, dbAlias);
 
             if (!script.IsEmptyOrNull())
-                using (var connection = SqlConnections.New(connectionString, DbSettings.ProviderName))
+                try
                 {
-                    RunScript(connection, script);
+                    using (var connection = SqlConnections.New(connectionString, DbSettings.ProviderName))
+                    {
+                        RunScript(connection, script);
+                    }
+                }
+                catch 
+                {
+                    DetachDb(dbAlias);
+                    DeleteDb(mdfFilePath);
+                    throw;
                 }
         }
 

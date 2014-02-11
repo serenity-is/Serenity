@@ -1,5 +1,5 @@
-﻿using Xunit;
-using Serenity.Data;
+﻿using Serenity.Data;
+using Xunit;
 
 namespace Serenity.Testing.Test
 {

@@ -280,7 +280,7 @@ namespace Serenity.Services
 
                 list.CopyTo(start, part, 0, len);
 
-                var query = new SqlQuery().Select(((Field)row.IdField).Name, nameField.Name).From(theRow.Table);
+                var query = new SqlQuery().Select(((Field)row.IdField).Name).Select(nameField.Name).From(theRow.Table);
                 query.Where(new Criteria((Field)row.IdField).In(part));
 
                 using (var reader = SqlHelper.ExecuteReader(connection, query))

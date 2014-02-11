@@ -32,12 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Couchbase">
-      <HintPath>..\References\Couchbase\Couchbase.dll</HintPath>
-    </Reference>
-    <Reference Include="Enyim.Caching">
-      <HintPath>..\References\Couchbase\Enyim.Caching.dll</HintPath>
-    </Reference>
     <Reference Include="LZ4, Version=1.0.3.93, Culture=neutral, PublicKeyToken=fd2bda0a70c5a705, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\lz4net.1.0.3.93\lib\net40-client\LZ4.dll</HintPath>
@@ -47,18 +41,6 @@
     </Reference>
     <Reference Include="NQuery">
       <HintPath>..\References\NQuery\NQuery.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Interfaces, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\ServiceStack.Common.3.9.56\lib\net35\ServiceStack.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Redis, Version=3.9.57.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\ServiceStack.Redis.3.9.57\lib\net35\ServiceStack.Redis.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Text, Version=3.9.56.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\ServiceStack.Text.3.9.56\lib\net35\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -73,7 +55,6 @@
   <ItemGroup>
     <Compile Include="Caching\CacheExpiration.cs" />
     <Compile Include="Caching\Distributed\CacheSerialization.cs" />
-    <Compile Include="Caching\Distributed\CouchbaseDistributedCache.cs" />
     <Compile Include="Caching\Distributed\LZ4Compression.cs" />
     <Compile Include="Caching\Distributed\DistributedCache.cs" />
     <Compile Include="Caching\Distributed\TwoLevelCache.cs" />
@@ -82,7 +63,6 @@
     <Compile Include="Caching\Distributed\IDistributedCache.cs" />
     <Compile Include="Caching\LocalCache.cs" />
     <Compile Include="Caching\LocalUserStateCache.cs" />
-    <Compile Include="Caching\Distributed\RedisDistributedCache.cs" />
     <Compile Include="Caching\SiteStateCache.cs" />
     <Compile Include="Core\ContextItems.cs" />
     <Compile Include="Core\DeleteType.cs" />
@@ -147,6 +127,7 @@
     <Compile Include="Data\FieldTypes\StreamField.cs" />
     <Compile Include="Data\FieldTypes\StringField.cs" />
     <Compile Include="Data\DeltaLister.cs" />
+    <Compile Include="Data\Interface\IChainable.cs" />
     <Compile Include="Data\Interface\IDbGetExpression.cs" />
     <Compile Include="Data\Join\OuterApply.cs" />
     <Compile Include="Data\Join\CrossApply.cs" />

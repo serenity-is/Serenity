@@ -20,7 +20,7 @@ namespace Serenity.Data
         ///   Bağlama yapılan contains table'a atanacak alias (zorunlu, ör. CT).</param>
         /// <returns>
         ///   SqlSelect nesnesinin kendisi.</returns>
-        public SqlQuery InnerJoinContainsTable(
+        public SqlQuery FullTextSearchJoin(
             string searchTable, string searchFields, string searchQuery,
             string searchTableAlias, string searchTableKey, string containsAlias)
         {

@@ -151,12 +151,11 @@ namespace Serenity.Data
             }
         }
 
-        const string DATETIME_FORMAT_ROUNDTRIP = "o";
         private static void logQuotedParameterValue(object value, StringBuilder sbCommandText)
         {
             try
             {
-                if (value == null)
+                if (value == null || value == DBNull.Value)
                 {
                     sbCommandText.Append("NULL");
                 }
@@ -195,14 +194,12 @@ namespace Serenity.Data
                     }
                     else if (value is DateTime)
                     {
-                        sbCommandText.Append('\'');
-                        sbCommandText.Append(((DateTime)value).ToString(DATETIME_FORMAT_ROUNDTRIP));
-                        sbCommandText.Append('\'');
+                        sbCommandText.Append(((DateTime)value).ToSql());
                     }
                     else if (value is DateTimeOffset)
                     {
                         sbCommandText.Append('\'');
-                        sbCommandText.Append(((DateTimeOffset)value).ToString(DATETIME_FORMAT_ROUNDTRIP));
+                        sbCommandText.Append(((DateTimeOffset)value).ToString("o"));
                         sbCommandText.Append('\'');
                     }
                     else if (value is Guid)
@@ -276,7 +273,7 @@ namespace Serenity.Data
                     {
                         sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
                         sbCommandText.Append('(');
-                        sbCommandText.Append(param.Size);
+                        sbCommandText.Append(param.Size == 0 ? 1 : param.Size);
                         sbCommandText.Append(')');
                     }
                     break;
@@ -286,7 +283,7 @@ namespace Serenity.Data
                     {
                         sbCommandText.Append(param.SqlDbType.ToString().ToUpperInvariant());
                         sbCommandText.Append("(");
-                        sbCommandText.Append(param.Size);
+                        sbCommandText.Append(param.Size == 0 ? 1 : param.Size);
                         sbCommandText.Append(")");
                         //sbCommandText.Append("(MAX /* Specified as ");
                         //sbCommandText.Append(param.Size);

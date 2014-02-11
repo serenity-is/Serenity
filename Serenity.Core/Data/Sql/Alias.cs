@@ -76,6 +76,14 @@ namespace Serenity.Data
             }
         }
 
+        public Alias WithNoLock()
+        {
+            if (this.table.IsEmptyOrNull())
+                return new Alias(this.alias + " WITH(NOLOCK)");
+
+            return new Alias(this.table, this.alias + " WITH(NOLOCK)");
+        }
+
         public static string operator +(Alias alias, string fieldName)
         {
             return alias.aliasDot + fieldName;

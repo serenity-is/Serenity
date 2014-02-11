@@ -71,5 +71,20 @@
 
             return this;
         }
+
+        public SqlQuery InnerJoin(Alias alias, BaseCriteria onCriteria)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (alias.Table.IsEmptyOrNull())
+                throw new ArgumentNullException("alias.table");
+
+            var join = new InnerJoin(alias.Table, alias.Name, onCriteria);
+
+            Join(join);
+
+            return this;
+        }
     }
 }
