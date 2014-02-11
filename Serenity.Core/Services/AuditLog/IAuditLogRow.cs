@@ -11,7 +11,7 @@ namespace Serenity.Data
         Int64Field OldParentIdField { get; }
         Int64Field NewParentIdField { get; }
         DateTimeField DateField { get; }
-        Int32Field UserIdField { get; }
+        IIdField UserIdField { get; }
         Int32Field AuditTypeIdField { get; }
         StringField OldAuditDataField { get; }
         StringField NewAuditDataField { get; }

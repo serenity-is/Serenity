@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Web;
 using System.Web.Security;
+using UserIdName = System.Tuple<System.Int64, System.String>;
 
 namespace Serenity
 {
@@ -148,7 +149,7 @@ namespace Serenity
         ///   Kullanıcı bulunursa ID'si. Bulunamazsa Guid.Empty.</returns>
         /// <returns>
         ///   Returns user id if it is found, else Guid.Empty .</returns>
-        public static Int32? GetUserID(string username)
+        public static Int64? GetUserID(string username)
         {
             if (username == null)
                 throw new ArgumentNullException("username");
@@ -168,9 +169,11 @@ namespace Serenity
         ///   if it is "Admin" returns true.</returns>
         public static bool IsAdmin()
         {
-            return (AdminUsername != null && LoggedUser == AdminUsername) || 
-                   (AdminUserId != null && ImpersonatedUserId == AdminUserId);
+            return (AdminUsername != null && CurrentUsername == AdminUsername) || 
+                   (AdminUserId != null && CurrentUserId == AdminUserId);
         }
+
+
 
         /// <summary>
         ///   Checks whether given username is admin</summary>
@@ -195,7 +198,7 @@ namespace Serenity
             if (role == null || role.Length == 0)
                 throw new ArgumentNullException("role");
 
-            if (LoggedUser == null)
+            if (CurrentUsername == null)
                 return false;
 
             return HttpContext.Current.User.IsInRole(role);
@@ -203,22 +206,22 @@ namespace Serenity
 
         /// <summary>
         ///   Checks if user is logged in.</summary>
-        public static bool IsLoggedIn
+        public static bool HttpContextLoggedIn
         {
             get
             {
-                string loggedUser = LoggedUser;
+                string loggedUser = HttpContextUsername;
                 return (loggedUser != null && loggedUser.Length > 0);
             }
         }
 
         /// <summary>
-        ///   Returns logged user, else if empty string or null.</summary>
-        public static string LoggedUser
+        ///   Returns actual logged user, else if empty string or null.</summary>
+        public static string HttpContextUsername
         {
             get
             {
-                if (HttpContext.Current != null && 
+                if (HttpContext.Current != null &&
                     HttpContext.Current.Request != null &&
                     HttpContext.Current.Request.IsAuthenticated)
                 {
@@ -227,42 +230,18 @@ namespace Serenity
                         return HttpContext.Current.User.Identity.Name;
                     }
                     catch
-                    { 
+                    {
                     }
                 }
                 return null;
             }
         }
 
-        public static Int32 CurrentUserId
+        public static Int64? HttpContextUserIdOrNull
         {
             get
             {
-                var userId = CurrentUserIdOrNull;
-                if (userId == null)
-                    throw new InvalidOperationException("Giriş yapmış bir kullanıcı yok!");
-
-                return userId.Value;
-            }
-        }
-
-        public static Int32 ActualUserId
-        {
-            get
-            {
-                var userId = ActualUserIdOrNull;
-                if (userId == null)
-                    throw new InvalidOperationException("Giriş yapmış bir kullanıcı yok!");
-
-                return userId.Value;
-            }
-        }
-
-        public static Int32? ActualUserIdOrNull
-        {
-            get
-            {
-                string username = LoggedUser;
+                string username = HttpContextUsername;
                 if (username.IsEmptyOrNull())
                     return null;
 
@@ -274,47 +253,109 @@ namespace Serenity
             }
         }
 
-        public static Int32? CurrentUserIdOrNull
+        public static Int64 HttpContextUserId
+        {
+            get
+            {
+                var userId = HttpContextUserIdOrNull;
+                if (userId == null)
+                    throw new InvalidOperationException("Giriş yapmış bir kullanıcı yok!");
+
+                return userId.Value;
+            }
+        }
+
+        /// <summary>
+        ///   Checks if user is logged in.</summary>
+        public static bool IsLoggedIn
+        {
+            get
+            {
+                string loggedUser = CurrentUsername;
+                return (loggedUser != null && loggedUser.Length > 0);
+            }
+        }
+
+        public static string CurrentUsername
+        {
+            get
+            {
+                var username = ImpersonatedUsername;
+                if (username != null)
+                    return username;
+
+                return HttpContextUsername;
+            }
+        }
+
+        public static Int64 CurrentUserId
+        {
+            get
+            {
+                var userId = CurrentUserIdOrNull;
+                if (userId == null)
+                    throw new InvalidOperationException("Giriş yapmış bir kullanıcı yok!");
+
+                return userId.Value;
+            }
+        }
+
+        public static Int64? CurrentUserIdOrNull
         {
             get
             {
                 var impersonated = ImpersonatedUserId;
                 if (impersonated != null)
                     return impersonated;
-                return ActualUserIdOrNull;
+                return HttpContextUserIdOrNull;
             }
         }
 
-        private static Int32? ImpersonatedUserId
+        private static Int64? ImpersonatedUserId
         {
             get
             {
-                var stack = ContextItems.Get<List<Int32>>("ImpersonationStack", null);
+                var stack = ContextItems.Get<List<UserIdName>>("ImpersonationStack", null);
+                
                 if (stack != null && stack.Count > 0)
-                    return stack[stack.Count - 1];
+                    return stack[stack.Count - 1].Item1;
+
                 return null;
             }
         }
 
-        public static void Impersonate(Int32 userId)
+        private static string ImpersonatedUsername
         {
-            var stack = ContextItems.Get<List<Int32>>("ImpersonationStack", null);
+            get
+            {
+                var stack = ContextItems.Get<List<UserIdName>>("ImpersonationStack", null);
+
+                if (stack != null && stack.Count > 0)
+                    return stack[stack.Count - 1].Item2;
+
+                return null;
+            }
+        }
+
+        public static void Impersonate(Int64 userId, string username)
+        {
+            var stack = ContextItems.Get<List<UserIdName>>("ImpersonationStack", null);
             if (stack != null)
             {
-                stack.Add(userId);
+                stack.Add(new UserIdName(userId, username));
                 return;
             }
             else
             {
-                stack = new List<int>();
-                stack.Add(userId);
+                stack = new List<UserIdName>();
+                stack.Add(new UserIdName(userId, username));
                 ContextItems.Set("ImpersonationStack", stack);
             }
         }
 
         public static void UndoImpersonate()
         {
-            var stack = ContextItems.Get<List<Int32>>("ImpersonationStack", null);
+            var stack = ContextItems.Get<List<UserIdName>>("ImpersonationStack", null);
             if (stack != null && stack.Count > 0)
                 stack.RemoveAt(stack.Count - 1);
         }
@@ -338,7 +379,7 @@ namespace Serenity
 
         private static void HandleRightError(RightErrorHandling errorHandling)
         {
-            bool isLoggedIn = SecurityHelper.IsLoggedIn;
+            bool isLoggedIn = SecurityHelper.HttpContextLoggedIn;
 
             switch (errorHandling)
             {
@@ -348,9 +389,11 @@ namespace Serenity
                     else
                         throw new ValidationError("NotLoggedIn", null, "Bu işlem için giriş yapmış olmalısınız!");
                     break;
+
                 case RightErrorHandling.Redirect:
                     FormsAuthentication.RedirectToLoginPage();
                     break;
+
                 default:
                     if (isLoggedIn)
                         throw new ValidationError("AccessDenied", null, "Bu işlem için gerekli haklara sahip değilsiniz!");

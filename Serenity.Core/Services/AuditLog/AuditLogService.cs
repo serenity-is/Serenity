@@ -37,7 +37,7 @@ namespace Serenity.Services
                         fld.OldParentIdField,
                         fld.NewParentIdField,
                         fld.DateField,
-                        fld.UserIdField,
+                        (Field)fld.UserIdField,
                         fld.AuditTypeIdField,
                         fld.OldAuditDataField,
                         fld.NewAuditDataField)
@@ -337,7 +337,7 @@ namespace Serenity.Services
             if (loggingRow != null)
                 fld.UserIdField[audit] = loggingRow.InsertUserIdField[(Row)request.Entity];
             if (fld.UserIdField[audit] == null)
-                fld.UserIdField[audit] = SecurityHelper.CurrentUserId;
+                fld.UserIdField[audit] = (int)SecurityHelper.CurrentUserId;
 
             new SqlInsert(audit).Execute(connection);
         }
@@ -450,7 +450,7 @@ namespace Serenity.Services
             if (loggingRow != null)
                 fld.UserIdField[audit] = loggingRow.UpdateUserIdField[(Row)request.NewEntity];
             if (fld.UserIdField[audit] == null)
-                fld.UserIdField[audit] = SecurityHelper.CurrentUserId;
+                fld.UserIdField[audit] = (int)SecurityHelper.CurrentUserId;
 
             return audit;
         }
@@ -473,7 +473,7 @@ namespace Serenity.Services
             fld.NewParentIdField[audit] = request.ParentId;
             fld.DateField[audit] = DateTime.UtcNow;
             fld.AuditTypeIdField[audit] = (Int32)AuditType.Delete;
-            fld.UserIdField[audit] = request.UserId == null ? SecurityHelper.CurrentUserId : request.UserId.Value;
+            fld.UserIdField[audit] = (int)(request.UserId == null ? SecurityHelper.CurrentUserId : request.UserId.Value);
 
             new SqlInsert(audit).Execute(connection);
         }
@@ -490,7 +490,7 @@ namespace Serenity.Services
             fld.NewParentIdField[audit] = request.ParentId;
             fld.DateField[audit] = DateTime.UtcNow;
             fld.AuditTypeIdField[audit] = (Int32)AuditType.UndoDelete;
-            fld.UserIdField[audit] = request.UserId == null ? SecurityHelper.CurrentUserId : request.UserId.Value;
+            fld.UserIdField[audit] = (int)(request.UserId == null ? SecurityHelper.CurrentUserId : request.UserId.Value);
 
             new SqlInsert(audit).Execute(connection);
         }

@@ -119,7 +119,7 @@ namespace Serenity.Data
             }
         }
 
-        public void Log(IUnitOfWork uow, TRow row, Int32 userId, bool isDelete)
+        public void Log(IUnitOfWork uow, TRow row, Int64 userId, bool isDelete)
         {
             var info = EnsureInfo();
             var logRow = info.logRowInstance.CreateNew();

@@ -2,9 +2,9 @@
 {
     public interface ILoggingRow
     {
-        Int32Field InsertUserIdField { get; }
+        IIdField InsertUserIdField { get; }
         DateTimeField InsertDateField { get; }
-        Int32Field UpdateUserIdField { get; }
+        IIdField UpdateUserIdField { get; }
         DateTimeField UpdateDateField { get; }
     }
 }
