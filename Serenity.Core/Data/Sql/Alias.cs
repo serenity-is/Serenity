@@ -31,7 +31,7 @@ namespace Serenity.Data
 
         public Alias(string alias)
         {
-            if (alias == null)
+            if (alias == null || alias.Length == 0)
                 throw new ArgumentNullException("alias");
 
             this.alias = alias;

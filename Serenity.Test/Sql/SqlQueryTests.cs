@@ -1,4 +1,5 @@
 ﻿using Serenity.Testing.Test;
+using System;
 using Xunit;
 
 namespace Serenity.Data.Test
@@ -47,6 +48,70 @@ namespace Serenity.Data.Test
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT TestColumn FROM TestTable1, TestTable2"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void FromMixedOverloadsMultipleCallsDoesCrossJoin()
+        {
+            var query = new SqlQuery()
+                .From("TestTable1", new Alias("x1"))
+                .From(new Alias("TestTable2", "x2"))
+                .From("TestTable3")
+                .Select("TestColumn");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT TestColumn FROM TestTable1 x1, TestTable2 x2, TestTable3"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void FromWithNullOrEmptyArgumentsThrowsArgumentNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().From((string)null));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().From(""));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().From((Alias)null));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().From((string)null, (Alias)null));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().From("", (Alias)null));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().From("x", (Alias)null));
+        }
+
+        [Fact]
+        public void FromWithAliasWithoutTableNameThrowsArgumentOutOfRange()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(delegate
+            {
+                new SqlQuery().From(new Alias("TestAlias"));
+            });
+        }
+
+        [Fact]
+        public void FromWithTableNameAndAliasWorks()
+        {
+            var query = new SqlQuery()
+                .From("TestTable", new Alias("TestAlias"))
+                .Select("TestColumn");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT TestColumn FROM TestTable TestAlias"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void FromWithOnlyAliasWorks()
+        {
+            var query = new SqlQuery()
+                .From(new Alias("TestTable", "TestAlias"))
+                .Select("TestColumn");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT TestColumn FROM TestTable TestAlias"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
