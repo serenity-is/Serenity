@@ -236,14 +236,14 @@ namespace Serenity.Data
                     selCount.Append(s.Expression);
 
                 // alana bir alias atanmışsa bunu yaz
-                if (s.AsAlias != null)
+                if (s.ColumnName != null)
                 {
                     sb.Append(Sql.Keyword.As);
-                    sb.Append(s.AsAlias);
+                    sb.Append(s.ColumnName);
                     if (distinct)
                     {
                         selCount.Append(Sql.Keyword.As);
-                        selCount.Append(s.AsAlias);
+                        selCount.Append(s.ColumnName);
                     }
                 }
             }

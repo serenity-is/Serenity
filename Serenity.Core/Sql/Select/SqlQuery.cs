@@ -119,29 +119,29 @@
         }
 
         /// <summary>
-        /// Gets a field source expression given its alias in query.
+        /// Gets the source expression for a column name in the query.
         /// </summary>
-        /// <param name="fieldAlias">Field alias.</param>
-        /// <returns>Field expression or null if not found.</returns>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Expression or null if not found.</returns>
         /// <remarks>This function uses a linear search in column list, so use with caution.</remarks>
-        public string GetExpression(string fieldAlias)
+        public string GetExpression(string columnName)
         {
-            if (fieldAlias == null || fieldAlias.Length == 0)
+            if (columnName == null || columnName.Length == 0)
                 return null;
 
             Column fieldInfo = columns.Find(
                 delegate(Column s)
                 {
                     return
-                        (s.AsAlias != null && s.AsAlias == fieldAlias) ||
-                        (String.IsNullOrEmpty(s.AsAlias) && s.Expression == fieldAlias);
+                        (s.ColumnName != null && s.ColumnName == columnName) ||
+                        (String.IsNullOrEmpty(s.ColumnName) && s.Expression == columnName);
                 });
 
             if (fieldInfo == null)
                 return null;
             else
             {
-                return fieldInfo.Expression ?? fieldInfo.AsAlias;
+                return fieldInfo.Expression ?? fieldInfo.ColumnName;
             }
         }
 
@@ -156,7 +156,7 @@
                 throw new ArgumentOutOfRangeException("selectIndex");
 
             Column si = columns[selectIndex];
-            return si.Expression ?? si.AsAlias;
+            return si.Expression ?? si.ColumnName;
         }
 
         /// <summary>
@@ -179,6 +179,23 @@
             EnsureJoinsInExpression(expression);
 
             return this;
+        }
+
+        /// <summary>
+        /// Adds a field of a given table alias to the GROUP BY clause.
+        /// </summary>
+        /// <param name="alias">A table alias that will be prepended to the field name with "." between</param>
+        /// <param name="fieldName">A field name of the aliased table.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery GroupBy(Alias alias, string fieldName)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (fieldName == null || fieldName.Length == 0)
+                throw new ArgumentNullException("field");
+
+            return GroupBy(alias + fieldName);
         }
 
         /// <summary>
@@ -206,11 +223,15 @@
         /// Adds a field name or an SQL expression to the ORDER BY clause.
         /// </summary>
         /// <param name="expression">A field or an SQL expression.</param>
+        /// <param name="desc">True to add " DESC" keyword to the expression.</param>
         /// <returns>The query itself.</returns>
         public SqlQuery OrderBy(string expression, bool desc = false)
         {
             if (expression == null || expression.Length == 0)
                 throw new ArgumentNullException("field");
+
+            if (desc)
+                expression += Sql.Keyword.Desc;
 
             cachedQuery = null;
 
@@ -222,6 +243,24 @@
             EnsureJoinsInExpression(expression);
 
             return this;
+        }
+
+        /// <summary>
+        /// Adds a field of a given table alias to the ORDER BY clause.
+        /// </summary>
+        /// <param name="alias">A table alias that will be prepended to the field name with "." between</param>
+        /// <param name="fieldName">A field name of the aliased table.</param>
+        /// <param name="desc">True to add " DESC" keyword to the expression.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery OrderBy(Alias alias, string fieldName, bool desc = false)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (fieldName == null || fieldName.Length == 0)
+                throw new ArgumentNullException("field");
+
+            return OrderBy(alias + fieldName, desc);
         }
 
         /// <summary>
@@ -279,7 +318,7 @@
         /// </summary>
         /// <param name="expression">A field or an SQL expression.</param>
         /// <returns>The query itself.</returns>
-        /// <remarks>No alias is used for the field or expression.</remarks>
+        /// <remarks>No column name is used for the field or expression.</remarks>
         public SqlQuery Select(string expression)
         {
             if (expression == null || expression.Length == 0)
@@ -290,24 +329,66 @@
             return this;
         }
 
+        /// <summary>
+        /// Adds a field of a given table alias to the SELECT statement.
+        /// </summary>
+        /// <param name="alias">A table alias that will be prepended to the field name with "." between</param>
+        /// <param name="fieldName">A field name of the aliased table.</param>
+        /// <returns>The query itself.</returns>
+        /// <remarks>No column name is used for the field or expression.</remarks>
+        public SqlQuery Select(Alias alias, string fieldName)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (fieldName == null || fieldName.Length == 0)
+                throw new ArgumentNullException("fieldName");
+
+            cachedQuery = null;
+            columns.Add(new Column(alias + fieldName, null, intoIndex, null));
+            return this;
+        }
 
         /// <summary>
-        /// Adds a field name or expression to the SELECT statement with a column alias
+        /// Adds a field name or expression to the SELECT statement with a column name
         /// </summary>
         /// <param name="expression">A field name or SQL expression.</param>
-        /// <param name="alias">A column alias.</param>
+        /// <param name="columnName">A column name.</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery Select(string expression, string alias)
+        public SqlQuery Select(string expression, string columnName)
         {
             if (expression == null || expression.Length == 0)
                 throw new ArgumentNullException("expression");
 
-            if (alias == null || alias.Length == 0)
-                throw new ArgumentNullException("alias");
+            if (columnName == null || columnName.Length == 0)
+                throw new ArgumentNullException("columnName");
 
             cachedQuery = null;
-            columns.Add(new Column(expression, alias, intoIndex, null));
+            columns.Add(new Column(expression, columnName, intoIndex, null));
 
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a field of a given table alias to the SELECT statement with a column name.
+        /// </summary>
+        /// <param name="alias">A table alias that will be prepended to the field name with "." between</param>
+        /// <param name="fieldName">A field name of the aliased table.</param>
+        /// <param name="columnName">A column name</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery Select(Alias alias, string fieldName, string columnName)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (fieldName == null || fieldName.Length == 0)
+                throw new ArgumentNullException("fieldName");
+
+            if (columnName == null || columnName.Length == 0)
+                throw new ArgumentNullException("columnName");
+
+            cachedQuery = null;
+            columns.Add(new Column(alias + fieldName, columnName, intoIndex, null));
             return this;
         }
 
@@ -316,15 +397,15 @@
         /// </summary>
         /// <param name="expression">A subquery.</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery Select(ISqlQuery expression, string alias = null)
+        public SqlQuery Select(ISqlQuery expression, string columnName = null)
         {
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            if (alias == null)
+            if (columnName == null)
                 this.Select(expression.ToString());
             else
-                this.Select(expression.ToString(), alias);
+                this.Select(expression.ToString(), columnName);
 
             return this;
         }
@@ -503,17 +584,17 @@
         {
             /// <summary>Field or expression</summary>
             public string Expression;
-            /// <summary>Field alias</summary>
-            public string AsAlias;
+            /// <summary>Column name</summary>
+            public string ColumnName;
             /// <summary>Used by entity system when more than one entity is used as a target</summary>
             public int IntoRow;
             /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
             public Field IntoField;
 
-            public Column(string expression, string asAlias, int intoRow, Field intoField)
+            public Column(string expression, string columnName, int intoRow, Field intoField)
             {
                 this.Expression = expression;
-                this.AsAlias = asAlias;
+                this.ColumnName = columnName;
                 this.IntoRow = intoRow;
                 this.IntoField = intoField;
             }
