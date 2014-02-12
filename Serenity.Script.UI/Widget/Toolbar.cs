@@ -30,26 +30,32 @@ namespace Serenity
                         "</div>")
                     .AppendTo(container);
 
-                var span = button.Find("span")
-                        .AddClass(cssClass)
-                        .Click(delegate(jQueryEvent e) {
-                            if (J(e.Target).Closest(".tool-button").HasClass("disabled"))
-                                return;
+                button.AddClass(cssClass);
 
-                            b.OnClick(e);
-                        });
+                if (!b.Hint.IsEmptyOrNull())
+                    button.Attribute("title", b.Hint);
+
+                button.Click(delegate(jQueryEvent e) {
+                    if (J(e.Target).HasClass("disabled"))
+                        return;
+
+                    b.OnClick(e);
+                });
 
                 var text = b.Title;
                 if (b.HtmlEncode != false)
                     text = Q.HtmlEncode(b.Title);
 
-                span.Html(text);
+                if (text == null || text.Length == 0)
+                    button.AddClass("no-text");
+                else
+                    button.Find("span").Html(text);
             }
         }
 
         public override void Destroy()
         {
-            this.element.Find("span.button-inner").Unbind("click");
+            this.element.Find("div.tool-button").Unbind("click");
 
             base.Destroy();
         }
@@ -60,8 +66,7 @@ namespace Serenity
                 className.StartsWith("."))
                 className = className.Substr(1);
 
-            return J("span.button-inner." + className, this.element)
-                .Closest("div.tool-button");
+            return J("div.tool-button." + className, this.element);
         }
     }
 
@@ -75,6 +80,7 @@ namespace Serenity
     public class ToolButton
     {
         public string Title { get; set; }
+        public string Hint { get; set; }
         public string CssClass { get; set; }
         public jQueryEventHandler OnClick { get; set; }
         public bool? HtmlEncode { get; set; }

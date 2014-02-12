@@ -363,7 +363,7 @@ namespace Serenity
                 return;
 
             var btn = toolbar.GetWidget<Toolbar>()
-                .FindButton("select-all-button").Find(".button-inner");
+                .FindButton("select-all-button");
 
             var items = grd.View.GetItems();
             btn.ToggleClass("checked", items.Count > 0 && !items.Some(x => !getSelected(x)));
@@ -386,7 +386,7 @@ namespace Serenity
                     var grid = getGrid().As<DataGrid<TItem, object>>();
                     var view = grid.View;
                     var btn = grid.Element.Children(".s-Toolbar").GetWidget<Toolbar>()
-                        .FindButton("select-all-button").Find(".button-inner");
+                        .FindButton("select-all-button");
                     var makeSelected = !btn.HasClass("checked");
                     view.BeginUpdate();
                     try

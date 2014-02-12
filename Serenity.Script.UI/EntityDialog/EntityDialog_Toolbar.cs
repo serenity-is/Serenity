@@ -12,7 +12,7 @@ namespace Serenity
     {
         protected Toolbar toolbar;
         protected jQueryObject saveAndCloseButton;
-        protected jQueryObject saveButton;
+        protected jQueryObject applyChangesButton;
         protected jQueryObject deleteButton;
         protected jQueryObject undeleteButton;
         protected jQueryObject cloneButton;
@@ -31,7 +31,7 @@ namespace Serenity
             toolbar = new Toolbar(toolbarDiv, opt);
 
             saveAndCloseButton = toolbar.FindButton("save-and-close-button");
-            saveButton = toolbar.FindButton("save-button");
+            applyChangesButton = toolbar.FindButton("apply-changes-button");
             deleteButton = toolbar.FindButton("delete-button");
             undeleteButton = toolbar.FindButton("undo-delete-button");
             cloneButton = toolbar.FindButton("clone-button");
@@ -45,7 +45,7 @@ namespace Serenity
 
             list.Add(new ToolButton 
             {
-                Title = "Kaydet ve Çık",
+                Title = "Kaydet",
                 CssClass = "save-and-close-button",
                 OnClick = delegate
                 {
@@ -58,8 +58,9 @@ namespace Serenity
 
             list.Add(new ToolButton
             {
-                Title = "Kaydet",
-                CssClass = "save-button",
+                Title = "",
+                Hint = "Değişiklikleri Uygula",
+                CssClass = "apply-changes-button",
                 OnClick = delegate
                 {
                     if (self.IsLocalizationMode)
@@ -163,8 +164,11 @@ namespace Serenity
             if (saveAndCloseButton != null)
                 saveAndCloseButton.Toggle(!isLocalizationMode && !isDeleted);
 
-            if (saveButton != null)
-                saveButton.Toggle(isLocalizationMode || !isDeleted);
+            saveAndCloseButton.Find(".button-inner").Text(
+                IsNew ? "Kaydet" : "Güncelle");
+
+            if (applyChangesButton != null)
+                applyChangesButton.Toggle(isLocalizationMode || !isDeleted);
 
             cloneButton.Toggle(false);
 

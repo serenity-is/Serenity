@@ -52,7 +52,7 @@ namespace Serenity
             }
 
             this.undeleteButton = null;
-            this.saveButton = null;
+            this.applyChangesButton = null;
             this.deleteButton = null;
             this.saveAndCloseButton = null;
 
