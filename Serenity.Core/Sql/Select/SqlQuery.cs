@@ -113,9 +113,27 @@
                 throw new ArgumentNullException("alias");
 
             if (alias.Table.IsEmptyOrNull())
-                throw new ArgumentNullException("alias.table");
+                throw new ArgumentOutOfRangeException("alias.table");
 
             return From(alias.Table, alias);
+        }
+
+        /// <summary>
+        /// Adds a subquery to the FROM statement, with given short name.
+        /// </summary>
+        /// <param name="subQuery">A subquery</param>
+        /// <param name="alias">Alias that contains the short name.</param>
+        /// <returns>The query itself.</returns>
+        /// <remarks>This overload requires that alias has a table name.</remarks>
+        public SqlQuery From(ISqlQuery subQuery, Alias alias)
+        {
+            if (subQuery == null)
+                throw new ArgumentNullException("subQuery");
+
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            return From(subQuery.ToString(), alias);
         }
 
         /// <summary>
