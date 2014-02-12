@@ -545,7 +545,7 @@
            return ExecuteScalar(connection, selectQuery.ToString(), param);
        }
 
-       private static void LogCommand(string type, IDbCommand command)
+       internal static void LogCommand(string type, IDbCommand command)
        {
            try
            {

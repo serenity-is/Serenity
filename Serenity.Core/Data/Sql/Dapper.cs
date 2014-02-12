@@ -872,6 +872,9 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
             {
                 cmd = SetupCommand(cnn, transaction, sql, info.ParamReader, param, commandTimeout, commandType);
 
+                if (Log.DebugLevel)
+                    SqlHelper.LogCommand("Dapper.QueryInternal", cmd);
+
                 SqlHelper.EnsureOpen(cnn);
                 reader = cmd.ExecuteReader(CommandBehavior.Default);
                 var tuple = info.Deserializer;
