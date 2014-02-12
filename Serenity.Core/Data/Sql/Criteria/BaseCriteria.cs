@@ -2,8 +2,10 @@ namespace Serenity.Data
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text;
 
+    [DebuggerDisplay("{ToStringIgnoreParams()}")]
     public abstract class BaseCriteria
     {
         private static NoParamsChecker noParamsChecker = new NoParamsChecker();
@@ -416,9 +418,9 @@ namespace Serenity.Data
             return base.Equals(obj);
         }
 
-        public string ToStringCheckNoParams()
+        public string ToStringIgnoreParams()
         {
-            return ToString(noParamsChecker);
+            return ToString(ignoreParams);
         }
 
         public string ToString(IDbParameterized query)
@@ -430,7 +432,7 @@ namespace Serenity.Data
 
         public override string ToString()
         {
-            return ToString(ignoreParams);
+            return ToString(noParamsChecker);
         }
 
         public virtual void ToString(StringBuilder sb, IDbParameterized query)

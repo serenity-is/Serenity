@@ -9,7 +9,6 @@ namespace Serenity.Data
     {
         private Dictionary<string, Join> joins;
         private BaseCriteria onCriteria;
-        private string onCriteriaString;
         private HashSet<string> referencedAliases;
 
         public abstract string GetKeyword();
@@ -22,9 +21,7 @@ namespace Serenity.Data
 
             if (!Object.ReferenceEquals(this.onCriteria, null))
             {
-                this.onCriteriaString = this.onCriteria.ToString();
-
-                var aliases = JoinAliasLocator.Locate(this.onCriteriaString);
+                var aliases = JoinAliasLocator.Locate(this.onCriteria.ToStringIgnoreParams());
                 if (aliases != null && aliases.Count > 0)
                     referencedAliases = aliases;
             }
@@ -49,16 +46,6 @@ namespace Serenity.Data
             get
             {
                 return onCriteria;
-            }
-        }
-
-        /// <summary>
-        ///   Left outer join'in "ON(...)" kýsmýnda yazýlan ifadeyi verir.</summary>
-        public string OnCriteriaString
-        {
-            get
-            {
-                return onCriteriaString;
             }
         }
 

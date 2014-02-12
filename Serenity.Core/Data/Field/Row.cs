@@ -103,8 +103,8 @@ namespace Serenity.Data
                     {
                         if (String.Compare(field.ForeignTable, join.Table) == 0 &&
                             join is LeftJoin &&
-                            !join.OnCriteriaString.IsEmptyOrNull() &&
-                            join.OnCriteriaString.IndexOf(field.QueryExpression, StringComparison.OrdinalIgnoreCase) >= 0)
+                            !Object.ReferenceEquals(null, join.OnCriteria) &&
+                            join.OnCriteria.ToStringIgnoreParams().IndexOf(field.QueryExpression, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             foreach (var f in _fields)
                                 if (String.Compare(f.JoinAlias, join.Name, StringComparison.OrdinalIgnoreCase) == 0 &&

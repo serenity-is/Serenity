@@ -183,7 +183,6 @@
     <Compile Include="Data\Interface\IOrderedDictionary.cs" />
     <Compile Include="Data\Interface\IParentIdRow.cs" />
     <Compile Include="Data\Interface\ISqlQuery.cs" />
-    <Compile Include="Data\Interface\IStagingRow.cs" />
     <Compile Include="Data\Interface\IUnitOfWork.cs" />
     <Compile Include="Data\Interface\SortingOrder.cs" />
     <Compile Include="Data\Invariants.cs" />

@@ -216,7 +216,7 @@ namespace Serenity.Data
                             throw new ArgumentOutOfRangeException("EmptyFilterLine", line.ToJsonString());
                         }
                         else
-                            sb.Append(filter.ToString()); // FIX!!!!
+                            sb.Append(filter.ToStringIgnoreParams()); // FIX!!!!
 
                         continue;
                     }
