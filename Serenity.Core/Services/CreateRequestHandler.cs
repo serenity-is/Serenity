@@ -93,7 +93,7 @@ namespace Serenity.Services
             if (_displayOrderFix)
             {
                 var displayOrderRow = Row as IDisplayOrderRow;
-                DisplayOrderHelper.FixRecordOrdering(Connection, displayOrderRow,
+                DisplayOrderHelper.ReorderValues(Connection, displayOrderRow,
                     GetDisplayOrderFilter(), Response.EntityId, displayOrderRow.DisplayOrderField[Row].Value, false);
             }
         }
@@ -311,7 +311,7 @@ namespace Serenity.Services
                 {
                     var filter = GetDisplayOrderFilter();
                     displayOrderRow.DisplayOrderField.AsObject(Row,
-                        DisplayOrderHelper.GetNextDisplayOrderValue(Connection, displayOrderRow, filter));
+                        DisplayOrderHelper.GetNextValue(Connection, displayOrderRow, filter));
                 }
                 else
                     _displayOrderFix = true;

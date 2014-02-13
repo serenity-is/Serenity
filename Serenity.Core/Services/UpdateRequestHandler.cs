@@ -63,7 +63,7 @@ namespace Serenity.Services
                 displayOrderRow.DisplayOrderField[Old] != displayOrderRow.DisplayOrderField[Row])
             {
                 var filter = GetDisplayOrderFilter();
-                DisplayOrderHelper.FixRecordOrdering(Connection, displayOrderRow, filter, Row.IdField[Row].Value,
+                DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter, Row.IdField[Row].Value,
                     displayOrderRow.DisplayOrderField[Row].Value, false);
             }
         }

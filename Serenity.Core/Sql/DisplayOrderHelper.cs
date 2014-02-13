@@ -24,7 +24,7 @@ namespace Serenity.Data
         /// <returns>
         ///   One more of maximum display order values of records in the group. 
         ///   If none, 1.</returns>
-        public static int GetNextDisplayOrderValue(IDbConnection connection, string tableName, 
+        public static int GetNextValue(IDbConnection connection, string tableName, 
             Field orderField, BaseCriteria filter)
         {
             if (connection == null)
@@ -60,125 +60,9 @@ namespace Serenity.Data
         /// <returns>
         ///   One more of maximum display order values of records in the group. 
         ///   If none, 1.</returns>
-        public static int GetNextDisplayOrderValue(IDbConnection connection, IDisplayOrderRow row, BaseCriteria filter)
+        public static int GetNextValue(IDbConnection connection, IDisplayOrderRow row, BaseCriteria filter = null)
         {
-            return GetNextDisplayOrderValue(connection, ((Row)row).Table, row.DisplayOrderField, filter);
-        }
-
-        /// <summary>
-        ///   Gets the next display order value for a table or a group of records.</summary>
-        /// <param name="connection">
-        ///   Connection (required).</param>
-        /// <param name="row">
-        ///   Row with a display order field (required).</param>
-        /// <returns>
-        ///   One more of maximum display order values of records in the table. 
-        ///   If none, 1.</returns>
-        public static int GetNextDisplayOrderValue(IDbConnection connection, IDisplayOrderRow row)
-        {
-            return GetNextDisplayOrderValue(connection, ((Row)row).Table, row.DisplayOrderField, null);
-        }
-
-
-        /// <summary>
-        ///   Gets the stored display order value for a record.</summary>
-        /// <param name="connection">
-        ///   Connection (required).</param>
-        /// <param name="tableName">
-        ///   Table name (required).</param>
-        /// <param name="keyField">
-        ///   ID meta field that will be used to locate the record (required).</param>
-        /// <param name="orderField">
-        ///   Display order field meta (required).</param>
-        /// <param name="recordID">
-        ///   Key value of the field.</param>
-        /// <returns>
-        ///   Display order field value of the record. If not found, <see cref="Null.Int64"/></returns>
-        public static Int32? GetDisplayOrderValue(IDbConnection connection, string tableName,
-            Field keyField, Field orderField, Int64 recordID)
-        {
-            if (connection == null)
-                throw new ArgumentNullException("connection");
-            if (tableName == null || tableName.Length == 0)
-                throw new ArgumentNullException("tableName");
-            if (orderField == null)
-                throw new ArgumentNullException("orderField");
-
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection,
-                new SqlQuery()
-                    .Select(Alias.T0[orderField.Name])
-                    .From(tableName, Alias.T0)
-                    .Where(new Criteria(keyField) == recordID)))
-            {
-                if (reader.Read())
-                    return Convert.ToInt32(reader.GetValue(0));
-                else
-                    return null;
-            }
-        }
-
-        /// <summary>
-        ///   Gets the actual display order of a record in a table or group of records.
-        ///   The value in the display order field, may not match the actual display order, because of
-        ///   deletions, changes etc. By scanning all the records in the group, this method returns
-        ///   the actual display order for a record.</summary>
-        /// <param name="connection">
-        ///   Connection (required).</param>
-        /// <param name="tableName">
-        ///   Tablename (required).</param>
-        /// <param name="keyField">
-        ///   ID field that will be used to locate the record (required).</param>
-        /// <param name="orderField">
-        ///   Display order field meta (required).</param>
-        /// <param name="filter">
-        ///   Filter that will determine the record group (can be null).</param>
-        /// <param name="recordID">
-        ///   ID value of the field.</param>
-        /// <param name="descendingKeyOrder">
-        ///   Will records with same display order values be sorted in ascending or descending ID order?
-        ///   For example, if records with ID's 1, 2, 3 has display order value of "0", their actual display
-        ///   orders are 1, 2 and 3. If this parameter is set to true (descending), their display orders will
-        ///   become 3, 2, 1. This parameter controls if records that are added recently and has no display
-        ///   order value assigned (or 0) be shown at start or at the end.</param>
-        /// <returns>
-        ///   Records actual display order value. If not found, <see cref="Null.Int32"/></returns>
-        public static Int32? GetTrueDisplayOrder(IDbConnection connection, string tableName,
-            Field keyField, Field orderField, Criteria filter, Int64 recordID, bool descendingKeyOrder)
-        {
-            if (connection == null)
-                throw new ArgumentNullException("connection");
-            if (tableName == null || tableName.Length == 0)
-                throw new ArgumentNullException("tableName");
-            if (keyField == null)
-                throw new ArgumentNullException("keyField");
-            if (orderField == null)
-                throw new ArgumentNullException("orderField");
-
-            int order = 0;
-
-            SqlQuery query = new SqlQuery()
-                .Select(Alias.T0[keyField])
-                .From(tableName, Alias.T0)
-                .Where(filter)
-                .OrderBy(
-                    orderField);
-
-            if (descendingKeyOrder)
-                query.OrderBy(keyField.Name, desc: true);
-            else
-                query.OrderBy(keyField);
-
-            using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
-            {
-                while (reader.Read())
-                {
-                    order++;
-                    if (Convert.ToInt32(reader.GetValue(0)) == recordID)
-                        return order;
-                }
-            }
-
-            return null;
+            return GetNextValue(connection, ((Row)row).Table, row.DisplayOrderField, filter);
         }
 
         /// <summary>
@@ -206,10 +90,9 @@ namespace Serenity.Data
         ///   order value assigned (or 0) be shown at start or at the end.</param>
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
-        public static bool FixRecordOrdering(IDbConnection connection, string tableName,
-            Field keyField, Field orderField, 
-            BaseCriteria filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder,
-            bool hasUniqueConstraint = false)
+        public static bool ReorderValues(IDbConnection connection, string tableName, Field keyField, Field orderField, 
+            BaseCriteria filter = null,  Int64? recordID = null, int newDisplayOrder = 1, 
+            bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
         {
             if (connection == null)
                 throw new ArgumentNullException("connection");
@@ -471,30 +354,11 @@ namespace Serenity.Data
         ///   order value assigned (or 0) be shown at start or at the end.</param>
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
-        public static bool FixRecordOrdering(IDbConnection connection, IDisplayOrderRow row,
-            BaseCriteria filter, Int64 recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint = false)
+        public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, BaseCriteria filter = null, 
+            Int64? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
         {
-            return FixRecordOrdering(connection, ((Row)row).Table, (Field)((IIdRow)row).IdField, row.DisplayOrderField, filter, recordID, 
+            return ReorderValues(connection, ((Row)row).Table, (Field)((IIdRow)row).IdField, row.DisplayOrderField, filter, recordID, 
                 newDisplayOrder, descendingKeyOrder, hasUniqueConstraint);
-        }
-
-        /// <summary>
-        ///   Sets a records display order to to requested value, and also renumbers other records
-        ///   in the group as required.</summary>
-        /// <param name="connection">
-        ///   Connection (required).</param>
-        /// <param name="row">
-        ///   Row with a display order and ID field (should implement IDbIdRow interface).</param>
-        /// <param name="recordID">
-        ///   ID value of the record.</param>
-        /// <param name="newDisplayOrder">
-        ///   New display order of the record.</param>
-        /// <returns>
-        ///   If any of the display order values is changed true.</returns>
-        public static bool FixRecordOrdering(IDbConnection connection, IDisplayOrderRow row, Int64 recordID, int newDisplayOrder)
-        {
-            return FixRecordOrdering(connection, ((Row)row).Table, (Field)((IIdRow)row).IdField, row.DisplayOrderField, null, recordID, 
-                newDisplayOrder, false);
         }
 
         /// <summary>
