@@ -36,7 +36,7 @@ namespace Serenity
                     button.Attribute("title", b.Hint);
 
                 button.Click(delegate(jQueryEvent e) {
-                    if (J(e.Target).HasClass("disabled"))
+                    if (button.HasClass("disabled"))
                         return;
 
                     b.OnClick(e);
