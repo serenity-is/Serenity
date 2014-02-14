@@ -16,41 +16,45 @@ namespace Serenity
 
             var container = J("div.buttons-inner", this.element);
         
-            for (var i = 0; i < this.options.Buttons.Count; i++)
+            var buttons = this.options.Buttons;
+
+            for (var i = 0; i < buttons.Count; i++)
+                CreateButton(container, buttons[i]);
+        }
+
+        private void CreateButton(jQueryObject container, ToolButton b)
+        {
+            var cssClass = b.CssClass ?? "";
+
+            var btn = J(
+                    "<div class=\"tool-button\">" +
+                        "<div class=\"button-outer\">" +
+                            "<span class=\"button-inner\"></span>" +
+                        "</div>" +
+                    "</div>")
+                .AppendTo(container);
+
+            btn.AddClass(cssClass);
+
+            if (!b.Hint.IsEmptyOrNull())
+                btn.Attribute("title", b.Hint);
+
+            btn.Click(delegate(jQueryEvent e)
             {
-                var b = this.options.Buttons[i];
+                if (btn.HasClass("disabled"))
+                    return;
 
-                var cssClass = b.CssClass ?? "";
+                b.OnClick(e);
+            });
 
-                var button = J(
-                        "<div class=\"tool-button\">" + 
-                            "<div class=\"button-outer\">" + 
-                                "<span class=\"button-inner\"></span>" + 
-                            "</div>" + 
-                        "</div>")
-                    .AppendTo(container);
+            var text = b.Title;
+            if (b.HtmlEncode != false)
+                text = Q.HtmlEncode(b.Title);
 
-                button.AddClass(cssClass);
-
-                if (!b.Hint.IsEmptyOrNull())
-                    button.Attribute("title", b.Hint);
-
-                button.Click(delegate(jQueryEvent e) {
-                    if (button.HasClass("disabled"))
-                        return;
-
-                    b.OnClick(e);
-                });
-
-                var text = b.Title;
-                if (b.HtmlEncode != false)
-                    text = Q.HtmlEncode(b.Title);
-
-                if (text == null || text.Length == 0)
-                    button.AddClass("no-text");
-                else
-                    button.Find("span").Html(text);
-            }
+            if (text == null || text.Length == 0)
+                btn.AddClass("no-text");
+            else
+                btn.Find("span").Html(text);
         }
 
         public override void Destroy()
