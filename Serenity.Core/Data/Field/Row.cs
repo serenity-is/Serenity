@@ -8,7 +8,7 @@ using System.Reflection.Emit;
 
 namespace Serenity.Data
 {
-    public abstract class Row : INotifyPropertyChanged, IEditableObject, IDataErrorInfo, ISupportAttached, IEntity
+    public abstract class Row : INotifyPropertyChanged, IEditableObject, IDataErrorInfo, ISupportAttached, IEntityWithJoins
     {
         internal RowFieldsBase _fields;
         internal int _insidePostHandler;
@@ -181,7 +181,7 @@ namespace Serenity.Data
                         prm[1] = column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name);
                         prm[2] = display != null ? new LocalText(display.DisplayName) : null;
                         prm[3] = size != null ? size.Value : 0;
-                        prm[4] = (FieldFlags)((FieldFlags.Default | addFlags) - removeFlags);
+                        prm[4] = (FieldFlags.Default ^ removeFlags) | addFlags;
                         prm[5] = null;
                         prm[6] = null;
 
@@ -207,7 +207,7 @@ namespace Serenity.Data
                             field.Caption = new LocalText(display.DisplayName);
 
                         if ((int)addFlags != 0 || (int)removeFlags != 0)
-                            field.Flags = (FieldFlags)((field.Flags | addFlags) - removeFlags);
+                            field.Flags = (field.Flags ^ removeFlags) | addFlags;
                     }
 
                     if (scale != null)
@@ -227,7 +227,7 @@ namespace Serenity.Data
 
                     if (join != null)
                     {
-                        new LeftJoin(field.ForeignTable, join.Alias,
+                        new LeftJoin(_fields.Joins, field.ForeignTable, join.Alias,
                             new Criteria(join.Alias, field.ForeignField) == new Criteria(field));
                     }
 
@@ -748,6 +748,11 @@ namespace Serenity.Data
         public PropertyDescriptorCollection GetPropertyDescriptors()
         {
             return _fields._propertyDescriptors;
+        }
+
+        IDictionary<string, Join> IEntityWithJoins.Joins
+        {
+            get { return _fields.Joins; }
         }
     }
 }

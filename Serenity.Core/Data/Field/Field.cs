@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Serenity.Data
 {
-    public abstract class Field : IField
+    public abstract class Field : IJoinField
     {
         private FieldType _type;
         internal int _index;
@@ -155,8 +155,8 @@ namespace Serenity.Data
                     {
                         if (String.Compare(_expression, "T0." + _name, StringComparison.OrdinalIgnoreCase) == 0)
                         {
-                            _flags -= FieldFlags.Calculated;
-                            _flags -= FieldFlags.Foreign;
+                            _flags ^= FieldFlags.Calculated;
+                            _flags ^= FieldFlags.Foreign;
                             _expression = "T0." + _name;
                             return;
                         }
@@ -173,7 +173,7 @@ namespace Serenity.Data
                                 var join = enumerator.Current;
 
                                 if (join.ToLowerInvariant() == "t0")
-                                    _flags = (FieldFlags)(_flags - FieldFlags.Foreign);
+                                    _flags = (FieldFlags)(_flags ^ FieldFlags.Foreign) | FieldFlags.Calculated;
                                 else
                                 {
                                     _flags = _flags | FieldFlags.Foreign;
@@ -186,15 +186,19 @@ namespace Serenity.Data
                                         _joinAlias = join;
                                         _origin = split[1];
                                     }
+                                    else
+                                        _flags = _flags | FieldFlags.Calculated;
                                 }
                             }
+                            else
+                                _flags = _flags | FieldFlags.Calculated | FieldFlags.Foreign;
                         }
                     }
                     else
                     {
                         _expression = "T0." + _name;
-                        _flags -= FieldFlags.Calculated;
-                        _flags -= FieldFlags.Foreign;
+                        _flags ^= FieldFlags.Calculated;
+                        _flags ^= FieldFlags.Foreign;
                     }
                 }
             }
@@ -330,5 +334,10 @@ namespace Serenity.Data
         //public bool? Localizable { get; set; }
         //public int? DisplayOrder { get; set; }
         //public string DisplayFormat { get; set; }
+
+        IDictionary<string, Join> IJoinField.Joins
+        {
+            get { return Fields.Joins; }
+        }
     }
 }
