@@ -1,5 +1,6 @@
 ﻿using Serenity.Data;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -10,6 +11,17 @@ namespace Serenity.Testing
 {
     public class DbManager
     {
+        static DbManager()
+        {
+            try
+            {
+                RemoveTestFiles();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public static void CopyDb(string sourcePath, string targetPath)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
@@ -21,6 +33,21 @@ namespace Serenity.Testing
         {
             TemporaryFileHelper.TryDelete(path);
             TemporaryFileHelper.TryDelete(Path.ChangeExtension(path, ".ldf"));
+        }
+
+        public static void RenameDb(string oldAlias, string newAlias)
+        {
+            using (var connection = SqlConnections.New(DbSettings.LocalDbConnectionString, DbSettings.ProviderName))
+            {
+                SqlConnection.ClearAllPools();
+                SqlHelper.ExecuteNonQuery(connection, String.Format(
+                    "if db_id('{0}') is not null\n" +
+                    "BEGIN\n" +
+                    "ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;" +
+                    "ALTER DATABASE {0} MODIFY NAME = '{1}';" +
+                    "ALTER DATABASE {0} SET MULTI_USER;" +
+                    "END\n", oldAlias, newAlias));
+            }
         }
 
         public static void DetachDb(string dbAlias)
@@ -108,7 +135,25 @@ namespace Serenity.Testing
                 }
         }
 
-        public static string CreateDatabaseFilesForScript(string script)
+        public static void RemoveTestFiles()
+        {
+            HashSet<string> files = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (var connection = SqlConnections.New(DbSettings.LocalDbConnectionString, DbSettings.ProviderName))
+            using (var reader = SqlHelper.ExecuteReader(connection, "SELECT physical_name FROM sys.master_files"))
+            {
+                while (reader.Read())
+                {
+                    if (!reader.IsDBNull(0))
+                        files.Add(Path.GetFileName(reader.GetString(0)));
+                }
+            }
+
+            foreach (var file in Directory.GetFiles(DbSettings.TestRootPath, "test*.*"))
+                if (!files.Contains(Path.GetFileName(file)))
+                    TemporaryFileHelper.TryDelete(file);
+        }
+
+        public static string GetHash(string script)
         {
             string hash;
             using (var md5 = new MD5CryptoServiceProvider())
@@ -116,6 +161,13 @@ namespace Serenity.Testing
                 var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(script));
                 hash = BitConverter.ToString(hashBytes).Replace("-", "");
             }
+
+            return hash;
+        }
+
+        public static string CreateDatabaseFilesForScript(string script)
+        {
+            var hash = GetHash(script);
 
             var cachedPath = Path.Combine(DbSettings.TestRootPath,
                 "cache_" + hash + ".mdf");

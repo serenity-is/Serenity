@@ -13,17 +13,7 @@ namespace Serenity.Data.Test
 
         private DbTestContext NewDbTestContext()
         {
-            var ctx = new DbTestContext();
-            try
-            {
-                ctx.Override<SerenityDbScript>("Serenity", "DBSerenity");
-                return ctx;
-            }
-            catch
-            {
-                ctx.Dispose();
-                throw;
-            }
+            return new DbTestContext(DbOverride.New<SerenityDbScript>("Serenity", "DBSerenity"));
         }
 
         [Fact]

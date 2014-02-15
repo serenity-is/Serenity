@@ -1,36 +1,27 @@
 ﻿using Serenity.Data;
 using System;
 using System.Collections.Generic;
+using System.Transactions;
 
 namespace Serenity.Testing
 {
-    public class DbTestContext : IDisposable
+    public class DbOverride
     {
-        private bool disposed;
-        private List<Tuple<string, string>> overrides;
-        
         private static class Cached<TDbScript>
         {
             public static string Script;
         }
 
-        public DbTestContext()
+        public DbOverride(string connectionKey, string dbAlias, string script)
         {
-            overrides = new List<Tuple<string, string>>();
+            this.ConnectionKey = connectionKey;
+            this.DbAlias = dbAlias;
+            this.Script = script;
+            this.ScriptHash = DbManager.GetHash(script ?? "");
         }
 
-        public void Override(string connectionKey, string dbAlias, string script)
-        {
-            DbManager.DetachDb(dbAlias);
-            var mdfFilePath = DbManager.CreateDatabaseFilesForScript(script);
-            overrides.Add(new Tuple<string, string>(dbAlias, mdfFilePath));
-            DbManager.AttachDb(dbAlias, mdfFilePath);
-            SqlConnections.SetConnection(connectionKey,
-                String.Format(DbSettings.ConnectionStringFormat, dbAlias), DbSettings.ProviderName);
-        }
-
-        public void Override<TDbScript>(string connectionKey, string dbAlias, bool cached = true)
-            where TDbScript: DbScript, new()
+        public static DbOverride New<TDbScript>(string connectionKey, string dbAlias, bool cached = true)
+            where TDbScript : DbScript, new()
         {
             string script;
             if (cached)
@@ -38,18 +29,98 @@ namespace Serenity.Testing
             else
                 script = new TDbScript().ToString();
 
-            Override(connectionKey, dbAlias, script);
+            return new DbOverride(connectionKey, dbAlias, script);
+        }
+
+        public string DbAlias { get; private set; }
+        public string Script { get; private set; }
+        public string ScriptHash { get; private set; }
+        public string ConnectionKey { get; private set; }
+    }
+
+    public class DbTestContext : IDisposable
+    {
+        private static object syncLock = new object();
+        private static Dictionary<string, string> attachedHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        private bool disposed;
+        private DbOverride[] overrides;
+        private TransactionScope scope;
+        
+        public DbTestContext(params DbOverride[] overrides)
+        {
+            this.overrides = overrides;
+            SetupOverrides();
+            this.scope = new TransactionScope();
+        }
+
+        private void SetupOverrides()
+        {
+            foreach (var over in overrides)
+                SetupOverride(over);
+        }
+
+        private void SetupOverride(DbOverride over)
+        {
+            lock (syncLock)
+            {
+                if (attachedHashes.ContainsKey(over.DbAlias))
+                {
+                    var currentHash = attachedHashes[over.DbAlias];
+
+                    if (currentHash == over.ScriptHash)
+                        return;
+
+                    var newAlias = over.DbAlias + "_" + currentHash;
+                    if (attachedHashes.ContainsKey(newAlias))
+                        DbManager.DetachDb(over.DbAlias);
+                    else
+                    {
+                        DbManager.RenameDb(over.DbAlias, newAlias);
+                        attachedHashes[newAlias] = attachedHashes[over.DbAlias];
+                    }
+
+                    attachedHashes.Remove(over.DbAlias);
+                }
+
+                string possibleOldAlias = over.DbAlias + "_" + over.ScriptHash;
+                if (attachedHashes.ContainsKey(possibleOldAlias))
+                {
+                    DbManager.DetachDb(over.DbAlias);
+                    attachedHashes.Remove(over.DbAlias);
+                    DbManager.RenameDb(possibleOldAlias, over.DbAlias);
+                    attachedHashes.Remove(possibleOldAlias);
+                    attachedHashes[over.DbAlias] = over.ScriptHash;
+                    return;
+                }
+
+                attachedHashes.Remove(over.DbAlias);
+                DbManager.DetachDb(over.DbAlias);
+                var mdfFilePath = DbManager.CreateDatabaseFilesForScript(over.Script);
+                try
+                {
+                    DbManager.AttachDb(over.DbAlias, mdfFilePath);
+                }
+                catch (Exception)
+                {
+                    DbManager.DetachDb(over.DbAlias);
+                    DbManager.DeleteDb(mdfFilePath);
+                    throw;
+                }
+
+                attachedHashes[over.DbAlias] = over.ScriptHash;
+
+                SqlConnections.SetConnection(over.ConnectionKey,
+                    String.Format(DbSettings.ConnectionStringFormat, over.DbAlias), DbSettings.ProviderName);
+            }
         }
 
         public void Dispose()
         {
             if (!disposed)
             {
-                foreach (var db in overrides)
-                {
-                    DbManager.DetachDb(db.Item1);
-                    DbManager.DeleteDb(db.Item2);
-                }
+                if (scope != null)
+                    scope.Dispose();
 
                 disposed = true;
             }
@@ -64,6 +135,6 @@ namespace Serenity.Testing
             catch
             {
             }
-        }    
+        }
     }
 }
