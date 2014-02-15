@@ -127,6 +127,11 @@
     <Compile Include="Data\FieldTypes\StreamField.cs" />
     <Compile Include="Data\FieldTypes\StringField.cs" />
     <Compile Include="Data\DeltaLister.cs" />
+    <Compile Include="Data\Field\ColumnAttribute.cs" />
+    <Compile Include="Data\Interface\IJoinField.cs" />
+    <Compile Include="Data\Interface\IEntityWithJoins.cs" />
+    <Compile Include="Data\Interface\IEntity.cs" />
+    <Compile Include="Data\Interface\IField.cs" />
     <Compile Include="Data\Interface\IChainable.cs" />
     <Compile Include="Data\Interface\IDbGetExpression.cs" />
     <Compile Include="Data\Join\OuterApply.cs" />

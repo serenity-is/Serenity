@@ -236,7 +236,6 @@
             return this;
         }
 
-
         /// <summary>
         /// Adds a field name or an SQL expression to the ORDER BY clause.
         /// </summary>
@@ -595,21 +594,26 @@
             set { countRecords = value; cachedQuery = null; }
         }
 
+        public IEnumerable<Column> GetColumns()
+        {
+            return columns;
+        }
+
         /// <summary>
         /// Holds information about a column in SELECT clause.
         /// </summary>
-        private class Column
+        public class Column
         {
             /// <summary>Field or expression</summary>
-            public string Expression;
+            public readonly string Expression;
             /// <summary>Column name</summary>
-            public string ColumnName;
+            public readonly string ColumnName;
             /// <summary>Used by entity system when more than one entity is used as a target</summary>
-            public int IntoRow;
+            public readonly int IntoRow;
             /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
-            public Field IntoField;
+            public readonly IField IntoField;
 
-            public Column(string expression, string columnName, int intoRow, Field intoField)
+            public Column(string expression, string columnName, int intoRow, IField intoField)
             {
                 this.Expression = expression;
                 this.ColumnName = columnName;

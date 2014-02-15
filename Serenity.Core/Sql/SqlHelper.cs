@@ -935,5 +935,46 @@
            });
            return list;
        }
+
+       public static void GetFromReader(this SqlQuery query, IDataReader reader)
+       {
+           GetFromReader(query, reader, query.IntoRows);
+       }
+
+       public static void GetFromReader(this SqlQuery query, IDataReader reader, IList<IEntity> into)
+       {
+           int index = 0;
+           foreach (var info in query.GetColumns())
+           {
+               if (info.IntoField as Field != null && info.IntoRow != -1)
+               {
+                   var row = into[info.IntoRow];
+                   ((Field)info.IntoField).GetFromReader(reader, index, (Row)row);
+               }
+               else if (info.IntoRow != -1)
+               {
+                   var row = (Row)(into[info.IntoRow]);
+                   var name = reader.GetName(index);
+                   var field = row.FindField(name) ?? row.FindFieldByPropertyName(name);
+                   if (field != null)
+                   {
+                       //info.IntoField = field;
+                       field.GetFromReader(reader, index, row);
+                   }
+                   else
+                   {
+                       if (reader.IsDBNull(index))
+                           row.SetDictionaryData(name, null);
+                       else
+                       {
+                           var value = reader.GetValue(index);
+                           row.SetDictionaryData(name, value);
+                       }
+                   }
+               }
+
+               index++;
+           }
+       }
    }
 }

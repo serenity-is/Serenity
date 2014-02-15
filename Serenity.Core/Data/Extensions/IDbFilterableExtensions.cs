@@ -60,31 +60,5 @@ namespace Serenity.Data
                     self.Where(new Criteria(field) == self.AddParam(field.AsObject(row)));
             return self;
         }
-
-        public static string FilterExpression(this Field field, SqlQuery query)
-        {
-            if (field == null)
-                throw new ArgumentNullException("field");
-
-            string fieldExpr = null;
-            if (query != null)
-                fieldExpr = query.GetExpression(field.Name);
-
-            if (fieldExpr == null)
-            {
-                if (field._joinAlias != null)
-                    fieldExpr = field._joinAlias + "." + (field._expression ?? field.Name);
-                else if (field._expression != null)
-                    fieldExpr = field._expression;
-                else
-                    fieldExpr = (0).TableAliasDot() + field.Name;
-
-                if (query != null)
-                    query.EnsureJoinOf(field);
-            }
-
-            return fieldExpr;
-        }
-
     }
 }

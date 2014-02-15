@@ -7,14 +7,14 @@
     public partial class SqlQuery : ParameterizedQuery, IDbFilterable, IDbGetExpression
     {
         private int intoIndex = -1;
-        private List<Row> into = new List<Row>();
+        private List<IEntity> into = new List<IEntity>();
 
         /// <summary>
         /// Adds a table to the FROM statement with "T0" alias and sets it as target for future field selections. 
         /// </summary>
         /// <param name="row">Row object.</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery From(Row row)
+        public SqlQuery From(IEntity row)
         {
             if (row == null)
                 throw new ArgumentNullException("row");
@@ -30,22 +30,16 @@
         /// </summary>
         /// <param name="field">Field object</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery Select(Field field)
+        public SqlQuery Select(IField field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
 
             cachedQuery = null;
 
-            if (field.Expression == null)
-            {
-                columns.Add(new Column(field.QueryExpression, field.Name, intoIndex, field));
-                return this;
-            }
-
             EnsureJoinOf(field);
-            columns.Add(new Column(field.Expression, field.Name, intoIndex, field));
 
+            columns.Add(new Column(field.Expression, field.Name, intoIndex, field));
             return this;
         }
 
@@ -57,7 +51,7 @@
         /// <returns>The query itself.</returns>
         /// <remarks>No column name is set for the selected field.
         /// Also field is not set as a target, unlike field only overload, only field name is used.</remarks>
-        public SqlQuery Select(Alias alias, Field field)
+        public SqlQuery Select(Alias alias, IField field)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -77,7 +71,7 @@
         /// <param name="columnName">A column name</param>
         /// <returns>The query itself.</returns>
         /// <remarks>Field is not set as a target, unlike field only overload, only field name is used.</remarks>
-        public SqlQuery Select(Alias alias, Field field, string columnName)
+        public SqlQuery Select(Alias alias, IField field, string columnName)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -97,12 +91,12 @@
         /// </summary>
         /// <param name="fields">Field objects</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery Select(params Field[] fields)
+        public SqlQuery Select(params IField[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
 
-            foreach (Field field in fields)
+            foreach (IField field in fields)
                 Select(field);
 
             return this;
@@ -116,7 +110,7 @@
         /// <param name="expression">A field name or an expression</param>
         /// <param name="intoField">A field object whose name to be used as a column name.</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery SelectAs(string expression, Field intoField)
+        public SqlQuery SelectAs(string expression, IField intoField)
         {
             if (expression == null || expression.Length == 0)
                 throw new ArgumentNullException("field");
@@ -129,7 +123,7 @@
             return this;
         }
 
-        public SqlQuery Into(Row row)
+        public SqlQuery Into(IEntity row)
         {
             if (row == null)
                 intoIndex = -1;
@@ -145,116 +139,75 @@
             return this;
         }
 
-        public SqlQuery OrderBy(Field field)
+        public SqlQuery OrderBy(IField field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return OrderBy(field.QueryExpression);
+            return OrderBy(field.Expression);
         }
 
-        public SqlQuery OrderBy(params Field[] fields)
+        public SqlQuery OrderBy(params IField[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
 
-            foreach (Field field in fields)
+            foreach (IField field in fields)
                 OrderBy(field);
 
             return this;
         }
 
-        public SqlQuery OrderByDescending(Field field)
+        public SqlQuery OrderByDescending(IField field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return OrderBy(field.QueryExpression, desc: true);
+            return OrderBy(field.Expression, desc: true);
         }
 
-        public SqlQuery OrderByDescending(params Field[] fields)
+        public SqlQuery OrderByDescending(params IField[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
 
-            foreach (Field field in fields)
+            foreach (IField field in fields)
                 OrderByDescending(field);
             return this;
         }
 
-        public SqlQuery GroupBy(Field field)
+        public SqlQuery GroupBy(IField field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return GroupBy(field.QueryExpression);
+            return GroupBy(field.Expression);
         }
 
-        public SqlQuery GroupBy(params Field[] fields)
+        public SqlQuery GroupBy(params IField[] fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
 
-            foreach (Field f in fields)
+            foreach (IField f in fields)
                 GroupBy(f);
             return this;
         }
 
-        public int GetSelectIntoIndex(Field field)
+        public int GetSelectIntoIndex(IField field)
         {
             return columns.FindIndex(
                 delegate(Column s) { return s.IntoField == field; });
         }
 
-        public Row IntoRow
+        public IEntity IntoRow
         {
             get { return into.Count > 0 ? into[0] : null; }
         }
 
-        public List<Row> IntoRows
+        public List<IEntity> IntoRows
         {
             get { return into; }
-        }
-
-        public void GetFromReader(IDataReader reader)
-        {
-            GetFromReader(reader, into);
-        }
-
-        public void GetFromReader(IDataReader reader, IList<Row> into)
-        {
-            int index = 0;
-            foreach (var info in columns)
-            {
-                if (info.IntoField != null && info.IntoRow != -1)
-                {
-                    var row = into[info.IntoRow];
-                    info.IntoField.GetFromReader(reader, index, row);
-                }
-                else if (info.IntoRow != -1)
-                {
-                    var row = into[info.IntoRow];
-                    var name = reader.GetName(index);
-                    var field = row.FindField(name) ?? row.FindFieldByPropertyName(name);
-                    if (field != null)
-                    {
-                        info.IntoField = field;
-                        field.GetFromReader(reader, index, row);
-                    }
-                    else
-                    {
-                        if (reader.IsDBNull(index))
-                            row.SetDictionaryData(name, null);
-                        else
-                        {
-                            var value = reader.GetValue(index);
-                            row.SetDictionaryData(name, value);
-                        }
-                    }
-                }
-
-                index++;
-            }
         }
 
         private void EnsureForeignJoin(IDictionary<string, Join> joins, string joinAlias)
@@ -286,16 +239,20 @@
             return this;
         }
 
-        public SqlQuery EnsureJoinOf(Field field)
+        public SqlQuery EnsureJoinOf(IField field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            if (field.ReferencedJoins == null)
+            var joinField = field as IJoinField;
+            if (joinField == null)
                 return this;
 
-            foreach (var alias in field.ReferencedJoins)
-                EnsureForeignJoin(field.Fields.Joins, alias);
+            if (joinField.ReferencedJoins == null)
+                return this;
+
+            foreach (var alias in joinField.ReferencedJoins)
+                EnsureForeignJoin(joinField.Joins, alias);
 
             return this;
         }
@@ -305,19 +262,18 @@
             if (expression.IsEmptyOrNull())
                 return;
 
-            if (this.IntoRow == null)
+            var intoRow = this.IntoRow as IEntityWithJoins;
+            if (intoRow == null)
                 return;
-
-            var fields = this.IntoRow.GetFields();
 
             string referencedJoin;
             var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out referencedJoin);
             if (referencedJoin != null)
-                EnsureForeignJoin(fields.Joins, referencedJoin);
+                EnsureForeignJoin(intoRow.Joins, referencedJoin);
 
             if (referencedJoins != null)
                 foreach (var alias in referencedJoins)
-                    EnsureForeignJoin(fields.Joins, alias);
+                    EnsureForeignJoin(intoRow.Joins, alias);
         }
     }
 }

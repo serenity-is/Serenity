@@ -34,13 +34,13 @@ namespace Serenity.Data
         /// <summary>
         ///   Creates a new criteria that contains field name of the metafield.</summary>
         /// <param name="field">
-        ///   Fieldfield (required).</param>
-        public Criteria(Field field)
+        ///   Field (required).</param>
+        public Criteria(IField field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            this.expression = field.QueryExpression;
+            this.expression = field.Expression;
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Serenity.Data
         ///   Join numarasý (T1 gibi kullanýlýr)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
-        public Criteria(Alias alias, Field field)
+        public Criteria(Alias alias, IField field)
             : this(alias.Name, field.Name)
         {
         }
@@ -110,7 +110,7 @@ namespace Serenity.Data
         ///   Join numarasý (T1 gibi kullanýlýr)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
-        public Criteria(int joinNumber, Field field)
+        public Criteria(int joinNumber, IField field)
             : this(joinNumber, field.Name)
         {
         }
@@ -122,7 +122,7 @@ namespace Serenity.Data
         ///   Tablo alias bilgisini içeren LeftJoin nesnesi (zorunlu).</param>
         /// <param name="field">
         ///   Field alan (zorunlu).</param>
-        public Criteria(string join, Field field)
+        public Criteria(string join, IField field)
             : this(join, field.Name)
         {
         }

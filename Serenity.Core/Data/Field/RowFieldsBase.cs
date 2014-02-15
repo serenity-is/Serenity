@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace Serenity.Data
 {
-    public class RowFieldsBase : Collection<Field>
+    public abstract class RowFieldsBase : Collection<Field>
     {
         public readonly string TableName;
         internal Dictionary<string, Field> _byName;
@@ -20,7 +20,7 @@ namespace Serenity.Data
         internal string _schema;
         internal string _schemaDotTable;
 
-        public RowFieldsBase(string tableName, string fieldPrefix)
+        protected RowFieldsBase(string tableName, string fieldPrefix = "")
         {
             TableName = tableName;
             FieldPrefix = fieldPrefix;

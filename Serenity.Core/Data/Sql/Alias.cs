@@ -65,7 +65,7 @@ namespace Serenity.Data
             get { return this.aliasDot + fieldName; }
         }
 
-        public string this[Field field]
+        public string this[IField field]
         {
             get
             {
@@ -89,7 +89,7 @@ namespace Serenity.Data
             return alias.aliasDot + fieldName;
         }
 
-        public static string operator +(Alias alias, Field field)
+        public static string operator +(Alias alias, IField field)
         {
             if (field == null)
                 throw new ArgumentNullException("field");

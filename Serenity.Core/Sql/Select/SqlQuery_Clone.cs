@@ -19,7 +19,7 @@
             clone.take = take;
             clone.countRecords = countRecords;
 
-            clone.into = new List<Row>(into);
+            clone.into = new List<IEntity>(into);
             clone.intoIndex = intoIndex;
 
             Column s;

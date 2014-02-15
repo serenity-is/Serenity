@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Serenity.Data
 {
-    public abstract class Field
+    public abstract class Field : IField
     {
         private FieldType _type;
         internal int _index;
@@ -16,7 +16,6 @@ namespace Serenity.Data
         internal int _size;
         internal FieldFlags _flags;
         internal string _expression;
-        internal string _queryExpression;
         internal HashSet<string> _referencedJoins;
         internal string _joinAlias;
         internal Join _join;
@@ -35,7 +34,7 @@ namespace Serenity.Data
         protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
         {
             _name = name;
-            _queryExpression = "T0." + name;
+            _expression = "T0." + name;
             _size = size;
             _flags = flags;
             _type = type;
@@ -147,14 +146,20 @@ namespace Serenity.Data
                 if (_expression != value)
                 {
                     _expression = value;
-                    _queryExpression = value ?? ("T0." + _name);
                     _referencedJoins = null;
                     _joinAlias = null;
                     _origin = null;
                     _join = null;
-                    
+
                     if (value != null)
                     {
+                        if (String.Compare(_expression, "T0." + _name, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            _flags -= FieldFlags.Calculated;
+                            _expression = "T0." + _name;
+                            return;
+                        }
+
                         var aliases = JoinAliasLocator.Locate(value);
                         if (aliases != null && aliases.Count > 0)
                         {
@@ -175,6 +180,10 @@ namespace Serenity.Data
                                 }
                             }
                         }
+                    }
+                    else
+                    {
+                        _expression = "T0." + _name;
                     }
                 }
             }
@@ -199,14 +208,6 @@ namespace Serenity.Data
             }
 
             return true;
-        }
-
-        public string QueryExpression
-        {
-            get
-            {
-                return _queryExpression;
-            }
         }
 
         public string JoinAlias

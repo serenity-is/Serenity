@@ -8,6 +8,9 @@ namespace Serenity.Data
     ///   Contains static extension methods for DbField and Meta objects.</summary>
     public static class DbFieldExtensions
     {
+        private const FieldFlags NonTableFieldFlags =
+            FieldFlags.ClientSide | FieldFlags.Foreign | FieldFlags.Calculated | FieldFlags.Reflective;
+
         /// <summary>
         ///   Checks to see if field is an actual table field, e.g. not a foreign or calculated 
         ///   field. This is determined by field flags and having expression.</summary>
@@ -20,13 +23,7 @@ namespace Serenity.Data
             if (field == null)
                 throw new ArgumentNullException("meta");
 
-            return
-                (field.Expression == null &&
-                 (field.Flags & FieldFlags.ClientSide) != FieldFlags.ClientSide &&
-                 (field.Flags & FieldFlags.Foreign) != FieldFlags.Foreign &&
-                 (field.Flags & FieldFlags.Calculated) != FieldFlags.Calculated &&
-                 (field.Flags & FieldFlags.Reflective) != FieldFlags.Reflective);
-
+            return (field.Flags & NonTableFieldFlags) == (FieldFlags)0;
         }
 
 

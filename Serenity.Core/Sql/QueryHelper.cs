@@ -22,7 +22,7 @@ namespace Serenity.Services
                     var row = query.IntoRow;
                     if (row != null)
                     {
-                        var field = query.IntoRow.FindFieldByPropertyName(sort);
+                        var field = ((Row)query.IntoRow).FindFieldByPropertyName(sort);
                         if (field != null)
                             expr = query.GetExpression(field.Name);
                     }
