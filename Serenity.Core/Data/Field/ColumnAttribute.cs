@@ -31,6 +31,38 @@ namespace Serenity.Data
     {
     }
 
+    public class MinSelectLevelAttribute : Attribute
+    {
+        public MinSelectLevelAttribute(SelectLevel value)
+        {
+            this.Value = value;
+        }
+
+        public SelectLevel Value { get; private set; }
+    }
+
+    public class ForeignKeyAttribute : Attribute
+    {
+        public ForeignKeyAttribute(string table, string field)
+        {
+            this.Field = field;
+            this.Table = table;
+        }
+
+        public String Field { get; private set; }
+        public String Table { get; private set; }
+    }
+
+    public class JoinAliasAttribute : Attribute
+    {
+        public JoinAliasAttribute(string alias)
+        {
+            this.Alias = alias;
+        }
+
+        public String Alias { get; private set; }
+    }
+
     public class SizeAttribute : Attribute
     {
         public SizeAttribute(int value)
@@ -59,10 +91,7 @@ namespace Serenity.Data
     {
     }
 
-    public class ForeignAttribute : Attribute
+    public class IdentityAttribute : Attribute
     {
-        public string Table { get; set; }
-        public string Alias { get; set; }
-        public string Field { get; set; }
     }
 }

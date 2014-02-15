@@ -156,6 +156,7 @@ namespace Serenity.Data
                         if (String.Compare(_expression, "T0." + _name, StringComparison.OrdinalIgnoreCase) == 0)
                         {
                             _flags -= FieldFlags.Calculated;
+                            _flags -= FieldFlags.Foreign;
                             _expression = "T0." + _name;
                             return;
                         }
@@ -170,13 +171,21 @@ namespace Serenity.Data
                                 var enumerator = aliases.GetEnumerator();
                                 enumerator.MoveNext();
                                 var join = enumerator.Current;
-                                var split = _expression.Split('.');
-                                if (split.Length == 2 &&
-                                    split[0] == join &&
-                                    IsValidIdentifier(split[1]))
+
+                                if (join.ToLowerInvariant() == "t0")
+                                    _flags = (FieldFlags)(_flags - FieldFlags.Foreign);
+                                else
                                 {
-                                    _joinAlias = join;
-                                    _origin = split[1];
+                                    _flags = _flags | FieldFlags.Foreign;
+
+                                    var split = _expression.Split('.');
+                                    if (split.Length == 2 &&
+                                        split[0] == join &&
+                                        IsValidIdentifier(split[1]))
+                                    {
+                                        _joinAlias = join;
+                                        _origin = split[1];
+                                    }
                                 }
                             }
                         }
@@ -184,6 +193,8 @@ namespace Serenity.Data
                     else
                     {
                         _expression = "T0." + _name;
+                        _flags -= FieldFlags.Calculated;
+                        _flags -= FieldFlags.Foreign;
                     }
                 }
             }

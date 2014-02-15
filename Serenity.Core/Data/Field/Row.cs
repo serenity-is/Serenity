@@ -123,6 +123,9 @@ namespace Serenity.Data
                     SizeAttribute size = null;
                     ExpressionAttribute expression = null;
                     ScaleAttribute scale = null;
+                    MinSelectLevelAttribute selectLevel = null;
+                    ForeignKeyAttribute foreign = null;
+                    JoinAliasAttribute join = null;
 
                     FieldFlags addFlags = (FieldFlags)0;
                     FieldFlags removeFlags = (FieldFlags)0;
@@ -134,6 +137,9 @@ namespace Serenity.Data
                         size = property.GetCustomAttribute<SizeAttribute>(false);
                         expression = property.GetCustomAttribute<ExpressionAttribute>(false);
                         scale = property.GetCustomAttribute<ScaleAttribute>(false);
+                        selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
+                        foreign = property.GetCustomAttribute<ForeignKeyAttribute>(false);
+                        join = property.GetCustomAttribute<JoinAliasAttribute>(false);
 
                         var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                         var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
@@ -152,6 +158,9 @@ namespace Serenity.Data
 
                         if (property.GetCustomAttribute<AutoIncrementAttribute>(false) != null)
                             addFlags |= FieldFlags.AutoIncrement;
+
+                        if (property.GetCustomAttribute<IdentityAttribute>(false) != null)
+                            addFlags |= FieldFlags.Identity;
 
                         var add = property.GetCustomAttribute<AddFlagsAttribute>(false);
                         if (add != null)
@@ -201,11 +210,26 @@ namespace Serenity.Data
                             field.Flags = (FieldFlags)((field.Flags | addFlags) - removeFlags);
                     }
 
+                    if (scale != null)
+                        field.Scale = scale.Value;
+
+                    if (selectLevel != null)
+                        field.MinSelectLevel = selectLevel.Value;
+
                     if (expression != null)
                         field.Expression = expression.Value;
 
-                    if (scale != null)
-                        field.Scale = scale.Value;
+                    if (foreign != null)
+                    {
+                        field.ForeignTable = foreign.Table;
+                        field.ForeignField = foreign.Field;
+                    }
+
+                    if (join != null)
+                    {
+                        new LeftJoin(field.ForeignTable, join.Alias,
+                            new Criteria(join.Alias, field.ForeignField) == new Criteria(field));
+                    }
 
                     if (property != null)
                         field.PropertyName = property.Name;
