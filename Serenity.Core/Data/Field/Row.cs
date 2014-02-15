@@ -173,7 +173,7 @@ namespace Serenity.Data
                         {
                             throw new InvalidProgramException(String.Format(
                                 "Field {0} in type {1} is null and has no corresponding property in entity!",
-                                    fieldInfo.Name, _fields.GetType().Name));
+                                    fieldInfo.Name, this.GetType().Name));
                         }
 
                         object[] prm = new object[7];
