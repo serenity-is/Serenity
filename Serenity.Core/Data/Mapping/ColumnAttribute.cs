@@ -6,6 +6,9 @@ namespace Serenity.Data.Mapping
     {
         public ColumnAttribute(string name)
         {
+            if (name.IsTrimmedEmpty())
+                throw new ArgumentNullException("name");
+
             this.Name = name;
         }
 

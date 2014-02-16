@@ -48,6 +48,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\RowMappingTests.InvalidColumnRow.cs" />
+    <Compile Include="Data\RowMappingTests.ComplexRow.cs" />
     <Compile Include="Data\RowMappingTests.OkRow.cs" />
     <Compile Include="Data\RowMappingTests.FaultyRow.cs" />
     <Compile Include="Data\RowMappingTests.cs" />

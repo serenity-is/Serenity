@@ -171,6 +171,11 @@ namespace Serenity.Data
 
                         if ((int)addFlags != 0 || (int)removeFlags != 0)
                             field.Flags = (field.Flags ^ removeFlags) | addFlags;
+
+                        if (column != null && String.Compare(column.Name, field.Name, StringComparison.OrdinalIgnoreCase) != 0)
+                            throw new InvalidProgramException(String.Format(
+                                "Field name '{0}' in type {1} can't be overridden by Column name attribute!",
+                                    fieldInfo.Name, this.GetType().Name));
                     }
 
                     if (scale != null)
