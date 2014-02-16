@@ -48,6 +48,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\RowMappingTests.OkRow.cs" />
+    <Compile Include="Data\RowMappingTests.FaultyRow.cs" />
+    <Compile Include="Data\RowMappingTests.cs" />
     <Compile Include="Data\SerenityDbScript.cs" />
     <Compile Include="Data\DisplayOrderTests.cs" />
     <Compile Include="Data\DisplayOrderRow.cs" />
