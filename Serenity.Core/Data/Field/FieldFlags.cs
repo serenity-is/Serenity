@@ -16,6 +16,9 @@ namespace Serenity.Data
     {
         /// <summary>
         ///   Hiçbir flag set edilmemiþ.</summary>
+        None = 0,
+        /// <summary>
+        ///   Hiçbir flag set edilmemiþ.</summary>
         Internal = 0,
         /// <summary>
         ///   INSERT esnasýnda deðer verilebilir mi? Diðer tablolardan gelen alanlar ve 

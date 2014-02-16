@@ -2,6 +2,7 @@
 namespace Serenity.Data
 {
     using Newtonsoft.Json;
+    using Serenity.Data.Mapping;
     using System;
     using System.ComponentModel;
 
