@@ -25,7 +25,7 @@ namespace Serenity.Data
             this.op = op;
         }
 
-        public override void ToString(StringBuilder sb, IDbParameterized query)
+        public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
             if (this.op == CriteriaOperator.Like ||
                 this.op == CriteriaOperator.NotLike)

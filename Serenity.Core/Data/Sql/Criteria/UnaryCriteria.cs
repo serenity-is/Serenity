@@ -20,7 +20,7 @@ namespace Serenity.Data
             this.operand = operand;
         }
 
-        public override void ToString(StringBuilder sb, IDbParameterized query)
+        public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
             switch (this.op)
             {

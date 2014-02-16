@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Serenity.Data
 {
-    public abstract class Field : IJoinField
+    public abstract class Field : IFieldWithJoinInfo
     {
         private FieldType _type;
         internal int _index;
@@ -335,7 +335,7 @@ namespace Serenity.Data
         //public int? DisplayOrder { get; set; }
         //public string DisplayFormat { get; set; }
 
-        IDictionary<string, Join> IJoinField.Joins
+        IDictionary<string, Join> IFieldWithJoinInfo.Joins
         {
             get { return Fields.Joins; }
         }

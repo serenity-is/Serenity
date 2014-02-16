@@ -423,7 +423,7 @@ namespace Serenity.Data
             return ToString(ignoreParams);
         }
 
-        public string ToString(IDbParameterized query)
+        public string ToString(IQueryWithParams query)
         {
             var sb = new StringBuilder(256);
             ToString(sb, query);
@@ -435,12 +435,12 @@ namespace Serenity.Data
             return ToString(noParamsChecker);
         }
 
-        public virtual void ToString(StringBuilder sb, IDbParameterized query)
+        public virtual void ToString(StringBuilder sb, IQueryWithParams query)
         {
             throw new NotImplementedException();
         }
 
-        private class NoParamsChecker : IDbParameterized
+        private class NoParamsChecker : IQueryWithParams
         {
             public void AddParam(string name, object value)
             {
@@ -468,7 +468,7 @@ namespace Serenity.Data
             }
         }
 
-        private class IgnoreParams : IDbParameterized
+        private class IgnoreParams : IQueryWithParams
         {
             private static int next;
 

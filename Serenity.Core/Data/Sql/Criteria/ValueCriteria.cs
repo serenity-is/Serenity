@@ -20,7 +20,7 @@ namespace Serenity.Data
             }
         }
 
-        public override void ToString(StringBuilder sb, IDbParameterized query)
+        public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
             var enumerable = value as IEnumerable;
             if (enumerable != null && !(value is string))
