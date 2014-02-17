@@ -7,7 +7,7 @@ namespace Serenity.Data
 {
     public abstract class RowFieldsBase : Collection<Field>
     {
-        public readonly string TableName;
+        internal string _tableName;
         internal Dictionary<string, Field> _byName;
         internal Dictionary<string, Field> _byPropertyName;
         internal Dictionary<string, Join> _joins;
@@ -20,13 +20,18 @@ namespace Serenity.Data
         internal string _schema;
         internal string _schemaDotTable;
 
-        protected RowFieldsBase(string tableName, string fieldPrefix = "")
+        protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
-            TableName = tableName;
+            _tableName = tableName;
             FieldPrefix = fieldPrefix;
             _byName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
             _joins = new Dictionary<string, Join>(StringComparer.OrdinalIgnoreCase);
             _filters = new FilterFields();
+        }
+
+        public string TableName
+        {
+            get { return _tableName; }
         }
 
         public string FieldPrefix

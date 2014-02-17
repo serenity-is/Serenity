@@ -6,6 +6,7 @@ namespace Serenity.Data
 {
     public partial class RowMappingTests
     {
+        [TableName("ComplexTable")]
         public class ComplexRow : Row
         {
             [DisplayName("Complex ID"), Column("ComplexID"), Identity]
@@ -60,7 +61,6 @@ namespace Serenity.Data
                 public StringField FullName;
 
                 public RowFields()
-                    : base("Complex")
                 {
                     Overriden = new StringField(this, "ManualName", "ManualCaption", 999, FieldFlags.Default)
                     {

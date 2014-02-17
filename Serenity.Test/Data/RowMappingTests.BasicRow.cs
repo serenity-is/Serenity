@@ -25,11 +25,6 @@ namespace Serenity.Data
             {
                 public StringField AString;
                 public Int32Field AInt32;
-
-                public RowFields()
-                    : base("BasicTable")
-                {
-                }
             }
 
             public static RowFields Fields = new RowFields();

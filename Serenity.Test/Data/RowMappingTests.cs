@@ -31,6 +31,8 @@ namespace Serenity.Data
         [Fact]
         public void BasicRowHasCorrectMappings()
         {
+            Assert.Equal("Basic", BasicRow.Fields.TableName);
+
             Assert.Equal("AString", BasicRow.Fields.AString.Name);
             Assert.Equal("T0.AString", BasicRow.Fields.AString.Expression);
             Assert.Equal("AString", BasicRow.Fields.AString.PropertyName);
@@ -76,6 +78,14 @@ namespace Serenity.Data
             Assert.Equal(typeof(Int32?), BasicRow.Fields.AInt32.ValueType);
             Assert.Equal(1, BasicRow.Fields.AInt32.Index);
             Assert.Equal(BasicRow.Fields, BasicRow.Fields.AInt32.Fields);
+
+            
+        }
+
+        [Fact]
+        public void TableNameAttributeSetsRowTableName()
+        {
+            Assert.Equal("ComplexTable", ComplexRow.Fields.TableName);
         }
 
         [Fact]

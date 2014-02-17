@@ -12,11 +12,39 @@ namespace Serenity.Data
     {
         private void InitFields()
         {
+            InitFields_TableName();
             InitFields_PropertyNames();
             InitFields_ByPropertyName();
             InitFields_PropertyDescriptors();
             InitFields_Schema();
             InitFields_InferTextualFields();
+        }
+
+        private void InitFields_TableName()
+        {
+            var attr = this.GetType().GetCustomAttribute<TableNameAttribute>();
+
+            if (_fields.TableName != null)
+            {
+                if (attr != null && String.Compare(_fields.TableName, attr.Name, StringComparison.OrdinalIgnoreCase) != 0)
+                    throw new InvalidProgramException(String.Format(
+                        "Tablename in row type {0} can't be overridden by attribute!",
+                            this.GetType().Name));
+
+                return;
+            }
+
+            if (attr != null)
+            {
+                _fields._tableName = attr.Name;
+                return;
+            }
+
+            var name = this.GetType().Name;
+            if (name.EndsWith("Row"))
+                name = name.Substring(0, name.Length - 3);
+
+            _fields._tableName = name;
         }
 
         private void InitFields_GetMyFieldsAndProperties(
