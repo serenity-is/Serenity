@@ -20,6 +20,9 @@ namespace Serenity
         {
             base.InitToolbar();
 
+            if (this.toolbar == null)
+                return;
+
             saveAndCloseButton = toolbar.FindButton("save-and-close-button");
             applyChangesButton = toolbar.FindButton("apply-changes-button");
             deleteButton = toolbar.FindButton("delete-button");
