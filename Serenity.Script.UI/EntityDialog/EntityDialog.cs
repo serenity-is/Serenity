@@ -11,27 +11,16 @@ namespace Serenity
     {
         private TEntity entity;
         private Int64? entityId;
-        protected TabsObject tabs;
-
+        
         protected EntityDialog(TOptions opt = null)
             : base(opt)
         {
-            InitTabs();
-            InitToolbar();
             InitPropertyGrid();
             InitLocalizationGrid();
         }
 
         public override void Destroy()
         {
-            if (tabs != null)
-                tabs.Destroy();
-
-            if (toolbar != null)
-            {
-                toolbar.Destroy();
-                toolbar = null;
-            }
 
             if (propertyGrid != null)
             {
@@ -57,15 +46,6 @@ namespace Serenity
             this.saveAndCloseButton = null;
 
             base.Destroy();
-        }
-
-        protected virtual void InitTabs()
-        {
-            var tabsDiv = this.ById("Tabs");
-            if (tabsDiv.Length == 0)
-                return;
-
-            tabs = tabsDiv.Tabs(new TabsOptions());
         }
 
         protected TEntity Entity
@@ -99,14 +79,6 @@ namespace Serenity
         protected virtual void UpdateTitle()
         {
             element.Dialog().Title = GetEntityTitle();
-        }
-
-        protected override void OnDialogOpen()
-        {
-            base.OnDialogOpen();
-
-            if (tabs != null)
-                tabs.Active = 0;
         }
 
         /*

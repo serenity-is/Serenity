@@ -1,6 +1,7 @@
 ﻿using jQueryApi;
 using jQueryApi.UI.Widgets;
 using System;
+using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
 
@@ -14,16 +15,29 @@ namespace Serenity
         where TOptions : class, new()
     {
         protected jQueryValidator validator;
+        protected TabsObject tabs;
+        protected Toolbar toolbar;
 
         protected TemplatedDialog(TOptions opt = null)
             : base(Q.NewBodyDiv(), opt)
         {
             InitDialog();
             InitValidator();
+            InitTabs();
+            InitToolbar();
         }
 
         public override void Destroy()
         {
+            if (tabs != null)
+                tabs.Destroy();
+
+            if (toolbar != null)
+            {
+                toolbar.Destroy();
+                toolbar = null;
+            }
+
             element.Dialog().Destroy();
             base.Destroy();
         }
@@ -42,6 +56,25 @@ namespace Serenity
             {
                 self.OnDialogClose();
             });
+        }
+
+        protected virtual void InitToolbar()
+        {
+            var toolbarDiv = this.ById("Toolbar");
+            if (toolbarDiv.Length == 0)
+                return;
+
+            var opt = new ToolbarOptions
+            {
+                Buttons = GetToolbarButtons()
+            };
+
+            toolbar = new Toolbar(toolbarDiv, opt);
+        }
+
+        protected virtual List<ToolButton> GetToolbarButtons()
+        {
+            return new List<ToolButton>();
         }
 
         protected virtual jQueryValidatorOptions GetValidatorOptions()
@@ -79,6 +112,9 @@ namespace Serenity
         {
             J(":input:eq(0)", element).Focus();
             this.Arrange();
+
+            if (tabs != null)
+                tabs.Active = 0;
         }
 
         protected virtual void Arrange()
@@ -138,6 +174,15 @@ namespace Serenity
         public void DialogClose()
         {
             this.element.Dialog().Close();
+        }
+
+        protected virtual void InitTabs()
+        {
+            var tabsDiv = this.ById("Tabs");
+            if (tabsDiv.Length == 0)
+                return;
+
+            tabs = tabsDiv.Tabs(new TabsOptions());
         }
 
         public string IdPrefix { get { return idPrefix; } }

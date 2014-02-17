@@ -10,25 +10,15 @@ namespace Serenity
         where TEntity : class, new()
         where TOptions: class, new()
     {
-        protected Toolbar toolbar;
         protected jQueryObject saveAndCloseButton;
         protected jQueryObject applyChangesButton;
         protected jQueryObject deleteButton;
         protected jQueryObject undeleteButton;
         protected jQueryObject cloneButton;
 
-        protected virtual void InitToolbar()
+        protected override void InitToolbar()
         {
-            var toolbarDiv = this.ById("Toolbar");
-            if (toolbarDiv.Length == 0)
-                return;
-
-            var opt = new ToolbarOptions
-            {
-                Buttons = GetToolbarButtons()
-            };
-
-            toolbar = new Toolbar(toolbarDiv, opt);
+            base.InitToolbar();
 
             saveAndCloseButton = toolbar.FindButton("save-and-close-button");
             applyChangesButton = toolbar.FindButton("apply-changes-button");
@@ -37,7 +27,7 @@ namespace Serenity
             cloneButton = toolbar.FindButton("clone-button");
         }
 
-        protected virtual List<ToolButton> GetToolbarButtons()
+        protected override List<ToolButton> GetToolbarButtons()
         {
             List<ToolButton> list = new List<ToolButton>();
 

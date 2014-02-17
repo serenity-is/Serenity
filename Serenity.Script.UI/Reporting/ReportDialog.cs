@@ -16,8 +16,6 @@ namespace Serenity.Reporting
         public ReportDialog(ReportDialogOptions opt)
             : base(opt)
         {
-            CreateToolbar();
-
             designPanel = new ReportDesignPanel(
                 J("<div/>")
                     .AddClass("design-panel")
@@ -98,50 +96,47 @@ namespace Serenity.Reporting
             });
         }
 
-        protected void CreateToolbar()
+        protected override List<ToolButton> GetToolbarButtons()
         {
-            new Toolbar(this.ById("Toolbar"), new ToolbarOptions
+            return new List<ToolButton> 
             {
-                Buttons = new List<ToolButton> 
+                new ToolButton 
+                { 
+                    Title = "Önizleme", 
+                    CssClass = "print-preview-button", 
+                    OnClick = delegate 
+                    {
+                        ExecuteReport("_blank", null);
+                    }
+                },
+                new ToolButton 
                 {
-                    new ToolButton 
-                    { 
-                        Title = "Önizleme", 
-                        CssClass = "print-preview-button", 
-                        OnClick = delegate 
-                        {
-                            ExecuteReport("_blank", null);
-                        }
-                    },
-                    new ToolButton 
+                    Title = "PDF",
+                    CssClass = "export-pdf-button",
+                    OnClick = delegate 
                     {
-                        Title = "PDF",
-                        CssClass = "export-pdf-button",
-                        OnClick = delegate 
-                        {
-                            ExecuteReport("", "Pdf");
-                        }
-                    },
-                    new ToolButton 
+                        ExecuteReport("", "Pdf");
+                    }
+                },
+                new ToolButton 
+                {
+                    Title = "Excel",
+                    CssClass = "export-xlsx-button",
+                    OnClick = delegate 
                     {
-                        Title = "Excel",
-                        CssClass = "export-xlsx-button",
-                        OnClick = delegate 
-                        {
-                            ExecuteReport("", "Xlsx");
-                        }
-                    },
-                    new ToolButton 
+                        ExecuteReport("", "Xlsx");
+                    }
+                },
+                new ToolButton 
+                {
+                    Title = "Word",
+                    CssClass = "export-docx-button",
+                    OnClick = delegate 
                     {
-                        Title = "Word",
-                        CssClass = "export-docx-button",
-                        OnClick = delegate 
-                        {
-                            ExecuteReport("", "Docx");
-                        }
+                        ExecuteReport("", "Docx");
                     }
                 }
-            });
+            };
         }
     }
 
