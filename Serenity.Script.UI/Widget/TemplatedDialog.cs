@@ -38,6 +38,12 @@ namespace Serenity
                 toolbar = null;
             }
 
+            if (validator != null)
+            {
+                this.ById("Form").Remove();
+                validator = null;
+            }
+
             element.Dialog().Destroy();
             base.Destroy();
         }

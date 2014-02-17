@@ -21,7 +21,6 @@ namespace Serenity
 
         public override void Destroy()
         {
-
             if (propertyGrid != null)
             {
                 propertyGrid.Destroy();
@@ -32,12 +31,6 @@ namespace Serenity
             {
                 localizationGrid.Destroy();
                 localizationGrid = null;
-            }
-
-            if (validator != null)
-            {
-                this.ById("Form").Remove();
-                validator = null;
             }
 
             this.undeleteButton = null;
