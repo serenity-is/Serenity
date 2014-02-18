@@ -105,6 +105,12 @@ namespace Serenity
             {
                 return null;
             }
+
+            [InlineCode("Select2.util.stripDiacritics({input})")]
+            public static string StripDiacritics(string input)
+            {
+                return null;
+            }
         }
     }
 }

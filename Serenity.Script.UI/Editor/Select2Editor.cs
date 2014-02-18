@@ -21,12 +21,6 @@ namespace Serenity
         protected List<Select2Item> items;
         protected int pageSize = 100;
 
-        [InlineCode("Select2.util.stripDiacritics({input})")]
-        private static string StripDiacritics(string input)
-        {
-            return null;
-        }
-
         public Select2Editor(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)
         {
@@ -58,18 +52,18 @@ namespace Serenity
                 AllowClear = emptyItemText != null,
                 Query = delegate(Select2QueryOptions query)
                 {
-                    var term = query.Term.IsEmptyOrNull() ? "" : StripDiacritics(query.Term ?? "").ToUpperCase();
+                    var term = query.Term.IsEmptyOrNull() ? "" : Q.Externals.StripDiacritics(query.Term ?? "").ToUpperCase();
                     var results = this.items.Filter(item =>
                     {
                         return (term == null ||
-                            StripDiacritics(item.Text ?? "").ToUpperCase().StartsWith(term));
+                            Q.Externals.StripDiacritics(item.Text ?? "").ToUpperCase().StartsWith(term));
                     });
 
                     results.AddRange(this.items.Filter(item =>
                     {
                         return term != null &&
-                            !StripDiacritics(item.Text ?? "").ToUpperCase().StartsWith(term) &&
-                            StripDiacritics(item.Text ?? "").ToUpperCase().IndexOf(term) >= 0;
+                            !Q.Externals.StripDiacritics(item.Text ?? "").ToUpperCase().StartsWith(term) &&
+                            Q.Externals.StripDiacritics(item.Text ?? "").ToUpperCase().IndexOf(term) >= 0;
                     }));
 
                     query.Callback(new Select2Result
