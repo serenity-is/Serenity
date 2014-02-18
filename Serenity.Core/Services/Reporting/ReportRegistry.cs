@@ -39,7 +39,7 @@ namespace Serenity.Reporting
 
         private static string GetReportCategoryTitle(string key)
         {
-            return LocalText.TryGet("Report.Category." + key) ?? key;
+            return LocalText.TryGet("Report.Category." + key.Replace("/", ".")) ?? key;
         }
 
         private static void EnsureTypes()
