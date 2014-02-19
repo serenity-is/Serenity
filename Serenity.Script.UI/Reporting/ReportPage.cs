@@ -7,9 +7,6 @@
         public ReportPage(jQueryObject div)
             : base(div)
         {
-            //Nt.resizeDivToWindow(div, 500, 10);
-            //InitAutoLayout();
-
             J(".report-link").Click(ReportLinkClick);
 
             J("div.line").Click(CategoryClick);
