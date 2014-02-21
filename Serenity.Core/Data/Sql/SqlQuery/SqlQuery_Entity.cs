@@ -200,7 +200,7 @@
                 delegate(Column s) { return s.IntoField == field; });
         }
 
-        public IEntity IntoRow
+        public IEntity FirstIntoRow
         {
             get { return into.Count > 0 ? into[0] : null; }
         }
@@ -262,7 +262,7 @@
             if (expression.IsEmptyOrNull())
                 return;
 
-            var intoRow = this.IntoRow as IEntityWithJoins;
+            var intoRow = this.FirstIntoRow as IEntityWithJoins;
             if (intoRow == null)
                 return;
 

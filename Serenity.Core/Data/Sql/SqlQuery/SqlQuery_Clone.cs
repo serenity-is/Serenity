@@ -26,7 +26,7 @@
             for (int i = 0; i < columns.Count; i++)
             {
                 s = columns[i];
-                var si = new Column(s.Expression, s.ColumnName, s.IntoRow, s.IntoField);
+                var si = new Column(s.Expression, s.ColumnName, s.IntoRowIndex, s.IntoField);
                 clone.columns.Add(si);
             }
 

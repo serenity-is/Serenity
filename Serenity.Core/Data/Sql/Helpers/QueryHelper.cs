@@ -19,10 +19,10 @@ namespace Serenity.Services
 
                 if (expr == null)
                 {
-                    var row = query.IntoRow;
+                    var row = query.FirstIntoRow;
                     if (row != null)
                     {
-                        var field = ((Row)query.IntoRow).FindFieldByPropertyName(sort);
+                        var field = ((Row)query.FirstIntoRow).FindFieldByPropertyName(sort);
                         if (field != null)
                             expr = query.GetExpression(field.Name);
                     }

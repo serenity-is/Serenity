@@ -144,8 +144,8 @@
         /// <remarks>This function uses a linear search in column list, so use with caution.</remarks>
         public string GetExpression(string columnName)
         {
-            if (columnName == null || columnName.Length == 0)
-                return null;
+            if (columnName == null)
+                throw new ArgumentNullException("columnName");
 
             Column fieldInfo = columns.Find(
                 delegate(Column s)
@@ -159,7 +159,7 @@
                 return null;
             else
             {
-                return fieldInfo.Expression ?? fieldInfo.ColumnName;
+                return fieldInfo.Expression;
             }
         }
 
@@ -174,7 +174,7 @@
                 throw new ArgumentOutOfRangeException("selectIndex");
 
             Column si = columns[selectIndex];
-            return si.Expression ?? si.ColumnName;
+            return si.Expression;
         }
 
         /// <summary>
@@ -185,7 +185,7 @@
         public SqlQuery GroupBy(string expression)
         {
             if (expression == null || expression.Length == 0)
-                throw new ArgumentNullException("field");
+                throw new ArgumentNullException("expression");
 
             cachedQuery = null;
 
@@ -413,16 +413,35 @@
         /// Adds a subquery to the SELECT statement.
         /// </summary>
         /// <param name="expression">A subquery.</param>
+        /// <param name="columnName">A column name</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery Select(ISqlQuery expression, string columnName = null)
+        public SqlQuery Select(ISqlQuery expression, string columnName)
         {
             if (expression == null)
                 throw new ArgumentNullException("expression");
+
+            if (columnName.IsEmptyOrNull())
+                throw new ArgumentNullException("columnName");
 
             if (columnName == null)
                 this.Select(expression.ToString());
             else
                 this.Select(expression.ToString(), columnName);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a subquery to the SELECT statement.
+        /// </summary>
+        /// <param name="expression">A subquery.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery Select(ISqlQuery expression)
+        {
+            if (expression == null)
+                throw new ArgumentNullException("expression");
+
+            this.Select(expression.ToString());
 
             return this;
         }
@@ -525,7 +544,7 @@
 
             cachedQuery = null;
 
-            if (where == null || where.Length == 0)
+            if (where == null)
                 where = new StringBuilder(expression);
             else
                 where.Append(Sql.Keyword.And).Append(expression);
@@ -609,7 +628,7 @@
             /// <summary>Column name</summary>
             public readonly string ColumnName;
             /// <summary>Used by entity system when more than one entity is used as a target</summary>
-            public readonly int IntoRow;
+            public readonly int IntoRowIndex;
             /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
             public readonly IField IntoField;
 
@@ -617,7 +636,7 @@
             {
                 this.Expression = expression;
                 this.ColumnName = columnName;
-                this.IntoRow = intoRow;
+                this.IntoRowIndex = intoRow;
                 this.IntoField = intoField;
             }
         }
