@@ -20,13 +20,7 @@ namespace Serenity.Data
             if (fields == null)
                 throw new ArgumentNullException("fields");
 
-            _fields = fields;
-
-            if (!_fields._isLocked)
-            {
-                InitFields();
-                _fields._isLocked = true;
-            }
+            _fields = fields.Init();
         }
 
         public void CloneInto(Row clone, 
@@ -89,7 +83,13 @@ namespace Serenity.Data
             return clone;
         }
 
-        public abstract Row CreateNew();
+        public virtual Row CreateNew()
+        {
+            if (_fields.rowFactory == null)
+                throw new NotImplementedException();
+
+            return _fields.rowFactory();
+        }
 
         internal void FieldAssignedValue(Field field)
         {

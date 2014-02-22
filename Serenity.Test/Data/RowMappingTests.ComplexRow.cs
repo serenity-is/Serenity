@@ -69,17 +69,11 @@ namespace Serenity.Data
                 }
             }
 
-            public static RowFields Fields = new RowFields();
-            public static ComplexRow Instance = new ComplexRow();
+            public static RowFields Fields = new RowFields().Init();
 
             public ComplexRow()
                 : base(Fields)
             {
-            }
-
-            public override Row CreateNew()
-            {
-                return new ComplexRow();
             }
         }
     }

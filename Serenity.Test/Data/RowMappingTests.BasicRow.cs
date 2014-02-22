@@ -1,7 +1,4 @@
 ﻿using System;
-using Serenity.Data;
-using Newtonsoft.Json;
-using Xunit;
 
 namespace Serenity.Data
 {
@@ -27,17 +24,11 @@ namespace Serenity.Data
                 public Int32Field AInt32;
             }
 
-            public static RowFields Fields = new RowFields();
-            public static BasicRow Instance = new BasicRow();
+            public static RowFields Fields = new RowFields().Init();
 
             public BasicRow()
                 : base(Fields)
             {
-            }
-
-            public override Row CreateNew()
-            {
-                return new BasicRow();
             }
         }
     }

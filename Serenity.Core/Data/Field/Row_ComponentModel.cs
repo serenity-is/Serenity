@@ -15,7 +15,7 @@ namespace Serenity.Data
 
         internal void RaisePropertyChanged(Field field)
         {
-            if (_fields._propertyChangedEventArgs == null)
+            if (_fields.propertyChangedEventArgs == null)
             {
                 var args = new PropertyChangedEventArgs[_fields.Count + 1];
                 for (var i = 0; i < _fields.Count; i++)
@@ -24,13 +24,13 @@ namespace Serenity.Data
                     args[i] = new PropertyChangedEventArgs(f._propertyName ?? f.Name);
                 }
                 args[_fields.Count] = new PropertyChangedEventArgs("__ROW__");
-                _fields._propertyChangedEventArgs = args;
+                _fields.propertyChangedEventArgs = args;
             }
 
             if (field == null)
-                _propertyChanged(this, _fields._propertyChangedEventArgs[_fields.Count]);
+                _propertyChanged(this, _fields.propertyChangedEventArgs[_fields.Count]);
             else
-                _propertyChanged(this, _fields._propertyChangedEventArgs[field._index]);
+                _propertyChanged(this, _fields.propertyChangedEventArgs[field._index]);
         }
 
         public Action<Row> PostHandler
@@ -202,7 +202,7 @@ namespace Serenity.Data
 
         public PropertyDescriptorCollection GetPropertyDescriptors()
         {
-            return _fields._propertyDescriptors;
+            return _fields.propertyDescriptors;
         }
     }
 }

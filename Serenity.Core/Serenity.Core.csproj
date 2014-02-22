@@ -121,7 +121,6 @@
     <Compile Include="Data\FieldTypes\StringField.cs" />
     <Compile Include="Core\Helpers\DeltaLister.cs" />
     <Compile Include="Data\Field\Row_ComponentModel.cs" />
-    <Compile Include="Data\Field\Row_InitFields.cs" />
     <Compile Include="Data\Mapping\ColumnAttribute.cs" />
     <Compile Include="Data\Interface\IFieldWithJoinInfo.cs" />
     <Compile Include="Data\Interface\IEntityWithJoins.cs" />
