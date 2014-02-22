@@ -128,7 +128,8 @@ namespace Serenity.Data
 
         private static void logStructuredParameter(SqlParameter param, StringBuilder sbCommandText)
         {
-            sbCommandText.AppendLine(" {List Type};");
+            throw new NotImplementedException();
+            /*sbCommandText.AppendLine(" {List Type};");
             var dataTable = (DataTable)param.Value;
 
             for (int rowNo = 0; rowNo < dataTable.Rows.Count; rowNo++)
@@ -148,7 +149,7 @@ namespace Serenity.Data
                     hasPrev = true;
                 }
                 sbCommandText.AppendLine(");");
-            }
+            }*/
         }
 
         private static void logQuotedParameterValue(object value, StringBuilder sbCommandText)
@@ -165,9 +166,9 @@ namespace Serenity.Data
 
                     if (value is string
                         || value is char
-                        || value is char[]
-                        || value is System.Xml.Linq.XElement
-                        || value is System.Xml.Linq.XDocument)
+                        || value is char[])
+                        //|| value is System.Xml.Linq.XElement
+                        //|| value is System.Xml.Linq.XDocument)
                     {
                         sbCommandText.Append('\'');
                         sbCommandText.Append(value.ToString().Replace("'", "''"));
