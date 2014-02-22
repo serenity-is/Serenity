@@ -72,13 +72,9 @@ namespace Serenity.Testing
                         return;
 
                     var newAlias = over.DbAlias + "_" + currentHash;
-                    if (attachedHashes.ContainsKey(newAlias))
-                        DbManager.DetachDb(over.DbAlias);
-                    else
-                    {
-                        DbManager.RenameDb(over.DbAlias, newAlias);
-                        attachedHashes[newAlias] = attachedHashes[over.DbAlias];
-                    }
+                    DbManager.DetachDb(over.DbAlias);
+                    DbManager.RenameDb(over.DbAlias, newAlias);
+                    attachedHashes[newAlias] = attachedHashes[over.DbAlias];
 
                     attachedHashes.Remove(over.DbAlias);
                 }
