@@ -72,10 +72,10 @@ namespace Serenity.Testing
                         return;
 
                     var newAlias = over.DbAlias + "_" + currentHash;
-                    DbManager.DetachDb(over.DbAlias);
+                    DbManager.DetachDb(newAlias);
+                    attachedHashes.Remove(newAlias);
                     DbManager.RenameDb(over.DbAlias, newAlias);
                     attachedHashes[newAlias] = attachedHashes[over.DbAlias];
-
                     attachedHashes.Remove(over.DbAlias);
                 }
 
