@@ -1,7 +1,8 @@
 ﻿using System.Net;
 using System.IO;
 using System;
-namespace Surat.Site.Services
+
+namespace Serenity.Services
 {
     public static class UriHelper
     {
