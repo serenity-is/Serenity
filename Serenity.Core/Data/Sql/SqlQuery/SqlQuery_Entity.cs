@@ -139,12 +139,12 @@
             return this;
         }
 
-        public SqlQuery OrderBy(IField field)
+        public SqlQuery OrderBy(IField field, bool desc = false)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return OrderBy(field.Expression);
+            return OrderBy(field.Expression, desc);
         }
 
         public SqlQuery OrderBy(params IField[] fields)
@@ -155,24 +155,6 @@
             foreach (IField field in fields)
                 OrderBy(field);
 
-            return this;
-        }
-
-        public SqlQuery OrderByDescending(IField field)
-        {
-            if (field == null)
-                throw new ArgumentNullException("field");
-
-            return OrderBy(field.Expression, desc: true);
-        }
-
-        public SqlQuery OrderByDescending(params IField[] fields)
-        {
-            if (fields == null)
-                throw new ArgumentNullException("fields");
-
-            foreach (IField field in fields)
-                OrderByDescending(field);
             return this;
         }
 

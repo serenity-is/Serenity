@@ -4,41 +4,41 @@ namespace Serenity.Data
 {
     public static class SqlSettings
     {
-        public static SqlDialect CurrentDialect = SqlDialect.MsSql;
+        public static SqlDialect CurrentDialect = SqlDialect.MsSql2000;
 
         public static bool IsCaseSensitive(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.Firebird);
+            return dialect.HasFlag(SqlDialect.ServerKindFirebird);
         }
 
         public static bool PrefixUnicodeStringsWithN(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.MsSql);
+            return dialect.HasFlag(SqlDialect.ServerKindMsSql);
         }
 
         public static bool UseReturningIdentity(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.Firebird);
+            return dialect.HasFlag(SqlDialect.ServerKindFirebird);
         }
 
         public static bool UseScopeIdentity(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.MsSql);
+            return dialect.HasFlag(SqlDialect.ServerKindMsSql);
         }
 
         public static bool MultipleResultsets(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.MsSql);
+            return dialect.HasFlag(SqlDialect.MsSql2000);
         }
 
         public static bool CanUseRowNumber(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.MsSql);
+            return dialect.HasFlag(SqlDialect.UseRowNumber);
         }
 
         public static bool CanUseSkipKeyword(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.Firebird) | dialect.HasFlag(SqlDialect.UseSkipKeyword);
+            return dialect.HasFlag(SqlDialect.UseSkipKeyword);
         }
 
         public static bool CanUseOffsetFetch(this SqlDialect dialect)
@@ -48,15 +48,15 @@ namespace Serenity.Data
 
         public static bool NeedsExecuteBlockStatement(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.Firebird);
+            return dialect.HasFlag(SqlDialect.ServerKindFirebird);
         }
 
         public static string TakeKeyword(this SqlDialect dialect)
         {
-            if (dialect.HasFlag(SqlDialect.Firebird))
+            if (dialect.HasFlag(SqlDialect.ServerKindFirebird))
                 return "FIRST";
 
-            if (dialect.HasFlag(SqlDialect.MsSql))
+            if (dialect.HasFlag(SqlDialect.ServerKindMsSql))
                 return "TOP";
                         
             throw new InvalidOperationException();
@@ -64,7 +64,7 @@ namespace Serenity.Data
 
         public static string SkipKeyword(this SqlDialect dialect)
         {
-            if (dialect.HasFlag(SqlDialect.Firebird))
+            if (dialect.HasFlag(SqlDialect.ServerKindFirebird))
                 return "SKIP";
 
             throw new InvalidOperationException();
@@ -72,7 +72,7 @@ namespace Serenity.Data
 
         public static string DateFormat(this SqlDialect dialect)
         {
-            if (dialect.HasFlag(SqlDialect.Firebird))
+            if (dialect.HasFlag(SqlDialect.ServerKindFirebird))
                 return "\\'yyyy'-'MM'-'dd\\'";
 
             return "\\'yyyyMMdd\\'";
@@ -80,7 +80,7 @@ namespace Serenity.Data
 
         public static string DateTimeFormat(this SqlDialect dialect)
         {
-            if (dialect.HasFlag(SqlDialect.Firebird))
+            if (dialect.HasFlag(SqlDialect.ServerKindFirebird))
                 return "\\'yyyy'-'MM'-'dd HH':'mm':'ss'.'fff\\'";
                     
             return "\\'yyyy'-'MM'-'ddTHH':'mm':'ss'.'fff\\'";

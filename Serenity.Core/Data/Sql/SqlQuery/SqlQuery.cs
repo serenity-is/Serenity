@@ -228,7 +228,7 @@
 
             cachedQuery = null;
 
-            if (having == null || having.Length == 0)
+            if (having == null)
                 having = new StringBuilder(expression);
             else
                 having.Append(Sql.Keyword.And).Append(expression);
@@ -423,10 +423,7 @@
             if (columnName.IsEmptyOrNull())
                 throw new ArgumentNullException("columnName");
 
-            if (columnName == null)
-                this.Select(expression.ToString());
-            else
-                this.Select(expression.ToString(), columnName);
+            this.Select(expression.ToString(), columnName);
 
             return this;
         }

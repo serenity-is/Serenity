@@ -44,7 +44,7 @@ namespace Serenity.Data
                 else
                 {
                     const string AssignCmd = "@Value{0} = {1}";
-                    const string DeclareCmd = "DECLARE @Value{0} SQL_VARIANT\n";
+                    const string DeclareCmd = "DECLARE @Value{0} SQL_VARIANT;\n";
                     const string Equality = "(({0} IS NULL AND @Value{1} IS NULL) OR ({0} = @Value{1}))";
                     const string Greater = "(({0} IS NOT NULL AND @Value{1} IS NULL) OR ({0} > @Value{1}))";
                     const string LessThan = "(({0} IS NULL AND @Value{1} IS NOT NULL) OR ({0} < @Value{1}))";
@@ -130,7 +130,7 @@ namespace Serenity.Data
                     // SqlSelect'in diğer kısımlarını sorguya ekle
                     AppendFromWhereOrderByGroupByHaving(sb, null, true);
 
-                    sb.Append('\n');
+                    sb.Append(";\n");
 
                     // son kayıttan sonrakileri bulmaya yarayacak koşul, alan sayısı arttıkça biraz daha 
                     // karmaşıklaşmaktadır. Örneğin A, B, C, D gibi 4 alanlı bir sıralamada,
@@ -251,18 +251,18 @@ namespace Serenity.Data
             if (useRowNumber)
             {
                 if (columns.Count > 0)
-                    sb.Append(',');
+                    sb.Append(", ");
 
                 sb.Append("ROW_NUMBER() OVER (ORDER BY ");
 
                 for (int i = 0; i < orderBy.Count; i++)
                 {
                     if (i > 0)
-                        sb.Append(',');
+                        sb.Append(", ");
 
                     sb.Append(orderBy[i].ToString());
                 }
-                sb.Append(") AS _row_number_");
+                sb.Append(") AS __num__");
             }
 
             // select sorgusunun kalan kısımlarını yaz
@@ -270,7 +270,7 @@ namespace Serenity.Data
 
             if (useRowNumber)
             {
-                sb.Append(") _row_number_results_ WHERE _row_number_ > ");
+                sb.Append(") __results__ WHERE __num__ > ");
                 sb.Append(skip);
             }
 

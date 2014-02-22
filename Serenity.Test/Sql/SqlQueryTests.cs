@@ -349,6 +349,166 @@ namespace Serenity.Data.Test
         }
 
         [Fact]
+        public void OrderByWithEmptyOrNullArgumentsThrowsArgumentNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy((string)null));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(String.Empty));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy((MyField)null));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy((Alias)null, "x"));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(new Alias("x"), (string)null));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(new Alias("x"), String.Empty));
+        }
+
+        [Fact]
+        public void OrderByWithExpressionWorks()
+        {
+            var query = new SqlQuery()
+                .Select("TestColumn")
+                .From("TestTable")
+                .OrderBy("TestColumn")
+                .OrderBy("TestColumn2");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT TestColumn FROM TestTable ORDER BY TestColumn, TestColumn2"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void OrderByWithAliasAndFieldnameWorks()
+        {
+            var query = new SqlQuery()
+                .Select("u.TestColumn")
+                .From("TestTable u")
+                .OrderBy(new Alias("u"), "TestColumn")
+                .OrderBy(new Alias("u"), "TestColumn2");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT u.TestColumn FROM TestTable u ORDER BY u.TestColumn, u.TestColumn2"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void OrderByAppendsDescKeywordWhenDescArgumentIsTrue()
+        {
+            var query = new SqlQuery()
+                .Select("u.TestColumn")
+                .From("TestTable u")
+                .OrderBy(new Alias("u"), "TestColumn", desc: true)
+                .OrderBy("TestColumn2", desc: true);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT u.TestColumn FROM TestTable u ORDER BY u.TestColumn DESC, TestColumn2 DESC"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void SkipThrowsExceptionIfNoOrderByForSql2000Dialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlDialect.MsSql2000)
+                .Select("c")
+                .From("t")
+                .Skip(10);
+
+            Assert.Throws<InvalidOperationException>(delegate
+            {
+                query.ToString();
+            });
+        }
+
+        [Fact]
+        public void SkipUsesWorkAroundWithOneOrderByForSql2000Dialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlDialect.MsSql2000)
+                .Select("c")
+                .From("t")
+                .OrderBy("x")
+                .Skip(10);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "DECLARE @Value0 SQL_VARIANT;" +
+                    "SELECT TOP 10 @Value0 = x FROM t ORDER BY x;" +
+                    "SELECT c FROM t WHERE ((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0)))) ORDER BY x"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void SkipUsesWorkAroundWithTwoOrderByForSql2000Dialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlDialect.MsSql2000)
+                .Select("c")
+                .From("t")
+                .Where("c > 2")
+                .OrderBy("x")
+                .OrderBy("y")
+                
+                .Skip(100)
+                .Take(50);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "DECLARE @Value0 SQL_VARIANT;" + 
+                    "DECLARE @Value1 SQL_VARIANT;" +
+                    "SELECT TOP 100 @Value0 = x,@Value1 = y FROM t WHERE c > 2 ORDER BY x, y;" +
+                    "SELECT TOP 50 c FROM t WHERE c > 2 AND " + 
+                        "((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0))) " + 
+                            "OR (((x IS NULL AND @Value0 IS NULL) OR (x = @Value0)) " + 
+                            "AND ((y IS NOT NULL AND @Value1 IS NULL) OR (y > @Value1)))) ORDER BY x, y"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void SkipUsesRowNumberForSql2005Dialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlDialect.MsSql2005)
+                .Select("c")
+                .From("t")
+                .OrderBy("x")
+                .Skip(10)
+                .Take(20);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT * FROM (\n" +
+                        "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS __num__ FROM t) __results__ " + 
+                    "WHERE __num__ > 10"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void HavingDoesAndWhenCalledMoreThanOnce()
+        {
+            var query = new SqlQuery()
+                .From("t")
+                .GroupBy("c")
+                .Select("c")
+                .Having("count(*) > 2")
+                .Having("sum(y) < 1000");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT c FROM t GROUP BY c HAVING count(*) > 2 AND sum(y) < 1000"),
+                TestSqlHelper.Normalize(
+                    query.ToString())
+            );
+        }
+
+
+
+        [Fact]
         public void IntoRowIndexCanBeSetToMinusOneWithNull()
         {
             var entity = new MyEntity() { Table = "x" };
