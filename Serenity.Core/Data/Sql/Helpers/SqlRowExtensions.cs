@@ -24,7 +24,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("row");
 
             HashSet<Field> excludeFields =
-                (exclude != null && exclude.Length > 0) ? FieldExtensions.ToFieldDictionary(exclude) : null;
+                (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
 
             var fields = row.GetFields();
 
@@ -59,7 +59,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("row");
 
             HashSet<Field> excludeFields =
-                (exclude != null && exclude.Length > 0) ? FieldExtensions.ToFieldDictionary(exclude) : null;
+                (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
 
             var fields = row.GetFields();
 
