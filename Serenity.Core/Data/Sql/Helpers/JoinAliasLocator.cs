@@ -33,8 +33,8 @@ namespace Serenity.Data
                     alias = s;
                 else
                 {
+                    aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { alias, s };
                     alias = null;
-                    aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { s };
                 }
             });
 
