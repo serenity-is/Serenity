@@ -52,6 +52,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlQuery\Sample1_Listing8_UsingPredefinedClasses.cs" />
     <Compile Include="SqlQuery\Sample1_Listing8_UsingFieldNameConsts.cs" />
     <Compile Include="SqlQuery\Sample1_Listing7_FromAsAlias.cs" />
     <Compile Include="SqlQuery\Sample1_Listing6_FromAs.cs" />
