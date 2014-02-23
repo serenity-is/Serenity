@@ -35,11 +35,11 @@ namespace Serenity.Data
                     !Object.ReferenceEquals(null, valueCriteria) &&
                     valueCriteria.Value is string)
                 {
-                    var mask = ((string)valueCriteria.Value).ToUpper();
                     sb.Append("UPPER(");
                     this.left.ToString(sb, query);
-                    sb.Append(this.op == CriteriaOperator.Like ? ") LIKE " : ") NOT LIKE ");
+                    sb.Append(this.op == CriteriaOperator.Like ? ") LIKE UPPER(" : ") NOT LIKE UPPER(");
                     this.right.ToString(sb, query);
+                    sb.Append(")");
                 }
                 else
                 {
