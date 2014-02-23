@@ -46,7 +46,7 @@ namespace Serenity.Data
         /// <summary>
         ///   Belirtilen tablo alias'ý ve alan adýný aralarýna nokta koyarak içeren yeni bir 
         ///   kriter oluþturur.</summary>
-        /// <param name="joinAlias">
+        /// <param name="alias">
         ///   Tablo alias'ý. Null ya da boþ olursa önemsenmez.</param>
         /// <param name="field">
         ///   Alan adý (zorunlu).</param>
