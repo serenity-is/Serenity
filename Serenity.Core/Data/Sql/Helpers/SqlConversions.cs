@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 namespace Serenity.Data
 {
@@ -18,8 +17,7 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else
-                return value.Value ? "1" : "0";
+            return value.Value ? "1" : "0";
         }
 
         /// <summary>
@@ -35,8 +33,7 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else
-                return value.Value.ToString(Invariants.NumberFormat);
+            return value.Value.ToString(Invariants.NumberFormat);
         }
 
         /// <summary>
@@ -52,8 +49,7 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else
-                return value.Value.ToString(Invariants.NumberFormat);
+            return value.Value.ToString(Invariants.NumberFormat);
         }
 
 
@@ -70,8 +66,7 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else
-                return value.Value.ToString(Invariants.NumberFormat);
+            return value.Value.ToString(Invariants.NumberFormat);
         }
 
         /// <summary>
@@ -88,10 +83,11 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else if (value.Value.Date == value.Value)
+            
+            if (value.Value.Date == value.Value)
                 return value.Value.ToString(SqlSettings.CurrentDialect.DateFormat(), Invariants.DateTimeFormat);
-            else
-                return value.Value.ToString(SqlSettings.CurrentDialect.DateTimeFormat(), Invariants.DateTimeFormat);
+            
+            return value.Value.ToString(SqlSettings.CurrentDialect.DateTimeFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -108,8 +104,7 @@ namespace Serenity.Data
         {
             if (value.Date == value)
                 return value.ToString(SqlSettings.CurrentDialect.DateFormat(), Invariants.DateTimeFormat);
-            else
-                return value.ToString(SqlSettings.CurrentDialect.DateTimeFormat(), Invariants.DateTimeFormat);
+            return value.ToString(SqlSettings.CurrentDialect.DateTimeFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -127,8 +122,7 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else
-                return value.Value.ToString(SqlSettings.CurrentDialect.DateFormat(), Invariants.DateTimeFormat);
+            return value.Value.ToString(SqlSettings.CurrentDialect.DateFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -162,8 +156,7 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else
-                return value.Value.ToString(SqlSettings.CurrentDialect.TimeFormat(), Invariants.DateTimeFormat);
+            return value.Value.ToString(SqlSettings.CurrentDialect.TimeFormat(), Invariants.DateTimeFormat);
         }
 
         /// <summary>
@@ -195,8 +188,7 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else
-                return "'" + value.Value.ToString("D", null) + "'";
+            return "'" + value.Value.ToString("D", null) + "'";
         }
 
         /// <summary>
@@ -213,27 +205,22 @@ namespace Serenity.Data
         {
             if (value == null)
                 return SqlConsts.Null;
-            else if (SqlSettings.CurrentDialect.PrefixUnicodeStringsWithN())
+            if (SqlSettings.CurrentDialect.PrefixUnicodeStringsWithN())
             {
                 if (value.IndexOf('\'') >= 0)
                     return "N'" + value.Replace("'", "''") + "'";
-                else
-                    return "N'" + value + "'";
+                return "N'" + value + "'";
             }
-            else if (value.IndexOf('\'') >= 0)
+            if (value.IndexOf('\'') >= 0)
                 return "'" + value.Replace("'", "''") + "'";
-            else
-                return "'" + value + "'";
+            return "'" + value + "'";
         }
 
         public static string ToSql(this int? value)
         {
             if (!value.HasValue)
                 return SqlConsts.Null;
-            else
-                return value.Value.ToString(Invariants.NumberFormat);
+            return value.Value.ToString(Invariants.NumberFormat);
         }
-
-
     }
 }

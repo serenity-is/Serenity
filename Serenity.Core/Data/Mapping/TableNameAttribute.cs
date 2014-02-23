@@ -6,7 +6,7 @@ namespace Serenity.Data.Mapping
     {
         public TableNameAttribute(string name)
         {
-            if (name.IsEmptyOrNull())
+            if (name.IsNullOrEmpty())
                 throw new ArgumentNullException("name");
 
             this.Name = name;

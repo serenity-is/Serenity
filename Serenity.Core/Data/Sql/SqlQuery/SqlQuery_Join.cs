@@ -20,7 +20,7 @@
             from.Append(join.Table);
 
             // joinAlias belirtilmişse ekle
-            if (!join.Name.IsEmptyOrNull())
+            if (!join.Name.IsNullOrEmpty())
             {
                 from.Append(' ');
                 from.Append(join.Name);
@@ -31,7 +31,7 @@
                 aliases.Add(join.Name);
             }
 
-            if (!Object.ReferenceEquals(null, join.OnCriteria) &&
+            if (!ReferenceEquals(null, join.OnCriteria) &&
                 !join.OnCriteria.IsEmpty)
             {
                 from.Append(" ON (");
@@ -47,7 +47,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (toTable.IsEmptyOrNull())
+            if (toTable.IsNullOrEmpty())
                 throw new ArgumentNullException("alias.table");
 
             var join = new LeftJoin(toTable, alias.Name, onCriteria);
@@ -62,7 +62,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (alias.Table.IsEmptyOrNull())
+            if (alias.Table.IsNullOrEmpty())
                 throw new ArgumentNullException("alias.table");
 
             var join = new LeftJoin(alias.Table, alias.Name, onCriteria);
@@ -77,7 +77,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (alias.Table.IsEmptyOrNull())
+            if (alias.Table.IsNullOrEmpty())
                 throw new ArgumentNullException("alias.table");
 
             var join = new InnerJoin(alias.Table, alias.Name, onCriteria);

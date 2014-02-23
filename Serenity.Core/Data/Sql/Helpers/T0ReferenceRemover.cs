@@ -14,9 +14,9 @@ namespace Serenity.Data
 
             bool inQuote = false;
             int startIdent = -1;
-            for (var i = 0; i < expression.Length; i++)
+            for (var index = 0; index < expression.Length; index++)
             {
-                var c = expression[i];
+                var c = expression[index];
                 sb.Append(c);
 
                 if (inQuote)
@@ -24,7 +24,6 @@ namespace Serenity.Data
                     if (c == '\'')
                     {
                         inQuote = false;
-                        continue;
                     }
                 }
                 else
@@ -37,7 +36,7 @@ namespace Serenity.Data
                     else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
                     {
                         if (startIdent < 0)
-                            startIdent = i;
+                            startIdent = index;
                     }
                     else if (c >= '0' && c <= '9')
                     {
@@ -45,8 +44,8 @@ namespace Serenity.Data
                     else if (c == '.')
                     {
                         if (startIdent >= 0 && 
-                            startIdent < i &&
-                            i - startIdent == 2 &&
+                            startIdent < index &&
+                            index - startIdent == 2 &&
                             expression[startIdent + 1] == '0' &&
                             Char.ToLowerInvariant(expression[startIdent]) == 't')
                         {

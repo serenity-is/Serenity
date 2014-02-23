@@ -34,9 +34,7 @@ namespace Serenity.Data
                 else
                 {
                     alias = null;
-                    aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    aliases.Add(alias);
-                    aliases.Add(s);
+                    aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { s };
                 }
             });
 
@@ -57,7 +55,6 @@ namespace Serenity.Data
                     if (c == '\'')
                     {
                         inQuote = false;
-                        continue;
                     }
                 }
                 else

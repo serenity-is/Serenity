@@ -70,12 +70,12 @@ namespace Serenity.Web
 
                     foreach (var sourceFile in sourceFiles)
                     {
-                        if (sourceFile.IsEmptyOrNull())
+                        if (sourceFile.IsNullOrEmpty())
                             continue;
 
                         string sourceUrl = 
                             UrlHelper.ResolveUrl(sourceFile);
-                        if (sourceUrl.IsEmptyOrNull())
+                        if (sourceUrl.IsNullOrEmpty())
                             continue;
 
                         bundleKeyBySourceUrlNew[sourceUrl] = bundleKey;
@@ -119,7 +119,7 @@ namespace Serenity.Web
 
         public static string GetScriptBundle(string scriptUrl)
         {
-            if (scriptUrl.IsEmptyOrNull())
+            if (scriptUrl.IsNullOrEmpty())
                 return scriptUrl;
 
             scriptUrl = UrlHelper.ResolveUrl(scriptUrl);

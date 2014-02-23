@@ -16,7 +16,7 @@ namespace Serenity.Data
                 return cachedQuery;
 
             // formatlamada kullanılacak StringBuilder nesnesi
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             // sub queries should be enclosed in paranthesis
             if (this.parent != null)
@@ -80,13 +80,13 @@ namespace Serenity.Data
 
                     // ikinci sorgulama için atlanan kayıtların altındaki kayıtları bulmayı sağlayacak koşulu 
                     // oluşturacağımız StringBuilder
-                    StringBuilder check = new StringBuilder();
+                    var check = new StringBuilder();
 
                     // sıralanan alan adlarını sonlarındaki DESC atılmış şekilde tutacak dizi
-                    string[] order = new string[orderBy.Count];
+                    var order = new string[orderBy.Count];
 
                     // alanların ters sıralı olma durumlarını tutacak dizi
-                    bool[] desc = new bool[orderBy.Count];
+                    var desc = new bool[orderBy.Count];
 
                     // tüm sıralama listesini tara
                     for (int i = 0; i < orderBy.Count; i++)
@@ -219,7 +219,7 @@ namespace Serenity.Data
             // seçilecek alan listesini dolaş
             for (int i = 0; i < columns.Count; i++)
             {
-                Column s = columns[i];
+                var s = columns[i];
 
                 // ilk alan adından sonra araya virgül konmalı
                 if (i > 0)
@@ -260,7 +260,7 @@ namespace Serenity.Data
                     if (i > 0)
                         sb.Append(", ");
 
-                    sb.Append(orderBy[i].ToString());
+                    sb.Append(orderBy[i]);
                 }
                 sb.Append(") AS __num__");
             }
@@ -298,7 +298,7 @@ namespace Serenity.Data
                     sb.Append('(');
                     sb.Append(Sql.Keyword.Select);
                     sb.Append(Sql.Keyword.Distinct);
-                    sb.Append(selCount.ToString());
+                    sb.Append(selCount);
                 }
                 else if (groupBy != null && groupBy.Length > 0)
                 {
@@ -357,7 +357,7 @@ namespace Serenity.Data
 
                 // Varsa, SqlSelect'te hazırlanmış filtreleri yaz
                 if (where != null)
-                    sb.Append(where.ToString());
+                    sb.Append(@where);
 
                 // Ekstra filtre belirtilmişse...
                 if (extraWhere != null)
@@ -374,14 +374,14 @@ namespace Serenity.Data
             if (groupBy != null)
             {
                 sb.Append(Sql.Keyword.GroupBy);
-                sb.Append(groupBy.ToString());
+                sb.Append(groupBy);
             }
 
             // Grup koşulu varsa ekle
             if (having != null)
             {
                 sb.Append(Sql.Keyword.Having);
-                sb.Append(having.ToString());
+                sb.Append(having);
             }
 
             // Sıralanmış alanlar varsa
@@ -396,7 +396,7 @@ namespace Serenity.Data
                     if (i > 0)
                         sb.Append(", ");
 
-                    sb.Append(orderBy[i].ToString());
+                    sb.Append(orderBy[i]);
                 }
             }
         }

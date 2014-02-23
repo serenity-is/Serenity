@@ -313,7 +313,7 @@ namespace Serenity.Data
         {
             foreach (var field in this)
             {
-                if (!field.ForeignTable.IsEmptyOrNull() &&
+                if (!field.ForeignTable.IsNullOrEmpty() &&
                     field.TextualField == null)
                 {
                     foreach (var join in this.joins.Values)

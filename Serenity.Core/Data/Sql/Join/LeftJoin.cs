@@ -14,12 +14,6 @@ namespace Serenity.Data
         {
         }
 
-        // remove this overload
-        public LeftJoin(RowFieldsBase fields, string toTable, string alias, BaseCriteria onCriteria)
-            : base(fields.Joins, toTable, alias, onCriteria)
-        {
-        }
-
         public override string GetKeyword()
         {
             return "LEFT JOIN";

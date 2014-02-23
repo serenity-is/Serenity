@@ -59,7 +59,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery From(string table)
         {
-            if (table.IsEmptyOrNull())
+            if (table.IsNullOrEmpty())
                 throw new ArgumentNullException("table");
 
             cachedQuery = null;
@@ -112,7 +112,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (alias.Table.IsEmptyOrNull())
+            if (alias.Table.IsNullOrEmpty())
                 throw new ArgumentOutOfRangeException("alias.table");
 
             return From(alias.Table, alias);
@@ -148,19 +148,12 @@
                 throw new ArgumentNullException("columnName");
 
             Column fieldInfo = columns.Find(
-                delegate(Column s)
-                {
-                    return
-                        (s.ColumnName != null && s.ColumnName == columnName) ||
-                        (String.IsNullOrEmpty(s.ColumnName) && s.Expression == columnName);
-                });
+                column => (column.ColumnName != null && column.ColumnName == columnName) ||
+                     (column.ColumnName.IsNullOrEmpty() && column.Expression == columnName));
 
             if (fieldInfo == null)
                 return null;
-            else
-            {
-                return fieldInfo.Expression;
-            }
+            return fieldInfo.Expression;
         }
 
         /// <summary>
@@ -184,7 +177,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery GroupBy(string expression)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
             cachedQuery = null;
@@ -210,7 +203,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             return GroupBy(alias + fieldName);
@@ -223,7 +216,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Having(string expression)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
             cachedQuery = null;
@@ -244,7 +237,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery OrderBy(string expression, bool desc = false)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             if (desc)
@@ -274,7 +267,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             return OrderBy(alias + fieldName, desc);
@@ -291,7 +284,7 @@
         /// existing order.</remarks>
         public SqlQuery OrderByFirst(string expression, bool desc = false)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             cachedQuery = null;
@@ -338,7 +331,7 @@
         /// <remarks>No column name is used for the field or expression.</remarks>
         public SqlQuery Select(string expression)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
             cachedQuery = null;
@@ -358,7 +351,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
             cachedQuery = null;
@@ -374,10 +367,10 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Select(string expression, string columnName)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            if (columnName == null || columnName.Length == 0)
+            if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
             cachedQuery = null;
@@ -398,10 +391,10 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
-            if (columnName == null || columnName.Length == 0)
+            if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
             cachedQuery = null;
@@ -420,7 +413,7 @@
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            if (columnName.IsEmptyOrNull())
+            if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
             this.Select(expression.ToString(), columnName);
@@ -490,8 +483,10 @@
         /// A new query that shares parameters.</returns>
         public SqlQuery SubQuery()
         {
-            var subQuery = new SqlQuery();
-            subQuery.parent = this;
+            var subQuery = new SqlQuery
+            {
+                parent = this
+            };
             return subQuery;
         }
 
@@ -536,7 +531,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Where(string expression)
         {
-            if (expression.IsEmptyOrNull())
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException(expression);
 
             cachedQuery = null;

@@ -140,7 +140,7 @@ namespace Serenity.Data
         ///   Required flag</param>
         private void Initialize(string name, LocalText title, string handler, bool isRequired)
         {
-            if (name.IsEmptyOrNull())
+            if (name.IsNullOrEmpty())
                 throw new ArgumentNullException("name");
 
             _name = name;

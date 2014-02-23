@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     public interface IField
     {

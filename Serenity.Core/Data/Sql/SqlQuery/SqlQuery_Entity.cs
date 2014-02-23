@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
 
     public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressionByName
     {
@@ -112,7 +111,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery SelectAs(string expression, IField intoField)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             if (intoField == null)
@@ -241,7 +240,7 @@
 
         partial void EnsureJoinsInExpression(string expression)
         {
-            if (expression.IsEmptyOrNull())
+            if (expression.IsNullOrEmpty())
                 return;
 
             var intoRow = this.FirstIntoRow as IEntityWithJoins;

@@ -34,7 +34,7 @@ namespace Serenity.Services
                 {
                     var parentIdField = (Field)parentIdRow.ParentIdField;
                     //EntityType parentEntityType;
-                    if (!parentIdField.ForeignTable.IsEmptyOrNull())// &&
+                    if (!parentIdField.ForeignTable.IsNullOrEmpty())// &&
                         //SiteSchema.Instance.TableToType.TryGetValue(parentIdField.ForeignTable, out parentEntityType))
                     {
                         auditRequest.ParentTypeId = parentIdField.ForeignTable;
@@ -131,7 +131,7 @@ namespace Serenity.Services
 
             if (attr != null)
             {
-                if (attr.Permission.IsEmptyOrNull())
+                if (attr.Permission.IsNullOrEmpty())
                     SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
                 else
                     SecurityHelper.EnsurePermission(attr.Permission, RightErrorHandling.ThrowException);

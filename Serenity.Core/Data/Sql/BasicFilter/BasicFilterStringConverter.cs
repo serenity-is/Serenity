@@ -234,7 +234,7 @@ namespace Serenity.Data
 
             if ((op == FilterOp.BW || op == FilterOp.NotBW))
             {
-                if (value1Text.IsEmptyOrNull() || value2Text.IsEmptyOrNull())
+                if (value1Text.IsNullOrEmpty() || value2Text.IsNullOrEmpty())
                     throw new ArgumentOutOfRangeException("InvalidFilterLine", filter.ToJsonString());
 
                 if (isInteger)

@@ -28,7 +28,7 @@ namespace Serenity.Web
                     if (attr != null)
                     {
                         string key = attr.Key;
-                        if (key.IsEmptyOrNull())
+                        if (key.IsNullOrEmpty())
                         {
                             key = type.Name;
                             const string p = "Form";

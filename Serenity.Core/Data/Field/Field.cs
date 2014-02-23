@@ -283,7 +283,7 @@ namespace Serenity.Data
 
         public LeftJoin ForeignJoin(Int32? foreignIndex = null)
         {
-            if (ForeignTable.IsEmptyOrNull())
+            if (ForeignTable.IsNullOrEmpty())
                 throw new ArgumentNullException("ForeignTable");
             
             string foreignJoin;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     public static partial class Sql
     {

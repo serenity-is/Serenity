@@ -130,7 +130,7 @@ namespace Serenity.Testing
 
             string connectionString = String.Format(DbSettings.ConnectionStringFormat, dbAlias);
 
-            if (!script.IsEmptyOrNull())
+            if (!script.IsNullOrEmpty())
                 try
                 {
                     using (var connection = SqlConnections.New(connectionString, DbSettings.ProviderName))

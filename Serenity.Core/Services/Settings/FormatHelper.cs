@@ -54,7 +54,7 @@ namespace Serenity.Data
                     format.Append('#', decimals);
             }
 
-            if (!symbol.IsEmptyOrNull())
+            if (!symbol.IsNullOrEmpty())
             {
                 format.Append(' ');
                 foreach (var c in symbol)

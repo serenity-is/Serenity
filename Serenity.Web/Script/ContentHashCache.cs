@@ -39,7 +39,7 @@ namespace Serenity.Web
 
         public static string ResolveWithHash(string contentUrl)
         {
-            if (contentUrl.IsEmptyOrNull())
+            if (contentUrl.IsNullOrEmpty())
                 throw new ArgumentNullException("contentUrl");
 
             contentUrl  = VirtualPathUtility.ToAbsolute(contentUrl);

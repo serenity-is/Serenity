@@ -43,7 +43,7 @@ namespace Serenity.Web
         ///   URL in which returnUrl query string is appended.</returns>
         public static string AddReturnUrl(string url, string returnUrl)
         {
-            if (!returnUrl.IsEmptyOrNull())
+            if (!returnUrl.IsNullOrEmpty())
             {
                 return AddQuery(url, "returnUrl", returnUrl);
             }

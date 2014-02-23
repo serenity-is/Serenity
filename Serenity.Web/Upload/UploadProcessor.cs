@@ -109,9 +109,9 @@ namespace Serenity.Web
             {
                 if (!success)
                 {
-                    if (!ThumbFile.IsEmptyOrNull())
+                    if (!ThumbFile.IsNullOrEmpty())
                         TemporaryFileHelper.TryDelete(ThumbFile);
-                    if (!FilePath.IsEmptyOrNull())
+                    if (!FilePath.IsNullOrEmpty())
                         TemporaryFileHelper.TryDelete(FilePath);
                 }
 

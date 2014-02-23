@@ -12,7 +12,7 @@
         ///   Sorgunun yeni bir kopyası.</returns>
         public SqlQuery Clone()
         {
-            SqlQuery clone = new SqlQuery();
+            var clone = new SqlQuery();
 
             clone.dialect = dialect;
             clone.skip = skip;

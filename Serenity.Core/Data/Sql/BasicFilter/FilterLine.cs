@@ -104,7 +104,7 @@ namespace Serenity.Data
         {
             get
             {
-                if (_field.IsEmptyOrNull())
+                if (_field.IsNullOrEmpty())
                     return false;
                 if (_op < FilterOp.True || _op > FilterOp.IsNotNull)
                     return false;
@@ -494,7 +494,7 @@ namespace Serenity.Data
 
             foreach (var fieldName in groupBy)
             {
-                if (fieldName.IsEmptyOrNull())
+                if (fieldName.IsNullOrEmpty())
                     continue;
 
                 if (filterFields != null && filterFields.ByNameOrTextual(fieldName) == null)

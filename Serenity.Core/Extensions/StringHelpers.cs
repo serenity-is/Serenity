@@ -11,7 +11,7 @@ namespace Serenity
 
         public static string ParseNbspSlashedKod(string kodIsim)
         {
-            if (kodIsim.IsEmptyOrNull())
+            if (kodIsim.IsNullOrEmpty())
                 return String.Empty;
 
             int index = kodIsim.IndexOf(NbspSlash);
@@ -23,9 +23,9 @@ namespace Serenity
 
         public static string PutNbspSlash(string kod, string isim, bool onlyIfNonEmpty = false)
         {
-            if (!onlyIfNonEmpty || ((!kod.IsEmptyOrNull()) && (!isim.IsEmptyOrNull())))
+            if (!onlyIfNonEmpty || ((!kod.IsNullOrEmpty()) && (!isim.IsNullOrEmpty())))
                 return kod + NbspSlash + isim;
-            else if (kod.IsEmptyOrNull())
+            else if (kod.IsNullOrEmpty())
                 return isim ?? "";
             else
                 return kod ?? "";
