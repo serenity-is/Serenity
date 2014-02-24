@@ -59,7 +59,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery From(string table)
         {
-            if (table.IsEmptyOrNull())
+            if (table.IsNullOrEmpty())
                 throw new ArgumentNullException("table");
 
             cachedQuery = null;
@@ -112,7 +112,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (alias.Table.IsEmptyOrNull())
+            if (alias.Table.IsNullOrEmpty())
                 throw new ArgumentOutOfRangeException("alias.table");
 
             return From(alias.Table, alias);
@@ -144,23 +144,16 @@
         /// <remarks>This function uses a linear search in column list, so use with caution.</remarks>
         public string GetExpression(string columnName)
         {
-            if (columnName == null || columnName.Length == 0)
-                return null;
+            if (columnName == null)
+                throw new ArgumentNullException("columnName");
 
             Column fieldInfo = columns.Find(
-                delegate(Column s)
-                {
-                    return
-                        (s.ColumnName != null && s.ColumnName == columnName) ||
-                        (String.IsNullOrEmpty(s.ColumnName) && s.Expression == columnName);
-                });
+                column => (column.ColumnName != null && column.ColumnName == columnName) ||
+                     (column.ColumnName.IsNullOrEmpty() && column.Expression == columnName));
 
             if (fieldInfo == null)
                 return null;
-            else
-            {
-                return fieldInfo.Expression ?? fieldInfo.ColumnName;
-            }
+            return fieldInfo.Expression;
         }
 
         /// <summary>
@@ -174,7 +167,7 @@
                 throw new ArgumentOutOfRangeException("selectIndex");
 
             Column si = columns[selectIndex];
-            return si.Expression ?? si.ColumnName;
+            return si.Expression;
         }
 
         /// <summary>
@@ -184,8 +177,8 @@
         /// <returns>The query itself.</returns>
         public SqlQuery GroupBy(string expression)
         {
-            if (expression == null || expression.Length == 0)
-                throw new ArgumentNullException("field");
+            if (expression.IsNullOrEmpty())
+                throw new ArgumentNullException("expression");
 
             cachedQuery = null;
 
@@ -210,7 +203,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             return GroupBy(alias + fieldName);
@@ -223,12 +216,12 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Having(string expression)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
             cachedQuery = null;
 
-            if (having == null || having.Length == 0)
+            if (having == null)
                 having = new StringBuilder(expression);
             else
                 having.Append(Sql.Keyword.And).Append(expression);
@@ -244,7 +237,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery OrderBy(string expression, bool desc = false)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             if (desc)
@@ -274,7 +267,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             return OrderBy(alias + fieldName, desc);
@@ -291,7 +284,7 @@
         /// existing order.</remarks>
         public SqlQuery OrderByFirst(string expression, bool desc = false)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             cachedQuery = null;
@@ -338,7 +331,7 @@
         /// <remarks>No column name is used for the field or expression.</remarks>
         public SqlQuery Select(string expression)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
             cachedQuery = null;
@@ -358,7 +351,7 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
             cachedQuery = null;
@@ -374,10 +367,10 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Select(string expression, string columnName)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            if (columnName == null || columnName.Length == 0)
+            if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
             cachedQuery = null;
@@ -398,10 +391,10 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
-            if (columnName == null || columnName.Length == 0)
+            if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
             cachedQuery = null;
@@ -413,16 +406,32 @@
         /// Adds a subquery to the SELECT statement.
         /// </summary>
         /// <param name="expression">A subquery.</param>
+        /// <param name="columnName">A column name</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery Select(ISqlQuery expression, string columnName = null)
+        public SqlQuery Select(ISqlQuery expression, string columnName)
         {
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            if (columnName == null)
-                this.Select(expression.ToString());
-            else
-                this.Select(expression.ToString(), columnName);
+            if (columnName.IsNullOrEmpty())
+                throw new ArgumentNullException("columnName");
+
+            this.Select(expression.ToString(), columnName);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a subquery to the SELECT statement.
+        /// </summary>
+        /// <param name="expression">A subquery.</param>
+        /// <returns>The query itself.</returns>
+        public SqlQuery Select(ISqlQuery expression)
+        {
+            if (expression == null)
+                throw new ArgumentNullException("expression");
+
+            this.Select(expression.ToString());
 
             return this;
         }
@@ -474,8 +483,10 @@
         /// A new query that shares parameters.</returns>
         public SqlQuery SubQuery()
         {
-            var subQuery = new SqlQuery();
-            subQuery.parent = this;
+            var subQuery = new SqlQuery
+            {
+                parent = this
+            };
             return subQuery;
         }
 
@@ -520,12 +531,12 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Where(string expression)
         {
-            if (expression.IsEmptyOrNull())
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException(expression);
 
             cachedQuery = null;
 
-            if (where == null || where.Length == 0)
+            if (where == null)
                 where = new StringBuilder(expression);
             else
                 where.Append(Sql.Keyword.And).Append(expression);
@@ -609,7 +620,7 @@
             /// <summary>Column name</summary>
             public readonly string ColumnName;
             /// <summary>Used by entity system when more than one entity is used as a target</summary>
-            public readonly int IntoRow;
+            public readonly int IntoRowIndex;
             /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
             public readonly IField IntoField;
 
@@ -617,7 +628,7 @@
             {
                 this.Expression = expression;
                 this.ColumnName = columnName;
-                this.IntoRow = intoRow;
+                this.IntoRowIndex = intoRow;
                 this.IntoField = intoField;
             }
         }

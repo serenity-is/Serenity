@@ -15,7 +15,7 @@ namespace Serenity.Data
         {
             get
             {
-                if (Field.IsEmptyOrNull())
+                if (Field.IsNullOrEmpty())
                     return false;
 
                 if (Operator < FilterOp.True || Operator > FilterOp.NotIN)

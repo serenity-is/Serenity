@@ -92,7 +92,7 @@ namespace Serenity.CodeGenerator
             File.Copy(file, generated, true);
             File.Copy(backup, file, true);
 
-            if (kdiff3Path.IsEmptyOrNull() ||
+            if (kdiff3Path.IsNullOrEmpty() ||
                 !File.Exists(kdiff3Path))
             {
                 throw new InvalidOperationException(String.Format("KDiff3, verilen '{0}' konumunda bulunamadı!",

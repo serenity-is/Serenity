@@ -43,9 +43,9 @@ namespace Serenity.Testing
                 SqlHelper.ExecuteNonQuery(connection, String.Format(
                     "if db_id('{0}') is not null\n" +
                     "BEGIN\n" +
-                    "ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;" +
-                    "ALTER DATABASE {0} MODIFY NAME = '{1}';" +
-                    "ALTER DATABASE {0} SET MULTI_USER;" +
+                    "ALTER DATABASE [{0}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;" +
+                    "ALTER DATABASE [{0}] MODIFY NAME = {1};" +
+                    "ALTER DATABASE [{0}] SET MULTI_USER;" +
                     "END\n", oldAlias, newAlias));
             }
         }
@@ -55,12 +55,23 @@ namespace Serenity.Testing
             using (var connection = SqlConnections.New(DbSettings.LocalDbConnectionString, DbSettings.ProviderName))
             {
                 SqlConnection.ClearAllPools();
-                SqlHelper.ExecuteNonQuery(connection, String.Format(
-                    "if db_id('{0}') is not null\n" +
-                    "BEGIN\n" +
-                    "ALTER DATABASE {0} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;" +
-                    "EXEC sp_detach_db '{0}', 'true'\n" +
-                    "END\n", dbAlias));
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(connection, String.Format(
+                        "if db_id('{0}') is not null\n" +
+                        "BEGIN\n" +
+                        "ALTER DATABASE [{0}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;" +
+                        "EXEC sp_detach_db '{0}', 'true'\n" +
+                        "END\n", dbAlias));
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.ErrorCode == -2146232060) // physical database file doesn't exist (manually deleted?)
+                        SqlHelper.ExecuteNonQuery(connection, String.Format(
+                            "DROP DATABASE [{0}]", dbAlias));
+                    else
+                        throw;
+                }
             }
         }
 
@@ -70,7 +81,7 @@ namespace Serenity.Testing
             {
                 var dbFile = Path.ChangeExtension(mdfFilePath, null);
                 var sql = String.Format(
-                    "CREATE DATABASE {0} ON (FILENAME = '{1}.mdf'), (FILENAME = '{1}.ldf') FOR ATTACH;",
+                    "CREATE DATABASE [{0}] ON (FILENAME = '{1}.mdf'), (FILENAME = '{1}.ldf') FOR ATTACH;",
                     dbAlias, dbFile);
 
                 SqlHelper.ExecuteNonQuery(connection, sql);
@@ -119,7 +130,7 @@ namespace Serenity.Testing
 
             string connectionString = String.Format(DbSettings.ConnectionStringFormat, dbAlias);
 
-            if (!script.IsEmptyOrNull())
+            if (!script.IsNullOrEmpty())
                 try
                 {
                     using (var connection = SqlConnections.New(connectionString, DbSettings.ProviderName))

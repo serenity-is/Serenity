@@ -20,15 +20,15 @@ namespace Serenity.Data
             if (_indexParam == null)
             {
                 var indexParam = new string[1000];
-                for (int i = 0; i < indexParam.Length; i++)
-                    indexParam[i] = "@p" + i.ToString();
+                for (int index = 0; index < indexParam.Length; index++)
+                    indexParam[index] = "@p" + index;
                 _indexParam = indexParam;
             }
 
             if (param >= 0 && param < _indexParam.Length)
                 return _indexParam[param];
             else
-                return "@p" + param.ToString();
+                return "@p" + param;
         }
 
         public static string TableAlias(this int joinIndex)

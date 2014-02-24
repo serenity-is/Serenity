@@ -24,17 +24,17 @@ namespace Serenity.Data
             string searchTable, string searchFields, string searchQuery,
             string searchTableAlias, string searchTableKey, string containsAlias)
         {
-            if (String.IsNullOrEmpty(searchTable))
+            if (searchTable.IsNullOrEmpty())
                 throw new ArgumentNullException("searchTable");
-            if (String.IsNullOrEmpty(searchFields))
+            if (searchFields.IsNullOrEmpty())
                 throw new ArgumentNullException("searchFields");
-            if (String.IsNullOrEmpty(searchQuery))
+            if (searchQuery.IsNullOrEmpty())
                 throw new ArgumentNullException("searchQuery");
-            if (String.IsNullOrEmpty(searchTableAlias))
+            if (searchTableAlias.IsNullOrEmpty())
                 throw new ArgumentNullException("searchTableAlias");
-            if (String.IsNullOrEmpty(searchTableKey))
+            if (searchTableKey.IsNullOrEmpty())
                 throw new ArgumentNullException("searchTableKey");
-            if (String.IsNullOrEmpty(containsAlias))
+            if (containsAlias.IsNullOrEmpty())
                 throw new ArgumentNullException("containsAlias");
 
             cachedQuery = null;

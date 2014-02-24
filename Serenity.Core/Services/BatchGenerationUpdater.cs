@@ -30,7 +30,7 @@ namespace Serenity.Services
 
         public static GenerationUpdater GetUpdater(string generationKey)
         {
-            if (generationKey.IsEmptyOrNull())
+            if (generationKey.IsNullOrEmpty())
                 throw new ArgumentNullException("generationKey");
 
             var updater = byGenerationKey[generationKey] as GenerationUpdater;

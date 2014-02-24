@@ -1,34 +1,10 @@
-using NQuery;
-using NQuery.Compilation;
 using System;
 using System.Collections.Generic;
 
 namespace Serenity.Data
 {
-    public class JoinAliasLocator : StandardVisitor
+    public class JoinAliasLocator
     {
-        private HashSet<string> aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        public override ExpressionNode VisitPropertyAccessExpression(PropertyAccessExpression expression)
-        {
-            var name = expression.Target as NameExpression;
-            if (name != null)
-            {
-                var identifier = name.Name as Identifier;
-                if (identifier != null)
-                {
-                    aliases.Add(identifier.Text);
-                }
-            }
-
-            return base.VisitPropertyAccessExpression(expression);
-        }
-
-        public HashSet<string> Aliases
-        {
-            get { return aliases; }
-        }
-
         public static HashSet<string> Locate(string expression)
         {
             if (expression == null)
@@ -46,10 +22,6 @@ namespace Serenity.Data
 
         public static HashSet<string> LocateOptimized(string expression, out string singleAlias)
         {
-            //var parser = new Parser(ExceptionErrorProvider.Instance);
-            //var node = parser.ParseExpression(expression);
-            //var locator = new JoinAliasLocator();
-            //locator.Visit(node);
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
@@ -61,10 +33,8 @@ namespace Serenity.Data
                     alias = s;
                 else
                 {
+                    aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { alias, s };
                     alias = null;
-                    aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    aliases.Add(alias);
-                    aliases.Add(s);
                 }
             });
 
@@ -85,7 +55,6 @@ namespace Serenity.Data
                     if (c == '\'')
                     {
                         inQuote = false;
-                        continue;
                     }
                 }
                 else

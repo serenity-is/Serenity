@@ -19,7 +19,7 @@ namespace Serenity.Data
         ///   Query itself.</returns>
         public static T Where<T>(this T self, BaseCriteria filter) where T: IFilterableQuery
         {
-            if (!Object.ReferenceEquals(null, filter) && !filter.IsEmpty)
+            if (!ReferenceEquals(null, filter) && !filter.IsEmpty)
             {
                 var statement = filter.ToString(self);
                 self.Where(statement);

@@ -242,7 +242,7 @@ namespace Serenity
             get
             {
                 string username = HttpContextUsername;
-                if (username.IsEmptyOrNull())
+                if (username.IsNullOrEmpty())
                     return null;
 
                 var user = IoC.Resolve<IUserRetrieveService>().ByUsername(username);

@@ -15,7 +15,7 @@ namespace Serenity.Reporting
         private static string GetReportKey(Type type)
         {
             var attr = type.GetCustomAttribute<RegisterReportAttribute>(false);
-            if (attr == null || attr.ReportKey.IsEmptyOrNull())
+            if (attr == null || attr.ReportKey.IsNullOrEmpty())
             {
                 var name = type.Name;
                 const string report = "Report";
@@ -110,12 +110,12 @@ namespace Serenity.Reporting
             var permissionService = IoC.Resolve<IPermissionService>();
 
             foreach (var k in reportsByCategory)
-                if (categoryKey.IsEmptyOrNull() ||
+                if (categoryKey.IsNullOrEmpty() ||
                     String.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
                     (categoryKey ?? "").StartsWith(k.Key + "/", StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (var report in k.Value)
-                        if (report.Permission.IsEmptyOrNull() ||
+                        if (report.Permission.IsNullOrEmpty() ||
                             permissionService.HasPermission(report.Permission))
                         {
                             list.Add(report);

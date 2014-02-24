@@ -68,7 +68,11 @@ namespace Serenity
                 DateTime expires;
                 if (this.expiration.TryGetValue(key, out expires) &&
                     expires >= DateTime.Now)
+                {
+                    this.dictionary.Remove(key);
+                    this.expiration.Remove(key);
                     return default(TValue);
+                }
 
                 return (TValue)value;
             }

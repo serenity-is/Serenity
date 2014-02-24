@@ -19,7 +19,7 @@ namespace Serenity.Data
             this.joins = new Dictionary<string, Join>();
             this.onCriteria = onCriteria;
 
-            if (!Object.ReferenceEquals(this.onCriteria, null))
+            if (!ReferenceEquals(this.onCriteria, null))
             {
                 var aliases = JoinAliasLocator.Locate(this.onCriteria.ToStringIgnoreParams());
                 if (aliases != null && aliases.Count > 0)
@@ -32,7 +32,10 @@ namespace Serenity.Data
                 if (referencedAliases == null)
                     referencedAliases = toTableAliases;
                 else
-                    referencedAliases.AddRange(toTableAliases);
+                {
+                    foreach (var x in toTableAliases)
+                        referencedAliases.Add(x);
+                }
             }
 
             if (joins != null)

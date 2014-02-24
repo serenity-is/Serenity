@@ -24,7 +24,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("row");
 
             HashSet<Field> excludeFields =
-                (exclude != null && exclude.Length > 0) ? FieldExtensions.ToFieldDictionary(exclude) : null;
+                (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
 
             var fields = row.GetFields();
 
@@ -59,7 +59,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("row");
 
             HashSet<Field> excludeFields =
-                (exclude != null && exclude.Length > 0) ? FieldExtensions.ToFieldDictionary(exclude) : null;
+                (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
 
             var fields = row.GetFields();
 
@@ -91,7 +91,7 @@ namespace Serenity.Data
             if (query == null)
                 throw new ArgumentNullException("query");
 
-            foreach (var field in ((Row)query.IntoRow).GetFields())
+            foreach (var field in ((Row)query.FirstIntoRow).GetFields())
             {
                 if (!FieldExtensions.IsTableField(field) &&
                     (field.Flags & FieldFlags.ClientSide) != FieldFlags.ClientSide)
@@ -114,7 +114,7 @@ namespace Serenity.Data
         {
             if (query == null)
                 throw new ArgumentNullException("query");
-            return SelectTableFields(query, (Row)query.IntoRow, exclude);
+            return SelectTableFields(query, (Row)query.FirstIntoRow, exclude);
         }
         
         public static SqlQuery EnsureAllForeignJoins(this SqlQuery query, Row row)

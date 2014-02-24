@@ -201,7 +201,7 @@ namespace Serenity.Services
                 return;
                     
             var parentIdField = (Field)parentIdRow.ParentIdField;
-            if (parentIdField.ForeignTable.IsEmptyOrNull())
+            if (parentIdField.ForeignTable.IsNullOrEmpty())
                 return;
 
             var foreignRow = RowRegistry.GetSchemaRow(RowRegistry.GetSchemaName(Row), parentIdField.ForeignTable);
@@ -289,7 +289,7 @@ namespace Serenity.Services
 
             if (attr != null)
             {
-                if (attr.Permission.IsEmptyOrNull())
+                if (attr.Permission.IsNullOrEmpty())
                     SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
                 else
                     SecurityHelper.EnsurePermission(attr.Permission, RightErrorHandling.ThrowException);

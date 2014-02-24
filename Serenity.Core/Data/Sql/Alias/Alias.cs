@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Serenity.Data
 {
@@ -31,7 +29,7 @@ namespace Serenity.Data
 
         public Alias(string alias)
         {
-            if (alias == null || alias.Length == 0)
+            if (alias.IsNullOrEmpty())
                 throw new ArgumentNullException("alias");
 
             this.alias = alias;
@@ -78,7 +76,7 @@ namespace Serenity.Data
 
         public Alias WithNoLock()
         {
-            if (this.table.IsEmptyOrNull())
+            if (this.table.IsNullOrEmpty())
                 return new Alias(this.alias + " WITH(NOLOCK)");
 
             return new Alias(this.table, this.alias + " WITH(NOLOCK)");

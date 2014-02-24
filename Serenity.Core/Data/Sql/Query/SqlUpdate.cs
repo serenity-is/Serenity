@@ -205,7 +205,7 @@
             }
 
             if (index >= 0)
-                return T0ReferenceRemover.RemoveT0(expression);
+                return T0ReferenceRemover.RemoveT0Aliases(expression);
 
             return expression;
         }

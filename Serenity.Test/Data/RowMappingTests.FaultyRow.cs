@@ -1,8 +1,4 @@
-﻿using System;
-using Serenity.Data;
-using Newtonsoft.Json;
-using Xunit;
-
+﻿
 namespace Serenity.Test.Data
 {
     public partial class RowMappingTests
@@ -26,17 +22,11 @@ namespace Serenity.Test.Data
                 }
             }
 
-            public static RowFields Fields = new RowFields();
-            public static FaultyRow Instance = new FaultyRow();
+            public static RowFields Fields = new RowFields().Init();
 
             public FaultyRow()
                 : base(Fields)
             {
-            }
-
-            public override Row CreateNew()
-            {
-                return new FaultyRow();
             }
         }
     }

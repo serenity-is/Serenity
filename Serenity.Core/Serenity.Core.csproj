@@ -32,31 +32,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LZ4, Version=1.0.3.93, Culture=neutral, PublicKeyToken=fd2bda0a70c5a705, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\packages\lz4net.1.0.3.93\lib\net40-client\LZ4.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(SolutionDir)packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NQuery">
-      <HintPath>..\References\NQuery\NQuery.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Caching\CacheExpiration.cs" />
     <Compile Include="Caching\Distributed\CacheSerialization.cs" />
-    <Compile Include="Caching\Distributed\LZ4Compression.cs" />
     <Compile Include="Caching\Distributed\DistributedCache.cs" />
+    <Compile Include="Caching\Distributed\CacheCompression.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Caching\Distributed\TwoLevelCache.cs" />
     <Compile Include="Caching\Distributed\DistributedCacheEmulator.cs" />
     <Compile Include="Caching\IByIdCache.cs" />
@@ -129,7 +121,6 @@
     <Compile Include="Data\FieldTypes\StringField.cs" />
     <Compile Include="Core\Helpers\DeltaLister.cs" />
     <Compile Include="Data\Field\Row_ComponentModel.cs" />
-    <Compile Include="Data\Field\Row_InitFields.cs" />
     <Compile Include="Data\Mapping\ColumnAttribute.cs" />
     <Compile Include="Data\Interface\IFieldWithJoinInfo.cs" />
     <Compile Include="Data\Interface\IEntityWithJoins.cs" />
@@ -206,7 +197,6 @@
     <Compile Include="Data\Sql\Alias\Alias.cs" />
     <Compile Include="Data\Sql\Alias\AliasWithFields.cs" />
     <Compile Include="Data\Sql\Helpers\SqlCommandDumper.cs" />
-    <Compile Include="Data\Sql\Helpers\ForXmlHelper.cs" />
     <Compile Include="Data\Sql\Criteria\BaseCriteria.cs" />
     <Compile Include="Data\Sql\Criteria\BinaryCriteria.cs" />
     <Compile Include="Data\Sql\Criteria\ParamCriteria.cs" />

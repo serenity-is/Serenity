@@ -1,34 +1,65 @@
-using System.Collections.Generic;
-using NQuery;
-using NQuery.Compilation;
 using System;
+using System.Text;
 
 namespace Serenity.Data
 {
-    public class T0ReferenceRemover : StandardVisitor
+    public class T0ReferenceRemover
     {
-        public override ExpressionNode VisitPropertyAccessExpression(PropertyAccessExpression expression)
+        public static string RemoveT0Aliases(string expression)
         {
-            var name = expression.Target as NameExpression;
-            if (name != null)
+            if (expression == null)
+                throw new ArgumentNullException("expression");
+
+            var sb = new StringBuilder();
+
+            bool inQuote = false;
+            int startIdent = -1;
+            for (var index = 0; index < expression.Length; index++)
             {
-                var identifier = name.Name as Identifier;
-                if (identifier != null)
+                var c = expression[index];
+                sb.Append(c);
+
+                if (inQuote)
                 {
-                    if (String.Compare(identifier.Text, "T0", StringComparison.OrdinalIgnoreCase) == 0)
-                        return new NameExpression { Name = expression.Name };
+                    if (c == '\'')
+                    {
+                        inQuote = false;
+                    }
+                }
+                else
+                {
+                    if (c == '\'')
+                    {
+                        inQuote = true;
+                        startIdent = -1;
+                    }
+                    else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+                    {
+                        if (startIdent < 0)
+                            startIdent = index;
+                    }
+                    else if (c >= '0' && c <= '9')
+                    {
+                    }
+                    else if (c == '.')
+                    {
+                        if (startIdent >= 0 && 
+                            startIdent < index &&
+                            index - startIdent == 2 &&
+                            expression[startIdent + 1] == '0' &&
+                            Char.ToLowerInvariant(expression[startIdent]) == 't')
+                        {
+                            sb.Length -= 3;
+                        }
+
+                        startIdent = -1;
+                    }
+                    else
+                        startIdent = -1;
                 }
             }
 
-            return base.VisitPropertyAccessExpression(expression);
-        }
-
-        public static string RemoveT0(string expression)
-        {
-            var parser = new Parser(ExceptionErrorProvider.Instance);
-            var node = parser.ParseExpression(expression);
-            var locator = new T0ReferenceRemover();
-            return locator.Visit(node).ToString();
+            return sb.ToString();
         }
     }
 }

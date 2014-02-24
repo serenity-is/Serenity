@@ -34,14 +34,14 @@ namespace Serenity.Services
 
                 string token = null;
 
-                if (!FormKey.IsEmptyOrNull())
+                if (!FormKey.IsNullOrEmpty())
                     token = httpContext.Request[FormKey].TrimToNull();
 
                 if (token == null)
                 {
                     string method = request.HttpMethod ?? "";
 
-                    if (!ActionArgument.IsEmptyOrNull() &&
+                    if (!ActionArgument.IsNullOrEmpty() &&
                         (method.Equals("POST", StringComparison.InvariantCultureIgnoreCase) ||
                          method.Equals("PUT", StringComparison.InvariantCultureIgnoreCase)) &&
                          (request.ContentType ?? string.Empty).Contains("application/json"))

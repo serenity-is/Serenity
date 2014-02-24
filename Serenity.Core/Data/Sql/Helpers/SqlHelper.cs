@@ -946,14 +946,14 @@
            int index = 0;
            foreach (var info in query.GetColumns())
            {
-               if (info.IntoField as Field != null && info.IntoRow != -1)
+               if (info.IntoField as Field != null && info.IntoRowIndex != -1)
                {
-                   var row = into[info.IntoRow];
+                   var row = into[info.IntoRowIndex];
                    ((Field)info.IntoField).GetFromReader(reader, index, (Row)row);
                }
-               else if (info.IntoRow != -1)
+               else if (info.IntoRowIndex != -1)
                {
-                   var row = (Row)(into[info.IntoRow]);
+                   var row = (Row)(into[info.IntoRowIndex]);
                    var name = reader.GetName(index);
                    var field = row.FindField(name) ?? row.FindFieldByPropertyName(name);
                    if (field != null)

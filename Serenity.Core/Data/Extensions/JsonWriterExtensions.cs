@@ -20,7 +20,7 @@ namespace Serenity.Data
         ///   Field value.</param>
         public static void WriteValue(this JsonWriter jw, string name, int? value)
         {
-            if (name.IsEmptyOrNull())
+            if (name.IsNullOrEmpty())
                 throw new ArgumentNullException("name");
 
             jw.WritePropertyName(name);
@@ -37,7 +37,7 @@ namespace Serenity.Data
         ///   Field value.</param>
         public static void WriteValue(this JsonWriter jw, string name, string value)
         {
-            if (name.IsEmptyOrNull())
+            if (name.IsNullOrEmpty())
                 throw new ArgumentNullException("name");
 
             jw.WritePropertyName(name);
@@ -54,7 +54,7 @@ namespace Serenity.Data
         ///   Field value.</param>
         public static void WriteValue(this JsonWriter jw, string name, decimal? value)
         {
-            if (name.IsEmptyOrNull())
+            if (name.IsNullOrEmpty())
                 throw new ArgumentNullException("name");
 
             jw.WritePropertyName(name);
@@ -71,7 +71,7 @@ namespace Serenity.Data
         ///   Field value.</param>
         public static void WriteValue(this JsonWriter jw, string name, Int64? value)
         {
-            if (name.IsEmptyOrNull())
+            if (name.IsNullOrEmpty())
                 throw new ArgumentNullException("name");
 
             jw.WritePropertyName(name);
@@ -88,7 +88,7 @@ namespace Serenity.Data
         ///   Field value.</param>
         public static void WriteValue(this JsonWriter jw, string name, double? value)
         {
-            if (name.IsEmptyOrNull())
+            if (name.IsNullOrEmpty())
                 throw new ArgumentNullException("name");
 
             jw.WritePropertyName(name);
@@ -105,7 +105,7 @@ namespace Serenity.Data
         ///   Field value.</param>
         public static void WriteValue(this JsonWriter jw, string name, bool? value)
         {
-            if (name.IsEmptyOrNull())
+            if (name.IsNullOrEmpty())
                 throw new ArgumentNullException("name");
 
             jw.WritePropertyName(name);

@@ -112,7 +112,7 @@
             var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(false);
             if (readAttr != null)
             {
-                if (readAttr.Permission.IsEmptyOrNull())
+                if (readAttr.Permission.IsNullOrEmpty())
                     SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
                 else
                     SecurityHelper.EnsurePermission(readAttr.Permission, RightErrorHandling.ThrowException);

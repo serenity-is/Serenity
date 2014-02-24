@@ -11,10 +11,10 @@ namespace Serenity.Data
 
         public BinaryCriteria(BaseCriteria left, CriteriaOperator op, BaseCriteria right)
         {
-            if (Object.ReferenceEquals(left, null))
+            if (ReferenceEquals(left, null))
                 throw new ArgumentNullException("left");
 
-            if (Object.ReferenceEquals(right, null))
+            if (ReferenceEquals(right, null))
                 throw new ArgumentNullException("right");
 
             if (op < CriteriaOperator.AND || op > CriteriaOperator.Like)
@@ -32,14 +32,14 @@ namespace Serenity.Data
             {
                 var valueCriteria = this.right as ValueCriteria;
                 if (query.Dialect.IsCaseSensitive() &&
-                    !Object.ReferenceEquals(null, valueCriteria) &&
+                    !ReferenceEquals(null, valueCriteria) &&
                     valueCriteria.Value is string)
                 {
-                    var mask = ((string)valueCriteria.Value).ToUpper();
                     sb.Append("UPPER(");
                     this.left.ToString(sb, query);
-                    sb.Append(this.op == CriteriaOperator.Like ? ") LIKE " : ") NOT LIKE ");
+                    sb.Append(this.op == CriteriaOperator.Like ? ") LIKE UPPER(" : ") NOT LIKE UPPER(");
                     this.right.ToString(sb, query);
+                    sb.Append(")");
                 }
                 else
                 {
@@ -56,7 +56,7 @@ namespace Serenity.Data
             }
         }
 
-        private static string[] opText = new string[]
+        private static readonly string[] opText =
         {
             " AND ",
             " OR ",

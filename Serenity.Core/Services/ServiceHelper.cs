@@ -27,7 +27,7 @@ namespace Serenity.Services
             }
 
             if ((support & ListRequestSupport.ContainsText) != ListRequestSupport.ContainsText &&
-                !request.ContainsText.IsEmptyOrNull())
+                !request.ContainsText.IsNullOrEmpty())
             {
                 throw new ValidationError("Bu liste servisi metin aramasını desteklemiyor!");
             }

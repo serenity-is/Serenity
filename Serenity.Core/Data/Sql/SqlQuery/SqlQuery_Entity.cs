@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
 
     public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressionByName
     {
@@ -112,7 +111,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery SelectAs(string expression, IField intoField)
         {
-            if (expression == null || expression.Length == 0)
+            if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             if (intoField == null)
@@ -139,12 +138,12 @@
             return this;
         }
 
-        public SqlQuery OrderBy(IField field)
+        public SqlQuery OrderBy(IField field, bool desc = false)
         {
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return OrderBy(field.Expression);
+            return OrderBy(field.Expression, desc);
         }
 
         public SqlQuery OrderBy(params IField[] fields)
@@ -155,24 +154,6 @@
             foreach (IField field in fields)
                 OrderBy(field);
 
-            return this;
-        }
-
-        public SqlQuery OrderByDescending(IField field)
-        {
-            if (field == null)
-                throw new ArgumentNullException("field");
-
-            return OrderBy(field.Expression, desc: true);
-        }
-
-        public SqlQuery OrderByDescending(params IField[] fields)
-        {
-            if (fields == null)
-                throw new ArgumentNullException("fields");
-
-            foreach (IField field in fields)
-                OrderByDescending(field);
             return this;
         }
 
@@ -200,7 +181,7 @@
                 delegate(Column s) { return s.IntoField == field; });
         }
 
-        public IEntity IntoRow
+        public IEntity FirstIntoRow
         {
             get { return into.Count > 0 ? into[0] : null; }
         }
@@ -259,10 +240,10 @@
 
         partial void EnsureJoinsInExpression(string expression)
         {
-            if (expression.IsEmptyOrNull())
+            if (expression.IsNullOrEmpty())
                 return;
 
-            var intoRow = this.IntoRow as IEntityWithJoins;
+            var intoRow = this.FirstIntoRow as IEntityWithJoins;
             if (intoRow == null)
                 return;
 

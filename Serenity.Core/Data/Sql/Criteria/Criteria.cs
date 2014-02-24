@@ -24,7 +24,7 @@ namespace Serenity.Data
         ///   field name, but it can also be a criteria text pre-generated.</summary>
         /// <remarks>
         ///   Usually used like: <c>new Criteria("fieldname") >= 5</c>.</remarks>
-        /// <param name="criteria">
+        /// <param name="text">
         ///   A field name or criteria condition (can be null)</param>
         public Criteria(string text)
         {
@@ -46,16 +46,16 @@ namespace Serenity.Data
         /// <summary>
         ///   Belirtilen tablo alias'ý ve alan adýný aralarýna nokta koyarak içeren yeni bir 
         ///   kriter oluþturur.</summary>
-        /// <param name="joinAlias">
+        /// <param name="alias">
         ///   Tablo alias'ý. Null ya da boþ olursa önemsenmez.</param>
         /// <param name="field">
         ///   Alan adý (zorunlu).</param>
         public Criteria(string alias, string field)
         {
-            if (field == null || field.Length == 0)
+            if (field.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
-            if (alias == null || alias.Length == 0)
+            if (alias.IsNullOrEmpty())
                 throw new ArgumentNullException("alias");
             this.expression = alias + "." + field;
         }
@@ -70,7 +70,7 @@ namespace Serenity.Data
         ///   Alan adý (zorunlu).</param>
         public Criteria(int joinNumber, string field)
         {
-            if (field == null || field.Length == 0)
+            if (field.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
             if (joinNumber < 0)
@@ -82,8 +82,8 @@ namespace Serenity.Data
         /// <summary>
         ///   Belirtilen numerik tablo alias'ý (baþýna T konarak) ve alanýn adýný aralarýna 
         ///   nokta koyarak içeren yeni bir kriter oluþturur.</summary>
-        /// <param name="joinNumber">
-        ///   Join numarasý (T1 gibi kullanýlýr)</param>
+        /// <param name="alias">
+        ///   Join aliasý (T1 gibi kullanýlýr)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
         public Criteria(Alias alias, IField field)
@@ -94,8 +94,8 @@ namespace Serenity.Data
         /// <summary>
         ///   Belirtilen numerik tablo alias'ý (baþýna T konarak) ve alanýn adýný aralarýna 
         ///   nokta koyarak içeren yeni bir kriter oluþturur.</summary>
-        /// <param name="joinNumber">
-        ///   Join numarasý (T1 gibi kullanýlýr)</param>
+        /// <param name="alias">
+        ///   Join aliasý (T1 gibi kullanýlýr)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
         public Criteria(Alias alias, string field)
@@ -148,7 +148,7 @@ namespace Serenity.Data
         ///   Alan adýný köþeli parantez içinde içeren yeni bir kriter.</returns>
         public static Criteria Bracket(string fieldName)
         {
-            if (fieldName == null || fieldName.Length == 0)
+            if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
             return new Criteria("[" + fieldName + "]");
@@ -170,7 +170,7 @@ namespace Serenity.Data
         {
             get 
             {
-                return expression.IsEmptyOrNull();
+                return expression.IsNullOrEmpty();
             }
         }
 

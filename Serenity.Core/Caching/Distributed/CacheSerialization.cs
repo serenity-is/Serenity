@@ -32,7 +32,7 @@ namespace Serenity
                 data = ms.ToArray();
             }
 
-            return LZ4Compression.CompressBytesIf(data, minCompressLength);
+            return CacheCompression.CompressBytesIf(data, minCompressLength);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Serenity
         /// <returns>Deserialize edilmiş obje.</returns>
         public static TValue BinaryRead<TValue>(byte[] input, Func<BinaryReader, TValue> deserialize)
         {
-            using (var ms = new MemoryStream(LZ4Compression.DecompressBytesIf(input)))
+            using (var ms = new MemoryStream(CacheCompression.DecompressBytesIf(input)))
             using (var sw = new BinaryReader(ms, Encoding.UTF8))
             {
                 return deserialize(sw);

@@ -11,7 +11,7 @@ namespace Serenity.Data
         public static LocalText ToLocalText(string caption)
         {
             LocalText lt = null;
-            if (!caption.IsEmptyOrNull())
+            if (!caption.IsNullOrEmpty())
                 lt = new LocalText(caption);
             return lt;
         }

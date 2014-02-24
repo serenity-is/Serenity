@@ -1,10 +1,8 @@
-﻿using System.Threading;
-
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     public struct Parameter
     {
-        private string name;
+        private readonly string name;
 
         public Parameter(string name)
         {

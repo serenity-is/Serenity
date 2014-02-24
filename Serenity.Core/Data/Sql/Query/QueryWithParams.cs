@@ -1,8 +1,6 @@
 ﻿namespace Serenity.Data
 {
-    using System;
     using System.Collections.Generic;
-    using System.Text;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
     public class QueryWithParams : IQueryWithParams

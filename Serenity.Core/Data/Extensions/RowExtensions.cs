@@ -39,5 +39,12 @@ namespace Serenity.Data
                     field.AsObject(row, field.ConvertValue(value, CultureInfo.InvariantCulture));
             }
         }
+
+        public static TRowFields Init<TRowFields>(this TRowFields rowFields) 
+            where TRowFields : RowFieldsBase
+        {
+            rowFields.Initialize();
+            return rowFields;
+        }
     }
 }
