@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.UI.WebControls.WebParts;
 using Munq;
 
 namespace Serenity
@@ -186,6 +187,15 @@ namespace Serenity
         public static IEnumerable<IRegistration> GetRegistrations(Type type)
         {
             return Container.GetRegistrations(type);
+        }
+
+        public static TType New<TType>() 
+            where TType : class, new()
+        {
+            if (CanResolve<TType>())
+                return Resolve<TType>();
+
+            return new TType();
         }
     }
 }
