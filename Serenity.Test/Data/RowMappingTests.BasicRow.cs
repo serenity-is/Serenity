@@ -1,7 +1,9 @@
-﻿using System;
-
+﻿
 namespace Serenity.Test.Data
 {
+    using System;
+    using Serenity.Data;
+
     public partial class RowMappingTests
     {
         public class BasicRow : Row

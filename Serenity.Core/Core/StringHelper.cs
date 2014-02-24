@@ -38,6 +38,20 @@ namespace Serenity
         ///   String.</param>
         /// <returns>
         ///   If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
+        public static bool IsEmptyOrNull(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
+
+        /// <summary>
+        ///   <p>Returns true if <see cref="String"/> is <c>null</c> or empty (zero length)</p></summary>
+        /// <remarks>
+        ///   <p>This function might be useful if an empty string is assumed to be <c>null</c>.</p>
+        ///   <p>This is an extension method, so it can be called directly as <c>str.IsNullOrEmpty()</c>.</p></remarks>
+        /// <param name="str">
+        ///   String.</param>
+        /// <returns>
+        ///   If <paramref name="str"/> is <c>null</c> or empty, <c>true</c></returns>
         public static bool IsNullOrEmpty(this string str)
         {
             return string.IsNullOrEmpty(str);

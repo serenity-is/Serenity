@@ -1,6 +1,8 @@
 ﻿
 namespace Serenity.Test.Data
 {
+    using Serenity.Data;
+
     public partial class RowMappingTests
     {
         public class FaultyRow : Row
