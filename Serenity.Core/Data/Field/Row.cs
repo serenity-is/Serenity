@@ -98,7 +98,7 @@ namespace Serenity.Data
 
             _assignedFields[field._index] = true;
 
-            RemoveValidationError(field.PropertyName);
+            RemoveValidationError(field.PropertyName ?? field.Name);
 
             if (_propertyChanged != null)
             {

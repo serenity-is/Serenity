@@ -9,7 +9,7 @@ namespace Serenity.Data
         private Field _field;
 
         internal FieldDescriptor(Field field)
-            : base(field.PropertyName, null)
+            : base(field.PropertyName ?? field.Name, null)
         {
             _field = field;
         }

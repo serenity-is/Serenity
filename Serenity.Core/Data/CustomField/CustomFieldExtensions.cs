@@ -53,7 +53,6 @@ namespace Serenity.Data
                 }
 
                 field.DefaultValue = item.DefaultValue.TrimToNull();
-                field.PropertyName = item.Name;
                 result.Add(field);
 
                 if (initialize != null)

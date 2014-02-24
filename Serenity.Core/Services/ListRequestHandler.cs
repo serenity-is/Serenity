@@ -49,11 +49,11 @@
 
             bool explicitlyExcluded = Request.ExcludeColumns != null &&
                 (Request.ExcludeColumns.Contains(field.Name) ||
-                    Request.ExcludeColumns.Contains(field.PropertyName));
+                    (field.PropertyName != null && Request.ExcludeColumns.Contains(field.PropertyName)));
 
             bool explicitlyIncluded = !explicitlyExcluded && Request.IncludeColumns != null &&
                 (Request.IncludeColumns.Contains(field.Name) ||
-                 Request.IncludeColumns.Contains(field.PropertyName));
+                    (field.PropertyName != null && Request.IncludeColumns.Contains(field.PropertyName)));
 
             if (isPrimaryKey)
                 return explicitlyIncluded;
