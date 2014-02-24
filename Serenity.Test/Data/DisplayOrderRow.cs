@@ -2,7 +2,7 @@
 using Serenity.Data;
 using Newtonsoft.Json;
 
-namespace Serenity.Data
+namespace Serenity.Test.Data
 {
     using R = DisplayOrderRow;
 
@@ -28,16 +28,16 @@ namespace Serenity.Data
                 : base(R.TableName, "")
             {
                 ID = new Int32Field(this, "ID", "ID", 0, FieldFlags.Identity,
-                    r => ((R)r)._ID, (r, v) => ((R)r)._ID = v);
+                    r => ((R)r)._id, (r, v) => ((R)r)._id = v);
 
                 GroupID = new Int32Field(this, "GroupID", "Değer No", 0, FieldFlags.Required,
-                    r => ((R)r)._GroupID, (r, v) => ((R)r)._GroupID = v);
+                    r => ((R)r)._groupId, (r, v) => ((R)r)._groupId = v);
 
                 DisplayOrder = new Int32Field(this, "DisplayOrder", "Gösterim Sırası", 0, FieldFlags.Required,
-                    r => ((R)r)._DisplayOrder, (r, v) => ((R)r)._DisplayOrder = v);
+                    r => ((R)r)._displayOrder, (r, v) => ((R)r)._displayOrder = v);
 
                 IsActive = new Int16Field(this, "IsActive", "Aktif", 0, FieldFlags.Required,
-                    r => ((R)r)._IsActive, (r, v) => ((R)r)._IsActive = v);
+                    r => ((R)r)._isActive, (r, v) => ((R)r)._isActive = v);
             }
         }
 
@@ -53,10 +53,10 @@ namespace Serenity.Data
             Instance = new DisplayOrderRow();
         }
 
-        private Int32? _ID;
-        private Int32? _GroupID;
-        private Int32? _DisplayOrder;
-        private Int16? _IsActive;
+        private Int32? _id;
+        private Int32? _groupId;
+        private Int32? _displayOrder;
+        private Int16? _isActive;
 
         /// <summary>Creates a new DisplayOrderRow instance.</summary>
         public DisplayOrderRow()
@@ -73,28 +73,28 @@ namespace Serenity.Data
         /// <summary>ID field value</summary>
         public Int32? ID
         {
-            get { return _ID; }
+            get { return _id; }
             set { Fields.ID[this] = value; }
         }
 
         /// <summary>GroupID field value</summary>
         public Int32? GroupID
         {
-            get { return _GroupID; }
+            get { return _groupId; }
             set { Fields.GroupID[this] = value; }
         }
 
         /// <summary>DisplayOrder field value</summary>
         public Int32? DisplayOrder
         {
-            get { return _DisplayOrder; }
+            get { return _displayOrder; }
             set { Fields.DisplayOrder[this] = value; }
         }
 
         /// <summary>IsActive field value</summary>
         public Int16? IsActive
         {
-            get { return _IsActive; }
+            get { return _isActive; }
             set { Fields.IsActive[this] = value; }
         }
 

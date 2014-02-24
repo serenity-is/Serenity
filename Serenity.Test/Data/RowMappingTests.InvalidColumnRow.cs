@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Xunit;
 using Serenity.Data.Mapping;
 
-namespace Serenity.Data
+namespace Serenity.Test.Data
 {
     public partial class RowMappingTests
     {

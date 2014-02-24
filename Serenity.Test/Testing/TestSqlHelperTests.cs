@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace Serenity.Testing.Test
+namespace Serenity.Test.Testing
 {
     public class TestSqlHelperTests
     {

@@ -1,7 +1,8 @@
 ﻿using Serenity.Data;
+using Serenity.Testing;
 using Xunit;
 
-namespace Serenity.Testing.Test
+namespace Serenity.Test.Testing
 {
     public class DbScriptTests
     {
@@ -36,7 +37,7 @@ namespace Serenity.Testing.Test
         public void CanAddSqlInsertProperly()
         {
             var script = new DbScript();
-            script.Add(new Data.SqlInsert(new TestRow
+            script.Add(new SqlInsert(new TestRow
             {
                 TrackAssignments = true,
                 TestId = 1,
@@ -54,7 +55,7 @@ namespace Serenity.Testing.Test
         public void CanAddSqlUpdateProperly()
         {
             var script = new DbScript();
-            script.Add(new Data.SqlUpdate(new TestRow
+            script.Add(new SqlUpdate(new TestRow
             {
                 TrackAssignments = true,
                 Description = "Test"

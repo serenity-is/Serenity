@@ -1,11 +1,12 @@
-﻿using Serenity.Testing;
-using Serenity.Testing.Test;
+﻿using Serenity.Data;
+using Serenity.Testing;
+using Serenity.Test.Testing;
 using System;
 using Xunit;
 using Xunit.Extensions;
 using System.Linq;
 
-namespace Serenity.Data.Test
+namespace Serenity.Test.Data
 {
     public partial class DisplayOrderTests
     {

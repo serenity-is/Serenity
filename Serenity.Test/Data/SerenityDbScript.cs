@@ -1,9 +1,9 @@
 ﻿using Serenity.Testing;
-using Serenity.Testing.Test;
+using Serenity.Test.Testing;
 using System;
 using Xunit;
 
-namespace Serenity.Data.Test
+namespace Serenity.Test.Data
 {
     public class SerenityDbScript : DbScript
     {

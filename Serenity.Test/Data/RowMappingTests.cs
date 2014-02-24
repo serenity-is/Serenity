@@ -1,8 +1,9 @@
-﻿using Serenity.Testing.Test;
+﻿using Serenity.Data;
+using Serenity.Test.Testing;
 using System;
 using Xunit;
 
-namespace Serenity.Data
+namespace Serenity.Test.Data
 {
     public partial class RowMappingTests
     {
