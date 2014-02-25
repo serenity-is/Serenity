@@ -14,8 +14,8 @@ namespace Serenity
 
     public static class CacheCompression
     {
-        /// <param name="data">Sıkıştırılacak veri</param>
-        /// <returns>Sıkıştırılmış veri</returns>
+        /// <param name="input">Compresses input string with ICacheCompressor implementation.</param>
+        /// <returns>Compressed bytes or just UTF8 bytes.</returns>
         public static byte[] CompressString(string input)
         {
             if (input == null)
@@ -25,11 +25,10 @@ namespace Serenity
         }
 
         /// <summary>
-        /// LZ4 algoritmasını kullanarak string i açar (LZ4 çok hızlı bir sıkıştırma yöntemidir)
-        /// http://lz4net.codeplex.com/
+        /// Decompresses, compressed bytes with ICacheCompressor implementation.
         /// </summary>
-        /// <param name="data">Sıkıştırılacak veri</param>
-        /// <returns>Sıkıştırılmış veri</returns>
+        /// <param name="input">Data to decompress</param>
+        /// <returns>Decompressed data</returns>
         public static string DecompressString(byte[] input)
         {
             if (input == null)
@@ -39,18 +38,14 @@ namespace Serenity
         }
 
         /// <summary>
-        /// LZ4 algoritmasını kullanarak veriyi sıkıştırır (LZ4 çok hızlı bir sıkıştırma yöntemidir)
-        /// http://lz4net.codeplex.com/
+        /// Compresses input bytes with ICacheCompressor implementation.
         /// </summary>
-        /// <param name="data">Sıkıştırılacak veri</param>
-        /// <returns>Sıkıştırılmış veri</returns>
+        /// <param name="input">Data to be compressed</param>
+        /// <returns>Compressed bytes</returns>
         public static byte[] CompressBytes(byte[] input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
-
-            if (!IoC.CanResolve<ICacheCompressor>())
-                return input;
 
             using (var ms = new MemoryStream(input.Length))
             {
@@ -60,17 +55,14 @@ namespace Serenity
         }
 
         /// <summary>
-        /// LZ4 ile sıkıştırılmış veriyi açar
+        /// Decompresses bytes, compressed with ICacheCompressor implementation.
         /// </summary>
-        /// <param name="data">Açılacak veri</param>
-        /// <returns>Açılmış veri</returns>
+        /// <param name="input">Data to be decompressed.</param>
+        /// <returns>Decompressed bytes.</returns>
         public static byte[] DecompressBytes(byte[] input)
         {
             if (input == null)
                 throw new ArgumentNullException("input");
-
-            if (!IoC.CanResolve<ICacheCompressor>())
-                return input;
 
             using (var ms = new MemoryStream(input))
             {
@@ -86,40 +78,53 @@ namespace Serenity
             }
         }
 
+        /// <summary>
+        /// Compresses byte array, if its larger than given size and 
+        /// ICacheCompressor is available.
+        /// </summary>
+        /// <param name="input">Input array</param>
+        /// <param name="minCompressLength">Compress if lower than this size</param>
+        /// <returns>Compressed bytes or raw bytes with 0 appended in front</returns>
         public static byte[] CompressBytesIf(byte[] input, int minCompressLength = 4096)
         {
-            if (input == null || !IoC.CanResolve<ICacheCompressor>())
-                return input;
+            if (input == null)
+                return null;
 
-            if (input.Length > minCompressLength)
+            if (input.Length > minCompressLength &&
+                IoC.CanResolve<ICacheCompressor>())
+            {
                 using (var ms = new MemoryStream(input.Length + 1))
                 {
                     ms.WriteByte(1);
-
                     IoC.Resolve<ICacheCompressor>().CompressBytes(ms, input);
+
                     return ms.ToArray();
                 }
+            }
 
-            byte[] result = new byte[input.Length + 1];
+            var result = new byte[input.Length + 1];
             result[0] = 0;
             input.CopyTo(result, 1);
             return result;
         }
 
+        /// <summary>
+        /// Decompresses bytes already compressed with CompressBytesIf function.
+        /// </summary>
+        /// <param name="input">Input array</param>
+        /// <returns>Decompressed data</returns>
         public static byte[] DecompressBytesIf(byte[] input)
         {
             if (input == null)
                 throw new ArgumentOutOfRangeException("input");
 
-            if (!IoC.CanResolve<ICacheCompressor>())
-                return input;
-
             if (input.Length < 1)
                 throw new ArgumentOutOfRangeException("input");
 
-            bool compressed = input[0] == (byte)1;
-            byte[] data = new byte[input.Length - 1];
+            var compressed = input[0] == (byte)1;
+            var data = new byte[input.Length - 1];
             Array.Copy(input, 1, data, 0, input.Length - 1);
+
             if (compressed)
                 return CacheCompression.DecompressBytes(data);
             else
