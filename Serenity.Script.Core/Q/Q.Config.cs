@@ -14,6 +14,11 @@ namespace Serenity
             public static string ApplicationPath = "/";
 
             /// <summary>
+            /// Flags that controls overriding jQueryValidation email method to allow only ascii characters (default true)
+            /// </summary>
+            public static bool EmailAllowOnlyAscii;
+
+            /// <summary>
             /// Variable that holds list of application namespaces to search for objects
             /// </summary>
             public static List<string> RootNamespaces;
@@ -26,6 +31,8 @@ namespace Serenity
 
                 RootNamespaces = new List<string>();
                 RootNamespaces.Add("Serenity");
+
+                EmailAllowOnlyAscii = true;
             }
         }
     }

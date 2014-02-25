@@ -711,6 +711,15 @@ Q$Externals.jQueryValidationInitialization = function () {
         return this.optional(element) || !isNaN(Q.parseInteger(value));
     });
 
+    var oldEmail = $.validator.methods.email;
+
+    $.validator.addMethod("email", function (value, element) {
+        if (!Q$Config.emailAllowOnlyAscii)
+            return oldEmail.call(this, value[i], element);
+
+        return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
+    });
+
     $.validator.addMethod("emailMultiple", function (value, element) {
         var result = this.optional(element);
         if (result)
