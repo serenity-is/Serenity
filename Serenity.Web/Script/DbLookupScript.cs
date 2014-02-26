@@ -80,6 +80,9 @@ namespace Serenity.Web
             _right = right;
             _nonCached = nonCached;
 
+            if (row != null)
+                GlobalGenerationKey = row.GetFields().GenerationKey;
+
             LocalExpiration = CacheExpiration.Never;
             RemoteExpiration = CacheExpiration.OneDay;
 
