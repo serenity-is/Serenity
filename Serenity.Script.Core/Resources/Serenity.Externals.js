@@ -715,7 +715,7 @@ Q$Externals.jQueryValidationInitialization = function () {
 
     $.validator.addMethod("email", function (value, element) {
         if (!Q$Config.emailAllowOnlyAscii)
-            return oldEmail.call(this, value[i], element);
+            return oldEmail.call(this, value, element);
 
         return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
     });

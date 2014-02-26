@@ -71,7 +71,7 @@ namespace Serenity
             return false;
         }
 
-        private static void RegisterValidationMethods()
+        public static void RegisterValidationMethods()
         {
             if (jQueryValidator.Methods["emailuser"] == null)
                 jQueryValidator.AddMethod("emailuser", (value, element) =>

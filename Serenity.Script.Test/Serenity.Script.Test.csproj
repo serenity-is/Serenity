@@ -42,6 +42,7 @@
     <Compile Include="Q\QDialogTests.cs" />
     <Compile Include="Q\QHtmlTests.cs" />
     <Compile Include="Q\QNumberTests.cs" />
+    <Compile Include="UI\EmailEditorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -77,6 +78,10 @@
     <ProjectReference Include="..\Serenity.Script.Imports\Serenity.Script.Imports.csproj">
       <Project>{1e32ed5b-d96e-41d9-b532-577005b0ddb0}</Project>
       <Name>Serenity.Script.Imports</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Script.UI\Serenity.Script.UI.csproj">
+      <Project>{56e9e208-55d9-4a50-a5b9-6eb22df6af0e}</Project>
+      <Name>Serenity.Script.UI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.4.0\tools\Saltarelle.Compiler.targets')" />
