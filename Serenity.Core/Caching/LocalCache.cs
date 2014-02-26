@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Web;
+using System.Web.Caching;
 
 namespace Serenity
 {
@@ -38,6 +41,18 @@ namespace Serenity
         public static void Remove(string cacheKey)
         {
             HttpRuntime.Cache.Remove(cacheKey);
+        }
+
+        public static Cache GetCache()
+        {
+            return HttpRuntime.Cache;
+        }
+
+        public static void Reset()
+        {
+            var cache = HttpRuntime.Cache;
+            foreach (DictionaryEntry k in cache)
+                cache.Remove((string)k.Key);
         }
     }
 }
