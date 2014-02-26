@@ -110,5 +110,17 @@ namespace Serenity
                 this.expiration[key] = expiresAt;
             }
         }
+
+        /// <summary>
+        /// Used for testing
+        /// </summary>
+        public void Reset()
+        {
+            lock (this.sync)
+            {
+                this.dictionary.Clear();
+                this.expiration.Clear();
+            }
+        }
     }
 }
