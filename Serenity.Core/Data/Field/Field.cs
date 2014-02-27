@@ -1,92 +1,91 @@
 using System;
 using System.Data;
 using System.Collections.Generic;
-using System.Collections;
 using Newtonsoft.Json;
-using System.Reflection;
 
 namespace Serenity.Data
 {
     public abstract class Field : IFieldWithJoinInfo
     {
-        private FieldType _type;
-        internal int _index;
-        internal RowFieldsBase _fields;
-        internal string _name;
-        internal int _size;
-        internal FieldFlags _flags;
-        internal string _expression;
-        internal HashSet<string> _referencedJoins;
-        internal string _joinAlias;
-        internal Join _join;
-        internal string _origin;
-        internal string _foreignTable;
-        internal string _foreignField;
-        internal LocalText _caption;
-        internal string _autoTextKey;
-        internal string _propertyName;
-        internal Type _rowType;
-        internal object _defaultValue;
-        internal SelectLevel _minSelectLevel;
-        internal int _naturalOrder;
-        internal string _textualField;
-        
+        private string autoTextKey;
+        internal LocalText caption;
+        private string expression;
+        private RowFieldsBase fields;
+        internal FieldFlags flags;
+        private string foreignTable;
+        private string foreignField;
+        internal int index;
+        internal Join join;
+        internal string joinAlias;
+        private readonly string name;
+        internal string origin;
+        internal string propertyName;
+        internal HashSet<string> referencedAliases;
+        private readonly int size;
+        private readonly FieldType type;
+        internal object defaultValue;
+        internal SelectLevel minSelectLevel;
+        internal int naturalOrder;
+        internal string textualField;
+
         protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
         {
-            _name = name;
-            _expression = "T0." + name;
-            _size = size;
-            _flags = flags;
-            _type = type;
-            _index = -1;
-            _minSelectLevel = SelectLevel.Default;
-            _naturalOrder = 0;
-            _caption = caption;
+            this.name = name;
+            expression = "T0." + name;
+            this.size = size;
+            this.flags = flags;
+            this.type = type;
+            index = -1;
+            minSelectLevel = SelectLevel.Default;
+            naturalOrder = 0;
+            this.caption = caption;
             if (fields != null)
                 fields.Add(this);
         }
 
         public RowFieldsBase Fields
         {
-            get { return _fields; }
+            get { return fields; }
+            internal set { fields = value; }
         }
 
         public int Index
         {
-            get { return _index; }
+            get { return index; }
+            internal set { index = value; }
         }
 
         public string Name
         {
-            get { return _name; }
+            get { return name; }
         }
 
         public FieldType Type
         {
-            get { return _type; }
+            get { return type; }
         }
 
         public LocalText Caption
         {
-            get { return _caption; }
-            set { _caption = value; }
+            get { return caption; }
+            set { caption = value; }
         }
 
         public object DefaultValue
         {
-            get { return _defaultValue; }
-            set { _defaultValue = value; }
+            get { return defaultValue; }
+            set { defaultValue = value; }
         }
 
-        public HashSet<string> ReferencedJoins
+        public HashSet<string> ReferencedAliases
         {
             get
             {
-                return _referencedJoins;
+                return referencedAliases;
             }
             set
             {
-                _referencedJoins = value;
+                referencedAliases = value;
             }
         }
 
@@ -94,36 +93,35 @@ namespace Serenity.Data
         {
             get
             {
-                if (null == _caption)
+                if (ReferenceEquals(null, caption))
                 {
-                    if (_autoTextKey == null)
-                        _autoTextKey = "Db." + this.Fields.LocalTextPrefix + "." + (_propertyName ?? _name);
+                    if (autoTextKey == null)
+                        autoTextKey = "Db." + this.Fields.LocalTextPrefix + "." + (propertyName ?? name);
 
-                    return LocalText.TryGet(_autoTextKey) ?? (_propertyName ?? _name);
+                    return LocalText.TryGet(autoTextKey) ?? (propertyName ?? name);
                 }
                 else
-                    return _caption.ToString();
+                    return caption.ToString();
             }
         }
 
         public int Size
         {
-            get { return _size; }
-            set { _size = value; }
+            get { return size; }
         }
 
         public int Scale { get; set; }
 
         public FieldFlags Flags
         {
-            get { return _flags; }
-            set { _flags = value; }
+            get { return flags; }
+            set { flags = value; }
         }
 
         public string PropertyName
         {
-            get { return _propertyName; }
-            set { _propertyName = value; }
+            get { return propertyName; }
+            set { propertyName = value; }
         }
 
         protected Exception JsonUnexpectedToken(JsonReader reader)
@@ -139,66 +137,66 @@ namespace Serenity.Data
 
         public string Expression
         {
-            get { return _expression; }
+            get { return expression; }
             set 
             {
                 value = value.TrimToNull();
-                if (_expression != value)
+                if (expression != value)
                 {
-                    _expression = value;
-                    _referencedJoins = null;
-                    _joinAlias = null;
-                    _origin = null;
-                    _join = null;
+                    expression = value;
+                    referencedAliases = null;
+                    joinAlias = null;
+                    origin = null;
+                    join = null;
 
                     if (value != null)
                     {
-                        if (String.Compare(_expression, "T0." + _name, StringComparison.OrdinalIgnoreCase) == 0)
+                        if (String.Compare(expression, "T0." + name, StringComparison.OrdinalIgnoreCase) == 0)
                         {
-                            _flags ^= FieldFlags.Calculated;
-                            _flags ^= FieldFlags.Foreign;
-                            _expression = "T0." + _name;
+                            flags ^= FieldFlags.Calculated;
+                            flags ^= FieldFlags.Foreign;
+                            expression = "T0." + name;
                             return;
                         }
 
                         var aliases = JoinAliasLocator.Locate(value);
                         if (aliases != null && aliases.Count > 0)
                         {
-                            _referencedJoins = aliases;
+                            referencedAliases = aliases;
 
                             if (aliases.Count == 1)
                             {
                                 var enumerator = aliases.GetEnumerator();
                                 enumerator.MoveNext();
-                                var join = enumerator.Current;
+                                var theJoin = enumerator.Current;
 
-                                if (join.ToLowerInvariant() == "t0")
-                                    _flags = (FieldFlags)(_flags ^ FieldFlags.Foreign) | FieldFlags.Calculated;
+                                if (theJoin.ToLowerInvariant() == "t0")
+                                    flags = (FieldFlags)(flags ^ FieldFlags.Foreign) | FieldFlags.Calculated;
                                 else
                                 {
-                                    _flags = _flags | FieldFlags.Foreign;
+                                    flags = flags | FieldFlags.Foreign;
 
-                                    var split = _expression.Split('.');
+                                    var split = expression.Split('.');
                                     if (split.Length == 2 &&
-                                        split[0] == join &&
+                                        split[0] == theJoin &&
                                         IsValidIdentifier(split[1]))
                                     {
-                                        _joinAlias = join;
-                                        _origin = split[1];
+                                        joinAlias = theJoin;
+                                        origin = split[1];
                                     }
                                     else
-                                        _flags = _flags | FieldFlags.Calculated;
+                                        flags = flags | FieldFlags.Calculated;
                                 }
                             }
                             else
-                                _flags = _flags | FieldFlags.Calculated | FieldFlags.Foreign;
+                                flags = flags | FieldFlags.Calculated | FieldFlags.Foreign;
                         }
                     }
                     else
                     {
-                        _expression = "T0." + _name;
-                        _flags ^= FieldFlags.Calculated;
-                        _flags ^= FieldFlags.Foreign;
+                        expression = "T0." + name;
+                        flags ^= FieldFlags.Calculated;
+                        flags ^= FieldFlags.Foreign;
                     }
                 }
             }
@@ -227,58 +225,58 @@ namespace Serenity.Data
 
         public string JoinAlias
         {
-            get { return _joinAlias; }
+            get { return joinAlias; }
         }
 
         public Join Join
         {
             get
             {
-                if (_join == null &&
-                    _joinAlias != null)
+                if (join == null &&
+                    joinAlias != null)
                 {
-                    Join join;
-                    if (_fields.Joins.TryGetValue(_joinAlias, out join))
-                        _join = join;
+                    Join theJoin;
+                    if (fields.Joins.TryGetValue(joinAlias, out theJoin))
+                        join = theJoin;
                 }
 
-                return _join;
+                return join;
             }
         }
 
         public string Origin
         {
-            get { return _origin; }
+            get { return origin; }
         }
 
         public string ForeignTable
         {
-            get { return _foreignTable; }
-            set { _foreignTable = value.TrimToNull(); }
+            get { return foreignTable; }
+            set { foreignTable = value.TrimToNull(); }
         }
 
         public string ForeignField
         {
-            get { return _foreignField; }
-            set { _foreignField = value.TrimToNull(); }
+            get { return foreignField; }
+            set { foreignField = value.TrimToNull(); }
         }
 
         public SelectLevel MinSelectLevel
         {
-            get { return _minSelectLevel; }
-            set { _minSelectLevel = value; }
+            get { return minSelectLevel; }
+            set { minSelectLevel = value; }
         }
 
         public int NaturalOrder
         {
-            get { return _naturalOrder; }
-            set { _naturalOrder = value; }
+            get { return naturalOrder; }
+            set { naturalOrder = value; }
         }
 
         public string TextualField
         {
-            get { return _textualField; }
-            set { _textualField = value; }
+            get { return textualField; }
+            set { textualField = value; }
         }
 
         public LeftJoin ForeignJoin(Int32? foreignIndex = null)

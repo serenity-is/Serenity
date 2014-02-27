@@ -96,7 +96,7 @@ namespace Serenity.Data
             if (_assignedFields == null)
                 _assignedFields = new bool[_fields.Count];
 
-            _assignedFields[field._index] = true;
+            _assignedFields[field.index] = true;
 
             RemoveValidationError(field.PropertyName ?? field.Name);
 
@@ -249,14 +249,14 @@ namespace Serenity.Data
         {
             if (_assignedFields == null)
                 return false;
-            return _assignedFields[field._index];
+            return _assignedFields[field.index];
         }
 
         public void ClearAssignment(Field field)
         {
             if (_assignedFields != null)
             {
-                _assignedFields[field._index] = false;
+                _assignedFields[field.index] = false;
                 for (var i = 0; i < _assignedFields.Length; i++)
                     if (_assignedFields[i])
                         return;

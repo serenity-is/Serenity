@@ -16,8 +16,8 @@ namespace Serenity.Data
             Func<Row, TValue> getValue = null, Action<Row, TValue> setValue = null)
             : base(collection, type, name, caption, size, flags)
         {
-            _getValue = getValue ?? (r => (TValue)(r.GetIndexedData(this._index)));
-            _setValue = setValue ?? ((r, v) => r.SetIndexedData(this._index, v));
+            _getValue = getValue ?? (r => (TValue)(r.GetIndexedData(this.index)));
+            _setValue = setValue ?? ((r, v) => r.SetIndexedData(this.index, v));
         }
 
         public override void Copy(Row source, Row target)

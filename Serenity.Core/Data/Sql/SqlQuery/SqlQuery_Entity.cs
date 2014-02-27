@@ -229,10 +229,10 @@
             if (joinField == null)
                 return this;
 
-            if (joinField.ReferencedJoins == null)
+            if (joinField.ReferencedAliases == null)
                 return this;
 
-            foreach (var alias in joinField.ReferencedJoins)
+            foreach (var alias in joinField.ReferencedAliases)
                 EnsureForeignJoin(joinField.Joins, alias);
 
             return this;

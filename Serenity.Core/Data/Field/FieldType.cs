@@ -10,7 +10,6 @@
         Decimal,
         Double,
         DateTime,
-        Date,
         Time,
         Guid,
         Stream,

@@ -97,7 +97,7 @@ namespace Serenity.Data
         {
             get
             {
-                return _field._rowType ?? typeof(Row);
+                return _field.Fields.rowType ?? typeof(Row);
             }
         }
 

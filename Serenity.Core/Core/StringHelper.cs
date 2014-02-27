@@ -22,11 +22,10 @@ namespace Serenity
         ///   If <paramref name="str"/> is <c>null</c> or empty <c>null</c>, otherwise string itself</returns>
         public static string EmptyToNull(this string str)
         {
-            if (str == null ||
-                str.Length == 0)
+            if (str.IsEmptyOrNull())
                 return null;
-            else
-                return str;
+                
+            return str;
         }
 
         /// <summary>

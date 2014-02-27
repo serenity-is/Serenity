@@ -21,7 +21,7 @@ namespace Serenity.Data
                 for (var i = 0; i < _fields.Count; i++)
                 {
                     var f = _fields[i];
-                    args[i] = new PropertyChangedEventArgs(f._propertyName ?? f.Name);
+                    args[i] = new PropertyChangedEventArgs(f.propertyName ?? f.Name);
                 }
                 args[_fields.Count] = new PropertyChangedEventArgs("__ROW__");
                 _fields.propertyChangedEventArgs = args;
@@ -30,7 +30,7 @@ namespace Serenity.Data
             if (field == null)
                 _propertyChanged(this, _fields.propertyChangedEventArgs[_fields.Count]);
             else
-                _propertyChanged(this, _fields.propertyChangedEventArgs[field._index]);
+                _propertyChanged(this, _fields.propertyChangedEventArgs[field.Index]);
         }
 
         public Action<Row> PostHandler

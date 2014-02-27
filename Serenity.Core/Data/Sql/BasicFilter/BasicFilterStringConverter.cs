@@ -58,8 +58,8 @@ namespace Serenity.Data
                 // check if field has a foreign schema determine field expression
                 /*if (field._joinAlias != null)
                     fieldExpr = field._joinAlias + "." + (field._expression ?? field.Name);*/
-                if (field._expression != null)
-                    fieldExpr = field._expression;
+                if (field.Expression != null)
+                    fieldExpr = field.Expression;
                 else
                     fieldExpr = (0).TableAliasDot() + field.Name;
             }

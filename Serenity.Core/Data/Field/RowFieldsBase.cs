@@ -216,7 +216,9 @@ namespace Serenity.Data
                         else
                         {
                             if (size != null)
-                                field.Size = size.Value;
+                                throw new InvalidProgramException(String.Format(
+                                    "Field size '{0}' in type {1} can't be overridden by Size attribute!",
+                                        fieldInfo.Name, rowType.Name));
 
                             if (display != null)
                                 field.Caption = new LocalText(display.DisplayName);
@@ -263,7 +265,6 @@ namespace Serenity.Data
                 for (int i = 0; i < this.Count; i++)
                 {
                     var field = this[i];
-                    field._rowType = rowType;
                     propertyDescriptorArray[i] = new FieldDescriptor(field);
                 }
 
@@ -387,13 +388,13 @@ namespace Serenity.Data
                 throw new ArgumentOutOfRangeException("item",
                     String.Format("field list already contains a field with name '{0}'", item.Name));
 
-            if (item._fields != null)
-                item._fields.Remove(item);
+            if (item.Fields != null)
+                item.Fields.Remove(item);
 
             base.InsertItem(index, item);
 
-            item._fields = this;
-            item._index = index;
+            item.Fields = this;
+            item.Index = index;
 
             byName[item.Name] = item;
         }
@@ -405,11 +406,11 @@ namespace Serenity.Data
 
             var item = base[index];
             base.RemoveItem(index);
-            item._index = -1;
-            item._fields = null;
+            item.Index = -1;
+            item.Fields = null;
             byName.Remove(item.Name);
             for (int i = index; i < Count; i++)
-                this[i]._index = i;
+                this[i].index = i;
         }
 
         protected override void SetItem(int index, Field item)
@@ -428,12 +429,12 @@ namespace Serenity.Data
 
             base.SetItem(index, item);
 
-            old._index = -1;
-            old._fields = null;
+            old.Index = -1;
+            old.Fields = null;
             byName.Remove(old.Name);
 
-            item._index = index;
-            item._fields = this;
+            item.Index = index;
+            item.Fields = this;
             byName[item.Name] = item;
         }
 

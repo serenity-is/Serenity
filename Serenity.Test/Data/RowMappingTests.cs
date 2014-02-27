@@ -46,7 +46,7 @@ namespace Serenity.Test.Data
             Assert.Equal(null, BasicRow.Fields.AString.ForeignField);
             Assert.Equal(null, BasicRow.Fields.AString.Join);
             Assert.Equal(null, BasicRow.Fields.AString.JoinAlias);
-            Assert.Equal(null, BasicRow.Fields.AString.ReferencedJoins);
+            Assert.Equal(null, BasicRow.Fields.AString.ReferencedAliases);
             Assert.Equal(null, BasicRow.Fields.AString.Origin);
             Assert.Equal(0, BasicRow.Fields.AString.NaturalOrder);
             Assert.Equal(null, BasicRow.Fields.AString.TextualField);
@@ -69,7 +69,7 @@ namespace Serenity.Test.Data
             Assert.Equal(null, BasicRow.Fields.AInt32.ForeignField);
             Assert.Equal(null, BasicRow.Fields.AInt32.Join);
             Assert.Equal(null, BasicRow.Fields.AInt32.JoinAlias);
-            Assert.Equal(null, BasicRow.Fields.AInt32.ReferencedJoins);
+            Assert.Equal(null, BasicRow.Fields.AInt32.ReferencedAliases);
             Assert.Equal(null, BasicRow.Fields.AInt32.Origin);
             Assert.Equal(0, BasicRow.Fields.AInt32.NaturalOrder);
             Assert.Equal(null, BasicRow.Fields.AInt32.TextualField);
