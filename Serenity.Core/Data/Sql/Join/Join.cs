@@ -42,7 +42,7 @@ namespace Serenity.Data
             {
                 if (joins.ContainsKey(this.Name))
                     throw new ArgumentException(String.Format(
-                        "There is already a join with alias '{0}': {1}", this.Name));
+                        "There is already a join with alias '{0}'", this.Name));
 
                 joins.Add(this.Name, this);
             }
