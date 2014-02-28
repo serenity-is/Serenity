@@ -175,9 +175,6 @@ namespace Serenity
             if (phone.StartsWith("0"))
                 return false;
 
-            if (phone.CharAt(3) == "0")
-                return false;
-
             for (var i = 0; i < phone.Length; i++)
             {
                 var c = phone.CharCodeAt(i);
