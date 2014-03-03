@@ -29,6 +29,7 @@ namespace Serenity
                 jQuery.Ajax(new jQueryAjaxOptions
                 {
                     Async = false,
+                    Cache = true,
                     Type = "GET",
                     Url = url,
                     Data = null,
