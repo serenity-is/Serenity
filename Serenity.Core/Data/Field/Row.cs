@@ -8,19 +8,20 @@ namespace Serenity.Data
     public abstract partial class Row : IEntityWithJoins, ISupportAttached, 
         INotifyPropertyChanged, IEditableObject, IDataErrorInfo
     {
-        internal RowFieldsBase _fields;
-        internal bool[] _assignedFields;
-        internal bool _tracking;
-        internal bool _ignoreConstraints;
-        internal Hashtable _dictionaryData;
-        internal object[] _indexedData;
+        internal RowFieldsBase fields;
+        internal bool[] assignedFields;
+        internal Hashtable dictionaryData;
+        internal bool ignoreConstraints;
+        internal object[] indexedData;
+        internal bool tracking;
+        internal bool unassignedReadErrors;
 
         protected Row(RowFieldsBase fields)
         {
             if (fields == null)
                 throw new ArgumentNullException("fields");
 
-            _fields = fields.Init();
+            this.fields = fields.Init();
 
             TrackAssignments = TrackAssignmentsDefault;
         }
@@ -28,53 +29,53 @@ namespace Serenity.Data
         public void CloneInto(Row clone, 
             bool cloneHandlers)
         {
-            clone._ignoreConstraints = _ignoreConstraints;
+            clone.ignoreConstraints = ignoreConstraints;
 
             foreach (var field in GetFields())
                 field.Copy(this, clone);
 
-            clone._tracking = _tracking;
-            if (_tracking)
+            clone.tracking = tracking;
+            if (tracking)
             {
-                if (_assignedFields != null)
+                if (assignedFields != null)
                 {
-                    clone._assignedFields = new bool[_assignedFields.Length];
-                    Array.Copy(_assignedFields, clone._assignedFields, _assignedFields.Length);
+                    clone.assignedFields = new bool[assignedFields.Length];
+                    Array.Copy(assignedFields, clone.assignedFields, assignedFields.Length);
                 }
             }
             else
-                clone._assignedFields = null;
+                clone.assignedFields = null;
 
-            clone._originalValues = _originalValues;
+            clone.originalValues = originalValues;
 
-            if (_dictionaryData != null)
-                clone._dictionaryData = (Hashtable)this._dictionaryData.Clone();
+            if (dictionaryData != null)
+                clone.dictionaryData = (Hashtable)this.dictionaryData.Clone();
             else
-                clone._dictionaryData = null;
+                clone.dictionaryData = null;
 
-            if (_indexedData != null)
+            if (indexedData != null)
             {
-                clone._indexedData = new object[_indexedData.Length];
-                for (var i = 0; i < _indexedData.Length; i++)
-                    clone._indexedData[i] = _indexedData[i];
+                clone.indexedData = new object[indexedData.Length];
+                for (var i = 0; i < indexedData.Length; i++)
+                    clone.indexedData[i] = indexedData[i];
             }
             else
-                clone._indexedData = null;
+                clone.indexedData = null;
 
-            if (_previousValues != null)
-                clone._previousValues = _previousValues.CloneRow();
+            if (previousValues != null)
+                clone.previousValues = previousValues.CloneRow();
             else
-                clone._previousValues = null;
+                clone.previousValues = null;
 
             if (cloneHandlers)
             {
-                clone._postHandler = this._postHandler;
-                clone._propertyChanged = this._propertyChanged;
+                clone.postHandler = this.postHandler;
+                clone.propertyChanged = this.propertyChanged;
 
-                if (this._validationErrors != null)
-                    clone._validationErrors = new Dictionary<string, string>(this._validationErrors);
+                if (this.validationErrors != null)
+                    clone.validationErrors = new Dictionary<string, string>(this.validationErrors);
                 else
-                    clone._validationErrors = null;
+                    clone.validationErrors = null;
             }
         }
 
@@ -87,93 +88,99 @@ namespace Serenity.Data
 
         public virtual Row CreateNew()
         {
-            if (_fields.rowFactory == null)
+            if (fields.rowFactory == null)
                 throw new NotImplementedException();
 
-            return _fields.rowFactory();
+            return fields.rowFactory();
         }
 
         internal void FieldAssignedValue(Field field)
         {
-            if (_assignedFields == null)
-                _assignedFields = new bool[_fields.Count];
+            if (assignedFields == null)
+                assignedFields = new bool[fields.Count];
 
-            _assignedFields[field.index] = true;
+            assignedFields[field.index] = true;
 
             RemoveValidationError(field.PropertyName ?? field.Name);
 
-            if (_propertyChanged != null)
+            if (propertyChanged != null)
             {
-                if (field.IndexCompare(_previousValues, this) != 0)
+                if (field.IndexCompare(previousValues, this) != 0)
                 {
                     RaisePropertyChanged(field);
-                    field.Copy(this, _previousValues);
+                    field.Copy(this, previousValues);
                 }
             }
         }
 
         public Field FindField(string fieldName)
         {
-            return _fields.FindField(fieldName);
+            return fields.FindField(fieldName);
         }
 
         public Field FindFieldByPropertyName(string propertyName)
         {
-            return _fields.FindFieldByPropertyName(propertyName);
+            return fields.FindFieldByPropertyName(propertyName);
         }
 
         public RowFieldsBase GetFields()
         {
-            return _fields;
+            return fields;
         }
 
         public int FieldCount
         {
-            get { return _fields.Count; }
+            get { return fields.Count; }
         }
 
         public bool IsAnyFieldAssigned
         {
             get
             {
-                return _tracking && _assignedFields != null;
+                return tracking && assignedFields != null;
             }
         }
 
         public bool IgnoreConstraints
         {
-            get { return _ignoreConstraints; }
-            set { _ignoreConstraints = value; }
+            get { return ignoreConstraints; }
+            set { ignoreConstraints = value; }
         }
 
         public string Table
         {
-            get { return _fields.TableName; }
+            get { return fields.TableName; }
         }
 
         public bool TrackAssignments
         {
             get
             { 
-                return _tracking;
+                return tracking;
             }
             set 
             {
-                if (_tracking != value)
+                if (tracking != value)
                 {
                     if (value)
                     {
-                        if (_propertyChanged != null)
-                            _previousValues = this.CloneRow();
-                        _tracking = value;
+                        if (propertyChanged != null)
+                            previousValues = this.CloneRow();
+                        tracking = value;
                     }
                     else
                     {
-                        _tracking = false;
-                        _assignedFields = null;
+                        tracking = false;
+                        assignedFields = null;
                     }
                 }
             }
+        }
+
+        public bool UnassignedReadErrors
+        {
+            get { return unassignedReadErrors; }
+            set { unassignedReadErrors = value; }
         }
 
         private Field FindFieldEnsure(string fieldName)
@@ -201,80 +208,84 @@ namespace Serenity.Data
         {
             if (value == null)
             {
-                if (_dictionaryData == null)
+                if (dictionaryData == null)
                     return;
-                _dictionaryData[key] = null;
+                dictionaryData[key] = null;
             }
             else
             {
-                if (_dictionaryData == null)
-                    _dictionaryData = new Hashtable();
-                _dictionaryData[key] = value;
+                if (dictionaryData == null)
+                    dictionaryData = new Hashtable();
+                dictionaryData[key] = value;
             }
-        }
-
-        public void SetIndexedData(int index, object value)
-        {
-            if (value == null)
-            {
-                if (_indexedData == null)
-                    return;
-
-                _indexedData[index] = null;
-            }
-            else
-            {
-                if (_indexedData == null)
-                    _indexedData = new object[this.FieldCount];
-
-                _indexedData[index] = value;
-            }
-        }
-
-        public object GetIndexedData(int index)
-        {
-            if (_indexedData != null)
-                return _indexedData[index];
-
-            return null;
         }
 
         public object GetDictionaryData(object key)
         {
-            if (_dictionaryData != null)
-                return _dictionaryData[key];
+            if (dictionaryData != null)
+                return dictionaryData[key];
+
+            return null;
+        }
+
+
+        internal void SetIndexedData(int index, object value)
+        {
+            if (value == null)
+            {
+                if (indexedData == null)
+                    return;
+
+                indexedData[index] = null;
+            }
+            else
+            {
+                if (indexedData == null)
+                    indexedData = new object[this.FieldCount];
+
+                indexedData[index] = value;
+            }
+        }
+
+        internal object GetIndexedData(int index)
+        {
+            if (indexedData != null)
+                return indexedData[index];
 
             return null;
         }
 
         public bool IsAssigned(Field field)
         {
-            if (_assignedFields == null)
+            if (assignedFields == null)
                 return false;
-            return _assignedFields[field.index];
+
+            return assignedFields[field.index];
         }
 
         public void ClearAssignment(Field field)
         {
-            if (_assignedFields != null)
-            {
-                _assignedFields[field.index] = false;
-                for (var i = 0; i < _assignedFields.Length; i++)
-                    if (_assignedFields[i])
-                        return;
-                _assignedFields = null;
-            }
+            if (assignedFields == null)
+                return;
+
+            assignedFields[field.index] = false;
+
+            for (var i = 0; i < assignedFields.Length; i++)
+                if (assignedFields[i])
+                    return;
+
+            assignedFields = null;
         }
 
         public bool IsAnyFieldChanged
         {
             get
             {
-                if (_originalValues == null)
+                if (originalValues == null)
                     return false;
 
-                for (var i = 0; i < _fields.Count; i++)
-                    if (_fields[i].IndexCompare(_originalValues, this) != 0)
+                for (var i = 0; i < fields.Count; i++)
+                    if (fields[i].IndexCompare(originalValues, this) != 0)
                         return true;
 
                 return false;
@@ -283,13 +294,13 @@ namespace Serenity.Data
 
         Hashtable ISupportAttached.AttachedProperties
         {
-            get { return _dictionaryData; }
-            set { _dictionaryData = value; }
+            get { return dictionaryData; }
+            set { dictionaryData = value; }
         }
 
         IDictionary<string, Join> IEntityWithJoins.Joins
         {
-            get { return _fields.Joins; }
+            get { return fields.Joins; }
         }
 
         /// <summary>

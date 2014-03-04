@@ -32,7 +32,7 @@ namespace Serenity.Data
             else
                 _setValue(row, Convert.ToInt64(reader.GetValue(index), CultureInfo.InvariantCulture));
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 
@@ -82,20 +82,21 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 
         Int64? IIdField.this[Row row]
         {
             get 
-            { 
+            {
+                CheckUnassignedRead(row);
                 return _getValue(row); 
             }
             set
             {
                 _setValue(row, value);
-                if (row._tracking)
+                if (row.tracking)
                     row.FieldAssignedValue(this);
             }
         }

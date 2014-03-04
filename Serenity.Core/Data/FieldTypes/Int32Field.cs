@@ -33,7 +33,7 @@ namespace Serenity.Data
             else
                 _setValue(row, Convert.ToInt32(value, CultureInfo.InvariantCulture));
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 
@@ -128,7 +128,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 
@@ -136,6 +136,7 @@ namespace Serenity.Data
         {
             get
             {
+                CheckUnassignedRead(row);
                 return _getValue(row);
             }
             set
@@ -148,7 +149,7 @@ namespace Serenity.Data
                 else
                     _setValue(row, null);
                 
-                if (row._tracking)
+                if (row.tracking)
                     row.FieldAssignedValue(this);
             }
         }

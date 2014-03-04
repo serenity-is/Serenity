@@ -36,7 +36,7 @@ namespace Serenity.Data
                 _setValue(row, datetime);
             }
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 #endif
@@ -69,6 +69,7 @@ namespace Serenity.Data
         {
             get
             {
+                CheckUnassignedRead(row);
                 return _getValue(row);
             }
             set
@@ -77,13 +78,14 @@ namespace Serenity.Data
                     _setValue(row, ToDateTimeKind(value.Value));
                 else
                     _setValue(row, value);
-                if (row._tracking)
+                if (row.tracking)
                     row.FieldAssignedValue(this);
             }
         }
 
         public override object AsObject(Row row)
         {
+            CheckUnassignedRead(row);
             return _getValue(row);
         }
 
@@ -94,7 +96,7 @@ namespace Serenity.Data
             else
                 _setValue(row, ToDateTimeKind((DateTime)value));
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 
@@ -134,7 +136,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
     }

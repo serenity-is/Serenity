@@ -26,7 +26,7 @@ namespace Serenity.Data
             _processCriteria = processCriteria;
             this.filterFields = filterFields;
             if (filterFields == null && row != null)
-                filterFields = row._fields.Filters;
+                filterFields = row.fields.Filters;
         }
 
         //protected virtual FilterFieldType GetFilterFieldType(Field field, string fieldName)

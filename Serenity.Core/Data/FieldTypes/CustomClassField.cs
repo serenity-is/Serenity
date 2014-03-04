@@ -29,7 +29,7 @@ namespace Serenity.Data
             else
                 _setValue(row, GetFromReader(reader, index));
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 
@@ -94,7 +94,7 @@ namespace Serenity.Data
                     break;
             }
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 
@@ -110,7 +110,7 @@ namespace Serenity.Data
                 value = Clone(value);
 
             _setValue((Row)(target), value);
-            if (target._tracking)
+            if (target.tracking)
                 target.FieldAssignedValue(this);
         }
     }

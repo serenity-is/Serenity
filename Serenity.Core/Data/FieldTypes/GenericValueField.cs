@@ -50,7 +50,7 @@ namespace Serenity.Data
         public override void Copy(Row source, Row target)
         {
             _setValue((Row)(target), _getValue((Row)(source)));
-            if (target._tracking)
+            if (target.tracking)
                 target.FieldAssignedValue(this);
         }
 
@@ -58,12 +58,13 @@ namespace Serenity.Data
         {
             get
             {
+                CheckUnassignedRead(row);
                 return _getValue(row);
             }
             set
             {
                 _setValue(row, value);
-                if (row._tracking)
+                if (row.tracking)
                     row.FieldAssignedValue(this);
             }
         }
@@ -80,7 +81,7 @@ namespace Serenity.Data
             else
                 _setValue(row, (TValue)value);
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 

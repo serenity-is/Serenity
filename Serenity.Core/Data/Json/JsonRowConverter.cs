@@ -26,10 +26,10 @@ namespace Serenity.Data
 
             if (row.TrackAssignments)
             {
-                var modified = row._assignedFields;
+                var modified = row.assignedFields;
                 if (modified != null)
                 {
-                    var fields = row._fields;
+                    var fields = row.fields;
                     for (var i = 0; i < fields.Count; i++)
                         if (modified[i])
                         {
@@ -44,7 +44,7 @@ namespace Serenity.Data
             }
             else
             {
-                var fields = row._fields;
+                var fields = row.fields;
                 foreach (var f in fields)
                     if (!f.IsNull(row))
                     {

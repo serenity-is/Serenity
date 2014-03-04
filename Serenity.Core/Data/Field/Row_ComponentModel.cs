@@ -6,56 +6,56 @@ namespace Serenity.Data
 {
     public abstract partial class Row
     {
-        internal int _insidePostHandler;
-        internal Row _originalValues;
-        internal Row _previousValues;
-        internal PropertyChangedEventHandler _propertyChanged;
-        internal Action<Row> _postHandler;
-        private Dictionary<String, String> _validationErrors;
+        internal int insidePostHandler;
+        internal Row originalValues;
+        internal Row previousValues;
+        internal PropertyChangedEventHandler propertyChanged;
+        internal Action<Row> postHandler;
+        private Dictionary<String, String> validationErrors;
 
         internal void RaisePropertyChanged(Field field)
         {
-            if (_fields.propertyChangedEventArgs == null)
+            if (fields.propertyChangedEventArgs == null)
             {
-                var args = new PropertyChangedEventArgs[_fields.Count + 1];
-                for (var i = 0; i < _fields.Count; i++)
+                var args = new PropertyChangedEventArgs[fields.Count + 1];
+                for (var i = 0; i < fields.Count; i++)
                 {
-                    var f = _fields[i];
+                    var f = fields[i];
                     args[i] = new PropertyChangedEventArgs(f.propertyName ?? f.Name);
                 }
-                args[_fields.Count] = new PropertyChangedEventArgs("__ROW__");
-                _fields.propertyChangedEventArgs = args;
+                args[fields.Count] = new PropertyChangedEventArgs("__ROW__");
+                fields.propertyChangedEventArgs = args;
             }
 
             if (field == null)
-                _propertyChanged(this, _fields.propertyChangedEventArgs[_fields.Count]);
+                propertyChanged(this, fields.propertyChangedEventArgs[fields.Count]);
             else
-                _propertyChanged(this, _fields.propertyChangedEventArgs[field.Index]);
+                propertyChanged(this, fields.propertyChangedEventArgs[field.Index]);
         }
 
         public Action<Row> PostHandler
         {
-            get { return _postHandler; }
-            set { _postHandler = value; }
+            get { return postHandler; }
+            set { postHandler = value; }
         }
 
         public bool IsFieldChanged(Field field)
         {
-            return (_originalValues != null &&
-                    field.IndexCompare(_originalValues, this) != 0);
+            return (originalValues != null &&
+                    field.IndexCompare(originalValues, this) != 0);
         }
 
         public event PropertyChangedEventHandler PropertyChanged
         {
             add
             {
-                _propertyChanged += value;
-                if (_previousValues == null)
-                    _previousValues = this.CloneRow();
+                propertyChanged += value;
+                if (previousValues == null)
+                    previousValues = this.CloneRow();
             }
             remove
             {
-                _propertyChanged -= value;
+                propertyChanged -= value;
             }
         }
 
@@ -63,22 +63,22 @@ namespace Serenity.Data
         {
             TrackAssignments = true;
 
-            if (_originalValues == null)
-                _originalValues = this.CloneRow();
+            if (originalValues == null)
+                originalValues = this.CloneRow();
         }
 
         public void CancelEdit()
         {
-            if (_originalValues != null)
+            if (originalValues != null)
             {
-                var original = _originalValues;
+                var original = originalValues;
 
-                _originalValues = null;
+                originalValues = null;
 
-                for (int i = 0; i < _fields.Count; i++)
-                    _fields[i].CopyNoAssignment(original, this);
+                for (int i = 0; i < fields.Count; i++)
+                    fields[i].CopyNoAssignment(original, this);
 
-                _assignedFields = original._assignedFields;
+                assignedFields = original.assignedFields;
 
                 ClearValidationErrors();
             }
@@ -86,24 +86,24 @@ namespace Serenity.Data
 
         public void EndEdit()
         {
-            if (_postHandler != null &&
-                _originalValues != null)
+            if (postHandler != null &&
+                originalValues != null)
             {
-                if (_insidePostHandler > 0)
+                if (insidePostHandler > 0)
                     return; // exception daha iyi olabilir mi?
 
-                _insidePostHandler++;
+                insidePostHandler++;
                 try
                 {
                     ClearValidationErrors();
-                    _postHandler(this);
+                    postHandler(this);
                     if (HasErrors)
                         throw new Exception("Lütfen satırdaki işaretli alanları düzeltiniz.");
-                    _originalValues = null;
+                    originalValues = null;
                 }
                 finally
                 {
-                    _insidePostHandler--;
+                    insidePostHandler--;
                 }
 
                 if (PostEnded != null)
@@ -111,59 +111,59 @@ namespace Serenity.Data
             }
             else
             {
-                _originalValues = null;
+                originalValues = null;
                 ClearValidationErrors();
             }
         }
 
         public bool IsEditing
         {
-            get { return _originalValues != null; }
+            get { return originalValues != null; }
         }
 
         public Row OriginalValues
         {
-            get { return _originalValues ?? this; }
+            get { return originalValues ?? this; }
         }
 
         public Row PreviousValues
         {
-            get { return _previousValues ?? this; }
+            get { return previousValues ?? this; }
         }
 
         public bool HasPostHandler
         {
-            get { return _postHandler != null; }
+            get { return postHandler != null; }
         }
 
         public EventHandler PostEnded;
 
         public void AddValidationError(string propertyName, string error)
         {
-            if (_validationErrors == null)
-                _validationErrors = new Dictionary<string, string>();
+            if (validationErrors == null)
+                validationErrors = new Dictionary<string, string>();
 
-            _validationErrors[propertyName ?? String.Empty] = error;
+            validationErrors[propertyName ?? String.Empty] = error;
         }
 
         public void ClearValidationErrors()
         {
-            if (_validationErrors != null &&
-                _validationErrors.Count > 0)
+            if (validationErrors != null &&
+                validationErrors.Count > 0)
             {
-                _validationErrors.Clear();
+                validationErrors.Clear();
             }
         }
 
         public void RemoveValidationError(string propertyName)
         {
-            if (_validationErrors != null)
-                _validationErrors.Remove(propertyName ?? String.Empty);
+            if (validationErrors != null)
+                validationErrors.Remove(propertyName ?? String.Empty);
         }
 
         public IDictionary<string, string> ValidationErrors
         {
-            get { return _validationErrors; }
+            get { return validationErrors; }
         }
 
         public bool HasErrors
@@ -171,8 +171,8 @@ namespace Serenity.Data
             get
             {
                 return
-                    _validationErrors != null &&
-                    _validationErrors.Count > 0;
+                    validationErrors != null &&
+                    validationErrors.Count > 0;
             }
         }
 
@@ -181,8 +181,8 @@ namespace Serenity.Data
             get
             {
                 string error;
-                if (_validationErrors != null &&
-                    _validationErrors.TryGetValue(String.Empty, out error))
+                if (validationErrors != null &&
+                    validationErrors.TryGetValue(String.Empty, out error))
                     return error;
                 return String.Empty;
             }
@@ -193,8 +193,8 @@ namespace Serenity.Data
             get
             {
                 string error;
-                if (_validationErrors != null &&
-                    _validationErrors.TryGetValue(columnName ?? String.Empty, out error))
+                if (validationErrors != null &&
+                    validationErrors.TryGetValue(columnName ?? String.Empty, out error))
                     return error;
                 return String.Empty;
             }
@@ -202,7 +202,7 @@ namespace Serenity.Data
 
         public PropertyDescriptorCollection GetPropertyDescriptors()
         {
-            return _fields.propertyDescriptors;
+            return fields.propertyDescriptors;
         }
     }
 }

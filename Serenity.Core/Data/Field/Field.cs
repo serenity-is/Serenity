@@ -311,6 +311,24 @@ namespace Serenity.Data
         {
         }
 
+        protected void CheckUnassignedRead(Row row)
+        {
+            if (row == null)
+                throw new ArgumentNullException("row");
+
+            if (!row.tracking)
+                return;
+
+            if (!row.unassignedReadErrors)
+                return;
+
+            if (row.IsAssigned(this))
+                return;
+
+            throw new InvalidOperationException(String.Format(
+                "{0} field on {1} is read before assigned a value!", this.Name, row.GetType().Name));
+        }
+
         public abstract void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer);
         public abstract void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer);
         public abstract void Copy(Row source, Row target);

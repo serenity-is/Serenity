@@ -31,7 +31,7 @@ namespace Serenity.Data
             else
                 _setValue(row, reader.GetBoolean(index));
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
 
@@ -69,7 +69,7 @@ namespace Serenity.Data
                     throw JsonUnexpectedToken(reader);
             }
 
-            if (row._tracking)
+            if (row.tracking)
                 row.FieldAssignedValue(this);
         }
     }
