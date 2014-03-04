@@ -21,6 +21,8 @@ namespace Serenity.Data
                 throw new ArgumentNullException("fields");
 
             _fields = fields.Init();
+
+            TrackAssignments = TrackAssignmentsDefault;
         }
 
         public void CloneInto(Row clone, 
@@ -289,5 +291,10 @@ namespace Serenity.Data
         {
             get { return _fields.Joins; }
         }
+
+        /// <summary>
+        /// Only use for unit testing purposes!
+        /// </summary>
+        public static bool TrackAssignmentsDefault { get; set; }
     }
 }
