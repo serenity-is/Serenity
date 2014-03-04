@@ -204,7 +204,7 @@ namespace Serenity.Data
                             FieldInfo storage;
                             if (rowFields.TryGetValue("_" + property.Name, out storage) ||
                                 rowFields.TryGetValue("m_" + property.Name, out storage) ||
-                                rowFields.TryGetValue(property.Name.Substring(1), out storage))
+                                rowFields.TryGetValue(property.Name, out storage))
                             {
                                 prm[5] = CreateFieldGetMethod(storage);
                                 prm[6] = CreateFieldSetMethod(storage);
