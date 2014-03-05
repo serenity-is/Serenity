@@ -12,7 +12,7 @@ namespace Serenity
 
     public interface IUserAuthenticationService
     {
-        bool Validate(string username, string password);
+        bool Validate(ref string username, string password);
     }
 
     //public class UserCache

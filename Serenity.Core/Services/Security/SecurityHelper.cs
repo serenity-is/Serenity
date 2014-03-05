@@ -52,16 +52,16 @@ namespace Serenity
         /// <returns>
         ///   if validation is successful,returns true and sets ticket. if it is invalid, returns only false
         ///   ,doesn't change current ticket.</returns>
-        public static bool Authenticate(string username, string password, bool persist)
+        public static bool Authenticate(ref string username, string password, bool persist)
         {
             if (username == null)
                 throw new ArgumentNullException("username");
             if (password == null)
                 throw new ArgumentNullException("password");
 
-            if (!Membership.ValidateUser(username, password))
+            if (!IoC.Resolve<IUserAuthenticationService>().Validate(ref username, password))
                 return false;
-
+            
             SetAuthenticationTicket(username, persist, Roles.GetRolesForUser(username));
             return true;
         }
