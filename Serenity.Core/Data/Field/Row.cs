@@ -14,7 +14,7 @@ namespace Serenity.Data
         internal bool ignoreConstraints;
         internal object[] indexedData;
         internal bool tracking;
-        internal bool unassignedReadErrors;
+        internal bool trackWithChecks;
 
         protected Row(RowFieldsBase fields)
         {
@@ -22,8 +22,6 @@ namespace Serenity.Data
                 throw new ArgumentNullException("fields");
 
             this.fields = fields.Init();
-
-            TrackAssignments = TrackAssignmentsDefault;
         }
 
         public void CloneInto(Row clone, 
@@ -45,6 +43,8 @@ namespace Serenity.Data
             }
             else
                 clone.assignedFields = null;
+
+            clone.trackWithChecks = trackWithChecks;
 
             clone.originalValues = originalValues;
 
@@ -166,21 +166,35 @@ namespace Serenity.Data
                     {
                         if (propertyChanged != null)
                             previousValues = this.CloneRow();
+
                         tracking = value;
                     }
                     else
                     {
                         tracking = false;
+                        trackWithChecks = false;
                         assignedFields = null;
                     }
                 }
             }
         }
 
-        public bool UnassignedReadErrors
+        public bool TrackWithChecks
         {
-            get { return unassignedReadErrors; }
-            set { unassignedReadErrors = value; }
+            get 
+            {
+                return tracking && trackWithChecks;
+            }
+            set
+            {
+                if (value != TrackWithChecks)
+                {
+                    if (value && !tracking)
+                        TrackAssignments = true;
+
+                    trackWithChecks = value;
+                }
+            }
         }
 
         private Field FindFieldEnsure(string fieldName)
@@ -302,10 +316,5 @@ namespace Serenity.Data
         {
             get { return fields.Joins; }
         }
-
-        /// <summary>
-        /// Only use for unit testing purposes!
-        /// </summary>
-        public static bool TrackAssignmentsDefault { get; set; }
     }
 }

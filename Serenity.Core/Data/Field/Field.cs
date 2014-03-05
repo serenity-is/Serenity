@@ -319,10 +319,13 @@ namespace Serenity.Data
             if (!row.tracking)
                 return;
 
-            if (!row.unassignedReadErrors)
+            if (!row.trackWithChecks)
                 return;
 
             if (row.IsAssigned(this))
+                return;
+
+            if (!this.GetIsNull(row))
                 return;
 
             throw new InvalidOperationException(String.Format(
@@ -338,7 +341,13 @@ namespace Serenity.Data
         public abstract int IndexCompare(Row row1, Row row2);
         public abstract object AsObject(Row row);
         public abstract void AsObject(Row row, object value);
-        public abstract bool IsNull(Row row);
+        protected abstract bool GetIsNull(Row row);
+
+        public bool IsNull(Row row)
+        {
+            CheckUnassignedRead(row);
+            return GetIsNull(row);
+        }
 
         //public string EditorType { get; set; }
         //public Dictionary<string, object> EditorOptions { get; set; }

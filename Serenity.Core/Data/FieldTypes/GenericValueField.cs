@@ -85,7 +85,7 @@ namespace Serenity.Data
                 row.FieldAssignedValue(this);
         }
 
-        public override bool IsNull(Row row)
+        protected override bool GetIsNull(Row row)
         {
             return _getValue(row) == null;
         }
