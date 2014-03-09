@@ -281,7 +281,11 @@
         /// <returns>The query itself.</returns>
         /// <remarks>This method is designed to help apply user defined orders 
         /// (for example by clicking headers on a grid) to a query with
-        /// existing order.</remarks>
+        /// existing order.
+        /// SQL server throws an error if a field is used more than once in ORDER BY
+        /// expression, so this function first removes normal and DESC versions of 
+        /// the expression from the ORDER BY statement.
+        /// </remarks>
         public SqlQuery OrderByFirst(string expression, bool desc = false)
         {
             if (expression.IsNullOrEmpty())
@@ -295,23 +299,15 @@
             if (orderBy == null)
                 orderBy = new List<string>();
 
-            if (orderBy.Contains(expression))
-            {
-                orderBy.Remove(expression);
-            }
-            else if (expression.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
-            {
-                string s = expression.Substring(0, expression.Length - 5);
+            string search = expression.TrimToEmpty();
+            orderBy.RemoveAll(x => String.Compare(x.TrimToEmpty(), search, StringComparison.OrdinalIgnoreCase) == 0);
 
-                if (orderBy.Contains(s))
-                    orderBy.Remove(s);
-            }
+            if (search.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
+                search = search.Substring(0, search.Length - 5).TrimToEmpty();
             else
-            {
-                string s = expression + " DESC";
-                if (orderBy.Contains(s))
-                    orderBy.Remove(s);
-            }
+                search += " DESC";
+
+            orderBy.RemoveAll(x => String.Compare(x.TrimToEmpty(), search, StringComparison.OrdinalIgnoreCase) == 0);
 
             if (orderBy.Count > 0)
                 orderBy.Insert(0, expression);
