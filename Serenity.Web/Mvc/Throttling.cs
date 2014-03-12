@@ -87,7 +87,7 @@ namespace Serenity.Web
 
             if (HttpRuntime.Cache[key] == null)
             {
-                HttpRuntime.Cache.Add(key,
+                HttpRuntime.Cache.Insert(key,
                     true, // is this the smallest data we can have?
                     null, // no dependencies
                     DateTime.Now.AddSeconds(Seconds), // absolute expiration
