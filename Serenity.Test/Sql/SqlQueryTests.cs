@@ -409,6 +409,114 @@ namespace Serenity.Test.Data
         }
 
         [Fact]
+        public void OrderByFirstWithEmptyOrNullArgumentsThrowsArgumentNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst((string)null, desc: false));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst((string)null, desc: true));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst("", desc: false));
+            Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst("", desc: true));
+        }
+
+        [Fact]
+        public void OrderByFirstInsertsExpressionToStart()
+        {
+            var query = new SqlQuery()
+                .From("TestTable")
+                .Select("a")
+                .OrderBy("a")
+                .OrderBy("b")
+                .OrderByFirst("c");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT a FROM TestTable ORDER BY c, a, b"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void OrderByFirstMovesExpressionToStartIfAlreadyInStatement()
+        {
+            var query = new SqlQuery()
+                .From("TestTable")
+                .Select("a")
+                .OrderBy("a")
+                .OrderBy("b")
+                .OrderBy("c")
+                .OrderByFirst("b");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT a FROM TestTable ORDER BY b, a, c"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void OrderByFirstHandlesDescWhileMovingExpressionToFirst()
+        {
+            var query1 = new SqlQuery()
+                .From("TestTable")
+                .Select("a")
+                .OrderBy("a")
+                .OrderBy("b", desc: true)
+                .OrderBy("c")
+                .OrderByFirst("b");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT a FROM TestTable ORDER BY b, a, c"),
+                TestSqlHelper.Normalize(
+                    query1.ToString()));
+
+            var query2 = new SqlQuery()
+                .From("TestTable")
+                .Select("a")
+                .OrderBy("a")
+                .OrderBy("b")
+                .OrderBy("c")
+                .OrderByFirst("b", desc: true);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT a FROM TestTable ORDER BY b DESC, a, c"),
+                TestSqlHelper.Normalize(
+                    query2.ToString()));
+        }
+
+        [Fact]
+        public void OrderByFirstAppendsDescKeywordWhenDescArgumentIsTrue()
+        {
+            var query = new SqlQuery()
+                .Select("u.TestColumn")
+                .From("TestTable u")
+                .OrderBy(new Alias("u"), "TestColumn", desc: true)
+                .OrderByFirst("TestColumn2", desc: true);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT u.TestColumn FROM TestTable u ORDER BY TestColumn2 DESC, u.TestColumn DESC"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void OrderByFirstWorksProperlyWhenNoOrderByExists()
+        {
+            var query = new SqlQuery()
+                .Select("TestColumn")
+                .From("TestTable")
+                .OrderByFirst("TestColumn")
+                .OrderBy("SecondColumn");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT TestColumn FROM TestTable ORDER BY TestColumn, SecondColumn"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
         public void SkipThrowsExceptionIfNoOrderByForSql2000Dialect()
         {
             var query = new SqlQuery()
