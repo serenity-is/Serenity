@@ -31,7 +31,7 @@ namespace Serenity.Data
         {
             if (_transaction != null)
             {
-                _transaction.Rollback();
+                _transaction.Dispose();
                 _transaction = null;
 
                 if (_rollback != null)
