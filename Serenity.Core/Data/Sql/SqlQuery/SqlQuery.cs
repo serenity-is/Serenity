@@ -7,7 +7,7 @@
     public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName
     {
         private HashSet<string> aliases;
-        private string cachedQuery;
+        private string cachedQueryText;
         private List<Column> columns;
         private bool countRecords;
         private bool distinct;
@@ -37,7 +37,7 @@
         {
             if (this.distinct != distinct)
             {
-                cachedQuery = null;
+                cachedQueryText = null;
                 this.distinct = distinct;
             }
 
@@ -62,7 +62,7 @@
             if (table.IsNullOrEmpty())
                 throw new ArgumentNullException("table");
 
-            cachedQuery = null;
+            cachedQueryText = null;
 
             if (from.Length > 0)
                 from.Append(", ");
@@ -180,7 +180,7 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQuery = null;
+            cachedQueryText = null;
 
             if (groupBy == null || groupBy.Length == 0)
                 groupBy = new StringBuilder(expression);
@@ -219,7 +219,7 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQuery = null;
+            cachedQueryText = null;
 
             if (having == null)
                 having = new StringBuilder(expression);
@@ -243,7 +243,7 @@
             if (desc)
                 expression += Sql.Keyword.Desc;
 
-            cachedQuery = null;
+            cachedQueryText = null;
 
             if (orderBy == null)
                 orderBy = new List<string>();
@@ -291,7 +291,7 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
-            cachedQuery = null;
+            cachedQueryText = null;
 
             if (desc)
                 expression += Sql.Keyword.Desc;
@@ -330,7 +330,7 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQuery = null;
+            cachedQueryText = null;
             columns.Add(new Column(expression, null, intoIndex, null));
             return this;
         }
@@ -350,7 +350,7 @@
             if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
-            cachedQuery = null;
+            cachedQueryText = null;
             columns.Add(new Column(alias + fieldName, null, intoIndex, null));
             return this;
         }
@@ -369,7 +369,7 @@
             if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
-            cachedQuery = null;
+            cachedQueryText = null;
             columns.Add(new Column(expression, columnName, intoIndex, null));
 
             return this;
@@ -393,7 +393,7 @@
             if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
-            cachedQuery = null;
+            cachedQueryText = null;
             columns.Add(new Column(alias + fieldName, columnName, intoIndex, null));
             return this;
         }
@@ -465,7 +465,7 @@
             if (skip != skipRows)
             {
                 skip = skipRows;
-                cachedQuery = null;
+                cachedQueryText = null;
             }
 
             return this;
@@ -504,7 +504,7 @@
         {
             if (take != rowCount)
             {
-                cachedQuery = null;
+                cachedQueryText = null;
                 take = rowCount;
             }
 
@@ -530,7 +530,7 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException(expression);
 
-            cachedQuery = null;
+            cachedQueryText = null;
 
             if (where == null)
                 where = new StringBuilder(expression);
@@ -584,7 +584,7 @@
             if (this.dialect != dialect)
             {
                 this.dialect = dialect;
-                cachedQuery = null;
+                cachedQueryText = null;
             }
 
             return this;
@@ -598,7 +598,14 @@
         public bool CountRecords
         {
             get { return countRecords; }
-            set { countRecords = value; cachedQuery = null; }
+            set
+            {
+                if (countRecords != value)
+                {
+                    countRecords = value;
+                    cachedQueryText = null;
+                }
+            }
         }
 
         public IEnumerable<Column> GetColumns()

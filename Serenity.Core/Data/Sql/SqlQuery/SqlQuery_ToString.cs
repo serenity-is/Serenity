@@ -5,6 +5,8 @@ namespace Serenity.Data
 {
     public partial class SqlQuery
     {
+        public bool HasCachedQueryText { get { return cachedQueryText != null; } }
+
         /// <summary>
         ///   SqlSelect sorgusunu formatlayıp bir SELECT sorgusuna çevirir. Sayfalama sözkonusuysa 
         ///   (atlanan kayıt varsa) birden fazla sorgu arka arkaya oluşturulur.</summary>
@@ -12,8 +14,8 @@ namespace Serenity.Data
         ///   Formatlanmış SELECT ifadesi</returns>
         public override string ToString()
         {
-            if (cachedQuery != null)
-                return cachedQuery;
+            if (cachedQueryText != null)
+                return cachedQueryText;
 
             // formatlamada kullanılacak StringBuilder nesnesi
             var sb = new StringBuilder();
@@ -320,10 +322,10 @@ namespace Serenity.Data
             if (this.parent != null)
                 sb.Append(")");
 
-            cachedQuery = sb.ToString();
+            cachedQueryText = sb.ToString();
 
             // select sorgusunu döndür
-            return cachedQuery;
+            return cachedQueryText;
         }
 
         /// <summary>
