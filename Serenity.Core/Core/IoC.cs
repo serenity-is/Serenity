@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Munq;
+using System;
 using System.Collections.Generic;
-using System.Web.UI.WebControls.WebParts;
-using Munq;
 using System.Configuration;
 
 namespace Serenity
@@ -254,24 +253,21 @@ namespace Serenity
             public Context()
             {
                 old = container;
-                container = new IocContainer();
+                mine = new IocContainer();
+                container = mine;
             }
 
             public void Dispose()
             {
-                if (old == null)
-                    return;
-
                 if (mine == null)
                     return;
                     
                 if (mine != container)
                     throw new InvalidOperationException("Container changed! Possible multi-thread error, or disposing order mistake!");
 
-                mine = null;
-                container.Dispose();
+                mine.Dispose();
                 container = old;
-                old = null;
+                mine = null;
             }
         }
     }
