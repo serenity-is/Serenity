@@ -107,7 +107,7 @@ namespace Serenity.Testing
                 attachedHashes[over.DbAlias] = over.ScriptHash;
 
                 SqlConnections.SetConnection(over.ConnectionKey,
-                    String.Format(DbSettings.ConnectionStringFormat, over.DbAlias), DbSettings.ProviderName);
+                    String.Format(DbSettings.Current.ConnectionStringFormat, over.DbAlias), DbSettings.Current.Provider);
             }
         }
 
