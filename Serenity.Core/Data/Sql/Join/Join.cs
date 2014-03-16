@@ -7,7 +7,7 @@ namespace Serenity.Data
     ///   SQL sorgusundaki bir JOIN ifadesine karþýlýk gelir (INNER, OUTER, CROSS vs.)</summary>
     public abstract class Join : Alias
     {
-        private Dictionary<string, Join> joins;
+        private IDictionary<string, Join> joins;
         private BaseCriteria onCriteria;
         private HashSet<string> referencedAliases;
 
@@ -16,7 +16,7 @@ namespace Serenity.Data
         protected Join(IDictionary<string, Join> joins, string toTable, string alias, BaseCriteria onCriteria)
             : base(toTable, alias)
         {
-            this.joins = new Dictionary<string, Join>();
+            this.joins = joins;
             this.onCriteria = onCriteria;
 
             if (!ReferenceEquals(this.onCriteria, null))

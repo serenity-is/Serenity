@@ -34,8 +34,6 @@
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            cachedQuery = null;
-
             EnsureJoinOf(field);
 
             columns.Add(new Column(field.Expression, field.Name, intoIndex, field));
@@ -117,7 +115,6 @@
             if (intoField == null)
                 throw new ArgumentNullException("alias");
 
-            cachedQuery = null;
             columns.Add(new Column(expression, intoField.Name, intoIndex, intoField));
             return this;
         }
@@ -191,32 +188,30 @@
             get { return into; }
         }
 
-        private void EnsureForeignJoin(IDictionary<string, Join> joins, string joinAlias)
-        {
-            joinAlias = joinAlias.TrimToNull();
-
-            if (joinAlias == null)
-                return;
-
-            Join join;
-            if (!aliases.Contains(joinAlias) &&
-                joins.TryGetValue(joinAlias, out join))
-            {
-                if (join.ReferencedAliases != null)
-                    foreach (var alias in join.ReferencedAliases)
-                    {
-                        if (alias != null &&
-                            String.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) != 0)
-                            EnsureForeignJoin(joins, alias);
-                    }
-
-                Join(join);
-            }
-        }
-
         public SqlQuery EnsureJoin(Join join)
         {
-            EnsureForeignJoin(join.Joins, join.Name);
+            if (join == null)
+                throw new ArgumentNullException("join");
+
+            var joinAlias = join.Name;
+
+            if (aliases != null && aliases.Contains(joinAlias))
+                return this;
+
+            if (join.Joins != null &&
+                join.ReferencedAliases != null)
+                foreach (var alias in join.ReferencedAliases)
+                {
+                    if (String.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) == 0)
+                        continue;
+
+                    Join other;
+                    if (join.Joins.TryGetValue(alias, out other))
+                        EnsureJoin(other);
+                }
+
+            Join(join);
+
             return this;
         }
 
@@ -233,7 +228,11 @@
                 return this;
 
             foreach (var alias in joinField.ReferencedAliases)
-                EnsureForeignJoin(joinField.Joins, alias);
+            {
+                Join join;
+                if (joinField.Joins.TryGetValue(alias, out join))
+                    EnsureJoin(join);
+            }
 
             return this;
         }
@@ -248,13 +247,20 @@
                 return;
 
             string referencedJoin;
+            Join join;
             var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out referencedJoin);
             if (referencedJoin != null)
-                EnsureForeignJoin(intoRow.Joins, referencedJoin);
+            {
+                if (intoRow.Joins.TryGetValue(referencedJoin, out join))
+                    EnsureJoin(join);
+            }
 
             if (referencedJoins != null)
                 foreach (var alias in referencedJoins)
-                    EnsureForeignJoin(intoRow.Joins, alias);
+                {
+                    if (intoRow.Joins.TryGetValue(alias, out join))
+                        EnsureJoin(join);
+                }
         }
     }
 }

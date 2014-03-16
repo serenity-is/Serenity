@@ -52,9 +52,7 @@
 
             if (this.Params != null)
                 foreach (var pair in this.Params)
-                    clone.Params.Add(pair.Key, pair.Value);
-
-            clone.cachedQuery = cachedQuery;
+                    clone.AddParam(pair.Key, pair.Value);
 
             return clone;
         }
