@@ -42,7 +42,7 @@ namespace Serenity.Data.Test
         }
 
         [Fact]
-        public void LocateOptimizedReturnsHashSetIfExpressionContainsMultipleAliases()
+        public void LocateOptimizedReturnsHashSetIfExpressionContainsDoubleAliases()
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("x.y + y.z", out singleAlias);
@@ -50,6 +50,18 @@ namespace Serenity.Data.Test
             Assert.Equal(2, aliases.Count);
             Assert.True(aliases.Contains("x"));
             Assert.True(aliases.Contains("y"));
+        }
+
+        [Fact]
+        public void LocateOptimizedReturnsHashSetIfExpressionContainsTripleAliases()
+        {
+            string singleAlias;
+            var aliases = JoinAliasLocator.LocateOptimized("x.y + y.z + u.w", out singleAlias);
+            Assert.Equal(null, singleAlias);
+            Assert.Equal(3, aliases.Count);
+            Assert.True(aliases.Contains("x"));
+            Assert.True(aliases.Contains("y"));
+            Assert.True(aliases.Contains("u"));
         }
 
         [Fact]
