@@ -34,8 +34,6 @@
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            cachedQueryText = null;
-
             EnsureJoinOf(field);
 
             columns.Add(new Column(field.Expression, field.Name, intoIndex, field));
@@ -117,7 +115,6 @@
             if (intoField == null)
                 throw new ArgumentNullException("alias");
 
-            cachedQueryText = null;
             columns.Add(new Column(expression, intoField.Name, intoIndex, intoField));
             return this;
         }

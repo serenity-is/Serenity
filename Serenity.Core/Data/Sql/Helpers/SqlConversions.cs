@@ -205,6 +205,7 @@ namespace Serenity.Data
         {
             if (value == null)
                 return SqlConsts.Null;
+
             if (SqlSettings.CurrentDialect.PrefixUnicodeStringsWithN())
             {
                 if (value.IndexOf('\'') >= 0)

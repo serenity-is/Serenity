@@ -54,8 +54,6 @@
                 foreach (var pair in this.Params)
                     clone.AddParam(pair.Key, pair.Value);
 
-            clone.cachedQueryText = cachedQueryText;
-
             return clone;
         }
     }

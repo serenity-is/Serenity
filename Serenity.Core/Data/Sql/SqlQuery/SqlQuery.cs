@@ -2,12 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text;
 
+    [DebuggerDisplay("{DebugText}")]
     public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName
     {
         private HashSet<string> aliases;
-        private string cachedQueryText;
         private List<Column> columns;
         private bool countRecords;
         private bool distinct;
@@ -35,11 +36,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Distinct(bool distinct)
         {
-            if (this.distinct != distinct)
-            {
-                cachedQueryText = null;
-                this.distinct = distinct;
-            }
+            this.distinct = distinct;
 
             return this;
         }
@@ -61,8 +58,6 @@
         {
             if (table.IsNullOrEmpty())
                 throw new ArgumentNullException("table");
-
-            cachedQueryText = null;
 
             if (from.Length > 0)
                 from.Append(", ");
@@ -180,8 +175,6 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQueryText = null;
-
             if (groupBy == null || groupBy.Length == 0)
                 groupBy = new StringBuilder(expression);
             else
@@ -219,8 +212,6 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQueryText = null;
-
             if (having == null)
                 having = new StringBuilder(expression);
             else
@@ -242,8 +233,6 @@
 
             if (desc)
                 expression += Sql.Keyword.Desc;
-
-            cachedQueryText = null;
 
             if (orderBy == null)
                 orderBy = new List<string>();
@@ -291,8 +280,6 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
 
-            cachedQueryText = null;
-
             if (desc)
                 expression += Sql.Keyword.Desc;
 
@@ -330,7 +317,6 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQueryText = null;
             columns.Add(new Column(expression, null, intoIndex, null));
             return this;
         }
@@ -350,7 +336,6 @@
             if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
-            cachedQueryText = null;
             columns.Add(new Column(alias + fieldName, null, intoIndex, null));
             return this;
         }
@@ -369,7 +354,6 @@
             if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
-            cachedQueryText = null;
             columns.Add(new Column(expression, columnName, intoIndex, null));
 
             return this;
@@ -393,7 +377,6 @@
             if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
-            cachedQueryText = null;
             columns.Add(new Column(alias + fieldName, columnName, intoIndex, null));
             return this;
         }
@@ -462,12 +445,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Skip(int skipRows)
         {
-            if (skip != skipRows)
-            {
-                skip = skipRows;
-                cachedQueryText = null;
-            }
-
+            skip = skipRows;
             return this;
         }
 
@@ -502,12 +480,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Take(int rowCount)
         {
-            if (take != rowCount)
-            {
-                cachedQueryText = null;
-                take = rowCount;
-            }
-
+            take = rowCount;
             return this;
         }
 
@@ -529,8 +502,6 @@
         {
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException(expression);
-
-            cachedQueryText = null;
 
             if (where == null)
                 where = new StringBuilder(expression);
@@ -581,11 +552,7 @@
         /// <remarks>TODO: SqlDialect system should be improved.</remarks>
         public SqlQuery Dialect(SqlDialect dialect)
         {
-            if (this.dialect != dialect)
-            {
-                this.dialect = dialect;
-                cachedQueryText = null;
-            }
+            this.dialect = dialect;
 
             return this;
         }
@@ -598,14 +565,7 @@
         public bool CountRecords
         {
             get { return countRecords; }
-            set
-            {
-                if (countRecords != value)
-                {
-                    countRecords = value;
-                    cachedQueryText = null;
-                }
-            }
+            set { countRecords = value; }
         }
 
         public IEnumerable<Column> GetColumns()

@@ -37,8 +37,6 @@ namespace Serenity.Data
             if (containsAlias.IsNullOrEmpty())
                 throw new ArgumentNullException("containsAlias");
 
-            cachedQueryText = null;
-
             if (from.Length > 0)
                 from.Append(" \n");
 

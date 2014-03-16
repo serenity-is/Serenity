@@ -761,47 +761,5 @@ namespace Serenity.Test.Data
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
-
-        [Fact]
-        public void QueryTextCachingWorksProperly()
-        {
-            var query = new SqlQuery();
-            Assert.False(query.HasCachedQueryText);
-
-            query.ToString();
-            Assert.True(query.HasCachedQueryText);
-
-            query.AddParam("@a", 1);
-            Assert.True(query.HasCachedQueryText, "adding param doesn't affect query text");
-
-            query.AutoParam();
-            Assert.True(query.HasCachedQueryText, "auto param doesn't affect query text");
-
-            var clone = query.Clone();
-            Assert.True(query.HasCachedQueryText, "query cloning doesn't affect query text"); 
-            Assert.True(clone.HasCachedQueryText, "cloned query should carry cached text");
-
-            query.CountRecords = true;
-            Assert.False(query.HasCachedQueryText);
-            query.ToString();
-            Assert.True(query.HasCachedQueryText);
-
-            query.Dialect(SqlDialect.Firebird);
-            Assert.False(query.HasCachedQueryText);
-            query.ToString();
-            Assert.True(query.HasCachedQueryText);
-
-            query.Distinct(true);
-            Assert.False(query.HasCachedQueryText);
-            query.ToString();
-            Assert.True(query.HasCachedQueryText);
-
-            var row = new Serenity.Test.Data.RowMappingTests.ComplexRow();
-
-            query.EnsureJoin(row.GetFields().Joins["c"]);
-            Assert.False(query.HasCachedQueryText);
-            query.ToString();
-            Assert.True(query.HasCachedQueryText);
-        }
     }
 }

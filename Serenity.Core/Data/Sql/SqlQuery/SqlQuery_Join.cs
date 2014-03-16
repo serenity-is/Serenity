@@ -10,8 +10,6 @@
             if (join == null)
                 throw new ArgumentNullException("join");
 
-            cachedQueryText = null;
-
             if (from.Length > 0)
                 from.Append(" \n");
 

@@ -5,8 +5,6 @@ namespace Serenity.Data
 {
     public partial class SqlQuery
     {
-        public bool HasCachedQueryText { get { return cachedQueryText != null; } }
-
         /// <summary>
         ///   SqlSelect sorgusunu formatlayıp bir SELECT sorgusuna çevirir. Sayfalama sözkonusuysa 
         ///   (atlanan kayıt varsa) birden fazla sorgu arka arkaya oluşturulur.</summary>
@@ -14,9 +12,6 @@ namespace Serenity.Data
         ///   Formatlanmış SELECT ifadesi</returns>
         public override string ToString()
         {
-            if (cachedQueryText != null)
-                return cachedQueryText;
-
             // formatlamada kullanılacak StringBuilder nesnesi
             var sb = new StringBuilder();
 
@@ -322,10 +317,8 @@ namespace Serenity.Data
             if (this.parent != null)
                 sb.Append(")");
 
-            cachedQueryText = sb.ToString();
-
             // select sorgusunu döndür
-            return cachedQueryText;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -400,6 +393,14 @@ namespace Serenity.Data
 
                     sb.Append(orderBy[i]);
                 }
+            }
+        }
+
+        public string DebugText
+        {
+            get
+            {
+                return SqlDebugDumper.Dump(ToString(), this.Params);
             }
         }
     }
