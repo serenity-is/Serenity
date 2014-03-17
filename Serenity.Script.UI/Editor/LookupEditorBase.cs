@@ -56,6 +56,12 @@ namespace Serenity
             return lookup.Items;
         }
 
+        protected virtual string GetItemText(TItem item, Lookup<TItem> lookup)
+        {
+            object textValue = (lookup.TextFormatter != null ? lookup.TextFormatter(item) : ((dynamic)item)[lookup.TextField]);
+            return textValue == null ? "" : textValue.ToString();
+        }
+
         protected virtual void UpdateItems()
         {
             var lookup = GetLookup();
@@ -65,8 +71,7 @@ namespace Serenity
             var items = GetItems(lookup);
             foreach (dynamic item in items)
             {
-                object textValue = (lookup.TextFormatter != null ? lookup.TextFormatter(item) : item[lookup.TextField]);
-                var text = textValue == null ? "" : textValue.ToString();
+                var text = GetItemText(item, lookup);
 
                 object idValue = item[lookup.IdField];
                 string id = idValue == null ? "" : idValue.ToString();
