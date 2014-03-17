@@ -65,6 +65,19 @@ namespace Serenity.Data.Test
         }
 
         [Fact]
+        public void LocateOptimizedReturnsHashSetIfExpressionContainsQuadrupleAliases()
+        {
+            string singleAlias;
+            var aliases = JoinAliasLocator.LocateOptimized("x.y + y.z + u.w + t.v", out singleAlias);
+            Assert.Equal(null, singleAlias);
+            Assert.Equal(4, aliases.Count);
+            Assert.True(aliases.Contains("x"));
+            Assert.True(aliases.Contains("y"));
+            Assert.True(aliases.Contains("u"));
+            Assert.True(aliases.Contains("t"));
+        }
+
+        [Fact]
         public void LocateOptimizedReturnsHashSetWithIgnoreCase()
         {
             string singleAlias;
