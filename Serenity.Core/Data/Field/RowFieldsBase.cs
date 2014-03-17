@@ -40,6 +40,7 @@ namespace Serenity.Data
             DetermineRowType();
             DetermineTableName();
             DetermineSchema();
+            DetermineLocalTextPrefix();
         }
 
         private void DetermineRowType()
@@ -99,6 +100,21 @@ namespace Serenity.Data
                 this.schema = schemaAttr.Schema;
             else
                 this.schema = "Default";
+        }
+
+        private void DetermineLocalTextPrefix()
+        {
+            if (localTextPrefix != null)
+                return;
+
+            if (schema != null)
+            {
+                localTextPrefix = schema + "." + tableName;
+                return;
+            }
+
+            localTextPrefix = tableName;
+            return;
         }
 
         private void GetRowFieldsAndProperties(
