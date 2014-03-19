@@ -1,4 +1,5 @@
-﻿using jQueryApi;
+﻿using System.Html;
+using jQueryApi;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -10,35 +11,29 @@ namespace Serenity
         where TOptions: class, new()
         where TItem: class, new()
     {
-        private Lookup<TItem> lookup;
-
         public LookupEditorBase(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)
         {
             UpdateItems();
 
-            lookup = GetLookup();
+            string lookupKey = GetLookupKey();
             var self = this;
-            if (lookup != null)
-                jQuery.FromObject(lookup).As<dynamic>().bind("change." + this.uniqueName, new jQueryEventHandler(e => {
+            jQuery.FromObject(Document.Body).As<dynamic>().bind("scriptdatachange." + this.uniqueName, new Action<jQueryEvent, string>((e, s) => {
+                if (s == lookupKey)
                     self.UpdateItems();
-                }));
+            }));
         }
 
         public override void Destroy()
         {
-            if (lookup != null)
-            {
-                jQuery.FromObject(lookup).Unbind("change." + this.uniqueName);
-                lookup = null;
-            }
+            jQuery.FromObject(Document.Body).As<dynamic>().unbind("scriptdatachange." + this.uniqueName);
 
             element.Select2("destroy");
 
             base.Destroy();
         }
 
-        protected virtual Lookup<TItem> GetLookup()
+        protected virtual string GetLookupKey()
         {
             var key = this.GetType().FullName;
             var idx = key.IndexOf(".");
@@ -48,7 +43,12 @@ namespace Serenity
             if (key.EndsWith("Editor"))
                 key = key.Substring(0, key.Length - 6);
 
-            return Q.GetLookup<TItem>(key);
+            return key;
+        }
+
+        protected virtual Lookup<TItem> GetLookup()
+        {
+            return Q.GetLookup<TItem>(GetLookupKey());
         }
 
         protected virtual IEnumerable<TItem> GetItems(Lookup<TItem> lookup)
