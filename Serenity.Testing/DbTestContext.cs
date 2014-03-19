@@ -116,7 +116,14 @@ namespace Serenity.Testing
             if (!disposed)
             {
                 if (scope != null)
-                    scope.Dispose();
+                    try
+                    {
+                        scope.Dispose();
+                    }
+                    catch
+                    {
+                        // thanks to nhibernate
+                    }
 
                 disposed = true;
             }
