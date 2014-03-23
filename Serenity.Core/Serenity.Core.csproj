@@ -173,6 +173,11 @@
     <Compile Include="Data\Index\IndexMatch.cs" />
     <Compile Include="Data\Index\TreeDictionary.cs" />
     <Compile Include="Data\Index\TreeIndex.cs" />
+    <Compile Include="Reflection\CloneHelper.cs" />
+    <Compile Include="Reflection\ILGeneration.cs" />
+    <Compile Include="Reflection\ObjectAccessor.cs" />
+    <Compile Include="Reflection\TypeAccessor.cs" />
+    <Compile Include="Reflection\VisitedGraph.cs" />
     <Compile Include="Services\CaptureLog\ICaptureLogRow.cs" />
     <Compile Include="Data\Sql\Helpers\IDisplayOrderRow.cs" />
     <Compile Include="Data\Sql\Interface\IFilterableQuery.cs" />
@@ -252,6 +257,9 @@
     <Compile Include="Media\Mp3CheckResult.cs" />
     <Compile Include="Media\SwfInfo.cs" />
     <Compile Include="Media\ThumbnailGenerator.cs" />
+    <Compile Include="Services\Reporting\IDataOnlyReport.cs" />
+    <Compile Include="Services\Reporting\Worksheet\ReportColumnConverter.cs" />
+    <Compile Include="Services\Reporting\Worksheet\ReportColumn.cs" />
     <Compile Include="Services\ServiceError.cs" />
     <Compile Include="Services\SortBy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
