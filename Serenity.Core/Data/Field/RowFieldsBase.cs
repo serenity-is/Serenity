@@ -271,6 +271,10 @@ namespace Serenity.Data
 
                         if (property != null)
                         {
+                            foreach (var attr in property.GetCustomAttributes<AddJoinToAttribute>())
+                                new LeftJoin(this.joins, attr.ToTable, attr.Alias,
+                                    new Criteria(attr.Alias, attr.ToField) == new Criteria(field));
+
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
                         }
