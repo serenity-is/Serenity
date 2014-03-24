@@ -71,6 +71,7 @@
     <Compile Include="Data\CustomField\CustomFieldExtensions.cs" />
     <Compile Include="Data\CustomField\ICustomFieldListService.cs" />
     <Compile Include="Data\CustomField\CustomFieldType.cs" />
+    <Compile Include="Data\Mapping\DisplayFormatAttribute.cs" />
     <Compile Include="Data\Mapping\TableNameAttribute.cs" />
     <Compile Include="Data\Sql\BasicFilter\BasicFilter.cs" />
     <Compile Include="Data\Sql\BasicFilter\BasicFilterBase.cs" />

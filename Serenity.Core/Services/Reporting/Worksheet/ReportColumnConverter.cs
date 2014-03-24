@@ -1,4 +1,5 @@
-﻿using Serenity.ComponentModel;
+﻿using Microsoft.SqlServer.Server;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using Serenity.Data.Mapping;
 using System;
@@ -10,7 +11,7 @@ namespace Serenity.Reporting
 {
     public static class ReportColumnConverter
     {
-        private static ReportColumn FromMember(MemberInfo member)
+        private static ReportColumn FromMember(MemberInfo member, Type dataType, Field baseField)
         {
             if (member == null)
                 throw new ArgumentNullException("member");
@@ -25,21 +26,47 @@ namespace Serenity.Reporting
             if (sizeAttr != null && sizeAttr.Value != 0)
                 result.Width = sizeAttr.Value;
 
+            var formatAttr = member.GetCustomAttribute<DisplayFormatAttribute>();
+            if (formatAttr != null)
+                result.Format = formatAttr.Value;
+            else
+            {
+                var dtf = baseField as DateTimeField;
+                if (dtf != null &&
+                    dtf.DateTimeKind != DateTimeKind.Unspecified)
+                {
+                    result.Format = "dd/MM/yyyy HH:mm";
+                }
+                else if (dtf != null ||
+                         dataType == typeof (DateTime) ||
+                         dataType == typeof (DateTime?))
+                {
+                    result.Format = "dd/MM/yyyy";
+                }
+            }
+
+            if (baseField != null)
+            {
+                if (result.Title == null)
+                    result.Title = baseField.Title;
+
+                if (result.Width == null && baseField is StringField && baseField.Size != 0)
+                    result.Width = baseField.Size;
+            }
+
+            result.DataType = dataType;
+
             return result;
         }
 
-        public static ReportColumn FromFieldInfo(FieldInfo field)
+        public static ReportColumn FromFieldInfo(FieldInfo field, Field baseField = null)
         {
-            var result = FromMember(field);
-            result.DataType = field.FieldType;
-            return result;
+            return FromMember(field, field.FieldType, baseField);
         }
 
-        public static ReportColumn FromPropertyInfo(PropertyInfo property)
+        public static ReportColumn FromPropertyInfo(PropertyInfo property, Field baseField = null)
         {
-            var result = FromMember(property);
-            result.DataType = property.PropertyType;
-            return result;
+            return FromMember(property, property.PropertyType, baseField);
         }
 
         public static List<ReportColumn> ObjectTypeToList(Type objectType)
@@ -62,24 +89,22 @@ namespace Serenity.Reporting
                 if (member.GetCustomAttribute<HiddenAttribute>() != null)
                     continue;
 
-                ReportColumn column;
-                if (fieldInfo != null)
-                    column = FromFieldInfo(fieldInfo);
-                else
-                    column = FromPropertyInfo(propertyInfo);
-
+                Field baseField;
                 if (basedOnRow != null)
                 {
-                    var field = basedOnRow.FindFieldByPropertyName(column.Name) ?? basedOnRow.FindField(column.Name);
-                    if (field != null)
-                    {
-                        if (column.Title == null)
-                            column.Title = field.Title;
-
-                        if (column.Width == null && field is StringField && field.Size != 0)
-                            column.Width = field.Size;
-                    }
+                    var name = ((MemberInfo) fieldInfo ?? propertyInfo).Name;
+                    baseField = basedOnRow.FindFieldByPropertyName(name) ?? basedOnRow.FindField(name);
                 }
+                else
+                {
+                    baseField = null;
+                }
+
+                ReportColumn column;
+                if (fieldInfo != null)
+                    column = FromFieldInfo(fieldInfo, baseField);
+                else
+                    column = FromPropertyInfo(propertyInfo, baseField);
 
                 list.Add(column);
             }
