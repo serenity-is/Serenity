@@ -150,7 +150,7 @@ namespace Serenity.CodeGenerator
                 else if (field.IsPrimaryKey)
                     flags = "PrimaryKey";
                 else if (!field.IsNullable)
-                    flags = "Required";
+                    flags = "NotNull";
                 else
                     flags = null;
 
@@ -183,6 +183,7 @@ namespace Serenity.CodeGenerator
                     j.Name = GenerateVariableName(f.Name.Substring(prefix));
                     if (j.Name.EndsWith("Id") || j.Name.EndsWith("ID"))
                         j.Name = j.Name.Substring(0, j.Name.Length - 2);
+                    f.ForeignJoinAlias = j.Name;
                     j.SourceField = f.Ident;
 
                     if (frgfld.Find(y => y.FieldName.Substring(frgPrefix) == "SonGuncelleyenID") != null)

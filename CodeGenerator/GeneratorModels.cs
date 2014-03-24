@@ -36,6 +36,7 @@ namespace Serenity.CodeGenerator
         public string Flags { get; set; }
         public string ForeignTable { get; set; }
         public string ForeignField { get; set; }
+        public string ForeignJoinAlias { get; set; }
         public bool IsValueType { get; set; }
         public int? Size { get; set; }
         public int Scale { get; set; }
