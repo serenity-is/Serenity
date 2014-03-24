@@ -261,6 +261,11 @@ namespace Serenity.Data
             set { foreignField = value.TrimToNull(); }
         }
 
+        public Join ForeignJoinAlias
+        {
+            get; set;
+        }
+
         public SelectLevel MinSelectLevel
         {
             get { return minSelectLevel; }
@@ -303,8 +308,12 @@ namespace Serenity.Data
             var joinKeyField = ForeignField ?? Name;
             var sourceAlias = "T0";
             var sourceKeyField = Name;
-            return new LeftJoin(this.Fields.Joins, ForeignTable, foreignJoin,
+
+            var join = new LeftJoin(this.Fields.Joins, ForeignTable, foreignJoin,
                 new Criteria(foreignJoin, joinKeyField) == new Criteria(sourceAlias, sourceKeyField));
+
+            this.ForeignJoinAlias = join;
+            return join;
         }
 
         protected internal virtual void OnRowInitialization()

@@ -265,7 +265,7 @@ namespace Serenity.Data
 
                         if (join != null)
                         {
-                            new LeftJoin(this.joins, field.ForeignTable, join.Alias,
+                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, join.Alias,
                                 new Criteria(join.Alias, field.ForeignField) == new Criteria(field));
                         }
 
