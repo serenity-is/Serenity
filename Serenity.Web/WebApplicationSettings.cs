@@ -7,8 +7,6 @@ namespace Serenity.Web
         public static bool IsDevelopmentMode { get; set; }
         public static bool HideExceptionDetails { get; set; }
 
-        /// <summary>
-        ///   Static constructor.</summary>
         static WebApplicationSettings()
         {
             IsDevelopmentMode = ConfigurationManager.AppSettings["IsDevelopmentMode"] == "1";
