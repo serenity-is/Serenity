@@ -228,7 +228,6 @@
     <Compile Include="Extensibility\SelfAssemblyAttribute.cs" />
     <Compile Include="Extensions\GenericExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
-    <Compile Include="Extensions\StringHelpers.cs" />
     <Compile Include="Extensions\WeakHashtable.cs" />
     <Compile Include="Reflection\InstanceCreator.cs" />
     <Compile Include="IocMunq\AlwaysNewLifetime.cs" />
@@ -261,6 +260,8 @@
     <Compile Include="Services\Reporting\IDataOnlyReport.cs" />
     <Compile Include="Services\Reporting\Worksheet\ReportColumnConverter.cs" />
     <Compile Include="Services\Reporting\Worksheet\ReportColumn.cs" />
+    <Compile Include="Services\Security\IUserAuthenticationService.cs" />
+    <Compile Include="Services\Security\IUserRetrieveService.cs" />
     <Compile Include="Services\ServiceError.cs" />
     <Compile Include="Services\SortBy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -334,12 +335,10 @@
     <Compile Include="Services\RetrieveRequestHandler.cs" />
     <Compile Include="Services\Security\IUserDefinition.cs" />
     <Compile Include="Services\Security\SecurityHelper.cs" />
-    <Compile Include="Services\Security\UserCache.cs" />
     <Compile Include="Services\ServiceHelper.cs" />
     <Compile Include="Services\UndeleteRequestHandler.cs" />
     <Compile Include="Services\UpdateRequestHandler.cs" />
     <Compile Include="Services\Settings\Config.cs" />
-    <Compile Include="Services\Settings\DecimalSettingsBase.cs" />
     <Compile Include="Services\Settings\FormatHelper.cs" />
     <Compile Include="Services\Settings\ILocalSetting.cs" />
     <Compile Include="Services\Settings\ILocalUserStateService.cs" />
