@@ -21,9 +21,13 @@ namespace Serenity
 
         private static void RegisterTypesInNamespace(string ns)
         {
-            JsDictionary nsObj = (Window.Instance.As<dynamic>())[ns];
-            if (nsObj == null)
-                return;
+            JsDictionary nsObj = Window.Instance.As<JsDictionary>();
+            foreach (var x in ns.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                nsObj = nsObj[x].As<JsDictionary>();
+                if (nsObj == null)
+                    return;
+            }
 
             foreach (var k in Object.Keys(nsObj))
             {
