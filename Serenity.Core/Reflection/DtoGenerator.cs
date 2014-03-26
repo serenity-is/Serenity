@@ -189,6 +189,12 @@ namespace Serenity.Reflection
                 return;
             }
 
+            if (memberType == typeof(Dictionary<string, string>))
+            {
+                code.Append("Dictionary<String, String>");
+                return;
+            }
+
             if (memberType == typeof(Object))
             {
                 code.Append("Object");
