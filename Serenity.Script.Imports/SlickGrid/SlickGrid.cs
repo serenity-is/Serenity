@@ -180,6 +180,18 @@ namespace Serenity
         }
 
         /// <summary>
+        /// Sets the current SelectionModel. See here for more information about SelectionModels.
+        /// </summary>
+        public dynamic SetSelectionModel(object model)
+        {
+            return null;
+        }
+
+        public void SetSelectedRows(int[] rows)
+        {
+        }
+        
+        /// <summary>
         /// Proportionately resizes all columns to fill available horizontal space. This does not take the cell contents into consideration.
         /// </summary>
         public void AutoSizeColumns()
@@ -734,6 +746,11 @@ namespace Serenity
         public SlickEvent OnSelectedRowsChanged { get; private set; }
         [IntrinsicProperty]
         public SlickEvent OnCellCssStylesChanged { get; private set; }
+    }
+
+    [Imported, ScriptNamespace("Slick"), ScriptName("RowSelectionModel")]
+    public class SlickRowSelectionModel
+    {
     }
 
     [Imported, ScriptNamespace("Slick"), ScriptName("RowMoveManager")]

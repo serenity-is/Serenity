@@ -137,6 +137,8 @@ namespace Serenity
                 int[] rows = data.rows;
                 int insertBefore = data.insertBefore;
                 handleMove(rows, insertBefore);
+                try { grid.SetSelectedRows(new int[0]); }
+                catch { }
             });
 
             grid.RegisterPlugin(moveRowsPlugin);
