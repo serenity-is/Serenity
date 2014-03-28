@@ -111,5 +111,93 @@ namespace Serenity
                 OnSearch = onSearch
             });
         }
+
+        public static void MakeOrderable(SlickGrid grid, Action<int[], int> handleMove)
+        {
+            var moveRowsPlugin = new SlickRowMoveManager(new SlickRowMoveManagerOptions
+            {
+                CancelEditOnDrag = true
+            });
+
+            moveRowsPlugin.OnBeforeMoveRows.Subscribe((e, data) =>
+            {
+                for (var i = 0; i < data.rows.length; i++)
+                {
+                    if (data.rows[i] == data.insertBefore || data.rows[i] == data.insertBefore - 1)
+                    {
+                        e.StopPropagation();
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            moveRowsPlugin.OnMoveRows.Subscribe((e, data) =>
+            {
+                int[] rows = data.rows;
+                int insertBefore = data.insertBefore;
+                handleMove(rows, insertBefore);
+            });
+
+            grid.RegisterPlugin(moveRowsPlugin);
+        }
+
+        public static void MakeOrderableWithUpdateRequest<TItem, TOptions>(DataGrid<TItem, TOptions> grid,
+            Func<TItem, Int64> getId, Func<TItem, int?> getDisplayOrder,
+            string service, Func<long, int, UpdateRequest<TItem>> getUpdateRequest)
+            where TItem : class, new()
+            where TOptions : class, new()
+        {
+            MakeOrderable(grid.SlickGrid, (rows, insertBefore) =>
+            {
+                if (rows.Length == 0)
+                    return;
+
+                int order;
+                var index = insertBefore;
+                if (index < 0)
+                    order = 1;
+                else
+                {
+                    if (insertBefore >= grid.View.Rows.Count)
+                    {
+                        order = getDisplayOrder((TItem)grid.View.Rows[grid.View.Rows.Count - 1]) ?? 0;
+                        if (order == 0)
+                            order = insertBefore + 1;
+                        else
+                            order = order + 1;
+                    }
+                    else
+                    {
+                        order = getDisplayOrder((TItem)grid.View.Rows[insertBefore]) ?? 0;
+                        if (order == 0)
+                            order = insertBefore + 1;
+                    }
+                }
+
+                int i = 0;
+
+                Action next = null;
+
+                next = delegate
+                {
+                    Q.ServiceCall(new ServiceCallOptions
+                    {
+                        Service = service,
+                        Request = getUpdateRequest(getId(grid.View.Rows[rows[i]]), order++),
+                        OnSuccess = delegate(ServiceResponse response)
+                        {
+                            i++;
+                            if (i < rows.Length)
+                                next();
+                            else
+                                grid.View.Populate();
+                        }
+                    });
+                };
+
+                next();
+            });
+        }
     }
 }

@@ -20,6 +20,10 @@ namespace Serenity
         {
         }
 
+        public void Subscribe(Func<jQueryEvent, dynamic, dynamic> handler)
+        {
+        }
+
         public void Unsubscribe(Action<jQueryEvent, dynamic> handler)
         {
         }
@@ -731,4 +735,25 @@ namespace Serenity
         [IntrinsicProperty]
         public SlickEvent OnCellCssStylesChanged { get; private set; }
     }
+
+    [Imported, ScriptNamespace("Slick"), ScriptName("RowMoveManager")]
+    public class SlickRowMoveManager
+    {
+        public SlickRowMoveManager(SlickRowMoveManagerOptions options)
+        {
+        }
+
+        [IntrinsicProperty]
+        public SlickEvent OnBeforeMoveRows { get; private set; }
+        [IntrinsicProperty]
+        public SlickEvent OnMoveRows { get; private set; }
+    }
+
+    [Imported, Serializable]
+    public class SlickRowMoveManagerOptions
+    {
+        public Boolean CancelEditOnDrag { get; set; }
+    }
+
+
 }
