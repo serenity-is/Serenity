@@ -28,5 +28,6 @@ namespace Serenity.Reporting
         public string Title;
         public object InitialSettings;
         public List<ReportDesignItem> Designs;
+        public bool IsDataOnlyReport;
     }
 }

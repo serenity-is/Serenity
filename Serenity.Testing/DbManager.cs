@@ -37,7 +37,7 @@ namespace Serenity.Testing
 
         public static void RenameDb(string oldAlias, string newAlias)
         {
-            using (var connection = SqlConnections.New(DbSettings.LocalDbConnectionString, DbSettings.ProviderName))
+            using (var connection = SqlConnections.New(DbSettings.Current.ServerConnectionString, DbSettings.Current.Provider))
             {
                 SqlConnection.ClearAllPools();
                 SqlHelper.ExecuteNonQuery(connection, String.Format(
@@ -52,7 +52,7 @@ namespace Serenity.Testing
 
         public static void DetachDb(string dbAlias)
         {
-            using (var connection = SqlConnections.New(DbSettings.LocalDbConnectionString, DbSettings.ProviderName))
+            using (var connection = SqlConnections.New(DbSettings.Current.ServerConnectionString, DbSettings.Current.Provider))
             {
                 SqlConnection.ClearAllPools();
                 try
@@ -77,7 +77,7 @@ namespace Serenity.Testing
 
         public static void AttachDb(string dbAlias, string mdfFilePath)
         {
-            using (var connection = SqlConnections.New(DbSettings.LocalDbConnectionString, DbSettings.ProviderName))
+            using (var connection = SqlConnections.New(DbSettings.Current.ServerConnectionString, DbSettings.Current.Provider))
             {
                 var dbFile = Path.ChangeExtension(mdfFilePath, null);
                 var sql = String.Format(
@@ -109,7 +109,7 @@ namespace Serenity.Testing
         {
             Directory.CreateDirectory(Path.GetDirectoryName(mdfFilePath));
 
-            using (var connection = SqlConnections.New(DbSettings.LocalDbConnectionString, DbSettings.ProviderName))
+            using (var connection = SqlConnections.New(DbSettings.Current.ServerConnectionString, DbSettings.Current.Provider))
             {
                 string createScript;
 
@@ -128,12 +128,12 @@ namespace Serenity.Testing
                 RunScript(connection, createScript);
             }
 
-            string connectionString = String.Format(DbSettings.ConnectionStringFormat, dbAlias);
+            string connectionString = String.Format(DbSettings.Current.ConnectionStringFormat, dbAlias);
 
             if (!script.IsNullOrEmpty())
                 try
                 {
-                    using (var connection = SqlConnections.New(connectionString, DbSettings.ProviderName))
+                    using (var connection = SqlConnections.New(connectionString, DbSettings.Current.Provider))
                     {
                         RunScript(connection, script);
                     }
@@ -149,7 +149,7 @@ namespace Serenity.Testing
         public static void RemoveTestFiles()
         {
             HashSet<string> files = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            using (var connection = SqlConnections.New(DbSettings.LocalDbConnectionString, DbSettings.ProviderName))
+            using (var connection = SqlConnections.New(DbSettings.Current.ServerConnectionString, DbSettings.Current.Provider))
             using (var reader = SqlHelper.ExecuteReader(connection, "SELECT physical_name FROM sys.master_files"))
             {
                 while (reader.Read())
@@ -159,7 +159,7 @@ namespace Serenity.Testing
                 }
             }
 
-            foreach (var file in Directory.GetFiles(DbSettings.TestRootPath, "test*.*"))
+            foreach (var file in Directory.GetFiles(DbSettings.Current.RootPath, "test*.*"))
                 if (!files.Contains(Path.GetFileName(file)))
                     TemporaryFileHelper.TryDelete(file);
         }
@@ -180,7 +180,7 @@ namespace Serenity.Testing
         {
             var hash = GetHash(script);
 
-            var cachedPath = Path.Combine(DbSettings.TestRootPath,
+            var cachedPath = Path.Combine(DbSettings.Current.RootPath,
                 "cache_" + hash + ".mdf");
 
             if (!File.Exists(cachedPath))
@@ -201,7 +201,7 @@ namespace Serenity.Testing
                 throw new InvalidOperationException("Test için cache veritabanı oluşturulamadı!");
 
             var rnd = TemporaryFileHelper.RandomFileCode();
-            var instancePath = Path.Combine(DbSettings.TestRootPath,
+            var instancePath = Path.Combine(DbSettings.Current.RootPath,
                 "test_" + rnd + ".mdf");
 
             CopyDb(cachedPath, instancePath);

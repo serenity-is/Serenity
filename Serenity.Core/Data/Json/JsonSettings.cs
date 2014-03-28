@@ -19,6 +19,7 @@ namespace Serenity
             Tolerant.PreserveReferencesHandling = PreserveReferencesHandling.None;
             Tolerant.Converters.Add(new IsoDateTimeConverter());
             Tolerant.Converters.Add(new JsonSafeInt64Converter());
+            Tolerant.Converters.Add(new StringEnumConverter());
 
             Strict = new JsonSerializerSettings();
             Strict.NullValueHandling = NullValueHandling.Ignore;
@@ -28,6 +29,7 @@ namespace Serenity
             Strict.PreserveReferencesHandling = PreserveReferencesHandling.None;
             Strict.Converters.Add(new IsoDateTimeConverter());
             Strict.Converters.Add(new JsonSafeInt64Converter());
+            Strict.Converters.Add(new StringEnumConverter());
         }
     }
 }

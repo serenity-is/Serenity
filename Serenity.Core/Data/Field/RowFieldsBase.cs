@@ -40,6 +40,7 @@ namespace Serenity.Data
             DetermineRowType();
             DetermineTableName();
             DetermineSchema();
+            DetermineLocalTextPrefix();
         }
 
         private void DetermineRowType()
@@ -99,6 +100,21 @@ namespace Serenity.Data
                 this.schema = schemaAttr.Schema;
             else
                 this.schema = "Default";
+        }
+
+        private void DetermineLocalTextPrefix()
+        {
+            if (localTextPrefix != null)
+                return;
+
+            if (schema != null)
+            {
+                localTextPrefix = schema + "." + tableName;
+                return;
+            }
+
+            localTextPrefix = tableName;
+            return;
         }
 
         private void GetRowFieldsAndProperties(
@@ -249,17 +265,24 @@ namespace Serenity.Data
 
                         if (join != null)
                         {
-                            new LeftJoin(this.joins, field.ForeignTable, join.Alias,
+                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, join.Alias,
                                 new Criteria(join.Alias, field.ForeignField) == new Criteria(field));
                         }
 
                         if (property != null)
                         {
+                            foreach (var attr in property.GetCustomAttributes<AddJoinToAttribute>())
+                                new LeftJoin(this.joins, attr.ToTable, attr.Alias,
+                                    new Criteria(attr.Alias, attr.ToField) == new Criteria(field));
+
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
                         }
                     }
                 }
+
+                foreach (var attr in this.rowType.GetCustomAttributes<AddLeftJoinAttribute>())
+                    new LeftJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
                 var propertyDescriptorArray = new PropertyDescriptor[this.Count];
                 for (int i = 0; i < this.Count; i++)

@@ -62,6 +62,11 @@ namespace Serenity.Reporting
                     this.designPanel.SetDesignList(response.Designs);
                     CreatePropertyGrid();
                     propertyGrid.Load(response.InitialSettings ?? new object());
+
+                    this.toolbar.FindButton("print-preview-button").Toggle(!response.IsDataOnlyReport);
+                    this.toolbar.FindButton("export-pdf-button").Toggle(!response.IsDataOnlyReport);
+                    this.toolbar.FindButton("export-docx-button").Toggle(!response.IsDataOnlyReport);
+
                     this.DialogOpen();
                 }
             });

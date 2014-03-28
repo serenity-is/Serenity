@@ -10,7 +10,7 @@ namespace Serenity
     {
         public static void AddToCacheWithExpiration(string cacheKey, object value, TimeSpan expiration)
         {
-            HttpRuntime.Cache.Add(cacheKey, value, null, expiration == CacheExpiration.Never ?
+            HttpRuntime.Cache.Insert(cacheKey, value, null, expiration == CacheExpiration.Never ?
                 System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(expiration),
                 System.Web.Caching.Cache.NoSlidingExpiration, System.Web.Caching.CacheItemPriority.Normal,
                 null);

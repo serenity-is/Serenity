@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Tarih")]
+    [Editor("Tarih/Zaman")]
     [Element("<input type=\"text\"/>")]
     public class DateTimeEditor : Widget, IStringValue
     {

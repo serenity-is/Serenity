@@ -2,12 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text;
 
+    [DebuggerDisplay("{DebugText}")]
     public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName
     {
         private HashSet<string> aliases;
-        private string cachedQuery;
         private List<Column> columns;
         private bool countRecords;
         private bool distinct;
@@ -35,11 +36,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Distinct(bool distinct)
         {
-            if (this.distinct != distinct)
-            {
-                cachedQuery = null;
-                this.distinct = distinct;
-            }
+            this.distinct = distinct;
 
             return this;
         }
@@ -61,8 +58,6 @@
         {
             if (table.IsNullOrEmpty())
                 throw new ArgumentNullException("table");
-
-            cachedQuery = null;
 
             if (from.Length > 0)
                 from.Append(", ");
@@ -180,8 +175,6 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQuery = null;
-
             if (groupBy == null || groupBy.Length == 0)
                 groupBy = new StringBuilder(expression);
             else
@@ -219,8 +212,6 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQuery = null;
-
             if (having == null)
                 having = new StringBuilder(expression);
             else
@@ -242,8 +233,6 @@
 
             if (desc)
                 expression += Sql.Keyword.Desc;
-
-            cachedQuery = null;
 
             if (orderBy == null)
                 orderBy = new List<string>();
@@ -281,13 +270,15 @@
         /// <returns>The query itself.</returns>
         /// <remarks>This method is designed to help apply user defined orders 
         /// (for example by clicking headers on a grid) to a query with
-        /// existing order.</remarks>
+        /// existing order.
+        /// SQL server throws an error if a field is used more than once in ORDER BY
+        /// expression, so this function first removes normal and DESC versions of 
+        /// the expression from the ORDER BY statement.
+        /// </remarks>
         public SqlQuery OrderByFirst(string expression, bool desc = false)
         {
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("field");
-
-            cachedQuery = null;
 
             if (desc)
                 expression += Sql.Keyword.Desc;
@@ -295,23 +286,15 @@
             if (orderBy == null)
                 orderBy = new List<string>();
 
-            if (orderBy.Contains(expression))
-            {
-                orderBy.Remove(expression);
-            }
-            else if (expression.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
-            {
-                string s = expression.Substring(0, expression.Length - 5);
+            string search = expression.TrimToEmpty();
+            orderBy.RemoveAll(x => String.Compare(x.TrimToEmpty(), search, StringComparison.OrdinalIgnoreCase) == 0);
 
-                if (orderBy.Contains(s))
-                    orderBy.Remove(s);
-            }
+            if (search.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
+                search = search.Substring(0, search.Length - 5).TrimToEmpty();
             else
-            {
-                string s = expression + " DESC";
-                if (orderBy.Contains(s))
-                    orderBy.Remove(s);
-            }
+                search += " DESC";
+
+            orderBy.RemoveAll(x => String.Compare(x.TrimToEmpty(), search, StringComparison.OrdinalIgnoreCase) == 0);
 
             if (orderBy.Count > 0)
                 orderBy.Insert(0, expression);
@@ -334,7 +317,6 @@
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            cachedQuery = null;
             columns.Add(new Column(expression, null, intoIndex, null));
             return this;
         }
@@ -354,7 +336,6 @@
             if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
-            cachedQuery = null;
             columns.Add(new Column(alias + fieldName, null, intoIndex, null));
             return this;
         }
@@ -373,7 +354,6 @@
             if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
-            cachedQuery = null;
             columns.Add(new Column(expression, columnName, intoIndex, null));
 
             return this;
@@ -397,7 +377,6 @@
             if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
-            cachedQuery = null;
             columns.Add(new Column(alias + fieldName, columnName, intoIndex, null));
             return this;
         }
@@ -466,12 +445,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Skip(int skipRows)
         {
-            if (skip != skipRows)
-            {
-                skip = skipRows;
-                cachedQuery = null;
-            }
-
+            skip = skipRows;
             return this;
         }
 
@@ -506,12 +480,7 @@
         /// <returns>The query itself.</returns>
         public SqlQuery Take(int rowCount)
         {
-            if (take != rowCount)
-            {
-                cachedQuery = null;
-                take = rowCount;
-            }
-
+            take = rowCount;
             return this;
         }
 
@@ -533,8 +502,6 @@
         {
             if (expression.IsNullOrEmpty())
                 throw new ArgumentNullException(expression);
-
-            cachedQuery = null;
 
             if (where == null)
                 where = new StringBuilder(expression);
@@ -585,11 +552,7 @@
         /// <remarks>TODO: SqlDialect system should be improved.</remarks>
         public SqlQuery Dialect(SqlDialect dialect)
         {
-            if (this.dialect != dialect)
-            {
-                this.dialect = dialect;
-                cachedQuery = null;
-            }
+            this.dialect = dialect;
 
             return this;
         }
@@ -602,7 +565,7 @@
         public bool CountRecords
         {
             get { return countRecords; }
-            set { countRecords = value; cachedQuery = null; }
+            set { countRecords = value; }
         }
 
         public IEnumerable<Column> GetColumns()

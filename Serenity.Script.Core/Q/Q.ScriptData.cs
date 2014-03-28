@@ -1,4 +1,5 @@
-﻿using jQueryApi;
+﻿using System.Html;
+using jQueryApi;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -65,6 +66,8 @@ namespace Serenity
 
                 if (!Script.IsValue(data))
                     throw new NotSupportedException(String.Format("Can't load script data: {0}!", name));
+
+                J(Document.Body).TriggerHandler("scriptdatachange", new object[] { name });
 
                 return data;
             }

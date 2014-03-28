@@ -1,4 +1,5 @@
-﻿using jQueryApi;
+﻿using System.Html;
+using jQueryApi;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,8 +48,6 @@ namespace Serenity
                         this.itemById[v] = r;
                 }
             }
-
-            RaiseChange();
         }
 
         public string IdField
@@ -69,11 +68,6 @@ namespace Serenity
         public Func<TItem, string> TextFormatter
         {
             get { return options.TextFormatter; }
-        }
-
-        public void RaiseChange()
-        {
-            jQuery.FromObject(this).Trigger("change");
         }
 
         public JsDictionary<object, TItem> ItemById

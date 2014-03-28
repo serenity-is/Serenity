@@ -31,11 +31,13 @@ namespace Serenity.Data
             {
                 if (aliases == null && (alias == null || (aliases == null && alias == s)))
                     alias = s;
-                else
+                else if (aliases == null)
                 {
                     aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { alias, s };
                     alias = null;
                 }
+                else
+                    aliases.Add(s);
             });
 
             singleAlias = alias;

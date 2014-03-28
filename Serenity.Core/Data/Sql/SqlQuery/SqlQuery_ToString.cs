@@ -12,9 +12,6 @@ namespace Serenity.Data
         ///   Formatlanmış SELECT ifadesi</returns>
         public override string ToString()
         {
-            if (cachedQuery != null)
-                return cachedQuery;
-
             // formatlamada kullanılacak StringBuilder nesnesi
             var sb = new StringBuilder();
 
@@ -320,10 +317,8 @@ namespace Serenity.Data
             if (this.parent != null)
                 sb.Append(")");
 
-            cachedQuery = sb.ToString();
-
             // select sorgusunu döndür
-            return cachedQuery;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -398,6 +393,14 @@ namespace Serenity.Data
 
                     sb.Append(orderBy[i]);
                 }
+            }
+        }
+
+        public string DebugText
+        {
+            get
+            {
+                return SqlDebugDumper.Dump(ToString(), this.Params);
             }
         }
     }

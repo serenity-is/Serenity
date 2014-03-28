@@ -10,5 +10,6 @@ namespace Serenity.Reporting
         public List<PropertyItem> Properties { get; set; }
         public List<ReportDesignItem> Designs { get; set; }
         public object InitialSettings { get; set; }
+        public bool IsDataOnlyReport { get; set; }
     }
 }

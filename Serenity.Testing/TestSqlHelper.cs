@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Serenity.Test.Testing
+namespace Serenity.Testing
 {
     public class TestSqlHelper
     {

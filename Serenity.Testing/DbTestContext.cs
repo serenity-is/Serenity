@@ -107,7 +107,7 @@ namespace Serenity.Testing
                 attachedHashes[over.DbAlias] = over.ScriptHash;
 
                 SqlConnections.SetConnection(over.ConnectionKey,
-                    String.Format(DbSettings.ConnectionStringFormat, over.DbAlias), DbSettings.ProviderName);
+                    String.Format(DbSettings.Current.ConnectionStringFormat, over.DbAlias), DbSettings.Current.Provider);
             }
         }
 
@@ -116,7 +116,14 @@ namespace Serenity.Testing
             if (!disposed)
             {
                 if (scope != null)
-                    scope.Dispose();
+                    try
+                    {
+                        scope.Dispose();
+                    }
+                    catch
+                    {
+                        // thanks to nhibernate
+                    }
 
                 disposed = true;
             }

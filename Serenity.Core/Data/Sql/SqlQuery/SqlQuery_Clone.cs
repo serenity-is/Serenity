@@ -7,9 +7,13 @@
     public partial class SqlQuery
     {
         /// <summary>
-        ///   Sorgunun birebir kopyasını oluşturur.</summary>
-        /// <returns>
-        ///   Sorgunun yeni bir kopyası.</returns>
+        /// Creates a clone of the query.
+        /// </summary>
+        /// <returns>A cloned query.</returns>
+        /// <remarks>
+        /// Clones states like TrackAssignments, AssignedFields etc,
+        /// creates a copy of Params dictionary
+        /// </remarks>
         public SqlQuery Clone()
         {
             var clone = new SqlQuery();
@@ -48,12 +52,9 @@
 
             if (this.Params != null)
                 foreach (var pair in this.Params)
-                    clone.Params.Add(pair.Key, pair.Value);
-
-            clone.cachedQuery = cachedQuery;
+                    clone.AddParam(pair.Key, pair.Value);
 
             return clone;
         }
-
     }
 }
