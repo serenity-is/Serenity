@@ -1,4 +1,5 @@
 ﻿using jQueryApi;
+using System;
 using System.Collections.Generic;
 
 namespace Serenity
@@ -22,6 +23,11 @@ namespace Serenity
             /// Variable that holds list of application namespaces to search for objects
             /// </summary>
             public static List<string> RootNamespaces;
+
+            /// <summary>
+            /// A callback that will handle login in case of ajax error
+            /// </summary>
+            public static Func<ServiceCallOptions, ServiceResponse, bool> NotLoggedInHandler;
 
             static Config()
             {

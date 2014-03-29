@@ -38,10 +38,20 @@ namespace Serenity
                                 if (options.OnSuccess != null)
                                     options.OnSuccess(response);
                             }
-                            else if (options.OnError != null)
-                                options.OnError(response);
                             else
-                                Q.ErrorHandling.ShowServiceError(response.Error);
+                            {
+                                if (Q.Config.NotLoggedInHandler != null &&
+                                    response != null &&
+                                    response.Error != null &&
+                                    response.Error.Code == "NotLoggedIn" &&
+                                    Q.Config.NotLoggedInHandler(options.As<ServiceCallOptions>(), response))
+                                    return;
+
+                                if (options.OnError != null)
+                                    options.OnError(response);
+                                else
+                                    Q.ErrorHandling.ShowServiceError(response.Error);
+                            }
                         }
                         finally
                         {
