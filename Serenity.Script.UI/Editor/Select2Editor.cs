@@ -144,7 +144,7 @@ namespace Serenity
             set
             {
                 if (value != Value)
-                    this.element.Select2("val", value).TriggerHandler("change");
+                    this.element.Select2("val", value).TriggerHandler("change", new object[] { true });
             }
         }
     }
