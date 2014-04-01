@@ -14,20 +14,15 @@ namespace Serenity
         public LookupEditorBase(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)
         {
-            UpdateItems();
-
-            string lookupKey = GetLookupKey();
             var self = this;
-            jQuery.FromObject(Document.Body).As<dynamic>().bind("scriptdatachange." + this.uniqueName, new Action<jQueryEvent, string>((e, s) => {
-                if (s == lookupKey)
-                    self.UpdateItems();
-            }));
+
+            UpdateItems();
+            Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, () => self.UpdateItems());
         }
 
         public override void Destroy()
         {
-            jQuery.FromObject(Document.Body).As<dynamic>().unbind("scriptdatachange." + this.uniqueName);
-
+            Q.ScriptData.UnbindFromChange(this.uniqueName);
             element.Select2("destroy");
 
             base.Destroy();

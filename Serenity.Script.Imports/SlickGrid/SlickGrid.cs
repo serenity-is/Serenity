@@ -20,6 +20,10 @@ namespace Serenity
         {
         }
 
+        public void Subscribe(Func<jQueryEvent, dynamic, dynamic> handler)
+        {
+        }
+
         public void Unsubscribe(Action<jQueryEvent, dynamic> handler)
         {
         }
@@ -175,6 +179,18 @@ namespace Serenity
             return null;
         }
 
+        /// <summary>
+        /// Sets the current SelectionModel. See here for more information about SelectionModels.
+        /// </summary>
+        public dynamic SetSelectionModel(object model)
+        {
+            return null;
+        }
+
+        public void SetSelectedRows(int[] rows)
+        {
+        }
+        
         /// <summary>
         /// Proportionately resizes all columns to fill available horizontal space. This does not take the cell contents into consideration.
         /// </summary>
@@ -731,4 +747,30 @@ namespace Serenity
         [IntrinsicProperty]
         public SlickEvent OnCellCssStylesChanged { get; private set; }
     }
+
+    [Imported, ScriptNamespace("Slick"), ScriptName("RowSelectionModel")]
+    public class SlickRowSelectionModel
+    {
+    }
+
+    [Imported, ScriptNamespace("Slick"), ScriptName("RowMoveManager")]
+    public class SlickRowMoveManager
+    {
+        public SlickRowMoveManager(SlickRowMoveManagerOptions options)
+        {
+        }
+
+        [IntrinsicProperty]
+        public SlickEvent OnBeforeMoveRows { get; private set; }
+        [IntrinsicProperty]
+        public SlickEvent OnMoveRows { get; private set; }
+    }
+
+    [Imported, Serializable]
+    public class SlickRowMoveManagerOptions
+    {
+        public Boolean CancelEditOnDrag { get; set; }
+    }
+
+
 }

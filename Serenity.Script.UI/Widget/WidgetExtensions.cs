@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -58,6 +59,12 @@ namespace Serenity
         public static bool HasOriginalEvent(this jQueryEvent e)
         {
             return !Script.IsUndefined(((dynamic)e).originalEvent);
+        }
+
+        [InlineCode("{obj}.bind({eventName}, {handler})")]
+        public static jQueryObject Bind2(this jQueryObject obj, string eventName, Action<jQueryEvent, dynamic> handler)
+        {
+            return null;
         }
     }
 }

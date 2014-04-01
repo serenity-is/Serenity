@@ -32,7 +32,7 @@ namespace Serenity
         /// <summary>
         /// Used by the the slick.rowMoveManager.js plugin for moving rows. Has no effect without the plugin installed. (default: null)
         /// </summary>
-        public object Behaviour { get; set; }
+        public object Behavior { get; set; }
 
         /// <summary>
         /// In the “Add New” row, determines whether clicking cells in this column can trigger row addition. If true, clicking on the cell in this column in the “Add New” row will not trigger row addition. (default: null)

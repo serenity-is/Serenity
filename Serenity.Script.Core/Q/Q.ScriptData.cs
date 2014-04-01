@@ -15,6 +15,27 @@ namespace Serenity
             private static JsDictionary<string, string> registered = new JsDictionary<string, string>();
             private static JsDictionary<string, object> loadedData = new JsDictionary<string, object>();
 
+            public static void BindToChange(string name, string regClass, Action onChange)
+            {
+                jQuery.FromObject(Document.Body).As<dynamic>()
+                    .bind("scriptdatachange." + regClass, new Action<jQueryEvent, string>((e, s) =>
+                {
+                    if (s == name)
+                        onChange();
+                }));
+            }
+
+            public static void TriggerChange(string name)
+            {
+                J(Document.Body).TriggerHandler("scriptdatachange", new object[] { name });
+            }
+
+            public static void UnbindFromChange(string regClass)
+            {
+                jQuery.FromObject(Document.Body)
+                    .Unbind("scriptdatachange." + regClass);
+            }
+
             private static void LoadScriptData(string name)
             {
                 if (!registered.ContainsKey(name))
@@ -64,11 +85,6 @@ namespace Serenity
 
                 var data = loadedData[name];
 
-                if (!Script.IsValue(data))
-                    throw new NotSupportedException(String.Format("Can't load script data: {0}!", name));
-
-                J(Document.Body).TriggerHandler("scriptdatachange", new object[] { name });
-
                 return data;
             }
 
@@ -93,6 +109,7 @@ namespace Serenity
             public static void Set(string name, object value)
             {
                 Q.ScriptData.loadedData[name] = value;
+                TriggerChange(name);
             }
         }
 
