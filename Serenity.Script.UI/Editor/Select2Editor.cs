@@ -11,6 +11,7 @@ namespace Serenity
         public string Id { get; set; }
         public string Text { get; set; }
         public object Source { get; set; }
+        public bool Disabled { get; set; }
     }
 
     [Element("<input type=\"hidden\"/>")]
@@ -96,13 +97,14 @@ namespace Serenity
             this.items.Clear();
         }
 
-        protected void AddItem(string key, string text, TItem source = null)
+        protected void AddItem(string key, string text, TItem source = null, bool disabled = false)
         {
             this.items.Add(new Select2Item
             {
                 Id = key,
                 Text = text,
-                Source = source
+                Source = source,
+                Disabled = disabled
             });
         }
 

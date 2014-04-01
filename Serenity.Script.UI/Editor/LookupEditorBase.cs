@@ -62,6 +62,11 @@ namespace Serenity
             return textValue == null ? "" : textValue.ToString();
         }
 
+        protected virtual bool GetItemDisabled(TItem item, Lookup<TItem> lookup)
+        {
+            return false;
+        }
+
         protected virtual void UpdateItems()
         {
             var lookup = GetLookup();
@@ -72,11 +77,18 @@ namespace Serenity
             foreach (dynamic item in items)
             {
                 var text = GetItemText(item, lookup);
+                var disabled = GetItemDisabled(item, lookup);
 
                 object idValue = item[lookup.IdField];
                 string id = idValue == null ? "" : idValue.ToString();
 
-                AddItem(id, text, item);
+                this.items.Add(new Select2Item
+                {
+                    Id = id,
+                    Text = text,
+                    Source = item,
+                    Disabled = disabled
+                });
             }
         }
     }
