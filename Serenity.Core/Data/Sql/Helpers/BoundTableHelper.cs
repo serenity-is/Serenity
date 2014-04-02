@@ -113,7 +113,7 @@ namespace Serenity
                                 .Set(mKeyID, keyID)
                                 .Set(mBoundID, boundID)
                                 .WhereEqual(mID, free[0])
-                                .Execute(connection);
+                                .Execute(connection, ExpectedRows.Ignore);
                             free.RemoveAt(0);
                         }
                         else
