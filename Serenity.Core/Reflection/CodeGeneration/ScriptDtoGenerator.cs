@@ -99,6 +99,9 @@ namespace Serenity.Reflection
                         if (owner.Key == null)
                             continue;
 
+                        if (owner.Key.Namespace != ns.Key)
+                            continue;
+
                         if (outputted.Contains(owner.Key))
                             continue;
 
