@@ -24,7 +24,7 @@ namespace Serenity.Test.Data
             using (var connection = SqlConnections.NewByKey("Serenity"))
             {
                 new SqlDelete(DisplayOrderRow.TableName)
-                    .Execute(connection);
+                    .Execute(connection, ExpectedRows.Ignore);
 
                 var next = DisplayOrderHelper.GetNextValue(connection, DisplayOrderRow.Instance);
                 Assert.Equal(1, next);
@@ -38,7 +38,7 @@ namespace Serenity.Test.Data
             using (var connection = SqlConnections.NewByKey("Serenity"))
             {
                 new SqlDelete(DisplayOrderRow.TableName)
-                    .Execute(connection);
+                    .Execute(connection, ExpectedRows.Ignore);
 
                 new SqlInsert(DisplayOrderRow.TableName)
                     .Set(fld.GroupID, 1)
@@ -84,7 +84,7 @@ namespace Serenity.Test.Data
                 })
                 {
                     new SqlDelete(DisplayOrderRow.TableName)
-                        .Execute(connection);
+                        .Execute(connection, ExpectedRows.Ignore);
 
                     for (var i = 0; i < data.Item1.Length; i++)
                     {
