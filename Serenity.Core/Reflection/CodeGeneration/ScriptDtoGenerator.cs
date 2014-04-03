@@ -144,7 +144,7 @@ namespace Serenity.Reflection
 
         public static void HandleMemberType(StringBuilder code, Type memberType, Action<Type> enqueueType = null)
         {
-            if (memberType == typeof(DateTime))
+            if (memberType == typeof(DateTime?) || memberType == typeof(DateTime))
             {
                 code.Append("String"); // şu an için string, JSON tarafında ISO string formatında tarihler gidiyor, 
                                        // ama bunu daha sonra JSON.parse, JSON.stringify'ı değiştirip düzelteceğiz.
@@ -315,9 +315,42 @@ namespace Serenity.Reflection
             }
         }
 
+        static Type GetFirstDerivedOfGenericType(Type type, Type genericType)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
+                return type;
+
+            if (type.BaseType != null)
+                return GetFirstDerivedOfGenericType(type.BaseType, genericType);
+
+            return null;
+        }
+
         private Type GetParentClass(Type type)
         {
-            if (typeof(ServiceRequest).IsAssignableFrom(type))
+            if (typeof(ListRequest).IsAssignableFrom(type))
+                return typeof(ListRequest);
+            else if (GetFirstDerivedOfGenericType(type, typeof(ListResponse<>)) != null)
+                return typeof(ListResponse<>).MakeGenericType(GetFirstDerivedOfGenericType(type, typeof(ListResponse<>)).GetGenericArguments()[0]);
+            else if (typeof(RetrieveRequest).IsAssignableFrom(type))
+                return typeof(RetrieveRequest);
+            else if (GetFirstDerivedOfGenericType(type, typeof(RetrieveResponse<>)) != null)
+                return typeof(RetrieveResponse<>).MakeGenericType(GetFirstDerivedOfGenericType(type, typeof(RetrieveResponse<>)).GetGenericArguments()[0]);
+            else if (GetFirstDerivedOfGenericType(type, typeof(SaveRequest<>)) != null)
+                return typeof(SaveRequest<>).MakeGenericType(GetFirstDerivedOfGenericType(type, typeof(SaveRequest<>)).GetGenericArguments()[0]);
+            else if (typeof(DeleteRequest).IsAssignableFrom(type))
+                return typeof(DeleteRequest);
+            else if (typeof(DeleteResponse).IsAssignableFrom(type))
+                return typeof(DeleteResponse);
+            else if (typeof(UndeleteRequest).IsAssignableFrom(type))
+                return typeof(UndeleteRequest);
+            else if (typeof(UndeleteResponse).IsAssignableFrom(type))
+                return typeof(UndeleteResponse);
+            else if (typeof(UpdateResponse).IsAssignableFrom(type))
+                return typeof(UpdateResponse);
+            else if (typeof(CreateResponse).IsAssignableFrom(type))
+                return typeof(CreateResponse);
+            else if (typeof(ServiceRequest).IsAssignableFrom(type))
                 return typeof(ServiceRequest);
             else if (typeof(ServiceResponse).IsAssignableFrom(type))
                 return typeof(ServiceResponse);
