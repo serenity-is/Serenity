@@ -4,6 +4,8 @@ using Serenity.Services;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -37,46 +39,100 @@ namespace Serenity.Reflection
             this.generateQueue = new Queue<Type>();
             this.visited = new HashSet<Type>();
 
-            sb.Append("namespace ");
-            sb.AppendLine(anamespace);
-            cw.InBrace(delegate
+            foreach (var fromType in assembly.GetTypes())
             {
-                foreach (var ns in
-                    new string[] {
+                if (fromType.IsAbstract)
+                    continue;
+
+                if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
+                    fromType.IsSubclassOf(typeof(ServiceResponse)) ||
+                    fromType.IsSubclassOf(typeof(Row)))
+                    EnqueueType(fromType);
+            }
+
+            Dictionary<Type, string> generatedCode = new Dictionary<Type, string>();
+            while (generateQueue.Count > 0)
+            {
+                var type = generateQueue.Dequeue();
+
+                if (type.Assembly != assembly)
+                    continue;
+
+                GenerateCodeFor(type);
+                generatedCode[type] = sb.ToString();
+                sb.Clear();
+            }
+
+            sb.Clear();
+
+            foreach (var ns in
+                new string[] {
+                        "Serenity",
+                        "Serenity.ComponentModel",
                         "System",
                         "System.Collections",
                         "System.Collections.Generic",
                         "System.ComponentModel",
                         "System.Runtime.CompilerServices"
                     })
-                {
-                    cw.Indented("using ");
-                    sb.Append(ns);
-                    sb.AppendLine(";");
-                }
+            {
+                cw.Indented("using ");
+                sb.Append(ns);
+                sb.AppendLine(";");
+            }
 
+            sb.AppendLine();
+
+            var byNameSpace = generatedCode.Keys.ToLookup(x => x.Namespace);
+            var byOwnerType = generatedCode.Keys.ToLookup(x => (x.IsNested ? x.DeclaringType : null));
+            var outputted = new HashSet<Type>();
+
+            foreach (var ns in byNameSpace.ToArray().OrderBy(x => x.Key))
+            {
                 sb.AppendLine();
-
-                foreach (var fromType in assembly.GetTypes())
+                cw.Indented("namespace ");
+                sb.AppendLine(ns.Key);
+                cw.InBrace(delegate
                 {
-                    if (fromType.IsAbstract)
-                        continue;
+                    foreach (var owner in byOwnerType)
+                    {
+                        if (owner.Key == null)
+                            continue;
 
-                    if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
-                        fromType.IsSubclassOf(typeof(ServiceResponse)) ||
-                        fromType.IsSubclassOf(typeof(Row)))
-                        EnqueueType(fromType);
-                }
+                        if (outputted.Contains(owner.Key))
+                            continue;
 
-                int i = 0;
-                while (generateQueue.Count > 0)
-                {
-                    if (i++ > 0)
+                        outputted.Add(owner.Key);
+
+                        string code = generatedCode[owner.Key].TrimEnd();
+                        code = code.Substring(0, code.Length - 1).TrimEnd();
+                        cw.IndentedMultiLine(code);
+
+                        cw.Block(delegate
+                        {
+                            sb.AppendLine();
+
+                            foreach (var subType in owner)
+                            {
+                                cw.IndentedMultiLine(generatedCode[subType]);
+                                outputted.Add(subType);
+                            }
+                        });
+
+                        cw.IndentedLine("}");
                         sb.AppendLine();
+                    }
 
-                    GenerateCodeFor(generateQueue.Dequeue());
-                }
-            });
+                    foreach (var type in ns)
+                    {
+                        if (outputted.Contains(type))
+                            continue;
+
+                        cw.IndentedMultiLine(generatedCode[type]);
+                        outputted.Add(type);
+                    }
+                });
+            }
 
             return sb.ToString();
         }
@@ -88,6 +144,13 @@ namespace Serenity.Reflection
 
         public static void HandleMemberType(StringBuilder code, Type memberType, Action<Type> enqueueType = null)
         {
+            if (memberType == typeof(DateTime))
+            {
+                code.Append("String"); // şu an için string, JSON tarafında ISO string formatında tarihler gidiyor, 
+                                       // ama bunu daha sonra JSON.parse, JSON.stringify'ı değiştirip düzelteceğiz.
+                return;
+            }
+
             if (GeneratorUtils.IsSimpleType(memberType))
             {
                 code.Append(memberType.Name);
@@ -113,34 +176,19 @@ namespace Serenity.Reflection
             // TODO: Bunlar özel durumlar, attribute la daha sonra halledelim!
             if (memberType == typeof(SortBy[]))
             {
-                code.Append("List<String>");
+                code.Append("SortBy[]");
                 return;
             }
 
-            if (memberType == typeof(HashSet<string>))
+            if (memberType == typeof(Stream))
             {
-                code.Append("List<String>");
-                return;
-            }
-
-            if (memberType == typeof(Dictionary<string, string>))
-            {
-                code.Append("Dictionary<String, String>");
+                code.Append("byte[]");
                 return;
             }
 
             if (memberType == typeof(Object))
             {
                 code.Append("Object");
-                return;
-            }
-
-            if (memberType.IsGenericType &&
-                memberType.GetGenericTypeDefinition() == typeof(List<>))
-            {
-                code.Append("List<");
-                HandleMemberType(code, memberType.GenericTypeArguments[0], enqueueType);
-                code.Append(">");
                 return;
             }
 
@@ -151,9 +199,30 @@ namespace Serenity.Reflection
                 code.Append(">");
                 return;
             }
-            
+
+            if (memberType.IsGenericType &&
+                (memberType.GetGenericTypeDefinition() == typeof(List<>) || memberType.GetGenericTypeDefinition() == typeof(HashSet<>)))
+            {
+                code.Append("List<");
+                HandleMemberType(code, memberType.GenericTypeArguments[0], enqueueType);
+                code.Append(">");
+                return;
+            }
+
+            if (memberType.IsGenericType &&
+                memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                code.Append("JsDictionary<");
+                HandleMemberType(code, memberType.GenericTypeArguments[0], enqueueType);
+                code.Append(",");
+                HandleMemberType(code, memberType.GenericTypeArguments[1], enqueueType);
+                code.Append(">");
+                return;
+            }
+
             if (enqueueType != null)
                 enqueueType(memberType);
+
             code.Append(MakeFriendlyName(memberType));
         }
 
@@ -176,13 +245,6 @@ namespace Serenity.Reflection
             if (type.IsGenericType)
             {
                 StringBuilder sb = new StringBuilder();
-                foreach (var argument in type.GetGenericArguments())
-                {
-                    var arg = MakeFriendlyName(argument);
-                    if (arg.EndsWith("Row"))
-                        arg = arg.Substring(0, arg.Length - 3);
-                    sb.Append(arg);
-                }
 
                 var name = type.GetGenericTypeDefinition().Name;
                 var idx = name.IndexOf('`');
@@ -190,6 +252,15 @@ namespace Serenity.Reflection
                     name = name.Substring(0, idx);
 
                 sb.Append(name);
+                sb.Append("<");
+
+                foreach (var argument in type.GetGenericArguments())
+                {
+                    var arg = MakeFriendlyName(argument);
+                    sb.Append(arg);
+                }
+
+                sb.Append(">");
 
                 return sb.ToString();
             }
@@ -199,7 +270,7 @@ namespace Serenity.Reflection
 
         private void GenerateEnum(Type enumType)
         {
-            cw.IndentedLine("[JsonConverter(typeof(StringEnumConverter))]");
+            cw.IndentedLine("[NamedValues, PreserveMemberCase]");
             cw.Indented("public enum ");
             sb.AppendLine(enumType.Name);
             cw.InBrace(delegate 
@@ -244,6 +315,16 @@ namespace Serenity.Reflection
             }
         }
 
+        private Type GetParentClass(Type type)
+        {
+            if (typeof(ServiceRequest).IsAssignableFrom(type))
+                return typeof(ServiceRequest);
+            else if (typeof(ServiceResponse).IsAssignableFrom(type))
+                return typeof(ServiceResponse);
+            else
+                return null;
+        }
+
         private void GenerateCodeFor(Type type)
         {
             if (type.IsEnum)
@@ -252,8 +333,19 @@ namespace Serenity.Reflection
                 return;
             }
 
-            cw.Indented("public class ");
-            sb.AppendLine(MakeFriendlyName(type));
+            cw.IndentedLine("[Imported, Serializable, PreserveMemberCase]");
+            cw.Indented("public partial class ");
+            sb.Append(MakeFriendlyName(type));
+
+            var parentClass = GetParentClass(type);
+            if (parentClass != null)
+            {
+                sb.Append(" : ");
+                sb.Append(MakeFriendlyName(parentClass));
+            }
+
+            sb.AppendLine();
+
             cw.InBrace(delegate
             {
                 if (type.IsSubclassOf(typeof(Row)))
@@ -263,6 +355,9 @@ namespace Serenity.Reflection
                     foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
                     {
                         if (member.GetCustomAttribute<JsonIgnoreAttribute>(false) != null)
+                            continue;
+
+                        if (parentClass != null && member.DeclaringType.IsAssignableFrom(parentClass))
                             continue;
 
                         var pi = member as PropertyInfo;
@@ -280,7 +375,7 @@ namespace Serenity.Reflection
                         var jsonProperty = member.GetCustomAttribute<JsonPropertyAttribute>(false);
                         if (jsonProperty != null)
                         {
-                            cw.Indented("[JsonProperty(\"");
+                            cw.Indented("[ScriptName(\"");
                             sb.Append(jsonProperty.PropertyName);
                             sb.AppendLine("\")]");
                         }

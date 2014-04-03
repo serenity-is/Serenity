@@ -67,5 +67,15 @@ namespace Serenity.Reflection
             sb.Append(indent);
             sb.AppendLine(s);
         }
+
+        public void IndentedMultiLine(string s)
+        {
+            var lines = s.Split(new char[] { '\n' }, StringSplitOptions.None);
+            foreach (var line in lines)
+            {
+                var x = line.Replace("\r", "");
+                IndentedLine(x);
+            }
+        }
     }
 }
