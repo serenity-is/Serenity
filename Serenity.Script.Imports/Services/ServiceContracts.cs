@@ -79,13 +79,13 @@ namespace Serenity
     }
 
     [Imported, Serializable, PreserveMemberCase]
-    public class CreateResponse
+    public class CreateResponse : ServiceResponse
     {
         public Int64? EntityId { get; set; }
     }
 
     [Imported, Serializable, PreserveMemberCase]
-    public class UpdateResponse
+    public class UpdateResponse : ServiceResponse
     {
     }
 }

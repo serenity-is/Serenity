@@ -32,6 +32,15 @@ namespace Serenity.Reflection
             return true;
         }
 
+        private string GetNamespace(Type type)
+        {
+            var ns = type.Namespace;
+            if (ns.EndsWith(".Entities"))
+                return ns.Substring(0, ns.Length - ".Entities".Length);
+
+            return ns;
+        }
+
         public string GenerateCode(Assembly assembly, string anamespace)
         {
             this.sb = new StringBuilder(4096);
@@ -83,8 +92,8 @@ namespace Serenity.Reflection
 
             sb.AppendLine();
 
-            var ordered = generatedCode.Keys.OrderBy(x => x.Namespace).ThenBy(x => x.Name);
-            var byNameSpace = ordered.ToLookup(x => x.Namespace);
+            var ordered = generatedCode.Keys.OrderBy(x => GetNamespace(x)).ThenBy(x => x.Name);
+            var byNameSpace = ordered.ToLookup(x => GetNamespace(x));
             var byOwnerType = ordered.ToLookup(x => (x.IsNested ? x.DeclaringType : null));
             var outputted = new HashSet<Type>();
 
@@ -100,7 +109,7 @@ namespace Serenity.Reflection
                         if (owner.Key == null)
                             continue;
 
-                        if (owner.Key.Namespace != ns.Key)
+                        if (GetNamespace(owner.Key) != ns.Key)
                             continue;
 
                         if (outputted.Contains(owner.Key))
@@ -285,12 +294,16 @@ namespace Serenity.Reflection
                 int i = 0;
                 foreach (var name in names)
                 {
+                    if (i > 0)
+                        sb.AppendLine(",");
+
                     cw.Indented(name);
                     sb.Append(" = ");
                     sb.Append(Convert.ToInt32(((IList)values)[i]));
-                    sb.AppendLine(",");
                     i++;
                 }
+
+                sb.AppendLine();
             });
         }
 

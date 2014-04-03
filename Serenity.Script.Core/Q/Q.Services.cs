@@ -110,5 +110,16 @@ namespace Serenity
 
             return jQuery.Ajax(options.As<jQueryAjaxOptions>());
         }
+
+        public static void ServiceRequest<TResponse>(string service, ServiceRequest request, Action<TResponse> onSuccess, ServiceCallOptions options = null)
+            where TResponse: ServiceResponse
+        {
+            ServiceCall(jQuery.ExtendObject(new ServiceCallOptions<TResponse>
+            {
+                Service = service,
+                Request = request,
+                OnSuccess = onSuccess
+            }, options.As<ServiceCallOptions<TResponse>>()));
+        }
     }
 }
