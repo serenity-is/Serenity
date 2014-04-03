@@ -9,74 +9,14 @@ using System.Text;
 
 namespace Serenity.Reflection
 {
-    public class CodeWriter
-    {
-        private StringBuilder sb;
-        private string space;
-        private string indent;
-
-        public CodeWriter(StringBuilder sb, int indentSize)
-        {
-            this.space = new String(' ', indentSize);
-            this.indent = "";
-            this.sb = sb;
-        }
-
-        private void IncreaseIndent()
-        {
-            indent += space;
-        }
-
-        private void DecreaseIndent()
-        {
-            if (indent.Length >= space.Length)
-                indent = indent.Substring(0, indent.Length - space.Length);
-        }
-
-        public void Block(Action insideBlock)
-        {
-            IncreaseIndent();
-            insideBlock();
-            DecreaseIndent();
-        }
-
-        public void InBrace(Action insideBlock)
-        {
-            sb.Append(indent);
-            sb.AppendLine("{");
-            IncreaseIndent();
-            insideBlock();
-            DecreaseIndent();
-            sb.Append(indent);
-            sb.AppendLine("}");
-        }
-
-        public void Indent()
-        {
-            sb.Append(indent);
-        }
-
-        public void Indented(string s)
-        {
-            sb.Append(indent);
-            sb.Append(s);
-        }
-
-        public void IndentedLine(string s)
-        {
-            sb.Append(indent);
-            sb.AppendLine(s);
-        }
-    }
-
-    public class DtoGenerator
+    public class ScriptDtoGenerator
     {
         private StringBuilder sb;
         private CodeWriter cw;
         private HashSet<Type> visited;
         private Queue<Type> generateQueue;
 
-        public DtoGenerator()
+        public ScriptDtoGenerator()
         {
         }
 
@@ -90,7 +30,7 @@ namespace Serenity.Reflection
             return true;
         }
 
-        public string GenerateCode(string anamespace, params Type[] fromTypes)
+        public string GenerateCode(Assembly assembly, string anamespace)
         {
             this.sb = new StringBuilder(4096);
             this.cw = new CodeWriter(sb, 4);
@@ -103,10 +43,11 @@ namespace Serenity.Reflection
             {
                 foreach (var ns in
                     new string[] {
-                        "Newtonsoft.Json",
-                        "Newtonsoft.Json.Converters",
                         "System",
-                        "System.Collections.Generic"
+                        "System.Collections",
+                        "System.Collections.Generic",
+                        "System.ComponentModel",
+                        "System.Runtime.CompilerServices"
                     })
                 {
                     cw.Indented("using ");
@@ -116,8 +57,16 @@ namespace Serenity.Reflection
 
                 sb.AppendLine();
 
-                foreach (var fromType in fromTypes)
-                    EnqueueType(fromType);
+                foreach (var fromType in assembly.GetTypes())
+                {
+                    if (fromType.IsAbstract)
+                        continue;
+
+                    if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
+                        fromType.IsSubclassOf(typeof(ServiceResponse)) ||
+                        fromType.IsSubclassOf(typeof(Row)))
+                        EnqueueType(fromType);
+                }
 
                 int i = 0;
                 while (generateQueue.Count > 0)
@@ -132,21 +81,6 @@ namespace Serenity.Reflection
             return sb.ToString();
         }
 
-        private static bool IsSimpleType(Type type)
-        {
-            if (type == typeof(String) ||
-                type == typeof(Int32) ||
-                type == typeof(Int64) ||
-                type == typeof(Int16) ||
-                type == typeof(Double) ||
-                type == typeof(Decimal) ||
-                type == typeof(DateTime) ||
-                type == typeof(Boolean))
-                return true;
-
-            return false;
-        }
-
         private void HandleMemberType(Type memberType)
         {
             HandleMemberType(sb, memberType, t => EnqueueType(t));
@@ -154,7 +88,7 @@ namespace Serenity.Reflection
 
         public static void HandleMemberType(StringBuilder code, Type memberType, Action<Type> enqueueType = null)
         {
-            if (IsSimpleType(memberType))
+            if (GeneratorUtils.IsSimpleType(memberType))
             {
                 code.Append(memberType.Name);
                 return;
@@ -162,7 +96,7 @@ namespace Serenity.Reflection
 
             var nullableType = Nullable.GetUnderlyingType(memberType);
             if (nullableType != null &&
-                IsSimpleType(nullableType))
+                GeneratorUtils.IsSimpleType(nullableType))
             {
                 code.Append(nullableType.Name);
                 code.Append("?");
