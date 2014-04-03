@@ -83,8 +83,9 @@ namespace Serenity.Reflection
 
             sb.AppendLine();
 
-            var byNameSpace = generatedCode.Keys.ToLookup(x => x.Namespace);
-            var byOwnerType = generatedCode.Keys.ToLookup(x => (x.IsNested ? x.DeclaringType : null));
+            var ordered = generatedCode.Keys.OrderBy(x => x.Namespace).ThenBy(x => x.Name);
+            var byNameSpace = ordered.ToLookup(x => x.Namespace);
+            var byOwnerType = ordered.ToLookup(x => (x.IsNested ? x.DeclaringType : null));
             var outputted = new HashSet<Type>();
 
             foreach (var ns in byNameSpace.ToArray().OrderBy(x => x.Key))
