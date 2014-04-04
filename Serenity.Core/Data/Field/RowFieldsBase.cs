@@ -271,11 +271,18 @@ namespace Serenity.Data
 
                         if (property != null)
                         {
+                            foreach (var attr in property.GetCustomAttributes<AddJoinToAttribute>())
+                                new LeftJoin(this.joins, attr.ToTable, attr.Alias,
+                                    new Criteria(attr.Alias, attr.ToField) == new Criteria(field));
+
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
                         }
                     }
                 }
+
+                foreach (var attr in this.rowType.GetCustomAttributes<AddLeftJoinAttribute>())
+                    new LeftJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
                 var propertyDescriptorArray = new PropertyDescriptor[this.Count];
                 for (int i = 0; i < this.Count; i++)

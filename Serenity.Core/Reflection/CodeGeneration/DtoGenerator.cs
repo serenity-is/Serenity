@@ -9,66 +9,6 @@ using System.Text;
 
 namespace Serenity.Reflection
 {
-    public class CodeWriter
-    {
-        private StringBuilder sb;
-        private string space;
-        private string indent;
-
-        public CodeWriter(StringBuilder sb, int indentSize)
-        {
-            this.space = new String(' ', indentSize);
-            this.indent = "";
-            this.sb = sb;
-        }
-
-        private void IncreaseIndent()
-        {
-            indent += space;
-        }
-
-        private void DecreaseIndent()
-        {
-            if (indent.Length >= space.Length)
-                indent = indent.Substring(0, indent.Length - space.Length);
-        }
-
-        public void Block(Action insideBlock)
-        {
-            IncreaseIndent();
-            insideBlock();
-            DecreaseIndent();
-        }
-
-        public void InBrace(Action insideBlock)
-        {
-            sb.Append(indent);
-            sb.AppendLine("{");
-            IncreaseIndent();
-            insideBlock();
-            DecreaseIndent();
-            sb.Append(indent);
-            sb.AppendLine("}");
-        }
-
-        public void Indent()
-        {
-            sb.Append(indent);
-        }
-
-        public void Indented(string s)
-        {
-            sb.Append(indent);
-            sb.Append(s);
-        }
-
-        public void IndentedLine(string s)
-        {
-            sb.Append(indent);
-            sb.AppendLine(s);
-        }
-    }
-
     public class DtoGenerator
     {
         private StringBuilder sb;
@@ -132,21 +72,6 @@ namespace Serenity.Reflection
             return sb.ToString();
         }
 
-        private static bool IsSimpleType(Type type)
-        {
-            if (type == typeof(String) ||
-                type == typeof(Int32) ||
-                type == typeof(Int64) ||
-                type == typeof(Int16) ||
-                type == typeof(Double) ||
-                type == typeof(Decimal) ||
-                type == typeof(DateTime) ||
-                type == typeof(Boolean))
-                return true;
-
-            return false;
-        }
-
         private void HandleMemberType(Type memberType)
         {
             HandleMemberType(sb, memberType, t => EnqueueType(t));
@@ -154,7 +79,7 @@ namespace Serenity.Reflection
 
         public static void HandleMemberType(StringBuilder code, Type memberType, Action<Type> enqueueType = null)
         {
-            if (IsSimpleType(memberType))
+            if (GeneratorUtils.IsSimpleType(memberType))
             {
                 code.Append(memberType.Name);
                 return;
@@ -162,7 +87,7 @@ namespace Serenity.Reflection
 
             var nullableType = Nullable.GetUnderlyingType(memberType);
             if (nullableType != null &&
-                IsSimpleType(nullableType))
+                GeneratorUtils.IsSimpleType(nullableType))
             {
                 code.Append(nullableType.Name);
                 code.Append("?");
@@ -186,6 +111,12 @@ namespace Serenity.Reflection
             if (memberType == typeof(HashSet<string>))
             {
                 code.Append("List<String>");
+                return;
+            }
+
+            if (memberType == typeof(Dictionary<string, string>))
+            {
+                code.Append("Dictionary<String, String>");
                 return;
             }
 

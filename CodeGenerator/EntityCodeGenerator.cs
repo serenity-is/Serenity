@@ -56,7 +56,7 @@ namespace Serenity.CodeGenerator
             GenerateEndpoint();
             GeneratePageController();
             GeneratePageIndex();
-            GenerateScriptRow();
+            //GenerateScriptRow();
             GenerateScriptGrid();
             GenerateScriptDialog();
         }
@@ -257,11 +257,11 @@ namespace Serenity.CodeGenerator
             }), Path.Combine(@"Modules\", Path.Combine(model.Module, Path.Combine(model.ClassName, model.ClassName + "Index.cshtml"))));
         }
 
-        private void GenerateScriptRow()
-        {
-            CreateNewSiteScriptFile(Templates.Render("EntityScriptRow", model),
-                Path.Combine(model.Module, Path.Combine(model.ClassName, model.RowClassName + ".cs")));
-        }
+        //private void GenerateScriptRow()
+        //{
+        //    CreateNewSiteScriptFile(Templates.Render("EntityScriptRow", model),
+        //        Path.Combine(model.Module, Path.Combine(model.ClassName, model.RowClassName + ".cs")));
+        //}
 
         private void GenerateScriptGrid()
         {

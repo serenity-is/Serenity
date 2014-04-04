@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Html;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -20,9 +21,13 @@ namespace Serenity
 
         private static void RegisterTypesInNamespace(string ns)
         {
-            Type nsObj = Type.GetType(ns);
-            if (nsObj == null)
-                return;
+            JsDictionary nsObj = Window.Instance.As<JsDictionary>();
+            foreach (var x in ns.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                nsObj = nsObj[x].As<JsDictionary>();
+                if (nsObj == null)
+                    return;
+            }
 
             foreach (var k in Object.Keys(nsObj))
             {
@@ -35,12 +40,12 @@ namespace Serenity
 
                 visited[name] = true;
 
-                var type = Type.GetType(name);
-                if (type == null)
-                    continue;
-
                 if (Script.TypeOf(obj) == "function")
                 {
+                    var type = Type.GetType(name);
+                    if (type == null)
+                        continue;
+
                     var attr = type.GetCustomAttributes(typeof(EditorAttribute), false);
                     if (attr != null && attr.Length > 0)
                         RegisterType(type, attr[0] as EditorAttribute);

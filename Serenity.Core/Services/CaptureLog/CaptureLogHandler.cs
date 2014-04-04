@@ -135,7 +135,7 @@ namespace Serenity.Data
                     .Set(capture.ValidUntilField, capture.ValidFromField[logRow])
                     .WhereEqual((Field)info.mappedIdField, info.mappedIdField[logRow])
                     .WhereEqual(capture.ValidUntilField, CaptureLogConsts.ValidUntil)
-                    .Execute(uow.Connection) > 1)
+                    .Execute(uow.Connection, ExpectedRows.Ignore) > 1)
                 throw new InvalidOperationException(String.Format("Capture log has more than one active instance for ID {0}?!", info.mappedIdField[logRow]));
 
             new SqlInsert(logRow).Execute(uow.Connection);

@@ -9,6 +9,13 @@
     using System.Text;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
+    public enum ExpectedRows
+    {
+        One = 0,
+        ZeroOrOne = 1,
+        Ignore = 2,
+    }
+
     public static class SqlHelper
     {
         public static bool IsDatabaseException(Exception e)
@@ -105,9 +112,23 @@
         ///   Sorguyu içeren <see cref="SqlUpdate"/> nesnesi.</param>
         /// <returns>
         ///   Etkilenen kayıt sayısı.</returns>
-        public static int Execute(this SqlUpdate query, IDbConnection connection)
+        public static int Execute(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One)
         {
-            return ExecuteNonQuery(connection, query.ToString(), query.Params);
+            return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params));
+        }
+
+        private static int CheckExpectedRows(ExpectedRows expectedRows, int affectedRows)
+        {
+            if (expectedRows == ExpectedRows.Ignore)
+                return affectedRows;
+
+            if (expectedRows == ExpectedRows.One && affectedRows != 1)
+                throw new InvalidOperationException(String.Format("Query affected {0} rows while 1 expected!", affectedRows));
+
+            if (expectedRows == ExpectedRows.ZeroOrOne && affectedRows > 1)
+                throw new InvalidOperationException("Query affected {0} rows while 1 expected!");
+
+            return affectedRows;
         }
 
         /// <summary>
@@ -121,9 +142,9 @@
         ///   Sorguyu içeren <see cref="SqlDelete"/> nesnesi.</param>
         /// <returns>
         ///   Etkilenen kayıt sayısı.</returns>
-        public static int Execute(this SqlDelete query, IDbConnection connection)
+        public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One)
         {
-            return ExecuteNonQuery(connection, query.ToString(), query.Params);
+            return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params));
         }
 
         /// <summary>
@@ -137,11 +158,10 @@
         ///   Sorguyu içeren <see cref="SqlDelete"/> nesnesi.</param>
         /// <returns>
         ///   Etkilenen kayıt sayısı.</returns>
-        public static int Execute(this SqlDelete query, IDbConnection connection, Dictionary param)
+        public static int Execute(this SqlDelete query, IDbConnection connection, Dictionary param, ExpectedRows expectedRows = ExpectedRows.One)
         {
-            return ExecuteNonQuery(connection, query.ToString(), param);
+            return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), param));
         }
-
 
         /// <summary>
         ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>

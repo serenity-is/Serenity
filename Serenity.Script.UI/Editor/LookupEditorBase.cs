@@ -14,20 +14,15 @@ namespace Serenity
         public LookupEditorBase(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)
         {
-            UpdateItems();
-
-            string lookupKey = GetLookupKey();
             var self = this;
-            jQuery.FromObject(Document.Body).As<dynamic>().bind("scriptdatachange." + this.uniqueName, new Action<jQueryEvent, string>((e, s) => {
-                if (s == lookupKey)
-                    self.UpdateItems();
-            }));
+
+            UpdateItems();
+            Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, () => self.UpdateItems());
         }
 
         public override void Destroy()
         {
-            jQuery.FromObject(Document.Body).As<dynamic>().unbind("scriptdatachange." + this.uniqueName);
-
+            Q.ScriptData.UnbindFromChange(this.uniqueName);
             element.Select2("destroy");
 
             base.Destroy();
@@ -62,6 +57,11 @@ namespace Serenity
             return textValue == null ? "" : textValue.ToString();
         }
 
+        protected virtual bool GetItemDisabled(TItem item, Lookup<TItem> lookup)
+        {
+            return false;
+        }
+
         protected virtual void UpdateItems()
         {
             var lookup = GetLookup();
@@ -72,11 +72,18 @@ namespace Serenity
             foreach (dynamic item in items)
             {
                 var text = GetItemText(item, lookup);
+                var disabled = GetItemDisabled(item, lookup);
 
                 object idValue = item[lookup.IdField];
                 string id = idValue == null ? "" : idValue.ToString();
 
-                AddItem(id, text, item);
+                this.items.Add(new Select2Item
+                {
+                    Id = id,
+                    Text = text,
+                    Source = item,
+                    Disabled = disabled
+                });
             }
         }
     }

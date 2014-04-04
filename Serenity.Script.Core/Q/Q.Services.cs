@@ -38,10 +38,20 @@ namespace Serenity
                                 if (options.OnSuccess != null)
                                     options.OnSuccess(response);
                             }
-                            else if (options.OnError != null)
-                                options.OnError(response);
                             else
-                                Q.ErrorHandling.ShowServiceError(response.Error);
+                            {
+                                if (Q.Config.NotLoggedInHandler != null &&
+                                    response != null &&
+                                    response.Error != null &&
+                                    response.Error.Code == "NotLoggedIn" &&
+                                    Q.Config.NotLoggedInHandler(options.As<ServiceCallOptions>(), response))
+                                    return;
+
+                                if (options.OnError != null)
+                                    options.OnError(response);
+                                else
+                                    Q.ErrorHandling.ShowServiceError(response.Error);
+                            }
                         }
                         finally
                         {
@@ -99,6 +109,17 @@ namespace Serenity
                 Q.BlockUI();
 
             return jQuery.Ajax(options.As<jQueryAjaxOptions>());
+        }
+
+        public static void ServiceRequest<TResponse>(string service, ServiceRequest request, Action<TResponse> onSuccess, ServiceCallOptions options = null)
+            where TResponse: ServiceResponse
+        {
+            ServiceCall(jQuery.ExtendObject(new ServiceCallOptions<TResponse>
+            {
+                Service = service,
+                Request = request,
+                OnSuccess = onSuccess
+            }, options.As<ServiceCallOptions<TResponse>>()));
         }
     }
 }

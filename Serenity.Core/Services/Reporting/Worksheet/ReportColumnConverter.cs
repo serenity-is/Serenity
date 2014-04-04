@@ -106,6 +106,13 @@ namespace Serenity.Reporting
                 else
                     column = FromPropertyInfo(propertyInfo, baseField);
 
+                var cellDecorator = member.GetCustomAttribute<CellDecoratorAttribute>();
+                if (cellDecorator != null)
+                {
+                    var decorator = ((ICellDecorator)Activator.CreateInstance(cellDecorator.DecoratorType));
+                    column.Decorator = decorator;
+                }
+
                 list.Add(column);
             }
 

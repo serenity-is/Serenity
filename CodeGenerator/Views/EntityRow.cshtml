@@ -27,6 +27,8 @@ namespace @(Model.RootNamespace).@(Model.Module).Entities
         attrs.Add("Column(\"" + x.Name + "\")");
     }
 
+    attrs.Add("DisplayName(\"" + x.Ident + "\")");
+
     if ((x.Size ?? 0) != 0) {
         attrs.Add("Size(" + x.Size + ")");
     }
@@ -52,7 +54,7 @@ namespace @(Model.RootNamespace).@(Model.Module).Entities
 </text>}
 @foreach (var x in Model.Joins){foreach (var y in x.Fields){
 <text>
-        [Expression("@Raw("j" + x.Name + "." + y.Name)")]
+        [DisplayName("@Raw(y.Ident)"), Expression("@Raw("j" + x.Name + "." + y.Name)")]
         public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident))
         {
             get { return Fields.@(jf(x.Name, y.Ident))[this]; }

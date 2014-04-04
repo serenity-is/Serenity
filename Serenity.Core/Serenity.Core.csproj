@@ -71,6 +71,8 @@
     <Compile Include="Data\CustomField\CustomFieldExtensions.cs" />
     <Compile Include="Data\CustomField\ICustomFieldListService.cs" />
     <Compile Include="Data\CustomField\CustomFieldType.cs" />
+    <Compile Include="Data\Mapping\AddJoinToAttribute.cs" />
+    <Compile Include="Data\Mapping\AddLeftJoinAttribute.cs" />
     <Compile Include="Data\Mapping\DisplayFormatAttribute.cs" />
     <Compile Include="Data\Mapping\TableNameAttribute.cs" />
     <Compile Include="Data\Sql\BasicFilter\BasicFilter.cs" />
@@ -175,6 +177,9 @@
     <Compile Include="Data\Index\TreeDictionary.cs" />
     <Compile Include="Data\Index\TreeIndex.cs" />
     <Compile Include="Reflection\CloneHelper.cs" />
+    <Compile Include="Reflection\CodeGeneration\CodeWriter.cs" />
+    <Compile Include="Reflection\CodeGeneration\ScriptDtoGenerator.cs" />
+    <Compile Include="Reflection\CodeGeneration\GeneratorUtils.cs" />
     <Compile Include="Reflection\ILGeneration.cs" />
     <Compile Include="Reflection\ObjectAccessor.cs" />
     <Compile Include="Reflection\TypeAccessor.cs" />
@@ -219,7 +224,7 @@
     <Compile Include="Extensions\MethodChainingExtensions.cs" />
     <Compile Include="Media\ImageScaleMode.cs" />
     <Compile Include="PropertyGrid\PropertyItem.cs" />
-    <Compile Include="Reflection\DtoGenerator.cs" />
+    <Compile Include="Reflection\CodeGeneration\DtoGenerator.cs" />
     <Compile Include="Extensibility\BaseRegistrarAttribute.cs" />
     <Compile Include="Extensibility\EnumRegistrarAttribute.cs" />
     <Compile Include="Extensibility\ExtensibilityHelper.cs" />
