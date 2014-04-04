@@ -12,3 +12,4 @@ Thumbs.db
 ErrorLog.db
 StyleCop.Cache
 Documentation/Samples/packages/*/*
+TestResults/
