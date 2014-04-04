@@ -1,32 +1,36 @@
 ﻿using System;
-using Serenity.Data;
 using System.Collections.Generic;
 using Serenity.Web;
+using Serenity.Data;
+using Serenity.Services;
 using EntityType = System.String;
 
 namespace Serenity.Services
 {
-    public class AuditInsertRequest
+    public class AuditSaveRequest
     {
         public EntityType EntityType { get; private set; }
-        public IIdRow Entity { get; private set;  }
+        public IIdRow OldEntity { get; private set; }
+        public IIdRow NewEntity { get; private set; }
         public Field[] AuditFields { get; private set; }
         public EntityType ParentTypeId { get; set; }
-        public Int64? ParentId { get; set; }
+        public Int64? OldParentId { get; set; }
+        public Int64? NewParentId { get; set; }
         public AuditFileFieldInfo[] FileFieldInfos { get; set; }
         public string FileSubFolder { get; set; }
         public ICollection<string> FilesToDelete { get; set; }
 
-        public AuditInsertRequest(EntityType entityType, IIdRow entity, Field[] auditFields)
+        public AuditSaveRequest(EntityType entityType, IIdRow oldEntity, IIdRow newEntity, Field[] auditFields)
         {
-            if (entity == null)
-                throw new ArgumentNullException("entity");
+            if (newEntity == null)
+                throw new ArgumentNullException("newEntity");
 
             if (auditFields == null)
                 throw new ArgumentNullException("auditFields");
 
             EntityType = entityType;
-            Entity = entity;
+            OldEntity = oldEntity;
+            NewEntity = newEntity;
             AuditFields = auditFields;
         }
     }

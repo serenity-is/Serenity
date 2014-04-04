@@ -3,7 +3,8 @@ using Serenity.Data;
 
 namespace Serenity.Services
 {
-    public class CreateResponse : SaveResponse
+    public class SaveResponse : ServiceResponse
     {
+        public Int64? EntityId;
     }
 }

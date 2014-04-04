@@ -1,7 +1,7 @@
 ﻿
 namespace Serenity.Services
 {
-    public class UpdateResponse : ServiceResponse
+    public class UpdateResponse : SaveResponse
     {
     }
 }

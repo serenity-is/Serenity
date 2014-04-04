@@ -82,11 +82,11 @@ namespace Serenity.Services
         {
         }
 
-        protected virtual AuditUpdateRequest GetAuditRequest(HashSet<Field> auditFields)
+        protected virtual AuditSaveRequest GetAuditRequest(HashSet<Field> auditFields)
         {
             Field[] array = new Field[auditFields.Count];
             auditFields.CopyTo(array);
-            var auditRequest = new AuditUpdateRequest(Row.Table, (IIdRow)Old, (IIdRow)Row, array);
+            var auditRequest = new AuditSaveRequest(Row.Table, (IIdRow)Old, (IIdRow)Row, array);
 
             var parentIdRow = Row as IParentIdRow;
             if (parentIdRow != null)

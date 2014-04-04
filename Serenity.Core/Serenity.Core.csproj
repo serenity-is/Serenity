@@ -265,6 +265,9 @@
     <Compile Include="Services\Reporting\IDataOnlyReport.cs" />
     <Compile Include="Services\Reporting\Worksheet\ReportColumnConverter.cs" />
     <Compile Include="Services\Reporting\Worksheet\ReportColumn.cs" />
+    <Compile Include="Services\RequestResponse\SaveResponse.cs" />
+    <Compile Include="Services\ISaveRequestHandler.cs" />
+    <Compile Include="Services\SaveRequestType.cs" />
     <Compile Include="Services\Security\IUserAuthenticationService.cs" />
     <Compile Include="Services\Security\IUserRetrieveService.cs" />
     <Compile Include="Services\ServiceError.cs" />
@@ -316,7 +319,6 @@
     <Compile Include="Services\RequestResponse\UpdateResponse.cs" />
     <Compile Include="Services\AuditLog\AuditDeleteRequest.cs" />
     <Compile Include="Services\AuditLog\AuditFileFieldInfo.cs" />
-    <Compile Include="Services\AuditLog\AuditInsertRequest.cs" />
     <Compile Include="Services\AuditLog\AuditLogListRequest.cs" />
     <Compile Include="Services\AuditLog\AuditLogListResponse.cs" />
     <Compile Include="Services\AuditLog\AuditLogAttribute.cs" />
@@ -324,7 +326,7 @@
     <Compile Include="Services\AuditLog\AuditLogService.cs" />
     <Compile Include="Services\AuditLog\AuditUndeleteRequest.cs" />
     <Compile Include="Services\AuditLog\AuditUpdateData.cs" />
-    <Compile Include="Services\AuditLog\AuditUpdateRequest.cs" />
+    <Compile Include="Services\AuditLog\AuditSaveRequest.cs" />
     <Compile Include="Services\CaptureLog\CaptureLogAttribute.cs" />
     <Compile Include="Services\CaptureLog\CaptureLogHandler.cs" />
     <Compile Include="Services\BatchGenerationUpdater.cs" />
@@ -342,6 +344,7 @@
     <Compile Include="Services\Security\SecurityHelper.cs" />
     <Compile Include="Services\ServiceHelper.cs" />
     <Compile Include="Services\UndeleteRequestHandler.cs" />
+    <Compile Include="Services\SaveRequestHandler.cs" />
     <Compile Include="Services\UpdateRequestHandler.cs" />
     <Compile Include="Services\Settings\Config.cs" />
     <Compile Include="Services\Settings\FormatHelper.cs" />

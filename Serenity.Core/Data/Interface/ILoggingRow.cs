@@ -1,10 +1,18 @@
 ﻿namespace Serenity.Data
 {
-    public interface ILoggingRow
+    public interface IUpdateLogRow
+    {
+        IIdField UpdateUserIdField { get; }
+        DateTimeField UpdateDateField { get; }
+    }
+
+    public interface IInsertLogRow
     {
         IIdField InsertUserIdField { get; }
         DateTimeField InsertDateField { get; }
-        IIdField UpdateUserIdField { get; }
-        DateTimeField UpdateDateField { get; }
+    }
+
+    public interface ILoggingRow : IUpdateLogRow, IInsertLogRow
+    {
     }
 }

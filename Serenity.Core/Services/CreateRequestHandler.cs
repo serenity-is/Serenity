@@ -1,6 +1,5 @@
 ﻿using Serenity.Data;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
@@ -102,13 +101,13 @@ namespace Serenity.Services
         {
         }
 
-        protected AuditInsertRequest GetAuditRequest(HashSet<Field> auditFields)
+        protected AuditSaveRequest GetAuditRequest(HashSet<Field> auditFields)
         {
             EntityType entityType = Row.Table;
 
             Field[] array = new Field[auditFields.Count];
             auditFields.CopyTo(array);
-            var auditRequest = new AuditInsertRequest(entityType, Row, array);
+            var auditRequest = new AuditSaveRequest(entityType, null, Row, array);
 
             var parentIdRow = Row as IParentIdRow;
             if (parentIdRow != null)
@@ -117,7 +116,7 @@ namespace Serenity.Services
                 if (!parentIdField.ForeignTable.IsTrimmedEmpty())
                 {
                     auditRequest.ParentTypeId = parentIdField.ForeignTable;
-                    auditRequest.ParentId = parentIdRow.ParentIdField[Row];
+                    auditRequest.NewParentId = parentIdRow.ParentIdField[Row];
                 }
             }
 

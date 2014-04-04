@@ -131,7 +131,6 @@ namespace Serenity.Services
 
                 Action<EntityType, string, EntityType> addForeign = (entityType, field, foreignType) =>
                 {
-
                     Dictionary<string, string> foreign;
                     if (!foreigns.TryGetValue(entityType, out foreign))
                     {
@@ -293,11 +292,11 @@ namespace Serenity.Services
             return dictionary;
         }
 
-        public static void AuditInsert(IDbConnection connection, string schema, AuditInsertRequest request)
+        public static void AuditInsert(IDbConnection connection, string schema, AuditSaveRequest request)
         {
             var fld = IoC.Resolve<IAuditLogRow>(schema);
 
-            var srcRow = (Row)request.Entity;
+            var srcRow = (Row)request.NewEntity;
             var dstRow = srcRow.CreateNew();
             dstRow.TrackAssignments = true;
 
@@ -325,17 +324,17 @@ namespace Serenity.Services
             var audit = ((Row)fld).CreateNew();
             audit.TrackAssignments = true;
             fld.EntityTypeIdField[audit] = request.EntityType;
-            fld.EntityIdField[audit] = request.Entity.IdField[srcRow];
+            fld.EntityIdField[audit] = request.NewEntity.IdField[srcRow];
             fld.ParentTypeIdField[audit] = request.ParentTypeId;
-            fld.NewParentIdField[audit] = request.ParentId;
+            fld.NewParentIdField[audit] = request.NewParentId;
             fld.DateField[audit] = DateTime.UtcNow;
             fld.AuditTypeIdField[audit] = (Int32?)AuditType.Insert;
             fld.OldAuditDataField[audit] = null;
             fld.NewAuditDataField[audit] = auditData;
 
-            var loggingRow = request.Entity as ILoggingRow;
+            var loggingRow = request.NewEntity as ILoggingRow;
             if (loggingRow != null)
-                fld.UserIdField[audit] = loggingRow.InsertUserIdField[(Row)request.Entity];
+                fld.UserIdField[audit] = loggingRow.InsertUserIdField[(Row)request.NewEntity];
             if (fld.UserIdField[audit] == null)
                 fld.UserIdField[audit] = (int)SecurityHelper.CurrentUserId;
 
@@ -360,7 +359,7 @@ namespace Serenity.Services
             //filesToDelete.Add(UploadHelper.UploadFilePath(fileUploadRoot, UploadHelper.HistoryFolder, historyFile));
         }
 
-        public static Row PrepareAuditUpdate(string schema, AuditUpdateRequest request)
+        public static Row PrepareAuditUpdate(string schema, AuditSaveRequest request)
         {
             var fld = IoC.Resolve<IAuditLogRow>(schema);
 
@@ -455,7 +454,7 @@ namespace Serenity.Services
             return audit;
         }
 
-        public static void AuditUpdate(IDbConnection connection, string schema, AuditUpdateRequest request)
+        public static void AuditUpdate(IDbConnection connection, string schema, AuditSaveRequest request)
         {
             var audit = PrepareAuditUpdate(schema, request);
             new SqlInsert(audit).Execute(connection);
