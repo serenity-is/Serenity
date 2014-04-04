@@ -26,5 +26,19 @@ namespace Serenity.Reflection
             return false;
         }
 
+        public static bool GetFirstDerivedOfGenericType(Type type, Type genericType, out Type derivedType)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
+            {
+                derivedType = type;
+                return true;
+            }
+
+            if (type.BaseType != null)
+                return GetFirstDerivedOfGenericType(type.BaseType, genericType, out derivedType);
+
+            derivedType = null;
+            return false;
+        }
     }
 }

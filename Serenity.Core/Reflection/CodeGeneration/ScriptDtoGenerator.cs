@@ -18,9 +18,28 @@ namespace Serenity.Reflection
         private HashSet<Type> visited;
         private Queue<Type> generateQueue;
 
-        public ScriptDtoGenerator()
+        public ScriptDtoGenerator(Assembly assembly)
         {
+            UsingNamespaces = new HashSet<string>
+            {
+                "Serenity",
+                "Serenity.ComponentModel",
+                "System",
+                "System.Collections",
+                "System.Collections.Generic",
+                "System.ComponentModel",
+                "System.Runtime.CompilerServices"
+            };
+
+            if (assembly == null)
+                throw new ArgumentNullException("assembly");
+
+            this.Assembly = assembly;
         }
+
+        public Assembly Assembly { get; private set; }
+        public HashSet<string> UsingNamespaces { get; private set; }
+        
 
         private bool EnqueueType(Type type)
         {
@@ -41,14 +60,14 @@ namespace Serenity.Reflection
             return ns;
         }
 
-        public string GenerateCode(Assembly assembly, string anamespace)
+        public string GenerateCode()
         {
             this.sb = new StringBuilder(4096);
             this.cw = new CodeWriter(sb, 4);
             this.generateQueue = new Queue<Type>();
             this.visited = new HashSet<Type>();
 
-            foreach (var fromType in assembly.GetTypes())
+            foreach (var fromType in this.Assembly.GetTypes())
             {
                 if (fromType.IsAbstract)
                     continue;
@@ -64,7 +83,7 @@ namespace Serenity.Reflection
             {
                 var type = generateQueue.Dequeue();
 
-                if (type.Assembly != assembly)
+                if (type.Assembly != this.Assembly)
                     continue;
 
                 GenerateCodeFor(type);
@@ -74,16 +93,7 @@ namespace Serenity.Reflection
 
             sb.Clear();
 
-            foreach (var ns in
-                new string[] {
-                        "Serenity",
-                        "Serenity.ComponentModel",
-                        "System",
-                        "System.Collections",
-                        "System.Collections.Generic",
-                        "System.ComponentModel",
-                        "System.Runtime.CompilerServices"
-                    })
+            foreach (var ns in UsingNamespaces.OrderBy(x => x))
             {
                 cw.Indented("using ");
                 sb.Append(ns);
@@ -332,29 +342,22 @@ namespace Serenity.Reflection
             }
         }
 
-        static Type GetFirstDerivedOfGenericType(Type type, Type genericType)
-        {
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
-                return type;
 
-            if (type.BaseType != null)
-                return GetFirstDerivedOfGenericType(type.BaseType, genericType);
-
-            return null;
-        }
 
         private Type GetParentClass(Type type)
         {
+            Type derived;
+
             if (typeof(ListRequest).IsAssignableFrom(type))
                 return typeof(ListRequest);
-            else if (GetFirstDerivedOfGenericType(type, typeof(ListResponse<>)) != null)
-                return typeof(ListResponse<>).MakeGenericType(GetFirstDerivedOfGenericType(type, typeof(ListResponse<>)).GetGenericArguments()[0]);
+            else if (GeneratorUtils.GetFirstDerivedOfGenericType(type, typeof(ListResponse<>), out derived))
+                return typeof(ListResponse<>).MakeGenericType(derived.GetGenericArguments()[0]);
             else if (typeof(RetrieveRequest).IsAssignableFrom(type))
                 return typeof(RetrieveRequest);
-            else if (GetFirstDerivedOfGenericType(type, typeof(RetrieveResponse<>)) != null)
-                return typeof(RetrieveResponse<>).MakeGenericType(GetFirstDerivedOfGenericType(type, typeof(RetrieveResponse<>)).GetGenericArguments()[0]);
-            else if (GetFirstDerivedOfGenericType(type, typeof(SaveRequest<>)) != null)
-                return typeof(SaveRequest<>).MakeGenericType(GetFirstDerivedOfGenericType(type, typeof(SaveRequest<>)).GetGenericArguments()[0]);
+            else if (GeneratorUtils.GetFirstDerivedOfGenericType(type, typeof(RetrieveResponse<>), out derived))
+                return typeof(RetrieveResponse<>).MakeGenericType(derived.GetGenericArguments()[0]);
+            else if (GeneratorUtils.GetFirstDerivedOfGenericType(type, typeof(SaveRequest<>), out derived))
+                return typeof(SaveRequest<>).MakeGenericType(derived.GetGenericArguments()[0]);
             else if (typeof(DeleteRequest).IsAssignableFrom(type))
                 return typeof(DeleteRequest);
             else if (typeof(DeleteResponse).IsAssignableFrom(type))
