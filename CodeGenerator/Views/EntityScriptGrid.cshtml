@@ -26,4 +26,9 @@ namespace @(Model.RootNamespace).@(Model.Module)
             return columns;
         }
     }
+
+    [Imported, Serializable, PreserveMemberCase]
+    public partial class @(Model.ClassName)Row
+    {
+    }
 }
