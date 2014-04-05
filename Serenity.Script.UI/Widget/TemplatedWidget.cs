@@ -24,6 +24,12 @@ namespace Serenity
             return J("#" + idPrefix + id);
         }
 
+        public TWidget ById<TWidget>(string id)
+            where TWidget: Widget
+        {
+            return ById(id).GetWidget<TWidget>();
+        }
+
         protected virtual string GetTemplateName()
         {
             return this.GetType().Name;

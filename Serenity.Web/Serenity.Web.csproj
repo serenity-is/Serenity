@@ -83,7 +83,8 @@
     <Compile Include="Content\LocaleID.cs" />
     <Compile Include="Content\RegistrationHelper.cs" />
     <Compile Include="Content\TemplateHelper.cs" />
-    <Compile Include="Mvc\ScriptEndpointGenerator.cs" />
+    <Compile Include="Script\ScriptEndpointGenerator.cs" />
+    <Compile Include="Script\ScriptFormGenerator.cs" />
     <Compile Include="Mvc\ServiceAuthorizeFilter.cs" />
     <Compile Include="Script\DataScript.cs">
       <SubType>Code</SubType>

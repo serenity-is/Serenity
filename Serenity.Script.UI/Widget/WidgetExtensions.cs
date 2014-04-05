@@ -61,6 +61,18 @@ namespace Serenity
             return !Script.IsUndefined(((dynamic)e).originalEvent);
         }
 
+        public static bool ValidateElement(this jQueryValidator validator, Widget widget)
+        {
+            return validator.ValidateElement(widget.Element[0]);
+        }
+
+        [IncludeGenericArguments(false)]
+        public static void Change<TWidget>(this TWidget widget, jQueryEventHandler handler)
+            where TWidget: Widget
+        {
+            widget.Element.Bind("change.", handler);
+        }
+
         [InlineCode("{obj}.bind({eventName}, {handler})")]
         public static jQueryObject Bind2(this jQueryObject obj, string eventName, Action<jQueryEvent, dynamic> handler)
         {

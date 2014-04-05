@@ -8,8 +8,9 @@ using Serenity.Reflection;
 using System.Text;
 using System.Collections.Generic;
 using System.Reflection;
+using Serenity.Services;
 
-namespace Serenity.Services
+namespace Serenity.Reflection
 {
     public class ScriptEndpointGenerator
     {

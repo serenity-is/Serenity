@@ -125,6 +125,17 @@ namespace jQueryApi
         }
 
         /// <summary>
+        /// Validates the specified element
+        /// </summary>
+        /// <param name="element">The element to validate</param>
+        /// <returns>True if the form is valid, otherwise returns false.</returns>
+        [InlineCode("{this}.element({element}[0])")]
+        public bool ValidateElement(jQueryObject element)
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Validates the controlled form
         /// </summary>
         /// <returns>True if the form is valid, otherwise returns false.</returns>
