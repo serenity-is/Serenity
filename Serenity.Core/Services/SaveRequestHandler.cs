@@ -6,43 +6,46 @@ using System.Reflection;
 
 namespace Serenity.Services
 {
-    public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestHandler<TRow>
+    public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestHandler
         where TRow : Row, IIdRow, new()
         where TSaveResponse : SaveResponse, new()
         where TSaveRequest : SaveRequest<TRow>, new()
     {
-
         private bool displayOrderFix;
         private static bool loggingInitialized;
         protected static CaptureLogHandler<TRow> captureLogHandler;
         protected static bool hasAuditLogAttribute;
+        protected IEnumerable<SaveRequestBehaviourAttribute> behaviours;
+
+        public SaveRequestHandler()
+        {
+            this.behaviours = this.GetType().GetCustomAttributes<SaveRequestBehaviourAttribute>();
+        }
 
         protected virtual void AfterSave()
         {
             HandleDisplayOrder(afterSave: true);
+
+            foreach (var behaviour in this.behaviours)
+                behaviour.OnAfterSave(this);
         }
 
         protected virtual void BeforeSave()
         {
+            foreach (var behaviour in this.behaviours)
+                behaviour.OnBeforeSave(this);
         }
 
         protected virtual void ClearNonTableAssignments()
         {
             foreach (var field in Row.GetFields())
             {
-                if (Row.IsAssigned(field) &&
-                    (field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign ||
-                    (field.Flags & FieldFlags.Calculated) == FieldFlags.Calculated ||
-                    (field.Flags & FieldFlags.Reflective) == FieldFlags.Reflective ||
-                    (field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
-                {
+                if (Row.IsAssigned(field) && !field.IsTableField())
                     Row.ClearAssignment(field);
-                }
             }
         }
 
-
-        protected virtual void DoAudit()
+        protected virtual void PerformAuditing()
         {
             if (!loggingInitialized)
             {
@@ -284,6 +287,8 @@ namespace Serenity.Services
 
         protected virtual void OnReturn()
         {
+            foreach (var behaviour in this.behaviours)
+                behaviour.OnReturn(this);
         }
 
         protected virtual SqlQuery PrepareQuery()
@@ -327,18 +332,16 @@ namespace Serenity.Services
                 LoadOldEntity();
             }
 
-            ValidatePermissions();
             ValidateRequest();
-
             SetInternalFields();
-
             BeforeSave();
-            ClearNonTableAssignments();
 
+            ClearNonTableAssignments();
             ExecuteSave();
 
             AfterSave();
-            DoAudit();
+
+            PerformAuditing();
 
             OnReturn();
             return Response;
@@ -353,6 +356,9 @@ namespace Serenity.Services
             }
 
             SetInternalLogFields();
+
+            foreach (var behaviour in this.behaviours)
+                behaviour.OnSetInternalFields(this);
         }
 
         protected virtual void SetInternalLogFields()
@@ -437,13 +443,16 @@ namespace Serenity.Services
 
         protected virtual void ValidateRequest()
         {
+            ValidatePermissions();
+
             var editableFields = ValidateEditable();
             ValidateRequired(editableFields);
 
             if (IsUpdate)
                 ValidateIsActive();
 
-            ValidateParent();
+            foreach (var behaviour in this.behaviours)
+                behaviour.OnValidateRequest(this);
         }
 
         protected virtual void ValidateIsActive()
@@ -454,48 +463,12 @@ namespace Serenity.Services
                 throw DataValidation.RecordNotActive(Old);
         }
 
-        protected virtual void ValidateParent()
-        {
-            var parentIdRow = Row as IParentIdRow;
-            if (parentIdRow == null)
-                return;
-
-            var parentId = parentIdRow.ParentIdField[Row];
-            if (parentId == null)
-                return;
-
-            if (IsUpdate && parentId == parentIdRow.ParentIdField[Old])
-                return;
-
-            var parentIdField = (Field)parentIdRow.ParentIdField;
-            if (parentIdField.ForeignTable.IsNullOrEmpty())
-                return;
-
-            var foreignRow = RowRegistry.GetSchemaRow(RowRegistry.GetSchemaName(Row), parentIdField.ForeignTable);
-            if (foreignRow == null)
-                return;
-
-            var idForeign = (IIdRow)foreignRow;
-            if (idForeign == null)
-                return;
-
-            var isActiveForeign = (IIsActiveRow)foreignRow;
-            if (isActiveForeign == null)
-                return;
-
-            ServiceHelper.CheckParentNotDeleted(Connection, foreignRow.Table, query => query
-                .Where(
-                    new Criteria((Field)idForeign.IdField) == parentId.Value &
-                    new Criteria(isActiveForeign.IsActiveField) < 0));
-        }
-
         protected virtual void ValidateAndClearIdField()
         {
             var idField = (Field)(Row.IdField);
             Row.ValidateRequired(idField);
             Row.ClearAssignment(idField);
         }
-
 
         protected virtual void ValidatePermissions()
         {
@@ -548,15 +521,13 @@ namespace Serenity.Services
 
         public TSaveResponse Response { get; protected set; }
 
-        SaveRequest<TRow> ISaveRequestHandler<TRow>.Request
-        {
-            get { return this.Request; }
-        }
+        ISaveRequest ISaveRequestHandler.Request { get { return this.Request; } }
 
-        SaveResponse ISaveRequestHandler<TRow>.Response
-        {
-            get { return this.Response; }
-        }
+        SaveResponse ISaveRequestHandler.Response { get { return this.Response; } }
+
+        Row ISaveRequestHandler.Old { get { return this.Old; } }
+
+        Row ISaveRequestHandler.Row { get { return this.Row; } }
     }
 
     public class SaveRequestHandler<TRow> : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>

@@ -2,13 +2,12 @@
 
 namespace Serenity.Services
 {
-    public interface ISaveRequestHandler<TRow>
-        where TRow : Row, IIdRow, new()
+    public interface ISaveRequestHandler
     {
-        TRow Old { get; }
-        TRow Row { get; }
+        Row Old { get; }
+        Row Row { get; }
         IUnitOfWork UnitOfWork { get; }
-        SaveRequest<TRow> Request { get; }
+        ISaveRequest Request { get; }
         SaveResponse Response { get; }
     }
 }

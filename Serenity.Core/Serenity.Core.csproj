@@ -262,6 +262,8 @@
     <Compile Include="Media\Mp3CheckResult.cs" />
     <Compile Include="Media\SwfInfo.cs" />
     <Compile Include="Media\ThumbnailGenerator.cs" />
+    <Compile Include="Services\ValidateParentAttribute.cs" />
+    <Compile Include="Services\SaveBehaviourAttribute.cs" />
     <Compile Include="Services\Reporting\IDataOnlyReport.cs" />
     <Compile Include="Services\Reporting\Worksheet\ReportColumnConverter.cs" />
     <Compile Include="Services\Reporting\Worksheet\ReportColumn.cs" />

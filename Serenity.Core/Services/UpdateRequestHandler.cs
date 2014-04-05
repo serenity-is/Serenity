@@ -118,20 +118,6 @@ namespace Serenity.Services
 
         protected virtual void LoadOldEntity()
         {
-            //if (Request.OldEntity != null)
-            //{
-            //    var row = Request.OldEntity;
-            //    foreach (var field in row.GetFields())
-            //        if (DbFieldExtensions.IsTableField(field))
-            //        {
-            //            if (row.IsAssigned(field))
-            //                field.Copy(row, Old);
-            //            else
-            //                field.CopyNoAssignment(row, Old);
-            //        }
-            //    return;
-            //}
-
             var idField = (Field)(Row.IdField);
             var id = Row.IdField[Row].Value;
 
