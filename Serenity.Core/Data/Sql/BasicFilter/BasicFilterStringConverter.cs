@@ -222,9 +222,9 @@ namespace Serenity.Data
                             throw new ArgumentOutOfRangeException("InvalidFilterLine", filter.ToJsonString());
 
                         if (op == FilterOp.IN)
-                            return new Criteria(fieldExpr).In(values);
+                            return new Criteria(fieldExpr).In(values.ToArray());
                         else 
-                            return new Criteria(fieldExpr).NotIn(values);
+                            return new Criteria(fieldExpr).NotIn(values.ToArray());
                     }
             }
 
