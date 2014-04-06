@@ -55,4 +55,13 @@ namespace Serenity
             return template;
         }
     }
+
+    public abstract class TemplatedWidget : TemplatedWidget<object>
+    {
+        protected TemplatedWidget(jQueryObject element)
+            : base(element, null)
+        {
+
+        }
+    }
 }

@@ -16,7 +16,7 @@ namespace Serenity
             this.widgetName = WidgetExtensions.GetWidgetName(this.GetType());
             this.uniqueName = widgetName + (NextWidgetNumber++).ToString();
 
-            if (element.GetDataValue("widgetName") != null)
+            if (element.GetDataValue(widgetName) != null)
                 throw new Exception(String.Format("Element already has widget '{0}'!", widgetName));
 
             var self = this;
