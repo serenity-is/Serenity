@@ -243,6 +243,18 @@ namespace Serenity.Data
                 return this;
             }
 
+            public CaseBuilder When(BaseCriteria when)
+            {
+                this.when.Add(when);
+                return this;
+            }
+
+            public CaseBuilder Then(object then)
+            {
+                this.then.Add(then);
+                return this;
+            }
+
             public CaseBuilder Else(object elseValue)
             {
                 if (!ReferenceEquals(null, this.elseValue))
@@ -259,7 +271,10 @@ namespace Serenity.Data
                 sb.Append("CASE ");
 
                 if (when.Count == 0)
-                    throw new ArgumentOutOfRangeException("whenThenPairs");
+                    throw new InvalidOperationException("There should be at least one WHEN/THEN pair.");
+
+                if (when.Count != then.Count)
+                    throw new InvalidOperationException("WHEN/THEN pairs doesn't match.");
 
                 for (var i = 0; i < when.Count; i++)
                 {
