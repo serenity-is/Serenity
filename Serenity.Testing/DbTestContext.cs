@@ -64,12 +64,21 @@ namespace Serenity.Testing
         {
             lock (syncLock)
             {
+                Action setConnectionString = delegate
+                {
+                    SqlConnections.SetConnection(over.ConnectionKey,
+                        String.Format(DbSettings.Current.ConnectionStringFormat, over.DbAlias), DbSettings.Current.Provider);
+                };
+
                 if (attachedHashes.ContainsKey(over.DbAlias))
                 {
                     var currentHash = attachedHashes[over.DbAlias];
 
                     if (currentHash == over.ScriptHash)
+                    {
+                        setConnectionString();
                         return;
+                    }
 
                     var newAlias = over.DbAlias + "_" + currentHash;
                     DbManager.DetachDb(newAlias);
@@ -87,6 +96,7 @@ namespace Serenity.Testing
                     DbManager.RenameDb(possibleOldAlias, over.DbAlias);
                     attachedHashes.Remove(possibleOldAlias);
                     attachedHashes[over.DbAlias] = over.ScriptHash;
+                    setConnectionString();
                     return;
                 }
 
@@ -105,16 +115,25 @@ namespace Serenity.Testing
                 }
 
                 attachedHashes[over.DbAlias] = over.ScriptHash;
-
-                SqlConnections.SetConnection(over.ConnectionKey,
-                    String.Format(DbSettings.Current.ConnectionStringFormat, over.DbAlias), DbSettings.Current.Provider);
+                setConnectionString();
             }
+        }
+
+        private void FreeOverrides()
+        {
+            if (overrides != null)
+                foreach (var over in overrides)
+                {
+                    SqlConnections.SetConnection(over.ConnectionKey, "!!!InvalidConnectionString!!!", DbSettings.Current.Provider);
+                }
         }
 
         public void Dispose()
         {
             if (!disposed)
             {
+                FreeOverrides();
+
                 if (scope != null)
                     try
                     {
