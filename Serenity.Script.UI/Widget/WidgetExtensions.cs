@@ -73,6 +73,11 @@ namespace Serenity
             widget.Element.Bind("change.", handler);
         }
 
+        public static jQueryObject GetGridField(this Widget widget)
+        {
+            return widget.Element.Closest(".field");
+        }
+
         [InlineCode("{obj}.bind({eventName}, {handler})")]
         public static jQueryObject Bind2(this jQueryObject obj, string eventName, Action<jQueryEvent, dynamic> handler)
         {
