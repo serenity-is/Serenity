@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Serenity.Data
@@ -187,6 +188,13 @@ namespace Serenity.Data
             return String.Format("AVG(T{0}.{1})", joinNumber.ToInvariant(), field);
         }
 
+        public static string Case(this IQueryWithParams query, Action<CaseBuilder> builder)
+        {
+            var cb = new CaseBuilder();
+            builder(cb);
+            return cb.ToString(query);
+        }
+
         public static string Case(string condition, string[] whenThenPairs, string elseStatement)
         {
             StringBuilder sb = new StringBuilder();
@@ -214,6 +222,75 @@ namespace Serenity.Data
             sb.Append(" END");
 
             return sb.ToString();
+        }
+
+        public class CaseBuilder
+        {
+            private List<BaseCriteria> when;
+            private List<object> then;
+            private object elseValue;
+
+            public CaseBuilder()
+            {
+                when = new List<BaseCriteria>();
+                then = new List<object>();
+            }
+
+            public CaseBuilder WhenThen(BaseCriteria when, object then)
+            {
+                this.when.Add(when);
+                this.then.Add(then);
+                return this;
+            }
+
+            public CaseBuilder Else(object elseValue)
+            {
+                if (!ReferenceEquals(null, this.elseValue))
+                    throw new InvalidOperationException();
+
+                this.elseValue = elseValue ?? new ValueCriteria(null);
+
+                return this;
+            }
+
+            public string ToString(IQueryWithParams query)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("CASE ");
+
+                if (when.Count == 0)
+                    throw new ArgumentOutOfRangeException("whenThenPairs");
+
+                for (var i = 0; i < when.Count; i++)
+                {
+                    sb.Append(" WHEN ");
+                    when[i].ToString(sb, query);
+                    sb.Append(" THEN ");
+                    var value = then[i];
+                    if (value is BaseCriteria)
+                        ((BaseCriteria)value).ToString(sb, query);
+                    else if (value is IQueryWithParams)
+                        sb.Append(((IQueryWithParams)value).ToString());
+                    else
+                        new ValueCriteria(value).ToString(sb, query);
+                }
+
+                if (!Object.ReferenceEquals(null, elseValue))
+                {
+                    sb.Append(" ELSE ");
+
+                    if (elseValue is BaseCriteria)
+                        ((BaseCriteria)elseValue).ToString(sb, query);
+                    else if (elseValue is IQueryWithParams)
+                        sb.Append(((IQueryWithParams)elseValue).ToString());
+                    else
+                        new ValueCriteria(elseValue).ToString(sb, query);
+                }
+
+                sb.Append(" END");
+
+                return sb.ToString();
+            }
         }
     }
 }
