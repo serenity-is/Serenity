@@ -16,6 +16,7 @@
         private StringBuilder having;
         private StringBuilder groupBy;
         private List<string> orderBy;
+        private string forXml;
         private int skip;
         private int take;
         private StringBuilder where;
@@ -38,6 +39,12 @@
         {
             this.distinct = distinct;
 
+            return this;
+        }
+
+        public SqlQuery ForXml(string forXml)
+        {
+            this.forXml = forXml;
             return this;
         }
 
@@ -318,6 +325,9 @@
                 throw new ArgumentNullException("expression");
 
             columns.Add(new Column(expression, null, intoIndex, null));
+
+            EnsureJoinsInExpression(expression);
+
             return this;
         }
 
@@ -336,7 +346,11 @@
             if (fieldName.IsNullOrEmpty())
                 throw new ArgumentNullException("fieldName");
 
-            columns.Add(new Column(alias + fieldName, null, intoIndex, null));
+            string expression = alias + fieldName;
+
+            columns.Add(new Column(expression, null, intoIndex, null));
+
+            EnsureJoinsInExpression(expression);
             return this;
         }
 
@@ -355,6 +369,8 @@
                 throw new ArgumentNullException("columnName");
 
             columns.Add(new Column(expression, columnName, intoIndex, null));
+
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
@@ -377,7 +393,12 @@
             if (columnName.IsNullOrEmpty())
                 throw new ArgumentNullException("columnName");
 
-            columns.Add(new Column(alias + fieldName, columnName, intoIndex, null));
+            var expression = alias + fieldName;
+
+            columns.Add(new Column(expression, columnName, intoIndex, null));
+
+            EnsureJoinsInExpression(expression);
+
             return this;
         }
 

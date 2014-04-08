@@ -280,6 +280,12 @@ namespace Serenity.Data
                 sb.Append(" ROWS ONLY");
             }
 
+            if (!forXml.IsNullOrEmpty())
+            {
+                sb.Append(" FOR XML ");
+                sb.Append(forXml);
+            }
+
             if (countRecords)
             {
                 if (!dialect.MultipleResultsets())
@@ -338,10 +344,13 @@ namespace Serenity.Data
         private void AppendFromWhereOrderByGroupByHaving(StringBuilder sb, string extraWhere,
             bool includeOrderBy)
         {
-            // FROM yaz
-            sb.Append(Sql.Keyword.From);
-            // tablo listesini yaz ("A LEFT OUTER JOIN B ON (...) ....")
-            sb.Append(from.ToString());
+            if (from.Length > 0)
+            {
+                // FROM yaz
+                sb.Append(Sql.Keyword.From);
+                // tablo listesini yaz ("A LEFT OUTER JOIN B ON (...) ....")
+                sb.Append(from.ToString());
+            }
 
             // ekstra filtre belirtilmişse ya da mevcut bir filtre varsa sorgunun
             // WHERE kısmı olacaktır

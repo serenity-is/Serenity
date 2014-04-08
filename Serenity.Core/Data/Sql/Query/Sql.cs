@@ -198,37 +198,12 @@ namespace Serenity.Data
             return String.Format(" Convert({0},{1}) ", type, field);
         }
 
-        public static string Convert(string type, int joinNumber, string field)
-        {
-            if (type.IsNullOrEmpty())
-                throw new ArgumentNullException("type");
-            if (field.IsNullOrEmpty())
-                throw new ArgumentNullException("field");
-
-            return String.Format(" Convert({0},T{1}.{2}) ", type, joinNumber, field);
-        }
-
         public static string SubString(string expression,int startIndex, int endIndex)
         {
             if(expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
             return string.Format(" substring({0},{1},{2}) ", expression, startIndex, endIndex);
-        }
-
-        public static string ForXml(this IQueryWithParams query, string expression)
-        {
-            if(expression.IsNullOrEmpty())
-                throw new ArgumentNullException("expression");
-
-            var sb = new StringBuilder();
-            var queryString = query.ToString().TrimEnd();
-            queryString = queryString.Remove(queryString.Length - 1, 1);
-            sb.Append(queryString);
-            sb.Append(" for xml ");
-            sb.Append(expression);
-            sb.Append(")");
-            return sb.ToString();
         }
         
         public static string Case(this IQueryWithParams query, Action<CaseBuilder> builder)
