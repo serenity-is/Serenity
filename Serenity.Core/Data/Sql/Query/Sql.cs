@@ -188,6 +188,54 @@ namespace Serenity.Data
             return String.Format("AVG(T{0}.{1})", joinNumber.ToInvariant(), field);
         }
 
+        public static string Convert(string type, string field)
+        {
+            if(type.IsNullOrEmpty())
+                throw new ArgumentNullException("type");
+            if(field.IsNullOrEmpty())
+                throw new ArgumentNullException("field");
+
+            return String.Format(" Convert({0},{1}) ", type, field);
+        }
+
+        public static string Convert(string type, int joinNumber, string field)
+        {
+            if (type.IsNullOrEmpty())
+                throw new ArgumentNullException("type");
+            if (field.IsNullOrEmpty())
+                throw new ArgumentNullException("field");
+
+            return String.Format(" Convert({0},T{1}.{2}) ", type, joinNumber, field);
+        }
+
+        public static string SubString(string expression,int startIndex, int endIndex)
+        {
+            if(expression.IsNullOrEmpty())
+                throw new ArgumentNullException("expression");
+
+            return string.Format(" substring({0},{1},{2} ", expression, startIndex, endIndex);
+        }
+
+        public static string SubString(IQueryWithParams expression, int startIndex, int endIndex)
+        {
+            var sb = new StringBuilder();
+            sb.Append(" substring( ");
+            sb.Append(expression);
+            sb.Append(string.Format(",{0},{1})", startIndex, endIndex));
+            return sb.ToString();
+        }
+
+        public static string ForXml(this IQueryWithParams query, string expression)
+        {
+            if(expression.IsNullOrEmpty())
+                throw new ArgumentNullException("expression");
+
+            var sb = new StringBuilder();
+            sb.Append(" for xml ");
+            new ValueCriteria(expression).ToString(sb, query);
+            return sb.ToString();
+        }
+        
         public static string Case(this IQueryWithParams query, Action<CaseBuilder> builder)
         {
             var cb = new CaseBuilder();
