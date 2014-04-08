@@ -94,6 +94,30 @@ namespace Serenity.Data
             if (new SqlQuery().From(row)
                     .SelectTableFields()
                     .Where(where)
+                    .GetSingle(connection))
+                return row;
+
+            return null;
+        }
+
+        public static TRow First<TRow>(this IDbConnection connection, BaseCriteria where)
+            where TRow : Row, new()
+        {
+            var row = TryFirst<TRow>(connection, where);
+
+            if (row == null)
+                throw new ValidationError("RecordNotFound", "Query returned no results!");
+
+            return row;
+        }
+
+        public static TRow TryFirst<TRow>(this IDbConnection connection, BaseCriteria where)
+            where TRow : Row, new()
+        {
+            var row = new TRow() { TrackWithChecks = true };
+            if (new SqlQuery().From(row)
+                    .SelectTableFields()
+                    .Where(where)
                     .GetFirst(connection))
                 return row;
 
