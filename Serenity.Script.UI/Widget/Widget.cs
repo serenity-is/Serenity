@@ -48,7 +48,12 @@ namespace Serenity
         }
 
         public jQueryObject Element { get { return element; } }
-        
+
+        public string UniqueName
+        {
+            get { return uniqueName; }
+        }
+
         public string WidgetName
         {
             get { return widgetName; }
