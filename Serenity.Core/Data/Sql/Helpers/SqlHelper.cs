@@ -840,6 +840,71 @@
            }
        }
 
+       /// <summary>
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   varsa sorgunun döndürdüğü ilk kaydı yükler.</summary>
+       /// <remarks>
+       ///   <p>Bu bir extension metodu olduğundan direk <c>query.ForFirst(connection)</c> 
+       ///   şeklinde de çalıştırılabilir.</p>
+       ///   <p><c>query.GetFromReader(reader)</c> işlemi ilk satır için çalıştırılır.</p>
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
+       /// <param name="connection">
+       ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
+       /// <param name="query">
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
+       /// <returns>
+       ///   Eğer en azından bir sonuç alındıysa <c>true</c></returns>
+       public static bool GetSingle(this SqlQuery query, IDbConnection connection)
+       {
+           using (IDataReader reader = ExecuteReader(connection, query))
+           {
+               if (reader.Read())
+               {
+                   query.GetFromReader(reader);
+                   
+                   if (reader.Read())
+                       throw new InvalidOperationException("Query returned more than one result!");
+
+                   return true;
+               }
+               else
+                   return false;
+           }
+       }
+
+       /// <summary>
+       ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
+       ///   varsa sorgunun döndürdüğü ilk kaydı yükler.</summary>
+       /// <remarks>
+       ///   <p>Bu bir extension metodu olduğundan direk <c>query.ForFirst(connection)</c> 
+       ///   şeklinde de çalıştırılabilir.</p>
+       ///   <p><c>query.GetFromReader(reader)</c> işlemi ilk satır için çalıştırılır.</p>
+       ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
+       ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
+       /// <param name="connection">
+       ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
+       /// <param name="query">
+       ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
+       /// <returns>
+       ///   Eğer en azından bir sonuç alındıysa <c>true</c></returns>
+       public static bool GetSingle(this SqlQuery query, IDbConnection connection, Row row, Dictionary param)
+       {
+           using (IDataReader reader = ExecuteReader(connection, query, param))
+           {
+               if (reader.Read())
+               {
+                   query.GetFromReader(reader, new Row[] { row });
+
+                   if (reader.Read())
+                       throw new InvalidOperationException("Query returned more than one result!");
+
+                   return true;
+               }
+               else
+                   return false;
+           }
+       }
 
        /// <summary>
        ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır ve
