@@ -263,6 +263,7 @@
     <Compile Include="Media\Mp3CheckResult.cs" />
     <Compile Include="Media\SwfInfo.cs" />
     <Compile Include="Media\ThumbnailGenerator.cs" />
+    <Compile Include="Reflection\CodeGeneration\ScriptIncludeAttribute.cs" />
     <Compile Include="Services\ValidateParentAttribute.cs" />
     <Compile Include="Services\SaveRequestBehaviourAttribute.cs" />
     <Compile Include="Services\Reporting\IDataOnlyReport.cs" />

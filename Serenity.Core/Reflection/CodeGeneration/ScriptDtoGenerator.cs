@@ -74,7 +74,8 @@ namespace Serenity.Reflection
 
                 if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
                     fromType.IsSubclassOf(typeof(ServiceResponse)) ||
-                    fromType.IsSubclassOf(typeof(Row)))
+                    fromType.IsSubclassOf(typeof(Row)) ||
+                    fromType.GetCustomAttribute<ScriptIncludeAttribute>() != null)
                     EnqueueType(fromType);
             }
 
