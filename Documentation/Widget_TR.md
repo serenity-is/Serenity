@@ -107,15 +107,15 @@ Widget sınıfından türeyen nesneler, kendilerinin bağlı olduğu HTML elemen
 public jQueryObject Element { get; }
 ```
 
-Bu özellik jQueryObject tipindedir ve widget oluşturulurken belirtilen elementi içerir. Örneğimizde, click olayı içerisinde elementimıza (`div`), `this.Element` şeklinde eriştik. 
+Bu özellik jQueryObject tipindedir ve widget oluşturulurken belirtilen elementi içerir. Örneğimizde, click olayı içerisinde elementimize (`div`), `this.Element` şeklinde eriştik. 
 
 ### HTML Elementi ve Widget *CSS Sınıfı* İlişkisi
 
-Bir HTML elementi üzerinde bir widget oluşturduğunuzda, HTML elementinda bazı düzenlemeler yapılır.
+Bir HTML elementi üzerinde bir widget oluşturduğunuzda, HTML elementinde bazı düzenlemeler yapılır.
 
-İlk olarak HTML elementina, üzerinde oluşan widget'ın tip adına göre bir CSS sınıfı (class) eklenir.
+İlk olarak HTML elementine, üzerinde oluşan widget'ın tip adına göre bir CSS sınıfı (class) eklenir.
 
-Örneğimizdeki `#SomeDiv` ID'sine sahip `DIV` elementina `.s-MyCoolWidget` sınıfı eklenmiş oldu.
+Örneğimizdeki `#SomeDiv` ID'sine sahip `DIV` elementine `.s-MyCoolWidget` sınıfı eklenmiş oldu.
 
 Yani DIV aşağıdaki gibi oldu:
 
@@ -127,7 +127,7 @@ CSS sınıfı, widget sınıf adının başına `s-` getirilerek elde edilir. (W
 
 ### Widget CSS Sınıfı İle HTML elementinı Stillendirme
 
-Bu CSS sınıfı sayesinde, dilersek HTML elementinı, üzerinde oluşturulan widget tipine göre CSS tarafında stillendirebiliriz.
+Bu CSS sınıfı sayesinde, dilersek HTML elementini, üzerinde oluşturulan widget tipine göre CSS tarafında stillendirebiliriz.
 
 ```css
 .s-MyCoolWidget {
@@ -148,7 +148,7 @@ Ayrıca elementimızın data özelliğine de üzerine eklenen widget ile ilgili 
 Yani, data özelliği üzerinden, bir elemente daha önce bağladığımız herhangi bir Widget'e ulaşmamız mümkün.
 
 ```cs
-var myWidget = (MyCoolWidget)($('#SomeDiv').GetDataValue('MySamples_MyCoolWidget'));
+var myWidget = (MyCoolWidget)(J("#SomeDiv").GetDataValue('MySamples_MyCoolWidget'));
 ```
 
 ### WidgetExtensions.GetWidget Uzantı Metodu
@@ -156,7 +156,7 @@ var myWidget = (MyCoolWidget)($('#SomeDiv').GetDataValue('MySamples_MyCoolWidget
 Biraz uzun ve karışık gözüken bu kod parçası yerine, Serenity kısayolu kullanılabilir:
 
 ```cs
-var myWidget = $('#SomeDiv').GetWidget<MyCoolWidget>();
+var myWidget = J("#SomeDiv").GetWidget<MyCoolWidget>();
 ```
 
 Bu kod parçası eğer widget varsa döndürecek, yoksa hata verecektir:
@@ -170,15 +170,15 @@ Element has no widget of type 'MySamples_MyCoolWidget'!
 Eğer element'in üzerinde widget var mı kontrol etmek isterseniz:
 
 ```cs
-var myWidget = $('#SomeDiv').TryGetWidget<MyCoolWidget>();
+var myWidget = J("#SomeDiv").TryGetWidget<MyCoolWidget>();
 ```
 
 `TryGetWidget`, eğer widget element'e bağlanmışsa bulup döndürür, yoksa hata vermek yerine `null` sonucunu verir.
 
 
-### Aynı HTML elementinda Birden Çok Widget
+### Aynı HTML elementinde Birden Çok Widget
 
-Bir HTML elementina, aynı sınıftan tek bir widget bağlanabilir.
+Bir HTML elementine, aynı sınıftan tek bir widget bağlanabilir.
 
 Aynı sınıftan ikinci bir widget oluşturmaya çalıştığınızda aşağıdaki gibi bir hata alırsınız:
 
@@ -188,20 +188,20 @@ Element already has widget 'MySamples_MyCoolWidget'
 
 Farklı sınıflardan, aynı elemente birden fazla Widget eklenebilir, tabi yaptıkları işlemlerin birbiriyle çakışmaması kaydıyla.
 
-### *uniqueName* Özelliği
+### *UniqueName* Özelliği
 
 Oluşturulan her bir Widget, otomatik olarak eşsiz (unique) bir isim alır (`MySamples_MyCoolWidget3`) gibi.
 
-`this.uniqueName` üzerinden erişilebilen bu ismi, Widget'ın bağlandığı eleman ya da içinde oluşturacağınız alt HTML elemanları için ID prefix'i (ön eki) olarak kullanarak, sayfa içindeki diğer Widget'larla çakışmayacak eşsiz ID'ler elde edebilirsiniz.
+`this.UniqueName` üzerinden erişilebilen bu ismi, Widget'ın bağlandığı eleman ya da içinde oluşturacağınız alt HTML elemanları için ID prefix'i (ön eki) olarak kullanarak, sayfa içindeki diğer Widget'larla çakışmayacak eşsiz ID'ler elde edebilirsiniz.
 
 Ayrıca, event handler'larınızı jQuery üzerinden bu isim sınıfıyla bağlayıp (bind), daha sonra yine aynı sınıfla kaldırarak (unbind), aynı eleman üzerine atanmış diğer event handler'ları etkilemekten korunabilirsiniz:
 
 ```cs
-jQuery("body").Bind("click." + this.uniqueName, delegate { ... });
+jQuery("body").Bind("click." + this.UniqueName, delegate { ... });
 
 ...
 
-jQUery("body").Unbind("click." + this.uniqueName);
+jQUery("body").Unbind("click." + this.UniqueName);
 ```
 
 ### Widget.Destroy Metodu
@@ -308,21 +308,21 @@ Bu widget'ı aşağıdaki gibi bir HTML elementi üzerinde oluşturduğunuzda:
 </div>
 ```
 
-TemplatedWidget, otomatik olarak sizin sınıfınız için hazırladığınız şablonu bulur ve HTML elementina uygular.
+TemplatedWidget, otomatik olarak sizin sınıfınız için hazırladığınız şablonu bulur ve HTML elementine uygular.
 
 ## TemplatedWidget ID Üretimi
 
 Dikkat ederseniz şablonumuzda alt elementlerin ID'lerini `~_MyToolbar`, `~_MyTable` şeklinde yazdık. 
 
-Ancak şablon HTML elementina uygulandığında üretilen ID'ler sırasıyla **MySamples_MyComplexWidget1_MyToolbar** ve `MySamples_MyComplexWidget1_MyTable` oldu.
+Ancak şablon HTML elementine uygulandığında üretilen ID'ler sırasıyla **MySamples_MyComplexWidget1_MyToolbar** ve `MySamples_MyComplexWidget1_MyTable` oldu.
 
 TemplatedWidget, şablondaki `~_` öneklerini, Widget'ın eşsiz ismi (`uniqueName`) ve alt çizgi "_" ile değiştirir (`_` de içeren bu ön eke `this.idPrefix` alanı üzerinden erişilebilir).
 
-Bu yolla, aynı Widget şablonu, aynı sayfada birden fazla HTML elementinda kullanılsa bile, ID'lerin çakışması önlenir.
+Bu yolla, aynı Widget şablonu, aynı sayfada birden fazla HTML elementinde kullanılsa bile, ID'lerin çakışması önlenir.
 
 ## TemplatedWidget.ByID Metodu
 
-ID'lerin başlarına TemplateWidget'ın eşsiz ismi getirildiğinden, şablon HTML elementina uygulandıktan sonra, üretilen alt HTML elemanlarına, şablonda belirttiğiniz ID'ler ile direk ulaşamazsınız.
+ID'lerin başlarına TemplateWidget'ın eşsiz ismi getirildiğinden, şablon HTML elementine uygulandıktan sonra, üretilen alt HTML elemanlarına, şablonda belirttiğiniz ID'ler ile direk ulaşamazsınız.
 
 elemanları ararken ID'lerinin başına TemplatedWidget'ın uniqueName'ini ve alt çizgi karakterini (`_`) getirmeniz gerekir:
 
@@ -391,7 +391,7 @@ public class MyCompleWidget
 {
 	protected override string GetTemplate()
     {
-    	return $('#TheMyComplexWidgetTemplate').GetHtml();
+    	return J("#TheMyComplexWidgetTemplate").GetHtml();
     }
 }
 ```
@@ -431,7 +431,7 @@ Ayrıca bu şablonlar ilk ihtiyaç olduğunda yüklendiğinden (*lazy loading*),
 
 TemplatedWidget'ın alt sınıfı olan TemplatedDialog, jQuery UI Dialog plugin'i kullanarak sayfa içi modal dialog'lar oluşturmamızı sağlar.
 
-Diğer widget türlerinden farklı olarak, TemplatedDialog, bağlanacağı HTML elementini kendi oluşturur  
+Diğer widget türlerinden farklı olarak, TemplatedDialog, bağlanacağı HTML elementini kendi oluşturur.
 
 
 ```
