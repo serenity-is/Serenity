@@ -126,10 +126,7 @@ namespace Serenity.Services
             {
                 if (Row.IsAnyFieldAssigned)
                 {
-                    var idField = (Field)(Row.IdField);
-                    var id = Row.IdField[Row].Value;
                     if (new SqlUpdate(Row)
-                        .WhereEqual(idField, id)
                         .Execute(Connection) != 1)
                         throw DataValidation.UnexpectedError();
 

@@ -125,5 +125,37 @@ namespace Serenity.Data
             return null;
         }
 
+        public static void Insert<TRow>(this IDbConnection connection, TRow row)
+            where TRow: Row
+        {
+            new SqlInsert(row).Execute(connection);
+        }
+
+        public static Int64? InsertAndGetID<TRow>(this IDbConnection connection, TRow row)
+            where TRow : Row
+        {
+            return new SqlInsert(row).ExecuteAndGetID(connection);
+        }
+
+        public static void Update<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One)
+            where TRow: Row, IIdRow
+        {
+            var idField = (Field)row.IdField;
+
+            if (idField.IsNull(row))
+                throw new InvalidOperationException("ID field of row has null value!");
+
+            new SqlUpdate(row)
+                .Execute(connection, expectedRows);
+        }
+
+        public static int DeleteById<TRow>(this IDbConnection connection, Int64 id, ExpectedRows expectedRows = ExpectedRows.One)
+            where TRow: Row, IIdRow, new()
+        {
+            var row = new TRow();
+            return new SqlDelete(row.Table)
+                .Where(new Criteria((Field)row.IdField) == id)
+                .Execute(connection, expectedRows);
+        }
     }
 }
