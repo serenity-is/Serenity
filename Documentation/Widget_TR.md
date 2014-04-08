@@ -42,7 +42,7 @@ Widget, bir HTML elementi üzerinde oluşturulan, bu elemente ek özellikler (*b
 
 Örneğin IntegerEditor widget'ı, bir INPUT elementine uygulanır ve bu input üzerinde sayı girişini kolaylaştırıp, girilen verinin geçerli bir tamsayı olmasını doğrular (validasyon).
 
-Benzer şekilde bir Toolbar widget'ı, bir DIV elementine uygulanır ve bu DIV'i bir araç çubuğuna dönüştür.
+Benzer şekilde bir Toolbar widget'ı, bir DIV elementine uygulanır ve bu DIV'i butonları olan bir araç çubuğuna dönüştür (burada DIV sadece yer tutucu olarak görev görür).
 
 ## Widget Sınıf Diyagramı
 ![Widget Class Diagram][1]
@@ -56,14 +56,14 @@ namespace MySamples
 {
     public class MyCoolWidget : Widget
     {
-        private int fontSize;
+        private int fontSize = 10;
         
         public MyCoolWidget(jQueryObject div)
             : base(div)
         {
             div.Click(e => {
                 fontSize++;
-                this.Element.Css("font-size", fontSize + "px");
+                this.Element.Css("font-size", fontSize + "pt");
             });
         }
     }
