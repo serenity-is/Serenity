@@ -178,7 +178,7 @@ var myWidget = $('#SomeDiv').TryGetWidget<MyCoolWidget>();
 
 Only one widget of the same class can be attached to an HTML element.
 
-When a second one of the same class is tried to be created on the same element, the following error is thrown:
+An attempt to create a secondary widget of the same class on a element throws the following error:
 
 ```text
 The element already has widget 'MySamples_MyCoolWidget'. 
