@@ -70,6 +70,36 @@
             return this;
         }
 
+        public SqlQuery RightJoin(string toTable, Alias alias, BaseCriteria onCriteria)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (toTable.IsNullOrEmpty())
+                throw new ArgumentNullException("alias.table");
+
+            var join = new RightJoin(toTable, alias.Name, onCriteria);
+
+            Join(join);
+
+            return this;
+        }
+
+        public SqlQuery RightJoin(Alias alias, BaseCriteria onCriteria)
+        {
+            if (alias == null)
+                throw new ArgumentNullException("alias");
+
+            if (alias.Table.IsNullOrEmpty())
+                throw new ArgumentNullException("alias.table");
+
+            var join = new RightJoin(alias.Table, alias.Name, onCriteria);
+
+            Join(join);
+
+            return this;
+        }
+
         public SqlQuery InnerJoin(Alias alias, BaseCriteria onCriteria)
         {
             if (alias == null)
