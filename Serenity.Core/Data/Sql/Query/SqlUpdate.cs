@@ -40,12 +40,15 @@
         ///   Creates a new SqlUpdate query.</summary>
         /// <param name="row">
         ///   Row with field values to set in new record (must be in TrackAssignments mode).</param>
-        public SqlUpdate(Row row)
+        public SqlUpdate(IIdRow row)
         {
             if (row == null)
                 throw new ArgumentNullException("row");
+
             Initialize(row.Table);
-            this.Set(row);
+
+            this.Set((Row)row, (Field)(row.IdField));
+            this.Where(new Criteria((Field)row.IdField) == row.IdField[(Row)row].Value);
         }
 
         /// <summary>

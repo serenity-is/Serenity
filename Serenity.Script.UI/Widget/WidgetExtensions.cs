@@ -66,11 +66,11 @@ namespace Serenity
             return validator.ValidateElement(widget.Element[0]);
         }
 
-        [IncludeGenericArguments(false)]
+        [IncludeGenericArguments(false)] // saltarelle bug ı var, değiştirme
         public static void Change<TWidget>(this TWidget widget, jQueryEventHandler handler)
             where TWidget: Widget
         {
-            widget.Element.Bind("change.", handler);
+            widget.Element.Bind("change." + widget.UniqueName, handler);
         }
 
         public static jQueryObject GetGridField(this Widget widget)

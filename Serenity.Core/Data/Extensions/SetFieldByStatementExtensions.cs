@@ -47,15 +47,18 @@ namespace Serenity.Data
         ///   The row with modified field values. Must be in TrackAssignments mode, or an exception is raised.</param>
         /// <returns>
         ///   Object itself.</returns>
-        public static T Set<T>(this T self, Row row) where T : ISetFieldByStatement
+        public static T Set<T>(this T self, Row row, Field exclude = null) where T : ISetFieldByStatement
         {
             if (row == null)
                 throw new ArgumentNullException("row");
+
             if (!row.TrackAssignments)
                 throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
+
             foreach (var field in row.GetFields())
-                if (row.IsAssigned(field))
+                if (field != exclude && row.IsAssigned(field))
                     Set(self, field, field.AsObject(row));
+
             return self;
         }
     }

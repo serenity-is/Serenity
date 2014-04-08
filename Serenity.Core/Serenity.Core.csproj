@@ -130,6 +130,7 @@
     <Compile Include="Data\Interface\IEntity.cs" />
     <Compile Include="Data\Interface\IField.cs" />
     <Compile Include="Data\Sql\Helpers\SqlDebugDumper.cs" />
+    <Compile Include="Data\Sql\Helpers\SqlConnectionExtensions.cs" />
     <Compile Include="Data\Sql\Interface\IChainable.cs" />
     <Compile Include="Data\Sql\Interface\IGetExpressionByName.cs" />
     <Compile Include="Data\Sql\Join\OuterApply.cs" />
@@ -262,6 +263,7 @@
     <Compile Include="Media\Mp3CheckResult.cs" />
     <Compile Include="Media\SwfInfo.cs" />
     <Compile Include="Media\ThumbnailGenerator.cs" />
+    <Compile Include="Reflection\CodeGeneration\ScriptIncludeAttribute.cs" />
     <Compile Include="Services\ValidateParentAttribute.cs" />
     <Compile Include="Services\SaveRequestBehaviourAttribute.cs" />
     <Compile Include="Services\Reporting\IDataOnlyReport.cs" />

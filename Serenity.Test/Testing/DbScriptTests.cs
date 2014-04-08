@@ -57,7 +57,7 @@ namespace Serenity.Test.Testing
             var script = new DbScript();
             script.Add(new SqlUpdate(new TestRow
             {
-                TrackAssignments = true,
+                TestId = 1,
                 Description = "Test"
             }).Where(new Criteria(TestRow.Fields.TestId) ==  1));
 
