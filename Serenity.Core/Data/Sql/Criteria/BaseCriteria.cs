@@ -62,10 +62,22 @@ namespace Serenity.Data
             return NotLike("%" + mask + "%");
         }
 
-        public BaseCriteria In<T>(T[] values)
+        public BaseCriteria In<T>(params T[] values)
         {
             if (values == null || values.Length == 0)
                 throw new ArgumentNullException("values");
+
+            if (values.Length == 1 &&
+                values[0] is BaseCriteria)
+            {
+                return In((BaseCriteria)(object)values[0]);
+            }
+
+            if ((values.Length == 1 &&
+                      values[0] is ISqlQuery))
+            {
+                return In((ISqlQuery)(object)values[0]);
+            }
 
             return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values));
         }
@@ -78,6 +90,11 @@ namespace Serenity.Data
             return new BinaryCriteria(this, CriteriaOperator.In, statement); 
         }
 
+        public BaseCriteria InStatement(BaseCriteria statement)
+        {
+            return In(statement);
+        }
+
         public BaseCriteria In(ISqlQuery statement)
         {
             if (Object.ReferenceEquals(null, statement))
@@ -86,10 +103,22 @@ namespace Serenity.Data
             return new BinaryCriteria(this, CriteriaOperator.In, new Criteria(statement));
         }
 
-        public BaseCriteria NotIn<T>(T[] values)
+        public BaseCriteria NotIn<T>(params T[] values)
         {
             if (values == null || values.Length == 0)
                 throw new ArgumentNullException("values");
+
+            if (values.Length == 1 &&
+                values[0] is BaseCriteria)
+            {
+                return NotIn((BaseCriteria)(object)values[0]);
+            }
+
+            if ((values.Length == 1 &&
+                      values[0] is ISqlQuery))
+            {
+                return NotIn((ISqlQuery)(object)values[0]);
+            }
 
             return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values));
         }
