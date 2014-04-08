@@ -22,6 +22,8 @@ namespace Serenity.Data
                 throw new ArgumentNullException("fields");
 
             this.fields = fields.Init();
+
+            TrackAssignments = true;
         }
 
         public void CloneInto(Row clone, 
