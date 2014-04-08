@@ -130,6 +130,7 @@
     <Compile Include="Data\Interface\IEntity.cs" />
     <Compile Include="Data\Interface\IField.cs" />
     <Compile Include="Data\Sql\Helpers\SqlDebugDumper.cs" />
+    <Compile Include="Data\Sql\Helpers\SqlConnectionExtensions.cs" />
     <Compile Include="Data\Sql\Interface\IChainable.cs" />
     <Compile Include="Data\Sql\Interface\IGetExpressionByName.cs" />
     <Compile Include="Data\Sql\Join\OuterApply.cs" />
