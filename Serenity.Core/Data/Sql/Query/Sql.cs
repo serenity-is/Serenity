@@ -213,16 +213,7 @@ namespace Serenity.Data
             if(expression.IsNullOrEmpty())
                 throw new ArgumentNullException("expression");
 
-            return string.Format(" substring({0},{1},{2} ", expression, startIndex, endIndex);
-        }
-
-        public static string SubString(IQueryWithParams expression, int startIndex, int endIndex)
-        {
-            var sb = new StringBuilder();
-            sb.Append(" substring( ");
-            sb.Append(expression);
-            sb.Append(string.Format(",{0},{1})", startIndex, endIndex));
-            return sb.ToString();
+            return string.Format(" substring({0},{1},{2}) ", expression, startIndex, endIndex);
         }
 
         public static string ForXml(this IQueryWithParams query, string expression)
@@ -231,8 +222,12 @@ namespace Serenity.Data
                 throw new ArgumentNullException("expression");
 
             var sb = new StringBuilder();
+            var queryString = query.ToString().TrimEnd();
+            queryString = queryString.Remove(queryString.Length - 1, 1);
+            sb.Append(queryString);
             sb.Append(" for xml ");
-            new ValueCriteria(expression).ToString(sb, query);
+            sb.Append(expression);
+            sb.Append(")");
             return sb.ToString();
         }
         
