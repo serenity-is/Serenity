@@ -161,6 +161,39 @@ namespace Serenity.Data
             return new SqlInsert(row).ExecuteAndGetID(connection);
         }
 
+        public static bool ExistsById<TRow>(this IDbConnection connection, Int64 id)
+            where TRow : Row, IIdRow, new()
+        {
+            var row = new TRow();
+            return new SqlQuery()
+                    .From(row)
+                    .Select("1")
+                    .Where(new Criteria((IField)row.IdField) == id)
+                    .Exists(connection);
+        }
+
+        public static bool Exists<TRow>(this IDbConnection connection, BaseCriteria where)
+            where TRow : Row, new()
+        {
+            var row = new TRow() { TrackWithChecks = true };
+            return new SqlQuery().From(row)
+                    .Select("1")
+                    .Where(where)
+                    .Exists(connection);
+        }
+
+        public static int Count<TRow>(this IDbConnection connection, BaseCriteria where)
+            where TRow : Row, new()
+        {
+            var row = new TRow() { TrackWithChecks = true };
+
+            return Convert.ToInt32(SqlHelper.ExecuteScalar(connection,
+                new SqlQuery().From(row)
+                    .Select(Sql.Count())
+                    .Where(where)));
+        }
+
+
         public static void Update<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One)
             where TRow: Row, IIdRow
         {
