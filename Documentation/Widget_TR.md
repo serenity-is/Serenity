@@ -86,7 +86,6 @@ new MyCoolWidget(div);
 public abstract class Widget : ScriptContext
 {
     private static int NextWidgetNumber = 0;
-    protected string uniqueName;
 
     protected Widget(jQueryObject element);
     public virtual void Destroy();
@@ -96,6 +95,7 @@ public abstract class Widget : ScriptContext
 
     public jQueryObject Element { get; }
     public string WidgetName { get; }
+    public string UniqueName { get; }
 }
 ```
 
