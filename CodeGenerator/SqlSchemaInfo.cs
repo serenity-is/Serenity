@@ -2,164 +2,217 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 
 namespace Serenity.CodeGenerator
 {
     public class SqlSchemaInfo
     {
-        public static List<string> GetTableNames(IDbConnection connection)
-        {
-            var tables = new List<string>();
 
-            using (var reader = SqlHelper.ExecuteReader(connection,
-                "SELECT NAME FROM SYSOBJECTS WHERE XTYPE='U' ORDER BY NAME"))
-            {
-                while (reader.Read())
-                    tables.Add(reader.GetString(0));
-            }
-            return tables;
+        public static string InformationSchema(IDbConnection connection)
+        {
+            return "INFORMATION_SCHEMA.";
         }
 
-        public static List<string> GetTablePrimaryFields(IDbConnection connection, string tableName)
+
+        public static List<Tuple<string, string>> GetTableNames(IDbConnection connection)
         {
+            var tables = ((DbConnection)connection).GetSchema("Tables");
+
+            var result = new List<Tuple<string, string>>();
+
+            foreach (DataRow row in tables.Rows)
+            {
+                var tableType = row["TABLE_TYPE"] as string;
+                
+                if (tableType != null && tableType.ToLowerInvariant() == "view")
+                    continue;
+
+                var schema = row["TABLE_SCHEMA"] as string;
+                var tableName = row["TABLE_NAME"] as string;
+
+                result.Add(new Tuple<string, string>(schema, tableName));
+            }
+
+            return result;
+        }
+
+        public static List<string> GetTablePrimaryFields(IDbConnection connection, string schema, string tableName)
+        {
+            var inf = InformationSchema(connection);
             List<string> primaryFields = new List<string>();
 
-            new SqlQuery().Select(
-                "KCU.COLUMN_NAME")
-            .From(
-                "INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC INNER JOIN " +
-                "INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KCU " +
-                "ON KCU.CONSTRAINT_SCHEMA = TC.CONSTRAINT_SCHEMA AND " +
-                "KCU.CONSTRAINT_NAME = TC.CONSTRAINT_NAME AND " +
-                "KCU.TABLE_SCHEMA = TC.TABLE_SCHEMA AND " +
-                "KCU.TABLE_NAME = TC.TABLE_NAME")
-            .Where(
-                new Criteria("TC.CONSTRAINT_TYPE") == "PRIMARY KEY" &
-                new Criteria("KCU.TABLE_NAME") == tableName)
-            .OrderBy(
-                "KCU.ORDINAL_POSITION")
-            .ForEach(connection, delegate(IDataReader reader)
+            var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            foreach (DataRow row in columns.Rows)
             {
-                primaryFields.Add(reader.GetString(0));
-            });
+                var isPrimaryKey = row["PRIMARY_KEY"] as Boolean?;
+                if (isPrimaryKey == true)
+                    primaryFields.Add((string)row["COLUMN_NAME"]);
+            }
+
+            if (primaryFields.Count == 0)
+            {
+                var query = new SqlQuery().Select(
+                        "KCU.COLUMN_NAME")
+                    .From(
+                        inf + "TABLE_CONSTRAINTS AS TC INNER JOIN " +
+                        inf + "KEY_COLUMN_USAGE AS KCU " +
+                        "ON KCU.CONSTRAINT_SCHEMA = TC.CONSTRAINT_SCHEMA AND " +
+                        "KCU.CONSTRAINT_NAME = TC.CONSTRAINT_NAME AND " +
+                        "KCU.TABLE_SCHEMA = TC.TABLE_SCHEMA AND " +
+                        "KCU.TABLE_NAME = TC.TABLE_NAME")
+                    .Where(
+                        new Criteria("TC.CONSTRAINT_TYPE") == "PRIMARY KEY" &
+                        new Criteria("KCU.TABLE_NAME") == tableName)
+                    .OrderBy(
+                        "KCU.ORDINAL_POSITION");
+
+                query.ForEach(connection, delegate(IDataReader reader)
+                {
+                    primaryFields.Add(reader.GetString(0));
+                });
+            }
 
             return primaryFields;
         }
 
 
-        public static List<string> GetTableIdentityFields(IDbConnection connection, string tableName)
+        public static List<string> GetTableIdentityFields(IDbConnection connection, string schema, string tableName)
         {
             List<string> identityFields = new List<string>();
 
-            new SqlQuery().Select(
-                "C.NAME")
-            .From(
-                "SYSCOLUMNS C " +
-                "LEFT OUTER JOIN SYSOBJECTS T " +
-                "ON (C.id = T.id)")
-            .Where(
-                new Criteria("C.STATUS & 128") == 128 &
-                new Criteria("T.NAME") == tableName &
-                new Criteria("T.XTYPE") == "U")
-            .ForEach(connection, delegate(IDataReader reader)
+            var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            if (columns.Columns.Contains("AUTOINCREMENT"))
+                foreach (DataRow row in columns.Rows)
+                {
+                    var isIdentity = row["AUTOINCREMENT"] as Boolean?;
+                    if (isIdentity == true)
+                        identityFields.Add((string)row["COLUMN_NAME"]);
+                }
+            else
             {
-                identityFields.Add(reader.GetString(0));
-            });
+                new SqlQuery().Select(
+                    "C.NAME")
+                .From(
+                    "SYSCOLUMNS C " +
+                    "LEFT OUTER JOIN SYSOBJECTS T " +
+                    "ON (C.id = T.id)")
+                .Where(
+                    new Criteria("C.STATUS & 128") == 128 &
+                    new Criteria("T.NAME") == tableName &
+                    new Criteria("T.XTYPE") == "U")
+                .ForEach(connection, delegate(IDataReader reader)
+                {
+                    identityFields.Add(reader.GetString(0));
+                });
+            }
 
             return identityFields;
         }
 
 
-        public static List<string> GetTableFieldNames(IDbConnection connection, string tableName)
+        public static List<string> GetTableFieldNames(IDbConnection connection, string schema, string tableName)
         {
+            var inf = InformationSchema(connection);
             var list = new List<string>();
 
-            new SqlQuery().Select("COLUMN_NAME").From("INFORMATION_SCHEMA.COLUMNS")
-                .Where(new Criteria("TABLE_NAME") == tableName)
-                .OrderBy("ORDINAL_POSITION")
-                .ForEach(connection, delegate(IDataReader reader)
-                {
-                    list.Add(reader.GetString(0));
-                });
+            var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            foreach (DataRow row in columns.Rows)
+            {
+                list.Add((string)row["COLUMN_NAME"]);
+            }
 
             return list;
         }
 
         public static List<ForeignKeyInfo> GetTableSingleFieldForeignKeys(IDbConnection connection, string tableName)
         {
+            var inf = InformationSchema(connection);
             List<ForeignKeyInfo> foreignKeyInfos = new List<ForeignKeyInfo>();
 
-            // çift (ya da daha çok) alanlı constraint ler yapımıza uymuyor
-            // bu yüzden constraint adına göre sıralı liste alıyoruz
-            // tarama sırasında tek bir constraint'te birden fazla
-            // alan bulduysak bu constraint hiç yokmuş gibi davranacağız
-            using (var reader = SqlHelper.ExecuteReader(connection, (String.Format(
-                "SELECT CCU.CONSTRAINT_NAME SRC_CONSTRAINT, CCU.COLUMN_NAME SRC_COL, " +
-                "KCU.TABLE_NAME FOREIGN_TABLE, KCU.COLUMN_NAME FOREIGN_COL " +
-                "FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE CCU, " +
-                "INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC, " +
-                "INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU " +
-                "WHERE CCU.TABLE_NAME = {0} AND " +
-                "CCU.CONSTRAINT_NAME = RC.CONSTRAINT_NAME AND " +
-                "KCU.CONSTRAINT_NAME = RC.UNIQUE_CONSTRAINT_NAME " +
-                "ORDER BY CCU.CONSTRAINT_NAME", tableName.ToSql()))))
+            try
             {
-                string priorConstraint = "";
-                bool priorDeleted = false;
-
-                while (reader.Read())
+                // çift (ya da daha çok) alanlı constraint ler yapımıza uymuyor
+                // bu yüzden constraint adına göre sıralı liste alıyoruz
+                // tarama sırasında tek bir constraint'te birden fazla
+                // alan bulduysak bu constraint hiç yokmuş gibi davranacağız
+                using (var reader = SqlHelper.ExecuteReader(connection, (String.Format(
+                    "SELECT CCU.CONSTRAINT_NAME SRC_CONSTRAINT, CCU.COLUMN_NAME SRC_COL, " +
+                    "KCU.TABLE_NAME FOREIGN_TABLE, KCU.COLUMN_NAME FOREIGN_COL " +
+                    "FROM " + inf + "CONSTRAINT_COLUMN_USAGE CCU, " +
+                    inf + "REFERENTIAL_CONSTRAINTS RC, " +
+                    inf + "KEY_COLUMN_USAGE KCU " +
+                    "WHERE CCU.TABLE_NAME = {0} AND " +
+                    "CCU.CONSTRAINT_NAME = RC.CONSTRAINT_NAME AND " +
+                    "KCU.CONSTRAINT_NAME = RC.UNIQUE_CONSTRAINT_NAME " +
+                    "ORDER BY CCU.CONSTRAINT_NAME", tableName.ToSql()))))
                 {
-                    ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
+                    string priorConstraint = "";
+                    bool priorDeleted = false;
 
-                    foreignKeyInfo.SourceConstraint = reader.GetString(0);
-
-                    // eğer bir önceki ile aynıysa bunu listeye ekleme ve öncekini de sil
-                    if (priorConstraint == foreignKeyInfo.SourceConstraint)
+                    while (reader.Read())
                     {
-                        if (!priorDeleted)
+                        ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
+
+                        foreignKeyInfo.SourceConstraint = reader.GetString(0);
+
+                        // eğer bir önceki ile aynıysa bunu listeye ekleme ve öncekini de sil
+                        if (priorConstraint == foreignKeyInfo.SourceConstraint)
                         {
-                            foreignKeyInfos.RemoveAt(foreignKeyInfos.Count - 1);
-                            priorDeleted = true;
+                            if (!priorDeleted)
+                            {
+                                foreignKeyInfos.RemoveAt(foreignKeyInfos.Count - 1);
+                                priorDeleted = true;
+                            }
+                            continue;
                         }
-                        continue;
+
+                        foreignKeyInfo.SourceTable = tableName;
+                        foreignKeyInfo.SourceColumn = reader.GetString(1);
+                        foreignKeyInfo.ForeignTable = reader.GetString(2);
+                        foreignKeyInfo.ForeignColumn = reader.GetString(3);
+
+                        foreignKeyInfos.Add(foreignKeyInfo);
+                        priorDeleted = false;
+                        priorConstraint = foreignKeyInfo.SourceConstraint;
                     }
-
-                    foreignKeyInfo.SourceTable = tableName;
-                    foreignKeyInfo.SourceColumn = reader.GetString(1);
-                    foreignKeyInfo.ForeignTable = reader.GetString(2);
-                    foreignKeyInfo.ForeignColumn = reader.GetString(3);
-
-                    foreignKeyInfos.Add(foreignKeyInfo);
-                    priorDeleted = false;
-                    priorConstraint = foreignKeyInfo.SourceConstraint;
                 }
+            }
+            catch (Exception)
+            {
+
             }
 
             return foreignKeyInfos;
         }
 
 
-        public static List<FieldInfo> GetTableFieldInfos(IDbConnection connection, string tableName)
+        public static List<FieldInfo> GetTableFieldInfos(IDbConnection connection, string schema, string tableName)
         {
+            var inf = InformationSchema(connection);
             List<FieldInfo> fieldInfos = new List<FieldInfo>();
             List<ForeignKeyInfo> foreignKeys = GetTableSingleFieldForeignKeys(connection, tableName);
-            List<string> primaryFields = GetTablePrimaryFields(connection, tableName);
-            List<string> identityFields = GetTableIdentityFields(connection, tableName);
+            List<string> primaryFields = GetTablePrimaryFields(connection, schema, tableName);
+            List<string> identityFields = GetTableIdentityFields(connection, schema, tableName);
 
-            new SqlQuery().Select("COLUMN_NAME, DATA_TYPE, IS_NULLABLE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE")
-                .From("INFORMATION_SCHEMA.COLUMNS")
+            var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            foreach (DataRow row in columns.Rows)
+            {
+
+            /*new SqlQuery().Select("COLUMN_NAME, DATA_TYPE, IS_NULLABLE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE")
+                .From(inf + "COLUMNS")
                 .Where(new Criteria("TABLE_NAME") == tableName)
                 .OrderBy("ORDINAL_POSITION")
-                .ForEach(connection, delegate(IDataReader reader)
+                .ForEach(connection, delegate(IDataReader reader)*/
                 {
                     FieldInfo fieldInfo = new FieldInfo();
-                    fieldInfo.FieldName = reader.GetString(0);
+                    fieldInfo.FieldName = row["COLUMN_NAME"] as string;
                     fieldInfo.IsPrimaryKey =
                         primaryFields.IndexOf(fieldInfo.FieldName) >= 0;
                     fieldInfo.IsIdentity =
                         identityFields.IndexOf(fieldInfo.FieldName) >= 0;
-                    fieldInfo.IsNullable = reader.GetString(2) == "YES";
-                    fieldInfo.DataType = reader.GetString(1);
+                    fieldInfo.IsNullable = (row["IS_NULLABLE"] as string == "YES") || (row["IS_NULLABLE"] as Boolean? == true);
+                    fieldInfo.DataType = row["DATA_TYPE"] as string;
                     fieldInfo.Size = 0;
 
                     if (fieldInfo.DataType != SqlInt &&
@@ -169,30 +222,35 @@ namespace Serenity.CodeGenerator
                         fieldInfo.DataType != SqlSmallInt &&
                         fieldInfo.DataType != SqlBigInt)
                     {
-                        if (!reader.IsDBNull(3))
+                        var size = row["CHARACTER_MAXIMUM_LENGTH"] as Int32?;
+                        if (size != null)
                         {
-                            fieldInfo.Size = reader.GetInt32(3);
+                            fieldInfo.Size = size.Value;
                             if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
                                 fieldInfo.Size = 0;
                         }
 
-                        if (!reader.IsDBNull(4))
+                        var prec = row["NUMERIC_PRECISION"] as Int32?;
+
+                        if (prec != null)
                         {
-                            fieldInfo.Size = Convert.ToInt32(reader.GetValue(4));
+                            fieldInfo.Size = Convert.ToInt32(prec.Value);
                             if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
                                 fieldInfo.Size = 0;
                         }
 
-                        if (!reader.IsDBNull(5))
+                        var scale = row["NUMERIC_SCALE"] as Int32?;
+                        if (scale != null)
                         {
-                            fieldInfo.Scale = Convert.ToInt32(reader.GetValue(5));
+                            fieldInfo.Scale = Convert.ToInt32(scale.Value);
                             if (fieldInfo.Scale < 0 || fieldInfo.Scale >= 1000000000)
                                 fieldInfo.Scale = 0;
                         }
                     }
 
                     fieldInfos.Add(fieldInfo);
-                });
+                }
+            }
 
             // şimdi ForeignKey tespiti yap, bunu önceki döngüde yapamayız reader'lar çakışır
 

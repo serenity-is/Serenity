@@ -10,9 +10,9 @@ namespace Serenity.CodeGenerator
 {
     public class RowGenerator
     {
-        public static string Generate(IDbConnection connection, string table, string module, string schema, string entityClass, string permission)
+        public static string Generate(IDbConnection connection, string tableSchema, string table, string module, string schema, string entityClass, string permission)
         {
-            var model = GenerateModel(connection, table, module, schema, entityClass, permission);
+            var model = GenerateModel(connection, tableSchema, table, module, schema, entityClass, permission);
             return Templates.Render("EntityRow", model);
         }
 
@@ -33,7 +33,7 @@ namespace Serenity.CodeGenerator
             return str2.Length + 1;
         }
 
-        public static EntityCodeGenerationModel GenerateModel(IDbConnection connection, string table,
+        public static EntityCodeGenerationModel GenerateModel(IDbConnection connection, string tableSchema, string table,
             string module, string schema, string entityClass, string permission)
         {
             var model = new EntityCodeGenerationModel();
@@ -49,7 +49,7 @@ namespace Serenity.CodeGenerator
             model.Joins = new List<EntityCodeJoin>();
             model.Instance = true;
 
-            var fields = SqlSchemaInfo.GetTableFieldInfos(connection, table);
+            var fields = SqlSchemaInfo.GetTableFieldInfos(connection, tableSchema, table);
             var foreigns = SqlSchemaInfo.GetTableSingleFieldForeignKeys(connection, table);
 
             var prefix = DeterminePrefixLength(fields, x => x.FieldName);
@@ -176,7 +176,7 @@ namespace Serenity.CodeGenerator
                     f.ForeignTable = foreign.ForeignTable;
                     f.ForeignField = foreign.ForeignColumn;
 
-                    var frgfld = SqlSchemaInfo.GetTableFieldInfos(connection, foreign.ForeignTable);
+                    var frgfld = SqlSchemaInfo.GetTableFieldInfos(connection, tableSchema, foreign.ForeignTable);
                     int frgPrefix = RowGenerator.DeterminePrefixLength(frgfld, z => z.FieldName);
                     var j = new EntityCodeJoin();
                     j.Fields = new List<EntityCodeField>();

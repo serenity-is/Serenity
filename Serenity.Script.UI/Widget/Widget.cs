@@ -17,7 +17,7 @@ namespace Serenity
             this.uniqueName = widgetName + (NextWidgetNumber++).ToString();
 
             if (element.GetDataValue(widgetName) != null)
-                throw new Exception(String.Format("Element already has widget '{0}'!", widgetName));
+                throw new Exception(String.Format("The element already has widget '{0}'!", widgetName));
 
             var self = this;
             element.Bind("remove." + widgetName, (e) => self.Destroy())

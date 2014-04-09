@@ -144,11 +144,11 @@ namespace Serenity.CodeGenerator
         private IDbConnection CreateConnection(string connStr)
         {
             string provider = "System.Data.SqlClient";
-            var idx = connStr.IndexOf("é");
+            var idx = connStr.IndexOf("||");
             if (idx >= 0)
             {
-                provider = connStr.Substring(idx + 1);
-                connStr = connStr.Substring(0, idx);
+                provider = connStr.Substring(idx + 2).Trim();
+                connStr = connStr.Substring(0, idx).Trim();
             }
 
             return SqlConnections.New(connStr, provider);
@@ -169,7 +169,7 @@ namespace Serenity.CodeGenerator
                         connection.Open();
 
                         foreach (var t in SqlSchemaInfo.GetTableNames(connection))
-                            _tables.Add(t);
+                            _tables.Add(((t.Item1 != null && t.Item1 != "dbo") ? (t.Item1 + ".") : "") + t.Item2);
                     }
                 }
                 catch (Exception ex)
@@ -186,13 +186,19 @@ namespace Serenity.CodeGenerator
                 !EntitySingular.IsTrimmedEmpty() &&
                 !this.Module.IsTrimmedEmpty())
             {
-                string tableName = (string)this.TablesCombo.SelectedItem; 
+                string table = (string)this.TablesCombo.SelectedItem;
+                string tableSchema = null;
+                if (table.IndexOf('.') > 0)
+                {
+                    tableSchema = table.Substring(0, table.IndexOf('.'));
+                    table = table.Substring(table.IndexOf('.') + 1);
+                }
                 try
                 {
                     using (var connection = CreateConnection((string)this.ConnectionsCombo.SelectedItem))
                     {
                         connection.Open();
-                        this.GeneratedCode.Text = RowGenerator.Generate(connection, (string)this.TablesCombo.SelectedItem,
+                        this.GeneratedCode.Text = RowGenerator.Generate(connection, tableSchema, table,
                             Module, Schema, EntitySingular, Permission);
                     }
                 }
@@ -254,7 +260,14 @@ namespace Serenity.CodeGenerator
                 using (var connection = CreateConnection((string)this.ConnectionsCombo.SelectedItem))
                 {
                     connection.Open();
-                    rowModel = RowGenerator.GenerateModel(connection, (string)this.TablesCombo.SelectedItem,
+                    var table = (string)this.TablesCombo.SelectedItem;
+                    string tableSchema = null;
+                    if (table.IndexOf('.') > 0)
+                    {
+                        tableSchema = table.Substring(0, table.IndexOf('.'));
+                        table = table.Substring(table.IndexOf('.') + 1);
+                    }
+                    rowModel = RowGenerator.GenerateModel(connection, tableSchema, table,
                         Module, Schema, EntitySingular, Permission);
                     new EntityCodeGenerator(rowModel, ProjectRoot).Run();
 
