@@ -1262,5 +1262,227 @@ namespace Serenity.Data.Test
                 Assert.False(row.IsAssigned(fld.DisplayOrder));
             }
         }
+
+        [Fact]
+        public void ListReturnsEmptyListIfNotFound()
+        {
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                new SqlDelete(DisplayOrderRow.TableName)
+                    .Execute(connection, ExpectedRows.Ignore);
+
+                var id = (int)new SqlInsert(DisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 1)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 5)
+                    .ExecuteAndGetID(connection);
+
+                var list = connection.List<DisplayOrderRow>(new Criteria(fld.ID) == (id + 1));
+
+                Assert.NotNull(list);
+                Assert.Equal(0, list.Count);
+            }
+        }
+
+        [Fact]
+        public void ListCanLoadMoreThanOneResult()
+        {
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                var fld = FakeDisplayOrderRow.Fields;
+
+                new SqlDelete(FakeDisplayOrderRow.TableName)
+                    .Execute(connection, ExpectedRows.Ignore);
+
+                var firstID = new SqlInsert(FakeDisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 777)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 5)
+                    .ExecuteAndGetID(connection);
+
+                var secondID = new SqlInsert(FakeDisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 777)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 6)
+                    .ExecuteAndGetID(connection);
+
+                var list = connection.List<FakeDisplayOrderRow>(new Criteria(fld.GroupID) == 777);
+                Assert.NotNull(list);
+                Assert.Equal(list.Count, 2);
+                Assert.True((list[0].ID == firstID && list[1].ID == secondID) ||
+                    (list[0].ID == secondID && list[1].ID == firstID));
+            }
+        }
+
+        [Fact]
+        public void ListWithEditQueryReturnsEmptyListIfNotFound()
+        {
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                new SqlDelete(DisplayOrderRow.TableName)
+                    .Execute(connection, ExpectedRows.Ignore);
+
+                var id = (int)new SqlInsert(DisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 1)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 5)
+                    .ExecuteAndGetID(connection);
+
+                var list = connection.List<DisplayOrderRow>(new Criteria(fld.ID) == (id + 1));
+
+                Assert.NotNull(list);
+                Assert.Equal(0, list.Count);
+            }
+        }
+
+        [Fact]
+        public void ListWithEditQueryCanLoadMoreThanOneResult()
+        {
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                var fld = FakeDisplayOrderRow.Fields;
+
+                new SqlDelete(FakeDisplayOrderRow.TableName)
+                    .Execute(connection, ExpectedRows.Ignore);
+
+                var firstID = (int)new SqlInsert(FakeDisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 777)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 5)
+                    .ExecuteAndGetID(connection);
+
+                var secondID = (int)new SqlInsert(FakeDisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 777)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 6)
+                    .ExecuteAndGetID(connection);
+
+                var list = connection.List<FakeDisplayOrderRow>(q =>
+                        q.Where(new Criteria(fld.GroupID) == 777).Select(fld.ID));
+
+                Assert.NotNull(list);
+                Assert.Equal(list.Count, 2);
+                Assert.True((list[0].ID == firstID && list[1].ID == secondID) ||
+                    (list[0].ID == secondID && list[1].ID == firstID));
+            }
+        }
+
+        [Fact]
+        public void ListLoadsAllTableFields()
+        {
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                new SqlDelete(DisplayOrderRow.TableName)
+                    .Execute(connection, ExpectedRows.Ignore);
+
+                var id = (int)new SqlInsert(DisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 7)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 5)
+                    .ExecuteAndGetID(connection);
+
+                var list = connection.List<DisplayOrderRow>(new Criteria(fld.ID) == id);
+                Assert.NotNull(list);
+                Assert.Equal(1, list.Count);
+                var row = list[0];
+                Assert.NotNull(row);
+                Assert.Equal(7, row.GroupID);
+                Assert.Equal((short)1, row.IsActive);
+                Assert.Equal(5, row.DisplayOrder);
+            }
+        }
+
+        [Fact]
+        public void ListUsesTrackWithChecksMode()
+        {
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                new SqlDelete(DisplayOrderRow.TableName)
+                    .Execute(connection, ExpectedRows.Ignore);
+
+                var id = (int)new SqlInsert(DisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 7)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 5)
+                    .ExecuteAndGetID(connection);
+
+                var list = connection.List<DisplayOrderRow>(new Criteria(fld.ID) == id);
+                Assert.NotNull(list);
+                Assert.Equal(1, list.Count);
+                var row = list[0];
+                Assert.True(row.TrackWithChecks);
+                Assert.True(row.IsAssigned(fld.ID));
+                Assert.True(row.IsAssigned(fld.GroupID));
+                Assert.True(row.IsAssigned(fld.DisplayOrder));
+                Assert.True(row.IsAssigned(fld.IsActive));
+            }
+        }
+
+        [Fact]
+        public void ListWithEditQueryUsesTrackWithChecksMode()
+        {
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                new SqlDelete(DisplayOrderRow.TableName)
+                    .Execute(connection, ExpectedRows.Ignore);
+
+                var id = (int)new SqlInsert(DisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 7)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 5)
+                    .ExecuteAndGetID(connection);
+
+                var list = connection.List<DisplayOrderRow>(q =>
+                    q.Where(new Criteria(fld.ID) == id).Select(fld.ID).Select(fld.GroupID));
+                Assert.NotNull(list);
+                Assert.Equal(1, list.Count);
+                var row = list[0];
+                Assert.NotNull(row);
+                Assert.True(row.TrackWithChecks);
+                Assert.True(row.IsAssigned(fld.ID));
+                Assert.True(row.IsAssigned(fld.GroupID));
+                Assert.False(row.IsAssigned(fld.DisplayOrder));
+                Assert.False(row.IsAssigned(fld.IsActive));
+            }
+        }
+
+        [Fact]
+        public void ListWithEditQueryLoadsNoImplicitFields()
+        {
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                new SqlDelete(DisplayOrderRow.TableName)
+                    .Execute(connection, ExpectedRows.Ignore);
+
+                var id = (int)new SqlInsert(DisplayOrderRow.TableName)
+                    .Set(fld.GroupID, 7)
+                    .Set(fld.IsActive, 1)
+                    .Set(fld.DisplayOrder, 5)
+                    .ExecuteAndGetID(connection);
+
+                var list = connection.List<DisplayOrderRow>(q =>
+                    q.Where(new Criteria(fld.ID) == id).Select(fld.ID).Select(fld.GroupID));
+                Assert.NotNull(list);
+                Assert.Equal(1, list.Count);
+                var row = list[0];
+                Assert.NotNull(row);
+                Assert.Equal(true, row.TrackWithChecks);
+                Assert.True(row.IsAssigned(fld.ID));
+                Assert.Equal(id, row.ID.Value);
+                Assert.True(row.IsAssigned(fld.GroupID));
+                Assert.Equal(7, row.GroupID);
+                Assert.False(row.IsAssigned(fld.IsActive));
+                Assert.False(row.IsAssigned(fld.DisplayOrder));
+            }
+        }
+
     }
 }

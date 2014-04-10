@@ -186,7 +186,7 @@ namespace Serenity.Data
         }
 
 
-        public static List<TRow> List<TRow>(this IDbConnection connection, Criteria where)
+        public static List<TRow> List<TRow>(this IDbConnection connection, BaseCriteria where)
             where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
@@ -196,7 +196,7 @@ namespace Serenity.Data
                     .List(connection, row);
         }
 
-        public static List<TRow> List<TRow>(this IDbConnection connection, Int64 id, Action<SqlQuery> editQuery)
+        public static List<TRow> List<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
             where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
