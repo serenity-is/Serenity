@@ -14,7 +14,7 @@ namespace Serenity.Data
             if (row == null)
                 throw new ValidationError("RecordNotFound", String.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
 
-            return null;
+            return row;
         }
 
         public static TRow TryById<TRow>(this IDbConnection connection, Int64 id)
@@ -37,7 +37,7 @@ namespace Serenity.Data
             if (row == null)
                 throw new ValidationError("RecordNotFound", String.Format("Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
 
-            return null;
+            return row;
         }
 
         public static TRow TryById<TRow>(this IDbConnection connection, Int64 id, Action<SqlQuery> editQuery)
@@ -132,7 +132,7 @@ namespace Serenity.Data
             if (row == null)
                 throw new ValidationError("RecordNotFound", "Query returned no results!");
 
-            return null;
+            return row;
         }
 
         public static TRow TrySingle<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
