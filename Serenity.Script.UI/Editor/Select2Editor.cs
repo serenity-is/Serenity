@@ -32,8 +32,13 @@ namespace Serenity
                 hidden.Attribute("placeholder", emptyItemText);
 
             hidden.Select2(GetSelect2Options());
-
+            
             hidden.Attribute("type", "text"); // jquery validate to work
+            hidden.Bind2("change." + this.uniqueName, (e, x) =>
+            {
+                if (e.HasOriginalEvent() || Q.IsFalse(x))
+                    hidden.Valid();
+            });
         }
 
         protected virtual string EmptyItemText()
