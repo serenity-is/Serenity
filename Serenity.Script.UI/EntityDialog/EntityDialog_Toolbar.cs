@@ -30,6 +30,11 @@ namespace Serenity
             cloneButton = toolbar.FindButton("clone-button");
         }
 
+        protected virtual void ShowSaveSuccessMessage(ServiceResponse response)
+        {
+            Q.NotifySuccess("Kayıt işlemi başarılı");
+        }
+
         protected override List<ToolButton> GetToolbarButtons()
         {
             List<ToolButton> list = new List<ToolButton>();
@@ -69,7 +74,7 @@ namespace Serenity
                         else
                             self.LoadById(((object)(response.As<dynamic>().EntityId)).As<long>(), null);
 
-                        Q.NotifySuccess("Kayıt işlemi başarılı");
+                        ShowSaveSuccessMessage(response);
                     });
                 }
             });
