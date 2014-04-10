@@ -10,7 +10,7 @@ namespace Serenity.Services
     public class CreateRequestHandler<TRow, TCreateRequest, TCreateResponse>
         where TRow : Row, IIdRow, new()
         where TCreateRequest: SaveRequest<TRow>
-        where TCreateResponse : CreateResponse, new()
+        where TCreateResponse : SaveResponse, new()
     {
         protected TRow Row;
         protected IUnitOfWork UnitOfWork;

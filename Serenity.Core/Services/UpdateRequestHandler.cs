@@ -8,7 +8,7 @@ namespace Serenity.Services
 {
     public class UpdateRequestHandler<TRow, TUpdateResponse>
         where TRow : Row, IIdRow, new()
-        where TUpdateResponse : UpdateResponse, new()
+        where TUpdateResponse : SaveResponse, new()
     {
         protected TRow Row;
         protected TRow Old;
