@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\FakeDisplayOrderRow.cs" />
     <Compile Include="Data\RowMappingTests.BasicRow.cs" />
     <Compile Include="Data\RowMappingTests.InvalidColumnRow.cs" />
     <Compile Include="Data\RowMappingTests.ComplexRow.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Data\DisplayOrderRow.cs" />
     <Compile Include="IoC\IoCTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sql\SqlConnectionExtensionsTests.cs" />
     <Compile Include="Sql\JoinAliasLocatorTests.cs" />
     <Compile Include="Sql\T0ReferenceRemoverTests.cs" />
     <Compile Include="Sql\SqlQueryTests.cs" />
