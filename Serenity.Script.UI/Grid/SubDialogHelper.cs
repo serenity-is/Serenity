@@ -18,9 +18,9 @@ namespace Serenity
             var widgetName = owner.WidgetName;
             dialog.Element.As<dynamic>().bind("ondatachange." + widgetName, new Action<jQueryEvent, DataChangeInfo>((e, dci) => {
                 if (useTimeout)
-                    Window.SetTimeout((Function)new Action(delegate() {
+                    Window.SetTimeout(delegate() {
                         dataChange(e, dci);
-                    }), 0);
+                    }, 0);
                 else
                     dataChange(e, dci);
             })).bind("remove." + widgetName, new Action(delegate

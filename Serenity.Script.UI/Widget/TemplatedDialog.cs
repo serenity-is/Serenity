@@ -150,12 +150,12 @@ namespace Serenity
             }
 
             var self = this;
-            Window.SetTimeout((Function)new Action(delegate()
+            Window.SetTimeout(delegate
             {
                 var element = self.element;
                 self.Destroy();
                 element.Remove();
-            }), 0);
+            }, 0);
         }
 
         protected override void AddCssClass()

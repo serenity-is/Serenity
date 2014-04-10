@@ -26,9 +26,9 @@ namespace Serenity
                 tabs.Active = 0;
 
             if (isDisabled)
-                tabs.Disable(index);
+                tabs.Disable(index.Value);
             else
-                tabs.Enable(index);
+                tabs.Enable(index.Value);
         }
 
         public static string ActiveTabKey(this TabsObject tabs)

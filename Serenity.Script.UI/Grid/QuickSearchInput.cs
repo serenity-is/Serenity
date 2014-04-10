@@ -99,14 +99,14 @@ namespace Serenity
                 Window.ClearTimeout(this.timer);
             
             var self = this;
-            this.timer = Window.SetTimeout((Function)new Action(delegate
+            this.timer = Window.SetTimeout(delegate
             {
                 if (self.options.OnSearch != null)
                     self.options.OnSearch(field != null && !field.Name.IsEmptyOrNull() ? field.Name : null, value);
 
                 self.element.RemoveClass(self.options.LoadingParentClass ?? "");
 
-            }), this.options.TypeDelay);
+            }, this.options.TypeDelay);
 
             this.lastValue = value;
         }

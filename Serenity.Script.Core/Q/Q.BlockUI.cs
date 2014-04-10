@@ -46,9 +46,9 @@ namespace Serenity
                 options);
 
             if (options.UseTimeout)
-                Window.SetTimeout((System.Function)new Action(delegate {
+                Window.SetTimeout(delegate {
                         BlockUIWithCheck(options);
-                    }), 0);
+                    }, 0);
             else
                 BlockUIWithCheck(options);
         }

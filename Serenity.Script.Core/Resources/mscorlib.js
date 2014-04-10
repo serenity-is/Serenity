@@ -1,8 +1,12 @@
 // SaltarelleCompiler Runtime (http://www.saltarelle-compiler.com)
 // Modified version of Script# Core Runtime (http://projects.nikhilk.net/ScriptSharp)
 
-if (typeof(global) === "undefined")
-	global = window;
+if (typeof(global) === "undefined") {
+	if (typeof(window) !== "undefined")
+		global = window;
+	else if (typeof(self) !== "undefined")
+		global = self;
+}
 (function(global) {
 "use strict";
 
@@ -168,9 +172,10 @@ ss.staticEquals = function ss$staticEquals(a, b) {
 };
 
 ss.shallowCopy = function ss$shallowCopy(source, target) {
-	for (var p in source) {
-		if (source.hasOwnProperty(p))
-			target[p] = source[p];
+	var keys = Object.keys(source);
+	for (var i = 0, l = keys.length; i < l; i++) {
+		var k = keys[i];
+		target[k] = source[k];
 	}
 };
 
@@ -234,6 +239,57 @@ if (typeof(window) == 'object') {
 		return null;
 	};
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Object Extensions
+
+ss.clearKeys = function ss$clearKeys(d) {
+	for (var n in d) {
+		if (d.hasOwnProperty(n))
+			delete d[n];
+	}
+};
+
+ss.keyExists = function ss$keyExists(d, key) {
+	return d[key] !== undefined;
+};
+
+if (!Object.keys) {
+	Object.keys = (function() {
+		'use strict';
+		var hasOwnProperty = Object.prototype.hasOwnProperty,
+			hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
+			dontEnums = ['toString','toLocaleString','valueOf','hasOwnProperty','isPrototypeOf','propertyIsEnumerable','constructor'],
+			dontEnumsLength = dontEnums.length;
+
+		return function (obj) {
+			if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+				throw new TypeError('Object.keys called on non-object');
+			}
+
+			var result = [], prop, i;
+
+			for (prop in obj) {
+				if (hasOwnProperty.call(obj, prop)) {
+					result.push(prop);
+				}
+			}
+
+			if (hasDontEnumBug) {
+				for (i = 0; i < dontEnumsLength; i++) {
+					if (hasOwnProperty.call(obj, dontEnums[i])) {
+						result.push(dontEnums[i]);
+					}
+				}
+			}
+			return result;
+		};
+	}());
+}
+
+ss.getKeyCount = function ss$getKeyCount(d) {
+	return Object.keys(d).length;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Type System Implementation
@@ -599,16 +655,26 @@ ss.getAttributes = function ss$getAttributes(type, attrType, inherit) {
 	var result = [];
 	if (inherit) {
 		var b = ss.getBaseType(type);
-		if (b)
-			result = ss.getAttributes(b, attrType, true).filter(function(a) { var t = ss.getInstanceType(a); return !t.__metadata || !t.__metadata.attrNoInherit; });
+		if (b) {
+			var a = ss.getAttributes(b, attrType, true);
+			for (var i = 0; i < a.length; i++) {
+				var t = ss.getInstanceType(a[i]);
+				if (!t.__metadata || !t.__metadata.attrNoInherit)
+					result.push(a[i]);
+			}
+		}
 	}
 	if (type.__metadata && type.__metadata.attr) {
 		for (var i = 0; i < type.__metadata.attr.length; i++) {
 			var a = type.__metadata.attr[i];
 			if (attrType == null || ss.isInstanceOfType(a, attrType)) {
 				var t = ss.getInstanceType(a);
-				if (!t.__metadata || !t.__metadata.attrAllowMultiple)
-					result = result.filter(function (a) { return !ss.isInstanceOfType(a, t); });
+				if (!t.__metadata || !t.__metadata.attrAllowMultiple) {
+					for (var j = result.length - 1; j >= 0; j--) {
+						if (ss.isInstanceOfType(result[j], t))
+							result.splice(j, 1);
+					}
+				}
 				result.push(a);
 			}
 		}
@@ -642,13 +708,21 @@ ss.getMembers = function ss$getMembers(type, memberTypes, bindingAttr, name, par
 		for (var i = 0; i < type.__metadata.members.length; i++) {
 			var m = type.__metadata.members[i];
 			f(m);
-			['getter','setter','adder','remover'].forEach(function(e) { if (m[e]) f(m[e]); });
+			for (var j = 0; j < 4; j++) {
+				var a = ['getter','setter','adder','remover'][j];
+				if (m[a])
+					f(m[a]);
+			}
 		}
 	}
 
 	if (bindingAttr & 256) {
 		while (type) {
-			var r = result.filter(function(m) { return m.typeDef === type; });
+			var r = [];
+			for (var i = 0; i < result.length; i++) {
+				if (result[i].typeDef === type)
+					r.push(result[i]);
+			}
 			if (r.length > 1)
 				throw new ss_AmbiguousMatchException('Ambiguous match');
 			else if (r.length === 1)
@@ -757,57 +831,6 @@ var ss_IEquatable = function IEquatable$() { };
 ss_IEquatable.__typeName = 'ss.IEquatable';
 ss.IEquatable = ss_IEquatable;
 ss.initInterface(ss_IEquatable, ss, { equalsT: null });
-
-///////////////////////////////////////////////////////////////////////////////
-// Object Extensions
-
-ss.clearKeys = function ss$clearKeys(d) {
-	for (var n in d) {
-		if (d.hasOwnProperty(n))
-			delete d[n];
-	}
-};
-
-ss.keyExists = function ss$keyExists(d, key) {
-	return d[key] !== undefined;
-};
-
-if (!Object.keys) {
-	Object.keys = (function() {
-		'use strict';
-		var hasOwnProperty = Object.prototype.hasOwnProperty,
-			hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
-			dontEnums = ['toString','toLocaleString','valueOf','hasOwnProperty','isPrototypeOf','propertyIsEnumerable','constructor'],
-			dontEnumsLength = dontEnums.length;
-
-		return function (obj) {
-			if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
-				throw new TypeError('Object.keys called on non-object');
-			}
-
-			var result = [], prop, i;
-
-			for (prop in obj) {
-				if (hasOwnProperty.call(obj, prop)) {
-					result.push(prop);
-				}
-			}
-
-			if (hasDontEnumBug) {
-				for (i = 0; i < dontEnumsLength; i++) {
-					if (hasOwnProperty.call(obj, dontEnums[i])) {
-						result.push(dontEnums[i]);
-					}
-				}
-			}
-			return result;
-		};
-	}());
-}
-
-ss.getKeyCount = function ss$getKeyCount(d) {
-	return Object.keys(d).length;
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Number Extensions
@@ -1509,45 +1532,6 @@ ss.arrayPeekBack = function ss$arrayPeekBack(arr) {
 		return arr[arr.length - 1];
 	throw new ss_InvalidOperationException('Array is empty');
 };
-
-if (!Array.prototype.every) {
-	Array.prototype.every = function Array$every(callback, instance) {
-		var length = this.length;
-		for (var i = 0; i < length; i++) {
-			if (i in this && !callback.call(instance, this[i], i, this)) {
-				return false;
-			}
-		}
-		return true;
-	};
-}
-
-if (!Array.prototype.filter) {
-	Array.prototype.filter = function Array$filter(callback, instance) {
-		var length = this.length;    
-		var filtered = [];
-		for (var i = 0; i < length; i++) {
-			if (i in this) {
-				var val = this[i];
-				if (callback.call(instance, val, i, this)) {
-					filtered.push(val);
-				}
-			}
-		}
-		return filtered;
-	};
-}
-
-if (!Array.prototype.forEach) {
-	Array.prototype.forEach = function Array$forEach(callback, instance) {
-		var length = this.length;
-		for (var i = 0; i < length; i++) {
-			if (i in this) {
-				callback.call(instance, this[i], i, this);
-			}
-		}
-	};
-}
 
 ss.indexOfArray = function ss$indexOfArray(arr, item, startIndex) {
 	startIndex = startIndex || 0;
@@ -2566,6 +2550,14 @@ ss_Nullable$1.cpl = function Nullable$cpl(a) {
 	return ss.isValue(a) ? ~a : null;
 };
 
+ss_Nullable$1.lift = function Nullable$lift() {
+	for (var i = 0; i < arguments.length; i++) {
+		if (!ss.isValue(arguments[i]))
+			return null;
+	}
+	return arguments[0].apply(null, Array.prototype.slice.call(arguments, 1));
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // IList
 
@@ -2765,7 +2757,14 @@ ss.initClass(ss_Comparer, ss, {
 		return this.f(x, y);
 	}
 }, null, [ss_IComparer]);
-ss_Comparer.def = new ss_Comparer(ss.compare);
+ss_Comparer.def = new ss_Comparer(function Comparer$defaultCompare(a, b) {
+	if (!ss.isValue(a))
+		return !ss.isValue(b)? 0 : -1;
+	else if (!ss.isValue(b))
+		return 1;
+	else
+		return ss.compare(a, b);
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // Dictionary
@@ -3174,7 +3173,21 @@ var ss_AggregateException = function AggregateException$(message, innerException
 
 ss_AggregateException.__typeName = 'ss.AggregateException';
 ss.AggregateException = ss_AggregateException;
-ss.initClass(ss_AggregateException, ss, {}, ss_Exception);
+ss.initClass(ss_AggregateException, ss, {
+	flatten: function  AggregateException$flatten() {
+		var inner = [];
+		for (var i = 0; i < this.innerExceptions.length; i++) {
+			var e = this.innerExceptions[i];
+			if (ss.isInstanceOfType(e, ss_AggregateException)) {
+				inner.push.apply(inner, e.flatten().innerExceptions);
+			}
+			else {
+				inner.push(e);
+			}
+		}
+		return new ss_AggregateException(this._message, inner);
+	}
+}, ss_Exception);
 
 ////////////////////////////////////////////////////////////////////////////////
 // PromiseException
@@ -3632,17 +3645,23 @@ ss.initClass(ss_Task, ss, {
 	isFaulted: function Task$isFaulted() {
 		return this.status === 7;
 	},
-	getResult: function Task$getResult() {
+	_getResult: function Task$_getResult(await) {
 		switch (this.status) {
 			case 5:
 				return this._result;
 			case 6:
 				throw new ss_InvalidOperationException('Task was cancelled.');
 			case 7:
-				throw this.exception;
+				throw await ? this.exception.innerExceptions[0] : this.exception;
 			default:
 				throw new ss_InvalidOperationException('Task is not yet completed.');
 		}
+	},
+	getResult: function Task$getResult() {
+		return this._getResult(false);
+	},
+	getAwaitedResult: function Task$getAwaitedResult() {
+		return this._getResult(true);
 	},
 	dispose: function Task$dispose() {
 	}
@@ -3686,12 +3705,9 @@ ss.initClass(ss_TaskCompletionSource, ss, {
 		return this.task._complete(result);
 	},
 	trySetException: function TaskCompletionSource$setException(exception) {
-		if (!ss.isInstanceOfType(exception, ss_AggregateException)) {
-			if (ss.isInstanceOfType(exception, ss_Exception))
-				exception = [exception];
-			exception = new ss_AggregateException(null, exception);
-		}
-		return this.task._fail(exception);
+		if (ss.isInstanceOfType(exception, ss_Exception))
+			exception = [exception];
+		return this.task._fail(new ss_AggregateException(null, exception));
 	}
 });
 
