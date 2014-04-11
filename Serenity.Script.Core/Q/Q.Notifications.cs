@@ -48,8 +48,8 @@ namespace Serenity
             var options = new ToastrOptions
             {
                 TimeOut = 3000,
-                FadeIn = 250,
-                FadeOut = 500,
+                ShowDuration = 250,
+                HideDuration = 500,
                 ExtendedTimeOut = 500
             };
 
