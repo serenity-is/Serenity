@@ -193,7 +193,7 @@ namespace Serenity.Data
             }
 
             // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (take != 0 && (!useFetchNext))
+            if (take != 0 && (!useFetchNext) && (useRowNumber || !dialect.UseTakeAtEnd()))
             {
                 sb.Append(dialect.TakeKeyword());
                 sb.Append(' ');
@@ -271,14 +271,16 @@ namespace Serenity.Data
                 sb.Append(skip);
             }
 
-            if (useFetchNext)
+            if (take != 0 && (!useFetchNext) && !useRowNumber && dialect.UseTakeAtEnd())
             {
-                sb.Append(" OFFSET ");
-                sb.Append(skip);
-                sb.Append(" ROWS FETCH NEXT ");
+                sb.Append(' ');
+                sb.Append(dialect.TakeKeyword());
+                sb.Append(' ');
                 sb.Append(take);
-                sb.Append(" ROWS ONLY");
             }
+
+            if (useFetchNext)
+                sb.Append(String.Format(dialect.OffsetFetchFormat(), skip, take));
 
             if (!forXml.IsNullOrEmpty())
             {

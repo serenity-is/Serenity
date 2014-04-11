@@ -8,63 +8,79 @@ namespace Serenity.Data
 
         public static bool IsCaseSensitive(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.ServerKindFirebird);
+            return dialect.HasFlag(SqlDialect.MsSql);
         }
 
         public static bool PrefixUnicodeStringsWithN(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.ServerKindMsSql);
+            return dialect.HasFlag(SqlDialect.MsSql);
         }
 
         public static bool UseReturningIdentity(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.ServerKindFirebird);
+            return dialect.HasFlag(SqlDialect.Firebird);
         }
 
         public static bool UseScopeIdentity(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.ServerKindMsSql);
+            return dialect.HasFlag(SqlDialect.MsSql);
         }
 
         public static bool MultipleResultsets(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.MsSql2000);
+            return dialect.HasFlag(SqlDialect.MsSql);
         }
 
         public static bool CanUseRowNumber(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.UseRowNumber);
-        }
-
-        public static bool CanUseSkipKeyword(this SqlDialect dialect)
-        {
-            return dialect.HasFlag(SqlDialect.UseSkipKeyword);
+            return dialect.HasFlag(SqlDialect.MsSql) && dialect >= SqlDialect.MsSql2005;
         }
 
         public static bool CanUseOffsetFetch(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.UseOffsetFetch);
+            return dialect.HasFlag(SqlDialect.MsSql) && dialect >= SqlDialect.MsSql2012;
         }
 
         public static bool NeedsExecuteBlockStatement(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.ServerKindFirebird);
+            return dialect.HasFlag(SqlDialect.Firebird);
+        }
+
+        public static string OffsetFetchFormat(this SqlDialect dialect)
+        {
+            if (dialect.HasFlag(SqlDialect.Sqlite))
+                return " LIMIT {1} OFFSET {0}";
+
+            return " OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY";
         }
 
         public static string TakeKeyword(this SqlDialect dialect)
         {
-            if (dialect.HasFlag(SqlDialect.ServerKindFirebird))
+            if (dialect.HasFlag(SqlDialect.Firebird))
                 return "FIRST";
 
-            if (dialect.HasFlag(SqlDialect.ServerKindMsSql))
+            if (dialect.HasFlag(SqlDialect.MsSql))
                 return "TOP";
-                        
+
+            if (dialect.HasFlag(SqlDialect.Sqlite))
+                return "LIMIT";
+            
             throw new InvalidOperationException();
+        }
+
+        public static bool UseTakeAtEnd(this SqlDialect dialect)
+        {
+            return dialect.HasFlag(SqlDialect.Sqlite);
+        }
+
+        public static bool CanUseSkipKeyword(this SqlDialect dialect)
+        {
+            return dialect.HasFlag(SqlDialect.Firebird);
         }
 
         public static string SkipKeyword(this SqlDialect dialect)
         {
-            if (dialect.HasFlag(SqlDialect.ServerKindFirebird))
+            if (dialect.HasFlag(SqlDialect.Firebird))
                 return "SKIP";
 
             throw new InvalidOperationException();
@@ -72,7 +88,7 @@ namespace Serenity.Data
 
         public static string DateFormat(this SqlDialect dialect)
         {
-            if (dialect.HasFlag(SqlDialect.ServerKindFirebird))
+            if (dialect.HasFlag(SqlDialect.Firebird))
                 return "\\'yyyy'-'MM'-'dd\\'";
 
             return "\\'yyyyMMdd\\'";
@@ -80,7 +96,7 @@ namespace Serenity.Data
 
         public static string DateTimeFormat(this SqlDialect dialect)
         {
-            if (dialect.HasFlag(SqlDialect.ServerKindFirebird))
+            if (dialect.HasFlag(SqlDialect.Firebird))
                 return "\\'yyyy'-'MM'-'dd HH':'mm':'ss'.'fff\\'";
                     
             return "\\'yyyy'-'MM'-'ddTHH':'mm':'ss'.'fff\\'";

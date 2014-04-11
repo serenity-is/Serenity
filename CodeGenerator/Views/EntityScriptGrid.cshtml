@@ -3,7 +3,9 @@ namespace @(Model.RootNamespace).@(Model.Module)
 {
     using jQueryApi;
     using Serenity;
+    using System;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
 
     [IdProperty("@Model.Identity")@if (Model.NameField != null) {<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
     public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>

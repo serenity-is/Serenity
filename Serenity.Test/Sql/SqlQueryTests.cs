@@ -761,5 +761,23 @@ namespace Serenity.Test.Data
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
+
+        [Fact]
+        public void TakeUsesCorrectSyntaxForSqliteDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(SqlDialect.Sqlite)
+                .Select("c")
+                .From("t")
+                .Take(10);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT c FROM t LIMIT 10"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+
+        }
+
     }
 }
