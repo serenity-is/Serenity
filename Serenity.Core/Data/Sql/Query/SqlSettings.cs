@@ -8,7 +8,7 @@ namespace Serenity.Data
 
         public static bool IsCaseSensitive(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.MsSql);
+            return dialect.HasFlag(SqlDialect.Firebird);
         }
 
         public static bool PrefixUnicodeStringsWithN(this SqlDialect dialect)
@@ -38,7 +38,8 @@ namespace Serenity.Data
 
         public static bool CanUseOffsetFetch(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.MsSql) && dialect >= SqlDialect.MsSql2012;
+            return (dialect.HasFlag(SqlDialect.MsSql) && dialect >= SqlDialect.MsSql2012) ||
+                dialect.HasFlag(SqlDialect.Sqlite);
         }
 
         public static bool NeedsExecuteBlockStatement(this SqlDialect dialect)
