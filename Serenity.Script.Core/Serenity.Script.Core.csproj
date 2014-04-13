@@ -35,6 +35,11 @@
   <ItemGroup>
     <Compile Include="Attribute\EditorAttribute.cs" />
     <Compile Include="Attribute\ElementAttribute.cs" />
+    <Compile Include="Attribute\DialogTypeAttribute.cs" />
+    <Compile Include="Attribute\FormKeyAttribute.cs" />
+    <Compile Include="Attribute\ItemNameAttribute.cs" />
+    <Compile Include="Attribute\LocalTextPrefixAttribute.cs" />
+    <Compile Include="Attribute\ServiceAttribute.cs" />
     <Compile Include="Attribute\EntityTypeAttribute.cs" />
     <Compile Include="Attribute\IdPropertyAttribute.cs" />
     <Compile Include="Attribute\IsActivePropertyAttribute.cs" />

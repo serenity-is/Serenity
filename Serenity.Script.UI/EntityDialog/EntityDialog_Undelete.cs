@@ -21,7 +21,7 @@ namespace Serenity
         {
             var self = this;
             var baseOptions = new ServiceCallOptions<UndeleteResponse>();
-            baseOptions.Service = this.GetEntityType().Replace('.', '/') + "/Undelete";
+            baseOptions.Service = this.GetService() + "/Undelete";
 
             var request = new UndeleteRequest();
             request.EntityId = EntityId.As<long>();

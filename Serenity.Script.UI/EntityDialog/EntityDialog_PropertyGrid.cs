@@ -21,11 +21,6 @@ namespace Serenity
             propertyGrid = new PropertyGrid(pgDiv, pgOptions);
         }
 
-        protected virtual string GetFormKey()
-        {
-            return this.GetEntityType();
-        }
-
         protected virtual List<PropertyItem> GetPropertyItems()
         {
             var formKey = GetFormKey();

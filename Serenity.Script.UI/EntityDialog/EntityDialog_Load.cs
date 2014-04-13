@@ -101,7 +101,7 @@ namespace Serenity
         public void LoadById(long id, Action<RetrieveResponse<TEntity>> callback)
         {
             var baseOptions = new ServiceCallOptions<RetrieveResponse<TEntity>>();
-            baseOptions.Service = this.GetEntityType().Replace('.', '/') + "/Retrieve";
+            baseOptions.Service = this.GetService() + "/Retrieve";
             baseOptions.BlockUI = false;
 
             baseOptions.Request = GetLoadByIdRequest(id);

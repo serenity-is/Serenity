@@ -95,7 +95,7 @@ namespace Serenity
         {
             var self = this;
             var opt = new ServiceCallOptions<RetrieveResponse<TEntity>>();
-            opt.Service = this.GetEntityType().Replace('.', '/') + "/RetrieveLocalization";
+            opt.Service = this.GetService() + "/RetrieveLocalization";
             opt.BlockUI = true;
             opt.Request = new RetrieveLocalizationRequest
             {
@@ -137,7 +137,7 @@ namespace Serenity
                 return;
 
             var opt = new ServiceCallOptions();
-            opt.Service = this.GetEntityType().Replace('.', '/') + "/UpdateLocalization";
+            opt.Service = this.GetService() + "/UpdateLocalization";
             opt.OnSuccess = delegate(ServiceResponse response)
             {
             };

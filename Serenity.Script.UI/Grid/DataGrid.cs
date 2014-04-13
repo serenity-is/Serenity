@@ -580,7 +580,15 @@ namespace Serenity
 
         protected virtual string GetLocalTextPrefix()
         {
-            localTextPrefix = localTextPrefix ?? "";
+            if (localTextPrefix == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(LocalTextPrefixAttribute), true);
+                if (attributes.Length >= 1)
+                    localTextPrefix = attributes[0].As<LocalTextPrefixAttribute>().Value;
+                else
+                    localTextPrefix = "";
+            }
+
             return localTextPrefix;
         }
 
@@ -590,7 +598,7 @@ namespace Serenity
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IdPropertyAttribute), true);
                 if (attributes.Length == 1)
-                    idFieldName = attributes[0].As<IdPropertyAttribute>().IdProperty;
+                    idFieldName = attributes[0].As<IdPropertyAttribute>().Value;
                 else
                     idFieldName = "ID";
             }
@@ -604,7 +612,7 @@ namespace Serenity
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IsActivePropertyAttribute), true);
                 if (attributes.Length == 1)
-                    isActiveFieldName = attributes[0].As<IsActivePropertyAttribute>().IsActiveProperty;
+                    isActiveFieldName = attributes[0].As<IsActivePropertyAttribute>().Value;
                 else
                     isActiveFieldName = "IsActive";
             }

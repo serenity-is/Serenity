@@ -19,7 +19,7 @@ namespace Serenity
         {
             var self = this;
             var opt = new ServiceCallOptions();
-            opt.Service = this.GetEntityType().Replace('.', '/') + "/" + (this.IsEditMode ? "Update" : "Create");
+            opt.Service = this.GetService() + "/" + (this.IsEditMode ? "Update" : "Create");
             opt.OnSuccess = delegate(ServiceResponse response)
             {
                 self.OnSaveSuccess(response);

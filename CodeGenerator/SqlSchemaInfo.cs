@@ -45,9 +45,16 @@ namespace Serenity.CodeGenerator
             var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             foreach (DataRow row in columns.Rows)
             {
-                var isPrimaryKey = row["PRIMARY_KEY"] as Boolean?;
-                if (isPrimaryKey == true)
-                    primaryFields.Add((string)row["COLUMN_NAME"]);
+                try
+                {
+                    var isPrimaryKey = row["PRIMARY_KEY"] as Boolean?;
+                    if (isPrimaryKey == true)
+                        primaryFields.Add((string)row["COLUMN_NAME"]);
+                }
+                catch (Exception)
+                {
+
+                }
             }
 
             if (primaryFields.Count == 0)

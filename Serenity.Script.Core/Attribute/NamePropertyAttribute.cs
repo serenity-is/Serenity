@@ -5,11 +5,11 @@ namespace Serenity
 {
     public class NamePropertyAttribute : Attribute
     {
-        public NamePropertyAttribute(string nameProperty)
+        public NamePropertyAttribute(string value)
         {
-            this.NameProperty = nameProperty;
+            this.Value = value;
         }
 
-        public string NameProperty { get; private set; }
+        public string Value { get; private set; }
     }
 }

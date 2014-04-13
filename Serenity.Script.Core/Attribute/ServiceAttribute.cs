@@ -3,9 +3,9 @@ using System;
 
 namespace Serenity
 {
-    public class EntityTypeAttribute : Attribute
+    public class ServiceAttribute : Attribute
     {
-        public EntityTypeAttribute(string value)
+        public ServiceAttribute(string value)
         {
             this.Value = value;
         }

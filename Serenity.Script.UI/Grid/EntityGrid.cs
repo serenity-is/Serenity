@@ -1,4 +1,5 @@
 ﻿using jQueryApi;
+using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
 
@@ -11,6 +12,7 @@ namespace Serenity
         private string entityType;
         private string entityPlural;
         private string entitySingular;
+        private string service;
         private Type entityDialogType;
 
         public EntityGrid(jQueryObject container, TOptions opt = null)
@@ -36,7 +38,15 @@ namespace Serenity
 
         protected override string GetLocalTextPrefix()
         {
-            localTextPrefix = localTextPrefix ?? ("Db." + GetEntityType() + ".");
+            if (localTextPrefix == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(LocalTextPrefixAttribute), true);
+                if (attributes.Length >= 1)
+                    localTextPrefix = attributes[0].As<LocalTextPrefixAttribute>().Value;
+                else
+                    localTextPrefix = ("Db." + GetEntityType() + ".");
+            }
+
             return localTextPrefix;
         }
 
@@ -47,7 +57,7 @@ namespace Serenity
                 var typeAttributes = this.GetType().GetCustomAttributes(typeof(EntityTypeAttribute), true);
                 if (typeAttributes.Length == 1)
                 {
-                    entityType = typeAttributes[0].As<EntityTypeAttribute>().EntityType;
+                    entityType = typeAttributes[0].As<EntityTypeAttribute>().Value;
                     return entityType;
                 }
 
@@ -72,13 +82,35 @@ namespace Serenity
 
         protected virtual string GetEntityPlural()
         {
-            entityPlural = entityPlural ?? (Q.TryGetText(GetLocalTextPrefix() + "EntityPlural") ?? GetEntityType());
+            if (entityPlural == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(DisplayNameAttribute), true);
+                if (attributes.Length >= 1)
+                {
+                    entityPlural = attributes[0].As<DisplayNameAttribute>().DisplayName;
+                    entityPlural = LocalText.GetDefault(entityPlural, entityPlural);
+                }
+                else
+                    entityPlural = (Q.TryGetText(GetLocalTextPrefix() + "EntityPlural") ?? GetEntityType());
+            }
+
             return entityPlural;
         }
 
         protected virtual string GetEntitySingular()
         {
-            entitySingular = entitySingular ?? (Q.TryGetText(GetLocalTextPrefix() + "EntitySingular") ?? GetEntityType());
+            if (entitySingular == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(ItemNameAttribute), true);
+                if (attributes.Length >= 1)
+                {
+                    entitySingular = attributes[0].As<ItemNameAttribute>().Value;
+                    entitySingular = LocalText.GetDefault(entitySingular, entitySingular);
+                }
+                else
+                    entitySingular = (Q.TryGetText(GetLocalTextPrefix() + "EntitySingular") ?? GetEntityType());
+            }
+
             return entitySingular;
         }
 
@@ -131,10 +163,24 @@ namespace Serenity
             }
         }
 
+        protected virtual string GetService()
+        {
+            if (service == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(ServiceAttribute), true);
+                if (attributes.Length >= 1)
+                    service = attributes[0].As<ServiceAttribute>().Value;
+                else
+                    service = this.GetEntityType().Replace('.', '/');
+            }
+
+            return service;
+        }
+
         protected override SlickRemoteViewOptions GetViewOptions()
         {
             var opt = base.GetViewOptions();
-            opt.Url = Q.ResolveUrl("~/Services/" + GetEntityType().Replace('.', '/') + "/List");
+            opt.Url = Q.ResolveUrl("~/Services/" + GetService() + "/List");
             return opt;
         }
 
@@ -166,21 +212,27 @@ namespace Serenity
         {
             if (entityDialogType == null)
             {
-                var entityClass = GetEntityType();
-                string typeName = entityClass + "Dialog";
-
-                Type dialogType = null;
-                foreach (var ns in Q.Config.RootNamespaces)
+                var attributes = this.GetType().GetCustomAttributes(typeof(DialogTypeAttribute), true);
+                if (attributes.Length >= 1)
+                    entityDialogType = attributes[0].As<DialogTypeAttribute>().Value;
+                else
                 {
-                    dialogType = Type.GetType(ns + "." + typeName);
-                    if (dialogType != null)
-                        break;
-                }
+                    var entityClass = GetEntityType();
+                    string typeName = entityClass + "Dialog";
 
-                if (dialogType == null)
-                    throw new Exception(typeName + " dialog sınıfı bulunamadı!");
+                    Type dialogType = null;
+                    foreach (var ns in Q.Config.RootNamespaces)
+                    {
+                        dialogType = Type.GetType(ns + "." + typeName);
+                        if (dialogType != null)
+                            break;
+                    }
 
-                entityDialogType = dialogType;
+                    if (dialogType == null)
+                        throw new Exception(typeName + " dialog sınıfı bulunamadı!");
+
+                    entityDialogType = dialogType;
+                }              
             }
 
             return entityDialogType;

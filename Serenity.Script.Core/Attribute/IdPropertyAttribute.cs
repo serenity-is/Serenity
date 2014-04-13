@@ -5,11 +5,11 @@ namespace Serenity
 {
     public class IdPropertyAttribute : Attribute
     {
-        public IdPropertyAttribute(string idProperty)
+        public IdPropertyAttribute(string value)
         {
-            this.IdProperty = idProperty;
+            this.Value = value;
         }
 
-        public string IdProperty { get; private set; }
+        public string Value { get; private set; }
     }
 }

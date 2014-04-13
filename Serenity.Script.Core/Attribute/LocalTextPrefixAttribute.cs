@@ -3,9 +3,9 @@ using System;
 
 namespace Serenity
 {
-    public class IsActivePropertyAttribute : Attribute
+    public class LocalTextPrefixAttribute : Attribute
     {
-        public IsActivePropertyAttribute(string value)
+        public LocalTextPrefixAttribute(string value)
         {
             this.Value = value;
         }

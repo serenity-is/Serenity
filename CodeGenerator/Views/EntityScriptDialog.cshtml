@@ -6,6 +6,7 @@ namespace @(Model.RootNamespace).@(Model.Module)
     using System.Collections.Generic;
 
     [IdProperty("@Model.Identity")@if (Model.NameField != null) {<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
+    [FormKey("@(Model.Module).@(Model.ClassName)"), LocalTextPrefix("Db.@(Model.Module).@(Model.ClassName)."), Service("@(Model.Module)/@(Model.ClassName)")]
     public class @(Model.ClassName)Dialog : EntityDialog<@(Model.RowClassName)>
     {
     }

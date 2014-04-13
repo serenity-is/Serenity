@@ -7,7 +7,8 @@ namespace @(Model.RootNamespace).@(Model.Module)
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
-    [IdProperty("@Model.Identity")@if (Model.NameField != null) {<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
+    [IdProperty("@Model.Identity")@if (Model.NameField != null){<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
+    [DialogType(typeof(@(Model.ClassName)Dialog)), LocalTextPrefix("Db.@(Model.Module).@(Model.ClassName)."), Service("@(Model.Module)/@(Model.ClassName)")]
     public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>
     {
         public @(Model.ClassName)Grid(jQueryObject container)

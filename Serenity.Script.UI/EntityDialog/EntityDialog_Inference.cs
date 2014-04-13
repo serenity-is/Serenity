@@ -12,6 +12,8 @@ namespace Serenity
         private string entityIdField;
         private string entityNameField;
         private string entityIsActiveField;
+        private string formKey;
+        private string service;
 
         protected virtual string GetEntityType()
         {
@@ -20,11 +22,9 @@ namespace Serenity
                 var typeAttributes = this.GetType().GetCustomAttributes(typeof(EntityTypeAttribute), true);
                 if (typeAttributes.Length == 1)
                 {
-                    entityType = typeAttributes[0].As<EntityTypeAttribute>().EntityType;
-                    return null;
+                    entityType = typeAttributes[0].As<EntityTypeAttribute>().Value;
+                    return entityType;
                 }
-
-                // typeof(TEntity).Name'i kullanamayız, TEntity genelde Serializable ve Imported olduğundan dolayı tipi Object e karşılık geliyor!
 
                 // remove global namespace
                 var name = this.GetType().FullName;
@@ -41,15 +41,48 @@ namespace Serenity
             return entityType;
         }
 
+        protected virtual string GetFormKey()
+        {
+            if (formKey == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(FormKeyAttribute), true);
+                if (attributes.Length >= 1)
+                    formKey = attributes[0].As<FormKeyAttribute>().Value;
+                else
+                    formKey = ("Db." + GetEntityType() + ".");
+            }
+
+            return formKey;
+        }
+
         protected virtual string GetLocalTextPrefix()
         {
-            localTextPrefix = localTextPrefix ?? ("Db." + GetEntityType() + ".");
+            if (localTextPrefix == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(LocalTextPrefixAttribute), true);
+                if (attributes.Length >= 1)
+                    localTextPrefix = attributes[0].As<LocalTextPrefixAttribute>().Value;
+                else
+                    localTextPrefix = ("Db." + GetEntityType() + ".");
+            }
+
             return localTextPrefix;
         }
 
         protected virtual string GetEntitySingular()
         {
-            entitySingular = entitySingular ?? (Q.TryGetText(GetLocalTextPrefix() + "EntitySingular") ?? GetEntityType());
+            if (entitySingular == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(ItemNameAttribute), true);
+                if (attributes.Length >= 1)
+                {
+                    entitySingular = attributes[0].As<ItemNameAttribute>().Value;
+                    entitySingular = LocalText.GetDefault(entitySingular, entitySingular);
+                }
+                else
+                    entitySingular = (Q.TryGetText(GetLocalTextPrefix() + "EntitySingular") ?? GetEntityType());
+            }
+
             return entitySingular;
         }
 
@@ -58,8 +91,8 @@ namespace Serenity
             if (entityNameField == null)
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(NamePropertyAttribute), true);
-                if (attributes.Length == 1)
-                    entityNameField = attributes[0].As<NamePropertyAttribute>().NameProperty;
+                if (attributes.Length >= 1)
+                    entityNameField = attributes[0].As<NamePropertyAttribute>().Value;
                 else
                     entityNameField = "Name";
             }
@@ -72,8 +105,8 @@ namespace Serenity
             if (entityIdField == null)
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IdPropertyAttribute), true);
-                if (attributes.Length == 1)
-                    entityIdField = attributes[0].As<IdPropertyAttribute>().IdProperty;
+                if (attributes.Length >= 1)
+                    entityIdField = attributes[0].As<IdPropertyAttribute>().Value;
                 else
                     entityIdField = "ID";
             }
@@ -86,13 +119,27 @@ namespace Serenity
             if (entityIsActiveField == null)
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IsActivePropertyAttribute), true);
-                if (attributes.Length == 1)
-                    entityIsActiveField = attributes[0].As<IsActivePropertyAttribute>().IsActiveProperty;
+                if (attributes.Length >= 1)
+                    entityIsActiveField = attributes[0].As<IsActivePropertyAttribute>().Value;
                 else
                     entityIsActiveField = "IsActive";
             }
 
             return entityIsActiveField;
+        }
+
+        protected virtual string GetService()
+        {
+            if (service == null)
+            {
+                var attributes = this.GetType().GetCustomAttributes(typeof(ServiceAttribute), true);
+                if (attributes.Length >= 1)
+                    service = attributes[0].As<ServiceAttribute>().Value;
+                else
+                    service = this.GetEntityType().Replace('.', '/');
+            }
+
+            return service;
         }
     }
 }

@@ -3,9 +3,9 @@ using System;
 
 namespace Serenity
 {
-    public class IsActivePropertyAttribute : Attribute
+    public class ItemNameAttribute : Attribute
     {
-        public IsActivePropertyAttribute(string value)
+        public ItemNameAttribute(string value)
         {
             this.Value = value;
         }
