@@ -256,7 +256,7 @@ namespace Serenity.CodeGenerator
             {
                 string str2 = s;
                 if (RowGenerator.IsStringLowerCase(s))
-                    str2 = !(str2 == "id") ? (string)(object)char.ToUpper(str2[0], CultureInfo.InvariantCulture) + (object)str2.Remove(0, 1) : "ID";
+                    str2 = !(str2 == "id") ? ((object)char.ToUpper(str2[0], CultureInfo.InvariantCulture)).ToString() + ((object)str2.Remove(0, 1)).ToString() : "ID";
                 str1 = str1 + str2;
             }
             return str1;
