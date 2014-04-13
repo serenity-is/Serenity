@@ -33,7 +33,7 @@ namespace Serenity.CodeGenerator
                 using (var sr = new StreamReader(file))
                 {
                     _connections.Clear();
-                    foreach (var s in JsonConvert.DeserializeObject<List<string>>(sr.ReadToEnd()))
+                    foreach (var s in JsonConvert.DeserializeObject<List<string>>(sr.ReadToEnd().TrimToNull() ?? "[]"))
                         _connections.Add(s);
                 }
 
