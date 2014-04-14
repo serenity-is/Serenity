@@ -49,7 +49,7 @@ namespace Serenity
                 if (attributes.Length >= 1)
                     formKey = attributes[0].As<FormKeyAttribute>().Value;
                 else
-                    formKey = ("Db." + GetEntityType() + ".");
+                    formKey = GetEntityType();
             }
 
             return formKey;
