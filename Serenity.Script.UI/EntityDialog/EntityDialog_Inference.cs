@@ -63,7 +63,9 @@ namespace Serenity
                 if (attributes.Length >= 1)
                     localTextPrefix = attributes[0].As<LocalTextPrefixAttribute>().Value;
                 else
-                    localTextPrefix = ("Db." + GetEntityType() + ".");
+                    localTextPrefix = GetEntityType();
+
+                localTextPrefix = ("Db." + localTextPrefix + ".");
             }
 
             return localTextPrefix;

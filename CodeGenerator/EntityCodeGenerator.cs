@@ -169,7 +169,7 @@ namespace Serenity.CodeGenerator
         private void GenerateRow()
         {
             CreateNewSiteWebFile(Templates.Render("EntityRow", model),
-                Path.Combine(@"Modules\", Path.Combine(model.Module, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
+                Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
         }
 
         /*private void GenerateCss()
@@ -201,7 +201,7 @@ namespace Serenity.CodeGenerator
                 RootNamespace = model.RootNamespace,
                 Fields = model.Fields,
                 IdField = model.Identity
-            }), Path.Combine(@"Modules\", Path.Combine(model.Module, Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
+            }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
         }
 
         private void GenerateRepository()
@@ -213,7 +213,7 @@ namespace Serenity.CodeGenerator
                 RowClassName = model.RowClassName,
                 Module = model.Module,
                 Permission = model.Permission
-            }), Path.Combine(@"Modules\", Path.Combine(model.Module, Path.Combine(model.ClassName, model.ClassName + "Repository.cs"))));
+            }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Repository.cs"))));
         }
 
         private void GenerateEndpoint()
@@ -226,7 +226,7 @@ namespace Serenity.CodeGenerator
                 RowClassName = model.RowClassName,
                 Module = model.Module,
                 Permission = model.Permission
-            }), Path.Combine(@"Modules\", Path.Combine(model.Module, Path.Combine(model.ClassName, model.ClassName + "Endpoint.cs"))));
+            }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Endpoint.cs"))));
         }
 
         private void GeneratePageController()
@@ -240,7 +240,7 @@ namespace Serenity.CodeGenerator
                 Module = model.Module,
                 Permission = model.Permission,
                 NavigationCategory = model.Module
-            }), Path.Combine(@"Modules\", Path.Combine(model.Module, Path.Combine(model.ClassName, model.ClassName + "Page.cs"))));
+            }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Page.cs"))));
         }
 
         private void GeneratePageIndex()
@@ -254,7 +254,7 @@ namespace Serenity.CodeGenerator
                 Module = model.Module,
                 Permission = model.Permission,
                 NavigationCategory = model.Module
-            }), Path.Combine(@"Modules\", Path.Combine(model.Module, Path.Combine(model.ClassName, model.ClassName + "Index.cshtml"))));
+            }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Index.cshtml"))));
         }
 
         //private void GenerateScriptRow()
@@ -266,14 +266,14 @@ namespace Serenity.CodeGenerator
         private void GenerateScriptGrid()
         {
             CreateNewSiteScriptFile(Templates.Render("EntityScriptGrid", model),
-                Path.Combine(model.Module, Path.Combine(model.ClassName, model.ClassName + "Grid.cs")));
+                Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Grid.cs")));
         }
 
 
         private void GenerateScriptDialog()
         {
             CreateNewSiteScriptFile(Templates.Render("EntityScriptDialog", model),
-                Path.Combine(model.Module, Path.Combine(model.ClassName, model.ClassName + "Dialog.cs")));
+                Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Dialog.cs")));
         }
 
         private void AddFileToProject(string projectFile, string codeFile)

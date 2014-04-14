@@ -69,7 +69,7 @@ namespace Serenity.CodeGenerator
             {
                 if (value != _module)
                 {
-                    _module = value;
+                    _module = value.TrimToNull();
                     Changed("Module");
                 }
             }
@@ -183,8 +183,7 @@ namespace Serenity.CodeGenerator
         {
             if (this.ConnectionsCombo.SelectedItem != null &&
                 this.TablesCombo.SelectedItem != null &&
-                !EntitySingular.IsTrimmedEmpty() &&
-                !this.Module.IsTrimmedEmpty())
+                !EntitySingular.IsTrimmedEmpty())
             {
                 string table = (string)this.TablesCombo.SelectedItem;
                 string tableSchema = null;
@@ -238,12 +237,6 @@ namespace Serenity.CodeGenerator
             if (EntitySingular.IsTrimmedEmpty())
             {
                 MessageBox.Show("Entity Sınıfı için değer girmelisiniz!");
-                return;
-            }
-
-            if (Module.IsTrimmedEmpty())
-            {
-                MessageBox.Show("Modül için değer girmelisiniz!");
                 return;
             }
 

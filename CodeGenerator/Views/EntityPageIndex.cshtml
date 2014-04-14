@@ -1,4 +1,5 @@
-﻿@@{
+﻿@{var dotModule = Model.Module == null ? "" : ("." + Model.Module);}
+@@{
     ViewBag.Title = "@(Model.ClassName)";
 }
 
@@ -6,7 +7,7 @@
 
 <script type="text/javascript">
     jQuery(function () {
-        new @(Model.RootNamespace).@(Model.Module).@(Model.ClassName)Grid($('#GridDiv'), {
+        new @(Model.RootNamespace)@(dotModule).@(Model.ClassName)Grid($('#GridDiv'), {
         });
 
         Q.initFullHeightGridPage($('#GridDiv'));

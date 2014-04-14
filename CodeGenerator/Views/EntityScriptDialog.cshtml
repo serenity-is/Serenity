@@ -1,12 +1,16 @@
-﻿
-namespace @(Model.RootNamespace).@(Model.Module)
+﻿@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+    var moduleSlash = Model.Module == null ? "" : (Model.Module + "/");
+}
+namespace @(Model.RootNamespace)@(dotModule)
 {
     using jQueryApi;
     using Serenity;
     using System.Collections.Generic;
 
     [IdProperty("@Model.Identity")@if (Model.NameField != null) {<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
-    [FormKey("@(Model.Module).@(Model.ClassName)"), LocalTextPrefix("Db.@(Model.Module).@(Model.ClassName)."), Service("@(Model.Module)/@(Model.ClassName)")]
+    [FormKey("@(moduleDot)@(Model.ClassName)"), LocalTextPrefix("@(dotModule).@(Model.ClassName)"), Service("@(moduleSlash)@(Model.ClassName)")]
     public class @(Model.ClassName)Dialog : EntityDialog<@(Model.RowClassName)>
     {
     }

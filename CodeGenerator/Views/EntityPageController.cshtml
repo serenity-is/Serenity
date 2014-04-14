@@ -1,5 +1,9 @@
-﻿
-namespace @(Model.RootNamespace).@(Model.Module).Pages
+﻿@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var modulePath = Model.Module ?? Model.RootNamespace;
+}
+
+namespace @(Model.RootNamespace)@(dotModule).Pages
 {
     using Serenity;
     using System.Web.Mvc;
@@ -10,7 +14,7 @@ namespace @(Model.RootNamespace).@(Model.Module).Pages
         public ActionResult Index()
         {
             SecurityHelper.EnsurePermission("@(Model.Permission)", RightErrorHandling.Redirect);
-            return View("~/Modules/@(Model.Module)/@(Model.ClassName)/@(Model.ClassName)Index.cshtml");
+            return View("~/Modules/@(modulePath)/@(Model.ClassName)/@(Model.ClassName)Index.cshtml");
         }
     }
 }

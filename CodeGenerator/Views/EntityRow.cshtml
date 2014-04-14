@@ -1,4 +1,7 @@
 ﻿@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+     
     Func<string, string, string> jf = (x, y) =>
     {
         if (x.ToLowerInvariant() == y.ToLowerInvariant())
@@ -7,7 +10,7 @@
             return x + y;
     };
 }
-namespace @(Model.RootNamespace).@(Model.Module).Entities
+namespace @(Model.RootNamespace)@(dotModule).Entities
 {
     using Newtonsoft.Json;
     using Serenity;
@@ -93,8 +96,9 @@ namespace @(Model.RootNamespace).@(Model.Module).Entities
 }
 
             public RowFields()
-                : base("@Model.Tablename")
+                : base("@Model.Tablename"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
             {
+                LocalTextPrefix = "@(moduleDot)@(Model.ClassName)";
             }
         }
     }

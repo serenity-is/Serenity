@@ -1,5 +1,8 @@
-﻿
-namespace @(Model.RootNamespace).@(Model.Module).Forms
+﻿@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+}
+namespace @(Model.RootNamespace)@(dotModule).Forms
 {
     using System;
     using Serenity;
@@ -7,7 +10,7 @@ namespace @(Model.RootNamespace).@(Model.Module).Forms
     using Serenity.Data;
     using System.Collections.Generic;
 
-    [FormScript("@(Model.Module).@(Model.ClassName)")]
+    [FormScript("@(moduleDot)@(Model.ClassName)")]
     [BasedOnRow(typeof(Entities.@(Model.RowClassName)))]
     public class @(Model.ClassName)Form
     {@foreach (var x in Model.Fields)
