@@ -206,7 +206,7 @@ namespace Serenity
 
         /// <summary>
         ///   Checks if user is logged in.</summary>
-        public static bool HttpContextLoggedIn
+        private static bool HttpContextLoggedIn
         {
             get
             {
@@ -217,7 +217,7 @@ namespace Serenity
 
         /// <summary>
         ///   Returns actual logged user, else if empty string or null.</summary>
-        public static string HttpContextUsername
+        private static string HttpContextUsername
         {
             get
             {
@@ -237,7 +237,7 @@ namespace Serenity
             }
         }
 
-        public static Int64? HttpContextUserIdOrNull
+        private static Int64? HttpContextUserIdOrNull
         {
             get
             {
@@ -253,7 +253,7 @@ namespace Serenity
             }
         }
 
-        public static Int64 HttpContextUserId
+        private static Int64 HttpContextUserId
         {
             get
             {
@@ -379,7 +379,7 @@ namespace Serenity
 
         private static void HandleRightError(RightErrorHandling errorHandling)
         {
-            bool isLoggedIn = SecurityHelper.HttpContextLoggedIn;
+            bool isLoggedIn = SecurityHelper.IsLoggedIn;
 
             switch (errorHandling)
             {
