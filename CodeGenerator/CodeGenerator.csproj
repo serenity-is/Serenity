@@ -111,6 +111,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="StringInflector.cs" />
     <Compile Include="EntityCodeGenerator.cs" />
     <Compile Include="RowGenerator.cs" />
     <Compile Include="GeneratorModels.cs" />

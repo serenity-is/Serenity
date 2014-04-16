@@ -33,6 +33,14 @@ namespace Serenity.CodeGenerator
             return str2.Length + 1;
         }
 
+        public static string JF(string join, string field)
+        {
+            if (join.ToLowerInvariant() == field.ToLowerInvariant())
+                return field;
+            else
+                return join + "_" + field;
+        }
+
         public static EntityCodeGenerationModel GenerateModel(IDbConnection connection, string tableSchema, string table,
             string module, string schema, string entityClass, string permission)
         {
@@ -57,6 +65,8 @@ namespace Serenity.CodeGenerator
             model.FieldPrefix = fields.First().FieldName.Substring(0, prefix);
 
             var identity = fields.Find(f => f.IsIdentity == true);
+            if (identity == null)
+                identity = fields.Find(f => f.IsPrimaryKey == true);
             if (identity != null)
                 model.Identity = GenerateVariableName(identity.FieldName.Substring(prefix));
             else
@@ -124,6 +134,7 @@ namespace Serenity.CodeGenerator
                         {
                             Type = ft,
                             Ident = GenerateVariableName(f.FieldName.Substring(prefix)),
+                            Title = Inflector.Inflector.Titleize(f.FieldName.Substring(prefix)),
                             Name = f.FieldName,
                             IsValueType = ft != "String" && ft != "Stream",
                             Size = f.Size == 0 ? (Int32?)null : f.Size,
@@ -160,6 +171,7 @@ namespace Serenity.CodeGenerator
                 {
                     Type = fieldType,
                     Ident = GenerateVariableName(field.FieldName.Substring(prefix)),
+                    Title = Inflector.Inflector.Titleize(field.FieldName.Substring(prefix)),
                     Name = field.FieldName,
                     Flags = flags,
                     IsValueType = fieldType != "String" && fieldType != "Stream",
@@ -201,6 +213,7 @@ namespace Serenity.CodeGenerator
                         {
                             Type = kType,
                             Ident = GenerateVariableName(frg.FieldName.Substring(frgPrefix)),
+                            Title = Inflector.Inflector.Titleize(JF(j.Name, frg.FieldName.Substring(frgPrefix))),
                             Name = frg.FieldName,
                             Flags = flags,
                             IsValueType = kType != "String" && kType != "Stream",
@@ -250,7 +263,9 @@ namespace Serenity.CodeGenerator
 
         public static string GenerateVariableName(string fieldName)
         {
-            string[] strArray = fieldName.Trim().Split(new char[1] { '_' });
+            return Inflector.Inflector.Pascalize(fieldName);
+
+            /*string[] strArray = fieldName.Trim().Split(new char[1] { '_' });
             string str1 = string.Empty;
             foreach (string s in strArray)
             {
@@ -259,7 +274,7 @@ namespace Serenity.CodeGenerator
                     str2 = !(str2 == "id") ? ((object)char.ToUpper(str2[0], CultureInfo.InvariantCulture)).ToString() + ((object)str2.Remove(0, 1)).ToString() : "ID";
                 str1 = str1 + str2;
             }
-            return str1;
+            return str1;*/
         }
 
         public static string ClassNameFromTableName(string tableName)

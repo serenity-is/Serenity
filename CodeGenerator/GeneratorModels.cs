@@ -33,6 +33,7 @@ namespace Serenity.CodeGenerator
         public string Type { get; set; }
         public string Ident { get; set; }
         public string Name { get; set; }
+        public string Title { get; set; }
         public string Flags { get; set; }
         public string ForeignTable { get; set; }
         public string ForeignField { get; set; }

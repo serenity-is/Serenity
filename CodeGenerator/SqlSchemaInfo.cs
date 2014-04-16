@@ -34,6 +34,8 @@ namespace Serenity.CodeGenerator
                 result.Add(new Tuple<string, string>(schema, tableName));
             }
 
+            result.Sort();
+
             return result;
         }
 
