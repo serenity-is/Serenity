@@ -10,7 +10,7 @@ namespace @(Model.RootNamespace)@(dotModule)
     using System.Collections.Generic;
 
     [IdProperty("@Model.Identity")@if (Model.NameField != null) {<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
-    [FormKey("@(moduleDot)@(Model.ClassName)"), LocalTextPrefix("@(dotModule).@(Model.ClassName)"), Service("@(moduleSlash)@(Model.ClassName)")]
+    [FormKey("@(moduleDot)@(Model.ClassName)"), LocalTextPrefix("@(moduleDot)@(Model.ClassName)"), Service("@(moduleSlash)@(Model.ClassName)")]
     public class @(Model.ClassName)Dialog : EntityDialog<@(Model.RowClassName)>
     {
     }
