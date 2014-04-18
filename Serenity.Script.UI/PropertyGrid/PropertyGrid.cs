@@ -461,7 +461,7 @@ namespace Serenity
                     (Mode == PropertyGridMode.Update && !item.Updatable);
 
                 SetReadOnly(editor, readOnly);
-                SetRequired(editor, !readOnly && !item.OneWay && item.Required && 
+                SetRequired(editor, !readOnly && item.Required && 
                     (item.EditorType != "Boolean"));
             }
         }
