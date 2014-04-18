@@ -95,5 +95,26 @@ namespace Serenity.Testing
 
             return sbAll.ToString();
         }
+
+        public static string GenerateInsertStatements(IDbConnection connection, string query, string table = null)
+        {
+            if (table == null)
+            {
+                var x = query.Replace("\r", "").Replace("\n", " ");
+                var idx = x.IndexOf("from ", StringComparison.OrdinalIgnoreCase);
+                if (idx >= 0)
+                {
+                    table = x.Substring(idx + 5).Trim();
+                    idx = table.IndexOf(" ");
+                    if (idx >= 0)
+                        table = table.Substring(0, idx).Trim();
+                }
+
+                table = table ?? "SomeTable";
+            }
+
+            using (var reader = SqlHelper.ExecuteReader(connection, query))
+                return GenerateInsertStatements(reader, table);
+        }
     }
 }
