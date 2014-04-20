@@ -1,11 +1,12 @@
 ﻿using jQueryApi;
 using Serenity.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Maskeli Giriş", typeof(MaskedEditorOptions))]
+    [Editor, DisplayName("Maskeli Giriş"), OptionsType(typeof(MaskedEditorOptions))]
     [Element("<input type=\"text\"/>")]
     public class MaskedEditor : Widget<MaskedEditorOptions>, IStringValue
     {

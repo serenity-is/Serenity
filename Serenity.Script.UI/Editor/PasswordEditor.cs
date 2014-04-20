@@ -1,10 +1,11 @@
 ﻿using jQueryApi;
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Şifre")]
+    [Editor, DisplayName("Şifre")]
     public class PasswordEditor : StringEditor
     {
         public PasswordEditor(jQueryObject input)

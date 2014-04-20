@@ -1,11 +1,12 @@
 ﻿using jQueryApi;
 using Serenity.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Çok Satırlı Metin", typeof(TextAreaEditorOptions))]
+    [Editor, DisplayName("Çok Satırlı Metin"), OptionsType(typeof(TextAreaEditorOptions))]
     [Element("<textarea />")]
     public class TextAreaEditor : Widget<TextAreaEditorOptions>, IStringValue
     {

@@ -1,10 +1,9 @@
 ﻿using jQueryApi;
-using System;
-using System.Runtime.CompilerServices;
+using System.ComponentModel;
 
 namespace Serenity
 {
-    [Editor("Metin")]
+    [Editor, DisplayName("Metin")]
     [Element("<input type=\"text\"/>")]
     public class StringEditor : Widget<object>, IStringValue
     {

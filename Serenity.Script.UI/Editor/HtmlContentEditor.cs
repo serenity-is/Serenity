@@ -3,12 +3,13 @@ using Serenity.ComponentModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Html;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Html İçerik", typeof(HtmlContentEditorOptions))]
+    [Editor, DisplayName("Html İçerik"), OptionsType(typeof(HtmlContentEditorOptions))]
     [Element("<textarea />")]
     public class HtmlContentEditor : Widget<HtmlContentEditorOptions>, IStringValue
     {

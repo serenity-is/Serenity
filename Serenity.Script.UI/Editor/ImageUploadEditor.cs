@@ -2,11 +2,12 @@
 using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Resim Yükleme", typeof(ImageUploadEditorOptions))]
+    [Editor, DisplayName("Resim Yükleme"), OptionsType(typeof(ImageUploadEditorOptions))]
     [Element("<div/>")]
     public class ImageUploadEditor : Widget<ImageUploadEditorOptions>, IGetEditValue, ISetEditValue, IReadOnly
     {

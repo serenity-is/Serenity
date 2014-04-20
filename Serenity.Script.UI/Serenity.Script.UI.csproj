@@ -84,6 +84,7 @@
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
     <Compile Include="PropertyGrid\Attributes\InsertableAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\ReadOnlyAttribute.cs" />
+    <Compile Include="PropertyGrid\ReflectionUtils.cs" />
     <Compile Include="PropertyGrid\EditorTypeCache.cs" />
     <Compile Include="PropertyGrid\Attributes\HiddenAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\HintAttribute.cs" />

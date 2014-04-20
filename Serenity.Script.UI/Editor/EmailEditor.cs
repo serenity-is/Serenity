@@ -1,13 +1,14 @@
 ﻿using jQueryApi;
 using Serenity.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Html;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Serenity
 {
-    [Editor("E-posta")]
+    [Editor, DisplayName("E-posta")]
     [Element("<input type=\"text\"/>")]
     public class EmailEditor : Widget<EmailEditorOptions>, IStringValue
     {

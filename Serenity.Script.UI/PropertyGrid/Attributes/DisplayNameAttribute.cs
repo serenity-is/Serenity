@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Serenity.ComponentModel
+namespace System.ComponentModel
 {
     public class DisplayNameAttribute : Attribute
     {

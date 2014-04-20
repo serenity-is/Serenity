@@ -1,10 +1,12 @@
 ﻿using jQueryApi;
+using Serenity.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Checkbox")]
+    [Editor, DisplayName("Checkbox")]
     [Element("<input type=\"checkbox\"/>")]
     public class BooleanEditor : Widget<object>, IBooleanValue
     {

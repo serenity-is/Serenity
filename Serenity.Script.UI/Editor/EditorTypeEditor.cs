@@ -1,11 +1,13 @@
 ﻿using jQueryApi;
+using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Editör Tipi")]
+    [Editor, DisplayName("Editör Tipi")]
     [Element("<input type=\"hidden\" />")]
     public class EditorTypeEditor : SelectEditor, IStringValue
     {
@@ -22,7 +24,7 @@ namespace Serenity
             {
                 editorTypeList = new List<object>();
                 foreach (var info in EditorTypeCache.RegisteredTypes)
-                    editorTypeList.Add(new object[] { info.Key, info.Value.Attribute.DisplayName });
+                    editorTypeList.Add(new object[] { info.Key, info.Value.DisplayName });
 
                 editorTypeList.Sort((x, y) =>
                 {

@@ -1,14 +1,14 @@
 ﻿using jQueryApi;
-using Serenity.ComponentModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Html;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Html İçerik (Rapor Uyumlu Kısıtlı Set)", typeof(HtmlContentEditorOptions))]
+    [Editor, DisplayName("Html İçerik (Rapor Uyumlu Kısıtlı Set)"), OptionsType(typeof(HtmlContentEditorOptions))]
     [Element("<textarea />")]
     public class HtmlReportContentEditor : HtmlContentEditor, IStringValue
     {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Html;
 using System.Runtime.CompilerServices;
 
@@ -11,7 +12,8 @@ namespace Serenity
     public class EditorTypeInfo
     {
         public Type Type;
-        public EditorAttribute Attribute;
+        public string DisplayName;
+        public Type OptionsType;
     }
 
     public class EditorTypeCache
@@ -48,7 +50,7 @@ namespace Serenity
 
                     var attr = type.GetCustomAttributes(typeof(EditorAttribute), false);
                     if (attr != null && attr.Length > 0)
-                        RegisterType(type, attr[0] as EditorAttribute);
+                        RegisterType(type);
                 }
                 else
                 {
@@ -58,18 +60,29 @@ namespace Serenity
             }
         }
 
-        private static void RegisterType(Type type, EditorAttribute attr)
+        private static void RegisterType(Type type)
         {
             string name = type.FullName;
             var idx = name.IndexOf('.');
             if (idx >= 0)
                 name = name.Substr(idx + 1);
 
-            registeredTypes[name] = new EditorTypeInfo
+            var info = new EditorTypeInfo
             {
-                Type = type,
-                Attribute = attr
+                Type = type
             };
+
+            var displayAttr = type.GetCustomAttributes(typeof(DisplayNameAttribute), false);
+            if (displayAttr != null)
+                info.DisplayName = ((DisplayNameAttribute)displayAttr[0]).DisplayName;
+            else
+                info.DisplayName = type.FullName;
+
+            var optionsAttr = type.GetCustomAttributes(typeof(OptionsTypeAttribute), false);
+            if (optionsAttr != null)
+                info.OptionsType = ((OptionsTypeAttribute)optionsAttr[0]).OptionsType;
+
+            registeredTypes[name] = info;
         }
 
         public static JsDictionary<string, EditorTypeInfo> RegisteredTypes

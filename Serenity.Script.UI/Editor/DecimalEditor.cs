@@ -1,11 +1,12 @@
 ﻿using jQueryApi;
 using Serenity.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Ondalıklı Sayı", typeof(DecimalEditorOptions))]
+    [Editor, DisplayName("Ondalıklı Sayı"), OptionsType(typeof(DecimalEditorOptions))]
     [Element("<input type=\"text\"/>")]
     public class DecimalEditor : Widget<DecimalEditorOptions>, IDoubleValue
     {

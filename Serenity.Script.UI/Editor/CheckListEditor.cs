@@ -2,11 +2,12 @@
 using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Checkbox'lı Liste", typeof(CheckListEditorOptions))]
+    [Editor, DisplayName("Checkbox'lı Liste"), OptionsType(typeof(CheckListEditorOptions))]
     [Element("<ul/>")]
     public abstract class CheckListEditor : Widget<CheckListEditorOptions>, IGetEditValue, ISetEditValue
     {

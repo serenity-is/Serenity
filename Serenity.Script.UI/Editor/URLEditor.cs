@@ -1,10 +1,12 @@
 ﻿using jQueryApi;
+using Serenity.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("URL")]
+    [Editor, DisplayName("URL")]
     public class URLEditor : StringEditor
     {
         public URLEditor(jQueryObject input)

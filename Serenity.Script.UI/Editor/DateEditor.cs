@@ -1,11 +1,12 @@
 ﻿using jQueryApi;
 using jQueryApi.UI.Widgets;
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Tarih")]
+    [Editor, DisplayName("Tarih")]
     [Element("<input type=\"text\"/>")]
     public class DateEditor : Widget<object>, IStringValue
     {

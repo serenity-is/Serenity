@@ -1,13 +1,14 @@
 ﻿using jQueryApi;
 using Serenity.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Html;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Serenity
 {
-    [Editor("Telefon", typeof(PhoneEditorOptions))]
+    [Editor, DisplayName("Telefon"), OptionsType(typeof(PhoneEditorOptions))]
     [Element("<input type=\"text\"/>")]
     public class PhoneEditor : Widget<PhoneEditorOptions>, IStringValue
     {

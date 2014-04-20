@@ -180,10 +180,13 @@ namespace Serenity
                 element.Attribute("name", item.Name ?? "");
 
             object editorParams = item.EditorParams;
-            var editorAttribute = editorType.GetCustomAttributes(typeof(EditorAttribute), false);
-            if (editorAttribute != null && editorAttribute.Length == 1 && editorAttribute[0].As<EditorAttribute>().OptionsType != null)
-                editorParams = jQuery.ExtendObject(Activator.CreateInstance(editorAttribute[0].As<EditorAttribute>().OptionsType),
-                    item.EditorParams);
+            Type optionsType = null;
+            var optionsAttr = editorType.GetCustomAttributes(typeof(OptionsTypeAttribute), false);
+            if (optionsAttr != null && optionsAttr.Length == 1)
+                optionsType = optionsAttr[0].As<OptionsTypeAttribute>().OptionsType;
+
+            if (optionsType != null)
+                editorParams = jQuery.ExtendObject(Activator.CreateInstance(optionsType), item.EditorParams);
 
             Widget editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
 

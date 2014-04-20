@@ -2,11 +2,12 @@
 using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Açılır Liste", typeof(SelectEditorOptions))]
+    [Editor, DisplayName("Açılır Liste"), OptionsType(typeof(SelectEditorOptions))]
     [Element("<input type=\"hidden\"/>")]
     public abstract class SelectEditor : Select2Editor<SelectEditorOptions, Select2Item>, IStringValue
     {

@@ -1,11 +1,12 @@
 ﻿using jQueryApi;
 using Serenity.ComponentModel;
 using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Tamsayı", typeof(IntegerEditorOptions))]
+    [Editor, DisplayName("Tamsayı"), OptionsType(typeof(IntegerEditorOptions))]
     [Element("<input type=\"text\"/>")]
     public class IntegerEditor : Widget<IntegerEditorOptions>, IDoubleValue
     {

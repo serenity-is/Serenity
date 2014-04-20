@@ -1,12 +1,14 @@
 ﻿using jQueryApi;
 using jQueryApi.UI.Widgets;
+using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor("Tarih/Zaman")]
+    [Editor, DisplayName("Tarih/Zaman")]
     [Element("<input type=\"text\"/>")]
     public class DateTimeEditor : Widget, IStringValue
     {
