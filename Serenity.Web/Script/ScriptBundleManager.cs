@@ -25,6 +25,11 @@ namespace Serenity.Web
         private static Dictionary<string, ConcatenatedScript> bundleByKey;
         private const string errorLines = "\r\n//\r\n//!!!ERROR: {0}!!!\r\n//\r\n";
 
+        public static void Reset()
+        {
+            isInitialized = false;
+        }
+
         public static void Initialize()
         {
             if (isInitialized)
@@ -47,7 +52,7 @@ namespace Serenity.Web
                     settings.Bundles.Count == 0)
                 {
                     settings.Bundles = JsConfigHelper.LoadConfig<Dictionary<string, string[]>>(
-                        "~/config/ScriptBundles.jsconfig");
+                        "~/Scripts/Site/ScriptBundles.js");
 
                     if (settings.Bundles == null ||
                         settings.Bundles.Count == 0)
@@ -113,8 +118,12 @@ namespace Serenity.Web
         public static void ScriptsChanged()
         {
             if (isEnabled && bundleByKey != null)
+            {
                 foreach (var bundle in bundleByKey.Values)
                     bundle.Changed();
+
+                Reset();
+            }
         }
 
         public static string GetScriptBundle(string scriptUrl)
