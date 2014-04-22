@@ -8,7 +8,7 @@ namespace Serenity
 {
     [Editor, DisplayName("Tarih")]
     [Element("<input type=\"text\"/>")]
-    public class DateEditor : Widget<object>, IStringValue
+    public class DateEditor : Widget<object>, IStringValue, IReadOnly
     {
         public DateEditor(jQueryObject input)
             : base(input, new object())
@@ -55,6 +55,30 @@ namespace Serenity
                 aSep = Q.Culture.DecimalSeparator == "." ? "," : ".",
                 aPad = true
             };
+        }
+
+        public bool ReadOnly
+        {
+            get
+            {
+                return this.element.HasClass("readonly");
+            }
+            set
+            {
+                if (value != ReadOnly)
+                {
+                    if (value)
+                    {
+                        this.element.AddClass("readonly").Attribute("readonly", "readonly");
+                        this.element.NextAll(".ui-datepicker-trigger").CSS("opacity", "0.1");
+                    }
+                    else
+                    {
+                        this.element.RemoveClass("readonly").RemoveAttr("readonly");
+                        this.element.NextAll(".ui-datepicker-trigger").CSS("opacity", "1");
+                    }
+                }
+            }
         }
     }
 }
