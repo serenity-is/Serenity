@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Serenity.Reporting
 {
-    public interface ICustomFileName : IReport
+    public interface ICustomFileName
     {
         string GetFileName();
     }
