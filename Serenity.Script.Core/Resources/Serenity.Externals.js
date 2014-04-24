@@ -665,6 +665,8 @@ Q$Externals.toId = function(id) {
 }
 
 Q$Externals.jQueryValidationInitialization = function () {
+    Serenity.CustomValidation.registerValidationMethods();
+
     jQuery.validator.addMethod("xss", function (value, element) {
         if (value.length == 0)
             return true;
