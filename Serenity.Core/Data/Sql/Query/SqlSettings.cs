@@ -23,7 +23,21 @@ namespace Serenity.Data
 
         public static bool UseScopeIdentity(this SqlDialect dialect)
         {
-            return dialect.HasFlag(SqlDialect.MsSql);
+            return dialect.HasFlag(SqlDialect.MsSql) || dialect.HasFlag(SqlDialect.Sqlite);
+        }
+
+        public static string ScopeIdentityExpression(this SqlDialect dialect)
+        {
+            if (dialect.HasFlag(SqlDialect.MsSql))
+            {
+                return "SCOPE_IDENTITY()";
+            }
+            if (dialect.HasFlag(SqlDialect.Sqlite))
+            {
+                return "last_insert_rowid()";
+            }
+
+            throw new NotImplementedException();
         }
 
         public static bool MultipleResultsets(this SqlDialect dialect)

@@ -56,21 +56,23 @@
                     return Convert.ToInt64(param.Value);
                 }
             }
-            else if (((IQueryWithParams)query).Dialect.UseScopeIdentity())
+            
+            if (((IQueryWithParams)query).Dialect.UseScopeIdentity())
             {
-                queryText += ";\nSELECT SCOPE_IDENTITY() AS IDCOLUMNVALUE";
+                var scopeIdentityExpression = ((IQueryWithParams) query).Dialect.ScopeIdentityExpression();
+
+                queryText += ";\nSELECT " + scopeIdentityExpression + " AS IDCOLUMNVALUE";
 
                 using (IDataReader reader = ExecuteReader(connection, queryText, query.Params))
                 {
                     if (reader.Read() &&
                         !reader.IsDBNull(0))
                         return Convert.ToInt64(reader.GetValue(0));
-                    else
-                        return null;
+                    return null;
                 }
             }
-            else
-                throw new NotImplementedException();
+            
+            throw new NotImplementedException();
         }
 
         /// <summary>
