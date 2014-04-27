@@ -225,6 +225,7 @@ namespace Serenity.CodeGenerator
                     fieldInfo.Size = 0;
 
                     if (fieldInfo.DataType != SqlInt &&
+                        fieldInfo.DataType != SqlInteger &&
                         fieldInfo.DataType != SqlReal &&
                         fieldInfo.DataType != SqlFloat &&
                         fieldInfo.DataType != SqlTinyInt &&
@@ -306,6 +307,7 @@ namespace Serenity.CodeGenerator
         const string SqlNumeric = "numeric";
         const string SqlBigInt = "bigint";
         const string SqlInt = "int";
+        const string SqlInteger = "integer";
         const string SqlMoney = "money";
         const string SqlNChar = "nchar";
         const string SqlNVarChar = "nvarchar";
@@ -324,7 +326,7 @@ namespace Serenity.CodeGenerator
         {
             if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlNChar || sqlTypeName == SqlVarChar || sqlTypeName == SqlChar)
                 return "String";
-            else if (sqlTypeName == SqlInt)
+            else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger)
                 return "Int32";
             else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp)
                 return "Int64";
