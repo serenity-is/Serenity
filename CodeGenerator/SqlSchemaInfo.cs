@@ -308,6 +308,7 @@ namespace Serenity.CodeGenerator
         const string SqlBigInt = "bigint";
         const string SqlInt = "int";
         const string SqlInteger = "integer";
+        const string SqlDouble = "double";
         const string SqlMoney = "money";
         const string SqlNChar = "nchar";
         const string SqlNVarChar = "nvarchar";
@@ -328,7 +329,7 @@ namespace Serenity.CodeGenerator
                 return "String";
             else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger)
                 return "Int32";
-            else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp)
+            else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp || sqlTypeName == SqlDouble)
                 return "Int64";
             else if (sqlTypeName == SqlMoney || sqlTypeName == SqlDecimal || sqlTypeName == SqlNumeric)
                 return "Decimal";
