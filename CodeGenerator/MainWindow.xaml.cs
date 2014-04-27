@@ -144,11 +144,14 @@ namespace Serenity.CodeGenerator
         private IDbConnection CreateConnection(string connStr)
         {
             string provider = "System.Data.SqlClient";
+            SqlSchemaInfo.Dialect = SqlDialect.MsSql;
             var idx = connStr.IndexOf("||");
             if (idx >= 0)
             {
                 provider = connStr.Substring(idx + 2).Trim();
                 connStr = connStr.Substring(0, idx).Trim();
+                if (provider == "System.Data.SQLite")
+                    SqlSchemaInfo.Dialect = SqlDialect.Sqlite;
             }
 
             return SqlConnections.New(connStr, provider);

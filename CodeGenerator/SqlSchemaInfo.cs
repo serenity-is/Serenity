@@ -8,6 +8,7 @@ namespace Serenity.CodeGenerator
 {
     public class SqlSchemaInfo
     {
+        public static SqlDialect Dialect { get; set; } 
 
         public static string InformationSchema(IDbConnection connection)
         {
@@ -138,6 +139,34 @@ namespace Serenity.CodeGenerator
         {
             var inf = InformationSchema(connection);
             List<ForeignKeyInfo> foreignKeyInfos = new List<ForeignKeyInfo>();
+
+            if (Dialect.HasFlag(SqlDialect.Sqlite))
+            {
+                try
+                {
+                    using (var reader = 
+                        SqlHelper.ExecuteReader(connection, 
+                        (String.Format("PRAGMA foreign_key_list({0});", tableName))))
+                    {
+                        while (reader.Read())
+                        {
+                            ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
+
+                            foreignKeyInfo.SourceTable = tableName;
+                            foreignKeyInfo.SourceColumn = reader.GetString(3);
+                            foreignKeyInfo.ForeignTable = reader.GetString(2);
+                            foreignKeyInfo.ForeignColumn = reader.GetString(4);
+
+                            foreignKeyInfos.Add(foreignKeyInfo);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
+                return foreignKeyInfos;
+            }
 
             try
             {
@@ -329,7 +358,7 @@ namespace Serenity.CodeGenerator
                 return "String";
             else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger)
                 return "Int32";
-            else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp || sqlTypeName == SqlDouble)
+            else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp)
                 return "Int64";
             else if (sqlTypeName == SqlMoney || sqlTypeName == SqlDecimal || sqlTypeName == SqlNumeric)
                 return "Decimal";
@@ -339,7 +368,7 @@ namespace Serenity.CodeGenerator
                 return "Boolean";
             else if (sqlTypeName == SqlReal)
                 return "Single";
-            else if (sqlTypeName == SqlFloat)
+            else if (sqlTypeName == SqlFloat || sqlTypeName == SqlDouble)
                 return "Double";
             else if (sqlTypeName == SqlSmallInt || sqlTypeName == SqlTinyInt)
                 return "Int16";
