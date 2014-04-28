@@ -4,6 +4,11 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    using System.Collections.Generic;
+    using System.Html;
+
+    public delegate string CustomValidationRule(jQueryObject element);
+
     public static class WidgetExtensions
     {
         public static TWidget GetWidget<TWidget>(this jQueryObject element) where TWidget : Widget
@@ -82,6 +87,33 @@ namespace Serenity
         public static jQueryObject Bind2(this jQueryObject obj, string eventName, Action<jQueryEvent, dynamic> handler)
         {
             return null;
+        }
+
+        public static jQueryObject AddValidationRule(this Widget widget, string eventClass,
+            Func<jQueryObject, string> rule)
+        {
+            return AddValidationRule(widget.Element, eventClass, rule);
+        }
+
+        public static jQueryObject AddValidationRule(this jQueryObject element, string eventClass,
+            Func<jQueryObject, string> rule)
+        {
+            if (element.Length == 0)
+                return element;
+
+            if (rule == null)
+                throw new Exception("rule is null!");
+
+            element.AddClass("customValidate")
+                .Bind("customValidate." + eventClass, rule.As<jQueryEventHandler>());
+
+            return element;
+        }
+
+        public static jQueryObject RemoveValidationRule(this jQueryObject element, string eventClass)
+        {
+            element.Unbind("customValidate." + eventClass);
+            return element;
         }
     }
 }

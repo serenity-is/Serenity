@@ -25,9 +25,6 @@ namespace Serenity
 
             AddCssClass();
 
-            if (this is ICustomValidate)
-                this.element.AddClass("customValidate");
-
             OnInit();
         }
 
