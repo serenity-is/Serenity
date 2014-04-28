@@ -32,7 +32,7 @@ namespace Serenity.Web.HttpHandlers
             if (script == null)
                 throw new HttpException(404, "File not found!");
 
-            int expiresOffset = 10; // Cache for 10 days in browser cache
+            int expiresOffset = 365; // Cache for 365 days in browser cache
             response.ContentType = "text/javascript";
             response.Charset = "utf-8";
 
