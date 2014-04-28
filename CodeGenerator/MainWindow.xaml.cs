@@ -38,13 +38,11 @@ namespace Serenity.CodeGenerator
                 }
 
 
-            Templates.LocationRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Views");
             ProjectRoot = System.IO.Path.GetFullPath(@"..\..\..\..\!!!Beni Sil!!!");
         }
 
         public BindingList<string> Tables { get { return _tables; } }
         public string ProjectRoot { get; set; }
-        public string TemplatesRoot { get { return Templates.LocationRoot; } set { Templates.LocationRoot = value; } }
 
         private string _entitySingular;
 

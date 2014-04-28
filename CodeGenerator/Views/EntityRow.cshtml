@@ -1,4 +1,5 @@
-﻿@{
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
      
@@ -48,7 +49,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     var attrString = String.Join(", ", attrs.ToArray());
 <text>
 @if (!String.IsNullOrEmpty(attrString)) {
-<text>        [@Raw(attrString)]
+<text>        [@attrString]
 </text>}        public @x.Type@(x.IsValueType ? "?" : "") @x.Ident
         {
             get { return Fields.@(x.Ident)[this]; }
@@ -57,7 +58,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 </text>}
 @foreach (var x in Model.Joins){foreach (var y in x.Fields){
 <text>
-        [DisplayName("@Raw(y.Title)"), Expression("@Raw("j" + x.Name + "." + y.Name)")]
+        [DisplayName("@y.Title"), Expression("@("j" + x.Name + "." + y.Name)")]
         public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident))
         {
             get { return Fields.@(jf(x.Name, y.Ident))[this]; }
@@ -96,7 +97,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 }
 
             public RowFields()
-                : base("@Model.Tablename"@Raw(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
+                : base("@Model.Tablename"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
             {
                 LocalTextPrefix = "@(moduleDot)@(Model.ClassName)";
             }

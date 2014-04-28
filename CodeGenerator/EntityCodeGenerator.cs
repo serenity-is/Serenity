@@ -168,7 +168,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateRow()
         {
-            CreateNewSiteWebFile(Templates.Render("EntityRow", model),
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityRow(), model),
                 Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
         }
 
@@ -193,7 +193,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateForm()
         {
-            CreateNewSiteWebFile(Templates.Render("EntityForm", new 
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityForm(), new 
             { 
                 ClassName = model.ClassName, 
                 RowClassName = model.RowClassName,
@@ -206,7 +206,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateRepository()
         {
-            CreateNewSiteWebFile(Templates.Render("EntityRepository", new
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityRepository(), new
             {
                 RootNamespace = model.RootNamespace,
                 ClassName = model.ClassName,
@@ -218,7 +218,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateEndpoint()
         {
-            CreateNewSiteWebFile(Templates.Render("EntityEndpoint", new
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityEndpoint(), new
             {
                 Schema = model.Schema,
                 RootNamespace = model.RootNamespace,
@@ -231,7 +231,7 @@ namespace Serenity.CodeGenerator
 
         private void GeneratePageController()
         {
-            CreateNewSiteWebFile(Templates.Render("EntityPageController", new 
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityPageController(), new 
             {
                 Schema = model.Schema,
                 RootNamespace = model.RootNamespace,
@@ -245,7 +245,7 @@ namespace Serenity.CodeGenerator
 
         private void GeneratePageIndex()
         {
-            CreateNewSiteWebFile(Templates.Render("EntityPageIndex", new
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityPageIndex(), new
             {
                 Schema = model.Schema,
                 RootNamespace = model.RootNamespace,
@@ -265,14 +265,14 @@ namespace Serenity.CodeGenerator
 
         private void GenerateScriptGrid()
         {
-            CreateNewSiteScriptFile(Templates.Render("EntityScriptGrid", model),
+            CreateNewSiteScriptFile(Templates.Render(new Views.EntityScriptGrid(), model),
                 Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Grid.cs")));
         }
 
 
         private void GenerateScriptDialog()
         {
-            CreateNewSiteScriptFile(Templates.Render("EntityScriptDialog", model),
+            CreateNewSiteScriptFile(Templates.Render(new Views.EntityScriptDialog(), model),
                 Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Dialog.cs")));
         }
 
