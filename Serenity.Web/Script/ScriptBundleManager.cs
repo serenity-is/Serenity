@@ -61,6 +61,7 @@ namespace Serenity.Web
 
                 var bundleKeyBySourceUrlNew = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 var bundleByKeyNew = new Dictionary<string, ConcatenatedScript>(StringComparer.OrdinalIgnoreCase);
+                bool minimize = settings.Minimize == true;
 
                 foreach (var pair in settings.Bundles)
                 {
@@ -93,6 +94,13 @@ namespace Serenity.Web
                             var sourcePath = HttpContext.Current.Server.MapPath(sourceUrl);
                             if (!File.Exists(sourcePath))
                                 return String.Format(errorLines, String.Format("File {0} is not found!", sourcePath));
+
+                            if (minimize)
+                            {
+                                var minPath = Path.ChangeExtension(sourcePath, ".min.js");
+                                if (File.Exists(minPath))
+                                    sourcePath = minPath;
+                            }
 
                             using (StreamReader sr = new StreamReader(sourcePath))
                                 return sr.ReadToEnd();
