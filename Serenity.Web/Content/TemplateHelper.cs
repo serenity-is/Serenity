@@ -31,10 +31,7 @@ namespace Serenity.Web
             if (controlPath != null && controlPath.EndsWith(".cshtml", System.StringComparison.InvariantCultureIgnoreCase))
             {
                 data = data ?? new ViewDataDictionary(new Dictionary<string, object>());
-                var httpBase = new FakeHttpContext(
-                    new FakePrincipal(new FakeIdentity("dummy"), new string[0]), 
-                    new NameValueCollection(), new NameValueCollection(),
-                    new HttpCookieCollection(), new SessionStateItemCollection());
+                var httpBase = new HttpContextWrapper(HttpContext.Current);
 
                 var controller = new FakeController();
                 var controllerContext = new ControllerContext(httpBase, new RouteData(), controller);
