@@ -9,7 +9,7 @@ namespace Serenity
 {
     public static partial class Q
     {
-        [AlternateSignature]
+        [InlineCode("Q.serviceCall({options})")]
         public static extern XmlHttpRequest ServiceCall(ServiceCallOptions options);
 
         [ScriptName("serviceCall"), IncludeGenericArguments(false)]
@@ -111,6 +111,7 @@ namespace Serenity
             return jQuery.Ajax(options.As<jQueryAjaxOptions>());
         }
 
+        [IncludeGenericArguments(false)]
         public static void ServiceRequest<TResponse>(string service, ServiceRequest request, Action<TResponse> onSuccess, ServiceCallOptions options = null)
             where TResponse: ServiceResponse
         {
