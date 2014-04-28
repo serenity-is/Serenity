@@ -8,6 +8,7 @@ namespace Serenity.CodeGenerator
 {
     public class SqlSchemaInfo
     {
+        public static SqlDialect Dialect { get; set; } 
 
         public static string InformationSchema(IDbConnection connection)
         {
@@ -139,6 +140,34 @@ namespace Serenity.CodeGenerator
             var inf = InformationSchema(connection);
             List<ForeignKeyInfo> foreignKeyInfos = new List<ForeignKeyInfo>();
 
+            if (Dialect.HasFlag(SqlDialect.Sqlite))
+            {
+                try
+                {
+                    using (var reader = 
+                        SqlHelper.ExecuteReader(connection, 
+                        (String.Format("PRAGMA foreign_key_list({0});", tableName))))
+                    {
+                        while (reader.Read())
+                        {
+                            ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
+
+                            foreignKeyInfo.SourceTable = tableName;
+                            foreignKeyInfo.SourceColumn = reader.GetString(3);
+                            foreignKeyInfo.ForeignTable = reader.GetString(2);
+                            foreignKeyInfo.ForeignColumn = reader.GetString(4);
+
+                            foreignKeyInfos.Add(foreignKeyInfo);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
+                return foreignKeyInfos;
+            }
+
             try
             {
                 // çift (ya da daha çok) alanlı constraint ler yapımıza uymuyor
@@ -225,6 +254,7 @@ namespace Serenity.CodeGenerator
                     fieldInfo.Size = 0;
 
                     if (fieldInfo.DataType != SqlInt &&
+                        fieldInfo.DataType != SqlInteger &&
                         fieldInfo.DataType != SqlReal &&
                         fieldInfo.DataType != SqlFloat &&
                         fieldInfo.DataType != SqlTinyInt &&
@@ -306,6 +336,8 @@ namespace Serenity.CodeGenerator
         const string SqlNumeric = "numeric";
         const string SqlBigInt = "bigint";
         const string SqlInt = "int";
+        const string SqlInteger = "integer";
+        const string SqlDouble = "double";
         const string SqlMoney = "money";
         const string SqlNChar = "nchar";
         const string SqlNVarChar = "nvarchar";
@@ -324,7 +356,7 @@ namespace Serenity.CodeGenerator
         {
             if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlNChar || sqlTypeName == SqlVarChar || sqlTypeName == SqlChar)
                 return "String";
-            else if (sqlTypeName == SqlInt)
+            else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger)
                 return "Int32";
             else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp)
                 return "Int64";
@@ -336,7 +368,7 @@ namespace Serenity.CodeGenerator
                 return "Boolean";
             else if (sqlTypeName == SqlReal)
                 return "Single";
-            else if (sqlTypeName == SqlFloat)
+            else if (sqlTypeName == SqlFloat || sqlTypeName == SqlDouble)
                 return "Double";
             else if (sqlTypeName == SqlSmallInt || sqlTypeName == SqlTinyInt)
                 return "Int16";

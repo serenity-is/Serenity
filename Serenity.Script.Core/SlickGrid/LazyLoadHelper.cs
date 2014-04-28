@@ -11,7 +11,8 @@ namespace Serenity
 
         public static void ExecuteOnceWhenShown(jQueryObject element, Action callback)
         {
-            string eventClass = "ExecuteOnceWhenShown" + (++autoIncrement);
+            ++autoIncrement;
+            string eventClass = "ExecuteOnceWhenShown" + autoIncrement;
 
             bool executed = false;
 

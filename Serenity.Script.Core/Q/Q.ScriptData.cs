@@ -125,6 +125,11 @@ namespace Serenity
             return ScriptData.Ensure("Lookup." + key).As<Lookup<TItem>>();
         }
 
+        public static void ReloadLookup(string key)
+        {
+            ScriptData.Reload("Lookup." + key);
+        }
+
         public static List<PropertyItem> GetForm(string key)
         {
             return ScriptData.Ensure("Form." + key).As<List<PropertyItem>>();

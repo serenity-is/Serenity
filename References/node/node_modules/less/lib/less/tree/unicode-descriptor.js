@@ -4,10 +4,12 @@ tree.UnicodeDescriptor = function (value) {
     this.value = value;
 };
 tree.UnicodeDescriptor.prototype = {
-    toCSS: function (env) {
-        return this.value;
+    type: "UnicodeDescriptor",
+    genCSS: function (env, output) {
+        output.add(this.value);
     },
-    eval: function () { return this }
+    toCSS: tree.toCSS,
+    eval: function () { return this; }
 };
 
 })(require('../tree'));
