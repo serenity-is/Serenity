@@ -10,22 +10,41 @@ using System.Web.UI;
 
 namespace Serenity.Web
 {
+    using System.Collections.Specialized;
+    using System.Web.Hosting;
+    using System.Web.SessionState;
+
+    public interface ITemplateRenderer
+    {
+        string Render(string controlPath, ViewDataDictionary data);
+    }
+
     public static class TemplateHelper
     {
         public static string RenderViewToString(string controlPath, ViewDataDictionary data)
         {
+            if (IoC.CanResolve<ITemplateRenderer>())
+                return IoC.Resolve<ITemplateRenderer>().Render(controlPath, data);
+
             StringBuilder sb = new StringBuilder();
 
             if (controlPath != null && controlPath.EndsWith(".cshtml", System.StringComparison.InvariantCultureIgnoreCase))
             {
                 data = data ?? new ViewDataDictionary(new Dictionary<string, object>());
-                var httpBase = new HttpContextWrapper(HttpContext.Current);
+                var httpBase = new FakeHttpContext(
+                    new FakePrincipal(new FakeIdentity("dummy"), new string[0]), 
+                    new NameValueCollection(), new NameValueCollection(),
+                    new HttpCookieCollection(), new SessionStateItemCollection());
+
                 var controller = new FakeController();
                 var controllerContext = new ControllerContext(httpBase, new RouteData(), controller);
 
                 var actualPath = controlPath;
                 if (actualPath.StartsWith("~/"))
-                    actualPath = Path.Combine(HttpRuntime.AppDomainAppPath, actualPath.Substring(2).Replace("/", "\\"));
+                {
+                    actualPath = Path.Combine(HostingEnvironment.ApplicationPhysicalPath,
+                        actualPath.Substring(2).Replace("/", "\\"));
+                }
 
                 if (!File.Exists(actualPath))
                     throw new ArgumentOutOfRangeException("controlPath", String.Format("controlPath: {0}", actualPath));
