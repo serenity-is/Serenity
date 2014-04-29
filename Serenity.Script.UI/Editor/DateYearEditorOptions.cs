@@ -23,10 +23,35 @@ namespace Serenity
                 return opt.Items;
 
             var years = new List<object>();
-            for (int i = opt.MinYear ; i <= opt.MaxYear; i++)
+
+            int minYear = DateTime.Now.Year;
+            int maxYear = DateTime.Now.Year;
+
+            if (opt.MinYear != null)
+            {
+                if (opt.MinYear.StartsWith("-"))
+                    minYear -= int.Parse(opt.MinYear.Substr(1), 10);
+                else if (opt.MinYear.StartsWith("+"))
+                    minYear += int.Parse(opt.MinYear.Substr(1), 10);
+                else
+                    minYear = int.Parse(opt.MinYear, 10);
+            }
+
+            if (opt.MaxYear != null)
+            {
+                if (opt.MaxYear.StartsWith("-"))
+                    maxYear -= int.Parse(opt.MaxYear.Substr(1), 10);
+                else if (opt.MaxYear.StartsWith("+"))
+                    maxYear += int.Parse(opt.MaxYear.Substr(1), 10);
+                else
+                    maxYear = int.Parse(opt.MaxYear, 10);
+            }
+
+            for (int i = minYear ; i <= maxYear; i++)
             {
                 years.Add(i.ToString());
             }
+
             return years;
         }
 
@@ -41,12 +66,12 @@ namespace Serenity
     {
         public DateYearEditorOptions()
         {
-            MinYear = DateTime.Now.Year - 10;
-            MaxYear = DateTime.Now.Year;
+            MinYear = "-10";
+            MaxYear = "+0";
         }
 
-        public int MinYear { get; set; }
-        public int MaxYear { get; set; }
+        public string MinYear { get; set; }
+        public string MaxYear { get; set; }
     }
 
 }
