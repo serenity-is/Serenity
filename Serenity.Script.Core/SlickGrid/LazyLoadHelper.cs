@@ -11,7 +11,7 @@ namespace Serenity
 
         public static void ExecuteOnceWhenShown(jQueryObject element, Action callback)
         {
-            ++autoIncrement;
+            autoIncrement++;
             string eventClass = "ExecuteOnceWhenShown" + autoIncrement;
 
             bool executed = false;
@@ -77,7 +77,8 @@ namespace Serenity
         public static void ExecuteEverytimeWhenShown(jQueryObject element, Action callback,
             bool callNowIfVisible)
         {
-            string eventClass = "ExecuteEverytimeWhenShown" + (++autoIncrement);
+            autoIncrement++;
+            string eventClass = "ExecuteEverytimeWhenShown";
 
             bool wasVisible = element.Is(":visible");
 

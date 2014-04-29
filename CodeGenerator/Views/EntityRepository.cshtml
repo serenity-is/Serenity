@@ -1,4 +1,5 @@
-﻿@{var dotModule = Model.Module == null ? "" : ("." + Model.Module);}
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{var dotModule = Model.Module == null ? "" : ("." + Model.Module);}
 
 namespace @(Model.RootNamespace)@(dotModule).Repositories
 {

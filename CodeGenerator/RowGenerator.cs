@@ -13,7 +13,7 @@ namespace Serenity.CodeGenerator
         public static string Generate(IDbConnection connection, string tableSchema, string table, string module, string schema, string entityClass, string permission)
         {
             var model = GenerateModel(connection, tableSchema, table, module, schema, entityClass, permission);
-            return Templates.Render("EntityRow", model);
+            return Templates.Render(new Views.EntityRow(), model);
         }
 
         private static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)

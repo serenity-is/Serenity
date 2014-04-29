@@ -13,10 +13,7 @@
             <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Tablo</TextBlock>
             <ComboBox Name="TablesCombo" ItemsSource="{Binding Path=Tables}" SelectionChanged="TablesCombo_SelectionChanged"></ComboBox>
         </DockPanel>
-        <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 4 0 0">
-            <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Şablon Dosyaları</TextBlock>
-            <TextBox Text="{Binding Path=TemplatesRoot}"></TextBox>
-        </DockPanel>
+        <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 4 0 0"/>
         <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 4 0 0">
             <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Proje Kök Klasörü</TextBlock>
             <TextBox Text="{Binding Path=ProjectRoot}"></TextBox>

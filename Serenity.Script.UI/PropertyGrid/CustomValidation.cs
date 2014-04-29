@@ -22,25 +22,30 @@ namespace Serenity
                     if (element == null || Q.IsTrue(result))
                         return result;
 
-                    Widget w = null;
-                    var data = jQuery.Select(element).GetData();
-                    foreach (var k in data.Keys)
-                        if (data[k] != null && 
-                            ((dynamic)data[k])["widgetName"] == k &&
-                            ((dynamic)data[k])["uniqueName"] != null)
-                        {
-                            w = data[k].As<Widget>();
-                        }
-
-                    if (w != null)
-                    {
-                        var customValidator = w as ICustomValidate;
-                        string message = customValidator.CustomValidate();
-                        jQuery.Select(element).Data("customValidationMessage", message);
-                        return message == null;
-                    }
-                    else 
+                    var events = jQuery.Instance._data(element, "events");
+                    if (events == null)
                         return true;
+
+                    var handlers = events.customValidate;
+                    if (handlers == null || handlers.length == 0)
+                        return true;
+
+                    var el = jQuery.Select(element);
+
+                    for (var i = 0; i < handlers.length; i++)
+                    {
+                        var handler = (handlers[i].handler as CustomValidationRule);
+                        if (handler != null)
+                        {
+                            var message = handler(el);
+                            if (message != null)
+                            {
+                                el.Data("customValidationMessage", message);
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
                 }, new Func<object, Element, string>((o, e) => {
                     return jQuery.Select(e).GetDataValue("customValidationMessage").As<string>();
                 }).As<string>());

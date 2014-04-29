@@ -8,7 +8,7 @@
     <ProjectGuid>{49704C9A-30A2-43DE-AE3D-D13073BA50A4}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CodeGenerator</RootNamespace>
+    <RootNamespace>Serenity.CodeGenerator</RootNamespace>
     <AssemblyName>CodeGenerator</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
@@ -78,9 +78,8 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.6.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RazorEngine, Version=3.4.1.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\packages\RazorEngine.3.4.1\lib\net45\RazorEngine.dll</HintPath>
+    <Reference Include="RazorGenerator.Templating">
+      <HintPath>$(SolutionDir)\packages\RazorGenerator.Templating.2.2.2\lib\net40\RazorGenerator.Templating.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -117,6 +116,46 @@
     <Compile Include="GeneratorModels.cs" />
     <Compile Include="SqlSchemaInfo.cs" />
     <Compile Include="Templates.cs" />
+    <Compile Include="Views\EntityEndpoint.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityEndpoint.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityForm.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityForm.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityPageController.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityPageController.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityPageIndex.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityPageIndex.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityRepository.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityRepository.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityRow.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityRow.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptDialog.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptDialog.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptGrid.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptGrid.cshtml</DependentUpon>
+    </Compile>
     <Page Include="AddConnectionStringWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -167,28 +206,36 @@
     </None>
     <AppDesigner Include="Properties\" />
     <None Include="Views\EntityScriptGrid.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptGrid.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityPageIndex.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityPageIndex.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityPageController.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityPageController.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityEndpoint.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityEndpoint.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityForm.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityForm.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityRow.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityRow.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityRepository.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityRepository.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityScriptDialog.cshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptDialog.generated.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
