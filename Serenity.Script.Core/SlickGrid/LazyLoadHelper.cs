@@ -78,7 +78,7 @@ namespace Serenity
             bool callNowIfVisible)
         {
             autoIncrement++;
-            string eventClass = "ExecuteEverytimeWhenShown";
+            string eventClass = "ExecuteEverytimeWhenShown" + autoIncrement;
 
             bool wasVisible = element.Is(":visible");
 
