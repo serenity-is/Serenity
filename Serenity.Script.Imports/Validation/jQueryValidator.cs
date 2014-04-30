@@ -329,17 +329,6 @@ namespace jQueryApi
         }
     }
 
-    [Imported, IgnoreNamespace]
-    public static class jQueryValidationExtensions
-    {
-        [InlineCode("{element}.valid()")]
-        public static bool Valid(this jQueryObject element)
-        {
-            return true;
-        }
-    }
-
-
     [Imported, Serializable]
     public class jQueryValidatorOptions
     {

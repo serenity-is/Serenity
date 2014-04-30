@@ -54,6 +54,21 @@ namespace Serenity
 
             return true;
         }
+
+        public static jQueryValidator GetValidator(this jQueryObject element)
+        {
+            var form = element.Closest("form");
+            if (form.Length == 0)
+                return null;
+
+            return (jQueryValidator)form.GetDataValue("validator");
+        }
+
+        [InlineCode("{element}.valid()")]
+        public static bool Valid(this jQueryObject element)
+        {
+            return true;
+        }
     }
 
 }

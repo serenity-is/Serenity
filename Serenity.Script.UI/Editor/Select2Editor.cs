@@ -37,7 +37,10 @@ namespace Serenity
             hidden.Bind2("change." + this.uniqueName, (e, x) =>
             {
                 if (e.HasOriginalEvent() || Q.IsFalse(x))
-                    hidden.Valid();
+                {
+                    if (hidden.GetValidator() != null)
+                        hidden.Valid();
+                }
             });
         }
 
