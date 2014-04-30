@@ -37,12 +37,25 @@ namespace Serenity
 
             var config = GetConfig();
             CKEditor.Replace(id, config);
+
+            this.AddValidationRule(this.uniqueName, e =>
+            {
+                if (e.HasClass("required"))
+                {
+                    var value = self.Value.TrimToNull();
+                    if (value == null)
+                        return Q.Text("Validation.Required");
+                }
+
+                return null;
+            });
         }
 
         protected virtual void InstanceReady(CKEditorEventArgs x)
         {
             instanceReady = true;
             J(x.Editor.Container.Element).AddClass(this.element.GetAttribute("class"));
+            this.element.AddClass("select2-offscreen").CSS("display", "block"); // validasyonun çalışması için
             x.Editor.SetData(this.element.GetValue());
         }
 
@@ -77,6 +90,7 @@ namespace Serenity
                 Entities = false,
                 EntitiesLatin = false,
                 EntitiesGreek = false,
+                AutoUpdateElement = true,
                 Height = (options.Rows == null || options.Rows == 0) ? null : ((options.Rows * 20) + "px")
             };
         }
