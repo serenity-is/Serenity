@@ -29,6 +29,7 @@ namespace Serenity
 
             if (opt.MinYear != null)
             {
+                opt.MinYear = opt.MinYear.ToString();
                 if (opt.MinYear.StartsWith("-"))
                     minYear -= int.Parse(opt.MinYear.Substr(1), 10);
                 else if (opt.MinYear.StartsWith("+"))
@@ -39,6 +40,7 @@ namespace Serenity
 
             if (opt.MaxYear != null)
             {
+                opt.MaxYear = opt.MaxYear.ToString();
                 if (opt.MaxYear.StartsWith("-"))
                     maxYear -= int.Parse(opt.MaxYear.Substr(1), 10);
                 else if (opt.MaxYear.StartsWith("+"))
