@@ -4,9 +4,6 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    using System.Collections.Generic;
-    using System.Html;
-
     public delegate string CustomValidationRule(jQueryObject element);
 
     public static class WidgetExtensions
