@@ -79,7 +79,7 @@ namespace Serenity
                 info.DisplayName = type.FullName;
 
             var optionsAttr = type.GetCustomAttributes(typeof(OptionsTypeAttribute), false);
-            if (optionsAttr != null)
+            if (optionsAttr != null && optionsAttr.Length > 0)
                 info.OptionsType = ((OptionsTypeAttribute)optionsAttr[0]).OptionsType;
 
             registeredTypes[name] = info;
