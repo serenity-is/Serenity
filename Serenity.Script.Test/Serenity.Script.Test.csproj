@@ -42,6 +42,7 @@
     <Compile Include="Q\QDialogTests.cs" />
     <Compile Include="Q\QHtmlTests.cs" />
     <Compile Include="Q\QNumberTests.cs" />
+    <Compile Include="ScriptContext\ScriptContextTests.cs" />
     <Compile Include="UI\EmailEditorTests.cs" />
   </ItemGroup>
   <ItemGroup>
