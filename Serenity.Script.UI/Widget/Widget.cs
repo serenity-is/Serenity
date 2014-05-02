@@ -28,15 +28,6 @@ namespace Serenity
             OnInit();
         }
 
-        protected virtual void AddCssClass()
-        {
-            this.element.AddClass("s-" + this.GetType().Name);
-        }
-
-        protected virtual void OnInit()
-        {
-        }
-
         public virtual void Destroy()
         {
             this.element.RemoveClass("s-" + this.GetType().Name);
@@ -47,7 +38,19 @@ namespace Serenity
             element = null;
         }
 
-        public jQueryObject Element { get { return element; } }
+        protected virtual void AddCssClass()
+        {
+            this.element.AddClass("s-" + this.GetType().Name);
+        }
+
+        protected virtual void OnInit()
+        {
+        }
+
+        public jQueryObject Element 
+        { 
+            get { return element; } 
+        }
 
         public string UniqueName
         {

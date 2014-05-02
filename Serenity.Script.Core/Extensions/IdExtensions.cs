@@ -5,7 +5,6 @@ namespace Serenity
 {
     /// <summary>
     /// Provides extension methods to work with identity values
-    /// <u>Identity değerleriyle çalışmak için uzantı metodları sunar.</u>
     /// </summary>
     public static class IdExtensions
     {

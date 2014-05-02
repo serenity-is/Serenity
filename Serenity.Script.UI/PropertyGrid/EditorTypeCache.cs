@@ -73,13 +73,13 @@ namespace Serenity
             };
 
             var displayAttr = type.GetCustomAttributes(typeof(DisplayNameAttribute), true);
-            if (displayAttr != null)
+            if (displayAttr != null && displayAttr.Length > 0)
                 info.DisplayName = ((DisplayNameAttribute)displayAttr[0]).DisplayName;
             else
                 info.DisplayName = type.FullName;
 
             var optionsAttr = type.GetCustomAttributes(typeof(OptionsTypeAttribute), true);
-            if (optionsAttr != null)
+            if (optionsAttr != null && optionsAttr.Length > 0)
                 info.OptionsType = ((OptionsTypeAttribute)optionsAttr[0]).OptionsType;
 
             registeredTypes[name] = info;

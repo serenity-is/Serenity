@@ -63,7 +63,8 @@ namespace Serenity.Test
                     Assert.IsFalse(jq.validator.methods.email.call(validator, "@xyz", input.Value("@xyz")[0]));
                     Assert.IsFalse(jq.validator.methods.email.call(validator, "@xyz.com", input.Value("@xyz.com")[0]));
 
-                    Assert.AreEqual(!onlyAscii, jq.validator.methods.email.call(validator, "êığş@ädomaın.com", input.Value("êığş@ädomaın.com")[0]));
+                    if (onlyAscii)
+                        Assert.AreEqual(false, jq.validator.methods.email.call(validator, "êığş@ädomaın.com", input.Value("êığş@ädomaın.com")[0]));
                 }
                 
                 form.Parent().Remove();

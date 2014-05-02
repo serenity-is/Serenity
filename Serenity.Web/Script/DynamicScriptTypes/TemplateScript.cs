@@ -2,6 +2,7 @@
 using System.IO;
 using System.Web;
 using System.Text.RegularExpressions;
+using System.Web.Hosting;
 
 namespace Serenity.Web
 {
@@ -34,7 +35,18 @@ namespace Serenity.Web
 
         public string GetScript()
         {
-            string templateText = TemplateHelper.RenderViewToString(_template, null);
+            string templateText;
+            
+            if (_template.ToLowerInvariant().EndsWith(".html"))
+            {
+                using (var sr = new StreamReader(HostingEnvironment.MapPath(_template)))
+                    templateText = sr.ReadToEnd();
+            }
+            else
+            {
+                templateText = TemplateHelper.RenderViewToString(_template, null);
+            } 
+
             return "Q$ScriptData.set('Template." + _key + "', " + templateText.ToSingleQuoted() + ");\n"; 
  	    }
 

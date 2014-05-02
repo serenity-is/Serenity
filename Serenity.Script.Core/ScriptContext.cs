@@ -1,9 +1,11 @@
-﻿using jQueryApi;
-using System;
-using System.Runtime.CompilerServices;
-
-namespace Serenity
+﻿namespace Serenity
 {
+    using jQueryApi;
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    /// Provides a shortcut to `jQuery.Select` (`$`) function as `J`
+    /// </summary>
     public class ScriptContext
     {
         [InlineCode("$({p})")]
