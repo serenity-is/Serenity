@@ -48,7 +48,7 @@ namespace Serenity
                     if (type == null)
                         continue;
 
-                    var attr = type.GetCustomAttributes(typeof(EditorAttribute), false);
+                    var attr = type.GetCustomAttributes(typeof(EditorAttribute), true);
                     if (attr != null && attr.Length > 0)
                         RegisterType(type);
                 }
@@ -72,13 +72,13 @@ namespace Serenity
                 Type = type
             };
 
-            var displayAttr = type.GetCustomAttributes(typeof(DisplayNameAttribute), false);
+            var displayAttr = type.GetCustomAttributes(typeof(DisplayNameAttribute), true);
             if (displayAttr != null)
                 info.DisplayName = ((DisplayNameAttribute)displayAttr[0]).DisplayName;
             else
                 info.DisplayName = type.FullName;
 
-            var optionsAttr = type.GetCustomAttributes(typeof(OptionsTypeAttribute), false);
+            var optionsAttr = type.GetCustomAttributes(typeof(OptionsTypeAttribute), true);
             if (optionsAttr != null)
                 info.OptionsType = ((OptionsTypeAttribute)optionsAttr[0]).OptionsType;
 
