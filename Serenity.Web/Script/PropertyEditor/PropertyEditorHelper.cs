@@ -53,35 +53,9 @@ namespace Serenity.Web.PropertyEditor
                 if (hiddenAttribute.Length > 0)
                     continue;
 
-                var displayNameAttribute = member.GetCustomAttributes(typeof(DisplayNameAttribute), false);
-                if (displayNameAttribute.Length > 1)
-                    throw new InvalidOperationException(String.Format("{0}.{1} için birden fazla başlık belirlenmiş!", type.Name, pi.Name));
-
-                var hintAttribute = member.GetCustomAttributes(typeof(HintAttribute), false);
-                if (hintAttribute.Length > 1)
-                    throw new InvalidOperationException(String.Format("{0}.{1} için birden fazla ipucu belirlenmiş!", type.Name, pi.Name));
-
                 Type memberType = member.MemberType == MemberTypes.Property ? ((PropertyInfo)member).PropertyType : ((FieldInfo)member).FieldType;
 
                 pi.Name = member.Name;
-
-                var categoryAttribute = member.GetCustomAttributes(typeof(CategoryAttribute), false);
-                if (categoryAttribute.Length == 1)
-                    pi.Category = ((CategoryAttribute)categoryAttribute[0]).Category;
-                else if (categoryAttribute.Length > 1)
-                    throw new InvalidOperationException(String.Format("{0}.{1} için birden fazla kategori belirlenmiş!", type.Name, pi.Name));
-
-                var cssClassAttr = member.GetCustomAttributes(typeof(CssClassAttribute), false);
-                if (cssClassAttr.Length == 1)
-                    pi.CssClass = ((CssClassAttribute)cssClassAttr[0]).CssClass;
-                else if (cssClassAttr.Length > 1)
-                    throw new InvalidOperationException(String.Format("{0}.{1} için birden fazla css class belirlenmiş!", type.Name, pi.Name));
-
-                if (member.GetCustomAttributes(typeof(OneWayAttribute), false).Length > 0)
-                    pi.OneWay = true;
-
-                if (member.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Length > 0)
-                    pi.ReadOnly = true;
 
                 Field basedOnField = null;
                 if (basedOnRow != null)
@@ -92,11 +66,56 @@ namespace Serenity.Web.PropertyEditor
                         basedOnField = basedOnRow.FindFieldByPropertyName(member.Name);
                 }
 
-                if (displayNameAttribute.Length > 0)
-                    pi.Title = ((DisplayNameAttribute)displayNameAttribute[0]).DisplayName;
+                Func<Type, object> getAttribute = delegate(Type attrType)
+                {
+                    var attr = member.GetCustomAttribute(attrType);
 
-                if (hintAttribute.Length > 0)
-                    pi.Hint = ((HintAttribute)hintAttribute[0]).Hint;
+                    if (attr == null && 
+                        basedOnField != null && 
+                        basedOnField.CustomAttributes != null)
+                    {
+                        foreach (var a in basedOnField.CustomAttributes)
+                            if (attrType.IsAssignableFrom(a.GetType()))
+                                return a;
+                    }
+
+                    return attr;
+                };
+
+                Func<Type, IEnumerable<object>> getAttributes = delegate(Type attrType)
+                {
+                    var attrList = new List<object>(member.GetCustomAttributes(attrType));
+
+                    if (basedOnField != null &&
+                        basedOnField.CustomAttributes != null)
+                    {
+                        foreach (var a in basedOnField.CustomAttributes)
+                            if (attrType.IsAssignableFrom(a.GetType()))
+                                attrList.Add(a);
+                    }
+
+                    return attrList;
+                };
+
+                var displayNameAttribute = (DisplayNameAttribute)member.GetCustomAttribute(typeof(DisplayNameAttribute), false);
+                if (displayNameAttribute != null)
+                    pi.Title = displayNameAttribute.DisplayName;
+
+                var hintAttribute = (HintAttribute)getAttribute(typeof(HintAttribute));
+                if (hintAttribute != null)
+                    pi.Hint = hintAttribute.Hint;
+
+                var categoryAttribute = (CategoryAttribute)getAttribute(typeof(CategoryAttribute));
+                
+                var cssClassAttr = (CssClassAttribute)getAttribute(typeof(CssClassAttribute));
+                if (cssClassAttr != null)
+                    pi.CssClass = cssClassAttr.CssClass;
+
+                if (getAttribute(typeof(OneWayAttribute)) != null)
+                    pi.OneWay = true;
+
+                if (getAttribute(typeof(ReadOnlyAttribute)) != null)
+                    pi.ReadOnly = true;
 
                 if (pi.Title == null)
                 {
@@ -115,9 +134,9 @@ namespace Serenity.Web.PropertyEditor
                         pi.Title = pi.Name;
                 }
 
-                var defaultValueAttribute = member.GetCustomAttributes(typeof(DefaultValueAttribute), false);
-                if (defaultValueAttribute.Length == 1)
-                    pi.DefaultValue = ((DefaultValueAttribute)defaultValueAttribute[0]).Value;
+                var defaultValueAttribute = (DefaultValueAttribute)member.GetCustomAttribute(typeof(DefaultValueAttribute), false);
+                if (defaultValueAttribute != null)
+                    pi.DefaultValue = defaultValueAttribute.Value;
                 else if (basedOnField != null && basedOnField.DefaultValue != null)
                     pi.DefaultValue = basedOnField.DefaultValue;
 
@@ -137,12 +156,10 @@ namespace Serenity.Web.PropertyEditor
                 else
                     pi.Updatable = true;
 
-                pi.Localizable = member.GetCustomAttribute<LocalizableAttribute>() != null ||
+                pi.Localizable = getAttribute(typeof(LocalizableAttribute)) != null ||
                     (basedOnField != null && localizationRowHandler != null && localizationRowHandler.IsLocalized(basedOnField));
 
-                var typeAttrArray = member.GetCustomAttributes(typeof(EditorTypeAttribute), false);
-                if (typeAttrArray.Length > 1)
-                    throw new InvalidOperationException(String.Format("{0}.{1} için birden fazla editör tipi belirlenmiş!", type.Name, pi.Name));
+                var editorTypeAttr = (EditorTypeAttribute)getAttribute(typeof(EditorTypeAttribute));
 
                 Type nullableType = Nullable.GetUnderlyingType(memberType);
                 Type enumType = null;
@@ -157,7 +174,7 @@ namespace Serenity.Web.PropertyEditor
                         enumType = null;
                 }
 
-                if (typeAttrArray.Length == 0)
+                if (editorTypeAttr == null)
                 {
                     if (enumType != null)
                         pi.EditorType = "Select";
@@ -175,9 +192,8 @@ namespace Serenity.Web.PropertyEditor
                 }
                 else
                 {
-                    var et = ((EditorTypeAttribute)typeAttrArray[0]);
-                    pi.EditorType = et.EditorType;
-                    et.SetParams(pi.EditorParams);
+                    pi.EditorType = editorTypeAttr.EditorType;
+                    editorTypeAttr.SetParams(pi.EditorParams);
                 }
 
                 if (enumType != null)
@@ -226,14 +242,14 @@ namespace Serenity.Web.PropertyEditor
                 if (reqAttr != null)
                     pi.Required = reqAttr.IsRequired;
 
-                var maxLengthAttr = member.GetCustomAttribute<MaxLengthAttribute>();
+                var maxLengthAttr = (MaxLengthAttribute)getAttribute(typeof(MaxLengthAttribute));
                 if (maxLengthAttr != null)
                 {
                     pi.MaxLength = maxLengthAttr.MaxLength;
                     pi.EditorParams["maxLength"] = maxLengthAttr.MaxLength;
                 }
 
-                foreach (EditorOptionAttribute param in member.GetCustomAttributes(typeof(EditorOptionAttribute), false))
+                foreach (EditorOptionAttribute param in getAttributes(typeof(EditorOptionAttribute)))
                 {
                     var key = param.Key;
                     if (key != null &&
