@@ -15,11 +15,16 @@ namespace Serenity
         public PhoneEditor(jQueryObject input, PhoneEditorOptions opt)
             : base(input, opt)
         {
-            RegisterValidationMethods();
+            var self = this;
 
-            input.AddClass(options.Multiple ? 
-                (options.Internal ? "phoneInternalMulti" : (options.Mobile ? "mobileTurkeyMulti" : "phoneTurkeyMulti")) :
-                (options.Internal ? "phoneInternal" : (options.Mobile ? "mobileTurkey" : "phoneTurkey")));
+            this.AddValidationRule(this.uniqueName, (e) =>
+            {
+                string value = this.Value.TrimToNull();
+                if (value == null)
+                    return null;
+
+                return Validate(value, options.Multiple, options.Internal, options.Mobile);
+            });
 
             string hint = options.Internal ? 
                 "Dahili telefon numarası '456, 8930, 12345' formatlarında" :
@@ -50,11 +55,6 @@ namespace Serenity
             });
         }
 
-        [InlineCode("this.optional({element})")]
-        private static bool ValidatorIsOptional(Element element)
-        {
-            return false;
-        }
 
         public void FormatValue()
         {
@@ -94,31 +94,6 @@ namespace Serenity
             }
         }
 
-        private static bool IsValidMulti(string phone, Func<string, bool> check)
-        {
-            if (phone.IsEmptyOrNull())
-                return false;
-
-            var phones = phone.Replace(';', ',').Split(',');
-            bool anyValid = false;
-            foreach (var x in phones)
-            {
-                string s = x.TrimToNull();
-                if (s == null)
-                    continue;
-
-                if (!check(s))
-                    return false;
-
-                anyValid = true;
-            }
-
-            if (!anyValid)
-                return false;
-
-            return true;
-        }
-
         private static string FormatMulti(string phone, Func<string, string> format)
         {
             var phones = phone.Replace(';', ',').Split(',');
@@ -137,7 +112,6 @@ namespace Serenity
             return result;
         }
 
-
         private static string FormatPhoneTurkey(string phone)
         {
             if (!IsValidPhoneTurkey(phone))
@@ -149,6 +123,84 @@ namespace Serenity
 
             phone = "(" + phone.Substr(0, 3) + ") " + phone.Substr(3, 3) + " " + phone.Substr(6, 2) + " " + phone.Substr(8, 2);
             return phone;
+        }
+
+        private static string FormatPhoneTurkeyMulti(string phone)
+        {
+            if (!IsValidPhoneTurkeyMulti(phone))
+                return phone;
+
+            return FormatMulti(phone, FormatPhoneTurkey);
+        }
+
+        private static string FormatMobileTurkey(string phone)
+        {
+            if (!IsValidMobileTurkey(phone))
+                return phone;
+
+            return FormatPhoneTurkey(phone);
+        }
+
+        private static string FormatMobileTurkeyMulti(string phone)
+        {
+            if (!IsValidMobileTurkeyMulti(phone))
+                return phone;
+
+            return FormatPhoneTurkeyMulti(phone);
+        }
+
+        private static string FormatPhoneInternal(string phone)
+        {
+            if (!IsValidPhoneInternal(phone))
+                return phone;
+
+            return phone.Trim();
+        }
+
+        private static string FormatPhoneInternalMulti(string phone)
+        {
+            if (!IsValidPhoneInternalMulti(phone))
+                return phone;
+
+            return FormatMulti(phone, FormatPhoneInternal);
+        }
+
+        private static string Validate(string phone, bool isMultiple, bool isInternal, bool isMobile)
+        {
+            Func<string, bool> validateFunc;
+
+            if (isInternal)
+                validateFunc = IsValidPhoneTurkey;
+            else if (isMobile)
+                validateFunc = IsValidMobileTurkey;
+            else
+                validateFunc = IsValidPhoneTurkey;
+
+            bool valid = isMultiple ? IsValidMulti(phone, validateFunc) : validateFunc(phone);
+
+            if (valid)
+                return null;
+
+            if (isMultiple)
+            {
+                if (isInternal)
+                    return "Dahili telefon numarası '4567' formatında girilmelidir!";
+
+                if (isMobile)
+                    return "Telefon numaraları '(533) 342 01 89' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";
+
+                return "Telefon numaları '(216) 432 10 98' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";
+            }
+            else
+            {
+                if (isInternal)
+                    return "Dahili telefon numarası '4567' formatında girilmelidir!";
+
+                if (isMobile)
+                    return "Telefon numarası '(533) 342 01 89' formatında girilmelidir!";
+
+                return "Telefon numarası '(216) 432 10 98' formatında girilmelidir!";
+            }
         }
 
         private static bool IsValidPhoneTurkey(string phone)
@@ -186,27 +238,6 @@ namespace Serenity
             return true;
         }
 
-        private static string FormatPhoneTurkeyMulti(string phone)
-        {
-            if (!IsValidPhoneTurkeyMulti(phone))
-                return phone;
-
-            return FormatMulti(phone, FormatPhoneTurkey);
-        }
-
-        private static string FormatMobileTurkey(string phone)
-        {
-            if (!IsValidMobileTurkey(phone))
-                return phone;
-
-            return FormatPhoneTurkey(phone);
-        }
-
-        private static bool IsValidPhoneTurkeyMulti(string phone)
-        {
-            return IsValidMulti(phone, IsValidPhoneTurkey);
-        }
-
         private static bool IsValidMobileTurkey(string phone)
         {
             if (!IsValidPhoneTurkey(phone))
@@ -224,27 +255,6 @@ namespace Serenity
                 return true;
 
             return false;
-        }
-
-        private static string FormatMobileTurkeyMulti(string phone)
-        {
-            if (!IsValidMobileTurkeyMulti(phone))
-                return phone;
-
-            return FormatPhoneTurkeyMulti(phone);
-        }
-
-        private static bool IsValidMobileTurkeyMulti(string phone)
-        {
-            return IsValidMulti(phone, IsValidMobileTurkey);
-        }
-
-        private static string FormatPhoneInternal(string phone)
-        {
-            if (!IsValidPhoneInternal(phone))
-                return phone;
-
-            return phone.Trim();
         }
 
         private static bool IsValidPhoneInternal(string phone)
@@ -267,57 +277,44 @@ namespace Serenity
             return true;
         }
 
-        private static string FormatPhoneInternalMulti(string phone)
+        private static bool IsValidMulti(string phone, Func<string, bool> check)
         {
-            if (!IsValidPhoneInternalMulti(phone))
-                return phone;
+            if (phone.IsEmptyOrNull())
+                return false;
 
-            return FormatMulti(phone, FormatPhoneInternal);
+            var phones = phone.Replace(';', ',').Split(',');
+            bool anyValid = false;
+            foreach (var x in phones)
+            {
+                string s = x.TrimToNull();
+                if (s == null)
+                    continue;
+
+                if (!check(s))
+                    return false;
+
+                anyValid = true;
+            }
+
+            if (!anyValid)
+                return false;
+
+            return true;
+        }
+
+        private static bool IsValidPhoneTurkeyMulti(string phone)
+        {
+            return IsValidMulti(phone, IsValidPhoneTurkey);
+        }
+
+        private static bool IsValidMobileTurkeyMulti(string phone)
+        {
+            return IsValidMulti(phone, IsValidMobileTurkey);
         }
 
         private static bool IsValidPhoneInternalMulti(string phone)
         {
             return IsValidMulti(phone, IsValidPhoneInternal);
-        }
-
-
-        private static void RegisterValidationMethods()
-        {
-            if (jQueryValidator.Methods["phoneTurkey"] == null)
-                jQueryValidator.AddMethod("phoneTurkey", (value, element) =>
-                {
-                    return ValidatorIsOptional(element) || IsValidPhoneTurkey(value);
-                }, "Telefon numarası '(216) 432 10 98' formatında girilmelidir!");
-
-            if (jQueryValidator.Methods["phoneTurkeyMulti"] == null)
-                jQueryValidator.AddMethod("phoneTurkeyMulti", (value, element) =>
-                {
-                    return ValidatorIsOptional(element) || IsValidPhoneTurkeyMulti(value);
-                }, "Telefon numaraları '(216) 432 10 98' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!");
-
-            if (jQueryValidator.Methods["mobileTurkey"] == null)
-                jQueryValidator.AddMethod("mobileTurkey", (value, element) =>
-                {
-                    return ValidatorIsOptional(element) || IsValidMobileTurkey(value);
-                }, "Telefon numarası '(533) 342 01 89' formatında girilmelidir!");
-
-            if (jQueryValidator.Methods["mobileTurkeyMulti"] == null)
-                jQueryValidator.AddMethod("mobileTurkeyMulti", (value, element) =>
-                {
-                    return ValidatorIsOptional(element) || IsValidMobileTurkeyMulti(value);
-                }, "Telefon numaraları '(533) 342 01 89' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!");
-
-            if (jQueryValidator.Methods["phoneInternal"] == null)
-                jQueryValidator.AddMethod("phoneInternal", (value, element) =>
-                {
-                    return ValidatorIsOptional(element) || IsValidPhoneInternal(value);
-                }, "Dahili telefon numarası '4567' formatında girilmelidir!");
-
-            if (jQueryValidator.Methods["phoneInternalMulti"] == null)
-                jQueryValidator.AddMethod("phoneInternalMulti", (value, element) =>
-                {
-                    return ValidatorIsOptional(element) || IsValidPhoneInternalMulti(value);
-                }, "Dahili telefon numaraları '4567, 8930' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!");
         }
 
         public string Value

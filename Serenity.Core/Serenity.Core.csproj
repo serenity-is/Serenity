@@ -267,6 +267,7 @@
     <Compile Include="Media\SwfInfo.cs" />
     <Compile Include="Media\ThumbnailGenerator.cs" />
     <Compile Include="Reflection\CodeGeneration\ScriptIncludeAttribute.cs" />
+    <Compile Include="Services\RowValidationContext.cs" />
     <Compile Include="Services\Reporting\ICustomFileName.cs" />
     <Compile Include="Services\ValidateParentAttribute.cs" />
     <Compile Include="Services\SaveRequestBehaviourAttribute.cs" />
@@ -387,6 +388,8 @@
     <Compile Include="Data\Sql\Helpers\SqlRowExtensions.cs" />
     <Compile Include="Data\Sql\Transaction\SqlTransactions.cs" />
     <Compile Include="Data\Sql\Transaction\UnitOfWork.cs" />
+    <Compile Include="Services\Validation\ValidationContext.cs" />
+    <Compile Include="Services\Validation\ICustomValidator.cs" />
     <Compile Include="Texts\Texts.Controls.cs" />
     <Compile Include="Texts\Texts.cs" />
     <Compile Include="Texts\Texts.Forms.cs" />

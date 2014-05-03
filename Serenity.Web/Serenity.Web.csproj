@@ -91,6 +91,8 @@
     <Compile Include="Script\DynamicScript\ITwoLevelCached.cs" />
     <Compile Include="Script\DynamicScript\IScriptName.cs" />
     <Compile Include="Script\DynamicScript\IDynamicScript.cs" />
+    <Compile Include="Script\PropertyEditor\PhoneEditorAttribute.cs" />
+    <Compile Include="Script\PropertyEditor\EmailEditorAttribute.cs" />
     <Compile Include="Script\PropertyEditor\EditorTypes.cs" />
     <Compile Include="Script\ScriptEndpointGenerator.cs" />
     <Compile Include="Script\ScriptFormGenerator.cs" />

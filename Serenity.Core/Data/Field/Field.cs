@@ -124,6 +124,8 @@ namespace Serenity.Data
             set { propertyName = value; }
         }
 
+        public object[] CustomAttributes { get; set; }
+
         protected Exception JsonUnexpectedToken(JsonReader reader)
         {
             throw new JsonSerializationException("Unexpected token when deserializing row: " + reader.TokenType);

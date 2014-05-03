@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace Serenity.Services
@@ -448,8 +449,40 @@ namespace Serenity.Services
             if (IsUpdate)
                 ValidateIsActive();
 
+            ValidateFieldValues();
+
             foreach (var behaviour in this.behaviours)
                 behaviour.OnValidateRequest(this);
+        }
+
+        protected virtual void ValidateFieldValues()
+        {
+            var context = new RowValidationContext(this.Connection, this.Row);
+
+            foreach (var field in Row.GetFields())
+            {
+                if (!Row.IsAssigned(field))
+                    continue;
+
+                if (field.CustomAttributes == null)
+                    continue;
+
+                var validators = field.CustomAttributes.OfType<ICustomValidator>();
+                foreach (var validator in validators)
+                {
+                    context.Value = field.AsObject(this.Row);
+
+                    var error = CustomValidate(context, field, validator);
+
+                    if (error != null)
+                        throw new ValidationError("CustomValidationError", field.PropertyName ?? field.Name, error);
+                }
+            }
+        }
+
+        protected virtual string CustomValidate(RowValidationContext context, Field field, ICustomValidator validator)
+        {
+            return validator.Validate(context);
         }
 
         protected virtual void ValidateIsActive()

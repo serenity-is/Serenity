@@ -277,6 +277,8 @@ namespace Serenity.Data
 
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
+
+                            field.CustomAttributes = property.GetCustomAttributes(false);
                         }
                     }
                 }
