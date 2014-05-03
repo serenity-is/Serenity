@@ -184,7 +184,6 @@ namespace Serenity
             var optionsAttr = editorType.GetCustomAttributes(typeof(OptionsTypeAttribute), true);
             if (optionsAttr != null && optionsAttr.Length > 0)
             {
-                Console.WriteLine(optionsAttr.Length.ToString());
                 optionsType = optionsAttr[0].As<OptionsTypeAttribute>().OptionsType;
             }
 
