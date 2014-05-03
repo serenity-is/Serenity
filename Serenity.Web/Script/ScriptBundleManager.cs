@@ -25,6 +25,15 @@ namespace Serenity.Web
         private static Dictionary<string, ConcatenatedScript> bundleByKey;
         private const string errorLines = "\r\n//\r\n//!!!ERROR: {0}!!!\r\n//\r\n";
 
+        public static bool IsEnabled
+        {
+            get
+            {
+                Initialize();
+                return isEnabled;
+            }
+        }
+
         public static void Reset()
         {
             isInitialized = false;
