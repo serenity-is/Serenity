@@ -181,9 +181,12 @@ namespace Serenity
 
             object editorParams = item.EditorParams;
             Type optionsType = null;
-            var optionsAttr = editorType.GetCustomAttributes(typeof(OptionsTypeAttribute), false);
-            if (optionsAttr != null && optionsAttr.Length == 1)
+            var optionsAttr = editorType.GetCustomAttributes(typeof(OptionsTypeAttribute), true);
+            if (optionsAttr != null && optionsAttr.Length > 0)
+            {
+                Console.WriteLine(optionsAttr.Length.ToString());
                 optionsType = optionsAttr[0].As<OptionsTypeAttribute>().OptionsType;
+            }
 
             if (optionsType != null)
                 editorParams = jQuery.ExtendObject(Activator.CreateInstance(optionsType), item.EditorParams);
