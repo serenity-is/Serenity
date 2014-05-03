@@ -91,6 +91,7 @@
     <Compile Include="Script\DynamicScript\ITwoLevelCached.cs" />
     <Compile Include="Script\DynamicScript\IScriptName.cs" />
     <Compile Include="Script\DynamicScript\IDynamicScript.cs" />
+    <Compile Include="Script\PropertyEditor\EditorTypes.cs" />
     <Compile Include="Script\ScriptEndpointGenerator.cs" />
     <Compile Include="Script\ScriptFormGenerator.cs" />
     <Compile Include="Mvc\ServiceAuthorizeFilter.cs" />
@@ -132,7 +133,7 @@
     <Compile Include="Script\DynamicScriptTypes\LocalInitScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\LocalTextScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\DbLookupScript.cs" />
-    <Compile Include="Script\PropertyEditor\EditablePropertyAttributes.cs" />
+    <Compile Include="Script\PropertyEditor\CssClassAttribute.cs" />
     <Compile Include="Script\PropertyEditor\FilterFieldsScript.cs" />
     <Compile Include="Script\PropertyEditor\FormScript.cs" />
     <Compile Include="Script\PropertyEditor\ICustomizedFormScript.cs" />

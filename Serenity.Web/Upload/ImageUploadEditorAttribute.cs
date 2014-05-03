@@ -8,23 +8,18 @@ using System.IO;
 
 namespace Serenity.ComponentModel
 {
-    public class ImageUploadEditorAttribute : FileUploadEditorAttribute
+    public partial class ImageUploadEditorAttribute
     {
-        public ImageUploadEditorAttribute(string originalNameProperty)
-            : base("ImageUpload", 0, 0)
-        {
-            ScaleMode = ImageScaleMode.CropSourceImage;
-            ThumbMode = ImageScaleMode.CropSourceImage;
-        }
-
         public ImageUploadEditorAttribute(string originalNameProperty = null,
             int minBytes = 0, int maxBytes = 0, int minWidth = 0, int maxWidth = 0, int minHeight = 0, int maxHeight = 0, 
             bool allowFlash = false, int scaleWidth = 0, int scaleHeight = 0, bool scaleSmaller = true, 
             ImageScaleMode scaleMode = ImageScaleMode.CropSourceImage, string thumbSizes = null, 
             ImageScaleMode thumbMode = ImageScaleMode.CropSourceImage, int thumbQuality = 0)
-            : base("ImageUpload", minBytes, maxBytes)
+            : base("ImageUpload")
         {
             OriginalNameProperty = originalNameProperty;
+            MinBytes = minBytes;
+            MaxBytes = maxBytes;
             MinWidth = minWidth;
             MaxWidth = maxWidth;
             MinHeight = minHeight;
@@ -49,11 +44,8 @@ namespace Serenity.ComponentModel
             editorParams["maxHeight"] = MaxHeight;
         }
 
-        public string OriginalNameProperty { get; private set; }
-        public int MinWidth { get; private set; }
-        public int MaxWidth { get; private set; }
-        public int MinHeight { get; private set; }
-        public int MaxHeight { get; private set; }
+        public int MinBytes { get; private set; }
+        public int MaxBytes { get; private set; }
         public int ScaleWidth { get; private set; }
         public int ScaleHeight { get; private set; }
         public bool ScaleSmaller { get; private set; }

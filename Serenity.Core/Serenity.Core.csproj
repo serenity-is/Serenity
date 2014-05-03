@@ -178,8 +178,10 @@
     <Compile Include="Data\Index\IndexMatch.cs" />
     <Compile Include="Data\Index\TreeDictionary.cs" />
     <Compile Include="Data\Index\TreeIndex.cs" />
+    <Compile Include="PropertyGrid\Attributes\EditorTypeAttribute.cs" />
     <Compile Include="Reflection\CloneHelper.cs" />
     <Compile Include="Reflection\CodeGeneration\CodeWriter.cs" />
+    <Compile Include="Reflection\CodeGeneration\EditorTypeGenerator.cs" />
     <Compile Include="Reflection\CodeGeneration\ScriptDtoGenerator.cs" />
     <Compile Include="Reflection\CodeGeneration\GeneratorUtils.cs" />
     <Compile Include="Reflection\ILGeneration.cs" />
@@ -281,7 +283,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyGrid\Attributes\BasedOnRowAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorOptionAttribute.cs" />
-    <Compile Include="PropertyGrid\Attributes\EditorTypeAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\CustomEditorAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
     <Compile Include="PropertyGrid\Attributes\HiddenAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\HintAttribute.cs" />
@@ -398,6 +400,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
