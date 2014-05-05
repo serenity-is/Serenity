@@ -80,23 +80,6 @@ namespace Serenity
                 throw new ArgumentNullException(username);
 
             HttpCookie authCookie = FormsAuthentication.GetAuthCookie(username, persist);
-            FormsAuthenticationTicket tempTicket = FormsAuthentication.Decrypt(authCookie.Value);
-
-            string userData = string.Join("|", roles);
-
-            var cookiePath = HttpContext.Current.Request.ApplicationPath;
-            FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(
-                tempTicket.Version,
-                tempTicket.Name,
-                tempTicket.IssueDate,
-                tempTicket.Expiration,
-                persist,
-                userData,
-                cookiePath);
-            authCookie.Value = FormsAuthentication.Encrypt(authTicket);
-            authCookie.Name = FormsAuthentication.FormsCookieName;
-            authCookie.Path = cookiePath;
-
             HttpContext.Current.Response.Cookies.Remove(authCookie.Name);
             HttpContext.Current.Response.Cookies.Add(authCookie);
         }
