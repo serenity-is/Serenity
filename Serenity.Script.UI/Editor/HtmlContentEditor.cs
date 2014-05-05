@@ -70,7 +70,11 @@ namespace Serenity
                 BodyClass = "s-HtmlContentBody",
                 On = new CKEditorEvents
                 {
-                    InstanceReady = x => self.InstanceReady(x)
+                    InstanceReady = x => self.InstanceReady(x),
+                    Change = x => {
+                        x.Editor.UpdateElement();
+                        self.Element.TriggerHandler("change");
+                    }
                 },
                 ToolbarGroups = new CKToolbarGroup[] 
                 {
