@@ -106,6 +106,8 @@ namespace Serenity.Web.PropertyEditor
                     pi.Hint = hintAttribute.Hint;
 
                 var categoryAttribute = (CategoryAttribute)getAttribute(typeof(CategoryAttribute));
+                if (categoryAttribute != null)
+                    pi.Category = categoryAttribute.Category;
                 
                 var cssClassAttr = (CssClassAttribute)getAttribute(typeof(CssClassAttribute));
                 if (cssClassAttr != null)
