@@ -14,6 +14,8 @@ namespace Serenity.ComponentModel
             return Validate(value, this.Multiple, this.Internal, this.Mobile);
         }
 
+        #region @@@SharedValidationCodeBlock@@@
+
         private static string Validate(string phone, bool isMultiple, bool isInternal, bool isMobile)
         {
             Func<string, bool> validateFunc;
@@ -79,7 +81,7 @@ namespace Serenity.ComponentModel
 
             for (var i = 0; i < phone.Length; i++)
             {
-                var c = phone[i];
+                var c = (int)phone[i];
                 if (c < (int)'0' || c > (int)'9')
                     return false;
             }
@@ -150,5 +152,7 @@ namespace Serenity.ComponentModel
 
             return true;
         }
+
+        #endregion @@@SharedValidationCodeBlock@@@
     }
 }

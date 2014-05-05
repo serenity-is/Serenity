@@ -55,7 +55,6 @@ namespace Serenity
             });
         }
 
-
         public void FormatValue()
         {
             var value = this.element.GetValue();
@@ -119,9 +118,9 @@ namespace Serenity
 
             phone = phone.Replace(" ", "").Replace("(", "").Replace(")", "");
             if (phone.StartsWith("0"))
-                phone = phone.Substr(1);
+                phone = phone.Substring(1);
 
-            phone = "(" + phone.Substr(0, 3) + ") " + phone.Substr(3, 3) + " " + phone.Substr(6, 2) + " " + phone.Substr(8, 2);
+            phone = "(" + phone.Substring(0, 3) + ") " + phone.Substring(3, 3) + " " + phone.Substring(6, 2) + " " + phone.Substring(8, 2);
             return phone;
         }
 
@@ -164,6 +163,36 @@ namespace Serenity
 
             return FormatMulti(phone, FormatPhoneInternal);
         }
+
+        private static bool IsValidPhoneTurkeyMulti(string phone)
+        {
+            return IsValidMulti(phone, IsValidPhoneTurkey);
+        }
+
+        private static bool IsValidMobileTurkeyMulti(string phone)
+        {
+            return IsValidMulti(phone, IsValidMobileTurkey);
+        }
+
+        private static bool IsValidPhoneInternalMulti(string phone)
+        {
+            return IsValidMulti(phone, IsValidPhoneInternal);
+        }
+
+        public string Value
+        {
+            get
+            {
+                FormatValue();
+                return this.element.GetValue();
+            }
+            set
+            {
+                this.element.Value(value);
+            }
+        }
+
+        #region @@@SharedValidationCodeBlock@@@
 
         private static string Validate(string phone, bool isMultiple, bool isInternal, bool isMobile)
         {
@@ -214,12 +243,12 @@ namespace Serenity
                 return false;
 
             if (phone.StartsWith("0"))
-                phone = phone.Substr(1);
+                phone = phone.Substring(1);
 
             if (phone.StartsWith("(") &&
-                phone.CharAt(4) == ")")
+                phone[4] == ')')
             {
-                phone = phone.Substr(1, 3) + phone.Substr(5);
+                phone = phone.Substring(1, 3) + phone.Substring(5);
             }
 
             if (phone.Length != 10)
@@ -230,7 +259,7 @@ namespace Serenity
 
             for (var i = 0; i < phone.Length; i++)
             {
-                var c = phone.CharCodeAt(i);
+                var c = (int)phone[i];
                 if (c < (int)'0' || c > (int)'9')
                     return false;
             }
@@ -245,13 +274,13 @@ namespace Serenity
 
             phone = phone.TrimStart();
             phone = phone.Replace(" ", "");
-            
+
             int lookIndex = 0;
-            if (phone.StartsWith('0'))
+            if (phone.StartsWith("0"))
                 lookIndex++;
 
-            if (phone.CharAt(lookIndex) == "5" ||
-                phone.CharAt(lookIndex) == "(" && phone.CharAt(lookIndex + 1) == "5")
+            if (phone[lookIndex] == '5' ||
+                phone[lookIndex] == '(' && phone[lookIndex + 1] == '5')
                 return true;
 
             return false;
@@ -269,7 +298,7 @@ namespace Serenity
 
             for (var i = 0; i < phone.Length; i++)
             {
-                var c = phone.CharCodeAt(i);
+                var c = (int)phone[i];
                 if (c < (int)'0' || c > (int)'9')
                     return false;
             }
@@ -302,33 +331,7 @@ namespace Serenity
             return true;
         }
 
-        private static bool IsValidPhoneTurkeyMulti(string phone)
-        {
-            return IsValidMulti(phone, IsValidPhoneTurkey);
-        }
-
-        private static bool IsValidMobileTurkeyMulti(string phone)
-        {
-            return IsValidMulti(phone, IsValidMobileTurkey);
-        }
-
-        private static bool IsValidPhoneInternalMulti(string phone)
-        {
-            return IsValidMulti(phone, IsValidPhoneInternal);
-        }
-
-        public string Value
-        {
-            get 
-            { 
-                FormatValue();  
-                return this.element.GetValue(); 
-            }
-            set 
-            { 
-                this.element.Value(value);
-            }
-        }
+        #endregion @@@SharedValidationCodeBlock@@@
     }
 
     [Serializable, Reflectable]
