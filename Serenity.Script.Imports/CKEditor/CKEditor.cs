@@ -45,6 +45,7 @@ namespace Serenity
     public class CKEditorEvents
     {
         public Action<CKEditorEventArgs> InstanceReady;
+        public Action<CKEditorEventArgs> Change;
     }
 
     [Imported, Serializable]
@@ -102,6 +103,10 @@ namespace Serenity
         }
 
         public void SetData(string data)
+        {
+        }
+
+        public void UpdateElement()
         {
         }
     }
