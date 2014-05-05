@@ -33,9 +33,16 @@ namespace Serenity.CodeGenerator
         public EntityCodeGenerator(EntityCodeGenerationModel model,
             string projectRoot)
         {
+            var kdiff3Paths = new[]
+            {
+                ConfigurationManager.AppSettings["KDiff3Path"], 
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "KDiff3\\kdiff3.exe"), 
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "KDiff3\\kdiff3.exe"), 
+            };
+
             this.model = model;
             projectPath = projectRoot;
-            kdiff3Path = ConfigurationManager.AppSettings["KDiff3Path"];
+            kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
             siteWebPath = Path.Combine(projectPath, ConfigurationManager.AppSettings["WebPath"]);
             siteWebProj = Path.Combine(projectPath, ConfigurationManager.AppSettings["WebProject"]);
             scriptPath = Path.Combine(projectPath, ConfigurationManager.AppSettings["ScriptPath"]);
