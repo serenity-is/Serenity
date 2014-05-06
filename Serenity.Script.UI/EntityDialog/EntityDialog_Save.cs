@@ -30,7 +30,7 @@ namespace Serenity
                 {
                     Type = self.IsEditMode ? "update" : "create",
                     Entity = (opt.Request ?? new object()).As<SaveRequest<object>>().Entity,
-                    EntityId = self.IsEditMode ? this.EntityId : (response ?? new object()).As<CreateResponse>().EntityId
+                    EntityId = self.IsEditMode ? this.EntityId : (response ?? new object()).As<SaveResponse>().EntityId
                 };
 
                 self.element.TriggerHandler("ondatachange", new object[] { dci });
@@ -73,7 +73,7 @@ namespace Serenity
                 // TODO: attachments
                 //AttachmentEntity[] att = this.GetPendingAttachments();
                 //if (att != null)
-                //    ((CreateRequest)(object)req).Attachments = this.GetPendingAttachments();
+                //    ((SaveRequest)(object)req).Attachments = this.GetPendingAttachments();
             }
 
             return req;

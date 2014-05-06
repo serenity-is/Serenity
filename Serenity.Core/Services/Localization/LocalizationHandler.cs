@@ -135,16 +135,16 @@ namespace Serenity.Data
             where TLocalRow: Row, IIdRow, new()
         {
             Update(uow, row, cultureId,
-                (r) => new CreateRequestHandler<TLocalRow>().Process(uow,
+                (r) => new SaveRequestHandler<TLocalRow>().Process(uow,
                     new SaveRequest<TLocalRow>
                     {
                         Entity = (TLocalRow)r
-                    }),
-                (r) => new UpdateRequestHandler<TLocalRow>().Process(uow,
+                    }, SaveRequestType.Create),
+                (r) => new SaveRequestHandler<TLocalRow>().Process(uow,
                     new SaveRequest<TLocalRow>
                     {
                         Entity = (TLocalRow)r
-                    }));
+                    }, SaveRequestType.Update));
         }
         
         public void Update(IUnitOfWork uow, TRow row, Int32 cultureId,

@@ -14,14 +14,14 @@ namespace @(Model.RootNamespace)@(dotModule).Repositories
     {
         private static MyRow.RowFields fld { get { return MyRow.Fields; } }
 
-        public CreateResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
+        public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return new MyCreateHandler().Process(uow, request);
+            return new MySaveHandler().Process(uow, request, SaveRequestType.Create);
         }
 
-        public UpdateResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
+        public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return new MyUpdateHandler().Process(uow, request);
+            return new MySaveHandler().Process(uow, request, SaveRequestType.Update);
         }
 
         public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
@@ -44,8 +44,7 @@ namespace @(Model.RootNamespace)@(dotModule).Repositories
             return new MyListHandler().Process(connection, request);
         }
 
-        private class MyCreateHandler : CreateRequestHandler<MyRow> { }
-        private class MyUpdateHandler : UpdateRequestHandler<MyRow> { }
+        private class MySaveHandler : SaveRequestHandler<MyRow> { }
         private class MyDeleteHandler : DeleteRequestHandler<MyRow> { }
         private class MyUndeleteHandler : UndeleteRequestHandler<MyRow> { }
         private class MyRetrieveHandler : RetrieveRequestHandler<MyRow> { }

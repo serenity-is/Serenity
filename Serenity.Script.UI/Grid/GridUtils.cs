@@ -146,7 +146,7 @@ namespace Serenity
 
         public static void MakeOrderableWithUpdateRequest<TItem, TOptions>(DataGrid<TItem, TOptions> grid,
             Func<TItem, Int64> getId, Func<TItem, int?> getDisplayOrder,
-            string service, Func<long, int, UpdateRequest<TItem>> getUpdateRequest)
+            string service, Func<long, int, SaveRequest<TItem>> getUpdateRequest)
             where TItem : class, new()
             where TOptions : class, new()
         {

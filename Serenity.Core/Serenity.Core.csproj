@@ -311,7 +311,6 @@
     <Compile Include="Services\Reporting\ReportRetrieveRequest.cs" />
     <Compile Include="Services\Reporting\ReportRetrieveResponse.cs" />
     <Compile Include="Services\Reporting\RequiredPermissionAttribute.cs" />
-    <Compile Include="Services\RequestResponse\CreateResponse.cs" />
     <Compile Include="Services\RequestResponse\DeleteRequest.cs" />
     <Compile Include="Services\RequestResponse\DeleteResponse.cs" />
     <Compile Include="Services\RequestResponse\ListRequest.cs" />
@@ -325,7 +324,6 @@
     <Compile Include="Services\RequestResponse\UndeleteRequest.cs" />
     <Compile Include="Services\RequestResponse\UndeleteResponse.cs" />
     <Compile Include="Services\RequestResponse\UpdateLocalizationRequest.cs" />
-    <Compile Include="Services\RequestResponse\UpdateResponse.cs" />
     <Compile Include="Services\AuditLog\AuditDeleteRequest.cs" />
     <Compile Include="Services\AuditLog\AuditFileFieldInfo.cs" />
     <Compile Include="Services\AuditLog\AuditLogListRequest.cs" />
@@ -341,7 +339,7 @@
     <Compile Include="Services\BatchGenerationUpdater.cs" />
     <Compile Include="Services\Client\UriHelper.cs" />
     <Compile Include="Services\Client\JsonServiceClient.cs" />
-    <Compile Include="Services\CreateRequestHandler.cs" />
+    <Compile Include="Services\DisplayOrderFilterHelper.cs" />
     <Compile Include="Services\CustomField\CustomizableAttribute.cs" />
     <Compile Include="Services\DeleteRequestHandler.cs" />
     <Compile Include="Services\ListRequestHandler.cs" />
@@ -354,7 +352,6 @@
     <Compile Include="Services\ServiceHelper.cs" />
     <Compile Include="Services\UndeleteRequestHandler.cs" />
     <Compile Include="Services\SaveRequestHandler.cs" />
-    <Compile Include="Services\UpdateRequestHandler.cs" />
     <Compile Include="Services\Settings\Config.cs" />
     <Compile Include="Services\Settings\FormatHelper.cs" />
     <Compile Include="Services\Settings\ILocalSetting.cs" />

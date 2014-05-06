@@ -91,8 +91,8 @@ WriteLiteral(";\r\n\r\n    [ServiceAuthorize]\r\n    public class ");
             #line default
             #line hidden
 WriteLiteral("Controller : Controller\r\n    {\r\n        [AcceptVerbs(\"POST\"), JsonFilter]\r\n      " +
-"  public Result<CreateResponse> Create(SaveRequest<MyRow> request)\r\n        {\r\n " +
-"           return this.InTransaction(\"");
+"  public Result<SaveResponse> Create(SaveRequest<MyRow> request)\r\n        {\r\n   " +
+"         return this.InTransaction(\"");
 
 
             
@@ -103,8 +103,8 @@ WriteLiteral("Controller : Controller\r\n    {\r\n        [AcceptVerbs(\"POST\")
             #line default
             #line hidden
 WriteLiteral("\", (uow) => new MyRepository().Create(uow, request));\r\n        }\r\n\r\n        [Acce" +
-"ptVerbs(\"POST\"), JsonFilter]\r\n        public Result<UpdateResponse> Update(SaveR" +
-"equest<MyRow> request)\r\n        {\r\n            return this.InTransaction(\"");
+"ptVerbs(\"POST\"), JsonFilter]\r\n        public Result<SaveResponse> Update(SaveReq" +
+"uest<MyRow> request)\r\n        {\r\n            return this.InTransaction(\"");
 
 
             

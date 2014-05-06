@@ -82,26 +82,25 @@ WriteLiteral(";\r\n\r\n    public class ");
             #line default
             #line hidden
 WriteLiteral("Repository\r\n    {\r\n        private static MyRow.RowFields fld { get { return MyRo" +
-"w.Fields; } }\r\n\r\n        public CreateResponse Create(IUnitOfWork uow, SaveReque" +
-"st<MyRow> request)\r\n        {\r\n            return new MyCreateHandler().Process(" +
-"uow, request);\r\n        }\r\n\r\n        public UpdateResponse Update(IUnitOfWork uo" +
-"w, SaveRequest<MyRow> request)\r\n        {\r\n            return new MyUpdateHandle" +
-"r().Process(uow, request);\r\n        }\r\n\r\n        public DeleteResponse Delete(IU" +
-"nitOfWork uow, DeleteRequest request)\r\n        {\r\n            return new MyDelet" +
-"eHandler().Process(uow, request);\r\n        }\r\n\r\n        public UndeleteResponse " +
-"Undelete(IUnitOfWork uow, UndeleteRequest request)\r\n        {\r\n            retur" +
-"n new MyUndeleteHandler().Process(uow, request);\r\n        }\r\n\r\n        public Re" +
-"trieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request" +
-")\r\n        {\r\n            return new MyRetrieveHandler().Process(connection, req" +
-"uest);\r\n        }\r\n\r\n        public ListResponse<MyRow> List(IDbConnection conne" +
-"ction, ListRequest request)\r\n        {\r\n            return new MyListHandler().P" +
-"rocess(connection, request);\r\n        }\r\n\r\n        private class MyCreateHandler" +
-" : CreateRequestHandler<MyRow> { }\r\n        private class MyUpdateHandler : Upda" +
-"teRequestHandler<MyRow> { }\r\n        private class MyDeleteHandler : DeleteReque" +
-"stHandler<MyRow> { }\r\n        private class MyUndeleteHandler : UndeleteRequestH" +
-"andler<MyRow> { }\r\n        private class MyRetrieveHandler : RetrieveRequestHand" +
-"ler<MyRow> { }\r\n        private class MyListHandler : ListRequestHandler<MyRow> " +
-"{ }\r\n    }\r\n}");
+"w.Fields; } }\r\n\r\n        public SaveResponse Create(IUnitOfWork uow, SaveRequest" +
+"<MyRow> request)\r\n        {\r\n            return new MySaveHandler().Process(uow," +
+" request, SaveRequestType.Create);\r\n        }\r\n\r\n        public SaveResponse Upd" +
+"ate(IUnitOfWork uow, SaveRequest<MyRow> request)\r\n        {\r\n            return " +
+"new MySaveHandler().Process(uow, request, SaveRequestType.Update);\r\n        }\r\n\r" +
+"\n        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)\r\n " +
+"       {\r\n            return new MyDeleteHandler().Process(uow, request);\r\n     " +
+"   }\r\n\r\n        public UndeleteResponse Undelete(IUnitOfWork uow, UndeleteReques" +
+"t request)\r\n        {\r\n            return new MyUndeleteHandler().Process(uow, r" +
+"equest);\r\n        }\r\n\r\n        public RetrieveResponse<MyRow> Retrieve(IDbConnec" +
+"tion connection, RetrieveRequest request)\r\n        {\r\n            return new MyR" +
+"etrieveHandler().Process(connection, request);\r\n        }\r\n\r\n        public List" +
+"Response<MyRow> List(IDbConnection connection, ListRequest request)\r\n        {\r\n" +
+"            return new MyListHandler().Process(connection, request);\r\n        }\r" +
+"\n\r\n        private class MySaveHandler : SaveRequestHandler<MyRow> { }\r\n        " +
+"private class MyDeleteHandler : DeleteRequestHandler<MyRow> { }\r\n        private" +
+" class MyUndeleteHandler : UndeleteRequestHandler<MyRow> { }\r\n        private cl" +
+"ass MyRetrieveHandler : RetrieveRequestHandler<MyRow> { }\r\n        private class" +
+" MyListHandler : ListRequestHandler<MyRow> { }\r\n    }\r\n}");
 
 
         }

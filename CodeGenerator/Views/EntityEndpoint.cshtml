@@ -13,13 +13,13 @@ namespace @(Model.RootNamespace)@(dotModule).Endpoints
     public class @(Model.ClassName)Controller : Controller
     {
         [AcceptVerbs("POST"), JsonFilter]
-        public Result<CreateResponse> Create(SaveRequest<MyRow> request)
+        public Result<SaveResponse> Create(SaveRequest<MyRow> request)
         {
             return this.InTransaction("@(Model.Schema)", (uow) => new MyRepository().Create(uow, request));
         }
 
         [AcceptVerbs("POST"), JsonFilter]
-        public Result<UpdateResponse> Update(SaveRequest<MyRow> request)
+        public Result<SaveResponse> Update(SaveRequest<MyRow> request)
         {
             return this.InTransaction("@(Model.Schema)", (uow) => new MyRepository().Update(uow, request));
         }

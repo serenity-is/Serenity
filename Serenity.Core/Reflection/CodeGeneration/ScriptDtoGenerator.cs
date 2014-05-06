@@ -367,10 +367,8 @@ namespace Serenity.Reflection
                 return typeof(UndeleteRequest);
             else if (typeof(UndeleteResponse).IsAssignableFrom(type))
                 return typeof(UndeleteResponse);
-            else if (typeof(UpdateResponse).IsAssignableFrom(type))
-                return typeof(UpdateResponse);
-            else if (typeof(CreateResponse).IsAssignableFrom(type))
-                return typeof(CreateResponse);
+            else if (typeof(SaveResponse).IsAssignableFrom(type))
+                return typeof(SaveResponse);
             else if (typeof(ServiceRequest).IsAssignableFrom(type))
                 return typeof(ServiceRequest);
             else if (typeof(ServiceResponse).IsAssignableFrom(type))

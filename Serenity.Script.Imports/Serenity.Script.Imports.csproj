@@ -43,12 +43,8 @@
     <Compile Include="PropertyGrid\PropertyItem.cs" />
     <Compile Include="Services\RequestResponse\RetrieveLocalizationRequest.cs" />
     <Compile Include="Services\RequestResponse\UpdateLocalizationRequest.cs" />
-    <Compile Include="Services\RequestResponse\CreateRequest.cs" />
-    <Compile Include="Services\RequestResponse\CreateResponse.cs" />
     <Compile Include="Services\RequestResponse\SaveRequestWithAttachment.cs" />
     <Compile Include="Services\RequestResponse\SaveRequest.cs" />
-    <Compile Include="Services\RequestResponse\UpdateRequest.cs" />
-    <Compile Include="Services\RequestResponse\UpdateResponse.cs" />
     <Compile Include="Services\RequestResponse\RetrieveRequest.cs" />
     <Compile Include="Services\RequestResponse\RetrieveResponse.cs" />
     <Compile Include="Services\RequestResponse\UndeleteRequest.cs" />
