@@ -3,9 +3,9 @@
 .s-QuickSearchBar {
     float: right;
     margin: 5px 4px 0 0;
-    padding: 0 16px 0 0;
+    padding: 0;
     border: 1px solid #aaa;
-    background: #fff url(images/magnifier-medium.png) no-repeat right center;
+    background: #fff;
 }
 
 .s-QuickSearchBar input {
@@ -17,6 +17,15 @@
     line-height: 16px;
     .box-shadow(none);
     float: left;
+}
+
+.s-QuickSearchBar::after {
+    content: '';
+    width: 16px;
+    height: 16px;
+    display: block;
+    float: right;
+    background: transparent url(images/sprites.png) no-repeat -73px -121px;
 }
 
 .s-QuickSearchBar.s-QuickSearchLoading, .s-QuickSearchBar.s-QuickSearchLoading input {
