@@ -104,8 +104,8 @@ namespace Serenity.CodeGenerator
                 new SqlQuery().Select(
                     "C.NAME")
                 .From(
-                    "SYSCOLUMNS C " +
-                    "LEFT OUTER JOIN SYSOBJECTS T " +
+                    "syscolumns C " +
+                    "LEFT OUTER JOIN sysobjects T " +
                     "ON (C.id = T.id)")
                 .Where(
                     new Criteria("C.STATUS & 128") == 128 &
