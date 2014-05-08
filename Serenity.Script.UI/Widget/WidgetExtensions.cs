@@ -6,6 +6,7 @@ namespace Serenity
 {
     public delegate string CustomValidationRule(jQueryObject element);
 
+    [ScriptName("WX")]
     public static class WidgetExtensions
     {
         public static TWidget GetWidget<TWidget>(this jQueryObject element) where TWidget : Widget
