@@ -146,6 +146,7 @@ namespace Serenity
         }
     }
 
+    [ScriptName("FLX")]
     public static class FlexifyExtensions
     {
         public static jQueryObject FlexHeightOnly(this jQueryObject element, double flexY = 1)
