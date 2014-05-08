@@ -248,6 +248,14 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class PersonNameEditorAttribute : CustomEditorAttribute
+    {
+        public PersonNameEditorAttribute()
+            : base("PersonName")
+        {
+        }
+    }
+
     public partial class PhoneEditorAttribute : CustomEditorAttribute
     {
         public PhoneEditorAttribute()

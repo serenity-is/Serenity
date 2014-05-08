@@ -65,7 +65,7 @@ namespace Serenity
             else
             {
                 string title = (GetEntityNameFieldValue() ?? "") + " - #" + (this.EntityId.As<long>().ToString());
-                return GetEntitySingular() + " Düzenle (" + title + ")";
+                return GetEntitySingular() + " Düzenleme (" + title + ")";
             }
         }
 
