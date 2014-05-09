@@ -23,9 +23,11 @@ namespace Serenity.Data
         internal Func<Row> rowFactory;
         internal Type rowType;
         internal string schema;
+        internal string generationKey;
         internal string schemaDotTable;
         internal object initializeLock;
         internal string tableName;
+        
 
         protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
@@ -387,18 +389,20 @@ namespace Serenity.Data
             get { return schema; }
         }
 
-        public string SchemaDotTable
+        public string GenerationKey
         {
             get 
             {
-                schemaDotTable = schemaDotTable ?? (schema + "." + TableName);
-                return schemaDotTable;
-            }
-        }
+                if (generationKey != null)
+                    return generationKey;
 
-        public string GenerationKey
-        {
-            get { return SchemaDotTable; }
+                generationKey = (schema + "." + TableName);
+                return generationKey;
+            }
+            set
+            {
+                generationKey = value;
+            }
         }
 
         protected override void InsertItem(int index, Field item)
