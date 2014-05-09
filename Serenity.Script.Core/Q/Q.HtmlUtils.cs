@@ -88,5 +88,10 @@ namespace Serenity
                     return result;
             }
         }
+
+        public static string OuterHtml(this jQueryObject element)
+        {
+            return J("<i/>").Append(element.Eq(0).Clone()).GetHtml();
+        }
     }
 }
