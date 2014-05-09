@@ -24,10 +24,8 @@ namespace Serenity.Data
         internal Type rowType;
         internal string schema;
         internal string generationKey;
-        internal string schemaDotTable;
         internal object initializeLock;
         internal string tableName;
-        
 
         protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
