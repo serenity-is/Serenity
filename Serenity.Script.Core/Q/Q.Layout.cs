@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Html;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
@@ -40,11 +41,22 @@ namespace Serenity
 
             jQueryEventHandler layout = delegate 
             {
+                if (gridDiv.Parent().HasClass("page-content"))
+                    gridDiv.CSS("height", "1px")
+                        .CSS("overflow", "hidden");
+
                 Q.LayoutFillHeight(gridDiv);
                 gridDiv.TriggerHandler("layout");
             };
 
-            jQuery.Window.Resize(layout);
+            if (Window.Instance.As<dynamic>().Metronic != null)
+                Window.Instance.As<dynamic>().Metronic.addResizeHandler(layout);
+            else
+            {
+            }
+                //jQuery.Window.Resize(layout);
+
+
             layout(null);
         }
 
