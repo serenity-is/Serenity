@@ -183,7 +183,7 @@ namespace Serenity
             GridSelectAllButtonHelper.Update<CheckTreeItem>(this, x => x.IsSelected);
         }
 
-        private void UpdateFlags()
+        protected  virtual void UpdateFlags()
         {
             var view = this.view;
             var items = view.GetItems();
@@ -257,7 +257,7 @@ namespace Serenity
             return view.Rows.Count > 0;
         }
 
-        private bool AllSubTreeSelected(CheckTreeItem item)
+        protected bool AllSubTreeSelected(CheckTreeItem item)
         {
             if (item.Children.Count > 0)
                 for (int i = 0; i < item.Children.Count; i++)
