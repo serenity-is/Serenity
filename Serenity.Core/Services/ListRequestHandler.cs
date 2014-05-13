@@ -129,8 +129,8 @@
                 if (nameRow != null)
                     criteria |= new Criteria((Field)nameRow.NameField).Contains(text);
 
-                if (id != null && idRow != null)
-                    criteria |= new Criteria(((Field)idRow.IdField)) == id.Value.ToInvariant();
+                //if (id != null && idRow != null)
+                //    criteria |= new Criteria(((Field)idRow.IdField)) == id.Value.ToInvariant();
 
                 if (!criteria.IsEmpty)
                     query.Where(criteria);
