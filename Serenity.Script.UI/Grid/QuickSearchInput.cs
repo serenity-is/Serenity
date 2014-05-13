@@ -35,6 +35,9 @@ namespace Serenity
 
             if (options.Fields != null && options.Fields.Count > 0)
             {
+                J("<span><i></i></span>").AddClass("quick-search-icon")
+                    .InsertBefore(input);
+
                 var a = J("<a/>").AddClass("quick-search-field")
                     .Attribute("title", "arama yapılacak alanı seç")
                     .InsertBefore(input);
@@ -73,7 +76,7 @@ namespace Serenity
 
             if (field != null)
             {
-                qsf.Text(field.Title + ":");
+                qsf.Text(field.Title);
             }
             else
             {

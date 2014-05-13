@@ -1,31 +1,44 @@
 ﻿@import "serenity.mixins.less";
 
 .s-QuickSearchBar {
-    float: right;
-    margin: 5px 4px 0 0;
+    float: left;
+    margin: 3px 0 0 2px;
     padding: 0;
-    border: 1px solid #aaa;
-    background: #fff;
+    background-color: #fff;
+    border-radius: 0 3px 3px 8px;
 }
 
 .s-QuickSearchBar input {
-    width: 68px;
-    border: 0px none;
-    font-size: 11px;
-    padding: 0 2px 0 2px;
+    width: 110px;
+    font-size: 12px;
+    border: none;
+    padding: 0 2px 0 4px;
     .border-radius(0);
-    line-height: 16px;
+    line-height: 21px;
     .box-shadow(none);
     float: left;
 }
 
-.s-QuickSearchBar::after {
-    content: '';
-    width: 16px;
-    height: 16px;
-    display: block;
-    float: right;
-    background: transparent url(images/sprites.png) no-repeat -73px -121px;
+.s-QuickSearchBar span {
+    display: inline-block;
+    width: 36px;
+    height: 21px;
+    float: left;
+    padding: 0 0 0 8px;
+    border-radius: 0 0 0 8px;
+    background: #4285f4;
+    background: -webkit-linear-gradient(top,#4387fd,#4683ea);
+    background: linear-gradient(top,#4387fd,#4683ea);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#4387fd,endColorstr=#4683ea,GradientType=1);
+}
+
+.s-QuickSearchBar span i {
+    display: inline-block;
+    width: 22px;
+    height: 20px;
+    background-image: url(images/sprites.png);
+    background-repeat: no-repeat;
+    background-position: -214px -93px;
 }
 
 .s-QuickSearchBar.s-QuickSearchLoading, .s-QuickSearchBar.s-QuickSearchLoading input {
@@ -33,22 +46,18 @@
 }
 
 .s-QuickSearchBar.s-QuickSearchFiltered, .s-QuickSearchBar.s-QuickSearchFiltered input {
-    background-color: #ffa;
 }
 
 .s-QuickSearchBar a.quick-search-field {
-    padding: 0 13px 0 2px;
-    background: url(images/down.gif) no-repeat right 0px;
-    float: left;
+    padding: 1px 13px 0 3px;
+    background: url(images/down.gif) no-repeat right 3px;
+    float: right;
     font-size: 11px;
-    line-height: 16px;
+    line-height: 19px;
     cursor: pointer;
     margin-right: 1px;
-    color: #333;
-    background-color: #dcdcdc;
-    border-right: 1px solid #ccc;
+    color: #578ebe;
 }
 
 .s-QuickSearchBar a.quick-search-field:hover {
-    background-color: #ffa;
 }
