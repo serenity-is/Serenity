@@ -119,8 +119,8 @@ namespace Serenity.Reflection
                         sb.AppendLine();
                         cw.Indented("public ");
                         sb.Append(typeName);
-                        if (nullable)
-                            sb.Append("?");
+                        //if (nullable) //Attribute name argument nullable problem
+                        //    sb.Append("?");
                         sb.Append(" ");
                         sb.AppendLine(item);
                         cw.InBrace(() =>
@@ -130,8 +130,8 @@ namespace Serenity.Reflection
                                 propName = "id";
                             cw.Indented("get { return GetOption<");
                             sb.Append(typeName);
-                            if (nullable)
-                                sb.Append("?");
+                            //if (nullable) //Attribute name argument nullable problem
+                            //    sb.Append("?");
                             sb.Append(">(\"");
                             sb.Append(propName);
                             sb.AppendLine("\"); }");
