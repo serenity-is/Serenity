@@ -33,11 +33,11 @@ namespace Serenity
                 self.CheckIfValueChanged();
             });
 
+            J("<span><i></i></span>").AddClass("quick-search-icon")
+                .InsertBefore(input);
+
             if (options.Fields != null && options.Fields.Count > 0)
             {
-                J("<span><i></i></span>").AddClass("quick-search-icon")
-                    .InsertBefore(input);
-
                 var a = J("<a/>").AddClass("quick-search-field")
                     .Attribute("title", "arama yapılacak alanı seç")
                     .InsertBefore(input);
