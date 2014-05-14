@@ -124,7 +124,7 @@
         {
             if (containsField == null)
             {
-                return Row.GetFields().Where(x =>
+                var fields = Row.GetFields().Where(x =>
                 {
                     if (x.CustomAttributes == null)
                         return false;
@@ -137,6 +137,11 @@
 
                     return true;
                 });
+
+                if (!fields.Any() && Row is INameRow)
+                    return new Field[] { ((INameRow)Row).NameField };
+
+                return fields;
             }
 
             var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);

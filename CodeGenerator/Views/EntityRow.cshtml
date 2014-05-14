@@ -46,6 +46,9 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
         attrs.Add("ForeignKey(\"" + x.ForeignTable + "\", \"" + x.ForeignField + "\")");
         attrs.Add("AddJoin(\"j" + x.ForeignJoinAlias + "\")");
     }
+    if (Model.NameField == x.Ident) {
+        attrs.Add("QuickSearch");
+    }
     var attrString = String.Join(", ", attrs.ToArray());
 <text>
 @if (!String.IsNullOrEmpty(attrString)) {
