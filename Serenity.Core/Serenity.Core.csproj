@@ -75,6 +75,8 @@
     <Compile Include="Data\Mapping\AddJoinToAttribute.cs" />
     <Compile Include="Data\Mapping\AddLeftJoinAttribute.cs" />
     <Compile Include="Data\Mapping\DisplayFormatAttribute.cs" />
+    <Compile Include="Data\Mapping\SearchType.cs" />
+    <Compile Include="Data\Mapping\QuickSearchAttribute.cs" />
     <Compile Include="Data\Mapping\TableNameAttribute.cs" />
     <Compile Include="Data\Sql\BasicFilter\BasicFilter.cs" />
     <Compile Include="Data\Sql\BasicFilter\BasicFilterBase.cs" />

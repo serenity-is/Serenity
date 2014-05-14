@@ -1,9 +1,11 @@
 ﻿namespace Serenity.Services
 {
     using Serenity.Data;
+    using Serenity.Data.Mapping;
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Linq;
     using System.Reflection;
 
     public class ListRequestHandler<TRow, TListRequest, TListResponse>
@@ -118,22 +120,129 @@
                 query.OrderBy((Field)idRow.IdField);
         }
 
+        protected virtual IEnumerable<Field> GetQuickSearchFields(string containsField)
+        {
+            if (containsField == null)
+            {
+                return Row.GetFields().Where(x =>
+                {
+                    if (x.CustomAttributes == null)
+                        return false;
+
+                    var attr = x.CustomAttributes.OfType<QuickSearchAttribute>()
+                        .FirstOrDefault();
+
+                    if (attr == null || attr.IsExplicit)
+                        return false;
+
+                    return true;
+                });
+            }
+
+            var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);
+            if (field == null ||
+                ((field.MinSelectLevel == SelectLevel.Never) && 
+                    (field.CustomAttributes == null || 
+                     !field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
+            {
+                throw new ArgumentOutOfRangeException("containsField");
+            }
+
+            return new Field[] { field };
+        }
+
         protected virtual void ApplyContainsText(SqlQuery query, string containsText)
         {
-            var nameRow = Row as INameRow;
-            var idRow = Row as IIdRow;
-            var idField = idRow != null ? (Field)idRow.IdField : null;
-            var idFieldFilter = idField == null ? null : new Criteria(idField);
-            query.ApplyContainsText(containsText, (text, id) => {
-                var criteria = Criteria.Empty;
-                if (nameRow != null)
-                    criteria |= new Criteria((Field)nameRow.NameField).Contains(text);
+            query.ApplyContainsText(containsText, (text, id) =>
+            {
+                var fields = GetQuickSearchFields(Request.ContainsField.TrimToNull());
+                if (fields == null || !fields.Any())
+                    throw new ArgumentOutOfRangeException("containsField");
 
-                //if (id != null && idRow != null)
-                //    criteria |= new Criteria(((Field)idRow.IdField)) == id.Value.ToInvariant();
+                var criteria = Criteria.Empty;
+
+                bool orFalse = false;
+
+                foreach (var field in fields)
+                {
+                    var attr = field.CustomAttributes == null ? null : field.CustomAttributes.OfType<QuickSearchAttribute>().FirstOrDefault();
+                    var searchType = attr == null ? SearchType.Auto : attr.SearchType;
+                    var numericOnly = attr == null ? null : attr.NumericOnly;
+
+                    if (numericOnly == null)
+                        numericOnly = field is Int32Field || field is Int16Field || field is Int64Field;
+
+                    if (searchType == SearchType.Auto)
+                    {
+                        if (field is Int32Field || field is Int16Field || field is Int64Field)
+                            searchType = SearchType.Equals;
+                        else
+                            searchType = SearchType.Contains;
+                    }
+
+                    if (numericOnly == true && (id == null))
+                    {
+                        orFalse = true;
+                        continue;
+                    }
+
+                    switch (searchType)
+                    {
+                        case SearchType.Contains:
+                            criteria |= new Criteria(field).Contains(containsText);
+                            break;
+
+                        case SearchType.StartsWith:
+                            criteria |= new Criteria(field).StartsWith(containsText);
+                            break;
+
+                        case SearchType.Equals:
+                            if (field is Int32Field)
+                            {
+                                if (id == null || id < Int32.MinValue || id > Int32.MaxValue)
+                                {
+                                    orFalse = true;
+                                    continue;
+                                }
+
+                                criteria |= new Criteria(field) == (int)id;
+                            }
+                            else if (field is Int16Field)
+                            {
+                                if (id == null || id < Int16.MinValue || id > Int16.MaxValue)
+                                {
+                                    orFalse = true;
+                                    continue;
+                                }
+
+                                criteria |= new Criteria(field) == (Int16)id;
+                            }
+                            else if (field is Int64Field)
+                            {
+                                if (id == null || id < Int64.MinValue || id > Int64.MaxValue)
+                                {
+                                    orFalse = true;
+                                    continue;
+                                }
+
+                                criteria |= new Criteria(field) == id.Value;
+                            }
+                            else
+                            {
+                                criteria |= new Criteria(field) == containsText;
+                            }
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException("searchType");
+                    }
+                }
+
+                if (orFalse && criteria.IsEmpty)
+                    criteria |= new Criteria("1 = 0");
 
                 if (!criteria.IsEmpty)
-                    query.Where(criteria);
+                    query.Where(~(criteria));
             });
         }
 
