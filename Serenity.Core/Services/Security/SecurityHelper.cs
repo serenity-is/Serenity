@@ -153,9 +153,8 @@ namespace Serenity
         public static bool IsAdmin()
         {
             return (AdminUsername != null && CurrentUsername == AdminUsername) || 
-                   (AdminUserId != null && CurrentUserId == AdminUserId);
+                   (AdminUserId != null && CurrentUserIdOrNull == AdminUserId);
         }
-
 
 
         /// <summary>
