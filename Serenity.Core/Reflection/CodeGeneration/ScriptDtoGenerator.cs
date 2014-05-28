@@ -126,6 +126,9 @@ namespace Serenity.Reflection
                         if (outputted.Contains(owner.Key))
                             continue;
 
+                        if (!generatedCode.ContainsKey(owner.Key))
+                            continue;
+
                         outputted.Add(owner.Key);
 
                         string code = generatedCode[owner.Key].TrimEnd();
