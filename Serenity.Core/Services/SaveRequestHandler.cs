@@ -351,6 +351,10 @@ namespace Serenity.Services
             {
                 HandleDisplayOrder(afterSave: false);
                 SetTrimToEmptyFields();
+
+                var isActiveRow = Row as IIsActiveRow;
+                if (isActiveRow != null)
+                    isActiveRow.IsActiveField[Row] = 1;
             }
 
             SetInternalLogFields();
