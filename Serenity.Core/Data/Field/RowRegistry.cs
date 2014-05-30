@@ -87,21 +87,7 @@ namespace Serenity.Data
 
         private static Row GetInstance(Type rowType)
         {
-            //var instanceField = rowType.GetField("Instance",
-            //    System.Reflection.BindingFlags.Public |
-            //    System.Reflection.BindingFlags.Static);
-
-            //if (instanceField != null)
-            //    return (Row)instanceField.GetValue(null);
-            
-            //var instanceProp = rowType.GetProperty("Instance",
-            //        System.Reflection.BindingFlags.Public |
-            //        System.Reflection.BindingFlags.Static);
-
-            //if (instanceProp != null)
-            //    return (Row)instanceProp.GetValue(null, null);
-
-            return (Row)InstanceCreator.GetInstance(rowType);
+            return (Row)Activator.CreateInstance(rowType);
         }
 
         private static Dictionary<string, Dictionary<string, Row>> EnsureRegistry()
