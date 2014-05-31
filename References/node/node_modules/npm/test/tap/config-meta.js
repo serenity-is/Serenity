@@ -31,7 +31,12 @@ test("get files", function (t) {
       return path.resolve(lib, f)
     })
     files.forEach(function (f) {
-      if (fs.statSync(f).isDirectory())
+      try {
+        var s = fs.statSync(f)
+      } catch (er) {
+        return
+      }
+      if (s.isDirectory())
         walk(f)
       else if (f.match(/\.js$/))
         FILES.push(f)
@@ -41,7 +46,6 @@ test("get files", function (t) {
 
 test("get lines", function (t) {
   FILES.forEach(function (f) {
-    console.error(f)
     var lines = fs.readFileSync(f, 'utf8').split('\n')
     lines.forEach(function (l, i) {
       var matches = l.split(/conf(?:ig)?\.get\(/g)
@@ -78,7 +82,6 @@ test("get docs", function (t) {
       DOC[ d[i].replace(/^### /, '').trim() ] = true
   }
   t.pass("read the docs")
-  console.error(DOC)
   t.end()
 })
 
