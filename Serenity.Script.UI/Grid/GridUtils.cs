@@ -102,8 +102,12 @@ namespace Serenity
         {
             var input = jQuery.FromHtml("<div><input type=\"text\"/></div>")
                 .AddClass("s-QuickSearchBar")
-                .PrependTo(container)
-                .Children();
+                .PrependTo(container);
+
+            if (fields != null && fields.Count > 0)
+                input.AddClass("has-quick-search-fields");
+
+            input = input.Children();
 
             new QuickSearchInput(input, new QuickSearchInputOptions
             {

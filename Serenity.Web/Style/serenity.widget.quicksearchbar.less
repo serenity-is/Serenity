@@ -4,8 +4,8 @@
     float: left;
     margin: 2px 1px 0 0;
     padding: 0;
-    background-color: #fff;
-    border-radius: 0 3px 3px 8px;
+    background-color: transparent;
+    border-right: 1px solid #aaa;
 }
 
 .s-QuickSearchBar input {
@@ -14,10 +14,12 @@
     border: none;
     padding: 0 2px 0 4px;
     .border-radius(0);
-    line-height: 22px;
+    line-height: 21px;
     height: 23px;
     .box-shadow(none);
     float: left;
+    border: 1px solid #aaa;
+    border-style: solid none solid none;
 }
 
 .s-QuickSearchBar span {
@@ -48,15 +50,22 @@
 
 .s-QuickSearchBar a.quick-search-field {
     padding: 0 13px 0 3px;
-    background: url(images/down.gif) no-repeat right 5px;
+    background: #fff url(images/down.gif) no-repeat right 3px;
     float: right;
     font-size: 11px;
     height: 23px;
-    line-height: 23px;
+    line-height: 21px;
     cursor: pointer;
     margin-right: 1px;
     color: #0090d9;
+    border: 1px solid #aaa;
+    border-radius: 0 4px 4px 0;
+    border-style: solid solid solid none;
 }
 
 .s-QuickSearchBar a.quick-search-field:hover {
+}
+
+.s-QuickSearchBar.has-quick-search-fields {
+    border-right: none;
 }
