@@ -511,8 +511,8 @@ namespace Serenity
             opt.MultiSelect = false;
             opt.MultiColumnSort = true;
             opt.EnableCellNavigation = false;
-            opt.HeaderRowHeight = 23;
-            opt.RowHeight = 23;
+            opt.HeaderRowHeight = 30;
+            opt.RowHeight = 27;
             return opt;
         }
 

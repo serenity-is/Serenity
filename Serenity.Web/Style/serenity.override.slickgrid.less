@@ -1,6 +1,10 @@
 ﻿@import "serenity.mixins.less";
 
-.slick-cell > a {
+.s-DataGrid, .slick-cell, .slick-header-column {
+    font-size: 13px;
+}
+
+.slick-header-column .slick-cell > a {
   color: #575790;
   text-decoration: none;
 }
@@ -26,7 +30,7 @@
 
 .ui-widget-content .slick-header-column.ui-state-default,
  .slick-header-column.ui-state-default {
-    padding: 4px 3px 4px 4px;
+    padding: 5px 3px 5px 4px;
     border-right: 1px solid #dddddd;
     border-left: 1px solid #f7f7f7;
 }
@@ -44,7 +48,7 @@
 }
 
 .slick-row {
-    line-height: 20px;
+    line-height: 23px;
 }
 
 .slick-row.odd {
@@ -65,10 +69,10 @@
 }
 
 .slick-cell, .ui-widget-content .slick-cell, .s-DataGrid .grid-container .slick-cell {
-    border-style: none solid solid none; 
-    border-color: transparent #dddddd #dddddd transparent;
+    border-style: none none solid none; 
+    border-color: transparent transparent #eee transparent;
     border-width: 1px;
-    padding: 1px 4px 1px 4px;
+    padding: 2px 4px 2px 4px;
 }
 
 .slick-row.ui-state-active {
