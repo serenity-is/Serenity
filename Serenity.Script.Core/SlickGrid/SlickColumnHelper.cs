@@ -27,6 +27,8 @@ namespace Serenity
                     col.Title = Q.Text(localTextPrefix + key);
                 }
 
+                col.Title = Q.Externals.TurkishLocaleToUpper(col.Title);
+
                 if (col.Formatter == null && col.Format != null)
                     col.Formatter = ConvertToFormatter(col.Format);
                 else if (col.Formatter == null)
