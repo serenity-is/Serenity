@@ -45,16 +45,12 @@
                 var x = J(e);
                 var title = Q.Externals.StripDiacritics((x.GetText() ?? "").ToUpperCase());
 
-                bool anyMatch = false;
                 foreach (var p in parts)
-                    if (p != null && title.Contains(p))
+                    if (p != null && !title.Contains(p))
                     {
-                        anyMatch = true;
+                        x.AddClass("non-match");
                         break;
                     }
-
-                if (!anyMatch)
-                    x.AddClass("non-match");
             });
             
             var matchingItems = reportItems.Not(".non-match");
