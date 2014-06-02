@@ -179,9 +179,15 @@ namespace Serenity
             return new object();
         }
 
+        protected virtual List<SlickColumn> PostProcessColumns(List<SlickColumn> columns)
+        {
+            columns.SetDefaults(localTextPrefix: GetLocalTextPrefix());
+            return columns;
+        }
+
         protected virtual SlickGrid CreateSlickGrid()
         {
-            var slickColumns = GetColumns().SetDefaults(localTextPrefix: GetLocalTextPrefix());
+            var slickColumns = PostProcessColumns(GetColumns());
             var slickOptions = GetSlickOptions();
             var self = this;
             dynamic viewRows = view.Rows;
