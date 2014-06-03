@@ -178,7 +178,7 @@
         ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
         /// <returns>
         ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
-        public static IDataReader Execute(this SqlQuery query, IDbConnection connection)
+        public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection)
         {
             return ExecuteReader(connection, query.ToString(), query.Params);
         }
@@ -196,7 +196,7 @@
         ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
         /// <returns>
         ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
-        public static IDataReader Execute(this SqlQuery query, IDbConnection connection, Dictionary param)
+        public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, Dictionary param)
         {
             return ExecuteReader(connection, query.ToString(), param);
         }
