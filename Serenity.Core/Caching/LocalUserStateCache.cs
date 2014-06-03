@@ -50,7 +50,7 @@ namespace Serenity.Data
                     return (T)item.State;
             }
 
-            var state = Json.Deserialize<T>(IoC.Resolve<ILocalUserStateService>().Load(stateKey).TrimToNull() ?? "{}"); 
+            var state = Json.ParseTolerant<T>(IoC.Resolve<ILocalUserStateService>().Load(stateKey).TrimToNull() ?? "{}"); 
 
             lock (_objectItems)
             {

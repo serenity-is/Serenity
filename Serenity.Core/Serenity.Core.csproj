@@ -109,7 +109,6 @@
     <Compile Include="Data\Extensions\FilterableQueryExtensions.cs" />
     <Compile Include="Data\Extensions\QueryWithParamsExtensions.cs" />
     <Compile Include="Data\Extensions\SetFieldByStatementExtensions.cs" />
-    <Compile Include="Data\Extensions\JsonWriterExtensions.cs" />
     <Compile Include="Data\FieldTypes\BooleanField.cs" />
     <Compile Include="Data\FieldTypes\CustomClassField.cs" />
     <Compile Include="Data\FieldTypes\DateTimeField.cs" />

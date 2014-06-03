@@ -22,7 +22,7 @@ namespace Serenity
         {
             try
             {
-                var settings = Json.Deserialize<LogSettings>(ConfigurationManager.AppSettings["Logging"].TrimToNull() ?? "{}");
+                var settings = Json.ParseTolerant<LogSettings>(ConfigurationManager.AppSettings["Logging"].TrimToNull() ?? "{}");
                 _level = settings.Level;
                 _file = settings.File;
                 _queue = new List<string>();
