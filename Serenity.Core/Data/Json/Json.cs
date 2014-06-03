@@ -8,17 +8,8 @@ namespace Serenity.Data
 {
     public static class Json
     {
-        public static JsonSerializerSettings DefaultSettings;
-
         static Json()
         {
-            DefaultSettings = new JsonSerializerSettings();
-            DefaultSettings.NullValueHandling = NullValueHandling.Ignore;
-            DefaultSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
-            DefaultSettings.TypeNameHandling = TypeNameHandling.None;
-            DefaultSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            DefaultSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
-            DefaultSettings.Converters.Add(new IsoDateTimeConverter());
         }
 
         public static JsonReader CreateReader(string input)
@@ -40,7 +31,7 @@ namespace Serenity.Data
 
         public static T Deserialize<T>(string input)
         {
-            return JsonConvert.DeserializeObject<T>(input, Json.DefaultSettings);
+            return JsonConvert.DeserializeObject<T>(input, JsonSettings.Tolerant);
         }
 
         public static object Deserialize(string input, Type type)
@@ -50,12 +41,12 @@ namespace Serenity.Data
 
         public static string Serialize(object value)
         {
-            return JsonConvert.SerializeObject(value, Formatting.None, Json.DefaultSettings);
+            return JsonConvert.SerializeObject(value, Formatting.None, JsonSettings.Tolerant);
         }
 
         public static string SerializeIndented(object value)
         {
-            return JsonConvert.SerializeObject(value, Formatting.Indented, Json.DefaultSettings);
+            return JsonConvert.SerializeObject(value, Formatting.Indented, JsonSettings.Tolerant);
         }
     }
 }

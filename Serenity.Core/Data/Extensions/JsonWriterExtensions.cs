@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;
 using Newtonsoft.Json;
+using Serenity.Data;
 
-namespace Serenity.Data
+namespace Serenity
 {
     /// <summary>
     ///   Class that contains extension methods for JsonWriter</summary>
@@ -140,7 +141,7 @@ namespace Serenity.Data
         ///   If object has a ToJson method it is used, otherwise value.ToString() is used as last fallback.</remarks>
         public static void ToJson(this object value, JsonWriter jw)
         {
-            JsonSerializer.Create(Json.DefaultSettings).Serialize(jw, value);
+            JsonSerializer.Create(JsonSettings.Tolerant).Serialize(jw, value);
         }
     }
 }
