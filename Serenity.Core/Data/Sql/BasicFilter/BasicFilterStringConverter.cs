@@ -124,7 +124,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("criteria");
 
             if (!filter.IsValid)
-                throw new ArgumentOutOfRangeException("InvalidFilterCriteria", filter.ToJsonString());
+                throw new ArgumentOutOfRangeException("InvalidFilterCriteria", filter.ToJson());
 
             if (_processCriteria != null)
             {
@@ -132,7 +132,7 @@ namespace Serenity.Data
                 if (!Object.ReferenceEquals(processed, null))
                 {
                     if (processed.IsEmpty)
-                        throw new ArgumentOutOfRangeException("EmptyFilterLine", filter.ToJsonString());
+                        throw new ArgumentOutOfRangeException("EmptyFilterLine", filter.ToJson());
 
                     return processed;
                 }
@@ -164,7 +164,7 @@ namespace Serenity.Data
             {
                 // field is not found anywhere, don't allow unknown fields as it may cause a script injection 
                 // attack or other types of security threats!
-                throw new ArgumentOutOfRangeException("UnknownFilterField", filter.ToJsonString());
+                throw new ArgumentOutOfRangeException("UnknownFilterField", filter.ToJson());
             }
 
             bool isInteger = (filterField != null && (filterField.Handler == "Integer")) ||
@@ -219,7 +219,7 @@ namespace Serenity.Data
                         }
 
                         if (values.Count == 0)
-                            throw new ArgumentOutOfRangeException("InvalidFilterLine", filter.ToJsonString());
+                            throw new ArgumentOutOfRangeException("InvalidFilterLine", filter.ToJson());
 
                         if (op == FilterOp.IN)
                             return new Criteria(fieldExpr).In(values.ToArray());
@@ -235,7 +235,7 @@ namespace Serenity.Data
             if ((op == FilterOp.BW || op == FilterOp.NotBW))
             {
                 if (value1Text.IsNullOrEmpty() || value2Text.IsNullOrEmpty())
-                    throw new ArgumentOutOfRangeException("InvalidFilterLine", filter.ToJsonString());
+                    throw new ArgumentOutOfRangeException("InvalidFilterLine", filter.ToJson());
 
                 if (isInteger)
                     return new Criteria(fieldExpr) >= ParseIntegerValue(field, value1Text) &

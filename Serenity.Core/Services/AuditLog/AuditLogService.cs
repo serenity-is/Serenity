@@ -317,7 +317,7 @@ namespace Serenity.Services
 
             string auditData;
             if (dstRow.IsAnyFieldAssigned)
-                auditData = dstRow.ToJsonString();
+                auditData = dstRow.ToJson();
             else
                 auditData = null;
 
@@ -426,12 +426,12 @@ namespace Serenity.Services
             if (data.Old == null)
                 oldAuditData = null;
             else
-                oldAuditData = data.Old.ToJsonString();
+                oldAuditData = data.Old.ToJson();
 
             if (data.New == null)
                 newAuditData = null;
             else
-                newAuditData = data.New.ToJsonString();
+                newAuditData = data.New.ToJson();
 
             var audit = ((Row)fld).CreateNew();
             audit.TrackAssignments = true;

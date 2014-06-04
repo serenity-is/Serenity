@@ -32,7 +32,7 @@ namespace Serenity.Web.FilterPanel
         public string GetScript()
         {
             var items = _getFields();
-            return String.Format("$.nt.filterFields.{0} = {1};", _name, items.ToJsonString());
+            return String.Format("$.nt.filterFields.{0} = {1};", _name, items.ToJson());
         }
 
         public void CheckRights()

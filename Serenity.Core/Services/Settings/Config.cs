@@ -67,7 +67,7 @@ namespace Serenity.Data
             var settingType = state.GetType();
 
             string key = GetSettingKey(state.GetType());
-            string stateString = Json.ToStringIndented(state);
+            string stateString = Json.StringifyIndented(state);
 
             if (typeof(ISiteSetting).IsAssignableFrom(settingType))
                 IoC.Resolve<ISiteStateService>().Save(key, stateString);

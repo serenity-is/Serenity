@@ -396,7 +396,7 @@ namespace Serenity.Data
                     v._params.Count > 0)
                 {
                     jw.WritePropertyName("Params");
-                    jw.WriteRawValue(v._params.ToJsonString());
+                    jw.WriteRawValue(v._params.ToJson());
                 }
 
                 if (v._isRequired)

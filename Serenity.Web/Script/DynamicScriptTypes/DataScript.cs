@@ -50,7 +50,7 @@ namespace Serenity.Web
         public string GetScript()
         {
             TData data = _getData();
-            return String.Format("Q$ScriptData.set({0}, {1});", _scriptName.ToSingleQuoted(), data.ToJsonString());
+            return String.Format("Q$ScriptData.set({0}, {1});", _scriptName.ToSingleQuoted(), data.ToJson());
         }
 
         public void CheckRights()

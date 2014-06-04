@@ -54,7 +54,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="value">Value to convert to JSON</param>
         /// <returns>Serialized JSON string</returns>
-        public static string ToString(object value)
+        public static string Stringify(object value)
         {
             return JsonConvert.SerializeObject(value, JsonSettings.Strict);
         }
@@ -64,7 +64,7 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="value">Value to convert to JSON</param>
         /// <returns>Serialized JSON string</returns>
-        public static string ToStringIndented(object value)
+        public static string StringifyIndented(object value)
         {
             return JsonConvert.SerializeObject(value, Formatting.Indented, JsonSettings.Strict);
         }
@@ -78,9 +78,24 @@ namespace Serenity.Data
         /// <remarks>
         ///   null, Int32, Boolean, DateTime, Decimal, Double, Guid types handled automatically.
         ///   If object has a ToJson method it is used, otherwise value.ToString() is used as last fallback.</remarks>
+        [Obsolete("Use ToJson()")]
         public static string ToJsonString(this object value)
         {
-            return ToString(value);
+            return Stringify(value);
+        }
+
+        /// <summary>
+        ///   Converts an object to its JSON representation (extension method for Stringify)</summary>
+        /// <param name="value">
+        ///   Object</param>
+        /// <returns>
+        ///   JSON representation string.</returns>
+        /// <remarks>
+        ///   null, Int32, Boolean, DateTime, Decimal, Double, Guid types handled automatically.
+        ///   If object has a ToJson method it is used, otherwise value.ToString() is used as last fallback.</remarks>
+        public static string ToJson(this object value)
+        {
+            return Stringify(value);
         }
     }
 }

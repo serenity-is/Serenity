@@ -200,7 +200,7 @@ namespace Serenity.Data
 
                 if (!line.IsValid)
                 {
-                    throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJsonString());
+                    throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJson());
                     //sb.Append(TRUE);
                     //continue;
                 }
@@ -213,7 +213,7 @@ namespace Serenity.Data
                         if (filter.IsEmpty)
                         {
                             //sb.Append(TRUE);
-                            throw new ArgumentOutOfRangeException("EmptyFilterLine", line.ToJsonString());
+                            throw new ArgumentOutOfRangeException("EmptyFilterLine", line.ToJson());
                         }
                         else
                             sb.Append(filter.ToStringIgnoreParams()); // FIX!!!!
@@ -232,7 +232,7 @@ namespace Serenity.Data
                 {
                     filterField = filterFields.ByNameOrTextual(fieldName);
                     if (filterField == null)
-                        throw new ArgumentOutOfRangeException("UnknownFilterField", line.ToJsonString());
+                        throw new ArgumentOutOfRangeException("UnknownFilterField", line.ToJson());
                     //sb.Append(TRUE);
                     //continue;
                 }
@@ -270,7 +270,7 @@ namespace Serenity.Data
                     // field is not found anywhere, don't allow unknown fields as it may cause a script injection 
                     // attack or other types of security threats!
                     //sb.Append(TRUE);
-                    throw new ArgumentOutOfRangeException("UnknownFilterField", line.ToJsonString());
+                    throw new ArgumentOutOfRangeException("UnknownFilterField", line.ToJson());
                     //continue;
                 }
 
@@ -311,7 +311,7 @@ namespace Serenity.Data
 
                     if (vs.Length == 0)
                         //sb.Append(TRUE);
-                        throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJsonString());
+                        throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJson());
                     else
                         sb.AppendFormat(sqlOp, fieldExpr, vs.ToString());
 
@@ -349,7 +349,7 @@ namespace Serenity.Data
 
                         // value must be entered
                         if (valueText == null)
-                            throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJsonString());
+                            throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJson());
 
                         bool isDateTime =
                             (filterField != null && (filterField.Handler == "Date")) ||
@@ -360,7 +360,7 @@ namespace Serenity.Data
                         {   // parse invariant decimal value for integer and float fields
                             decimal d;
                             if (!Decimal.TryParse(valueText, NumberStyles.Float, Invariants.NumberFormat, out d))
-                                throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJsonString());
+                                throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJson());
 
                             valueText = d.ToInvariant();
                         }
@@ -368,7 +368,7 @@ namespace Serenity.Data
                         {   // parse iso date-time string
                             DateTime d;
                             if (!DateHelper.TryParseISO8601DateTime(valueText, out d))
-                                throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJsonString());
+                                throw new ArgumentOutOfRangeException("InvalidFilterLine", line.ToJson());
 
                             DateTimeKind kind = DateTimeKind.Unspecified;
                             object dateKindObj;

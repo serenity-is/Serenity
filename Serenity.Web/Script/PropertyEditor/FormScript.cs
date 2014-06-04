@@ -45,7 +45,7 @@ namespace Serenity.Web
                 instance.Customize(items);
             }
 
-            return String.Format("Q$ScriptData.set({0}, {1});", ("Form." + _name).ToSingleQuoted(), items.ToJsonString());
+            return String.Format("Q$ScriptData.set({0}, {1});", ("Form." + _name).ToSingleQuoted(), items.ToJson());
         }
 
         public void CheckRights()
