@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Serenity.Data
+namespace Serenity
 {
-    public static class Json
+    public static class JSON
     {
         /// <summary>
         /// Deserializes a JSON string to an object

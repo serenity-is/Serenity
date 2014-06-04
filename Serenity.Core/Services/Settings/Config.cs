@@ -28,14 +28,14 @@ namespace Serenity.Data
                 if (cached)
                     return SiteStateCache.Get(key);
                 else
-                    return Json.ParseTolerant(IoC.Resolve<ISiteStateService>().Load(key).TrimToNull() ?? "{}", settingType);
+                    return JSON.ParseTolerant(IoC.Resolve<ISiteStateService>().Load(key).TrimToNull() ?? "{}", settingType);
             }
             else
             {
                 if (cached)
                     return LocalUserStateCache.Get(key);
                 else
-                    return Json.ParseTolerant(IoC.Resolve<ILocalUserStateService>().Load(key).TrimToNull() ?? "{}", settingType);
+                    return JSON.ParseTolerant(IoC.Resolve<ILocalUserStateService>().Load(key).TrimToNull() ?? "{}", settingType);
             }
         }
 
@@ -48,14 +48,14 @@ namespace Serenity.Data
                 if (cached)
                     return SiteStateCache.Deserialize<TSettings>(key);
                 else
-                    return Json.ParseTolerant<TSettings>(IoC.Resolve<ISiteStateService>().Load(key).TrimToNull() ?? "{}");
+                    return JSON.ParseTolerant<TSettings>(IoC.Resolve<ISiteStateService>().Load(key).TrimToNull() ?? "{}");
             }
             else
             {
                 if (cached)
                     return LocalUserStateCache.Deserialize<TSettings>(key);
                 else
-                    return Json.ParseTolerant<TSettings>(IoC.Resolve<ILocalUserStateService>().Load(key).TrimToNull() ?? "{}");
+                    return JSON.ParseTolerant<TSettings>(IoC.Resolve<ILocalUserStateService>().Load(key).TrimToNull() ?? "{}");
             }
         }
 
@@ -67,7 +67,7 @@ namespace Serenity.Data
             var settingType = state.GetType();
 
             string key = GetSettingKey(state.GetType());
-            string stateString = Json.StringifyIndented(state);
+            string stateString = JSON.StringifyIndented(state);
 
             if (typeof(ISiteSetting).IsAssignableFrom(settingType))
                 IoC.Resolve<ISiteStateService>().Save(key, stateString);
