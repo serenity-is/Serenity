@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
 using Serenity.Data;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace Serenity
 {
@@ -71,7 +73,7 @@ namespace Serenity
                 bool hasCustomData = false;
 
                 var sb = new StringBuilder();
-                var jw = Json.CreateWriter(sb);
+                var jw = new JsonTextWriter(new StringWriter(sb));
 
                 foreach (var key in exception.Data.Keys)
                     if (key is String)
@@ -86,11 +88,12 @@ namespace Serenity
                         try
                         {
                             jw.WritePropertyName((string)key);
-                            value.ToJson(jw);
+                            JsonSerializer.Create(JsonSettings.Tolerant).Serialize(jw, value);
                         }
                         catch
                         {
-                            jw.WriteValue((string)key, "error converting data to string");
+                            jw.WritePropertyName((string)key);
+                            jw.WriteValue("error converting data to string");
                         }
                     }
 

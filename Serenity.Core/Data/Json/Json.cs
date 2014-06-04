@@ -1,52 +1,86 @@
-﻿using System.IO;
-using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json;
 using System;
 
 namespace Serenity.Data
 {
     public static class Json
     {
-        static Json()
+        /// <summary>
+        /// Deserializes a JSON string to an object
+        /// </summary>
+        /// <typeparam name="T">Type to deserialize</typeparam>
+        /// <param name="input">JSON string</param>
+        /// <returns>Deserialized object</returns>
+        public static T Parse<T>(string input)
         {
+            return JsonConvert.DeserializeObject<T>(input, JsonSettings.Strict);
         }
 
-        public static JsonReader CreateReader(string input)
+        /// <summary>
+        /// Deserializes a JSON string to an object
+        /// </summary>
+        /// <typeparam name="T">Type to deserialize</typeparam>
+        /// <param name="input">JSON string</param>
+        /// <returns>Deserialized object</returns>
+        public static object Parse(string input, Type targetType)
         {
-            var tw = new StringReader(input);
-            return new JsonTextReader(tw);
+            return JsonConvert.DeserializeObject(input, targetType, JsonSettings.Strict);
         }
 
-        public static JsonWriter CreateWriter(TextWriter output)
-        {
-            return new JsonTextWriter(output);
-        }
-
-        public static JsonWriter CreateWriter(StringBuilder sb)
-        {
-            var tw = new StringWriter(sb);
-            return new JsonTextWriter(tw);
-        }
-
-        public static T Deserialize<T>(string input)
+        /// <summary>
+        /// Deserializes a JSON string to an object, using more tolerant settings.
+        /// </summary>
+        /// <typeparam name="T">Type to deserialize</typeparam>
+        /// <param name="input">JSON strng</param>
+        /// <returns>Deserialized object</returns>
+        public static T ParseTolerant<T>(string input)
         {
             return JsonConvert.DeserializeObject<T>(input, JsonSettings.Tolerant);
         }
 
-        public static object Deserialize(string input, Type type)
+        /// <summary>
+        /// Deserializes a JSON string to an object, using more tolerant settings
+        /// </summary>
+        /// <typeparam name="T">Type to deserialize</typeparam>
+        /// <param name="input">JSON string</param>
+        /// <returns>Deserialized object</returns>
+        public static object ParseTolerant(string input, Type targetType)
         {
-            return JsonConvert.DeserializeObject(input, type);
+            return JsonConvert.DeserializeObject(input, targetType, JsonSettings.Tolerant);
         }
 
-        public static string Serialize(object value)
+        /// <summary>
+        /// Converts object to its JSON representation
+        /// </summary>
+        /// <param name="value">Value to convert to JSON</param>
+        /// <returns>Serialized JSON string</returns>
+        public static string ToString(object value)
         {
-            return JsonConvert.SerializeObject(value, Formatting.None, JsonSettings.Tolerant);
+            return JsonConvert.SerializeObject(value, JsonSettings.Strict);
         }
 
-        public static string SerializeIndented(object value)
+        /// <summary>
+        /// Converts object to its JSON representation
+        /// </summary>
+        /// <param name="value">Value to convert to JSON</param>
+        /// <returns>Serialized JSON string</returns>
+        public static string ToStringIndented(object value)
         {
-            return JsonConvert.SerializeObject(value, Formatting.Indented, JsonSettings.Tolerant);
+            return JsonConvert.SerializeObject(value, Formatting.Indented, JsonSettings.Strict);
+        }
+
+        /// <summary>
+        ///   Converts an object to its JSON representation</summary>
+        /// <param name="value">
+        ///   Object</param>
+        /// <returns>
+        ///   JSON representation string.</returns>
+        /// <remarks>
+        ///   null, Int32, Boolean, DateTime, Decimal, Double, Guid types handled automatically.
+        ///   If object has a ToJson method it is used, otherwise value.ToString() is used as last fallback.</remarks>
+        public static string ToJsonString(this object value)
+        {
+            return ToString(value);
         }
     }
 }
