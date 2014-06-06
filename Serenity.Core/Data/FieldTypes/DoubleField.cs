@@ -28,7 +28,7 @@ namespace Serenity.Data
             if (reader.IsDBNull(index))
                 _setValue(row, null);
             else
-                _setValue(row, Convert.ToDouble(index, CultureInfo.InvariantCulture));
+                _setValue(row, reader.GetDouble(index));
 
             if (row.tracking)
                 row.FieldAssignedValue(this);
