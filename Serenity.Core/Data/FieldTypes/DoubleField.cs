@@ -25,10 +25,13 @@ namespace Serenity.Data
             if (reader == null)
                 throw new ArgumentNullException("reader");
 
+            var value = reader.GetValue(index);
             if (reader.IsDBNull(index))
                 _setValue(row, null);
+            else if (value is Double)
+                _setValue(row, (double)value);
             else
-                _setValue(row, reader.GetDouble(index));
+                _setValue(row, Convert.ToDouble(value, CultureInfo.InvariantCulture));
 
             if (row.tracking)
                 row.FieldAssignedValue(this);
