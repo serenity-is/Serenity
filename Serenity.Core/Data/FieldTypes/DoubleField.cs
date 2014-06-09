@@ -26,7 +26,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("reader");
 
             var value = reader.GetValue(index);
-            if (reader.IsDBNull(index))
+            if (value is DBNull)
                 _setValue(row, null);
             else if (value is Double)
                 _setValue(row, (double)value);
