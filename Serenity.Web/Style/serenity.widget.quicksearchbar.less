@@ -6,6 +6,7 @@
     padding: 0;
     background-color: transparent;
     border-right: 1px solid #aaa;
+    .border-radius(4px, 4px, 0, 0);
 }
 
 .s-QuickSearchBar input {
@@ -13,13 +14,17 @@
     font-size: 13px;
     border: none;
     padding: 0 2px 0 4px;
-    .border-radius(0);
+    .border-radius(4px, 4px, 0, 0);
     line-height: 23px;
     height: 28px;
     .box-shadow(none);
     float: left;
     border: 1px solid #aaa;
     border-style: solid none solid none;
+}
+
+.s-QuickSearchBar.has-quick-search-fields input {
+    .border-radius(0);
 }
 
 .s-QuickSearchBar span {
