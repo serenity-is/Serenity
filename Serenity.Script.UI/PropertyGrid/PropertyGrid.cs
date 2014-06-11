@@ -191,6 +191,8 @@ namespace Serenity
                 editorParams = jQuery.ExtendObject(Activator.CreateInstance(optionsType), item.EditorParams);
 
             Widget editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
+            if (editor is BooleanEditor)
+                label.RemoveAttr("for");
 
             if (Script.IsValue(item.MaxLength))
                 SetMaxLength(editor, item.MaxLength.Value);
