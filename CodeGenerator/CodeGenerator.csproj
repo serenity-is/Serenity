@@ -78,8 +78,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RazorGenerator.Templating">
-      <HintPath>$(SolutionDir)\packages\RazorGenerator.Templating.2.2.2\lib\net40\RazorGenerator.Templating.dll</HintPath>
+    <Reference Include="RazorGenerator.Templating, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\RazorGenerator.Templating.2.2.3\lib\net40\RazorGenerator.Templating.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -108,6 +109,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="SampleTemplate.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SampleTemplate.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="StringInflector.cs" />
     <Compile Include="EntityCodeGenerator.cs" />
     <Compile Include="RowGenerator.cs" />
@@ -204,6 +210,10 @@
       <SubType>Designer</SubType>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="SampleTemplate.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>SampleTemplate.generated.cs</LastGenOutput>
+    </None>
     <None Include="Views\EntityScriptGrid.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityScriptGrid.generated.cs</LastGenOutput>
