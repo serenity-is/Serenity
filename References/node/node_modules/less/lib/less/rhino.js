@@ -56,7 +56,8 @@ function formatError(ctx, options) {
 function writeError(ctx, options) {
     options = options || {};
     if (options.silent) { return; }
-    print(formatError(ctx, options));
+    var message = formatError(ctx, options);
+    throw new Error(message);
 }
 
 function loadStyleSheet(sheet, callback, reload, remaining) {
@@ -203,7 +204,7 @@ function writeFile(filename, content) {
         switch (arg) {
             case 'v':
             case 'version':
-                console.log("lessc " + less.version.join('.') + " (LESS Compiler) [JavaScript]");
+                console.log("lessc " + less.version.join('.') + " (Less Compiler) [JavaScript]");
                 continueProcessing = false;
                 break;
             case 'verbose':
@@ -444,5 +445,4 @@ function writeFile(filename, content) {
         writeError(e, options);
         quit(1);
     }
-    console.log("done");
 }(arguments));

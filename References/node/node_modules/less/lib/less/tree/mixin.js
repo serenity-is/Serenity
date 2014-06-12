@@ -21,7 +21,7 @@ tree.mixin.Call.prototype = {
     eval: function (env) {
         var mixins, mixin, args, rules = [], match = false, i, m, f, isRecursive, isOneFound, rule,
             candidates = [], candidate, conditionResult = [], defaultFunc = tree.defaultFunc,
-            defaultResult, defNone = 0, defTrue = 1, defFalse = 2, count; 
+            defaultResult, defNone = 0, defTrue = 1, defFalse = 2, count, originalRuleset; 
 
         args = this.arguments && this.arguments.map(function (a) {
             return { name: a.name, value: a.value.eval(env) };
@@ -99,8 +99,9 @@ tree.mixin.Call.prototype = {
                         try {
                             mixin = candidates[m].mixin;
                             if (!(mixin instanceof tree.mixin.Definition)) {
+                                originalRuleset = mixin.originalRuleset || mixin;
                                 mixin = new tree.mixin.Definition("", [], mixin.rules, null, false);
-                                mixin.originalRuleset = mixins[m].originalRuleset || mixins[m];
+                                mixin.originalRuleset = originalRuleset;
                             }
                             Array.prototype.push.apply(
                                   rules, mixin.evalCall(env, args, this.important).rules);
@@ -282,7 +283,7 @@ tree.mixin.Definition.prototype = {
     matchCondition: function (args, env) {
         if (this.condition && !this.condition.eval(
             new(tree.evalEnv)(env,
-                [this.evalParams(env, new(tree.evalEnv)(env, this.frames.concat(env.frames)), args, [])] // the parameter variables
+                [this.evalParams(env, new(tree.evalEnv)(env, this.frames ? this.frames.concat(env.frames) : env.frames), args, [])] // the parameter variables
                     .concat(this.frames) // the parent namespace/mixin frames
                     .concat(env.frames)))) { // the current environment frames
             return false;
