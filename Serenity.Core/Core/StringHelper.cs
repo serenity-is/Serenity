@@ -311,5 +311,45 @@ namespace Serenity
 
             return stringBuilder.ToString();
         }
+
+        /// <summary>
+        /// Formats a nullable struct
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="format">The format string 
+        /// If <c>null</c> use the default format defined for the type of the IFormattable implementation.</param>
+        /// <param name="provider">The format provider 
+        /// If <c>null</c> the default provider is used</param>
+        /// <param name="defaultValue">The string to show when the source is <c>null</c>. 
+        /// If <c>null</c> an empty string is returned</param>
+        /// <returns>The formatted string or the default value if the source is <c>null</c></returns>
+        public static string ToStringDefault<T>(this T? source, string format = null, IFormatProvider provider = null, string empty = null)
+            where T : struct, IFormattable
+        {
+            if (source.HasValue)
+                return source.Value.ToString(format, provider);
+
+            return empty ?? "";
+        }
+
+        /// <summary>
+        /// Formats a nullable object
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="format">The format string 
+        /// If <c>null</c> use the default format defined for the type of the IFormattable implementation.</param>
+        /// <param name="provider">The format provider 
+        /// If <c>null</c> the default provider is used</param>
+        /// <param name="defaultValue">The string to show when the source is <c>null</c>. 
+        /// If <c>null</c> an empty string is returned</param>
+        /// <returns>The formatted string or the default value if the source is <c>null</c></returns>
+        public static string ToStringDefault<T>(this T source, string format = null, IFormatProvider provider = null, string empty = null)
+            where T : class, IFormattable
+        {
+            if (source != null)
+                return source.ToString(format, provider);
+
+            return empty ?? "";
+        }
     }
 }
