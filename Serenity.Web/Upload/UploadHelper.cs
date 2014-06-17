@@ -110,8 +110,6 @@ namespace Serenity.Web
             if (!Directory.Exists(targetPath))
                 Directory.CreateDirectory(targetPath);
 
-            string targetFilename = Path.GetFileName(targetFilePath);
-
             File.Copy(sourceFilePath, targetFilePath);
 
             string sourcePath = Path.GetDirectoryName(sourceFilePath);
