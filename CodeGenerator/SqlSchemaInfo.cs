@@ -332,6 +332,7 @@ namespace Serenity.CodeGenerator
 
         const string SqlBit = "bit";
         const string SqlDateTime = "datetime";
+        const string SqlSmallDateTime = "smalldatetime";
         const string SqlDecimal = "decimal";
         const string SqlNumeric = "numeric";
         const string SqlBigInt = "bigint";
@@ -363,6 +364,8 @@ namespace Serenity.CodeGenerator
             else if (sqlTypeName == SqlMoney || sqlTypeName == SqlDecimal || sqlTypeName == SqlNumeric)
                 return "Decimal";
             else if (sqlTypeName == SqlDateTime)
+                return "DateTime";
+            else if (sqlTypeName == SqlSmallDateTime)
                 return "DateTime";
             else if (sqlTypeName == SqlBit)
                 return "Boolean";
