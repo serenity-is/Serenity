@@ -983,7 +983,7 @@ else
 Q$Externals.postToService = function (options) {
     var form = $('<form/>')
         .attr('method', 'POST')
-        .attr('action', Q.resolveUrl('~/services/' + options.service))
+        .attr('action', options.url ? (Q.resolveUrl(options.url)) : Q.resolveUrl('~/services/' + options.service))
         .appendTo(document.body);
 
     if (options.target)
@@ -994,6 +994,32 @@ Q$Externals.postToService = function (options) {
     $('<input/>').attr('type', 'hidden').attr('name', 'request')
         .val($.toJSON(options.request))
         .appendTo(div);
+
+    $('<input/>').attr('type', 'submit')
+        .appendTo(div);
+
+    form.submit();
+    window.setTimeout(function () { form.remove(); }, 0);
+};
+
+Q$Externals.postToUrl = function (options) {
+    var form = $('<form/>')
+        .attr('method', 'POST')
+        .attr('action', Q.resolveUrl(options.url))
+        .appendTo(document.body);
+
+    if (options.target)
+        form.attr('target', options.target);
+
+    var div = $('<div/>').appendTo(form);
+
+    if (options.params != null) {
+        for (var k in options.params) {
+            $('<input/>').attr('type', 'hidden').attr('name', k)
+                .val(options.params[k])
+                .appendTo(div);
+        }
+    }
 
     $('<input/>').attr('type', 'submit')
         .appendTo(div);
