@@ -55,6 +55,7 @@ namespace Serenity
             });
 
             UpdateSelectAll();
+            UpdateFlags();
         }
 
         void IGetEditValue.GetEditValue(PropertyItem property, dynamic target)
@@ -135,11 +136,16 @@ namespace Serenity
             });
         }
 
+        protected virtual bool GetInitialCollapse()
+        {
+            return false;
+        }
+
         protected override ListResponse<CheckTreeItem> OnViewProcessData(ListResponse<CheckTreeItem> response)
         {
             response = base.OnViewProcessData(response);
             byId = null;
-            SlickTreeHelper.SetIndents(response.Entities, getId: x => x.Id, getParentId: x => x.ParentId, setCollapsed: false);
+            SlickTreeHelper.SetIndents(response.Entities, getId: x => x.Id, getParentId: x => x.ParentId, setCollapsed: GetInitialCollapse());
             return response;
         }
 
@@ -198,18 +204,18 @@ namespace Serenity
                 for (int i = 0; i < items.Count; i++)
                 {
                     var item = items[i];
+                    if (item.Children == null || item.Children.Count == 0)
+                        continue;
 
-                    if (threeState)
+                    bool allSelected = AllDescendantsSelected(item);
+                    bool selected = allSelected || AnyDescendantsSelected(item);
+                    
+                    if (allSelected != item.IsAllDescendantsSelected ||
+                        selected != item.IsSelected)
                     {
-                        if (item.Children.Count > 0)
-                        {
-                            bool treeSelected = AllSubTreeSelected(item);
-                            if (treeSelected != item.IsDescendantsSelected)
-                            {
-                                item.IsDescendantsSelected = treeSelected;
-                                view.UpdateItem(item.Id, item);
-                            }
-                        }
+                        item.IsAllDescendantsSelected = allSelected;
+                        item.IsSelected = selected;
+                        view.UpdateItem(item.Id, item);
                     }
                 }
             }
@@ -237,17 +243,6 @@ namespace Serenity
             return result;
         }
 
-        private bool AllChildSelected(CheckTreeItem item)
-        {
-            for (int i = 0; i < item.Children.Count; i++)
-            {
-                if (!item.Children[i].IsSelected)
-                    return false;
-            }
-
-            return true;
-        }
-
         private bool AllItemsSelected()
         {
             foreach (var row in view.Rows)
@@ -257,7 +252,7 @@ namespace Serenity
             return view.Rows.Count > 0;
         }
 
-        protected bool AllSubTreeSelected(CheckTreeItem item)
+        protected bool AllDescendantsSelected(CheckTreeItem item)
         {
             if (item.Children.Count > 0)
                 for (int i = 0; i < item.Children.Count; i++)
@@ -265,11 +260,26 @@ namespace Serenity
                     var sub = item.Children[i];
                     if (!sub.IsSelected)
                         return false;
-                    if (!AllSubTreeSelected(sub))
+                    if (!AllDescendantsSelected(sub))
                         return false;
                 }
 
             return true;
+        }
+
+        protected bool AnyDescendantsSelected(CheckTreeItem item)
+        {
+            if (item.Children.Count > 0)
+                for (int i = 0; i < item.Children.Count; i++)
+                {
+                    var sub = item.Children[i];
+                    if (sub.IsSelected)
+                        return true;
+                    if (AnyDescendantsSelected(sub))
+                        return true;
+                }
+
+            return false;
         }
 
         protected override List<SlickColumn> GetColumns()
@@ -287,7 +297,7 @@ namespace Serenity
                         bool threeState = IsThreeStateHierarchy();
                         if (item.IsSelected)
                         {
-                            if (threeState && !item.IsDescendantsSelected)
+                            if (threeState && item.Children != null && item.Children.Count > 0 && !item.IsAllDescendantsSelected)
                                 cls += " partial";
                             else
                                 cls += " checked";
@@ -412,7 +422,7 @@ namespace Serenity
     {
         public bool IsSelected { get; set; }
 
-        public bool IsDescendantsSelected { get; set; }
+        public bool IsAllDescendantsSelected { get; set; }
         public string Id { get; set; }
         public string Text { get; set; }
         public string ParentId { get; set; }
