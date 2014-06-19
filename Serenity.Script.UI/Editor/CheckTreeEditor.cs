@@ -304,10 +304,15 @@ namespace Serenity
                         }
 
                         return "<span class=\"" + cls + "\"></span>" + 
-                            Q.HtmlEncode(ctx.Value);
+                            GetItemText(ctx);
                     })
                 }
             };
+        }
+
+        protected virtual string GetItemText(SlickFormatterContext ctx)
+        {
+            return Q.HtmlEncode(ctx.Value);
         }
 
         protected override SlickGridOptions GetSlickOptions()
