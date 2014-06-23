@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -42,14 +42,14 @@ namespace Serenity.Data
             var value = _getValue(row);
             if (value == null)
                 writer.WriteNull();
-            else if (EnumType == null)
+            else //if (EnumType == null)
                 writer.WriteValue(value.Value);
-            else if (EnumType.IsEnum)
-                writer.WriteValue(Enum.GetName(EnumType, value.Value));
-            else if (EnumType.IsSubclassOf(typeof(DataEnum)))
-                writer.WriteValue(DataEnum.ConvertFromInt32(EnumType, value.Value).Key);
-            else
-                throw new InvalidProgramException(String.Format("{0} geçerli bir enum tipi deðil!", EnumType.Name));
+            //else if (EnumType.IsEnum)
+            //    writer.WriteValue(Enum.GetName(EnumType, value.Value));
+            //else if (EnumType.IsSubclassOf(typeof(DataEnum)))
+            //    writer.WriteValue(DataEnum.ConvertFromInt32(EnumType, value.Value).Key);
+            //else
+            //    throw new InvalidProgramException(String.Format("{0} geÃ§erli bir enum tipi deÄŸil!", EnumType.Name));
         }
 
         internal static Int64 ConvertEnumFromInt(Type enumType, Int64 v)
@@ -57,7 +57,7 @@ namespace Serenity.Data
             if (enumType.IsEnum)
             {
                 if (!Enum.IsDefined(enumType, v))
-                    throw new InvalidCastException(String.Format("{0} geçerli bir {1} deðeri deðil!", v, enumType.Name));
+                    throw new InvalidCastException(String.Format("{0} geÃ§erli bir {1} deÄŸeri deÄŸil!", v, enumType.Name));
 
                 return v;
             }
@@ -67,7 +67,7 @@ namespace Serenity.Data
                 return v;
             }
             else
-                throw new InvalidProgramException(String.Format("{0} geçerli bir enum tipi deðil!", enumType.Name));
+                throw new InvalidProgramException(String.Format("{0} geÃ§erli bir enum tipi deÄŸil!", enumType.Name));
         }
 
         internal static Int64 ConvertEnumFromString(Type enumType, string s)
@@ -78,7 +78,7 @@ namespace Serenity.Data
                 if (Int64.TryParse(s, out v))
                 {
                     if (!Enum.IsDefined(enumType, v))
-                        throw new InvalidCastException(String.Format("{0} geçerli bir {1} deðeri deðil!", v, enumType.Name));
+                        throw new InvalidCastException(String.Format("{0} geÃ§erli bir {1} deÄŸeri deÄŸil!", v, enumType.Name));
 
                     return v;
                 }
@@ -90,7 +90,7 @@ namespace Serenity.Data
                 return ((DataEnum)DataEnum.ConvertFromString(enumType, s)).Id;
             }
             else
-                throw new InvalidProgramException(String.Format("{0} geçerli bir enum tipi deðil!", enumType.Name));
+                throw new InvalidProgramException(String.Format("{0} geÃ§erli bir enum tipi deÄŸil!", enumType.Name));
         }
 
         public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)

@@ -238,13 +238,12 @@ namespace Serenity
                     if (allSelected != item.IsAllDescendantsSelected ||
                         selected != item.IsSelected)
                     {
+                        bool selectedChange = item.IsSelected != selected;
                         item.IsAllDescendantsSelected = allSelected;
-                        if (item.IsSelected != selected)
-                        {
-                            item.IsSelected = selected;
-                            view.UpdateItem(item.Id, item);
+                        item.IsSelected = selected;
+                        view.UpdateItem(item.Id, item);
+                        if (selectedChange)
                             ItemSelectedChanged(item);
-                        }
                     }
                 }
             }

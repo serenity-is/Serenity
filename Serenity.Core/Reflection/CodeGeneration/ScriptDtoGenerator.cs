@@ -297,7 +297,7 @@ namespace Serenity.Reflection
 
         private void GenerateEnum(Type enumType)
         {
-            cw.IndentedLine("[NamedValues, PreserveMemberCase]");
+            cw.IndentedLine("[PreserveMemberCase]");
             cw.Indented("public enum ");
             sb.AppendLine(enumType.Name);
             cw.InBrace(delegate 
