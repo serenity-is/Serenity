@@ -85,10 +85,21 @@ namespace Serenity
                     getGrid: () => self,
                     getId: x => x.Id,
                     getSelected: x => x.IsSelected,
-                    setSelected: (x, v) => x.IsSelected = v,
+                    setSelected: (x, v) => {
+                        if (x.IsSelected != v)
+                        {
+                            x.IsSelected = v;
+                            ItemSelectedChanged(x);
+                        }
+
+                    },
                     onClick: () => UpdateFlags()
                 )
             };
+        }
+
+        protected virtual void ItemSelectedChanged(CheckTreeItem item)
+        {
         }
 
         protected virtual string GetSelectAllText()
@@ -170,8 +181,12 @@ namespace Serenity
                 view.BeginUpdate();
                 try
                 {
-                    item.IsSelected = !checkedOrPartial;
-                    view.UpdateItem(item.Id, item);
+                    if (item.IsSelected != !checkedOrPartial)
+                    {
+                        item.IsSelected = !checkedOrPartial;
+                        view.UpdateItem(item.Id, item);
+                        ItemSelectedChanged(item);
+                    }
                     anyChanged = SetAllSubTreeSelected(item, item.IsSelected) | anyChanged;
                     UpdateSelectAll();
                     UpdateFlags();
@@ -224,8 +239,12 @@ namespace Serenity
                         selected != item.IsSelected)
                     {
                         item.IsAllDescendantsSelected = allSelected;
-                        item.IsSelected = selected;
-                        view.UpdateItem(item.Id, item);
+                        if (item.IsSelected != selected)
+                        {
+                            item.IsSelected = selected;
+                            view.UpdateItem(item.Id, item);
+                            ItemSelectedChanged(item);
+                        }
                     }
                 }
             }
@@ -251,6 +270,7 @@ namespace Serenity
                     result = true;
                     sub.IsSelected = selected;
                     view.UpdateItem(sub.Id, sub);
+                    ItemSelectedChanged(sub);
                 }
                 if (sub.Children.Count > 0)
                     result = SetAllSubTreeSelected(sub, selected) | result;
