@@ -80,11 +80,13 @@ namespace Serenity
 
             return new List<ToolButton>
             {
-                GridSelectAllButtonHelper.Define<CheckTreeItem>(
-                    () => self,
-                    x => x.Id,
-                    x => x.IsSelected,
-                    (x, v) => x.IsSelected = v
+                GridSelectAllButtonHelper.Define<CheckTreeItem>
+                (
+                    getGrid: () => self,
+                    getId: x => x.Id,
+                    getSelected: x => x.IsSelected,
+                    setSelected: (x, v) => x.IsSelected = v,
+                    onClick: () => UpdateFlags()
                 )
             };
         }
@@ -389,7 +391,8 @@ namespace Serenity
             Func<TItem, object> getId,
             Func<TItem, bool> getSelected,
             Action<TItem, bool> setSelected,
-            string text = null)
+            string text = null,
+            Action onClick = null)
             where TItem : class, new()
         {
             return new ToolButton
@@ -411,6 +414,9 @@ namespace Serenity
                             setSelected(item, makeSelected);
                             view.UpdateItem(getId(item), item);
                         }
+
+                        if (onClick != null)
+                            onClick();
                     }
                     finally
                     {
