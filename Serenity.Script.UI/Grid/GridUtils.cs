@@ -97,7 +97,7 @@ namespace Serenity
             }, fields);
         }
 
-        private static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string> onSearch,
+        public static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string> onSearch,
             List<QuickSearchField> fields = null)
         {
             var input = jQuery.FromHtml("<div><input type=\"text\"/></div>")

@@ -9,21 +9,22 @@
     .border-radius(4px, 4px, 0, 0);
 }
 
-.s-QuickSearchBar input {
+.s-QuickSearchBar input.s-QuickSearchInput {
     width: 120px;
     font-size: 12px;
     border: none;
     padding: 0 2px 0 4px;
     .border-radius(4px, 4px, 0, 0);
-    line-height: 21px;
-    height: 21px;
+    line-height: 23px;
+    height: 23px;
     .box-shadow(none);
     float: left;
     border: 1px solid #aaa;
     border-style: solid none solid none;
+    .box-sizing(border-box);
 }
 
-.s-QuickSearchBar.has-quick-search-fields input {
+.s-QuickSearchBar.has-quick-search-fields input.s-QuickSearchInput {
     .border-radius(0);
 }
 
