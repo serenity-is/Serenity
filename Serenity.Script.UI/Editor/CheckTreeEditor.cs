@@ -207,7 +207,15 @@ namespace Serenity
                 {
                     var item = items[i];
                     if (item.Children == null || item.Children.Count == 0)
+                    {
+                        var allsel = GetDescendantsSelected(item);
+                        if (allsel != item.IsAllDescendantsSelected)
+                        {
+                            item.IsAllDescendantsSelected = allsel;
+                            view.UpdateItem(item.Id, item);
+                        }
                         continue;
+                    }
 
                     bool allSelected = AllDescendantsSelected(item);
                     bool selected = allSelected || AnyDescendantsSelected(item);
@@ -225,6 +233,11 @@ namespace Serenity
             {
                 view.EndUpdate();
             }
+        }
+
+        protected virtual bool GetDescendantsSelected(CheckTreeItem item)
+        {
+            return true;
         }
 
         private bool SetAllSubTreeSelected(CheckTreeItem item, bool selected)
@@ -299,7 +312,7 @@ namespace Serenity
                         bool threeState = IsThreeStateHierarchy();
                         if (item.IsSelected)
                         {
-                            if (threeState && item.Children != null && item.Children.Count > 0 && !item.IsAllDescendantsSelected)
+                            if (threeState && !item.IsAllDescendantsSelected)
                                 cls += " partial";
                             else
                                 cls += " checked";
