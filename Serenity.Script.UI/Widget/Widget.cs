@@ -98,15 +98,5 @@ namespace Serenity
         {
             get { return widgetName; }
         }
-
-        public static TWidget Create<TWidget>(params object[] arguments)
-            where TWidget: Widget
-        {
-            var element = WidgetExtensions.CreateElementFor(typeof(TWidget));
-            var args = new List<object>();
-            args.Add(element);
-            args.AddRange(arguments);
-            return (TWidget)Activator.CreateInstance(typeof(TWidget), args.As<object[]>());
-        }
     }
 }

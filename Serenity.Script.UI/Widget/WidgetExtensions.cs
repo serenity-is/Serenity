@@ -125,5 +125,12 @@ namespace Serenity
             string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
             return jQuery.FromHtml(elementHtml);
         }
+
+        public static TWidget CreateInside<TWidget>(jQueryObject container, object options)
+            where TWidget : Widget
+        {
+            var element = CreateElementFor(typeof(TWidget)).AppendTo(container);
+            return (TWidget)Activator.CreateInstance(typeof(TWidget), element, options);
+        }
     }
 }
