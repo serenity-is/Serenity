@@ -126,10 +126,14 @@ namespace Serenity
             return jQuery.FromHtml(elementHtml);
         }
 
-        public static TWidget CreateInside<TWidget>(jQueryObject container, object options)
+        public static TWidget Create<TWidget>(Action<jQueryObject> initElement, object options = null)
             where TWidget : Widget
         {
-            var element = CreateElementFor(typeof(TWidget)).AppendTo(container);
+            var element = CreateElementFor(typeof(TWidget));
+            
+            if (initElement != null)
+                initElement(element);
+
             return (TWidget)Activator.CreateInstance(typeof(TWidget), element, options);
         }
     }

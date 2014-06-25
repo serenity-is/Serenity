@@ -428,7 +428,7 @@ namespace Serenity.Reflection
                         var memberName = pi != null ? pi.Name : fi.Name;
 
                         var jsonProperty = member.GetCustomAttribute<JsonPropertyAttribute>(false);
-                        if (jsonProperty != null)
+                        if (jsonProperty != null && !jsonProperty.PropertyName.IsEmptyOrNull())
                         {
                             cw.Indented("[ScriptName(\"");
                             sb.Append(jsonProperty.PropertyName);
