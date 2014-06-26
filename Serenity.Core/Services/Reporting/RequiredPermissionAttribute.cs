@@ -9,6 +9,11 @@ namespace Serenity.Reporting
             this.Permission = permission;
         }
 
+        public RequiredPermissionAttribute(object applicationId, string permission)
+            : this(applicationId.ToString() + ":" + permission)
+        {
+        }
+
         public string Permission { get; private set; }
     }
 }
