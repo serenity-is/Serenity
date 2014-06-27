@@ -28,7 +28,7 @@ namespace Serenity.Data
         ///   Connection (required)</param>
         /// <returns>
         ///   The automatic transaction associated with the connection.</returns>
-        internal static DbTransaction GetCurrentTransaction(IDbConnection connection)
+        public static DbTransaction GetCurrentTransaction(IDbConnection connection)
         {
             return GetDefaultTransaction(connection) as DbTransaction;
         }

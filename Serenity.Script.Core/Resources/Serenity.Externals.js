@@ -1044,3 +1044,13 @@ else
     });
 
 global.Q$Externals = Q$Externals;
+
+function showInFrame(code) {
+    height = screen.availHeight - 60;
+    width = screen.availWidth - 10;
+    var x = (screen.availWidth - width) / 2 - 5; if (x < 0) x = 0;
+    var y = (screen.availHeight - height) / 2 - 25; if (y < 0) y = 0;
+    var winPopup = window.open("", "", "status=0, toolbar=0, width=" + width + ", height=" + height +
+        ", scrollbars=1, resizable=yes, left=" + x + ", top=" + y);
+    winPopup.document.body.innerHTML = code;
+}
