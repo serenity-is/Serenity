@@ -9,10 +9,11 @@ namespace Serenity
 {
     [Element("<div/>")]
     [IdProperty("id")]
-    public abstract class CheckTreeEditor<TOptions> : DataGrid<CheckTreeItem, TOptions>, IGetEditValue, ISetEditValue
+    public abstract class CheckTreeEditor<TItem, TOptions> : DataGrid<TItem, TOptions>, IGetEditValue, ISetEditValue
         where TOptions: class, new()
+        where TItem: CheckTreeItem, new()
     {
-        private JsDictionary<string, CheckTreeItem> byId;
+        private JsDictionary<string, TItem> byId;
 
         public CheckTreeEditor(jQueryObject div, TOptions opt)
             : base(div, opt)
@@ -22,15 +23,15 @@ namespace Serenity
             UpdateItems();
         }
 
-        protected virtual List<CheckTreeItem> GetItems()
+        protected virtual List<TItem> GetItems()
         {
-            return new List<CheckTreeItem>();
+            return new List<TItem>();
         }
 
         protected virtual void UpdateItems()
         {
             var items = GetItems();
-            var itemById = new JsDictionary<string, CheckTreeItem>();
+            var itemById = new JsDictionary<string, TItem>();
             for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
@@ -46,7 +47,7 @@ namespace Serenity
                 }
             }
 
-            view.AddData(new ListResponse<CheckTreeItem>
+            view.AddData(new ListResponse<TItem>
             {
                 Entities = items,
                 Skip = 0,
@@ -80,7 +81,7 @@ namespace Serenity
 
             return new List<ToolButton>
             {
-                GridSelectAllButtonHelper.Define<CheckTreeItem>
+                GridSelectAllButtonHelper.Define<TItem>
                 (
                     getGrid: () => self,
                     getId: x => x.Id,
@@ -98,7 +99,7 @@ namespace Serenity
             };
         }
 
-        protected virtual void ItemSelectedChanged(CheckTreeItem item)
+        protected virtual void ItemSelectedChanged(TItem item)
         {
         }
 
@@ -121,7 +122,7 @@ namespace Serenity
             return result;
         }
 
-        protected override bool OnViewFilter(CheckTreeItem item)
+        protected override bool OnViewFilter(TItem item)
         {
             if (!base.OnViewFilter(item))
                 return false;
@@ -136,7 +137,7 @@ namespace Serenity
 
                 if (self.byId == null)
                 {
-                    self.byId = new JsDictionary<string, CheckTreeItem>();
+                    self.byId = new JsDictionary<string, TItem>();
                     for (var i = 0; i < items.Count; i++)
                     {
                         var o = items[i];
@@ -154,7 +155,7 @@ namespace Serenity
             return false;
         }
 
-        protected override ListResponse<CheckTreeItem> OnViewProcessData(ListResponse<CheckTreeItem> response)
+        protected override ListResponse<TItem> OnViewProcessData(ListResponse<TItem> response)
         {
             response = base.OnViewProcessData(response);
             byId = null;
@@ -203,7 +204,7 @@ namespace Serenity
 
         protected void UpdateSelectAll()
         {
-            GridSelectAllButtonHelper.Update<CheckTreeItem>(this, x => x.IsSelected);
+            GridSelectAllButtonHelper.Update<TItem>(this, x => x.IsSelected);
         }
 
         protected  virtual void UpdateFlags()
@@ -253,12 +254,12 @@ namespace Serenity
             }
         }
 
-        protected virtual bool GetDescendantsSelected(CheckTreeItem item)
+        protected virtual bool GetDescendantsSelected(TItem item)
         {
             return true;
         }
 
-        private bool SetAllSubTreeSelected(CheckTreeItem item, bool selected)
+        private bool SetAllSubTreeSelected(TItem item, bool selected)
         {
             var result = false;
             for (int i = 0; i < item.Children.Count; i++)
@@ -269,10 +270,10 @@ namespace Serenity
                     result = true;
                     sub.IsSelected = selected;
                     view.UpdateItem(sub.Id, sub);
-                    ItemSelectedChanged(sub);
+                    ItemSelectedChanged(sub.As<TItem>());
                 }
                 if (sub.Children.Count > 0)
-                    result = SetAllSubTreeSelected(sub, selected) | result;
+                    result = SetAllSubTreeSelected(sub.As<TItem>(), selected) | result;
             }
             return result;
         }
@@ -286,7 +287,7 @@ namespace Serenity
             return view.Rows.Count > 0;
         }
 
-        protected bool AllDescendantsSelected(CheckTreeItem item)
+        protected bool AllDescendantsSelected(TItem item)
         {
             if (item.Children.Count > 0)
                 for (int i = 0; i < item.Children.Count; i++)
@@ -294,14 +295,14 @@ namespace Serenity
                     var sub = item.Children[i];
                     if (!sub.IsSelected)
                         return false;
-                    if (!AllDescendantsSelected(sub))
+                    if (!AllDescendantsSelected(sub.As<TItem>()))
                         return false;
                 }
 
             return true;
         }
 
-        protected bool AnyDescendantsSelected(CheckTreeItem item)
+        protected bool AnyDescendantsSelected(TItem item)
         {
             if (item.Children.Count > 0)
                 for (int i = 0; i < item.Children.Count; i++)
@@ -309,7 +310,7 @@ namespace Serenity
                     var sub = item.Children[i];
                     if (sub.IsSelected)
                         return true;
-                    if (AnyDescendantsSelected(sub))
+                    if (AnyDescendantsSelected(sub.As<TItem>()))
                         return true;
                 }
 
@@ -326,7 +327,7 @@ namespace Serenity
                     SlickFormatting.TreeToggle(() => self.view, x => x.Id, ctx => 
                     {
                         var cls = "check-box";
-                        var item = (CheckTreeItem)ctx.Item;
+                        var item = (TItem)ctx.Item;
 
                         bool threeState = IsThreeStateHierarchy();
                         if (item.IsSelected)
@@ -460,6 +461,15 @@ namespace Serenity
         }
     }
 
+    public abstract class CheckTreeEditor<TOptions> : CheckTreeEditor<CheckTreeItem, TOptions>, IGetEditValue, ISetEditValue
+        where TOptions : class, new()
+    {
+        public CheckTreeEditor(jQueryObject div, TOptions opt)
+            : base(div, opt)
+        {
+        }
+    }
+
     [Imported, Serializable]
     public class CheckTreeItem
     {
@@ -470,5 +480,13 @@ namespace Serenity
         public string Text { get; set; }
         public string ParentId { get; set; }
         public List<CheckTreeItem> Children { get; set; }
+        public object Source { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class CheckTreeItem<TSource> : CheckTreeItem
+    {
+        public new TSource Source { get; set; }
+        public new List<CheckTreeItem<TSource>> Children { get; set; }
     }
 }
