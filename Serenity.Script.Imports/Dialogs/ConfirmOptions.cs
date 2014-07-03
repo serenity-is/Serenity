@@ -41,6 +41,16 @@ namespace Serenity
         public Action OnClose { get; set; }
 
         /// <summary>
+        /// Cancel or close button event
+        /// </summary>
+        public Action OnCancel { get; set; }
+
+        /// <summary>
+        /// No button click event
+        /// </summary>
+        public Action OnNo { get; set; }
+
+        /// <summary>
         /// Dialog open event
         /// </summary>
         public Action OnOpen { get; set; }
