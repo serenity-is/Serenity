@@ -21,10 +21,7 @@ namespace Serenity
             get { return this.element.Is(":checked"); }
             set 
             { 
-                if (value)
-                    this.Element.Attribute("checked", "checked");
-                else
-                    this.element.RemoveAttr("checked");
+                this.Element.Property("checked", Q.IsTrue(value));
             }
         }
     }
