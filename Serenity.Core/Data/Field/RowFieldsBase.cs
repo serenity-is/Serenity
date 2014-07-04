@@ -168,6 +168,7 @@ namespace Serenity.Data
                         MinSelectLevelAttribute selectLevel = null;
                         ForeignKeyAttribute foreign = null;
                         AddJoinAttribute join = null;
+                        DefaultValueAttribute defaultValue = null;
 
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
@@ -182,6 +183,7 @@ namespace Serenity.Data
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
                             foreign = property.GetCustomAttribute<ForeignKeyAttribute>(false);
                             join = property.GetCustomAttribute<AddJoinAttribute>(false);
+                            defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                             var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
@@ -250,6 +252,9 @@ namespace Serenity.Data
 
                         if (scale != null)
                             field.Scale = scale.Value;
+
+                        if (defaultValue != null)
+                            field.DefaultValue = defaultValue.Value;
 
                         if (selectLevel != null)
                             field.MinSelectLevel = selectLevel.Value;

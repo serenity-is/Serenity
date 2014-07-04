@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -345,16 +346,37 @@ namespace Serenity.Services
             return Response;
         }
 
+        protected virtual void SetDefaultValue(Field field)
+        {
+            if (field.DefaultValue == null)
+                return;
+
+            field.AsObject(Row, field.ConvertValue(field.DefaultValue, CultureInfo.InvariantCulture));
+        }
+
+        protected virtual void SetDefaultValues()
+        {
+            foreach (var field in Row.GetTableFields())
+            {
+                if (Row.IsAssigned(field) || !field.IsNull(Row))
+                    continue;
+
+                SetDefaultValue(field);
+            }
+
+            var isActiveRow = Row as IIsActiveRow;
+            if (isActiveRow != null &&
+                !Row.IsAssigned(isActiveRow.IsActiveField))
+                isActiveRow.IsActiveField[Row] = 1;
+        }
+
         protected virtual void SetInternalFields()
         {
             if (IsCreate)
             {
                 HandleDisplayOrder(afterSave: false);
                 SetTrimToEmptyFields();
-
-                var isActiveRow = Row as IIsActiveRow;
-                if (isActiveRow != null)
-                    isActiveRow.IsActiveField[Row] = 1;
+                SetDefaultValues();
             }
 
             SetInternalLogFields();
