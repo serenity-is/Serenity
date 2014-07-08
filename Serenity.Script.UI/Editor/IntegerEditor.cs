@@ -18,7 +18,8 @@ namespace Serenity
             dynamic numericOptions = jQuery.ExtendObject(DecimalEditor.DefaultAutoNumericOptions(), new
             {
                 vMin = options.MinValue,
-                vMax = options.MaxValue
+                vMax = options.MaxValue,
+                aSep = (string)null
             });
 
             ((dynamic)input).autoNumeric(numericOptions);
