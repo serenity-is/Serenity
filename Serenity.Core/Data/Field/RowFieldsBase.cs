@@ -271,9 +271,17 @@ namespace Serenity.Data
 
                         if (property != null)
                         {
+                            if (property.PropertyType != null &&
+                                property.PropertyType.IsEnum &&
+                                field is IEnumTypeField)
+                            {
+                                (field as IEnumTypeField).EnumType = property.PropertyType;
+                            }
+                            
                             foreach (var attr in property.GetCustomAttributes<AddJoinToAttribute>())
                                 new LeftJoin(this.joins, attr.ToTable, attr.Alias,
                                     new Criteria(attr.Alias, attr.ToField) == new Criteria(field));
+
 
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;

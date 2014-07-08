@@ -160,15 +160,18 @@ namespace Serenity
                 undeleteButton.Toggle(!isLocalizationMode && IsEditMode && isDeleted);
 
             if (saveAndCloseButton != null)
+            {
                 saveAndCloseButton.Toggle(!isLocalizationMode && !isDeleted);
 
-            saveAndCloseButton.Find(".button-inner").Text(
-                IsNew ? "Kaydet" : "Güncelle");
+                saveAndCloseButton.Find(".button-inner").Text(
+                    IsNew ? "Kaydet" : "Güncelle");
+            }
 
             if (applyChangesButton != null)
                 applyChangesButton.Toggle(isLocalizationMode || !isDeleted);
 
-            cloneButton.Toggle(false);
+            if (cloneButton != null)
+                cloneButton.Toggle(false);
 
             if (propertyGrid != null)
                 propertyGrid.Element.Toggle(!isLocalizationMode);

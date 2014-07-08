@@ -204,7 +204,7 @@ namespace Serenity.Web.PropertyEditor
                     foreach (var val in Enum.GetValues(enumType))
                     {
                         string key = Enum.GetName(enumType, val);
-                        string text = ValueFormatters.FormatEnum(enumType, val);
+                        string text = EnumMapper.FormatEnum(enumType, val);
                         options.Add(new string[] { key, text });
                     }
                     if (memberType == typeof(DayOfWeek)) // şimdilik tek bir özel durum
@@ -326,7 +326,7 @@ namespace Serenity.Web.PropertyEditor
                 foreach (var val in Enum.GetValues(enumType))
                 {
                     string key = Enum.GetName(enumType, val);
-                    string text = ValueFormatters.FormatEnum(enumType, val);
+                    string text = EnumMapper.FormatEnum(enumType, val);
                     options.Add(new string[] { key, text });
                 }
 

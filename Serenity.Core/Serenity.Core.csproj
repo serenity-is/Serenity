@@ -396,8 +396,6 @@
     <Compile Include="Services\TimeUnit\TimeUnitConsts.cs" />
     <Compile Include="Services\Validation\DataValidation.cs" />
     <Compile Include="Services\Validation\ValidationError.cs" />
-    <Compile Include="Core\Helpers\ValueFormatter.cs" />
-    <Compile Include="Core\Helpers\ValueFormatters.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

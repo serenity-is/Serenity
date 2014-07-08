@@ -102,7 +102,7 @@ namespace Serenity
         {
             var baseOptions = new ServiceCallOptions<RetrieveResponse<TEntity>>();
             baseOptions.Service = this.GetService() + "/Retrieve";
-            baseOptions.BlockUI = false;
+            baseOptions.BlockUI = true;
 
             baseOptions.Request = GetLoadByIdRequest(id);
 

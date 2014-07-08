@@ -285,11 +285,12 @@ WriteLiteral("\", Width = 80 });");
             
             #line default
             #line hidden
-WriteLiteral("\r\n\r\n            return columns;\r\n        }\r\n    }\r\n\r\n    public partial class ");
+WriteLiteral("\r\n\r\n            return columns;\r\n        }\r\n    }\r\n\r\n    [Imported, Serializable," +
+" PreserveMemberCase]\r\n    public partial class ");
 
 
             
-            #line 38 "..\..\Views\EntityScriptGrid.cshtml"
+            #line 39 "..\..\Views\EntityScriptGrid.cshtml"
                      Write(Model.ClassName);
 
             

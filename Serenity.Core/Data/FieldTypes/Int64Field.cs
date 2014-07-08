@@ -41,12 +41,12 @@ namespace Serenity.Data
             var value = _getValue(row);
             if (value == null)
                 writer.WriteNull();
-            else if (EnumType == null)
+            else //if (EnumType == null)
                 writer.WriteValue(value.Value);
-            else if (EnumType.IsEnum)
-                writer.WriteValue(Enum.GetName(EnumType, value.Value));
-            else if (EnumType.IsSubclassOf(typeof(DataEnum)))
-                writer.WriteValue(DataEnum.ConvertFromInt32(EnumType, (Int32)value.Value).Key);
+            //else if (EnumType.IsEnum)
+            //    writer.WriteValue(Enum.GetName(EnumType, value.Value));
+            //else if (EnumType.IsSubclassOf(typeof(DataEnum)))
+            //    writer.WriteValue(DataEnum.ConvertFromInt32(EnumType, (Int32)value.Value).Key);
         }
 
         public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)
@@ -70,7 +70,7 @@ namespace Serenity.Data
                         _setValue(row, Int32Field.ConvertEnumFromInt(EnumType, v));
                     break;
                 case JsonToken.String:
-                    string s = ((string)reader.Value).TrimToNull();                  
+                    string s = ((string)reader.Value).TrimToNull();
                     if (s == null)
                         _setValue(row, null);
                     else if (EnumType == null)

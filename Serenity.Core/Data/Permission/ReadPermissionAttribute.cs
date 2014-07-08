@@ -8,5 +8,10 @@ namespace Serenity.Data
             : base(permission)
         {
         }
+
+        public ReadPermissionAttribute(object applicationId, string permission)
+            : this(applicationId.ToString() + ":" + permission)
+        {
+        }
     }
 }

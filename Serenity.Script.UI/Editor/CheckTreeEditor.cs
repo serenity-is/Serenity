@@ -9,10 +9,11 @@ namespace Serenity
 {
     [Element("<div/>")]
     [IdProperty("id")]
-    public abstract class CheckTreeEditor<TOptions> : DataGrid<CheckTreeItem, TOptions>, IGetEditValue, ISetEditValue
+    public abstract class CheckTreeEditor<TItem, TOptions> : DataGrid<TItem, TOptions>, IGetEditValue, ISetEditValue
         where TOptions: class, new()
+        where TItem: CheckTreeItem, new()
     {
-        private JsDictionary<string, CheckTreeItem> byId;
+        private JsDictionary<string, TItem> byId;
 
         public CheckTreeEditor(jQueryObject div, TOptions opt)
             : base(div, opt)
@@ -22,15 +23,15 @@ namespace Serenity
             UpdateItems();
         }
 
-        protected virtual List<CheckTreeItem> GetItems()
+        protected virtual List<TItem> GetItems()
         {
-            return new List<CheckTreeItem>();
+            return new List<TItem>();
         }
 
         protected virtual void UpdateItems()
         {
             var items = GetItems();
-            var itemById = new JsDictionary<string, CheckTreeItem>();
+            var itemById = new JsDictionary<string, TItem>();
             for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
@@ -46,7 +47,7 @@ namespace Serenity
                 }
             }
 
-            view.AddData(new ListResponse<CheckTreeItem>
+            view.AddData(new ListResponse<TItem>
             {
                 Entities = items,
                 Skip = 0,
@@ -55,6 +56,7 @@ namespace Serenity
             });
 
             UpdateSelectAll();
+            UpdateFlags();
         }
 
         void IGetEditValue.GetEditValue(PropertyItem property, dynamic target)
@@ -79,13 +81,26 @@ namespace Serenity
 
             return new List<ToolButton>
             {
-                GridSelectAllButtonHelper.Define<CheckTreeItem>(
-                    () => self,
-                    x => x.Id,
-                    x => x.IsSelected,
-                    (x, v) => x.IsSelected = v
+                GridSelectAllButtonHelper.Define<TItem>
+                (
+                    getGrid: () => self,
+                    getId: x => x.Id,
+                    getSelected: x => x.IsSelected,
+                    setSelected: (x, v) => {
+                        if (x.IsSelected != v)
+                        {
+                            x.IsSelected = v;
+                            ItemSelectedChanged(x);
+                        }
+
+                    },
+                    onClick: () => UpdateFlags()
                 )
             };
+        }
+
+        protected virtual void ItemSelectedChanged(TItem item)
+        {
         }
 
         protected virtual string GetSelectAllText()
@@ -107,7 +122,7 @@ namespace Serenity
             return result;
         }
 
-        protected override bool OnViewFilter(CheckTreeItem item)
+        protected override bool OnViewFilter(TItem item)
         {
             if (!base.OnViewFilter(item))
                 return false;
@@ -122,7 +137,7 @@ namespace Serenity
 
                 if (self.byId == null)
                 {
-                    self.byId = new JsDictionary<string, CheckTreeItem>();
+                    self.byId = new JsDictionary<string, TItem>();
                     for (var i = 0; i < items.Count; i++)
                     {
                         var o = items[i];
@@ -135,11 +150,16 @@ namespace Serenity
             });
         }
 
-        protected override ListResponse<CheckTreeItem> OnViewProcessData(ListResponse<CheckTreeItem> response)
+        protected virtual bool GetInitialCollapse()
+        {
+            return false;
+        }
+
+        protected override ListResponse<TItem> OnViewProcessData(ListResponse<TItem> response)
         {
             response = base.OnViewProcessData(response);
             byId = null;
-            SlickTreeHelper.SetIndents(response.Entities, getId: x => x.Id, getParentId: x => x.ParentId, setCollapsed: false);
+            SlickTreeHelper.SetIndents(response.Entities, getId: x => x.Id, getParentId: x => x.ParentId, setCollapsed: GetInitialCollapse());
             return response;
         }
 
@@ -162,8 +182,12 @@ namespace Serenity
                 view.BeginUpdate();
                 try
                 {
-                    item.IsSelected = !checkedOrPartial;
-                    view.UpdateItem(item.Id, item);
+                    if (item.IsSelected != !checkedOrPartial)
+                    {
+                        item.IsSelected = !checkedOrPartial;
+                        view.UpdateItem(item.Id, item);
+                        ItemSelectedChanged(item);
+                    }
                     anyChanged = SetAllSubTreeSelected(item, item.IsSelected) | anyChanged;
                     UpdateSelectAll();
                     UpdateFlags();
@@ -180,7 +204,7 @@ namespace Serenity
 
         protected void UpdateSelectAll()
         {
-            GridSelectAllButtonHelper.Update<CheckTreeItem>(this, x => x.IsSelected);
+            GridSelectAllButtonHelper.Update<TItem>(this, x => x.IsSelected);
         }
 
         protected  virtual void UpdateFlags()
@@ -198,18 +222,29 @@ namespace Serenity
                 for (int i = 0; i < items.Count; i++)
                 {
                     var item = items[i];
-
-                    if (threeState)
+                    if (item.Children == null || item.Children.Count == 0)
                     {
-                        if (item.Children.Count > 0)
+                        var allsel = GetDescendantsSelected(item);
+                        if (allsel != item.IsAllDescendantsSelected)
                         {
-                            bool treeSelected = AllSubTreeSelected(item);
-                            if (treeSelected != item.IsDescendantsSelected)
-                            {
-                                item.IsDescendantsSelected = treeSelected;
-                                view.UpdateItem(item.Id, item);
-                            }
+                            item.IsAllDescendantsSelected = allsel;
+                            view.UpdateItem(item.Id, item);
                         }
+                        continue;
+                    }
+
+                    bool allSelected = AllDescendantsSelected(item);
+                    bool selected = allSelected || AnyDescendantsSelected(item);
+                    
+                    if (allSelected != item.IsAllDescendantsSelected ||
+                        selected != item.IsSelected)
+                    {
+                        bool selectedChange = item.IsSelected != selected;
+                        item.IsAllDescendantsSelected = allSelected;
+                        item.IsSelected = selected;
+                        view.UpdateItem(item.Id, item);
+                        if (selectedChange)
+                            ItemSelectedChanged(item);
                     }
                 }
             }
@@ -219,7 +254,12 @@ namespace Serenity
             }
         }
 
-        private bool SetAllSubTreeSelected(CheckTreeItem item, bool selected)
+        protected virtual bool GetDescendantsSelected(TItem item)
+        {
+            return true;
+        }
+
+        private bool SetAllSubTreeSelected(TItem item, bool selected)
         {
             var result = false;
             for (int i = 0; i < item.Children.Count; i++)
@@ -230,22 +270,12 @@ namespace Serenity
                     result = true;
                     sub.IsSelected = selected;
                     view.UpdateItem(sub.Id, sub);
+                    ItemSelectedChanged(sub.As<TItem>());
                 }
                 if (sub.Children.Count > 0)
-                    result = SetAllSubTreeSelected(sub, selected) | result;
+                    result = SetAllSubTreeSelected(sub.As<TItem>(), selected) | result;
             }
             return result;
-        }
-
-        private bool AllChildSelected(CheckTreeItem item)
-        {
-            for (int i = 0; i < item.Children.Count; i++)
-            {
-                if (!item.Children[i].IsSelected)
-                    return false;
-            }
-
-            return true;
         }
 
         private bool AllItemsSelected()
@@ -257,7 +287,7 @@ namespace Serenity
             return view.Rows.Count > 0;
         }
 
-        protected bool AllSubTreeSelected(CheckTreeItem item)
+        protected bool AllDescendantsSelected(TItem item)
         {
             if (item.Children.Count > 0)
                 for (int i = 0; i < item.Children.Count; i++)
@@ -265,11 +295,26 @@ namespace Serenity
                     var sub = item.Children[i];
                     if (!sub.IsSelected)
                         return false;
-                    if (!AllSubTreeSelected(sub))
+                    if (!AllDescendantsSelected(sub.As<TItem>()))
                         return false;
                 }
 
             return true;
+        }
+
+        protected bool AnyDescendantsSelected(TItem item)
+        {
+            if (item.Children.Count > 0)
+                for (int i = 0; i < item.Children.Count; i++)
+                {
+                    var sub = item.Children[i];
+                    if (sub.IsSelected)
+                        return true;
+                    if (AnyDescendantsSelected(sub.As<TItem>()))
+                        return true;
+                }
+
+            return false;
         }
 
         protected override List<SlickColumn> GetColumns()
@@ -282,22 +327,27 @@ namespace Serenity
                     SlickFormatting.TreeToggle(() => self.view, x => x.Id, ctx => 
                     {
                         var cls = "check-box";
-                        var item = (CheckTreeItem)ctx.Item;
+                        var item = (TItem)ctx.Item;
 
                         bool threeState = IsThreeStateHierarchy();
                         if (item.IsSelected)
                         {
-                            if (threeState && !item.IsDescendantsSelected)
+                            if (threeState && !item.IsAllDescendantsSelected)
                                 cls += " partial";
                             else
                                 cls += " checked";
                         }
 
                         return "<span class=\"" + cls + "\"></span>" + 
-                            Q.HtmlEncode(ctx.Value);
+                            GetItemText(ctx);
                     })
                 }
             };
+        }
+
+        protected virtual string GetItemText(SlickFormatterContext ctx)
+        {
+            return Q.HtmlEncode(ctx.Value);
         }
 
         protected override SlickGridOptions GetSlickOptions()
@@ -374,7 +424,8 @@ namespace Serenity
             Func<TItem, object> getId,
             Func<TItem, bool> getSelected,
             Action<TItem, bool> setSelected,
-            string text = null)
+            string text = null,
+            Action onClick = null)
             where TItem : class, new()
         {
             return new ToolButton
@@ -396,6 +447,9 @@ namespace Serenity
                             setSelected(item, makeSelected);
                             view.UpdateItem(getId(item), item);
                         }
+
+                        if (onClick != null)
+                            onClick();
                     }
                     finally
                     {
@@ -407,15 +461,32 @@ namespace Serenity
         }
     }
 
+    public abstract class CheckTreeEditor<TOptions> : CheckTreeEditor<CheckTreeItem, TOptions>, IGetEditValue, ISetEditValue
+        where TOptions : class, new()
+    {
+        public CheckTreeEditor(jQueryObject div, TOptions opt)
+            : base(div, opt)
+        {
+        }
+    }
+
     [Imported, Serializable]
     public class CheckTreeItem
     {
         public bool IsSelected { get; set; }
 
-        public bool IsDescendantsSelected { get; set; }
+        public bool IsAllDescendantsSelected { get; set; }
         public string Id { get; set; }
         public string Text { get; set; }
         public string ParentId { get; set; }
         public List<CheckTreeItem> Children { get; set; }
+        public object Source { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class CheckTreeItem<TSource> : CheckTreeItem
+    {
+        public new TSource Source { get; set; }
+        public new List<CheckTreeItem<TSource>> Children { get; set; }
     }
 }

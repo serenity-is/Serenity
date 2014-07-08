@@ -19,7 +19,7 @@ namespace Serenity
         protected override List<object> GetItems()
         {
             var opt = options.As<DateYearEditorOptions>();
-            if (opt.Items.Count >= 1)
+            if (opt.Items != null && opt.Items.Count >= 1)
                 return opt.Items;
 
             var years = new List<object>();
@@ -49,9 +49,19 @@ namespace Serenity
                     maxYear = int.Parse(opt.MaxYear, 10);
             }
 
-            for (int i = minYear ; i <= maxYear; i++)
+            if (opt.Descending)
             {
-                years.Add(i.ToString());
+                for (int i = maxYear; i >= minYear; i--)
+                {
+                    years.Add(i.ToString());
+                }
+            }
+            else
+            {
+                for (int i = minYear; i <= maxYear; i++)
+                {
+                    years.Add(i.ToString());
+                }
             }
 
             return years;
@@ -74,6 +84,7 @@ namespace Serenity
 
         public string MinYear { get; set; }
         public string MaxYear { get; set; }
+        public bool Descending { get; set; }
     }
 
 }

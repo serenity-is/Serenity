@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections.Generic;
 
 namespace Serenity
 {

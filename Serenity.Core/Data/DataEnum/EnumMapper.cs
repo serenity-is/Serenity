@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Serenity
 {
@@ -82,6 +83,52 @@ namespace Serenity
                 return key;
 
             return intValue.ToString();
+        }
+
+        public static string GetName(this Enum value)
+        {
+            return System.Enum.GetName(value.GetType(), value);
+        }
+
+        public static string GetText(this Enum value)
+        {
+            return FormatEnum(value.GetType(), value);
+        }
+
+        public static string FormatEnum(Type enumType, object value)
+        {
+            if (value == null)
+                return String.Empty;
+
+            if (enumType != null &&
+                enumType.IsEnum &&
+                System.Enum.GetName(enumType, value) != null)
+            {
+                var typeName = enumType.Name;
+                var enumName = System.Enum.GetName(enumType, value);
+                var key = "Enums." + typeName + "." + enumName;
+                var text = LocalText.TryGet(key);
+                if (text == null)
+                {
+                    var memInfo = enumType.GetMember(enumName);
+                    if (memInfo != null && memInfo.Length == 1)
+                    {
+                        var attributes = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+                        if (attributes.Length > 0)
+                        {
+                            text = ((DescriptionAttribute)attributes[0]).Description;
+                            LocalText.Add(new List<LocalText.Entry>
+                            {
+                                new LocalText.Entry(LocalText.DefaultLanguageID, key, text)
+                            }, false);
+                        }
+                    }
+                }
+
+                return text ?? enumName;
+            }
+            else
+                return value.ToString();
         }
     }
 }

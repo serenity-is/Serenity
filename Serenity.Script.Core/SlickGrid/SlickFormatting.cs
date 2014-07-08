@@ -164,12 +164,12 @@ namespace Serenity
             return href;
         }
 
-        public static Int64? GetItemId(jQueryObject link)
+        public static string GetItemId(jQueryObject link)
         {
             return GetItemId(link.GetAttribute("href"));
         }
 
-        public static Int64? GetItemId(string href)
+        public static string GetItemId(string href)
         {
             if (href.IsEmptyOrNull())
                 return null;
@@ -181,7 +181,7 @@ namespace Serenity
             if (idx >= 0)
                 href = href.Substr(idx + 1);
 
-            return href.ConvertToId();
+            return href;
         }
 
         public static string ItemLinkText(string itemType, object id, object text, string extraClass)

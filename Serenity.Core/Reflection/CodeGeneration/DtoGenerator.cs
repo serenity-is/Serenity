@@ -190,7 +190,6 @@ namespace Serenity.Reflection
 
         private void GenerateEnum(Type enumType)
         {
-            cw.IndentedLine("[JsonConverter(typeof(StringEnumConverter))]");
             cw.Indented("public enum ");
             sb.AppendLine(enumType.Name);
             cw.InBrace(delegate 
@@ -269,7 +268,7 @@ namespace Serenity.Reflection
                         var memberName = pi != null ? pi.Name : fi.Name;
 
                         var jsonProperty = member.GetCustomAttribute<JsonPropertyAttribute>(false);
-                        if (jsonProperty != null)
+                        if (jsonProperty != null && !jsonProperty.PropertyName.IsEmptyOrNull())
                         {
                             cw.Indented("[JsonProperty(\"");
                             sb.Append(jsonProperty.PropertyName);

@@ -113,5 +113,28 @@ namespace Serenity
             element.Unbind("customValidate." + eventClass);
             return element;
         }
+
+        public static jQueryObject CreateElementFor<TEditor>()
+        {
+            return CreateElementFor(typeof(TEditor));
+        }
+
+        public static jQueryObject CreateElementFor(this Type editorType)
+        {
+            var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
+            string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
+            return jQuery.FromHtml(elementHtml);
+        }
+
+        public static TWidget Create<TWidget>(Action<jQueryObject> initElement, object options = null)
+            where TWidget : Widget
+        {
+            var element = CreateElementFor(typeof(TWidget));
+            
+            if (initElement != null)
+                initElement(element);
+
+            return (TWidget)Activator.CreateInstance(typeof(TWidget), element, options);
+        }
     }
 }
