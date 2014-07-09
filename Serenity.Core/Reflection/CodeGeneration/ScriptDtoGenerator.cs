@@ -31,6 +31,10 @@ namespace Serenity.Reflection
                 "System.Runtime.CompilerServices"
             };
 
+            RootNamespaces = new HashSet<string>
+            {
+            };
+
             if (assembly == null)
                 throw new ArgumentNullException("assembly");
 
@@ -39,7 +43,7 @@ namespace Serenity.Reflection
 
         public Assembly Assembly { get; private set; }
         public HashSet<string> UsingNamespaces { get; private set; }
-        
+        public HashSet<string> RootNamespaces { get; private set; }
 
         private bool EnqueueType(Type type)
         {
@@ -60,7 +64,7 @@ namespace Serenity.Reflection
             return ns;
         }
 
-        public string GenerateCode()
+        public SortedDictionary<string, string> GenerateCode()
         {
             this.sb = new StringBuilder(4096);
             this.cw = new CodeWriter(sb, 4);
@@ -94,13 +98,6 @@ namespace Serenity.Reflection
 
             sb.Clear();
 
-            foreach (var ns in UsingNamespaces.OrderBy(x => x))
-            {
-                cw.Indented("using ");
-                sb.Append(ns);
-                sb.AppendLine(";");
-            }
-
             sb.AppendLine();
 
             var ordered = generatedCode.Keys.OrderBy(x => GetNamespace(x)).ThenBy(x => x.Name);
@@ -108,28 +105,65 @@ namespace Serenity.Reflection
             var byOwnerType = ordered.ToLookup(x => (x.IsNested ? x.DeclaringType : null));
             var outputted = new HashSet<Type>();
 
+            var result = new SortedDictionary<string, string>();
+
             foreach (var ns in byNameSpace.ToArray().OrderBy(x => x.Key))
             {
-                sb.AppendLine();
-                cw.Indented("namespace ");
-                sb.AppendLine(ns.Key);
-                cw.InBrace(delegate
+                Action<Type> outputType = delegate(Type type)
                 {
-                    foreach (var owner in byOwnerType)
+                    var filename = ns.Key + "." + MakeFriendlyName(type) + ".cs";
+
+                    foreach (var rn in RootNamespaces)
                     {
+                        if (filename.StartsWith(rn + "."))
+                            filename = filename.Substring(rn.Length + 1);
+                    }
+
+                    result.Add(filename, sb.ToString());
+                };
+
+                foreach (var owner in byOwnerType)
+                {
+                    bool skip = false;
+
+                    sb.Clear();
+                    sb.AppendLine();
+                    cw.Indented("namespace ");
+                    sb.AppendLine(ns.Key);
+
+                    cw.InBrace(delegate
+                    {
+                        foreach (var usingNamespace in UsingNamespaces.OrderBy(x => x))
+                        {
+                            cw.Indented("using ");
+                            sb.Append(usingNamespace);
+                            sb.AppendLine(";");
+                        }
+
+                        sb.AppendLine();
+
                         if (owner.Key == null)
-                            continue;
+                        {
+                            skip = true;
+                            return;
+                        }
 
                         if (GetNamespace(owner.Key) != ns.Key)
-                            continue;
+                        {
+                            skip = true;
+                            return;
+                        }
 
                         if (outputted.Contains(owner.Key))
-                            continue;
-
-                        if (!generatedCode.ContainsKey(owner.Key))
-                            continue;
+                        {
+                            skip = true;
+                            return;
+                        }
 
                         outputted.Add(owner.Key);
+
+                        if (!generatedCode.ContainsKey(owner.Key))
+                            return;
 
                         string code = generatedCode[owner.Key].TrimEnd();
                         code = code.Substring(0, code.Length - 1).TrimEnd();
@@ -148,20 +182,44 @@ namespace Serenity.Reflection
 
                         cw.IndentedLine("}");
                         sb.AppendLine();
-                    }
+                    });
 
-                    foreach (var type in ns)
+                    if (skip)
+                        continue;
+
+                    outputType(owner.Key);
+                }
+
+                foreach (var type in ns)
+                {
+                    if (outputted.Contains(type))
+                        continue;
+
+                    sb.Clear();
+                    sb.AppendLine();
+                    cw.Indented("namespace ");
+                    sb.AppendLine(ns.Key);
+
+                    cw.InBrace(() =>
                     {
-                        if (outputted.Contains(type))
-                            continue;
+                        foreach (var usingNamespace in UsingNamespaces.OrderBy(x => x))
+                        {
+                            cw.Indented("using ");
+                            sb.Append(usingNamespace);
+                            sb.AppendLine(";");
+                        }
+
+                        sb.AppendLine();
 
                         cw.IndentedMultiLine(generatedCode[type]);
-                        outputted.Add(type);
-                    }
-                });
+                    });
+
+                    outputType(type);
+                    outputted.Add(type);
+                }
             }
 
-            return sb.ToString();
+            return result;
         }
 
         private void HandleMemberType(Type memberType)
@@ -174,7 +232,7 @@ namespace Serenity.Reflection
             if (memberType == typeof(DateTime?) || memberType == typeof(DateTime))
             {
                 code.Append("String"); // şu an için string, JSON tarafında ISO string formatında tarihler gidiyor, 
-                                       // ama bunu daha sonra JSON.parse, JSON.stringify'ı değiştirip düzelteceğiz.
+                // ama bunu daha sonra JSON.parse, JSON.stringify'ı değiştirip düzelteceğiz.
                 return;
             }
 
