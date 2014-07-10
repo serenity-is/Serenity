@@ -109,6 +109,20 @@ namespace Serenity
                         item._collapsed = false;
                     view.UpdateItem(getId(item), item);
                 }
+
+                if (e.ShiftKey)
+                {
+                    view.BeginUpdate();
+                    try
+                    {
+                        SetCollapsed(view.GetItems(), item._collapsed);
+                        view.SetItems(view.GetItems(), true);
+                    }
+                    finally
+                    {
+                        view.EndUpdate();
+                    }
+                }
             }
         }
     }
