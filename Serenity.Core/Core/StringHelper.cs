@@ -306,7 +306,12 @@ namespace Serenity
             {
                 Char c = normalizedString[i];
                 if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                {
+                    if (c == 'ý')
+                        c = 'i';
+
                     stringBuilder.Append(c);
+                }
             }
 
             return stringBuilder.ToString();
