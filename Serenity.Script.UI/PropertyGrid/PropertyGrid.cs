@@ -420,8 +420,8 @@ namespace Serenity
             {
                 var item = items[i];
                 if (!item.OneWay &&
-                    !(Mode == PropertyGridMode.Insert && !item.Insertable) &&
-                    !(Mode == PropertyGridMode.Update && !item.Updatable))
+                    !(Mode == PropertyGridMode.Insert && item.Insertable == false) &&
+                    !(Mode == PropertyGridMode.Update && item.Updatable == false))
                 {
                     var editor = editors[i];
 
@@ -465,8 +465,8 @@ namespace Serenity
                 var editor = editors[i];
 
                 bool readOnly = item.ReadOnly ||
-                    (Mode == PropertyGridMode.Insert && !item.Insertable) ||
-                    (Mode == PropertyGridMode.Update && !item.Updatable);
+                    (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
+                    (Mode == PropertyGridMode.Update && item.Updatable == false);
 
                 SetReadOnly(editor, readOnly);
                 SetRequired(editor, !readOnly && item.Required && 
