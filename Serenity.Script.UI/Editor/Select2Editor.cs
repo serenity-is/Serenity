@@ -157,5 +157,14 @@ namespace Serenity
                     this.element.Select2("val", value).TriggerHandler("change", new object[] { true });
             }
         }
+
+        public string Text
+        {
+            get
+            {
+                var item = items.Filter(s => s.Id == Value)[0];
+                return item != null ? item.Text : null;
+            }
+        }
     }
 }
