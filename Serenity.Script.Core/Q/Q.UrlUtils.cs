@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -15,6 +16,26 @@ namespace Serenity
                 return Q.Config.ApplicationPath + url.Substr(2);
             else
                 return url;
+        }
+
+        public static void AutoOpenByQuery(string key, Action<string> autoOpen)
+        {
+            var query = Q.Externals.ParseQueryString();
+            var value = query[key];
+            if (value != null)
+                autoOpen(value);
+        }
+
+        public static void AutoOpenByQueryID(string key, Action<Int64> autoOpen)
+        {
+            AutoOpenByQuery(key, delegate(string value)
+            {
+                var id = value.ConvertToId();
+                if (id == null || Double.IsNaN(id.As<double>()))
+                    return;
+
+                autoOpen(id.Value);
+            });
         }
     }
 }
