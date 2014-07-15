@@ -16,8 +16,8 @@ namespace Serenity
         public string CssClass { get; set; }
         public int? MaxLength { get; set; }
         public bool Required { get; set; }
-        public bool Insertable { get; set; }
-        public bool Updatable { get; set; }
+        public bool? Insertable { get; set; }
+        public bool? Updatable { get; set; }
         public bool ReadOnly { get; set; }
         public bool OneWay { get; set; }
         public object DefaultValue { get; set; }
