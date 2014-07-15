@@ -188,10 +188,23 @@ namespace Serenity
                 optionsType = optionsAttr[0].As<OptionsTypeAttribute>().OptionsType;
             }
 
+            Widget editor;
+
             if (optionsType != null)
+            {
                 editorParams = jQuery.ExtendObject(Activator.CreateInstance(optionsType), item.EditorParams);
 
-            Widget editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
+                editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
+            }
+            else 
+            {
+                editor = (Widget)(Activator.CreateInstance(editorType, element));
+
+                if (item.EditorParams != null)
+                    foreach (var k in item.EditorParams.Keys)
+                        ReflectionUtils.SetPropertyValue(editor, k, item.EditorParams[k]);
+            }
+
             if (editor is BooleanEditor)
                 label.RemoveAttr("for");
 
