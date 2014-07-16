@@ -297,15 +297,15 @@ namespace Serenity.ComponentModel
         {
         }
 
-        public Int32? Cols
+        public Int32 Cols
         {
-            get { return GetOption<Int32?>("cols"); }
+            get { return GetOption<Int32>("cols"); }
             set { SetOption("cols", value); }
         }
 
-        public Int32? Rows
+        public Int32 Rows
         {
-            get { return GetOption<Int32?>("rows"); }
+            get { return GetOption<Int32>("rows"); }
             set { SetOption("rows", value); }
         }
     }
