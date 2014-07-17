@@ -89,9 +89,9 @@ namespace Serenity
         protected abstract string GetItemKey(TItem item);
         protected abstract string GetItemText(TItem item);
 
-        protected virtual int GetSearchTimeout()
+        protected virtual int GetTypeDelay()
         {
-            return 1000;
+            return 250;
         }
 
         protected virtual Select2Options GetSelect2Options()
@@ -131,7 +131,7 @@ namespace Serenity
                                 More = response.TotalCount >= query.Page * pageSize
                             });
                         });
-                    }, GetSearchTimeout());
+                    }, GetTypeDelay());
                 },
                 InitSelection = delegate(jQueryObject element, Action<object> callback)
                 {
