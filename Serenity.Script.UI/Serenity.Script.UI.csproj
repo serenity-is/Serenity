@@ -43,6 +43,7 @@
     <Compile Include="Editor\HtmlReportContentEditor.cs" />
     <Compile Include="Editor\HtmlContentEditor.cs" />
     <Compile Include="Editor\DateTimeEditor.cs" />
+    <Compile Include="Editor\Select2AjaxEditor.cs" />
     <Compile Include="Editor\Select2Editor.cs" />
     <Compile Include="Editor\URLEditor.cs" />
     <Compile Include="Editor\MaskEditor.cs" />
