@@ -195,7 +195,7 @@
 
             var joinAlias = join.Name;
 
-            if (aliases != null && aliases.Contains(joinAlias))
+            if (aliases != null && aliases.ContainsKey(joinAlias))
                 return this;
 
             if (join.Joins != null &&
