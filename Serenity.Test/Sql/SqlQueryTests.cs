@@ -779,5 +779,41 @@ namespace Serenity.Test.Data
 
         }
 
+        [Fact]
+        public void JoinIgnoresExistingJoinsWithSameAliasAndSameExpression()
+        {
+            var row = new Serenity.Test.Data.RowMappingTests.ComplexRow();
+            var fld = Serenity.Test.Data.RowMappingTests.ComplexRow.Fields;
+            var query = new SqlQuery()
+                .From(row)
+                .Select(fld.CountryName)
+                .LeftJoin(new Alias("TheCountryTable", "c"), new Criteria("c", "TheCountryID") == new Criteria(0, "CountryID"));
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT c.Name AS CountryName FROM ComplexTable T0 LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+
+        }
+
+        [Fact]
+        public void JoinThrowsExceptionForJoinsWithSameAliasButDifferentExpression()
+        {
+            var row = new Serenity.Test.Data.RowMappingTests.ComplexRow();
+            var fld = Serenity.Test.Data.RowMappingTests.ComplexRow.Fields;
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+            {
+                var query = new SqlQuery()
+                    .From(row)
+                    .Select(fld.CountryName)
+                    .LeftJoin(new Alias("City", "c"), new Criteria("c", "CityID") == new Criteria(0, "CountryID"));
+            });
+
+            Assert.Contains("already has a join 'c'", exception.Message);
+            Assert.Contains("LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)", exception.Message);
+            Assert.Contains("Attempted join expression is 'LEFT JOIN City c ON (c.CityID = T0.CountryID)", exception.Message);
+        }
     }
 }
