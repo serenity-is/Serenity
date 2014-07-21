@@ -74,7 +74,7 @@ namespace Serenity.Services
         {
             var auditRequest = GetAuditRequest();
             if (auditRequest != null)
-                AuditLogService.AuditUndelete(Connection, RowRegistry.GetSchemaName(Row), auditRequest);
+                AuditLogService.AuditUndelete(Connection, RowRegistry.GetConnectionKey(Row), auditRequest);
         }
 
         protected virtual void DoCaptureLog()

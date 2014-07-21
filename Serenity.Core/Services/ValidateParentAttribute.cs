@@ -28,7 +28,7 @@ namespace Serenity.Services
             if (parentIdField.ForeignTable.IsNullOrEmpty())
                 return;
 
-            var foreignRow = RowRegistry.GetSchemaRow(RowRegistry.GetSchemaName(row), 
+            var foreignRow = RowRegistry.GetConnectionRow(RowRegistry.GetConnectionKey(row), 
                 parentIdField.ForeignTable);
 
             if (foreignRow == null)

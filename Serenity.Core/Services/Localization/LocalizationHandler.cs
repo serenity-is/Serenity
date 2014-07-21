@@ -47,8 +47,8 @@ namespace Serenity.Data
             if (localAttr == null || localAttr.LocalizationTable.IsTrimmedEmpty())
                 throw new InvalidOperationException(String.Format("{0} row type has no localization attribute defined!", typeof(TRow).Name));
 
-            schemaName = RowRegistry.GetSchemaName(typeof(TRow));
-            var localInstance = RowRegistry.GetSchemaRow(schemaName, localAttr.LocalizationTable);
+            schemaName = RowRegistry.GetConnectionKey(typeof(TRow));
+            var localInstance = RowRegistry.GetConnectionRow(schemaName, localAttr.LocalizationTable);
             if (localInstance == null)
                 throw new InvalidOperationException(String.Format("Can't locate {0} localization table in schema {1} for {2} row type!",
                     localAttr.LocalizationTable, schemaName, typeof(TRow).Name));

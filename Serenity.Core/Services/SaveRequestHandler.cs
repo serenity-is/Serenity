@@ -110,7 +110,7 @@ namespace Serenity.Services
             {
                 Row audit = null;
                 if (auditRequest != null)
-                    audit = AuditLogService.PrepareAuditUpdate(RowRegistry.GetSchemaName(Row), auditRequest);
+                    audit = AuditLogService.PrepareAuditUpdate(RowRegistry.GetConnectionKey(Row), auditRequest);
 
                 if (audit != null)
                     new SqlInsert(audit).Execute(Connection);
@@ -118,7 +118,7 @@ namespace Serenity.Services
             else if (IsCreate)
             {
                 if (auditRequest != null)
-                    AuditLogService.AuditInsert(Connection, RowRegistry.GetSchemaName(Row), auditRequest);
+                    AuditLogService.AuditInsert(Connection, RowRegistry.GetConnectionKey(Row), auditRequest);
             }
         }
 

@@ -67,9 +67,9 @@ namespace Serenity.Web
             if (schema == null)
             {
                 if (row != null)
-                    schema = RowRegistry.GetSchemaName(row);
+                    schema = RowRegistry.GetConnectionKey(row);
                 else
-                    schema = RowRegistry.DefaultSchema;
+                    schema = RowRegistry.DefaultConnectionKey;
             }
 
             _schema = schema;
