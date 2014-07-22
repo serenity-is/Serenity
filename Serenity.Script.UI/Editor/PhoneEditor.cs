@@ -57,40 +57,47 @@ namespace Serenity
 
         public void FormatValue()
         {
+            this.element.Value(GetFormattedValue());
+        }
+
+        public string GetFormattedValue()
+        {
             var value = this.element.GetValue();
 
             if (!options.Multiple &&
                 !options.Internal &&
                 !options.Mobile)
             {
-                this.element.Value(FormatPhoneTurkey(value));
+                return FormatPhoneTurkey(value);
             }
             else if (options.Multiple &&
                 !options.Mobile &&
                 !options.Internal)
             {
-                this.element.Value(FormatPhoneTurkeyMulti(value));
+                return FormatPhoneTurkeyMulti(value);
             }
             else if (options.Mobile &&
                 !options.Multiple)
             {
-                this.element.Value(FormatMobileTurkey(value));
+                return FormatMobileTurkey(value);
             }
             else if (options.Mobile &&
                 options.Multiple)
             {
-                this.element.Value(FormatMobileTurkeyMulti(value));
+                return FormatMobileTurkeyMulti(value);
             }
             else if (options.Internal &&
                 !options.Multiple)
             {
-                this.element.Value(FormatPhoneInternal(value));
+                return FormatPhoneInternal(value);
             }
             else if (options.Internal &&
                 options.Multiple)
             {
-                this.element.Value(FormatPhoneInternalMulti(value));
+                return FormatPhoneInternalMulti(value);
             }
+
+            return value;
         }
 
         private static string FormatMulti(string phone, Func<string, string> format)
@@ -183,8 +190,7 @@ namespace Serenity
         {
             get
             {
-                FormatValue();
-                return this.element.GetValue();
+                return GetFormattedValue();
             }
             set
             {
@@ -199,7 +205,7 @@ namespace Serenity
             Func<string, bool> validateFunc;
 
             if (isInternal)
-                validateFunc = IsValidPhoneTurkey;
+                validateFunc = IsValidPhoneInternal;
             else if (isMobile)
                 validateFunc = IsValidMobileTurkey;
             else
@@ -213,7 +219,7 @@ namespace Serenity
             if (isMultiple)
             {
                 if (isInternal)
-                    return "Dahili telefon numarası '4567' formatında girilmelidir!";
+                    return "Dahili telefon numarası '4567' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";
 
                 if (isMobile)
                     return "Telefon numaraları '(533) 342 01 89' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";
