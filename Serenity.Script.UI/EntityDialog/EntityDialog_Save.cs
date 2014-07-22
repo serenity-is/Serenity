@@ -98,7 +98,7 @@ namespace Serenity
             });
         }
 
-        protected void SaveHandler(ServiceCallOptions options, Action<ServiceResponse> callback)
+        protected virtual void SaveHandler(ServiceCallOptions options, Action<ServiceResponse> callback)
         {
             Q.ServiceCall(options);
         }

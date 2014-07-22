@@ -8,7 +8,7 @@
     [DebuggerDisplay("{DebugText}")]
     public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName
     {
-        private HashSet<string> aliases;
+        private Dictionary<string, string> aliases;
         private List<Column> columns;
         private bool countRecords;
         private bool distinct;
@@ -87,7 +87,7 @@
                 throw new ArgumentNullException("alias");
 
             if (aliases != null &&
-                aliases.Contains(alias.Name))
+                aliases.ContainsKey(alias.Name))
                 throw new ArgumentOutOfRangeException("{0} alias is used more than once in the query!");
 
             From(table);
@@ -96,9 +96,9 @@
             from.Append(alias.Name);
 
             if (aliases == null)
-                aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            aliases.Add(alias.Name);
+            aliases.Add(alias.Name, table + " " + alias.Name);
 
             return this;
         }

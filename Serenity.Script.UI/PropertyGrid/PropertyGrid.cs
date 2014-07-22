@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections;
 using jQueryApi;
 using System.Html;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Serenity
 {
@@ -188,10 +188,23 @@ namespace Serenity
                 optionsType = optionsAttr[0].As<OptionsTypeAttribute>().OptionsType;
             }
 
+            Widget editor;
+
             if (optionsType != null)
+            {
                 editorParams = jQuery.ExtendObject(Activator.CreateInstance(optionsType), item.EditorParams);
 
-            Widget editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
+                editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
+            }
+            else 
+            {
+                editor = (Widget)(Activator.CreateInstance(editorType, element));
+
+                if (item.EditorParams != null)
+                    foreach (var k in item.EditorParams.Keys)
+                        ReflectionUtils.SetPropertyValue(editor, k, item.EditorParams[k]);
+            }
+
             if (editor is BooleanEditor)
                 label.RemoveAttr("for");
 
@@ -420,8 +433,8 @@ namespace Serenity
             {
                 var item = items[i];
                 if (!item.OneWay &&
-                    !(Mode == PropertyGridMode.Insert && !item.Insertable) &&
-                    !(Mode == PropertyGridMode.Update && !item.Updatable))
+                    !(Mode == PropertyGridMode.Insert && item.Insertable == false) &&
+                    !(Mode == PropertyGridMode.Update && item.Updatable == false))
                 {
                     var editor = editors[i];
 
@@ -465,8 +478,8 @@ namespace Serenity
                 var editor = editors[i];
 
                 bool readOnly = item.ReadOnly ||
-                    (Mode == PropertyGridMode.Insert && !item.Insertable) ||
-                    (Mode == PropertyGridMode.Update && !item.Updatable);
+                    (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
+                    (Mode == PropertyGridMode.Update && item.Updatable == false);
 
                 SetReadOnly(editor, readOnly);
                 SetRequired(editor, !readOnly && item.Required && 
@@ -496,13 +509,24 @@ namespace Serenity
             }
         }
 
-        private static void SetRequired(Widget widget, bool isRequired)
+        public static void SetRequired(Widget widget, bool isRequired)
         {
             var req = widget as IValidateRequired;
             if (req != null)
                 req.Required = isRequired;
             else if (widget.Element.Is(":input"))
                 widget.Element.ToggleClass("required", Q.IsTrue(isRequired));
+
+            var gridField = widget.GetGridField();
+            var hasSupItem = gridField.Find("sup").GetItems().Any();
+            if (isRequired && !hasSupItem){
+                J("<sup>*</sup>")
+                    .Attribute("title", "Bu alan zorunludur")
+                    .PrependTo(gridField.Find(".caption")[0]);
+            }
+            else if (!isRequired && hasSupItem){
+                J(gridField.Find("sup")[0]).Remove();
+            }
         }
 
         public static void SetReadOnly(Widget widget, bool isReadOnly)

@@ -153,30 +153,39 @@ namespace Serenity
             base.Destroy();
         }
 
-        protected virtual dynamic GetItemMetadata(TItem entity, int index)
+        protected virtual string GetItemCssClass(TItem item, int index)
         {
             var activeFieldName = GetIsActiveFieldName();
             if (activeFieldName.IsEmptyOrNull())
-                return new object();
+                return null;
 
-            var value = entity.As<JsDictionary>()[activeFieldName].As<Int32?>();
+            var value = item.As<JsDictionary>()[activeFieldName].As<Int32?>();
             if (value == null)
-                return new object();
+                return null;
 
             if (Script.TypeOf(value) == "number")
             {
                 if (IdExtensions.IsNegativeId(value.As<Int64>()))
-                    return new { cssClasses = "deleted" };
+                    return "deleted";
                 else if (value.As<Int32>() == 0)
-                    return new { cssClasses = "inactive" };
+                    return "inactive";
             }
             else if (Script.TypeOf(value) == "boolean")
             {
                 if (value.As<Boolean>() == false)
-                    return new { cssClasses = "deleted" };
+                    return "deleted";
             }
 
-            return new object();
+            return null;
+        }
+
+        protected virtual dynamic GetItemMetadata(TItem item, int index)
+        {
+            var itemClass = GetItemCssClass(item, index);
+            if (itemClass.IsEmptyOrNull())
+                return new object();
+
+            return new { cssClasses = itemClass };
         }
 
         protected virtual List<SlickColumn> PostProcessColumns(List<SlickColumn> columns)

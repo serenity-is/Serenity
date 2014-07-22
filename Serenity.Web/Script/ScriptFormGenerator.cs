@@ -57,7 +57,7 @@ namespace Serenity.Reflection
             return type.Namespace;
         }
 
-        public string GenerateCode()
+        public SortedDictionary<string, string> GenerateCode()
         {
             var codeByType = new Dictionary<Type, string>();
             var sb = new StringBuilder();
@@ -134,38 +134,53 @@ namespace Serenity.Reflection
                 sb.Clear();
             }
 
-            sb.Clear();
-            sb.AppendLine();
-
-            foreach (var ns in UsingNamespaces)
-            {
-                cw.Indented("using ");
-                sb.Append(ns);
-                sb.AppendLine(";");
-            }
-
             var ordered = codeByType.Keys.OrderBy(x => DoGetNamespace(x)).ThenBy(x => x.Name);
             var byNameSpace = ordered.ToLookup(x => DoGetNamespace(x));
 
+            var result = new SortedDictionary<string, string>();
+
             foreach (var ns in byNameSpace.ToArray().OrderBy(x => x.Key))
             {
-                sb.AppendLine();
-                cw.Indented("namespace ");
-                sb.AppendLine(ns.Key);
-                cw.InBrace(delegate
+                foreach (var type in ns)
                 {
-                    int i = 0;
-                    foreach (var type in ns)
+                    sb.Clear();
+                    sb.AppendLine();
+                    cw.Indented("namespace ");
+                    sb.AppendLine(ns.Key);
+                    cw.InBrace(delegate
                     {
-                        if (i++ > 0)
-                            sb.AppendLine();
+                        foreach (var usingNamespace in UsingNamespaces)
+                        {
+                            cw.Indented("using ");
+                            sb.Append(usingNamespace);
+                            sb.AppendLine(";");
+                        }
 
-                        cw.IndentedMultiLine(codeByType[type].TrimEnd());
+                        sb.AppendLine();
+
+                        int i = 0;
+
+                        {
+                            if (i++ > 0)
+                                sb.AppendLine();
+
+                            cw.IndentedMultiLine(codeByType[type].TrimEnd());
+                        }
+                    });
+
+                    var filename = ns.Key + "." + DoGetTypeName(type) + ".cs";
+
+                    foreach (var rn in RootNamespaces)
+                    {
+                        if (filename.StartsWith(rn + "."))
+                            filename = filename.Substring(rn.Length + 1);
                     }
-                });
+
+                    result.Add(filename, sb.ToString());
+                }
             }
 
-            return sb.ToString();
+            return result;
         }
     }
 }

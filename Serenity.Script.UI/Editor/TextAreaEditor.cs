@@ -13,11 +13,11 @@ namespace Serenity
         public TextAreaEditor(jQueryObject input, TextAreaEditorOptions opt)
             : base(input, opt)
         {
-            if (options.Cols != null)
-                input.Attribute("cols", options.Cols.Value.ToString());
+            if (options.Cols != 0)
+                input.Attribute("cols", options.Cols.ToString());
 
-            if (options.Rows != null)
-                input.Attribute("rows", options.Rows.Value.ToString());
+            if (options.Rows != 0)
+                input.Attribute("rows", options.Rows.ToString());
         }
 
         public string Value
@@ -37,8 +37,8 @@ namespace Serenity
         }
 
         [Hidden]
-        public int? Cols { get; set; }
+        public int Cols { get; set; }
         [Hidden]
-        public int? Rows { get; set; }
+        public int Rows { get; set; }
     }
 }

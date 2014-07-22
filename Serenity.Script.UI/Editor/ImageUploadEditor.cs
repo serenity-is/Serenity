@@ -1,5 +1,4 @@
 ﻿using jQueryApi;
-using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,10 +10,10 @@ namespace Serenity
     [Element("<div/>")]
     public class ImageUploadEditor : Widget<ImageUploadEditorOptions>, IGetEditValue, ISetEditValue, IReadOnly
     {
-        private UploadedFile entity;
-        private Toolbar toolbar;
-        private jQueryObject fileSymbols;
-        private jQueryObject uploadInput;
+        protected UploadedFile entity;
+        protected Toolbar toolbar;
+        protected jQueryObject fileSymbols;
+        protected jQueryObject uploadInput;
 
         public ImageUploadEditor(jQueryObject div, ImageUploadEditorOptions opt)
             : base(div, opt)
@@ -28,24 +27,7 @@ namespace Serenity
 
             toolbar = new Toolbar(J("<div/>").AppendTo(this.Element), new ToolbarOptions
             {
-                Buttons = new List<ToolButton>
-                {
-                    new ToolButton {
-                        Title = "Dosya Seç",
-                        CssClass = "add-file-button",
-                        OnClick = delegate {
-                        }
-                    },
-                    new ToolButton {
-                        Title = "Kaldır",
-                        CssClass = "delete-button",
-                        OnClick = delegate {
-                            self.entity = null;
-                            self.Populate();
-                            self.UpdateInterface();
-                        }
-                    }
-                }
+                Buttons = GetToolButtons()
             });
 
             var progress = J("<div><div></div></div>").AddClass("upload-progress")
@@ -80,7 +62,34 @@ namespace Serenity
             this.UpdateInterface();
         }
 
-        private void Populate()
+        protected virtual List<ToolButton> GetToolButtons()
+        {
+            var self = this;
+
+            return new List<ToolButton>
+            {
+                new ToolButton
+                {
+                    Title = "Dosya Seç",
+                    CssClass = "add-file-button",
+                    OnClick = delegate {
+                    }
+                },
+                new ToolButton
+                {
+                    Title = "Kaldır",
+                    CssClass = "delete-button",
+                    OnClick = delegate
+                    {
+                        self.entity = null;
+                        self.Populate();
+                        self.UpdateInterface();
+                    }
+                }
+            };
+        }
+
+        protected virtual void Populate()
         {
             bool displayOriginalName = !options.OriginalNameProperty.IsTrimmedEmpty();
 
@@ -90,7 +99,7 @@ namespace Serenity
                 UploadHelper.PopulateFileSymbols(fileSymbols, new List<UploadedFile> { entity }, displayOriginalName);
         }
 
-        private void UpdateInterface()
+        protected virtual void UpdateInterface()
         {
             var addButton = this.toolbar.FindButton("add-file-button");
             var delButton = this.toolbar.FindButton("delete-button");
@@ -114,7 +123,7 @@ namespace Serenity
             }
         }
 
-        public UploadedFile Value
+        public virtual UploadedFile Value
         {
             get
             {

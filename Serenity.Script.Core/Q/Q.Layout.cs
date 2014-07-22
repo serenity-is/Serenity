@@ -53,9 +53,8 @@ namespace Serenity
                 Window.Instance.As<dynamic>().Metronic.addResizeHandler(layout);
             else
             {
+                jQuery.Window.Resize(layout);
             }
-                //jQuery.Window.Resize(layout);
-
 
             layout(null);
         }

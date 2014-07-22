@@ -104,13 +104,13 @@ namespace Serenity.Web
             return historyFile;
         }
 
-        public static void CopyFileAndRelated(string sourceFilePath, string targetFilePath)
+        public static void CopyFileAndRelated(string sourceFilePath, string targetFilePath, bool overwrite = false)
         {
             var targetPath = Path.GetDirectoryName(targetFilePath);
             if (!Directory.Exists(targetPath))
                 Directory.CreateDirectory(targetPath);
 
-            File.Copy(sourceFilePath, targetFilePath);
+            File.Copy(sourceFilePath, targetFilePath, overwrite);
 
             string sourcePath = Path.GetDirectoryName(sourceFilePath);
             string sourceBase = Path.GetFileNameWithoutExtension(sourceFilePath);
@@ -120,7 +120,7 @@ namespace Serenity.Web
                 sourceBase + "_t*.jpg"))
             {
                 string thumbSuffix = Path.GetFileName(f).Substring(sourceBase.Length);
-                File.Copy(f, Path.Combine(targetPath, targetBase + thumbSuffix));
+                File.Copy(f, Path.Combine(targetPath, targetBase + thumbSuffix), overwrite);
             }
         }
 

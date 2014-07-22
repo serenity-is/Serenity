@@ -115,12 +115,12 @@ namespace Serenity
         }
     }
 
-    [Imported, Serializable]
+    [Serializable, Reflectable]
     public class QuickSearchInputOptions
     {
         public QuickSearchInputOptions()
         {
-            TypeDelay = 1000;
+            TypeDelay = 250;
             LoadingParentClass = "s-QuickSearchLoading";
             FilteredParentClass = "s-QuickSearchFiltered";
         }

@@ -12,7 +12,6 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -171,7 +170,7 @@
     <Compile Include="Data\Field\Row.cs" />
     <Compile Include="Data\Field\RowFieldsBase.cs" />
     <Compile Include="Data\Field\RowRegistry.cs" />
-    <Compile Include="Data\Field\SchemaAttribute.cs" />
+    <Compile Include="Data\Field\ConnectionKeyAttribute.cs" />
     <Compile Include="Data\Sql\Helpers\T0ReferenceRemover.cs" />
     <Compile Include="Core\Helpers\GroupingHelper.cs" />
     <Compile Include="Data\Index\DbIndex.cs" />

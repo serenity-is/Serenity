@@ -9,48 +9,48 @@ namespace Serenity.Data
 {
     public static class RowRegistry
     {
-        public const string DefaultSchema = "Default";
+        public const string DefaultConnectionKey = "Default";
 
-        private static IDictionary<string, Row> emptySchema = new Dictionary<string, Row>(StringComparer.OrdinalIgnoreCase);
+        private static IDictionary<string, Row> emptyRegistry = new Dictionary<string, Row>(StringComparer.OrdinalIgnoreCase);
         internal static Dictionary<string, Dictionary<string, Row>> registry;
 
         static RowRegistry()
         {
-            SchemaChangeSource.Observers += (schema, table) => {
+            SchemaChangeSource.Observers += (connectionKey, table) => {
                 registry = null;
             };
         }
 
-        public static string GetSchemaName(Type type)
+        public static string GetConnectionKey(Type type)
         {
-            var schemaAttrs = type.GetCustomAttributes(typeof(SchemaAttribute), true);
-            if (schemaAttrs.Length == 1)
-                return ((SchemaAttribute)schemaAttrs[0]).Schema;
+            var connectionKeyAttrs = type.GetCustomAttributes(typeof(ConnectionKeyAttribute), true);
+            if (connectionKeyAttrs.Length == 1)
+                return ((ConnectionKeyAttribute)connectionKeyAttrs[0]).Value;
             else
-                return DefaultSchema;
+                return DefaultConnectionKey;
         }
 
-        public static string GetSchemaName(Row row)
+        public static string GetConnectionKey(Row row)
         {
-            return GetSchemaName(row.GetType());
+            return GetConnectionKey(row.GetType());
         }
 
-        public static IDictionary<string, Row> GetSchema(string schema)
+        public static IDictionary<string, Row> GetRegistry(string connectionKey)
         {
             var registry = EnsureRegistry();
 
             Dictionary<string, Row> schemaRegistry;
-            if (registry.TryGetValue(schema, out schemaRegistry))
+            if (registry.TryGetValue(connectionKey, out schemaRegistry))
                 return schemaRegistry;
 
-            return emptySchema;
+            return emptyRegistry;
         }
 
-        public static Row GetSchemaRow(string schema, string table)
+        public static Row GetConnectionRow(string connectionKey, string table)
         {
-            var schemaRegistry = GetSchema(schema);
+            var connectionRegistry = GetRegistry(connectionKey);
             Row row;
-            if (schemaRegistry.TryGetValue(table, out row))
+            if (connectionRegistry.TryGetValue(table, out row))
                 return row;
 
             return null;
@@ -60,8 +60,8 @@ namespace Serenity.Data
         {
             var registry = EnsureRegistry();
 
-            foreach (var schema in registry.Values)
-                foreach (var row in schema.Values)
+            foreach (var reg in registry.Values)
+                foreach (var row in reg.Values)
                     yield return row;
         }
 
@@ -69,14 +69,14 @@ namespace Serenity.Data
         {
             try
             {
-                var schemaName = GetSchemaName(row.GetType());
-                Dictionary<string, Row> schemaRegistry;
-                if (!registry.TryGetValue(schemaName, out schemaRegistry))
-                    registry[schemaName] = schemaRegistry = new Dictionary<string, Row>(StringComparer.OrdinalIgnoreCase);
+                var connectionKey = GetConnectionKey(row.GetType());
+                Dictionary<string, Row> connectionRegistry;
+                if (!registry.TryGetValue(connectionKey, out connectionRegistry))
+                    registry[connectionKey] = connectionRegistry = new Dictionary<string, Row>(StringComparer.OrdinalIgnoreCase);
 
                 string table = row.Table;
 
-                schemaRegistry.Add(table, row);
+                connectionRegistry.Add(table, row);
             }
             catch (Exception ex)
             {

@@ -157,7 +157,7 @@ namespace Serenity.Services
                          (AuditType?)fld.AuditTypeIdField[entity] == AuditType.Update) &&
                         (fld.OldAuditDataField[entity] != null || fld.NewAuditDataField[entity] != null))
                     {
-                        theRow = RowRegistry.GetSchemaRow(RowRegistry.DefaultSchema, fld.EntityTypeIdField[entity]);
+                        theRow = RowRegistry.GetConnectionRow(RowRegistry.DefaultConnectionKey, fld.EntityTypeIdField[entity]);
                         if (theRow == null)
                             continue;
 
@@ -200,7 +200,7 @@ namespace Serenity.Services
 
                 foreach (var pair in response.IdNameLookups)
                 {
-                    Row entity = RowRegistry.GetSchemaRow(RowRegistry.DefaultSchema, pair.Key);
+                    Row entity = RowRegistry.GetConnectionRow(RowRegistry.DefaultConnectionKey, pair.Key);
                     if (entity != null)
                     {
                         var idRow = entity as IIdRow;
@@ -218,7 +218,7 @@ namespace Serenity.Services
 
                 foreach (var pair in response.FieldTitles)
                 {
-                    Row entity = RowRegistry.GetSchemaRow(RowRegistry.DefaultSchema, pair.Key);
+                    Row entity = RowRegistry.GetConnectionRow(RowRegistry.DefaultConnectionKey, pair.Key);
                     if (entity != null)
                     {
                         var lookup = pair.Value;

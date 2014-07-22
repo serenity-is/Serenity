@@ -120,7 +120,7 @@ namespace Serenity
         {
             var self = this;
 
-            J("<a><b/></a>").AddClass("inplace-create")
+            J("<a><b/></a>").AddClass("inplace-button inplace-create")
                 .Attribute("title", title)
                 .InsertAfter(this.element)
                 .Click(e =>
@@ -128,7 +128,7 @@ namespace Serenity
                     self.InplaceCreateClick(e);
                 });
 
-            this.Select2Container.Add(this.element).AddClass("has-inplace-create");
+            this.Select2Container.Add(this.element).AddClass("has-inplace-button");
         }
 
         protected virtual void InplaceCreateClick(jQueryEvent e)
@@ -155,6 +155,15 @@ namespace Serenity
             {
                 if (value != Value)
                     this.element.Select2("val", value).TriggerHandler("change", new object[] { true });
+            }
+        }
+
+        public string Text
+        {
+            get
+            {
+                var item = items.Filter(s => s.Id == Value)[0];
+                return item != null ? item.Text : null;
             }
         }
     }

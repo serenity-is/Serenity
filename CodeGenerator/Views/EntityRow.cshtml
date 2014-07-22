@@ -20,7 +20,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     using System;
     using System.ComponentModel;
 
-    [Schema("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename")]
+    [ConnectionKey("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename")]
     [ReadPermission("@Model.Permission")]
     [ModifyPermission("@Model.Permission")]
     [JsonConverter(typeof(JsonRowConverter))]

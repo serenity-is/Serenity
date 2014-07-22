@@ -73,37 +73,37 @@ namespace Serenity
 
             if (opt.MinSize > 0 && file.Size < opt.MinSize)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz dosya en az {0} boyutunda olmalı!", FileSizeDisplay(file.Size)));
+                Q.Alert(String.Format("Yükleyeceğiniz dosya en az {0} boyutunda olmalı!", opt.MinSize));
                 return false;
             }
 
             if (opt.MaxSize > 0 && file.Size > opt.MaxSize)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} boyutunda olabilir!", FileSizeDisplay(file.Size)));
+                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} boyutunda olabilir!", opt.MaxSize));
                 return false;
             }
 
             if (opt.MinWidth > 0 && file.Width < opt.MinWidth)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz resim en az {0} genişliğinde olmalı!", file.Width));
+                Q.Alert(String.Format("Yükleyeceğiniz resim en az {0} genişliğinde olmalı!", opt.MinWidth));
                 return false;
             }
 
             if (opt.MaxWidth > 0 && file.Width > opt.MaxWidth)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} genişliğinde olabilir!", file.Width));
+                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} genişliğinde olabilir!", opt.MaxWidth));
                 return false;
             }
 
             if (opt.MinHeight > 0 && file.Height < opt.MinHeight)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz resim en az {0} yüksekliğinde olmalı!", file.Height));
+                Q.Alert(String.Format("Yükleyeceğiniz resim en az {0} yüksekliğinde olmalı!", opt.MinHeight));
                 return false;
             }
 
             if (opt.MaxHeight > 0 && file.Height > opt.MaxHeight)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} yüksekliğinde olabilir!", file.Height));
+                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} yüksekliğinde olabilir!", opt.MaxHeight));
                 return false;
             }
 

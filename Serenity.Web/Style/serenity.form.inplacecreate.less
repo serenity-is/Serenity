@@ -1,6 +1,6 @@
 ﻿@import "serenity.mixins.less";
 
-.inplace-create {
+.inplace-button {
     display: inline-block;
     width: 18px;
     height: 20px;
@@ -18,11 +18,27 @@
     cursor: pointer;
 }
 
-.inplace-create b {
+.inplace-button b {
     display: block;
     width: 18px;
     height: 18px;
-    background: url(images/new.png) no-repeat center center;
+    background-repeat: no-repeat;
     background-position: center 2px;
     cursor: pointer;
+}
+
+.inplace-create b {
+    background-image: url(images/new.png);
+}
+
+.inplace-calc b {
+    background-image: url(images/calculator3.png);
+    background-position: 1px 3px;
+    height: 19px;
+}
+
+.inplace-calc {
+    background: none;
+    border: none;
+    filter: initial;
 }

@@ -2,40 +2,64 @@
 {
     using System;
     using System.Collections.Generic;
+using System.Text;
 
     public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressionByName
     {
-        public SqlQuery Join(Join join)
+        private void JoinToString(Join join, StringBuilder sb, bool modifySelf)
         {
-            if (join == null)
-                throw new ArgumentNullException("join");
-
-            if (from.Length > 0)
-                from.Append(" \n");
-
-            from.Append(join.GetKeyword());
-            from.Append(' ');
-            from.Append(join.Table);
+            sb.Append(join.GetKeyword());
+            sb.Append(' ');
+            sb.Append(join.Table);
 
             // joinAlias belirtilmişse ekle
             if (!join.Name.IsNullOrEmpty())
             {
-                from.Append(' ');
-                from.Append(join.Name);
-
-                if (aliases == null)
-                    aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                aliases.Add(join.Name);
+                sb.Append(' ');
+                sb.Append(join.Name);
             }
 
             if (!ReferenceEquals(null, join.OnCriteria) &&
                 !join.OnCriteria.IsEmpty)
             {
-                from.Append(" ON (");
-                from.Append(join.OnCriteria.ToString(this));
-                from.Append(')');
+                sb.Append(" ON (");
+                
+                if (modifySelf)
+                    sb.Append(join.OnCriteria.ToString(this));
+                else
+                    sb.Append(join.OnCriteria.ToStringIgnoreParams());
+
+                sb.Append(')');
             }
+        }
+
+        public SqlQuery Join(Join join)
+        {
+            if (join == null)
+                throw new ArgumentNullException("join");
+
+            var sb = new StringBuilder();
+            JoinToString(join, sb, modifySelf: false);
+            string expression = sb.ToString();
+            string existingExpression;
+
+            if (!join.Name.IsNullOrEmpty() &&
+                aliases.TryGetValue(join.Name, out existingExpression))
+            {
+                if (expression == existingExpression)
+                    return this;
+
+                throw new InvalidOperationException(String.Format("Query already has a join '{0}' with expression '{1}'. " +
+                    "Attempted join expression is '{2}'", join.Name, existingExpression, expression));
+            }
+
+            if (from.Length > 0)
+                from.Append(" \n");
+
+            JoinToString(join, from, modifySelf: true);
+
+            if (!join.Name.IsEmptyOrNull())
+                aliases[join.Name] = expression;
 
             return this;
         }

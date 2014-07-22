@@ -13,12 +13,12 @@ namespace Serenity
             var d = (dynamic)o;
             var getter = d["get_" + property];
             if (!Script.IsUndefined(getter))
-                return ((Func<object, object>)getter)(o);
+                return ((dynamic)getter).apply(o);
 
             var camelCase = MakeCamelCase(property);
             getter = d["get_" + camelCase];
             if (!Script.IsUndefined(getter))
-                return ((Func<object, object>)getter)(o);
+                return ((dynamic)getter).apply(o);
 
             return d[camelCase];
         }
@@ -29,7 +29,7 @@ namespace Serenity
             var setter = d["set_" + property];
             if (!Script.IsUndefined(setter))
             {
-                ((Action<object, object>)setter)(o, value);
+                ((dynamic)setter).apply(o, new[] { value });
                 return;
             }
 
@@ -37,7 +37,7 @@ namespace Serenity
             setter = d["set_" + camelCase];
             if (!Script.IsUndefined(setter))
             {
-                ((Action<object, object>)setter)(o, value);
+                ((dynamic)setter).apply(o, new[] { value });
                 return;
             }
 

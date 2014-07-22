@@ -13,7 +13,6 @@
     <FileAlignment>512</FileAlignment>
     <NoStdLib>True</NoStdLib>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +42,7 @@
     <Compile Include="Editor\HtmlReportContentEditor.cs" />
     <Compile Include="Editor\HtmlContentEditor.cs" />
     <Compile Include="Editor\DateTimeEditor.cs" />
+    <Compile Include="Editor\Select2AjaxEditor.cs" />
     <Compile Include="Editor\Select2Editor.cs" />
     <Compile Include="Editor\URLEditor.cs" />
     <Compile Include="Editor\MaskEditor.cs" />
@@ -82,6 +82,7 @@
     <Compile Include="PropertyGrid\Attributes\DefaultValueAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\CssClassAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\DisplayNameAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\OptionAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorOptionAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
@@ -157,7 +158,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

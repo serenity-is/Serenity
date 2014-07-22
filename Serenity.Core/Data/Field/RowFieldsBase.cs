@@ -22,7 +22,7 @@ namespace Serenity.Data
         internal PropertyDescriptorCollection propertyDescriptors;
         internal Func<Row> rowFactory;
         internal Type rowType;
-        internal string schema;
+        internal string connectionKey;
         internal string generationKey;
         internal object initializeLock;
         internal string tableName;
@@ -39,7 +39,7 @@ namespace Serenity.Data
 
             DetermineRowType();
             DetermineTableName();
-            DetermineSchema();
+            DetermineConnectionKey();
             DetermineLocalTextPrefix();
         }
 
@@ -93,13 +93,13 @@ namespace Serenity.Data
             tableName = name;
         }
 
-        private void DetermineSchema()
+        private void DetermineConnectionKey()
         {
-            var schemaAttr = rowType.GetCustomAttribute<SchemaAttribute>();
-            if (schemaAttr != null)
-                this.schema = schemaAttr.Schema;
+            var connectionKeyAttr = rowType.GetCustomAttribute<ConnectionKeyAttribute>();
+            if (connectionKeyAttr != null)
+                this.connectionKey = connectionKeyAttr.Value;
             else
-                this.schema = "Default";
+                this.connectionKey = "Default";
         }
 
         private void DetermineLocalTextPrefix()
@@ -107,9 +107,9 @@ namespace Serenity.Data
             if (localTextPrefix != null)
                 return;
 
-            if (schema != null)
+            if (connectionKey != null)
             {
-                localTextPrefix = schema + "." + tableName;
+                localTextPrefix = connectionKey + "." + tableName;
                 return;
             }
 
@@ -168,6 +168,7 @@ namespace Serenity.Data
                         MinSelectLevelAttribute selectLevel = null;
                         ForeignKeyAttribute foreign = null;
                         AddJoinAttribute join = null;
+                        DefaultValueAttribute defaultValue = null;
 
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
@@ -182,6 +183,7 @@ namespace Serenity.Data
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
                             foreign = property.GetCustomAttribute<ForeignKeyAttribute>(false);
                             join = property.GetCustomAttribute<AddJoinAttribute>(false);
+                            defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                             var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
@@ -250,6 +252,9 @@ namespace Serenity.Data
 
                         if (scale != null)
                             field.Scale = scale.Value;
+
+                        if (defaultValue != null)
+                            field.DefaultValue = defaultValue.Value;
 
                         if (selectLevel != null)
                             field.MinSelectLevel = selectLevel.Value;
@@ -392,7 +397,7 @@ namespace Serenity.Data
 
         public string Schema
         {
-            get { return schema; }
+            get { return connectionKey; }
         }
 
         public string GenerationKey
@@ -402,7 +407,7 @@ namespace Serenity.Data
                 if (generationKey != null)
                     return generationKey;
 
-                generationKey = (schema + "." + TableName);
+                generationKey = (connectionKey + "." + TableName);
                 return generationKey;
             }
             set
