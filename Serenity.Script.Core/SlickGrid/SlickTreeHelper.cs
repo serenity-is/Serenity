@@ -16,12 +16,15 @@ namespace Serenity
         {
             var parent = getParent(item);
 
+            int loop = 0;
             while (parent != null)
             {
                 if (((dynamic)parent)._collapsed)
                     return false;
 
                 parent = getParent(parent);
+                if (loop++ > 1000)
+                    throw new InvalidOperationException("Possible infinite loop, check parents has no circular reference!");
             }
 
             return true;
