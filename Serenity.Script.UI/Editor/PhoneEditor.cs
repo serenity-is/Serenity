@@ -299,7 +299,7 @@ namespace Serenity
 
             phone = phone.Trim();
 
-            if (phone.Length < 3 || phone.Length > 5)
+            if (phone.Length < 2 || phone.Length > 5)
                 return false;
 
             for (var i = 0; i < phone.Length; i++)
