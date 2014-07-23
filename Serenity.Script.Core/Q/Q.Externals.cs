@@ -93,6 +93,10 @@ namespace Serenity
             {
             }
 
+            public static void PostToUrl(PostToUrlOptions options)
+            {
+            }
+
             public static jQueryValidatorOptions ValidateOptions(jQueryValidatorOptions options)
             {
                 return null;

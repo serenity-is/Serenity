@@ -11,6 +11,12 @@ namespace Serenity
     /// </summary>
     public static class SlickFormatting
     {
+        public static string GetEnumText<TEnum>(this TEnum value)
+        {
+            var key = System.Enum.ToString(typeof (TEnum), value.As<System.Enum>());
+            return GetEnumText(typeof (TEnum).Name, key);
+        }
+
         public static string GetEnumText(string enumKey, string enumValue)
         {
             if (Script.IsValue(enumValue))
