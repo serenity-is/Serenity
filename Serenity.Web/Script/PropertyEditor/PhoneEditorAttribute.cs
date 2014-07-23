@@ -21,7 +21,7 @@ namespace Serenity.ComponentModel
             Func<string, bool> validateFunc;
 
             if (isInternal)
-                validateFunc = IsValidPhoneTurkey;
+                validateFunc = IsValidPhoneInternal;
             else if (isMobile)
                 validateFunc = IsValidMobileTurkey;
             else
@@ -35,7 +35,7 @@ namespace Serenity.ComponentModel
             if (isMultiple)
             {
                 if (isInternal)
-                    return "Dahili telefon numarası '4567' formatında girilmelidir!";
+                    return "Dahili telefon numaraları '4567' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";
 
                 if (isMobile)
                     return "Telefon numaraları '(533) 342 01 89' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";

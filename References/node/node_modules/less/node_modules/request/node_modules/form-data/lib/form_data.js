@@ -79,14 +79,38 @@ FormData.prototype._trackLength = function(header, value, options) {
   this._lengthRetrievers.push(function(next) {
 
     if (value.hasOwnProperty('fd')) {
-      fs.stat(value.path, function(err, stat) {
-        if (err) {
-          next(err);
-          return;
-        }
 
-        next(null, stat.size);
-      });
+      // take read range into a account
+      // `end` = Infinity –> read file till the end
+      //
+      // TODO: Looks like there is bug in Node fs.createReadStream
+      // it doesn't respect `end` options without `start` options
+      // Fix it when node fixes it.
+      // https://github.com/joyent/node/issues/7819
+      if (value.end != undefined && value.end != Infinity && value.start != undefined) {
+
+        // when end specified
+        // no need to calculate range
+        // inclusive, starts with 0
+        next(null, value.end+1 - (value.start ? value.start : 0));
+
+      // not that fast snoopy
+      } else {
+        // still need to fetch file size from fs
+        fs.stat(value.path, function(err, stat) {
+
+          var fileSize;
+
+          if (err) {
+            next(err);
+            return;
+          }
+
+          // update final size based on the range options
+          fileSize = stat.size - (value.start ? value.start : 0);
+          next(null, fileSize);
+        });
+      }
 
     // or http response
     } else if (value.hasOwnProperty('httpVersion')) {
