@@ -219,7 +219,7 @@ namespace Serenity
             if (isMultiple)
             {
                 if (isInternal)
-                    return "Dahili telefon numarası '4567' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";
+                    return "Dahili telefon numaraları '4567' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";
 
                 if (isMobile)
                     return "Telefon numaraları '(533) 342 01 89' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir!";
