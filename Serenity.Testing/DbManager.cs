@@ -1,11 +1,11 @@
-﻿using Serenity.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Serenity.Data;
 
 namespace Serenity.Testing
 {
@@ -44,8 +44,8 @@ namespace Serenity.Testing
                     "if db_id('{0}') is not null\n" +
                     "BEGIN\n" +
                     "ALTER DATABASE [{0}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;" +
-                    "ALTER DATABASE [{0}] MODIFY NAME = {1};" +
-                    "ALTER DATABASE [{0}] SET MULTI_USER;" +
+                    "ALTER DATABASE [{0}] MODIFY NAME = [{1}];" +
+                    "ALTER DATABASE [{1}] SET MULTI_USER;" +
                     "END\n", oldAlias, newAlias));
             }
         }
