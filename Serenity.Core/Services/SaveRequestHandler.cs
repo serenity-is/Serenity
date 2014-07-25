@@ -146,7 +146,11 @@ namespace Serenity.Services
                     Row.IdField[Row] = Response.EntityId;
                 }
                 else
+                {
                     new SqlInsert(Row).Execute(Connection);
+                    if (idField != null)
+                        Response.EntityId = Row.IdField[Row];
+                }
 
                 InvalidateCacheOnCommit();
             }
