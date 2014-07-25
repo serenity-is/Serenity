@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Text;
 
 namespace Serenity.Data
@@ -90,8 +89,8 @@ namespace Serenity.Data
         ///   order value assigned (or 0) be shown at start or at the end.</param>
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
-        public static bool ReorderValues(IDbConnection connection, string tableName, Field keyField, Field orderField, 
-            BaseCriteria filter = null,  Int64? recordID = null, int newDisplayOrder = 1, 
+        public static bool ReorderValues(IDbConnection connection, string tableName, Field keyField, Field orderField,
+            BaseCriteria filter = null, Int64? recordID = null, int newDisplayOrder = 1,
             bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
         {
             if (connection == null)
@@ -127,7 +126,7 @@ namespace Serenity.Data
 
             // determine display order for records with same display order values 
             // based on ID ordering set
-            query.OrderBy(keyField.Name, desc: descendingKeyOrder);
+            query.OrderBy(keyField.Name, desc : descendingKeyOrder);
 
             // read all existing records
             using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
@@ -144,7 +143,7 @@ namespace Serenity.Data
                     r.oldOrder = Convert.ToInt32(reader.GetValue(1));
                     // new display order value (actual one to be set)
                     r.newOrder = order;
-                    
+
                     orderRecords.Add(r);
 
                     // if this is the one that is requested to be changed, hold a link to its entry
@@ -182,7 +181,25 @@ namespace Serenity.Data
                 changing.newOrder = newDisplayOrder;
             }
 
-            // from now on, apply the new display order values by preparing queries
+            return UpdateOrders(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
+        }
+
+
+        public static bool UpdateOrders(IDbConnection connection, List<OrderRecord> orderRecords, 
+            string tableName, Field keyField, Field orderField, bool hasUniqueConstraint = false)
+        {
+            if (connection == null)
+                throw new ArgumentNullException("connection");
+
+            if (tableName.IsEmptyOrNull())
+                throw new ArgumentNullException("tableName");
+
+            if (keyField == null)
+                throw new ArgumentNullException("keyField");
+
+            if (orderField == null)
+                throw new ArgumentNullException("orderField");
+
 
             // StringBuilder that will contain query(s)
             StringBuilder queries = new StringBuilder();
@@ -364,7 +381,7 @@ namespace Serenity.Data
         /// <summary>
         ///   An internal class that is used FixRecordOrdering to store old and new display orders
         ///   for records to be sorted.</summary>
-        private class OrderRecord
+        public class OrderRecord
         {
             public Int64 recordID;
             public int oldOrder;
