@@ -165,3 +165,12 @@
     .caption { width: @l; }
     .editor { width: @e; }
 }
+
+.reset-box-sizing {
+  &,
+  *,
+  *:before,
+  *:after {
+    .box-sizing(content-box);
+  }
+}
