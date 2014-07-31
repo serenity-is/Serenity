@@ -3,6 +3,9 @@ using jQueryApi;
 using System.Html;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Serenity.ComponentModel;
+using System.ComponentModel;
 
 namespace Serenity
 {
@@ -196,13 +199,27 @@ namespace Serenity
 
                 editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
             }
-            else 
+            else
             {
-                editor = (Widget)(Activator.CreateInstance(editorType, element));
+                editorParams = jQuery.ExtendObject(new object(), item.EditorParams);
+                editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
+            }
 
-                if (item.EditorParams != null)
-                    foreach (var k in item.EditorParams.Keys)
-                        ReflectionUtils.SetPropertyValue(editor, k, item.EditorParams[k]);
+            if (item.EditorParams != null)
+            {
+                var props = editor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                var propByName = props.Where(x => x.CanWrite && 
+                        (x.GetCustomAttributes(typeof(OptionAttribute)).Length > 0 ||
+                         x.GetCustomAttributes(typeof(DisplayNameAttribute)).Length > 0))
+                    .ToDictionary(x => ReflectionUtils.MakeCamelCase(x.Name));
+
+                foreach (var k in item.EditorParams.Keys)
+                {
+                    PropertyInfo p;
+                    if (propByName.TryGetValue(ReflectionUtils.MakeCamelCase(k), out p))
+                        p.SetValue(editor, item.EditorParams[k]);
+                }
             }
 
             if (editor is BooleanEditor)
