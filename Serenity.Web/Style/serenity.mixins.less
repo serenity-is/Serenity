@@ -165,3 +165,28 @@
     .caption { width: @l; }
     .editor { width: @e; }
 }
+
+.widthAndMin(@w) {
+    min-width: @w;
+    width: @w;
+}
+
+.heightAndMin(@h) {
+    min-height: @h;
+    height: @h;
+}
+
+.flexDialogStyles(@width, @height, @caption: 12em) {
+    > .size { 
+        .widthAndMin(@width);
+        .heightAndMin(@height);
+    }
+
+    .caption { 
+        width: @caption; 
+    }
+
+    .s-PropertyGrid > .categories {
+        height: @height - 140px;
+    }
+}

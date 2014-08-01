@@ -163,12 +163,66 @@ namespace Serenity
             // will add css class to ui-dialog container, not content element
         }
 
+        private static bool GetCssSize(jQueryObject element, string name, out int size)
+        {
+            size = 0;
+            var cssSize = element.GetCSS(name);
+            if (!Script.IsValue(cssSize))
+                return false;
+
+            if (!cssSize.EndsWith("px"))
+                return false;
+
+            cssSize = cssSize.Substr(0, cssSize.Length - 2);
+
+            if (!Int32.TryParse(cssSize, out size) || size == 0)
+                return false;
+
+            return true;
+        }
+
+        private static void ApplyCssSizes(DialogOptions opt, string dialogClass)
+        {
+            int size;
+            var dialog = J("<div/>")
+                .Hide()
+                .AddClass(dialogClass)
+                .AppendTo(Document.Body);
+
+            try
+            {
+                var sizeHelper = J("<div/>")
+                    .AddClass("size")
+                    .AppendTo(dialog);
+                
+                if (GetCssSize(sizeHelper, "minWidth", out size))
+                    opt.MinWidth = size;
+
+                if (GetCssSize(sizeHelper, "width", out size))
+                    opt.Width = size;
+
+                if (GetCssSize(sizeHelper, "height", out size))
+                    opt.Height = size;
+
+                if (GetCssSize(sizeHelper, "minHeight", out size))
+                    opt.MinHeight = size;
+            }
+            finally
+            {
+                dialog.Remove();
+            }
+        }
+
         protected virtual DialogOptions GetDialogOptions()
         {
             DialogOptions opt = new DialogOptions();
 
-            opt.DialogClass = "s-Dialog " + "s-" + this.GetType().Name;
+            var dialogClass = "s-Dialog " + "s-" + this.GetType().Name;
+            opt.DialogClass = dialogClass;
+
             opt.Width = 920;
+            ApplyCssSizes(opt, dialogClass);
+            
             opt.AutoOpen = false;
             opt.Resizable = false;
             opt.Modal = true;
