@@ -10,20 +10,11 @@ namespace Serenity.Reporting
     {
         private List<PropertyItem> propertyItems;
         private PropertyGrid propertyGrid;
-        private ReportDesignPanel designPanel;
         private string reportKey;
 
         public ReportDialog(ReportDialogOptions opt)
             : base(opt)
         {
-            designPanel = new ReportDesignPanel(
-                J("<div/>")
-                    .AddClass("design-panel")
-                    .PrependTo(this.ById("Toolbar").Find(".tool-buttons")),
-                new ReportDesignPanelOptions
-            {
-            });
-
             if (opt.ReportKey != null)
                 LoadReport(opt.ReportKey);
         }
@@ -57,9 +48,7 @@ namespace Serenity.Reporting
                 {
                     this.reportKey = response.ReportKey ?? reportKey;
                     this.propertyItems = response.Properties ?? new List<PropertyItem>();
-                    this.designPanel.ReportKey = this.reportKey;
                     this.Element.Dialog().Title = response.Title;
-                    this.designPanel.SetDesignList(response.Designs);
                     CreatePropertyGrid();
                     propertyGrid.Load(response.InitialSettings ?? new object());
 
@@ -74,13 +63,6 @@ namespace Serenity.Reporting
 
         protected void ExecuteReport(string targetFrame, string exportType)
         {
-            var designId = designPanel.SelectedDesignId;
-            if (designId == null)
-            {
-                Q.Alert("Lütfen bir rapor dizaynı seçiniz");
-                return;
-            }
-
             if (!ValidateForm())
                 return;
 
@@ -93,7 +75,7 @@ namespace Serenity.Reporting
                 Request = new ReportExecuteRequest
                 {
                     ReportKey = reportKey,
-                    DesignId = designId,
+                    DesignId = "Default",
                     ExportType = exportType,
                     Parameters = parameters
                 },
