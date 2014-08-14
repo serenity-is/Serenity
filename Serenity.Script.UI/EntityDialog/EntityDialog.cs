@@ -1,7 +1,6 @@
-﻿using jQueryApi.UI.Widgets;
-using System;
+﻿using System;
 using System.Collections;
-using System.Collections.Generic;
+using jQueryApi.UI.Widgets;
 
 namespace Serenity
 {
@@ -64,7 +63,7 @@ namespace Serenity
                 return "Yeni " + GetEntitySingular();
             else
             {
-                string title = (GetEntityNameFieldValue() ?? "") + " - #" + (this.EntityId.As<long>().ToString());
+                string title = (GetEntityNameFieldValue() ?? "");
                 return GetEntitySingular() + " Düzenleme (" + title + ")";
             }
         }
