@@ -299,6 +299,9 @@ namespace Serenity.Data
                 foreach (var attr in this.rowType.GetCustomAttributes<AddLeftJoinAttribute>())
                     new LeftJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
+                foreach (var attr in this.rowType.GetCustomAttributes<AddOuterApplyAttribute>())
+                    new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
+
                 var propertyDescriptorArray = new PropertyDescriptor[this.Count];
                 for (int i = 0; i < this.Count; i++)
                 {
