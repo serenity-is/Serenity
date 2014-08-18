@@ -162,7 +162,8 @@ namespace Serenity
         {
             get
             {
-                var item = items.Filter(s => s.Id == Value)[0];
+                var value = (Value ?? "").ToString();
+                var item = items.Filter(s => s.Id == value)[0];
                 return item != null ? item.Text : null;
             }
         }

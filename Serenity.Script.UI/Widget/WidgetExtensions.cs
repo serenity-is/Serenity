@@ -76,6 +76,19 @@ namespace Serenity
             widget.Element.Bind("change." + widget.UniqueName, handler);
         }
 
+        [IncludeGenericArguments(false)] // saltarelle bug ı var, değiştirme
+        public static void ChangeSelect2<TWidget>(this TWidget widget, jQueryEventHandler handler)
+            where TWidget : Widget
+        {
+            widget.Element.Bind2("change." + widget.UniqueName, (e, x) =>
+            {
+                if (e.HasOriginalEvent() || Q.IsFalse(x))
+                {
+                    handler(e);
+                }
+            });
+        }
+
         public static jQueryObject GetGridField(this Widget widget)
         {
             return widget.Element.Closest(".field");
