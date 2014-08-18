@@ -64,7 +64,7 @@ namespace Serenity
             else
             {
                 string title = (GetEntityNameFieldValue() ?? "");
-                return GetEntitySingular() + " Düzenleme (" + title + ")";
+                return GetEntitySingular() + " Düzenleme" + (title.IsEmptyOrNull() ? "" : "(" + title + ")");
             }
         }
 
