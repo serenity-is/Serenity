@@ -54,8 +54,6 @@
     <Compile Include="Caching\IByIdCache.cs" />
     <Compile Include="Caching\Distributed\IDistributedCache.cs" />
     <Compile Include="Caching\LocalCache.cs" />
-    <Compile Include="Caching\LocalUserStateCache.cs" />
-    <Compile Include="Caching\SiteStateCache.cs" />
     <Compile Include="Core\ContextItems.cs" />
     <Compile Include="Core\DeleteType.cs" />
     <Compile Include="Core\Helpers\PrefixHelper.cs" />
@@ -270,6 +268,7 @@
     <Compile Include="Reflection\CodeGeneration\ScriptIncludeAttribute.cs" />
     <Compile Include="Services\RowValidationContext.cs" />
     <Compile Include="Services\Reporting\ICustomFileName.cs" />
+    <Compile Include="Services\Settings\SettingAttribute.cs" />
     <Compile Include="Services\ValidateParentAttribute.cs" />
     <Compile Include="Services\SaveRequestBehaviourAttribute.cs" />
     <Compile Include="Services\Reporting\IDataOnlyReport.cs" />
@@ -355,12 +354,7 @@
     <Compile Include="Services\SaveRequestHandler.cs" />
     <Compile Include="Services\Settings\Config.cs" />
     <Compile Include="Services\Settings\FormatHelper.cs" />
-    <Compile Include="Services\Settings\ILocalSetting.cs" />
-    <Compile Include="Services\Settings\ILocalUserStateService.cs" />
-    <Compile Include="Services\Settings\ISettings.cs" />
-    <Compile Include="Services\Settings\ISiteSetting.cs" />
-    <Compile Include="Services\Settings\ISiteStateService.cs" />
-    <Compile Include="Services\Settings\IStateService.cs" />
+    <Compile Include="Services\Settings\IConfigurationStore.cs" />
     <Compile Include="Core\SilentException.cs" />
     <Compile Include="Data\Sql\Transaction\AutoTransaction.cs" />
     <Compile Include="Data\Sql\Helpers\DisplayOrderHelper.cs" />
