@@ -14,13 +14,13 @@ namespace Serenity
             this.Key = key;
         }
 
-        public SettingAttribute(string scope, string key)
+        public SettingAttribute(string repository, string key)
         {
-            this.Scope = scope;
+            this.Repository = repository;
             this.Key = key;
         }
 
-        public string Scope { get; private set; }
+        public string Repository { get; private set; }
         public string Key { get; private set; }
     }
 }

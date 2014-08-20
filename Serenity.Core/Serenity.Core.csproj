@@ -352,9 +352,9 @@
     <Compile Include="Services\ServiceHelper.cs" />
     <Compile Include="Services\UndeleteRequestHandler.cs" />
     <Compile Include="Services\SaveRequestHandler.cs" />
-    <Compile Include="Services\Settings\Config.cs" />
+    <Compile Include="Services\Settings\Settings.cs" />
     <Compile Include="Services\Settings\FormatHelper.cs" />
-    <Compile Include="Services\Settings\IConfigurationStore.cs" />
+    <Compile Include="Services\Settings\IConfigurationRepository.cs" />
     <Compile Include="Core\SilentException.cs" />
     <Compile Include="Data\Sql\Transaction\AutoTransaction.cs" />
     <Compile Include="Data\Sql\Helpers\DisplayOrderHelper.cs" />
