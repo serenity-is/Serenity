@@ -446,7 +446,7 @@ Q$Externals.turkishLocaleCompare = function(a, b) {
     if (!Q$Externals.turkishLocaleIndex) {
         Q$Externals.turkishLocaleIndex = {};
         for (var z = 0; z < alphabet.length; z++) {
-            Q$Externals.turkishLocaleIndex[alphabet.charAt(z)] = z;
+            Q$Externals.turkishLocaleIndex[alphabet.charAt(z)] = z + 1;
         }
     }
 
@@ -458,11 +458,13 @@ Q$Externals.turkishLocaleCompare = function(a, b) {
 
         var ix = Q$Externals.turkishLocaleIndex[x], iy = Q$Externals.turkishLocaleIndex[y];
 
-        if (ix != -1 && iy != -1)
+        if (ix != null && iy != null)
             return ix < iy ? -1 : 1;
 
         return x.localeCompare(y);
     }
+
+    return x.localeCompare(y);
 }
 
 Q$Externals.turkishLocaleToUpper = function (a) {
