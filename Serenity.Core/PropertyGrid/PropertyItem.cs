@@ -16,6 +16,8 @@ namespace Serenity
         public string Title { get; set; }
         [JsonProperty("hint")]
         public string Hint { get; set; }
+        [JsonProperty("placeholder")]
+        public string Placeholder { get; set; }
         [JsonProperty("editorType")]
         public string EditorType { get; set; }
         [JsonProperty("editorParams")]

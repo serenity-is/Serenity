@@ -132,7 +132,7 @@ namespace Serenity
 
         public static SlickFormatter CheckBox()
         {
-            return (ctx) => "<span class=\"check-box " + (Q.IsTrue(ctx.Value) ? " checked" : "") + "\"></span>";
+            return (ctx) => "<span class=\"check-box no-float " + (Q.IsTrue(ctx.Value) ? " checked" : "") + "\"></span>";
         }
 
         public static SlickFormatter Number(string format)

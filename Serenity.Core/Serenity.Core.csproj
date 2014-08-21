@@ -178,6 +178,7 @@
     <Compile Include="Data\Index\TreeDictionary.cs" />
     <Compile Include="Data\Index\TreeIndex.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\PlaceholderAttribute.cs" />
     <Compile Include="Reflection\CloneHelper.cs" />
     <Compile Include="Reflection\CodeGeneration\CodeWriter.cs" />
     <Compile Include="Reflection\CodeGeneration\EditorTypeGenerator.cs" />

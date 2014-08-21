@@ -183,6 +183,9 @@ namespace Serenity
             if (element.Is(":input"))
                 element.Attribute("name", item.Name ?? "");
 
+            if (!item.Placeholder.IsEmptyOrNull())
+                element.Attribute("placeholder", item.Placeholder);
+
             object editorParams = item.EditorParams;
             Type optionsType = null;
             var optionsAttr = editorType.GetCustomAttributes(typeof(OptionsTypeAttribute), true);

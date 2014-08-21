@@ -36,6 +36,10 @@ namespace Serenity
                 if (hintAttribute.Length > 1)
                     throw new Exception(String.Format("{0}.{1} için birden fazla ipucu belirlenmiş!", type.Name, pi.Name));
 
+                var placeholderAttribute = member.GetCustomAttributes(typeof(PlaceholderAttribute), false);
+                if (placeholderAttribute.Length > 1)
+                    throw new Exception(String.Format("{0}.{1} için birden fazla placeholder belirlenmiş!", type.Name, pi.Name));
+
                 Type memberType = member.MemberType == MemberTypes.Property ? ((PropertyInfo)member).PropertyType : ((FieldInfo)member).FieldType;
 
                 if (member.MemberType == MemberTypes.Property)
@@ -77,6 +81,9 @@ namespace Serenity
 
                 if (hintAttribute.Length > 0)
                     pi.Hint = ((HintAttribute)hintAttribute[0]).Hint;
+
+                if (placeholderAttribute.Length > 0)
+                    pi.Placeholder = ((PlaceholderAttribute)placeholderAttribute[0]).Value;
 
                 if (pi.Title == null)
                     pi.Title = pi.Name;

@@ -10,6 +10,7 @@ namespace Serenity
         public string Name { get; set; }
         public string Title { get; set; }
         public string Hint { get; set; }
+        public string Placeholder { get; set; }
         public string EditorType { get; set; }
         public JsDictionary EditorParams { get; set; }
         public string Category { get; set; }
