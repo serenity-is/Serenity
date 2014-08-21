@@ -136,16 +136,24 @@ namespace Serenity
                 }
             });
 
-            buttons.Add(new ToolButton
+            buttons.Add(NewRefreshButton());
+
+            return buttons;
+        }
+
+        protected ToolButton NewRefreshButton()
+        {
+            var self = this;
+
+            return new ToolButton
             {
                 Title = "Yenile",
                 CssClass = "refresh-button",
-                OnClick = delegate {
+                OnClick = delegate
+                {
                     self.Refresh();
                 }
-            });
-
-            return buttons;
+            };
         }
 
         protected virtual void AddButtonClick()
