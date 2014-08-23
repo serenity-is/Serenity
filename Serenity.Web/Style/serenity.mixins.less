@@ -190,3 +190,12 @@
         height: @height - 140px;
     }
 }
+
+.reset-box-sizing {
+  &,
+  *,
+  *:before,
+  *:after {
+    .box-sizing(content-box);
+  }
+}
