@@ -38,7 +38,7 @@ namespace Serenity.Test.Data
                 set { Fields.FullName[this] = value; }
             }
 
-            [ForeignKey("TheCountryTable", "TheCountryID"), AddJoin("c")]
+            [ForeignKey("TheCountryTable", "TheCountryID"), LeftJoin("c")]
             public Int32? CountryID
             {
                 get { return Fields.CountryID[this]; }

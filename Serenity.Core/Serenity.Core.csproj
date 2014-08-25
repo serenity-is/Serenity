@@ -69,9 +69,7 @@
     <Compile Include="Data\CustomField\CustomFieldExtensions.cs" />
     <Compile Include="Data\CustomField\ICustomFieldListService.cs" />
     <Compile Include="Data\CustomField\CustomFieldType.cs" />
-    <Compile Include="Data\Mapping\AddJoinToAttribute.cs" />
     <Compile Include="Data\Mapping\AddOuterApplyAttribute.cs" />
-    <Compile Include="Data\Mapping\AddLeftJoinAttribute.cs" />
     <Compile Include="Data\Mapping\DisplayFormatAttribute.cs" />
     <Compile Include="Data\Mapping\SearchType.cs" />
     <Compile Include="Data\Mapping\QuickSearchAttribute.cs" />
@@ -146,7 +144,7 @@
     <Compile Include="Data\Mapping\NotNullAttribute.cs" />
     <Compile Include="Data\Mapping\MinSelectLevelAttribute.cs" />
     <Compile Include="Data\Mapping\ForeignKeyAttribute.cs" />
-    <Compile Include="Data\Mapping\AddJoinAttribute.cs" />
+    <Compile Include="Data\Mapping\LeftJoinAttribute.cs" />
     <Compile Include="Data\Mapping\SizeAttribute.cs" />
     <Compile Include="Data\Mapping\ScaleAttribute.cs" />
     <Compile Include="Data\Mapping\PrimaryKeyAttribute.cs" />
