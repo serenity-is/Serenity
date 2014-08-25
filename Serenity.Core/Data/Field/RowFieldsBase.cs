@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -166,8 +167,8 @@ namespace Serenity.Data
                         ExpressionAttribute expression = null;
                         ScaleAttribute scale = null;
                         MinSelectLevelAttribute selectLevel = null;
-                        ForeignKeyAttribute foreign = null;
-                        LeftJoinAttribute join = null;
+                        ForeignKeyAttribute foreignKey = null;
+                        LeftJoinAttribute foreignJoin = null;
                         DefaultValueAttribute defaultValue = null;
 
                         FieldFlags addFlags = (FieldFlags)0;
@@ -181,8 +182,8 @@ namespace Serenity.Data
                             expression = property.GetCustomAttribute<ExpressionAttribute>(false);
                             scale = property.GetCustomAttribute<ScaleAttribute>(false);
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
-                            foreign = property.GetCustomAttribute<ForeignKeyAttribute>(false);
-                            join = property.GetCustomAttribute<LeftJoinAttribute>(false);
+                            foreignKey = property.GetCustomAttribute<ForeignKeyAttribute>(false);
+                            foreignJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
                             defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
@@ -262,16 +263,16 @@ namespace Serenity.Data
                         if (expression != null)
                             field.Expression = expression.Value;
 
-                        if (foreign != null)
+                        if (foreignKey != null)
                         {
-                            field.ForeignTable = foreign.Table;
-                            field.ForeignField = foreign.Field;
+                            field.ForeignTable = foreignKey.Table;
+                            field.ForeignField = foreignKey.Field;
                         }
 
-                        if (join != null)
+                        if (foreignJoin != null)
                         {
-                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, join.Alias,
-                                new Criteria(join.Alias, field.ForeignField) == new Criteria(field));
+                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, foreignJoin.Alias,
+                                new Criteria(foreignJoin.Alias, field.ForeignField) == new Criteria(field));
                         }
 
                         if (property != null)
@@ -284,9 +285,9 @@ namespace Serenity.Data
                             }
                             
                             foreach (var attr in property.GetCustomAttributes<LeftJoinAttribute>())
-                                new LeftJoin(this.joins, attr.ToTable, attr.Alias,
-                                    new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
-
+                                if (attr.ToTable != null && attr.OnCriteria != null)
+                                    new LeftJoin(this.joins, attr.ToTable, attr.Alias,
+                                        new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
 
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;

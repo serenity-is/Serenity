@@ -17,9 +17,10 @@ namespace Serenity.Data.Mapping
         /// <summary>
         /// Adds a left join
         /// </summary>
-        /// <param name="alias"></param>
-        /// <param name="toTable"></param>
-        /// <param name="onCriteria">On property, this parameter is a field name, while on class this is an ON criteria</param>
+        /// <param name="alias">Join alias</param>
+        /// <param name="toTable">Join table</param>
+        /// <param name="onCriteria">If the attribute is used on a property, this parameter is a field name, if used on a class,
+        /// this parameter is the ON criteria of the left join statement.</param>
         public LeftJoinAttribute(string alias, string toTable, string onCriteria)
         {
             this.Alias = alias;
