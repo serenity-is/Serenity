@@ -69,7 +69,7 @@
     <Compile Include="Data\CustomField\CustomFieldExtensions.cs" />
     <Compile Include="Data\CustomField\ICustomFieldListService.cs" />
     <Compile Include="Data\CustomField\CustomFieldType.cs" />
-    <Compile Include="Data\Mapping\AddOuterApplyAttribute.cs" />
+    <Compile Include="Data\Mapping\OuterApplyAttribute.cs" />
     <Compile Include="Data\Mapping\DisplayFormatAttribute.cs" />
     <Compile Include="Data\Mapping\SearchType.cs" />
     <Compile Include="Data\Mapping\QuickSearchAttribute.cs" />
