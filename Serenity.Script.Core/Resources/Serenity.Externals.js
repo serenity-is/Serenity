@@ -440,6 +440,9 @@ Q$Externals.parseQueryString = function(queryString) {
 Q$Externals.turkishLocaleCompare = function(a, b) {
     var alphabet = "AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz";
 
+    a = a || "";
+    b = b || "";
+
     if (a == b)
         return 0;
 
@@ -461,10 +464,14 @@ Q$Externals.turkishLocaleCompare = function(a, b) {
         if (ix != null && iy != null)
             return ix < iy ? -1 : 1;
 
-        return x.localeCompare(y);
+        var c = x.localeCompare(y);
+        if (c == 0)
+            continue;
+
+        return c;
     }
 
-    return x.localeCompare(y);
+    return a.localeCompare(b);
 }
 
 Q$Externals.turkishLocaleToUpper = function (a) {
