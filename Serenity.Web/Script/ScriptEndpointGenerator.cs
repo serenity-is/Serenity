@@ -90,7 +90,7 @@ namespace Serenity.Reflection
                         {
                             responseType = returnType.GenericTypeArguments[0];
                         }
-                        else if (returnType.IsAssignableFrom(typeof(ActionResult)))
+                        else if (typeof(ActionResult).IsAssignableFrom(returnType))
                             continue;
 
                         if (hasAnyMethod)
