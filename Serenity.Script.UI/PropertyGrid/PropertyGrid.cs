@@ -105,7 +105,19 @@ namespace Serenity
                 Type editorType = null;
                 foreach (var ns in Q.Config.RootNamespaces)
                 {
-                    editorType = Type.GetType(ns + "." + editorTypeKey) ?? Type.GetType(ns + "." + editorTypeKey + "Editor");
+                    var withoutSuffix = Type.GetType(ns + "." + editorTypeKey);
+                    var withSuffix = Type.GetType(ns + "." + editorTypeKey + "Editor");
+
+                    if (withoutSuffix != null && withSuffix != null)
+                    {
+                        if (!typeof(Widget).IsAssignableFrom(withoutSuffix))
+                            editorType = withSuffix;
+                        else
+                            editorType = withoutSuffix ?? withSuffix;
+                    }
+
+                    editorType = withoutSuffix ?? withSuffix;
+
                     if (editorType != null)
                         break;
                 }
