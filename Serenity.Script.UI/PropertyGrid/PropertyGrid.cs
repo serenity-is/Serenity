@@ -107,16 +107,14 @@ namespace Serenity
                 {
                     var withoutSuffix = Type.GetType(ns + "." + editorTypeKey);
                     var withSuffix = Type.GetType(ns + "." + editorTypeKey + "Editor");
-
-                    if (withoutSuffix != null && withSuffix != null)
-                    {
-                        if (!typeof(Widget).IsAssignableFrom(withoutSuffix))
-                            editorType = withSuffix;
-                        else
-                            editorType = withoutSuffix ?? withSuffix;
-                    }
-
                     editorType = withoutSuffix ?? withSuffix;
+                    if (withoutSuffix != null && 
+                        withSuffix != null && 
+                        !typeof(Widget).IsAssignableFrom(withoutSuffix) &&
+                        typeof(Widget).IsAssignableFrom(withSuffix))
+                    {
+                        editorType = withSuffix;
+                    }
 
                     if (editorType != null)
                         break;
