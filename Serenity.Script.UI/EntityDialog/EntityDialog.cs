@@ -70,7 +70,8 @@ namespace Serenity
 
         protected virtual void UpdateTitle()
         {
-            element.Dialog().Title = GetEntityTitle();
+            if (!isPanel)
+                element.Dialog().Title = GetEntityTitle();
         }
 
         /*

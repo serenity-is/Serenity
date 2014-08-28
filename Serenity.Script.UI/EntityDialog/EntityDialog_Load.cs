@@ -13,13 +13,17 @@ namespace Serenity
         public void LoadNewAndOpenDialog()
         {
             LoadResponse(new RetrieveResponse<TEntity>());
-            this.element.Dialog().Open();
+            
+            if (!isPanel)
+                this.element.Dialog().Open();
         }
 
         public virtual void LoadEntityAndOpenDialog(TEntity entity)
         {
             LoadResponse(new RetrieveResponse<TEntity> { Entity = entity });
-            this.element.Dialog().Open();
+
+            if (!isPanel)
+                this.element.Dialog().Open();
         }
 
         public virtual void LoadResponse(RetrieveResponse<TEntity> data)
@@ -73,7 +77,7 @@ namespace Serenity
         public void LoadByIdAndOpenDialog(long entityId)
         {
             var self = this;
-            LoadById(entityId, response => Window.SetTimeout(() => self.element.Dialog().Open(), 0));
+            LoadById(entityId, response => Window.SetTimeout(() => { if (!isPanel) self.element.Dialog().Open(); }, 0));
         }
 
         protected virtual void OnLoadingData(RetrieveResponse<TEntity> data)

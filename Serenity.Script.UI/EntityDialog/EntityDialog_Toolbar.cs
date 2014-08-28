@@ -41,23 +41,26 @@ namespace Serenity
 
             var self = this;
 
-            list.Add(new ToolButton 
+            if (!isPanel)
             {
-                Title = "Kaydet",
-                CssClass = "save-and-close-button",
-                OnClick = delegate
+                list.Add(new ToolButton
                 {
-                    self.Save(delegate(ServiceResponse response)
+                    Title = "Kaydet",
+                    CssClass = "save-and-close-button",
+                    OnClick = delegate
                     {
-                        self.element.Dialog().Close();
-                    });
-                }
-            });
+                        self.Save(delegate(ServiceResponse response)
+                        {
+                            self.element.Dialog().Close();
+                        });
+                    }
+                });
+            }
 
             list.Add(new ToolButton
             {
-                Title = "",
-                Hint = "Değişiklikleri Uygula",
+                Title = isPanel ? "Kaydet" : "",
+                Hint = isPanel ? "Kaydet" : "Değişiklikleri Uygula",
                 CssClass = "apply-changes-button",
                 OnClick = delegate
                 {
@@ -79,55 +82,58 @@ namespace Serenity
                 }
             });
 
-            list.Add(new ToolButton
+            if (!isPanel)
             {
-                Title = "Sil",
-                CssClass = "delete-button",
-                OnClick = delegate
+                list.Add(new ToolButton
                 {
-                    Q.Confirm("Kaydı silmek istiyor musunuz?", delegate
+                    Title = "Sil",
+                    CssClass = "delete-button",
+                    OnClick = delegate
                     {
-                        self.DoDelete(delegate
+                        Q.Confirm("Kaydı silmek istiyor musunuz?", delegate
                         {
-                            self.element.Dialog().Close();
-                        });
-                    });
-                }
-            });
-
-            list.Add(new ToolButton
-            {
-                Title = "Geri Al",
-                CssClass = "undo-delete-button",
-                OnClick = delegate
-                {
-                    if (self.IsDeleted)
-                    {
-                        Q.Confirm("Kaydı geri almak istiyor musunuz?", delegate()
-                        {
-                            self.Undelete(delegate
+                            self.DoDelete(delegate
                             {
-                                self.LoadById(self.EntityId.As<long>(), null);
+                                self.element.Dialog().Close();
                             });
                         });
                     }
-                }
-            });
+                });
 
-            list.Add(new ToolButton
-            {
-                Title = "Klonla",
-                CssClass = "clone-button",
-                OnClick = delegate
+                list.Add(new ToolButton
                 {
-                    if (!self.IsEditMode)
-                        return;
+                    Title = "Geri Al",
+                    CssClass = "undo-delete-button",
+                    OnClick = delegate
+                    {
+                        if (self.IsDeleted)
+                        {
+                            Q.Confirm("Kaydı geri almak istiyor musunuz?", delegate()
+                            {
+                                self.Undelete(delegate
+                                {
+                                    self.LoadById(self.EntityId.As<long>(), null);
+                                });
+                            });
+                        }
+                    }
+                });
 
-                    var cloneEntity = GetCloningEntity();
-                    var cloneDialog = Activator.CreateInstance(this.GetType(), new object()).As<EntityDialog<TEntity, TOptions>>();
-                    cloneDialog.Cascade(this.element).BubbleDataChange(this).LoadEntityAndOpenDialog(cloneEntity);
-                }
-            });
+                list.Add(new ToolButton
+                {
+                    Title = "Klonla",
+                    CssClass = "clone-button",
+                    OnClick = delegate
+                    {
+                        if (!self.IsEditMode)
+                            return;
+
+                        var cloneEntity = GetCloningEntity();
+                        var cloneDialog = Activator.CreateInstance(this.GetType(), new object()).As<EntityDialog<TEntity, TOptions>>();
+                        cloneDialog.Cascade(this.element).BubbleDataChange(this).LoadEntityAndOpenDialog(cloneEntity);
+                    }
+                });
+            }
             
             return list;
         }

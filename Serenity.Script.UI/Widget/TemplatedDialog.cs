@@ -11,9 +11,14 @@ namespace Serenity
     {
     }
 
+    public class PanelAttribute : Attribute
+    {
+    }
+
     public abstract class TemplatedDialog<TOptions> : TemplatedWidget<TOptions>, IDialog
         where TOptions : class, new()
     {
+        protected bool isPanel;
         protected jQueryValidator validator;
         protected TabsObject tabs;
         protected Toolbar toolbar;
@@ -21,7 +26,11 @@ namespace Serenity
         protected TemplatedDialog(TOptions opt = null)
             : base(Q.NewBodyDiv(), opt)
         {
-            InitDialog();
+            isPanel = this.GetType().GetCustomAttributes(typeof(PanelAttribute), true).Length > 0;
+
+            if (!isPanel)
+                InitDialog();
+
             InitValidator();
             InitTabs();
             InitToolbar();
@@ -44,7 +53,9 @@ namespace Serenity
                 validator = null;
             }
 
-            element.Dialog().Destroy();
+            if (!isPanel)
+                element.Dialog().Destroy();
+
             base.Destroy();
         }
 
@@ -160,6 +171,9 @@ namespace Serenity
 
         protected override void AddCssClass()
         {
+            if (isPanel)
+                base.AddCssClass();
+
             // will add css class to ui-dialog container, not content element
         }
 
