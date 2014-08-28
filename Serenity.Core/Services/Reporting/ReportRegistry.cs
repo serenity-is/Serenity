@@ -16,14 +16,7 @@ namespace Serenity.Reporting
         {
             var attr = type.GetCustomAttribute<RegisterReportAttribute>(false);
             if (attr == null || attr.ReportKey.IsNullOrEmpty())
-            {
-                var name = type.Name;
-                const string report = "Report";
-                if (name.EndsWith(report))
-                    name = name.Substring(0, name.Length - report.Length);
-
-                return name;
-            }
+                return type.FullName;
 
             return attr.ReportKey;
         }
@@ -67,8 +60,9 @@ namespace Serenity.Reporting
                     if (attr != null)
                     {
                         var report = new Report(type);
+                        var key = report.Key.TrimToNull() ?? type.FullName;
 
-                        reportByKeyNew[report.Key] = report;
+                        reportByKeyNew[key] = report;
 
                         var category = report.Category.Key;
                         List<Report> reports;
