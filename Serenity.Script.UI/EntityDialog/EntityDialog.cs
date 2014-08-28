@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using jQueryApi.UI.Widgets;
+using jQueryApi;
 
 namespace Serenity
 {
@@ -11,8 +12,18 @@ namespace Serenity
         private TEntity entity;
         private Int64? entityId;
         
-        protected EntityDialog(TOptions opt = null)
-            : base(opt)
+        protected EntityDialog()
+            : this(Q.NewBodyDiv(), null)
+        {
+        }
+
+        protected EntityDialog(TOptions opt)
+            : this(Q.NewBodyDiv(), opt)
+        {
+        }
+
+        protected EntityDialog(jQueryObject div, TOptions opt)
+            : base(div, opt)
         {
             InitPropertyGrid();
             InitLocalizationGrid();

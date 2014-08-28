@@ -1,4 +1,5 @@
-﻿using jQueryApi.UI.Widgets;
+﻿using jQueryApi;
+using jQueryApi.UI.Widgets;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -19,8 +20,18 @@ namespace Serenity
         private TEntity entity;
         private Int64? entityId;
 
-        protected PropertyDialog(TOptions opt = null)
-            : base(opt)
+        protected PropertyDialog()
+            : this(Q.NewBodyDiv(), null)
+        {
+        }
+
+        protected PropertyDialog(TOptions opt)
+            : this(Q.NewBodyDiv(), opt)
+        {
+        }
+
+        protected PropertyDialog(jQueryObject div, TOptions opt)
+            : base(div, opt)
         {
             InitPropertyGrid();
             LoadInitialEntity();
