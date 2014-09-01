@@ -29,6 +29,7 @@ namespace Serenity
 
             baseOptions.OnSuccess = response =>
             {
+                self.OnDeleteSuccess(response);
                 if (callback != null)
                     callback(response);
                 self.element.TriggerHandler("ondatachange", new object[] { 
@@ -45,6 +46,11 @@ namespace Serenity
             //    EntityObject._deleteHandler(this, finalOptions, callback);
             //else
             DeleteHandler(finalOptions, callback);
+        }
+
+        protected virtual void OnDeleteSuccess(DeleteResponse response)
+        {
+            
         }
     }
 }

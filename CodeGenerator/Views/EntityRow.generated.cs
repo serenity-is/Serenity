@@ -189,7 +189,7 @@ WriteLiteral(", IIdRow");
     }       
     if (!String.IsNullOrEmpty(x.ForeignTable)) {
         attrs.Add("ForeignKey(\"" + x.ForeignTable + "\", \"" + x.ForeignField + "\")");
-        attrs.Add("AddJoin(\"j" + x.ForeignJoinAlias + "\")");
+        attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
     }
     if (Model.NameField == x.Ident) {
         attrs.Add("QuickSearch");
