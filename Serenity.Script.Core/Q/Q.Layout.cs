@@ -1,8 +1,6 @@
-﻿using jQueryApi;
-using System;
+﻿using System;
 using System.Html;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
+using jQueryApi;
 
 namespace Serenity
 {
@@ -47,6 +45,38 @@ namespace Serenity
 
                 Q.LayoutFillHeight(gridDiv);
                 gridDiv.TriggerHandler("layout");
+            };
+
+            if (Window.Instance.As<dynamic>().Metronic != null)
+                Window.Instance.As<dynamic>().Metronic.addResizeHandler(layout);
+            else
+            {
+                jQuery.Window.Resize(layout);
+            }
+
+            layout(null);
+        }
+
+        public static void AddFullHeightResizeHandler(Action<int> handler)
+        {
+            J("body")
+                .AddClass("full-height-page");
+
+            jQueryEventHandler layout = delegate
+            {
+                int avail;
+                try
+                {
+                    avail = int.Parse(J(".page-content").GetCSS("min-height") ?? "0")
+                                - int.Parse(J(".page-content").GetCSS("padding-top") ?? "0")
+                                - int.Parse(J(".page-content").GetCSS("padding-bottom") ?? "0");
+                }
+                catch
+                {
+                    avail = 100;
+                }
+
+                handler(avail);
             };
 
             if (Window.Instance.As<dynamic>().Metronic != null)
