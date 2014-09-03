@@ -8,12 +8,12 @@ namespace Serenity.Data
     public abstract class Join : Alias
     {
         private IDictionary<string, Join> joins;
-        private BaseCriteria onCriteria;
+        private ICriteria onCriteria;
         private HashSet<string> referencedAliases;
 
         public abstract string GetKeyword();
 
-        protected Join(IDictionary<string, Join> joins, string toTable, string alias, BaseCriteria onCriteria)
+        protected Join(IDictionary<string, Join> joins, string toTable, string alias, ICriteria onCriteria)
             : base(toTable, alias)
         {
             this.joins = joins;
@@ -50,7 +50,7 @@ namespace Serenity.Data
 
         /// <summary>
         ///   Left outer join'in "ON(...)" kýsmýnda yazýlan ifadeyi verir.</summary>
-        public BaseCriteria OnCriteria
+        public ICriteria OnCriteria
         {
             get
             {

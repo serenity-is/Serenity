@@ -114,11 +114,8 @@
     <Compile Include="Data\Interface\IFieldWithJoinInfo.cs" />
     <Compile Include="Data\Interface\IEntityWithJoins.cs" />
     <Compile Include="Data\Interface\IEntity.cs" />
-    <Compile Include="Data\Interface\IField.cs" />
     <Compile Include="Data\Sql\Helpers\SqlDebugDumper.cs" />
     <Compile Include="Data\Sql\Helpers\SqlConnectionExtensions.cs" />
-    <Compile Include="Data\Sql\Interface\IChainable.cs" />
-    <Compile Include="Data\Sql\Interface\IGetExpressionByName.cs" />
     <Compile Include="Data\Sql\Join\OuterApply.cs" />
     <Compile Include="Data\Sql\Join\CrossApply.cs" />
     <Compile Include="Data\Sql\Join\InnerJoin.cs" />
@@ -176,39 +173,23 @@
     <Compile Include="Reflection\VisitedGraph.cs" />
     <Compile Include="Services\CaptureLog\ICaptureLogRow.cs" />
     <Compile Include="Data\Sql\Helpers\IDisplayOrderRow.cs" />
-    <Compile Include="Data\Sql\Interface\IFilterableQuery.cs" />
-    <Compile Include="Data\Sql\Interface\IQueryWithParams.cs" />
-    <Compile Include="Data\Sql\Interface\ISetFieldByStatement.cs" />
     <Compile Include="Data\Interface\IIdField.cs" />
     <Compile Include="Data\Interface\IIdRow.cs" />
     <Compile Include="Data\Interface\IIsActiveRow.cs" />
     <Compile Include="Data\Interface\ILoggingRow.cs" />
     <Compile Include="Data\Interface\INameRow.cs" />
     <Compile Include="Data\Interface\IParentIdRow.cs" />
-    <Compile Include="Data\Sql\Interface\ISqlQuery.cs" />
     <Compile Include="Data\Interface\IUnitOfWork.cs" />
     <Compile Include="Core\Helpers\Invariants.cs" />
     <Compile Include="Data\Json\Json.cs" />
     <Compile Include="Data\Json\JsonDataEnumConverter.cs" />
     <Compile Include="Data\Json\JsonRowConverter.cs" />
     <Compile Include="Data\Json\JsonStringRawConverter.cs" />
-    <Compile Include="Data\Sql\Query\Parameter.cs" />
     <Compile Include="Data\Extensions\RowExtensions.cs" />
-    <Compile Include="Data\Sql\Alias\Alias.cs" />
     <Compile Include="Data\Sql\Alias\AliasWithFields.cs" />
     <Compile Include="Data\Sql\Helpers\SqlCommandDumper.cs" />
-    <Compile Include="Data\Sql\Criteria\BaseCriteria.cs" />
-    <Compile Include="Data\Sql\Criteria\BinaryCriteria.cs" />
-    <Compile Include="Data\Sql\Criteria\ParamCriteria.cs" />
-    <Compile Include="Data\Sql\Criteria\ValueCriteria.cs" />
-    <Compile Include="Data\Sql\Criteria\UnaryCriteria.cs" />
-    <Compile Include="Data\Sql\Criteria\CriteriaOperator.cs" />
     <Compile Include="Data\Sql\Query\Dapper.cs" />
-    <Compile Include="Data\Sql\Criteria\Criteria.cs" />
-    <Compile Include="Data\Sql\Query\SqlConsts.cs" />
     <Compile Include="Data\Sql\Helpers\SqlConversions.cs" />
-    <Compile Include="Data\Sql\Query\SqlDialect.cs" />
-    <Compile Include="Data\Sql\Query\SqlSettings.cs" />
     <Compile Include="Extensions\MethodChainingExtensions.cs" />
     <Compile Include="Media\ImageScaleMode.cs" />
     <Compile Include="PropertyGrid\PropertyItem.cs" />
@@ -398,6 +379,14 @@
     <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
       <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
       <Name>Serenity.Localization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Sql.Criteria\Serenity.Sql.Criteria.csproj">
+      <Project>{394f4b53-7af2-4cdb-a217-c00cba620700}</Project>
+      <Name>Serenity.Sql.Criteria</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Sql.Interfaces\Serenity.Sql.Interfaces.csproj">
+      <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
+      <Name>Serenity.Sql.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

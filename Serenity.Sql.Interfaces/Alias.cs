@@ -29,7 +29,7 @@ namespace Serenity.Data
 
         public Alias(string alias)
         {
-            if (alias.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(alias))
                 throw new ArgumentNullException("alias");
 
             this.alias = alias;
@@ -76,7 +76,7 @@ namespace Serenity.Data
 
         public Alias WithNoLock()
         {
-            if (this.table.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(this.table))
                 return new Alias(this.alias + " WITH(NOLOCK)");
 
             return new Alias(this.table, this.alias + " WITH(NOLOCK)");

@@ -244,24 +244,24 @@ namespace Serenity.Data
 
         public class CaseBuilder
         {
-            private List<BaseCriteria> when;
+            private List<ICriteria> when;
             private List<object> then;
             private object elseValue;
 
             public CaseBuilder()
             {
-                when = new List<BaseCriteria>();
+                when = new List<ICriteria>();
                 then = new List<object>();
             }
 
-            public CaseBuilder WhenThen(BaseCriteria when, object then)
+            public CaseBuilder WhenThen(ICriteria when, object then)
             {
                 this.when.Add(when);
                 this.then.Add(then);
                 return this;
             }
 
-            public CaseBuilder When(BaseCriteria when)
+            public CaseBuilder When(ICriteria when)
             {
                 this.when.Add(when);
                 return this;
@@ -300,8 +300,8 @@ namespace Serenity.Data
                     when[i].ToString(sb, query);
                     sb.Append(" THEN ");
                     var value = then[i];
-                    if (value is BaseCriteria)
-                        ((BaseCriteria)value).ToString(sb, query);
+                    if (value is ICriteria)
+                        ((ICriteria)value).ToString(sb, query);
                     else if (value is IQueryWithParams)
                         sb.Append(((IQueryWithParams)value).ToString());
                     else
@@ -312,8 +312,8 @@ namespace Serenity.Data
                 {
                     sb.Append(" ELSE ");
 
-                    if (elseValue is BaseCriteria)
-                        ((BaseCriteria)elseValue).ToString(sb, query);
+                    if (elseValue is ICriteria)
+                        ((ICriteria)elseValue).ToString(sb, query);
                     else if (elseValue is IQueryWithParams)
                         sb.Append(((IQueryWithParams)elseValue).ToString());
                     else

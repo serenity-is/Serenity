@@ -1,6 +1,4 @@
-﻿using Serenity;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Text;
 
@@ -90,15 +88,19 @@ namespace Serenity
             if (input == null)
                 return null;
 
-            if (input.Length > minCompressLength &&
-                Dependency.TryResolve<ICacheCompressor>() != null)
+            if (input.Length > minCompressLength)
             {
-                using (var ms = new MemoryStream(input.Length + 1))
-                {
-                    ms.WriteByte(1);
-                    Dependency.Resolve<ICacheCompressor>().CompressBytes(ms, input);
+                var compressor = Dependency.TryResolve<ICacheCompressor>();
 
-                    return ms.ToArray();
+                if (compressor != null)
+                {
+                    using (var ms = new MemoryStream(input.Length + 1))
+                    {
+                        ms.WriteByte(1);
+                        compressor.CompressBytes(ms, input);
+
+                        return ms.ToArray();
+                    }
                 }
             }
 

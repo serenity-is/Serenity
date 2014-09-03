@@ -52,10 +52,10 @@ namespace Serenity.Data
         ///   Alan adý (zorunlu).</param>
         public Criteria(string alias, string field)
         {
-            if (field.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(field))
                 throw new ArgumentNullException("field");
 
-            if (alias.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(alias))
                 throw new ArgumentNullException("alias");
             this.expression = alias + "." + field;
         }
@@ -70,7 +70,7 @@ namespace Serenity.Data
         ///   Alan adý (zorunlu).</param>
         public Criteria(int joinNumber, string field)
         {
-            if (field.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(field))
                 throw new ArgumentNullException("field");
 
             if (joinNumber < 0)
@@ -148,7 +148,7 @@ namespace Serenity.Data
         ///   Alan adýný köþeli parantez içinde içeren yeni bir kriter.</returns>
         public static Criteria Bracket(string fieldName)
         {
-            if (fieldName.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(fieldName))
                 throw new ArgumentNullException("fieldName");
 
             return new Criteria("[" + fieldName + "]");
@@ -170,7 +170,7 @@ namespace Serenity.Data
         {
             get 
             {
-                return expression.IsNullOrEmpty();
+                return String.IsNullOrEmpty(expression);
             }
         }
 

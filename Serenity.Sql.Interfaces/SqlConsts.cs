@@ -1,4 +1,5 @@
 ﻿
+using System.Globalization;
 namespace Serenity.Data
 {
     public static class SqlConsts
@@ -8,6 +9,7 @@ namespace Serenity.Data
         private static string[] _indexParam;
         private static string[] _tableAlias;
         private static string[] _tableAliasDot;
+        private static CultureInfo _invariant = CultureInfo.InvariantCulture;
 
         /// <summary>
         ///   Returns an indexed parameter name like @p123.</summary>
@@ -37,14 +39,14 @@ namespace Serenity.Data
             {
                 var tableAlias = new string[100];
                 for (int i = 0; i < tableAlias.Length; i++)
-                    tableAlias[i] = "T" + i.ToInvariant();
+                    tableAlias[i] = "T" + i.ToString(_invariant);
                 _tableAlias = tableAlias;
             }
 
             if (joinIndex >= 0 && joinIndex < _tableAlias.Length)
                 return _tableAlias[joinIndex];
             else
-                return "T" + joinIndex.ToInvariant();
+                return "T" + joinIndex.ToString(_invariant);
         }
 
         public static string TableAliasDot(this int joinIndex)
@@ -53,14 +55,14 @@ namespace Serenity.Data
             {
                 var tableAliasDot = new string[100];
                 for (int i = 0; i < tableAliasDot.Length; i++)
-                    tableAliasDot[i] = "T" + i.ToInvariant() + ".";
+                    tableAliasDot[i] = "T" + i.ToString(_invariant) + ".";
                 _tableAliasDot = tableAliasDot;
             }
 
             if (joinIndex >= 0 && joinIndex < _tableAliasDot.Length)
                 return _tableAliasDot[joinIndex];
             else
-                return "T" + joinIndex.ToInvariant() + ".";
+                return "T" + joinIndex.ToString(_invariant) + ".";
         }
     }
 }

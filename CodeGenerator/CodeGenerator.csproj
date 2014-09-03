@@ -269,6 +269,14 @@
       <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
       <Name>Serenity.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Serenity.Sql.Criteria\Serenity.Sql.Criteria.csproj">
+      <Project>{394f4b53-7af2-4cdb-a217-c00cba620700}</Project>
+      <Name>Serenity.Sql.Criteria</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Sql.Interfaces\Serenity.Sql.Interfaces.csproj">
+      <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
+      <Name>Serenity.Sql.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.Web\Serenity.Web.csproj">
       <Project>{8632943d-2a88-4c83-8451-69d62f059efc}</Project>
       <Name>Serenity.Web</Name>

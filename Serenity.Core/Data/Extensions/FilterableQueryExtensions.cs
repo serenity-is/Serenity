@@ -17,7 +17,7 @@ namespace Serenity.Data
         ///   Filter</param>
         /// <returns>
         ///   Query itself.</returns>
-        public static T Where<T>(this T self, BaseCriteria filter) where T: IFilterableQuery
+        public static T Where<T>(this T self, ICriteria filter) where T: IFilterableQuery
         {
             if (!ReferenceEquals(null, filter) && !filter.IsEmpty)
             {

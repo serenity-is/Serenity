@@ -9,7 +9,7 @@ namespace Serenity.Data
 
         public ParamCriteria(string name)
         {
-            if (name.IsNullOrEmpty())
+            if (String.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
             if (!name.StartsWith("@"))

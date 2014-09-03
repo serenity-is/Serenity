@@ -24,7 +24,7 @@ namespace Serenity.Data
         ///   One more of maximum display order values of records in the group. 
         ///   If none, 1.</returns>
         public static int GetNextValue(IDbConnection connection, string tableName, 
-            Field orderField, BaseCriteria filter)
+            Field orderField, ICriteria filter)
         {
             if (connection == null)
                 throw new ArgumentNullException("connection");
@@ -59,7 +59,7 @@ namespace Serenity.Data
         /// <returns>
         ///   One more of maximum display order values of records in the group. 
         ///   If none, 1.</returns>
-        public static int GetNextValue(IDbConnection connection, IDisplayOrderRow row, BaseCriteria filter = null)
+        public static int GetNextValue(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null)
         {
             return GetNextValue(connection, ((Row)row).Table, row.DisplayOrderField, filter);
         }
@@ -90,7 +90,7 @@ namespace Serenity.Data
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
         public static bool ReorderValues(IDbConnection connection, string tableName, Field keyField, Field orderField,
-            BaseCriteria filter = null, Int64? recordID = null, int newDisplayOrder = 1,
+            ICriteria filter = null, Int64? recordID = null, int newDisplayOrder = 1,
             bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
         {
             if (connection == null)
@@ -371,7 +371,7 @@ namespace Serenity.Data
         ///   order value assigned (or 0) be shown at start or at the end.</param>
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
-        public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, BaseCriteria filter = null, 
+        public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null, 
             Int64? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
         {
             return ReorderValues(connection, ((Row)row).Table, (Field)((IIdRow)row).IdField, row.DisplayOrderField, filter, recordID, 

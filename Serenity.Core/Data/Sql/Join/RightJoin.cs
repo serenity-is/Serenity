@@ -4,12 +4,12 @@ namespace Serenity.Data
 {
     public class RightJoin : Join
     {
-        public RightJoin(string toTable, string alias, BaseCriteria onCriteria)
+        public RightJoin(string toTable, string alias, ICriteria onCriteria)
             : base(null, toTable, alias, onCriteria)
         {
         }
 
-        public RightJoin(IDictionary<string, Join> joins, string toTable, string alias, BaseCriteria onCriteria)
+        public RightJoin(IDictionary<string, Join> joins, string toTable, string alias, ICriteria onCriteria)
             : base(joins, toTable, alias, onCriteria)
         {
         }

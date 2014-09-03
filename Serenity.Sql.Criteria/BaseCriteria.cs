@@ -6,7 +6,7 @@ namespace Serenity.Data
     using System.Text;
 
     [DebuggerDisplay("{ToStringIgnoreParams()}")]
-    public abstract class BaseCriteria
+    public abstract class BaseCriteria : ICriteria
     {
         private static NoParamsChecker noParamsChecker = new NoParamsChecker();
         private static IgnoreParams ignoreParams = new IgnoreParams();

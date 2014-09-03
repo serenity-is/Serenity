@@ -55,7 +55,7 @@ namespace Serenity.Data
             return null;
         }
 
-        public static TRow Single<TRow>(this IDbConnection connection, BaseCriteria where)
+        public static TRow Single<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()
         {
             var row = TrySingle<TRow>(connection, where);
@@ -66,7 +66,7 @@ namespace Serenity.Data
             return row;
         }
 
-        public static TRow TrySingle<TRow>(this IDbConnection connection, BaseCriteria where)
+        public static TRow TrySingle<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
@@ -104,7 +104,7 @@ namespace Serenity.Data
             return null;
         }
 
-        public static TRow First<TRow>(this IDbConnection connection, BaseCriteria where)
+        public static TRow First<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()
         {
             var row = TryFirst<TRow>(connection, where);
@@ -115,7 +115,7 @@ namespace Serenity.Data
             return row;
         }
 
-        public static TRow TryFirst<TRow>(this IDbConnection connection, BaseCriteria where)
+        public static TRow TryFirst<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
@@ -153,7 +153,7 @@ namespace Serenity.Data
             return null;
         }
 
-        public static int Count<TRow>(this IDbConnection connection, BaseCriteria where)
+        public static int Count<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
@@ -175,7 +175,7 @@ namespace Serenity.Data
                     .Exists(connection);
         }
 
-        public static bool Exists<TRow>(this IDbConnection connection, BaseCriteria where)
+        public static bool Exists<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
@@ -186,7 +186,7 @@ namespace Serenity.Data
         }
 
 
-        public static List<TRow> List<TRow>(this IDbConnection connection, BaseCriteria where)
+        public static List<TRow> List<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
