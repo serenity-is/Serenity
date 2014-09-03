@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E5FD07EF-84B5-48C4-8640-46CDC9219AE8}</ProjectGuid>
+    <ProjectGuid>{C146399F-5A12-4CA0-BAEB-79833287F3BC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Serenity.Testing</RootNamespace>
-    <AssemblyName>Serenity.Testing</AssemblyName>
+    <RootNamespace>Serenity</RootNamespace>
+    <AssemblyName>Serenity.Caching</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,39 +31,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbManager.cs" />
-    <Compile Include="DbScript.cs" />
-    <Compile Include="DbSettings.cs" />
-    <Compile Include="DbTestContext.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestSqlHelper.cs" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SqlScript\CreateDatabase.sql" />
+    <Compile Include="CacheExpiration.cs" />
+    <Compile Include="CacheCompression.cs" />
+    <Compile Include="CacheSerialization.cs" />
+    <Compile Include="DistributedCache.cs" />
+    <Compile Include="DistributedCacheEmulator.cs" />
+    <Compile Include="IDistributedCache.cs" />
+    <Compile Include="TwoLevelCache.cs" />
+    <Compile Include="LocalCache.cs" />
+    <Compile Include="ICache.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
-      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
-      <Name>Serenity.Core</Name>
+    <ProjectReference Include="..\Serenity.DependencyResolver\Serenity.DependencyResolver.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.DependencyResolver</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

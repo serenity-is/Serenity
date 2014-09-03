@@ -6,6 +6,7 @@ namespace Serenity
     using Enyim.Caching.Memcached;
     using Newtonsoft.Json;
     using System;
+    using System.Collections.Generic;
     using System.Configuration;
 
     /// <summary>
@@ -24,7 +25,7 @@ namespace Serenity
         /// olduğunda diğer sunucunun da resetlenmesinin istendiği durumlar için geliştirildi. Standart ortamlarda
         /// tek sunucu olmalı, ya da mirrored çalışmalı.
         /// </summary>
-        private ICouchbaseClient secondaryClient;
+        private List<ICouchbaseClient> secondaryClients;
 
         /// <summary>
         /// Uygulama ayarlarından okunan ayarları içerir. Bu ayarlar constructor'da tek bir kez okunur.
@@ -43,14 +44,17 @@ namespace Serenity
         /// ServerAddress ayarini yapiniz!</exception>
         public CouchbaseDistributedCache()
         {
-            this.configuration = JsonConvert.DeserializeObject<Configuration>(
-                ConfigurationManager.AppSettings["DistributedCache"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
+            var setting = (ConfigurationManager.AppSettings["DistributedCache"] ?? "").Trim();
+            if (setting.Length == 0)
+                setting = "{}";
 
-            if (this.configuration.ServerAddress.IsTrimmedEmpty())
+            this.configuration = JsonConvert.DeserializeObject<Configuration>(setting, JsonSettings.Tolerant);
+
+            if (String.IsNullOrWhiteSpace(this.configuration.ServerAddress))
                 throw new InvalidOperationException(
                     "Lutfen uygulama icin AppSettings -> DistributedCache -> ServerAddress ayarini yapiniz!");
 
-            if (this.configuration.BucketName.IsTrimmedEmpty())
+            if (String.IsNullOrWhiteSpace(this.configuration.BucketName))
                 throw new InvalidOperationException(
                     "Lutfen uygulama icin AppSettings -> DistributedCache -> BucketName ayarini yapiniz!");
 
@@ -64,21 +68,26 @@ namespace Serenity
 
             this.cacheClient = new CouchbaseClient(config);
 
-            // ikinci mirror sunucusu sadece konfigürasyonda belirtilmişse kullanılır
-            if (!this.configuration.SecondaryServerAddress.IsTrimmedEmpty())
+            foreach (var secondaryServerAddress in
+                (this.configuration.SecondaryServerAddress ?? "").Trim()
+                    .Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                var secondaryConfig = new CouchbaseClientConfiguration();
-                secondaryConfig.Bucket = config.Bucket;
-                secondaryConfig.BucketPassword = config.BucketPassword;
-                var secondaryServer = this.configuration.SecondaryServerAddress;
-                var pipeIndex = secondaryServer.IndexOf('|');
-                if (pipeIndex > 0)
+                if (!String.IsNullOrWhiteSpace(secondaryServerAddress))
                 {
-                    secondaryConfig.Bucket = secondaryServer.Substring(pipeIndex + 1);
-                    secondaryServer = secondaryServer.Substring(0, pipeIndex);
+                    var secondaryConfig = new CouchbaseClientConfiguration();
+                    secondaryConfig.Bucket = config.Bucket;
+                    secondaryConfig.BucketPassword = config.BucketPassword;
+                    var secondaryServer = (secondaryServerAddress ?? "").Trim();
+                    var pipeIndex = secondaryServer.IndexOf('|');
+                    if (pipeIndex > 0)
+                    {
+                        secondaryConfig.Bucket = secondaryServer.Substring(pipeIndex + 1);
+                        secondaryServer = secondaryServer.Substring(0, pipeIndex);
+                    }
+                    secondaryConfig.Urls.Add(new Uri(secondaryServer));
+                    this.secondaryClients = this.secondaryClients ?? new List<ICouchbaseClient>();
+                    this.secondaryClients.Add(new CouchbaseClient(secondaryConfig));
                 }
-                secondaryConfig.Urls.Add(new Uri(secondaryServer));
-                this.secondaryClient = new CouchbaseClient(secondaryConfig);
             }
         }
 
@@ -93,10 +102,13 @@ namespace Serenity
                 cacheClient = null;
             }
 
-            if (secondaryClient != null)
+            if (secondaryClients != null)
             {
-                secondaryClient.Dispose();
-                secondaryClient = null;
+                foreach (var secondaryClient in secondaryClients)
+                {
+                    secondaryClient.Dispose();
+                }
+                secondaryClients = null;
             }
         }
 
@@ -140,14 +152,19 @@ namespace Serenity
             if (Object.ReferenceEquals(null, value))
             {
                 cacheClient.Remove(key);
-                if (secondaryClient != null)
-                    try
+                if (secondaryClients != null)
+                {
+                    foreach (var secondaryClient in secondaryClients)
                     {
-                        secondaryClient.Remove(key);
+                        try
+                        {
+                            secondaryClient.Remove(key);
+                        }
+                        catch
+                        {
+                        }
                     }
-                    catch
-                    {
-                    }
+                }
             }
             else
                 cacheClient.Store(StoreMode.Set, key, value);
@@ -167,14 +184,19 @@ namespace Serenity
             if (Object.ReferenceEquals(null, value))
             {
                 cacheClient.Remove(key);
-                if (secondaryClient != null)
-                    try
+                if (secondaryClients != null)
+                {
+                    foreach (var secondaryClient in secondaryClients)
                     {
-                        secondaryClient.Remove(key);
+                        try
+                        {
+                            secondaryClient.Remove(key);
+                        }
+                        catch
+                        {
+                        }
                     }
-                    catch
-                    {
-                    }
+                }
             }
             else
                 cacheClient.Store(StoreMode.Set, key, value, expiresAt);

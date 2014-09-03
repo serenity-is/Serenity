@@ -49,7 +49,7 @@ namespace Serenity
 
             using (var ms = new MemoryStream(input.Length))
             {
-                IoC.Resolve<ICacheCompressor>().CompressBytes(ms, input);
+                Dependency.Resolve<ICacheCompressor>().CompressBytes(ms, input);
                 return ms.ToArray();
             }
         }
@@ -66,7 +66,7 @@ namespace Serenity
 
             using (var ms = new MemoryStream(input))
             {
-                using (var ds = IoC.Resolve<ICacheCompressor>().CreateDecompressionStream(ms))
+                using (var ds = Dependency.Resolve<ICacheCompressor>().CreateDecompressionStream(ms))
                 {
                     using (var output = new MemoryStream())
                     {
@@ -91,12 +91,12 @@ namespace Serenity
                 return null;
 
             if (input.Length > minCompressLength &&
-                IoC.CanResolve<ICacheCompressor>())
+                Dependency.TryResolve<ICacheCompressor>() != null)
             {
                 using (var ms = new MemoryStream(input.Length + 1))
                 {
                     ms.WriteByte(1);
-                    IoC.Resolve<ICacheCompressor>().CompressBytes(ms, input);
+                    Dependency.Resolve<ICacheCompressor>().CompressBytes(ms, input);
 
                     return ms.ToArray();
                 }

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Serenity.Test.Data
 {
-    public partial class RowMappingTests
+    public partial class RowMappingTests : SerenityTestBase
     {
         [Fact]
         public void FaultyRowThrowsException()

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Serenity.Localization;
 
 namespace Serenity
 {
@@ -117,10 +118,8 @@ namespace Serenity
                         if (attributes.Length > 0)
                         {
                             text = ((DescriptionAttribute)attributes[0]).Description;
-                            LocalText.Add(new List<LocalText.Entry>
-                            {
-                                new LocalText.Entry(LocalText.DefaultLanguageID, key, text)
-                            }, false);
+                            Dependency.Resolve<ILocalTextProvider>().Add(
+                                new LocalTextEntry(LocalText.DefaultLanguageID, key, text), false);
                         }
                     }
                 }

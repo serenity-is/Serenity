@@ -3,8 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 
+
 namespace Serenity
 {
+    using MyResolver = Munq.IDependencyResolver;
+
     /// <summary>
     /// Provides an entry point to Munq IoC Container.
     /// This class only uses one IoCContainer, we don't need more than one
@@ -97,22 +100,22 @@ namespace Serenity
             set { container.DefaultLifetimeManager = value; }
         }
 
-        public static IRegistration Register<TType>(Func<IDependencyResolver, TType> func) where TType : class
+        public static IRegistration Register<TType>(Func<MyResolver, TType> func) where TType : class
         {
             return container.Register<TType>(func);
         }
 
-        public static IRegistration Register<TType>(string name, Func<IDependencyResolver, TType> func) where TType : class
+        public static IRegistration Register<TType>(string name, Func<MyResolver, TType> func) where TType : class
         {
             return container.Register<TType>(name, func);
         }
 
-        public static IRegistration Register(Type type, Func<IDependencyResolver, object> func)
+        public static IRegistration Register(Type type, Func<MyResolver, object> func)
         {
             return container.Register(type, func);
         }
 
-        public static IRegistration Register(string name, Type type, Func<IDependencyResolver, object> func)
+        public static IRegistration Register(string name, Type type, Func<MyResolver, object> func)
         {
             return container.Register(name, type, func);
         }
@@ -268,6 +271,33 @@ namespace Serenity
                 mine.Dispose();
                 container = old;
                 mine = null;
+            }
+        }
+
+        public class DependencyResolver : Serenity.IDependencyResolver
+        {
+            public TService Resolve<TService>()
+                where TService: class
+            {
+                return IoC.Resolve<TService>();
+            }
+
+            public TService Resolve<TService>(string name)
+                where TService : class
+            {
+                return IoC.Resolve<TService>(name);
+            }
+
+            public TService TryResolve<TService>()
+                where TService : class
+            {
+                return IoC.CanResolve<TService>() ? IoC.Resolve<TService>() : null;
+            }
+
+            public TService TryResolve<TService>(string name)
+                where TService : class
+            {
+                return IoC.CanResolve<TService>(name) ? IoC.Resolve<TService>(name) : null;
             }
         }
     }

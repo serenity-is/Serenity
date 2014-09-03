@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Serenity.Data;
 using System.Configuration;
 using System.IO;
+using Serenity.Localization;
 
 namespace Serenity.Web
 {
@@ -73,7 +74,9 @@ namespace Serenity.Web
             }
             sb.Append(")$");
             var regex = new Regex(sb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var texts = LocalText.GetAllAvailableTextsInLanguage(languageId, isPending);
+            var texts = ((LocalTextRegistry)Dependency.Resolve<ILocalTextProvider>())
+                .GetAllAvailableTextsInLanguage(languageId, isPending);
+
             var list = new List<KeyValuePair<string, string>>();
 
             foreach (var pair in texts)

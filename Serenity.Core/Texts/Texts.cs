@@ -1,12 +1,14 @@
-﻿namespace Serenity
+﻿using Serenity.Localization;
+
+namespace Serenity
 {
     public static partial class Texts
     {
-        public static readonly LocalText.Package Package;
+        public static readonly LocalTextPackage Package;
 
         static Texts()
         {
-            Package = new LocalText.Package().InitializeTextClass(typeof(Texts));
+            Package = new LocalTextPackage().InitializeTextClass(typeof(Texts));
         }
     }
 }

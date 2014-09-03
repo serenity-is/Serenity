@@ -1,27 +1,18 @@
 ﻿using System;
-using System.Collections;
-using System.Web;
-using System.Web.Caching;
 
 namespace Serenity
 {
-    /// <summary>
-    /// HttpRuntime.Cache ile çalışmak için kısayollar ve yardım fonksiyonlar içerir
-    /// </summary>
     public static class LocalCache
     {
         /// <summary>
-        /// Değeri belli bir tarihte expire olacak şekilde cache'e ekler.
+        /// Adds a value to cache with a given key
         /// </summary>
-        /// <param name="cacheKey">Anahtar</param>
-        /// <param name="value">Değer</param>
-        /// <param name="expiration">Expire süresi (CacheExpiration.Never ile limitsiz yapılabilir)</param>
-        public static void AddToCacheWithExpiration(string cacheKey, object value, TimeSpan expiration)
+        /// <param name="key">key</param>
+        /// <param name="value">value</param>
+        /// <param name="expiration">Expire time (Use CacheExpiration.Never to make it limitless)</param>
+        public static void AddToCacheWithExpiration(string key, object value, TimeSpan expiration)
         {
-            HttpRuntime.Cache.Insert(cacheKey, value, null, expiration == CacheExpiration.Never ?
-                System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(expiration),
-                System.Web.Caching.Cache.NoSlidingExpiration, System.Web.Caching.CacheItemPriority.Normal,
-                null);
+            Dependency.Resolve<ICache>().Add(key, value, expiration);
         }
 
 
@@ -37,17 +28,21 @@ namespace Serenity
         public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, Func<TItem> loader)
             where TItem : class
         {
-            var cachedObj = HttpRuntime.Cache.Get(cacheKey);
+            var cachedObj = Dependency.Resolve<ICache>().Get<object>(cacheKey);
+            
             if (cachedObj == DBNull.Value)
+            {
                 return null;
-            else if (cachedObj == null)
+            }
+
+            if (cachedObj == null)
             {
                 var item = loader();
-                AddToCacheWithExpiration(cacheKey, (object)item ?? DBNull.Value, expiration);
+                AddToCacheWithExpiration(cacheKey, (object) item ?? DBNull.Value, expiration);
                 return item;
             }
-            else
-                return (TItem)cachedObj;
+
+            return (TItem) cachedObj;
         }
 
         /// <summary>
@@ -59,24 +54,16 @@ namespace Serenity
         public static TItem TryGet<TItem>(string cacheKey)
             where TItem : class
         {
-            return HttpRuntime.Cache[cacheKey] as TItem;
+            return Dependency.Resolve<ICache>().Get<object>(cacheKey) as TItem;
         }
 
         /// <summary>
         /// Verilen anahtara sahip değeri cache'ten siler. Yoksa hata vermez.
         /// </summary>
         /// <param name="cacheKey">Anahtar</param>
-        public static void Remove(string cacheKey)
+        public static object Remove(string cacheKey)
         {
-            HttpRuntime.Cache.Remove(cacheKey);
-        }
-
-        /// <summary>
-        /// HttpRuntime.Cache' erişim sağlar
-        /// </summary>
-        public static Cache GetCache()
-        {
-            return HttpRuntime.Cache;
+            return Dependency.Resolve<ICache>().Remove(cacheKey);
         }
 
         /// <summary>
@@ -84,9 +71,7 @@ namespace Serenity
         /// </summary>
         public static void Reset()
         {
-            var cache = HttpRuntime.Cache;
-            foreach (DictionaryEntry k in cache)
-                cache.Remove((string)k.Key);
+            Dependency.Resolve<ICache>().RemoveAll();
         }
     }
 }

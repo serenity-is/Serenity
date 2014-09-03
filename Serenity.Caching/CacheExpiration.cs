@@ -20,6 +20,6 @@ namespace Serenity
         public static readonly TimeSpan OneHour = TimeSpan.FromMinutes(60);
         public static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
 
-        public static readonly TimeSpan Never = System.Web.Caching.Cache.NoSlidingExpiration;
+        public static readonly TimeSpan Never = TimeSpan.Zero;
     }
 }

@@ -35,9 +35,9 @@
       <Private>True</Private>
       <HintPath>$(SolutionDir)\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -194,9 +194,25 @@
     <None Include="Style\serenity.toolbuttons.less" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Serenity.Caching\Serenity.Caching.csproj">
+      <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
+      <Name>Serenity.Caching</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
       <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.DependencyResolver\Serenity.DependencyResolver.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.DependencyResolver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Json\Serenity.Json.csproj">
+      <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
+      <Name>Serenity.Json</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
+      <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
+      <Name>Serenity.Localization</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

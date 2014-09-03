@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using Serenity.Localization;
 
 namespace Serenity.Web
 {
@@ -54,12 +55,14 @@ namespace Serenity.Web
 
         public static string GetLocalTextInclude(this HtmlHelper page, string package)
         {
-            int languageId = (int)LocalText.ContextLanguageID;
-            bool isPending = LocalText.ContextPending;
-            string scriptName = LocalTextScript.GetScriptName(package, languageId, isPending);
+            var provider = Dependency.Resolve<ILocalTextProvider>() as LocalTextRegistry;
+
+            long languageId = provider == null ? 0: provider.ContextLanguageID;
+            bool isPending = provider != null && provider.ContextIsApprovalMode;
+            string scriptName = LocalTextScript.GetScriptName(package, (int)languageId, isPending);
             DynamicScriptManager.IfNotRegistered(scriptName, () =>
             {
-                var script = new LocalTextScript(package, languageId, isPending);
+                var script = new LocalTextScript(package, (int)languageId, isPending);
                 DynamicScriptManager.Register(script);
             });
 

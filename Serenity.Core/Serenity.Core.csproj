@@ -31,9 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -43,23 +42,12 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Caching\CacheExpiration.cs" />
-    <Compile Include="Caching\Distributed\CacheSerialization.cs" />
-    <Compile Include="Caching\Distributed\DistributedCache.cs" />
-    <Compile Include="Caching\Distributed\CacheCompression.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Caching\Distributed\TwoLevelCache.cs" />
-    <Compile Include="Caching\Distributed\DistributedCacheEmulator.cs" />
-    <Compile Include="Caching\IByIdCache.cs" />
-    <Compile Include="Caching\Distributed\IDistributedCache.cs" />
-    <Compile Include="Caching\LocalCache.cs" />
+    <Compile Include="Data\Extensions\TwoLevelCacheExtensions.cs" />
     <Compile Include="Core\ContextItems.cs" />
     <Compile Include="Core\DeleteType.cs" />
     <Compile Include="Core\Helpers\PrefixHelper.cs" />
     <Compile Include="Core\Helpers\DateElementOrder.cs" />
     <Compile Include="Core\IoC.cs" />
-    <Compile Include="Core\LocalText.cs" />
     <Compile Include="Core\LruCache.cs" />
     <Compile Include="Core\LruCacheNode.cs" />
     <Compile Include="Core\StringHelper.cs" />
@@ -203,8 +191,6 @@
     <Compile Include="Data\Json\Json.cs" />
     <Compile Include="Data\Json\JsonDataEnumConverter.cs" />
     <Compile Include="Data\Json\JsonRowConverter.cs" />
-    <Compile Include="Data\Json\JsonSafeInt64Converter.cs" />
-    <Compile Include="Data\Json\JsonSettings.cs" />
     <Compile Include="Data\Json\JsonStringRawConverter.cs" />
     <Compile Include="Data\Sql\Query\Parameter.cs" />
     <Compile Include="Data\Extensions\RowExtensions.cs" />
@@ -396,6 +382,25 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Caching\Serenity.Caching.csproj">
+      <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
+      <Name>Serenity.Caching</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.DependencyResolver\Serenity.DependencyResolver.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.DependencyResolver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Json\Serenity.Json.csproj">
+      <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
+      <Name>Serenity.Json</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
+      <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
+      <Name>Serenity.Localization</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

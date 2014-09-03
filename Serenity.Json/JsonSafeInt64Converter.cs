@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Serenity.Data
 {
@@ -24,7 +25,7 @@ namespace Serenity.Data
                 var intvalue = Convert.ToInt64(value);
                 if (intvalue > 9007199254740992 ||
                     intvalue < -9007199254740992)
-                    writer.WriteValue(intvalue.ToInvariant());
+                    writer.WriteValue(intvalue.ToString(CultureInfo.InvariantCulture));
                 else
                     writer.WriteValue(intvalue);
             }

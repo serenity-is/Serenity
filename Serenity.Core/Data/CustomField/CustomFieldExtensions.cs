@@ -95,10 +95,10 @@ namespace Serenity.Data
         //    return result.ToArray();
         //}
 
-        public static void DefaultFieldCaption(this RowFieldsBase fields, string fieldName, string caption)
-        {
-            LocalText.Add(new List<LocalText.Entry>() { new LocalText.Entry(LocalText.DefaultLanguageID, "Db." + fields.TableName + "." + fieldName,
-                caption) }, false);
-        }
+        //public static void DefaultFieldCaption(this RowFieldsBase fields, string fieldName, string caption)
+        //{
+        //    LocalText.Add(new List<LocalText.Entry>() { new LocalText.Entry(LocalText.DefaultLanguageID, "Db." + fields.TableName + "." + fieldName,
+        //        caption) }, false);
+        //}
     }
 }

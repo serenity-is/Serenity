@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-using System;
-using System.Web;
+﻿using System;
 
 namespace Serenity
 {
@@ -10,7 +8,7 @@ namespace Serenity
     public static class TwoLevelCache
     {
         private static readonly TimeSpan GenerationCacheExpiration = TimeSpan.FromSeconds(5);
-        private static readonly string GenerationSuffix = "$Generation$";
+        private const string GenerationSuffix = "$Generation$";
         private static readonly Random GenerationRandomizer;
 
         /// <summary>
@@ -31,7 +29,6 @@ namespace Serenity
         /// haberdar olur.
         /// </summary>
         /// <typeparam name="TItem">Cache ten getirilecek objenin tipi</typeparam>
-        /// <typeparam name="TSerialized">Objenin distributed cache e gönderilmeden önce serialize edileceği tip (performans açısından byte[] ya da string olmalı)</typeparam>
         /// <param name="cacheKey">Hem local hem de distributed cache için kullanılacak item key i</param>
         /// <param name="localExpiration">Local cache için kullanılacak expiration</param>
         /// <param name="remoteExpiration">Distributed cache için kullanılacak expiration</param>
@@ -90,7 +87,7 @@ namespace Serenity
         /// </summary>
         /// <typeparam name="TItem">Cache ten getirilecek objenin tipi</typeparam>
         /// <param name="cacheKey">Hem local hem de distributed cache için kullanılacak item key i</param>
-        /// <param name="expiration">Hem local hem de distributed cache için kullanılacak expiration</param>
+        /// <param name="localExpiration">Local cache için kullanılacak expiration</param>
         /// <param name="globalGenerationKey">Global versiyon numarasının kontrol edileceği key. Bu tablo adı olabilir mesela. Bu key arttırılarak 
         /// tüm cache lerin yenilenmesi sağlanabilir.</param>
         /// <param name="loader">Local cache te item bulunamazsa yüklemeyi yapacak delegate</param>
@@ -114,7 +111,8 @@ namespace Serenity
         /// <typeparam name="TItem">Cache ten getirilecek objenin tipi</typeparam>
         /// <typeparam name="TSerialized">Objenin distributed cache e gönderilmeden önce serialize edileceği tip (performans açısından byte[] ya da string olmalı)</typeparam>
         /// <param name="cacheKey">Hem local hem de distributed cache için kullanılacak item key i</param>
-        /// <param name="expiration">Hem local hem de distributed cache için kullanılacak expiration</param>
+        /// <param name="localExpiration">Hem local hem de distributed cache için kullanılacak expiration</param>
+        /// <param name="remoteExpiration">Hem local hem de distributed cache için kullanılacak expiration</param>
         /// <param name="globalGenerationKey">Global versiyon numarasının kontrol edileceği key. Bu tablo adı olabilir mesela. Bu key arttırılarak 
         /// tüm cache lerin yenilenmesi sağlanabilir.</param>
         /// <param name="loader">Hiçbir cache te item bulunamazsa yüklemeyi yapacak delegate</param>
@@ -159,7 +157,7 @@ namespace Serenity
                     return globalGenerationCache.Value;
 
                 // global jenerasyonın local de cache lediğimiz değerine bak (1 dk da bir cache ten silinir, server dan sorarız)
-                globalGenerationCache = HttpRuntime.Cache.Get(globalGenerationKey) as ulong?;
+                globalGenerationCache = Dependency.Resolve<ICache>().Get<object>(globalGenerationKey) as ulong?;
 
                 // cache te varsa onu döndür
                 if (globalGenerationCache != null)
@@ -169,11 +167,11 @@ namespace Serenity
             };
 
             // öncelikle local cache'e bak, varsa ve expire olmadıysa (global versiyon artışı nedeniyle) döndür
-            var cachedObj = HttpRuntime.Cache.Get(cacheKey);
+            var cachedObj = Dependency.Resolve<ICache>().Get<object>(cacheKey);
             if (cachedObj != null)
             {
                 // önce local cache'e bak, varsa bununla global versiyonu karşılaştır
-                var itemGenerationCache = HttpRuntime.Cache.Get(itemGenerationKey) as ulong?;
+                var itemGenerationCache = Dependency.Resolve<ICache>().Get<object>(itemGenerationKey) as ulong?;
                 if (itemGenerationCache != null &&
                     itemGenerationCache == getGlobalGenerationCacheValue())
                 {
@@ -187,9 +185,9 @@ namespace Serenity
 
                 // local cache teki item expire olmuş, tüm bilgilerini temizle
                 if (itemGenerationCache != null)
-                    HttpRuntime.Cache.Remove(itemGenerationKey);
+                    Dependency.Resolve<ICache>().Remove(itemGenerationKey);
 
-                HttpRuntime.Cache.Remove(cacheKey);
+                Dependency.Resolve<ICache>().Remove(cacheKey);
 
                 cachedObj = null;
             }
@@ -285,7 +283,7 @@ namespace Serenity
         /// <param name="globalGenerationKey"></param>
         public static void ChangeGlobalGeneration(string globalGenerationKey)
         {
-            HttpRuntime.Cache.Remove(globalGenerationKey);
+            Dependency.Resolve<ICache>().Remove(globalGenerationKey);
             DistributedCache.Set<object>(globalGenerationKey, null);
         }
 
@@ -298,23 +296,10 @@ namespace Serenity
             // local cache ve dist cache te bir item ın versiyon bilgisini tutmak için kullanacağımız key
             string itemGenerationKey = cacheKey + GenerationSuffix;
 
-            HttpRuntime.Cache.Remove(cacheKey);
-            HttpRuntime.Cache.Remove(itemGenerationKey);
+            Dependency.Resolve<ICache>().Remove(cacheKey);
+            Dependency.Resolve<ICache>().Remove(itemGenerationKey);
             DistributedCache.Set<object>(cacheKey, null);
             DistributedCache.Set<object>(itemGenerationKey, null);
-        }
-    }
-
-    public static class TwoLevelCacheExtensions
-    {
-        public static void ChangeGlobalGeneration(Row row)
-        {
-            TwoLevelCache.ChangeGlobalGeneration(row.GetFields().GenerationKey);
-        }
-
-        public static void ChangeGlobalGeneration(RowFieldsBase fields)
-        {
-            TwoLevelCache.ChangeGlobalGeneration(fields.GenerationKey);
         }
     }
 }

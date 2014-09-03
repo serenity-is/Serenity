@@ -16,7 +16,7 @@ namespace Serenity
         /// <returns>Arttırılmış değer, ya da yoksa 1</returns>
         public static long Increment(string key, int amount = 1)
         {
-            return IoC.Resolve<IDistributedCache>().Increment(key, amount);
+            return Dependency.Resolve<IDistributedCache>().Increment(key, amount);
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Serenity
         /// bir exception üretebilir.</remarks>
         public static TValue Get<TValue>(string key)
         {
-            return IoC.Resolve<IDistributedCache>().Get<TValue>(key);
+            return Dependency.Resolve<IDistributedCache>().Get<TValue>(key);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Serenity
         /// <param name="value">Değer.</param>
         public static void Set<TValue>(string key, TValue value)
         {
-            IoC.Resolve<IDistributedCache>().Set(key, value);
+            Dependency.Resolve<IDistributedCache>().Set(key, value);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Serenity
         /// <param name="expiresAt">Değerin expire olacağı tarih.</param>
         public static void Set<TValue>(string key, TValue value, DateTime expiresAt)
         {
-            IoC.Resolve<IDistributedCache>().Set(key, value, expiresAt);
+            Dependency.Resolve<IDistributedCache>().Set(key, value, expiresAt);
         }
     }
 }
