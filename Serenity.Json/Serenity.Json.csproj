@@ -45,12 +45,6 @@
     <Compile Include="JsonSettings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Caching\Serenity.Caching.csproj">
-      <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
-      <Name>Serenity.Caching</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

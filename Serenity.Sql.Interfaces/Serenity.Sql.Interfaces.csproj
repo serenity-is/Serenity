@@ -52,12 +52,6 @@
     <Compile Include="SqlDialect.cs" />
     <Compile Include="SqlSettings.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Serenity.Caching\Serenity.Caching.csproj">
-      <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
-      <Name>Serenity.Caching</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
