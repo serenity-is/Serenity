@@ -43,6 +43,7 @@
     <Compile Include="Json.cs" />
     <Compile Include="JsonSafeInt64Converter.cs" />
     <Compile Include="JsonSettings.cs" />
+    <Compile Include="JsonStringHashSetConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

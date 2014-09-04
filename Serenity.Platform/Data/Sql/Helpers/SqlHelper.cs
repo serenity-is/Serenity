@@ -277,9 +277,7 @@
                throw new ArgumentNullException("connection");
 
            IDbCommand command = connection.CreateCommand();
-           command.Connection = connection;
            command.CommandText = commandText;
-           command.Transaction = SqlTransactions.GetCurrentTransaction(connection);
            return command;
        }
 
@@ -350,19 +348,6 @@
        }
 
        /// <summary>
-       ///   Bağlantının açık olmasını kontrol eder, değilse açar.</summary>
-       /// <param name="connection">
-       ///   Açık olması kontrol edilecek bağlantı.</param>
-       public static void EnsureOpen(IDbConnection connection)
-       {
-           if (connection == null)
-               throw new ArgumentNullException("connection");
-
-           if (connection.State != ConnectionState.Open)
-               connection.Open();
-       }
-
-       /// <summary>
        ///   Verilen Sql exception'ının numarasının, bilinen connection pool hatalarından biri olmasını 
        ///   denetler ve gerekirse bağlantıyı tekrar açıp kapatır.</summary>
        /// <param name="connection">
@@ -402,7 +387,7 @@
 
            try
            {
-               EnsureOpen(command.Connection);
+               command.Connection.EnsureOpen();
                try
                {
                    return command.ExecuteNonQuery();
@@ -488,7 +473,7 @@
            if (connection == null)
                throw new ArgumentNullException("connection");
 
-           EnsureOpen(connection);
+           connection.EnsureOpen();
 
            using (IDbCommand command = NewCommand(connection, commandText, param))
            {
@@ -621,7 +606,7 @@
            if (connection == null)
                throw new ArgumentNullException("connection");
 
-           EnsureOpen(connection);
+           connection.EnsureOpen();
 
            try
            {

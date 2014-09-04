@@ -32,11 +32,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connections\IUnitOfWork.cs" />
+    <Compile Include="Connections\IWrappedConnection.cs" />
+    <Compile Include="Connections\UnitOfWork.cs" />
+    <Compile Include="Connections\WrappedTransaction.cs" />
+    <Compile Include="Connections\WrappedConnection.cs" />
+    <Compile Include="Connections\SqlConnections.cs" />
     <Compile Include="Criteria\BaseCriteria.cs" />
     <Compile Include="Criteria\BinaryCriteria.cs" />
     <Compile Include="Criteria\Criteria.cs" />

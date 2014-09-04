@@ -81,66 +81,61 @@ namespace Serenity
             Dictionary<Int64, Int64> existing = new Dictionary<Int64, Int64>();
             List<Int64> free = new List<Int64>();
 
-            using (IDbTransaction transaction = SqlTransactions.BeginTransactionIf(connection))
+            using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
             {
-                using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    var myID = Convert.ToInt64(reader.GetValue(0));
+                    existing[reader.ToInt64(1).Value] = myID;
+                    free.Add(myID);
+                }
+            }
+
+            if (free.Count > 0)
+            {
+                Int64 id;
+                foreach (var boundID in listBoundID)
+                    if (existing.TryGetValue(boundID, out id))
+                        free.Remove(id);
+            }
+
+            string insertQuery = null;
+
+            foreach (Int64 boundID in listBoundID)
+            {
+                if (!existing.ContainsKey(boundID))
+                {
+                    if (free.Count > 0)
                     {
-                        var myID = Convert.ToInt64(reader.GetValue(0));
-                        existing[reader.ToInt64(1).Value] = myID;
-                        free.Add(myID);
+                        new SqlUpdate(tableName)
+                            .Set(mKeyID, keyID)
+                            .Set(mBoundID, boundID)
+                            .WhereEqual(mID, free[0])
+                            .Execute(connection, ExpectedRows.Ignore);
+                        free.RemoveAt(0);
+                    }
+                    else
+                    {
+                        if (insertQuery == null)
+                        {
+                            insertQuery = String.Format(sqlInsert,
+                                tableName, mKeyID.Name, mBoundID.Name);
+                        }
+
+                        SqlHelper.ExecuteNonQuery(connection, String.Format(insertQuery),
+                            new Dictionary<string, object>() {
+                                { "@keyID", keyID },
+                                { "@boundID", (object)boundID }
+                            });
                     }
                 }
+            }
 
-                if (free.Count > 0)
-                {
-                    Int64 id;
-                    foreach (var boundID in listBoundID)
-                        if (existing.TryGetValue(boundID, out id))
-                            free.Remove(id);
-                }
-
-                string insertQuery = null;
-
-                foreach (Int64 boundID in listBoundID)
-                {
-                    if (!existing.ContainsKey(boundID))
-                    {
-                        if (free.Count > 0)
-                        {
-                            new SqlUpdate(tableName)
-                                .Set(mKeyID, keyID)
-                                .Set(mBoundID, boundID)
-                                .WhereEqual(mID, free[0])
-                                .Execute(connection, ExpectedRows.Ignore);
-                            free.RemoveAt(0);
-                        }
-                        else
-                        {
-                            if (insertQuery == null)
-                            {
-                                insertQuery = String.Format(sqlInsert,
-                                    tableName, mKeyID.Name, mBoundID.Name);
-                            }
-
-                            SqlHelper.ExecuteNonQuery(connection, String.Format(insertQuery),
-                                new Dictionary<string, object>() {
-                                    { "@keyID", keyID },
-                                    { "@boundID", (object)boundID }
-                                });
-                        }
-                    }
-                }
-
-                foreach (Int64 id in free)
-                {
-                    new SqlDelete(tableName)
-                        .WhereEqual(mID, id)
-                        .Execute(connection);
-                }
-
-                transaction.Commit();
+            foreach (Int64 id in free)
+            {
+                new SqlDelete(tableName)
+                    .WhereEqual(mID, id)
+                    .Execute(connection);
             }
         }
 

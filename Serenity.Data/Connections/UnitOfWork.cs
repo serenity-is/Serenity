@@ -19,7 +19,8 @@ namespace Serenity.Data
                 throw new ArgumentNullException("connection");
 
             _connection = connection;
-            _transaction = SqlTransactions.BeginTransaction(connection);
+            connection.EnsureOpen();
+            _transaction = connection.BeginTransaction();
         }
 
         public IDbConnection Connection

@@ -24,9 +24,9 @@ namespace Serenity.Services
         public bool IncludeDeleted { get; set; }
         public bool ExcludeTotalCount { get; set; }
         public ColumnSelection ColumnSelection { get; set; }
-        [JsonConverter(typeof(JsonIdentifierSetConverter))]
+        [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> IncludeColumns { get; set; }
-        [JsonConverter(typeof(JsonIdentifierSetConverter))]
+        [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> ExcludeColumns { get; set; }
     }
 

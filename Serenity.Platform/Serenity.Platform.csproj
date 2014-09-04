@@ -90,7 +90,6 @@
     <Compile Include="Data\Interface\ILoggingRow.cs" />
     <Compile Include="Data\Interface\INameRow.cs" />
     <Compile Include="Data\Interface\IParentIdRow.cs" />
-    <Compile Include="Data\Interface\IUnitOfWork.cs" />
     <Compile Include="Data\Json\JsonStringRawConverter.cs" />
     <Compile Include="Data\Sql\Helpers\SqlCommandDumper.cs" />
     <Compile Include="Data\Sql\Query\Dapper.cs" />
@@ -109,8 +108,7 @@
     <Compile Include="Extensions\WeakHashtable.cs" />
     <Compile Include="Reflection\InstanceCreator.cs" />
     <Compile Include="Core\IProgressManager.cs" />
-    <Compile Include="Json\JsonIdentifierSetConverter.cs" />
-    <Compile Include="Json\JsonSortByConverter.cs" />
+    <Compile Include="Services\JsonSortByConverter.cs" />
     <Compile Include="Logging\ExceptionLog.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\LoggingLevel.cs" />
@@ -196,16 +194,11 @@
     <Compile Include="Services\Settings\FormatHelper.cs" />
     <Compile Include="Services\Settings\IConfigurationRepository.cs" />
     <Compile Include="Core\SilentException.cs" />
-    <Compile Include="Data\Sql\Transaction\AutoTransaction.cs" />
     <Compile Include="Data\Sql\Helpers\DisplayOrderHelper.cs" />
-    <Compile Include="Data\Sql\Transaction\DummyTransaction.cs" />
     <Compile Include="Data\Sql\Helpers\BoundTableHelper.cs" />
     <Compile Include="Data\Sql\Helpers\QueryHelper.cs" />
-    <Compile Include="Data\Sql\Helpers\SqlConnections.cs" />
     <Compile Include="Data\Sql\Helpers\SqlHelper.cs" />
     <Compile Include="Data\Sql\Helpers\SqlRowExtensions.cs" />
-    <Compile Include="Data\Sql\Transaction\SqlTransactions.cs" />
-    <Compile Include="Data\Sql\Transaction\UnitOfWork.cs" />
     <Compile Include="Services\Validation\ValidationContext.cs" />
     <Compile Include="Services\Validation\ICustomValidator.cs" />
     <Compile Include="Texts\Texts.Controls.cs" />
@@ -262,7 +255,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="IocMunq\" />
+    <Folder Include="Data\Sql\Transaction\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -837,7 +837,7 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
             IDataReader reader = null;
             try
             {
-                SqlHelper.EnsureOpen(cnn);
+                cnn.EnsureOpen();
                 cmd = SetupCommand(cnn, transaction, sql, info.ParamReader, (object)param, commandTimeout, commandType);
                 reader = cmd.ExecuteReader(CommandBehavior.Default);
 
@@ -875,7 +875,7 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
                 if (Log.DebugLevel)
                     SqlHelper.LogCommand("Dapper.QueryInternal", cmd);
 
-                SqlHelper.EnsureOpen(cnn);
+                cnn.EnsureOpen();
                 reader = cmd.ExecuteReader(CommandBehavior.Default);
                 var tuple = info.Deserializer;
                 int hash = GetColumnHash(reader);
@@ -1095,7 +1095,7 @@ this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TRetu
                 if (reader == null)
                 {
                     ownedCommand = SetupCommand(cnn, transaction, sql, cinfo.ParamReader, (object)param, commandTimeout, commandType);
-                    SqlHelper.EnsureOpen(cnn);
+                    cnn.EnsureOpen();
                     ownedReader = ownedCommand.ExecuteReader();
                     reader = ownedReader;
                 }
@@ -2052,7 +2052,7 @@ this IDbConnection cnn, string sql, Func<TFirst, TSecond, TThird, TFourth, TRetu
             try
             {
                 cmd = SetupCommand(cnn, transaction, sql, paramReader, obj, commandTimeout, commandType);
-                SqlHelper.EnsureOpen(cnn);
+                cnn.EnsureOpen();
                 return cmd.ExecuteNonQuery();
             }
             finally

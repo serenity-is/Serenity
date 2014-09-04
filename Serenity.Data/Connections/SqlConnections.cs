@@ -58,7 +58,7 @@ namespace Serenity.Data
             var factory = GetFactory(providerName);
             var connection = factory.CreateConnection();
             connection.ConnectionString = connectionString;
-            return connection;
+            return new WrappedConnection(connection);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Serenity.Data
             var connectionSetting = GetConnectionString(connectionKey);
             var connection = connectionSetting.Item2.CreateConnection();
             connection.ConnectionString = connectionSetting.Item1;
-            return connection;
+            return new WrappedConnection(connection);
         }
 
         public static void SetConnection(string connectionKey, string connectionString, string providerName)
@@ -91,6 +91,26 @@ namespace Serenity.Data
             var newConnections = new Dictionary<string, Tuple<string, DbProviderFactory>>(connections);
             newConnections[connectionKey] = new Tuple<string, DbProviderFactory>(connectionString, GetFactory(providerName));
             connections = newConnections;
+        }
+
+        public static IDbConnection EnsureOpen(this IDbConnection connection)
+        {
+            if (connection == null)
+                throw new ArgumentNullException("connection");
+
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
+
+            return connection;
+        }
+
+        public static IDbTransaction GetCurrentTransaction(this IDbConnection connection)
+        {
+            var wrapped = connection as IWrappedConnection;
+            if (wrapped != null)
+                return wrapped.Transaction;
+
+            return null;
         }
     }
 }

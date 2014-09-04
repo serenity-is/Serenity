@@ -16,9 +16,9 @@ namespace Serenity.Services
     {
         public Int64? EntityId { get; set; }
         public RetrieveColumnSelection ColumnSelection { get; set; }
-        [JsonConverter(typeof(JsonIdentifierSetConverter))]
+        [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> IncludeColumns { get; set; }
-        [JsonConverter(typeof(JsonIdentifierSetConverter))]
+        [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> ExcludeColumns { get; set; }
     }
 }

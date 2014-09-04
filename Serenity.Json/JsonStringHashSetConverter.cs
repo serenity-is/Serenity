@@ -1,14 +1,12 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Serenity.Services
 {
     /// <summary>
     ///   Serialize/deserialize a IdentifierSet object as string</summary>
-    /// <typeparam name="T">
-    ///   Type</typeparam>
-    public class JsonIdentifierSetConverter : JsonConverter
+    public class JsonStringHashSetConverter : JsonConverter
     {
         /// <summary>
         ///   Writes the JSON representation of the object.</summary>
