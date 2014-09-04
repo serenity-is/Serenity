@@ -37,12 +37,12 @@ namespace Serenity.Test.Testing
         public void CanAddSqlInsertProperly()
         {
             var script = new DbScript();
-            script.Add(new SqlInsert(new TestRow
+            script.Add(new TestRow
             {
                 TrackAssignments = true,
                 TestId = 1,
                 Description = "Test"
-            }));
+            }.ToSqlInsert());
 
             Assert.Equal(TestSqlHelper.Normalize(
                 "DECLARE @p1 INT = 1;" + 
@@ -55,11 +55,11 @@ namespace Serenity.Test.Testing
         public void CanAddSqlUpdateProperly()
         {
             var script = new DbScript();
-            script.Add(new SqlUpdate(new TestRow
+            script.Add(new TestRow
             {
                 TestId = 1,
                 Description = "Test"
-            }));
+            }.ToSqlUpdateById());
 
             Assert.Equal(TestSqlHelper.Normalize(
                 "DECLARE @p1 NVARCHAR(4) = 'Test';" +

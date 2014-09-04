@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E5FD07EF-84B5-48C4-8640-46CDC9219AE8}</ProjectGuid>
+    <ProjectGuid>{5BB8EFD5-512C-48DC-B1F5-DD5EE13DD5D6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Serenity.Testing</RootNamespace>
-    <AssemblyName>Serenity.Testing</AssemblyName>
+    <RootNamespace>Serenity</RootNamespace>
+    <AssemblyName>Serenity.Data.FluentSql</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,55 +31,30 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbManager.cs" />
-    <Compile Include="DbScript.cs" />
-    <Compile Include="DbSettings.cs" />
-    <Compile Include="DbTestContext.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestSqlHelper.cs" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SqlScript\CreateDatabase.sql" />
+    <Compile Include="Manipulation\SqlDelete.cs" />
+    <Compile Include="Manipulation\SqlInsert.cs" />
+    <Compile Include="Manipulation\SqlUpdate.cs" />
+    <Compile Include="QueryWithParams.cs" />
+    <Compile Include="Sql\Sql.cs" />
+    <Compile Include="Sql\SqlKeywords.cs" />
+    <Compile Include="SqlQuery\SqlQuery.cs" />
+    <Compile Include="SqlQuery\SqlQuery_Clone.cs" />
+    <Compile Include="SqlQuery\SqlQuery_Entity.cs" />
+    <Compile Include="SqlQuery\SqlQuery_FullTextSearch.cs" />
+    <Compile Include="SqlQuery\SqlQuery_Join.cs" />
+    <Compile Include="SqlQuery\SqlQuery_ToString.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
-      <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
-      <Name>Serenity.Data.Entity</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Platform\Serenity.Platform.csproj">
-      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
-      <Name>Serenity.Platform</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.FluentSql\Serenity.Data.FluentSql.csproj">
-      <Project>{5bb8efd5-512c-48dc-b1f5-dd5ee13dd5d6}</Project>
-      <Name>Serenity.Data.FluentSql</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Kernel\Serenity.Core.csproj">
-      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
-      <Name>Serenity.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

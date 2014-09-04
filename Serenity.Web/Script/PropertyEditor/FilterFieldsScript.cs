@@ -8,10 +8,10 @@ namespace Serenity.Web.FilterPanel
     {
         private string _name;
         private string _scriptName;
-        private Func<IEnumerable<FilterField>> _getFields;
+        private Func<IEnumerable<IFilterField>> _getFields;
         private EventHandler _scriptChanged;
 
-        public FilterFieldsScript(string name, Func<IEnumerable<FilterField>> getFields)
+        public FilterFieldsScript(string name, Func<IEnumerable<IFilterField>> getFields)
         {
             _getFields = getFields;
             _name = name;

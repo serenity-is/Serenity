@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}</ProjectGuid>
+    <ProjectGuid>{2E232606-1FC5-4240-8519-58DB36C9A9BB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Serenity</RootNamespace>
-    <AssemblyName>Serenity.Bare</AssemblyName>
+    <AssemblyName>Serenity.Data.Mapping</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -37,6 +37,26 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoIncrementAttribute.cs" />
+    <Compile Include="ColumnAttribute.cs" />
+    <Compile Include="ConnectionKeyAttribute.cs" />
+    <Compile Include="DisplayFormatAttribute.cs" />
+    <Compile Include="ExpressionAttribute.cs" />
+    <Compile Include="FieldFlags.cs" />
+    <Compile Include="ForeignKeyAttribute.cs" />
+    <Compile Include="IdentityAttribute.cs" />
+    <Compile Include="LeftJoinAttribute.cs" />
+    <Compile Include="MinSelectLevelAttribute.cs" />
+    <Compile Include="NotNullAttribute.cs" />
+    <Compile Include="OuterApplyAttribute.cs" />
+    <Compile Include="PrimaryKeyAttribute.cs" />
+    <Compile Include="QuickSearchAttribute.cs" />
+    <Compile Include="ScaleAttribute.cs" />
+    <Compile Include="SearchType.cs" />
+    <Compile Include="SelectLevel.cs" />
+    <Compile Include="SetFlagsAttribute.cs" />
+    <Compile Include="SizeAttribute.cs" />
+    <Compile Include="TableNameAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

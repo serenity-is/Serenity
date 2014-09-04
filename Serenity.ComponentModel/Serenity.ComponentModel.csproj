@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}</ProjectGuid>
+    <ProjectGuid>{098462C1-4C1F-4623-A6E9-91BAF37DD198}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Serenity</RootNamespace>
-    <AssemblyName>Serenity.Bare</AssemblyName>
+    <AssemblyName>Serenity.ComponentModel</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -37,6 +37,25 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PropertyGrid\BasedOnRowAttribute.cs" />
+    <Compile Include="PropertyGrid\CustomEditorAttribute.cs" />
+    <Compile Include="PropertyGrid\EditorOptionAttribute.cs" />
+    <Compile Include="PropertyGrid\EditorTypeAttribute.cs" />
+    <Compile Include="PropertyGrid\EditorTypeAttributeBase.cs" />
+    <Compile Include="Common\InsertableAttribute.cs" />
+    <Compile Include="Permission\CreatePermissionAttribute.cs" />
+    <Compile Include="Permission\DeletePermissionAttribute.cs" />
+    <Compile Include="Permission\ModifyPermissionAttribute.cs" />
+    <Compile Include="Permission\OperationPermissionAttribute.cs" />
+    <Compile Include="Permission\ReadPermissionAttribute.cs" />
+    <Compile Include="Permission\UpdatePermissionAttribute.cs" />
+    <Compile Include="PropertyGrid\HiddenAttribute.cs" />
+    <Compile Include="PropertyGrid\HintAttribute.cs" />
+    <Compile Include="PropertyGrid\MaxLengthAttribute.cs" />
+    <Compile Include="PropertyGrid\OneWayAttribute.cs" />
+    <Compile Include="PropertyGrid\PlaceholderAttribute.cs" />
+    <Compile Include="PropertyGrid\RequiredAttribute.cs" />
+    <Compile Include="Common\UpdatableAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E5FD07EF-84B5-48C4-8640-46CDC9219AE8}</ProjectGuid>
+    <ProjectGuid>{7D55C2E1-B805-428E-873A-1EFB55C37DEA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Serenity.Testing</RootNamespace>
-    <AssemblyName>Serenity.Testing</AssemblyName>
+    <RootNamespace>Serenity</RootNamespace>
+    <AssemblyName>Serenity.Data.Entity</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,42 +32,56 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbManager.cs" />
-    <Compile Include="DbScript.cs" />
-    <Compile Include="DbSettings.cs" />
-    <Compile Include="DbTestContext.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestSqlHelper.cs" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SqlScript\CreateDatabase.sql" />
+    <Compile Include="AliasWithFields.cs" />
+    <Compile Include="Field.cs" />
+    <Compile Include="FieldDescriptor.cs" />
+    <Compile Include="FieldType.cs" />
+    <Compile Include="FieldTypes\BooleanField.cs" />
+    <Compile Include="FieldTypes\CustomClassField.cs" />
+    <Compile Include="FieldTypes\DateTimeField.cs" />
+    <Compile Include="FieldTypes\DecimalField.cs" />
+    <Compile Include="FieldTypes\DoubleField.cs" />
+    <Compile Include="FieldTypes\ForeignRowSetField.cs" />
+    <Compile Include="FieldTypes\GenericClassField.cs" />
+    <Compile Include="FieldTypes\GenericField.cs" />
+    <Compile Include="FieldTypes\GenericValueField.cs" />
+    <Compile Include="FieldTypes\GuidField.cs" />
+    <Compile Include="FieldTypes\Int16Field.cs" />
+    <Compile Include="FieldTypes\Int32Field.cs" />
+    <Compile Include="FieldTypes\Int64Field.cs" />
+    <Compile Include="FieldTypes\StreamField.cs" />
+    <Compile Include="FieldTypes\StringField.cs" />
+    <Compile Include="IEnumTypeField.cs" />
+    <Compile Include="IFilterFields.cs" />
+    <Compile Include="IFilterField.cs" />
+    <Compile Include="IIdField.cs" />
+    <Compile Include="JsonRowConverter.cs" />
+    <Compile Include="Row.cs" />
+    <Compile Include="RowExtensions.cs" />
+    <Compile Include="RowFieldsBase.cs" />
+    <Compile Include="Row_ComponentModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
-      <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
-      <Name>Serenity.Data.Entity</Name>
+    <ProjectReference Include="..\Serenity.ComponentModel\Serenity.ComponentModel.csproj">
+      <Project>{098462c1-4c1f-4623-a6e9-91baf37dd198}</Project>
+      <Name>Serenity.ComponentModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Platform\Serenity.Platform.csproj">
-      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
-      <Name>Serenity.Platform</Name>
+    <ProjectReference Include="..\Serenity.Data.Criteria\Serenity.Data.Criteria.csproj">
+      <Project>{394f4b53-7af2-4cdb-a217-c00cba620700}</Project>
+      <Name>Serenity.Data.Criteria</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.FluentSql\Serenity.Data.FluentSql.csproj">
-      <Project>{5bb8efd5-512c-48dc-b1f5-dd5ee13dd5d6}</Project>
-      <Name>Serenity.Data.FluentSql</Name>
+    <ProjectReference Include="..\Serenity.Data.Mapping\Serenity.Data.Mapping.csproj">
+      <Project>{2e232606-1fc5-4240-8519-58db36c9a9bb}</Project>
+      <Name>Serenity.Data.Mapping</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
@@ -75,6 +90,10 @@
     <ProjectReference Include="..\Serenity.Kernel\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
+      <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
+      <Name>Serenity.Localization</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

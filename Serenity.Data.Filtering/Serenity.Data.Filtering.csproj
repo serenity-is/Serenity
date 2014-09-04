@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E5FD07EF-84B5-48C4-8640-46CDC9219AE8}</ProjectGuid>
+    <ProjectGuid>{8029272A-7583-490E-91DB-7150980E492E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Serenity.Testing</RootNamespace>
-    <AssemblyName>Serenity.Testing</AssemblyName>
+    <RootNamespace>Serenity</RootNamespace>
+    <AssemblyName>Serenity.Data.Filtering</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,54 +32,66 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbManager.cs" />
-    <Compile Include="DbScript.cs" />
-    <Compile Include="DbSettings.cs" />
-    <Compile Include="DbTestContext.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestSqlHelper.cs" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SqlScript\CreateDatabase.sql" />
+    <Compile Include="BasicFilter.cs" />
+    <Compile Include="BasicFilterBase.cs" />
+    <Compile Include="BasicFilterExtensions.cs" />
+    <Compile Include="BasicFilterGroup.cs" />
+    <Compile Include="BasicFilterStringConverter.cs" />
+    <Compile Include="ExpressionToBasicFilter.cs" />
+    <Compile Include="FilterField.cs" />
+    <Compile Include="FilterFieldExtensions.cs" />
+    <Compile Include="FilterFields.cs" />
+    <Compile Include="FilterFieldType.cs" />
+    <Compile Include="FilterLine.cs" />
+    <Compile Include="FilterLineExtensions.cs" />
+    <Compile Include="FilterOp.cs" />
+    <Compile Include="JsonFilterLineConverter.cs" />
+    <Compile Include="LogicalOp.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Data.Criteria\Serenity.Data.Criteria.csproj">
+      <Project>{394f4b53-7af2-4cdb-a217-c00cba620700}</Project>
+      <Name>Serenity.Data.Criteria</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Platform\Serenity.Platform.csproj">
-      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
-      <Name>Serenity.Platform</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Data.FluentSql\Serenity.Data.FluentSql.csproj">
       <Project>{5bb8efd5-512c-48dc-b1f5-dd5ee13dd5d6}</Project>
       <Name>Serenity.Data.FluentSql</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.Mapping\Serenity.Data.Mapping.csproj">
+      <Project>{2e232606-1fc5-4240-8519-58db36c9a9bb}</Project>
+      <Name>Serenity.Data.Mapping</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Json\Serenity.Json.csproj">
+      <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
+      <Name>Serenity.Json</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Kernel\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
+      <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
+      <Name>Serenity.Localization</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

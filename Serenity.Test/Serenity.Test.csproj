@@ -78,25 +78,37 @@
       <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
       <Name>Serenity.Caching</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
-      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
-      <Name>Serenity.Core</Name>
+    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
+      <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
+      <Name>Serenity.Data.Entity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.DependencyResolver\Serenity.DependencyResolver.csproj">
+    <ProjectReference Include="..\Serenity.Data.Mapping\Serenity.Data.Mapping.csproj">
+      <Project>{2e232606-1fc5-4240-8519-58db36c9a9bb}</Project>
+      <Name>Serenity.Data.Mapping</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Platform\Serenity.Platform.csproj">
+      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
+      <Name>Serenity.Platform</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.FluentSql\Serenity.Data.FluentSql.csproj">
+      <Project>{5bb8efd5-512c-48dc-b1f5-dd5ee13dd5d6}</Project>
+      <Name>Serenity.Data.FluentSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Kernel\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
-      <Name>Serenity.DependencyResolver</Name>
+      <Name>Serenity.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
       <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
       <Name>Serenity.Localization</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Sql.Criteria\Serenity.Sql.Criteria.csproj">
+    <ProjectReference Include="..\Serenity.Data.Criteria\Serenity.Data.Criteria.csproj">
       <Project>{394f4b53-7af2-4cdb-a217-c00cba620700}</Project>
-      <Name>Serenity.Sql.Criteria</Name>
+      <Name>Serenity.Data.Criteria</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Sql.Interfaces\Serenity.Sql.Interfaces.csproj">
+    <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
-      <Name>Serenity.Sql.Interfaces</Name>
+      <Name>Serenity.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Testing\Serenity.Testing.csproj">
       <Project>{e5fd07ef-84b5-48c4-8640-46cdc9219ae8}</Project>
