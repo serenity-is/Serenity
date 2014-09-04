@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Serenity;
 using Serenity.Caching;
+using Serenity.Testing;
 using System;
 using System.IO;
 using System.Reflection;
@@ -9,18 +10,19 @@ namespace Serenity.Test
 {
     public class SerenityTestBase : IDisposable
     {
-        private IDisposable iocContext;
+        private MunqContext munqContext;
 
         public SerenityTestBase()
         {
-            Dependency.SetResolver(new IoC.DependencyResolver());
-            iocContext = IoC.StartContext();
-            IoC.RegisterInstance<ICache>(new HttpRuntimeCache());
+            munqContext = new MunqContext();
+            var registrar = Dependency.Resolve<IDependencyRegistrar>();
+            registrar.RegisterInstance<ICache>(new HttpRuntimeCache());
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
-            iocContext.Dispose();
+            if (munqContext != null)
+                munqContext.Dispose();
         }
     }
 }

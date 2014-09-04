@@ -23,8 +23,9 @@ namespace Serenity.Web
     {
         public static string RenderViewToString(string controlPath, ViewDataDictionary data)
         {
-            if (IoC.CanResolve<ITemplateRenderer>())
-                return IoC.Resolve<ITemplateRenderer>().Render(controlPath, data);
+            var renderer = Dependency.TryResolve<ITemplateRenderer>();
+            if (renderer != null)
+                return renderer.Render(controlPath, data);
 
             StringBuilder sb = new StringBuilder();
 

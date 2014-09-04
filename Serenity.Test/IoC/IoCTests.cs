@@ -1,5 +1,6 @@
 ﻿using Serenity.Data;
 using Serenity.Test.Testing;
+using Serenity.Testing;
 using System;
 using Xunit;
 
@@ -16,16 +17,18 @@ namespace Serenity.Test
         [Fact]
         public void IoCThrowsNullReferenceExceptionIfTestingModeAndNoContextStarted()
         {
-            Assert.Throws<NullReferenceException>(() => IoC.Resolve<ISupportAttached>());
-            Assert.Throws<NullReferenceException>(() => IoC.RegisterInstance<ISupportAttached>(new TestRow()));
+            Assert.Throws<InvalidProgramException>(() => Dependency.Resolve<ISupportAttached>());
+            Assert.Throws<InvalidProgramException>(() => Dependency.Resolve<IDependencyRegistrar>()
+                .RegisterInstance<ISupportAttached>(new TestRow()));
 
-            using (var context = IoC.StartContext())
+            using (var context = new MunqContext())
             {
-                IoC.RegisterInstance<ISupportAttached>(new TestRow());
+                Dependency.Resolve<IDependencyRegistrar>().RegisterInstance<ISupportAttached>(new TestRow());
             }
 
-            Assert.Throws<NullReferenceException>(() => IoC.Resolve<ISupportAttached>());
-            Assert.Throws<NullReferenceException>(() => IoC.RegisterInstance<ISupportAttached>(new TestRow()));
+            Assert.Throws<InvalidProgramException>(() => Dependency.Resolve<ISupportAttached>());
+            Assert.Throws<InvalidProgramException>(() => Dependency.Resolve<IDependencyRegistrar>()
+                .RegisterInstance<ISupportAttached>(new TestRow()));
         }
     }
 }

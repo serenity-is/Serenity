@@ -90,7 +90,7 @@ namespace Serenity.Reporting
                 return false;
 
             foreach (var report in reports)
-                if (IoC.Resolve<IPermissionService>().HasPermission(report.Permission))
+                if (Dependency.Resolve<IPermissionService>().HasPermission(report.Permission))
                     return true;
 
             return false;
@@ -101,7 +101,7 @@ namespace Serenity.Reporting
             EnsureTypes();
 
             var list = new List<Report>();
-            var permissionService = IoC.Resolve<IPermissionService>();
+            var permissionService = Dependency.Resolve<IPermissionService>();
 
             foreach (var k in reportsByCategory)
                 if (categoryKey.IsNullOrEmpty() ||

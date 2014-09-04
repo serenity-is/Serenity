@@ -59,7 +59,7 @@ namespace Serenity
             if (password == null)
                 throw new ArgumentNullException("password");
 
-            if (!IoC.Resolve<IUserAuthenticationService>().Validate(ref username, password))
+            if (!Dependency.Resolve<IUserAuthenticationService>().Validate(ref username, password))
                 return false;
             
             SetAuthenticationTicket(username, persist, Roles.GetRolesForUser(username));
@@ -137,7 +137,7 @@ namespace Serenity
             if (username == null)
                 throw new ArgumentNullException("username");
 
-            var user = IoC.Resolve<IUserRetrieveService>().ByUsername(username);
+            var user = Dependency.Resolve<IUserRetrieveService>().ByUsername(username);
             if (user == null)
                 return null;
             else
@@ -227,7 +227,7 @@ namespace Serenity
                 if (username.IsNullOrEmpty())
                     return null;
 
-                var user = IoC.Resolve<IUserRetrieveService>().ByUsername(username);
+                var user = Dependency.Resolve<IUserRetrieveService>().ByUsername(username);
                 if (user == null)
                     return null;
 
@@ -344,7 +344,7 @@ namespace Serenity
 
         public static bool HasPermission(string permission)
         {
-            return IoC.Resolve<IPermissionService>().HasPermission(permission);
+            return Dependency.Resolve<IPermissionService>().HasPermission(permission);
         }
 
         public static void EnsureLoggedIn(RightErrorHandling errorHandling)

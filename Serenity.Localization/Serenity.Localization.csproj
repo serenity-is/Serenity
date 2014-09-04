@@ -38,12 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ILocalTextContext.cs" />
-    <Compile Include="ILocalTextProvider.cs" />
-    <Compile Include="LocalTextEntry.cs" />
     <Compile Include="LocalTextRegistryExtensions.cs" />
     <Compile Include="LocalTextRegistry.cs" />
     <Compile Include="LocalTextPackage.cs" />
-    <Compile Include="LocalText.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">

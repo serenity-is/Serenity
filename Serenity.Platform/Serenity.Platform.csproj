@@ -46,7 +46,6 @@
     <Compile Include="Core\ContextItems.cs" />
     <Compile Include="Core\DeleteType.cs" />
     <Compile Include="Core\Helpers\PrefixHelper.cs" />
-    <Compile Include="Core\IoC.cs" />
     <Compile Include="Core\LruCache.cs" />
     <Compile Include="Core\LruCacheNode.cs" />
     <Compile Include="Core\TemporaryFileHelper.cs" />
@@ -109,21 +108,6 @@
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Extensions\WeakHashtable.cs" />
     <Compile Include="Reflection\InstanceCreator.cs" />
-    <Compile Include="IocMunq\AlwaysNewLifetime.cs" />
-    <Compile Include="IocMunq\Container.cs" />
-    <Compile Include="IocMunq\Container.Registrar.cs" />
-    <Compile Include="IocMunq\Container.Resolver.cs" />
-    <Compile Include="IocMunq\CreateInstanceDelegateFactory.cs" />
-    <Compile Include="IocMunq\IContainerFluent.cs" />
-    <Compile Include="IocMunq\IDependecyRegistrar.cs" />
-    <Compile Include="IocMunq\IDependencyResolver.cs" />
-    <Compile Include="IocMunq\ILifetimeManager.cs" />
-    <Compile Include="IocMunq\IRegistration.cs" />
-    <Compile Include="IocMunq\IRegistrationKey.cs" />
-    <Compile Include="IocMunq\NamedRegistrationKey.cs" />
-    <Compile Include="IocMunq\Registration.cs" />
-    <Compile Include="IocMunq\TypeRegistry.cs" />
-    <Compile Include="IocMunq\UnNamedRegistrationKey.cs" />
     <Compile Include="Core\IProgressManager.cs" />
     <Compile Include="Json\JsonIdentifierSetConverter.cs" />
     <Compile Include="Json\JsonSortByConverter.cs" />
@@ -256,14 +240,6 @@
       <Project>{8029272a-7583-490e-91db-7150980e492e}</Project>
       <Name>Serenity.Data.Filtering</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.FluentSql\Serenity.Data.FluentSql.csproj">
-      <Project>{5bb8efd5-512c-48dc-b1f5-dd5ee13dd5d6}</Project>
-      <Name>Serenity.Data.FluentSql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.Mapping\Serenity.Data.Mapping.csproj">
-      <Project>{2e232606-1fc5-4240-8519-58db36c9a9bb}</Project>
-      <Name>Serenity.Data.Mapping</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
@@ -276,16 +252,18 @@
       <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
       <Name>Serenity.Localization</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.Criteria\Serenity.Data.Criteria.csproj">
-      <Project>{394f4b53-7af2-4cdb-a217-c00cba620700}</Project>
-      <Name>Serenity.Data.Criteria</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Serenity.Munq\Serenity.Munq.csproj">
+      <Project>{5fbada38-f1f3-44c9-83fa-e1bf1f4d7d10}</Project>
+      <Name>Serenity.Munq</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="IocMunq\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

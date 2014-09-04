@@ -18,8 +18,9 @@
 
         public static IDependencyResolver SetResolver(IDependencyResolver value)
         {
+            var old = resolver;
             resolver = value;
-            return resolver;
+            return old;
         }
 
         public static TType TryResolve<TType>() where TType : class

@@ -27,7 +27,7 @@ namespace Serenity
             return TwoLevelCache.GetLocalStoreOnly("Settings:" + repository + ":" + key, TimeSpan.FromDays(1),
                 "Settings", () =>
             {
-                return IoC.Resolve<IConfigurationRepository>(repository)
+                return Dependency.Resolve<IConfigurationRepository>(repository)
                     .Load(settingType);
             });
         }

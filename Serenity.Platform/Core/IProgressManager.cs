@@ -35,6 +35,6 @@ namespace Serenity
         }
     }
 
-    /*IoC.Resolve<IProgressDialog>().Start((pm, data) => {
+    /*Dependency.Resolve<IProgressDialog>().Start((pm, data) => {
     });*/
 }

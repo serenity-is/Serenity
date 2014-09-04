@@ -11,7 +11,7 @@ namespace Serenity.Services
     {
         public static AuditLogListResponse List(string schema, AuditLogListRequest request)
         {
-            var fld = IoC.Resolve<IAuditLogRow>(schema);
+            var fld = Dependency.Resolve<IAuditLogRow>(schema);
 
             SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
 
@@ -293,7 +293,7 @@ namespace Serenity.Services
 
         public static void AuditInsert(IDbConnection connection, string schema, AuditSaveRequest request)
         {
-            var fld = IoC.Resolve<IAuditLogRow>(schema);
+            var fld = Dependency.Resolve<IAuditLogRow>(schema);
 
             var srcRow = (Row)request.NewEntity;
             var dstRow = srcRow.CreateNew();
@@ -360,7 +360,7 @@ namespace Serenity.Services
 
         public static Row PrepareAuditUpdate(string schema, AuditSaveRequest request)
         {
-            var fld = IoC.Resolve<IAuditLogRow>(schema);
+            var fld = Dependency.Resolve<IAuditLogRow>(schema);
 
             var data = new AuditUpdateData<Row>();
 
@@ -461,7 +461,7 @@ namespace Serenity.Services
 
         public static void AuditDelete(IDbConnection connection, string schema, AuditDeleteRequest request)
         {
-            var fld = IoC.Resolve<IAuditLogRow>(schema);
+            var fld = Dependency.Resolve<IAuditLogRow>(schema);
             var audit = ((Row)fld).CreateNew();
             audit.TrackAssignments = true;
             fld.EntityTypeIdField[audit] = request.EntityType;
@@ -478,7 +478,7 @@ namespace Serenity.Services
 
         public static void AuditUndelete(IDbConnection connection, string schema, AuditUndeleteRequest request)
         {
-            var fld = IoC.Resolve<IAuditLogRow>(schema);
+            var fld = Dependency.Resolve<IAuditLogRow>(schema);
             var audit = ((Row)fld).CreateNew();
             audit.TrackAssignments = true;
             fld.EntityTypeIdField[audit] = request.EntityType;

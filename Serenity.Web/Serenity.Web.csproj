@@ -206,10 +206,6 @@
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.Mapping\Serenity.Data.Mapping.csproj">
-      <Project>{2e232606-1fc5-4240-8519-58db36c9a9bb}</Project>
-      <Name>Serenity.Data.Mapping</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Platform\Serenity.Platform.csproj">
       <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
       <Name>Serenity.Platform</Name>

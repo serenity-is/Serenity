@@ -60,21 +60,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Data.Criteria\Serenity.Data.Criteria.csproj">
-      <Project>{394f4b53-7af2-4cdb-a217-c00cba620700}</Project>
-      <Name>Serenity.Data.Criteria</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.FluentSql\Serenity.Data.FluentSql.csproj">
-      <Project>{5bb8efd5-512c-48dc-b1f5-dd5ee13dd5d6}</Project>
-      <Name>Serenity.Data.FluentSql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.Mapping\Serenity.Data.Mapping.csproj">
-      <Project>{2e232606-1fc5-4240-8519-58db36c9a9bb}</Project>
-      <Name>Serenity.Data.Mapping</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>

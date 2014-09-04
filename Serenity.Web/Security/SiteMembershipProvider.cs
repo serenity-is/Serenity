@@ -106,7 +106,7 @@ namespace Serenity.Web.Providers
             if (String.IsNullOrEmpty(username) || username.Length > 100)
                 return null;
 
-            var user = IoC.Resolve<IUserRetrieveService>().ByUsername(username);
+            var user = Dependency.Resolve<IUserRetrieveService>().ByUsername(username);
             if (user != null)
                 return UserCacheItemToMembershipUser(user);
 
@@ -120,7 +120,7 @@ namespace Serenity.Web.Providers
 
             int userId = System.Convert.ToInt32(providerUserKey, Invariants.NumberFormat);
 
-            var user = IoC.Resolve<IUserRetrieveService>().ById(userId);
+            var user = Dependency.Resolve<IUserRetrieveService>().ById(userId);
             if (user != null)
                 return UserCacheItemToMembershipUser(user);
 
@@ -152,7 +152,7 @@ namespace Serenity.Web.Providers
                 username.Length > 100)
                 return false;
 
-            return IoC.Resolve<IUserAuthenticationService>().Validate(ref username, password);
+            return Dependency.Resolve<IUserAuthenticationService>().Validate(ref username, password);
         }
 
         public void ValidateNewPassword(string username, string newPassword, bool isNewUser)
@@ -255,7 +255,7 @@ namespace Serenity.Web.Providers
 
         public bool CheckUserExists(string username)
         {
-            return IoC.Resolve<IUserRetrieveService>().ByUsername(username) != null;
+            return Dependency.Resolve<IUserRetrieveService>().ByUsername(username) != null;
         }
 
         private string GetConfig(string name, string defaultValue)

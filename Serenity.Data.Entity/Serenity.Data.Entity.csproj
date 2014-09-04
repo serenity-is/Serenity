@@ -75,14 +75,6 @@
       <Project>{098462c1-4c1f-4623-a6e9-91baf37dd198}</Project>
       <Name>Serenity.ComponentModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.Criteria\Serenity.Data.Criteria.csproj">
-      <Project>{394f4b53-7af2-4cdb-a217-c00cba620700}</Project>
-      <Name>Serenity.Data.Criteria</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.Mapping\Serenity.Data.Mapping.csproj">
-      <Project>{2e232606-1fc5-4240-8519-58db36c9a9bb}</Project>
-      <Name>Serenity.Data.Mapping</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
@@ -99,6 +91,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

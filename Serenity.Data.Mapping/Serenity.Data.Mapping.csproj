@@ -37,28 +37,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoIncrementAttribute.cs" />
-    <Compile Include="ColumnAttribute.cs" />
-    <Compile Include="ConnectionKeyAttribute.cs" />
-    <Compile Include="DisplayFormatAttribute.cs" />
-    <Compile Include="ExpressionAttribute.cs" />
-    <Compile Include="FieldFlags.cs" />
-    <Compile Include="ForeignKeyAttribute.cs" />
-    <Compile Include="IdentityAttribute.cs" />
-    <Compile Include="LeftJoinAttribute.cs" />
-    <Compile Include="MinSelectLevelAttribute.cs" />
-    <Compile Include="NotNullAttribute.cs" />
-    <Compile Include="OuterApplyAttribute.cs" />
-    <Compile Include="PrimaryKeyAttribute.cs" />
-    <Compile Include="QuickSearchAttribute.cs" />
-    <Compile Include="ScaleAttribute.cs" />
-    <Compile Include="SearchType.cs" />
-    <Compile Include="SelectLevel.cs" />
-    <Compile Include="SetFlagsAttribute.cs" />
-    <Compile Include="SizeAttribute.cs" />
-    <Compile Include="TableNameAttribute.cs" />
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

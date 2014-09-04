@@ -48,6 +48,7 @@
     <Compile Include="DbManager.cs" />
     <Compile Include="DbScript.cs" />
     <Compile Include="DbSettings.cs" />
+    <Compile Include="DependencyContext.cs" />
     <Compile Include="DbTestContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestSqlHelper.cs" />
@@ -60,13 +61,13 @@
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Serenity.Munq\Serenity.Munq.csproj">
+      <Project>{5fbada38-f1f3-44c9-83fa-e1bf1f4d7d10}</Project>
+      <Name>Serenity.Munq</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.Platform\Serenity.Platform.csproj">
       <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
       <Name>Serenity.Platform</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data.FluentSql\Serenity.Data.FluentSql.csproj">
-      <Project>{5bb8efd5-512c-48dc-b1f5-dd5ee13dd5d6}</Project>
-      <Name>Serenity.Data.FluentSql</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>

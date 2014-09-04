@@ -37,24 +37,15 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Manipulation\SqlDelete.cs" />
-    <Compile Include="Manipulation\SqlInsert.cs" />
-    <Compile Include="Manipulation\SqlUpdate.cs" />
-    <Compile Include="QueryWithParams.cs" />
-    <Compile Include="Sql\Sql.cs" />
-    <Compile Include="Sql\SqlKeywords.cs" />
-    <Compile Include="SqlQuery\SqlQuery.cs" />
-    <Compile Include="SqlQuery\SqlQuery_Clone.cs" />
-    <Compile Include="SqlQuery\SqlQuery_Entity.cs" />
-    <Compile Include="SqlQuery\SqlQuery_FullTextSearch.cs" />
-    <Compile Include="SqlQuery\SqlQuery_Join.cs" />
-    <Compile Include="SqlQuery\SqlQuery_ToString.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Manipulation\" />
+    <Folder Include="SqlQuery\" />
+    <Folder Include="Sql\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
