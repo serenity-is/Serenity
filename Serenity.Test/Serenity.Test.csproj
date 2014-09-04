@@ -94,7 +94,7 @@
       <Project>{5bb8efd5-512c-48dc-b1f5-dd5ee13dd5d6}</Project>
       <Name>Serenity.Data.FluentSql</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Kernel\Serenity.Core.csproj">
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
     </ProjectReference>

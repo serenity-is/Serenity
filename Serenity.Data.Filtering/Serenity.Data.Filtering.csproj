@@ -84,7 +84,7 @@
       <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
       <Name>Serenity.Json</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Kernel\Serenity.Core.csproj">
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
     </ProjectReference>
