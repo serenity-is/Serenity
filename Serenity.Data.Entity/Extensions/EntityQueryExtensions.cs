@@ -1,12 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Serenity.Data
 {
-    public static class SqlRowExtensions
+    /// <summary>
+    ///   Extensions for objects implementing IDbWhere interface.</summary>
+    public static class EntityQueryExtensions
     {
+        /// <summary>
+        ///   Adds all field values in a row to where clause with equality operator and auto named parameters 
+        ///   (field name prefixed with '@').</summary>
+        /// <param field="row">
+        ///   The row with modified field values to be added to the where clause (key row).  Must be in TrackAssignments mode, 
+        ///   or an exception is raised.</param>
+        /// <returns>
+        ///   Object itself.</returns>
+        public static T WhereEqual<T>(this T self, Row row) where T : IFilterableQuery
+        {
+            if (row == null)
+                throw new ArgumentNullException("row");
+            if (!row.TrackAssignments)
+                throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
+            foreach (var field in row.GetFields())
+                if (row.IsAssigned(field))
+                    self.Where(new Criteria(field) == self.AddParam(field.AsObject(row)));
+            return self;
+        }
+
+        /// <summary>
+        ///   Sets all field values in a row with auto named parameters (field name prefixed with '@').</summary>
+        /// <param field="row">
+        ///   The row with modified field values. Must be in TrackAssignments mode, or an exception is raised.</param>
+        /// <returns>
+        ///   Object itself.</returns>
+        public static T Set<T>(this T self, Row row, IField exclude = null) where T : ISetFieldByStatement
+        {
+            if (row == null)
+                throw new ArgumentNullException("row");
+
+            if (!row.TrackAssignments)
+                throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
+
+            foreach (var field in row.GetFields())
+                if (field != exclude && row.IsAssigned(field))
+                    self.Set((IField)field, field.AsObject(row));
+
+            return self;
+        }
+
         /// <summary>
         ///   Adds actual table fields in a row to select list of a query.</summary>
         /// <param name="query">
@@ -31,7 +72,7 @@ namespace Serenity.Data
             for (int i = 0; i < row.FieldCount; i++)
             {
                 Field field = fields[i];
-                if (FieldExtensions.IsTableField(field))
+                if (EntityFieldExtensions.IsTableField(field))
                 {
                     if (excludeFields == null ||
                         !excludeFields.Contains(field))
@@ -66,7 +107,7 @@ namespace Serenity.Data
             for (int i = 0; i < row.FieldCount; i++)
             {
                 Field field = fields[i];
-                if (!FieldExtensions.IsTableField(field) &&
+                if (!EntityFieldExtensions.IsTableField(field) &&
                     (field.Flags & FieldFlags.ClientSide) != FieldFlags.ClientSide)
                 {
                     if (excludeFields == null ||
@@ -93,16 +134,15 @@ namespace Serenity.Data
 
             foreach (var field in ((Row)query.FirstIntoRow).GetFields())
             {
-                if (!FieldExtensions.IsTableField(field) &&
+                if (!EntityFieldExtensions.IsTableField(field) &&
                     (field.Flags & FieldFlags.ClientSide) != FieldFlags.ClientSide)
                 {
                     query.Select(field);
                 }
             }
 
-            return query;            
+            return query;
         }
-
 
         /// <summary>
         ///   Adds actual table fields in a row to select list of a query.</summary>
@@ -116,7 +156,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("query");
             return SelectTableFields(query, (Row)query.FirstIntoRow, exclude);
         }
-        
+
         public static SqlQuery EnsureAllForeignJoins(this SqlQuery query, Row row)
         {
             foreach (var field in row.GetFields())
@@ -124,5 +164,6 @@ namespace Serenity.Data
                     query.EnsureJoinOf(field);
             return query;
         }
+
     }
 }

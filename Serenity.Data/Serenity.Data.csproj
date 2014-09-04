@@ -39,6 +39,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Connections\DataReaderExtensions.cs" />
     <Compile Include="Connections\IUnitOfWork.cs" />
     <Compile Include="Connections\IWrappedConnection.cs" />
     <Compile Include="Connections\UnitOfWork.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Mapping\FieldFlags.cs" />
     <Compile Include="Mapping\ForeignKeyAttribute.cs" />
     <Compile Include="Mapping\IdentityAttribute.cs" />
+    <Compile Include="Mapping\InstanceNameAttribute.cs" />
     <Compile Include="Mapping\LeftJoinAttribute.cs" />
     <Compile Include="Mapping\MinSelectLevelAttribute.cs" />
     <Compile Include="Mapping\NotNullAttribute.cs" />
@@ -78,12 +80,18 @@
     <Compile Include="Mapping\SetFlagsAttribute.cs" />
     <Compile Include="Mapping\SizeAttribute.cs" />
     <Compile Include="Mapping\TableNameAttribute.cs" />
+    <Compile Include="Mapping\TwoLevelCachedAttribute.cs" />
+    <Compile Include="QueryExtensions\FilterableQueryExtensions.cs" />
+    <Compile Include="QueryExtensions\QueryWithParamsExtensions.cs" />
+    <Compile Include="QueryExtensions\SetFieldByStatementExtensions.cs" />
     <Compile Include="QueryModel\QueryWithParams.cs" />
+    <Compile Include="SqlHelpers\Dapper.cs" />
     <Compile Include="SqlHelpers\Sql.cs" />
     <Compile Include="FluentSql\SqlDelete.cs" />
     <Compile Include="FluentSql\SqlInsert.cs" />
     <Compile Include="FluentSql\SqlKeywords.cs" />
     <Compile Include="FluentSql\SqlUpdate.cs" />
+    <Compile Include="SqlHelpers\SqlCommandDumper.cs" />
     <Compile Include="SqlHelpers\SqlConversions.cs" />
     <Compile Include="SqlHelpers\SqlDebugDumper.cs" />
     <Compile Include="SqlHelpers\SqlDialectExtensions.cs" />
@@ -108,6 +116,7 @@
     <Compile Include="Join\OuterApply.cs" />
     <Compile Include="Join\RightJoin.cs" />
     <Compile Include="QueryModel\Parameter.cs" />
+    <Compile Include="SqlHelpers\SqlHelper.cs" />
     <Compile Include="SqlHelpers\SqlSyntax.cs" />
     <Compile Include="SqlHelpers\SqlDialect.cs" />
     <Compile Include="SqlHelpers\SqlSettings.cs" />

@@ -3,7 +3,7 @@ using System;
 
 namespace Serenity
 {
-    public static class TwoLevelCacheExtensions
+    public static class EntityCacheExtensions
     {
         public static void ChangeGlobalGeneration(Row row)
         {

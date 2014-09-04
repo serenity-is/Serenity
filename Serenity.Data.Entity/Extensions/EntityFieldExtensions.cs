@@ -6,7 +6,7 @@ namespace Serenity.Data
 {
     /// <summary>
     ///   Contains static extension methods for DbField and Meta objects.</summary>
-    public static class FieldExtensions
+    public static class EntityFieldExtensions
     {
         private const FieldFlags NonTableFieldFlags =
             FieldFlags.ClientSide | FieldFlags.Foreign | FieldFlags.Calculated | FieldFlags.Reflective;
@@ -64,12 +64,6 @@ namespace Serenity.Data
             return tableFields;
         }
 
-        public static TRequest IncludeField<TRequest>(this TRequest request, Field field) where TRequest : IIncludeExcludeColumns
-        {
-            request.IncludeColumns = request.IncludeColumns ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            request.IncludeColumns.Add(field.PropertyName ?? field.Name);
-            return request;
-        }
 
         public static void AutoTrim(this Field field, Row row)
         {

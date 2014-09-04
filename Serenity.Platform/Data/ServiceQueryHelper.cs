@@ -4,7 +4,7 @@ using Serenity.Data;
 
 namespace Serenity.Services
 {
-    public static class QueryHelper
+    public static class ServiceQueryHelper
     {
         public static SqlQuery ApplySort(this SqlQuery query, string sort, bool descending)
         {

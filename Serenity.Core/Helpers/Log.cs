@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Text;
 using Serenity.Data;
+using Serenity.Services;
 
 namespace Serenity
 {
@@ -22,7 +23,13 @@ namespace Serenity
         {
             try
             {
-                var settings = JSON.ParseTolerant<LogSettings>(ConfigurationManager.AppSettings["Logging"].TrimToNull() ?? "{}");
+                LogSettings settings = null;
+
+                var configRepository = Dependency.TryResolve<IConfigurationRepository>();
+                if (configRepository != null)
+                    settings = configRepository.Load(typeof (LogSettings)) as LogSettings;
+
+                settings = settings ?? new LogSettings();
                 _level = settings.Level;
                 _file = settings.File;
                 _queue = new List<string>();
@@ -35,8 +42,10 @@ namespace Serenity
             }
             catch (Exception ex)
             {
-                ex.Log();
                 _level = LoggingLevel.Off;
+                var exceptionLogger = Dependency.TryResolve<IExceptionLogger>();
+                if (exceptionLogger != null)
+                    exceptionLogger.Log(ex);
             }
         }
 
@@ -111,7 +120,7 @@ namespace Serenity
                         if (_stream == null || _writerDate != DateTime.Today)
                         {
                             _writerDate = DateTime.Today;
-                            string newFile = String.Format(_file, _writerDate.ToString("yyyyMMdd"), TemporaryFileHelper.RandomFileCode());
+                            string newFile = String.Format(_file, _writerDate.ToString("yyyyMMdd"), RandomFileCode());
 
                             Directory.CreateDirectory(Path.GetDirectoryName(newFile));
 
@@ -195,6 +204,20 @@ namespace Serenity
         public static void Error(string message)
         {
             Write(LoggingLevel.Error, message);
+        }
+
+        /// <summary>
+        ///   Gets a 13 character random code that can be used safely in a filename</summary>
+        /// <returns>
+        ///   A random code.</returns>
+        public static string RandomFileCode()
+        {
+            Guid guid = Guid.NewGuid();
+            var guidBytes = guid.ToByteArray();
+            var eightBytes = new byte[8];
+            for (int i = 0; i < 8; i++)
+                eightBytes[i] = (byte)(guidBytes[i] ^ guidBytes[i + 8]);
+            return Base32.Encode(eightBytes);
         }
 
         private class LogSettings

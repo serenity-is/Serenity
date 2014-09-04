@@ -35,10 +35,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dependency\IDependecyRegistrar.cs" />
+    <Compile Include="Helpers\Base32.cs" />
+    <Compile Include="Helpers\ExceptionExtensions.cs" />
     <Compile Include="Helpers\DateElementOrder.cs" />
     <Compile Include="Helpers\DateHelper.cs" />
     <Compile Include="Dependency\Dependency.cs" />
     <Compile Include="Dependency\IDependencyResolver.cs" />
+    <Compile Include="Helpers\EnumMapper.cs" />
+    <Compile Include="Helpers\Log.cs" />
+    <Compile Include="Interface\ExceptionLog.cs" />
+    <Compile Include="Interface\IExceptionLogger.cs" />
+    <Compile Include="Interface\LoggingLevel.cs" />
+    <Compile Include="Interface\IConfigurationRepository.cs" />
+    <Compile Include="Interface\ValidationError.cs" />
     <Compile Include="Localization\ILocalTextProvider.cs" />
     <Compile Include="Helpers\Invariants.cs" />
     <Compile Include="Interface\ISupportAttached.cs" />

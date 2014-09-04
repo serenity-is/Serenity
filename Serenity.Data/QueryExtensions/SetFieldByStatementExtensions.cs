@@ -34,31 +34,10 @@ namespace Serenity.Data
         ///   Parameter value</param>
         /// <returns>
         ///   Object itself.</returns>
-        public static T Set<T>(this T self, Field field, object value) where T : ISetFieldByStatement
+        public static T Set<T>(this T self, IField field, object value) where T : ISetFieldByStatement
         {
             var param = self.AddParam(value);
             self.SetTo(field.Name, param.Name);
-            return self;
-        }
-
-        /// <summary>
-        ///   Sets all field values in a row with auto named parameters (field name prefixed with '@').</summary>
-        /// <param field="row">
-        ///   The row with modified field values. Must be in TrackAssignments mode, or an exception is raised.</param>
-        /// <returns>
-        ///   Object itself.</returns>
-        public static T Set<T>(this T self, Row row, Field exclude = null) where T : ISetFieldByStatement
-        {
-            if (row == null)
-                throw new ArgumentNullException("row");
-
-            if (!row.TrackAssignments)
-                throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
-
-            foreach (var field in row.GetFields())
-                if (field != exclude && row.IsAssigned(field))
-                    Set(self, field, field.AsObject(row));
-
             return self;
         }
     }

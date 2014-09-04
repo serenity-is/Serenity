@@ -43,6 +43,8 @@
     <Compile Include="DistributedCache.cs" />
     <Compile Include="DistributedCacheEmulator.cs" />
     <Compile Include="IDistributedCache.cs" />
+    <Compile Include="LruCache\LruCache.cs" />
+    <Compile Include="LruCache\LruCacheNode.cs" />
     <Compile Include="TwoLevelCache.cs" />
     <Compile Include="LocalCache.cs" />
     <Compile Include="ICache.cs" />

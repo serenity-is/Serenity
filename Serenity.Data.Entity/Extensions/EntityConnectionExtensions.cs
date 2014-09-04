@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Serenity.Data
 {
-    public static class SqlConnectionExtensions
+    public static class EntityConnectionExtensions
     {
         public static TRow ById<TRow>(this IDbConnection connection, Int64 id)
             where TRow: Row, IIdRow, new()

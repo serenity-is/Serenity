@@ -42,38 +42,22 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Extensions\TwoLevelCacheExtensions.cs" />
     <Compile Include="Core\ContextItems.cs" />
     <Compile Include="Core\DeleteType.cs" />
-    <Compile Include="Core\Helpers\PrefixHelper.cs" />
-    <Compile Include="Core\LruCache.cs" />
-    <Compile Include="Core\LruCacheNode.cs" />
+    <Compile Include="Core\PrefixHelper.cs" />
     <Compile Include="Core\TemporaryFileHelper.cs" />
-    <Compile Include="Data\CustomField\ICustomFieldDefinition.cs" />
-    <Compile Include="Data\CustomField\CustomFieldCache.cs" />
-    <Compile Include="Data\CustomField\CustomFieldExtensions.cs" />
-    <Compile Include="Data\CustomField\ICustomFieldListService.cs" />
-    <Compile Include="Data\CustomField\CustomFieldType.cs" />
-    <Compile Include="Data\EnumMapper.cs" />
-    <Compile Include="Core\Helpers\DictionaryHelper.cs" />
-    <Compile Include="Data\Encoding\Base32.cs" />
-    <Compile Include="Data\Extensions\FieldExtensions.cs" />
-    <Compile Include="Data\Extensions\DataReaderExtensions.cs" />
-    <Compile Include="Data\Extensions\FilterableQueryExtensions.cs" />
-    <Compile Include="Data\Extensions\QueryWithParamsExtensions.cs" />
-    <Compile Include="Data\Extensions\SetFieldByStatementExtensions.cs" />
-    <Compile Include="Core\Helpers\DeltaLister.cs" />
-    <Compile Include="Data\Sql\Helpers\SqlConnectionExtensions.cs" />
-    <Compile Include="Data\Field\TwoLevelCached.cs" />
-    <Compile Include="Data\Field\SchemaChangeSource.cs" />
-    <Compile Include="Data\Field\InstanceNameAttribute.cs" />
-    <Compile Include="Data\Field\RowRegistry.cs" />
-    <Compile Include="Core\Helpers\GroupingHelper.cs" />
-    <Compile Include="Data\Index\DbIndex.cs" />
-    <Compile Include="Data\Index\DbIndexFlags.cs" />
-    <Compile Include="Data\Index\IndexMatch.cs" />
-    <Compile Include="Data\Index\TreeDictionary.cs" />
-    <Compile Include="Data\Index\TreeIndex.cs" />
+    <Compile Include="CustomField\ICustomFieldDefinition.cs" />
+    <Compile Include="CustomField\CustomFieldCache.cs" />
+    <Compile Include="CustomField\CustomFieldExtensions.cs" />
+    <Compile Include="CustomField\ICustomFieldListService.cs" />
+    <Compile Include="CustomField\CustomFieldType.cs" />
+    <Compile Include="Core\DictionaryHelper.cs" />
+    <Compile Include="Data\EntityCacheExtensions.cs" />
+    <Compile Include="Data\ServiceRequestExtensions.cs" />
+    <Compile Include="Core\DeltaLister.cs" />
+    <Compile Include="Core\GroupingHelper.cs" />
+    <Compile Include="Data\RowRegistry.cs" />
+    <Compile Include="Data\SchemaChangeSource.cs" />
     <Compile Include="Reflection\CloneHelper.cs" />
     <Compile Include="Reflection\CodeGeneration\CodeWriter.cs" />
     <Compile Include="Reflection\CodeGeneration\EditorTypeGenerator.cs" />
@@ -84,15 +68,7 @@
     <Compile Include="Reflection\TypeAccessor.cs" />
     <Compile Include="Reflection\VisitedGraph.cs" />
     <Compile Include="Services\CaptureLog\ICaptureLogRow.cs" />
-    <Compile Include="Data\Sql\Helpers\IDisplayOrderRow.cs" />
-    <Compile Include="Data\Interface\IIdRow.cs" />
-    <Compile Include="Data\Interface\IIsActiveRow.cs" />
-    <Compile Include="Data\Interface\ILoggingRow.cs" />
-    <Compile Include="Data\Interface\INameRow.cs" />
-    <Compile Include="Data\Interface\IParentIdRow.cs" />
-    <Compile Include="Data\Json\JsonStringRawConverter.cs" />
-    <Compile Include="Data\Sql\Helpers\SqlCommandDumper.cs" />
-    <Compile Include="Data\Sql\Query\Dapper.cs" />
+    <Compile Include="Data\JsonStringRawConverter.cs" />
     <Compile Include="Extensions\MethodChainingExtensions.cs" />
     <Compile Include="Media\ImageScaleMode.cs" />
     <Compile Include="PropertyGrid\PropertyItem.cs" />
@@ -109,9 +85,6 @@
     <Compile Include="Reflection\InstanceCreator.cs" />
     <Compile Include="Core\IProgressManager.cs" />
     <Compile Include="Services\JsonSortByConverter.cs" />
-    <Compile Include="Logging\ExceptionLog.cs" />
-    <Compile Include="Logging\Log.cs" />
-    <Compile Include="Logging\LoggingLevel.cs" />
     <Compile Include="Media\ImageChecker.cs" />
     <Compile Include="Media\ImageCheckResult.cs" />
     <Compile Include="Media\MP3Checker.cs" />
@@ -192,13 +165,9 @@
     <Compile Include="Services\SaveRequestHandler.cs" />
     <Compile Include="Services\Settings\Settings.cs" />
     <Compile Include="Services\Settings\FormatHelper.cs" />
-    <Compile Include="Services\Settings\IConfigurationRepository.cs" />
     <Compile Include="Core\SilentException.cs" />
-    <Compile Include="Data\Sql\Helpers\DisplayOrderHelper.cs" />
-    <Compile Include="Data\Sql\Helpers\BoundTableHelper.cs" />
-    <Compile Include="Data\Sql\Helpers\QueryHelper.cs" />
-    <Compile Include="Data\Sql\Helpers\SqlHelper.cs" />
-    <Compile Include="Data\Sql\Helpers\SqlRowExtensions.cs" />
+    <Compile Include="Data\DisplayOrderHelper.cs" />
+    <Compile Include="Data\ServiceQueryHelper.cs" />
     <Compile Include="Services\Validation\ValidationContext.cs" />
     <Compile Include="Services\Validation\ICustomValidator.cs" />
     <Compile Include="Texts\Texts.Controls.cs" />
@@ -208,7 +177,6 @@
     <Compile Include="Services\TimeUnit\TimeUnit.cs" />
     <Compile Include="Services\TimeUnit\TimeUnitConsts.cs" />
     <Compile Include="Services\Validation\DataValidation.cs" />
-    <Compile Include="Services\Validation\ValidationError.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -255,7 +223,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Data\Sql\Transaction\" />
+    <Folder Include="Logging\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

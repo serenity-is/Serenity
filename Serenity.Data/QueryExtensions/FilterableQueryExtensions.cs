@@ -17,7 +17,7 @@ namespace Serenity.Data
         ///   Filter</param>
         /// <returns>
         ///   Query itself.</returns>
-        public static T Where<T>(this T self, ICriteria filter) where T: IFilterableQuery
+        public static T Where<T>(this T self, ICriteria filter) where T : IFilterableQuery
         {
             if (!ReferenceEquals(null, filter) && !filter.IsEmpty)
             {
@@ -35,29 +35,9 @@ namespace Serenity.Data
         ///   Parameter value</param>
         /// <returns>
         ///   The new filter parameter.</returns>
-        public static T WhereEqual<T>(this T self, Field field, object value) where T : IFilterableQuery
+        public static T WhereEqual<T>(this T self, IField field, object value) where T : IFilterableQuery
         {
             self.Where(new Criteria(field) == self.AddParam(value));
-            return self;
-        }
-
-        /// <summary>
-        ///   Adds all field values in a row to where clause with equality operator and auto named parameters 
-        ///   (field name prefixed with '@').</summary>
-        /// <param field="row">
-        ///   The row with modified field values to be added to the where clause (key row).  Must be in TrackAssignments mode, 
-        ///   or an exception is raised.</param>
-        /// <returns>
-        ///   Object itself.</returns>
-        public static T WhereEqual<T>(this T self, Row row) where T : IFilterableQuery
-        {
-            if (row == null)
-                throw new ArgumentNullException("row");
-            if (!row.TrackAssignments)
-                throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
-            foreach (var field in row.GetFields())
-                if (row.IsAssigned(field))
-                    self.Where(new Criteria(field) == self.AddParam(field.AsObject(row)));
             return self;
         }
     }

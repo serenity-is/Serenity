@@ -42,6 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AliasWithFields.cs" />
+    <Compile Include="Extensions\EntityQueryExtensions.cs" />
+    <Compile Include="Extensions\EntityConnectionExtensions.cs" />
+    <Compile Include="Extensions\EntityFieldExtensions.cs" />
+    <Compile Include="Extensions\EntitySqlHelper.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="FieldDescriptor.cs" />
     <Compile Include="FieldType.cs" />
@@ -60,10 +64,16 @@
     <Compile Include="FieldTypes\Int64Field.cs" />
     <Compile Include="FieldTypes\StreamField.cs" />
     <Compile Include="FieldTypes\StringField.cs" />
+    <Compile Include="IDisplayOrderRow.cs" />
     <Compile Include="IEnumTypeField.cs" />
     <Compile Include="IFilterFields.cs" />
     <Compile Include="IFilterField.cs" />
     <Compile Include="IIdField.cs" />
+    <Compile Include="IIdRow.cs" />
+    <Compile Include="IIsActiveRow.cs" />
+    <Compile Include="ILoggingRow.cs" />
+    <Compile Include="INameRow.cs" />
+    <Compile Include="IParentIdRow.cs" />
     <Compile Include="JsonRowConverter.cs" />
     <Compile Include="Row.cs" />
     <Compile Include="RowExtensions.cs" />
@@ -82,10 +92,6 @@
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
-      <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
-      <Name>Serenity.Localization</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
