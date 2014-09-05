@@ -200,17 +200,9 @@
     <None Include="Style\serenity.toolbuttons.less" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Caching\Serenity.Caching.csproj">
-      <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
-      <Name>Serenity.Caching</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.CodeGeneration\Serenity.CodeGeneration.csproj">
       <Project>{880cec07-a629-44d3-a79d-5b138967e1c4}</Project>
       <Name>Serenity.CodeGeneration</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.ComponentModel\Serenity.ComponentModel.csproj">
-      <Project>{098462c1-4c1f-4623-a6e9-91baf37dd198}</Project>
-      <Name>Serenity.ComponentModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
@@ -227,10 +219,6 @@
     <ProjectReference Include="..\Serenity.Json\Serenity.Json.csproj">
       <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
       <Name>Serenity.Json</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
-      <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
-      <Name>Serenity.Localization</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
       <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>

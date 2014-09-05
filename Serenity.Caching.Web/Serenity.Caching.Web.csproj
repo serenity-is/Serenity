@@ -41,9 +41,9 @@
     <Compile Include="HttpRuntimeCache.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Caching\Serenity.Caching.csproj">
-      <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
-      <Name>Serenity.Caching</Name>
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

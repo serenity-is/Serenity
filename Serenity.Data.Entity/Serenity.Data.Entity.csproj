@@ -89,10 +89,6 @@
     <Compile Include="Row_ComponentModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.ComponentModel\Serenity.ComponentModel.csproj">
-      <Project>{098462c1-4c1f-4623-a6e9-91baf37dd198}</Project>
-      <Name>Serenity.ComponentModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>

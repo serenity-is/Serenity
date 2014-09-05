@@ -37,19 +37,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CacheExpiration.cs" />
-    <Compile Include="CacheCompression.cs" />
-    <Compile Include="CacheSerialization.cs" />
-    <Compile Include="DistributedCache.cs" />
-    <Compile Include="DistributedCacheEmulator.cs" />
-    <Compile Include="IDistributedCache.cs" />
-    <Compile Include="LruCache\LruCache.cs" />
-    <Compile Include="LruCache\LruCacheNode.cs" />
-    <Compile Include="TwoLevelCache.cs" />
-    <Compile Include="LocalCache.cs" />
-    <Compile Include="ICache.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>

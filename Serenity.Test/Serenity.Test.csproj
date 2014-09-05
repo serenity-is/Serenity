@@ -75,10 +75,6 @@
       <Project>{cebb3cf6-8eed-4f6d-b29b-0ea5ff06faf4}</Project>
       <Name>Serenity.Caching.Web</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Caching\Serenity.Caching.csproj">
-      <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
-      <Name>Serenity.Caching</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
@@ -90,10 +86,6 @@
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
-      <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
-      <Name>Serenity.Localization</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>

@@ -76,10 +76,6 @@
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
-      <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
-      <Name>Serenity.Localization</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

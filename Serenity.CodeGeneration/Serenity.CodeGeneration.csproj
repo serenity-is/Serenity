@@ -46,10 +46,6 @@
     <Compile Include="ScriptDtoGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.ComponentModel\Serenity.ComponentModel.csproj">
-      <Project>{098462c1-4c1f-4623-a6e9-91baf37dd198}</Project>
-      <Name>Serenity.ComponentModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
