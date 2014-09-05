@@ -6,7 +6,7 @@ using System.ComponentModel;
 using Newtonsoft.Json;
 using Serenity.ComponentModel;
 
-namespace Serenity
+namespace Serenity.ComponentModel
 {
     public class PropertyItem
     {

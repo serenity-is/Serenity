@@ -54,12 +54,9 @@
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Json\Serenity.Json.csproj">
-      <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
-      <Name>Serenity.Json</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

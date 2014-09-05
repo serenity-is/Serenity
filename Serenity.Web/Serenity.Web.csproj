@@ -95,11 +95,11 @@
     <Compile Include="Script\PropertyEditor\EmailEditorAttribute.cs" />
     <Compile Include="Script\PropertyEditor\EditorTypes.cs" />
     <Compile Include="Script\ScriptEndpointGenerator.cs" />
-    <Compile Include="Script\ScriptFormGenerator.cs" />
     <Compile Include="Mvc\ServiceAuthorizeFilter.cs" />
     <Compile Include="Script\DynamicScriptTypes\DataScript.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Script\ScriptFormGenerator.cs" />
     <Compile Include="Security\WebSecurityHelper.cs" />
     <Compile Include="Texts\Texts.Controls.cs" />
     <Compile Include="Texts\Texts.cs" />
@@ -115,7 +115,6 @@
     <Compile Include="Upload\ThumbnailGenerator.cs" />
     <Compile Include="Upload\ImageScaleMode.cs" />
     <Compile Include="Upload\UploadHelper.cs" />
-    <Compile Include="Content\UrlHelper.cs" />
     <Compile Include="MvcFakes\FakeController.cs" />
     <Compile Include="MvcFakes\FakeControllerContext.cs" />
     <Compile Include="MvcFakes\FakeHttpContext.cs" />
@@ -123,10 +122,9 @@
     <Compile Include="MvcFakes\FakeHttpSessionState.cs" />
     <Compile Include="MvcFakes\FakeIdentity.cs" />
     <Compile Include="MvcFakes\FakePrincipal.cs" />
-    <Compile Include="Mvc\AuditLogController.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
     <Compile Include="Mvc\TokenAuthorizeFilter.cs" />
-    <Compile Include="Mvc\DtoFilter.cs" />
+    <Compile Include="Mvc\DtoActionResult.cs" />
     <Compile Include="Mvc\EndpointExtensions.cs" />
     <Compile Include="Mvc\JsonFilter.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
@@ -140,7 +138,6 @@
     <Compile Include="Script\DynamicScriptTypes\LocalInitScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\LocalTextScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\DbLookupScript.cs" />
-    <Compile Include="Script\PropertyEditor\CssClassAttribute.cs" />
     <Compile Include="Script\PropertyEditor\FilterFieldsScript.cs" />
     <Compile Include="Script\PropertyEditor\FormScript.cs" />
     <Compile Include="Script\PropertyEditor\ICustomizedFormScript.cs" />
@@ -148,8 +145,6 @@
     <Compile Include="Script\DynamicScriptTypes\RegisteredScripts.cs" />
     <Compile Include="Script\ScriptBundleManager.cs" />
     <Compile Include="Script\DynamicScriptTypes\TemplateScript.cs" />
-    <Compile Include="Security\ImpersonalizationHelper.cs" />
-    <Compile Include="Security\NetMappingHelper.cs" />
     <Compile Include="Security\SiteMembershipProvider.cs" />
     <Compile Include="Security\SiteRoleProvider.cs" />
     <Compile Include="Mvc\Throttling.cs" />
@@ -215,10 +210,6 @@
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Json\Serenity.Json.csproj">
-      <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
-      <Name>Serenity.Json</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
       <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>

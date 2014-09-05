@@ -88,8 +88,7 @@ namespace Serenity.Web
                         if (sourceFile.IsNullOrEmpty())
                             continue;
 
-                        string sourceUrl = 
-                            UrlHelper.ResolveUrl(sourceFile);
+                        string sourceUrl = VirtualPathUtility.ToAbsolute(sourceFile);
                         if (sourceUrl.IsNullOrEmpty())
                             continue;
 
@@ -148,7 +147,7 @@ namespace Serenity.Web
             if (scriptUrl.IsNullOrEmpty())
                 return scriptUrl;
 
-            scriptUrl = UrlHelper.ResolveUrl(scriptUrl);
+            scriptUrl = VirtualPathUtility.ToAbsolute(scriptUrl);
 
             Initialize();
 
@@ -160,7 +159,7 @@ namespace Serenity.Web
                 return scriptUrl;
 
             string include = DynamicScriptManager.GetScriptInclude("Bundle." + bundleKey);
-            return UrlHelper.ResolveUrl("~/DynJS.axd/" + include);
+            return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + include);
         }
     }
 }

@@ -64,7 +64,7 @@ namespace Serenity.Web
                 Hashtable.Synchronized(hashByContentPath)[contentPath] = hash;
             }
 
-            return UrlHelper.ResolveUrl(contentUrl) + "?v=" + (string)hash;
+            return VirtualPathUtility.ToAbsolute(contentUrl) + "?v=" + (string)hash;
         }
     }
 }

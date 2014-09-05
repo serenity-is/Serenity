@@ -2,7 +2,7 @@
 using System.IO;
 using System;
 
-namespace Serenity.Services
+namespace Serenity
 {
     public static class UriHelper
     {
@@ -26,8 +26,19 @@ namespace Serenity.Services
             if (fileName == null)
                 throw new ArgumentNullException("fileName");
 
-            if (url == null || url.Length == 0)
+            if (url == null)
+                throw new ArgumentNullException("url");
+
+            if (fileName.Contains(".."))
+                throw new ArgumentOutOfRangeException("fileName");
+
+            if (url.Contains(".."))
+                throw new ArgumentOutOfRangeException("url");
+
+            if (url.Length == 0)
+            {
                 return fileName;
+            }
             else if (url.Length > 0 && url[url.Length - 1] == '/')
             {
                 if (fileName.Length > 0 && fileName[0] == '/')
@@ -36,7 +47,9 @@ namespace Serenity.Services
                     return url + fileName;
             }
             else if (fileName.Length > 0 && fileName[0] == '/')
+            {
                 return url + fileName;
+            }
             else
                 return url + "/" + fileName;
         }

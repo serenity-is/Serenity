@@ -49,12 +49,9 @@
     <Compile Include="RequestHandlers\IntegratedFeatures\DisplayOrder\DisplayOrderFilterHelper.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\DisplayOrder\DisplayOrderHelper.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\Validation\DataValidation.cs" />
-    <Compile Include="RequestHandlers\IntegratedFeatures\Validation\ICustomValidator.cs" />
     <Compile Include="RequestHandlers\Helpers\PrefixHelper.cs" />
-    <Compile Include="RequestHandlers\IntegratedFeatures\Validation\RowValidationContext.cs" />
     <Compile Include="RequestHandlers\Behaviours\SaveRequestBehaviourAttribute.cs" />
     <Compile Include="RequestHandlers\Helpers\ServiceHelper.cs" />
-    <Compile Include="RequestHandlers\IntegratedFeatures\Validation\ValidationContext.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditDeleteRequest.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditFileFieldInfo.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditLogAttribute.cs" />
@@ -113,10 +110,6 @@
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Json\Serenity.Json.csproj">
-      <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
-      <Name>Serenity.Json</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

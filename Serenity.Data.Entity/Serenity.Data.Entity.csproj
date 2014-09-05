@@ -41,7 +41,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AliasWithFields.cs" />
+    <Compile Include="Extensions\AliasWithFields.cs" />
     <Compile Include="CustomFields\CustomFieldCache.cs" />
     <Compile Include="CustomFields\CustomFieldExtensions.cs" />
     <Compile Include="CustomFields\CustomFieldType.cs" />
@@ -53,9 +53,9 @@
     <Compile Include="Extensions\EntityFieldExtensions.cs" />
     <Compile Include="Extensions\EntitySqlHelper.cs" />
     <Compile Include="Extensions\EntityLocalTexts.cs" />
-    <Compile Include="Field.cs" />
-    <Compile Include="FieldDescriptor.cs" />
-    <Compile Include="FieldType.cs" />
+    <Compile Include="FieldTypes\Field.cs" />
+    <Compile Include="Extensions\FieldDescriptor.cs" />
+    <Compile Include="FieldTypes\FieldType.cs" />
     <Compile Include="FieldTypes\BooleanField.cs" />
     <Compile Include="FieldTypes\CustomClassField.cs" />
     <Compile Include="FieldTypes\DateTimeField.cs" />
@@ -71,23 +71,23 @@
     <Compile Include="FieldTypes\Int64Field.cs" />
     <Compile Include="FieldTypes\StreamField.cs" />
     <Compile Include="FieldTypes\StringField.cs" />
-    <Compile Include="IDisplayOrderRow.cs" />
-    <Compile Include="IEnumTypeField.cs" />
-    <Compile Include="IFilterFields.cs" />
-    <Compile Include="IFilterField.cs" />
-    <Compile Include="IIdField.cs" />
-    <Compile Include="IIdRow.cs" />
-    <Compile Include="IIsActiveRow.cs" />
-    <Compile Include="ILoggingRow.cs" />
-    <Compile Include="INameRow.cs" />
-    <Compile Include="IParentIdRow.cs" />
-    <Compile Include="JsonRowConverter.cs" />
-    <Compile Include="PropertyGrid\PropertyItem.cs" />
-    <Compile Include="Row.cs" />
-    <Compile Include="RowExtensions.cs" />
-    <Compile Include="RowFieldsBase.cs" />
-    <Compile Include="RowRegistry.cs" />
-    <Compile Include="Row_ComponentModel.cs" />
+    <Compile Include="Contracts\IDisplayOrderRow.cs" />
+    <Compile Include="FieldTypes\IEnumTypeField.cs" />
+    <Compile Include="Contracts\IFilterFields.cs" />
+    <Compile Include="Contracts\IFilterField.cs" />
+    <Compile Include="Contracts\IIdField.cs" />
+    <Compile Include="Contracts\IIdRow.cs" />
+    <Compile Include="Contracts\IIsActiveRow.cs" />
+    <Compile Include="Contracts\ILoggingRow.cs" />
+    <Compile Include="Contracts\INameRow.cs" />
+    <Compile Include="Contracts\IParentIdRow.cs" />
+    <Compile Include="Row\JsonRowConverter.cs" />
+    <Compile Include="Row\RowValidationContext.cs" />
+    <Compile Include="Row\Row.cs" />
+    <Compile Include="Extensions\RowExtensions.cs" />
+    <Compile Include="Row\RowFieldsBase.cs" />
+    <Compile Include="Row\RowRegistry.cs" />
+    <Compile Include="Row\Row_ComponentModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">

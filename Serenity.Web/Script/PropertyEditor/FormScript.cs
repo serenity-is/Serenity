@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Serenity.Data;
 using Serenity.Web.PropertyEditor;
 using Serenity.Reflection;
+using Serenity.ComponentModel;
 
 namespace Serenity.Web
 {

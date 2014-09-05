@@ -122,6 +122,8 @@
     <Compile Include="SqlHelpers\SqlDialect.cs" />
     <Compile Include="SqlHelpers\SqlSettings.cs" />
     <Compile Include="Utility\DeltaLister.cs" />
+    <Compile Include="Validation\ICustomValidator.cs" />
+    <Compile Include="Validation\ValidationContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
