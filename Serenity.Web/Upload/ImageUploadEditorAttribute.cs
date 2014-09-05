@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Serenity.ComponentModel
 {
-    public partial class ImageUploadEditorAttribute
+    public partial class ImageUploadEditorAttribute : CustomEditorAttribute
     {
         public ImageUploadEditorAttribute(string originalNameProperty = null,
             int minBytes = 0, int maxBytes = 0, int minWidth = 0, int maxWidth = 0, int minHeight = 0, int maxHeight = 0, 
@@ -43,6 +43,53 @@ namespace Serenity.ComponentModel
             editorParams["maxWidth"] = MaxWidth;
             editorParams["minHeight"] = MinHeight;
             editorParams["maxHeight"] = MaxHeight;
+        }
+
+        public ImageUploadEditorAttribute()
+            : base("ImageUpload")
+        {
+        }
+
+        public Int32 MaxHeight
+        {
+            get { return GetOption<Int32>("maxHeight"); }
+            set { SetOption("maxHeight", value); }
+        }
+
+        public Int32 MaxSize
+        {
+            get { return GetOption<Int32>("maxSize"); }
+            set { SetOption("maxSize", value); }
+        }
+
+        public Int32 MaxWidth
+        {
+            get { return GetOption<Int32>("maxWidth"); }
+            set { SetOption("maxWidth", value); }
+        }
+
+        public Int32 MinHeight
+        {
+            get { return GetOption<Int32>("minHeight"); }
+            set { SetOption("minHeight", value); }
+        }
+
+        public Int32 MinSize
+        {
+            get { return GetOption<Int32>("minSize"); }
+            set { SetOption("minSize", value); }
+        }
+
+        public Int32 MinWidth
+        {
+            get { return GetOption<Int32>("minWidth"); }
+            set { SetOption("minWidth", value); }
+        }
+
+        public String OriginalNameProperty
+        {
+            get { return GetOption<String>("originalNameProperty"); }
+            set { SetOption("originalNameProperty", value); }
         }
 
         public int MinBytes { get; private set; }

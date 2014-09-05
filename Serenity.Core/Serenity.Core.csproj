@@ -73,6 +73,7 @@
     <Compile Include="ComponentModel\PropertyGrid\EditorOptionAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\EditorTypeAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\EditorTypeAttributeBase.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\BasicEditorTypes.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HiddenAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HintAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\MaxLengthAttribute.cs" />

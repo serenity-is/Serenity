@@ -3,8 +3,32 @@ using System.Text.RegularExpressions;
 
 namespace Serenity.ComponentModel
 {
-    public partial class PhoneEditorAttribute : ICustomValidator
+    public partial class PhoneEditorAttribute : CustomEditorAttribute, ICustomValidator
     {
+        public PhoneEditorAttribute()
+            : base("Phone")
+        {
+        }
+
+        public Boolean Internal
+        {
+            get { return GetOption<Boolean>("internal"); }
+            set { SetOption("internal", value); }
+        }
+
+        public Boolean Mobile
+        {
+            get { return GetOption<Boolean>("mobile"); }
+            set { SetOption("mobile", value); }
+        }
+
+        public Boolean Multiple
+        {
+            get { return GetOption<Boolean>("multiple"); }
+            set { SetOption("multiple", value); }
+        }
+
+
         public string Validate(IValidationContext context)
         {
             if (context.Value == null)

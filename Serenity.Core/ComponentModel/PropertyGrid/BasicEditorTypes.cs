@@ -90,26 +90,6 @@ namespace Serenity.ComponentModel
         }
     }
 
-    public partial class EmailEditorAttribute : CustomEditorAttribute
-    {
-        public EmailEditorAttribute()
-            : base("Email")
-        {
-        }
-
-        public String Domain
-        {
-            get { return GetOption<String>("domain"); }
-            set { SetOption("domain", value); }
-        }
-
-        public Boolean ReadOnlyDomain
-        {
-            get { return GetOption<Boolean>("readOnlyDomain"); }
-            set { SetOption("readOnlyDomain", value); }
-        }
-    }
-
     public partial class HtmlContentEditorAttribute : CustomEditorAttribute
     {
         public HtmlContentEditorAttribute()
@@ -147,56 +127,6 @@ namespace Serenity.ComponentModel
         {
             get { return GetOption<Int32?>("rows"); }
             set { SetOption("rows", value); }
-        }
-    }
-
-    public partial class ImageUploadEditorAttribute : CustomEditorAttribute
-    {
-        public ImageUploadEditorAttribute()
-            : base("ImageUpload")
-        {
-        }
-
-        public Int32 MaxHeight
-        {
-            get { return GetOption<Int32>("maxHeight"); }
-            set { SetOption("maxHeight", value); }
-        }
-
-        public Int32 MaxSize
-        {
-            get { return GetOption<Int32>("maxSize"); }
-            set { SetOption("maxSize", value); }
-        }
-
-        public Int32 MaxWidth
-        {
-            get { return GetOption<Int32>("maxWidth"); }
-            set { SetOption("maxWidth", value); }
-        }
-
-        public Int32 MinHeight
-        {
-            get { return GetOption<Int32>("minHeight"); }
-            set { SetOption("minHeight", value); }
-        }
-
-        public Int32 MinSize
-        {
-            get { return GetOption<Int32>("minSize"); }
-            set { SetOption("minSize", value); }
-        }
-
-        public Int32 MinWidth
-        {
-            get { return GetOption<Int32>("minWidth"); }
-            set { SetOption("minWidth", value); }
-        }
-
-        public String OriginalNameProperty
-        {
-            get { return GetOption<String>("originalNameProperty"); }
-            set { SetOption("originalNameProperty", value); }
         }
     }
 
@@ -253,32 +183,6 @@ namespace Serenity.ComponentModel
         public PersonNameEditorAttribute()
             : base("PersonName")
         {
-        }
-    }
-
-    public partial class PhoneEditorAttribute : CustomEditorAttribute
-    {
-        public PhoneEditorAttribute()
-            : base("Phone")
-        {
-        }
-
-        public Boolean Internal
-        {
-            get { return GetOption<Boolean>("internal"); }
-            set { SetOption("internal", value); }
-        }
-
-        public Boolean Mobile
-        {
-            get { return GetOption<Boolean>("mobile"); }
-            set { SetOption("mobile", value); }
-        }
-
-        public Boolean Multiple
-        {
-            get { return GetOption<Boolean>("multiple"); }
-            set { SetOption("multiple", value); }
         }
     }
 

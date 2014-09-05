@@ -93,7 +93,6 @@
     <Compile Include="Script\DynamicScript\IDynamicScript.cs" />
     <Compile Include="Script\PropertyEditor\PhoneEditorAttribute.cs" />
     <Compile Include="Script\PropertyEditor\EmailEditorAttribute.cs" />
-    <Compile Include="Script\PropertyEditor\EditorTypes.cs" />
     <Compile Include="Script\ScriptEndpointGenerator.cs" />
     <Compile Include="Mvc\ServiceAuthorizeFilter.cs" />
     <Compile Include="Script\DynamicScriptTypes\DataScript.cs">
