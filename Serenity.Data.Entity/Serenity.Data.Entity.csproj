@@ -52,6 +52,7 @@
     <Compile Include="Extensions\EntityConnectionExtensions.cs" />
     <Compile Include="Extensions\EntityFieldExtensions.cs" />
     <Compile Include="Extensions\EntitySqlHelper.cs" />
+    <Compile Include="Extensions\EntityLocalTexts.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="FieldDescriptor.cs" />
     <Compile Include="FieldType.cs" />

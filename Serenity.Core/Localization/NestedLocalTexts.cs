@@ -1,20 +1,21 @@
 
-namespace Serenity
+namespace Serenity.Localization
 {
     using Localization;
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
 
-    public static class LocalTextRegistryExtensions
+    public static class NestedLocalTexts
     {
-        public static LocalTextPackage InitializeTextClass(this LocalTextPackage package, Type type)
+        public static void Initialize(Type type, long languageID = LocalText.DefaultLanguageID)
         {
-            InitializeTextClass(package, type, "");
-            return package;
+            Initialize(type, languageID, "");
         }
 
-        private static void InitializeTextClass(LocalTextPackage package, Type type, string prefix)
+        private static void Initialize(Type type, long languageID, string prefix)
         {
+            var provider = Dependency.Resolve<ILocalTextProvider>();
             foreach (var member in type.GetMembers(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 var fi = member as FieldInfo;
@@ -24,7 +25,7 @@ namespace Serenity
                     var value = fi.GetValue(null) as LocalText;
                     if (value != null)
                     {
-                        package.Add(prefix + fi.Name, value.Key);
+                        provider.Add(new LocalTextEntry(languageID, prefix + fi.Name, value.Key), false);
                         fi.SetValue(null, new LocalText(prefix + fi.Name));
                     }
                 }
@@ -36,15 +37,8 @@ namespace Serenity
                 if (name.EndsWith("_"))
                     name = name.Substring(0, name.Length - 1);
 
-                InitializeTextClass(package, nested, prefix + name + ".");
+                Initialize(nested, languageID, prefix + name + ".");
             }
-        }
-
-        public static void Register(this LocalTextPackage package, bool pendingApproval = false)
-        {
-            var provider = Dependency.Resolve<ILocalTextProvider>();
-            foreach (var entry in package.Entries)
-                provider.Add(entry, pendingApproval);
         }
     }
 }

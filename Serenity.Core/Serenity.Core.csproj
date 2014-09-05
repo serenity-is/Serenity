@@ -107,9 +107,9 @@
     <Compile Include="Localization\LocalText.cs" />
     <Compile Include="Localization\LocalTextEntry.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
-    <Compile Include="Localization\LocalTextPackage.cs" />
     <Compile Include="Localization\LocalTextRegistry.cs" />
-    <Compile Include="Localization\LocalTextRegistryExtensions.cs" />
+    <Compile Include="Localization\EnumLocalTexts.cs" />
+    <Compile Include="Localization\NestedLocalTexts.cs" />
     <Compile Include="Reflection\CloneHelper.cs" />
     <Compile Include="Reflection\CodeWriter.cs" />
     <Compile Include="Reflection\ILGeneration.cs" />

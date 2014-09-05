@@ -17,7 +17,7 @@ namespace Serenity.ComponentModel
             var value = context.Value.ToString();
 
             if (!EmailPattern.IsMatch(value))
-                return Texts.Validation.Email;
+                return Web.Texts.Validation.Email;
 
             return null;
         }
