@@ -6,7 +6,7 @@ namespace Serenity.Web
 {
     /// <summary>
     ///   Helper class to write CSV files to HTTP context or another stream</summary>
-    public class RegistrationHelper
+    public class FormScriptRegistration
     {
         public static void RegisterFormScripts(Assembly[] assemblies = null)
         {
