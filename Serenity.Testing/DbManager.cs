@@ -6,6 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Serenity.Data;
+using Serenity.IO;
 
 namespace Serenity.Testing
 {

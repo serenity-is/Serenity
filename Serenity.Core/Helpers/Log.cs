@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Text;
+using Serenity.Abstractions;
 using Serenity.Data;
-using Serenity.Services;
+using Serenity.ComponentModel;
 
 namespace Serenity
 {
@@ -23,13 +24,8 @@ namespace Serenity
         {
             try
             {
-                LogSettings settings = null;
+                var settings = Config.TryGet<LogSettings>() ?? new LogSettings();
 
-                var configRepository = Dependency.TryResolve<IConfigurationRepository>();
-                if (configRepository != null)
-                    settings = configRepository.Load(typeof (LogSettings)) as LogSettings;
-
-                settings = settings ?? new LogSettings();
                 _level = settings.Level;
                 _file = settings.File;
                 _queue = new List<string>();
@@ -168,7 +164,10 @@ namespace Serenity
 
         public static bool DebugLevel
         {
-            get { return _level <= LoggingLevel.Debug; }
+            get
+            {
+                return _level <= LoggingLevel.Debug;
+            }
         }
 
         public static void Debug(string message)
@@ -220,6 +219,7 @@ namespace Serenity
             return Base32.Encode(eightBytes);
         }
 
+        [SettingScope("Application"), SettingKey("Logging")]
         private class LogSettings
         {
             public LoggingLevel Level { get; set; }

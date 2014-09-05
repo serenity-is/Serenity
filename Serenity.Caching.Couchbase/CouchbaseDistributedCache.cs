@@ -5,6 +5,7 @@ namespace Serenity
     using Couchbase.Configuration;
     using Enyim.Caching.Memcached;
     using Newtonsoft.Json;
+    using Serenity.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.Configuration;

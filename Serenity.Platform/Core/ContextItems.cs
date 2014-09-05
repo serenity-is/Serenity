@@ -1,4 +1,4 @@
-﻿namespace Serenity
+﻿namespace Serenity.Configuration
 {
     using System.Collections;
     using System.Threading;

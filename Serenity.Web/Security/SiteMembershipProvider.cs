@@ -152,7 +152,7 @@ namespace Serenity.Web.Providers
                 username.Length > 100)
                 return false;
 
-            return Dependency.Resolve<IUserAuthenticationService>().Validate(ref username, password);
+            return Dependency.Resolve<IAuthenticationService>().Validate(ref username, password);
         }
 
         public void ValidateNewPassword(string username, string newPassword, bool isNewUser)

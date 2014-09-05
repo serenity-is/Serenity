@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Serenity
+namespace Serenity.Extensibility
 {
     public static class ExtensibilityHelper
     {
@@ -40,15 +40,5 @@ namespace Serenity
         {
             System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
         }
-
-        public static void RunStartupRegistrars<TAttribute>(Assembly[] assemblies = null) where TAttribute : BaseRegistrarAttribute
-        {
-            assemblies = assemblies ?? SelfAssemblies;
-
-            foreach (var assembly in assemblies)
-                foreach (TAttribute attr in assembly.GetCustomAttributes(typeof(TAttribute), false))
-                    RunClassConstructor(attr.Type);
-        }
-
     }
 }

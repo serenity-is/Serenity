@@ -37,6 +37,11 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensibility\BaseRegistrarAttribute.cs" />
+    <Compile Include="Extensibility\EnumRegistrarAttribute.cs" />
+    <Compile Include="Extensibility\RegisterFormAttribute.cs" />
+    <Compile Include="Extensibility\ScriptRegistrarAttribute.cs" />
+    <Compile Include="Extensibility\SelfAssemblyAttribute.cs" />
     <Compile Include="PropertyGrid\BasedOnRowAttribute.cs" />
     <Compile Include="PropertyGrid\CustomEditorAttribute.cs" />
     <Compile Include="PropertyGrid\EditorOptionAttribute.cs" />
@@ -56,6 +61,7 @@
     <Compile Include="PropertyGrid\PlaceholderAttribute.cs" />
     <Compile Include="PropertyGrid\RequiredAttribute.cs" />
     <Compile Include="Common\UpdatableAttribute.cs" />
+    <Compile Include="Common\ScriptIncludeAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

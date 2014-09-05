@@ -67,5 +67,10 @@ namespace Serenity
         {
             return container.Register<TType, TImpl>(name);
         }
+
+        public void Remove(object registration)
+        {
+            container.Remove((Munq.IRegistration)registration);
+        }
     }
 }

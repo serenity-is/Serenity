@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Serenity.Services
+namespace Serenity.Abstractions
 {
     public interface IExceptionLogger
     {

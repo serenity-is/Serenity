@@ -1,5 +1,5 @@
 ﻿
-namespace Serenity
+namespace Serenity.IO
 {
     /// <summary>
     ///   File deletion type.</summary>

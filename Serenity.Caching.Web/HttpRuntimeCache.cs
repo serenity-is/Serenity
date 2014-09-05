@@ -1,6 +1,7 @@
 ﻿
 namespace Serenity.Caching
 {
+    using Serenity.Abstractions;
     using System;
     using System.Collections;
     using System.Web;

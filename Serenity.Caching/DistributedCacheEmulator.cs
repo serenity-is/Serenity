@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using System;
 using System.Collections.Generic;
 
-namespace Serenity
+namespace Serenity.Caching
 {
     /// <summary>
     /// In memory distributed cache implementation, which emulates an IDistributedCache.

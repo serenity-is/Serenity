@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using Serenity;
+using Serenity.Abstractions;
 using Serenity.Data;
+using Serenity.Extensibility;
 
 namespace Serenity.Reporting
 {
@@ -90,7 +92,7 @@ namespace Serenity.Reporting
                 return false;
 
             foreach (var report in reports)
-                if (Dependency.Resolve<IPermissionService>().HasPermission(report.Permission))
+                if (Authorization.HasPermission(report.Permission))
                     return true;
 
             return false;

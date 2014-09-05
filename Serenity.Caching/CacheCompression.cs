@@ -1,15 +1,19 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Serenity.Abstractions;
 
-namespace Serenity
+namespace Serenity.Abstractions
 {
     public interface ICacheCompressor
     {
         void CompressBytes(Stream target, byte[] input);
         Stream CreateDecompressionStream(Stream input);
     }
+}
 
+namespace Serenity.Caching
+{
     public static class CacheCompression
     {
         /// <param name="input">Compresses input string with ICacheCompressor implementation.</param>

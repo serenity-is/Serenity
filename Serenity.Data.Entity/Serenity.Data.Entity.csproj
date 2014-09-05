@@ -42,6 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AliasWithFields.cs" />
+    <Compile Include="CustomFields\CustomFieldCache.cs" />
+    <Compile Include="CustomFields\CustomFieldExtensions.cs" />
+    <Compile Include="CustomFields\CustomFieldType.cs" />
+    <Compile Include="CustomFields\ICustomFieldDefinition.cs" />
+    <Compile Include="CustomFields\ICustomFieldListService.cs" />
+    <Compile Include="CustomFields\SchemaChangeSource.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\EntityConnectionExtensions.cs" />
     <Compile Include="Extensions\EntityFieldExtensions.cs" />

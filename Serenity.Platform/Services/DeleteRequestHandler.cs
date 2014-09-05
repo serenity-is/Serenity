@@ -140,7 +140,7 @@ namespace Serenity.Services
 
         protected virtual void DoCaptureLog()
         {
-            captureLogHandler.Log(this.UnitOfWork, this.Row, SecurityHelper.CurrentUserId, isDelete: true);
+            captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.Value, isDelete: true);
         }
 
         protected virtual void DoAudit()
@@ -174,9 +174,9 @@ namespace Serenity.Services
             if (attr != null)
             {
                 if (attr.Permission.IsNullOrEmpty())
-                    SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
+                    Authorization.ValidateLoggedIn();
                 else
-                    SecurityHelper.EnsurePermission(attr.Permission, RightErrorHandling.ThrowException);
+                    Authorization.ValidatePermission(attr.Permission);
             }
         }
 

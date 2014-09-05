@@ -1,5 +1,5 @@
 ﻿using System;
-using Serenity.Services;
+using Serenity.Abstractions;
 
 namespace Serenity
 {

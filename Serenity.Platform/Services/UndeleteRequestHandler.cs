@@ -80,7 +80,7 @@ namespace Serenity.Services
         protected virtual void DoCaptureLog()
         {
             ((IIsActiveRow)Row).IsActiveField[Row] = 1;
-            captureLogHandler.Log(this.UnitOfWork, this.Row, SecurityHelper.CurrentUserId, isDelete: false);
+            captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.Value, isDelete: false);
         }
 
         protected virtual void DoAudit()
@@ -132,9 +132,9 @@ namespace Serenity.Services
             if (attr != null)
             {
                 if (attr.Permission.IsNullOrEmpty())
-                    SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
+                    Authorization.ValidateLoggedIn();
                 else
-                    SecurityHelper.EnsurePermission(attr.Permission, RightErrorHandling.ThrowException);
+                    Authorization.ValidatePermission(attr.Permission);
             }
         }
 

@@ -56,7 +56,10 @@ namespace Serenity.Reflection
         private string DoGetNamespace(string typeName)
         {
             var parts = typeName.Split(new char[] { '.' });
-            return String.Join(".", parts.Take(parts.Length - 1).ToArray());
+            var result = String.Join(".", parts.Take(parts.Length - 1).ToArray());
+            if (result == "Serenity")
+                result = "Serenity.ComponentModel";
+            return result;
         }
 
         public string GenerateCode()

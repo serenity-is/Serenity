@@ -65,7 +65,7 @@ namespace Serenity.Reflection
 
             foreach (var type in this.Assembly.GetTypes())
             {
-                if (type.GetCustomAttribute(typeof(Serenity.FormScriptAttribute)) == null)
+                if (type.GetCustomAttribute(typeof(Serenity.ComponentModel.FormScriptAttribute)) == null)
                     continue;
 
                 var ns = DoGetNamespace(type);

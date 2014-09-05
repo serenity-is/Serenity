@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System;
 using System.ComponentModel;
 using Serenity.Data;
+using Serenity.Extensibility;
 using Serenity.Reflection;
 
 namespace Serenity.Data

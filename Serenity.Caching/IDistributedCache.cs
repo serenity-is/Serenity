@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Serenity
+namespace Serenity.Abstractions
 {
     /// <summary>
     /// Distributed cache erişimi sağlayan servisler için ortak arayüz. (ör: Redis, MemCached, Couchbase)

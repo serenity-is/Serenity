@@ -1,6 +1,7 @@
 ﻿using System;
+using Serenity.Extensibility;
 
-namespace Serenity
+namespace Serenity.Extensibility
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=true)]
     public sealed class ScriptRegistrarAttribute : BaseRegistrarAttribute

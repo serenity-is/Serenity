@@ -91,11 +91,11 @@ namespace Serenity.Services
                 }
 
                 if (anyChanged)
-                    captureLogHandler.Log(this.UnitOfWork, this.Row, SecurityHelper.CurrentUserId, isDelete: false);
+                    captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.Value, isDelete: false);
             }
             else if (IsCreate)
             {
-                captureLogHandler.Log(this.UnitOfWork, this.Row, SecurityHelper.CurrentUserId, isDelete: false);
+                captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.Value, isDelete: false);
             }
         }
 
@@ -393,12 +393,12 @@ namespace Serenity.Services
             if (updateLogRow != null && (IsUpdate || insertLogRow == null))
             {
                 updateLogRow.UpdateDateField[Row] = DateTimeField.ToDateTimeKind(DateTime.Now, updateLogRow.UpdateDateField.DateTimeKind);
-                updateLogRow.UpdateUserIdField[Row] = SecurityHelper.CurrentUserId;
+                updateLogRow.UpdateUserIdField[Row] = Authorization.UserId;
             }
             else if (insertLogRow != null && IsCreate)
             {
                 insertLogRow.InsertDateField[Row] = DateTimeField.ToDateTimeKind(DateTime.Now, insertLogRow.InsertDateField.DateTimeKind);
-                insertLogRow.InsertUserIdField[Row] = SecurityHelper.CurrentUserId;
+                insertLogRow.InsertUserIdField[Row] = Authorization.UserId;
             }
         }
 
@@ -544,9 +544,9 @@ namespace Serenity.Services
             if (attr != null)
             {
                 if (attr.Permission.IsNullOrEmpty())
-                    SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
+                    Authorization.ValidateLoggedIn();
                 else
-                    SecurityHelper.EnsurePermission(attr.Permission, RightErrorHandling.ThrowException);
+                    Authorization.ValidatePermission(attr.Permission);
             }
         }
 

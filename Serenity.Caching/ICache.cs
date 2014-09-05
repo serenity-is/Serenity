@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Serenity
+namespace Serenity.Abstractions
 {
     public interface ICache
     {

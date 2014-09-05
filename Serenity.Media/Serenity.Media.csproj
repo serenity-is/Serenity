@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}</ProjectGuid>
+    <ProjectGuid>{28C0C65C-5D8E-417C-ABF4-77D448C1183C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Serenity</RootNamespace>
-    <AssemblyName>Serenity.Core</AssemblyName>
+    <AssemblyName>Serenity.Media</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -32,44 +32,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Authorization\IPermissionService.cs" />
-    <Compile Include="Authorization\IUserDefinition.cs" />
-    <Compile Include="Dependency\IDependecyRegistrar.cs" />
-    <Compile Include="Helpers\Base32.cs" />
-    <Compile Include="Helpers\ExceptionExtensions.cs" />
-    <Compile Include="Helpers\DateElementOrder.cs" />
-    <Compile Include="Helpers\DateHelper.cs" />
-    <Compile Include="Dependency\Dependency.cs" />
-    <Compile Include="Dependency\IDependencyResolver.cs" />
-    <Compile Include="Helpers\EnumMapper.cs" />
-    <Compile Include="Helpers\CollectionExtensions.cs" />
-    <Compile Include="Helpers\ExtensibilityHelper.cs" />
-    <Compile Include="Helpers\Log.cs" />
-    <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Interface\ExceptionLog.cs" />
-    <Compile Include="Authorization\Authorization.cs" />
-    <Compile Include="Authorization\IAuthorizationService.cs" />
-    <Compile Include="Authorization\IUserRetrieveService.cs" />
-    <Compile Include="Interface\SettingScopeAttribute.cs" />
-    <Compile Include="Interface\SettingKeyAttribute.cs" />
-    <Compile Include="Interface\IExceptionLogger.cs" />
-    <Compile Include="Interface\LoggingLevel.cs" />
-    <Compile Include="Configuration\IConfigurationRepository.cs" />
-    <Compile Include="Interface\ValidationError.cs" />
-    <Compile Include="IO\DeleteType.cs" />
-    <Compile Include="IO\TemporaryFileHelper.cs" />
-    <Compile Include="Localization\ILocalTextProvider.cs" />
-    <Compile Include="Helpers\Invariants.cs" />
-    <Compile Include="Interface\ISupportAttached.cs" />
-    <Compile Include="Localization\LocalText.cs" />
-    <Compile Include="Localization\LocalTextEntry.cs" />
-    <Compile Include="Helpers\StringHelper.cs" />
-    <Compile Include="Texts\Texts.cs" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ImageChecker.cs" />
+    <Compile Include="ImageCheckResult.cs" />
+    <Compile Include="ImageScaleMode.cs" />
+    <Compile Include="SwfInfo.cs" />
+    <Compile Include="ThumbnailGenerator.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -295,9 +295,9 @@
             if (readAttr != null)
             {
                 if (readAttr.Permission.IsNullOrEmpty())
-                    SecurityHelper.EnsureLoggedIn(RightErrorHandling.ThrowException);
+                    Authorization.ValidateLoggedIn();
                 else
-                    SecurityHelper.EnsurePermission(readAttr.Permission, RightErrorHandling.ThrowException);
+                    Authorization.ValidatePermission(readAttr.Permission);
             }
         }
 

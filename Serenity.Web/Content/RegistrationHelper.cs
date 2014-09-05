@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Text;
-using System.Web;
-using Serenity.Data;
+﻿using Serenity.ComponentModel;
+using Serenity.Extensibility;
 using System.Reflection;
-using Serenity.Web.PropertyEditor;
-using Serenity.Web.FilterPanel;
-using Serenity.Reflection;
 
 namespace Serenity.Web
 {

@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
+using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Web;
+using Serenity.IO;
 
 namespace Serenity.Web
 {
@@ -18,13 +20,7 @@ namespace Serenity.Web
         public long FileSize { get; set; }
     }
 
-    public enum ImageDisplayMode
-    {
-        None = 0,
-        Image = 1,
-        Thumbnail = 2
-    }
-
+    [SettingScope("Application"), SettingKey("Logging")]
     public class UploadSettings
     {
         private static UploadSettings current;

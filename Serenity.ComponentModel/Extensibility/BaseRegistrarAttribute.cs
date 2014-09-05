@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Reflection;
 
-namespace Serenity
+namespace Serenity.Extensibility
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=true)]
     public abstract class BaseRegistrarAttribute : Attribute

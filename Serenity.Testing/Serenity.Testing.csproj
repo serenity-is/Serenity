@@ -48,7 +48,8 @@
     <Compile Include="DbManager.cs" />
     <Compile Include="DbScript.cs" />
     <Compile Include="DbSettings.cs" />
-    <Compile Include="DependencyContext.cs" />
+    <Compile Include="ImpersonationContext.cs" />
+    <Compile Include="MunqContext.cs" />
     <Compile Include="DbTestContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestSqlHelper.cs" />

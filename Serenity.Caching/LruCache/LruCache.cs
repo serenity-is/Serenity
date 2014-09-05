@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Serenity.Data
+namespace Serenity.Caching
 {
     public class LruCache<T> where T: LruCacheNode
     {

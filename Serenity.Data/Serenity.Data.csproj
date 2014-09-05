@@ -53,6 +53,7 @@
     <Compile Include="Criteria\ParamCriteria.cs" />
     <Compile Include="Criteria\UnaryCriteria.cs" />
     <Compile Include="Criteria\ValueCriteria.cs" />
+    <Compile Include="FluentSql\MethodChainingExtensions.cs" />
     <Compile Include="FluentSql\SqlQuery.cs" />
     <Compile Include="FluentSql\SqlQuery_Clone.cs" />
     <Compile Include="FluentSql\SqlQuery_Entity.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="SqlHelpers\SqlSyntax.cs" />
     <Compile Include="SqlHelpers\SqlDialect.cs" />
     <Compile Include="SqlHelpers\SqlSettings.cs" />
+    <Compile Include="Utility\DeltaLister.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">

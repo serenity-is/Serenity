@@ -1,7 +1,8 @@
-﻿using System;
-
+﻿
 namespace Serenity.Testing
 {
+    using System;
+
     public class MunqContext : IDisposable
     {
         private IDependencyResolver old;

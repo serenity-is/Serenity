@@ -1,7 +1,7 @@
 ﻿using Serenity.Data;
 using System;
 
-namespace Serenity
+namespace Serenity.Data
 {
     public static class EntityCacheExtensions
     {

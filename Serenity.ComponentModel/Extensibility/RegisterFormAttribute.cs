@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Serenity
+namespace Serenity.ComponentModel
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
     public sealed class FormScriptAttribute : Attribute

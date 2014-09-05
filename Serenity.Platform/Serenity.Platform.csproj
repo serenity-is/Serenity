@@ -43,21 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\ContextItems.cs" />
-    <Compile Include="Core\DeleteType.cs" />
-    <Compile Include="Core\PrefixHelper.cs" />
-    <Compile Include="Core\TemporaryFileHelper.cs" />
-    <Compile Include="CustomField\ICustomFieldDefinition.cs" />
-    <Compile Include="CustomField\CustomFieldCache.cs" />
-    <Compile Include="CustomField\CustomFieldExtensions.cs" />
-    <Compile Include="CustomField\ICustomFieldListService.cs" />
-    <Compile Include="CustomField\CustomFieldType.cs" />
-    <Compile Include="Core\DictionaryHelper.cs" />
+    <Compile Include="Services\PrefixHelper.cs" />
     <Compile Include="Data\EntityCacheExtensions.cs" />
     <Compile Include="Data\ServiceRequestExtensions.cs" />
-    <Compile Include="Core\DeltaLister.cs" />
-    <Compile Include="Core\GroupingHelper.cs" />
     <Compile Include="Data\RowRegistry.cs" />
-    <Compile Include="Data\SchemaChangeSource.cs" />
     <Compile Include="Reflection\CloneHelper.cs" />
     <Compile Include="Reflection\CodeGeneration\CodeWriter.cs" />
     <Compile Include="Reflection\CodeGeneration\EditorTypeGenerator.cs" />
@@ -69,29 +58,12 @@
     <Compile Include="Reflection\VisitedGraph.cs" />
     <Compile Include="Services\CaptureLog\ICaptureLogRow.cs" />
     <Compile Include="Data\JsonStringRawConverter.cs" />
-    <Compile Include="Extensions\MethodChainingExtensions.cs" />
-    <Compile Include="Media\ImageScaleMode.cs" />
     <Compile Include="PropertyGrid\PropertyItem.cs" />
     <Compile Include="Reflection\CodeGeneration\DtoGenerator.cs" />
-    <Compile Include="Extensibility\BaseRegistrarAttribute.cs" />
-    <Compile Include="Extensibility\EnumRegistrarAttribute.cs" />
-    <Compile Include="Extensibility\ExtensibilityHelper.cs" />
-    <Compile Include="Extensibility\RegisterFormAttribute.cs" />
-    <Compile Include="Extensibility\ScriptRegistrarAttribute.cs" />
-    <Compile Include="Extensibility\SelfAssemblyAttribute.cs" />
-    <Compile Include="Extensions\GenericExtensions.cs" />
     <Compile Include="Extensions\ReflectionExtensions.cs" />
     <Compile Include="Extensions\WeakHashtable.cs" />
     <Compile Include="Reflection\InstanceCreator.cs" />
-    <Compile Include="Core\IProgressManager.cs" />
     <Compile Include="Services\JsonSortByConverter.cs" />
-    <Compile Include="Media\ImageChecker.cs" />
-    <Compile Include="Media\ImageCheckResult.cs" />
-    <Compile Include="Media\MP3Checker.cs" />
-    <Compile Include="Media\Mp3CheckResult.cs" />
-    <Compile Include="Media\SwfInfo.cs" />
-    <Compile Include="Media\ThumbnailGenerator.cs" />
-    <Compile Include="Reflection\CodeGeneration\ScriptIncludeAttribute.cs" />
     <Compile Include="Services\RowValidationContext.cs" />
     <Compile Include="Services\Reporting\ICustomFileName.cs" />
     <Compile Include="Services\Settings\SettingAttribute.cs" />
@@ -104,7 +76,6 @@
     <Compile Include="Services\ISaveRequestHandler.cs" />
     <Compile Include="Services\SaveRequestType.cs" />
     <Compile Include="Services\Security\IUserAuthenticationService.cs" />
-    <Compile Include="Services\Security\IUserRetrieveService.cs" />
     <Compile Include="Services\ServiceError.cs" />
     <Compile Include="Services\SortBy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -158,14 +129,12 @@
     <Compile Include="Services\Localization\LocalizationHandler.cs" />
     <Compile Include="Services\Localization\LocalizationRowAttribute.cs" />
     <Compile Include="Services\RetrieveRequestHandler.cs" />
-    <Compile Include="Services\Security\IUserDefinition.cs" />
-    <Compile Include="Services\Security\SecurityHelper.cs" />
+    <Compile Include="Services\Security\UserDefinition.cs" />
+    <Compile Include="Services\Security\WebSecurityHelper.cs" />
     <Compile Include="Services\ServiceHelper.cs" />
     <Compile Include="Services\UndeleteRequestHandler.cs" />
     <Compile Include="Services\SaveRequestHandler.cs" />
-    <Compile Include="Services\Settings\Settings.cs" />
     <Compile Include="Services\Settings\FormatHelper.cs" />
-    <Compile Include="Core\SilentException.cs" />
     <Compile Include="Data\DisplayOrderHelper.cs" />
     <Compile Include="Data\ServiceQueryHelper.cs" />
     <Compile Include="Services\Validation\ValidationContext.cs" />
@@ -222,9 +191,7 @@
       <Name>Serenity.Munq</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Logging\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

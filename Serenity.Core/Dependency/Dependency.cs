@@ -1,7 +1,7 @@
 ﻿namespace Serenity
 {
     using System;
-
+    
     public static class Dependency
     {
         private static IDependencyResolver resolver;

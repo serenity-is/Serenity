@@ -1,5 +1,5 @@
 ﻿
-namespace Serenity
+namespace Serenity.Caching
 {
     using System;
     using System.IO;

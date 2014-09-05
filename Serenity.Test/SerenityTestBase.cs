@@ -2,6 +2,7 @@
 using Serenity;
 using Serenity.Caching;
 using Serenity.Testing;
+using Serenity.Abstractions;
 using System;
 using System.IO;
 using System.Reflection;

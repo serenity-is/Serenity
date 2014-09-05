@@ -55,11 +55,11 @@ namespace Serenity.Web
 
         public void CheckRights()
         {
-            if (_authorize && !SecurityHelper.IsLoggedIn)
+            if (_authorize && !Authorization.IsLoggedIn)
                 throw new AccessViolationException(String.Format("{0} script'ine yalnızca giriş yapmış kullanıcılar tarafından erişilebilir!"));
 
             if (_right != null)
-                SecurityHelper.EnsurePermission(_right, RightErrorHandling.ThrowException);
+                Authorization.ValidatePermission(_right);
         }
 
         public event System.EventHandler ScriptChanged

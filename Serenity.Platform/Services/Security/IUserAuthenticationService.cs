@@ -3,7 +3,7 @@ using System;
 
 namespace Serenity
 {
-    public interface IUserAuthenticationService
+    public interface IAuthenticationService
     {
         bool Validate(ref string username, string password);
     }
