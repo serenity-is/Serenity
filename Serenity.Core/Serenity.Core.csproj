@@ -34,7 +34,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authorization\AdminUserSettings.cs" />
     <Compile Include="Authorization\IPermissionService.cs" />
+    <Compile Include="Authorization\IUserAuthenticationService.cs" />
     <Compile Include="Authorization\IUserDefinition.cs" />
     <Compile Include="Dependency\IDependecyRegistrar.cs" />
     <Compile Include="Helpers\Base32.cs" />
@@ -48,6 +50,7 @@
     <Compile Include="Helpers\ExtensibilityHelper.cs" />
     <Compile Include="Helpers\Log.cs" />
     <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Helpers\UriHelper.cs" />
     <Compile Include="Interface\ExceptionLog.cs" />
     <Compile Include="Authorization\Authorization.cs" />
     <Compile Include="Authorization\IAuthorizationService.cs" />
@@ -66,6 +69,15 @@
     <Compile Include="Localization\LocalText.cs" />
     <Compile Include="Localization\LocalTextEntry.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
+    <Compile Include="Reflection\CloneHelper.cs" />
+    <Compile Include="Reflection\CodeWriter.cs" />
+    <Compile Include="Reflection\ILGeneration.cs" />
+    <Compile Include="Reflection\InstanceCreator.cs" />
+    <Compile Include="Reflection\ObjectAccessor.cs" />
+    <Compile Include="Reflection\ReflectionExtensions.cs" />
+    <Compile Include="Reflection\TypeAccessor.cs" />
+    <Compile Include="Reflection\TypeConversions.cs" />
+    <Compile Include="Reflection\VisitedGraph.cs" />
     <Compile Include="Texts\Texts.cs" />
   </ItemGroup>
   <ItemGroup>

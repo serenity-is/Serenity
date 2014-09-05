@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7D55C2E1-B805-428E-873A-1EFB55C37DEA}</ProjectGuid>
+    <ProjectGuid>{880CEC07-A629-44D3-A79D-5B138967E1C4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Serenity</RootNamespace>
-    <AssemblyName>Serenity.Data.Entity</AssemblyName>
+    <AssemblyName>Serenity.CodeGeneration</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -35,77 +35,41 @@
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AliasWithFields.cs" />
-    <Compile Include="CustomFields\CustomFieldCache.cs" />
-    <Compile Include="CustomFields\CustomFieldExtensions.cs" />
-    <Compile Include="CustomFields\CustomFieldType.cs" />
-    <Compile Include="CustomFields\ICustomFieldDefinition.cs" />
-    <Compile Include="CustomFields\ICustomFieldListService.cs" />
-    <Compile Include="CustomFields\SchemaChangeSource.cs" />
-    <Compile Include="Extensions\EntityQueryExtensions.cs" />
-    <Compile Include="Extensions\EntityConnectionExtensions.cs" />
-    <Compile Include="Extensions\EntityFieldExtensions.cs" />
-    <Compile Include="Extensions\EntitySqlHelper.cs" />
-    <Compile Include="Field.cs" />
-    <Compile Include="FieldDescriptor.cs" />
-    <Compile Include="FieldType.cs" />
-    <Compile Include="FieldTypes\BooleanField.cs" />
-    <Compile Include="FieldTypes\CustomClassField.cs" />
-    <Compile Include="FieldTypes\DateTimeField.cs" />
-    <Compile Include="FieldTypes\DecimalField.cs" />
-    <Compile Include="FieldTypes\DoubleField.cs" />
-    <Compile Include="FieldTypes\ForeignRowSetField.cs" />
-    <Compile Include="FieldTypes\GenericClassField.cs" />
-    <Compile Include="FieldTypes\GenericField.cs" />
-    <Compile Include="FieldTypes\GenericValueField.cs" />
-    <Compile Include="FieldTypes\GuidField.cs" />
-    <Compile Include="FieldTypes\Int16Field.cs" />
-    <Compile Include="FieldTypes\Int32Field.cs" />
-    <Compile Include="FieldTypes\Int64Field.cs" />
-    <Compile Include="FieldTypes\StreamField.cs" />
-    <Compile Include="FieldTypes\StringField.cs" />
-    <Compile Include="IDisplayOrderRow.cs" />
-    <Compile Include="IEnumTypeField.cs" />
-    <Compile Include="IFilterFields.cs" />
-    <Compile Include="IFilterField.cs" />
-    <Compile Include="IIdField.cs" />
-    <Compile Include="IIdRow.cs" />
-    <Compile Include="IIsActiveRow.cs" />
-    <Compile Include="ILoggingRow.cs" />
-    <Compile Include="INameRow.cs" />
-    <Compile Include="IParentIdRow.cs" />
-    <Compile Include="JsonRowConverter.cs" />
-    <Compile Include="PropertyGrid\PropertyItem.cs" />
-    <Compile Include="Row.cs" />
-    <Compile Include="RowExtensions.cs" />
-    <Compile Include="RowFieldsBase.cs" />
-    <Compile Include="RowRegistry.cs" />
-    <Compile Include="Row_ComponentModel.cs" />
+    <Compile Include="DtoGenerator.cs" />
+    <Compile Include="EditorTypeGenerator.cs" />
+    <Compile Include="GeneratorUtils.cs" />
+    <Compile Include="ScriptDtoGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.ComponentModel\Serenity.ComponentModel.csproj">
       <Project>{098462c1-4c1f-4623-a6e9-91baf37dd198}</Project>
       <Name>Serenity.ComponentModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
+      <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
+      <Name>Serenity.Data.Entity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
-      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
-      <Name>Serenity.Core</Name>
+    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
+      <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>
+      <Name>Serenity.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

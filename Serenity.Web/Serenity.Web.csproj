@@ -81,6 +81,7 @@
     <Compile Include="Content\CsvContentResult.cs" />
     <Compile Include="Content\CsvWriter.cs" />
     <Compile Include="Content\ExcelContentResult.cs" />
+    <Compile Include="Content\ForXmlHelper.cs" />
     <Compile Include="Content\LocaleID.cs" />
     <Compile Include="Content\RegistrationHelper.cs" />
     <Compile Include="Content\TemplateHelper.cs" />
@@ -99,6 +100,11 @@
     <Compile Include="Script\DynamicScriptTypes\DataScript.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Security\WebSecurityHelper.cs" />
+    <Compile Include="Texts\Texts.Controls.cs" />
+    <Compile Include="Texts\Texts.cs" />
+    <Compile Include="Texts\Texts.Forms.cs" />
+    <Compile Include="Texts\Texts.Validation.cs" />
     <Compile Include="Upload\ImageUploadEditorAttribute.cs" />
     <Compile Include="Upload\FileUploadEditorAttribute.cs" />
     <Compile Include="Upload\FilesToDelete.cs" />
@@ -198,6 +204,10 @@
       <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
       <Name>Serenity.Caching</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Serenity.CodeGeneration\Serenity.CodeGeneration.csproj">
+      <Project>{880cec07-a629-44d3-a79d-5b138967e1c4}</Project>
+      <Name>Serenity.CodeGeneration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.ComponentModel\Serenity.ComponentModel.csproj">
       <Project>{098462c1-4c1f-4623-a6e9-91baf37dd198}</Project>
       <Name>Serenity.ComponentModel</Name>
@@ -205,10 +215,6 @@
     <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Platform\Serenity.Platform.csproj">
-      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
-      <Name>Serenity.Platform</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
@@ -225,6 +231,10 @@
     <ProjectReference Include="..\Serenity.Localization\Serenity.Localization.csproj">
       <Project>{0ee019e9-ba6d-4732-80e4-39f01d9de858}</Project>
       <Name>Serenity.Localization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
+      <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>
+      <Name>Serenity.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

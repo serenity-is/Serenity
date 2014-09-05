@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{027F4308-30BC-458C-9431-7076FE5C6B64}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Serenity</RootNamespace>
+    <AssemblyName>Serenity.Services</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Json\JsonServiceClient.cs" />
+    <Compile Include="RequestHandlers\DeleteRequestHandler.cs" />
+    <Compile Include="RequestHandlers\Helpers\BatchGenerationUpdater.cs" />
+    <Compile Include="RequestHandlers\Behaviours\ValidateParentAttribute.cs" />
+    <Compile Include="RequestHandlers\Helpers\EntityCacheExtensions.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\DisplayOrder\DisplayOrderFilterHelper.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\DisplayOrder\DisplayOrderHelper.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\Validation\DataValidation.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\Validation\ICustomValidator.cs" />
+    <Compile Include="RequestHandlers\Helpers\PrefixHelper.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\Validation\RowValidationContext.cs" />
+    <Compile Include="RequestHandlers\Behaviours\SaveRequestBehaviourAttribute.cs" />
+    <Compile Include="RequestHandlers\Helpers\ServiceHelper.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\Validation\ValidationContext.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditDeleteRequest.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditFileFieldInfo.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditLogAttribute.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditLogListRequest.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditLogListResponse.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditLogService.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditSaveRequest.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditUndeleteRequest.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\AuditUpdateData.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\AuditLog\IAuditLogRow.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\CaptureLogAttribute.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\CaptureLogHandler.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\ICaptureLogRow.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\Localization\ILocalizationRow.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\Localization\LocalizationHandler.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\Localization\LocalizationRowAttribute.cs" />
+    <Compile Include="Json\JsonSortByConverter.cs" />
+    <Compile Include="Models\DeleteRequest.cs" />
+    <Compile Include="Models\DeleteResponse.cs" />
+    <Compile Include="Models\ListRequest.cs" />
+    <Compile Include="Models\ListResponse.cs" />
+    <Compile Include="Models\PostRequest.cs" />
+    <Compile Include="Models\RetrieveLocalizationRequest.cs" />
+    <Compile Include="Models\RetrieveRequest.cs" />
+    <Compile Include="Models\RetrieveResponse.cs" />
+    <Compile Include="Models\SaveResponse.cs" />
+    <Compile Include="Models\ServiceError.cs" />
+    <Compile Include="Models\ServiceRequest.cs" />
+    <Compile Include="Models\ServiceResponse.cs" />
+    <Compile Include="Models\SortBy.cs" />
+    <Compile Include="Models\UndeleteRequest.cs" />
+    <Compile Include="Models\UndeleteResponse.cs" />
+    <Compile Include="Models\UpdateLocalizationRequest.cs" />
+    <Compile Include="RequestHandlers\Helpers\ServiceQueryHelper.cs" />
+    <Compile Include="RequestHandlers\Behaviours\ISaveRequestHandler.cs" />
+    <Compile Include="RequestHandlers\ListRequestHandler.cs" />
+    <Compile Include="RequestHandlers\RetrieveRequestHandler.cs" />
+    <Compile Include="RequestHandlers\SaveRequestHandler.cs" />
+    <Compile Include="RequestHandlers\SaveRequestType.cs" />
+    <Compile Include="RequestHandlers\UndeleteRequestHandler.cs" />
+    <Compile Include="ServiceRequestExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Caching\Serenity.Caching.csproj">
+      <Project>{c146399f-5a12-4ca0-baeb-79833287f3bc}</Project>
+      <Name>Serenity.Caching</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.ComponentModel\Serenity.ComponentModel.csproj">
+      <Project>{098462c1-4c1f-4623-a6e9-91baf37dd198}</Project>
+      <Name>Serenity.ComponentModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
+      <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
+      <Name>Serenity.Data.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.Filtering\Serenity.Data.Filtering.csproj">
+      <Project>{8029272a-7583-490e-91db-7150980e492e}</Project>
+      <Name>Serenity.Data.Filtering</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
+      <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
+      <Name>Serenity.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Json\Serenity.Json.csproj">
+      <Project>{e7c183fb-f863-4bee-ae29-f682a0d22eb5}</Project>
+      <Name>Serenity.Json</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

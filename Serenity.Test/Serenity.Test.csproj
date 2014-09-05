@@ -87,10 +87,6 @@
       <Project>{5fbada38-f1f3-44c9-83fa-e1bf1f4d7d10}</Project>
       <Name>Serenity.Munq</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Platform\Serenity.Platform.csproj">
-      <Project>{b7cca37b-2cc4-4f86-869a-43413abc1abb}</Project>
-      <Name>Serenity.Platform</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
@@ -102,6 +98,10 @@
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
+      <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>
+      <Name>Serenity.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Testing\Serenity.Testing.csproj">
       <Project>{e5fd07ef-84b5-48c4-8640-46cdc9219ae8}</Project>
