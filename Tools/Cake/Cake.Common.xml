@@ -1,0 +1,2062 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Cake.Common</name>
+    </assembly>
+    <members>
+        <member name="T:Cake.Common.AssemblyInfoCreator">
+            <summary>
+            The aseembly info creator.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.AssemblyInfoCreator.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.Diagnostics.ICakeLog)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.AssemblyInfoCreator"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="log">The log.</param>
+        </member>
+        <member name="M:Cake.Common.AssemblyInfoCreator.Create(Cake.Core.IO.FilePath,Cake.Common.AssemblyInfoSettings)">
+            <summary>
+            Creates an assembly info file.
+            </summary>
+            <param name="outputPath">The output path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="T:Cake.Common.AssemblyInfoExtensions">
+            <summary>
+            Contains functionality related to assembly info.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.AssemblyInfoExtensions.CreateAssemblyInfo(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Common.AssemblyInfoSettings)">
+            <summary>
+            Creates an assembly information file.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="outputPath">The output path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.AssemblyInfoExtensions.ParseAssemblyInfo(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Parses an assembly information.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblyInfoPath">The assembly info path.</param>
+            <returns>The content of the assembly info file.</returns>
+        </member>
+        <member name="T:Cake.Common.AssemblyInfoParser">
+            <summary>
+            The assembly info creator.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.AssemblyInfoParser.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.AssemblyInfoParser"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+        </member>
+        <member name="M:Cake.Common.AssemblyInfoParser.Parse(Cake.Core.IO.FilePath)">
+            <summary>
+            Parses information from an assembly info file.
+            </summary>
+            <param name="assemblyInfoPath">The file path.</param>
+            <returns>Information about the assembly info content.</returns>
+        </member>
+        <member name="T:Cake.Common.AssemblyInfoParseResult">
+            <summary>
+            Represents the content in an assembly info file.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.AssemblyInfoParseResult.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.AssemblyInfoParseResult"/> class.
+            </summary>
+            <param name="assemblyVersion">The assembly version.</param>
+            <param name="assemblyFileVersion">The assembly file version.</param>
+            <param name="assemblyInformationalVersion">The assembly informational version.</param>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoParseResult.AssemblyVersion">
+            <summary>
+            Gets the assembly version.
+            </summary>
+            <value>The assembly version.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoParseResult.AssemblyFileVersion">
+            <summary>
+            Gets the assembly file version.
+            </summary>
+            <value>The assembly file version.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoParseResult.AssemblyInformationalVersion">
+            <summary>
+            Gets the assembly informational version.
+            </summary>
+            <value>The assembly informational version.</value>
+        </member>
+        <member name="T:Cake.Common.AssemblyInfoSettings">
+            <summary>
+            Contains functionality used by <see cref="T:Cake.Common.AssemblyInfoCreator"/>.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.Title">
+            <summary>
+            Gets or sets the title.
+            </summary>
+            <value>The assembly title.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.Description">
+            <summary>
+            Gets or sets the description.
+            </summary>
+            <value>The assembly description.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.Guid">
+            <summary>
+            Gets or sets the unique identifier.
+            </summary>
+            <value>The unique identifier.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.Product">
+            <summary>
+            Gets or sets the product.
+            </summary>
+            <value>The assembly product.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.Copyright">
+            <summary>
+            Gets or sets the copyright.
+            </summary>
+            <value>The copyright.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.Trademark">
+            <summary>
+            Gets or sets the trademark.
+            </summary>
+            <value>The trademark.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.Version">
+            <summary>
+            Gets or sets the version.
+            </summary>
+            <value>The version.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.FileVersion">
+            <summary>
+            Gets or sets the file version.
+            </summary>
+            <value>The file version.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.InformationalVersion">
+            <summary>
+            Gets or sets the informational version.
+            </summary>
+            <value>The informational version.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.ComVisible">
+            <summary>
+            Gets or sets whether or not the assembly is COM visible.
+            </summary>
+            <value>Whether or not the assembly is COM visible.</value>
+        </member>
+        <member name="P:Cake.Common.AssemblyInfoSettings.CLSCompliant">
+            <summary>
+            Gets or sets whether or not the assembly is CLS compliant.
+            </summary>
+            <value>Whether or not the assembly is CLS compliant.</value>
+        </member>
+        <member name="T:Cake.Common.Diagnostics.LoggingExtensions">
+            <summary>
+            Contains functionality related to logging.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Diagnostics.LoggingExtensions.Error(Cake.Core.ICakeContext,System.String,System.Object[])">
+            <summary>
+            Writes an error message to the log using the specified format information.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="format">The format.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Cake.Common.Diagnostics.LoggingExtensions.Warning(Cake.Core.ICakeContext,System.String,System.Object[])">
+            <summary>
+            Writes a warning message to the log using the specified format information.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="format">The format.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Cake.Common.Diagnostics.LoggingExtensions.Information(Cake.Core.ICakeContext,System.String,System.Object[])">
+            <summary>
+            Writes an informational message to the log using the specified format information.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="format">The format.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Cake.Common.Diagnostics.LoggingExtensions.Verbose(Cake.Core.ICakeContext,System.String,System.Object[])">
+            <summary>
+            Writes a verbose message to the log using the specified format information.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="format">The format.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="M:Cake.Common.Diagnostics.LoggingExtensions.Debug(Cake.Core.ICakeContext,System.String,System.Object[])">
+            <summary>
+            Writes a debug message to the log using the specified format information.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="format">The format.</param>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="T:Cake.Common.EnvironmentExtensions">
+            <summary>
+            Added helpers to retrieve enviroment information
+            </summary>
+        </member>
+        <member name="M:Cake.Common.EnvironmentExtensions.EnvironmentVariable(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Retrieves the value of the enviroment variable.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="variable">The environment variable.</param>
+            <returns>The environment variable or <c>null</c> if variable did not exist.</returns>
+        </member>
+        <member name="M:Cake.Common.EnvironmentExtensions.HasEnvironmentVariable(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Checks for the existance of a value for a given enviroment variable.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="variable">The environment variable.</param>
+            <returns><c>true</c> if environment variable exist, else <c>false</c>.</returns>
+        </member>
+        <member name="T:Cake.Common.ProcessExtensions">
+            <summary>
+            Contains functionality related to processes.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.ProcessExtensions.StartProcess(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Starts the process resource that is specified by the filename.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="fileName">The file name.</param>
+            <returns>The exit code that the started process specified when it terminated.</returns>
+        </member>
+        <member name="M:Cake.Common.ProcessExtensions.StartProcess(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Core.IO.ProcessSettings)">
+            <summary>
+            Starts the process resource that is specified by the filename and settings.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="fileName">Name of the file.</param>
+            <param name="settings">The settings.</param>
+            <returns>The exit code that the started process specified when it terminated.</returns>
+        </member>
+        <member name="T:Cake.Common.ReleaseNotes">
+            <summary>
+            Represent release notes.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.ReleaseNotes.#ctor(System.Version,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.ReleaseNotes"/> class.
+            </summary>
+            <param name="version">The version.</param>
+            <param name="notes">The notes.</param>
+        </member>
+        <member name="P:Cake.Common.ReleaseNotes.Version">
+            <summary>
+            Gets the version.
+            </summary>
+            <value>The version.</value>
+        </member>
+        <member name="P:Cake.Common.ReleaseNotes.Notes">
+            <summary>
+            Gets the release notes.
+            </summary>
+            <value>The release notes.</value>
+        </member>
+        <member name="T:Cake.Common.ReleaseNotesExtensions">
+            <summary>
+            Contains functionality related to release notes.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.ReleaseNotesExtensions.ParseAllReleaseNotes(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Parses all release notes.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePath">The file path.</param>
+            <returns>All release notes.</returns>
+        </member>
+        <member name="M:Cake.Common.ReleaseNotesExtensions.ParseReleaseNotes(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Parses the latest release notes.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePath">The file path.</param>
+            <returns>The latest release notes.</returns>
+        </member>
+        <member name="T:Cake.Common.ReleaseNotesParser">
+            <summary>
+            The release notes parser.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.ReleaseNotesParser.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.ReleaseNotesParser"/> class.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.ReleaseNotesParser.Parse(System.String)">
+            <summary>
+            Parses all release notes.
+            </summary>
+            <param name="content">The content.</param>
+            <returns>All release notes.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.ILMerge.ILMergeExtensions">
+            <summary>
+            Contains functionality related to ILMerge.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.ILMerge.ILMergeExtensions.ILMerge(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Core.IO.FilePath,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath})">
+            <summary>
+            Merges the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="outputFile">The output file.</param>
+            <param name="primaryAssembly">The primary assembly.</param>
+            <param name="assemblyPaths">The assembly paths.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.ILMerge.ILMergeExtensions.ILMerge(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Core.IO.FilePath,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.ILMerge.ILMergeSettings)">
+            <summary>
+            Merges the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="outputFile">The output file.</param>
+            <param name="primaryAssembly">The primary assembly.</param>
+            <param name="assemblyPaths">The assembly paths.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="T:Cake.Common.Tools.ILMerge.ILMergeRunner">
+            <summary>
+            The ILMerge runner.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.ILMerge.ILMergeRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IGlobber,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.ILMerge.ILMergeRunner"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="globber">The globber.</param>
+            <param name="processRunner">The process runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.ILMerge.ILMergeRunner.Merge(Cake.Core.IO.FilePath,Cake.Core.IO.FilePath,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.ILMerge.ILMergeSettings)">
+            <summary>
+            Merges the specified assemblies.
+            </summary>
+            <param name="outputAssemblyPath">The output assembly path.</param>
+            <param name="primaryAssemblyPath">The primary assembly path.</param>
+            <param name="assemblyPaths">The assembly paths.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.ILMerge.ILMergeRunner.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.ILMerge.ILMergeRunner.GetDefaultToolPath(Cake.Common.Tools.ILMerge.ILMergeSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.ILMerge.ILMergeSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.ILMerge.ILMergeRunner"/>.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.ILMerge.ILMergeSettings.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.ILMerge.ILMergeSettings"/> class.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.ILMerge.ILMergeSettings.Internalize">
+            <summary>
+            Gets or sets a value indicating whether whether types in assemblies other 
+            than the primary assembly should have their visibility modified to internal.
+            </summary>
+            <value>
+            <c>true</c> if types in assemblies other than the primary assembly should 
+            have their visibility modified to internal; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.ILMerge.ILMergeSettings.TargetKind">
+            <summary>
+            Gets or sets the target kind.
+            </summary>
+            <value>The target kind.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.ILMerge.ILMergeSettings.ToolPath">
+            <summary>
+            Gets or sets the tool path.
+            </summary>
+            <value>The tool path.</value>
+        </member>
+        <member name="T:Cake.Common.Tools.ILMerge.TargetKind">
+            <summary>
+            Represents an ILMerge target.
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.ILMerge.TargetKind.Default">
+            <summary>
+            The default target.
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.ILMerge.TargetKind.Dll">
+            <summary>
+            Dynamic Link Library
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.ILMerge.TargetKind.Exe">
+            <summary>
+            Executable
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.ILMerge.TargetKind.WinExe">
+            <summary>
+            Windows executable
+            </summary>
+        </member>
+        <member name="T:Cake.Common.ArgumentExtensions">
+            <summary>
+            Contains functionality related to arguments.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.ArgumentExtensions.HasArgument(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Determines whether or not the specified argument exist.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="name">The argument name.</param>
+            <returns>Whether or not the specified argument exist.</returns>
+        </member>
+        <member name="M:Cake.Common.ArgumentExtensions.Argument``1(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Gets an argument.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="context">The context.</param>
+            <param name="name">The argument name.</param>
+            <returns>The value of the argument.</returns>
+        </member>
+        <member name="M:Cake.Common.ArgumentExtensions.Argument``1(Cake.Core.ICakeContext,System.String,``0)">
+            <summary>
+            Gets an argument.
+            </summary>
+            <typeparam name="T">The argument type.</typeparam>
+            <param name="context">The context.</param>
+            <param name="name">The argument name.</param>
+            <param name="defaultValue">The default value of the argument.</param>
+            <returns>The value of the argument.</returns>
+        </member>
+        <member name="T:Cake.Common.IO.ZipExtensions">
+            <summary>
+            Contains functionality related to compress files to Zip.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.IO.ZipExtensions.Zip(Cake.Core.ICakeContext,Cake.Core.IO.DirectoryPath,Cake.Core.IO.FilePath)">
+            <summary>
+            Zips the specified directory.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="rootPath">The root path.</param>
+            <param name="outputPath">The output path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.ZipExtensions.Zip(Cake.Core.ICakeContext,Cake.Core.IO.DirectoryPath,Cake.Core.IO.FilePath,System.String)">
+            <summary>
+            Zips the files matching the specified pattern.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="rootPath">The root path.</param>
+            <param name="outputPath">The output path.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:Cake.Common.IO.ZipExtensions.Zip(Cake.Core.ICakeContext,Cake.Core.IO.DirectoryPath,Cake.Core.IO.FilePath,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath})">
+            <summary>
+            Zips the specified files.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="rootPath">The root path.</param>
+            <param name="outputPath">The output path.</param>
+            <param name="filePaths">The file paths.</param>
+        </member>
+        <member name="M:Cake.Common.IO.ZipExtensions.Zip(Cake.Core.ICakeContext,Cake.Core.IO.DirectoryPath,Cake.Core.IO.FilePath,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Zips the specified files.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="rootPath">The root path.</param>
+            <param name="outputPath">The output path.</param>
+            <param name="filePaths">The file paths.</param>
+        </member>
+        <member name="T:Cake.Common.IO.Zipper">
+            <summary>
+            Performs Zip compression.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.IO.Zipper.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.Diagnostics.ICakeLog)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.IO.Zipper"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="log">The log.</param>
+        </member>
+        <member name="M:Cake.Common.IO.Zipper.Zip(Cake.Core.IO.DirectoryPath,Cake.Core.IO.FilePath,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath})">
+            <summary>
+            Zips the specified directory.
+            </summary>
+            <param name="rootPath">The root path.</param>
+            <param name="outputPath">The output path.</param>
+            <param name="filePaths">The files to zip.</param>
+        </member>
+        <member name="T:Cake.Common.IO.DirectoryExtensions">
+            <summary>
+            Contains extension methods for working with directories.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.IO.DirectoryExtensions.DeleteDirectories(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.DirectoryPath},System.Boolean)">
+            <summary>
+            Deletes the specified directories.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="directories">The directory paths.</param>
+            <param name="recursive">Will perform a recursive delete if set to <c>true</c>.</param>
+        </member>
+        <member name="M:Cake.Common.IO.DirectoryExtensions.DeleteDirectories(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{System.String},System.Boolean)">
+            <summary>
+            Deletes the specified directories.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="directories">The directory paths.</param>
+            <param name="recursive">Will perform a recursive delete if set to <c>true</c>.</param>
+        </member>
+        <member name="M:Cake.Common.IO.DirectoryExtensions.DeleteDirectory(Cake.Core.ICakeContext,Cake.Core.IO.DirectoryPath,System.Boolean)">
+            <summary>
+            Deletes the specified directory.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="path">The directory path.</param>
+            <param name="recursive">Will perform a recursive delete if set to <c>true</c>.</param>
+        </member>
+        <member name="M:Cake.Common.IO.DirectoryExtensions.CleanDirectories(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Cleans the directories matching the specified pattern.
+            Cleaning the directory will remove all it's content but not the directory iteself.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern to match.</param>
+        </member>
+        <member name="M:Cake.Common.IO.DirectoryExtensions.CleanDirectories(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.DirectoryPath})">
+            <summary>
+            Cleans the specified directories.
+            Cleaning a directory will remove all it's content but not the directory iteself.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="directories">The directory paths.</param>
+        </member>
+        <member name="M:Cake.Common.IO.DirectoryExtensions.CleanDirectories(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Cleans the specified directories.
+            Cleaning a directory will remove all it's content but not the directory iteself.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="directories">The directory paths.</param>
+        </member>
+        <member name="M:Cake.Common.IO.DirectoryExtensions.CleanDirectory(Cake.Core.ICakeContext,Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Cleans the specified directory.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="path">The directory path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.DirectoryExtensions.CreateDirectory(Cake.Core.ICakeContext,Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Creates the specified directory.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="path">The directory path.</param>
+        </member>
+        <member name="T:Cake.Common.IO.FileExtensions">
+            <summary>
+            Contains functionality related to file operations.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.CopyFileToDirectory(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Copies the specified file.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePath">The file path.</param>
+            <param name="targetDirectoryPath">The target directory path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.CopyFile(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Core.IO.FilePath)">
+            <summary>
+            Copies the specified file.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePath">The file path.</param>
+            <param name="targetFilePath">The target file path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.CopyFiles(Cake.Core.ICakeContext,System.String,Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Copies the files matching the specified pattern.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+            <param name="targetDirectoryPath">The target directory path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.CopyFiles(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Copies the specified files.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePaths">The file paths.</param>
+            <param name="targetDirectoryPath">The target directory path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.CopyFiles(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{System.String},Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Copies the specified files.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePaths">The file paths.</param>
+            <param name="targetDirectoryPath">The target directory path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.MoveFileToDirectory(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Moves the specified file to the specified directory.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePath">The file path.</param>
+            <param name="targetDirectoryPath">The target directory path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.MoveFiles(Cake.Core.ICakeContext,System.String,Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Moves the files matching the specified pattern to the specified directory.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+            <param name="targetDirectoryPath">The target directory path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.MoveFiles(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Core.IO.DirectoryPath)">
+            <summary>
+            Moves the specified files to the specified directory.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePaths">The file paths.</param>
+            <param name="targetDirectoryPath">The target directory path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.MoveFile(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Core.IO.FilePath)">
+            <summary>
+            Moves the specified file to the specified directory.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePath">The file path.</param>
+            <param name="targetFilePath">The target file path.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.DeleteFiles(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Deletes the specified files.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.DeleteFiles(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath})">
+            <summary>
+            Deletes the specified files.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePaths">The file paths.</param>
+        </member>
+        <member name="M:Cake.Common.IO.FileExtensions.DeleteFile(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Deletes the specified file.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="filePath">The file path.</param>
+        </member>
+        <member name="T:Cake.Common.IO.GlobbingExtensions">
+            <summary>
+            Contains functionality related to file system globbing.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.IO.GlobbingExtensions.GetFiles(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Gets all files matching the specified pattern.
+            </summary>
+            <param name="context"></param>
+            <param name="pattern"></param>
+            <returns>A <see cref="T:Cake.Core.IO.FilePathCollection"/>.</returns>
+        </member>
+        <member name="M:Cake.Common.IO.GlobbingExtensions.GetDirectories(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Gets all directory matching the specified pattern.
+            </summary>
+            <param name="context"></param>
+            <param name="pattern"></param>
+            <returns>A <see cref="T:Cake.Core.IO.DirectoryPathCollection"/>.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.MSBuild.MSBuildExtensions">
+            <summary>
+            Contains functionality related to MSBuild.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildExtensions.MSBuild(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Builds the specified solution using MSBuild.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="solution">The solution.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildExtensions.MSBuild(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,System.Action{Cake.Common.Tools.MSBuild.MSBuildSettings})">
+            <summary>
+            Builds the specified solution using MSBuild.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="solution">The solution.</param>
+            <param name="configurator">The configurator.</param>
+        </member>
+        <member name="T:Cake.Common.Tools.MSBuild.MSBuildRunner">
+            <summary>
+            The MSBuild runner.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.MSBuild.MSBuildRunner"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="runner">The runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildRunner.Run(Cake.Common.Tools.MSBuild.MSBuildSettings)">
+            <summary>
+            Runs MSBuild with the specified settings.
+            </summary>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildRunner.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildRunner.GetDefaultToolPath(Cake.Common.Tools.MSBuild.MSBuildSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <param name="settings">The settings.</param>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.MSBuild.MSBuildSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.MSBuild.MSBuildRunner"/>.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildSettings.#ctor(Cake.Core.IO.FilePath)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.MSBuild.MSBuildSettings"/> class.
+            </summary>
+            <param name="solution">The solution.</param>
+        </member>
+        <member name="P:Cake.Common.Tools.MSBuild.MSBuildSettings.Solution">
+            <summary>
+            Gets the solution path.
+            </summary>
+            <value>The solution.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.MSBuild.MSBuildSettings.Targets">
+            <summary>
+            Gets the targets.
+            </summary>
+            <value>The targets.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.MSBuild.MSBuildSettings.Properties">
+            <summary>
+            Gets the properties.
+            </summary>
+            <value>The properties.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.MSBuild.MSBuildSettings.PlatformTarget">
+            <summary>
+            Gets or sets the platform target.
+            </summary>
+            <value>The platform target.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.MSBuild.MSBuildSettings.ToolVersion">
+            <summary>
+            Gets or sets the tool version.
+            </summary>
+            <value>The tool version.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.MSBuild.MSBuildSettings.Configuration">
+            <summary>
+            Gets or sets the configuration.
+            </summary>
+            <value>The configuration.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.MSBuild.MSBuildSettings.MaxCpuCount">
+            <summary>
+            Gets or sets the maximum CPU count.
+            </summary>
+            <value>The maximum CPU count.</value>
+        </member>
+        <member name="T:Cake.Common.Tools.MSBuild.MSBuildSettingsExtensions">
+            <summary>
+            Contains functionality related to MSBuild settings.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildSettingsExtensions.WithTarget(Cake.Common.Tools.MSBuild.MSBuildSettings,System.String)">
+            <summary>
+            Adds a MSBuild target to the configuration.
+            </summary>
+            <param name="settings">The settings.</param>
+            <param name="target">The MSBuild target.</param>
+            <returns>The same <see cref="T:Cake.Common.Tools.MSBuild.MSBuildSettings"/> instance so that multiple calls can be chained.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildSettingsExtensions.UseToolVersion(Cake.Common.Tools.MSBuild.MSBuildSettings,Cake.Common.Tools.MSBuild.MSBuildToolVersion)">
+            <summary>
+            Sets the tool version.
+            </summary>
+            <param name="settings">The settings.</param>
+            <param name="version">The version.</param>
+            <returns>The same <see cref="T:Cake.Common.Tools.MSBuild.MSBuildSettings"/> instance so that multiple calls can be chained.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildSettingsExtensions.SetPlatformTarget(Cake.Common.Tools.MSBuild.MSBuildSettings,Cake.Common.Tools.MSBuild.PlatformTarget)">
+            <summary>
+            Sets the platform target.
+            </summary>
+            <param name="settings">The settings.</param>
+            <param name="target">The target.</param>
+            <returns>The same <see cref="T:Cake.Common.Tools.MSBuild.MSBuildSettings"/> instance so that multiple calls can be chained.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildSettingsExtensions.WithProperty(Cake.Common.Tools.MSBuild.MSBuildSettings,System.String,System.String[])">
+            <summary>
+            Adds a property to the configuration.
+            </summary>
+            <param name="settings">The settings.</param>
+            <param name="name">The property name.</param>
+            <param name="values">The property values.</param>
+            <returns>The same <see cref="T:Cake.Common.Tools.MSBuild.MSBuildSettings"/> instance so that multiple calls can be chained.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildSettingsExtensions.SetConfiguration(Cake.Common.Tools.MSBuild.MSBuildSettings,System.String)">
+            <summary>
+            Sets the configuration.
+            </summary>
+            <param name="settings">The settings.</param>
+            <param name="configuration">The configuration.</param>
+            <returns>The same <see cref="T:Cake.Common.Tools.MSBuild.MSBuildSettings"/> instance so that multiple calls can be chained.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.MSBuild.MSBuildSettingsExtensions.SetMaxCpuCount(Cake.Common.Tools.MSBuild.MSBuildSettings,System.Int32)">
+            <summary>
+            Sets the maximum CPU count.
+            </summary>
+            <param name="settings">The settings.</param>
+            <param name="maxCpuCount">The maximum CPU count.</param>
+            <returns>The same <see cref="T:Cake.Common.Tools.MSBuild.MSBuildSettings"/> instance so that multiple calls can be chained.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.MSBuild.MSBuildToolVersion">
+            <summary>
+            Represents a MSBuild tool version.
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.Default">
+            <summary>
+            The highest available MSBuild tool version.
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.NET20">
+            <summary>
+            .NET 2.0
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.NET30">
+            <summary>
+            .NET 3.0
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.VS2005">
+            <summary>
+            Visual Studio 2005
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.NET35">
+            <summary>
+            .NET 3.5
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.VS2008">
+            <summary>
+            Visual Studio 2008
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.NET40">
+            <summary>
+            .NET 4.0
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.NET45">
+            <summary>
+            .NET 4.5
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.VS2010">
+            <summary>
+            Visual Studio 2010
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.VS2011">
+            <summary>
+            Visual Studio 2011
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.VS2012">
+            <summary>
+            Visual Studio 2012
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.NET451">
+            <summary>
+            .NET 4.5.1
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.NET452">
+            <summary>
+            .NET 4.5.2
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.MSBuildToolVersion.VS2013">
+            <summary>
+            Visual Studio 2013
+            </summary>
+        </member>
+        <member name="T:Cake.Common.Tools.MSBuild.PlatformTarget">
+            <summary>
+            Represents a MSBuild platform target.
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.PlatformTarget.MSIL">
+            <summary>
+            MSIL (AnyCPU).
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.PlatformTarget.x86">
+            <summary>
+            x86
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.MSBuild.PlatformTarget.x64">
+            <summary>
+            x64
+            </summary>
+        </member>
+        <member name="T:Cake.Common.Tools.MSTest.MSTestExtensions">
+            <summary>
+            Contains functionality related to running MSTest unit tests.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestExtensions.MSTest(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Runs all MSTest unit tests in the assemblies matching the specified pattern.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestExtensions.MSTest(Cake.Core.ICakeContext,System.String,Cake.Common.Tools.MSTest.MSTestSettings)">
+            <summary>
+            Runs all MSTest unit tests in the assemblies matching the specified pattern.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestExtensions.MSTest(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath})">
+            <summary>
+            Runs all MSTest unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblyPaths">The assembly paths.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestExtensions.MSTest(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.MSTest.MSTestSettings)">
+            <summary>
+            Runs all MSTest unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblyPaths">The assembly paths.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="T:Cake.Common.Tools.MSTest.MSTestRunner">
+            <summary>
+            The MSTest unit test runner.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.MSTest.MSTestRunner"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="processRunner">The process runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestRunner.Run(Cake.Core.IO.FilePath,Cake.Common.Tools.MSTest.MSTestSettings)">
+            <summary>
+            Runs the tests in the specified assembly.
+            </summary>
+            <param name="assemblyPath">The assembly path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestRunner.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The tool name.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestRunner.GetDefaultToolPath(Cake.Common.Tools.MSTest.MSTestSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.MSTest.MSTestSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.MSTest.MSTestRunner"/>.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.MSTest.MSTestSettings.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.MSTest.MSTestSettings"/> class.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.MSTest.MSTestSettings.ToolPath">
+            <summary>
+            Gets or sets the tool path.
+            </summary>
+            <value>The tool path.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.MSTest.MSTestSettings.NoIsolation">
+            <summary>
+            Gets or sets a value indicating whether to run tests within the MSTest process.
+            This choice improves test run speed but increases risk to the MSTest.exe process.
+            Defaults to <c>true</c>.
+            </summary>
+            <value>
+              <c>true</c> if running without isolation; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="T:Cake.Common.Tools.NuGet.NuGetExtensions">
+            <summary>
+            Contains functionality for working with NuGet.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.NuGetExtensions.NuGetPack(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Common.Tools.NuGet.Pack.NuGetPackSettings)">
+            <summary>
+            Creates a NuGet package using the specified Nuspec file.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="nuspecFilePath">The nuspec file path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.NuGetExtensions.NuGetRestore(Cake.Core.ICakeContext,Cake.Core.IO.FilePath)">
+            <summary>
+            Restores NuGet packages for the specified target.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="targetFilePath">The target to restore.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.NuGetExtensions.NuGetRestore(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings)">
+            <summary>
+            Restores NuGet packages using the specified settings.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="targetFilePath">The target to restore.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.NuGetExtensions.NuGetPush(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Common.Tools.NuGet.Push.NuGetPushSettings)">
+            <summary>
+            Pushes a NuGet package to a NuGet server and publishes it.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="packageFilePath">The nupkg file path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="T:Cake.Common.Tools.NuGet.Pack.NuGetPacker">
+            <summary>
+            The NuGet packer.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Pack.NuGetPacker.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IGlobber,Cake.Core.IO.IProcessRunner,Cake.Core.Diagnostics.ICakeLog)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.NuGet.Pack.NuGetPacker"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="globber">The globber.</param>
+            <param name="processRunner">The process runner.</param>
+            <param name="log">The log.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Pack.NuGetPacker.Pack(Cake.Core.IO.FilePath,Cake.Common.Tools.NuGet.Pack.NuGetPackSettings)">
+            <summary>
+            Creates a NuGet package from the specified Nuspec file.
+            </summary>
+            <param name="nuspecFilePath">The nuspec file path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Pack.NuGetPacker.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Pack.NuGetPacker.GetDefaultToolPath(Cake.Common.Tools.NuGet.Pack.NuGetPackSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.NuGet.Pack.NuGetPacker"/>.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.BasePath">
+            <summary>
+            Gets or sets the base path.
+            </summary>
+            <value>The base path.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.OutputDirectory">
+            <summary>
+            Gets or sets the output directory.
+            </summary>
+            <value>The output directory.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.NoPackageAnalysis">
+            <summary>
+            Gets or sets a value indicating whether package analysis should be performed.
+            Defaults to <c>true</c>.
+            </summary>
+            <value>
+              <c>true</c> if package analysis should be performed; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Symbols">
+            <summary>
+            Gets or sets a value indicating whether a symbol package should be created.
+            Defaults to <c>false</c>.
+            </summary>
+            <value>
+              <c>true</c> if a symbol package should be created; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Id">
+            <summary>
+            Gets or sets the package ID.
+            </summary>
+            <value>The package ID.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Version">
+            <summary>
+            Gets or sets the Nuspec version.
+            </summary>
+            <value>The Nuspec version.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Title">
+            <summary>
+            Gets or sets the package title.
+            </summary>
+            <value>The package title.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Authors">
+            <summary>
+            Gets or sets the package authors.
+            </summary>
+            <value>The package authors.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Owners">
+            <summary>
+            Gets or sets the package owners.
+            </summary>
+            <value>The package owners.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Description">
+            <summary>
+            Gets or sets the package description.
+            </summary>
+            <value>The package description.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Summary">
+            <summary>
+            Gets or sets the package summary.
+            </summary>
+            <value>The package summary.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.ProjectUrl">
+            <summary>
+            Gets or sets the package project URL.
+            </summary>
+            <value>The package project URL.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.IconUrl">
+            <summary>
+            Gets or sets the package icon URL.
+            </summary>
+            <value>The package icon URL.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.LicenseUrl">
+            <summary>
+            Gets or sets the package license URL.
+            </summary>
+            <value>The package license URL.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Copyright">
+            <summary>
+            Gets or sets the package copyright.
+            </summary>
+            <value>The package copyright.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.ReleaseNotes">
+            <summary>
+            Gets or sets the package release notes.
+            </summary>
+            <value>The package release notes.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.Tags">
+            <summary>
+            Gets or sets the package tags.
+            </summary>
+            <value>The package tags.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.RequireLicenseAcceptance">
+            <summary>
+            Gets or sets a value indicating whether users has to accept the package license.
+            </summary>
+            <value>
+            <c>true</c> if users has to accept the package license; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Pack.NuGetPackSettings.ToolPath">
+            <summary>
+            Gets or sets the tool path.
+            </summary>
+            <value>The tool path.</value>
+        </member>
+        <member name="T:Cake.Common.Tools.NuGet.Push.NuGetPusher">
+            <summary>
+            The NuGet package pusher.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Push.NuGetPusher.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IGlobber,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.NuGet.Push.NuGetPusher"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="globber">The globber.</param>
+            <param name="processRunner">The process runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Push.NuGetPusher.Push(Cake.Core.IO.FilePath,Cake.Common.Tools.NuGet.Push.NuGetPushSettings)">
+            <summary>
+            Pushes a NuGet package to a NuGet server and publishes it.
+            </summary>
+            <param name="packageFilePath">The package file path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Push.NuGetPusher.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Push.NuGetPusher.GetDefaultToolPath(Cake.Common.Tools.NuGet.Push.NuGetPushSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.NuGet.Push.NuGetPushSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.NuGet.Push.NuGetPusher"/>.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Push.NuGetPushSettings.Source">
+            <summary>
+            Gets or sets  the server URL. If not specified, nuget.org is used unless 
+            DefaultPushSource config value is set in the NuGet config file. 
+            Starting with NuGet 2.5, if NuGet.exe identifies a UNC/folder source, 
+            it will perform the file copy to the source.
+            </summary>
+            <value>The server URL.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Push.NuGetPushSettings.ApiKey">
+            <summary>
+            Gets or sets the API key for the server.
+            </summary>
+            <value>The API key for the server.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Push.NuGetPushSettings.Timeout">
+            <summary>
+            Gets or sets the timeout for pushing to a server. 
+            Defaults to 300 seconds (5 minutes).
+            </summary>
+            <value>The timeout for pushing to a server.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Push.NuGetPushSettings.Verbosity">
+            <summary>
+            Gets or sets the verbosity.
+            </summary>
+            <value>The verbosity.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Push.NuGetPushSettings.ConfigFile">
+            <summary>
+            Gets or sets the NuGet configuration file.
+            </summary>
+            <value>The NuGet configuation file.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Push.NuGetPushSettings.ToolPath">
+            <summary>
+            Gets or sets the tool path.
+            </summary>
+            <value>The tool path.</value>
+        </member>
+        <member name="T:Cake.Common.Tools.NuGet.Restore.NuGetRestorer">
+            <summary>
+            The NuGet package restorer used to restore solution packages.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Restore.NuGetRestorer.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IGlobber,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.NuGet.Restore.NuGetRestorer"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="globber">The globber.</param>
+            <param name="processRunner">The process runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Restore.NuGetRestorer.Restore(Cake.Core.IO.FilePath,Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings)">
+            <summary>
+            Restores NuGet packages using the specified settings.
+            </summary>
+            <param name="targetFilePath">The target file path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Restore.NuGetRestorer.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.NuGet.Restore.NuGetRestorer.GetDefaultToolPath(Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <param name="settings">The settings.</param>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.NuGet.Restore.NuGetRestorer"/>.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings.ToolPath">
+            <summary>
+            Path to nuget.exe
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings.RequireConsent">
+            <summary>
+            Checks if package restore consent is granted before installing a package.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings.PackagesDirectory">
+            <summary>
+            Specifies the packages folder.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings.Source">
+            <summary>
+            A list of packages sources to use for this command.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings.NoCache">
+            <summary>
+            Sets whether or not to use the machine cache as the first package source.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings.DisableParallelProcessing">
+            <summary>
+            Disable parallel processing of packages for this command.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings.Verbosity">
+            <summary>
+            Display this amount of details in the output: Normal, Quiet, Detailed.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NuGet.Restore.NuGetRestoreSettings.ConfigFile">
+            <summary>
+            The NuGet configuration file. If not specified, file %AppData%\NuGet\NuGet.config is used as configuration file.
+            </summary>
+        </member>
+        <member name="T:Cake.Common.Tools.NuGet.NuGetVerbosity">
+            <summary>
+            Represents NuGet verbosity.
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.NuGet.NuGetVerbosity.Normal">
+            <summary>
+            Normal
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.NuGet.NuGetVerbosity.Quiet">
+            <summary>
+            Quiet
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.NuGet.NuGetVerbosity.Detailed">
+            <summary>
+            Detailed
+            </summary>
+        </member>
+        <member name="T:Cake.Common.Tools.NUnit.NUnitExtensions">
+            <summary>
+            Contains functionality related to running NUnit unit tests.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitExtensions.NUnit(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Runs all NUnit unit tests in the assemblies matching the specified pattern.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitExtensions.NUnit(Cake.Core.ICakeContext,System.String,Cake.Common.Tools.NUnit.NUnitSettings)">
+            <summary>
+            Runs all NUnit unit tests in the assemblies matching the specified pattern.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitExtensions.NUnit(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Runs all NUnit unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The assemblies.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitExtensions.NUnit(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath})">
+            <summary>
+            Runs all NUnit unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The assemblies.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitExtensions.NUnit(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{System.String},Cake.Common.Tools.NUnit.NUnitSettings)">
+            <summary>
+            Runs all NUnit unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The assemblies.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitExtensions.NUnit(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.NUnit.NUnitSettings)">
+            <summary>
+            Runs all NUnit unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The assemblies.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="T:Cake.Common.Tools.NUnit.NUnitRunner">
+            <summary>
+            The NUnit unit test runner.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IGlobber,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.NUnit.NUnitRunner"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="globber">The globber.</param>
+            <param name="processRunner">The process runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitRunner.Run(Cake.Core.IO.FilePath,Cake.Common.Tools.NUnit.NUnitSettings)">
+            <summary>
+            Runs the tests in the specified assembly.
+            </summary>
+            <param name="assemblyPath">The assembly path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitRunner.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitRunner.GetDefaultToolPath(Cake.Common.Tools.NUnit.NUnitSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.NUnit.NUnitSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.NUnit.NUnitRunner"/>.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.NUnit.NUnitSettings.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.NUnit.NUnitSettings"/> class.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.ToolPath">
+            <summary>
+            Gets or sets the tool path.
+            </summary>
+            <value>
+            The tool path.
+            Defaults to './tools/**/nunit-console.exe'.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.ResultsFile">
+            <summary>
+            Specifies the name of the Xml Results File.
+            </summary>
+            <value>
+            Results file path.
+            Defaults to 'TestResult.xml'
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.NoResults">
+            <summary>
+            Specifies wether to generate the results xml file.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.Framework">
+            <summary>
+            Allows you to specify the version of the runtime to be used in executing tests.
+            </summary>
+            <remarks>
+            If that version specified is different from the one being used by NUnit, the tests are run in a separate process.
+            </remarks>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.Include">
+            <summary>
+            Specifies categories to include in running. 
+            See <see cref="!:http://nunit.org/index.php?p=consoleCommandLine&amp;r=2.6.3 "> examples here</see> under "Specifying Test Categories to Include or Exclude".
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.Exclude">
+            <summary>
+            Specifies categories to exclude from running.
+            See <see cref="!:http://nunit.org/index.php?p=consoleCommandLine&amp;r=2.6.3 ">examples here</see> under "Specifying Test Categories to Include or Exclude".
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.Timeout">
+            <summary>
+            Represents the default timeout to be used for test cases in this run. 
+            If any test exceeds the timeout value, it is cancelled and reported as an error.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.ShadowCopy">
+            <summary>
+            Gets or sets a value indicating whether tests should be run as a shadow copy.
+            Default value is <c>true</c>.
+            </summary>
+            <value>
+              <c>true</c> if tests should be run as a shadow copy; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.NoThread">
+            <summary>
+            Suppresses use of a separate thread for running the tests and uses the main thread instead.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.NoLogo">
+            <summary>
+            Disables display of the copyright information at the start of the program.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.StopOnError">
+            <summary>
+            Causes execution of the test run to terminate immediately on the first test failure or error.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.NUnit.NUnitSettings.Trace">
+            <summary>
+            Allows you to control the amount of information that NUnit writes to its internal trace log.
+            </summary>
+            <value>
+                Valid values are Off, Error, Warning, Info, and Debug. The default is Off.
+            </value>
+        </member>
+        <member name="T:Cake.Common.Tools.SignTool.Sign.SignToolSignExtensions">
+            <summary>
+            Contains functionality related to signing assemblies with PFX certificate
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.SignTool.Sign.SignToolSignExtensions.Sign(Cake.Core.ICakeContext,System.String,Cake.Common.Tools.SignTool.Sign.SignToolSignSettings)">
+            <summary>
+            Signs the specified assembly
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assembly">The target assembly.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.SignTool.Sign.SignToolSignExtensions.Sign(Cake.Core.ICakeContext,Cake.Core.IO.FilePath,Cake.Common.Tools.SignTool.Sign.SignToolSignSettings)">
+            <summary>
+            Signs the specified assembly
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assembly">The target assembly.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.SignTool.Sign.SignToolSignExtensions.Sign(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{System.String},Cake.Common.Tools.SignTool.Sign.SignToolSignSettings)">
+            <summary>
+            Signs the specified assemblies
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The target assembly.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.SignTool.Sign.SignToolSignExtensions.Sign(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.SignTool.Sign.SignToolSignSettings)">
+            <summary>
+            Signs the specified assemblies
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The target assembly.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="T:Cake.Common.Tools.SignTool.Sign.SignToolSignRunner">
+            <summary>
+            The SignTool SIGN assembly runner
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.SignTool.Sign.SignToolSignRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.SignTool.Sign.SignToolSignRunner"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="processRunner">The process runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.SignTool.Sign.SignToolSignRunner.Run(Cake.Core.IO.FilePath,Cake.Common.Tools.SignTool.Sign.SignToolSignSettings)">
+            <summary>
+            Runs the tests in the specified assembly.
+            </summary>
+            <param name="assemblyPath">The assembly path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.SignTool.Sign.SignToolSignRunner.GetToolName">
+            <summary>
+            Get name of tool
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Cake.Common.Tools.SignTool.Sign.SignToolSignRunner.GetDefaultToolPath(Cake.Common.Tools.SignTool.Sign.SignToolSignSettings)">
+            <summary>
+            Get the default path to tool
+            </summary>
+            <param name="settings"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Cake.Common.Tools.SignTool.Sign.SignToolSignSettings">
+            <summary>
+            Contains settings used by  <see cref="T:Cake.Common.Tools.SignTool.Sign.SignToolSignRunner"/>.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.SignTool.Sign.SignToolSignSettings.ToolPath">
+            <summary>
+            Gets or sets the tool path.
+            </summary>
+            <value>
+            The tool path.
+            Defaults to path given by <see cref="M:Cake.Common.Tools.SignTool.SignToolResolver.GetSignToolPath(Cake.Core.ICakeEnvironment)"/>
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.SignTool.Sign.SignToolSignSettings.TimeStampUri">
+            <summary>
+            Specify the timestamp server's URL.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.SignTool.Sign.SignToolSignSettings.CertPath">
+            <summary>
+            Path to PFX cerificate
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.SignTool.Sign.SignToolSignSettings.Password">
+            <summary>
+            PFX certificate password
+            </summary>
+        </member>
+        <member name="T:Cake.Common.Tools.WiX.Architecture">
+            <summary>
+            The architecture for the package.
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.WiX.Architecture.X64">
+            <summary>
+            x86_64
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.WiX.Architecture.X86">
+            <summary>
+            x86
+            </summary>
+        </member>
+        <member name="F:Cake.Common.Tools.WiX.Architecture.IA64">
+            <summary>
+            Itanium
+            </summary>
+        </member>
+        <member name="T:Cake.Common.Tools.WiX.CandleRunner">
+            <summary>
+            The WiX Candle runner.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.CandleRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IGlobber,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.WiX.CandleRunner"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The environment.</param>
+            <param name="globber">The globber.</param>
+            <param name="processRunner">The process runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.CandleRunner.Run(System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.WiX.CandleSettings)">
+            <summary>
+            Runs Candle with the specified source files and settings.
+            </summary>
+            <param name="sourceFiles">The source files (.wxs) to compile.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.CandleRunner.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.CandleRunner.GetDefaultToolPath(Cake.Common.Tools.WiX.CandleSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <param name="settings">The settings.</param>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.WiX.CandleSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.WiX.CandleRunner"/>.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.Architecture">
+            <summary>
+            Gets or sets a value indicating which architecture to build the MSI package for.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.Defines">
+            <summary>
+            Gets or sets the preprocessor defines.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.Extensions">
+            <summary>
+            Gets or sets the WiX extensions to use.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.FIPS">
+            <summary>
+            Gets or sets a value indicating if FIPS compliant algorithms should be used.
+            </summary>
+            <value>
+              <c>true</c> if FIPS compliant algorithms should be used, otherwise <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.NoLogo">
+            <summary>
+            Gets or sets a value indicating whether to show the logo information.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.OutputDirectory">
+            <summary>
+            Gets or sets the output directory for the object files.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.Pedantic">
+            <summary>
+            Gets or sets a value indicating whether to show pedantic messages.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.ShowSourceTrace">
+            <summary>
+            Gets or sets a value indicating whether to show source trace for errors, warnings and verbose messages.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.Verbose">
+            <summary>
+            Gets or sets a value indicating verbose output.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.CandleSettings.ToolPath">
+            <summary>
+            Gets or sets the path to <c>Candle.exe</c>.
+            </summary>
+        </member>
+        <member name="T:Cake.Common.Tools.WiX.LightRunner">
+            <summary>
+            The WiX Light runner.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.LightRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IGlobber,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.WiX.LightRunner"/> class.
+            </summary>
+            <param name="fileSystem">The file system.</param>
+            <param name="environment">The Cake environment.</param>
+            <param name="globber">The globber.</param>
+            <param name="processRunner">The process runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.LightRunner.Run(System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.WiX.LightSettings)">
+            <summary>
+            Runs Light with the specified input object files and settings.
+            </summary>
+            <param name="objectFiles">The object files (.wixobj).</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.LightRunner.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.LightRunner.GetDefaultToolPath(Cake.Common.Tools.WiX.LightSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <param name="settings">The settings.</param>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.WiX.LightSettings">
+            <summary>
+            Contains settings used by the <see cref="T:Cake.Common.Tools.WiX.LightRunner"/>.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.LightSettings.Defines">
+            <summary>
+            Gets or sets the defined WiX variables.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.LightSettings.Extensions">
+            <summary>
+            Gets or sets the WiX extensions to use.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.LightSettings.RawArguments">
+            <summary>
+            Gets or sets raw command line arguments to pass through to the linker.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.LightSettings.NoLogo">
+            <summary>
+            Gets or sets a value indicating whether to show the logo information.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.LightSettings.OutputFile">
+            <summary>
+            Gets or sets the path to the output file (ie. the resulting MSI package).
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.WiX.LightSettings.ToolPath">
+            <summary>
+            Gets or sets the path to <c>Light.exe</c>.
+            </summary>
+        </member>
+        <member name="T:Cake.Common.Tools.WiX.WiXExtensions">
+            <summary>
+            Contains functionality related to running WiX tools.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.WiXExtensions.WiXCandle(Cake.Core.ICakeContext,System.String,Cake.Common.Tools.WiX.CandleSettings)">
+            <summary>
+            Compiles all .wxs sources matching the <paramref name="pattern"/>.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The globbing pattern.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.WiXExtensions.WiXCandle(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.WiX.CandleSettings)">
+            <summary>
+            Compiles all .wxs sources in <paramref name="sourceFiles"/>.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="sourceFiles">The source files.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.WiXExtensions.WiXLight(Cake.Core.ICakeContext,System.String,Cake.Common.Tools.WiX.LightSettings)">
+            <summary>
+            Links all .wixobj files matching the <paramref name="pattern"/>.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The globbing pattern.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.WiX.WiXExtensions.WiXLight(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.WiX.LightSettings)">
+            <summary>
+            Links all .wixobj files in <paramref name="objectFiles"/>.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="objectFiles">The object files.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="T:Cake.Common.Tools.XUnit.XUnitExtensions">
+            <summary>
+            Contains functionality related to running xUnit unit tests.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitExtensions.XUnit(Cake.Core.ICakeContext,System.String)">
+            <summary>
+            Runs all xUnit unit tests in the assemblies matching the specified pattern.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitExtensions.XUnit(Cake.Core.ICakeContext,System.String,Cake.Common.Tools.XUnit.XUnitSettings)">
+            <summary>
+            Runs all xUnit unit tests in the assemblies matching the specified pattern.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="pattern">The pattern.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitExtensions.XUnit(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Runs all xUnit unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The assemblies.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitExtensions.XUnit(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath})">
+            <summary>
+            Runs all xUnit unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The assemblies.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitExtensions.XUnit(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{System.String},Cake.Common.Tools.XUnit.XUnitSettings)">
+            <summary>
+            Runs all xUnit unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The assemblies.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitExtensions.XUnit(Cake.Core.ICakeContext,System.Collections.Generic.IEnumerable{Cake.Core.IO.FilePath},Cake.Common.Tools.XUnit.XUnitSettings)">
+            <summary>
+            Runs all xUnit unit tests in the specified assemblies.
+            </summary>
+            <param name="context">The context.</param>
+            <param name="assemblies">The assemblies.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="T:Cake.Common.Tools.XUnit.XUnitRunner">
+            <summary>
+            The xUnit unit test runner.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitRunner.#ctor(Cake.Core.IO.IFileSystem,Cake.Core.ICakeEnvironment,Cake.Core.IO.IGlobber,Cake.Core.IO.IProcessRunner)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.XUnit.XUnitRunner"/> class.
+            </summary>
+            <param name="fileSystem"></param>
+            <param name="environment">The environment.</param>
+            <param name="globber">The globber.</param>
+            <param name="runner">The runner.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitRunner.Run(Cake.Core.IO.FilePath,Cake.Common.Tools.XUnit.XUnitSettings)">
+            <summary>
+            Runs the tests in the specified assembly.
+            </summary>
+            <param name="assemblyPath">The assembly path.</param>
+            <param name="settings">The settings.</param>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitRunner.GetToolName">
+            <summary>
+            Gets the name of the tool.
+            </summary>
+            <returns>The name of the tool.</returns>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitRunner.GetDefaultToolPath(Cake.Common.Tools.XUnit.XUnitSettings)">
+            <summary>
+            Gets the default tool path.
+            </summary>
+            <returns>The default tool path.</returns>
+        </member>
+        <member name="T:Cake.Common.Tools.XUnit.XUnitSettings">
+            <summary>
+            Contains settings used by <see cref="T:Cake.Common.Tools.XUnit.XUnitRunner"/>.
+            </summary>
+        </member>
+        <member name="M:Cake.Common.Tools.XUnit.XUnitSettings.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Cake.Common.Tools.XUnit.XUnitSettings"/> class.
+            </summary>
+        </member>
+        <member name="P:Cake.Common.Tools.XUnit.XUnitSettings.ShadowCopy">
+            <summary>
+            Gets or sets a value indicating whether tests should be run as a shadow copy.
+            Default value is <c>true</c>.
+            </summary>
+            <value>
+              <c>true</c> if tests should be run as a shadow copy; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.XUnit.XUnitSettings.OutputDirectory">
+            <summary>
+            Gets or sets the output directory.
+            </summary>
+            <value>The output directory.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.XUnit.XUnitSettings.XmlReport">
+            <summary>
+            Gets or sets a value indicating whether an XML report should be generated.
+            </summary>
+            <value>
+              <c>true</c> if an XML report should be generated; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.XUnit.XUnitSettings.HtmlReport">
+            <summary>
+            Gets or sets a value indicating whether an HTML report should be generated.
+            </summary>
+            <value>
+              <c>true</c> if an HTML report should be generated; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Cake.Common.Tools.XUnit.XUnitSettings.ToolPath">
+            <summary>
+            Gets or sets the tool path.
+            </summary>
+            <value>The tool path.</value>
+        </member>
+        <member name="P:Cake.Common.Tools.XUnit.XUnitSettings.Silent">
+            <summary>
+            Gets or set whether or not output running test count.
+            </summary>
+        </member>
+    </members>
+</doc>

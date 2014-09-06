@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Serenity.Core</id>
+    <version>0.0.0</version>
+    <title>Serenity Platform - Core Library</title>
+    <description>Contains abstractions and implementations for 
+      some basic Serenity features like authorization, caching, 
+      localization, dependency resolution, reflection...</description>
+    <authors>Volkan Ceylan</authors>
+    <language>en-US</language>
+    <projectUrl>http://github.com/volkanceylan/Serenity</projectUrl>
+    <licenseUrl>https://raw.github.com/volkanceylan/Serenity/master/LICENSE.md</licenseUrl>
+    <tags>Serenity</tags>
+  </metadata>
+</package>
