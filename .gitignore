@@ -14,3 +14,4 @@ StyleCop.Cache
 Documentation/Samples/packages/*/*
 TestResults/
 CodeGenerator/app.config
+Build/
