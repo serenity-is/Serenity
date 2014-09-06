@@ -1,9 +1,11 @@
 ﻿var target = Argument("target", "NuGet");
 var configuration = Argument("configuration", "Release");
+var serenityVersion = Argument("Version", (string)null);
 
 Task("Clean")
     .Does(() =>
 {
+    CleanDirectories("./Build");
     CleanDirectories("./Serenity.*/**/bin/" + configuration);
 });
 
@@ -21,6 +23,9 @@ Task("Build")
     MSBuild("./Serenity.sln", s => {
         s.SetConfiguration(configuration);
     });
+    
+    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
+    serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;
 });
 
 Task("Unit-Tests")
@@ -46,12 +51,21 @@ Task("NuGet")
     .IsDependentOn("Pack")
     .Does(() =>
 {
-    NuGetPack("./Serenity.Core/Serenity.Core.nuspec", new NuGetPackSettings {
-        Version = "0.1.0",
-        BasePath = "./Serenity.Core/bin/" + configuration,
-        OutputDirectory = "./Build",
-        NoPackageAnalysis = true
-    });
+    Action<string> myPack = s => {
+      File.WriteAllText("./Build/" + s + ".nuspec", 
+          File.ReadAllText("./" + s + "/" + s + ".nuspec")
+              .Replace("${Version}", serenityVersion));
+              
+      NuGetPack("./Build/" + s + ".nuspec", new NuGetPackSettings {
+          BasePath = "./" + s + "/bin/" + configuration,
+          OutputDirectory = "./Build",
+          NoPackageAnalysis = true
+      });
+    };
+    
+    myPack("Serenity.Core");
+    myPack("Serenity.Data");
+    myPack("Serenity.Data.Entity");
 });
 
 RunTarget(target);

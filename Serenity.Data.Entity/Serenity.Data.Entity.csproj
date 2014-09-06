@@ -41,6 +41,9 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Extensions\AliasWithFields.cs" />
     <Compile Include="CustomFields\CustomFieldCache.cs" />
     <Compile Include="CustomFields\CustomFieldExtensions.cs" />
@@ -81,6 +84,7 @@
     <Compile Include="Contracts\ILoggingRow.cs" />
     <Compile Include="Contracts\INameRow.cs" />
     <Compile Include="Contracts\IParentIdRow.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Row\JsonRowConverter.cs" />
     <Compile Include="Row\RowValidationContext.cs" />
     <Compile Include="Row\Row.cs" />

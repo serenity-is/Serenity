@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <id>Serenity.Core</id>
+    <id>Serenity.Data.Entity</id>
     <version>${Version}</version>
     <authors>Volkan Ceylan</authors>
     <owners>Volkan Ceylan</owners>
-    <title>Serenity Platform - Core Library</title>
-    <description>Contains abstractions and implementations for 
-      some basic Serenity features like authorization, caching, 
-      localization, dependency resolution, reflection...</description>
+    <title>Serenity Platform - Data Entity Library</title>
+    <description>Contains entity classes, fields and related functions...</description>
     <language>en-US</language>
     <iconUrl>https://raw.github.com/volkanceylan/Serenity/master/Tools/Images/serenity-icon.png</iconUrl>
     <licenseUrl>https://raw.github.com/volkanceylan/Serenity/master/LICENSE.md</licenseUrl>
@@ -17,9 +15,11 @@
     <tags>Serenity</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="6.0.4" />
+      <dependency id="Serenity.Core" version="${Version}" />
+      <dependency id="Serenity.Data" version="${Version}" />
     </dependencies>
   </metadata>
   <files>
-    <file src="Serenity.Core.dll" target="lib/net45" />
+    <file src="Serenity.Data.dll" target="lib/net45" />
   </files>
 </package>
