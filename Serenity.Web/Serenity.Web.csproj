@@ -85,6 +85,9 @@
     <Compile Include="Content\CsvWriter.cs" />
     <Compile Include="Content\ExcelContentResult.cs" />
     <Compile Include="Content\ForXmlHelper.cs" />
+    <Compile Include="Mvc\CssFileWatcher.cs" />
+    <Compile Include="Mvc\ScriptFileWatcher.cs" />
+    <Compile Include="Mvc\TemplateScriptRegistrar.cs" />
     <Compile Include="Script\PropertyEditor\FormScriptRegistration.cs" />
     <Compile Include="Mvc\TemplateHelper.cs" />
     <Compile Include="Script\DynamicScript\DynamicScriptManager.Script.cs" />
@@ -120,8 +123,6 @@
     <Compile Include="Mvc\Fakes\FakeHttpSessionState.cs" />
     <Compile Include="Mvc\Fakes\FakeIdentity.cs" />
     <Compile Include="Mvc\Fakes\FakePrincipal.cs" />
-    <Compile Include="Mvc\CompressFilter.cs" />
-    <Compile Include="Mvc\TokenAuthorizeFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\DynamicScriptTypes\ConcatenatedScript.cs" />
     <Compile Include="Script\DynamicScript\DynamicScriptHandler.cs" />
