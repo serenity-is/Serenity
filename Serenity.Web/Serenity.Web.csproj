@@ -95,12 +95,9 @@
     <Compile Include="Script\DynamicScript\IDynamicScript.cs" />
     <Compile Include="Script\PropertyEditor\PhoneEditorAttribute.cs" />
     <Compile Include="Script\PropertyEditor\EmailEditorAttribute.cs" />
-    <Compile Include="Script\ScriptEndpointGenerator.cs" />
-    <Compile Include="Mvc\ServiceAuthorizeFilter.cs" />
     <Compile Include="Script\DynamicScriptTypes\DataScript.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Script\ScriptFormGenerator.cs" />
     <Compile Include="Security\WebSecurityHelper.cs" />
     <Compile Include="Texts\Texts.Controls.cs" />
     <Compile Include="Texts\Texts.cs" />
@@ -125,10 +122,6 @@
     <Compile Include="Mvc\Fakes\FakePrincipal.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
     <Compile Include="Mvc\TokenAuthorizeFilter.cs" />
-    <Compile Include="Mvc\DtoActionResult.cs" />
-    <Compile Include="Mvc\EndpointExtensions.cs" />
-    <Compile Include="Mvc\JsonFilter.cs" />
-    <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\DynamicScriptTypes\ConcatenatedScript.cs" />
     <Compile Include="Script\DynamicScript\DynamicScriptHandler.cs" />
@@ -142,14 +135,12 @@
     <Compile Include="Script\PropertyEditor\FilterFieldsScript.cs" />
     <Compile Include="Script\PropertyEditor\FormScript.cs" />
     <Compile Include="Script\PropertyEditor\ICustomizedFormScript.cs" />
-    <Compile Include="Script\PropertyEditor\PropertyEditorHelper.cs" />
     <Compile Include="Script\DynamicScriptTypes\RegisteredScripts.cs" />
     <Compile Include="Script\ScriptBundleManager.cs" />
     <Compile Include="Script\DynamicScriptTypes\TemplateScript.cs" />
     <Compile Include="Security\SiteMembershipProvider.cs" />
     <Compile Include="Security\SiteRoleProvider.cs" />
     <Compile Include="Mvc\Throttling.cs" />
-    <Compile Include="WebApplicationSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

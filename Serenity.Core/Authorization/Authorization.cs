@@ -1,4 +1,5 @@
 ﻿using Serenity.Abstractions;
+using Serenity.Configuration;
 using Serenity.Services;
 using System;
 

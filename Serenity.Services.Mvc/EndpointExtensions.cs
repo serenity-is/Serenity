@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
+using Serenity.Configuration;
 using Serenity.Data;
-using Serenity.Web;
 using System;
 using System.Data;
 using System.Text;
@@ -9,42 +9,6 @@ using System.Web.Mvc;
 
 namespace Serenity.Services
 {
-    public class Result<TResponse> : ActionResult
-        where TResponse: ServiceResponse
-    {
-        public Encoding ContentEncoding { get; set; }
-        public string ContentType { get; set; }
-        public JsonSerializerSettings SerializerSettings { get; set; }
-        public TResponse Data { get; set; }
-        public Formatting Formatting { get; set; }
-
-        public Result(TResponse data)
-        {
-            this.Data = data;
-            this.SerializerSettings = JsonSettings.Strict;
-        }
-
-        public override void ExecuteResult(ControllerContext context)
-        {
-            if (context == null)
-                throw new ArgumentNullException("context");
-
-            HttpResponseBase response = context.HttpContext.Response;
-            response.ContentType = !string.IsNullOrEmpty(ContentType) ? ContentType : "application/json";
-
-            if (ContentEncoding != null)
-                response.ContentEncoding = this.ContentEncoding;
-
-            if (Data != null)
-            {
-                JsonTextWriter writer = new JsonTextWriter(response.Output) { Formatting = this.Formatting };
-                JsonSerializer serializer = JsonSerializer.Create(SerializerSettings);
-                serializer.Serialize(writer, Data);
-                writer.Flush();
-            }
-        }
-    }
-
     public static class EndpointExtensions
     {
         public static TResponse ConvertToResponse<TResponse>(this Exception exception)
@@ -60,14 +24,14 @@ namespace Serenity.Services
                 error.Code = ve.ErrorCode;
                 error.Arguments = ve.Arguments;
                 error.Message = ve.Message;
-                if (!WebApplicationSettings.HideExceptionDetails)
+                if (!Config.Get<DevelopmentSettings>().HideExceptionDetails)
                     error.Details = ve.ToString();
             }
             else
             {
                 error.Code = "Exception";
 
-                if (!WebApplicationSettings.HideExceptionDetails)
+                if (!Config.Get<DevelopmentSettings>().HideExceptionDetails)
                 {
                     error.Message = exception.Message;
                     error.Details = exception.ToString();

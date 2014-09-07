@@ -81,7 +81,7 @@ namespace Serenity.Reflection
                     sb.AppendLine("(string idPrefix) : base(idPrefix) {}");
                     sb.AppendLine();
 
-                    foreach (var item in Serenity.Web.PropertyEditor.PropertyEditorHelper.GetPropertyItemsFor(type))
+                    foreach (var item in Serenity.PropertyGrid.PropertyEditorHelper.GetPropertyItemsFor(type))
                     {
                         var editorType = item.EditorType;
                         string widgetTypeName = null;

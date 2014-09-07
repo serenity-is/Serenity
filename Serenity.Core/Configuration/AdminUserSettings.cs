@@ -3,7 +3,7 @@ using Serenity.ComponentModel;
 using Serenity.Services;
 using System;
 
-namespace Serenity
+namespace Serenity.Configuration
 {
     [SettingScope("Application"), SettingKey("AdminUserSettings")]
     public class AdminUserSettings

@@ -39,7 +39,7 @@ namespace Serenity.Web
 
         public string GetScript()
         {
-            var items = PropertyEditorHelper.GetPropertyItemsFor(_formType);
+            var items = Serenity.PropertyGrid.PropertyEditorHelper.GetPropertyItemsFor(_formType);
             if (typeof(ICustomizedFormScript).IsAssignableFrom(_formType))
             {
                 var instance = InstanceCreator.GetInstance(_formType) as ICustomizedFormScript;
