@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-using System.Text;
+    using System.Text;
 
     public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressionByName
     {
@@ -44,7 +44,7 @@ using System.Text;
             string existingExpression;
 
             if (!string.IsNullOrEmpty(join.Name) &&
-                aliases.TryGetValue(join.Name, out existingExpression))
+                aliases != null && aliases.TryGetValue(join.Name, out existingExpression))
             {
                 if (expression == existingExpression)
                     return this;
@@ -59,7 +59,7 @@ using System.Text;
             JoinToString(join, from, modifySelf: true);
 
             if (!string.IsNullOrEmpty(join.Name))
-                aliases[join.Name] = expression;
+                ((ISqlQueryExtensible)this).Aliases[join.Name] = expression;
 
             return this;
         }

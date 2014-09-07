@@ -344,13 +344,17 @@
 
        public static void GetFromReader(this SqlQuery query, IDataReader reader)
        {
-           GetFromReader(query, reader, query.IntoRows);
+           var ext = (ISqlQueryExtensible)query;
+
+           GetFromReader(query, reader, ext.IntoRows);
        }
 
-       public static void GetFromReader(this SqlQuery query, IDataReader reader, IList<IEntity> into)
+       public static void GetFromReader(this SqlQuery query, IDataReader reader, IList<object> into)
        {
+           var ext = (ISqlQueryExtensible)query;
+
            int index = 0;
-           foreach (var info in query.GetColumns())
+           foreach (var info in ext.Columns)
            {
                if (info.IntoField as Field != null && info.IntoRowIndex != -1)
                {

@@ -132,7 +132,9 @@ namespace Serenity.Data
             if (query == null)
                 throw new ArgumentNullException("query");
 
-            foreach (var field in ((Row)query.FirstIntoRow).GetFields())
+            var ext = (ISqlQueryExtensible)query;
+
+            foreach (var field in ((Row)ext.FirstIntoRow).GetFields())
             {
                 if (!EntityFieldExtensions.IsTableField(field) &&
                     (field.Flags & FieldFlags.ClientSide) != FieldFlags.ClientSide)
@@ -154,7 +156,10 @@ namespace Serenity.Data
         {
             if (query == null)
                 throw new ArgumentNullException("query");
-            return SelectTableFields(query, (Row)query.FirstIntoRow, exclude);
+
+            var ext = (ISqlQueryExtensible)query;
+
+            return SelectTableFields(query, (Row)ext.FirstIntoRow, exclude);
         }
 
         public static SqlQuery EnsureAllForeignJoins(this SqlQuery query, Row row)
@@ -165,5 +170,21 @@ namespace Serenity.Data
             return query;
         }
 
+        /// <summary>
+        ///   Sets a field value with a parameter.</summary>
+        /// <param field="field">
+        ///   Field name.</param>
+        /// <param field="param">
+        ///   Parameter name</param>
+        /// <param field="value">
+        ///   Parameter value</param>
+        /// <returns>
+        ///   Object itself.</returns>
+        public static T Set<T>(this T self, IField field, object value) where T : ISetFieldByStatement
+        {
+            var param = self.AddParam(value);
+            self.SetTo(field.Name, param.Name);
+            return self;
+        }
     }
 }

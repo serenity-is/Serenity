@@ -6,7 +6,7 @@
     using System.Text;
 
     [DebuggerDisplay("{DebugText}")]
-    public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName
+    public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName, ISqlQueryExtensible
     {
         private Dictionary<string, string> aliases;
         private List<Column> columns;
@@ -20,6 +20,10 @@
         private int skip;
         private int take;
         private StringBuilder where;
+
+        private Action<SqlQuery, string> ensureJoinsInExpression;
+        private int intoIndex = -1;
+        private List<object> into = new List<object>();
 
         /// <summary>
         /// Creates a new SqlQuery instance.
@@ -47,13 +51,6 @@
             this.forXml = forXml;
             return this;
         }
-
-        /// <summary>
-        /// A hook for Serenity entity system, to ensure related joins in 
-        /// defined in row when a field is used in query. 
-        /// </summary>
-        /// <param name="expression">An expression</param>
-        partial void EnsureJoinsInExpression(string expression);
 
         /// <summary>
         /// Adds a table to the FROM statement. When it is called more than once, puts a comma
@@ -95,10 +92,7 @@
             from.Append(' ');
             from.Append(alias.Name);
 
-            if (aliases == null)
-                aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            aliases.Add(alias.Name, table + " " + alias.Name);
+            ((ISqlQueryExtensible)this).Aliases.Add(alias.Name, table + " " + alias.Name);
 
             return this;
         }
@@ -144,7 +138,7 @@
         /// <param name="columnName">Column name.</param>
         /// <returns>Expression or null if not found.</returns>
         /// <remarks>This function uses a linear search in column list, so use with caution.</remarks>
-        public string GetExpression(string columnName)
+        string IGetExpressionByName.GetExpression(string columnName)
         {
             if (columnName == null)
                 throw new ArgumentNullException("columnName");
@@ -156,20 +150,6 @@
             if (fieldInfo == null)
                 return null;
             return fieldInfo.Expression;
-        }
-
-        /// <summary>
-        /// Gets a column expression given its select index.
-        /// </summary>
-        /// <param name="selectIndex">Index of column in SELECT clause.</param>
-        /// <returns>Field expression or null if not found.</returns>
-        public string GetExpression(int selectIndex)
-        {
-            if (selectIndex < 0 || selectIndex >= columns.Count)
-                throw new ArgumentOutOfRangeException("selectIndex");
-
-            Column si = columns[selectIndex];
-            return si.Expression;
         }
 
         /// <summary>
@@ -187,7 +167,8 @@
             else
                 groupBy.Append(", ").Append(expression);
 
-            EnsureJoinsInExpression(expression);
+            if (ensureJoinsInExpression != null)
+                ensureJoinsInExpression(this, expression);
 
             return this;
         }
@@ -246,7 +227,8 @@
 
             orderBy.Add(expression);
 
-            EnsureJoinsInExpression(expression);
+            if (ensureJoinsInExpression != null)
+                ensureJoinsInExpression(this, expression);
 
             return this;
         }
@@ -308,7 +290,8 @@
             else
                 orderBy.Add(expression);
 
-            EnsureJoinsInExpression(expression);
+            if (ensureJoinsInExpression != null)
+                ensureJoinsInExpression(this, expression);
 
             return this;
         }
@@ -326,7 +309,8 @@
 
             columns.Add(new Column(expression, null, intoIndex, null));
 
-            EnsureJoinsInExpression(expression);
+            if (ensureJoinsInExpression != null)
+                ensureJoinsInExpression(this, expression);
 
             return this;
         }
@@ -350,7 +334,8 @@
 
             columns.Add(new Column(expression, null, intoIndex, null));
 
-            EnsureJoinsInExpression(expression);
+            if (ensureJoinsInExpression != null)
+                ensureJoinsInExpression(this, expression);
             return this;
         }
 
@@ -370,7 +355,8 @@
 
             columns.Add(new Column(expression, columnName, intoIndex, null));
 
-            EnsureJoinsInExpression(expression);
+            if (ensureJoinsInExpression != null)
+                ensureJoinsInExpression(this, expression);
 
             return this;
         }
@@ -397,7 +383,8 @@
 
             columns.Add(new Column(expression, columnName, intoIndex, null));
 
-            EnsureJoinsInExpression(expression);
+            if (ensureJoinsInExpression != null)
+                ensureJoinsInExpression(this, expression);
 
             return this;
         }
@@ -529,7 +516,8 @@
             else
                 where.Append(SqlKeywords.And).Append(expression);
 
-            EnsureJoinsInExpression(expression);
+            if (ensureJoinsInExpression != null)
+                ensureJoinsInExpression(this, expression);
 
             return this;
         }
@@ -578,6 +566,7 @@
             return this;
         }
 
+
         /// <summary>
         /// Gets/sets the flag to get the total record count when paging is used by SKIP/TAKE. 
         /// A secondary query without SKIP/TAKE is generated to get total record count, 
@@ -589,9 +578,57 @@
             set { countRecords = value; }
         }
 
-        public IEnumerable<Column> GetColumns()
+        object ISqlQueryExtensible.FirstIntoRow
         {
-            return columns;
+            get { return into.Count > 0 ? into[0] : null; }
+        }
+
+        IList<Column> ISqlQueryExtensible.Columns
+        {
+            get { return columns; }
+        }
+
+        IList<object> ISqlQueryExtensible.IntoRows
+        {
+            get { return into; }
+        }
+
+        IDictionary<string, string> ISqlQueryExtensible.Aliases 
+        {
+            get
+            {
+                if (aliases == null)
+                    aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                return aliases;
+            }
+        }
+
+        int ISqlQueryExtensible.GetSelectIntoIndex(IField field)
+        {
+            return this.columns.FindIndex(
+                delegate(Column s) { return s.IntoField == field; });
+        }
+
+        Action<SqlQuery, string> ISqlQueryExtensible.EnsureJoinsInExpression
+        {
+            get { return ensureJoinsInExpression; }
+            set { ensureJoinsInExpression = value; }
+        }
+
+        void ISqlQueryExtensible.IntoRowSelection(object row)
+        {
+            if (row == null)
+                intoIndex = -1;
+            else
+            {
+                intoIndex = into.IndexOf(row);
+                if (intoIndex == -1)
+                {
+                    into.Add(row);
+                    intoIndex = into.Count - 1;
+                }
+            }
         }
 
         /// <summary>
@@ -606,14 +643,20 @@
             /// <summary>Used by entity system when more than one entity is used as a target</summary>
             public readonly int IntoRowIndex;
             /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
-            public readonly IField IntoField;
+            public readonly object IntoField;
 
-            public Column(string expression, string columnName, int intoRow, IField intoField)
+            public Column(string expression, string columnName, int intoRow, object intoField)
             {
                 this.Expression = expression;
                 this.ColumnName = columnName;
                 this.IntoRowIndex = intoRow;
                 this.IntoField = intoField;
+            }
+
+            public Column(SqlQuery query, string expression, string columnName, object intoField)
+                : this(expression, columnName, query.intoIndex, intoField)
+            {
+                query.columns.Add(this);
             }
         }
     }

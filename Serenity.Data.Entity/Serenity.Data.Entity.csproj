@@ -44,6 +44,9 @@
     <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Contracts\IEntity.cs" />
+    <Compile Include="Contracts\IEntityWithJoins.cs" />
+    <Compile Include="Contracts\IFieldWithJoinInfo.cs" />
     <Compile Include="Extensions\AliasWithFields.cs" />
     <Compile Include="CustomFields\CustomFieldCache.cs" />
     <Compile Include="CustomFields\CustomFieldExtensions.cs" />
@@ -51,6 +54,7 @@
     <Compile Include="CustomFields\ICustomFieldDefinition.cs" />
     <Compile Include="CustomFields\ICustomFieldListService.cs" />
     <Compile Include="CustomFields\SchemaChangeSource.cs" />
+    <Compile Include="Extensions\EntitySqlQueryExtensions.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\EntityConnectionExtensions.cs" />
     <Compile Include="Extensions\EntityFieldExtensions.cs" />

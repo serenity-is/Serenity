@@ -59,7 +59,6 @@
     <Compile Include="FluentSql\MethodChainingExtensions.cs" />
     <Compile Include="FluentSql\SqlQuery.cs" />
     <Compile Include="FluentSql\SqlQuery_Clone.cs" />
-    <Compile Include="FluentSql\SqlQuery_Entity.cs" />
     <Compile Include="FluentSql\SqlQuery_FullTextSearch.cs" />
     <Compile Include="FluentSql\SqlQuery_Join.cs" />
     <Compile Include="FluentSql\SqlQuery_ToString.cs" />
@@ -89,6 +88,8 @@
     <Compile Include="QueryExtensions\FilterableQueryExtensions.cs" />
     <Compile Include="QueryExtensions\QueryWithParamsExtensions.cs" />
     <Compile Include="QueryExtensions\SetFieldByStatementExtensions.cs" />
+    <Compile Include="QueryModel\IField.cs" />
+    <Compile Include="QueryModel\ISqlQueryExtensible.cs" />
     <Compile Include="QueryModel\QueryWithParams.cs" />
     <Compile Include="SqlHelpers\Dapper.cs" />
     <Compile Include="SqlHelpers\Sql.cs" />
@@ -100,14 +101,10 @@
     <Compile Include="SqlHelpers\SqlConversions.cs" />
     <Compile Include="SqlHelpers\SqlDebugDumper.cs" />
     <Compile Include="SqlHelpers\SqlDialectExtensions.cs" />
-    <Compile Include="Entity\IEntity.cs" />
-    <Compile Include="Entity\IEntityWithJoins.cs" />
-    <Compile Include="Entity\IFieldWithJoinInfo.cs" />
     <Compile Include="Join\Alias.cs" />
     <Compile Include="Join\T0ReferenceRemover.cs" />
     <Compile Include="QueryModel\ICriteria.cs" />
     <Compile Include="QueryModel\IChainable.cs" />
-    <Compile Include="Entity\IField.cs" />
     <Compile Include="QueryModel\IFilterableQuery.cs" />
     <Compile Include="QueryModel\IGetExpressionByName.cs" />
     <Compile Include="QueryModel\IQueryWithParams.cs" />

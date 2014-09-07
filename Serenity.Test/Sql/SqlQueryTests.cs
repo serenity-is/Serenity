@@ -54,7 +54,7 @@ namespace Serenity.Test.Data
         [Fact]
         public void FirstIntoRowShouldReturnNullIfNoEntityUsedYet()
         {
-            Assert.Equal(null, new SqlQuery().FirstIntoRow);
+            Assert.Equal(null, ((ISqlQueryExtensible)new SqlQuery()).FirstIntoRow);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Serenity.Test.Data
             var first = new MyEntity() { Table = "x" };
             var second = new MyEntity() { Table = "y" };
             var query = new SqlQuery().From(first).From(second.Table, Alias.T1).Into(second);
-            Assert.Equal(first, query.FirstIntoRow);
+            Assert.Equal(first, ((ISqlQueryExtensible)query).FirstIntoRow);
         }
 
         [Fact]
@@ -183,7 +183,7 @@ namespace Serenity.Test.Data
                 .Select("SomeColumn")
                 .From("SomeTable");
 
-            Assert.Throws<ArgumentNullException>(() => query.GetExpression(null));
+            Assert.Throws<ArgumentNullException>(() => ((IGetExpressionByName)query).GetExpression(null));
         }
 
         [Fact]
@@ -193,7 +193,7 @@ namespace Serenity.Test.Data
                 .Select("SomeColumn")
                 .From("SomeTable");
 
-            Assert.Null(query.GetExpression("OtherColumn"));
+            Assert.Null(((IGetExpressionByName)query).GetExpression("OtherColumn"));
         }
 
         [Fact]
@@ -205,7 +205,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 "SomeColumn",
-                query.GetExpression("SomeColumn"));
+                ((IGetExpressionByName)query).GetExpression("SomeColumn"));
         }
 
         [Fact]
@@ -217,7 +217,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 "SomeColumn",
-                query.GetExpression("x"));
+                ((IGetExpressionByName)query).GetExpression("x"));
         }
 
         [Fact]
@@ -227,7 +227,7 @@ namespace Serenity.Test.Data
                 .Select("SomeColumn", "x")
                 .From("SomeTable");
 
-            Assert.Null(query.GetExpression("SomeColumn"));
+            Assert.Null(((IGetExpressionByName)query).GetExpression("SomeColumn"));
         }
 
         [Fact]
@@ -238,7 +238,7 @@ namespace Serenity.Test.Data
                 .Select(new Alias("x"), "SomeColumn")
                 .From("SomeTable");
 
-            Assert.Null(query.GetExpression("SomeColumn"));
+            Assert.Null(((IGetExpressionByName)query).GetExpression("SomeColumn"));
         }
 
         [Fact]
@@ -250,17 +250,17 @@ namespace Serenity.Test.Data
                 .Select("c", "c3")
                 .From("SomeTable");
 
-            Assert.Equal("x.SomeColumn", query.GetExpression(0));
-            Assert.Equal("a.b", query.GetExpression(1));
-            Assert.Equal("c", query.GetExpression(2));
+            Assert.Equal("x.SomeColumn", ((ISqlQueryExtensible)query).Columns[0].Expression);
+            Assert.Equal("a.b", ((ISqlQueryExtensible)query).Columns[1].Expression);
+            Assert.Equal("c", ((ISqlQueryExtensible)query).Columns[2].Expression);
         }
 
         [Fact]
         public void GetExpressionsWithOutOfBoundsIndexThrowsArgumentOutOfRange()
         {
             var query = new SqlQuery().Select("a").Select("b");
-            Assert.Throws(typeof(ArgumentOutOfRangeException), () => query.GetExpression(2));
-            Assert.Throws(typeof(ArgumentOutOfRangeException), () => query.GetExpression(-1));
+            Assert.Throws(typeof(ArgumentOutOfRangeException), () => ((ISqlQueryExtensible)query).Columns[2].Expression);
+            Assert.Throws(typeof(ArgumentOutOfRangeException), () => ((ISqlQueryExtensible)query).Columns[-1].Expression);
         }
 
         [Fact]
@@ -271,7 +271,7 @@ namespace Serenity.Test.Data
                 .Select(new Alias("x"), "SomeColumn", "SomeColumn")
                 .From("SomeTable");
 
-            Assert.Equal("x.SomeColumn", query.GetExpression("SomeColumn"));
+            Assert.Equal("x.SomeColumn", ((IGetExpressionByName)query).GetExpression("SomeColumn"));
         }
 
         [Fact]
@@ -280,7 +280,7 @@ namespace Serenity.Test.Data
             var query = new SqlQuery()
                 .Select("SomeColumn");
 
-            Assert.Equal("SomeColumn", query.GetExpression("SomeColumn"));
+            Assert.Equal("SomeColumn", ((IGetExpressionByName)query).GetExpression("SomeColumn"));
         }
 
         [Fact]
@@ -622,11 +622,11 @@ namespace Serenity.Test.Data
         {
             var entity = new MyEntity() { Table = "x" };
             var query = new SqlQuery().From(entity).Select("x1");
-            Assert.Equal(query.GetColumns().ElementAt(0).IntoRowIndex, 0);
+            Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex, 0);
             query.Into(null).Select("x2");
-            Assert.Equal(query.GetColumns().ElementAt(1).IntoRowIndex, -1);
-            Assert.Equal(1, query.IntoRows.Count);
-            Assert.Equal(entity, query.IntoRows[0]);
+            Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(1).IntoRowIndex, -1);
+            Assert.Equal(1, ((ISqlQueryExtensible)query).IntoRows.Count);
+            Assert.Equal(entity, ((ISqlQueryExtensible)query).IntoRows[0]);
         }
 
         [Fact]
@@ -634,13 +634,13 @@ namespace Serenity.Test.Data
         {
             var entity1 = new MyEntity() { Table = "x" };
             var query = new SqlQuery().From(entity1).Select("x1");
-            Assert.Equal(query.GetColumns().ElementAt(0).IntoRowIndex, 0);
+            Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex, 0);
             var entity2 = new MyEntity() { Table = "y" };
             query.Into(entity2).Select("y1");
-            Assert.Equal(1, query.GetColumns().ElementAt(1).IntoRowIndex);
-            Assert.Equal(2, query.IntoRows.Count);
-            Assert.Equal(entity1, query.IntoRows[0]);
-            Assert.Equal(entity2, query.IntoRows[1]);
+            Assert.Equal(1, ((ISqlQueryExtensible)query).Columns.ElementAt(1).IntoRowIndex);
+            Assert.Equal(2, ((ISqlQueryExtensible)query).IntoRows.Count);
+            Assert.Equal(entity1, ((ISqlQueryExtensible)query).IntoRows[0]);
+            Assert.Equal(entity2, ((ISqlQueryExtensible)query).IntoRows[1]);
         }
 
         [Fact]

@@ -11,20 +11,22 @@ namespace Serenity.Services
             if (query == null)
                 throw new ArgumentNullException("query");
 
+            var ext = (ISqlQueryExtensible)query;
+
             sort = sort.TrimToNull();
 
             if (sort != null)
             {
-                string expr = query.GetExpression(sort);
+                string expr = ((IGetExpressionByName)query).GetExpression(sort);
 
                 if (expr == null)
                 {
-                    var row = query.FirstIntoRow;
+                    var row = ext.FirstIntoRow;
                     if (row != null)
                     {
-                        var field = ((Row)query.FirstIntoRow).FindFieldByPropertyName(sort);
+                        var field = ((Row)ext.FirstIntoRow).FindFieldByPropertyName(sort);
                         if (field != null)
-                            expr = query.GetExpression(field.Name);
+                            expr = ((IGetExpressionByName)query).GetExpression(field.Name);
                     }
                 }
 

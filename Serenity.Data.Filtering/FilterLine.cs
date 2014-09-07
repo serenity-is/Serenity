@@ -262,7 +262,7 @@ namespace Serenity.Data
                     if (field != null)
                         fieldExpr = field.Expression;
                     else if (query != null)
-                        fieldExpr = query.GetExpression(fieldName);
+                        fieldExpr = ((IGetExpressionByName)query).GetExpression(fieldName);
                 }
 
                 if (fieldExpr == null)
