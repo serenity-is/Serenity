@@ -1,6 +1,8 @@
-﻿
+﻿using Serenity.Extensibility;
+
 namespace Serenity.Core
 {
+    [NestedLocalTexts]
     public static class Texts
     {
         public static class Authorization

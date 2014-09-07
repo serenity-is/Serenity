@@ -85,9 +85,11 @@
     <Compile Include="Content\CsvWriter.cs" />
     <Compile Include="Content\ExcelContentResult.cs" />
     <Compile Include="Content\ForXmlHelper.cs" />
-    <Compile Include="Mvc\CssFileWatcher.cs" />
-    <Compile Include="Mvc\ScriptFileWatcher.cs" />
-    <Compile Include="Mvc\TemplateScriptRegistrar.cs" />
+    <Compile Include="Common\CommonInitialization.cs" />
+    <Compile Include="Common\CssFileWatcher.cs" />
+    <Compile Include="Common\ScriptFileWatcher.cs" />
+    <Compile Include="Common\ApplicationConfigurationRepository.cs" />
+    <Compile Include="Common\TemplateScriptRegistrar.cs" />
     <Compile Include="Script\PropertyEditor\FormScriptRegistration.cs" />
     <Compile Include="Mvc\TemplateHelper.cs" />
     <Compile Include="Script\DynamicScript\DynamicScriptManager.Script.cs" />
@@ -188,6 +190,10 @@
     <None Include="Style\serenity.toolbuttons.less" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Serenity.Caching.Web\Serenity.Caching.Web.csproj">
+      <Project>{cebb3cf6-8eed-4f6d-b29b-0ea5ff06faf4}</Project>
+      <Name>Serenity.Caching.Web</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Serenity.CodeGeneration\Serenity.CodeGeneration.csproj">
       <Project>{880cec07-a629-44d3-a79d-5b138967e1c4}</Project>
       <Name>Serenity.CodeGeneration</Name>
@@ -203,6 +209,10 @@
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Munq\Serenity.Munq.csproj">
+      <Project>{5fbada38-f1f3-44c9-83fa-e1bf1f4d7d10}</Project>
+      <Name>Serenity.Munq</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
       <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>

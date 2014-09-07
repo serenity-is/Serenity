@@ -1,14 +1,28 @@
 
 namespace Serenity.Localization
 {
-    using Localization;
+    using Extensibility;
     using System;
-    using System.Collections.Generic;
     using System.Reflection;
 
-    public static class NestedLocalTexts
+    public static class NestedLocalTextRegistration
     {
-        public static void Initialize(Type type, long languageID = LocalText.DefaultLanguageID)
+        public static void Initialize()
+        {
+            var assemblies = ExtensibilityHelper.SelfAssemblies;
+
+            foreach (var assembly in assemblies)
+                foreach (var type in assembly.GetTypes())
+                {
+                    var attr = type.GetCustomAttribute<NestedLocalTextsAttribute>();
+                    if (attr != null)
+                    {
+                        Initialize(type);
+                    }
+                }
+        }
+
+        private static void Initialize(Type type, long languageID = LocalText.DefaultLanguageID)
         {
             Initialize(type, languageID, "");
         }

@@ -8,9 +8,9 @@ namespace Serenity.Web
     ///   Helper class to write CSV files to HTTP context or another stream</summary>
     public class FormScriptRegistration
     {
-        public static void RegisterFormScripts(Assembly[] assemblies = null)
+        public static void RegisterFormScripts()
         {
-            assemblies = assemblies ?? ExtensibilityHelper.SelfAssemblies;
+            var assemblies = ExtensibilityHelper.SelfAssemblies;
 
             foreach (var assembly in assemblies)
                 foreach (var type in assembly.GetTypes())
