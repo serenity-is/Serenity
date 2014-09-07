@@ -14,10 +14,12 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
+      <dependency id="Newtonsoft.Json" version="${jsonNetVersion}" />
       <dependency id="Serenity.Core" version="${version}" />
+      <dependency id="CouchbaseNetClient" version="1.3.9" />
     </dependencies>
   </metadata>
   <files>
-    <file src="Serenity.Data.dll" target="lib/${framework}" />
+    <file src="${id}.dll" target="lib/${framework}" />
   </files>
 </package>

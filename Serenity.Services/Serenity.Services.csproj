@@ -41,7 +41,11 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Json\JsonServiceClient.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestHandlers\DeleteRequestHandler.cs" />
     <Compile Include="RequestHandlers\Helpers\BatchGenerationUpdater.cs" />
     <Compile Include="RequestHandlers\Behaviours\ValidateParentAttribute.cs" />

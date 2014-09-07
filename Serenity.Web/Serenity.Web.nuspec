@@ -14,10 +14,20 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
+      <dependency id="Newtonsoft.Json" version="${jsonNetVersion}" />
+      <dependency id="Microsoft.AspNet.Mvc" version="5.1.2" />
+      <dependency id="Microsoft.AspNet.Razor" version="3.1.2" />
+      <dependency id="Microsoft.AspNet.WebPages" version="3.1.2" />
+      <dependency id="Microsoft.Web.Infrastructure" version="1.0.0.0" />
       <dependency id="Serenity.Core" version="${version}" />
+      <dependency id="Serenity.Munq" version="${version}" />
+      <dependency id="Serenity.Data" version="${version}" />
+      <dependency id="Serenity.Data.Entity" version="${version}" />
+      <dependency id="Serenity.Services" version="${version}" />
+      <dependency id="Serenity.CodeGeneration" version="${version}" />
     </dependencies>
   </metadata>
   <files>
-    <file src="Serenity.Data.dll" target="lib/${framework}" />
+    <file src="${id}.dll" target="lib/${framework}" />
   </files>
 </package>

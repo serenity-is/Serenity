@@ -15,9 +15,12 @@
     <tags>${tags}</tags>
     <dependencies>
       <dependency id="Serenity.Core" version="${version}" />
+      <dependency id="Serenity.Data" version="${version}" />
+      <dependency id="Serenity.Data.Entity" version="${version}" />
+      <dependency id="Serenity.Services" version="${version}" />
     </dependencies>
   </metadata>
   <files>
-    <file src="Serenity.Data.dll" target="lib/${framework}" />
+    <file src="${id}.dll" target="lib/${framework}" />
   </files>
 </package>
