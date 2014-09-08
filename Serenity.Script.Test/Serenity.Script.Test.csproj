@@ -7,7 +7,7 @@
     <ProjectGuid>{95EC24BE-CAF7-4E1B-BB45-5FF88F763827}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Serenity.Test</RootNamespace>
+    <RootNamespace>Serenity.Script.Test</RootNamespace>
     <AssemblyName>Serenity.Test</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
