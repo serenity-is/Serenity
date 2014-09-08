@@ -18,10 +18,13 @@ namespace Serenity.Web
                 Dependency.SetResolver(container);
             }
 
-            ExtensibilityHelper.SelfAssemblies = BuildManager.GetReferencedAssemblies()
+            var selfAssemblies = BuildManager.GetReferencedAssemblies()
                 .Cast<Assembly>()
-                .Where(x => x.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity")))
-                .ToArray();
+                .Where(x => 
+                    x.FullName.Contains("Serenity") ||
+                    x.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity")));
+
+            ExtensibilityHelper.SelfAssemblies = AssemblySorter.Sort(selfAssemblies).ToArray();
 
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 

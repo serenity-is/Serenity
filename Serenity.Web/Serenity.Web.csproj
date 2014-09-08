@@ -81,6 +81,7 @@
     <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Common\AssemblySorter.cs" />
     <Compile Include="Content\CsvContentResult.cs" />
     <Compile Include="Content\CsvWriter.cs" />
     <Compile Include="Content\ExcelContentResult.cs" />
