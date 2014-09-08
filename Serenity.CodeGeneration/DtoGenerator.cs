@@ -5,9 +5,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using Serenity.Reflection;
 using System.Text;
 
-namespace Serenity.Reflection
+namespace Serenity.CodeGeneration
 {
     public class DtoGenerator
     {

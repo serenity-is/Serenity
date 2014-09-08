@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Serenity.Services;
 
-namespace Serenity.Reflection
+namespace Serenity.CodeGeneration
 {
     public class ScriptEndpointGenerator
     {

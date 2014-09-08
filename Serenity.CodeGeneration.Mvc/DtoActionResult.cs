@@ -7,6 +7,7 @@ using Serenity.Reflection;
 using System.Text;
 using System.Collections.Generic;
 using System.Reflection;
+using Serenity.CodeGeneration;
 
 namespace Serenity.Services
 {
