@@ -457,7 +457,6 @@
             return this;
         }
 
-
         /// <summary>
         /// Creates a new query that shares parameter dictionary with this query.
         /// </summary>
@@ -465,11 +464,7 @@
         /// A new query that shares parameters.</returns>
         public SqlQuery SubQuery()
         {
-            var subQuery = new SqlQuery
-            {
-                parent = this
-            };
-            return subQuery;
+            return this.CreateSubQuery<SqlQuery>();
         }
 
         /// <summary>

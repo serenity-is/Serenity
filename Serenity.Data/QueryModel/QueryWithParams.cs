@@ -87,6 +87,21 @@
             return new Parameter((++nextAutoParam).IndexParam());
         }
 
+        /// <summary>
+        /// Creates a new query that shares parameter dictionary with this query.
+        /// </summary>
+        /// <returns>
+        /// A new query that shares parameters.</returns>
+        public TQuery CreateSubQuery<TQuery>()
+            where TQuery: QueryWithParams, new()
+        {
+            var subQuery = new TQuery
+            {
+                parent = this
+            };
+            return subQuery;
+        }
+
         SqlDialect IQueryWithParams.Dialect
         {
             get { return dialect; }
