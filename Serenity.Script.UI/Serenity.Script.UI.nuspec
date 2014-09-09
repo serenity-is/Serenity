@@ -26,5 +26,7 @@
   </metadata>
   <files>
     <file src="${id}.dll" target="lib/${scriptFramework}" />
+    <file src="Serenity.Script.UI.js" target="" />
+    <file src="Serenity.Script.UI.min.js" target="" />
   </files>
 </package>

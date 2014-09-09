@@ -31,6 +31,15 @@ Func<string, string, string> getPackageVersion = (project, package) =>
         throw new InvalidOperationException("Couldn't find version for " + package + " in project " + project);
     return node.Value;
 };
+
+Action<string> minimizeJs = filename => {
+    StartProcess("./Tools/Node/uglifyjs.cmd", new ProcessSettings 
+    {
+        Arguments = filename + 
+            " -o " + System.IO.Path.ChangeExtension(filename, "min.js") + 
+            " --comments --mangle"
+    });
+};
     
 Task("Clean")
     .Does(() =>
@@ -56,6 +65,9 @@ Task("Build")
     MSBuild("./Serenity.sln", s => {
         s.SetConfiguration(configuration);
     });
+    
+    minimizeJs("./Serenity.Script.Core/bin/" + configuration + "/Serenity.Script.Core.js");
+    minimizeJs("./Serenity.Script.UI/bin/" + configuration + "/Serenity.Script.UI.js");
     
     var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
     serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   

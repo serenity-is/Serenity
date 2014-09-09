@@ -25,5 +25,7 @@
   </metadata>
   <files>
     <file src="${id}.dll" target="lib/${scriptFramework}" />
+    <file src="Serenity.Script.Core.js" target="" />
+    <file src="Serenity.Script.Core.min.js" target="" />
   </files>
 </package>
