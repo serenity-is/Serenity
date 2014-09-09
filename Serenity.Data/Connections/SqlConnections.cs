@@ -104,11 +104,11 @@ namespace Serenity.Data
             return connection;
         }
 
-        public static IDbTransaction GetCurrentTransaction(this IDbConnection connection)
+        public static IDbTransaction GetCurrentActualTransaction(this IDbConnection connection)
         {
-            var wrapped = connection as IWrappedConnection;
-            if (wrapped != null)
-                return wrapped.Transaction;
+            var wrapped = connection as WrappedConnection;
+            if (wrapped != null && wrapped.CurrentTransaction != null)
+                return wrapped.CurrentTransaction.ActualTransaction;
 
             return null;
         }

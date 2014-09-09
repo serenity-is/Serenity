@@ -44,7 +44,6 @@
     </Compile>
     <Compile Include="Connections\DataReaderExtensions.cs" />
     <Compile Include="Connections\IUnitOfWork.cs" />
-    <Compile Include="Connections\IWrappedConnection.cs" />
     <Compile Include="Connections\UnitOfWork.cs" />
     <Compile Include="Connections\WrappedTransaction.cs" />
     <Compile Include="Connections\WrappedConnection.cs" />

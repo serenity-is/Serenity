@@ -32,21 +32,21 @@ namespace Serenity.Data.Test
                 connection.EnsureOpen();
 
                 Assert.IsType<WrappedConnection>(connection);
-                Assert.Null(connection.GetCurrentTransaction());
+                Assert.Null(connection.GetCurrentActualTransaction());
 
                 using (var transaction = connection.BeginTransaction())
                 {
                     Assert.IsType<WrappedTransaction>(transaction);
 
-                    var currentTransaction = connection.GetCurrentTransaction();
-                    Assert.NotNull(currentTransaction);
+                    var actualTransaction = connection.GetCurrentActualTransaction();
+                    Assert.NotNull(actualTransaction);
 
-                    Assert.Equal(((WrappedTransaction)transaction).Transaction, currentTransaction);
-                    Assert.NotEqual(currentTransaction, transaction);
+                    Assert.Equal(((WrappedTransaction)transaction).ActualTransaction, actualTransaction);
+                    Assert.NotEqual(actualTransaction, transaction);
 
                     transaction.Commit();
 
-                    Assert.Null(connection.GetCurrentTransaction());
+                    Assert.Null(connection.GetCurrentActualTransaction());
                 }
             }
         }
@@ -60,21 +60,21 @@ namespace Serenity.Data.Test
                 connection.EnsureOpen();
 
                 Assert.IsType<WrappedConnection>(connection);
-                Assert.Null(connection.GetCurrentTransaction());
+                Assert.Null(connection.GetCurrentActualTransaction());
 
                 using (var transaction = connection.BeginTransaction())
                 {
                     Assert.IsType<WrappedTransaction>(transaction);
 
-                    var currentTransaction = connection.GetCurrentTransaction();
-                    Assert.NotNull(currentTransaction);
+                    var actualTransaction = connection.GetCurrentActualTransaction();
+                    Assert.NotNull(actualTransaction);
 
-                    Assert.Equal(((WrappedTransaction)transaction).Transaction, currentTransaction);
-                    Assert.NotEqual(currentTransaction, transaction);
+                    Assert.Equal(((WrappedTransaction)transaction).ActualTransaction, actualTransaction);
+                    Assert.NotEqual(actualTransaction, transaction);
 
                     transaction.Rollback();
 
-                    Assert.Null(connection.GetCurrentTransaction());
+                    Assert.Null(connection.GetCurrentActualTransaction());
                 }
             }
         }
@@ -88,20 +88,20 @@ namespace Serenity.Data.Test
                 connection.EnsureOpen();
 
                 Assert.IsType<WrappedConnection>(connection);
-                Assert.Null(connection.GetCurrentTransaction());
+                Assert.Null(connection.GetCurrentActualTransaction());
 
                 using (var transaction = connection.BeginTransaction())
                 {
                     Assert.IsType<WrappedTransaction>(transaction);
 
-                    var currentTransaction = connection.GetCurrentTransaction();
-                    Assert.NotNull(currentTransaction);
+                    var actualTransaction = connection.GetCurrentActualTransaction();
+                    Assert.NotNull(actualTransaction);
 
-                    Assert.Equal(((WrappedTransaction)transaction).Transaction, currentTransaction);
-                    Assert.NotEqual(currentTransaction, transaction);
+                    Assert.Equal(((WrappedTransaction)transaction).ActualTransaction, actualTransaction);
+                    Assert.NotEqual(actualTransaction, transaction);
                 }
 
-                Assert.Null(connection.GetCurrentTransaction());
+                Assert.Null(connection.GetCurrentActualTransaction());
             }
         }
 
@@ -114,32 +114,32 @@ namespace Serenity.Data.Test
                 connection.EnsureOpen();
 
                 Assert.IsType<WrappedConnection>(connection);
-                Assert.Null(connection.GetCurrentTransaction());
+                Assert.Null(connection.GetCurrentActualTransaction());
 
                 using (var transaction = connection.BeginTransaction())
                 {
                     Assert.IsType<WrappedTransaction>(transaction);
 
-                    var currentTransaction = connection.GetCurrentTransaction();
-                    Assert.NotNull(currentTransaction);
+                    var actualTransaction = connection.GetCurrentActualTransaction();
+                    Assert.NotNull(actualTransaction);
 
-                    Assert.Equal(((WrappedTransaction)transaction).Transaction, currentTransaction);
-                    Assert.NotEqual(currentTransaction, transaction);
+                    Assert.Equal(((WrappedTransaction)transaction).ActualTransaction, actualTransaction);
+                    Assert.NotEqual(actualTransaction, transaction);
 
                     using (var command = connection.CreateCommand())
                     {
                         Assert.NotNull(command.Transaction);
-                        Assert.Equal(((WrappedConnection)connection).Connection, command.Connection);
-                        Assert.Equal(currentTransaction, command.Transaction);
+                        Assert.Equal(((WrappedConnection)connection).ActualConnection, command.Connection);
+                        Assert.Equal(actualTransaction, command.Transaction);
                     }
                 }
 
-                Assert.Null(connection.GetCurrentTransaction());
+                Assert.Null(connection.GetCurrentActualTransaction());
 
                 using (var command = connection.CreateCommand())
                 {
                     Assert.Null(command.Transaction);
-                    Assert.Equal(((WrappedConnection)connection).Connection, command.Connection);
+                    Assert.Equal(((WrappedConnection)connection).ActualConnection, command.Connection);
                 }
             }
         }

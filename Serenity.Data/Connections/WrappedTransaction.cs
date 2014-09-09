@@ -4,45 +4,45 @@ namespace Serenity.Data
 {
     public class WrappedTransaction : IDbTransaction
     {
-        private WrappedConnection connection;
-        private IDbTransaction transaction;
+        private WrappedConnection wrappedConnection;
+        private IDbTransaction actualTransaction;
 
         /// <summary>
         ///   Creates a new WrappedTransaction instance.</summary>
         /// <param name="transaction">
         ///   The actual transaction, this wrapped transaction is created for.</param>
-        internal WrappedTransaction(WrappedConnection connection, IDbTransaction transaction)
+        internal WrappedTransaction(WrappedConnection wrappedConnection, IDbTransaction actualTransaction)
         {
-            this.connection = connection;
-            this.transaction = transaction;
+            this.wrappedConnection = wrappedConnection;
+            this.actualTransaction = actualTransaction;
         }
 
         /// <summary>
         ///   Returns the connection associated with this transaction.</summary>
         public IDbConnection Connection
         {
-            get { return connection ?? transaction.Connection; }
+            get { return wrappedConnection; }
         }
 
         /// <summary>
         ///   Returns the actual transaction.</summary>
-        public IDbTransaction Transaction
+        public IDbTransaction ActualTransaction
         {
-            get { return transaction; }
+            get { return actualTransaction; }
         }
 
         /// <summary>
         ///   Returns the transaction isolation level</summary>
         public IsolationLevel IsolationLevel
         {
-            get { return transaction.IsolationLevel; }
+            get { return actualTransaction.IsolationLevel; }
         }
 
         /// <summary>
         ///   Commits actual transaction and sets wrapped transaction for related connection to null.</summary>
         public void Commit()
         {
-            transaction.Commit();
+            actualTransaction.Commit();
             DetachConnection();
         }
 
@@ -50,7 +50,7 @@ namespace Serenity.Data
         ///   Rollbacks actual transaction and sets wrapped transaction for related connection to null.</summary>
         public void Rollback()
         {
-            transaction.Rollback();
+            actualTransaction.Rollback();
             DetachConnection();
         }
 
@@ -58,16 +58,16 @@ namespace Serenity.Data
         ///   Rolbacks actual transaction and sets wrapped transaction for related connection to null.</summary>
         public void Dispose()
         {
-            transaction.Dispose();
+            actualTransaction.Dispose();
             DetachConnection();
         }
 
         private void DetachConnection()
         {
-            if (this.connection != null)
+            if (this.wrappedConnection != null)
             {
-                this.connection.Release(this.transaction);
-                this.connection = null;
+                this.wrappedConnection.Release(this);
+                this.wrappedConnection = null;
             }
         }
     }

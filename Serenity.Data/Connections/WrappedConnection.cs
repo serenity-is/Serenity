@@ -2,79 +2,81 @@
 
 namespace Serenity.Data
 {
-    public class WrappedConnection : IWrappedConnection
+    public class WrappedConnection : IDbConnection
     {
-        private IDbConnection connection;
-        private IDbTransaction transaction;
+        private IDbConnection actualConnection;
+        private WrappedTransaction currentTransaction;
 
-        public WrappedConnection(IDbConnection connection)
+        public WrappedConnection(IDbConnection actualConnection)
         {
-            this.connection = connection;
+            this.actualConnection = actualConnection;
         }
 
-        public IDbConnection Connection
+        public IDbConnection ActualConnection
         {
-            get { return connection; }
+            get { return actualConnection; }
         }
 
-        public IDbTransaction Transaction
+        public WrappedTransaction CurrentTransaction
         {
-            get { return transaction; }
+            get { return currentTransaction; }
         }
 
         public IDbTransaction BeginTransaction(IsolationLevel il)
         {
-            transaction = connection.BeginTransaction(il);
-            return new WrappedTransaction(this, transaction);
+            var actualTransaction = actualConnection.BeginTransaction(il);
+            currentTransaction = new WrappedTransaction(this, actualTransaction);
+            return currentTransaction;
         }
 
         public IDbTransaction BeginTransaction()
         {
-            transaction = connection.BeginTransaction();
-            return new WrappedTransaction(this, transaction);
+            var actualTransaction = actualConnection.BeginTransaction();
+            currentTransaction = new WrappedTransaction(this, actualTransaction);
+            return currentTransaction;
         }
 
-        internal void Release(IDbTransaction transaction)
+        internal void Release(WrappedTransaction transaction)
         {
-            if (this.transaction == transaction)
+            if (this.currentTransaction == transaction)
             {
-                this.transaction = null;
+                this.currentTransaction = null;
             }
         }
 
         public void ChangeDatabase(string databaseName)
         {
-            connection.ChangeDatabase(databaseName);
+            actualConnection.ChangeDatabase(databaseName);
         }
 
         public void Close()
         {
-            connection.Close();
+            actualConnection.Close();
         }
 
         public string ConnectionString
         {
             get
             {
-                return connection.ConnectionString;
+                return actualConnection.ConnectionString;
             }
             set
             {
-                connection.ConnectionString = value;
+                actualConnection.ConnectionString = value;
             }
         }
 
         public int ConnectionTimeout
         {
-            get { return connection.ConnectionTimeout; }
+            get { return actualConnection.ConnectionTimeout; }
         }
 
         public IDbCommand CreateCommand()
         {
-            var command = connection.CreateCommand();
+            var command = actualConnection.CreateCommand();
             try
             {
-                command.Transaction = this.transaction;
+                command.Transaction = this.currentTransaction != null ? this.currentTransaction.ActualTransaction : null;
             }
             catch
             {
@@ -87,22 +89,22 @@ namespace Serenity.Data
 
         public string Database
         {
-            get { return connection.Database; }
+            get { return actualConnection.Database; }
         }
 
         public void Open()
         {
-            connection.Open();
+            actualConnection.Open();
         }
 
         public ConnectionState State
         {
-            get { return connection.State; }
+            get { return actualConnection.State; }
         }
 
         public void Dispose()
         {
-            connection.Dispose();
+            actualConnection.Dispose();
         }
     }
 }
