@@ -73,9 +73,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="CompressFilter.cs" />
     <Compile Include="EndpointExtensions.cs" />
     <Compile Include="JsonFilter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="ServiceAuthorizeFilter.cs" />
     <Compile Include="TokenAuthorizeFilter.cs" />

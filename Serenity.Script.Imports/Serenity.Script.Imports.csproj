@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="CKEditor\CKEditor.cs" />
     <Compile Include="Select2\Select2.cs" />
     <Compile Include="Dialogs\AlertOptions.cs" />

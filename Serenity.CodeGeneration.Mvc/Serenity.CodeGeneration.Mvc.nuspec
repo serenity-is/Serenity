@@ -20,10 +20,8 @@
       <dependency id="Microsoft.AspNet.WebPages" version="${microsoftAspNetWebPagesVersion}" />
       <dependency id="Microsoft.Web.Infrastructure" version="${microsoftWebInfrastructureVersion}" />
       <dependency id="Serenity.Core" version="${version}" />
-      <dependency id="Serenity.Munq" version="${version}" />
-      <dependency id="Serenity.Data" version="${version}" />
-      <dependency id="Serenity.Data.Entity" version="${version}" />
       <dependency id="Serenity.Services" version="${version}" />
+      <dependency id="Serenity.Services.Mvc" version="${version}" />
       <dependency id="Serenity.CodeGeneration" version="${version}" />
     </dependencies>
   </metadata>

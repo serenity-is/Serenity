@@ -14,12 +14,17 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="${jsonNetVersion}" />
-      <dependency id="Serenity.Core" version="${version}" />
-      <dependency id="CouchbaseNetClient" version="${couchbaseNetClientVersion}" />
+      <dependency id="Saltarelle.Compiler" version="${saltarelleCompilerVersion}" />
+      <dependency id="Saltarelle.jQuery" version="${saltarellejQueryVersion}" />
+      <dependency id="Saltarelle.jQuery.UI" version="${saltarellejQueryUIVersion}" />
+      <dependency id="Saltarelle.Linq" version="${saltarelleLinqVersion}" />
+      <dependency id="Saltarelle.Runtime" version="${saltarelleRuntimeVersion}" />
+      <dependency id="Saltarelle.Web" version="${saltarelleWebVersion}" />
+      <dependency id="Serenity.Script.Imports" version="${version}" />
+      <dependency id="Serenity.Script.Core" version="${version}" />
     </dependencies>
   </metadata>
   <files>
-    <file src="${id}.dll" target="lib/${framework}" />
+    <file src="${id}.dll" target="lib/${scriptFramework}" />
   </files>
 </package>

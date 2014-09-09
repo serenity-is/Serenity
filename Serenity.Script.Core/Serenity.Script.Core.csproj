@@ -33,6 +33,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Attribute\EditorAttribute.cs" />
     <Compile Include="Attribute\ElementAttribute.cs" />
     <Compile Include="Attribute\DialogTypeAttribute.cs" />
