@@ -5,6 +5,7 @@ using System.IO;
 using System.Web;
 using System.Web.Hosting;
 using Serenity.Web;
+using Serenity.Configuration;
 using Serenity.Data;
 using Newtonsoft.Json;
 
@@ -60,8 +61,8 @@ namespace Serenity.Web
                 if (settings.Bundles == null ||
                     settings.Bundles.Count == 0)
                 {
-                    settings.Bundles = JsConfigHelper.LoadConfig<Dictionary<string, string[]>>(
-                        "~/Scripts/Site/ScriptBundles.js");
+                    settings.Bundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
+                        HostingEnvironment.MapPath("~/Scripts/Site/ScriptBundles.js"));
 
                     if (settings.Bundles == null ||
                         settings.Bundles.Count == 0)

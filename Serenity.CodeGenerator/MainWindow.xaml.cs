@@ -1,5 +1,5 @@
-﻿using Serenity.Data;
-using Serenity.Web;
+﻿using Serenity.Configuration;
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,7 +32,7 @@ namespace Serenity.CodeGenerator
             this.DataContext = this;
 
             var configFilePath = GetConfigurationFilePath();
-            config = JsConfigHelper.LoadConfig<GeneratorConfig>(configFilePath);
+            config = JsonConfigHelper.LoadConfig<GeneratorConfig>(configFilePath);
             config.Connections = config.Connections ?? new List<GeneratorConfig.Connection>();
             config.RemoveForeignFields = config.RemoveForeignFields ?? new List<string>();
 

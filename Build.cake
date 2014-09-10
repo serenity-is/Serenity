@@ -120,6 +120,9 @@ Task("NuGet")
             nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
           
         var assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
+        if (!File.Exists(assembly))
+            assembly = "./" + s + "/bin/" + configuration + "/" + s + ".exe";
+          
         if (File.Exists(assembly)) 
         {
             var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly);
@@ -156,6 +159,8 @@ Task("NuGet")
     myPack("Serenity.Script.Imports");
     myPack("Serenity.Script.Core");
     myPack("Serenity.Script.UI");
+    
+    myPack("Serenity.CodeGenerator");
 });
 
 Task("NuGet-Push")

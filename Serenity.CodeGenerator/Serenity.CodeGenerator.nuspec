@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>${id}</id>
+    <version>${version}</version>
+    <authors>${authors}</authors>
+    <owners>${owners}</owners>
+    <title>${title}</title>
+    <description>${description}</description>
+    <language>${language}</language>
+    <iconUrl>${iconUrl}</iconUrl>
+    <licenseUrl>${licenceUrl}</licenseUrl>
+    <projectUrl>${projectUrl}</projectUrl>
+    <copyright>${copyright}</copyright>
+    <tags>${tags}</tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="../../Readme.CodeGenerator.txt" target="content" />
+    <file src="Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
+    <file src="Newtonsoft.Json.dll" target="tools" />
+    <file src="RazorGenerator.Templating.dll" target="tools" />
+    <file src="Serenity.Core.dll" target="tools" />
+    <file src="Serenity.Data.dll" target="tools" />
+    <file src="Serenity.Data.Entity.dll" target="tools" />
+    <file src="System.Data.SQLite.dll" target="tools" />
+    <file src="x86/SQLite.Interop.dll" target="tools/x86" />
+    <file src="x64/SQLite.Interop.dll" target="tools/x64" />
+  </files>
+</package>

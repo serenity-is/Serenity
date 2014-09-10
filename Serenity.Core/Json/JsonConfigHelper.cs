@@ -1,12 +1,10 @@
-﻿using Serenity.Data;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Web.Hosting;
 
-namespace Serenity.Web
+namespace Serenity.Configuration
 {
-    public static class JsConfigHelper
+    public static class JsonConfigHelper
     {
         public static string RemovePrefix(string json)
         {
@@ -36,13 +34,10 @@ namespace Serenity.Web
         public static TConfig LoadConfig<TConfig>(string path)
             where TConfig : new()
         {
-            if (path.StartsWith("~/"))
-                path = HostingEnvironment.MapPath(path);
-
             if (File.Exists(path))
                 using (var sr = new StreamReader(path))
                 {
-                    string json = JsConfigHelper.RemovePrefix(sr.ReadToEnd()) ?? "{}";
+                    string json = RemovePrefix(sr.ReadToEnd()) ?? "{}";
                     return JsonConvert.DeserializeObject<TConfig>(json, JsonSettings.Tolerant);
                 }
 
