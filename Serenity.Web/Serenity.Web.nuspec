@@ -29,5 +29,7 @@
   </metadata>
   <files>
     <file src="${id}.dll" target="lib/${framework}" />
+    <file src="../../Style/images/*.jpg" target="content/Content/serenity/images" />
+    <file src="../../Style/images/*.png" target="content/Content/serenity/images" />
   </files>
 </package>

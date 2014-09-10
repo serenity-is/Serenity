@@ -20,19 +20,4 @@ namespace Serenity.Web
             return result;
         }
     }
-
-    public static class XlsContentResult
-    {
-        public static FileContentResult Create(byte[] data)
-        {
-            return Create(data, null);
-        }
-
-        public static FileContentResult Create(byte[] data, string downloadName)
-        {
-            var result = new FileContentResult(data, "application/xls");
-            result.FileDownloadName = downloadName ?? ("report" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xls");
-            return result;
-        }
-    }
 }
