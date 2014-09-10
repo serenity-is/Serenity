@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
 using System.Xml.Linq;
 
 namespace Serenity.CodeGenerator
@@ -13,7 +15,6 @@ namespace Serenity.CodeGenerator
     public class EntityCodeGenerator
     {
         private EntityCodeGenerationModel model;
-        private string projectPath;
         private string siteWebPath;
         private string siteWebProj;
         private string scriptPath;
@@ -30,28 +31,25 @@ namespace Serenity.CodeGenerator
             sw.WriteLine("/* ------------------------------------------------------------------------- */");
         }
 
-        public EntityCodeGenerator(EntityCodeGenerationModel model,
-            string projectRoot)
+        public EntityCodeGenerator(EntityCodeGenerationModel model, GeneratorConfig config)
         {
             var kdiff3Paths = new[]
             {
-                ConfigurationManager.AppSettings["KDiff3Path"], 
+                config.KDiff3Path, 
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "KDiff3\\kdiff3.exe"), 
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "KDiff3\\kdiff3.exe"), 
             };
 
             this.model = model;
-            projectPath = projectRoot;
             kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
-            siteWebPath = Path.Combine(projectPath, ConfigurationManager.AppSettings["WebPath"]);
-            siteWebProj = Path.Combine(projectPath, ConfigurationManager.AppSettings["WebProject"]);
-            scriptPath = Path.Combine(projectPath, ConfigurationManager.AppSettings["ScriptPath"]);
-            scriptProject = Path.Combine(projectPath, ConfigurationManager.AppSettings["ScriptProject"]);
+            siteWebProj = config.WebProjectFile;
+            siteWebPath = Path.GetDirectoryName(siteWebProj);
+            scriptProject = config.ScriptProjectFile;
+            scriptPath = Path.GetDirectoryName(scriptProject);
         }
 
         public void Run()
         {
-            Directory.CreateDirectory(projectPath);
             Directory.CreateDirectory(scriptPath);
             Directory.CreateDirectory(siteWebPath);
             Directory.CreateDirectory(scriptPath);

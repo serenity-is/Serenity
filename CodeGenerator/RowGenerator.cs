@@ -10,9 +10,10 @@ namespace Serenity.CodeGenerator
 {
     public class RowGenerator
     {
-        public static string Generate(IDbConnection connection, string tableSchema, string table, string module, string schema, string entityClass, string permission)
+        public static string Generate(IDbConnection connection, string tableSchema, string table, string module, string schema, string entityClass, string permission,
+            GeneratorConfig config)
         {
-            var model = GenerateModel(connection, tableSchema, table, module, schema, entityClass, permission);
+            var model = GenerateModel(connection, tableSchema, table, module, schema, entityClass, permission, config);
             return Templates.Render(new Views.EntityRow(), model);
         }
 
@@ -42,13 +43,13 @@ namespace Serenity.CodeGenerator
         }
 
         public static EntityCodeGenerationModel GenerateModel(IDbConnection connection, string tableSchema, string table,
-            string module, string schema, string entityClass, string permission)
+            string module, string schema, string entityClass, string permission, GeneratorConfig config)
         {
             var model = new EntityCodeGenerationModel();
             model.Module = module;
             model.Permission = permission;
             model.Schema = schema;
-            model.RootNamespace = ConfigurationManager.AppSettings["RootNamespace"];
+            model.RootNamespace = config.RootNamespace;
             var className = entityClass ?? ClassNameFromTableName(table);
             model.ClassName = className;
             model.RowClassName = className + "Row";
@@ -79,40 +80,37 @@ namespace Serenity.CodeGenerator
             string baseRowMatch = null;
             HashSet<string> baseRowFieldset = null;
             List<string> baseRowFieldList = new List<string>();
-            foreach (var k in ConfigurationManager.AppSettings.AllKeys)
+            foreach (var k in config.BaseRowClasses ?? new List<GeneratorConfig.BaseRowClass>())
             {
-                if (k.StartsWith("BaseRowFields_", StringComparison.OrdinalIgnoreCase))
+                var b = k.ClassName;
+                var f = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var fl = new List<string>();
+                bool skip = false;
+                foreach (var s in k.Fields ?? new List<string>())
                 {
-                    var b = k.Substring("BaseRowFields_".Length);
-                    var f = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    var fl = new List<string>();
-                    bool skip = false;
-                    foreach (var s in ConfigurationManager.AppSettings[k].Split(new char[] { ',', ';' }))
+                    string n = s.TrimToNull();
+                    if (n == null || !fields.Exists(z => z.FieldName.Substring(prefix) == n))
                     {
-                        string n = s.TrimToNull();
-                        if (n == null || !fields.Exists(z => z.FieldName.Substring(prefix) == n))
-                        {
-                            skip = true;
-                            break;
-                        }
-                        f.Add(n);
-                        fl.Add(n);
+                        skip = true;
+                        break;
                     }
+                    f.Add(n);
+                    fl.Add(n);
+                }
 
-                    if (skip)
-                        continue;
+                if (skip)
+                    continue;
 
-                    if (baseRowFieldset == null || f.Count > baseRowFieldset.Count)
-                    {
-                        baseRowFieldset = f;
-                        baseRowFieldList = fl;
-                        baseRowMatch = b;
-                    }
+                if (baseRowFieldset == null || f.Count > baseRowFieldset.Count)
+                {
+                    baseRowFieldset = f;
+                    baseRowFieldList = fl;
+                    baseRowMatch = b;
                 }
             }
 
             var removeForeignFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var s in ConfigurationManager.AppSettings["RemoveForeignFields"].Split(new char[] { ',', ';' }))
+            foreach (var s in config.RemoveForeignFields ?? new List<string>())
             {
                 string n = s.TrimToNull();
                 if (n != null)

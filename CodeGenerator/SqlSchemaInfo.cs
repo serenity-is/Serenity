@@ -18,7 +18,7 @@ namespace Serenity.CodeGenerator
 
         public static List<Tuple<string, string>> GetTableNames(IDbConnection connection)
         {
-            var tables = ((DbConnection)connection).GetSchema("Tables");
+            var tables = ((DbConnection)(((WrappedConnection)connection)).ActualConnection).GetSchema("Tables");
 
             var result = new List<Tuple<string, string>>();
 
@@ -45,7 +45,7 @@ namespace Serenity.CodeGenerator
             var inf = InformationSchema(connection);
             List<string> primaryFields = new List<string>();
 
-            var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             foreach (DataRow row in columns.Rows)
             {
                 try
@@ -91,7 +91,7 @@ namespace Serenity.CodeGenerator
         {
             List<string> identityFields = new List<string>();
 
-            var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             if (columns.Columns.Contains("AUTOINCREMENT"))
                 foreach (DataRow row in columns.Rows)
                 {
@@ -126,7 +126,7 @@ namespace Serenity.CodeGenerator
             var inf = InformationSchema(connection);
             var list = new List<string>();
 
-            var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             foreach (DataRow row in columns.Rows)
             {
                 list.Add((string)row["COLUMN_NAME"]);
@@ -233,7 +233,7 @@ namespace Serenity.CodeGenerator
             List<string> primaryFields = GetTablePrimaryFields(connection, schema, tableName);
             List<string> identityFields = GetTableIdentityFields(connection, schema, tableName);
 
-            var columns = ((DbConnection)connection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             foreach (DataRow row in columns.Rows)
             {
 

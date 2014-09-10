@@ -1,6 +1,5 @@
-﻿using Serenity;
-using Serenity.Data;
-using Newtonsoft.Json;
+﻿using Serenity.Data;
+using Serenity.Web;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Xml;
 
 namespace Serenity.CodeGenerator
 {
@@ -17,32 +17,123 @@ namespace Serenity.CodeGenerator
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private BindingList<string> _connections;
+        private BindingList<GeneratorConfig.Connection> _connections;
         private BindingList<string> _tables;
+        private GeneratorConfig config;
 
         public MainWindow()
         {
             InitializeComponent();
-            _connections = new BindingList<string>();
+
+            _connections = new BindingList<GeneratorConfig.Connection>();
             _tables = new BindingList<string>();
+
             this.ConnectionsCombo.DataContext = _connections;
             this.DataContext = this;
 
-            var file = ConnectionsFile();
-            if (File.Exists(file))
-                using (var sr = new StreamReader(file))
+            var configFilePath = GetConfigurationFilePath();
+            config = JsConfigHelper.LoadConfig<GeneratorConfig>(configFilePath);
+            config.Connections = config.Connections ?? new List<GeneratorConfig.Connection>();
+            config.RemoveForeignFields = config.RemoveForeignFields ?? new List<string>();
+
+            if (!config.WebProjectFile.IsEmptyOrNull())
+            {
+                var webConfig = Path.Combine(Path.GetDirectoryName(config.WebProjectFile), "web.config");
+                AddConnectionsFromAppConfig(config.Connections, webConfig);
+            }
+                
+
+            foreach (var connection in config.Connections)
+                _connections.Add(connection);
+        }
+         
+        private void AddConnectionsFromAppConfig(List<GeneratorConfig.Connection> connections, string configFilePath)
+        {
+            if (File.Exists(configFilePath))
+            {
+                try
                 {
-                    _connections.Clear();
-                    foreach (var s in JsonConvert.DeserializeObject<List<string>>(sr.ReadToEnd().TrimToNull() ?? "[]"))
-                        _connections.Add(s);
+                    var xml = new XmlDocument();
+                    xml.LoadXml(File.ReadAllText(configFilePath));
+                    var nodes = xml.SelectNodes("//configuration/connectionStrings/add");
+                    foreach (XmlElement node in nodes)
+                    {
+                        var name = node.Attributes["name"];
+                        var conn = node.Attributes["connectionString"];
+                        var prov = node.Attributes["providerName"];
+                        if (name != null && 
+                            !string.IsNullOrWhiteSpace(name.Value) &&
+                            conn != null &&
+                            !string.IsNullOrWhiteSpace(conn.Value) &&
+                            prov != null &&
+                            !string.IsNullOrWhiteSpace(prov.Value))
+                        {
+                            var connection = config.Connections.FirstOrDefault(x => String.Compare(x.Key, name.Value, StringComparison.OrdinalIgnoreCase) == 0);
+                            if (connection == null)
+                            {
+                                connection = new GeneratorConfig.Connection();
+                                connection.Key = name.Value;
+                                connections.Add(connection);
+                            }
+                            connection.ConnectionString = conn.Value;
+                            connection.ProviderName = prov.Value;
+                        }
+                    }
                 }
-
-
-            ProjectRoot = System.IO.Path.GetFullPath(@"..\..\..\..\!!!Beni Sil!!!");
+                catch (Exception ex)
+                {
+                    ex.Log();
+                }
+            }
         }
 
         public BindingList<string> Tables { get { return _tables; } }
-        public string ProjectRoot { get; set; }
+
+        public string RootNamespace
+        {
+            get { return config.RootNamespace; }
+            set 
+            { 
+                if (value != config.RootNamespace) {
+                    config.RootNamespace = value;
+                    SaveConfig();
+                    Changed("RootNamespace");
+                }
+            }
+        }
+
+        public string WebProjectFile
+        {
+            get { return config.WebProjectFile; }
+            set
+            {
+                if (value != config.WebProjectFile)
+                {
+                    config.WebProjectFile = value;
+
+                    if (!config.WebProjectFile.IsEmptyOrNull())
+                    {
+                        var webConfig = Path.Combine(Path.GetDirectoryName(config.WebProjectFile), "web.config");
+                        AddConnectionsFromAppConfig(config.Connections, webConfig);
+                    }
+
+                    Changed("WebProjectFile");
+                }
+            }
+        }
+
+        public string ScriptProjectFile
+        {
+            get { return config.ScriptProjectFile; }
+            set
+            {
+                if (value != config.ScriptProjectFile)
+                {
+                    config.ScriptProjectFile = value;
+                    Changed("ScriptProjectFile");
+                }
+            }
+        }
 
         private string _entitySingular;
 
@@ -73,18 +164,18 @@ namespace Serenity.CodeGenerator
             }
         } private string _module;
 
-        public string Schema
+        public string ConnectionKey
         {
-            get { return _schema; }
+            get { return _connectionKey; }
             set
             {
-                if (value != _schema)
+                if (value != _connectionKey)
                 {
-                    _schema = value;
-                    Changed("Schema");
+                    _connectionKey = value;
+                    Changed("ConnectionKey");
                 }
             }
-        } private string _schema;
+        } private string _connectionKey;
 
         public string Permission
         { 
@@ -105,54 +196,100 @@ namespace Serenity.CodeGenerator
                 PropertyChanged(this, new PropertyChangedEventArgs(property));
         }
 
+        private void ScriptProjectFileBrowse(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = string.IsNullOrWhiteSpace(ScriptProjectFile) ? "*.csproj" : ScriptProjectFile;
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                ScriptProjectFile = dlg.FileName;
+                SaveConfig();
+            }
+        }
+
+        private void WebProjectFileBrowse(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = string.IsNullOrWhiteSpace(WebProjectFile) ? "*.csproj" : WebProjectFile;
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                WebProjectFile = dlg.FileName;
+                SaveConfig();
+            }
+        }
+
         private void Ekle_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new AddConnectionStringWindow();
             if (dlg.ShowDialog() == true)
             {
-                var cstr = dlg.ConnectionString.Text.Trim();
-                if (cstr.Length == 0)
-                    return;
-                if (_connections.IndexOf(cstr) < 0)
-                    _connections.Add(cstr);
-                this.ConnectionsCombo.SelectedItem = cstr;
+                var cstr = dlg.Key.Text.Trim();
+                if (cstr.Length < 0)
+                    throw new ArgumentNullException("connectionKey");
+
+                var connection = config.Connections.FirstOrDefault(x => String.Compare(x.Key, cstr, StringComparison.OrdinalIgnoreCase) == 0);
+                if (connection == null)
+                {
+                    connection = new GeneratorConfig.Connection
+                    {
+                        Key = cstr,
+                        ConnectionString = dlg.ConnectionString.Text.Trim(),
+                        ProviderName = dlg.Provider.Text.Trim(),
+                        Tables = new List<GeneratorConfig.Table>
+                        {
+
+                        }
+                    };
+
+                    config.Connections.Add(connection);
+                    _connections.Clear();
+                    _connections.AddRange(config.Connections);
+                }
+                else
+                {
+                    connection.ConnectionString = dlg.ConnectionString.Text.Trim();
+                    connection.ProviderName = dlg.Provider.Text.Trim();
+                }
+
+                this.ConnectionsCombo.SelectedItem = connection;
+                SaveConfig();
             }
+        }
+
+        private void SaveConfig()
+        {
+            config.Connections.Sort((x, y) => x.Key.CompareTo(y.Key));
+            File.WriteAllText(GetConfigurationFilePath(), JSON.StringifyIndented(config));
         }
 
         private void Sil_Click(object sender, RoutedEventArgs e)
         {
-            _connections.Remove((string)this.ConnectionsCombo.SelectedItem);
+            var connection = (GeneratorConfig.Connection)this.ConnectionsCombo.SelectedItem;
+            config.Connections.Remove(connection);
+            _connections.Remove(connection);
+            SaveConfig();
         }
 
-        private string ConnectionsFile()
+        private bool IsNugetPackage()
         {
-            return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Connections.config");
+            var parentPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\"));
+            return File.Exists(Path.Combine(parentPath, "repositories.config")) &&
+                parentPath.EndsWith(@"packages\", StringComparison.OrdinalIgnoreCase);
         }
 
-        protected override void OnClosed(EventArgs e)
+        private string GetConfigurationFilePath()
         {
-            base.OnClosed(e);
+            var configPath = AppDomain.CurrentDomain.BaseDirectory;
+            if (IsNugetPackage())
+                configPath = Path.GetFullPath(Path.Combine(configPath, @"..\..\..\"));
 
-            using (var sw = new StreamWriter(ConnectionsFile()))
-            {
-                sw.Write(JsonConvert.SerializeObject(_connections.ToList()));
-            }
-        }
-
-        private IDbConnection CreateConnection(string connStr)
-        {
-            string provider = "System.Data.SqlClient";
-            SqlSchemaInfo.Dialect = SqlDialect.MsSql;
-            var idx = connStr.IndexOf("||");
-            if (idx >= 0)
-            {
-                provider = connStr.Substring(idx + 2).Trim();
-                connStr = connStr.Substring(0, idx).Trim();
-                if (provider == "System.Data.SQLite")
-                    SqlSchemaInfo.Dialect = SqlDialect.Sqlite;
-            }
-
-            return SqlConnections.New(connStr, provider);
+            return Path.Combine(configPath, "Serenity.CodeGenerator.config");
         }
 
         private void ConnectionsCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -161,11 +298,11 @@ namespace Serenity.CodeGenerator
 
             if (this.ConnectionsCombo.SelectedItem != null)
             {
-                string connStr = (string)this.ConnectionsCombo.SelectedItem;
+                var conn = (GeneratorConfig.Connection)this.ConnectionsCombo.SelectedItem;
 
                 try
                 {
-                    using (var connection = CreateConnection(connStr))
+                    using (var connection = SqlConnections.New(conn.ConnectionString, conn.ProviderName)) 
                     {
                         connection.Open();
 
@@ -195,11 +332,12 @@ namespace Serenity.CodeGenerator
                 }
                 try
                 {
-                    using (var connection = CreateConnection((string)this.ConnectionsCombo.SelectedItem))
+                    var conn = (GeneratorConfig.Connection)this.ConnectionsCombo.SelectedItem;
+                    using (var connection = SqlConnections.New(conn.ConnectionString, conn.ProviderName)) 
                     {
                         connection.Open();
                         this.GeneratedCode.Text = RowGenerator.Generate(connection, tableSchema, table,
-                            Module, Schema, EntitySingular, Permission);
+                            Module, ConnectionKey, EntitySingular, Permission, config);
                     }
                 }
                 catch (Exception ex)
@@ -207,7 +345,6 @@ namespace Serenity.CodeGenerator
                     MessageBox.Show(ex.ToString());
                 }
             }
-
         }
 
         private void TablesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -217,8 +354,13 @@ namespace Serenity.CodeGenerator
             if (this.ConnectionsCombo.SelectedItem != null &&
                 this.TablesCombo.SelectedItem != null)
             {
-                string tableName = (string)this.TablesCombo.SelectedItem; 
-                EntitySingular = "";
+                string tableName = (string)this.TablesCombo.SelectedItem;
+                var connection = this.ConnectionsCombo.SelectedItem as GeneratorConfig.Connection;
+                var table = connection != null ? connection.Tables.FirstOrDefault(x => x.Tablename == tableName) : null;
+                EntitySingular = table == null ? "" : table.Identifier;
+                Permission = table == null ? "" : table.PermissionKey;
+                ConnectionKey = table != null ? table.ConnectionKey : (connection != null ? connection.Key : "");
+                Module = table == null ? "" : table.Module;
                 GenerateCodeButton.IsEnabled = true;
                 GenerateRowCode();
             }
@@ -231,19 +373,19 @@ namespace Serenity.CodeGenerator
             if (this.ConnectionsCombo.SelectedItem == null ||
                 this.TablesCombo.SelectedItem == null)
             {
-                MessageBox.Show("Bir bağlantı ve tablo adı seçmelisiniz!");
+                MessageBox.Show("A connection string and table name must be selected!");
                 return;
             }
 
             if (EntitySingular.IsTrimmedEmpty())
             {
-                MessageBox.Show("Entity Sınıfı için değer girmelisiniz!");
+                MessageBox.Show("Entity class identifier must be entered!");
                 return;
             }
 
             if (Permission.IsTrimmedEmpty())
             {
-                MessageBox.Show("Erişim Hakkı için değer girmelisiniz!");
+                MessageBox.Show("Permission key must be entered!");
                 return;
             }
    
@@ -251,7 +393,8 @@ namespace Serenity.CodeGenerator
             try
             {
                 EntityCodeGenerationModel rowModel;
-                using (var connection = CreateConnection((string)this.ConnectionsCombo.SelectedItem))
+                var conn = (GeneratorConfig.Connection)this.ConnectionsCombo.SelectedItem;
+                using (var connection = SqlConnections.New(conn.ConnectionString, conn.ProviderName)) 
                 {
                     connection.Open();
                     var table = (string)this.TablesCombo.SelectedItem;
@@ -262,18 +405,37 @@ namespace Serenity.CodeGenerator
                         table = table.Substring(table.IndexOf('.') + 1);
                     }
                     rowModel = RowGenerator.GenerateModel(connection, tableSchema, table,
-                        Module, Schema, EntitySingular, Permission);
-                    new EntityCodeGenerator(rowModel, ProjectRoot).Run();
+                        Module, ConnectionKey, EntitySingular, Permission, config);
+                    new EntityCodeGenerator(rowModel, config).Run();
 
-                    MessageBox.Show("Seçilen tablo için kod üretildi!");
+                    MessageBox.Show("Code files for the selected table is generated!");
 
                     GenerateCodeButton.IsEnabled = false;
+                }
+
+                var cnn = this.ConnectionsCombo.SelectedItem as GeneratorConfig.Connection;
+                var tableObj = cnn != null ? cnn.Tables.FirstOrDefault(x => x.Tablename == tableName) : null;
+                if (tableObj == null && cnn != null)
+                {
+                    tableObj = new GeneratorConfig.Table();
+                    tableObj.Tablename = tableName;
+                    cnn.Tables.Add(tableObj);
+                }
+
+                if (tableObj != null)
+                {
+                    tableObj.Identifier = EntitySingular;
+                    tableObj.PermissionKey = Permission;
+                    tableObj.Module = Module;
+                    tableObj.ConnectionKey = ConnectionKey;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
+
+            File.WriteAllText(GetConfigurationFilePath(), JSON.StringifyIndented(config));
         }
     }
 }
