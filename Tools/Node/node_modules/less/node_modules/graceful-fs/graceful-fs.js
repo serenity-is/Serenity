@@ -1,13 +1,11 @@
 // Monkey-patching the fs module.
 // It's ugly, but there is simply no other way to do this.
-var fs = module.exports = require('fs')
+var fs = module.exports = require('./fs.js')
 
 var assert = require('assert')
 
 // fix up some busted stuff, mostly on windows and old nodes
 require('./polyfills.js')
-
-// The EMFILE enqueuing stuff
 
 var util = require('util')
 

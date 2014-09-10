@@ -55,6 +55,14 @@
 .test {
   color: 1px;
 }
+.sr-only-focusable {
+  clip: auto;
+}
+@-webkit-keyframes hover {
+  0% {
+    color: red;
+  }
+}
 #last {
   color: #0000ff;
 }
