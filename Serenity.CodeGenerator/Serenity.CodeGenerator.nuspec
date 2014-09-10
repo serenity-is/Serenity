@@ -17,7 +17,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../../Readme.CodeGenerator.txt" target="content" />
+    <file src="..\..\Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
     <file src="Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
     <file src="Newtonsoft.Json.dll" target="tools" />
     <file src="RazorGenerator.Templating.dll" target="tools" />
