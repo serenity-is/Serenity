@@ -82,8 +82,8 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Common\AssemblySorter.cs" />
-    <Compile Include="Content\ExcelContentResult.cs" />
-    <Compile Include="Content\ForXmlHelper.cs" />
+    <Compile Include="Mvc\ExcelContentResult.cs" />
+    <Compile Include="Mvc\ForXmlHelper.cs" />
     <Compile Include="Common\CommonInitialization.cs" />
     <Compile Include="Common\CssFileWatcher.cs" />
     <Compile Include="Common\ScriptFileWatcher.cs" />
