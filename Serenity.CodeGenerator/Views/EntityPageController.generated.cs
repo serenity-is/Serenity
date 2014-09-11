@@ -39,6 +39,7 @@ WriteLiteral("\r\n");
                                                    
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var modulePath = Model.Module ?? Model.RootNamespace;
+    var modulePrefix = (Model.Module == null ? "" : (Model.Module + "/"));
 
 
             
@@ -48,7 +49,7 @@ WriteLiteral("\r\nnamespace ");
 
 
             
-            #line 7 "..\..\Views\EntityPageController.cshtml"
+            #line 8 "..\..\Views\EntityPageController.cshtml"
       Write(Model.RootNamespace);
 
             
@@ -56,17 +57,35 @@ WriteLiteral("\r\nnamespace ");
             #line hidden
 
             
-            #line 7 "..\..\Views\EntityPageController.cshtml"
+            #line 8 "..\..\Views\EntityPageController.cshtml"
                             Write(dotModule);
 
             
             #line default
             #line hidden
-WriteLiteral(".Pages\r\n{\r\n    using Serenity;\r\n    using System.Web.Mvc;\r\n\r\n    public class ");
+WriteLiteral(".Pages\r\n{\r\n    using Serenity;\r\n    using System.Web.Mvc;\r\n\r\n    [RoutePrefix(\"");
 
 
             
-            #line 12 "..\..\Views\EntityPageController.cshtml"
+            #line 13 "..\..\Views\EntityPageController.cshtml"
+              Write(modulePrefix);
+
+            
+            #line default
+            #line hidden
+
+            
+            #line 13 "..\..\Views\EntityPageController.cshtml"
+                             Write(Model.ClassName);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("\"), Route(\"{action=index}\")]\r\n    public class ");
+
+
+            
+            #line 14 "..\..\Views\EntityPageController.cshtml"
              Write(Model.ClassName);
 
             
@@ -77,8 +96,8 @@ WriteLiteral("Controller : Controller\r\n    {\r\n        [Authorize]\r\n       
 
 
             
-            #line 17 "..\..\Views\EntityPageController.cshtml"
-                                         Write(Model.Permission);
+            #line 19 "..\..\Views\EntityPageController.cshtml"
+                                            Write(Model.Permission);
 
             
             #line default
@@ -87,7 +106,7 @@ WriteLiteral("\");\r\n            return View(\"~/Modules/");
 
 
             
-            #line 18 "..\..\Views\EntityPageController.cshtml"
+            #line 20 "..\..\Views\EntityPageController.cshtml"
                                Write(modulePath);
 
             
@@ -97,7 +116,7 @@ WriteLiteral("/");
 
 
             
-            #line 18 "..\..\Views\EntityPageController.cshtml"
+            #line 20 "..\..\Views\EntityPageController.cshtml"
                                              Write(Model.ClassName);
 
             
@@ -107,7 +126,7 @@ WriteLiteral("/");
 
 
             
-            #line 18 "..\..\Views\EntityPageController.cshtml"
+            #line 20 "..\..\Views\EntityPageController.cshtml"
                                                                 Write(Model.ClassName);
 
             

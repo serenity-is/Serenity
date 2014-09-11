@@ -2,6 +2,7 @@
 @functions { public dynamic Model { get; set; } }@{
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var modulePath = Model.Module ?? Model.RootNamespace;
+    var modulePrefix = (Model.Module == null ? "" : (Model.Module + "/"));
 }
 
 namespace @(Model.RootNamespace)@(dotModule).Pages
@@ -9,6 +10,7 @@ namespace @(Model.RootNamespace)@(dotModule).Pages
     using Serenity;
     using System.Web.Mvc;
 
+    [RoutePrefix("@(modulePrefix)@(Model.ClassName)"), Route("{action=index}")]
     public class @(Model.ClassName)Controller : Controller
     {
         [Authorize]
