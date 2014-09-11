@@ -138,6 +138,11 @@ namespace Serenity.Data
             }
         }
 
+        protected virtual void AfterInitialize()
+        {
+
+        }
+
         public void Initialize()
         {
             if (isInitialized)
@@ -168,6 +173,7 @@ namespace Serenity.Data
                         ForeignKeyAttribute foreignKey = null;
                         LeftJoinAttribute foreignJoin = null;
                         DefaultValueAttribute defaultValue = null;
+                        TextualFieldAttribute textualField = null;
 
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
@@ -183,6 +189,7 @@ namespace Serenity.Data
                             foreignKey = property.GetCustomAttribute<ForeignKeyAttribute>(false);
                             foreignJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
                             defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
+                            textualField = property.GetCustomAttribute<TextualFieldAttribute>(false);
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                             var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
@@ -250,16 +257,24 @@ namespace Serenity.Data
                         }
 
                         if (scale != null)
+                        {
                             field.Scale = scale.Value;
+                        }
 
                         if (defaultValue != null)
+                        {
                             field.DefaultValue = defaultValue.Value;
+                        }
 
                         if (selectLevel != null)
+                        {
                             field.MinSelectLevel = selectLevel.Value;
+                        }
 
                         if (expression != null)
+                        {
                             field.Expression = expression.Value;
+                        }
 
                         if (foreignKey != null)
                         {
@@ -271,6 +286,11 @@ namespace Serenity.Data
                         {
                             field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, foreignJoin.Alias,
                                 new Criteria(foreignJoin.Alias, field.ForeignField) == new Criteria(field));
+                        }
+
+                        if (textualField != null)
+                        {
+                            field.textualField = textualField.Value;
                         }
 
                         if (property != null)
@@ -311,6 +331,7 @@ namespace Serenity.Data
                 this.propertyDescriptors = new PropertyDescriptorCollection(propertyDescriptorArray);
 
                 InferTextualFields();
+                AfterInitialize();
             }
 
             isInitialized = true;
