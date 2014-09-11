@@ -278,9 +278,11 @@ namespace Serenity.CodeGenerator
 
         private bool IsNugetPackage()
         {
-            var parentPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\"));
-            return File.Exists(Path.Combine(parentPath, "repositories.config")) &&
-                parentPath.EndsWith(@"packages\", StringComparison.OrdinalIgnoreCase);
+            return
+                AppDomain.CurrentDomain.BaseDirectory.EndsWith(@"\tools\", 
+                    StringComparison.OrdinalIgnoreCase) &&
+                AppDomain.CurrentDomain.BaseDirectory.IndexOf(@"\packages\Serenity.CodeGenerator.", 
+                    StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private string GetConfigurationFilePath()
