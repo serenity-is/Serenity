@@ -16,3 +16,5 @@ TestResults/
 CodeGenerator/app.config
 Build/
 /Bin/
+Samples/BasicApplication/packages/
+Samples/BasicApplication/BasicApplication.Web/bin

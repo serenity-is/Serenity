@@ -66,9 +66,6 @@ Task("Build")
         s.SetConfiguration(configuration);
     });
     
-    minimizeJs("./Serenity.Script.Core/bin/" + configuration + "/Serenity.Script.Core.js");
-    minimizeJs("./Serenity.Script.UI/bin/" + configuration + "/Serenity.Script.UI.js");
-    
     var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
     serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
 });
@@ -96,6 +93,7 @@ Task("NuGet")
     .IsDependentOn("Pack")
     .Does(() =>
 {
+    nuspecParams["configuration"] = configuration;
     nuspecParams["jsonNetVersion"] = getPackageVersion("Serenity.Core", "Newtonsoft.Json");
     nuspecParams["couchbaseNetClientVersion"] = getPackageVersion("Serenity.Caching.Couchbase", "CouchbaseNetClient");
     nuspecParams["microsoftAspNetMvcVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.Mvc");

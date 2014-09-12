@@ -27,5 +27,9 @@
     <file src="${id}.dll" target="lib/${scriptFramework}" />
     <file src="Serenity.Script.Core.js" target="" />
     <file src="Serenity.Script.Core.min.js" target="" />
+    <file src="Serenity.Externals.js" target="" />
+    <file src="Serenity.Externals.min.js" target="" />
+    <file src="Serenity.Externals.Slick.js" target="" />
+    <file src="Serenity.Externals.Slick.min.js" target="" />
   </files>
 </package>

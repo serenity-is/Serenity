@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A0098374-9055-40BA-9F81-1C73AE7F3670}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BasicApplication</RootNamespace>
+    <AssemblyName>BasicApplication.Script</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NoStdLib>True</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptInitialization.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.5.0\tools\Assemblies\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.jQuery">
+      <HintPath>..\packages\Saltarelle.jQuery.1.10.1\lib\Saltarelle.jQuery.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.jQuery.UI">
+      <HintPath>..\packages\Saltarelle.jQuery.UI.1.10.1\lib\Saltarelle.jQuery.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.Linq">
+      <HintPath>..\packages\Saltarelle.Linq.2.4.0\lib\Saltarelle.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="Saltarelle.Web">
+      <HintPath>..\packages\Saltarelle.Web.3.1.0\lib\Saltarelle.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Serenity.Script.Core">
+      <HintPath>..\packages\Serenity.Script.Core.1.0.7\lib\net20\Serenity.Script.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Serenity.Script.Imports">
+      <HintPath>..\packages\Serenity.Script.Imports.1.0.7\lib\net20\Serenity.Script.Imports.dll</HintPath>
+    </Reference>
+    <Reference Include="Serenity.Script.UI">
+      <HintPath>..\packages\Serenity.Script.UI.1.0.7\lib\net20\Serenity.Script.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <Target Name="CopyGeneratedScriptToWeb" AfterTargets="CopyFilesToOutputDirectory">
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication.Web\Scripts\site\$(AssemblyName).js" Condition="Exists('$(TargetDir)$(AssemblyName).js')"></Copy>
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
