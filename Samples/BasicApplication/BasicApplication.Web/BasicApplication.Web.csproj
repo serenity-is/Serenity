@@ -46,6 +46,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Serenity.Caching.Web">
+      <HintPath>..\packages\Serenity.Caching.Web.1.0.7\lib\net45\Serenity.Caching.Web.dll</HintPath>
+    </Reference>
     <Reference Include="Serenity.CodeGeneration">
       <HintPath>..\packages\Serenity.CodeGeneration.1.0.7\lib\net45\Serenity.CodeGeneration.dll</HintPath>
     </Reference>
@@ -112,6 +115,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Start\SampleDBScript.sql" />
     <Content Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -445,6 +449,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

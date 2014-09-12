@@ -18,3 +18,4 @@ Build/
 /Bin/
 Samples/BasicApplication/packages/
 Samples/BasicApplication/BasicApplication.Web/bin
+Samples/BasicApplication/BasicApplication.Web/App_Data/

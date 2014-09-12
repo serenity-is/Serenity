@@ -35,10 +35,6 @@
       <Private>True</Private>
       <HintPath>$(SolutionDir)\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -472,10 +468,6 @@
     <None Include="Style\serenity.toolbuttons.less" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Caching.Web\Serenity.Caching.Web.csproj">
-      <Project>{cebb3cf6-8eed-4f6d-b29b-0ea5ff06faf4}</Project>
-      <Name>Serenity.Caching.Web</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.CodeGeneration\Serenity.CodeGeneration.csproj">
       <Project>{880cec07-a629-44d3-a79d-5b138967e1c4}</Project>
       <Name>Serenity.CodeGeneration</Name>
@@ -487,10 +479,6 @@
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
-      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
-      <Name>Serenity.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Munq\Serenity.Munq.csproj">
       <Project>{5fbada38-f1f3-44c9-83fa-e1bf1f4d7d10}</Project>
