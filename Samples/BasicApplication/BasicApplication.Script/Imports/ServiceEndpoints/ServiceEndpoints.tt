@@ -1,0 +1,30 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.Core.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.CodeGeneration.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.CodeGeneration.Mvc.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.Web.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\BasicApplication.Web.dll" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Serenity" #>
+<#@ import namespace="Serenity.Reflection" #>
+<#@ import namespace="Serenity.CodeGeneration" #>
+<#@ include file="..\MultipleOutputHelper.ttinclude" #>
+<#@ output extension=".log" #>
+<# 
+    var generator = new ScriptEndpointGenerator(typeof(BasicApplication.SiteInitialization).Assembly);
+    generator.IsEndpoint = type => type.Namespace.EndsWith(".Endpoints");
+    generator.GetNamespace = type => type.Namespace.Substring(0, type.Namespace.Length - (".Endpoints").Length);
+    generator.GetServiceUrl = type => { var ns = type.Namespace; ns = ns.Substring(0, ns.Length - (".Endpoints").Length); ns = ns.Substring("BasicApplication.".Length); if (ns == "Common") return ""; return ns; };
+    var code = generator.Generate();
+    var manager = Manager.Create(Host, GenerationEnvironment);
+    manager.StartNewFile("ServiceEndpoints.cs");
+#>
+<#=code#>
+<# 
+    manager.EndBlock(); 
+    manager.Process(true);
+#>
+Executed on <#=DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")#>

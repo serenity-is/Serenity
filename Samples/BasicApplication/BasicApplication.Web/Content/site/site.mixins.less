@@ -1,0 +1,201 @@
+﻿.background-clip(@argument: padding-box) {
+  -moz-background-clip: @argument;
+  -webkit-background-clip: @argument;
+  background-clip: @argument;
+}
+
+.border-radius(@topright: 0, @bottomright: 0, @bottomleft: 0, @topleft: 0) {
+  -webkit-border-top-right-radius: @topright;
+  -webkit-border-bottom-right-radius: @bottomright;
+  -webkit-border-bottom-left-radius: @bottomleft;
+  -webkit-border-top-left-radius: @topleft;
+  -moz-border-radius-topright: @topright;
+  -moz-border-radius-bottomright: @bottomright;
+  -moz-border-radius-bottomleft: @bottomleft;
+  -moz-border-radius-topleft: @topleft;
+  border-top-right-radius: @topright;
+  border-bottom-right-radius: @bottomright;
+  border-bottom-left-radius: @bottomleft;
+  border-top-left-radius: @topleft;
+  .background-clip(padding-box);
+}
+
+.box-shadow(@arguments) {
+  -webkit-box-shadow: @arguments;
+  -moz-box-shadow: @arguments;
+  box-shadow: @arguments;
+}
+
+.box-sizing(@sizing: border-box) {
+  -ms-box-sizing: @sizing;
+  -moz-box-sizing: @sizing;
+  -webkit-box-sizing: @sizing;
+  box-sizing: @sizing;
+}
+
+.bw-gradient(@color: #F5F5F5, @start: 0, @stop: 255) {
+  background: @color;
+  background: -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, rgb(@start,@start,@start)),
+                               color-stop(1, rgb(@stop,@stop,@stop)));
+  background: -ms-linear-gradient(bottom,
+                                  rgb(@start,@start,@start) 0%,
+                                  rgb(@stop,@stop,@stop) 100%);
+  background: -moz-linear-gradient(center bottom,
+                                   rgb(@start,@start,@start) 0%,
+                                   rgb(@stop,@stop,@stop) 100%);
+  background: -o-linear-gradient(rgb(@stop,@stop,@stop),
+                                 rgb(@start,@start,@start));
+  filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",rgb(@stop,@stop,@stop),rgb(@start,@start,@start)));
+}
+
+.drop-shadow(@x-axis: 0, @y-axis: 1px, @blur: 2px, @alpha: 0.1) {
+  -webkit-box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+  -moz-box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+  box-shadow: @x-axis @y-axis @blur rgba(0, 0, 0, @alpha);
+}
+
+.gradient(@color: #F5F5F5, @start: #EEE, @stop: #FFF) {
+  background: @color;
+  background: -webkit-gradient(linear,
+                               left bottom,
+                               left top,
+                               color-stop(0, @start),
+                               color-stop(1, @stop));
+  background: -ms-linear-gradient(bottom,
+                                  @start,
+                                  @stop);
+  background: -moz-linear-gradient(center bottom,
+                                   @start 0%,
+                                   @stop 100%);
+  background: -o-linear-gradient(@stop,
+                                 @start);
+  filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",@stop,@start));
+}
+
+.inner-shadow(@horizontal:0, @vertical:1px, @blur:2px, @alpha: 0.4) {
+  -webkit-box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+  -moz-box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+  box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
+}
+
+.opacity(@opacity: 0.5) {
+  -moz-opacity: @opacity;
+  -khtml-opacity: @opacity;
+  -webkit-opacity: @opacity;
+  opacity: @opacity;
+  @opperc: @opacity * 100;
+  -ms-filter: ~"progid:DXImageTransform.Microsoft.Alpha(opacity=@{opperc})";
+  filter: ~"alpha(opacity=@{opperc})";
+}
+
+.rounded(@radius: 2px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
+}
+
+.user-select(@argument: none) {
+  -webkit-user-select: @argument;
+  -moz-user-select: @argument;
+  -ms-user-select: @argument;
+  user-select: @argument;
+}
+
+.dialog-back (@hueshift: 0) {
+  .ui-dialog-content { background-color: desaturate(darken(spin(#efe7e4, @hueshift), 50%), 15%); border-bottom: 1px solid spin(#654, @hueshift); }
+}
+
+.grid-odd (@hueshift: 0) {
+    .slick-row.odd { background-color: spin(#efe7e4, @hueshift); }
+}
+
+.entity-item (@image: document) {
+    padding: 2px 0px 2px 20px; background: url("images/@{image}.png") no-repeat 0px center;
+}
+
+.form-styles (@l, @e) {
+    .caption {
+        width: @l;
+    }
+
+    .editor {
+        width: @e;
+    }
+
+    input.editor[type=checkbox] {
+        width: auto;
+    }
+
+    .s-Form .editor.dateQ {
+        width: @e - 17;
+    }
+
+    .s-Form .editor.emailuser {
+        width: 170px;
+    }
+
+    .s-Form .editor.dateQ.s-DateTimeEditor {
+        width: @e - 77;
+    }
+
+    .s-Form .editor.s-DateTimeEditor.time {
+        width: 56px;
+        margin-left: 4px;
+    }
+
+    .s-Form .editor.has-inplace-button {
+        width: @e - 22;
+    }
+
+    .s-Form .emaildomain {
+        width: @e - 185;
+    }
+}
+
+.dialog-styles (@h, @l, @e) {
+    .tab-pane { height: @h; }
+    .form-styles(@l, @e);
+}
+
+.tabless-dialog-styles (@h, @l, @e) {
+    .form-styles(@l, @e);
+    .caption { width: @l; }
+    .editor { width: @e; }
+}
+
+.widthAndMin(@w) {
+    min-width: @w;
+    width: @w;
+}
+
+.heightAndMin(@h) {
+    min-height: @h;
+    height: @h;
+}
+
+.flexDialogStyles(@width, @height, @caption: 12em) {
+    > .size { 
+        .widthAndMin(@width);
+        .heightAndMin(@height);
+    }
+
+    .caption { 
+        width: @caption; 
+    }
+
+    .s-PropertyGrid > .categories {
+        height: @height - 140px;
+    }
+}
+
+.reset-box-sizing {
+  &,
+  *,
+  *:before,
+  *:after {
+    .box-sizing(content-box);
+  }
+}

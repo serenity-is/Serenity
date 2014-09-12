@@ -31,6 +31,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Imports\FormContexts\Administration.UserForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Administration.UserRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceEndpoints\ServiceEndpoints.cs">
+      <DependentUpon>ServiceEndpoints.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Membership\LoginPanel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptInitialization.cs" />
     <Compile Include="Administration\User\UserGrid.cs" />
@@ -63,12 +73,45 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Imports\FormContexts\FormContexts.log">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </None>
+    <None Include="Imports\FormContexts\FormContexts.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>FormContexts.log</LastGenOutput>
+    </None>
+    <None Include="Imports\MultipleOutputHelper.ttinclude" />
+    <None Include="Imports\ServiceContracts\ServiceContracts.log">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </None>
+    <None Include="Imports\ServiceContracts\ServiceContracts.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ServiceContracts.log</LastGenOutput>
+    </None>
+    <None Include="Imports\ServiceEndpoints\ServiceEndpoints.log">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ServiceEndpoints.tt</DependentUpon>
+    </None>
+    <None Include="Imports\ServiceEndpoints\ServiceEndpoints.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ServiceEndpoints.log</LastGenOutput>
+    </None>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
   <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
   <Target Name="CopyGeneratedScriptToWeb" AfterTargets="CopyFilesToOutputDirectory">
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication.Web\Scripts\site\$(AssemblyName).js" Condition="Exists('$(TargetDir)$(AssemblyName).js')"></Copy>
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication.Web\Scripts\site\$(AssemblyName).js" Condition="Exists('$(TargetDir)$(AssemblyName).js')">
+    </Copy>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

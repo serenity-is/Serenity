@@ -1,0 +1,518 @@
+@import "site.mixins.less";
+
+.opensans {
+    font-family: 'Open Sans', 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+
+body, td, input, select, .ui-widget, .ui-widget-content, .ui-widget .ui-widget-content,
+input[type=text], input[type=email], input[type=password] {
+    .opensans;
+    font-size: 13px;
+}
+
+.select2-container, .select2-container * {
+    box-sizing: content-box;
+}
+
+.s-Dialog {
+    line-height: normal;
+}
+
+.s-DataGrid input[type=checkbox] {
+    box-shadow: none;
+}
+
+.s-QuickSearchBar {
+    margin: 2px 2px 0 0;
+}
+
+.s-QuickSearchBar input.s-QuickSearchInput {
+    font-size: 13px;
+    line-height: 23px;
+    height: 28px;
+}
+
+.s-QuickSearchBar a.quick-search-field {
+    height: 28px;
+    line-height: 25px;
+}
+
+.s-QuickSearchBar span {
+    height: 28px;
+    width: 36px;
+}
+
+.s-QuickSearchBar span i {
+    height: 28px;
+    background-position: -214px -90px;
+}
+
+.s-DataGrid, .slick-cell, .slick-header-column, .s-SlickPager {
+    font-family: 'Open Sans', 'Segoe UI', Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+
+.slick-header.ui-state-default {
+    border: none;
+    background: transparent;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-bottom: 2px solid #ddd;
+}
+
+.ui-widget-content .slick-header-column,
+.slick-header-column {
+    border-right: 1px solid #fff;
+    background: #fff;
+    color: #333;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.ui-widget-content .slick-header-column.ui-state-default,
+.slick-header-column.ui-state-default {
+    padding: 5px 3px 5px 4px;
+    border-right: 1px solid #fff;
+    border-left: none;
+}
+
+.slick-header-column:hover, .slick-header-column-active {
+    background: #9bcfea;
+}
+
+.slick-row {
+    line-height: 23px;
+}
+
+.page-container-common {
+
+    .s-DataGrid {
+        padding: 0;
+        box-shadow: none;
+        border: none;
+    }
+
+    .s-DataGrid .grid-title {
+        padding: 0;
+        margin-bottom: 10px;
+    }
+
+    .s-DataGrid .slick-row.odd {
+        background-color: #f7f7f7;
+    }
+
+    div.s-Toolbar {
+        background: #f0f0f0 none;
+        border-style: none;
+        font-size: 13px;
+        min-height: 32px;
+        padding: 4px 6px;
+        border-bottom: 1px solid #e7e7e7;
+    }
+
+    .grid-title {
+        font-size: 20px;
+    }
+
+    ::-webkit-input-placeholder { /* WebKit browsers */
+        color: #999;
+    }
+
+    :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        color: #999;
+        opacity: 1;
+    }
+
+    ::-moz-placeholder { /* Mozilla Firefox 19+ */
+        color: #999;
+        opacity: 1;
+    }
+
+    :-ms-input-placeholder { /* Internet Explorer 10+ */
+        color: #999;
+    }
+}
+
+div.s-Toolbar .tool-button {
+    color: #000;
+}
+
+.ui-dialog {
+
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+
+    .ui-dialog-titlebar .ui-dialog-title {
+        font-weight: 600;
+    }
+
+    .ui-dialog-titlebar {
+        .gradient(#fff, #F2F8FF, #fff);
+        color: #000;
+        font-weight: 600;
+    }
+
+    .ui-dialog-buttonpane {
+        background-color: #fff;
+        border-top: 1px solid #C7E9FA;
+        padding: 0;
+
+        button {
+            margin: .5em .5em .5em 0;
+        }
+    }
+
+    .ui-tabs .tab-pane {
+        padding: 6px 0;
+    }
+
+    .ui-tabs-nav {
+        margin-top: 6px;
+    }
+
+    .ui-tabs-panel {
+        border: none;
+    }
+
+    .ui-tabs .ui-tabs-nav {
+        padding-left: 8px;
+    }
+
+    .ui-tabs .ui-tabs-nav li a {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .ui-tabs .ui-tabs-nav .ui-state-default, 
+    .ui-tabs .ui-tabs-nav .ui-widget-content .ui-state-default, 
+    .ui-tabs .ui-tabs-nav .ui-widget-header .ui-state-default {
+        .gradient(#fff, #f7f7f7, #fff);
+    }
+
+    .ui-tabs .ui-tabs-nav .ui-state-active {
+        background: #fff;
+    }
+
+    .ui-tabs .ui-tabs-nav li {
+        box-shadow: none;
+        border-color: #e7e7e7;
+        border-left: none;
+        border-right: none;
+        margin-right: 3px;
+    }
+
+    .ui-tabs .ui-tabs-nav li a {
+        border-left: 1px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+        color: #424E68;
+    }
+
+    .ui-tabs .ui-tabs-nav li {
+        border-top: 3px solid #B1AFDB;
+    }
+
+    .ui-tabs .ui-tabs-nav li.ui-tabs-active {
+        border-top: 3px solid #f3565d;
+    }
+
+    .ui-tabs .ui-tabs-nav li.ui-tabs-active a {
+        color: #000;
+    }
+
+    .s-Dialog .ui-tabs .ui-tabs-nav li a {
+        padding: 4px 10px 3px 10px;
+    }
+}
+
+.ui-dialog .ui-resizable-se {
+    right: -1px;
+    bottom: -1px;
+}
+
+.ui-dialog .ui-dialog-content {
+    padding: 0;
+}
+
+.s-Dialog .s-PropertyGrid .category-title {
+    margin: 12px 10px 8px 6px; 
+    border-bottom: 1px solid #7380C4;
+    
+    a {
+        color: #d99000;
+        font-size: 13px;
+        font-weight: 600;
+    }
+}
+
+.ui-dialog {
+    border: 1px solid #A8DEFA;
+    border-radius: 0;
+    box-shadow: 0 0 10px rgba(18, 35, 122, 0.4);
+}
+
+.ui-dialog:focus {
+    outline: none;
+}
+
+.ui-dialog-titlebar {
+    color: #095B85;
+}
+
+.ui-dialog-titlebar span.ui-dialog-title {
+    font-size: 15px;
+    font-weight: 500;
+    text-shadow: 0 0 3px rgba(0, 144, 217, 0.15);
+}
+
+.ui-dialog .ui-dialog-titlebar {
+    border-bottom: 1px solid #C7E9FA;
+    padding: 0.5em 10em 0.4em 1em
+}
+
+.ui-dialog-titlebar-buttonpane .ui-corner-all {
+    border-radius: 0;
+}
+
+.ui-dialog-titlebar-buttonpane a.ui-state-default {
+    background: none;
+    border: 1px solid #C7E9FA;
+}
+
+.ui-dialog-titlebar button.ui-dialog-titlebar-close,
+.ui-dialog-titlebar button.ui-dialog-titlebar-close:hover {
+    border: 1px solid #C7E9FA;
+    height: 22px;
+    width: 22px;
+    border-radius: 0;
+    background: transparent url(../serenity/images/cross.png) no-repeat center center;
+}
+
+.ui-dialog-titlebar button.ui-dialog-titlebar-close:hover {
+    background-color: #fff;
+}
+
+.ui-dialog-titlebar span.ui-icon-closethick {
+    background-image: url(../serenity/images/cross.png);
+    background-position: center center;
+}
+
+.ui-dialog-titlebar-buttonpane .ui-icon-maximize-window {
+    background-image: url(../serenity/images/full-screen-2.png) !important;
+    background-position: center center;
+}
+
+.ui-dialog .ui-dialog-titlebar-buttonpane > a {
+    width: 22px;
+    height: 22px;
+}
+
+.ui-dialog .ui-dialog-titlebar-buttonpane > a span {
+    margin: 2px;
+}
+
+.ui-dialog-titlebar-buttonpane {
+    margin-top: -11px !important;
+}
+
+.ui-dialog .ui-dialog-titlebar-close {
+    margin-top: -11px;
+}
+
+.ui-dialog .ui-dialog-titlebar-buttonpane > a:hover {
+    background: #fff;
+}
+
+.s-Dialog .s-DialogToolbar {
+    margin: 0 0 10px 0;
+}
+
+.s-Dialog .s-Toolbar {
+    background: #f8fafc;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 5px 4px 5px 4px;
+    margin-bottom: 0;
+}
+
+div.s-Toolbar .tool-button.no-text span.button-inner {
+    padding: 5px 3px 19px 13px;
+}
+
+div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
+    margin-top: 2px;
+}
+
+
+.s-Dialog .s-Form {
+    padding: 12px 12px 0 12px;
+}
+
+.s-PropertyGrid .category-links {
+    background: #7380C4;
+    border-radius: 0;
+    border: 0;
+    margin-bottom: 6px;
+}
+
+.s-DataGrid {
+    border: 1px solid #ccc;
+    line-height: normal;
+
+    .slick-cell, .slick-header-column {
+        font-size: 13px;
+    }
+
+    .slick-cell {
+        border-color: transparent transparent #ddd transparent;
+    }
+
+    div.s-Toolbar {
+        margin-bottom: 4px;
+    }
+
+    .grid-container {
+        border-style: none;
+    }
+
+    div.s-SlickPager {
+        margin-top: 0px;
+        padding: 0 0 0 2px;
+        height: 29px;
+        background: #f0f0f0 none;
+        border-left-style: none;
+        border-right-style: none;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+
+
+        input, select {
+            font-size: 13px;
+            height: 19px;
+            padding: 0 2px;
+            line-height: 19px;
+        }
+
+        .slick-pg-stat {
+            top: 2px;
+        }
+
+        .slick-pg-size {
+            margin-top: 2px;
+        }
+    }
+
+    div.s-Toolbar {
+        .select2-container {
+            margin-top: 2px;
+        }
+    }
+
+    .grid-title {
+        background: transparent;
+        border-radius: 0;
+        border-style: none none solid none;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 0;
+        color: #0090d9;
+        padding: 0px 8px;
+        font-size: 15px;
+        font-weight: 600;
+        height: auto;
+
+        .title-text {
+            padding: 4px 0;
+        }
+    }
+}
+
+.s-Form, .s-Form td, .s-Form input, .s-Form select {
+    font-family: 'Open Sans', Tahoma, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+
+.s-Form {
+    .fieldset {
+        border: none;
+        background: none;
+        padding: 0;
+    }
+
+    .categories {
+        padding: 0;
+    }
+
+    .field {
+        padding: 4px 3px;
+    }
+
+    label {
+        font-weight: normal;
+        margin-bottom: 0;
+    }
+
+    label.caption {
+        padding-top: 4px;
+        padding-right: 7px;
+        line-height: initial;
+        color: #112383;
+        text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .caption sup {
+        top: 5px;
+        font-size: 10px;
+    }
+
+    .vx {
+        margin-top: 2px;
+        min-height: 22px;
+        width: 20px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="search"],
+    input[type="url"],
+    input[type="password"],
+    select {
+        line-height: initial;
+        height: initial;
+        .box-sizing();
+    }
+
+    input[type=checkbox] {
+        margin-top: 6px;
+    }
+
+    .ui-datepicker-trigger {
+        margin-top: 5px;
+    }
+
+    .inplace-calc b {
+        margin-top: 2px;
+    }
+}
+
+.select2-container .select2-choice {
+    line-height: 23px;
+    height: 24px;
+}
+
+.select2-container .select2-choice .select2-arrow b {
+    background-position: 0px 0px;
+}
+
+.select2-container .select2-choice abbr.select2-search-choice-close {
+    top: 6px;
+}
+
+.s-Toolbar {
+    .select2-container .select2-choice {
+        height: 26px;
+        line-height: 27px;
+    }
+}

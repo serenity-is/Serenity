@@ -36,9 +36,4 @@ namespace BasicApplication.Administration
             return columns;
         }
     }
-
-    [Imported, Serializable, PreserveMemberCase]
-    public partial class UserRow
-    {
-    }
 }
