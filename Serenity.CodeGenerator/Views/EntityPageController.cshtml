@@ -5,6 +5,8 @@
     var modulePrefix = (Model.Module == null ? "" : (Model.Module + "/"));
 }
 
+[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "@(modulePrefix)@(Model.ClassName)", url: "~/@(modulePrefix)@(Model.ClassName)", permission: "@(Model.Permission)")]
+
 namespace @(Model.RootNamespace)@(dotModule).Pages
 {
     using Serenity;

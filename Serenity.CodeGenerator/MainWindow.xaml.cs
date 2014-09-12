@@ -36,18 +36,17 @@ namespace Serenity.CodeGenerator
             config.Connections = config.Connections ?? new List<GeneratorConfig.Connection>();
             config.RemoveForeignFields = config.RemoveForeignFields ?? new List<string>();
 
-            if (!config.WebProjectFile.IsEmptyOrNull())
-            {
-                var webConfig = Path.Combine(Path.GetDirectoryName(config.WebProjectFile), "web.config");
-                AddConnectionsFromAppConfig(config.Connections, webConfig);
-            }
-                
-
             foreach (var connection in config.Connections)
                 _connections.Add(connection);
+
+            if (!config.WebProjectFile.IsEmptyOrNull())
+            {
+                var webConfig = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile))), "web.config");
+                AddConnectionsFromAppConfig(webConfig);
+            }
         }
          
-        private void AddConnectionsFromAppConfig(List<GeneratorConfig.Connection> connections, string configFilePath)
+        private void AddConnectionsFromAppConfig(string configFilePath)
         {
             if (File.Exists(configFilePath))
             {
@@ -73,10 +72,16 @@ namespace Serenity.CodeGenerator
                             {
                                 connection = new GeneratorConfig.Connection();
                                 connection.Key = name.Value;
-                                connections.Add(connection);
+                                config.Connections.Add(connection);
+                                connection.ConnectionString = conn.Value;
+                                connection.ProviderName = prov.Value;
+                                _connections.Add(connection);
                             }
-                            connection.ConnectionString = conn.Value;
-                            connection.ProviderName = prov.Value;
+                            else
+                            {
+                                connection.ConnectionString = conn.Value;
+                                connection.ProviderName = prov.Value;
+                            }
                         }
                     }
                 }
@@ -113,8 +118,9 @@ namespace Serenity.CodeGenerator
 
                     if (!config.WebProjectFile.IsEmptyOrNull())
                     {
-                        var webConfig = Path.Combine(Path.GetDirectoryName(config.WebProjectFile), "web.config");
-                        AddConnectionsFromAppConfig(config.Connections, webConfig);
+                        var webConfig = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile))), "web.config");
+                        AddConnectionsFromAppConfig(webConfig);
+                        Changed("Connections");
                     }
 
                     Changed("WebProjectFile");
@@ -196,6 +202,18 @@ namespace Serenity.CodeGenerator
                 PropertyChanged(this, new PropertyChangedEventArgs(property));
         }
 
+        string GetRelativePath(string filespec, string folder)
+        {
+            Uri pathUri = new Uri(filespec);
+            // Folders must end in a slash
+            if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            {
+                folder += Path.DirectorySeparatorChar;
+            }
+            Uri folderUri = new Uri(folder);
+            return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+        }
+
         private void ScriptProjectFileBrowse(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -205,7 +223,7 @@ namespace Serenity.CodeGenerator
 
             if (result == true)
             {
-                ScriptProjectFile = dlg.FileName;
+                ScriptProjectFile = GetRelativePath(dlg.FileName, AppDomain.CurrentDomain.BaseDirectory);
                 SaveConfig();
             }
         }
@@ -219,7 +237,7 @@ namespace Serenity.CodeGenerator
 
             if (result == true)
             {
-                WebProjectFile = dlg.FileName;
+                WebProjectFile = GetRelativePath(dlg.FileName, AppDomain.CurrentDomain.BaseDirectory);
                 SaveConfig();
             }
         }

@@ -1,0 +1,112 @@
+﻿@model Marmara.LeftNavigationModel
+
+@{
+    var activeSection = -1; 
+    var activeLink = -1;
+    var bestSection = -1;
+    var bestLink = -1;
+    var bestMatchLength = 0;
+    var i = 0;
+    var currentUrl = "";
+    if (HttpContext.Current != null) {
+        currentUrl = HttpContext.Current.Request.Url.ToString();
+    }
+    
+    foreach (var section in Model.Items)
+    {
+        <li id="LeftNavigationSection_@i">
+	        <a href="@(section.Url ?? "javascript:;")">
+	        <i class="@(section.IconClass ?? (section.Children.Count > 0 ? "fa icon-layers" : "fa icon-none"))"></i>
+	        <span class="title">@(section.Title)</span>
+            <span class=""></span>
+	        <span class="@(section.Children.Count > 0 ? "arrow" : "")"></span>
+	        </a>
+
+            @if (section.Children.Count > 0)
+            {
+            <ul class="sub-menu">
+            @{var l = 0;}
+
+            @foreach (var link in section.Children)
+            {
+                var url = link.Url;
+
+                if (url.StartsWith("~/", StringComparison.Ordinal))
+                {
+                    url = VirtualPathUtility.ToAbsolute(url);
+                }
+
+                if (currentUrl.IndexOf(url, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    if (bestMatchLength == 0 || url.Length > bestMatchLength)
+                    {
+                        bestSection = i;
+                        bestLink = l;
+                        bestMatchLength = url.Length;
+                    }
+                }
+
+                var target = link.Target;
+                if (target != null)
+                {
+                    target += " target=" + target;
+                }
+                   
+                <li id="LeftNavigationLink_@(i)_@(l)">
+	                <a href="@(!String.IsNullOrEmpty(url) ? url : "javascript:;")">
+	                <i class="@(link.IconClass ?? "fa icon-none")"></i>
+	                <span class="title">@(link.Title)</span>
+	                <span class=""></span>
+                    <span class=""></span>
+	                </a>                
+                </li>
+            
+                l++;
+            }
+            </ul>
+            }
+            @{i++;}
+        </li>
+    }
+
+    if ((activeLink == -1 || activeSection == -1) && bestLink != -1) {
+        activeSection = bestSection;
+        activeLink = bestLink;
+    }
+        
+    if (activeSection == -1 && activeLink == -1) {
+        activeSection = -1;
+        activeLink = -1;
+    }
+    
+<script type="text/javascript">
+    $(function() {
+        var section = $('#LeftNavigationSection_' + (@activeSection)).addClass("active open");
+        section.children('a').children('span').eq(2).addClass('open');
+        if (@activeLink != -1)
+        {
+            var link = $('#LeftNavigationLink_' + (@activeSection) + '_' + (@activeLink)).addClass("active");
+            link.children('a').children('span').eq(1).addClass('selected');
+        }
+        else {
+            section.children('a').children('span').eq(1).addClass('selected');
+        }
+        
+        //$('#left-navigation').accordion({ active: @(activeSection) });
+    });
+
+    function openWindow(url, width, height) {
+        height = height || (screen.availHeight - 60);
+        width = width || (screen.availWidth - 10);
+        var x = (screen.availWidth - width) / 2 - 5; if (x < 0) x = 0;
+        var y = (screen.availHeight - height) / 2 - 25; if (y < 0) y = 0;
+        var winPopup = window.open(url, "", "status=0, toolbar=0, width=" + width + ", height=" + height + 
+            ", scrollbars=1, resizable=yes, left=" + x + ", top=" + y);
+    }
+
+    jQuery(function () {
+        new Marmara.LeftNavigation.Search($('.page-sidebar-menu'));
+    });
+
+</script>
+}

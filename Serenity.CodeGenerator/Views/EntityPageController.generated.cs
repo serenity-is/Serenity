@@ -45,12 +45,12 @@ WriteLiteral("\r\n");
             
             #line default
             #line hidden
-WriteLiteral("\r\nnamespace ");
+WriteLiteral("\r\n[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, \"");
 
 
             
             #line 8 "..\..\Views\EntityPageController.cshtml"
-      Write(Model.RootNamespace);
+                                                        Write(modulePrefix);
 
             
             #line default
@@ -58,6 +58,52 @@ WriteLiteral("\r\nnamespace ");
 
             
             #line 8 "..\..\Views\EntityPageController.cshtml"
+                                                                       Write(Model.ClassName);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("\", url: \"~/");
+
+
+            
+            #line 8 "..\..\Views\EntityPageController.cshtml"
+                                                                                                    Write(modulePrefix);
+
+            
+            #line default
+            #line hidden
+
+            
+            #line 8 "..\..\Views\EntityPageController.cshtml"
+                                                                                                                   Write(Model.ClassName);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("\", permission: \"");
+
+
+            
+            #line 8 "..\..\Views\EntityPageController.cshtml"
+                                                                                                                                                     Write(Model.Permission);
+
+            
+            #line default
+            #line hidden
+WriteLiteral("\")]\r\n\r\nnamespace ");
+
+
+            
+            #line 10 "..\..\Views\EntityPageController.cshtml"
+      Write(Model.RootNamespace);
+
+            
+            #line default
+            #line hidden
+
+            
+            #line 10 "..\..\Views\EntityPageController.cshtml"
                             Write(dotModule);
 
             
@@ -67,7 +113,7 @@ WriteLiteral(".Pages\r\n{\r\n    using Serenity;\r\n    using System.Web.Mvc;\r\
 
 
             
-            #line 13 "..\..\Views\EntityPageController.cshtml"
+            #line 15 "..\..\Views\EntityPageController.cshtml"
               Write(modulePrefix);
 
             
@@ -75,7 +121,7 @@ WriteLiteral(".Pages\r\n{\r\n    using Serenity;\r\n    using System.Web.Mvc;\r\
             #line hidden
 
             
-            #line 13 "..\..\Views\EntityPageController.cshtml"
+            #line 15 "..\..\Views\EntityPageController.cshtml"
                              Write(Model.ClassName);
 
             
@@ -85,7 +131,7 @@ WriteLiteral("\"), Route(\"{action=index}\")]\r\n    public class ");
 
 
             
-            #line 14 "..\..\Views\EntityPageController.cshtml"
+            #line 16 "..\..\Views\EntityPageController.cshtml"
              Write(Model.ClassName);
 
             
@@ -96,7 +142,7 @@ WriteLiteral("Controller : Controller\r\n    {\r\n        [Authorize]\r\n       
 
 
             
-            #line 19 "..\..\Views\EntityPageController.cshtml"
+            #line 21 "..\..\Views\EntityPageController.cshtml"
                                             Write(Model.Permission);
 
             
@@ -106,7 +152,7 @@ WriteLiteral("\");\r\n            return View(\"~/Modules/");
 
 
             
-            #line 20 "..\..\Views\EntityPageController.cshtml"
+            #line 22 "..\..\Views\EntityPageController.cshtml"
                                Write(modulePath);
 
             
@@ -116,7 +162,7 @@ WriteLiteral("/");
 
 
             
-            #line 20 "..\..\Views\EntityPageController.cshtml"
+            #line 22 "..\..\Views\EntityPageController.cshtml"
                                              Write(Model.ClassName);
 
             
@@ -126,7 +172,7 @@ WriteLiteral("/");
 
 
             
-            #line 20 "..\..\Views\EntityPageController.cshtml"
+            #line 22 "..\..\Views\EntityPageController.cshtml"
                                                                 Write(Model.ClassName);
 
             

@@ -2,11 +2,25 @@
 namespace BasicApplication
 {
     using System;
+    using System.Linq;
+    using System.Web.Mvc;
+    using System.Web.Routing;
 
     public class Global : System.Web.HttpApplication
     {
         protected void Application_Start(object sender, EventArgs e)
         {
+            AreaRegistration.RegisterAllAreas();
+
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+            ValueProviderFactories.Factories.Remove(
+                ValueProviderFactories.Factories.OfType<JsonValueProviderFactory>().First());
+
+            ViewEngines.Engines.Clear();
+            ViewEngines.Engines.Add(new RazorViewEngine());
+
             SiteInitialization.ApplicationStart();
         }
 

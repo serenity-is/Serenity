@@ -43,34 +43,48 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Caching.Web">
+    <Reference Include="Serenity.Caching.Web, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.Caching.Web.1.0.7\lib\net45\Serenity.Caching.Web.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.CodeGeneration">
+    <Reference Include="Serenity.CodeGeneration, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.CodeGeneration.1.0.7\lib\net45\Serenity.CodeGeneration.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Core">
+    <Reference Include="Serenity.Core, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.Core.1.0.7\lib\net45\Serenity.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data">
+    <Reference Include="Serenity.Data, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.Data.1.0.7\lib\net45\Serenity.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Entity">
+    <Reference Include="Serenity.Data.Entity, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.Data.Entity.1.0.7\lib\net45\Serenity.Data.Entity.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Filtering">
+    <Reference Include="Serenity.Data.Filtering, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.Data.Filtering.1.0.7\lib\net45\Serenity.Data.Filtering.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Munq">
+    <Reference Include="Serenity.Munq, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.Munq.1.0.7\lib\net45\Serenity.Munq.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services">
+    <Reference Include="Serenity.Services, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.Services.1.0.7\lib\net45\Serenity.Services.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Web">
+    <Reference Include="Serenity.Services.Mvc, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Serenity.Services.Mvc.1.0.7\lib\net45\Serenity.Services.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Serenity.Web, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Serenity.Web.1.0.7\lib\net45\Serenity.Web.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
@@ -116,21 +130,25 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Start\SampleDBScript.sql" />
-    <Content Include="packages.config" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Content\aristo\css\aristo.css" />
     <Content Include="Content\aristo\images\icon_sprite.png" />
     <Content Include="Content\aristo\images\progress_bar.gif" />
     <Content Include="Content\aristo\images\slider_handles.png" />
     <Content Include="Content\aristo\images\ui-icons_222222_256x240.png" />
     <Content Include="Content\aristo\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\images\collapse.gif" />
+    <Content Include="Content\images\down.gif" />
+    <Content Include="Content\images\expand.gif" />
+    <Content Include="Content\images\header-columns-bg.gif" />
+    <Content Include="Content\images\header-columns-over-bg.gif" />
+    <Content Include="Content\images\sort-asc.gif" />
+    <Content Include="Content\images\sort-desc.gif" />
     <Content Include="Content\serenity\images\32px.png" />
     <Content Include="Content\serenity\images\accessright.png" />
     <Content Include="Content\serenity\images\accordion-down.png" />
@@ -426,8 +444,125 @@
     <Content Include="Content\serenity\images\zones-stack.png" />
     <Content Include="Content\serenity\images\zoom.png" />
     <Content Include="Content\serenity\serenity.css" />
-    <Content Include="Global.asax" />
+    <Content Include="Content\slick-default-theme.css" />
+    <Content Include="Content\slick.columnpicker.css" />
+    <Content Include="Content\slick.grid.css" />
+    <Content Include="Content\slick.headerbuttons.css" />
+    <Content Include="Content\slick.headermenu.css" />
+    <Content Include="Content\slick.pager.css" />
+    <Content Include="Content\themes\base\images\animated-overlay.gif" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\base\jquery.ui.accordion.css" />
+    <Content Include="Content\themes\base\jquery.ui.all.css" />
+    <Content Include="Content\themes\base\jquery.ui.autocomplete.css" />
+    <Content Include="Content\themes\base\jquery.ui.base.css" />
+    <Content Include="Content\themes\base\jquery.ui.button.css" />
+    <Content Include="Content\themes\base\jquery.ui.core.css" />
+    <Content Include="Content\themes\base\jquery.ui.datepicker.css" />
+    <Content Include="Content\themes\base\jquery.ui.dialog.css" />
+    <Content Include="Content\themes\base\jquery.ui.menu.css" />
+    <Content Include="Content\themes\base\jquery.ui.progressbar.css" />
+    <Content Include="Content\themes\base\jquery.ui.resizable.css" />
+    <Content Include="Content\themes\base\jquery.ui.selectable.css" />
+    <Content Include="Content\themes\base\jquery.ui.slider.css" />
+    <Content Include="Content\themes\base\jquery.ui.spinner.css" />
+    <Content Include="Content\themes\base\jquery.ui.tabs.css" />
+    <Content Include="Content\themes\base\jquery.ui.theme.css" />
+    <Content Include="Content\themes\base\jquery.ui.tooltip.css" />
+    <Content Include="Content\themes\base\minified\images\animated-overlay.gif" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\minified\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\minified\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\minified\jquery-ui.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.accordion.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.autocomplete.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.button.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.core.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.datepicker.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.dialog.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.menu.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.progressbar.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.resizable.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.selectable.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.slider.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.spinner.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
+    <Content Include="Content\themes\base\minified\jquery.ui.tooltip.min.css" />
+    <Content Include="Content\toastr.css" />
+    <Content Include="Content\toastr.min.css" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="packages.config" />
     <Content Include="Readme.CodeGenerator.txt" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\toastr.scss" />
+    <Content Include="Content\toastr.less" />
+    <Content Include="Modules\Membership\Account\AccountLogin.cshtml" />
+    <Content Include="Modules\Web.config" />
+    <None Include="Scripts\jquery-2.1.1.intellisense.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\jlayout.border.js" />
+    <Content Include="Scripts\jlayout.border.min.js" />
+    <Content Include="Scripts\jquery-2.1.1.js" />
+    <Content Include="Scripts\jquery-2.1.1.min.js" />
+    <Content Include="Scripts\jquery-ui-1.10.4.js" />
+    <Content Include="Scripts\jquery-ui-1.10.4.min.js" />
+    <Content Include="Scripts\jquery.autoNumeric.js" />
+    <Content Include="Scripts\jquery.autoNumeric.min.js" />
+    <Content Include="Scripts\jquery.blockUI.js" />
+    <Content Include="Scripts\jquery.blockUI.min.js" />
+    <Content Include="Scripts\jquery.colorbox.js" />
+    <Content Include="Scripts\jquery.colorbox.min.js" />
+    <Content Include="Scripts\jquery.cookie.js" />
+    <Content Include="Scripts\jquery.cookie.min.js" />
+    <Content Include="Scripts\jquery.cropzoom.js" />
+    <Content Include="Scripts\jquery.cropzoom.min.js" />
+    <Content Include="Scripts\jquery.dialogextendQ.js" />
+    <Content Include="Scripts\jquery.dialogextendQ.min.js" />
+    <Content Include="Scripts\jquery.event.drag.js" />
+    <Content Include="Scripts\jquery.event.drag.live.js" />
+    <Content Include="Scripts\jquery.event.drag.live.min.js" />
+    <Content Include="Scripts\jquery.event.drag.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.jlayout.js" />
+    <Content Include="Scripts\jquery.jlayout.min.js" />
+    <Content Include="Scripts\jquery.json.js" />
+    <Content Include="Scripts\jquery.json.min.js" />
+    <Content Include="Scripts\jquery.slimscroll.js" />
+    <Content Include="Scripts\jquery.slimscroll.min.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\pace.js" />
+    <Content Include="Scripts\pace.min.js" />
     <Content Include="Scripts\saltarelle\linq.js" />
     <Content Include="Scripts\saltarelle\linq.min.js" />
     <Content Include="Scripts\saltarelle\mscorlib.js" />
@@ -440,15 +575,72 @@
     <Content Include="Scripts\serenity\Serenity.Script.Core.min.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
+    <Content Include="Scripts\SlickGrid\Controls\slick.columnpicker.js" />
+    <Content Include="Scripts\SlickGrid\Controls\slick.pager.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.autotooltips.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.cellcopymanager.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.cellrangedecorator.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.cellrangeselector.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.cellselectionmodel.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.checkboxselectcolumn.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.headerbuttons.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.headermenu.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.rowmovemanager.js" />
+    <Content Include="Scripts\SlickGrid\Plugins\slick.rowselectionmodel.js" />
+    <Content Include="Scripts\SlickGrid\slick.core.js" />
+    <Content Include="Scripts\SlickGrid\slick.dataview.js" />
+    <Content Include="Scripts\SlickGrid\slick.editors.js" />
+    <Content Include="Scripts\SlickGrid\slick.formatters.js" />
+    <Content Include="Scripts\SlickGrid\slick.grid.js" />
+    <Content Include="Scripts\SlickGrid\slick.groupitemmetadataprovider.js" />
+    <Content Include="Scripts\SlickGrid\slick.remotemodel.js" />
+    <Content Include="Scripts\toastr.js" />
+    <Content Include="Scripts\toastr.min.js" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\LeftNavigation.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_LayoutHead.cshtml" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="Scripts\jquery-2.1.1.min.map" />
+    <Content Include="Scripts\toastr.min.js.map" />
+    <Content Include="Views\Shared\_LayoutNoNavigation.cshtml" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <Content Include="Modules\Administration\User\UserIndex.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Global.asax" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\SiteInitialization.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Membership\Account\AccountPage.cs" />
+    <Compile Include="Modules\Administration\User\AuthorizationService.cs" />
+    <Compile Include="Modules\Administration\User\PermissionService.cs" />
+    <Compile Include="Modules\Administration\User\LoggingRow.cs" />
+    <Compile Include="Modules\Administration\User\UserDefinition.cs" />
+    <Compile Include="Modules\Administration\User\AuthenticationService.cs" />
+    <Compile Include="Modules\Administration\User\UserRetrieveService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Modules\Administration\User\UserRow.cs" />
+    <Compile Include="Modules\Administration\User\UserForm.cs" />
+    <Compile Include="Modules\Administration\User\UserRepository.cs" />
+    <Compile Include="Modules\Administration\User\UserEndpoint.cs" />
+    <Compile Include="Modules\Administration\User\UserPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

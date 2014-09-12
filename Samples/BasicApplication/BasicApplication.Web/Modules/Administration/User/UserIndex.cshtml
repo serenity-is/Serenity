@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewBag.Title = "User";
+}
+
+<div id="GridDiv"></div>
+
+<script type="text/javascript">
+    jQuery(function () {
+        new BasicApplication.Administration.UserGrid($('#GridDiv'), {
+        });
+
+        Q.initFullHeightGridPage($('#GridDiv'));
+    });
+</script>

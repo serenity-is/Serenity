@@ -1,0 +1,12 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    @{Html.RenderPartial("~/Views/Shared/_LayoutHead.cshtml");}
+    @RenderSection("Head", false)
+    <title>@ViewBag.Title</title>
+</head>
+<body id="s-@(ViewBag.PageId)Page" class="no-navigation">
+    @RenderBody()
+</body>
+</html>

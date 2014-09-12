@@ -1,14 +1,14 @@
 ﻿namespace BasicApplication
 {
     using Serenity;
-using Serenity.Data;
-using System;
-using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
-using System.Web.Hosting;
+    using Serenity.Abstractions;
+    using Serenity.Data;
+    using System;
+    using System.Data;
+    using System.Data.Common;
+    using System.Data.SqlClient;
+    using System.IO;
+    using System.Web.Hosting;
 
     public static partial class SiteInitialization
     {
@@ -21,10 +21,10 @@ using System.Web.Hosting;
                 Serenity.Web.CommonInitialization.Run();
 
                 var registrar = Dependency.Resolve<IDependencyRegistrar>();
-                //registrar.RegisterInstance<IUserRetrieveService>(new MasterDB.Repositories.KullaniciRepository.UserRetrieveService());
-                //registrar.RegisterInstance<IAuthenticationService>(new MasterDB.Repositories.KullaniciRepository.AuthenticationService());
-                //registrar.RegisterInstance<IPermissionService>(new MasterDB.Repositories.KullaniciRepository.PermissionService());
-                //registrar.RegisterInstance<IAuthorizationService>(new MasterDB.Repositories.KullaniciRepository.AuthorizationService());
+                registrar.RegisterInstance<IAuthorizationService>(new Administration.AuthorizationService());
+                registrar.RegisterInstance<IAuthenticationService>(new Administration.AuthenticationService());
+                registrar.RegisterInstance<IPermissionService>(new Administration.PermissionService());
+                registrar.RegisterInstance<IUserRetrieveService>(new Administration.UserRetrieveService());
             }
             catch (Exception ex)
             {

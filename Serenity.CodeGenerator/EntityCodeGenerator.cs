@@ -42,9 +42,9 @@ namespace Serenity.CodeGenerator
 
             this.model = model;
             kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
-            siteWebProj = config.WebProjectFile;
+            siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
             siteWebPath = Path.GetDirectoryName(siteWebProj);
-            scriptProject = config.ScriptProjectFile;
+            scriptProject = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.ScriptProjectFile));
             scriptPath = Path.GetDirectoryName(scriptProject);
         }
 

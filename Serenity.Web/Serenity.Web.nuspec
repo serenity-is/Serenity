@@ -24,8 +24,17 @@
       <dependency id="Serenity.Data" version="${version}" />
       <dependency id="Serenity.Data.Entity" version="${version}" />
       <dependency id="Serenity.Services" version="${version}" />
+      <dependency id="Serenity.Services.Mvc" version="${version}" />
       <dependency id="Serenity.Caching.Web" version="${version}" />
       <dependency id="Serenity.CodeGeneration" version="${version}" />
+      <dependency id="FontAwesome" version="4.1.0" />
+      <dependency id="jQuery" version="2.1.1" />
+      <dependency id="jquery.event.drag" version="2.2.0" />
+      <dependency id="jQuery.UI.Combined" version="1.10.4" />
+      <dependency id="jQuery.Validation" version="1.12.0" />
+      <dependency id="bootstrap" version="3.1.1" />
+      <dependency id="toastr" version="2.0.3" />
+      <dependency id="SlickGrid" version="2.2.20140120" />
     </dependencies>
   </metadata>
   <files>
@@ -37,6 +46,28 @@
     <file src="serenity.css" target="content/Content/serenity" />
     <file src="..\..\Style\images\*.jpg" target="content/Content/serenity/images" />
     <file src="..\..\Style\images\*.png" target="content/Content/serenity/images" />
+    <file src="..\..\build\jlayout.border.js" target="content/Scripts" />
+    <file src="..\..\build\jlayout.border.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.autoNumeric.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.autoNumeric.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.blockUI.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.blockUI.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.colorbox.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.colorbox.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.cookie.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.cookie.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.cropzoom.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.cropzoom.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.dialogExtendQ.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.dialogExtendQ.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.jlayout.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.jlayout.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.json.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.json.min.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.slimscroll.js" target="content/Scripts" />
+    <file src="..\..\build\jquery.slimscroll.min.js" target="content/Scripts" />
+    <file src="..\..\build\pace.js" target="content/Scripts" />
+    <file src="..\..\build\pace.min.js" target="content/Scripts" />
     <file src="..\..\..\packages\Saltarelle.Runtime.${saltarelleRuntimeVersion}\mscorlib.js" target="content/Scripts/saltarelle" />
     <file src="..\..\..\packages\Saltarelle.Runtime.${saltarelleRuntimeVersion}\mscorlib.min.js" target="content/Scripts/saltarelle" />
     <file src="..\..\..\packages\Saltarelle.Linq.${saltarelleLinqVersion}\linq.js" target="content/Scripts/saltarelle" />

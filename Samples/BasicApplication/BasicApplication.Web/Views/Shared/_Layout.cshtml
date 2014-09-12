@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+@{ 
+   Func<string, IHtmlString> json = x => new HtmlString(Serenity.JSON.Stringify(x));
+   var hideNav = Request["hideNav"] == "1";
+   var logged = Serenity.Authorization.Username;
+}
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en-us" class="no-js@(hideNav ? " no-navigation" : "")">
+<!--<![endif]-->
+<head>
+    @{Html.RenderPartial("~/Views/Shared/_LayoutHead.cshtml");}
+    @RenderSection("Head", false)
+    <title>@ViewBag.Title</title>
+</head>
+<body id="s-@(ViewBag.PageId)Page" class="@(hideNav ? "no-navigation" : "")">
+@if (hideNav)
+{
+    <script type="text/javascript">
+        $(function () {
+            @RenderSection("PageInitScript", false)
+        });
+    </script>
+    <div id="page-outer-nonav">
+    <div id="page-container" class="page-container-common">
+        @RenderBody()
+    </div>
+    </div>
+}
+else
+{
+<div class="page-container page-container-common">
+    <div class="page-left-navigation-wrapper">
+        <div class="page-left-navigation">
+                <ul class="page-left-navigation-menu" data-auto-scroll="false" data-auto-speed="200">
+                    <li class="search-wrapper">
+                        <div class="search">
+                            <input id="leftNavigationSearch" type="text" class="form-control" placeholder="Search...">
+                        </div>
+                    </li>
+                    @{Html.RenderPartial("~/Views/Shared/LeftNavigation.cshtml", new LeftNavigationModel((string)ViewData["NavigationPath"]));}
+                </ul>
+            </div>
+        </div>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            @RenderBody()
+
+            <script type="text/javascript">
+                $().ready(function () {
+                    @RenderSection("PageInitScript", false)
+                });
+            </script>
+        </div>
+    </div>
+</div>
+    
+<div class="page-footer">
+	<div class="page-footer-inner">
+		 &copy; Some Company
+	</div>
+</div>
+  
+}
+</body>
+</html>

@@ -1,0 +1,67 @@
+﻿@{
+    ViewBag.Title = "Login";
+    ViewBag.PageId = "Login";
+    Layout = "~/Views/Shared/_LayoutNoNavigation.cshtml";
+}
+
+<div class="page-content">
+    <div class="s-Form s-LoginForm">
+        <form id="LoginForm" action="/Account/Login">
+            <div class="form">
+                <div id="LoginForm_PropertyGrid"></div>
+                <div class="clear"></div>
+            </div>
+            <div class="buttons">
+                <button id="LoginForm_LoginButton" type="submit"
+                        class="ui-button-primary ui-btn-large ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    Giriş
+                </button>
+            </div>
+        </form>
+        <div class="clear"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+jQuery(function() {
+    $('#LoginForm_LoginButton').button();
+
+    var pg = new Serenity.PropertyGrid($('#LoginForm_PropertyGrid'), {
+        idPrefix: 'LoginForm_',
+        items: Q.getForm('Common.Login'),
+        useCategories: false
+    });
+
+    var validator = $('#LoginForm').validate(Q$Externals.validateOptions({
+    }));
+
+    $('#LoginForm_LoginButton').click(function (e) {
+        e.preventDefault();
+
+        if (!validator.form())
+            return;
+
+        var request = {};
+        pg.save(request);
+
+        Q.serviceCall({
+            service: 'Account/Login',
+            blockUI: true,
+            request: request,
+            onSuccess: function() {
+                var q = Q$Externals.parseQueryString();
+                var r = q.returnUrl || q.ReturnUrl;
+                if (r)
+                    window.location = r;
+                else
+                    window.location = Q.resolveUrl('~/');
+            },
+            onError: function(response) {
+                $('#LoginForm_Username').removeClass('valid').addClass('error');
+                $('#LoginForm_Password').removeClass('valid').addClass('error');
+                Q.notifyError(response.Error.Message);
+            }
+        });
+    });
+});
+</script>

@@ -33,6 +33,8 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptInitialization.cs" />
+    <Compile Include="Administration\User\UserGrid.cs" />
+    <Compile Include="Administration\User\UserDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
