@@ -8,6 +8,7 @@ namespace Serenity
     {
         public static partial class Controls
         {
+            [PreserveMemberCase]
             public static class EntityDialog
             {
                 public static LocalText DeleteConfirmation = "Delete record?";
@@ -21,6 +22,11 @@ namespace Serenity
                 public static LocalText DeleteButton = "Delete";
                 public static LocalText NewRecordTitle = "New {0}";
                 public static LocalText EditRecordTitle = "Edit {0}{1}";
+
+                static EntityDialog()
+                {
+                    LocalText.InitializeTextClass(typeof(EntityDialog), "Controls.EntityDialog.");
+                }
             }
         }
     }

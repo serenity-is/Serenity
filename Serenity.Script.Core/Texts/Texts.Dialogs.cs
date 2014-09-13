@@ -17,6 +17,11 @@ namespace Serenity
             public static LocalText ConfirmationTitle = "Confirm";
             public static LocalText InformationTitle = "Information";
             public static LocalText WarningTitle = "Warning";
+
+            static Dialogs()
+            {
+                LocalText.InitializeTextClass(typeof(Dialogs), "Dialogs.");
+            }
         }
     }
 }

@@ -5,6 +5,19 @@
         "NotLoggedIn": "Bu işlem için giriş yapmış olmalısınız!"
     },
     "Controls": {
+        "EntityDialog": {
+            "DeleteConfirmation": "Kaydı silmek istiyor musunuz?",
+            "UndeleteButton": "Geri Al",
+            "UndeleteConfirmation": "Kaydı geri almak istiyor musunuz?",
+            "CloneButton": "Klonla",
+            "SaveSuccessMessage": "Kayıt işlemi başarılı",
+            "SaveButton": "Kaydet",
+            "UpdateButton": "Güncelle",
+            "ApplyChangesButton": "Değişiklikleri Uygula",
+            "DeleteButton": "Sil",
+            "NewRecordTitle": "Yeni {0}",
+            "EditRecordTitle": "{0} Düzenleme{1}"
+        },
         "FilterPanel": {
             "AddFilter": "filtre koşulu ekle",
             "All": "<tümü>",
@@ -58,19 +71,6 @@
             "SelectField": "---alan seçiniz---",
             "ThenBy": "--ve grupla--",
             "ValueRequired": "alan için değer girilmeli!"
-        },
-        "EntityDialog": {
-            "DeleteConfirmation": "Kaydı silmek istiyor musunuz?",
-            "UndeleteButton": "Geri Al",
-            "UndeleteConfirmation": "Kaydı geri almak istiyor musunuz?",
-            "CloneButton": "Klonla",
-            "SaveSuccessMessage": "Kayıt işlemi başarılı",
-            "SaveButton": "Kaydet",
-            "UpdateButton": "Güncelle",
-            "ApplyChangesButton": "Değişiklikleri Uygula",
-            "DeleteButton": "Sil",
-            "NewRecordTitle": "Yeni {0}",
-            "EditRecordTitle": "{0} Düzenleme{1}"
         }
     },
     "Enums": {

@@ -7,9 +7,5 @@ namespace Serenity
     [ScriptName("Texts"), IgnoreNamespace, PreserveMemberCase]
     public static partial class Texts
     {
-        static Texts()
-        {
-            LocalText.InitializeTextClass(typeof(Dialogs), "Dialogs.");
-        }
     }
 }
