@@ -25,11 +25,6 @@ namespace BasicApplication.Administration
             columns.Add(new SlickColumn { Field = "Source", Width = 80 });
             columns.Add(new SlickColumn { Field = "PasswordHash", Width = 80 });
             columns.Add(new SlickColumn { Field = "PasswordSalt", Width = 80 });
-            columns.Add(new SlickColumn { Field = "InsertDate", Width = 80 });
-            columns.Add(new SlickColumn { Field = "InsertUserId", Width = 80 });
-            columns.Add(new SlickColumn { Field = "IsActive", Width = 80 });
-            columns.Add(new SlickColumn { Field = "UpdateDate", Width = 80 });
-            columns.Add(new SlickColumn { Field = "UpdateUserId", Width = 80 });
             columns.Add(new SlickColumn { Field = "DisplayName", Width = 80 });
             columns.Add(new SlickColumn { Field = "Email", Width = 80 });
 

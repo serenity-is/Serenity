@@ -1,6 +1,4 @@
-﻿[assembly: Serenity.Navigation.NavigationLink(91000, "Administration/User", url: "~/Administration/User", permission: null, icon: null)]
-
-namespace Serenity.Navigation
+﻿namespace Serenity.Navigation
 {
     using Serenity.Extensibility;
     using System;

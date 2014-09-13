@@ -673,6 +673,18 @@
 	$Texts.__typeName = 'Texts';
 	global.Texts = $Texts;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.Texts.Controls
+	var $Texts$Controls = function() {
+	};
+	$Texts$Controls.__typeName = 'Texts$Controls';
+	global.Texts$Controls = $Texts$Controls;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.Texts.Controls.EntityDialog
+	var $Texts$Controls$EntityDialog = function() {
+	};
+	$Texts$Controls$EntityDialog.__typeName = 'Texts$Controls$EntityDialog';
+	global.Texts$Controls$EntityDialog = $Texts$Controls$EntityDialog;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Texts.Dialogs
 	var $Texts$Dialogs = function() {
 	};
@@ -1326,6 +1338,8 @@
 	});
 	ss.initClass($Q$ScriptData, $asm, {});
 	ss.initClass($Texts, $asm, {});
+	ss.initClass($Texts$Controls, $asm, {});
+	ss.initClass($Texts$Controls$EntityDialog, $asm, {});
 	ss.initClass($Texts$Dialogs, $asm, {});
 	ss.initClass($Serenity_DialogTypeAttribute, $asm, {
 		get_value: function() {
@@ -1425,14 +1439,17 @@
 	$Q$Culture.dateOrder = 'dmy';
 	$Q$Culture.dateFormat = 'dd/MM/yyyy';
 	$Q$Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
-	$Texts$Dialogs.OkButton = new Q$LT('Tamam');
-	$Texts$Dialogs.YesButton = new Q$LT('Evet');
-	$Texts$Dialogs.NoButton = new Q$LT('Hayır');
-	$Texts$Dialogs.CancelButton = new Q$LT('İptal');
-	$Texts$Dialogs.AlertTitle = new Q$LT('Hata');
-	$Texts$Dialogs.ConfirmationTitle = new Q$LT('Onay');
-	$Texts$Dialogs.InformationTitle = new Q$LT('Bilgi');
-	$Texts$Dialogs.WarningTitle = new Q$LT('Uyarı');
+	$Q$LT.$table = {};
+	$Q$LT.empty = new $Q$LT('');
+	$Texts$Dialogs.OkButton = new Q$LT('OK');
+	$Texts$Dialogs.YesButton = new Q$LT('Yes');
+	$Texts$Dialogs.NoButton = new Q$LT('No');
+	$Texts$Dialogs.CancelButton = new Q$LT('Cancel');
+	$Texts$Dialogs.AlertTitle = new Q$LT('Alert');
+	$Texts$Dialogs.ConfirmationTitle = new Q$LT('Confirm');
+	$Texts$Dialogs.InformationTitle = new Q$LT('Information');
+	$Texts$Dialogs.WarningTitle = new Q$LT('Warning');
+	$Q$LT.initializeTextClass($Texts$Dialogs, 'Dialogs.');
 	$Serenity_LazyLoadHelper.$autoIncrement = 0;
 	$Q$Config.applicationPath = '/';
 	$Q$Config.emailAllowOnlyAscii = false;
@@ -1445,10 +1462,19 @@
 	$Q$Config.rootNamespaces = [];
 	ss.add($Q$Config.rootNamespaces, 'Serenity');
 	$Q$Config.emailAllowOnlyAscii = true;
-	$Q$LT.$table = {};
-	$Q$LT.empty = new $Q$LT('');
 	$Q$ScriptData.$registered = {};
 	$Q$ScriptData.$loadedData = {};
 	$Q.$blockUICount = 0;
-	$Q$LT.initializeTextClass($Texts$Dialogs, 'Dialogs.');
+	$Texts$Controls$EntityDialog.DeleteConfirmation = new Q$LT('Delete record?');
+	$Texts$Controls$EntityDialog.UndeleteButton = new Q$LT('Undelete');
+	$Texts$Controls$EntityDialog.UndeleteConfirmation = new Q$LT('Undelete record?');
+	$Texts$Controls$EntityDialog.CloneButton = new Q$LT('Clone');
+	$Texts$Controls$EntityDialog.SaveSuccessMessage = new Q$LT('Save success');
+	$Texts$Controls$EntityDialog.SaveButton = new Q$LT('Save');
+	$Texts$Controls$EntityDialog.UpdateButton = new Q$LT('Update');
+	$Texts$Controls$EntityDialog.ApplyChangesButton = new Q$LT('Apply Changes');
+	$Texts$Controls$EntityDialog.DeleteButton = new Q$LT('Delete');
+	$Texts$Controls$EntityDialog.NewRecordTitle = new Q$LT('New {0}');
+	$Texts$Controls$EntityDialog.EditRecordTitle = new Q$LT('Edit {0}{1}');
+	$Q$LT.initializeTextClass($Texts$Controls$EntityDialog, 'Controls.EntityDialog.');
 })();

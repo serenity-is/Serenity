@@ -43,47 +43,34 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Caching.Web, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Caching.Web">
       <HintPath>..\packages\Serenity.Caching.Web.1.0.7\lib\net45\Serenity.Caching.Web.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.CodeGeneration, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.CodeGeneration">
       <HintPath>..\packages\Serenity.CodeGeneration.1.0.7\lib\net45\Serenity.CodeGeneration.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.CodeGeneration.Mvc">
-      <HintPath>..\packages\Serenity.CodeGeneration.Mvc.1.0.7\lib\net45\Serenity.CodeGeneration.Mvc.dll</HintPath>
-    </Reference>
-    <Reference Include="Serenity.Core, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Core">
       <HintPath>..\packages\Serenity.Core.1.0.7\lib\net45\Serenity.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Data">
       <HintPath>..\packages\Serenity.Data.1.0.7\lib\net45\Serenity.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Entity, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Data.Entity">
       <HintPath>..\packages\Serenity.Data.Entity.1.0.7\lib\net45\Serenity.Data.Entity.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Filtering, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Data.Filtering">
       <HintPath>..\packages\Serenity.Data.Filtering.1.0.7\lib\net45\Serenity.Data.Filtering.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Munq, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Munq">
       <HintPath>..\packages\Serenity.Munq.1.0.7\lib\net45\Serenity.Munq.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Services">
       <HintPath>..\packages\Serenity.Services.1.0.7\lib\net45\Serenity.Services.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services.Mvc, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Services.Mvc">
       <HintPath>..\packages\Serenity.Services.Mvc.1.0.7\lib\net45\Serenity.Services.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="Serenity.Web, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
@@ -143,6 +130,11 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\colorbox\images\border.png" />
+    <Content Include="Content\colorbox\images\controls.png" />
+    <Content Include="Content\colorbox\images\loading.gif" />
+    <Content Include="Content\colorbox\images\loading_background.png" />
+    <Content Include="Content\colorbox\jquery.colorbox.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.png" />
@@ -197,6 +189,7 @@
     <Content Include="Content\serenity\images\bin-minus.png" />
     <Content Include="Content\serenity\images\bin.png" />
     <Content Include="Content\serenity\images\binocular.png" />
+    <Content Include="Content\serenity\images\blank.gif" />
     <Content Include="Content\serenity\images\block.png" />
     <Content Include="Content\serenity\images\blog.png" />
     <Content Include="Content\serenity\images\bomb.png" />
@@ -246,6 +239,7 @@
     <Content Include="Content\serenity\images\currency.png" />
     <Content Include="Content\serenity\images\cv.png" />
     <Content Include="Content\serenity\images\data-sync.png" />
+    <Content Include="Content\serenity\images\datepicker.gif" />
     <Content Include="Content\serenity\images\delete.png" />
     <Content Include="Content\serenity\images\delete2.png" />
     <Content Include="Content\serenity\images\dialog-alert.png" />
@@ -267,6 +261,7 @@
     <Content Include="Content\serenity\images\documents-stack.png" />
     <Content Include="Content\serenity\images\docx.png" />
     <Content Include="Content\serenity\images\door.png" />
+    <Content Include="Content\serenity\images\down.gif" />
     <Content Include="Content\serenity\images\drawer.png" />
     <Content Include="Content\serenity\images\dropdown.png" />
     <Content Include="Content\serenity\images\edit.png" />
@@ -289,9 +284,12 @@
     <Content Include="Content\serenity\images\get-products.png" />
     <Content Include="Content\serenity\images\get.png" />
     <Content Include="Content\serenity\images\globe-small.png" />
+    <Content Include="Content\serenity\images\grid-title-bg.gif" />
     <Content Include="Content\serenity\images\gtk-print-preview.png" />
     <Content Include="Content\serenity\images\hammer-screwdriver.png" />
     <Content Include="Content\serenity\images\hammer.png" />
+    <Content Include="Content\serenity\images\header-columns-bg.gif" />
+    <Content Include="Content\serenity\images\header-columns-over-bg.gif" />
     <Content Include="Content\serenity\images\home.png" />
     <Content Include="Content\serenity\images\hourglass.png" />
     <Content Include="Content\serenity\images\inbox-document-text.png" />
@@ -307,6 +305,7 @@
     <Content Include="Content\serenity\images\lifebuoy.png" />
     <Content Include="Content\serenity\images\light-bulb.png" />
     <Content Include="Content\serenity\images\list-delete.png" />
+    <Content Include="Content\serenity\images\loading.gif" />
     <Content Include="Content\serenity\images\location.png" />
     <Content Include="Content\serenity\images\lock.png" />
     <Content Include="Content\serenity\images\luggage.png" />
@@ -337,7 +336,9 @@
     <Content Include="Content\serenity\images\order.png" />
     <Content Include="Content\serenity\images\organization-tree.png" />
     <Content Include="Content\serenity\images\outlook.png" />
+    <Content Include="Content\serenity\images\pager-bg.gif" />
     <Content Include="Content\serenity\images\pager-buttons.png" />
+    <Content Include="Content\serenity\images\pager-load.gif" />
     <Content Include="Content\serenity\images\paper-bag.png" />
     <Content Include="Content\serenity\images\paper-clip.png" />
     <Content Include="Content\serenity\images\payment.png" />
@@ -386,6 +387,7 @@
     <Content Include="Content\serenity\images\sitemap-application-blue.png" />
     <Content Include="Content\serenity\images\sitemap.png" />
     <Content Include="Content\serenity\images\slash.png" />
+    <Content Include="Content\serenity\images\slick-header-columns-over-bg.gif" />
     <Content Include="Content\serenity\images\slides.png" />
     <Content Include="Content\serenity\images\sofa.png" />
     <Content Include="Content\serenity\images\sort-order.png" />
@@ -402,6 +404,7 @@
     <Content Include="Content\serenity\images\stock.png" />
     <Content Include="Content\serenity\images\store.png" />
     <Content Include="Content\serenity\images\table-chart.png" />
+    <Content Include="Content\serenity\images\table-header.gif" />
     <Content Include="Content\serenity\images\table-select-all.png" />
     <Content Include="Content\serenity\images\table.png" />
     <Content Include="Content\serenity\images\tag--arrow.png" />
@@ -425,12 +428,15 @@
     <Content Include="Content\serenity\images\toggle-small-expand.png" />
     <Content Include="Content\serenity\images\toggle-small.png" />
     <Content Include="Content\serenity\images\toggle.png" />
+    <Content Include="Content\serenity\images\toolbar-bg.gif" />
     <Content Include="Content\serenity\images\toolbox.png" />
+    <Content Include="Content\serenity\images\trash.gif" />
     <Content Include="Content\serenity\images\trash.png" />
     <Content Include="Content\serenity\images\tree-item.png" />
     <Content Include="Content\serenity\images\truck.png" />
     <Content Include="Content\serenity\images\ui-check-box-uncheck.png" />
     <Content Include="Content\serenity\images\ui-radio-button-uncheck.png" />
+    <Content Include="Content\serenity\images\unchecked.gif" />
     <Content Include="Content\serenity\images\universal.png" />
     <Content Include="Content\serenity\images\unlock-disable.png" />
     <Content Include="Content\serenity\images\unlock.png" />
@@ -459,6 +465,8 @@
     <Content Include="Content\simple-line-icons.css" />
     <Content Include="Content\site\site.mixins.less" />
     <Content Include="Content\site\site.overrides.serenity.less" />
+    <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
     <None Include="Content\site\site.less" />
     <Content Include="Content\slick-default-theme.css" />
     <Content Include="Content\slick.columnpicker.css" />
@@ -532,15 +540,10 @@
     <Content Include="Content\toastr.min.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="fonts\Simple-Line-Icons.dev.svg" />
+    <Content Include="fonts\Simple-Line-Icons.svg" />
     <Content Include="packages.config" />
     <Content Include="Readme.CodeGenerator.txt" />
-    <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap-theme.css.map" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\toastr.scss" />
-    <Content Include="Content\toastr.less" />
     <Content Include="Modules\Membership\Account\AccountLogin.cshtml" />
     <Content Include="Modules\Web.config" />
     <Content Include="fonts\OpenSans.woff" />
@@ -552,6 +555,14 @@
     <Content Include="Modules\Membership\_ViewStart.cshtml" />
     <Content Include="Modules\_ViewStart.cshtml" />
     <Content Include="Content\site\site.layout.less" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\toastr.scss" />
+    <Content Include="Content\toastr.less" />
+    <Content Include="fonts\Simple-Line-Icons.woff" />
+    <Content Include="fonts\Simple-Line-Icons.ttf" />
+    <Content Include="fonts\Simple-Line-Icons.eot" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -652,6 +663,7 @@
     <Content Include="Scripts\serenity\Serenity.Script.Core.min.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
+    <Content Include="Scripts\serenity\texts\serenity.texts.tr-TR.js" />
     <Content Include="Scripts\site\BasicApplication.Script.js" />
     <Content Include="Scripts\SlickGrid\Controls\slick.columnpicker.js" />
     <Content Include="Scripts\SlickGrid\Controls\slick.pager.js" />
@@ -682,13 +694,13 @@
     <Content Include="Views\Shared\LeftNavigation.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\_LayoutHead.cshtml" />
+    <Content Include="Views\Shared\_LayoutNoNavigation.cshtml" />
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
     <Content Include="fonts\FontAwesome.otf" />
     <Content Include="Scripts\jquery-2.1.1.min.map" />
     <Content Include="Scripts\toastr.min.js.map" />
-    <Content Include="Views\Shared\_LayoutNoNavigation.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -730,7 +742,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Texts\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -11,6 +11,12 @@ namespace Serenity.Core
             public static LocalText NotLoggedIn = "Authorization is required for this request!";
         }
 
-
+        public static partial class Db
+        {
+            public static class Shared
+            {
+                public static LocalText RecordId = "ID";
+            }
+        }
     }
 }

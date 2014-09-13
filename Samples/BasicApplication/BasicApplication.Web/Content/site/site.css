@@ -897,3 +897,41 @@ table.dataTable thead .sorting:after {
 #LoginPanelWrapper .s-Form .caption {
   padding: 6px 10px;
 }
+.s-UserDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-UserDialog .tab-pane {
+  height: auto;
+}
+.s-UserDialog .caption {
+  width: 150px;
+}
+.s-UserDialog .editor {
+  width: 400px;
+}
+.s-UserDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-UserDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-UserDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-UserDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-UserDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-UserDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-UserDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-UserDialog .categories {
+  height: 450px;
+}

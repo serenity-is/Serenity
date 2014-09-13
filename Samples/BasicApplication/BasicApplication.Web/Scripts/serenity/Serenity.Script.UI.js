@@ -1381,11 +1381,11 @@
 			},
 			getEntityTitle: function() {
 				if (!this.get_isEditMode()) {
-					return 'Yeni ' + this.getEntitySingular();
+					return ss.formatString(Texts$Controls$EntityDialog.NewRecordTitle.get(), this.getEntitySingular());
 				}
 				else {
 					var title = ss.coalesce(this.getEntityNameFieldValue(), '');
-					return this.getEntitySingular() + ' Düzenleme' + (Q.isEmptyOrNull(title) ? '' : (' (' + title + ')'));
+					return ss.formatString(Texts$Controls$EntityDialog.EditRecordTitle.get(), this.getEntitySingular(), (Q.isEmptyOrNull(title) ? '' : (' (' + title + ')')));
 				}
 			},
 			updateTitle: function() {
@@ -1444,9 +1444,6 @@
 				});
 				var thisOptions = this.getDeleteOptions(callback);
 				var finalOptions = $.extend(baseOptions, thisOptions);
-				//if (Entity._deleteHandler != null)
-				//    EntityObject._deleteHandler(this, finalOptions, callback);
-				//else
 				this.deleteHandler(finalOptions, callback);
 			},
 			onDeleteSuccess: function(response) {
@@ -1588,19 +1585,14 @@
 					this.set_entityId(Serenity.IdExtensions.convertToId(entity[idField]));
 				}
 				this.set_entity(entity);
-				//SetInputsDisabled(this.Form[0], Type.GetField(ent, "IsActive") == (object)false);
 				if (ss.isValue(this.propertyGrid)) {
 					this.propertyGrid.set_mode((this.get_isEditMode() ? 1 : 0));
 					this.propertyGrid.load(entity);
 				}
-				//this.ResetValidation();
 			},
 			beforeLoadEntity: function(entity) {
 			},
 			afterLoadEntity: function() {
-				// TODO: düzelt
-				//AfterLoadEntity_AttachmentPanel();
-				//AfterLoadEntity_AuditLogPanel();
 				this.updateInterface();
 				this.updateTitle();
 			},
@@ -1646,9 +1638,6 @@
 				};
 				var thisOptions = this.getLoadByIdOptions(id, callback);
 				var finalOptions = $.extend(baseOptions, thisOptions);
-				//if (EntityObject != null && EntityObject._loadByIdHandler != null)
-				//    EntityObject._loadByIdHandler(this, finalOptions, callback);
-				//else
 				this.loadByIdHandler(finalOptions, callback);
 			},
 			loadByIdHandler: function(options, callback) {
@@ -1832,12 +1821,6 @@
 				var entity = this.getSaveEntity();
 				var req = {};
 				req.Entity = entity;
-				if (!this.get_isEditMode()) {
-					// TODO: attachments
-					//AttachmentEntity[] att = this.GetPendingAttachments();
-					//if (att != null)
-					//    ((SaveRequest)(object)req).Attachments = this.GetPendingAttachments();
-				}
 				return req;
 			},
 			onSaveSuccess: function(response) {
@@ -1869,14 +1852,14 @@
 				this.cloneButton = this.toolbar.findButton('clone-button');
 			},
 			showSaveSuccessMessage: function(response) {
-				Q.notifySuccess('Kayıt işlemi başarılı');
+				Q.notifySuccess(Texts$Controls$EntityDialog.SaveSuccessMessage.get());
 			},
 			getToolbarButtons: function() {
 				var list = [];
 				var self = this;
 				if (!this.isPanel) {
 					ss.add(list, {
-						title: 'Kaydet',
+						title: Texts$Controls$EntityDialog.SaveButton.get(),
 						cssClass: 'save-and-close-button',
 						onClick: function() {
 							self.save(function(response) {
@@ -1885,7 +1868,7 @@
 						}
 					});
 				}
-				ss.add(list, { title: (this.isPanel ? 'Kaydet' : ''), hint: (this.isPanel ? 'Kaydet' : 'Değişiklikleri Uygula'), cssClass: 'apply-changes-button', onClick: ss.mkdel(this, function() {
+				ss.add(list, { title: (this.isPanel ? Texts$Controls$EntityDialog.SaveButton : Q$LT.empty).get(), hint: (this.isPanel ? Texts$Controls$EntityDialog.SaveButton : Texts$Controls$EntityDialog.ApplyChangesButton).get(), cssClass: 'apply-changes-button', onClick: ss.mkdel(this, function() {
 					if (self.get_$isLocalizationMode()) {
 						self.$saveLocalization();
 						return;
@@ -1902,10 +1885,10 @@
 				}) });
 				if (!this.isPanel) {
 					ss.add(list, {
-						title: 'Sil',
+						title: Texts$Controls$EntityDialog.DeleteButton.get(),
 						cssClass: 'delete-button',
 						onClick: function() {
-							Q.confirm('Kaydı silmek istiyor musunuz?', function() {
+							Q.confirm(Texts$Controls$EntityDialog.DeleteConfirmation.get(), function() {
 								self.doDelete(function() {
 									self.element.dialog().dialog('close');
 								});
@@ -1913,11 +1896,11 @@
 						}
 					});
 					ss.add(list, {
-						title: 'Geri Al',
+						title: Texts$Controls$EntityDialog.UndeleteButton.get(),
 						cssClass: 'undo-delete-button',
 						onClick: function() {
 							if (self.get_isDeleted()) {
-								Q.confirm('Kaydı geri almak istiyor musunuz?', function() {
+								Q.confirm(Texts$Controls$EntityDialog.UndeleteConfirmation.get(), function() {
 									self.undelete(function() {
 										self.loadById(self.get_entityId(), null);
 									});
@@ -1925,7 +1908,7 @@
 							}
 						}
 					});
-					ss.add(list, { title: 'Klonla', cssClass: 'clone-button', onClick: ss.mkdel(this, function() {
+					ss.add(list, { title: Texts$Controls$EntityDialog.CloneButton.get(), cssClass: 'clone-button', onClick: ss.mkdel(this, function() {
 						if (!self.get_isEditMode()) {
 							return;
 						}
@@ -1960,7 +1943,7 @@
 				}
 				if (ss.isValue(this.saveAndCloseButton)) {
 					this.saveAndCloseButton.toggle(!isLocalizationMode && !isDeleted);
-					this.saveAndCloseButton.find('.button-inner').text((this.get_isNew() ? 'Kaydet' : 'Güncelle'));
+					this.saveAndCloseButton.find('.button-inner').text((this.get_isNew() ? Texts$Controls$EntityDialog.SaveButton : Texts$Controls$EntityDialog.UpdateButton).get());
 				}
 				if (ss.isValue(this.applyChangesButton)) {
 					this.applyChangesButton.toggle(isLocalizationMode || !isDeleted);
@@ -2002,9 +1985,6 @@
 				});
 				var thisOptions = this.getUndeleteOptions(callback);
 				var finalOptions = $.extend(baseOptions, thisOptions);
-				//if ( != null && EntityObject._undeleteHandler != null)
-				//    EntityObject._undeleteHandler(this, finalOptions, callback);
-				//else
 				this.undeleteHandler(finalOptions, callback);
 			}
 		}, function() {

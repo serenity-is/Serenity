@@ -133,11 +133,6 @@
 			ss.add(columns, { field: 'Source', width: 80 });
 			ss.add(columns, { field: 'PasswordHash', width: 80 });
 			ss.add(columns, { field: 'PasswordSalt', width: 80 });
-			ss.add(columns, { field: 'InsertDate', width: 80 });
-			ss.add(columns, { field: 'InsertUserId', width: 80 });
-			ss.add(columns, { field: 'IsActive', width: 80 });
-			ss.add(columns, { field: 'UpdateDate', width: 80 });
-			ss.add(columns, { field: 'UpdateUserId', width: 80 });
 			ss.add(columns, { field: 'DisplayName', width: 80 });
 			ss.add(columns, { field: 'Email', width: 80 });
 			return columns;
