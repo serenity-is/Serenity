@@ -107,9 +107,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Security\WebSecurityHelper.cs" />
-    <Compile Include="Texts\Texts.Controls.cs" />
+    <Compile Include="Texts\Texts.Controls.FilterPanel.cs" />
     <Compile Include="Texts\Texts.cs" />
-    <Compile Include="Texts\Texts.Forms.cs" />
     <Compile Include="Texts\Texts.Validation.cs" />
     <Compile Include="Upload\ImageUploadEditorAttribute.cs" />
     <Compile Include="Upload\FileUploadEditorAttribute.cs" />
@@ -148,6 +147,10 @@
     <Compile Include="Mvc\Throttling.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Includes\Fonts\Simple-Line-Icons.eot" />
+    <None Include="Includes\Fonts\Simple-Line-Icons.ttf" />
+    <None Include="Includes\Fonts\Simple-Line-Icons.woff" />
+    <None Include="Includes\web.config.transform" />
     <None Include="packages.config" />
     <None Include="Style\images\accessright.png" />
     <None Include="Style\images\add.png" />
@@ -501,6 +504,48 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Includes\Content\aristo\aristo.css" />
+    <Content Include="Includes\Content\aristo\images\icon_sprite.png" />
+    <Content Include="Includes\Content\aristo\images\progress_bar.gif" />
+    <Content Include="Includes\Content\aristo\images\slider_handles.png" />
+    <Content Include="Includes\Content\aristo\images\ui-icons_222222_256x240.png" />
+    <Content Include="Includes\Content\aristo\images\ui-icons_454545_256x240.png" />
+    <Content Include="Includes\Content\colorbox\images\border.png" />
+    <Content Include="Includes\Content\colorbox\images\controls.png" />
+    <Content Include="Includes\Content\colorbox\images\loading.gif" />
+    <Content Include="Includes\Content\colorbox\images\loading_background.png" />
+    <Content Include="Includes\Content\colorbox\jquery.colorbox.css" />
+    <Content Include="Includes\Content\glyphicons.css" />
+    <Content Include="Includes\Content\jquery.fileupload.css" />
+    <Content Include="Includes\Content\pace.css" />
+    <Content Include="Includes\Content\simple-line-icons.css" />
+    <Content Include="Includes\Fonts\Simple-Line-Icons.dev.svg" />
+    <Content Include="Includes\Fonts\Simple-Line-Icons.svg" />
+    <Content Include="Includes\Scripts\jlayout.border.js" />
+    <Content Include="Includes\Scripts\jlayout.border.min.js" />
+    <Content Include="Includes\Scripts\jquery.autoNumeric.js" />
+    <Content Include="Includes\Scripts\jquery.autoNumeric.min.js" />
+    <Content Include="Includes\Scripts\jquery.blockUI.js" />
+    <Content Include="Includes\Scripts\jquery.blockUI.min.js" />
+    <Content Include="Includes\Scripts\jquery.colorbox.js" />
+    <Content Include="Includes\Scripts\jquery.colorbox.min.js" />
+    <Content Include="Includes\Scripts\jquery.cookie.js" />
+    <Content Include="Includes\Scripts\jquery.cookie.min.js" />
+    <Content Include="Includes\Scripts\jquery.cropzoom.js" />
+    <Content Include="Includes\Scripts\jquery.cropzoom.min.js" />
+    <Content Include="Includes\Scripts\jquery.dialogextendQ.js" />
+    <Content Include="Includes\Scripts\jquery.dialogextendQ.min.js" />
+    <Content Include="Includes\Scripts\jquery.jlayout.js" />
+    <Content Include="Includes\Scripts\jquery.jlayout.min.js" />
+    <Content Include="Includes\Scripts\jquery.json.js" />
+    <Content Include="Includes\Scripts\jquery.json.min.js" />
+    <Content Include="Includes\Scripts\jquery.scrollintoview.js" />
+    <Content Include="Includes\Scripts\jquery.scrollintoview.min.js" />
+    <Content Include="Includes\Scripts\jquery.slimscroll.js" />
+    <Content Include="Includes\Scripts\jquery.slimscroll.min.js" />
+    <Content Include="Includes\Scripts\pace.js" />
+    <Content Include="Includes\Scripts\pace.min.js" />
+    <Content Include="Includes\Scripts\serenity\texts\serenity.texts.tr-TR.js" />
     <Content Include="Style\images\32px.png" />
     <Content Include="Style\images\accordion-down.png" />
     <Content Include="Style\images\accordion-left.png" />

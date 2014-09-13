@@ -1,6 +1,5 @@
 ﻿
-
-[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "Administration/User", url: "~/Administration/User", permission: "Administration", icon: null)]
+[assembly:Serenity.Navigation.NavigationLink(91000, "Administration/User Management", url: "~/Administration/User", permission: "Administration", icon: "icon-users")]
 
 namespace BasicApplication.Administration.Pages
 {

@@ -39,9 +39,6 @@ namespace Serenity
             var thisOptions = GetUndeleteOptions(callback);
             var finalOptions = jQuery.ExtendObject(baseOptions, thisOptions);
 
-            //if ( != null && EntityObject._undeleteHandler != null)
-            //    EntityObject._undeleteHandler(this, finalOptions, callback);
-            //else
             UndeleteHandler(finalOptions, callback);
         }
 

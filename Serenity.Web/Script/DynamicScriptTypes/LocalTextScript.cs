@@ -16,12 +16,12 @@ namespace Serenity.Web
     {
         private string _scriptName;
         private string _package;
-        private int _languageId;
+        private string _languageId;
         private bool _isPending;
         private EventHandler _scriptChanged;
         private static Dictionary<string, string[]> _packages;
 
-        public LocalTextScript(string package, int languageId, bool isPending)
+        public LocalTextScript(string package, string languageId, bool isPending)
         {
             _package = package;
             _languageId = languageId;
@@ -31,7 +31,7 @@ namespace Serenity.Web
 
         public bool NonCached { get { return false; } }
 
-        public static string GetScriptName(string package, int languageId, bool isPending)
+        public static string GetScriptName(string package, string languageId, bool isPending)
         {
             return String.Format("LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
         }
@@ -44,7 +44,7 @@ namespace Serenity.Web
 
         public string ScriptName { get { return _scriptName; } }
 
-        public static string GetLocalTextPackageScript(string package, int languageId, bool isPending)
+        public static string GetLocalTextPackageScript(string package, string languageId, bool isPending)
         {
             if (_packages == null)
             {

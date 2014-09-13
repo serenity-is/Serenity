@@ -28,16 +28,12 @@ namespace BasicApplication.Membership.Pages
                     throw new ArgumentNullException("username");
 
                 var username = request.Username;
-                if (Dependency.Resolve<IAuthenticationService>().Validate(ref username, request.Password))
+                
+                if (WebSecurityHelper.Authenticate(ref username, request.Password, false))
                     return new ServiceResponse();
 
                 throw new ValidationError("AuthenticationError", null, "Invalid username or password!");
             });
-        }
-
-        public ActionResult Signup()
-        {
-            return View("~/Modules/Membership/Account/AccountSignup.cshtml");
         }
 
         public ActionResult Signout()

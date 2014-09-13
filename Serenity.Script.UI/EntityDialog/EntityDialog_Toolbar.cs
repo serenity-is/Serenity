@@ -32,7 +32,7 @@ namespace Serenity
 
         protected virtual void ShowSaveSuccessMessage(ServiceResponse response)
         {
-            Q.NotifySuccess("Kayıt işlemi başarılı");
+            Q.NotifySuccess(Texts.Controls.EntityDialog.SaveSuccessMessage);
         }
 
         protected override List<ToolButton> GetToolbarButtons()
@@ -45,7 +45,7 @@ namespace Serenity
             {
                 list.Add(new ToolButton
                 {
-                    Title = "Kaydet",
+                    Title = Texts.Controls.EntityDialog.SaveButton,
                     CssClass = "save-and-close-button",
                     OnClick = delegate
                     {
@@ -59,8 +59,8 @@ namespace Serenity
 
             list.Add(new ToolButton
             {
-                Title = isPanel ? "Kaydet" : "",
-                Hint = isPanel ? "Kaydet" : "Değişiklikleri Uygula",
+                Title = isPanel ? Texts.Controls.EntityDialog.SaveButton : LocalText.Empty,
+                Hint = isPanel ? Texts.Controls.EntityDialog.SaveButton : Texts.Controls.EntityDialog.ApplyChangesButton,
                 CssClass = "apply-changes-button",
                 OnClick = delegate
                 {
@@ -86,11 +86,11 @@ namespace Serenity
             {
                 list.Add(new ToolButton
                 {
-                    Title = "Sil",
+                    Title = Texts.Controls.EntityDialog.DeleteButton,
                     CssClass = "delete-button",
                     OnClick = delegate
                     {
-                        Q.Confirm("Kaydı silmek istiyor musunuz?", delegate
+                        Q.Confirm(Texts.Controls.EntityDialog.DeleteConfirmation, delegate
                         {
                             self.DoDelete(delegate
                             {
@@ -102,13 +102,13 @@ namespace Serenity
 
                 list.Add(new ToolButton
                 {
-                    Title = "Geri Al",
+                    Title = Texts.Controls.EntityDialog.UndeleteButton,
                     CssClass = "undo-delete-button",
                     OnClick = delegate
                     {
                         if (self.IsDeleted)
                         {
-                            Q.Confirm("Kaydı geri almak istiyor musunuz?", delegate()
+                            Q.Confirm(Texts.Controls.EntityDialog.UndeleteConfirmation, delegate()
                             {
                                 self.Undelete(delegate
                                 {
@@ -121,7 +121,7 @@ namespace Serenity
 
                 list.Add(new ToolButton
                 {
-                    Title = "Klonla",
+                    Title = Texts.Controls.EntityDialog.CloneButton,
                     CssClass = "clone-button",
                     OnClick = delegate
                     {
@@ -170,7 +170,7 @@ namespace Serenity
                 saveAndCloseButton.Toggle(!isLocalizationMode && !isDeleted);
 
                 saveAndCloseButton.Find(".button-inner").Text(
-                    IsNew ? "Kaydet" : "Güncelle");
+                    IsNew ? Texts.Controls.EntityDialog.SaveButton : Texts.Controls.EntityDialog.UpdateButton);
             }
 
             if (applyChangesButton != null)

@@ -4,22 +4,14 @@ namespace Serenity.Localization
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using ItemKey = System.Tuple<long, string>;
+    using System.Globalization;
+    using ItemKey = System.Tuple<string, string>;
 
     public class LocalTextRegistry : ILocalTextProvider
     {
-        private readonly ConcurrentDictionary<long, long> languageParents = new ConcurrentDictionary<long, long>();
+        private readonly ConcurrentDictionary<string, string> languageParents = new ConcurrentDictionary<string, string>();
         private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = new ConcurrentDictionary<ItemKey, string>();
         private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = new ConcurrentDictionary<ItemKey, string>();
-
-        public long ContextLanguageID
-        {
-            get
-            {
-                var context = Dependency.TryResolve<ILocalTextContext>();
-                return context != null ? context.LanguageID : LocalText.DefaultLanguageID;
-            }
-        }
 
         public bool ContextIsApprovalMode
         {
@@ -30,7 +22,7 @@ namespace Serenity.Localization
             }
         }
 
-        public void SetParentLanguageID(int languageID, int parentLanguageID)
+        public void SetParentLanguageID(string languageID, string parentLanguageID)
         {
             languageParents[languageID] = parentLanguageID;
         }
@@ -39,7 +31,7 @@ namespace Serenity.Localization
         {
             var context = Dependency.TryResolve<ILocalTextContext>();
 
-            return TryGet(context != null ? context.LanguageID : LocalText.DefaultLanguageID, 
+            return TryGet(CultureInfo.CurrentUICulture.Name, 
                 key, context != null && context.IsApprovalMode);
         }
 
@@ -69,7 +61,7 @@ namespace Serenity.Localization
         /// <returns>
         ///   Local text, looked up from requested language, its parents, and default language in order. If not found
         ///   in any, null is returned</returns>
-        public string TryGet(Int64 languageID, string textKey, bool isApprovalMode)
+        public string TryGet(string languageID, string textKey, bool isApprovalMode)
         {
             // create a key to lookup by language and text key pair
             var k = new ItemKey(languageID, textKey);
@@ -87,7 +79,7 @@ namespace Serenity.Localization
 
                     // pending text is null, it means marked for deletion, 
                     // if this is default language, return key itself
-                    if (languageID == LocalText.DefaultLanguageID)
+                    if (languageID == LocalText.InvariantLanguageID)
                         return null;
                 }
                 else if (approvedTexts.TryGetValue(k, out s))
@@ -95,7 +87,7 @@ namespace Serenity.Localization
                     // approved is available, return it
                     return s;
                 }
-                else if (languageID == LocalText.DefaultLanguageID)
+                else if (languageID == LocalText.InvariantLanguageID)
                 {
                     // if language is default language, return text key
                     return null;
@@ -105,7 +97,7 @@ namespace Serenity.Localization
                 while (true)
                 {
                     if (!languageParents.TryGetValue(languageID, out languageID))
-                        languageID = LocalText.DefaultLanguageID;
+                        languageID = LocalText.InvariantLanguageID;
 
                     // search in parent or default language
                     k = new ItemKey(languageID, textKey);
@@ -117,7 +109,7 @@ namespace Serenity.Localization
                             return s;
 
                         // if marked for deletion in default language, return key itself
-                        if (languageID == LocalText.DefaultLanguageID)
+                        if (languageID == LocalText.InvariantLanguageID)
                             return null;
                     }
                     else if (approvedTexts.TryGetValue(k, out s))
@@ -125,7 +117,7 @@ namespace Serenity.Localization
                         // text available in approved default language
                         return s;
                     }
-                    else if (languageID == LocalText.DefaultLanguageID)
+                    else if (languageID == LocalText.InvariantLanguageID)
                     {
                         // not in pending nor approved, or circular reference, return key itself
                         return null;
@@ -142,13 +134,13 @@ namespace Serenity.Localization
             if (!approvedTexts.TryGetValue(k, out s))
             {
                 // couldn't find, if requested language is not DefaultLanguageID, search in it too
-                if (languageID != LocalText.DefaultLanguageID)
+                if (languageID != LocalText.InvariantLanguageID)
                 {
                     int circularCheck2 = 0;
                     while (true)
                     {
                         if (!languageParents.TryGetValue(languageID, out languageID))
-                            languageID = LocalText.DefaultLanguageID;
+                            languageID = LocalText.InvariantLanguageID;
 
                         // search in parent or default language
                         k = new ItemKey(languageID, textKey);
@@ -157,7 +149,7 @@ namespace Serenity.Localization
                         if (approvedTexts.TryGetValue(k, out s))
                             return s;
 
-                        if (languageID == LocalText.DefaultLanguageID ||
+                        if (languageID == LocalText.InvariantLanguageID ||
                             circularCheck2++ >= 10)
                             return null;
                     }
@@ -180,7 +172,7 @@ namespace Serenity.Localization
         ///   True if pending texts should be returned (e.g. in preview/edit mode).</param>
         /// <returns>
         ///   A dictionary of all text in the language.</returns>
-        public Dictionary<string, string> GetAllAvailableTextsInLanguage(long languageID, bool pending)
+        public Dictionary<string, string> GetAllAvailableTextsInLanguage(string languageID, bool pending)
         {
             var texts = new Dictionary<string, string>();
             string text;
@@ -218,11 +210,11 @@ namespace Serenity.Localization
                 tries++;
 
                 if (tries > 10 ||
-                    currentID == LocalText.DefaultLanguageID)
+                    currentID == LocalText.InvariantLanguageID)
                     break;
 
                 if (!languageParents.TryGetValue(currentID, out currentID))
-                    currentID = LocalText.DefaultLanguageID;
+                    currentID = LocalText.InvariantLanguageID;
             }
 
             return texts;

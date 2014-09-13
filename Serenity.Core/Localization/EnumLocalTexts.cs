@@ -10,7 +10,7 @@ namespace Serenity.Localization
     public static class EnumLocalTexts
     {
         public static void Initialize(IEnumerable<Assembly> assemblies,
-            long languageID = LocalText.DefaultLanguageID)
+            string languageID = LocalText.InvariantLanguageID)
         {
             var provider = Dependency.Resolve<ILocalTextProvider>();
 

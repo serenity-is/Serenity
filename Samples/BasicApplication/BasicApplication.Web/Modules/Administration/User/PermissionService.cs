@@ -7,8 +7,11 @@
     {
         public bool HasPermission(string permission)
         {
+            if (Authorization.AdminUsername != null && Authorization.AdminUsername == Authorization.Username)
+                return true;
+
             if (permission == "Administration")
-                return Authorization.AdminUsername != null && Authorization.AdminUsername == Authorization.Username;
+                return false;
 
             return true;
         }

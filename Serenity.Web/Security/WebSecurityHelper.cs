@@ -37,7 +37,7 @@ namespace Serenity
             if (!Dependency.Resolve<IAuthenticationService>().Validate(ref username, password))
                 return false;
             
-            SetAuthenticationTicket(username, persist, Roles.GetRolesForUser(username));
+            SetAuthenticationTicket(username, persist);
             return true;
         }
 
@@ -49,7 +49,7 @@ namespace Serenity
         ///   is persistent authentication tikcet? (remember me, we don't use this for reasons considering with security)</param>
         /// <param name="roles">
         ///   Roles users has. Persisted in cookie for quick access</param>
-        public static void SetAuthenticationTicket(string username, bool persist, params string[] roles)
+        public static void SetAuthenticationTicket(string username, bool persist)
         {
             if (username == null)
                 throw new ArgumentNullException(username);

@@ -75,6 +75,7 @@
     <Compile Include="SlickGrid\SlickColumnHelper.cs" />
     <Compile Include="SlickGrid\SlickFormatting.cs" />
     <Compile Include="Texts\Texts.cs" />
+    <Compile Include="Texts\Texts.Controls.EntityDialog.cs" />
     <Compile Include="Texts\Texts.Dialogs.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -117,15 +118,18 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="(!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')) And (!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets'))" />
   <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="(Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')) And (!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets'))" />
   <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets')" />
-
   <Target Name="CopyAndMinimize" AfterTargets="AfterBuild">
-    <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.js" DestinationFolder="$(OutDir)"></Copy>
-    <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.Slick.js" DestinationFolder="$(OutDir)"></Copy>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.Core.js -o $(OutDir)Serenity.Script.Core.min.js --comments --mangle"></Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Externals.js -o $(OutDir)Serenity.Externals.min.js --comments --mangle"></Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Externals.Slick.js -o $(OutDir)Serenity.Externals.Slick.min.js --comments --mangle"></Exec>
+    <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.js" DestinationFolder="$(OutDir)">
+    </Copy>
+    <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.Slick.js" DestinationFolder="$(OutDir)">
+    </Copy>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.Core.js -o $(OutDir)Serenity.Script.Core.min.js --comments --mangle">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Externals.js -o $(OutDir)Serenity.Externals.min.js --comments --mangle">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Externals.Slick.js -o $(OutDir)Serenity.Externals.Slick.min.js --comments --mangle">
+    </Exec>
   </Target>
-
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

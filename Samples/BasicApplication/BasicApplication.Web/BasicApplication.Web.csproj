@@ -14,7 +14,7 @@
     <RootNamespace>BasicApplication</RootNamespace>
     <AssemblyName>BasicApplication.Web</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -150,6 +150,7 @@
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\font-open-sans.css" />
+    <Content Include="Content\glyphicons.css" />
     <Content Include="Content\images\collapse.gif" />
     <Content Include="Content\images\down.gif" />
     <Content Include="Content\images\expand.gif" />
@@ -157,6 +158,9 @@
     <Content Include="Content\images\header-columns-over-bg.gif" />
     <Content Include="Content\images\sort-asc.gif" />
     <Content Include="Content\images\sort-desc.gif" />
+    <Content Include="Content\jquery.fileupload.css" />
+    <Content Include="Content\jquery.metisMenu.css" />
+    <Content Include="Content\pace.css" />
     <Content Include="Content\serenity\images\32px.png" />
     <Content Include="Content\serenity\images\accessright.png" />
     <Content Include="Content\serenity\images\accordion-down.png" />
@@ -452,8 +456,9 @@
     <Content Include="Content\serenity\images\zones-stack.png" />
     <Content Include="Content\serenity\images\zoom.png" />
     <Content Include="Content\serenity\serenity.css" />
+    <Content Include="Content\simple-line-icons.css" />
     <Content Include="Content\site\site.mixins.less" />
-    <Content Include="Content\site\site.theme.less" />
+    <Content Include="Content\site\site.overrides.serenity.less" />
     <None Include="Content\site\site.less" />
     <Content Include="Content\slick-default-theme.css" />
     <Content Include="Content\slick.columnpicker.css" />
@@ -543,6 +548,10 @@
     <Content Include="fonts\OpenSansItalic.woff" />
     <Content Include="fonts\OpenSansLight.woff" />
     <Content Include="fonts\OpenSansSemiBold.woff" />
+    <Content Include="Modules\Common\Dashboard\DashboardIndex.cshtml" />
+    <Content Include="Modules\Membership\_ViewStart.cshtml" />
+    <Content Include="Modules\_ViewStart.cshtml" />
+    <Content Include="Content\site\site.layout.less" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -573,6 +582,10 @@
     <Content Include="Scripts\jquery.jlayout.min.js" />
     <Content Include="Scripts\jquery.json.js" />
     <Content Include="Scripts\jquery.json.min.js" />
+    <Content Include="Scripts\jquery.metisMenu.js" />
+    <Content Include="Scripts\jquery.metisMenu.min.js" />
+    <Content Include="Scripts\jquery.scrollintoview.js" />
+    <Content Include="Scripts\jquery.scrollintoview.min.js" />
     <Content Include="Scripts\jquery.slimscroll.js" />
     <Content Include="Scripts\jquery.slimscroll.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
@@ -639,6 +652,7 @@
     <Content Include="Scripts\serenity\Serenity.Script.Core.min.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
+    <Content Include="Scripts\site\BasicApplication.Script.js" />
     <Content Include="Scripts\SlickGrid\Controls\slick.columnpicker.js" />
     <Content Include="Scripts\SlickGrid\Controls\slick.pager.js" />
     <Content Include="Scripts\SlickGrid\Plugins\slick.autotooltips.js" />
@@ -694,6 +708,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Common\Dashboard\DashboardPage.cs" />
+    <Compile Include="Modules\Common\Navigation\NavigationCategories.cs" />
+    <Compile Include="Modules\Common\Navigation\NavigationModel.cs" />
     <Compile Include="Modules\Membership\Account\AccountPage.cs" />
     <Compile Include="Modules\Administration\User\AuthorizationService.cs" />
     <Compile Include="Modules\Administration\User\PermissionService.cs" />
@@ -713,6 +730,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Texts\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -729,7 +747,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>55508</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:55508/</IISUrl>
+          <IISUrl>http://localhost/basic</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -119,7 +119,7 @@ namespace Serenity
                         {
                             text = ((DescriptionAttribute)attributes[0]).Description;
                             Dependency.Resolve<ILocalTextProvider>().Add(
-                                new LocalTextEntry(LocalText.DefaultLanguageID, key, text), false);
+                                new LocalTextEntry(LocalText.InvariantLanguageID, key, text), false);
                         }
                     }
                 }

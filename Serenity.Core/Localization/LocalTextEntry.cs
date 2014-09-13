@@ -6,7 +6,7 @@ namespace Serenity.Localization
     {
         /// <summary>
         ///   Language ID</summary>
-        public readonly Int64 LanguageID;
+        public readonly string LanguageID;
         /// <summary>
         ///   Text key</summary>
         public readonly string Key;
@@ -22,7 +22,7 @@ namespace Serenity.Localization
         ///   Text key</param>
         /// <param name="text">
         ///   Local text</param>
-        public LocalTextEntry(Int64 languageID, string key, string text)
+        public LocalTextEntry(string languageID, string key, string text)
         {
             LanguageID = languageID;
             Key = key;

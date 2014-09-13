@@ -68,14 +68,6 @@ namespace Serenity
             SaveRequest<TEntity> req = new SaveRequest<TEntity>();
             req.Entity = entity;
 
-            if (!this.IsEditMode)
-            {
-                // TODO: attachments
-                //AttachmentEntity[] att = this.GetPendingAttachments();
-                //if (att != null)
-                //    ((SaveRequest)(object)req).Attachments = this.GetPendingAttachments();
-            }
-
             return req;
         }
 

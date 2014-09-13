@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using Serenity.Localization;
+using System.Globalization;
 
 namespace Serenity.Web
 {
@@ -57,12 +58,12 @@ namespace Serenity.Web
         {
             var provider = Dependency.Resolve<ILocalTextProvider>() as LocalTextRegistry;
 
-            long languageId = provider == null ? 0: provider.ContextLanguageID;
+            string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
             bool isPending = provider != null && provider.ContextIsApprovalMode;
-            string scriptName = LocalTextScript.GetScriptName(package, (int)languageId, isPending);
+            string scriptName = LocalTextScript.GetScriptName(package, languageId, isPending);
             DynamicScriptManager.IfNotRegistered(scriptName, () =>
             {
-                var script = new LocalTextScript(package, (int)languageId, isPending);
+                var script = new LocalTextScript(package, (string)languageId, isPending);
                 DynamicScriptManager.Register(script);
             });
 

@@ -1,10 +1,15 @@
 ﻿using Serenity.Abstractions;
 using Serenity.Caching;
+using Serenity.Configuration;
 using Serenity.Extensibility;
 using Serenity.Localization;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web.Compilation;
+using System.Web.Hosting;
 
 namespace Serenity.Web
 {
@@ -43,6 +48,8 @@ namespace Serenity.Web
             NestedLocalTextRegistration.Initialize();
             EnumLocalTexts.Initialize(ExtensibilityHelper.SelfAssemblies);
             EntityLocalTexts.Initialize();
+            NestedLocalTextRegistration.AddFromScripts(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));
+            NestedLocalTextRegistration.AddFromScripts(HostingEnvironment.MapPath("~/Scripts/site/texts/"));
 
             RunStartupRegistrars<EnumRegistrarAttribute>();
             RunStartupRegistrars<ScriptRegistrarAttribute>();

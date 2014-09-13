@@ -42,9 +42,6 @@ namespace Serenity
             var finalOptions = jQuery.ExtendObject(
                 baseOptions, thisOptions);
 
-            //if (Entity._deleteHandler != null)
-            //    EntityObject._deleteHandler(this, finalOptions, callback);
-            //else
             DeleteHandler(finalOptions, callback);
         }
 

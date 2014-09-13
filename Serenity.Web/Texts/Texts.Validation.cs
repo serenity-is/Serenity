@@ -4,26 +4,26 @@
     {
         public static class Validation
         {
-            public static LocalText CaptchaMismatch = "Doğru kod girilmelidir. Eğer karakterleri göremiyorsanız, resme tıklayarak yeni bir tane ürettirebilirsiniz.";
-            public static LocalText DayHourAndMin = "Lütfen geçerli bir süre giriniz (2.15:30 gibi)";
-            public static LocalText Decimal = "Lütfen geçerli bir sayısal değer giriniz.";
-            public static LocalText Digits = "Lütfen sadece rakam giriniz.";
-            public static LocalText Email = "Lütfen geçerli bir e-posta adresi giriniz.";
-            public static LocalText EmailMultiple = "Lütfen geçerli bir e-posta adresi giriniz (birden fazlaysa ';' ile ayırınız)";
-            public static LocalText EmailExists = "Bu e-posta adresiyle kaydolmuş bir kullanıcı var. Eğer şifrenizi hatırlamıyorsanız, şifremi unuttum formunu kullanınız.";
-            public static LocalText HourAndMin = "Lütfen geçerli bir zaman giriniz (15:30 gibi)";
-            public static LocalText Required = "Bu alan zorunludur.";
-            public static LocalText PasswordConfirm = "Girilen şifreler birbirini tutmuyor.";
-            public static LocalText DateInvalid = "Lütfen geçerli bir tarih giriniz.";
-            public static LocalText IncorrectPassword = "Girilen şifre hatalı. Kontrol ediniz.";
-            public static LocalText Integer = "Lütfen geçerli bir tamsayı değeri giriniz.";
-            public static LocalText MaxLength = "Lütfen en fazla {0} karakter giriniz.";
-            public static LocalText MinLength = "Lütfen en az {0} karakter giriniz.";
-            public static LocalText Range = "Lütfen {0} ile {1} arasında bir değer giriniz.";
-            public static LocalText Url = "Lütfen geçerli bir URL giriniz (http://www.site.com formatında).";
-            public static LocalText Username = "Kullanıcı adı '@' karakteri içeremez.";
-            public static LocalText UsernameExists = "Bu kullanıcı adı müsait değil. Lütfen başka bir ad seçiniz.";
-            public static LocalText Xss = "Geçersiz değer! ('&lt;' ve '&amp;' kullanmayın)";
+            public static LocalText CaptchaMismatch = "Incorrect code entered. You can generate a new one by clicking image, if you can't see the characters clearly.";
+            public static LocalText DayHourAndMin = "Please enter a valid timespan (e.g. 2.15:30)";
+            public static LocalText DateInvalid = "Please enter a valid date.";
+            public static LocalText Decimal = "Please enter a valid decimal value.";
+            public static LocalText Digits = "Please only use digits 0-9.";
+            public static LocalText Email = "Please enter a valid e-mail address.";
+            public static LocalText EmailMultiple = "Please enter a valid e-mail address (if more than one, use ';' as separator)";
+            public static LocalText EmailExists = "There is another user registered with this e-mail address. If you don't remember your password, use the forgot my password form.";
+            public static LocalText HourAndMin = "Please enter a valid time (e.g. 15:30)";
+            public static LocalText IncorrectPassword = "Incorrect password. Please check.";
+            public static LocalText Integer = "Please enter a valid integer value.";
+            public static LocalText MaxLength = "Please enter no more than {0} characters.";
+            public static LocalText MinLength = "Please enter no less than {0} characters.";
+            public static LocalText PasswordConfirm = "Password entered don't match.";
+            public static LocalText Required = "This field is required.";
+            public static LocalText Range = "Please enter a value between {0} and {1}.";
+            public static LocalText Url = "Please enter a valid URL (e.g. http://www.site.com).";
+            public static LocalText Username = "Not a valid username.";
+            public static LocalText UsernameExists = "This username is already used. Please choose another.";
+            public static LocalText Xss = "Invalid value! (don't use '&lt;' and '&amp;')";
         }
     }
 }

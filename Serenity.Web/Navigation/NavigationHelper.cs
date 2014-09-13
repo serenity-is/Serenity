@@ -1,4 +1,6 @@
-﻿namespace Serenity.Navigation
+﻿[assembly: Serenity.Navigation.NavigationLink(91000, "Administration/User", url: "~/Administration/User", permission: null, icon: null)]
+
+namespace Serenity.Navigation
 {
     using Serenity.Extensibility;
     using System;
@@ -6,19 +8,27 @@
     using System.Linq;
     using System.Web.Hosting;
 
+    
+
     public class NavigationHelper
     {
         public static List<NavigationItem> GetNavigationItems(Func<string, string> resolveUrl = null)
         {
             var result = new List<NavigationItem>();
             var menuItems = GetNavigationItemAttributes();
+            var remaining = new HashSet<NavigationItemAttribute>();
+            foreach (var item in menuItems)
+                foreach (var value in item)
+                    remaining.AddRange(value);
 
-            foreach (var menu in menuItems[null])
+            Action<NavigationItemAttribute> processMenu = menu =>
             {
+                remaining.Remove(menu);
+
                 var section = new NavigationItem
                 {
                     Title = menu.Title,
-                    Url = resolveUrl != null ? resolveUrl(menu.Url) : menu.Url,
+                    Url = (!string.IsNullOrEmpty(menu.Url) && resolveUrl != null) ? resolveUrl(menu.Url) : menu.Url,
                     IconClass = menu.IconClass.TrimToNull()
                 };
 
@@ -28,6 +38,8 @@
                 var children = menuItems[menu.Title.TrimToNull() ?? "???"];
                 foreach (var child in children)
                 {
+                    remaining.Remove(child);
+
                     if (child.Url.IsEmptyOrNull())
                         continue;
 
@@ -38,7 +50,7 @@
                     section.Children.Add(new NavigationItem
                     {
                         Title = child.Title,
-                        Url = resolveUrl != null ? resolveUrl(child.Url) : child.Url,
+                        Url = (!string.IsNullOrEmpty(child.Url) && resolveUrl != null) ? resolveUrl(child.Url) : child.Url,
                         IconClass = child.IconClass.TrimToNull(),
                     });
                 }
@@ -47,6 +59,22 @@
                 {
                     result.Add(section);
                 }
+            };
+
+            foreach (var menu in menuItems[null])
+                processMenu(menu);
+
+            while (remaining.Count > 0)
+            {
+                var first = remaining.FirstOrDefault();
+                remaining.Remove(first);
+                if (!first.Category.IsEmptyOrNull())
+                {
+                    var menu = new NavigationMenuAttribute(Int32.MaxValue, first.Category);
+                    processMenu(menu);
+                }
+                else
+                    processMenu(first);
             }
 
             return result;
@@ -54,7 +82,7 @@
 
         private static ILookup<string, NavigationItemAttribute> GetNavigationItemAttributes()
         {
-            return LocalCache.Get("LeftNavigationModel:MenuItems", CacheExpiration.Never, () =>
+            return LocalCache.Get("NavigationHelper:NavigationItems", CacheExpiration.Never, () =>
             {
                 var list = new List<NavigationItemAttribute>();
 

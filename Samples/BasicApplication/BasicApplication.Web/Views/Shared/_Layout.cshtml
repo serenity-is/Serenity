@@ -14,7 +14,7 @@
     @RenderSection("Head", false)
     <title>@ViewBag.Title</title>
 </head>
-<body id="s-@(ViewBag.PageId)Page" class="@(hideNav ? "no-navigation" : "")">
+<body id="s-@(ViewBag.PageId)Page" class="@(hideNav ? " no-navigation" : "has-layout-event")">
 @if (hideNav)
 {
     <script type="text/javascript">
@@ -30,38 +30,92 @@
 }
 else
 {
-<div class="page-container page-container-common">
-    <div class="page-left-navigation-wrapper">
-        <div class="page-left-navigation">
-                <ul class="page-left-navigation-menu" data-auto-scroll="false" data-auto-speed="200">
-                    <li class="search-wrapper">
-                        <div class="search">
-                            <input id="leftNavigationSearch" type="text" class="form-control" placeholder="Search...">
-                        </div>
-                    </li>
-                    @{Html.RenderPartial("~/Views/Shared/LeftNavigation.cshtml", new LeftNavigationModel((string)ViewData["NavigationPath"]));}
-                </ul>
+    <div id="wrapper">
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">Sample Site</a>
+            </div>
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user fa-fw"></i>
+                        @Serenity.Authorization.Username
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li>
+                            <a href="~/Account/Signout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-search">
+                    <div class="input-group custom-search-form">
+                        <input type="text" class="form-control" placeholder="Search...">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        @{Html.RenderPartial("~/Views/Shared/LeftNavigation.cshtml", new BasicApplication.Navigation.NavigationModel()); }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div id="page-content" class="page-content">
+                        @RenderBody()
+                    </div>
+                </div>
             </div>
         </div>
-    <div class="page-content-wrapper">
-        <div class="page-content">
-            @RenderBody()
 
-            <script type="text/javascript">
-                $().ready(function () {
-                    @RenderSection("PageInitScript", false)
-                });
-            </script>
-        </div>
     </div>
-</div>
-    
-<div class="page-footer">
-	<div class="page-footer-inner">
-		 &copy; Some Company
-	</div>
-</div>
-  
+    <script type="text/javascript">
+    $().ready(function () {
+        $('#side-menu').metisMenu();
+        
+        $(window).bind("load resize", function() {
+            topOffset = 50;
+            width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
+            if (width < 768) {
+                $('div.navbar-collapse').addClass('collapse')
+                topOffset = 100; // 2-row-menu
+            } else {
+                $('div.navbar-collapse').removeClass('collapse')
+            }
+
+            height = (this.window.innerHeight > 0) ? this.window.innerHeight : this.screen.height;
+            height = height - topOffset;
+            if (height < 1) height = 1;
+            if (height > topOffset) {
+                $("#page-wrapper").css("min-height", (height) + "px");
+            }
+
+            if ($('body').hasClass('full-height-page'))
+                $('#page-content').css("height", height + "px");
+
+            $('body').triggerHandler('layout');
+        });
+        @RenderSection("PageInitScript", false)
+    });
+    </script>
 }
 </body>
 </html>

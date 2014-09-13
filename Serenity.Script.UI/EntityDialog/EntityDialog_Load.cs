@@ -50,15 +50,12 @@ namespace Serenity
                 this.EntityId = (long?)(entity.As<JsDictionary>()[idField]).ConvertToId();
 
             this.Entity = entity;
-            //SetInputsDisabled(this.Form[0], Type.GetField(ent, "IsActive") == (object)false);
 
             if (this.propertyGrid != null)
             {
                 this.propertyGrid.Mode = this.IsEditMode ? PropertyGridMode.Update : PropertyGridMode.Insert;
                 this.propertyGrid.Load(entity);
             }
-
-            //this.ResetValidation();
         }
 
         protected virtual void BeforeLoadEntity(TEntity entity)
@@ -67,9 +64,6 @@ namespace Serenity
 
         protected virtual void AfterLoadEntity()
         {
-            // TODO: düzelt
-            //AfterLoadEntity_AttachmentPanel();
-            //AfterLoadEntity_AuditLogPanel();
             UpdateInterface();
             UpdateTitle();
         }
@@ -128,9 +122,6 @@ namespace Serenity
             var thisOptions = GetLoadByIdOptions(id, callback);
             var finalOptions = jQuery.ExtendObject(baseOptions, thisOptions);
 
-            //if (EntityObject != null && EntityObject._loadByIdHandler != null)
-            //    EntityObject._loadByIdHandler(this, finalOptions, callback);
-            //else
             LoadByIdHandler(finalOptions, callback);
         }
 

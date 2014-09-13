@@ -10,7 +10,7 @@ namespace Serenity.Localization
 
     public static class EntityLocalTexts
     {
-        public static void Initialize(long languageID = LocalText.DefaultLanguageID)
+        public static void Initialize(string languageID = LocalText.InvariantLanguageID)
         {
             var provider = Dependency.Resolve<ILocalTextProvider>();
 

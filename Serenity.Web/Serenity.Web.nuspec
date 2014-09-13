@@ -45,6 +45,10 @@
     <file src="..\..\Includes\Content\**\*.png" target="content\Content" />
     <file src="..\..\Includes\Content\**\*.gif" target="content\Content" />
     <file src="..\..\Includes\Content\**\*.jpg" target="content\Content" />
+    <file src="..\..\Includes\Fonts\**\*.eot" target="content\fonts" />
+    <file src="..\..\Includes\Fonts\**\*.svg" target="content\fonts" />
+    <file src="..\..\Includes\Fonts\**\*.ttf" target="content\fonts" />
+    <file src="..\..\Includes\Fonts\**\*.woff" target="content\fonts" />
     <file src="..\..\Includes\Scripts\**\*.js" target="content\Scripts" />
     <file src="serenity.css" target="content/Content/serenity" />
     <file src="..\..\Style\images\*.png" target="content/Content/serenity/images" />

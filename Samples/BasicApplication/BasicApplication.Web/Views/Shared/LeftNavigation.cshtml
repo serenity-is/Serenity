@@ -1,30 +1,30 @@
-﻿@model Marmara.LeftNavigationModel
+﻿@model BasicApplication.Navigation.NavigationModel
 
 @{
-    var activeSection = -1; 
+    var activeSection = -1;
     var activeLink = -1;
     var bestSection = -1;
     var bestLink = -1;
     var bestMatchLength = 0;
     var i = 0;
     var currentUrl = "";
-    if (HttpContext.Current != null) {
+    if (HttpContext.Current != null)
+    {
         currentUrl = HttpContext.Current.Request.Url.ToString();
     }
-    
+
     foreach (var section in Model.Items)
     {
         <li id="LeftNavigationSection_@i">
 	        <a href="@(section.Url ?? "javascript:;")">
-	        <i class="@(section.IconClass ?? (section.Children.Count > 0 ? "fa icon-layers" : "fa icon-none"))"></i>
-	        <span class="title">@(section.Title)</span>
-            <span class=""></span>
-	        <span class="@(section.Children.Count > 0 ? "arrow" : "")"></span>
+                <span class="sidebar-nav-item-icon @(section.IconClass ?? (section.Children.Count > 0 ? "fa icon-layers" : "fa icon-none"))"></span>
+                <span class="sidebar-nav-item">@(section.Title)</span>
+                <span class="fa arrow"></span>
 	        </a>
 
             @if (section.Children.Count > 0)
             {
-            <ul class="sub-menu">
+            <ul class="nav nav-second-level">
             @{var l = 0;}
 
             @foreach (var link in section.Children)
@@ -51,16 +51,14 @@
                 {
                     target += " target=" + target;
                 }
-                   
+
                 <li id="LeftNavigationLink_@(i)_@(l)">
-	                <a href="@(!String.IsNullOrEmpty(url) ? url : "javascript:;")">
-	                <i class="@(link.IconClass ?? "fa icon-none")"></i>
-	                <span class="title">@(link.Title)</span>
-	                <span class=""></span>
-                    <span class=""></span>
-	                </a>                
+                    <a href="@(link.Url ?? "javascript:;")">
+                        <span class="sidebar-nav-item-icon @(link.IconClass ?? (link.Children.Count > 0 ? "fa icon-layers" : "fa icon-none"))"></span>
+                        @(link.Title)
+                    </a>
                 </li>
-            
+
                 l++;
             }
             </ul>
@@ -91,8 +89,6 @@
         else {
             section.children('a').children('span').eq(1).addClass('selected');
         }
-        
-        //$('#left-navigation').accordion({ active: @(activeSection) });
     });
 
     function openWindow(url, width, height) {
@@ -103,10 +99,5 @@
         var winPopup = window.open(url, "", "status=0, toolbar=0, width=" + width + ", height=" + height + 
             ", scrollbars=1, resizable=yes, left=" + x + ", top=" + y);
     }
-
-    jQuery(function () {
-        new Marmara.LeftNavigation.Search($('.page-sidebar-menu'));
-    });
-
 </script>
 }

@@ -47,7 +47,11 @@ namespace Serenity
                 gridDiv.TriggerHandler("layout");
             };
 
-            if (Window.Instance.As<dynamic>().Metronic != null)
+            if (J("body").HasClass("has-layout-event"))
+            {
+                J("body").Bind("layout", layout);
+            }
+            else if (Window.Instance.As<dynamic>().Metronic != null)
                 Window.Instance.As<dynamic>().Metronic.addResizeHandler(layout);
             else
             {

@@ -6,7 +6,7 @@ namespace Serenity
 
     public class LocalText
     {
-        public const long DefaultLanguageID = default(long);
+        public const string InvariantLanguageID = "";
         public static LocalText Empty;
 
         private string key;

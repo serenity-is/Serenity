@@ -1,0 +1,1 @@
+﻿[assembly: Serenity.Navigation.NavigationMenu(95000, "Administration", icon: "icon-screen-desktop")]

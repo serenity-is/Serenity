@@ -71,11 +71,12 @@ namespace Serenity
         protected virtual string GetEntityTitle()
         {
             if (!(this.IsEditMode))
-                return "Yeni " + GetEntitySingular();
+                return String.Format(Texts.Controls.EntityDialog.NewRecordTitle, GetEntitySingular());
             else
             {
                 string title = (GetEntityNameFieldValue() ?? "");
-                return GetEntitySingular() + " Düzenleme" + (title.IsEmptyOrNull() ? "" : " (" + title + ")");
+                return String.Format(Texts.Controls.EntityDialog.EditRecordTitle, GetEntitySingular(),
+                    (title.IsEmptyOrNull() ? "" : " (" + title + ")"));
             }
         }
 
@@ -84,19 +85,6 @@ namespace Serenity
             if (!isPanel)
                 element.Dialog().Title = GetEntityTitle();
         }
-
-        /*
-        protected void SetInputsDisabled(Element container, bool isDisabled)
-        {
-            Query inputs = J.Query(container)
-                .find(":input")
-                .not(".readonly");
-
-            if (isDisabled)
-                inputs.attr("disabled", "disabled");
-            else
-                inputs.removeAttr("disabled");
-        }*/
 
         protected override string GetTemplateName()
         {

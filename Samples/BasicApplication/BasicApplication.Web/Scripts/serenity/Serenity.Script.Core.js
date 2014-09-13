@@ -225,7 +225,10 @@
 			$Q.layoutFillHeight(gridDiv);
 			gridDiv.triggerHandler('layout');
 		};
-		if (!!ss.isValue(window.window.Metronic)) {
+		if ($('body').hasClass('has-layout-event')) {
+			$('body').bind('layout', layout);
+		}
+		else if (!!ss.isValue(window.window.Metronic)) {
 			window.window.Metronic.addResizeHandler(layout);
 		}
 		else {
