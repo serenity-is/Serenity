@@ -1,0 +1,54 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>BasicApplication.Script</Name>
+    <Description>&lt;No description available&gt;</Description>
+    <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>BasicApplication.Script</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <Icon>__TemplateIcon.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <Project TargetFileName="BasicApplication.Script.csproj" File="BasicApplication.Script.csproj" ReplaceParameters="true">
+      <Folder Name="Administration" TargetFolderName="Administration">
+        <Folder Name="User" TargetFolderName="User">
+          <ProjectItem ReplaceParameters="true" TargetFileName="UserDialog.cs">UserDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="UserGrid.cs">UserGrid.cs</ProjectItem>
+        </Folder>
+      </Folder>
+      <Folder Name="Imports" TargetFolderName="Imports">
+        <Folder Name="FormContexts" TargetFolderName="FormContexts">
+          <ProjectItem ReplaceParameters="false" TargetFileName="FormContexts.tt">FormContexts.tt</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserForm.cs">Administration.UserForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="false" TargetFileName="FormContexts.log">FormContexts.log</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginForm.cs">Membership.LoginForm.cs</ProjectItem>
+        </Folder>
+        <ProjectItem ReplaceParameters="false" TargetFileName="MultipleOutputHelper.ttinclude">MultipleOutputHelper.ttinclude</ProjectItem>
+        <Folder Name="ServiceContracts" TargetFolderName="ServiceContracts">
+          <ProjectItem ReplaceParameters="false" TargetFileName="ServiceContracts.tt">ServiceContracts.tt</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserRow.cs">Administration.UserRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginRequest.cs">Membership.LoginRequest.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="false" TargetFileName="ServiceContracts.log">ServiceContracts.log</ProjectItem>
+        </Folder>
+        <Folder Name="ServiceEndpoints" TargetFolderName="ServiceEndpoints">
+          <ProjectItem ReplaceParameters="false" TargetFileName="ServiceEndpoints.tt">ServiceEndpoints.tt</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="ServiceEndpoints.cs">ServiceEndpoints.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="false" TargetFileName="ServiceEndpoints.log">ServiceEndpoints.log</ProjectItem>
+        </Folder>
+      </Folder>
+      <Folder Name="Membership" TargetFolderName="Membership">
+        <ProjectItem ReplaceParameters="true" TargetFileName="LoginPanel.cs">LoginPanel.cs</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="packages.config">packages.config</ProjectItem>
+      <Folder Name="Properties" TargetFolderName="Properties">
+        <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
+      </Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="ScriptInitialization.cs">ScriptInitialization.cs</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>

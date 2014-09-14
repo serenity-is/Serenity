@@ -17,15 +17,16 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
-    <file src="Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
+    <file src="..\..\Readme.CodeGenerator.txt" target="content\Readme.CodeGenerator.txt" />
+    <file src="Serenity.CodeGenerator.exe" target="tools\sergen.exe" />
     <file src="Newtonsoft.Json.dll" target="tools" />
     <file src="RazorGenerator.Templating.dll" target="tools" />
     <file src="Serenity.Core.dll" target="tools" />
     <file src="Serenity.Data.dll" target="tools" />
     <file src="Serenity.Data.Entity.dll" target="tools" />
     <file src="System.Data.SQLite.dll" target="tools" />
-    <file src="x86/SQLite.Interop.dll" target="tools/x86" />
-    <file src="x64/SQLite.Interop.dll" target="tools/x64" />
+    <file src="x86/SQLite.Interop.dll" target="tools\x86" />
+    <file src="x64/SQLite.Interop.dll" target="tools\x64" />
+    <file src="..\..\Includes\tools\**\*.*" target="content\tools" />
   </files>
 </package>

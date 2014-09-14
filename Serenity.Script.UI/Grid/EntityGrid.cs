@@ -119,7 +119,7 @@ namespace Serenity
 
         protected override string GetAddButtonCaption()
         {
-            return "Yeni " + GetEntitySingular();
+            return String.Format(Texts.Controls.EntityGrid.NewButton, GetEntitySingular());
         }
 
         protected override List<ToolButton> GetButtons()
@@ -147,7 +147,7 @@ namespace Serenity
 
             return new ToolButton
             {
-                Title = "Yenile",
+                Title = Texts.Controls.EntityGrid.RefreshButton,
                 CssClass = "refresh-button",
                 OnClick = delegate
                 {
@@ -240,7 +240,7 @@ namespace Serenity
                     }
 
                     if (dialogType == null)
-                        throw new Exception(typeName + " dialog sınıfı bulunamadı!");
+                        throw new Exception(typeName + " dialog class is not found!");
 
                     entityDialogType = dialogType;
                 }              

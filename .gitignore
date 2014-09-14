@@ -17,5 +17,5 @@ CodeGenerator/app.config
 Build/
 /Bin/
 Samples/BasicApplication/packages/
-Samples/BasicApplication/BasicApplication.Web/bin
-Samples/BasicApplication/BasicApplication.Web/App_Data/
+Samples/BasicApplication/BasicApplication/BasicApplication.Web/bin
+Samples/BasicApplication/BasicApplication/BasicApplication.Web/App_Data/

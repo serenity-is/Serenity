@@ -6,8 +6,6 @@
     using System.Linq;
     using System.Web.Hosting;
 
-    
-
     public class NavigationHelper
     {
         public static List<NavigationItem> GetNavigationItems(Func<string, string> resolveUrl = null)

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicApplication.Web", "BasicApplication.Web\BasicApplication.Web.csproj", "{E298DC33-D240-4585-AC47-775575246780}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicApplication.Web", "BasicApplication\BasicApplication.Web\BasicApplication.Web.csproj", "{E298DC33-D240-4585-AC47-775575246780}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicApplication.Script", "BasicApplication.Script\BasicApplication.Script.csproj", "{A0098374-9055-40BA-9F81-1C73AE7F3670}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicApplication.Script", "BasicApplication\BasicApplication.Script\BasicApplication.Script.csproj", "{A0098374-9055-40BA-9F81-1C73AE7F3670}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

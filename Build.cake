@@ -149,7 +149,6 @@ Task("NuGet")
     myPack("Serenity.Services");
     myPack("Serenity.Services.Mvc");
     myPack("Serenity.Reporting");
-    myPack("Serenity.Web");
     myPack("Serenity.CodeGeneration");
     myPack("Serenity.CodeGeneration.Mvc");
     myPack("Serenity.Testing");
@@ -157,7 +156,8 @@ Task("NuGet")
     myPack("Serenity.Script.Imports");
     myPack("Serenity.Script.Core");
     myPack("Serenity.Script.UI");
-    
+
+    myPack("Serenity.Web");
     myPack("Serenity.CodeGenerator");
 });
 

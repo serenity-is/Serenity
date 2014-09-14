@@ -74,6 +74,8 @@
     <Compile Include="SlickGrid\LazyLoadHelper.cs" />
     <Compile Include="SlickGrid\SlickColumnHelper.cs" />
     <Compile Include="SlickGrid\SlickFormatting.cs" />
+    <Compile Include="Texts\Texts.Controls.Pager.cs" />
+    <Compile Include="Texts\Texts.Controls.EntityGrid.cs" />
     <Compile Include="Texts\Texts.cs" />
     <Compile Include="Texts\Texts.Controls.EntityDialog.cs" />
     <Compile Include="Texts\Texts.Dialogs.cs" />
@@ -115,10 +117,8 @@
     <None Include="Resources\linq.js" />
     <None Include="Resources\mscorlib.js" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="(!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')) And (!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets'))" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="(Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')) And (!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets'))" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets')" />
-  <Target Name="CopyAndMinimize" AfterTargets="AfterBuild">
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets" />
+  <Target Name="MinimizeScripts" AfterTargets="BuildScript">
     <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.js" DestinationFolder="$(OutDir)">
     </Copy>
     <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.Slick.js" DestinationFolder="$(OutDir)">

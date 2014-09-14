@@ -1,0 +1,103 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.Core.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.Munq.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.CodeGeneration.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.CodeGeneration.Mvc.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\Serenity.Web.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\bin\BasicApplication.Web.dll" #>
+<#@ assembly name="$(SolutionDir)\BasicApplication.Web\tools\Mono.Cecil\Mono.Cecil.dll" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Serenity" #>
+<#@ import namespace="Serenity.Reflection" #>
+<#@ import namespace="Serenity.CodeGeneration" #>
+<#@ include file="..\MultipleOutputHelper.ttinclude" #>
+<#@ output extension=".log" #>
+<# 
+	var container = new Serenity.MunqContainer();
+    Serenity.Dependency.SetResolver(container);
+    container.RegisterInstance<Serenity.Localization.ILocalTextProvider>(new Serenity.Localization.LocalTextRegistry());
+    var solutionDir = Host.ResolvePath(@"..\..\..");
+    var scriptAssembly1 =(solutionDir + @"\BasicApplication.Script\bin\debug\Serenity.Script.UI.dll");
+    var scriptAssembly2 =(solutionDir + @"\BasicApplication.Script\bin\debug\BasicApplication.Script.dll");
+
+    var widgetTypes1 = new ScriptWidgetTypeLister(scriptAssembly1).List();
+    var widgetTypes2 = new ScriptWidgetTypeLister(scriptAssembly2).List();
+    
+    var generator = new ScriptFormGenerator(typeof(BasicApplication.SiteInitialization).Assembly);
+    foreach (var wt in widgetTypes1.Keys)
+        generator.WidgetTypes.Add(wt);
+    foreach (var wt in widgetTypes2.Keys)
+        generator.WidgetTypes.Add(wt);
+    generator.RootNamespaces.Add("BasicApplication");
+    generator.GetTypeName = x => x.Name;
+    generator.GetNamespace = x => x.Namespace.EndsWith(".Forms") ? x.Namespace.Substring(0, x.Namespace.Length - ".Forms".Length) : x.Namespace;
+    var codes = generator.GenerateCode();
+    var manager = Manager.Create(Host, GenerationEnvironment);
+    foreach (var pair in codes) 
+    {
+        manager.StartNewFile(pair.Key);
+#>
+<#=pair.Value#>
+<# 
+        manager.EndBlock(); 
+    }
+    manager.Process(true);
+#>
+Executed on <#=DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")#>
+<#+
+public class ScriptWidgetTypeLister
+{
+    public ScriptWidgetTypeLister(string scriptAssembly)
+    {
+        if (scriptAssembly == null)
+            throw new ArgumentNullException("assembly");
+
+        var resolver = new Mono.Cecil.DefaultAssemblyResolver();
+        resolver.AddSearchDirectory(Path.GetDirectoryName(scriptAssembly)); 	
+        this.ScriptAssembly = Mono.Cecil.AssemblyDefinition.ReadAssembly(scriptAssembly, new Mono.Cecil.ReaderParameters { AssemblyResolver = resolver });
+    }
+    
+    private bool HasBaseType(Mono.Cecil.TypeDefinition type, string baseTypeFullName)
+    {
+        if (type.BaseType == null)
+            return false;
+            
+        if (type.BaseType.Namespace.StartsWith("System"))
+            return false;
+            
+        if (type.BaseType.FullName == baseTypeFullName)
+            return true;
+        else {
+            return HasBaseType(type.BaseType.Resolve(), baseTypeFullName);
+        }
+    }
+    
+    public Dictionary<string, Mono.Cecil.TypeDefinition> List()
+    {
+        var result = new Dictionary<string, Mono.Cecil.TypeDefinition>();
+        
+        foreach (var module in this.ScriptAssembly.Modules)
+        {
+            foreach (var type in module.Types)
+            {
+                if (type.IsAbstract)
+                    continue;
+                    
+                if (type.HasGenericParameters)
+                    continue;
+            
+                if (HasBaseType(type, "Serenity.Widget"))
+                    result.Add(type.FullName, type);
+            }
+        }
+        
+        return result;
+    }
+    
+    public Mono.Cecil.AssemblyDefinition ScriptAssembly { get; private set; }
+}
+#>
