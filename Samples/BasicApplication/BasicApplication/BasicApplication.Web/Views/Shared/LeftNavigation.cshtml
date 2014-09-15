@@ -80,7 +80,6 @@
 <script type="text/javascript">
     $(function() {
         var section = $('#LeftNavigationSection_' + (@activeSection)).addClass("active selected");
-        Q.notifySuccess("@activeSection");
         if (@activeLink != -1)
             $('#LeftNavigationLink_' + (@activeSection) + '_' + (@activeLink)).addClass("selected");
     });
