@@ -5,11 +5,12 @@
 }
 namespace @(Model.RootNamespace)@(dotModule).Forms
 {
-    using System;
     using Serenity;
     using Serenity.ComponentModel;
     using Serenity.Data;
+    using System;
     using System.Collections.Generic;
+    using System.IO;
 
     [FormScript("@(moduleDot)@(Model.ClassName)")]
     [BasedOnRow(typeof(Entities.@(Model.RowClassName)))]
