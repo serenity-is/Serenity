@@ -3,8 +3,7 @@
     <Name>BasicApplication.Web</Name>
     <Description>Serenity Basic Application Sample (Web Project)</Description>
     <ProjectType>CSharp</ProjectType>
-    <ProjectSubType>
-    </ProjectSubType>
+    <ProjectSubType></ProjectSubType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>$ext_projectname$.Web</DefaultName>
@@ -33,12 +32,12 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_454545_256x240.png">ui-icons_454545_256x240.png</ProjectItem>
           </Folder>
         </Folder>
-        <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-theme.css">bootstrap-theme.css</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-theme.css.map">bootstrap-theme.css.map</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-theme.min.css">bootstrap-theme.min.css</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap.css">bootstrap.css</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap.css.map">bootstrap.css.map</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap.min.css">bootstrap.min.css</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-theme.css">bootstrap-theme.css</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-theme.css.map">bootstrap-theme.css.map</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap-theme.min.css">bootstrap-theme.min.css</ProjectItem>
         <Folder Name="colorbox" TargetFolderName="colorbox">
           <Folder Name="images" TargetFolderName="images">
             <ProjectItem ReplaceParameters="false" TargetFileName="border.png">border.png</ProjectItem>
@@ -49,9 +48,9 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="jquery.colorbox.css">jquery.colorbox.css</ProjectItem>
         </Folder>
         <Folder Name="css" TargetFolderName="css">
-          <ProjectItem ReplaceParameters="false" TargetFileName="select2-spinner.gif">select2-spinner.gif</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="select2.css">select2.css</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="select2.png">select2.png</ProjectItem>
+          <ProjectItem ReplaceParameters="false" TargetFileName="select2-spinner.gif">select2-spinner.gif</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="select2x2.png">select2x2.png</ProjectItem>
         </Folder>
         <ProjectItem ReplaceParameters="true" TargetFileName="font-awesome.css">font-awesome.css</ProjectItem>
@@ -79,14 +78,14 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="accordion-right.png">accordion-right.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="add.png">add.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="add2.png">add2.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="address-book-open.png">address-book-open.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="address-book.png">address-book.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="address-book-open.png">address-book-open.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="agenda.png">agenda.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="alarm-clock-exclamation.png">alarm-clock-exclamation.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="alarm-clock.png">alarm-clock.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="alarm-clock-exclamation.png">alarm-clock-exclamation.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="application-resize.png">application-resize.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="application-resize-actual.png">application-resize-actual.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="application-resize-full.png">application-resize-full.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="application-resize.png">application-resize.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="apply-button.png">apply-button.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="apply-changes-button.png">apply-changes-button.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="arrow-circle-135.png">arrow-circle-135.png</ProjectItem>
@@ -104,33 +103,33 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="balloons.png">balloons.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="barcode.png">barcode.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="bell.png">bell.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="bin.png">bin.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="bin-exclamation.png">bin-exclamation.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="bin-minus.png">bin-minus.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="bin.png">bin.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="binocular.png">binocular.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="blank.gif">blank.gif</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="block.png">block.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="blog.png">blog.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="bomb.png">bomb.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="book-open.png">book-open.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="book.png">book.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="bookmark.png">bookmark.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="book-open.png">book-open.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="box.png">box.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="briefcase.png">briefcase.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="brightness-small-low.png">brightness-small-low.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="brightness-small.png">brightness-small.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="brightness-small-low.png">brightness-small-low.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="bug.png">bug.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="building.png">building.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="building-arrow.png">building-arrow.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="building-medium.png">building-medium.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="building-old.png">building-old.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="building.png">building.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="calculator.png">calculator.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="calculator2.png">calculator2.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="calculator3.png">calculator3.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="calendar.png">calendar.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="calendar-blue.png">calendar-blue.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="calendar-day.png">calendar-day.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="calendar-task.png">calendar-task.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="calendar.png">calendar.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="card-small.png">card-small.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="categories.png">categories.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="category.png">category.png</ProjectItem>
@@ -152,8 +151,8 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="control-record-small.png">control-record-small.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="counter.png">counter.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="credit-card.png">credit-card.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="cross-script.png">cross-script.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="cross.png">cross.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="cross-script.png">cross-script.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="csv.png">csv.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="currency.png">currency.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="cv.png">cv.png</ProjectItem>
@@ -166,18 +165,18 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="dialog-information.png">dialog-information.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="dialog-warning.png">dialog-warning.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="direction.png">direction.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="disk-arrow.png">disk-arrow.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="disk-black-accept.png">disk-black-accept.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="disk-black.png">disk-black.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="disk.png">disk.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="disk-arrow.png">disk-arrow.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="disk-black.png">disk-black.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="disk-black-accept.png">disk-black-accept.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="doc.png">doc.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="document.png">document.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="document-copy.png">document-copy.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="document-print-preview.png">document-print-preview.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="document-small-list.png">document-small-list.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="document-small.png">document-small.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="document-task.png">document-task.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="document.png">document.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="document-small-list.png">document-small-list.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="documents-stack.png">documents-stack.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="document-task.png">document-task.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="docx.png">docx.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="door.png">door.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="down.gif">down.gif</ProjectItem>
@@ -185,8 +184,8 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="dropdown.png">dropdown.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="edit.png">edit.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="envelope.png">envelope.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="eraser-plus.png">eraser-plus.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="eraser.png">eraser.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="eraser-plus.png">eraser-plus.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="exclamation.png">exclamation.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="eye.png">eye.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="feed.png">feed.png</ProjectItem>
@@ -200,20 +199,20 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="full-screen-2.png">full-screen-2.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="funnel.png">funnel.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="gear.png">gear.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="get-products.png">get-products.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="get.png">get.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="get-products.png">get-products.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="globe-small.png">globe-small.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="grid-title-bg.gif">grid-title-bg.gif</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="gtk-print-preview.png">gtk-print-preview.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="hammer-screwdriver.png">hammer-screwdriver.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="hammer.png">hammer.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="hammer-screwdriver.png">hammer-screwdriver.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="header-columns-bg.gif">header-columns-bg.gif</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="header-columns-over-bg.gif">header-columns-over-bg.gif</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="home.png">home.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="hourglass.png">hourglass.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="inbox-document-text.png">inbox-document-text.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="inbox-document.png">inbox-document.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="inbox.png">inbox.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="inbox-document.png">inbox-document.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="inbox-document-text.png">inbox-document-text.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="information-frame.png">information-frame.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="item.png">item.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="jpg.png">jpg.png</ProjectItem>
@@ -228,13 +227,13 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="location.png">location.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="lock.png">lock.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="luggage.png">luggage.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="magnifier-left.png">magnifier-left.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="magnifier-medium-left.png">magnifier-medium-left.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="magnifier-medium.png">magnifier-medium.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="magnifier-zoom.png">magnifier-zoom.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="magnifier.png">magnifier.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="mail-open.png">mail-open.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="magnifier-left.png">magnifier-left.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="magnifier-medium.png">magnifier-medium.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="magnifier-medium-left.png">magnifier-medium-left.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="magnifier-zoom.png">magnifier-zoom.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="mail.png">mail.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="mail-open.png">mail-open.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="maximize-button.png">maximize-button.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="maximize-button2.png">maximize-button2.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="medal.png">medal.png</ProjectItem>
@@ -245,10 +244,10 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="newspaper.png">newspaper.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="node-insert-next.png">node-insert-next.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="node-select-all.png">node-select-all.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="notebook-pencil.png">notebook-pencil.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="notebook-share.png">notebook-share.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="notebook.png">notebook.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="notebook-pencil.png">notebook-pencil.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="notebooks.png">notebooks.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="notebook-share.png">notebook-share.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="odata.png">odata.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="ok.png">ok.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="open-share.png">open-share.png</ProjectItem>
@@ -264,38 +263,38 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="pda.png">pda.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="pdf.png">pdf.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="pencil.png">pencil.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="picture-delete.png">picture-delete.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="picture.png">picture.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="picture-delete.png">picture-delete.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="pill.png">pill.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="pin.png">pin.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="pipette.png">pipette.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="place-empty.png">place-empty.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="plug.png">plug.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="plus-button.png">plus-button.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="plus-circle-false.png">plus-circle-false.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="plus-circle.png">plus-circle.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="plus-octagon-frame.png">plus-octagon-frame.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="plus.png">plus.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="plus-button.png">plus-button.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="plus-circle.png">plus-circle.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="plus-circle-false.png">plus-circle-false.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="plus-octagon-frame.png">plus-octagon-frame.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="png.png">png.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="price-tag.png">price-tag.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="printer.png">printer.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="product.png">product.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="project.png">project.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="projection-screen.png">projection-screen.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="projection-screen-presentation.png">projection-screen-presentation.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="project-logs.png">project-logs.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="project-module.png">project-module.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="project-version.png">project-version.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="project.png">project.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="projection-screen-presentation.png">projection-screen-presentation.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="projection-screen.png">projection-screen.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="property-blue.png">property-blue.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="property.png">property.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="property-blue.png">property-blue.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="question-frame.png">question-frame.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="receipt.png">receipt.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="report.png">report.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="report-arrow.png">report-arrow.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="report-excel.png">report-excel.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="report-minus.png">report-minus.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="report-pencil.png">report-pencil.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="report-plus.png">report-plus.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="report.png">report.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="ruby.png">ruby.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="ruler.png">ruler.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="safe.png">safe.png</ProjectItem>
@@ -303,50 +302,50 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="scissors.png">scissors.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="script.png">script.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="scripts-text.png">scripts-text.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="sitemap-application-blue.png">sitemap-application-blue.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="sitemap.png">sitemap.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="sitemap-application-blue.png">sitemap-application-blue.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="slash.png">slash.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="slick-header-columns-over-bg.gif">slick-header-columns-over-bg.gif</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="slides.png">slides.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="sofa.png">sofa.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="sort-order.png">sort-order.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="spreadsheet-template.png">spreadsheet-template.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="spreadsheet.png">spreadsheet.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="spreadsheet-template.png">spreadsheet-template.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="sprites.png">sprites.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="star-pencil.png">star-pencil.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="sticky-note-plus.png">sticky-note-plus.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="sticky-note-small-pin.png">sticky-note-small-pin.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="sticky-notes.png">sticky-notes.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="sticky-note-small.png">sticky-note-small.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="sticky-note-small-pin.png">sticky-note-small-pin.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="sticky-notes-pin.png">sticky-notes-pin.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="sticky-notes-stack.png">sticky-notes-stack.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="sticky-notes.png">sticky-notes.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="stock.png">stock.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="store.png">store.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="table.png">table.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="table-chart.png">table-chart.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="table-header.gif">table-header.gif</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="table-select-all.png">table-select-all.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="table.png">table.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="tag.png">tag.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="tag--arrow.png">tag--arrow.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="tag--exclamation.png">tag--exclamation.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="tag-label.png">tag-label.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="tag-plus.png">tag-plus.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="tag-small.png">tag-small.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="tag.png">tag.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="tags-label.png">tags-label.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="tags.png">tags.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="tags-label.png">tags-label.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="tag-small.png">tag-small.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="thumb-file-72.png">thumb-file-72.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="tick-empty.png">tick-empty.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="tick-green.png">tick-green.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="tick-red.png">tick-red.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="ticket-arrow.png">ticket-arrow.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="ticket-exclamation.png">ticket-exclamation.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="ticket-plus.png">ticket-plus.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="ticket-stub.png">ticket-stub.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="ticket-user.png">ticket-user.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="toggle-expand.png">toggle-expand.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="toggle-small-expand.png">toggle-small-expand.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="toggle-small.png">toggle-small.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="tick-green.png">tick-green.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="tick-red.png">tick-red.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="toggle.png">toggle.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="toggle-expand.png">toggle-expand.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="toggle-small.png">toggle-small.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="toggle-small-expand.png">toggle-small-expand.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="toolbar-bg.gif">toolbar-bg.gif</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="toolbox.png">toolbox.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="trash.gif">trash.gif</ProjectItem>
@@ -357,24 +356,24 @@
             <ProjectItem ReplaceParameters="false" TargetFileName="ui-radio-button-uncheck.png">ui-radio-button-uncheck.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="unchecked.gif">unchecked.gif</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="universal.png">universal.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="unlock-disable.png">unlock-disable.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="unlock.png">unlock.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="unlock-disable.png">unlock-disable.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="user.png">user.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="user-arrow.png">user-arrow.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="user-business.png">user-business.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="user-female.png">user-female.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="users.png">users.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="user-share.png">user-share.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="user-worker.png">user-worker.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="user.png">user.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="users.png">users.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="viewtree.png">viewtree.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="wall-brick.png">wall-brick.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="wand-plus.png">wand-plus.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="wand.png">wand.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="wand-plus.png">wand-plus.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="warning.png">warning.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="wheel.png">wheel.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="wooden-box.png">wooden-box.png</ProjectItem>
-            <ProjectItem ReplaceParameters="false" TargetFileName="wrench-screwdriver.png">wrench-screwdriver.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="wrench.png">wrench.png</ProjectItem>
+            <ProjectItem ReplaceParameters="false" TargetFileName="wrench-screwdriver.png">wrench-screwdriver.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="xls.png">xls.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="xlsx.png">xlsx.png</ProjectItem>
             <ProjectItem ReplaceParameters="false" TargetFileName="xml.png">xml.png</ProjectItem>
@@ -385,17 +384,17 @@
         </Folder>
         <ProjectItem ReplaceParameters="true" TargetFileName="simple-line-icons.css">simple-line-icons.css</ProjectItem>
         <Folder Name="site" TargetFolderName="site">
-          <ProjectItem ReplaceParameters="false" TargetFileName="site.layout.less">site.layout.less</ProjectItem>
-          <ProjectItem ReplaceParameters="false" TargetFileName="site.less">site.less</ProjectItem>
-          <ProjectItem ReplaceParameters="false" TargetFileName="site.mixins.less">site.mixins.less</ProjectItem>
-          <ProjectItem ReplaceParameters="false" TargetFileName="site.overrides.serenity.less">site.overrides.serenity.less</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="site.layout.less">site.layout.less</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="site.less">site.less</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="site.mixins.less">site.mixins.less</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="site.overrides.serenity.less">site.overrides.serenity.less</ProjectItem>
         </Folder>
-        <ProjectItem ReplaceParameters="true" TargetFileName="slick-default-theme.css">slick-default-theme.css</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="slick.columnpicker.css">slick.columnpicker.css</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="slick.grid.css">slick.grid.css</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="slick.headerbuttons.css">slick.headerbuttons.css</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="slick.headermenu.css">slick.headermenu.css</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="slick.pager.css">slick.pager.css</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="slick-default-theme.css">slick-default-theme.css</ProjectItem>
         <Folder Name="themes" TargetFolderName="themes">
           <Folder Name="base" TargetFolderName="base">
             <Folder Name="images" TargetFolderName="images">
@@ -414,7 +413,6 @@
               <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_888888_256x240.png">ui-icons_888888_256x240.png</ProjectItem>
               <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_cd0a0a_256x240.png">ui-icons_cd0a0a_256x240.png</ProjectItem>
             </Folder>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui.css">jquery-ui.css</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.accordion.css">jquery.ui.accordion.css</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.all.css">jquery.ui.all.css</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.autocomplete.css">jquery.ui.autocomplete.css</ProjectItem>
@@ -432,6 +430,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.tabs.css">jquery.ui.tabs.css</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.theme.css">jquery.ui.theme.css</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.tooltip.css">jquery.ui.tooltip.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui.css">jquery-ui.css</ProjectItem>
             <Folder Name="minified" TargetFolderName="minified">
               <Folder Name="images" TargetFolderName="images">
                 <ProjectItem ReplaceParameters="false" TargetFileName="animated-overlay.gif">animated-overlay.gif</ProjectItem>
@@ -449,7 +448,6 @@
                 <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_888888_256x240.png">ui-icons_888888_256x240.png</ProjectItem>
                 <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_cd0a0a_256x240.png">ui-icons_cd0a0a_256x240.png</ProjectItem>
               </Folder>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui.min.css">jquery-ui.min.css</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.accordion.min.css">jquery.ui.accordion.min.css</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.autocomplete.min.css">jquery.ui.autocomplete.min.css</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.button.min.css">jquery.ui.button.min.css</ProjectItem>
@@ -465,20 +463,21 @@
               <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.tabs.min.css">jquery.ui.tabs.min.css</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.theme.min.css">jquery.ui.theme.min.css</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.tooltip.min.css">jquery.ui.tooltip.min.css</ProjectItem>
+              <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui.min.css">jquery-ui.min.css</ProjectItem>
             </Folder>
           </Folder>
         </Folder>
         <ProjectItem ReplaceParameters="true" TargetFileName="toastr.css">toastr.css</ProjectItem>
-        <ProjectItem ReplaceParameters="false" TargetFileName="toastr.less">toastr.less</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="toastr.less">toastr.less</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="toastr.min.css">toastr.min.css</ProjectItem>
         <ProjectItem ReplaceParameters="false" TargetFileName="toastr.scss">toastr.scss</ProjectItem>
       </Folder>
       <Folder Name="fonts" TargetFolderName="fonts">
+        <ProjectItem ReplaceParameters="false" TargetFileName="FontAwesome.otf">FontAwesome.otf</ProjectItem>
         <ProjectItem ReplaceParameters="false" TargetFileName="fontawesome-webfont.eot">fontawesome-webfont.eot</ProjectItem>
         <ProjectItem ReplaceParameters="false" TargetFileName="fontawesome-webfont.svg">fontawesome-webfont.svg</ProjectItem>
         <ProjectItem ReplaceParameters="false" TargetFileName="fontawesome-webfont.ttf">fontawesome-webfont.ttf</ProjectItem>
         <ProjectItem ReplaceParameters="false" TargetFileName="fontawesome-webfont.woff">fontawesome-webfont.woff</ProjectItem>
-        <ProjectItem ReplaceParameters="false" TargetFileName="FontAwesome.otf">FontAwesome.otf</ProjectItem>
         <ProjectItem ReplaceParameters="false" TargetFileName="glyphicons-halflings-regular.eot">glyphicons-halflings-regular.eot</ProjectItem>
         <ProjectItem ReplaceParameters="false" TargetFileName="glyphicons-halflings-regular.svg">glyphicons-halflings-regular.svg</ProjectItem>
         <ProjectItem ReplaceParameters="false" TargetFileName="glyphicons-halflings-regular.ttf">glyphicons-halflings-regular.ttf</ProjectItem>
@@ -546,12 +545,6 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="bootstrap.min.js">bootstrap.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jlayout.border.js">jlayout.border.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jlayout.border.min.js">jlayout.border.min.js</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.intellisense.js">jquery-2.1.1.intellisense.js</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.js">jquery-2.1.1.js</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.min.js">jquery-2.1.1.min.js</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.min.map">jquery-2.1.1.min.map</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.10.4.js">jquery-ui-1.10.4.js</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.10.4.min.js">jquery-ui-1.10.4.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery.autoNumeric.js">jquery.autoNumeric.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery.autoNumeric.min.js">jquery.autoNumeric.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery.blockUI.js">jquery.blockUI.js</ProjectItem>
@@ -578,9 +571,15 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery.scrollintoview.min.js">jquery.scrollintoview.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery.slimscroll.js">jquery.slimscroll.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery.slimscroll.min.js">jquery.slimscroll.min.js</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery.validate-vsdoc.js">jquery.validate-vsdoc.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery.validate.js">jquery.validate.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery.validate.min.js">jquery.validate.min.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery.validate-vsdoc.js">jquery.validate-vsdoc.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.intellisense.js">jquery-2.1.1.intellisense.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.js">jquery-2.1.1.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.min.js">jquery-2.1.1.min.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.min.map">jquery-2.1.1.min.map</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.10.4.js">jquery-ui-1.10.4.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.10.4.min.js">jquery-ui-1.10.4.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="pace.js">pace.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="pace.min.js">pace.min.js</ProjectItem>
         <Folder Name="saltarelle" TargetFolderName="saltarelle">
@@ -589,6 +588,8 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="mscorlib.js">mscorlib.js</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="mscorlib.min.js">mscorlib.min.js</ProjectItem>
         </Folder>
+        <ProjectItem ReplaceParameters="true" TargetFileName="select2.js">select2.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="select2.min.js">select2.min.js</ProjectItem>
         <Folder Name="Select2-locales" TargetFolderName="Select2-locales">
           <ProjectItem ReplaceParameters="true" TargetFileName="select2_locale_ar.js">select2_locale_ar.js</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="select2_locale_az.js">select2_locale_az.js</ProjectItem>
@@ -637,8 +638,6 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="select2_locale_zh-CN.js">select2_locale_zh-CN.js</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="select2_locale_zh-TW.js">select2_locale_zh-TW.js</ProjectItem>
         </Folder>
-        <ProjectItem ReplaceParameters="true" TargetFileName="select2.js">select2.js</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="select2.min.js">select2.min.js</ProjectItem>
         <Folder Name="serenity" TargetFolderName="serenity">
           <ProjectItem ReplaceParameters="true" TargetFileName="Serenity.Externals.js">Serenity.Externals.js</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Serenity.Externals.min.js">Serenity.Externals.min.js</ProjectItem>
@@ -712,6 +711,7 @@
                 <ProjectItem ReplaceParameters="true" TargetFileName="rhino.js">rhino.js</ProjectItem>
                 <ProjectItem ReplaceParameters="true" TargetFileName="source-map-output.js">source-map-output.js</ProjectItem>
                 <ProjectItem ReplaceParameters="true" TargetFileName="to-css-visitor.js">to-css-visitor.js</ProjectItem>
+                <ProjectItem ReplaceParameters="true" TargetFileName="tree.js">tree.js</ProjectItem>
                 <Folder Name="tree" TargetFolderName="tree">
                   <ProjectItem ReplaceParameters="true" TargetFileName="alpha.js">alpha.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="anonymous.js">anonymous.js</ProjectItem>
@@ -736,15 +736,14 @@
                   <ProjectItem ReplaceParameters="true" TargetFileName="paren.js">paren.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="quoted.js">quoted.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="rule.js">rule.js</ProjectItem>
-                  <ProjectItem ReplaceParameters="true" TargetFileName="ruleset-call.js">ruleset-call.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="ruleset.js">ruleset.js</ProjectItem>
+                  <ProjectItem ReplaceParameters="true" TargetFileName="ruleset-call.js">ruleset-call.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="selector.js">selector.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="unicode-descriptor.js">unicode-descriptor.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="url.js">url.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="value.js">value.js</ProjectItem>
                   <ProjectItem ReplaceParameters="true" TargetFileName="variable.js">variable.js</ProjectItem>
                 </Folder>
-                <ProjectItem ReplaceParameters="true" TargetFileName="tree.js">tree.js</ProjectItem>
                 <ProjectItem ReplaceParameters="true" TargetFileName="visitor.js">visitor.js</ProjectItem>
               </Folder>
             </Folder>
@@ -773,40 +772,39 @@
       <ProjectItem ReplaceParameters="true" TargetFileName="Web.Release.config">Web.Release.config</ProjectItem>
     </Project>
   </TemplateContent>
-<WizardExtension>
-  <Assembly>NuGet.VisualStudio.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
-  <FullClassName>NuGet.VisualStudio.TemplateWizard</FullClassName>
-</WizardExtension>
-<WizardData>
-  <packages repository="extension" repositoryId="SerenityBasicApplicationSampleV1">
-    <package id="bootstrap" version="3.1.1" />
-    <package id="FontAwesome" version="4.1.0" />
-    <package id="jQuery" version="2.1.1" />
-    <package id="jquery.event.drag" version="2.2.0" />
-    <package id="jQuery.UI.Combined" version="1.10.4" />
-    <package id="jQuery.Validation" version="1.12.0" />
-    <package id="Microsoft.AspNet.Mvc" version="5.1.2" />
-    <package id="Microsoft.AspNet.Razor" version="3.1.2" />
-    <package id="Microsoft.AspNet.WebPages" version="3.1.2" />
-    <package id="Microsoft.Web.Infrastructure" version="1.0.0.0" />
-    <package id="Newtonsoft.Json" version="6.0.4" />
-    <package id="Select2.js" version="3.5.1" />
-    <package id="Serenity.Caching.Web" version="1.0.9" />
-    <package id="Serenity.CodeGeneration" version="1.0.9" />
-    <package id="Serenity.CodeGeneration.Mvc" version="1.0.9" />
-    <package id="Serenity.CodeGenerator" version="1.0.9" />
-    <package id="Serenity.Core" version="1.0.9" />
-    <package id="Serenity.Data" version="1.0.9" />
-    <package id="Serenity.Data.Entity" version="1.0.9" />
-    <package id="Serenity.Data.Filtering" version="1.0.9" />
-    <package id="Serenity.Munq" version="1.0.9" />
-    <package id="Serenity.Reporting" version="1.0.9" />
-    <package id="Serenity.Services" version="1.0.9" />
-    <package id="Serenity.Services.Mvc" version="1.0.9" />
-    <package id="Serenity.Web" version="1.0.9" />
-    <package id="SlickGrid" version="2.2.20140120" />
-    <package id="toastr" version="2.0.3" />
-    <package id="Newtonsoft.Json" version="5.0.6" />
-  </packages>
-</WizardData>
+  <WizardExtension>
+    <Assembly>NuGet.VisualStudio.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>NuGet.VisualStudio.TemplateWizard</FullClassName>
+  </WizardExtension>
+  <WizardData>
+    <packages repository="extension" repositoryId="SerenityBasicApplicationSampleV1">
+      <package id="bootstrap" version="3.1.1" />
+      <package id="FontAwesome" version="4.1.0" />
+      <package id="jQuery" version="2.1.1" />
+      <package id="jquery.event.drag" version="2.2.0" />
+      <package id="jQuery.UI.Combined" version="1.10.4" />
+      <package id="jQuery.Validation" version="1.12.0" />
+      <package id="Microsoft.AspNet.Mvc" version="5.1.2" />
+      <package id="Microsoft.AspNet.Razor" version="3.1.2" />
+      <package id="Microsoft.AspNet.WebPages" version="3.1.2" />
+      <package id="Microsoft.Web.Infrastructure" version="1.0.0.0" />
+      <package id="Newtonsoft.Json" version="6.0.4" />
+      <package id="Select2.js" version="3.5.1" />
+      <package id="Serenity.Caching.Web" version="1.0.9" />
+      <package id="Serenity.CodeGeneration" version="1.0.9" />
+      <package id="Serenity.CodeGeneration.Mvc" version="1.0.9" />
+      <package id="Serenity.CodeGenerator" version="1.0.9" />
+      <package id="Serenity.Core" version="1.0.9" />
+      <package id="Serenity.Data" version="1.0.9" />
+      <package id="Serenity.Data.Entity" version="1.0.9" />
+      <package id="Serenity.Data.Filtering" version="1.0.9" />
+      <package id="Serenity.Munq" version="1.0.9" />
+      <package id="Serenity.Reporting" version="1.0.9" />
+      <package id="Serenity.Services" version="1.0.9" />
+      <package id="Serenity.Services.Mvc" version="1.0.9" />
+      <package id="Serenity.Web" version="1.0.9" />
+      <package id="SlickGrid" version="2.2.20140120" />
+      <package id="toastr" version="2.0.3" />
+    </packages>
+  </WizardData>
 </VSTemplate>

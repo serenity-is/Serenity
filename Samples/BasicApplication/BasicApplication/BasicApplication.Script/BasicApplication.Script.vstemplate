@@ -3,8 +3,7 @@
     <Name>BasicApplication.Script</Name>
     <Description>Serenity Basic Application Sample (Script Project)</Description>
     <ProjectType>CSharp</ProjectType>
-    <ProjectSubType>
-    </ProjectSubType>
+    <ProjectSubType></ProjectSubType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>$ext_projectname$.Script</DefaultName>
@@ -23,20 +22,20 @@
       </Folder>
       <Folder Name="Imports" TargetFolderName="Imports">
         <Folder Name="FormContexts" TargetFolderName="FormContexts">
-          <ProjectItem ReplaceParameters="false" TargetFileName="FormContexts.tt">FormContexts.tt</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="FormContexts.tt">FormContexts.tt</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserForm.cs">Administration.UserForm.cs</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="FormContexts.log">FormContexts.log</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginForm.cs">Membership.LoginForm.cs</ProjectItem>
         </Folder>
-        <ProjectItem ReplaceParameters="false" TargetFileName="MultipleOutputHelper.ttinclude">MultipleOutputHelper.ttinclude</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="MultipleOutputHelper.ttinclude">MultipleOutputHelper.ttinclude</ProjectItem>
         <Folder Name="ServiceContracts" TargetFolderName="ServiceContracts">
-          <ProjectItem ReplaceParameters="false" TargetFileName="ServiceContracts.tt">ServiceContracts.tt</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="ServiceContracts.tt">ServiceContracts.tt</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserRow.cs">Administration.UserRow.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginRequest.cs">Membership.LoginRequest.cs</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="ServiceContracts.log">ServiceContracts.log</ProjectItem>
         </Folder>
         <Folder Name="ServiceEndpoints" TargetFolderName="ServiceEndpoints">
-          <ProjectItem ReplaceParameters="false" TargetFileName="ServiceEndpoints.tt">ServiceEndpoints.tt</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="ServiceEndpoints.tt">ServiceEndpoints.tt</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="ServiceEndpoints.cs">ServiceEndpoints.cs</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="ServiceEndpoints.log">ServiceEndpoints.log</ProjectItem>
         </Folder>

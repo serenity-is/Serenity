@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="ProjectGroup">
+  <TemplateData>
+    <Name>Serenity Basic Application Sample</Name>
+    <Description>Serenity Basic Application Sample (Script Project)</Description>
+    <Icon>__TemplateIcon.png</Icon>
+    <DefaultName>BasicApplication</DefaultName>
+    <ProjectType>CSharp</ProjectType>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectCollection>
+      <ProjectTemplateLink ProjectName="$projectname$.Web" CopyParameters="true">
+        BasicApplication.Web\BasicApplication.Web.vstemplate
+      </ProjectTemplateLink>
+      <ProjectTemplateLink ProjectName="$projectname$.Script" CopyParameters="true">
+        BasicApplication.Script\BasicApplication.Script.vstemplate
+      </ProjectTemplateLink>
+    </ProjectCollection>
+  </TemplateContent>  
+</VSTemplate>
