@@ -653,7 +653,7 @@
           </Folder>
         </Folder>
         <Folder Name="site" TargetFolderName="site">
-          <ProjectItem ReplaceParameters="true" TargetFileName="BasicApplication.Script.js">BasicApplication.Script.js</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="$ext_safeprojectname$.Script.js">BasicApplication.Script.js</ProjectItem>
         </Folder>
         <Folder Name="SlickGrid" TargetFolderName="SlickGrid">
           <Folder Name="Controls" TargetFolderName="Controls">

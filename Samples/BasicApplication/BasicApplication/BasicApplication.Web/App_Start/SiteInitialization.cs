@@ -62,6 +62,8 @@
                         @"CREATE DATABASE [{0}] ON PRIMARY (Name = N'{0}', FILENAME = '{1}\{0}.mdf') LOG ON (NAME = N'{0}_log', FILENAME = '{1}\{0}.ldf');",
                             catalog, HostingEnvironment.MapPath("~/App_Data")));
                 }
+                
+                SqlConnection.ClearAllPools();
             }
 
             EnsureDBScript();

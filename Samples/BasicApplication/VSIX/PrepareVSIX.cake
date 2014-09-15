@@ -1,14 +1,15 @@
 ﻿using System.Xml.Linq;
 
-var target = Argument("target", "BuildVSIX");
+var target = Argument("target", "PrepareVSIX");
 
-Task("BuildVSIX")
+Task("PrepareVSIX")
   .Does(() => 
 {
-    var r = System.IO.Path.GetFullPath(@".\");
+    var r = System.IO.Path.GetFullPath(@"..\");
     var samplePackagesFolder = r + @"packages\";
     var vsixPackagesFolder = r + @"VSIX\packages\";
     var vsixProjFile = r + @"VSIX\BasicApplication.VSIX.csproj";
+    var vsixManifestFile = r + @"VSIX\source.extension.vsixmanifest";
     var templateFolder = r + @"VSIX\obj\BasicApplication.Template";
     var sampleWebProj = r + @"BasicApplication\BasicApplication.Web\BasicApplication.Web.csproj";
     var sampleScriptProj = r + @"BasicApplication\BasicApplication.Script\BasicApplication.Script.csproj";
@@ -71,6 +72,11 @@ Task("BuildVSIX")
         var allPackages = new List<Tuple<string, string>>();
         allPackages.AddRange(hash);
         allPackages.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+    
+        var xm = XElement.Parse(File.ReadAllText(vsixManifestFile));
+        xm.Descendants(((XNamespace)"http://schemas.microsoft.com/developer/vsx-schema/2011") + "Identity")
+            .First().SetAttributeValue("Version", allPackages.First(x => x.Item1.StartsWith("Serenity.Core")).Item2);
+        File.WriteAllText(vsixManifestFile, xm.ToString(SaveOptions.OmitDuplicateNamespaces));
     
         var xv = XElement.Parse(File.ReadAllText(vsixProjFile));
         XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
@@ -164,7 +170,7 @@ Task("BuildVSIX")
                 extension == ".html";
             
             item.SetAttributeValue("ReplaceParameters", replaceParameters ? "true" : "false");
-            item.SetAttributeValue("TargetFileName", parts[parts.Length - 1]);
+            item.SetAttributeValue("TargetFileName", parts[parts.Length - 1].Replace("BasicApplication", "$ext_safeprojectname$"));
             item.SetValue(parts[parts.Length - 1]);
             folder.Add(item);
             
