@@ -7,12 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicApplication.Web", "Bas
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicApplication.Script", "BasicApplication\BasicApplication.Script\BasicApplication.Script.csproj", "{A0098374-9055-40BA-9F81-1C73AE7F3670}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicApplication.VSIX", "VSIX\BasicApplication.VSIX.csproj", "{9DC33F28-9BB3-4703-BC09-9EB0C109C2D4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E298DC33-D240-4585-AC47-775575246780} = {E298DC33-D240-4585-AC47-775575246780}
-		{A0098374-9055-40BA-9F81-1C73AE7F3670} = {A0098374-9055-40BA-9F81-1C73AE7F3670}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,10 +21,6 @@ Global
 		{A0098374-9055-40BA-9F81-1C73AE7F3670}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0098374-9055-40BA-9F81-1C73AE7F3670}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0098374-9055-40BA-9F81-1C73AE7F3670}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9DC33F28-9BB3-4703-BC09-9EB0C109C2D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9DC33F28-9BB3-4703-BC09-9EB0C109C2D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9DC33F28-9BB3-4703-BC09-9EB0C109C2D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DC33F28-9BB3-4703-BC09-9EB0C109C2D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
