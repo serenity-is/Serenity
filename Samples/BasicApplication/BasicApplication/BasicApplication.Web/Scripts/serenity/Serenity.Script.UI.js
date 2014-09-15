@@ -3599,7 +3599,7 @@
 		$this.defaultCategory = null;
 		$this.mode = 0;
 		$this.useCategories = true;
-		$this.defaultCategory = 'Özellikler';
+		$this.defaultCategory = Texts$Controls$PropertyGrid.DefaultCategory.get();
 		return $this;
 	};
 	global.Serenity.PropertyGridOptions = $Serenity_PropertyGridOptions;
@@ -3611,7 +3611,7 @@
 		this.$field = null;
 		this.$fieldChanged = false;
 		ss.makeGenericType($Serenity_Widget$1, [$Serenity_QuickSearchInputOptions]).call(this, input, opt);
-		input.attr('title', 'aranacak kelimeyi giriniz').attr('placeholder', 'hızlı arama');
+		input.attr('title', Texts$Controls$QuickSearch.Hint.get()).attr('placeholder', Texts$Controls$QuickSearch.Placeholder.get());
 		this.$lastValue = Q.trim(ss.coalesce(input.val(), ''));
 		var self = this;
 		this.element.bind('keyup.' + this.uniqueName, function() {
@@ -3622,7 +3622,7 @@
 		});
 		$('<span><i></i></span>').addClass('quick-search-icon').insertBefore(input);
 		if (ss.isValue(this.options.fields) && this.options.fields.length > 0) {
-			var a = $('<a/>').addClass('quick-search-field').attr('title', 'arama yapılacak alanı seç').insertBefore(input);
+			var a = $('<a/>').addClass('quick-search-field').attr('title', Texts$Controls$QuickSearch.FieldSelection.get()).insertBefore(input);
 			var menu = $('<ul></ul>').css('width', '120px');
 			for (var $t1 = 0; $t1 < this.options.fields.length; $t1++) {
 				var item = this.options.fields[$t1];

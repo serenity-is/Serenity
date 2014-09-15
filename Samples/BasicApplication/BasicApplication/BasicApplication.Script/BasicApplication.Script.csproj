@@ -31,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Common\Navigation\SidebarSearch.cs" />
     <Compile Include="Imports\FormContexts\Administration.UserForm.cs">
       <DependentUpon>FormContexts.tt</DependentUpon>
     </Compile>

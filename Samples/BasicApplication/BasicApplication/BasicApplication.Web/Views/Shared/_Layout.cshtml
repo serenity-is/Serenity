@@ -60,7 +60,7 @@ else
             <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-search">
                     <div class="input-group custom-search-form">
-                        <input type="text" class="form-control" placeholder="Search...">
+                        <input id="SidebarSearch" type="text" class="form-control" placeholder="Search...">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button">
                                 <i class="fa fa-search"></i>
@@ -90,6 +90,7 @@ else
     <script type="text/javascript">
     $().ready(function () {
         $('#side-menu').metisMenu();
+        new BasicApplication.Common.SidebarSearch($('#SidebarSearch'), $('#side-menu'));
         
         $(window).bind("load resize", function() {
             topOffset = 50;

@@ -697,6 +697,18 @@
 	$Texts$Controls$Pager.__typeName = 'Texts$Controls$Pager';
 	global.Texts$Controls$Pager = $Texts$Controls$Pager;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.Texts.Controls.PropertyGrid
+	var $Texts$Controls$PropertyGrid = function() {
+	};
+	$Texts$Controls$PropertyGrid.__typeName = 'Texts$Controls$PropertyGrid';
+	global.Texts$Controls$PropertyGrid = $Texts$Controls$PropertyGrid;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.Texts.Controls.QuickSearch
+	var $Texts$Controls$QuickSearch = function() {
+	};
+	$Texts$Controls$QuickSearch.__typeName = 'Texts$Controls$QuickSearch';
+	global.Texts$Controls$QuickSearch = $Texts$Controls$QuickSearch;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Texts.Dialogs
 	var $Texts$Dialogs = function() {
 	};
@@ -1354,6 +1366,8 @@
 	ss.initClass($Texts$Controls$EntityDialog, $asm, {});
 	ss.initClass($Texts$Controls$EntityGrid, $asm, {});
 	ss.initClass($Texts$Controls$Pager, $asm, {});
+	ss.initClass($Texts$Controls$PropertyGrid, $asm, {});
+	ss.initClass($Texts$Controls$QuickSearch, $asm, {});
 	ss.initClass($Texts$Dialogs, $asm, {});
 	ss.initClass($Serenity_DialogTypeAttribute, $asm, {
 		get_value: function() {
@@ -1500,4 +1514,10 @@
 	$Texts$Controls$Pager.LoadingStatus = new Q$LT('Please wait, loading data...');
 	$Texts$Controls$Pager.DefaultLoadError = new Q$LT('An error occured while loading data!');
 	$Q$LT.initializeTextClass($Texts$Controls$Pager, 'Controls.Pager.');
+	$Texts$Controls$PropertyGrid.DefaultCategory = new Q$LT('Properties');
+	$Q$LT.initializeTextClass($Texts$Controls$PropertyGrid, 'Controls.PropertyGrid.');
+	$Texts$Controls$QuickSearch.Placeholder = new Q$LT('search...');
+	$Texts$Controls$QuickSearch.Hint = new Q$LT('enter the text to search for...');
+	$Texts$Controls$QuickSearch.FieldSelection = new Q$LT('select the field to search on');
+	$Q$LT.initializeTextClass($Texts$Controls$QuickSearch, 'Controls.QuickSearch.');
 })();

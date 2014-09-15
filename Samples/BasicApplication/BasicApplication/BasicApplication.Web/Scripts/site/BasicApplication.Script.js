@@ -3,6 +3,7 @@
 	var $asm = {};
 	global.BasicApplication = global.BasicApplication || {};
 	global.BasicApplication.Administration = global.BasicApplication.Administration || {};
+	global.BasicApplication.Common = global.BasicApplication.Common || {};
 	global.BasicApplication.Membership = global.BasicApplication.Membership || {};
 	ss.initAssembly($asm, 'BasicApplication.Script');
 	////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +57,21 @@
 		Q.serviceRequest('Administration/User/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Administration.UserService = $BasicApplication_Administration_UserService;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Common.SidebarSearch
+	var $BasicApplication_Common_SidebarSearch = function(input, menuUL) {
+		this.$menuUL = null;
+		Serenity.Widget.call(this, input);
+		var self = this;
+		var $t1 = Serenity.QuickSearchInputOptions.$ctor();
+		$t1.onSearch = function(field, text) {
+			self.$updateMatchFlags(text);
+		};
+		new Serenity.QuickSearchInput(input, $t1);
+		this.$menuUL = menuUL;
+	};
+	$BasicApplication_Common_SidebarSearch.__typeName = 'BasicApplication.Common.SidebarSearch';
+	global.BasicApplication.Common.SidebarSearch = $BasicApplication_Common_SidebarSearch;
 	////////////////////////////////////////////////////////////////////////////////
 	// BasicApplication.Membership.LoginForm
 	var $BasicApplication_Membership_LoginForm = function(idPrefix) {
@@ -146,6 +162,44 @@
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
 	ss.initClass($BasicApplication_Administration_UserService, $asm, {});
+	ss.initClass($BasicApplication_Common_SidebarSearch, $asm, {
+		$updateMatchFlags: function(text) {
+			var liList = this.$menuUL.find('li').removeClass('non-match');
+			text = Q.trimToNull(text);
+			if (ss.isNullOrUndefined(text)) {
+				liList.children('ul').hide();
+				liList.show().removeClass('expanded');
+				return;
+			}
+			var parts = ss.netSplit(text, [44, 32].map(function(i) {
+				return String.fromCharCode(i);
+			}), null, 1);
+			for (var i = 0; i < parts.length; i++) {
+				parts[i] = Q.trimToNull(Select2.util.stripDiacritics(parts[i]).toUpperCase());
+			}
+			var items = liList;
+			items.each(function(i1, e) {
+				var x = $(e);
+				var title = Select2.util.stripDiacritics(ss.coalesce(x.text(), '').toUpperCase());
+				for (var $t1 = 0; $t1 < parts.length; $t1++) {
+					var p = parts[$t1];
+					if (ss.isValue(p) && !(title.indexOf(p) !== -1)) {
+						x.addClass('non-match');
+						break;
+					}
+				}
+			});
+			var matchingItems = items.not('.non-match');
+			var visibles = matchingItems.parents('li').add(matchingItems);
+			var nonVisibles = liList.not(visibles);
+			nonVisibles.hide().addClass('non-match');
+			visibles.show();
+			if (visibles.length <= 100) {
+				liList.children('ul').show();
+				liList.addClass('expanded');
+			}
+		}
+	}, Serenity.Widget);
 	ss.initClass($BasicApplication_Membership_LoginForm, $asm, {
 		get_username: function() {
 			return this.byId(Serenity.StringEditor).call(this, 'Username');
