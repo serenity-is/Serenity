@@ -11,7 +11,7 @@ namespace Serenity
         public PropertyGridOptions()
         {
             UseCategories = true;
-            DefaultCategory = "Özellikler";
+            DefaultCategory = Texts.Controls.PropertyGrid.DefaultCategory;
         }
 
         public string IdPrefix { get; set; }

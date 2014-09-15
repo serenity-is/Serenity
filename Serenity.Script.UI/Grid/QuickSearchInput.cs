@@ -17,8 +17,8 @@ namespace Serenity
         public QuickSearchInput(jQueryObject input, QuickSearchInputOptions opt)
             : base(input, opt)
         {
-            input.Attribute("title", "aranacak kelimeyi giriniz")
-                .Attribute("placeholder", "hızlı arama");
+            input.Attribute("title", Texts.Controls.QuickSearch.Hint)
+                .Attribute("placeholder", Texts.Controls.QuickSearch.Placeholder);
 
             lastValue = Q.Trim(input.GetValue() ?? "");
 
@@ -39,7 +39,7 @@ namespace Serenity
             if (options.Fields != null && options.Fields.Count > 0)
             {
                 var a = J("<a/>").AddClass("quick-search-field")
-                    .Attribute("title", "arama yapılacak alanı seç")
+                    .Attribute("title", Texts.Controls.QuickSearch.FieldSelection)
                     .InsertBefore(input);
 
                 var menu = J("<ul></ul>").CSS("width", "120px");

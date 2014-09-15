@@ -29,6 +29,14 @@
             "LoadingStatus": "Veri alınıyor, lütfen bekleyiniz...",
             "DefaultLoadError": "Kayıtlar alınırken hata oluştu!"
         },
+        "PropertyGrid": {
+            "DefaultCategory": "Özellikler"
+        },
+        "QuickSearch": {
+            "Placeholder": "hızlı arama",
+            "Hint": "aranacak kelimeyi giriniz",
+            "FieldSelection": "arama yapılacak alanı seç"
+        },
         "FilterPanel": {
             "AddFilter": "filtre koşulu ekle",
             "All": "<tümü>",
