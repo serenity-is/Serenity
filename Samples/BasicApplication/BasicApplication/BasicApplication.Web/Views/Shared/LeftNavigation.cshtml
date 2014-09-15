@@ -19,7 +19,7 @@
 	        <a href="@(section.Url ?? "javascript:;")">
                 <span class="sidebar-nav-item-icon @(section.IconClass ?? (section.Children.Count > 0 ? "fa icon-layers" : "fa icon-none"))"></span>
                 <span class="sidebar-nav-item">@(section.Title)</span>
-                <span class="fa arrow"></span>
+                @if (!section.Children.IsEmptyOrNull()){<span class="fa arrow"></span>}
 	        </a>
 
             @if (section.Children.Count > 0)
@@ -73,22 +73,16 @@
     }
         
     if (activeSection == -1 && activeLink == -1) {
-        activeSection = -1;
-        activeLink = -1;
+        activeSection = 0;
+        activeLink = 0;
     }
     
 <script type="text/javascript">
     $(function() {
-        var section = $('#LeftNavigationSection_' + (@activeSection)).addClass("active open");
-        section.children('a').children('span').eq(2).addClass('open');
+        var section = $('#LeftNavigationSection_' + (@activeSection)).addClass("active selected");
+        Q.notifySuccess("@activeSection");
         if (@activeLink != -1)
-        {
-            var link = $('#LeftNavigationLink_' + (@activeSection) + '_' + (@activeLink)).addClass("active");
-            link.children('a').children('span').eq(1).addClass('selected');
-        }
-        else {
-            section.children('a').children('span').eq(1).addClass('selected');
-        }
+            $('#LeftNavigationLink_' + (@activeSection) + '_' + (@activeLink)).addClass("selected");
     });
 
     function openWindow(url, width, height) {

@@ -136,7 +136,8 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Start\SampleDBScript.sql" />
+    <Content Include="App_Start\NorthwindDBScript.sql" />
+    <Content Include="App_Start\BasicDBScript.sql" />
     <Content Include="Content\aristo\aristo.css" />
     <Content Include="Content\aristo\images\icon_sprite.png" />
     <Content Include="Content\aristo\images\progress_bar.gif" />

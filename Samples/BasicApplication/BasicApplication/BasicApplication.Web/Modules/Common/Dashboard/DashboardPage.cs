@@ -1,4 +1,5 @@
-﻿
+﻿[assembly: Serenity.Navigation.NavigationLink(91000, "Dashboard", url: "~/", permission: "", icon: "icon-speedometer")]
+
 namespace BasicApplication.Common.Pages
 {
     using Serenity;

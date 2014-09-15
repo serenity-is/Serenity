@@ -84,7 +84,8 @@
                     }
                 }
 
-                connection.Execute(File.ReadAllText(HostingEnvironment.MapPath("~/App_Start/SampleDBScript.sql")));
+                RunScript(connection, File.ReadAllText(HostingEnvironment.MapPath("~/App_Start/BasicDBScript.sql")));
+                RunScript(connection, File.ReadAllText(HostingEnvironment.MapPath("~/App_Start/NorthwindDBScript.sql")));
             }
         }
 
