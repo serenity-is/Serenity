@@ -36,14 +36,14 @@ namespace BasicApplication.Administration.Entities
             set { Fields.Source[this] = value; }
         }
 
-        [DisplayName("Password Hash"), Size(86), NotNull]
+        [DisplayName("Password Hash"), Size(86), NotNull, Insertable(false), Updatable(false), MinSelectLevel(SelectLevel.Never)]
         public String PasswordHash
         {
             get { return Fields.PasswordHash[this]; }
             set { Fields.PasswordHash[this] = value; }
         }
 
-        [DisplayName("Password Salt"), Size(10), NotNull]
+        [DisplayName("Password Salt"), Size(10), NotNull, Insertable(false), Updatable(false), MinSelectLevel(SelectLevel.Never)]
         public String PasswordSalt
         {
             get { return Fields.PasswordSalt[this]; }

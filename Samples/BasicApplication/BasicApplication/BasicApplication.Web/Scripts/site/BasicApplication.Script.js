@@ -15,7 +15,21 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// BasicApplication.Administration.UserDialog
 	var $BasicApplication_Administration_UserDialog = function() {
+		this.$form = null;
 		ss.makeGenericType(Serenity.EntityDialog$1, [Object]).call(this);
+		this.$form = new $BasicApplication_Administration_UserForm(this.get_idPrefix());
+		Serenity.WX.addValidationRule(this.$form.get_password(), this.uniqueName, ss.mkdel(this, function(e) {
+			if (this.$form.get_password().get_value().length < 7) {
+				return 'Password must be at least 7 characters!';
+			}
+			return null;
+		}));
+		Serenity.WX.addValidationRule(this.$form.get_passwordConfirm(), this.uniqueName, ss.mkdel(this, function(e1) {
+			if (!ss.referenceEquals(this.$form.get_password().get_value(), this.$form.get_passwordConfirm().get_value())) {
+				return "The passwords entered doesn't match!";
+			}
+			return null;
+		}));
 	};
 	$BasicApplication_Administration_UserDialog.__typeName = 'BasicApplication.Administration.UserDialog';
 	global.BasicApplication.Administration.UserDialog = $BasicApplication_Administration_UserDialog;
@@ -117,47 +131,30 @@
 		get_username: function() {
 			return this.byId(Serenity.StringEditor).call(this, 'Username');
 		},
-		get_source: function() {
-			return this.byId(Serenity.StringEditor).call(this, 'Source');
-		},
-		get_passwordHash: function() {
-			return this.byId(Serenity.StringEditor).call(this, 'PasswordHash');
-		},
-		get_passwordSalt: function() {
-			return this.byId(Serenity.StringEditor).call(this, 'PasswordSalt');
-		},
-		get_insertDate: function() {
-			return this.byId(Serenity.DateEditor).call(this, 'InsertDate');
-		},
-		get_insertUserId: function() {
-			return this.byId(Serenity.IntegerEditor).call(this, 'InsertUserId');
-		},
-		get_isActive: function() {
-			return this.byId(Serenity.StringEditor).call(this, 'IsActive');
-		},
-		get_updateDate: function() {
-			return this.byId(Serenity.DateEditor).call(this, 'UpdateDate');
-		},
-		get_updateUserId: function() {
-			return this.byId(Serenity.IntegerEditor).call(this, 'UpdateUserId');
-		},
 		get_displayName: function() {
 			return this.byId(Serenity.StringEditor).call(this, 'DisplayName');
 		},
 		get_email: function() {
-			return this.byId(Serenity.StringEditor).call(this, 'Email');
+			return this.byId(Serenity.EmailEditor).call(this, 'Email');
+		},
+		get_password: function() {
+			return this.byId(Serenity.PasswordEditor).call(this, 'Password');
+		},
+		get_passwordConfirm: function() {
+			return this.byId(Serenity.PasswordEditor).call(this, 'PasswordConfirm');
+		},
+		get_source: function() {
+			return this.byId(Serenity.StringEditor).call(this, 'Source');
 		}
 	}, Serenity.PrefixedContext);
 	ss.initClass($BasicApplication_Administration_UserGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
 			ss.add(columns, { field: 'UserId', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'Username', width: 200, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'Source', width: 80 });
-			ss.add(columns, { field: 'PasswordHash', width: 80 });
-			ss.add(columns, { field: 'PasswordSalt', width: 80 });
-			ss.add(columns, { field: 'DisplayName', width: 80 });
-			ss.add(columns, { field: 'Email', width: 80 });
+			ss.add(columns, { field: 'Username', width: 150, format: this.itemLink(null, null, null, null) });
+			ss.add(columns, { field: 'DisplayName', width: 150 });
+			ss.add(columns, { field: 'Email', width: 250 });
+			ss.add(columns, { field: 'Source', width: 100 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -167,8 +164,9 @@
 			var liList = this.$menuUL.find('li').removeClass('non-match');
 			text = Q.trimToNull(text);
 			if (ss.isNullOrUndefined(text)) {
-				liList.children('ul').hide();
-				liList.show().removeClass('expanded');
+				liList.removeClass('active');
+				liList.show();
+				liList.children('ul').addClass('collapse');
 				return;
 			}
 			var parts = ss.netSplit(text, [44, 32].map(function(i) {
@@ -194,10 +192,7 @@
 			var nonVisibles = liList.not(visibles);
 			nonVisibles.hide().addClass('non-match');
 			visibles.show();
-			if (visibles.length <= 100) {
-				liList.children('ul').show();
-				liList.addClass('expanded');
-			}
+			liList.children('ul').removeClass('collapse');
 		}
 	}, Serenity.Widget);
 	ss.initClass($BasicApplication_Membership_LoginForm, $asm, {

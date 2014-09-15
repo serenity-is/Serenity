@@ -17,12 +17,12 @@ namespace BasicApplication.Administration.Repositories
 
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return new MyCreateHandler().Process(uow, request);
+            return new MySaveHandler().Process(uow, request, SaveRequestType.Create);
         }
 
         public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return new MyUpdateHandler().Process(uow, request);
+            return new MySaveHandler().Process(uow, request, SaveRequestType.Update);
         }
 
         public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
@@ -45,7 +45,7 @@ namespace BasicApplication.Administration.Repositories
             return new MyListHandler().Process(connection, request);
         }
 
-        private class MyCreateHandler : SaveRequestHandler<MyRow>
+        private class MySaveHandler : SaveRequestHandler<MyRow>
         {
             private string password;
 
@@ -126,10 +126,8 @@ namespace BasicApplication.Administration.Repositories
 
                 if (password == null ||
                     password.Length < Membership.MinRequiredPasswordLength)
-                    throw new ValidationError("PasswordLength", "Password", "Girilen şifre yeterli uzunlukta değil!");
-
-                var membership = (SiteMembershipProvider)Membership.Provider;
-                membership.ValidateNewPassword(username, password, isNewUser);
+                    throw new ValidationError("PasswordLength", "Password", 
+                        String.Format("Entered password doesn't have enough characters (min {0})!", Membership.MinRequiredPasswordLength));
 
                 return password;
             }
@@ -143,7 +141,7 @@ namespace BasicApplication.Administration.Repositories
 
                 if (!IsValidUsername(username))
                     throw new ValidationError("InvalidUsername", "Username",
-                        "Kullanıcı adları harfle başlamalı, boşluk içermemeli, harf ve sayılardan oluşmalı ve türkçeye özel karakterler içermemelidir!");
+                        "Usernames should start with letters, only contain letters and numbers!");
 
                 var existing = GetUser(connection,
                     new Criteria(fld.Username) == username |
@@ -151,7 +149,7 @@ namespace BasicApplication.Administration.Repositories
 
                 if (existing != null && existingUserId != existing.UserId)
                     throw new ValidationError("UniqueViolation", "Username",
-                        "Bu kullanıcı adına sahip başka bir kullanıcı daha var. Lütfen başka bir kullanıcı adı seçiniz!");
+                        "A user with same name exists. Please choose another!");
 
                 return username;
             }
@@ -170,53 +168,37 @@ namespace BasicApplication.Administration.Repositories
             {
                 base.ValidateRequest();
 
-                this.Row.Username = ValidateUsername(this.Connection, this.Row.Username, null);
-                this.Row.DisplayName = ValidateDisplayName(this.Connection, this.Row.DisplayName, null);
+                if (IsUpdate)
+                {
+                    if (Row.IsAssigned(fld.Password) && !Row.Password.IsEmptyOrNull())
+                        password = Row.Password = MySaveHandler.ValidatePassword(Old.Username, Row.Password, false);
 
-                password = ValidatePassword(Row.Username, Row.Password, true);
+                    if (Row.Username != Old.Username)
+                        Row.Username = MySaveHandler.ValidateUsername(this.Connection, Row.Username, Old.UserId.Value);
+
+                    if (Row.DisplayName != Old.DisplayName)
+                        Row.DisplayName = MySaveHandler.ValidateDisplayName(this.Connection, Row.Username, Old.UserId.Value);
+                }
+
+                if (IsCreate)
+                {
+                    this.Row.Username = ValidateUsername(this.Connection, this.Row.Username, null);
+                    this.Row.DisplayName = ValidateDisplayName(this.Connection, this.Row.DisplayName, null);
+                    password = ValidatePassword(Row.Username, Row.Password, true);
+                }
             }
 
             protected override void SetInternalFields()
             {
                 base.SetInternalFields();
 
-                Row.PasswordSalt = Membership.GeneratePassword(5, 1);
-                Row.PasswordHash = SiteMembershipProvider.ComputeSHA512(password + Row.PasswordSalt);
-                Row.Source = "site";
-                Row.IsActive = Row.IsActive ?? 1;
-            }
+                if (IsCreate)
+                {
+                    Row.Source = "site";
+                    Row.IsActive = Row.IsActive ?? 1;
+                }
 
-            protected override void AfterSave()
-            {
-                base.AfterSave();
-
-                BatchGenerationUpdater.OnCommit(this.UnitOfWork, fld.GenerationKey);
-            }
-        }
-
-        private class MyUpdateHandler : SaveRequestHandler<MyRow>
-        {
-            private string password;
-
-            protected override void ValidateRequest()
-            {
-                base.ValidateRequest();
-
-                if (Row.IsAssigned(fld.Password))
-                    password = Row.Password = MyCreateHandler.ValidatePassword(Old.Username, Row.Password, false);
-
-                if (Row.Username != Old.Username)
-                    Row.Username = MyCreateHandler.ValidateUsername(this.Connection, Row.Username, Old.UserId.Value);
-
-                if (Row.DisplayName != Old.DisplayName)
-                    Row.DisplayName = MyCreateHandler.ValidateDisplayName(this.Connection, Row.Username, Old.UserId.Value);
-            }
-
-            protected override void SetInternalFields()
-            {
-                base.SetInternalFields();
-
-                if (password != null)
+                if (IsCreate || !Row.Password.IsEmptyOrNull())
                 {
                     Row.PasswordSalt = Membership.GeneratePassword(5, 1);
                     Row.PasswordHash = SiteMembershipProvider.ComputeSHA512(password + Row.PasswordSalt);

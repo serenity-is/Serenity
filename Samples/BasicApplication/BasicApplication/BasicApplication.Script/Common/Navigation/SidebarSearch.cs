@@ -30,8 +30,9 @@
             text = text.TrimToNull();
             if (text == null)
             {
-                liList.Children("ul").Hide();
-                liList.Show().RemoveClass("expanded");
+                liList.RemoveClass("active");
+                liList.Show();
+                liList.Children("ul").AddClass("collapse");
                 return;
             }
 
@@ -63,11 +64,7 @@
             nonVisibles.Hide().AddClass("non-match");
             visibles.Show();
 
-            if (visibles.Length <= 100)
-            {
-                liList.Children("ul").Show();
-                liList.AddClass("expanded");
-            }
+            liList.Children("ul").RemoveClass("collapse");
         }
     }
 }

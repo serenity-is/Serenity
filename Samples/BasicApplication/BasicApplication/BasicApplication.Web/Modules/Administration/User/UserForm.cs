@@ -1,26 +1,23 @@
-﻿
-namespace BasicApplication.Administration.Forms
+﻿namespace BasicApplication.Administration.Forms
 {
-    using System;
     using Serenity;
     using Serenity.ComponentModel;
-    using Serenity.Data;
-    using System.Collections.Generic;
+    using System;
+    using System.ComponentModel;
 
     [FormScript("Administration.User")]
     [BasedOnRow(typeof(Entities.UserRow))]
     public class UserForm
     {
         public String Username { get; set; }
-        public String Source { get; set; }
-        public String PasswordHash { get; set; }
-        public String PasswordSalt { get; set; }
-        public DateTime InsertDate { get; set; }
-        public Int32 InsertUserId { get; set; }
-        public Int16 IsActive { get; set; }
-        public DateTime UpdateDate { get; set; }
-        public Int32 UpdateUserId { get; set; }
         public String DisplayName { get; set; }
+        [EmailEditor]
         public String Email { get; set; }
+        [PasswordEditor]
+        public String Password { get; set; }
+        [PasswordEditor, DisplayName("Confirm Password"), OneWay]
+        public String PasswordConfirm { get; set; }
+        [OneWay]
+        public string Source { get; set; }
     }
 }

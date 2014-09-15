@@ -14,16 +14,11 @@ namespace BasicApplication.Administration
         public UserForm(string idPrefix) : base(idPrefix) {}
     
         public StringEditor Username { get { return ById<StringEditor>("Username"); } }
-        public StringEditor Source { get { return ById<StringEditor>("Source"); } }
-        public StringEditor PasswordHash { get { return ById<StringEditor>("PasswordHash"); } }
-        public StringEditor PasswordSalt { get { return ById<StringEditor>("PasswordSalt"); } }
-        public DateEditor InsertDate { get { return ById<DateEditor>("InsertDate"); } }
-        public IntegerEditor InsertUserId { get { return ById<IntegerEditor>("InsertUserId"); } }
-        public StringEditor IsActive { get { return ById<StringEditor>("IsActive"); } }
-        public DateEditor UpdateDate { get { return ById<DateEditor>("UpdateDate"); } }
-        public IntegerEditor UpdateUserId { get { return ById<IntegerEditor>("UpdateUserId"); } }
         public StringEditor DisplayName { get { return ById<StringEditor>("DisplayName"); } }
-        public StringEditor Email { get { return ById<StringEditor>("Email"); } }
+        public EmailEditor Email { get { return ById<EmailEditor>("Email"); } }
+        public PasswordEditor Password { get { return ById<PasswordEditor>("Password"); } }
+        public PasswordEditor PasswordConfirm { get { return ById<PasswordEditor>("PasswordConfirm"); } }
+        public StringEditor Source { get { return ById<StringEditor>("Source"); } }
     }
 }
 

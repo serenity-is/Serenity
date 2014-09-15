@@ -21,12 +21,10 @@ namespace BasicApplication.Administration
             var columns = base.GetColumns();
 
             columns.Add(new SlickColumn { Field = "UserId", Width = 55, CssClass = "align-right", Title = Q.Text("Db.Shared.RecordId") });
-            columns.Add(new SlickColumn { Field = "Username", Width = 200, Format = ItemLink() });
-            columns.Add(new SlickColumn { Field = "Source", Width = 80 });
-            columns.Add(new SlickColumn { Field = "PasswordHash", Width = 80 });
-            columns.Add(new SlickColumn { Field = "PasswordSalt", Width = 80 });
-            columns.Add(new SlickColumn { Field = "DisplayName", Width = 80 });
-            columns.Add(new SlickColumn { Field = "Email", Width = 80 });
+            columns.Add(new SlickColumn { Field = "Username", Width = 150, Format = ItemLink() });
+            columns.Add(new SlickColumn { Field = "DisplayName", Width = 150 });
+            columns.Add(new SlickColumn { Field = "Email", Width = 250 });
+            columns.Add(new SlickColumn { Field = "Source", Width = 100 });
 
             return columns;
         }
