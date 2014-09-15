@@ -171,5 +171,11 @@ Task("NuGet-Push")
           });
       }
   });
+  
+Task("VSIX")
+  .Does(() => 
+  {
+      
+  });
 
 RunTarget(target);
