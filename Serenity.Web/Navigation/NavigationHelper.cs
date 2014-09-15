@@ -12,14 +12,13 @@
         {
             var result = new List<NavigationItem>();
             var menuItems = GetNavigationItemAttributes();
-            var remaining = new HashSet<NavigationItemAttribute>();
+            var remaining = new HashSet<string>();
             foreach (var item in menuItems)
-                foreach (var value in item)
-                    remaining.AddRange(value);
+                remaining.Add(item.Key);
 
             Action<NavigationItemAttribute> processMenu = menu =>
             {
-                remaining.Remove(menu);
+                remaining.Remove(menu.Title.TrimToNull());
 
                 var section = new NavigationItem
                 {
@@ -34,8 +33,6 @@
                 var children = menuItems[menu.Title.TrimToNull() ?? "???"];
                 foreach (var child in children)
                 {
-                    remaining.Remove(child);
-
                     if (child.Url.IsEmptyOrNull())
                         continue;
 
@@ -62,15 +59,10 @@
 
             while (remaining.Count > 0)
             {
-                var first = remaining.FirstOrDefault();
+                var first = remaining.First();
                 remaining.Remove(first);
-                if (!first.Category.IsEmptyOrNull())
-                {
-                    var menu = new NavigationMenuAttribute(Int32.MaxValue, first.Category);
-                    processMenu(menu);
-                }
-                else
-                    processMenu(first);
+                var menu = new NavigationMenuAttribute(Int32.MaxValue, first);
+                processMenu(menu);
             }
 
             return result;
