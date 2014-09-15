@@ -481,6 +481,7 @@ body {
   background: #000;
   color: #fff;
   border-bottom: none;
+  z-index: 2;
 }
 .navbar-static-top .navbar-brand {
   color: #ddd;

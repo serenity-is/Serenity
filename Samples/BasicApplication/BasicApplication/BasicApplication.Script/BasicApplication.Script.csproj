@@ -52,6 +52,8 @@
     <Compile Include="ScriptInitialization.cs" />
     <Compile Include="Administration\User\UserGrid.cs" />
     <Compile Include="Administration\User\UserDialog.cs" />
+    <Compile Include="Northwind\Category\CategoryGrid.cs" />
+    <Compile Include="Northwind\Category\CategoryDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">

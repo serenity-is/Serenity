@@ -5,6 +5,7 @@
 	global.BasicApplication.Administration = global.BasicApplication.Administration || {};
 	global.BasicApplication.Common = global.BasicApplication.Common || {};
 	global.BasicApplication.Membership = global.BasicApplication.Membership || {};
+	global.BasicApplication.Northwind = global.BasicApplication.Northwind || {};
 	ss.initAssembly($asm, 'BasicApplication.Script');
 	////////////////////////////////////////////////////////////////////////////////
 	// BasicApplication.ScriptInitialization
@@ -125,6 +126,20 @@
 	};
 	$BasicApplication_Membership_LoginPanel.__typeName = 'BasicApplication.Membership.LoginPanel';
 	global.BasicApplication.Membership.LoginPanel = $BasicApplication_Membership_LoginPanel;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Northwind.CategoryDialog
+	var $BasicApplication_Northwind_CategoryDialog = function() {
+		ss.makeGenericType(Serenity.EntityDialog$1, [Object]).call(this);
+	};
+	$BasicApplication_Northwind_CategoryDialog.__typeName = 'BasicApplication.Northwind.CategoryDialog';
+	global.BasicApplication.Northwind.CategoryDialog = $BasicApplication_Northwind_CategoryDialog;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Northwind.CategoryGrid
+	var $BasicApplication_Northwind_CategoryGrid = function(container) {
+		ss.makeGenericType(Serenity.EntityGrid$1, [Object]).call(this, container);
+	};
+	$BasicApplication_Northwind_CategoryGrid.__typeName = 'BasicApplication.Northwind.CategoryGrid';
+	global.BasicApplication.Northwind.CategoryGrid = $BasicApplication_Northwind_CategoryGrid;
 	ss.initClass($BasicApplication_ScriptInitialization, $asm, {});
 	ss.initClass($BasicApplication_Administration_UserDialog, $asm, {}, ss.makeGenericType(Serenity.EntityDialog$1, [Object]), [Serenity.IDialog]);
 	ss.initClass($BasicApplication_Administration_UserForm, $asm, {
@@ -204,8 +219,21 @@
 		}
 	}, Serenity.PrefixedContext);
 	ss.initClass($BasicApplication_Membership_LoginPanel, $asm, {}, ss.makeGenericType(Serenity.PropertyDialog$1, [Object]), [Serenity.IDialog]);
+	ss.initClass($BasicApplication_Northwind_CategoryDialog, $asm, {}, ss.makeGenericType(Serenity.EntityDialog$1, [Object]), [Serenity.IDialog]);
+	ss.initClass($BasicApplication_Northwind_CategoryGrid, $asm, {
+		getColumns: function() {
+			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
+			ss.add(columns, { field: 'CategoryID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			ss.add(columns, { field: 'CategoryName', width: 200, format: this.itemLink(null, null, null, null) });
+			ss.add(columns, { field: 'Description', width: 80 });
+			ss.add(columns, { field: 'Picture', width: 80 });
+			return columns;
+		}
+	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
 	ss.setMetadata($BasicApplication_Administration_UserDialog, { attr: [new Serenity.IdPropertyAttribute('UserId'), new Serenity.NamePropertyAttribute('Username'), new Serenity.IsActivePropertyAttribute('IsActive'), new Serenity.FormKeyAttribute('Administration.User'), new Serenity.LocalTextPrefixAttribute('Administration.User'), new Serenity.ServiceAttribute('Administration/User')] });
 	ss.setMetadata($BasicApplication_Administration_UserGrid, { attr: [new Serenity.IdPropertyAttribute('UserId'), new Serenity.NamePropertyAttribute('Username'), new Serenity.IsActivePropertyAttribute('IsActive'), new Serenity.DialogTypeAttribute($BasicApplication_Administration_UserDialog), new Serenity.LocalTextPrefixAttribute('Administration.User'), new Serenity.ServiceAttribute('Administration/User')] });
 	ss.setMetadata($BasicApplication_Membership_LoginPanel, { attr: [new Serenity.FormKeyAttribute('Membership.User'), new Serenity.PanelAttribute()] });
+	ss.setMetadata($BasicApplication_Northwind_CategoryDialog, { attr: [new Serenity.IdPropertyAttribute('CategoryID'), new Serenity.NamePropertyAttribute('CategoryName'), new Serenity.FormKeyAttribute('Northwind.Category'), new Serenity.LocalTextPrefixAttribute('Northwind.Category'), new Serenity.ServiceAttribute('Northwind/Category')] });
+	ss.setMetadata($BasicApplication_Northwind_CategoryGrid, { attr: [new Serenity.IdPropertyAttribute('CategoryID'), new Serenity.NamePropertyAttribute('CategoryName'), new Serenity.DialogTypeAttribute($BasicApplication_Northwind_CategoryDialog), new Serenity.LocalTextPrefixAttribute('Northwind.Category'), new Serenity.ServiceAttribute('Northwind/Category')] });
 	ss.add(Q$Config.rootNamespaces, 'BasicApplication');
 })();

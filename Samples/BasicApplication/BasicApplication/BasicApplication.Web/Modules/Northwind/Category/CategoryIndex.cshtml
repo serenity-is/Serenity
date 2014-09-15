@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewBag.Title = "Category";
+}
+
+<div id="GridDiv"></div>
+
+<script type="text/javascript">
+    jQuery(function () {
+        new BasicApplication.Northwind.CategoryGrid($('#GridDiv'), {
+        });
+
+        Q.initFullHeightGridPage($('#GridDiv'));
+    });
+</script>

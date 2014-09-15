@@ -780,6 +780,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <Content Include="Modules\Administration\User\UserIndex.cshtml" />
+    <Content Include="Modules\Northwind\Category\CategoryIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -811,6 +812,11 @@
     <Compile Include="Modules\Administration\User\UserRepository.cs" />
     <Compile Include="Modules\Administration\User\UserEndpoint.cs" />
     <Compile Include="Modules\Administration\User\UserPage.cs" />
+    <Compile Include="Modules\Northwind\Category\CategoryRow.cs" />
+    <Compile Include="Modules\Northwind\Category\CategoryForm.cs" />
+    <Compile Include="Modules\Northwind\Category\CategoryRepository.cs" />
+    <Compile Include="Modules\Northwind\Category\CategoryEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Category\CategoryPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
