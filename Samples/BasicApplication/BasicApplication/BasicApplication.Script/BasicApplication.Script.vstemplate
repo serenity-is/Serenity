@@ -1,20 +1,20 @@
 <VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
   <TemplateData>
     <Name>BasicApplication.Script</Name>
-    <Description>&lt;No description available&gt;</Description>
+    <Description>Serenity Basic Application Sample (Script Project)</Description>
     <ProjectType>CSharp</ProjectType>
     <ProjectSubType>
     </ProjectSubType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
-    <DefaultName>BasicApplication.Script</DefaultName>
+    <DefaultName>$ext_projectname$.Script</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
-    <Icon>__TemplateIcon.ico</Icon>
+    <Icon>__TemplateIcon.png</Icon>
   </TemplateData>
   <TemplateContent>
-    <Project TargetFileName="BasicApplication.Script.csproj" File="BasicApplication.Script.csproj" ReplaceParameters="true">
+    <Project TargetFileName="$ext_projectname$.Script.csproj" File="BasicApplication.Script.csproj" ReplaceParameters="true">
       <Folder Name="Administration" TargetFolderName="Administration">
         <Folder Name="User" TargetFolderName="User">
           <ProjectItem ReplaceParameters="true" TargetFileName="UserDialog.cs">UserDialog.cs</ProjectItem>
@@ -51,4 +51,21 @@
       <ProjectItem ReplaceParameters="true" TargetFileName="ScriptInitialization.cs">ScriptInitialization.cs</ProjectItem>
     </Project>
   </TemplateContent>
+  <WizardExtension>
+    <Assembly>NuGet.VisualStudio.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>NuGet.VisualStudio.TemplateWizard</FullClassName>
+  </WizardExtension>
+  <WizardData>
+    <packages repository="extension" repositoryId="SerenityBasicApplicationSampleV1">
+      <package id="Saltarelle.Compiler" version="2.5.0" />
+      <package id="Saltarelle.jQuery" version="1.10.1" />
+      <package id="Saltarelle.jQuery.UI" version="1.10.1" />
+      <package id="Saltarelle.Linq" version="2.4.0" />
+      <package id="Saltarelle.Runtime" version="2.5.0" />
+      <package id="Saltarelle.Web" version="3.1.0" />
+      <package id="Serenity.Script.Core" version="1.0.9" />
+      <package id="Serenity.Script.Imports" version="1.0.9" />
+      <package id="Serenity.Script.UI" version="1.0.9" />
+    </packages>
+  </WizardData>
 </VSTemplate>
