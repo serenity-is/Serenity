@@ -46,53 +46,53 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(SolutionDir)packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Caching.Web, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Caching.Web, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Caching.Web.1.0.9\lib\net45\Serenity.Caching.Web.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Caching.Web.1.1.0\lib\net45\Serenity.Caching.Web.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.CodeGeneration, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.CodeGeneration, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.CodeGeneration.1.0.9\lib\net45\Serenity.CodeGeneration.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.CodeGeneration.1.1.0\lib\net45\Serenity.CodeGeneration.dll</HintPath>
     </Reference>
     <Reference Include="Serenity.CodeGeneration.Mvc, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SolutionDir)packages\Serenity.CodeGeneration.Mvc.1.0.9\lib\net45\Serenity.CodeGeneration.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Core, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Core, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.Core.1.0.9\lib\net45\Serenity.Core.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Core.1.1.0\lib\net45\Serenity.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Data, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.Data.1.0.9\lib\net45\Serenity.Data.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Data.1.1.0\lib\net45\Serenity.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Entity, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Data.Entity, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.Data.Entity.1.0.9\lib\net45\Serenity.Data.Entity.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Data.Entity.1.1.0\lib\net45\Serenity.Data.Entity.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Filtering, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Data.Filtering, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.Data.Filtering.1.0.9\lib\net45\Serenity.Data.Filtering.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Data.Filtering.1.1.0\lib\net45\Serenity.Data.Filtering.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Munq, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Munq, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Munq.1.0.9\lib\net45\Serenity.Munq.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Munq.1.1.0\lib\net45\Serenity.Munq.dll</HintPath>
     </Reference>
     <Reference Include="Serenity.Reporting, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SolutionDir)packages\Serenity.Reporting.1.0.9\lib\net45\Serenity.Reporting.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Services, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.Services.1.0.9\lib\net45\Serenity.Services.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Services.1.1.0\lib\net45\Serenity.Services.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services.Mvc, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Services.Mvc, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.Services.Mvc.1.0.9\lib\net45\Serenity.Services.Mvc.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Services.Mvc.1.1.0\lib\net45\Serenity.Services.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Web, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Web, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Web.1.0.9\lib\net45\Serenity.Web.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Web.1.1.0\lib\net45\Serenity.Web.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />

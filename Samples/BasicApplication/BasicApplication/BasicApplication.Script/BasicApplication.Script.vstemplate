@@ -20,6 +20,11 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="UserGrid.cs">UserGrid.cs</ProjectItem>
         </Folder>
       </Folder>
+      <Folder Name="Common" TargetFolderName="Common">
+        <Folder Name="Navigation" TargetFolderName="Navigation">
+          <ProjectItem ReplaceParameters="true" TargetFileName="SidebarSearch.cs">SidebarSearch.cs</ProjectItem>
+        </Folder>
+      </Folder>
       <Folder Name="Imports" TargetFolderName="Imports">
         <Folder Name="FormContexts" TargetFolderName="FormContexts">
           <ProjectItem ReplaceParameters="true" TargetFileName="FormContexts.tt">FormContexts.tt</ProjectItem>
@@ -62,9 +67,9 @@
       <package id="Saltarelle.Linq" version="2.4.0" />
       <package id="Saltarelle.Runtime" version="2.5.0" />
       <package id="Saltarelle.Web" version="3.1.0" />
-      <package id="Serenity.Script.Core" version="1.0.9" />
-      <package id="Serenity.Script.Imports" version="1.0.9" />
-      <package id="Serenity.Script.UI" version="1.0.9" />
+      <package id="Serenity.Script.Core" version="1.1.0" />
+      <package id="Serenity.Script.Imports" version="1.1.0" />
+      <package id="Serenity.Script.UI" version="1.1.0" />
     </packages>
   </WizardData>
 </VSTemplate>

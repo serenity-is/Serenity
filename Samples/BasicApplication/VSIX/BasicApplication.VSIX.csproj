@@ -146,10 +146,10 @@
     <Content Include="packages\Select2.js.3.5.1.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Caching.Web.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Caching.Web.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.CodeGeneration.1.0.9.nupkg">
+    <Content Include="packages\Serenity.CodeGeneration.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="packages\Serenity.CodeGeneration.Mvc.1.0.9.nupkg">
@@ -158,40 +158,40 @@
     <Content Include="packages\Serenity.CodeGenerator.1.0.9.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Core.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Core.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Data.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Data.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Data.Entity.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Data.Entity.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Data.Filtering.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Data.Filtering.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Munq.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Munq.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="packages\Serenity.Reporting.1.0.9.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Script.Core.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Script.Core.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Script.Imports.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Script.Imports.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Script.UI.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Script.UI.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Services.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Services.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Services.Mvc.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Services.Mvc.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="packages\Serenity.Web.1.0.9.nupkg">
+    <Content Include="packages\Serenity.Web.1.1.0.nupkg">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="packages\SlickGrid.2.2.20140120.nupkg">
