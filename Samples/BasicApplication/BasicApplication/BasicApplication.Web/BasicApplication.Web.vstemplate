@@ -384,6 +384,7 @@
         </Folder>
         <ProjectItem ReplaceParameters="true" TargetFileName="simple-line-icons.css">simple-line-icons.css</ProjectItem>
         <Folder Name="site" TargetFolderName="site">
+          <ProjectItem ReplaceParameters="true" TargetFileName="site.css">site.css</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="site.layout.less">site.layout.less</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="site.less">site.less</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="site.mixins.less">site.mixins.less</ProjectItem>

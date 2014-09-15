@@ -480,6 +480,7 @@
     <Content Include="Content\serenity\images\zoom.png" />
     <Content Include="Content\serenity\serenity.css" />
     <Content Include="Content\simple-line-icons.css" />
+    <Content Include="Content\site\site.css" />
     <Content Include="Content\site\site.mixins.less" />
     <Content Include="Content\site\site.overrides.serenity.less" />
     <Content Include="Content\bootstrap-theme.css.map" />
