@@ -40,6 +40,13 @@ Action<string> minimizeJs = filename => {
             " --comments --mangle"
     });
 };
+
+Action runGitLink = () => {
+    StartProcess("./Tools/GitHubLink/GitHubLink.exe", new ProcessSettings
+    { 
+        Arguments = System.IO.Path.GetFullPath(@".\") + " -u https://github.com/volkanceylan/serenity"
+    });
+};
     
 Task("Clean")
     .Does(() =>
@@ -87,6 +94,7 @@ Task("Pack")
     .IsDependentOn("Copy-Files")
     .Does(() =>
 {
+    runGitLink();
 });
 
 Task("NuGet")
