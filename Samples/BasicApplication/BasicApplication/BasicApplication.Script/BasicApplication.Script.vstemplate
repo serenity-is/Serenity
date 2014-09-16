@@ -48,6 +48,12 @@
       <Folder Name="Membership" TargetFolderName="Membership">
         <ProjectItem ReplaceParameters="true" TargetFileName="LoginPanel.cs">LoginPanel.cs</ProjectItem>
       </Folder>
+      <Folder Name="Northwind" TargetFolderName="Northwind">
+        <Folder Name="Category" TargetFolderName="Category">
+          <ProjectItem ReplaceParameters="true" TargetFileName="CategoryDialog.cs">CategoryDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="CategoryGrid.cs">CategoryGrid.cs</ProjectItem>
+        </Folder>
+      </Folder>
       <ProjectItem ReplaceParameters="true" TargetFileName="packages.config">packages.config</ProjectItem>
       <Folder Name="Properties" TargetFolderName="Properties">
         <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>
@@ -67,9 +73,7 @@
       <package id="Saltarelle.Linq" version="2.4.0" />
       <package id="Saltarelle.Runtime" version="2.5.0" />
       <package id="Saltarelle.Web" version="3.1.0" />
-      <package id="Serenity.Script.Core" version="1.1.0" />
-      <package id="Serenity.Script.Imports" version="1.1.0" />
-      <package id="Serenity.Script.UI" version="1.1.0" />
+      <package id="Serenity.Script" version="1.1.1" />
     </packages>
   </WizardData>
 </VSTemplate>

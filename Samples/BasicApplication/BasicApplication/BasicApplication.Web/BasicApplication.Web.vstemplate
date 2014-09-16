@@ -535,6 +535,17 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="LoginRequest.cs">LoginRequest.cs</ProjectItem>
           </Folder>
         </Folder>
+        <Folder Name="Northwind" TargetFolderName="Northwind">
+          <Folder Name="Category" TargetFolderName="Category">
+            <ProjectItem ReplaceParameters="true" TargetFileName="CategoryEndpoint.cs">CategoryEndpoint.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="CategoryForm.cs">CategoryForm.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="CategoryIndex.cshtml">CategoryIndex.cshtml</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="CategoryPage.cs">CategoryPage.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="CategoryRepository.cs">CategoryRepository.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="CategoryRow.cs">CategoryRow.cs</ProjectItem>
+          </Folder>
+        </Folder>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Texts.cs">Texts.cs</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="Web.config">Web.config</ProjectItem>
       </Folder>
       <ProjectItem ReplaceParameters="true" TargetFileName="packages.config">packages.config</ProjectItem>
@@ -582,6 +593,8 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.min.map">jquery-2.1.1.min.map</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.10.4.js">jquery-ui-1.10.4.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.10.4.min.js">jquery-ui-1.10.4.min.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jsrender.js">jsrender.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jsrender.min.js">jsrender.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="pace.js">pace.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="pace.min.js">pace.min.js</ProjectItem>
         <Folder Name="saltarelle" TargetFolderName="saltarelle">
@@ -650,11 +663,14 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="Serenity.Script.UI.js">Serenity.Script.UI.js</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Serenity.Script.UI.min.js">Serenity.Script.UI.min.js</ProjectItem>
           <Folder Name="texts" TargetFolderName="texts">
-            <ProjectItem ReplaceParameters="true" TargetFileName="serenity.texts.tr-TR.js">serenity.texts.tr-TR.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="serenity.texts.tr.json">serenity.texts.tr.json</ProjectItem>
           </Folder>
         </Folder>
         <Folder Name="site" TargetFolderName="site">
           <ProjectItem ReplaceParameters="true" TargetFileName="$ext_safeprojectname$.Script.js">BasicApplication.Script.js</ProjectItem>
+          <Folder Name="texts" TargetFolderName="texts">
+            <ProjectItem ReplaceParameters="true" TargetFileName="site.texts.tr.json">site.texts.tr.json</ProjectItem>
+          </Folder>
         </Folder>
         <Folder Name="SlickGrid" TargetFolderName="SlickGrid">
           <Folder Name="Controls" TargetFolderName="Controls">
@@ -792,19 +808,12 @@
       <package id="Microsoft.Web.Infrastructure" version="1.0.0.0" />
       <package id="Newtonsoft.Json" version="6.0.4" />
       <package id="Select2.js" version="3.5.1" />
-      <package id="Serenity.Caching.Web" version="1.1.0" />
-      <package id="Serenity.CodeGeneration" version="1.1.0" />
-      <package id="Serenity.CodeGeneration.Mvc" version="1.0.9" />
-      <package id="Serenity.CodeGenerator" version="1.0.9" />
-      <package id="Serenity.Core" version="1.1.0" />
-      <package id="Serenity.Data" version="1.1.0" />
-      <package id="Serenity.Data.Entity" version="1.1.0" />
-      <package id="Serenity.Data.Filtering" version="1.1.0" />
-      <package id="Serenity.Munq" version="1.1.0" />
-      <package id="Serenity.Reporting" version="1.0.9" />
-      <package id="Serenity.Services" version="1.1.0" />
-      <package id="Serenity.Services.Mvc" version="1.1.0" />
-      <package id="Serenity.Web" version="1.1.0" />
+      <package id="Serenity.CodeGenerator" version="1.1.1" />
+      <package id="Serenity.Core" version="1.1.1" />
+      <package id="Serenity.Data" version="1.1.1" />
+      <package id="Serenity.Data.Entity" version="1.1.1" />
+      <package id="Serenity.Services" version="1.1.1" />
+      <package id="Serenity.Web" version="1.1.1" />
       <package id="SlickGrid" version="2.2.20140120" />
       <package id="toastr" version="2.0.3" />
     </packages>
