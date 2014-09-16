@@ -1506,7 +1506,7 @@
 	$Texts$Controls$EntityDialog.EditRecordTitle = new Q$LT('Edit {0}{1}');
 	$Q$LT.initializeTextClass($Texts$Controls$EntityDialog, 'Controls.EntityDialog.');
 	$Texts$Controls$EntityGrid.NewButton = new Q$LT('New {0}');
-	$Texts$Controls$EntityGrid.RefreshButton = new Q$LT('Yenile');
+	$Texts$Controls$EntityGrid.RefreshButton = new Q$LT('Refresh');
 	$Q$LT.initializeTextClass($Texts$Controls$EntityGrid, 'Controls.EntityGrid.');
 	$Texts$Controls$Pager.Page = new Q$LT('Page');
 	$Texts$Controls$Pager.PageStatus = new Q$LT('Showing {from} to {to} of {total} total records');

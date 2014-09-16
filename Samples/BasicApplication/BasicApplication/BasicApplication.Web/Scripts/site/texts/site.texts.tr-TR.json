@@ -1,0 +1,37 @@
+﻿{
+    "Db": {
+        "Administration": {
+            "User": {
+                "DisplayName": "Görünen İsim",
+                "Email": "E-posta",
+                "EntitySingular": "Kullanıcı",
+                "EntityPlural": "Kullanıcılar",
+                "Source": "Kaynak",
+                "Username": "Kullanıcı Adı",
+                "Password": "Şifre",
+                "PasswordConfirm": "Şifre Onay"
+            }
+        },
+        "Northwind": {
+            "Category": {
+                "CategoryName": "Kategori Adı",
+                "Description": "Açıklama",
+                "EntitySingular": "Kategori",
+                "EntityPlural":  "Kategoriler",
+                "Picture": "Resim"
+            }
+        }
+    },
+    "Navigation": {
+        "Dashboard": "Ana Sayfa",
+        "Administration": "Yönetim",
+        "Administration/User Management": "Kullanıcı Yönetimi",
+        "Northwind": "Northwind",
+        "Northwind/Categories": "Kategoriler"
+    },
+    "Site": {
+        "Dashboard": {
+            "WelcomeMessage": "Serenity BasicApplication ana sayfasına hoşgeldiniz. Soldaki navigasyondan diğer sayfaları inceleyebilirsiniz..."
+        }
+    }
+}

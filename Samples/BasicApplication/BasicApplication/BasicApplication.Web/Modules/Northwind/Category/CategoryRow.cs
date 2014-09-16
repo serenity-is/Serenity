@@ -9,7 +9,7 @@ namespace BasicApplication.Northwind.Entities
     using System.ComponentModel;
     using System.IO;
 
-    [ConnectionKey("Default"), DisplayName("Categories"), InstanceName("Categories")]
+    [ConnectionKey("Default"), DisplayName("Categories"), InstanceName("Category")]
     [ReadPermission("Administration")]
     [ModifyPermission("Administration")]
     [JsonConverter(typeof(JsonRowConverter))]

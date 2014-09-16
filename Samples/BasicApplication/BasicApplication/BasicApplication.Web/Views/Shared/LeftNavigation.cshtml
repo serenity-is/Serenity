@@ -18,7 +18,7 @@
         <li id="LeftNavigationSection_@i">
 	        <a href="@(section.Url ?? "javascript:;")">
                 <span class="sidebar-nav-item-icon @(section.IconClass ?? (section.Children.Count > 0 ? "fa icon-layers" : "fa icon-none"))"></span>
-                <span class="sidebar-nav-item">@(section.Title)</span>
+                <span class="sidebar-nav-item">@(LocalText.TryGet("Navigation." + section.Title) ?? section.Title)</span>
                 @if (!section.Children.IsEmptyOrNull()){<span class="fa arrow"></span>}
 	        </a>
 
@@ -55,7 +55,7 @@
                 <li id="LeftNavigationLink_@(i)_@(l)">
                     <a href="@(link.Url ?? "javascript:;")">
                         <span class="sidebar-nav-item-icon @(link.IconClass ?? (link.Children.Count > 0 ? "fa icon-layers" : "fa icon-none"))"></span>
-                        @(link.Title)
+                        @(LocalText.TryGet("Navigation." + section.Title + "/" + link.Title) ?? link.Title)
                     </a>
                 </li>
 

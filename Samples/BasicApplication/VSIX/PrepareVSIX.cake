@@ -165,6 +165,7 @@ Task("PrepareVSIX")
                 extension == ".ttinclude" ||
                 extension == ".txt" ||
                 extension == ".js" ||
+                extension == ".json" ||
                 extension == ".asax" ||
                 extension == ".cshtml" ||
                 extension == ".html";

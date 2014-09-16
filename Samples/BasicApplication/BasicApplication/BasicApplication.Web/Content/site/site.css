@@ -697,6 +697,10 @@ body {
 #LoginPanelWrapper .s-Form .caption {
   padding: 6px 10px;
 }
+#s-DashboardPage h1 {
+  margin: 40px;
+  font-size: 16px;
+}
 .s-UserDialog > .size {
   min-width: 650px;
   width: 650px;
@@ -733,5 +737,43 @@ body {
   width: 215px;
 }
 .s-UserDialog .categories {
+  height: 260px;
+}
+.s-CategoryDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-CategoryDialog .tab-pane {
+  height: auto;
+}
+.s-CategoryDialog .caption {
+  width: 150px;
+}
+.s-CategoryDialog .editor {
+  width: 400px;
+}
+.s-CategoryDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-CategoryDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-CategoryDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-CategoryDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-CategoryDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-CategoryDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-CategoryDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-CategoryDialog .categories {
   height: 260px;
 }

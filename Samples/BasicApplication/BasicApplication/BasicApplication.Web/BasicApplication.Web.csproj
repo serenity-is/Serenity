@@ -46,53 +46,53 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(SolutionDir)packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Caching.Web, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Caching.Web, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Caching.Web.1.1.0\lib\net45\Serenity.Caching.Web.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Caching.Web.1.1.1\lib\net45\Serenity.Caching.Web.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.CodeGeneration, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.CodeGeneration, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.CodeGeneration.1.1.0\lib\net45\Serenity.CodeGeneration.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.CodeGeneration.1.1.1\lib\net45\Serenity.CodeGeneration.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.CodeGeneration.Mvc, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.CodeGeneration.Mvc, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.CodeGeneration.Mvc.1.0.9\lib\net45\Serenity.CodeGeneration.Mvc.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.CodeGeneration.Mvc.1.1.1\lib\net45\Serenity.CodeGeneration.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Core, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Core, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Core.1.1.0\lib\net45\Serenity.Core.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Core.1.1.1\lib\net45\Serenity.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Data, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Data.1.1.0\lib\net45\Serenity.Data.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Data.1.1.1\lib\net45\Serenity.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Entity, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Data.Entity, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Data.Entity.1.1.0\lib\net45\Serenity.Data.Entity.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Data.Entity.1.1.1\lib\net45\Serenity.Data.Entity.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Filtering, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Data.Filtering, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Data.Filtering.1.1.0\lib\net45\Serenity.Data.Filtering.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Data.Filtering.1.1.1\lib\net45\Serenity.Data.Filtering.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Munq, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Munq, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Munq.1.1.0\lib\net45\Serenity.Munq.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Munq.1.1.1\lib\net45\Serenity.Munq.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Reporting, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Reporting, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)packages\Serenity.Reporting.1.0.9\lib\net45\Serenity.Reporting.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Reporting.1.1.1\lib\net45\Serenity.Reporting.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Services, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Services.1.1.0\lib\net45\Serenity.Services.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Services.1.1.1\lib\net45\Serenity.Services.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services.Mvc, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Services.Mvc, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Services.Mvc.1.1.0\lib\net45\Serenity.Services.Mvc.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Services.Mvc.1.1.1\lib\net45\Serenity.Services.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Web, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Web, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Web.1.1.0\lib\net45\Serenity.Web.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Web.1.1.1\lib\net45\Serenity.Web.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -559,18 +559,18 @@
     <Content Include="Content\toastr.min.css" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="fonts\Simple-Line-Icons.dev.svg" />
-    <Content Include="fonts\Simple-Line-Icons.svg" />
-    <Content Include="Readme.CodeGenerator.txt" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\toastr.scss" />
     <Content Include="Content\toastr.less" />
+    <Content Include="fonts\Simple-Line-Icons.dev.svg" />
+    <Content Include="fonts\Simple-Line-Icons.svg" />
     <Content Include="fonts\Simple-Line-Icons.woff" />
     <Content Include="fonts\Simple-Line-Icons.ttf" />
     <Content Include="fonts\Simple-Line-Icons.eot" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
+    <None Include="Readme.CodeGenerator.txt" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jlayout.border.js" />
@@ -670,7 +670,8 @@
     <Content Include="Scripts\serenity\Serenity.Script.Core.min.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
-    <Content Include="Scripts\serenity\texts\serenity.texts.tr-TR.js" />
+    <Content Include="Scripts\serenity\texts\serenity.texts.tr-TR.json" />
+    <None Include="Scripts\site\texts\site.texts.tr-TR.json" />
     <Content Include="Scripts\SlickGrid\Controls\slick.columnpicker.js" />
     <Content Include="Scripts\SlickGrid\Controls\slick.pager.js" />
     <Content Include="Scripts\SlickGrid\Plugins\slick.autotooltips.js" />
@@ -692,10 +693,6 @@
     <Content Include="Scripts\SlickGrid\slick.remotemodel.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
-    <Content Include="tools\Mono.Cecil\Mono.Cecil.dll" />
-    <Content Include="tools\Mono.Cecil\Mono.Cecil.Mdb.dll" />
-    <Content Include="tools\Mono.Cecil\Mono.Cecil.Pdb.dll" />
-    <Content Include="tools\Mono.Cecil\Mono.Cecil.Rocks.dll" />
     <Content Include="packages.config" />
     <Content Include="Modules\Membership\Account\AccountLogin.cshtml" />
     <Content Include="Modules\Web.config" />
@@ -709,6 +706,10 @@
     <Content Include="Modules\_ViewStart.cshtml" />
     <Content Include="Content\site\site.layout.less" />
     <Content Include="Scripts\site\BasicApplication.Script.js" />
+    <Content Include="tools\Mono.Cecil\Mono.Cecil.dll" />
+    <Content Include="tools\Mono.Cecil\Mono.Cecil.Mdb.dll" />
+    <Content Include="tools\Mono.Cecil\Mono.Cecil.Pdb.dll" />
+    <Content Include="tools\Mono.Cecil\Mono.Cecil.Rocks.dll" />
     <Content Include="tools\Node\less\lib\less\colors.js" />
     <Content Include="tools\Node\less\lib\less\encoder.js" />
     <Content Include="tools\Node\less\lib\less\env.js" />
@@ -765,7 +766,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\_LayoutHead.cshtml" />
     <Content Include="Views\Shared\_LayoutNoNavigation.cshtml" />
-    <Content Include="tools\Node\lessc.cmd" />
     <Content Include="tools\Node\less\bin\lessc" />
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
@@ -773,6 +773,7 @@
     <Content Include="fonts\FontAwesome.otf" />
     <Content Include="Scripts\jquery-2.1.1.min.map" />
     <Content Include="Scripts\toastr.min.js.map" />
+    <Content Include="tools\Node\lessc.cmd" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -796,6 +797,7 @@
     <Compile Include="Modules\Common\Dashboard\DashboardPage.cs" />
     <Compile Include="Modules\Common\Navigation\NavigationCategories.cs" />
     <Compile Include="Modules\Common\Navigation\NavigationModel.cs" />
+    <Compile Include="Modules\Texts.cs" />
     <Compile Include="Modules\Membership\Account\AccountPage.cs" />
     <Compile Include="Modules\Administration\User\AuthorizationService.cs" />
     <Compile Include="Modules\Administration\User\PermissionService.cs" />

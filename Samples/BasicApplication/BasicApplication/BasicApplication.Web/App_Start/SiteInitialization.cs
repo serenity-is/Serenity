@@ -3,6 +3,7 @@
     using Serenity;
     using Serenity.Abstractions;
     using Serenity.Data;
+    using Serenity.Localization;
     using System;
     using System.Data;
     using System.Data.Common;
@@ -25,6 +26,8 @@
                 registrar.RegisterInstance<IAuthenticationService>(new Administration.AuthenticationService());
                 registrar.RegisterInstance<IPermissionService>(new Administration.PermissionService());
                 registrar.RegisterInstance<IUserRetrieveService>(new Administration.UserRetrieveService());
+
+                Dependency.Resolve<ILocalTextProvider>().Add(new LocalTextEntry("en-US", "Site.Dashboard.WelcomeMessage", "Hello world!"), false);
             }
             catch (Exception ex)
             {

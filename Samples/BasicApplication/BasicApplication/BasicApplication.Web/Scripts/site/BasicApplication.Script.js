@@ -224,9 +224,8 @@
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
 			ss.add(columns, { field: 'CategoryID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'CategoryName', width: 200, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'Description', width: 80 });
-			ss.add(columns, { field: 'Picture', width: 80 });
+			ss.add(columns, { field: 'CategoryName', width: 250, format: this.itemLink(null, null, null, null) });
+			ss.add(columns, { field: 'Description', width: 450 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);

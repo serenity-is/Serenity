@@ -71,6 +71,14 @@ namespace BasicApplication.Administration.Entities
             set { Fields.Password[this] = value; }
         }
 
+        [DisplayName("Confirm Password"), Size(50), SetFieldFlags(FieldFlags.ClientSide)]
+        public String PasswordConfirm
+        {
+            get { return Fields.PasswordConfirm[this]; }
+            set { Fields.PasswordConfirm[this] = value; }
+        }
+
+
         IIdField IIdRow.IdField
         {
             get { return Fields.UserId; }
@@ -99,6 +107,7 @@ namespace BasicApplication.Administration.Entities
             public readonly StringField Email;
 
             public readonly StringField Password;
+            public readonly StringField PasswordConfirm;
 
             public RowFields()
                 : base("Users")

@@ -71,17 +71,17 @@
     <Reference Include="Saltarelle.Web">
       <HintPath>$(SolutionDir)packages\Saltarelle.Web.3.1.0\lib\Saltarelle.Web.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Script.Core, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Script.Core, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Script.Core.1.1.0\lib\net20\Serenity.Script.Core.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Script.Core.1.1.1\lib\net20\Serenity.Script.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Script.Imports, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Script.Imports, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Script.Imports.1.1.0\lib\net20\Serenity.Script.Imports.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Script.Imports.1.1.1\lib\net20\Serenity.Script.Imports.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Script.UI, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Serenity.Script.UI, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Script.UI.1.1.0\lib\net20\Serenity.Script.UI.dll</HintPath>
+      <HintPath>..\..\packages\Serenity.Script.UI.1.1.1\lib\net20\Serenity.Script.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -121,15 +121,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
   <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
-  <Target Name="CopyGeneratedScriptToWeb" AfterTargets="CopyFilesToOutputDirectory">
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\site\$(AssemblyName).js" Condition="Exists('$(TargetDir)$(AssemblyName).js')">
-    </Copy>
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild">
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\site\$(AssemblyName).js">
+    </Copy>
+  </Target>
 </Project>

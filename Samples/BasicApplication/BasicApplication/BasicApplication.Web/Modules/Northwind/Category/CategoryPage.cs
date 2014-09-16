@@ -1,5 +1,5 @@
 ﻿
-[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "Northwind/Category", url: "~/Northwind/Category", permission: "Administration")]
+[assembly:Serenity.Navigation.NavigationLink(9200, "Northwind/Categories", url: "~/Northwind/Category", permission: "Administration", icon: "icon-folder-alt")]
 
 namespace BasicApplication.Northwind.Pages
 {

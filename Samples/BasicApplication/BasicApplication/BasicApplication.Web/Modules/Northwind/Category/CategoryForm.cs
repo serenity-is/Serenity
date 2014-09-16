@@ -14,6 +14,5 @@ namespace BasicApplication.Northwind.Forms
     {
         public String CategoryName { get; set; }
         public String Description { get; set; }
-        public Stream Picture { get; set; }
     }
 }

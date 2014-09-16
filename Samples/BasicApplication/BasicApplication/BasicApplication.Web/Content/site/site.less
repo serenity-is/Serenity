@@ -37,13 +37,22 @@
     }
 }
 
-.s-UserDialog {
-    > .size {
-        .widthAndMin(650px);
-    }
-    .dialog-styles(@h: auto, @l: 150px, @e: 400px);
-
-    .categories {
-        height: 260px;
+#s-DashboardPage {
+    h1 {
+        margin: 40px;
+        font-size: 16px;
     }
 }
+
+.s-UserDialog {
+    > .size { .widthAndMin(650px); }
+    .dialog-styles(@h: auto, @l: 150px, @e: 400px);
+    .categories { height: 260px; }
+}
+
+.s-CategoryDialog {
+    > .size { .widthAndMin(650px); }
+    .dialog-styles(@h: auto, @l: 150px, @e: 400px);
+    .categories { height: 260px; }
+}
+

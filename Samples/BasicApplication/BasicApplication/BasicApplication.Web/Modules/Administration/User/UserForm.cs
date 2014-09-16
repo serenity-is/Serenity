@@ -15,7 +15,7 @@
         public String Email { get; set; }
         [PasswordEditor]
         public String Password { get; set; }
-        [PasswordEditor, DisplayName("Confirm Password"), OneWay]
+        [PasswordEditor, OneWay]
         public String PasswordConfirm { get; set; }
         [OneWay]
         public string Source { get; set; }
