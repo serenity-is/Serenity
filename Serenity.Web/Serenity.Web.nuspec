@@ -40,6 +40,7 @@
   </metadata>
   <files>
     <file src="${id}.dll" target="lib/${framework}" />
+    <file src="${id}.pdb" target="lib/${framework}" />
     <file src="..\..\Includes\web.config.transform" target="content\web.config.transform" />
     <file src="..\..\Includes\Content\**\*.css" target="content\Content" />
     <file src="..\..\Includes\Content\**\*.png" target="content\Content" />

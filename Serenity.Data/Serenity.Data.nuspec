@@ -18,6 +18,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="Serenity.Data.dll" target="lib/${framework}" />
+    <file src="${id}.dll" target="lib/${framework}" />
+    <file src="${id}.pdb" target="lib/${framework}" />
   </files>
 </package>
