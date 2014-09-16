@@ -49,7 +49,7 @@ namespace Serenity
 
         public static string TryGet(string key)
         {
-            var provider = Dependency.TryResolve<ILocalTextProvider>();
+            var provider = Dependency.TryResolve<ILocalTextRegistry>();
             return provider == null ? null : provider.TryGet(key);
         }
     }

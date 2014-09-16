@@ -12,7 +12,7 @@ namespace Serenity.Localization
     {
         public static void Initialize(string languageID = LocalText.InvariantLanguageID)
         {
-            var provider = Dependency.Resolve<ILocalTextProvider>();
+            var provider = Dependency.Resolve<ILocalTextRegistry>();
 
             foreach (var row in RowRegistry.EnumerateRows())
             {
@@ -27,18 +27,18 @@ namespace Serenity.Localization
                         !lt.Key.StartsWith("Db."))
                     {
                         var key = "Db." + prefix + "." + (field.PropertyName ?? field.Name);
-                        provider.Add(new LocalTextEntry(languageID, key, lt.Key), false);
+                        provider.Add(languageID, key, lt.Key);
                         field.Caption = new LocalText(key);
                     }
                 }
 
                 var displayName = row.GetType().GetCustomAttribute<DisplayNameAttribute>();
                 if (displayName != null)
-                    provider.Add(new LocalTextEntry(languageID, "Db." + prefix + ".EntityPlural", displayName.DisplayName), false);
+                    provider.Add(languageID, "Db." + prefix + ".EntityPlural", displayName.DisplayName);
 
                 var instanceName = row.GetType().GetCustomAttribute<InstanceNameAttribute>();
                 if (instanceName != null)
-                    provider.Add(new LocalTextEntry(languageID, "Db." + prefix + ".EntitySingular", instanceName.InstanceName), false);
+                    provider.Add(languageID, "Db." + prefix + ".EntitySingular", instanceName.InstanceName);
             }
         }
 

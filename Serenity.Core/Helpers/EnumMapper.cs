@@ -118,8 +118,7 @@ namespace Serenity
                         if (attributes.Length > 0)
                         {
                             text = ((DescriptionAttribute)attributes[0]).Description;
-                            Dependency.Resolve<ILocalTextProvider>().Add(
-                                new LocalTextEntry(LocalText.InvariantLanguageID, key, text), false);
+                            Dependency.Resolve<ILocalTextRegistry>().Add(LocalText.InvariantLanguageID, key, text);
                         }
                     }
                 }

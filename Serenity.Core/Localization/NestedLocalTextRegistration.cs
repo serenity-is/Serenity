@@ -33,7 +33,7 @@ namespace Serenity.Localization
 
         private static void Initialize(Type type, string languageID, string prefix)
         {
-            var provider = Dependency.Resolve<ILocalTextProvider>();
+            var provider = Dependency.Resolve<ILocalTextRegistry>();
             foreach (var member in type.GetMembers(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 var fi = member as FieldInfo;
@@ -43,7 +43,7 @@ namespace Serenity.Localization
                     var value = fi.GetValue(null) as LocalText;
                     if (value != null)
                     {
-                        provider.Add(new LocalTextEntry(languageID, prefix + fi.Name, value.Key), false);
+                        provider.Add(languageID, prefix + fi.Name, value.Key);
                         fi.SetValue(null, new LocalText(prefix + fi.Name));
                     }
                 }
@@ -65,7 +65,7 @@ namespace Serenity.Localization
                 return;
 
             prefix = prefix ?? "";
-            var registry = Dependency.Resolve<ILocalTextProvider>();
+            var registry = Dependency.Resolve<ILocalTextRegistry>();
 
             foreach (var k in obj)
             {
@@ -75,7 +75,7 @@ namespace Serenity.Localization
                     AddFromDictionary((IDictionary<string, JToken>)o, actual + ".", languageID);
                 else
                 {
-                    registry.Add(new LocalTextEntry(languageID, actual, o.ToString()), false);
+                    registry.Add(languageID, actual, o.ToString());
                 }
             }
         }

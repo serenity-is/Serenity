@@ -7,7 +7,7 @@ namespace Serenity.Localization
     using System.Globalization;
     using ItemKey = System.Tuple<string, string>;
 
-    public class LocalTextRegistry : ILocalTextProvider
+    public class LocalTextRegistry : ILocalTextRegistry
     {
         private readonly ConcurrentDictionary<string, string> languageParents = new ConcurrentDictionary<string, string>();
         private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = new ConcurrentDictionary<ItemKey, string>();
@@ -35,18 +35,9 @@ namespace Serenity.Localization
                 key, context != null && context.IsApprovalMode);
         }
 
-        public void Add(LocalTextEntry e, bool pendingApproval)
+        public void Add(string languageID, string key, string text)
         {
-            var dict = pendingApproval ? pendingTexts : approvedTexts;
-            dict[new ItemKey(e.LanguageID, e.Key)] = e.Text;
-        }
-
-        public void AddList(IEnumerable<LocalTextEntry> list, bool pendingApproval)
-        {
-            var dict = pendingApproval ? pendingTexts : approvedTexts;
-
-            foreach (var e in list)
-                dict[new ItemKey(e.LanguageID, e.Key)] = e.Text;
+            approvedTexts[new ItemKey(languageID, key)] = text;
         }
 
         /// <summary>

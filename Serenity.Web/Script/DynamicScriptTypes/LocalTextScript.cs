@@ -74,7 +74,7 @@ namespace Serenity.Web
             }
             sb.Append(")$");
             var regex = new Regex(sb.ToString(), RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var texts = ((LocalTextRegistry)Dependency.Resolve<ILocalTextProvider>())
+            var texts = ((LocalTextRegistry)Dependency.Resolve<ILocalTextRegistry>())
                 .GetAllAvailableTextsInLanguage(languageId, isPending);
 
             var list = new List<KeyValuePair<string, string>>();

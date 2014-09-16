@@ -121,7 +121,6 @@
     <Compile Include="Helpers\Invariants.cs" />
     <Compile Include="Interface\ISupportAttached.cs" />
     <Compile Include="Localization\LocalText.cs" />
-    <Compile Include="Localization\LocalTextEntry.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Localization\LocalTextRegistry.cs" />
     <Compile Include="Localization\EnumLocalTexts.cs" />

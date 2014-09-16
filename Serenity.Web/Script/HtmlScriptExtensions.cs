@@ -56,7 +56,7 @@ namespace Serenity.Web
 
         public static string GetLocalTextInclude(this HtmlHelper page, string package)
         {
-            var provider = Dependency.Resolve<ILocalTextProvider>() as LocalTextRegistry;
+            var provider = Dependency.Resolve<ILocalTextRegistry>() as LocalTextRegistry;
 
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
             bool isPending = provider != null && provider.ContextIsApprovalMode;

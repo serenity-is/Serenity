@@ -12,7 +12,7 @@ namespace Serenity.Localization
         public static void Initialize(IEnumerable<Assembly> assemblies,
             string languageID = LocalText.InvariantLanguageID)
         {
-            var provider = Dependency.Resolve<ILocalTextProvider>();
+            var provider = Dependency.Resolve<ILocalTextRegistry>();
 
             foreach (var assembly in assemblies)
             {
@@ -28,7 +28,7 @@ namespace Serenity.Localization
 
                             var descAttr = member[0].GetCustomAttribute<DescriptionAttribute>();
                             if (descAttr != null)
-                                provider.Add(new LocalTextEntry(languageID, "Enums." + type.Name + "." + name, descAttr.Description), false);
+                                provider.Add(languageID, "Enums." + type.Name + "." + name, descAttr.Description);
                         }
                     }
                 }

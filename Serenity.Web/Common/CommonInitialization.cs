@@ -42,8 +42,8 @@ namespace Serenity.Web
             if (Dependency.TryResolve<IDistributedCache>() == null)
                 registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());
 
-            if (Dependency.TryResolve<ILocalTextProvider>() == null)
-                registrar.RegisterInstance<ILocalTextProvider>(new LocalTextRegistry());
+            if (Dependency.TryResolve<ILocalTextRegistry>() == null)
+                registrar.RegisterInstance<ILocalTextRegistry>(new LocalTextRegistry());
 
             NestedLocalTextRegistration.Initialize();
             EnumLocalTexts.Initialize(ExtensibilityHelper.SelfAssemblies);

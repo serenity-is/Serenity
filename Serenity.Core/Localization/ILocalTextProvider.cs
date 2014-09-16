@@ -1,8 +1,8 @@
 namespace Serenity.Localization
 {
-    public interface ILocalTextProvider
+    public interface ILocalTextRegistry
     {
         string TryGet(string key);
-        void Add(LocalTextEntry entry, bool pendingApproval);
+        void Add(string languageID, string key, string text);
     }
 }

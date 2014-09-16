@@ -26,8 +26,6 @@
                 registrar.RegisterInstance<IAuthenticationService>(new Administration.AuthenticationService());
                 registrar.RegisterInstance<IPermissionService>(new Administration.PermissionService());
                 registrar.RegisterInstance<IUserRetrieveService>(new Administration.UserRetrieveService());
-
-                Dependency.Resolve<ILocalTextProvider>().Add(new LocalTextEntry("en-US", "Site.Dashboard.WelcomeMessage", "Hello world!"), false);
             }
             catch (Exception ex)
             {
