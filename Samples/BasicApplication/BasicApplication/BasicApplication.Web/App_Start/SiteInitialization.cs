@@ -3,7 +3,6 @@
     using Serenity;
     using Serenity.Abstractions;
     using Serenity.Data;
-    using Serenity.Localization;
     using System;
     using System.Data;
     using System.Data.Common;
