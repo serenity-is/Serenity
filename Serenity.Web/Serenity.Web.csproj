@@ -545,7 +545,7 @@
     <Content Include="Includes\Scripts\jquery.slimscroll.min.js" />
     <Content Include="Includes\Scripts\pace.js" />
     <Content Include="Includes\Scripts\pace.min.js" />
-    <Content Include="Includes\Scripts\serenity\texts\serenity.texts.tr-TR.js" />
+    <None Include="Includes\Scripts\serenity\texts\serenity.texts.tr-TR.json" />
     <Content Include="Style\images\32px.png" />
     <Content Include="Style\images\accordion-down.png" />
     <Content Include="Style\images\accordion-left.png" />

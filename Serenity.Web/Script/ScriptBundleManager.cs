@@ -62,7 +62,7 @@ namespace Serenity.Web
                     settings.Bundles.Count == 0)
                 {
                     settings.Bundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
-                        HostingEnvironment.MapPath("~/Scripts/Site/ScriptBundles.js"));
+                        HostingEnvironment.MapPath("~/Scripts/Site/ScriptBundles.json"));
 
                     if (settings.Bundles == null ||
                         settings.Bundles.Count == 0)

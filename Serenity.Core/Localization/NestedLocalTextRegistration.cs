@@ -85,7 +85,7 @@ namespace Serenity.Localization
             if (!Directory.Exists(path))
                 return;
 
-            foreach (var file in Directory.GetFiles(path, "*.js"))
+            foreach (var file in Directory.GetFiles(path, "*.json"))
             {
                 try
                 {
