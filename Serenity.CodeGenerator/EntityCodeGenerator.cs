@@ -55,13 +55,12 @@ namespace Serenity.CodeGenerator
             Directory.CreateDirectory(scriptPath);
 
             GenerateRow();
-            //GenerateCss();
+            GenerateCss();
             GenerateForm();
             GenerateRepository();
             GenerateEndpoint();
             GeneratePageController();
             GeneratePageIndex();
-            //GenerateScriptRow();
             GenerateScriptGrid();
             GenerateScriptDialog();
         }
@@ -177,16 +176,16 @@ namespace Serenity.CodeGenerator
                 Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
         }
 
-        /*private void GenerateCss()
+        private void GenerateCss()
         {
-            string relativeFile = Path.Combine(@"Content\site\", "site.module." + model.Module.ToLowerInvariant() + ".less");
+            string relativeFile = Path.Combine(@"Content\site\", "site.less");
             string file = Path.Combine(siteWebPath, relativeFile);
             Directory.CreateDirectory(Path.GetDirectoryName(file));
             if (!File.Exists(file))
                 using (var sw = new StreamWriter(file, false, utf8))
                     sw.Write("\r\n");
 
-            string code = Templates.Render("EntityCss", model);
+            string code = Templates.Render(new Views.EntityCss(), model);
             using (var sw = new StreamWriter(file, true, utf8))
             {
                 AppendComment(sw);
@@ -194,7 +193,7 @@ namespace Serenity.CodeGenerator
             }
 
             AddFileToProject(siteWebProj, relativeFile);
-        }*/
+        }
 
         private void GenerateForm()
         {
@@ -261,12 +260,6 @@ namespace Serenity.CodeGenerator
                 NavigationCategory = model.Module
             }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Index.cshtml"))));
         }
-
-        //private void GenerateScriptRow()
-        //{
-        //    CreateNewSiteScriptFile(Templates.Render("EntityScriptRow", model),
-        //        Path.Combine(model.Module, Path.Combine(model.ClassName, model.RowClassName + ".cs")));
-        //}
 
         private void GenerateScriptGrid()
         {

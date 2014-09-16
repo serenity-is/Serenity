@@ -12,7 +12,7 @@ namespace Serenity
             public static class EntityGrid
             {
                 public static LocalText NewButton = "New {0}";
-                public static LocalText RefreshButton = "Yenile";
+                public static LocalText RefreshButton = "Refresh";
 
                 static EntityGrid()
                 {

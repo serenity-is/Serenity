@@ -124,6 +124,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityEndpoint.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EntityCss.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityCss.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EntityForm.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -208,6 +213,10 @@
     <None Include="SampleTemplate.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SampleTemplate.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityCss.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityCss.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityScriptGrid.cshtml">
       <Generator>RazorGenerator</Generator>
