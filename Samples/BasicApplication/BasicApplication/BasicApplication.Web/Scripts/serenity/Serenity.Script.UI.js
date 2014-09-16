@@ -1461,8 +1461,12 @@
 					if (px >= 0) {
 						name = name.substring(px + 1);
 					}
-					if (ss.endsWithString(name, 'Dialog')) {
+					// don't like this kind of convention, make it obsolete soon...
+					if (ss.endsWithString(name, 'Dialog') || ss.endsWithString(name, 'Control')) {
 						name = name.substr(0, name.length - 6);
+					}
+					else if (ss.endsWithString(name, 'Panel')) {
+						name = name.substr(0, name.length - 5);
 					}
 					this.$entityType = name;
 				}
@@ -1762,6 +1766,7 @@
 				$t1.idPrefix = this.idPrefix;
 				$t1.items = this.getPropertyItems();
 				$t1.mode = 0;
+				$t1.localTextPrefix = 'Forms.' + this.getFormKey() + '.';
 				return $t1;
 			},
 			validateBeforeSave: function() {
@@ -2656,6 +2661,32 @@
 	$Serenity_IValidateRequired.__typeName = 'Serenity.IValidateRequired';
 	global.Serenity.IValidateRequired = $Serenity_IValidateRequired;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.JsRender
+	var $Serenity_JsRender = function() {
+	};
+	$Serenity_JsRender.__typeName = 'Serenity.JsRender';
+	$Serenity_JsRender.render = function(markup, data) {
+		if (ss.isNullOrUndefined(markup) || markup.indexOf('{{') < 0) {
+			return markup;
+		}
+		if (!!(ss.isNullOrUndefined($.templates) || ss.isNullOrUndefined($.views))) {
+			throw new ss.Exception('Please make sure that jsrender.js is included in the page!');
+		}
+		var $t1 = data;
+		if (ss.isNullOrUndefined($t1)) {
+			$t1 = {};
+		}
+		data = $t1;
+		var template = $.templates(markup);
+		$.views.converters({
+			text: function(s) {
+				return Q.text(s);
+			}
+		}, template);
+		return ss.cast(template.render(data), String);
+	};
+	global.Serenity.JsRender = $Serenity_JsRender;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.LookupEditorBase
 	var $Serenity_LookupEditorBase$1 = function(TItem) {
 		var $type = function(hidden) {
@@ -3177,15 +3208,24 @@
 				this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
 			},
 			getFormKey: function() {
-				var name = ss.getTypeFullName(ss.getInstanceType(this));
-				var px = name.indexOf('.');
-				if (px >= 0) {
-					name = name.substring(px + 1);
+				var attributes = ss.getAttributes(ss.getInstanceType(this), Serenity.FormKeyAttribute, true);
+				if (attributes.length >= 1) {
+					return attributes[0].get_value();
 				}
-				if (ss.endsWithString(name, 'Dialog')) {
-					name = name.substr(0, name.length - 6);
+				else {
+					var name = ss.getTypeFullName(ss.getInstanceType(this));
+					var px = name.indexOf('.');
+					if (px >= 0) {
+						name = name.substring(px + 1);
+					}
+					if (ss.endsWithString(name, 'Dialog')) {
+						name = name.substr(0, name.length - 6);
+					}
+					else if (ss.endsWithString(name, 'Panel')) {
+						name = name.substr(0, name.length - 5);
+					}
+					return name;
 				}
-				return name;
 			},
 			getPropertyItems: function() {
 				var formKey = this.getFormKey();
@@ -3197,6 +3237,7 @@
 				$t1.items = this.getPropertyItems();
 				$t1.mode = 0;
 				$t1.useCategories = false;
+				$t1.localTextPrefix = 'Forms.' + this.getFormKey() + '.';
 				return $t1;
 			},
 			validateBeforeSave: function() {
@@ -3597,6 +3638,7 @@
 		$this.useCategories = false;
 		$this.categoryOrder = null;
 		$this.defaultCategory = null;
+		$this.localTextPrefix = null;
 		$this.mode = 0;
 		$this.useCategories = true;
 		$this.defaultCategory = Texts$Controls$PropertyGrid.DefaultCategory.get();
@@ -4377,6 +4419,7 @@
 			ss.makeGenericType($Serenity_Widget$1, [TOptions]).call(this, element, opt);
 			this.idPrefix = this.uniqueName + '_';
 			var widgetMarkup = this.getTemplate().replace(new RegExp('~_', 'g'), this.idPrefix);
+			widgetMarkup = $Serenity_JsRender.render(widgetMarkup, null);
 			this.element.html(widgetMarkup);
 		};
 		ss.registerGenericClassInstance($type, $Serenity_TemplatedWidget$1, [TOptions], {
@@ -5588,6 +5631,7 @@
 	}, ss.makeGenericType($Serenity_Widget$1, [$Serenity_IntegerEditorOptions]), [$Serenity_IDoubleValue]);
 	ss.initClass($Serenity_IntegerEditorOptions, $asm, {});
 	ss.initInterface($Serenity_IValidateRequired, $asm, { get_required: null, set_required: null });
+	ss.initClass($Serenity_JsRender, $asm, {});
 	ss.initClass($Serenity_MaskedEditor, $asm, {
 		get_value: function() {
 			this.element.triggerHandler('blur.mask');
@@ -5689,20 +5733,41 @@
 			$('<div/>').addClass('category-title').append($('<a/>').addClass('category-anchor').text(category).attr('name', this.options.idPrefix + 'Category' + categoryIndexes[category].toString())).appendTo(categoryDiv);
 			return categoryDiv;
 		},
+		$determineText: function(name, text, suffix) {
+			if (ss.isValue(text) && !ss.startsWithString(text, '`')) {
+				var local = Q.tryGetText(text);
+				if (ss.isValue(local)) {
+					return local;
+				}
+			}
+			if (ss.isValue(text) && ss.startsWithString(text, '`')) {
+				text = text.substr(1);
+			}
+			if (!Q.isEmptyOrNull(this.options.localTextPrefix)) {
+				var local1 = Q.tryGetText(this.options.localTextPrefix + name + suffix);
+				if (ss.isValue(local1)) {
+					return local1;
+				}
+			}
+			return text;
+		},
 		$createField: function(container, item) {
 			var fieldDiv = $('<div/>').addClass('field').addClass(item.name).data('PropertyItem', item).appendTo(container);
 			if (!ss.isNullOrEmptyString(item.cssClass)) {
 				fieldDiv.addClass(item.cssClass);
 			}
 			var editorId = this.options.idPrefix + item.name;
+			var title = this.$determineText(item.name, item.title, '');
+			var hint = this.$determineText(item.name, item.hint, 'Hint');
+			var placeHolder = this.$determineText(item.name, item.placeholder, 'Placeholder');
 			var $t2 = $('<label/>').addClass('caption').attr('for', editorId);
-			var $t1 = item.hint;
+			var $t1 = hint;
 			if (ss.isNullOrUndefined($t1)) {
-				$t1 = ss.coalesce(item.title, '');
+				$t1 = ss.coalesce(title, '');
 			}
-			var label = $t2.attr('title', $t1).html(item.title).appendTo(fieldDiv);
+			var label = $t2.attr('title', $t1).html(ss.coalesce(title, '')).appendTo(fieldDiv);
 			if (item.required) {
-				$('<sup>*</sup>').attr('title', 'Bu alan zorunludur').prependTo(label);
+				$('<sup>*</sup>').attr('title', Texts$Controls$PropertyGrid.RequiredHint.get()).prependTo(label);
 			}
 			var editorType = $Serenity_PropertyGrid.$getEditorType(item.editorType);
 			var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
@@ -5711,8 +5776,8 @@
 			if (element.is(':input')) {
 				element.attr('name', ss.coalesce(item.name, ''));
 			}
-			if (!Q.isEmptyOrNull(item.placeholder)) {
-				element.attr('placeholder', item.placeholder);
+			if (!Q.isEmptyOrNull(placeHolder)) {
+				element.attr('placeholder', placeHolder);
 			}
 			var editorParams = item.editorParams;
 			var optionsType = null;

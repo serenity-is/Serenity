@@ -6,7 +6,7 @@ namespace BasicApplication.Membership
     using System.Collections.Generic;
     using System.Html;
 
-    [FormKey("Membership.User"), Panel]
+    [Panel, FormKey("Membership.Login")]
     public class LoginPanel : PropertyDialog<object>
     {
         public LoginPanel()

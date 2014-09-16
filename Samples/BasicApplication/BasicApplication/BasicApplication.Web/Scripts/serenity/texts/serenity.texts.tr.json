@@ -29,7 +29,8 @@
             "DefaultLoadError": "Kayıtlar alınırken hata oluştu!"
         },
         "PropertyGrid": {
-            "DefaultCategory": "Özellikler"
+            "DefaultCategory": "Özellikler",
+            "RequiredHint": "Bu alan zorunludur"
         },
         "QuickSearch": {
             "Placeholder": "hızlı arama",

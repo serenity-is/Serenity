@@ -32,8 +32,11 @@ namespace Serenity
                 if (px >= 0)
                     name = name.Substring(px + 1);
 
-                if (name.EndsWith("Dialog"))
+                // don't like this kind of convention, make it obsolete soon...
+                if (name.EndsWith("Dialog") || name.EndsWith("Control"))
                     name = name.Substr(0, name.Length - 6);
+                else if (name.EndsWith("Panel"))
+                    name = name.Substr(0, name.Length - 5);
 
                 entityType = name;
             }

@@ -652,41 +652,41 @@ body {
   text-transform: uppercase;
 }
 #LoginPanelWrapper .s-LoginPanel .caption {
-  width: 100px;
+  width: 150px;
 }
 #LoginPanelWrapper .s-LoginPanel .editor {
-  width: 350px;
+  width: 300px;
 }
 #LoginPanelWrapper .s-LoginPanel input.editor[type=checkbox] {
   width: auto;
 }
 #LoginPanelWrapper .s-LoginPanel .s-Form .editor.dateQ {
-  width: 333px;
+  width: 283px;
 }
 #LoginPanelWrapper .s-LoginPanel .s-Form .editor.emailuser {
   width: 170px;
 }
 #LoginPanelWrapper .s-LoginPanel .s-Form .editor.dateQ.s-DateTimeEditor {
-  width: 273px;
+  width: 223px;
 }
 #LoginPanelWrapper .s-LoginPanel .s-Form .editor.s-DateTimeEditor.time {
   width: 56px;
   margin-left: 4px;
 }
 #LoginPanelWrapper .s-LoginPanel .s-Form .editor.has-inplace-button {
-  width: 328px;
+  width: 278px;
 }
 #LoginPanelWrapper .s-LoginPanel .s-Form .emaildomain {
-  width: 165px;
+  width: 115px;
 }
 #LoginPanelWrapper .s-LoginPanel .caption {
-  width: 100px;
+  width: 150px;
 }
 #LoginPanelWrapper .s-LoginPanel .editor {
-  width: 350px;
+  width: 300px;
 }
 #LoginPanelWrapper .buttons {
-  padding: 8px 0 0 108px;
+  padding: 8px 0 0 158px;
 }
 #LoginPanelWrapper .s-Form .field {
   padding: 8px;

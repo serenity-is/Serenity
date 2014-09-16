@@ -16,14 +16,14 @@ namespace Serenity
             {
                 throw new Exception("Please make sure that jsrender.js is included in the page!");
             }
-
+            data = data ?? new JsDictionary();
             var template = jQuery.Instance.templates(markup);
             jQuery.Instance.views.converters(new
             {
                 text = new Func<string, string>(s => Q.Text(s))
             }, template);
 
-            return template.render(data ?? new JsDictionary());
+            return template.render(data);
         }
     }
 }

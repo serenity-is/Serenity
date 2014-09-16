@@ -17,8 +17,18 @@
                 "CategoryName": "Kategori Adı",
                 "Description": "Açıklama",
                 "EntitySingular": "Kategori",
-                "EntityPlural":  "Kategoriler",
+                "EntityPlural": "Kategoriler",
                 "Picture": "Resim"
+            }
+        }
+    },
+    "Forms": {
+        "Membership": {
+            "Login": {
+                "UsernamePlaceholder": "varsayılan kullanıcı adı 'admin'",
+                "PasswordPlaceholder": "varsayılan şifre 'serenity'",
+                "FormTitle": "SERENITY BASİT UYGULAMA ÖRNEĞİNE HOŞGELDİNİZ",
+                "SignInButton": "Giriş"
             }
         }
     },

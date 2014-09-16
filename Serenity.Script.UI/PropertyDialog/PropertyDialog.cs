@@ -154,15 +154,23 @@ namespace Serenity
 
         protected virtual string GetFormKey()
         {
-            var name = this.GetType().FullName;
-            var px = name.IndexOf(".");
-            if (px >= 0)
-                name = name.Substring(px + 1);
+            var attributes = this.GetType().GetCustomAttributes(typeof(FormKeyAttribute), true);
+            if (attributes.Length >= 1)
+                return attributes[0].As<FormKeyAttribute>().Value;
+            else
+            {
+                var name = this.GetType().FullName;
+                var px = name.IndexOf(".");
+                if (px >= 0)
+                    name = name.Substring(px + 1);
 
-            if (name.EndsWith("Dialog"))
-                name = name.Substr(0, name.Length - 6);
+                if (name.EndsWith("Dialog"))
+                    name = name.Substr(0, name.Length - 6);
+                else if (name.EndsWith("Panel"))
+                    name = name.Substr(0, name.Length - 5);
 
-            return name;
+                return name;
+            }
         }
 
         protected virtual List<PropertyItem> GetPropertyItems()

@@ -1515,6 +1515,7 @@
 	$Texts$Controls$Pager.DefaultLoadError = new Q$LT('An error occured while loading data!');
 	$Q$LT.initializeTextClass($Texts$Controls$Pager, 'Controls.Pager.');
 	$Texts$Controls$PropertyGrid.DefaultCategory = new Q$LT('Properties');
+	$Texts$Controls$PropertyGrid.RequiredHint = new Q$LT('this field is required');
 	$Q$LT.initializeTextClass($Texts$Controls$PropertyGrid, 'Controls.PropertyGrid.');
 	$Texts$Controls$QuickSearch.Placeholder = new Q$LT('search...');
 	$Texts$Controls$QuickSearch.Hint = new Q$LT('enter the text to search for...');
