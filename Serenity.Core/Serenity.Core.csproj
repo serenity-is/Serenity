@@ -62,7 +62,6 @@
     <Compile Include="ComponentModel\Common\ScriptIncludeAttribute.cs" />
     <Compile Include="ComponentModel\Common\UpdatableAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\BaseRegistrarAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\EnumRegistrarAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\RegisterFormAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\ScriptRegistrarAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\SelfAssemblyAttribute.cs" />

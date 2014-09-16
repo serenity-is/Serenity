@@ -94,7 +94,8 @@ Task("Pack")
     .IsDependentOn("Copy-Files")
     .Does(() =>
 {
-    runGitLink();
+    if ((target ?? "").ToLowerInvariant() == "nuget-push")
+        runGitLink();
 });
 
 Task("NuGet")

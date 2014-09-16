@@ -154,6 +154,29 @@ namespace Serenity
             return categoryDiv;
         }
 
+        private string DetermineText(string name, string text, string suffix)
+        {
+            if (text != null &&
+                !text.StartsWith("`"))
+            {
+                var local = Q.TryGetText(text);
+                if (local != null)
+                    return local;
+            }
+
+            if (text != null && text.StartsWith("`"))
+                text = text.Substr(1);
+
+            if (!options.LocalTextPrefix.IsEmptyOrNull())
+            {
+                var local = Q.TryGetText(options.LocalTextPrefix + name + suffix);
+                if (local != null)
+                    return local;
+            }
+
+            return text;
+        }
+
         private Widget CreateField(jQueryObject container, PropertyItem item)
         {
             var fieldDiv = J("<div/>")
@@ -167,16 +190,20 @@ namespace Serenity
 
             string editorId = options.IdPrefix + item.Name;
 
+            string title = DetermineText(item.Name, item.Title, "");
+            string hint = DetermineText(item.Name, item.Hint, "Hint");
+            string placeHolder = DetermineText(item.Name, item.Placeholder, "Placeholder");
+
             var label = J("<label/>")
                 .AddClass("caption")
                 .Attribute("for", editorId)
-                .Attribute("title", item.Hint ?? item.Title ?? "")
-                .Html(item.Title)
+                .Attribute("title", hint ?? title ?? "")
+                .Html(title ?? "")
                 .AppendTo(fieldDiv);
 
             if (item.Required)
                 J("<sup>*</sup>")
-                    .Attribute("title", "Bu alan zorunludur")
+                    .Attribute("title", Texts.Controls.PropertyGrid.RequiredHint)
                     .PrependTo(label);
 
             var editorType = GetEditorType(item.EditorType);
@@ -193,8 +220,8 @@ namespace Serenity
             if (element.Is(":input"))
                 element.Attribute("name", item.Name ?? "");
 
-            if (!item.Placeholder.IsEmptyOrNull())
-                element.Attribute("placeholder", item.Placeholder);
+            if (!placeHolder.IsEmptyOrNull())
+                element.Attribute("placeholder", placeHolder);
 
             object editorParams = item.EditorParams;
             Type optionsType = null;

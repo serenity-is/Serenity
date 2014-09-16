@@ -12,6 +12,7 @@ namespace Serenity
             public static class PropertyGrid
             {
                 public static LocalText DefaultCategory = "Properties";
+                public static LocalText RequiredHint = "this field is required";
 
                 static PropertyGrid()
                 {

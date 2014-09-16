@@ -9,7 +9,7 @@ namespace Serenity.Localization
 
     public class LocalTextRegistry : ILocalTextRegistry
     {
-        private readonly ConcurrentDictionary<string, string> languageParents = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<string, string> languageParents = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = new ConcurrentDictionary<ItemKey, string>();
         private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = new ConcurrentDictionary<ItemKey, string>();
 
@@ -20,6 +20,22 @@ namespace Serenity.Localization
                 var context = Dependency.TryResolve<ILocalTextContext>();
                 return context != null && context.IsApprovalMode;
             }
+        }
+
+        private string TryGetParentLanguageID(string languageID)
+        {
+            string parent;
+            if (languageParents.TryGetValue(languageID, out parent))
+                return parent;
+
+            if (languageID == LocalText.InvariantLanguageID)
+                return null;
+
+            var idx = languageID.LastIndexOf('-');
+            if (idx >= 1)
+                return languageID.Substring(idx);
+
+            return LocalText.InvariantLanguageID;
         }
 
         public void SetParentLanguageID(string languageID, string parentLanguageID)
@@ -87,8 +103,7 @@ namespace Serenity.Localization
                 var circularCheck1 = 0;
                 while (true)
                 {
-                    if (!languageParents.TryGetValue(languageID, out languageID))
-                        languageID = LocalText.InvariantLanguageID;
+                    languageID = TryGetParentLanguageID(languageID) ?? LocalText.InvariantLanguageID;
 
                     // search in parent or default language
                     k = new ItemKey(languageID, textKey);
@@ -130,8 +145,7 @@ namespace Serenity.Localization
                     int circularCheck2 = 0;
                     while (true)
                     {
-                        if (!languageParents.TryGetValue(languageID, out languageID))
-                            languageID = LocalText.InvariantLanguageID;
+                        languageID = TryGetParentLanguageID(languageID) ?? LocalText.InvariantLanguageID;
 
                         // search in parent or default language
                         k = new ItemKey(languageID, textKey);
@@ -204,8 +218,7 @@ namespace Serenity.Localization
                     currentID == LocalText.InvariantLanguageID)
                     break;
 
-                if (!languageParents.TryGetValue(currentID, out currentID))
-                    currentID = LocalText.InvariantLanguageID;
+                currentID = TryGetParentLanguageID(currentID) ?? LocalText.InvariantLanguageID;
             }
 
             return texts;

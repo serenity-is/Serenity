@@ -19,6 +19,7 @@ namespace Serenity
         public bool UseCategories { get; set; }
         public string CategoryOrder { get; set; }
         public string DefaultCategory { get; set; }
+        public string LocalTextPrefix { get; set; }
         public PropertyGridMode Mode { get; set; }
     }
 

@@ -121,6 +121,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Widget\TemplatedDialog.cs" />
+    <Compile Include="Widget\JsRender.cs" />
     <Compile Include="Widget\TemplatedWidget.cs" />
     <Compile Include="Widget\Toolbar.cs" />
     <Compile Include="Widget\Widget.cs" />

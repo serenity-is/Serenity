@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections;
 using System.Text.RegularExpressions;
 
 namespace Serenity
@@ -15,6 +16,7 @@ namespace Serenity
             idPrefix = this.uniqueName + "_";
 
             string widgetMarkup = GetTemplate().Replace(new Regex("~_", "g"), idPrefix);
+            widgetMarkup = JsRender.Render(widgetMarkup);
 
             this.element.Html(widgetMarkup);
         }

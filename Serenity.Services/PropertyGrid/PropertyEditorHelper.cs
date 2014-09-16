@@ -132,9 +132,15 @@ namespace Serenity.PropertyGrid
                             textualField = basedOnField.Fields.FindFieldByPropertyName(basedOnField.TextualField) ?? basedOnField.Fields.FindField(basedOnField.TextualField);
 
                         if (textualField != null)
-                            pi.Title = textualField.Title;
+                        {
+                            pi.Title = !object.ReferenceEquals(null, textualField.Caption) ? 
+                                textualField.Caption.Key : textualField.Title;
+                        }
                         else
-                            pi.Title = basedOnField.Title;
+                        {
+                            pi.Title = !object.ReferenceEquals(null, basedOnField.Caption) ? 
+                                basedOnField.Caption.Key : basedOnField.Title;
+                        }
                     }
                     else
                         pi.Title = pi.Name;
