@@ -43,8 +43,7 @@ Write(Model.ClassName);
             
             #line default
             #line hidden
-WriteLiteral("Dialog {\r\n    > .size {\r\n        .widthAndMin(650px);\r\n    }\r\n    .dialog-styles(" +
-"");
+WriteLiteral("Dialog {\r\n    > .size { .widthAndMin(650px); }\r\n    .dialog-styles(");
 
 
 WriteLiteral("@h: auto, ");
@@ -53,7 +52,7 @@ WriteLiteral("@h: auto, ");
 WriteLiteral("@l: 150px, ");
 
 
-WriteLiteral("@e: 400px);\r\n\r\n    .categories {\r\n    height: 260px;\r\n    }\r\n}");
+WriteLiteral("@e: 400px);\r\n    .categories { height: 260px; }\r\n}");
 
 
         }
