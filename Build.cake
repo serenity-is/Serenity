@@ -117,11 +117,11 @@ Task("NuGet")
     nuspecParams["saltarelleWebVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Web");
     nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value;
 
-    Action<string> myPack = s => {
-        var nuspec = File.ReadAllText("./" + s + "/" + s + ".nuspec");
+    Action<string, string> myPack = (s, id) => {
+        var nuspec = File.ReadAllText("./" + s + "/" + (id ?? s) + ".nuspec");
       
         nuspec = nuspec.Replace("${version}", serenityVersion);
-        nuspec = nuspec.Replace("${id}", s);
+        nuspec = nuspec.Replace("${id}", (id ?? s));
         
         foreach (var p in nuspecParams)
             nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
@@ -145,28 +145,26 @@ Task("NuGet")
             NoPackageAnalysis = true
         });
         
-        nugetPackages.Add("./Bin/Packages/" + s + "." + serenityVersion + ".nupkg");
+        nugetPackages.Add("./Bin/Packages/" + (id ?? s) + "." + serenityVersion + ".nupkg");
     };
     
-    myPack("Serenity.Core");
-    myPack("Serenity.Caching.Web");
-    myPack("Serenity.Caching.Couchbase");
-    myPack("Serenity.Data");
-    myPack("Serenity.Data.Entity");
-    myPack("Serenity.Data.Filtering");
-    myPack("Serenity.Services");
-    myPack("Serenity.Services.Mvc");
-    myPack("Serenity.Reporting");
-    myPack("Serenity.CodeGeneration");
-    myPack("Serenity.CodeGeneration.Mvc");
-    myPack("Serenity.Testing");
+    myPack("Serenity.Core", null);
+    myPack("Serenity.Caching.Couchbase", null);
+    myPack("Serenity.Data", null);
+    myPack("Serenity.Data.Entity", null);
+    myPack("Serenity.Services", null);
+    myPack("Serenity.Testing", null);
     
-    myPack("Serenity.Script.Imports");
-    myPack("Serenity.Script.Core");
-    myPack("Serenity.Script.UI");
+    myPack("Serenity.Script.UI", "Serenity.Script");
 
-    myPack("Serenity.Web");
-    myPack("Serenity.CodeGenerator");
+    myPack("Serenity.Web", null);
+    myPack("Serenity.CodeGenerator", null);
+    
+    if (System.IO.Directory.Exists(@"C:\Sandbox\MyNugetFeed")) 
+    {
+        foreach (var package in nugetPackages)
+            File.Copy(package, @"C:\Sandbox\MyNugetFeed\" + System.IO.Path.GetFileName(package), true);
+    }
 });
 
 Task("NuGet-Push")

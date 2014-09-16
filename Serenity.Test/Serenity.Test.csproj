@@ -83,10 +83,6 @@
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Services.Mvc\Serenity.Services.Mvc.csproj">
-      <Project>{bbc4b7b7-8d42-492d-83d1-8b8fbe460231}</Project>
-      <Name>Serenity.Services.Mvc</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
       <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>
       <Name>Serenity.Services</Name>

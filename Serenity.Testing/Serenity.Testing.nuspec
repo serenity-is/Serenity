@@ -18,7 +18,6 @@
       <dependency id="Serenity.Core" version="${version}" />
       <dependency id="Serenity.Data" version="${version}" />
       <dependency id="Serenity.Data.Entity" version="${version}" />
-      <dependency id="Serenity.Munq" version="${version}" />
     </dependencies>
   </metadata>
   <files>

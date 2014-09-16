@@ -23,6 +23,16 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="${id}.dll" target="lib/${scriptFramework}" />
+    <file src="Serenity.Script.Imports.dll" target="lib/${scriptFramework}" />
+    <file src="Serenity.Script.Core.dll" target="lib/${scriptFramework}" />
+    <file src="Serenity.Script.UI.dll" target="lib/${scriptFramework}" />
+    <file src="../../../Serenity.Script.Core/bin/${configuration}/Serenity.Script.Core.js" target="" />
+    <file src="../../../Serenity.Script.Core/bin/${configuration}/Serenity.Script.Core.min.js" target="" />
+    <file src="../../../Serenity.Script.Core/bin/${configuration}/Serenity.Externals.js" target="" />
+    <file src="../../../Serenity.Script.Core/bin/${configuration}/Serenity.Externals.min.js" target="" />
+    <file src="../../../Serenity.Script.Core/bin/${configuration}/Serenity.Externals.Slick.js" target="" />
+    <file src="../../../Serenity.Script.Core/bin/${configuration}/Serenity.Externals.Slick.min.js" target="" />   
+    <file src="Serenity.Script.UI.js" target="" />
+    <file src="Serenity.Script.UI.min.js" target="" />
   </files>
 </package>

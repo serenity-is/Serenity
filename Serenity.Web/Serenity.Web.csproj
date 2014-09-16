@@ -80,7 +80,16 @@
     <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CodeGeneration\DtoActionResult.cs" />
+    <Compile Include="CodeGeneration\DtoGenerator.cs" />
+    <Compile Include="CodeGeneration\EditorTypeGenerator.cs" />
+    <Compile Include="CodeGeneration\GeneratorUtils.cs" />
+    <Compile Include="CodeGeneration\ScriptDtoGenerator.cs" />
+    <Compile Include="CodeGeneration\ScriptEndpointGenerator.cs" />
+    <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
     <Compile Include="Common\AssemblySorter.cs" />
+    <Compile Include="Mvc\CompressFilter.cs" />
+    <Compile Include="Mvc\EndpointExtensions.cs" />
     <Compile Include="Mvc\ExcelContentResult.cs" />
     <Compile Include="Mvc\ForXmlHelper.cs" />
     <Compile Include="Common\CommonInitialization.cs" />
@@ -88,11 +97,31 @@
     <Compile Include="Common\ScriptFileWatcher.cs" />
     <Compile Include="Common\ApplicationConfigurationRepository.cs" />
     <Compile Include="Common\TemplateScriptRegistrar.cs" />
+    <Compile Include="Mvc\HttpRuntimeCache.cs" />
+    <Compile Include="Mvc\JsonFilter.cs" />
+    <Compile Include="Mvc\Result.cs" />
+    <Compile Include="Mvc\ServiceAuthorizeFilter.cs" />
+    <Compile Include="Mvc\TokenAuthorizeFilter.cs" />
     <Compile Include="Navigation\NavigationHelper.cs" />
     <Compile Include="Navigation\NavigationItem.cs" />
     <Compile Include="Navigation\NavigationMenuAttribute.cs" />
     <Compile Include="Navigation\NavigationLinkAttribute.cs" />
     <Compile Include="Navigation\NavigationItemAttribute.cs" />
+    <Compile Include="Reporting\BaseReport.cs" />
+    <Compile Include="Reporting\ICustomFileName.cs" />
+    <Compile Include="Reporting\IDataOnlyReport.cs" />
+    <Compile Include="Reporting\IReport.cs" />
+    <Compile Include="Reporting\IReportWithAdditionalData.cs" />
+    <Compile Include="Reporting\RegisterReportAttribute.cs" />
+    <Compile Include="Reporting\ReportDesignItem.cs" />
+    <Compile Include="Reporting\ReportDesignListRequest.cs" />
+    <Compile Include="Reporting\ReportExecuteRequest.cs" />
+    <Compile Include="Reporting\ReportExportType.cs" />
+    <Compile Include="Reporting\ReportRegistry.cs" />
+    <Compile Include="Reporting\ReportRetrieveRequest.cs" />
+    <Compile Include="Reporting\ReportRetrieveResponse.cs" />
+    <Compile Include="Reporting\Worksheet\ReportColumn.cs" />
+    <Compile Include="Reporting\Worksheet\ReportColumnConverter.cs" />
     <Compile Include="Script\PropertyEditor\FormScriptRegistration.cs" />
     <Compile Include="Mvc\TemplateHelper.cs" />
     <Compile Include="Script\DynamicScript\DynamicScriptManager.Script.cs" />
@@ -474,10 +503,6 @@
     <None Include="Style\serenity.toolbuttons.less" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.CodeGeneration\Serenity.CodeGeneration.csproj">
-      <Project>{880cec07-a629-44d3-a79d-5b138967e1c4}</Project>
-      <Name>Serenity.CodeGeneration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
@@ -489,10 +514,6 @@
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serenity.Services.Mvc\Serenity.Services.Mvc.csproj">
-      <Project>{bbc4b7b7-8d42-492d-83d1-8b8fbe460231}</Project>
-      <Name>Serenity.Services.Mvc</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
       <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>
