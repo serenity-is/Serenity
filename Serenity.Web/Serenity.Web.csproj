@@ -474,10 +474,6 @@
     <None Include="Style\serenity.toolbuttons.less" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Caching.Web\Serenity.Caching.Web.csproj">
-      <Project>{cebb3cf6-8eed-4f6d-b29b-0ea5ff06faf4}</Project>
-      <Name>Serenity.Caching.Web</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.CodeGeneration\Serenity.CodeGeneration.csproj">
       <Project>{880cec07-a629-44d3-a79d-5b138967e1c4}</Project>
       <Name>Serenity.CodeGeneration</Name>
@@ -494,9 +490,9 @@
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Munq\Serenity.Munq.csproj">
-      <Project>{5fbada38-f1f3-44c9-83fa-e1bf1f4d7d10}</Project>
-      <Name>Serenity.Munq</Name>
+    <ProjectReference Include="..\Serenity.Services.Mvc\Serenity.Services.Mvc.csproj">
+      <Project>{bbc4b7b7-8d42-492d-83d1-8b8fbe460231}</Project>
+      <Name>Serenity.Services.Mvc</Name>
     </ProjectReference>
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
       <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>

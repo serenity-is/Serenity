@@ -10,8 +10,8 @@ namespace Serenity.Localization
     public class LocalTextRegistry : ILocalTextRegistry
     {
         private readonly ConcurrentDictionary<string, string> languageParents = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = new ConcurrentDictionary<ItemKey, string>();
-        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = new ConcurrentDictionary<ItemKey, string>();
+        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
+        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
 
         public bool ContextIsApprovalMode
         {
@@ -33,7 +33,7 @@ namespace Serenity.Localization
 
             var idx = languageID.LastIndexOf('-');
             if (idx >= 1)
-                return languageID.Substring(idx);
+                return languageID.SafeSubstring(0, idx);
 
             return LocalText.InvariantLanguageID;
         }
@@ -222,6 +222,23 @@ namespace Serenity.Localization
             }
 
             return texts;
+        }
+
+        class ItemKeyComparer : IEqualityComparer<Tuple<string, string>>
+        {
+            public static readonly ItemKeyComparer Default = new ItemKeyComparer();
+
+            public bool Equals(ItemKey lhs, ItemKey rhs)
+            {
+                return StringComparer.OrdinalIgnoreCase.Equals(lhs.Item1, rhs.Item1)
+                    && StringComparer.OrdinalIgnoreCase.Equals(lhs.Item2, rhs.Item2);
+            }
+
+            public int GetHashCode(ItemKey tuple)
+            {
+                return StringComparer.OrdinalIgnoreCase.GetHashCode(tuple.Item1)
+                     ^ tuple.Item2.GetHashCode();
+            }
         }
     }
 }

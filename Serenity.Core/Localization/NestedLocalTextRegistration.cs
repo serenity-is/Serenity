@@ -87,25 +87,14 @@ namespace Serenity.Localization
 
             foreach (var file in Directory.GetFiles(path, "*.json"))
             {
-                try
-                {
-                    var texts = JsonConfigHelper.LoadConfig<Dictionary<string, JToken>>(file);
-                    var langID = Path.GetFileNameWithoutExtension(Path.GetFileName(file));
+                var texts = JsonConfigHelper.LoadConfig<Dictionary<string, JToken>>(file);
+                var langID = Path.GetFileNameWithoutExtension(Path.GetFileName(file));
 
-                    var idx = langID.LastIndexOf(".");
-                    if (idx >= 0)
-                        langID = langID.Substring(idx + 1);
+                var idx = langID.LastIndexOf(".");
+                if (idx >= 0)
+                    langID = langID.Substring(idx + 1);
 
-                    idx = langID.LastIndexOf("-");
-                    if (idx >= 0 && idx < langID.Length - 1)
-                        langID = langID.Substring(0, idx) + "-" + langID.Substring(idx + 1).ToUpperInvariant();
-
-                    NestedLocalTextRegistration.AddFromDictionary(texts, "", langID);
-                }
-                catch (Exception ex)
-                {
-                    ex.Log();
-                }
+                NestedLocalTextRegistration.AddFromDictionary(texts, "", langID);
             }
         }
     }

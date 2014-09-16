@@ -149,7 +149,6 @@ Task("NuGet")
     };
     
     myPack("Serenity.Core");
-    myPack("Serenity.Munq");
     myPack("Serenity.Caching.Web");
     myPack("Serenity.Caching.Couchbase");
     myPack("Serenity.Data");

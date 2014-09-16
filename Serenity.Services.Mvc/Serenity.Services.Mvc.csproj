@@ -78,6 +78,7 @@
     </Compile>
     <Compile Include="CompressFilter.cs" />
     <Compile Include="EndpointExtensions.cs" />
+    <Compile Include="HttpRuntimeCache.cs" />
     <Compile Include="JsonFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Result.cs" />

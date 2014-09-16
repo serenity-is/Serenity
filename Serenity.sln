@@ -5,10 +5,6 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Core", "Serenity.Core\Serenity.Core.csproj", "{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Munq", "Serenity.Munq\Serenity.Munq.csproj", "{5FBADA38-F1F3-44C9-83FA-E1BF1F4D7D10}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Caching.Web", "Serenity.Caching.Web\Serenity.Caching.Web.csproj", "{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Caching.Couchbase", "Serenity.Caching.Couchbase\Serenity.Caching.Couchbase.csproj", "{12C5F0EF-FFAD-4820-A078-8F78A5372657}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Data", "Serenity.Data\Serenity.Data.csproj", "{BF7AC82B-3476-4235-8CC2-58BBA1C4804B}"
@@ -57,18 +53,6 @@ Global
 		{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}.Release|x86.ActiveCfg = Release|Any CPU
-		{5FBADA38-F1F3-44C9-83FA-E1BF1F4D7D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FBADA38-F1F3-44C9-83FA-E1BF1F4D7D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FBADA38-F1F3-44C9-83FA-E1BF1F4D7D10}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5FBADA38-F1F3-44C9-83FA-E1BF1F4D7D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FBADA38-F1F3-44C9-83FA-E1BF1F4D7D10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FBADA38-F1F3-44C9-83FA-E1BF1F4D7D10}.Release|x86.ActiveCfg = Release|Any CPU
-		{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}.Release|x86.ActiveCfg = Release|Any CPU
 		{12C5F0EF-FFAD-4820-A078-8F78A5372657}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{12C5F0EF-FFAD-4820-A078-8F78A5372657}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12C5F0EF-FFAD-4820-A078-8F78A5372657}.Debug|x86.ActiveCfg = Debug|Any CPU

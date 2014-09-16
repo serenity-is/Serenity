@@ -63,10 +63,6 @@
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Munq\Serenity.Munq.csproj">
-      <Project>{5fbada38-f1f3-44c9-83fa-e1bf1f4d7d10}</Project>
-      <Name>Serenity.Munq</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
