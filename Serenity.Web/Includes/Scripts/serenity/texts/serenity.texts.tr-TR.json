@@ -1,5 +1,4 @@
-﻿var config =
-{
+﻿{
     "Authorization": {
         "AccessDenied": "Bu işlem için gerekli haklara sahip değilsiniz!",
         "NotLoggedIn": "Bu işlem için giriş yapmış olmalısınız!"

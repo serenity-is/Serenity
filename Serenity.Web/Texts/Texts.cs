@@ -3,7 +3,7 @@
     using Serenity.Extensibility;
 
     [NestedLocalTexts]
-    public static partial class Texts
+    internal static partial class Texts
     {
         static Texts()
         {
