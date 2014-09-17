@@ -1,6 +1,6 @@
 ﻿
 
-[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "Northwind/CustomerCustomerDemo", url: "~/Northwind/CustomerCustomerDemo", permission: "Northwind")]
+//[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "Northwind/CustomerCustomerDemo", url: "~/Northwind/CustomerCustomerDemo", permission: "Northwind")]
 
 namespace BasicApplication.Northwind.Pages
 {
