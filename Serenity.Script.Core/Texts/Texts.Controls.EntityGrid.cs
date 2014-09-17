@@ -13,6 +13,7 @@ namespace Serenity
             {
                 public static LocalText NewButton = "New {0}";
                 public static LocalText RefreshButton = "Refresh";
+                public static LocalText IncludeDeletedToggle = "display inactive records";
 
                 static EntityGrid()
                 {

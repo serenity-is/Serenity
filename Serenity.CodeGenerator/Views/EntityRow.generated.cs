@@ -102,7 +102,7 @@ WriteLiteral("\"), InstanceName(\"");
             
             #line default
             #line hidden
-WriteLiteral("\")]\r\n    [ReadPermission(\"");
+WriteLiteral("\"), TwoLevelCached]\r\n    [ReadPermission(\"");
 
 
             

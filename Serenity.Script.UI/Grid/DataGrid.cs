@@ -97,7 +97,8 @@ namespace Serenity
 
         protected virtual void CreateIncludeDeletedButton()
         {
-            GridUtils.AddIncludeDeletedToggle(toolbar.Element, view);
+            if (!GetIsActiveFieldName().IsEmptyOrNull())
+                GridUtils.AddIncludeDeletedToggle(toolbar.Element, view);
         }
 
         protected virtual List<QuickSearchField> GetQuickSearchFields()
@@ -628,8 +629,8 @@ namespace Serenity
                 var attributes = this.GetType().GetCustomAttributes(typeof(IsActivePropertyAttribute), true);
                 if (attributes.Length == 1)
                     isActiveFieldName = attributes[0].As<IsActivePropertyAttribute>().Value;
-                else
-                    isActiveFieldName = "IsActive";
+
+                isActiveFieldName = String.Empty;
             }
 
             return isActiveFieldName;

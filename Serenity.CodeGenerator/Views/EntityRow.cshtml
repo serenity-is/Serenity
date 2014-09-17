@@ -21,7 +21,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     using System.IO;
     using System.ComponentModel;
 
-    [ConnectionKey("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename")]
+    [ConnectionKey("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), TwoLevelCached]
     [ReadPermission("@Model.Permission")]
     [ModifyPermission("@Model.Permission")]
     [JsonConverter(typeof(JsonRowConverter))]

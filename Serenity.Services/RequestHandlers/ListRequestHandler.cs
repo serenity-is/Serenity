@@ -5,6 +5,7 @@
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
 
@@ -284,8 +285,42 @@
             }
         }
 
+        protected virtual void ApplyEqualityFilter(SqlQuery query)
+        {
+            if (Request.EqualityFilter != null)
+            {
+                foreach (var pair in Request.EqualityFilter)
+                {
+                    if (pair.Value == null)
+                        continue;
+
+                    if (pair.Value is string && ((string)pair.Value).Length == 0)
+                        continue;
+
+                    var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
+                    if (field != null)
+                    {
+                        if (field.MinSelectLevel == SelectLevel.Never ||
+                            field.Flags.HasFlag(FieldFlags.DenyFiltering))
+                        {
+                            throw new ArgumentOutOfRangeException("equalityFilter");
+                        }
+
+                        var value = field.ConvertValue(pair.Value, CultureInfo.InvariantCulture);
+                        if (value == null)
+                            continue;
+
+                        query.WhereEqual(field, value);
+                    }
+                    else
+                        throw new ArgumentOutOfRangeException(String.Format("Can't find field {0} in row for equality filter.", pair.Key));
+                }
+            }
+        }
+
         protected virtual void ApplyFilters(SqlQuery query)
         {
+            ApplyEqualityFilter(query);
             ApplyIncludeDeletedFilter(query);
         }
 

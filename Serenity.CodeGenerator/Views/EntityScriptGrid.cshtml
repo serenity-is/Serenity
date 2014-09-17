@@ -25,8 +25,8 @@ namespace @(Model.RootNamespace)@(dotModule)
         {
             var columns = base.GetColumns();
 
-            columns.Add(new SlickColumn { Field = "@(Model.Identity)", Width = 55, CssClass = "align-right", Title = Q.Text("Db.Shared.RecordId") });@if (Model.NameField != null) {<text>
-            columns.Add(new SlickColumn { Field = "@(Model.NameField)", Width = 200, Format = ItemLink() });</text>}
+            columns.Add(new SlickColumn { Field = "@(Model.Identity)", Width = 65, CssClass = "align-right", Title = Q.Text("Db.Shared.RecordId") });@if (Model.NameField != null) {<text>
+            columns.Add(new SlickColumn { Field = "@(Model.NameField)", Width = 250, Format = ItemLink() });</text>}
 @foreach (var x in Model.Fields) { if (x.Ident != Model.NameField && x.Ident != Model.Identity) {<text>
             columns.Add(new SlickColumn { Field = "@(x.Ident)", Width = 80 });</text>}}
 

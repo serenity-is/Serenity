@@ -18,11 +18,9 @@ namespace Serenity.Services
         public SortBy[] Sort { get; set; }
         public string ContainsText { get; set; }
         public string ContainsField { get; set; }
-        public List<FilterLine> FilterLines { get; set; }
-        [JsonIgnore]
-        public BasicFilterBase Filter { get; set; }
         public bool IncludeDeleted { get; set; }
         public bool ExcludeTotalCount { get; set; }
+        public Dictionary<string, string> EqualityFilter { get; set; }
         public ColumnSelection ColumnSelection { get; set; }
         [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> IncludeColumns { get; set; }
@@ -38,16 +36,16 @@ namespace Serenity.Services
         Details = 3,
     }
 
-    [Flags]
-    public enum ListRequestSupport
-    {
-        Paging = 1,
-        Sorting = 2,
-        ContainsText = 4,
-        IncludeDeleted = 8,
-        FilterLines = 16,
-        Filter = 32,
-        SetPageSortContains = Paging | Sorting | ContainsText,
-        SetFull = SetPageSortContains | Filter | FilterLines | IncludeDeleted
-    }
+    //[Flags] //TODO: add this validation
+    //public enum ListRequestSupport
+    //{
+    //    Paging = 1,
+    //    Sorting = 2,
+    //    ContainsText = 4,
+    //    IncludeDeleted = 8
+    //    FilterLines = 16,
+    //    Filter = 32,
+    //    SetPageSortContains = Paging | Sorting | ContainsText,
+    //    SetFull = SetPageSortContains | Filter | FilterLines | IncludeDeleted
+    //}
 }

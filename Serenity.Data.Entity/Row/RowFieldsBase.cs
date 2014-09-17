@@ -14,6 +14,7 @@ namespace Serenity.Data
     {
         internal Dictionary<string, Field> byName;
         internal Dictionary<string, Field> byPropertyName;
+        internal Field[] primaryKeys;
         internal bool isInitialized;
         internal string fieldPrefix;
         internal Dictionary<string, Join> joins;
@@ -436,6 +437,20 @@ namespace Serenity.Data
             set
             {
                 generationKey = value;
+            }
+        }
+
+        public Field[] PrimaryKeys
+        {
+            get
+            {
+                if (primaryKeys == null)
+                {
+                    primaryKeys = this.Where(x => x.flags.HasFlag(FieldFlags.PrimaryKey))
+                        .ToArray();
+                }
+
+                return primaryKeys;
             }
         }
 

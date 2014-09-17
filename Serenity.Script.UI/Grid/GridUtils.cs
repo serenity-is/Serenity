@@ -48,7 +48,7 @@ namespace Serenity
             AddToggleButton(toolDiv,
                 cssClass: "s-IncludeDeletedToggle",
                 initial: initial,
-                hint: hint ?? "silinmiş kayıtları da göster",
+                hint: hint ?? Texts.Controls.EntityGrid.IncludeDeletedToggle,
                 callback: (pressed) =>
                 {
                     includeDeleted = pressed;

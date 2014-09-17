@@ -6,58 +6,58 @@ namespace Serenity.Services
 {
     public static class ServiceHelper
     {
-        public static void ValidateRequestSupport(this ListRequest request, ListRequestSupport support)
-        {
-            DataValidation.CheckNotNull(request);
+    //    public static void ValidateRequestSupport(this ListRequest request, ListRequestSupport support)
+    //    {
+    //        DataValidation.CheckNotNull(request);
 
-            if (request.Take < 0 ||
-                request.Skip < 0)
-                throw new ValidationError("Liste isteklerinde Take ve Skip parametreleri 0'dan büyük olmalıdır!");
+    //        if (request.Take < 0 ||
+    //            request.Skip < 0)
+    //            throw new ValidationError("Liste isteklerinde Take ve Skip parametreleri 0'dan büyük olmalıdır!");
 
-            if ((support & ListRequestSupport.Paging) != ListRequestSupport.Paging &&
-                (request.Take > 0 || request.Skip > 0))
-            {
-                throw new ValidationError("Bu liste servisi sayfalamayı desteklemiyor!");
-            }
+    //        if ((support & ListRequestSupport.Paging) != ListRequestSupport.Paging &&
+    //            (request.Take > 0 || request.Skip > 0))
+    //        {
+    //            throw new ValidationError("Bu liste servisi sayfalamayı desteklemiyor!");
+    //        }
 
-            if ((support & ListRequestSupport.Sorting) != ListRequestSupport.Sorting &&
-                !request.Sort.IsEmptyOrNull())
-            {
-                throw new ValidationError("Bu liste servisi sıralamayı desteklemiyor!");
-            }
+    //        if ((support & ListRequestSupport.Sorting) != ListRequestSupport.Sorting &&
+    //            !request.Sort.IsEmptyOrNull())
+    //        {
+    //            throw new ValidationError("Bu liste servisi sıralamayı desteklemiyor!");
+    //        }
 
-            if ((support & ListRequestSupport.ContainsText) != ListRequestSupport.ContainsText &&
-                !request.ContainsText.IsNullOrEmpty())
-            {
-                throw new ValidationError("Bu liste servisi metin aramasını desteklemiyor!");
-            }
+    //        if ((support & ListRequestSupport.ContainsText) != ListRequestSupport.ContainsText &&
+    //            !request.ContainsText.IsNullOrEmpty())
+    //        {
+    //            throw new ValidationError("Bu liste servisi metin aramasını desteklemiyor!");
+    //        }
 
-            if ((support & ListRequestSupport.IncludeDeleted) != ListRequestSupport.IncludeDeleted &&
-                request.IncludeDeleted)
-            {
-                throw new ValidationError("Bu liste servisi silinmiş kayıtları göstermeyi desteklemiyor!");
-            }
+    //        if ((support & ListRequestSupport.IncludeDeleted) != ListRequestSupport.IncludeDeleted &&
+    //            request.IncludeDeleted)
+    //        {
+    //            throw new ValidationError("Bu liste servisi silinmiş kayıtları göstermeyi desteklemiyor!");
+    //        }
 
-            if ((support & ListRequestSupport.FilterLines) != ListRequestSupport.FilterLines &&
-                !request.FilterLines.IsEmptyOrNull())
-            {
-                throw new ValidationError("Bu liste servisi filtre satırlarını desteklemiyor!");
-            }
+    //        /*if ((support & ListRequestSupport.FilterLines) != ListRequestSupport.FilterLines &&
+    //            !request.FilterLines.IsEmptyOrNull())
+    //        {
+    //            throw new ValidationError("Bu liste servisi filtre satırlarını desteklemiyor!");
+    //        }
 
-            if ((support & ListRequestSupport.Filter) != ListRequestSupport.Filter &&
-                request.Filter != null)
-            {
-                throw new ValidationError("Bu liste servisi filtre desteklemiyor!");
-            }
-        }
+    //        if ((support & ListRequestSupport.Filter) != ListRequestSupport.Filter &&
+    //            request.Filter != null)
+    //        {
+    //            throw new ValidationError("Bu liste servisi filtre desteklemiyor!");
+    //        }*/
+    //    }
 
-        public static void CheckRelatedOnDelete(IDbConnection connection, string tableName, Action<SqlQuery> filter)
-        {
-            var query = new SqlQuery().Select("1").From(tableName, Alias.T0);
-            filter(query);
-            if (query.Take(1).Exists(connection))
-                throw DataValidation.RelatedRecordExist(tableName);
-        }
+    //    public static void CheckRelatedOnDelete(IDbConnection connection, string tableName, Action<SqlQuery> filter)
+    //    {
+    //        var query = new SqlQuery().Select("1").From(tableName, Alias.T0);
+    //        filter(query);
+    //        if (query.Take(1).Exists(connection))
+    //            throw DataValidation.RelatedRecordExist(tableName);
+    //    }
 
         public static void CheckParentNotDeleted(IDbConnection connection, string tableName, Action<SqlQuery> filter)
         {

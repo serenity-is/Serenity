@@ -19,7 +19,7 @@ namespace Serenity.Web
         private bool _nonCached; 
         private Dictionary<string, object> _lookupParams;
 
-        public DbLookupScript(string name, string schema = null, bool authorize = false, string right = null, bool nonCached = false,
+        public DbLookupScript(string name, string connectionKey = null, bool authorize = false, string right = null, bool nonCached = false,
             Func<IDbConnection, IEnumerable<TItem>> getItems = null)
         {
             _lookupParams = new Dictionary<string, object>();
@@ -64,15 +64,15 @@ namespace Serenity.Web
 
             _scriptName = "Lookup." + name;
 
-            if (schema == null)
+            if (connectionKey == null)
             {
                 if (row != null)
-                    schema = RowRegistry.GetConnectionKey(row);
+                    connectionKey = RowRegistry.GetConnectionKey(row);
                 else
-                    schema = RowRegistry.DefaultConnectionKey;
+                    connectionKey = RowRegistry.DefaultConnectionKey;
             }
 
-            _schema = schema;
+            _schema = connectionKey;
 
             _lookup = name;
             _getItems = getItems;
