@@ -20,7 +20,7 @@ namespace Serenity.Services
         public string ContainsField { get; set; }
         public bool IncludeDeleted { get; set; }
         public bool ExcludeTotalCount { get; set; }
-        public Dictionary<string, string> EqualityFilter { get; set; }
+        public Dictionary<string, object> EqualityFilter { get; set; }
         public ColumnSelection ColumnSelection { get; set; }
         [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> IncludeColumns { get; set; }
