@@ -21,6 +21,9 @@
         </Folder>
       </Folder>
       <Folder Name="Common" TargetFolderName="Common">
+        <Folder Name="Helper" TargetFolderName="Helper">
+          <ProjectItem ReplaceParameters="true" TargetFileName="CascadedEditorHelper.cs">CascadedEditorHelper.cs</ProjectItem>
+        </Folder>
         <Folder Name="Navigation" TargetFolderName="Navigation">
           <ProjectItem ReplaceParameters="true" TargetFileName="SidebarSearch.cs">SidebarSearch.cs</ProjectItem>
         </Folder>
@@ -31,12 +34,38 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserForm.cs">Administration.UserForm.cs</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="FormContexts.log">FormContexts.log</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginForm.cs">Membership.LoginForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CategoryForm.cs">Northwind.CategoryForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerCustomerDemoForm.cs">Northwind.CustomerCustomerDemoForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerDemographicForm.cs">Northwind.CustomerDemographicForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerForm.cs">Northwind.CustomerForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.EmployeeForm.cs">Northwind.EmployeeForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.EmployeeTerritoryForm.cs">Northwind.EmployeeTerritoryForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.OrderDetailForm.cs">Northwind.OrderDetailForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.OrderForm.cs">Northwind.OrderForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.ProductForm.cs">Northwind.ProductForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.RegionForm.cs">Northwind.RegionForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.ShipperForm.cs">Northwind.ShipperForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.SupplierForm.cs">Northwind.SupplierForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.TerritoryForm.cs">Northwind.TerritoryForm.cs</ProjectItem>
         </Folder>
         <ProjectItem ReplaceParameters="true" TargetFileName="MultipleOutputHelper.ttinclude">MultipleOutputHelper.ttinclude</ProjectItem>
         <Folder Name="ServiceContracts" TargetFolderName="ServiceContracts">
           <ProjectItem ReplaceParameters="true" TargetFileName="ServiceContracts.tt">ServiceContracts.tt</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserRow.cs">Administration.UserRow.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginRequest.cs">Membership.LoginRequest.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CategoryRow.cs">Northwind.CategoryRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerCustomerDemoRow.cs">Northwind.CustomerCustomerDemoRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerDemographicRow.cs">Northwind.CustomerDemographicRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerRow.cs">Northwind.CustomerRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.EmployeeRow.cs">Northwind.EmployeeRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.EmployeeTerritoryRow.cs">Northwind.EmployeeTerritoryRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.OrderDetailRow.cs">Northwind.OrderDetailRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.OrderRow.cs">Northwind.OrderRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.ProductRow.cs">Northwind.ProductRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.RegionRow.cs">Northwind.RegionRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.ShipperRow.cs">Northwind.ShipperRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.SupplierRow.cs">Northwind.SupplierRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.TerritoryRow.cs">Northwind.TerritoryRow.cs</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="ServiceContracts.log">ServiceContracts.log</ProjectItem>
         </Folder>
         <Folder Name="ServiceEndpoints" TargetFolderName="ServiceEndpoints">
@@ -51,7 +80,61 @@
       <Folder Name="Northwind" TargetFolderName="Northwind">
         <Folder Name="Category" TargetFolderName="Category">
           <ProjectItem ReplaceParameters="true" TargetFileName="CategoryDialog.cs">CategoryDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="CategoryEditor.cs">CategoryEditor.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="CategoryGrid.cs">CategoryGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Customer" TargetFolderName="Customer">
+          <ProjectItem ReplaceParameters="true" TargetFileName="CustomerDialog.cs">CustomerDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="CustomerGrid.cs">CustomerGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="CustomerCustomerDemo" TargetFolderName="CustomerCustomerDemo">
+          <ProjectItem ReplaceParameters="true" TargetFileName="CustomerCustomerDemoDialog.cs">CustomerCustomerDemoDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="CustomerCustomerDemoGrid.cs">CustomerCustomerDemoGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="CustomerDemographic" TargetFolderName="CustomerDemographic">
+          <ProjectItem ReplaceParameters="true" TargetFileName="CustomerDemographicDialog.cs">CustomerDemographicDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="CustomerDemographicGrid.cs">CustomerDemographicGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Employee" TargetFolderName="Employee">
+          <ProjectItem ReplaceParameters="true" TargetFileName="EmployeeDialog.cs">EmployeeDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="EmployeeGrid.cs">EmployeeGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="EmployeeTerritory" TargetFolderName="EmployeeTerritory">
+          <ProjectItem ReplaceParameters="true" TargetFileName="EmployeeTerritoryDialog.cs">EmployeeTerritoryDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="EmployeeTerritoryGrid.cs">EmployeeTerritoryGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Order" TargetFolderName="Order">
+          <ProjectItem ReplaceParameters="true" TargetFileName="OrderDialog.cs">OrderDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="OrderGrid.cs">OrderGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="OrderDetail" TargetFolderName="OrderDetail">
+          <ProjectItem ReplaceParameters="true" TargetFileName="OrderDetailDialog.cs">OrderDetailDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="OrderDetailGrid.cs">OrderDetailGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Product" TargetFolderName="Product">
+          <ProjectItem ReplaceParameters="true" TargetFileName="ProductDialog.cs">ProductDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="ProductGrid.cs">ProductGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Region" TargetFolderName="Region">
+          <ProjectItem ReplaceParameters="true" TargetFileName="RegionDialog.cs">RegionDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="RegionEditor.cs">RegionEditor.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="RegionGrid.cs">RegionGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Shared" TargetFolderName="Shared">
+          <ProjectItem ReplaceParameters="true" TargetFileName="PhoneEditor.cs">PhoneEditor.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Shipper" TargetFolderName="Shipper">
+          <ProjectItem ReplaceParameters="true" TargetFileName="ShipperDialog.cs">ShipperDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="ShipperGrid.cs">ShipperGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Supplier" TargetFolderName="Supplier">
+          <ProjectItem ReplaceParameters="true" TargetFileName="SupplierDialog.cs">SupplierDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="SupplierEditor.cs">SupplierEditor.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="SupplierGrid.cs">SupplierGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Territory" TargetFolderName="Territory">
+          <ProjectItem ReplaceParameters="true" TargetFileName="TerritoryDialog.cs">TerritoryDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="TerritoryGrid.cs">TerritoryGrid.cs</ProjectItem>
         </Folder>
       </Folder>
       <ProjectItem ReplaceParameters="true" TargetFileName="packages.config">packages.config</ProjectItem>
@@ -73,7 +156,7 @@
       <package id="Saltarelle.Linq" version="2.4.0" />
       <package id="Saltarelle.Runtime" version="2.5.0" />
       <package id="Saltarelle.Web" version="3.1.0" />
-      <package id="Serenity.Script" version="1.1.1" />
+      <package id="Serenity.Script" version="1.1.2" />
     </packages>
   </WizardData>
 </VSTemplate>
