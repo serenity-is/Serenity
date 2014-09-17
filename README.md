@@ -29,6 +29,12 @@ The sample application includes old and famous Nortwind data along with services
 
 You can take a look at the code for this application while more documentation is on the way...
 
+## What's In The Name
+
+Serenity has dictionary meanings of *peace*, *comfort* and *calmness*. 
+
+This is what we are trying to achieve with Serenity. We hope that after installing and using it you will feel this way too...
+
 ## Who/What This Platform Is For
 Serenity is best suited to business applications with many data entry forms or administrative interface of public facing web sites. 
 
@@ -72,6 +78,7 @@ Serenity platform makes use of some valuable open source tools and libraries tha
 * Cecil (https://github.com/jbevain/cecil)
 * Clean-CSS [Node] (https://github.com/jakubpawlowicz/clean-css)
 * Colorbox (https://github.com/jackmoore/colorbox)
+* Dapper (https://github.com/StackExchange/dapper-dot-net)
 * DialogExtend (https://github.com/ROMB/jquery-dialogextend)
 * jLayout (https://github.com/bramstein/jlayout)
 * Json.NET (https://github.com/JamesNK/Newtonsoft.Json)
