@@ -595,6 +595,7 @@
     <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
     <Content Include="Scripts\serenity\texts\serenity.texts.tr.json" />
+    <Content Include="Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Scripts\site\texts\site.texts.tr.json" />
     <Content Include="Modules\Membership\Account\AccountLogin.cshtml" />
     <Content Include="Modules\Web.config" />

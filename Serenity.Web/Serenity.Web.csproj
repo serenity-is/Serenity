@@ -179,6 +179,7 @@
     <None Include="Includes\Fonts\Simple-Line-Icons.eot" />
     <None Include="Includes\Fonts\Simple-Line-Icons.ttf" />
     <None Include="Includes\Fonts\Simple-Line-Icons.woff" />
+    <None Include="Includes\Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Includes\web.config.transform" />
     <None Include="packages.config" />
     <None Include="Style\images\accessright.png" />
