@@ -52,7 +52,7 @@ WriteLiteral("@h: auto, ");
 WriteLiteral("@l: 150px, ");
 
 
-WriteLiteral("@e: 400px);\r\n    .categories { height: 260px; }\r\n}");
+WriteLiteral("@e: 400px);\r\n    .s-PropertyGrid .categories { height: 260px; }\r\n}");
 
 
         }
