@@ -19,7 +19,58 @@
                 "EntitySingular": "Kategori",
                 "EntityPlural": "Kategoriler",
                 "Picture": "Resim"
+            },
+            "Product": {
+                "EntitySingular": "Ürün",
+                "EntityPlural": "Ürünler",
+                "ProductID": "Ürün ID",
+                "ProductName": "Ürün Adı",
+                "Discontinued": "Tedarik Edilemiyor",
+                "SupplierCompanyName": "Tedarikçi",
+                "CategoryName": "Kategori",
+                "QuantityPerUnit": "Birim Başına Miktar",
+                "UnitPrice": "Birim Fiyatı",
+                "UnitsInStock": "Stok Miktarı",
+                "UnitsOnOrder": "Sipariş Miktarı",
+                "ReorderLevel":  "Azami Sipariş Seviyesi"
+            },
+            "Region": {
+                "EntitySingular": "Ana Bölge",
+                "EntityPlural": "Ana Bölgeler",
+                "RegionID": "Ana Bölge No",
+                "RegionDescription": "Ana Bölge Adı"
+            },
+            "Shipper": {
+                "EntitySingular": "Kargo Firması",
+                "EntityPlural": "Kargo Firmaları",
+                "CompanyName": "Firma Adı",
+                "Phone": "Telefon"
+            },
+            "Supplier": {
+                "EntitySingular": "Tedarikçi",
+                "EntityPlural": "Tedarikçiler",
+                "CompanyName": "Firma Adı",
+                "ContactName": "İlgili Adı",
+                "ContactTitle": "İlgili Unvanı",
+                "Address": "Adres",
+                "City": "Şehir",
+                "Region": "Bölge",
+                "PostalCode": "Posta Kodu",
+                "Country": "Ülke",
+                "Phone": "Telefon",
+                "Fax": "Faks",
+                "HomePage": "İnternet Adresi"
+            },
+            "Territory": {
+                "EntitySingular": "Alt Bölge",
+                "EntityPlural": "Alt Bölgeler",
+                "TerritoryID": "Alt Bölge No",
+                "TerritoryDescription": "Alt Bölge Adı",
+                "RegionDescription": "Ana Bölge Adı"
             }
+        },
+        "Shared": {
+            "RecordId": "Kayıt No"
         }
     },
     "Forms": {
@@ -37,11 +88,25 @@
         "Administration": "Yönetim",
         "Administration/User Management": "Kullanıcı Yönetimi",
         "Northwind": "Northwind",
-        "Northwind/Categories": "Kategoriler"
+        "Northwind/Categories": "Kategoriler",
+        "Northwind/Orders": "Siparişler",
+        "Northwind/Products": "Ürünler",
+        "Northwind/Regions": "Ana Bölgeler",
+        "Northwind/Shippers": "Kargo Firmaları",
+        "Northwind/Suppliers": "Tedarikçiler",
+        "Northwind/Territories": "Alt Bölgeler",
+        "SiteTitle": "Serenity Örnek Sitesi",
+        "LogoutLink": "Çıkış yap"
     },
     "Site": {
         "Dashboard": {
             "WelcomeMessage": "Serenity BasicApplication ana sayfasına hoşgeldiniz. Soldaki navigasyondan diğer sayfaları inceleyebilirsiniz..."
+        },
+        "Validation": {
+            "DeleteForeignKeyError": "Kayıt silinemiyor. '{0}' tablosunda bu kayda bağlı veriler var!",
+            "SavePrimaryKeyError": "Kayıt yapılamıyor. Aynı {1} değerine sahip başka bir kayıt var!",
+            "NorthwindPhone": "Telefon numaraları '(503) 555-9831' formatında girilmelidir.",
+            "NorthwindPhoneMultiple": "Telefon numaraları '(503) 555-9831' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir."
         }
     }
 }

@@ -23,6 +23,9 @@ input[type=password] {
   font-family: 'Open Sans', 'Segoe UI', Arial, Helvetica, sans-serif;
   font-size: 13px;
 }
+.s-Toolbar .select2-container {
+  margin-right: 6px;
+}
 .select2-container,
 .select2-container * {
   box-sizing: content-box;
@@ -449,6 +452,9 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
   height: 26px;
   line-height: 27px;
 }
+#toast-container {
+  font-size: 13px;
+}
 body {
   background-color: #fff;
 }
@@ -477,6 +483,9 @@ body {
   border: none;
   box-shadow: none;
 }
+.navbar-collapse {
+  max-height: none;
+}
 .navbar-static-top {
   background: #000;
   color: #fff;
@@ -485,6 +494,9 @@ body {
 }
 .navbar-static-top .navbar-brand {
   color: #ddd;
+}
+.navbar-top-links a {
+  color: #bbb;
 }
 .navbar-top-links li {
   display: inline-block;
@@ -638,6 +650,238 @@ body {
   background-color: rgba(255, 255, 255, 0.15);
   color: #ffffe0;
 }
+.s-CategoryDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-CategoryDialog .tab-pane {
+  height: auto;
+}
+.s-CategoryDialog .caption {
+  width: 150px;
+}
+.s-CategoryDialog .editor {
+  width: 400px;
+}
+.s-CategoryDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-CategoryDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-CategoryDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-CategoryDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-CategoryDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-CategoryDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-CategoryDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-CategoryDialog .s-PropertyGrid .categories {
+  height: 260px;
+}
+.s-ProductDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-ProductDialog .tab-pane {
+  height: auto;
+}
+.s-ProductDialog .caption {
+  width: 180px;
+}
+.s-ProductDialog .editor {
+  width: 380px;
+}
+.s-ProductDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-ProductDialog .s-Form .editor.dateQ {
+  width: 363px;
+}
+.s-ProductDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-ProductDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 303px;
+}
+.s-ProductDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-ProductDialog .s-Form .editor.has-inplace-button {
+  width: 358px;
+}
+.s-ProductDialog .s-Form .emaildomain {
+  width: 195px;
+}
+.s-ProductDialog .categories {
+  height: 400px;
+}
+.s-RegionDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-RegionDialog .tab-pane {
+  height: auto;
+}
+.s-RegionDialog .caption {
+  width: 150px;
+}
+.s-RegionDialog .editor {
+  width: 400px;
+}
+.s-RegionDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-RegionDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-RegionDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-RegionDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-RegionDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-RegionDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-RegionDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-RegionDialog .s-PropertyGrid .categories {
+  height: 260px;
+}
+.s-ShipperDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-ShipperDialog .tab-pane {
+  height: auto;
+}
+.s-ShipperDialog .caption {
+  width: 150px;
+}
+.s-ShipperDialog .editor {
+  width: 400px;
+}
+.s-ShipperDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-ShipperDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-ShipperDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-ShipperDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-ShipperDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-ShipperDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-ShipperDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-ShipperDialog .s-PropertyGrid .categories {
+  height: 260px;
+}
+.s-SupplierDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-SupplierDialog .tab-pane {
+  height: auto;
+}
+.s-SupplierDialog .caption {
+  width: 150px;
+}
+.s-SupplierDialog .editor {
+  width: 400px;
+}
+.s-SupplierDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-SupplierDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-SupplierDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-SupplierDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-SupplierDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-SupplierDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-SupplierDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-SupplierDialog .s-PropertyGrid .categories {
+  height: 460px;
+}
+.s-TerritoryDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-TerritoryDialog .tab-pane {
+  height: auto;
+}
+.s-TerritoryDialog .caption {
+  width: 150px;
+}
+.s-TerritoryDialog .editor {
+  width: 400px;
+}
+.s-TerritoryDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-TerritoryDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-TerritoryDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-TerritoryDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-TerritoryDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-TerritoryDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-TerritoryDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-TerritoryDialog .s-PropertyGrid .categories {
+  height: 260px;
+}
+a,
+.slick-cell > a {
+  color: #0000be;
+}
 #LoginPanelWrapper {
   border: 2px solid #e7e7e7;
   padding: 40px;
@@ -739,41 +983,249 @@ body {
 .s-UserDialog .categories {
   height: 260px;
 }
-.s-CategoryDialog > .size {
+/* ------------------------------------------------------------------------- */
+/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
+/* ------------------------------------------------------------------------- */
+.s-CustomerDemographicDialog > .size {
   min-width: 650px;
   width: 650px;
 }
-.s-CategoryDialog .tab-pane {
+.s-CustomerDemographicDialog .tab-pane {
   height: auto;
 }
-.s-CategoryDialog .caption {
+.s-CustomerDemographicDialog .caption {
   width: 150px;
 }
-.s-CategoryDialog .editor {
+.s-CustomerDemographicDialog .editor {
   width: 400px;
 }
-.s-CategoryDialog input.editor[type=checkbox] {
+.s-CustomerDemographicDialog input.editor[type=checkbox] {
   width: auto;
 }
-.s-CategoryDialog .s-Form .editor.dateQ {
+.s-CustomerDemographicDialog .s-Form .editor.dateQ {
   width: 383px;
 }
-.s-CategoryDialog .s-Form .editor.emailuser {
+.s-CustomerDemographicDialog .s-Form .editor.emailuser {
   width: 170px;
 }
-.s-CategoryDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+.s-CustomerDemographicDialog .s-Form .editor.dateQ.s-DateTimeEditor {
   width: 323px;
 }
-.s-CategoryDialog .s-Form .editor.s-DateTimeEditor.time {
+.s-CustomerDemographicDialog .s-Form .editor.s-DateTimeEditor.time {
   width: 56px;
   margin-left: 4px;
 }
-.s-CategoryDialog .s-Form .editor.has-inplace-button {
+.s-CustomerDemographicDialog .s-Form .editor.has-inplace-button {
   width: 378px;
 }
-.s-CategoryDialog .s-Form .emaildomain {
+.s-CustomerDemographicDialog .s-Form .emaildomain {
   width: 215px;
 }
-.s-CategoryDialog .categories {
+.s-CustomerDemographicDialog .categories {
+  height: 260px;
+}
+/* ------------------------------------------------------------------------- */
+/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
+/* ------------------------------------------------------------------------- */
+.s-CustomerDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-CustomerDialog .tab-pane {
+  height: auto;
+}
+.s-CustomerDialog .caption {
+  width: 150px;
+}
+.s-CustomerDialog .editor {
+  width: 400px;
+}
+.s-CustomerDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-CustomerDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-CustomerDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-CustomerDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-CustomerDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-CustomerDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-CustomerDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-CustomerDialog .categories {
+  height: 260px;
+}
+/* ------------------------------------------------------------------------- */
+/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
+/* ------------------------------------------------------------------------- */
+.s-EmployeeDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-EmployeeDialog .tab-pane {
+  height: auto;
+}
+.s-EmployeeDialog .caption {
+  width: 150px;
+}
+.s-EmployeeDialog .editor {
+  width: 400px;
+}
+.s-EmployeeDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-EmployeeDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-EmployeeDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-EmployeeDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-EmployeeDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-EmployeeDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-EmployeeDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-EmployeeDialog .categories {
+  height: 260px;
+}
+/* ------------------------------------------------------------------------- */
+/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
+/* ------------------------------------------------------------------------- */
+.s-EmployeeTerritoryDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-EmployeeTerritoryDialog .tab-pane {
+  height: auto;
+}
+.s-EmployeeTerritoryDialog .caption {
+  width: 150px;
+}
+.s-EmployeeTerritoryDialog .editor {
+  width: 400px;
+}
+.s-EmployeeTerritoryDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-EmployeeTerritoryDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-EmployeeTerritoryDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-EmployeeTerritoryDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-EmployeeTerritoryDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-EmployeeTerritoryDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-EmployeeTerritoryDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-EmployeeTerritoryDialog .categories {
+  height: 260px;
+}
+/* ------------------------------------------------------------------------- */
+/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
+/* ------------------------------------------------------------------------- */
+.s-OrderDetailDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-OrderDetailDialog .tab-pane {
+  height: auto;
+}
+.s-OrderDetailDialog .caption {
+  width: 150px;
+}
+.s-OrderDetailDialog .editor {
+  width: 400px;
+}
+.s-OrderDetailDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-OrderDetailDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-OrderDetailDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-OrderDetailDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-OrderDetailDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-OrderDetailDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-OrderDetailDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-OrderDetailDialog .categories {
+  height: 260px;
+}
+/* ------------------------------------------------------------------------- */
+/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
+/* ------------------------------------------------------------------------- */
+.s-OrderDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-OrderDialog .tab-pane {
+  height: auto;
+}
+.s-OrderDialog .caption {
+  width: 150px;
+}
+.s-OrderDialog .editor {
+  width: 400px;
+}
+.s-OrderDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-OrderDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-OrderDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-OrderDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-OrderDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-OrderDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-OrderDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-OrderDialog .categories {
   height: 260px;
 }

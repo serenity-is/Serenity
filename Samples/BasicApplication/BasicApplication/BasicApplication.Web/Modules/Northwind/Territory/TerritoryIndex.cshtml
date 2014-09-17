@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewBag.Title = Serenity.LocalText.Get("Db.Northwind.Territory.EntityPlural");
+}
+
+<div id="GridDiv"></div>
+
+<script type="text/javascript">
+    jQuery(function () {
+        new BasicApplication.Northwind.TerritoryGrid($('#GridDiv'), {
+        });
+
+        Q.initFullHeightGridPage($('#GridDiv'));
+    });
+</script>

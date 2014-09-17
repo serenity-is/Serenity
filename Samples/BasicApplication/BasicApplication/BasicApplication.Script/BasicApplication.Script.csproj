@@ -31,11 +31,51 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Common\Helper\CascadedEditorHelper.cs" />
     <Compile Include="Common\Navigation\SidebarSearch.cs" />
     <Compile Include="Imports\FormContexts\Administration.UserForm.cs">
       <DependentUpon>FormContexts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\FormContexts\Membership.LoginForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.CategoryForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.CustomerCustomerDemoForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.CustomerDemographicForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.CustomerForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.EmployeeForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.EmployeeTerritoryForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.OrderDetailForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.OrderForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.ProductForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.RegionForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.ShipperForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.SupplierForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Northwind.TerritoryForm.cs">
       <DependentUpon>FormContexts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Administration.UserRow.cs">
@@ -44,16 +84,83 @@
     <Compile Include="Imports\ServiceContracts\Membership.LoginRequest.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.CategoryRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.CustomerCustomerDemoRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.CustomerDemographicRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.CustomerRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.EmployeeRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.EmployeeTerritoryRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.OrderDetailRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.OrderRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.ProductRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.RegionRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.ShipperRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.SupplierRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.TerritoryRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\ServiceEndpoints\ServiceEndpoints.cs">
       <DependentUpon>ServiceEndpoints.tt</DependentUpon>
     </Compile>
     <Compile Include="Membership\LoginPanel.cs" />
+    <Compile Include="Northwind\Region\RegionEditor.cs" />
+    <Compile Include="Northwind\Shared\PhoneEditor.cs" />
+    <Compile Include="Northwind\Category\CategoryEditor.cs" />
+    <Compile Include="Northwind\Supplier\SupplierEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptInitialization.cs" />
     <Compile Include="Administration\User\UserGrid.cs" />
     <Compile Include="Administration\User\UserDialog.cs" />
     <Compile Include="Northwind\Category\CategoryGrid.cs" />
     <Compile Include="Northwind\Category\CategoryDialog.cs" />
+    <Compile Include="Northwind\Customer\CustomerGrid.cs" />
+    <Compile Include="Northwind\Customer\CustomerDialog.cs" />
+    <Compile Include="Northwind\Employee\EmployeeGrid.cs" />
+    <Compile Include="Northwind\Employee\EmployeeDialog.cs" />
+    <Compile Include="Northwind\EmployeeTerritory\EmployeeTerritoryGrid.cs" />
+    <Compile Include="Northwind\EmployeeTerritory\EmployeeTerritoryDialog.cs" />
+    <Compile Include="Northwind\OrderDetail\OrderDetailGrid.cs" />
+    <Compile Include="Northwind\OrderDetail\OrderDetailDialog.cs" />
+    <Compile Include="Northwind\Order\OrderGrid.cs" />
+    <Compile Include="Northwind\Order\OrderDialog.cs" />
+    <Compile Include="Northwind\Product\ProductGrid.cs" />
+    <Compile Include="Northwind\Product\ProductDialog.cs" />
+    <Compile Include="Northwind\Region\RegionGrid.cs" />
+    <Compile Include="Northwind\Region\RegionDialog.cs" />
+    <Compile Include="Northwind\Shipper\ShipperGrid.cs" />
+    <Compile Include="Northwind\Shipper\ShipperDialog.cs" />
+    <Compile Include="Northwind\Supplier\SupplierGrid.cs" />
+    <Compile Include="Northwind\Supplier\SupplierDialog.cs" />
+    <Compile Include="Northwind\Territory\TerritoryGrid.cs" />
+    <Compile Include="Northwind\Territory\TerritoryDialog.cs" />
+    <Compile Include="Northwind\CustomerDemographic\CustomerDemographicGrid.cs" />
+    <Compile Include="Northwind\CustomerDemographic\CustomerDemographicDialog.cs" />
+    <Compile Include="Northwind\CustomerCustomerDemo\CustomerCustomerDemoGrid.cs" />
+    <Compile Include="Northwind\CustomerCustomerDemo\CustomerCustomerDemoDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Imports\FormContexts\FormContexts.log">
@@ -122,6 +229,7 @@
       <HintPath>..\..\packages\Serenity.Script.1.1.1\lib\net20\Serenity.Script.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
   <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

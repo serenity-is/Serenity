@@ -508,7 +508,9 @@
 			createToolbarExtensions: function() {
 			},
 			createIncludeDeletedButton: function() {
-				$Serenity_GridUtils.addIncludeDeletedToggle(this.toolbar.get_element(), this.view, null, false);
+				if (!Q.isEmptyOrNull(this.getIsActiveFieldName())) {
+					$Serenity_GridUtils.addIncludeDeletedToggle(this.toolbar.get_element(), this.view, null, false);
+				}
 			},
 			getQuickSearchFields: function() {
 				return null;
@@ -909,9 +911,7 @@
 					if (attributes.length === 1) {
 						this.isActiveFieldName = attributes[0].get_value();
 					}
-					else {
-						this.isActiveFieldName = 'IsActive';
-					}
+					this.isActiveFieldName = '';
 				}
 				return this.isActiveFieldName;
 			},
@@ -2335,7 +2335,10 @@
 			}
 			return true;
 		};
-		var $t1 = ss.coalesce(hint, 'silinmiş kayıtları da göster');
+		var $t1 = hint;
+		if (ss.isNullOrUndefined($t1)) {
+			$t1 = Texts$Controls$EntityGrid.IncludeDeletedToggle.get();
+		}
 		$Serenity_GridUtils.addToggleButton(toolDiv, 's-IncludeDeletedToggle', function(pressed) {
 			includeDeleted = pressed;
 			view.seekToPage = 1;

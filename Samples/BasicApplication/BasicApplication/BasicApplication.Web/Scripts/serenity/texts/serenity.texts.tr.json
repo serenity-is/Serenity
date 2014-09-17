@@ -19,7 +19,8 @@
         },
         "EntityGrid": {
             "NewButton": "Yeni {0}",
-            "RefreshButton": "Yenile"
+            "RefreshButton": "Yenile",
+            "IncludeDeletedToggle": "silinmiş kayıtları da göster"
         },
         "Pager": {
             "Page": "Sayfa",
@@ -133,6 +134,7 @@
         "Url": "Lütfen geçerli bir URL giriniz (http://www.site.com formatında).",
         "Username": "Bu geçerli bir kullanıcı adı değil.",
         "UsernameExists": "Bu kullanıcı adı müsait değil. Lütfen başka bir ad seçiniz.",
-        "Xss": "Geçersiz değer! ('&lt;' ve '&amp;' kullanmayın)"
+        "Xss": "Geçersiz değer! ('&lt;' ve '&amp;' kullanmayın)",
+        "InvalidFormMessage": "Lütfen formda kırmızı renkle işaretlenmiş olan eksik ya da hatalı alanları düzeltiniz."
     }
 }

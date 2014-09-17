@@ -1,8 +1,6 @@
 ﻿<#@ template debug="false" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.Core.dll" #>
-<#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.CodeGeneration.dll" #>
-<#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.CodeGeneration.Mvc.dll" #>
 <#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.Web.dll" #>
 <#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\BasicApplication.Web.dll" #>
 <#@ import namespace="System.Linq" #>

@@ -459,6 +459,7 @@
     <Content Include="Content\site\site.overrides.serenity.less" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\site\site.northwind.less" />
     <None Include="Content\site\site.less" />
     <Content Include="Content\slick-default-theme.css" />
     <Content Include="Content\slick.columnpicker.css" />
@@ -544,6 +545,16 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\toastr.scss" />
     <Content Include="Content\toastr.less" />
+    <Content Include="Modules\Common\Imports\ScriptEditorTypes.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ScriptEditorTypes.log</LastGenOutput>
+    </Content>
+    <Content Include="Modules\Common\Imports\ScriptEditorTypes.log">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ScriptEditorTypes.tt</DependentUpon>
+    </Content>
+    <Content Include="Modules\Common\Imports\MultipleOutputHelper.ttinclude" />
     <Content Include="fonts\Simple-Line-Icons.woff" />
     <Content Include="fonts\Simple-Line-Icons.ttf" />
     <Content Include="fonts\Simple-Line-Icons.eot" />
@@ -758,6 +769,18 @@
     </None>
     <Content Include="Modules\Administration\User\UserIndex.cshtml" />
     <Content Include="Modules\Northwind\Category\CategoryIndex.cshtml" />
+    <Content Include="Modules\Northwind\Customer\CustomerIndex.cshtml" />
+    <Content Include="Modules\Northwind\Employee\EmployeeIndex.cshtml" />
+    <Content Include="Modules\Northwind\EmployeeTerritory\EmployeeTerritoryIndex.cshtml" />
+    <Content Include="Modules\Northwind\OrderDetail\OrderDetailIndex.cshtml" />
+    <Content Include="Modules\Northwind\Order\OrderIndex.cshtml" />
+    <Content Include="Modules\Northwind\Product\ProductIndex.cshtml" />
+    <Content Include="Modules\Northwind\Region\RegionIndex.cshtml" />
+    <Content Include="Modules\Northwind\Shipper\ShipperIndex.cshtml" />
+    <Content Include="Modules\Northwind\Supplier\SupplierIndex.cshtml" />
+    <Content Include="Modules\Northwind\Territory\TerritoryIndex.cshtml" />
+    <Content Include="Modules\Northwind\CustomerDemographic\CustomerDemographicIndex.cshtml" />
+    <Content Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -771,8 +794,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Modules\Common\Dashboard\DashboardPage.cs" />
-    <Compile Include="Modules\Common\Navigation\NavigationCategories.cs" />
+    <Compile Include="Modules\Common\Helpers\SqlExceptionHelper.cs" />
+    <Compile Include="Modules\Common\Imports\ScriptEditorTypes.cs">
+      <DependentUpon>ScriptEditorTypes.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Common\Navigation\NavigationItems.cs" />
     <Compile Include="Modules\Common\Navigation\NavigationModel.cs" />
+    <Compile Include="Modules\Northwind.DynamicScripts.cs" />
     <Compile Include="Modules\Texts.cs" />
     <Compile Include="Modules\Membership\Account\AccountPage.cs" />
     <Compile Include="Modules\Administration\User\AuthorizationService.cs" />
@@ -795,9 +823,72 @@
     <Compile Include="Modules\Northwind\Category\CategoryRepository.cs" />
     <Compile Include="Modules\Northwind\Category\CategoryEndpoint.cs" />
     <Compile Include="Modules\Northwind\Category\CategoryPage.cs" />
+    <Compile Include="Modules\Northwind\Customer\CustomerRow.cs" />
+    <Compile Include="Modules\Northwind\Customer\CustomerForm.cs" />
+    <Compile Include="Modules\Northwind\Customer\CustomerRepository.cs" />
+    <Compile Include="Modules\Northwind\Customer\CustomerEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Customer\CustomerPage.cs" />
+    <Compile Include="Modules\Northwind\Employee\EmployeeRow.cs" />
+    <Compile Include="Modules\Northwind\Employee\EmployeeForm.cs" />
+    <Compile Include="Modules\Northwind\Employee\EmployeeRepository.cs" />
+    <Compile Include="Modules\Northwind\Employee\EmployeeEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Employee\EmployeePage.cs" />
+    <Compile Include="Modules\Northwind\EmployeeTerritory\EmployeeTerritoryRow.cs" />
+    <Compile Include="Modules\Northwind\EmployeeTerritory\EmployeeTerritoryForm.cs" />
+    <Compile Include="Modules\Northwind\EmployeeTerritory\EmployeeTerritoryRepository.cs" />
+    <Compile Include="Modules\Northwind\EmployeeTerritory\EmployeeTerritoryEndpoint.cs" />
+    <Compile Include="Modules\Northwind\EmployeeTerritory\EmployeeTerritoryPage.cs" />
+    <Compile Include="Modules\Northwind\OrderDetail\OrderDetailRow.cs" />
+    <Compile Include="Modules\Northwind\OrderDetail\OrderDetailForm.cs" />
+    <Compile Include="Modules\Northwind\OrderDetail\OrderDetailRepository.cs" />
+    <Compile Include="Modules\Northwind\OrderDetail\OrderDetailEndpoint.cs" />
+    <Compile Include="Modules\Northwind\OrderDetail\OrderDetailPage.cs" />
+    <Compile Include="Modules\Northwind\Order\OrderRow.cs" />
+    <Compile Include="Modules\Northwind\Order\OrderForm.cs" />
+    <Compile Include="Modules\Northwind\Order\OrderRepository.cs" />
+    <Compile Include="Modules\Northwind\Order\OrderEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Order\OrderPage.cs" />
+    <Compile Include="Modules\Northwind\Product\ProductRow.cs" />
+    <Compile Include="Modules\Northwind\Product\ProductForm.cs" />
+    <Compile Include="Modules\Northwind\Product\ProductRepository.cs" />
+    <Compile Include="Modules\Northwind\Product\ProductEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Product\ProductPage.cs" />
+    <Compile Include="Modules\Northwind\Region\RegionRow.cs" />
+    <Compile Include="Modules\Northwind\Region\RegionForm.cs" />
+    <Compile Include="Modules\Northwind\Region\RegionRepository.cs" />
+    <Compile Include="Modules\Northwind\Region\RegionEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Region\RegionPage.cs" />
+    <Compile Include="Modules\Northwind\Shipper\ShipperRow.cs" />
+    <Compile Include="Modules\Northwind\Shipper\ShipperForm.cs" />
+    <Compile Include="Modules\Northwind\Shipper\ShipperRepository.cs" />
+    <Compile Include="Modules\Northwind\Shipper\ShipperEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Shipper\ShipperPage.cs" />
+    <Compile Include="Modules\Northwind\Supplier\SupplierRow.cs" />
+    <Compile Include="Modules\Northwind\Supplier\SupplierForm.cs" />
+    <Compile Include="Modules\Northwind\Supplier\SupplierRepository.cs" />
+    <Compile Include="Modules\Northwind\Supplier\SupplierEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Supplier\SupplierPage.cs" />
+    <Compile Include="Modules\Northwind\Territory\TerritoryRow.cs" />
+    <Compile Include="Modules\Northwind\Territory\TerritoryForm.cs" />
+    <Compile Include="Modules\Northwind\Territory\TerritoryRepository.cs" />
+    <Compile Include="Modules\Northwind\Territory\TerritoryEndpoint.cs" />
+    <Compile Include="Modules\Northwind\Territory\TerritoryPage.cs" />
+    <Compile Include="Modules\Northwind\CustomerDemographic\CustomerDemographicRow.cs" />
+    <Compile Include="Modules\Northwind\CustomerDemographic\CustomerDemographicForm.cs" />
+    <Compile Include="Modules\Northwind\CustomerDemographic\CustomerDemographicRepository.cs" />
+    <Compile Include="Modules\Northwind\CustomerDemographic\CustomerDemographicEndpoint.cs" />
+    <Compile Include="Modules\Northwind\CustomerDemographic\CustomerDemographicPage.cs" />
+    <Compile Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoRow.cs" />
+    <Compile Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoForm.cs" />
+    <Compile Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoRepository.cs" />
+    <Compile Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoEndpoint.cs" />
+    <Compile Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,9 +1,6 @@
 ﻿<#@ template debug="false" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.Core.dll" #>
-<#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.Munq.dll" #>
-<#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.CodeGeneration.dll" #>
-<#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.CodeGeneration.Mvc.dll" #>
 <#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\Serenity.Web.dll" #>
 <#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\bin\BasicApplication.Web.dll" #>
 <#@ assembly name="$(SolutionDir)BasicApplication\BasicApplication.Web\tools\Mono.Cecil\Mono.Cecil.dll" #>
@@ -19,7 +16,7 @@
 <# 
 	var container = new Serenity.MunqContainer();
     Serenity.Dependency.SetResolver(container);
-    container.RegisterInstance<Serenity.Localization.ILocalTextProvider>(new Serenity.Localization.LocalTextRegistry());
+    container.RegisterInstance<Serenity.Localization.ILocalTextRegistry>(new Serenity.Localization.LocalTextRegistry());
     var solutionDir = Host.ResolvePath(@"..\..\..");
     var scriptAssembly1 =(solutionDir + @"\BasicApplication.Script\bin\debug\Serenity.Script.UI.dll");
     var scriptAssembly2 =(solutionDir + @"\BasicApplication.Script\bin\debug\BasicApplication.Script.dll");

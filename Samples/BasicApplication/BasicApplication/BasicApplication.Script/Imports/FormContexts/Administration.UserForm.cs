@@ -8,6 +8,7 @@ namespace BasicApplication.Administration
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
+    using BasicApplication;
 
     public partial class UserForm : PrefixedContext
     {

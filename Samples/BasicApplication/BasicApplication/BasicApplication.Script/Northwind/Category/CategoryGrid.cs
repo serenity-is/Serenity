@@ -20,16 +20,11 @@ namespace BasicApplication.Northwind
         {
             var columns = base.GetColumns();
 
-            columns.Add(new SlickColumn { Field = "CategoryID", Width = 55, CssClass = "align-right", Title = Q.Text("Db.Shared.RecordId") });
+            columns.Add(new SlickColumn { Field = "CategoryID", Width = 65, CssClass = "align-right", Title = Q.Text("Db.Shared.RecordId") });
             columns.Add(new SlickColumn { Field = "CategoryName", Width = 250, Format = ItemLink() });
             columns.Add(new SlickColumn { Field = "Description", Width = 450 });
 
             return columns;
         }
-    }
-
-    [Imported, Serializable, PreserveMemberCase]
-    public partial class CategoryRow
-    {
     }
 }

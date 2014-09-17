@@ -1,6 +1,4 @@
 ﻿
-[assembly:Serenity.Navigation.NavigationLink(9200, "Northwind/Categories", url: "~/Northwind/Category", permission: "Administration", icon: "icon-folder-alt")]
-
 namespace BasicApplication.Northwind.Pages
 {
     using Serenity;
@@ -12,7 +10,7 @@ namespace BasicApplication.Northwind.Pages
         [Authorize]
         public ActionResult Index()
         {
-            WebSecurityHelper.EnsurePermission("Administration");
+            WebSecurityHelper.EnsurePermission("Northwind");
             return View("~/Modules/Northwind/Category/CategoryIndex.cshtml");
         }
     }

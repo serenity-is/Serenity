@@ -1507,6 +1507,7 @@
 	$Q$LT.initializeTextClass($Texts$Controls$EntityDialog, 'Controls.EntityDialog.');
 	$Texts$Controls$EntityGrid.NewButton = new Q$LT('New {0}');
 	$Texts$Controls$EntityGrid.RefreshButton = new Q$LT('Refresh');
+	$Texts$Controls$EntityGrid.IncludeDeletedToggle = new Q$LT('display inactive records');
 	$Q$LT.initializeTextClass($Texts$Controls$EntityGrid, 'Controls.EntityGrid.');
 	$Texts$Controls$Pager.Page = new Q$LT('Page');
 	$Texts$Controls$Pager.PageStatus = new Q$LT('Showing {from} to {to} of {total} total records');

@@ -10,8 +10,8 @@ namespace BasicApplication.Northwind.Entities
     using System.IO;
 
     [ConnectionKey("Default"), DisplayName("Categories"), InstanceName("Category")]
-    [ReadPermission("Administration")]
-    [ModifyPermission("Administration")]
+    [ReadPermission("Northwind")]
+    [ModifyPermission("Northwind")]
     [JsonConverter(typeof(JsonRowConverter))]
     public sealed class CategoryRow : Row, IIdRow, INameRow
     {
@@ -29,7 +29,7 @@ namespace BasicApplication.Northwind.Entities
             set { Fields.CategoryName[this] = value; }
         }
 
-        [DisplayName("Description")]
+        [DisplayName("Description"), QuickSearch]
         public String Description
         {
             get { return Fields.Description[this]; }
