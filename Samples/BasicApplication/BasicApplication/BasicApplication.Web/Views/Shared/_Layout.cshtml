@@ -91,8 +91,9 @@ else
     $().ready(function () {
         $('#side-menu').metisMenu();
         new BasicApplication.Common.SidebarSearch($('#SidebarSearch'), $('#side-menu'));
-        
-        $(window).bind("load resize", function() {
+        @RenderSection("PageInitScript", false);
+
+        var doLayout = function () {
             topOffset = 50;
             width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
             if (width < 768) {
@@ -113,8 +114,10 @@ else
                 $('#page-content').css("height", height + "px");
 
             $('body').triggerHandler('layout');
-        });
-        @RenderSection("PageInitScript", false)
+        };
+
+        $(window).bind("load,resize", doLayout);
+        doLayout();
     });
     </script>
 }
