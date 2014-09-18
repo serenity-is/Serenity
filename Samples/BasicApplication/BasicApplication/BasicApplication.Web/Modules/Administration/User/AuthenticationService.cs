@@ -1,6 +1,7 @@
 ﻿namespace BasicApplication.Administration
 {
     using Serenity;
+    using Serenity.Abstractions;
     using Serenity.Web.Providers;
     using System;
 

@@ -1,6 +1,7 @@
 ﻿namespace BasicApplication.Administration
 {
     using Serenity;
+    using Serenity.Abstractions;
     using Serenity.Data;
     using System.Data;
     using MyRow = Entities.UserRow;
