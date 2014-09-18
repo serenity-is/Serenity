@@ -812,6 +812,13 @@
 	};
 	global.BasicApplication.Northwind.ShipperService = $BasicApplication_Northwind_ShipperService;
 	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Northwind.SupplierCountryEditor
+	var $BasicApplication_Northwind_SupplierCountryEditor = function(select) {
+		ss.makeGenericType(Serenity.LookupEditorBase$2, [Object, Object]).call(this, select, null);
+	};
+	$BasicApplication_Northwind_SupplierCountryEditor.__typeName = 'BasicApplication.Northwind.SupplierCountryEditor';
+	global.BasicApplication.Northwind.SupplierCountryEditor = $BasicApplication_Northwind_SupplierCountryEditor;
+	////////////////////////////////////////////////////////////////////////////////
 	// BasicApplication.Northwind.SupplierDialog
 	var $BasicApplication_Northwind_SupplierDialog = function() {
 		ss.makeGenericType(Serenity.EntityDialog$1, [Object]).call(this);
@@ -835,6 +842,7 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// BasicApplication.Northwind.SupplierGrid
 	var $BasicApplication_Northwind_SupplierGrid = function(container) {
+		this.$country = null;
 		ss.makeGenericType(Serenity.EntityGrid$1, [Object]).call(this, container);
 	};
 	$BasicApplication_Northwind_SupplierGrid.__typeName = 'BasicApplication.Northwind.SupplierGrid';
@@ -1427,6 +1435,11 @@
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
 	ss.initClass($BasicApplication_Northwind_ShipperService, $asm, {});
+	ss.initClass($BasicApplication_Northwind_SupplierCountryEditor, $asm, {
+		getLookupKey: function() {
+			return 'Northwind.SupplierCountry';
+		}
+	}, ss.makeGenericType(Serenity.LookupEditorBase$2, [Object, Object]), [Serenity.IStringValue]);
 	ss.initClass($BasicApplication_Northwind_SupplierDialog, $asm, {}, ss.makeGenericType(Serenity.EntityDialog$1, [Object]), [Serenity.IDialog]);
 	ss.initClass($BasicApplication_Northwind_SupplierEditor, $asm, {
 		getLookupKey: function() {
@@ -1480,6 +1493,24 @@
 			ss.add(columns, { field: 'Region', width: 80 });
 			ss.add(columns, { field: 'Country', width: 130 });
 			return columns;
+		},
+		createToolbarExtensions: function() {
+			ss.makeGenericType(Serenity.EntityGrid$2, [Object, Object]).prototype.createToolbarExtensions.call(this);
+			this.$country = Serenity.WX.create($BasicApplication_Northwind_SupplierCountryEditor).call(null, ss.mkdel(this, function(e) {
+				e.appendTo(this.toolbar.get_element()).attr('placeholder', '--- ' + Q.text('Db.Northwind.Supplier.Country') + ' ---');
+			}), null);
+			Serenity.WX.change(this.$country, ss.mkdel(this, function(e1) {
+				this.refresh();
+			}));
+		},
+		onViewSubmit: function() {
+			if (!ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.onViewSubmit.call(this)) {
+				return false;
+			}
+			var req = this.view.params;
+			req.EqualityFilter = req.EqualityFilter || {};
+			req.EqualityFilter['Country'] = this.$country.get_value();
+			return true;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
 	ss.initClass($BasicApplication_Northwind_SupplierService, $asm, {});
@@ -1551,6 +1582,7 @@
 	ss.setMetadata($BasicApplication_Northwind_RegionGrid, { attr: [new Serenity.IdPropertyAttribute('RegionID'), new Serenity.NamePropertyAttribute('RegionDescription'), new Serenity.DialogTypeAttribute($BasicApplication_Northwind_RegionDialog), new Serenity.LocalTextPrefixAttribute('Northwind.Region'), new Serenity.ServiceAttribute('Northwind/Region')] });
 	ss.setMetadata($BasicApplication_Northwind_ShipperDialog, { attr: [new Serenity.IdPropertyAttribute('ShipperID'), new Serenity.NamePropertyAttribute('CompanyName'), new Serenity.FormKeyAttribute('Northwind.Shipper'), new Serenity.LocalTextPrefixAttribute('Northwind.Shipper'), new Serenity.ServiceAttribute('Northwind/Shipper')] });
 	ss.setMetadata($BasicApplication_Northwind_ShipperGrid, { attr: [new Serenity.IdPropertyAttribute('ShipperID'), new Serenity.NamePropertyAttribute('CompanyName'), new Serenity.DialogTypeAttribute($BasicApplication_Northwind_ShipperDialog), new Serenity.LocalTextPrefixAttribute('Northwind.Shipper'), new Serenity.ServiceAttribute('Northwind/Shipper')] });
+	ss.setMetadata($BasicApplication_Northwind_SupplierCountryEditor, { attr: [new Serenity.EditorAttribute()] });
 	ss.setMetadata($BasicApplication_Northwind_SupplierDialog, { attr: [new Serenity.IdPropertyAttribute('SupplierID'), new Serenity.NamePropertyAttribute('CompanyName'), new Serenity.FormKeyAttribute('Northwind.Supplier'), new Serenity.LocalTextPrefixAttribute('Northwind.Supplier'), new Serenity.ServiceAttribute('Northwind/Supplier')] });
 	ss.setMetadata($BasicApplication_Northwind_SupplierEditor, { attr: [new Serenity.EditorAttribute()] });
 	ss.setMetadata($BasicApplication_Northwind_SupplierGrid, { attr: [new Serenity.IdPropertyAttribute('SupplierID'), new Serenity.NamePropertyAttribute('CompanyName'), new Serenity.DialogTypeAttribute($BasicApplication_Northwind_SupplierDialog), new Serenity.LocalTextPrefixAttribute('Northwind.Supplier'), new Serenity.ServiceAttribute('Northwind/Supplier')] });

@@ -11,6 +11,8 @@ namespace BasicApplication.Northwind
     [DialogType(typeof(SupplierDialog)), LocalTextPrefix("Northwind.Supplier"), Service("Northwind/Supplier")]
     public class SupplierGrid : EntityGrid<SupplierRow>
     {
+        private SupplierCountryEditor country;
+
         public SupplierGrid(jQueryObject container)
             : base(container)
         {
@@ -30,6 +32,28 @@ namespace BasicApplication.Northwind
             columns.Add(new SlickColumn { Field = "Country", Width = 130 });
 
             return columns;
+        }
+
+        protected override void CreateToolbarExtensions()
+        {
+            base.CreateToolbarExtensions();
+
+            country = WidgetExtensions.Create<SupplierCountryEditor>(
+                    initElement: e => e.AppendTo(toolbar.Element)
+                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Supplier.Country") + " ---"));
+
+            country.Change(e => Refresh());
+        }
+
+        protected override bool OnViewSubmit()
+        {
+            if (!base.OnViewSubmit())
+                return false;
+
+            var req = (ListRequest)view.Params;
+            req.EqualityFilter = req.EqualityFilter ?? new JsDictionary<string, object>();
+            req.EqualityFilter["Country"] = country.Value;
+            return true;
         }
     }
 }

@@ -130,6 +130,7 @@
     <Compile Include="Northwind\Region\RegionEditor.cs" />
     <Compile Include="Northwind\Shared\PhoneEditor.cs" />
     <Compile Include="Northwind\Category\CategoryEditor.cs" />
+    <Compile Include="Northwind\Supplier\SupplierCountryEditor.cs" />
     <Compile Include="Northwind\Supplier\SupplierEditor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptInitialization.cs" />
