@@ -688,6 +688,44 @@ body {
 .s-CategoryDialog .s-PropertyGrid .categories {
   height: 260px;
 }
+.s-CustomerDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-CustomerDialog .tab-pane {
+  height: auto;
+}
+.s-CustomerDialog .caption {
+  width: 150px;
+}
+.s-CustomerDialog .editor {
+  width: 400px;
+}
+.s-CustomerDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-CustomerDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-CustomerDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-CustomerDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-CustomerDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-CustomerDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-CustomerDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-CustomerDialog .categories {
+  height: 450px;
+}
 .s-ProductDialog > .size {
   min-width: 650px;
   width: 650px;
@@ -1024,50 +1062,6 @@ a,
 .s-CustomerDemographicDialog .categories {
   height: 260px;
 }
-/* ------------------------------------------------------------------------- */
-/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
-/* ------------------------------------------------------------------------- */
-.s-CustomerDialog > .size {
-  min-width: 650px;
-  width: 650px;
-}
-.s-CustomerDialog .tab-pane {
-  height: auto;
-}
-.s-CustomerDialog .caption {
-  width: 150px;
-}
-.s-CustomerDialog .editor {
-  width: 400px;
-}
-.s-CustomerDialog input.editor[type=checkbox] {
-  width: auto;
-}
-.s-CustomerDialog .s-Form .editor.dateQ {
-  width: 383px;
-}
-.s-CustomerDialog .s-Form .editor.emailuser {
-  width: 170px;
-}
-.s-CustomerDialog .s-Form .editor.dateQ.s-DateTimeEditor {
-  width: 323px;
-}
-.s-CustomerDialog .s-Form .editor.s-DateTimeEditor.time {
-  width: 56px;
-  margin-left: 4px;
-}
-.s-CustomerDialog .s-Form .editor.has-inplace-button {
-  width: 378px;
-}
-.s-CustomerDialog .s-Form .emaildomain {
-  width: 215px;
-}
-.s-CustomerDialog .categories {
-  height: 260px;
-}
-/* ------------------------------------------------------------------------- */
-/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
-/* ------------------------------------------------------------------------- */
 .s-EmployeeDialog > .size {
   min-width: 650px;
   width: 650px;

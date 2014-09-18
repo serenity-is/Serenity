@@ -1,4 +1,5 @@
 ﻿[assembly: Serenity.Navigation.NavigationMenu(8000, "Northwind", icon: "icon-anchor")]
+[assembly: Serenity.Navigation.NavigationLink(8200, "Northwind/Customers", url: "~/Northwind/Customer", permission: "Northwind", icon: "icon-wallet")]
 [assembly: Serenity.Navigation.NavigationLink(8300, "Northwind/Products", url: "~/Northwind/Product", permission: "Northwind", icon: "icon-present")]
 [assembly: Serenity.Navigation.NavigationLink(8400, "Northwind/Suppliers", url: "~/Northwind/Supplier", permission: "Northwind", icon: "icon-magic-wand")]
 [assembly: Serenity.Navigation.NavigationLink(8500, "Northwind/Shippers", url: "~/Northwind/Shipper", permission: "Northwind", icon: "icon-plane")]

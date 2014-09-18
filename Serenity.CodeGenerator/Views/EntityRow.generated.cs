@@ -70,13 +70,22 @@ WriteLiteral("namespace ");
             
             #line default
             #line hidden
-WriteLiteral(".Entities\r\n{\r\n    using Newtonsoft.Json;\r\n    using Serenity;\r\n    using Serenity" +
-".Data;\r\n    using Serenity.Data.Mapping;\r\n    using System;\r\n    using System.IO" +
-";\r\n    using System.ComponentModel;\r\n\r\n    [ConnectionKey(\"");
+WriteLiteral(@".Entities
+{
+    using Newtonsoft.Json;
+    using Serenity;
+    using Serenity.ComponentModel;
+    using Serenity.Data;
+    using Serenity.Data.Mapping;
+    using System;
+    using System.IO;
+    using System.ComponentModel;
+
+    [ConnectionKey(""");
 
 
             
-            #line 24 "..\..\Views\EntityRow.cshtml"
+            #line 25 "..\..\Views\EntityRow.cshtml"
                Write(Model.Schema);
 
             
@@ -86,7 +95,7 @@ WriteLiteral("\"), DisplayName(\"");
 
 
             
-            #line 24 "..\..\Views\EntityRow.cshtml"
+            #line 25 "..\..\Views\EntityRow.cshtml"
                                              Write(Model.Tablename);
 
             
@@ -96,7 +105,7 @@ WriteLiteral("\"), InstanceName(\"");
 
 
             
-            #line 24 "..\..\Views\EntityRow.cshtml"
+            #line 25 "..\..\Views\EntityRow.cshtml"
                                                                                Write(Model.Tablename);
 
             
@@ -106,7 +115,7 @@ WriteLiteral("\"), TwoLevelCached]\r\n    [ReadPermission(\"");
 
 
             
-            #line 25 "..\..\Views\EntityRow.cshtml"
+            #line 26 "..\..\Views\EntityRow.cshtml"
                 Write(Model.Permission);
 
             
@@ -116,7 +125,7 @@ WriteLiteral("\")]\r\n    [ModifyPermission(\"");
 
 
             
-            #line 26 "..\..\Views\EntityRow.cshtml"
+            #line 27 "..\..\Views\EntityRow.cshtml"
                   Write(Model.Permission);
 
             
@@ -126,7 +135,7 @@ WriteLiteral("\")]\r\n    [JsonConverter(typeof(JsonRowConverter))]\r\n    publi
 
 
             
-            #line 28 "..\..\Views\EntityRow.cshtml"
+            #line 29 "..\..\Views\EntityRow.cshtml"
                    Write(Model.RowClassName);
 
             
@@ -136,7 +145,7 @@ WriteLiteral(" : ");
 
 
             
-            #line 28 "..\..\Views\EntityRow.cshtml"
+            #line 29 "..\..\Views\EntityRow.cshtml"
                                          Write(Model.RowBaseClass);
 
             
@@ -146,7 +155,7 @@ WriteLiteral(", IIdRow");
 
 
             
-            #line 28 "..\..\Views\EntityRow.cshtml"
+            #line 29 "..\..\Views\EntityRow.cshtml"
                                                                      Write(Model.IsLookup ? ", IDbLookupRow" : "");
 
             
@@ -154,7 +163,7 @@ WriteLiteral(", IIdRow");
             #line hidden
 
             
-            #line 28 "..\..\Views\EntityRow.cshtml"
+            #line 29 "..\..\Views\EntityRow.cshtml"
                                                                                                               Write(Model.NameField == null ? "" : ", INameRow");
 
             
@@ -162,14 +171,14 @@ WriteLiteral(", IIdRow");
             #line hidden
 
             
-            #line 28 "..\..\Views\EntityRow.cshtml"
+            #line 29 "..\..\Views\EntityRow.cshtml"
                                                                                                                                                                 WriteLiteral("\r\n    {");
 
             
             #line default
             #line hidden
             
-            #line 29 "..\..\Views\EntityRow.cshtml"
+            #line 30 "..\..\Views\EntityRow.cshtml"
       foreach (var x in Model.Fields) {
     var attrs = new List<string>();
     if (x.Ident != x.Name) {
@@ -203,7 +212,7 @@ WriteLiteral("\r\n");
 
 
             
-            #line 55 "..\..\Views\EntityRow.cshtml"
+            #line 56 "..\..\Views\EntityRow.cshtml"
  if (!String.IsNullOrEmpty(attrString)) {
 
             
@@ -213,7 +222,7 @@ WriteLiteral("        [");
 
 
             
-            #line 56 "..\..\Views\EntityRow.cshtml"
+            #line 57 "..\..\Views\EntityRow.cshtml"
           Write(attrString);
 
             
@@ -223,7 +232,7 @@ WriteLiteral("]\r\n");
 
 
             
-            #line 57 "..\..\Views\EntityRow.cshtml"
+            #line 58 "..\..\Views\EntityRow.cshtml"
        }
             
             #line default
@@ -232,7 +241,7 @@ WriteLiteral("        public ");
 
 
             
-            #line 57 "..\..\Views\EntityRow.cshtml"
+            #line 58 "..\..\Views\EntityRow.cshtml"
                   Write(x.Type);
 
             
@@ -240,7 +249,7 @@ WriteLiteral("        public ");
             #line hidden
 
             
-            #line 57 "..\..\Views\EntityRow.cshtml"
+            #line 58 "..\..\Views\EntityRow.cshtml"
                           Write(x.IsValueType ? "?" : "");
 
             
@@ -250,7 +259,7 @@ WriteLiteral(" ");
 
 
             
-            #line 57 "..\..\Views\EntityRow.cshtml"
+            #line 58 "..\..\Views\EntityRow.cshtml"
                                                      Write(x.Ident);
 
             
@@ -260,7 +269,7 @@ WriteLiteral("\r\n        {\r\n            get { return Fields.");
 
 
             
-            #line 59 "..\..\Views\EntityRow.cshtml"
+            #line 60 "..\..\Views\EntityRow.cshtml"
                             Write(x.Ident);
 
             
@@ -270,7 +279,7 @@ WriteLiteral("[this]; }\r\n            set { Fields.");
 
 
             
-            #line 60 "..\..\Views\EntityRow.cshtml"
+            #line 61 "..\..\Views\EntityRow.cshtml"
                      Write(x.Ident);
 
             
@@ -280,7 +289,7 @@ WriteLiteral("[this] = value; }\r\n        }\r\n");
 
 
             
-            #line 62 "..\..\Views\EntityRow.cshtml"
+            #line 63 "..\..\Views\EntityRow.cshtml"
        }
 
             
@@ -288,7 +297,7 @@ WriteLiteral("[this] = value; }\r\n        }\r\n");
             #line hidden
 
             
-            #line 63 "..\..\Views\EntityRow.cshtml"
+            #line 64 "..\..\Views\EntityRow.cshtml"
  foreach (var x in Model.Joins){foreach (var y in x.Fields){
 
             
@@ -298,7 +307,7 @@ WriteLiteral("\r\n        [DisplayName(\"");
 
 
             
-            #line 65 "..\..\Views\EntityRow.cshtml"
+            #line 66 "..\..\Views\EntityRow.cshtml"
                  Write(y.Title);
 
             
@@ -308,7 +317,7 @@ WriteLiteral("\"), Expression(\"");
 
 
             
-            #line 65 "..\..\Views\EntityRow.cshtml"
+            #line 66 "..\..\Views\EntityRow.cshtml"
                                           Write("j" + x.Name + "." + y.Name);
 
             
@@ -318,7 +327,7 @@ WriteLiteral("\")]\r\n        public ");
 
 
             
-            #line 66 "..\..\Views\EntityRow.cshtml"
+            #line 67 "..\..\Views\EntityRow.cshtml"
           Write(y.Type);
 
             
@@ -326,7 +335,7 @@ WriteLiteral("\")]\r\n        public ");
             #line hidden
 
             
-            #line 66 "..\..\Views\EntityRow.cshtml"
+            #line 67 "..\..\Views\EntityRow.cshtml"
                   Write(y.IsValueType ? "?" : "");
 
             
@@ -336,7 +345,7 @@ WriteLiteral(" ");
 
 
             
-            #line 66 "..\..\Views\EntityRow.cshtml"
+            #line 67 "..\..\Views\EntityRow.cshtml"
                                               Write(jf(x.Name, y.Ident));
 
             
@@ -346,7 +355,7 @@ WriteLiteral("\r\n        {\r\n            get { return Fields.");
 
 
             
-            #line 68 "..\..\Views\EntityRow.cshtml"
+            #line 69 "..\..\Views\EntityRow.cshtml"
                             Write(jf(x.Name, y.Ident));
 
             
@@ -356,7 +365,7 @@ WriteLiteral("[this]; }\r\n            set { Fields.");
 
 
             
-            #line 69 "..\..\Views\EntityRow.cshtml"
+            #line 70 "..\..\Views\EntityRow.cshtml"
                      Write(jf(x.Name, y.Ident));
 
             
@@ -366,7 +375,7 @@ WriteLiteral("[this] = value; }\r\n        }\r\n");
 
 
             
-            #line 71 "..\..\Views\EntityRow.cshtml"
+            #line 72 "..\..\Views\EntityRow.cshtml"
        }}
 
             
@@ -376,7 +385,7 @@ WriteLiteral("\r\n        IIdField IIdRow.IdField\r\n        {\r\n            ge
 
 
             
-            #line 75 "..\..\Views\EntityRow.cshtml"
+            #line 76 "..\..\Views\EntityRow.cshtml"
                             Write(Model.Identity);
 
             
@@ -386,7 +395,7 @@ WriteLiteral("; }\r\n        }\r\n");
 
 
             
-            #line 77 "..\..\Views\EntityRow.cshtml"
+            #line 78 "..\..\Views\EntityRow.cshtml"
  if (Model.NameField != null) {
 
             
@@ -397,7 +406,7 @@ WriteLiteral("\r\n        StringField INameRow.NameField\r\n        {\r\n       
 
 
             
-            #line 81 "..\..\Views\EntityRow.cshtml"
+            #line 82 "..\..\Views\EntityRow.cshtml"
                            Write(Model.NameField);
 
             
@@ -407,7 +416,7 @@ WriteLiteral("; }\r\n        }\r\n");
 
 
             
-            #line 83 "..\..\Views\EntityRow.cshtml"
+            #line 84 "..\..\Views\EntityRow.cshtml"
        }
 
             
@@ -418,7 +427,7 @@ WriteLiteral("\r\n        public static readonly RowFields Fields = new RowField
 
 
             
-            #line 87 "..\..\Views\EntityRow.cshtml"
+            #line 88 "..\..\Views\EntityRow.cshtml"
            Write(Model.RowClassName);
 
             
@@ -429,7 +438,7 @@ WriteLiteral("()\r\n            : base(Fields)\r\n        {\r\n        }\r\n\r\n
 
 
             
-            #line 92 "..\..\Views\EntityRow.cshtml"
+            #line 93 "..\..\Views\EntityRow.cshtml"
                              Write(Model.FieldsBaseClass);
 
             
@@ -437,14 +446,14 @@ WriteLiteral("()\r\n            : base(Fields)\r\n        {\r\n        }\r\n\r\n
             #line hidden
 
             
-            #line 92 "..\..\Views\EntityRow.cshtml"
+            #line 93 "..\..\Views\EntityRow.cshtml"
                                                          WriteLiteral("\r\n        {");
 
             
             #line default
             #line hidden
             
-            #line 93 "..\..\Views\EntityRow.cshtml"
+            #line 94 "..\..\Views\EntityRow.cshtml"
           foreach (var x in Model.Fields) {
 
             
@@ -454,7 +463,7 @@ WriteLiteral("\r\n            public readonly ");
 
 
             
-            #line 95 "..\..\Views\EntityRow.cshtml"
+            #line 96 "..\..\Views\EntityRow.cshtml"
                         Write(x.Type);
 
             
@@ -464,7 +473,7 @@ WriteLiteral("Field ");
 
 
             
-            #line 95 "..\..\Views\EntityRow.cshtml"
+            #line 96 "..\..\Views\EntityRow.cshtml"
                                        Write(x.Ident);
 
             
@@ -474,7 +483,7 @@ WriteLiteral(";");
 
 
             
-            #line 95 "..\..\Views\EntityRow.cshtml"
+            #line 96 "..\..\Views\EntityRow.cshtml"
                                                              }
 
             
@@ -482,7 +491,7 @@ WriteLiteral(";");
             #line hidden
 
             
-            #line 96 "..\..\Views\EntityRow.cshtml"
+            #line 97 "..\..\Views\EntityRow.cshtml"
  foreach (var x in Model.Joins) {
 
             
@@ -492,7 +501,7 @@ WriteLiteral("\r\n");
 
 
             
-            #line 98 "..\..\Views\EntityRow.cshtml"
+            #line 99 "..\..\Views\EntityRow.cshtml"
  foreach (var y in x.Fields) {
 
             
@@ -502,7 +511,7 @@ WriteLiteral("\r\n            public readonly ");
 
 
             
-            #line 100 "..\..\Views\EntityRow.cshtml"
+            #line 101 "..\..\Views\EntityRow.cshtml"
                         Write(y.Type);
 
             
@@ -512,7 +521,7 @@ WriteLiteral("Field ");
 
 
             
-            #line 100 "..\..\Views\EntityRow.cshtml"
+            #line 101 "..\..\Views\EntityRow.cshtml"
                                        Write(jf(x.Name, y.Ident));
 
             
@@ -522,7 +531,7 @@ WriteLiteral(";");
 
 
             
-            #line 100 "..\..\Views\EntityRow.cshtml"
+            #line 101 "..\..\Views\EntityRow.cshtml"
                                                                          }
             
             #line default
@@ -531,7 +540,7 @@ WriteLiteral("\r\n");
 
 
             
-            #line 101 "..\..\Views\EntityRow.cshtml"
+            #line 102 "..\..\Views\EntityRow.cshtml"
 }
 
             
@@ -541,7 +550,7 @@ WriteLiteral("\r\n            public RowFields()\r\n                : base(\"");
 
 
             
-            #line 104 "..\..\Views\EntityRow.cshtml"
+            #line 105 "..\..\Views\EntityRow.cshtml"
                    Write(Model.Tablename);
 
             
@@ -551,7 +560,7 @@ WriteLiteral("\"");
 
 
             
-            #line 104 "..\..\Views\EntityRow.cshtml"
+            #line 105 "..\..\Views\EntityRow.cshtml"
                                      Write(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\""));
 
             
@@ -561,7 +570,7 @@ WriteLiteral(")\r\n            {\r\n                LocalTextPrefix = \"");
 
 
             
-            #line 106 "..\..\Views\EntityRow.cshtml"
+            #line 107 "..\..\Views\EntityRow.cshtml"
                                Write(moduleDot);
 
             
@@ -569,7 +578,7 @@ WriteLiteral(")\r\n            {\r\n                LocalTextPrefix = \"");
             #line hidden
 
             
-            #line 106 "..\..\Views\EntityRow.cshtml"
+            #line 107 "..\..\Views\EntityRow.cshtml"
                                            Write(Model.ClassName);
 
             

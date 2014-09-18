@@ -11,6 +11,8 @@ namespace BasicApplication.Northwind
     [DialogType(typeof(CustomerDialog)), LocalTextPrefix("Northwind.Customer"), Service("Northwind/Customer")]
     public class CustomerGrid : EntityGrid<CustomerRow>
     {
+        private CustomerCountryEditor country;
+
         public CustomerGrid(jQueryObject container)
             : base(container)
         {
@@ -20,20 +22,40 @@ namespace BasicApplication.Northwind
         {
             var columns = base.GetColumns();
 
-            columns.Add(new SlickColumn { Field = "ID", Width = 55, CssClass = "align-right", Title = Q.Text("Db.Shared.RecordId") });
-            columns.Add(new SlickColumn { Field = "CustomerID", Width = 200, Format = ItemLink() });
-            columns.Add(new SlickColumn { Field = "CompanyName", Width = 80 });
-            columns.Add(new SlickColumn { Field = "ContactName", Width = 80 });
-            columns.Add(new SlickColumn { Field = "ContactTitle", Width = 80 });
-            columns.Add(new SlickColumn { Field = "Address", Width = 80 });
-            columns.Add(new SlickColumn { Field = "City", Width = 80 });
-            columns.Add(new SlickColumn { Field = "Region", Width = 80 });
-            columns.Add(new SlickColumn { Field = "PostalCode", Width = 80 });
-            columns.Add(new SlickColumn { Field = "Country", Width = 80 });
-            columns.Add(new SlickColumn { Field = "Phone", Width = 80 });
-            columns.Add(new SlickColumn { Field = "Fax", Width = 80 });
+            columns.Add(new SlickColumn { Field = "CustomerID", Width = 100, Format = ItemLink() });
+            columns.Add(new SlickColumn { Field = "CompanyName", Width = 250, Format = ItemLink() });
+            columns.Add(new SlickColumn { Field = "ContactName", Width = 150 });
+            columns.Add(new SlickColumn { Field = "ContactTitle", Width = 150 });
+            columns.Add(new SlickColumn { Field = "City", Width = 120 });
+            columns.Add(new SlickColumn { Field = "Region", Width = 60 });
+            columns.Add(new SlickColumn { Field = "PostalCode", Width = 100 });
+            columns.Add(new SlickColumn { Field = "Country", Width = 130 });
+            columns.Add(new SlickColumn { Field = "Phone", Width = 120 });
+            columns.Add(new SlickColumn { Field = "Fax", Width = 120 });
 
             return columns;
+        }
+
+        protected override void CreateToolbarExtensions()
+        {
+            base.CreateToolbarExtensions();
+
+            country = WidgetExtensions.Create<CustomerCountryEditor>(
+                    initElement: e => e.AppendTo(toolbar.Element)
+                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Customer.Country") + " ---"));
+
+            country.Change(e => Refresh());
+        }
+
+        protected override bool OnViewSubmit()
+        {
+            if (!base.OnViewSubmit())
+                return false;
+
+            var req = (ListRequest)view.Params;
+            req.EqualityFilter = req.EqualityFilter ?? new JsDictionary<string, object>();
+            req.EqualityFilter["Country"] = country.Value;
+            return true;
         }
     }
 }

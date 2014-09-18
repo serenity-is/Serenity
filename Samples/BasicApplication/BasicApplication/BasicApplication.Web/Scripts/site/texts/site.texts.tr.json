@@ -20,6 +20,21 @@
                 "EntityPlural": "Kategoriler",
                 "Picture": "Resim"
             },
+            "Customer": {
+                "EntitySingular": "Müşteri",
+                "EntityPlural": "Müşteriler",
+                "CustomerID": "Müşteri Kodu",
+                "CompanyName": "Firma Adı",
+                "ContactName": "İlgili Kişi Adı",
+                "ContactTitle": "İlgili Kişi Unvanı",
+                "Address": "Adres",
+                "City": "Şehir",
+                "Region": "Bölge",
+                "PostalCode": "Posta Kodu",
+                "Country": "Ülke",
+                "Phone": "Telefon",
+                "Fax": "Faks"
+            },
             "Product": {
                 "EntitySingular": "Ürün",
                 "EntityPlural": "Ürünler",
@@ -32,7 +47,7 @@
                 "UnitPrice": "Birim Fiyatı",
                 "UnitsInStock": "Stok Miktarı",
                 "UnitsOnOrder": "Sipariş Miktarı",
-                "ReorderLevel":  "Azami Sipariş Seviyesi"
+                "ReorderLevel": "Azami Sipariş Seviyesi"
             },
             "Region": {
                 "EntitySingular": "Ana Bölge",
@@ -84,11 +99,13 @@
         }
     },
     "Navigation": {
-        "Dashboard": "Ana Sayfa",
         "Administration": "Yönetim",
         "Administration/User Management": "Kullanıcı Yönetimi",
+        "Dashboard": "Ana Sayfa",
         "Northwind": "Northwind",
         "Northwind/Categories": "Kategoriler",
+        "Northwind/Customers": "Müşteriler",
+        "Northwind/Employees": "Personeller",
         "Northwind/Orders": "Siparişler",
         "Northwind/Products": "Ürünler",
         "Northwind/Regions": "Ana Bölgeler",

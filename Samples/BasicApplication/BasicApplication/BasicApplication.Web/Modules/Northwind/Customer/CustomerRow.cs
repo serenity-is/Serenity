@@ -8,8 +8,9 @@ namespace BasicApplication.Northwind.Entities
     using System;
     using System.IO;
     using System.ComponentModel;
+    using Serenity.ComponentModel;
 
-    [ConnectionKey("Default"), DisplayName("Customers"), InstanceName("Customers")]
+    [ConnectionKey("Default"), DisplayName("Customers"), InstanceName("Customer"), TwoLevelCached]
     [ReadPermission("Northwind")]
     [ModifyPermission("Northwind")]
     [JsonConverter(typeof(JsonRowConverter))]
@@ -22,21 +23,21 @@ namespace BasicApplication.Northwind.Entities
             set { Fields.ID[this] = value; }
         }
 
-        [DisplayName("Customer Id"), Size(5), PrimaryKey, QuickSearch]
+        [DisplayName("Customer Id"), Size(5), PrimaryKey, QuickSearch, Updatable(false)]
         public String CustomerID
         {
             get { return Fields.CustomerID[this]; }
             set { Fields.CustomerID[this] = value; }
         }
 
-        [DisplayName("Company Name"), Size(40), NotNull]
+        [DisplayName("Company Name"), Size(40), NotNull, QuickSearch]
         public String CompanyName
         {
             get { return Fields.CompanyName[this]; }
             set { Fields.CompanyName[this] = value; }
         }
 
-        [DisplayName("Contact Name"), Size(30)]
+        [DisplayName("Contact Name"), Size(30), QuickSearch]
         public String ContactName
         {
             get { return Fields.ContactName[this]; }

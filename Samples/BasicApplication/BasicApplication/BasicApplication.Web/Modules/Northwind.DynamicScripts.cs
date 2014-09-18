@@ -19,6 +19,35 @@ namespace BasicApplication.Northwind
                         fld.CategoryName));
                 });
 
+        public static IDynamicScript Customer =
+            new DbLookupScript<CustomerRow>(
+                name: "Northwind.Customer",
+                getItems: cnn =>
+                {
+                    var fld = CustomerRow.Fields;
+                    return cnn.List<CustomerRow>(q => q.Select(
+                        fld.CustomerID,
+                        fld.CompanyName));
+                });
+
+        public static IDynamicScript CustomerCountry =
+            new DbLookupScript<CustomerRow>(
+                name: "Northwind.CustomerCountry",
+                getItems: cnn =>
+                {
+                    var fld = CustomerRow.Fields;
+                    return cnn.List<CustomerRow>(q => q.Select(
+                            fld.Country)
+                        .Where(
+                            new Criteria(fld.Country) != "" &
+                            new Criteria(fld.Country).IsNotNull())
+                        .Distinct(true));
+                })
+            {
+                IdField = "Country",
+                TextField = "Country"
+            };
+
         public static IDynamicScript Region =
             new DbLookupScript<RegionRow>(
                 name: "Northwind.Region",
