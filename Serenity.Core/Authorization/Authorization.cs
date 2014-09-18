@@ -63,34 +63,5 @@ namespace Serenity
             if (!HasPermission(permission))
                 throw new ValidationError("AccessDenied", null, Serenity.Core.Texts.Authorization.AccessDenied);
         }
-
-        private static AdminUserSettings admin;
-
-        public static long? AdminUserId
-        {
-            get 
-            {
-                admin = admin ?? Config.TryGet<AdminUserSettings>();
-                return admin != null ? admin.UserId : null;
-            }
-        }
-
-        public static string AdminUsername
-        {
-            get
-            {
-                admin = admin ?? Config.TryGet<AdminUserSettings>();
-                return admin != null ? admin.Username : null;
-            }
-        }
-
-        public static string MasterPassword
-        {
-            get
-            {
-                admin = admin ?? Config.TryGet<AdminUserSettings>();
-                return admin != null ? admin.MasterPassword : null;
-            }
-        }
     }
 }

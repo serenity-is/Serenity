@@ -1,7 +1,7 @@
 ﻿using Serenity.Services;
 using System;
 
-namespace Serenity
+namespace Serenity.Abstractions
 {
     public interface IAuthenticationService
     {

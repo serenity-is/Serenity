@@ -1,4 +1,5 @@
-﻿using Serenity.Data;
+﻿using Serenity.Abstractions;
+using Serenity.Data;
 using System;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
