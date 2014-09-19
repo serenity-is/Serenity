@@ -5,7 +5,7 @@
     var modulePrefix = (Model.Module == null ? "" : (Model.Module + "/"));
 }
 
-[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "@(modulePrefix)@(Model.ClassName)", @(Model.RootNamespace)@(dotModule).Pages.@(Model.ClassName)Controller)]
+[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "@(modulePrefix)@(Model.ClassName)", typeof(@(Model.RootNamespace)@(dotModule).Pages.@(Model.ClassName)Controller))]
 
 namespace @(Model.RootNamespace)@(dotModule).Pages
 {

@@ -63,12 +63,12 @@ WriteLiteral("\r\n[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, \""
             
             #line default
             #line hidden
-WriteLiteral("\", ");
+WriteLiteral("\", typeof(");
 
 
             
             #line 8 "..\..\Views\EntityPageController.cshtml"
-                                                                                            Write(Model.RootNamespace);
+                                                                                                   Write(Model.RootNamespace);
 
             
             #line default
@@ -76,7 +76,7 @@ WriteLiteral("\", ");
 
             
             #line 8 "..\..\Views\EntityPageController.cshtml"
-                                                                                                                  Write(dotModule);
+                                                                                                                         Write(dotModule);
 
             
             #line default
@@ -86,12 +86,12 @@ WriteLiteral(".Pages.");
 
             
             #line 8 "..\..\Views\EntityPageController.cshtml"
-                                                                                                                                     Write(Model.ClassName);
+                                                                                                                                            Write(Model.ClassName);
 
             
             #line default
             #line hidden
-WriteLiteral("Controller)]\r\n\r\nnamespace ");
+WriteLiteral("Controller))]\r\n\r\nnamespace ");
 
 
             
