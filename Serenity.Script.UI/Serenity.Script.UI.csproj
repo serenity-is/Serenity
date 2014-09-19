@@ -38,6 +38,7 @@
     </Compile>
     <Compile Include="Editor\CheckListEditor.cs" />
     <Compile Include="Editor\CheckTreeEditor.cs" />
+    <Compile Include="Editor\LookupEditor.cs" />
     <Compile Include="Editor\PersonNameEditor.cs" />
     <Compile Include="Editor\DateYearEditorOptions.cs" />
     <Compile Include="Editor\ImageUploadHelper.cs" />
