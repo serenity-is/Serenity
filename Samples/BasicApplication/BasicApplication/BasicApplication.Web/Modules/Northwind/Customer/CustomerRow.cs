@@ -14,6 +14,7 @@ namespace BasicApplication.Northwind.Entities
     [ReadPermission("Northwind")]
     [ModifyPermission("Northwind")]
     [JsonConverter(typeof(JsonRowConverter))]
+    [LookupScript("Northwind.Customer")]
     public sealed class CustomerRow : Row, IIdRow, INameRow
     {
         [DisplayName("ID"), Identity]
@@ -30,7 +31,7 @@ namespace BasicApplication.Northwind.Entities
             set { Fields.CustomerID[this] = value; }
         }
 
-        [DisplayName("Company Name"), Size(40), NotNull, QuickSearch]
+        [DisplayName("Company Name"), Size(40), NotNull, QuickSearch, LookupInclude]
         public String CompanyName
         {
             get { return Fields.CompanyName[this]; }

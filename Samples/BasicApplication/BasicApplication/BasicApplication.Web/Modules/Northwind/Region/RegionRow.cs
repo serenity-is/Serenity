@@ -14,6 +14,7 @@ namespace BasicApplication.Northwind.Entities
     [ReadPermission("Northwind")]
     [ModifyPermission("Northwind")]
     [JsonConverter(typeof(JsonRowConverter))]
+    [LookupScript("Northwind.Region")]
     public sealed class RegionRow : Row, IIdRow, INameRow
     {
         [DisplayName("Region Id"), PrimaryKey, NotNull, Updatable(false), QuickSearch]

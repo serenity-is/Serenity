@@ -16,7 +16,7 @@ namespace BasicApplication.Northwind
     
         public StringEditor TerritoryID { get { return ById<StringEditor>("TerritoryID"); } }
         public StringEditor TerritoryDescription { get { return ById<StringEditor>("TerritoryDescription"); } }
-        public RegionEditor RegionID { get { return ById<RegionEditor>("RegionID"); } }
+        public LookupEditor RegionID { get { return ById<LookupEditor>("RegionID"); } }
     }
 }
 

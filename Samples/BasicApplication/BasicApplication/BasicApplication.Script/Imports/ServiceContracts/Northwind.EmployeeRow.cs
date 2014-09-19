@@ -15,6 +15,7 @@ namespace BasicApplication.Northwind
         public Int32? EmployeeID { get; set; }
         public String LastName { get; set; }
         public String FirstName { get; set; }
+        public String FullName { get; set; }
         public String Title { get; set; }
         public String TitleOfCourtesy { get; set; }
         public String BirthDate { get; set; }
@@ -30,6 +31,7 @@ namespace BasicApplication.Northwind
         public String Notes { get; set; }
         public Int32? ReportsTo { get; set; }
         public String PhotoPath { get; set; }
+        public String ReportsToFullName { get; set; }
         public String ReportsToLastName { get; set; }
         public String ReportsToFirstName { get; set; }
         public String ReportsToTitle { get; set; }

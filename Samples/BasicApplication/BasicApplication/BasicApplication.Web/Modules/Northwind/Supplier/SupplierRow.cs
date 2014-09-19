@@ -8,11 +8,13 @@ namespace BasicApplication.Northwind.Entities
     using System;
     using System.IO;
     using System.ComponentModel;
+    using Serenity.ComponentModel;
 
     [ConnectionKey("Default"), DisplayName("Suppliers"), InstanceName("Supplier"), TwoLevelCached]
     [ReadPermission("Northwind")]
     [ModifyPermission("Northwind")]
     [JsonConverter(typeof(JsonRowConverter))]
+    [LookupScript("Northwind.Supplier")]
     public sealed class SupplierRow : Row, IIdRow, INameRow
     {
         [DisplayName("Supplier Id"), Identity]

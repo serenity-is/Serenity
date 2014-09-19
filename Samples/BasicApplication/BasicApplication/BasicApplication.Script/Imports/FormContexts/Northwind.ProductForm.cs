@@ -16,8 +16,8 @@ namespace BasicApplication.Northwind
     
         public StringEditor ProductName { get { return ById<StringEditor>("ProductName"); } }
         public BooleanEditor Discontinued { get { return ById<BooleanEditor>("Discontinued"); } }
-        public SupplierEditor SupplierID { get { return ById<SupplierEditor>("SupplierID"); } }
-        public CategoryEditor CategoryID { get { return ById<CategoryEditor>("CategoryID"); } }
+        public LookupEditor SupplierID { get { return ById<LookupEditor>("SupplierID"); } }
+        public LookupEditor CategoryID { get { return ById<LookupEditor>("CategoryID"); } }
         public StringEditor QuantityPerUnit { get { return ById<StringEditor>("QuantityPerUnit"); } }
         public DecimalEditor UnitPrice { get { return ById<DecimalEditor>("UnitPrice"); } }
         public StringEditor UnitsInStock { get { return ById<StringEditor>("UnitsInStock"); } }

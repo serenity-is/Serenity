@@ -11,7 +11,7 @@ namespace BasicApplication.Northwind
     [DialogType(typeof(SupplierDialog)), LocalTextPrefix("Northwind.Supplier"), Service("Northwind/Supplier")]
     public class SupplierGrid : EntityGrid<SupplierRow>
     {
-        private SupplierCountryEditor country;
+        private LookupEditor country;
 
         public SupplierGrid(jQueryObject container)
             : base(container)
@@ -38,9 +38,10 @@ namespace BasicApplication.Northwind
         {
             base.CreateToolbarExtensions();
 
-            country = WidgetExtensions.Create<SupplierCountryEditor>(
+            country = WidgetExtensions.Create<LookupEditor>(
                     initElement: e => e.AppendTo(toolbar.Element)
-                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Supplier.Country") + " ---"));
+                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Supplier.Country") + " ---"),
+                        options: new LookupEditorOptions { LookupKey = "Northwind.SupplierCountry" });
 
             country.Change(e => Refresh());
         }

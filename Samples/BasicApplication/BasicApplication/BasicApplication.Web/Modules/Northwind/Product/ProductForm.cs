@@ -14,9 +14,9 @@ namespace BasicApplication.Northwind.Forms
     {
         public String ProductName { get; set; }
         public Boolean Discontinued { get; set; }
-        [SupplierEditor]
+        [LookupEditor(typeof(Entities.SupplierRow))]
         public Int32 SupplierID { get; set; }
-        [CategoryEditor]
+        [LookupEditor(typeof(Entities.CategoryRow))]
         public Int32 CategoryID { get; set; }
         public String QuantityPerUnit { get; set; }
         public Decimal UnitPrice { get; set; }

@@ -11,7 +11,7 @@ namespace BasicApplication.Northwind
     [DialogType(typeof(CustomerDialog)), LocalTextPrefix("Northwind.Customer"), Service("Northwind/Customer")]
     public class CustomerGrid : EntityGrid<CustomerRow>
     {
-        private CustomerCountryEditor country;
+        private LookupEditor country;
 
         public CustomerGrid(jQueryObject container)
             : base(container)
@@ -40,9 +40,10 @@ namespace BasicApplication.Northwind
         {
             base.CreateToolbarExtensions();
 
-            country = WidgetExtensions.Create<CustomerCountryEditor>(
+            country = WidgetExtensions.Create<LookupEditor>(
                     initElement: e => e.AppendTo(toolbar.Element)
-                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Customer.Country") + " ---"));
+                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Customer.Country") + " ---"),
+                    options: new LookupEditorOptions { LookupKey = "Northwind.CustomerCountry" });
 
             country.Change(e => Refresh());
         }

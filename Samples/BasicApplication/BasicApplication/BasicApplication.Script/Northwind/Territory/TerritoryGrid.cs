@@ -11,7 +11,7 @@ namespace BasicApplication.Northwind
     [DialogType(typeof(TerritoryDialog)), LocalTextPrefix("Northwind.Territory"), Service("Northwind/Territory")]
     public class TerritoryGrid : EntityGrid<TerritoryRow>
     {
-        private RegionEditor region;
+        private LookupEditor region;
 
         public TerritoryGrid(jQueryObject container)
             : base(container)
@@ -33,9 +33,10 @@ namespace BasicApplication.Northwind
         {
             base.CreateToolbarExtensions();
 
-            region = WidgetExtensions.Create<RegionEditor>(
+            region = WidgetExtensions.Create<LookupEditor>(
                     initElement: e => e.AppendTo(toolbar.Element)
-                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Territory.RegionDescription") + " ---"));
+                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Territory.RegionDescription") + " ---"),
+                    options: new LookupEditorOptions { LookupKey = "Northwind.Region" });
                 
             region.Change(e => Refresh());
         }

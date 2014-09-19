@@ -11,8 +11,8 @@ namespace BasicApplication.Northwind
     [DialogType(typeof(ProductDialog)), LocalTextPrefix("Northwind.Product"), Service("Northwind/Product")]
     public class ProductGrid : EntityGrid<ProductRow>
     {
-        private SupplierEditor supplier;
-        private CategoryEditor category;
+        private LookupEditor supplier;
+        private LookupEditor category;
 
         public ProductGrid(jQueryObject container)
             : base(container)
@@ -41,15 +41,17 @@ namespace BasicApplication.Northwind
         {
             base.CreateToolbarExtensions();
 
-            supplier = WidgetExtensions.Create<SupplierEditor>(
+            supplier = WidgetExtensions.Create<LookupEditor>(
                     initElement: e => e.AppendTo(toolbar.Element)
-                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Product.SupplierCompanyName") + " ---"));
+                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Product.SupplierCompanyName") + " ---"),
+                    options: new LookupEditorOptions { LookupKey = "Northwind.Supplier" });
 
             supplier.Change(e => Refresh());
 
-            category = WidgetExtensions.Create<CategoryEditor>(
+            category = WidgetExtensions.Create<LookupEditor>(
                     initElement: e => e.AppendTo(toolbar.Element)
-                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Product.CategoryName") + " ---"));
+                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Product.CategoryName") + " ---"),
+                    options: new LookupEditorOptions { LookupKey = "Northwind.Category" });
 
             category.Change(e => Refresh());
         }

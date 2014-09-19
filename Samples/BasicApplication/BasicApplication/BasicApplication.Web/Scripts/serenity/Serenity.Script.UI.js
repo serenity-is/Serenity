@@ -2690,6 +2690,13 @@
 	};
 	global.Serenity.JsRender = $Serenity_JsRender;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.LookupEditor
+	var $Serenity_LookupEditor = function(hidden, opt) {
+		ss.makeGenericType($Serenity_LookupEditorBase$2, [$Serenity_LookupEditorOptions, Object]).call(this, hidden, opt);
+	};
+	$Serenity_LookupEditor.__typeName = 'Serenity.LookupEditor';
+	global.Serenity.LookupEditor = $Serenity_LookupEditor;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.LookupEditorBase
 	var $Serenity_LookupEditorBase$1 = function(TItem) {
 		var $type = function(hidden) {
@@ -2776,6 +2783,20 @@
 	$Serenity_LookupEditorBase$2.__typeName = 'Serenity.LookupEditorBase$2';
 	ss.initGenericClass($Serenity_LookupEditorBase$2, $asm, 2);
 	global.Serenity.LookupEditorBase$2 = $Serenity_LookupEditorBase$2;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.LookupEditorOptions
+	var $Serenity_LookupEditorOptions = function() {
+	};
+	$Serenity_LookupEditorOptions.__typeName = 'Serenity.LookupEditorOptions';
+	$Serenity_LookupEditorOptions.createInstance = function() {
+		return $Serenity_LookupEditorOptions.$ctor();
+	};
+	$Serenity_LookupEditorOptions.$ctor = function() {
+		var $this = {};
+		$this.lookupKey = null;
+		return $this;
+	};
+	global.Serenity.LookupEditorOptions = $Serenity_LookupEditorOptions;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.MaskedEditor
 	var $Serenity_MaskedEditor = function(input, opt) {
@@ -5635,6 +5656,16 @@
 	ss.initClass($Serenity_IntegerEditorOptions, $asm, {});
 	ss.initInterface($Serenity_IValidateRequired, $asm, { get_required: null, set_required: null });
 	ss.initClass($Serenity_JsRender, $asm, {});
+	ss.initClass($Serenity_LookupEditor, $asm, {
+		getLookupKey: function() {
+			var $t1 = this.options.lookupKey;
+			if (ss.isNullOrUndefined($t1)) {
+				$t1 = ss.makeGenericType($Serenity_LookupEditorBase$2, [$Serenity_LookupEditorOptions, Object]).prototype.getLookupKey.call(this);
+			}
+			return $t1;
+		}
+	}, ss.makeGenericType($Serenity_LookupEditorBase$2, [$Serenity_LookupEditorOptions, Object]), [$Serenity_IStringValue]);
+	ss.initClass($Serenity_LookupEditorOptions, $asm, {});
 	ss.initClass($Serenity_MaskedEditor, $asm, {
 		get_value: function() {
 			this.element.triggerHandler('blur.mask');
@@ -6437,6 +6468,7 @@
 	ss.setMetadata($Serenity_ImageUploadEditorOptions, { members: [{ attr: [new $System_ComponentModel_DisplayNameAttribute('Maksimum Yükseklik')], name: 'MaxHeight', type: 16, returnType: ss.Int32, getter: { name: 'get_MaxHeight', type: 8, params: [], returnType: ss.Int32, fget: 'maxHeight' }, setter: { name: 'set_MaxHeight', type: 8, params: [ss.Int32], returnType: Object, fset: 'maxHeight' }, fname: 'maxHeight' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Maksimum Boyut')], name: 'MaxSize', type: 16, returnType: ss.Int32, getter: { name: 'get_MaxSize', type: 8, params: [], returnType: ss.Int32, fget: 'maxSize' }, setter: { name: 'set_MaxSize', type: 8, params: [ss.Int32], returnType: Object, fset: 'maxSize' }, fname: 'maxSize' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Maksimum Genişlik')], name: 'MaxWidth', type: 16, returnType: ss.Int32, getter: { name: 'get_MaxWidth', type: 8, params: [], returnType: ss.Int32, fget: 'maxWidth' }, setter: { name: 'set_MaxWidth', type: 8, params: [ss.Int32], returnType: Object, fset: 'maxWidth' }, fname: 'maxWidth' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Minimum Yükseklik')], name: 'MinHeight', type: 16, returnType: ss.Int32, getter: { name: 'get_MinHeight', type: 8, params: [], returnType: ss.Int32, fget: 'minHeight' }, setter: { name: 'set_MinHeight', type: 8, params: [ss.Int32], returnType: Object, fset: 'minHeight' }, fname: 'minHeight' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Minimum Boyut')], name: 'MinSize', type: 16, returnType: ss.Int32, getter: { name: 'get_MinSize', type: 8, params: [], returnType: ss.Int32, fget: 'minSize' }, setter: { name: 'set_MinSize', type: 8, params: [ss.Int32], returnType: Object, fset: 'minSize' }, fname: 'minSize' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Minimum Genişlik')], name: 'MinWidth', type: 16, returnType: ss.Int32, getter: { name: 'get_MinWidth', type: 8, params: [], returnType: ss.Int32, fget: 'minWidth' }, setter: { name: 'set_MinWidth', type: 8, params: [ss.Int32], returnType: Object, fset: 'minWidth' }, fname: 'minWidth' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Orjinal Dosya Adı Alanı')], name: 'OriginalNameProperty', type: 16, returnType: String, getter: { name: 'get_OriginalNameProperty', type: 8, params: [], returnType: String, fget: 'originalNameProperty' }, setter: { name: 'set_OriginalNameProperty', type: 8, params: [String], returnType: Object, fset: 'originalNameProperty' }, fname: 'originalNameProperty' }] });
 	ss.setMetadata($Serenity_IntegerEditor, { attr: [new Serenity.EditorAttribute(), new $System_ComponentModel_DisplayNameAttribute('Tamsayı'), new Serenity.OptionsTypeAttribute($Serenity_IntegerEditorOptions), new Serenity.ElementAttribute('<input type="text"/>')] });
 	ss.setMetadata($Serenity_IntegerEditorOptions, { members: [{ attr: [new $System_ComponentModel_DisplayNameAttribute('Max Değer')], name: 'MaxValue', type: 16, returnType: ss.Int32, getter: { name: 'get_MaxValue', type: 8, params: [], returnType: ss.Int32, fget: 'maxValue' }, setter: { name: 'set_MaxValue', type: 8, params: [ss.Int32], returnType: Object, fset: 'maxValue' }, fname: 'maxValue' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Min Değer')], name: 'MinValue', type: 16, returnType: ss.Int32, getter: { name: 'get_MinValue', type: 8, params: [], returnType: ss.Int32, fget: 'minValue' }, setter: { name: 'set_MinValue', type: 8, params: [ss.Int32], returnType: Object, fset: 'minValue' }, fname: 'minValue' }] });
+	ss.setMetadata($Serenity_LookupEditor, { attr: [new Serenity.EditorAttribute(), new Serenity.OptionsTypeAttribute($Serenity_LookupEditorOptions)] });
 	ss.setMetadata($Serenity_LookupEditorBase$2, { attr: [new Serenity.ElementAttribute('<input type="hidden"/>')] });
 	ss.setMetadata($Serenity_MaskedEditor, { attr: [new Serenity.EditorAttribute(), new $System_ComponentModel_DisplayNameAttribute('Maskeli Giriş'), new Serenity.OptionsTypeAttribute($Serenity_MaskedEditorOptions), new Serenity.ElementAttribute('<input type="text"/>')] });
 	ss.setMetadata($Serenity_MaskedEditorOptions, { members: [{ attr: [new $System_ComponentModel_DisplayNameAttribute('Giriş Maskesi')], name: 'Mask', type: 16, returnType: String, getter: { name: 'get_Mask', type: 8, params: [], returnType: String, fget: 'mask' }, setter: { name: 'set_Mask', type: 8, params: [String], returnType: Object, fset: 'mask' }, fname: 'mask' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Yer Tutucu Karakter')], name: 'Placeholder', type: 16, returnType: String, getter: { name: 'get_Placeholder', type: 8, params: [], returnType: String, fget: 'placeholder' }, setter: { name: 'set_Placeholder', type: 8, params: [String], returnType: Object, fset: 'placeholder' }, fname: 'placeholder' }] });

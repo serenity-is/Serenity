@@ -3,6 +3,7 @@ namespace BasicApplication.Northwind.Entities
 {
     using Newtonsoft.Json;
     using Serenity;
+    using Serenity.ComponentModel;
     using Serenity.Data;
     using Serenity.Data.Mapping;
     using System;
@@ -13,6 +14,7 @@ namespace BasicApplication.Northwind.Entities
     [ReadPermission("Northwind")]
     [ModifyPermission("Northwind")]
     [JsonConverter(typeof(JsonRowConverter))]
+    [LookupScript("Northwind.Category")]
     public sealed class CategoryRow : Row, IIdRow, INameRow
     {
         [DisplayName("Category Id"), Identity]

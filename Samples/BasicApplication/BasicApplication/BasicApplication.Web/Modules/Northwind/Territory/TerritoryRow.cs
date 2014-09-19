@@ -8,11 +8,13 @@ namespace BasicApplication.Northwind.Entities
     using System;
     using System.IO;
     using System.ComponentModel;
+    using Serenity.ComponentModel;
 
     [ConnectionKey("Default"), DisplayName("Territories"), InstanceName("Territory")]
     [ReadPermission("Northwind")]
     [ModifyPermission("Northwind")]
     [JsonConverter(typeof(JsonRowConverter))]
+    [LookupScript("Northwind.Territory")]
     public sealed class TerritoryRow : Row, IIdRow, INameRow
     {
         [DisplayName("ID"), Identity]
@@ -22,14 +24,14 @@ namespace BasicApplication.Northwind.Entities
             set { Fields.ID[this] = value; }
         }
 
-        [DisplayName("Territory ID"), Size(20), PrimaryKey, NotNull, QuickSearch]
+        [DisplayName("Territory ID"), Size(20), PrimaryKey, NotNull, QuickSearch, Updatable(false)]
         public String TerritoryID
         {
             get { return Fields.TerritoryID[this]; }
             set { Fields.TerritoryID[this] = value; }
         }
 
-        [DisplayName("Territory Description"), Size(50), NotNull, QuickSearch]
+        [DisplayName("Territory Description"), Size(50), NotNull, QuickSearch, LookupInclude]
         public String TerritoryDescription
         {
             get { return Fields.TerritoryDescription[this]; }
@@ -43,7 +45,7 @@ namespace BasicApplication.Northwind.Entities
             set { Fields.RegionID[this] = value; }
         }
 
-        [DisplayName("Region"), Expression("jRegion.RegionDescription"), QuickSearch]
+        [DisplayName("Region"), Expression("jRegion.RegionDescription"), QuickSearch, LookupInclude]
         public String RegionDescription
         {
             get { return Fields.RegionDescription[this]; }

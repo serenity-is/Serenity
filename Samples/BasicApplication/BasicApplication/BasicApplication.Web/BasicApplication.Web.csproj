@@ -801,6 +801,8 @@
     <Compile Include="Modules\Common\Navigation\NavigationItems.cs" />
     <Compile Include="Modules\Common\Navigation\NavigationModel.cs" />
     <Compile Include="Modules\Northwind.DynamicScripts.cs" />
+    <Compile Include="Modules\Northwind\Customer\CustomerCountryLookup.cs" />
+    <Compile Include="Modules\Northwind\Supplier\SupplierCountryLookup.cs" />
     <Compile Include="Modules\Texts.cs" />
     <Compile Include="Modules\Membership\Account\AccountPage.cs" />
     <Compile Include="Modules\Administration\User\AuthorizationService.cs" />
