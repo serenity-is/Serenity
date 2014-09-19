@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Serenity.Web
 {
     public static partial class DynamicScriptManager
     {
-        private static Hashtable registeredScripts;
+        private static ConcurrentDictionary<string, Item> registeredScripts;
 
         static DynamicScriptManager()
         {
-            registeredScripts = new Hashtable(StringComparer.OrdinalIgnoreCase);
+            registeredScripts = new ConcurrentDictionary<string, Item>(StringComparer.OrdinalIgnoreCase);
 
             Register(new RegisteredScripts());
         }
@@ -22,9 +22,12 @@ namespace Serenity.Web
 
         public static void Changed(string name)
         {
-            Item item = registeredScripts[name] as Item;
-            if (item != null)
+            Item item;
+            if (registeredScripts.TryGetValue(name, out item) &&
+                item != null)
+            {
                 item.Generator.Changed();
+            }
         }
 
         public static void IfNotRegistered(string name, Action callback)
@@ -42,14 +45,13 @@ namespace Serenity.Web
         {
             var item = new Item(name, script);
             item.NonCached = script.NonCached;
-            var reg = Hashtable.Synchronized(registeredScripts);
-            reg[name] = item;
+            registeredScripts[name] = item;
         }
 
         public static Dictionary<string, string> GetRegisteredScripts()
         {
             var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (DictionaryEntry s in registeredScripts)
+            foreach (var s in registeredScripts)
             {
                 var key = (string)s.Key;
                 if (key != RegisteredScripts._scriptName)
@@ -69,9 +71,12 @@ namespace Serenity.Web
 
         public static string GetScriptInclude(string name)
         {
-            Item item = registeredScripts[name] as Item;
-            if (item == null)
+            Item item;
+            if (!registeredScripts.TryGetValue(name, out item)
+                || item == null)
+            {
                 return name;
+            }
 
             var script = item.EnsureContentBytes();
 
@@ -80,9 +85,12 @@ namespace Serenity.Web
 
         internal static Script GetScript(string name)
         {
-            Item item = registeredScripts[name] as Item;
-            if (item == null)
+            Item item;
+            if (!registeredScripts.TryGetValue(name, out item) ||
+                item == null)
+            {
                 return null;
+            }
 
             item.Generator.CheckRights();
             return item.EnsureContentBytes();
