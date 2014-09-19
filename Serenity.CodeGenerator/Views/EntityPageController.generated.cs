@@ -63,12 +63,12 @@ WriteLiteral("\r\n[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, \""
             
             #line default
             #line hidden
-WriteLiteral("\", url: \"~/");
+WriteLiteral("\", ");
 
 
             
             #line 8 "..\..\Views\EntityPageController.cshtml"
-                                                                                                    Write(modulePrefix);
+                                                                                            Write(Model.RootNamespace);
 
             
             #line default
@@ -76,22 +76,22 @@ WriteLiteral("\", url: \"~/");
 
             
             #line 8 "..\..\Views\EntityPageController.cshtml"
-                                                                                                                   Write(Model.ClassName);
+                                                                                                                  Write(dotModule);
 
             
             #line default
             #line hidden
-WriteLiteral("\", permission: \"");
+WriteLiteral(".Pages.");
 
 
             
             #line 8 "..\..\Views\EntityPageController.cshtml"
-                                                                                                                                                     Write(Model.Permission);
+                                                                                                                                     Write(Model.ClassName);
 
             
             #line default
             #line hidden
-WriteLiteral("\")]\r\n\r\nnamespace ");
+WriteLiteral("Controller)]\r\n\r\nnamespace ");
 
 
             
@@ -109,11 +109,12 @@ WriteLiteral("\")]\r\n\r\nnamespace ");
             
             #line default
             #line hidden
-WriteLiteral(".Pages\r\n{\r\n    using Serenity;\r\n    using System.Web.Mvc;\r\n\r\n    [RoutePrefix(\"");
+WriteLiteral(".Pages\r\n{\r\n    using Serenity;\r\n    using Serenity.Web;\r\n    using System.Web.Mvc" +
+";\r\n\r\n    [RoutePrefix(\"");
 
 
             
-            #line 15 "..\..\Views\EntityPageController.cshtml"
+            #line 16 "..\..\Views\EntityPageController.cshtml"
               Write(modulePrefix);
 
             
@@ -121,7 +122,7 @@ WriteLiteral(".Pages\r\n{\r\n    using Serenity;\r\n    using System.Web.Mvc;\r\
             #line hidden
 
             
-            #line 15 "..\..\Views\EntityPageController.cshtml"
+            #line 16 "..\..\Views\EntityPageController.cshtml"
                              Write(Model.ClassName);
 
             
@@ -131,24 +132,24 @@ WriteLiteral("\"), Route(\"{action=index}\")]\r\n    public class ");
 
 
             
-            #line 16 "..\..\Views\EntityPageController.cshtml"
+            #line 17 "..\..\Views\EntityPageController.cshtml"
              Write(Model.ClassName);
 
             
             #line default
             #line hidden
-WriteLiteral("Controller : Controller\r\n    {\r\n        [Authorize]\r\n        public ActionResult " +
-"Index()\r\n        {\r\n            WebSecurityHelper.EnsurePermission(\"");
+WriteLiteral("Controller : Controller\r\n    {\r\n        [PageAuthorize(\"");
 
 
             
-            #line 21 "..\..\Views\EntityPageController.cshtml"
-                                            Write(Model.Permission);
+            #line 19 "..\..\Views\EntityPageController.cshtml"
+                    Write(Model.Permission);
 
             
             #line default
             #line hidden
-WriteLiteral("\");\r\n            return View(\"~/Modules/");
+WriteLiteral("\")]\r\n        public ActionResult Index()\r\n        {\r\n            return View(\"~/M" +
+"odules/");
 
 
             

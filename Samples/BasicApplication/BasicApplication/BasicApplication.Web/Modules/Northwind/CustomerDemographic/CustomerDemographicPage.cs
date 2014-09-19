@@ -5,15 +5,15 @@
 namespace BasicApplication.Northwind.Pages
 {
     using Serenity;
+    using Serenity.Web;
     using System.Web.Mvc;
 
     [RoutePrefix("Northwind/CustomerDemographic"), Route("{action=index}")]
     public class CustomerDemographicController : Controller
     {
-        [Authorize]
+        [PageAuthorize("Northwind")]
         public ActionResult Index()
         {
-            WebSecurityHelper.EnsurePermission("Northwind");
             return View("~/Modules/Northwind/CustomerDemographic/CustomerDemographicIndex.cshtml");
         }
     }

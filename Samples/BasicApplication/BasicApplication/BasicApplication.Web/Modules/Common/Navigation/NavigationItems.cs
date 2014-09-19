@@ -1,10 +1,15 @@
-﻿[assembly: Serenity.Navigation.NavigationMenu(8000, "Northwind", icon: "icon-anchor")]
-[assembly: Serenity.Navigation.NavigationLink(8200, "Northwind/Customers", url: "~/Northwind/Customer", permission: "Northwind", icon: "icon-wallet")]
-[assembly: Serenity.Navigation.NavigationLink(8300, "Northwind/Products", url: "~/Northwind/Product", permission: "Northwind", icon: "icon-present")]
-[assembly: Serenity.Navigation.NavigationLink(8400, "Northwind/Suppliers", url: "~/Northwind/Supplier", permission: "Northwind", icon: "icon-magic-wand")]
-[assembly: Serenity.Navigation.NavigationLink(8500, "Northwind/Shippers", url: "~/Northwind/Shipper", permission: "Northwind", icon: "icon-plane")]
-[assembly: Serenity.Navigation.NavigationLink(8600, "Northwind/Categories", url: "~/Northwind/Category", permission: "Northwind", icon: "icon-folder-alt")]
-[assembly: Serenity.Navigation.NavigationLink(8700, "Northwind/Regions", url: "~/Northwind/Region", permission: "Northwind", icon: "icon-map")]
-[assembly: Serenity.Navigation.NavigationLink(8800, "Northwind/Territories", url: "~/Northwind/Territory", permission: "Northwind", icon: "icon-puzzle")]
+﻿using Serenity;
+using Serenity.Navigation;
+using Northwind = BasicApplication.Northwind.Pages;
 
-[assembly: Serenity.Navigation.NavigationMenu(9000, "Administration", icon: "icon-screen-desktop")]
+[assembly: NavigationMenu(8000, "Northwind", icon: "icon-anchor")]
+[assembly: NavigationLink(8200, "Northwind/Customers", typeof(Northwind.CustomerController), icon: "icon-wallet")]
+[assembly: NavigationLink(8200, "Northwind/Employees", typeof(Northwind.EmployeeController), icon: "icon-wallet")]
+[assembly: NavigationLink(8300, "Northwind/Products", typeof(Northwind.ProductController), icon: "icon-present")]
+[assembly: NavigationLink(8400, "Northwind/Suppliers", typeof(Northwind.SupplierController), icon: "icon-magic-wand")]
+[assembly: NavigationLink(8500, "Northwind/Shippers", typeof(Northwind.ShipperController), icon: "icon-plane")]
+[assembly: NavigationLink(8600, "Northwind/Categories", typeof(Northwind.CategoryController), icon: "icon-folder-alt")]
+[assembly: NavigationLink(8700, "Northwind/Regions", typeof(Northwind.RegionController), icon: "icon-map")]
+[assembly: NavigationLink(8800, "Northwind/Territories", typeof(Northwind.TerritoryController), icon: "icon-puzzle")]
+
+[assembly: NavigationMenu(9000, "Administration", icon: "icon-screen-desktop")]

@@ -9,7 +9,7 @@ namespace BasicApplication.Northwind.Entities
     using System.IO;
     using System.ComponentModel;
 
-    [ConnectionKey("Default"), DisplayName("Employees"), InstanceName("Employees")]
+    [ConnectionKey("Default"), DisplayName("Employees"), InstanceName("Employee")]
     [ReadPermission("Northwind")]
     [ModifyPermission("Northwind")]
     [JsonConverter(typeof(JsonRowConverter))]
@@ -34,6 +34,13 @@ namespace BasicApplication.Northwind.Entities
         {
             get { return Fields.FirstName[this]; }
             set { Fields.FirstName[this] = value; }
+        }
+
+        [DisplayName("FullName"), Expression("(T0.FirstName + ' ' + T0.LastName)")]
+        public String FullName
+        {
+            get { return Fields.FullName[this]; }
+            set { Fields.FullName[this] = value; }
         }
 
         [DisplayName("Title"), Size(30)]
@@ -153,6 +160,13 @@ namespace BasicApplication.Northwind.Entities
         {
             get { return Fields.ReportsToFirstName[this]; }
             set { Fields.ReportsToFirstName[this] = value; }
+        }
+
+        [DisplayName("Reports To"), Expression("(jReportsTo.FirstName + ' ' + jReportsTo.LastName)")]
+        public String ReportsToFullName
+        {
+            get { return Fields.ReportsToFullName[this]; }
+            set { Fields.ReportsToFullName[this] = value; }
         }
 
         [DisplayName("Reports To Title"), Expression("jReportsTo.Title")]
@@ -282,6 +296,7 @@ namespace BasicApplication.Northwind.Entities
             public readonly Int32Field EmployeeID;
             public readonly StringField LastName;
             public readonly StringField FirstName;
+            public readonly StringField FullName;
             public readonly StringField Title;
             public readonly StringField TitleOfCourtesy;
             public readonly DateTimeField BirthDate;
@@ -298,6 +313,7 @@ namespace BasicApplication.Northwind.Entities
             public readonly Int32Field ReportsTo;
             public readonly StringField PhotoPath;
 
+            public readonly StringField ReportsToFullName;
             public readonly StringField ReportsToLastName;
             public readonly StringField ReportsToFirstName;
             public readonly StringField ReportsToTitle;

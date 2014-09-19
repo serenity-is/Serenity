@@ -35,6 +35,27 @@
                 "Phone": "Telefon",
                 "Fax": "Faks"
             },
+            "Employee": {
+                "EntitySingular": "Personel",
+                "EntityPlural": "Personeller",
+                "FirstName": "Adı",
+                "LastName": "Soyadı",
+                "FullName": "Adı Soyadı",
+                "Title": "Unvan",
+                "TitleOfCourtesy": "Nezaket Unvanı",
+                "BirthDate": "Doğum Tarihi",
+                "HireDate": "İşe Giriş Tarihi",
+                "Address": "Adres",
+                "City": "Şehir",
+                "Region": "Bölge",
+                "PostalCode": "Posta Kodu",
+                "Country": "Ülke",
+                "HomePhone": "Ev Telefonu",
+                "Extension": "Dahili",
+                "Photo": "Fotoğraf",
+                "PhotoPath": "Fotoğraf Yolu",
+                "ReportsToFullName": "Amiri"
+            },
             "Product": {
                 "EntitySingular": "Ürün",
                 "EntityPlural": "Ürünler",

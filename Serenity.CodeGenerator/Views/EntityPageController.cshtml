@@ -5,20 +5,20 @@
     var modulePrefix = (Model.Module == null ? "" : (Model.Module + "/"));
 }
 
-[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "@(modulePrefix)@(Model.ClassName)", url: "~/@(modulePrefix)@(Model.ClassName)", permission: "@(Model.Permission)")]
+[assembly:Serenity.Navigation.NavigationLink(int.MaxValue, "@(modulePrefix)@(Model.ClassName)", @(Model.RootNamespace)@(dotModule).Pages.@(Model.ClassName)Controller)]
 
 namespace @(Model.RootNamespace)@(dotModule).Pages
 {
     using Serenity;
+    using Serenity.Web;
     using System.Web.Mvc;
 
     [RoutePrefix("@(modulePrefix)@(Model.ClassName)"), Route("{action=index}")]
     public class @(Model.ClassName)Controller : Controller
     {
-        [Authorize]
+        [PageAuthorize("@(Model.Permission)")]
         public ActionResult Index()
         {
-            WebSecurityHelper.EnsurePermission("@(Model.Permission)");
             return View("~/Modules/@(modulePath)/@(Model.ClassName)/@(Model.ClassName)Index.cshtml");
         }
     }
