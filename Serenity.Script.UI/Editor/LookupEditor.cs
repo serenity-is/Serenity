@@ -11,6 +11,11 @@ namespace Serenity
             : base(hidden, opt)
         {
         }
+
+        protected override string GetLookupKey()
+        {
+            return options.LookupKey ?? base.GetLookupKey();
+        }
     }
 
     [Serializable, Reflectable]
