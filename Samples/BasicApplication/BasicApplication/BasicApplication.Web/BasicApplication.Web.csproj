@@ -47,25 +47,20 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Core, Version=1.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Core.1.1.4\lib\net45\Serenity.Core.dll</HintPath>
+    <Reference Include="Serenity.Core">
+      <HintPath>..\..\packages\Serenity.Core.1.1.5\lib\net45\Serenity.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data, Version=1.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Data.1.1.4\lib\net45\Serenity.Data.dll</HintPath>
+    <Reference Include="Serenity.Data">
+      <HintPath>..\..\packages\Serenity.Data.1.1.5\lib\net45\Serenity.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Entity, Version=1.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Data.Entity.1.1.4\lib\net45\Serenity.Data.Entity.dll</HintPath>
+    <Reference Include="Serenity.Data.Entity">
+      <HintPath>..\..\packages\Serenity.Data.Entity.1.1.5\lib\net45\Serenity.Data.Entity.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services, Version=1.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Services.1.1.4\lib\net45\Serenity.Services.dll</HintPath>
+    <Reference Include="Serenity.Services">
+      <HintPath>..\..\packages\Serenity.Services.1.1.5\lib\net45\Serenity.Services.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Web, Version=1.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Serenity.Web.1.1.4\lib\net45\Serenity.Web.dll</HintPath>
+    <Reference Include="Serenity.Web">
+      <HintPath>..\..\packages\Serenity.Web.1.1.5\lib\net45\Serenity.Web.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />

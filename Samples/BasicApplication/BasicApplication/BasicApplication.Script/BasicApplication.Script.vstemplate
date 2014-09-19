@@ -80,13 +80,10 @@
       <Folder Name="Northwind" TargetFolderName="Northwind">
         <Folder Name="Category" TargetFolderName="Category">
           <ProjectItem ReplaceParameters="true" TargetFileName="CategoryDialog.cs">CategoryDialog.cs</ProjectItem>
-          <ProjectItem ReplaceParameters="true" TargetFileName="CategoryEditor.cs">CategoryEditor.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="CategoryGrid.cs">CategoryGrid.cs</ProjectItem>
         </Folder>
         <Folder Name="Customer" TargetFolderName="Customer">
-          <ProjectItem ReplaceParameters="true" TargetFileName="CustomerCountryEditor.cs">CustomerCountryEditor.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="CustomerDialog.cs">CustomerDialog.cs</ProjectItem>
-          <ProjectItem ReplaceParameters="true" TargetFileName="CustomerEditor.cs">CustomerEditor.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="CustomerGrid.cs">CustomerGrid.cs</ProjectItem>
         </Folder>
         <Folder Name="CustomerCustomerDemo" TargetFolderName="CustomerCustomerDemo">
@@ -119,7 +116,6 @@
         </Folder>
         <Folder Name="Region" TargetFolderName="Region">
           <ProjectItem ReplaceParameters="true" TargetFileName="RegionDialog.cs">RegionDialog.cs</ProjectItem>
-          <ProjectItem ReplaceParameters="true" TargetFileName="RegionEditor.cs">RegionEditor.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="RegionGrid.cs">RegionGrid.cs</ProjectItem>
         </Folder>
         <Folder Name="Shared" TargetFolderName="Shared">
@@ -130,9 +126,7 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="ShipperGrid.cs">ShipperGrid.cs</ProjectItem>
         </Folder>
         <Folder Name="Supplier" TargetFolderName="Supplier">
-          <ProjectItem ReplaceParameters="true" TargetFileName="SupplierCountryEditor.cs">SupplierCountryEditor.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="SupplierDialog.cs">SupplierDialog.cs</ProjectItem>
-          <ProjectItem ReplaceParameters="true" TargetFileName="SupplierEditor.cs">SupplierEditor.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="SupplierGrid.cs">SupplierGrid.cs</ProjectItem>
         </Folder>
         <Folder Name="Territory" TargetFolderName="Territory">
@@ -159,7 +153,7 @@
       <package id="Saltarelle.Linq" version="2.4.0" />
       <package id="Saltarelle.Runtime" version="2.5.0" />
       <package id="Saltarelle.Web" version="3.1.0" />
-      <package id="Serenity.Script" version="1.1.4" />
+      <package id="Serenity.Script" version="1.1.5" />
     </packages>
   </WizardData>
 </VSTemplate>
