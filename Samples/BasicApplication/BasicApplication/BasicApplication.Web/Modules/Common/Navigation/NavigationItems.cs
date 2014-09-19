@@ -7,7 +7,6 @@ using Administration = BasicApplication.Administration.Pages;
 
 [assembly: NavigationMenu(8000, "Northwind", icon: "icon-anchor")]
 [assembly: NavigationLink(8200, "Northwind/Customers", typeof(Northwind.CustomerController), icon: "icon-wallet")]
-[assembly: NavigationLink(8200, "Northwind/Employees", typeof(Northwind.EmployeeController), icon: "icon-wallet")]
 [assembly: NavigationLink(8300, "Northwind/Products", typeof(Northwind.ProductController), icon: "icon-present")]
 [assembly: NavigationLink(8400, "Northwind/Suppliers", typeof(Northwind.SupplierController), icon: "icon-magic-wand")]
 [assembly: NavigationLink(8500, "Northwind/Shippers", typeof(Northwind.ShipperController), icon: "icon-plane")]
