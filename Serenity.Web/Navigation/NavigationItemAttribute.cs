@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Reflection;
 using System.IO;
+using System.Linq;
 using System.Web;
+using System.Web.Mvc;
+using Serenity.Services;
+using Serenity.Web;
 
 namespace Serenity.Navigation
 {
@@ -22,6 +27,98 @@ namespace Serenity.Navigation
             this.Permission = permission;
             this.IconClass = icon;
             this.Url = url;
+        }
+
+        protected NavigationItemAttribute(int order, string path, Type controller, string icon, string action)
+            : this(order, path, GetUrlFromController(controller, action), GetPermissionFromController(controller, action), icon)
+        {
+        }
+
+        public static string GetUrlFromController(Type controller, string action)
+        {
+            if (controller == null)
+                throw new ArgumentNullException("controller");
+
+            if (action.IsEmptyOrNull())
+                throw new ArgumentNullException("action");
+
+            var actionMethod = controller.GetMethod(action, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            if (actionMethod == null)
+                throw new ArgumentOutOfRangeException("action");
+
+            var route = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault() ?? controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            if (route == null)
+                throw new InvalidOperationException(String.Format(
+                    "Route attribute for {0} action of {1} controller is not found!",
+                        actionMethod, controller.FullName));
+
+            string url = route.Template ?? "";
+
+            if (!url.StartsWith("~/"))
+            {
+                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
+                if (routePrefix != null)
+                {
+                    url = UriHelper.Combine(routePrefix.Prefix, url);
+                }
+            }
+
+            if (!url.StartsWith("~/") && !url.StartsWith("/"))
+                url = "~/" + url;
+
+            var act = "{action=";
+            var act1 = url.IndexOf(act, StringComparison.OrdinalIgnoreCase);
+            if (act1 >= 0)
+            {
+                var act2 = url.IndexOf("}", act1 + 1);
+                if (act2 >= 0)
+                {
+                    var defaultAction = url.Substring(act1 + act.Length, act2 - act1 - act.Length);
+                    bool isDefaultAction = String.Compare(defaultAction, action, StringComparison.OrdinalIgnoreCase) == 0;
+                    bool startsWithSlash = act1 > 0 && url[act1 - 1] == '/';
+                    url = url.Substring(0, act1) +  
+                        (startsWithSlash ? "" : "/") + 
+                        (isDefaultAction ? "" : action) + 
+                        url.Substring(act2 + 1);
+
+                    if (url.Length > 2 && url.EndsWith("/"))
+                        url = url.Substring(0, url.Length - 1);
+                }
+            }
+
+            while (true)
+            {
+                var idx1 = url.IndexOf('{');
+                if (idx1 <= 0)
+                    break;
+
+                var idx2 = url.IndexOf("}", idx1 + 1);
+                if (idx2 <= 0)
+                    break;
+
+                url = url.Substring(0, idx1) + url.Substring(idx2 + 1);
+            }
+
+            return url;
+        }
+
+        protected static string GetPermissionFromController(Type controller, string action)
+        {
+            if (controller == null)
+                throw new ArgumentNullException("controller");
+
+            if (action.IsEmptyOrNull())
+                throw new ArgumentNullException("action");
+
+            var actionMethod = controller.GetMethod(action, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            if (actionMethod == null)
+                throw new ArgumentOutOfRangeException("action");
+
+            var pageAuthorize = actionMethod.GetCustomAttribute<PageAuthorizeAttribute>() ?? controller.GetCustomAttribute<PageAuthorizeAttribute>();
+            if (pageAuthorize != null)
+                return pageAuthorize.Permission;
+
+            return null;
         }
 
         public int Order { get; set; }

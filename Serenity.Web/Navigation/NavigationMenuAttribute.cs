@@ -8,7 +8,7 @@ namespace Serenity.Navigation
     public class NavigationMenuAttribute : NavigationItemAttribute
     {
         public NavigationMenuAttribute(int order, string title, string icon = null)
-            : base(order, title, null, null, icon)
+            : base(order, title, (string)null, (string)null, icon)
         {
         }
     }
