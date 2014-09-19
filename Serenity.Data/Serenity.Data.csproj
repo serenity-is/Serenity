@@ -67,6 +67,7 @@
     <Compile Include="Mapping\DisplayFormatAttribute.cs" />
     <Compile Include="Mapping\ExpressionAttribute.cs" />
     <Compile Include="Mapping\FieldFlags.cs" />
+    <Compile Include="Mapping\LookupIncludeAttribute.cs" />
     <Compile Include="Mapping\TextualFieldAttribute.cs" />
     <Compile Include="Mapping\ForeignKeyAttribute.cs" />
     <Compile Include="Mapping\IdentityAttribute.cs" />

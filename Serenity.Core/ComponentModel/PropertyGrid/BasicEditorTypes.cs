@@ -150,6 +150,25 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class LookupEditorAttribute : CustomEditorAttribute
+    {
+        public LookupEditorAttribute(string lookupKey)
+            : base("Lookup")
+        {
+            SetOption("lookupKey", lookupKey);
+        }
+
+        public LookupEditorAttribute(Type lookupType)
+            : base("Lookup")
+        {
+            var attr = lookupType.GetCustomAttributes(typeof(LookupScriptAttribute), false);
+            if (attr.Length == 0)
+                throw new ArgumentOutOfRangeException("lookupType");
+
+            SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
+        }
+    }
+
     public partial class MaskedEditorAttribute : CustomEditorAttribute
     {
         public MaskedEditorAttribute()

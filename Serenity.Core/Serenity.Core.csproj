@@ -37,6 +37,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />
     <Compile Include="Configuration\DevelopmentSettings.cs" />
     <Compile Include="Json\JsonLocalTextsHelper.cs" />
@@ -77,7 +78,7 @@
     <Compile Include="ComponentModel\Common\ScriptIncludeAttribute.cs" />
     <Compile Include="ComponentModel\Common\UpdatableAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\BaseRegistrarAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\RegisterFormAttribute.cs" />
+    <Compile Include="ComponentModel\Extensibility\FormScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\ScriptRegistrarAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\SelfAssemblyAttribute.cs" />
     <Compile Include="ComponentModel\Permission\CreatePermissionAttribute.cs" />

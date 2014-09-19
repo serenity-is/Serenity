@@ -71,8 +71,6 @@
 
             switch (selection)
             {
-                case ColumnSelection.Lookup:
-                    return mode <= SelectLevel.Lookup;
                 case ColumnSelection.List:
                     return mode <= SelectLevel.List;
                 case ColumnSelection.Details:

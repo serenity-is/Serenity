@@ -60,8 +60,6 @@
 
             switch (selection)
             {
-                case RetrieveColumnSelection.Lookup:
-                    return mode <= SelectLevel.Lookup;
                 case RetrieveColumnSelection.List:
                     return mode <= SelectLevel.List;
                 case RetrieveColumnSelection.Details:

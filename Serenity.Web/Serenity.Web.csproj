@@ -123,6 +123,9 @@
     <Compile Include="Reporting\ReportRetrieveResponse.cs" />
     <Compile Include="Reporting\Worksheet\ReportColumn.cs" />
     <Compile Include="Reporting\Worksheet\ReportColumnConverter.cs" />
+    <Compile Include="Script\DynamicScriptTypes\RowLookupScript.cs" />
+    <Compile Include="Script\DynamicScriptTypes\LookupScript.cs" />
+    <Compile Include="Script\PropertyEditor\LookupScriptRegistration.cs" />
     <Compile Include="Script\PropertyEditor\FormScriptRegistration.cs" />
     <Compile Include="Mvc\TemplateHelper.cs" />
     <Compile Include="Script\DynamicScript\DynamicScriptManager.Script.cs" />

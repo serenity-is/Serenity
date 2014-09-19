@@ -51,6 +51,7 @@ namespace Serenity.Web
             NestedLocalTextRegistration.AddFromScripts(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));
             NestedLocalTextRegistration.AddFromScripts(HostingEnvironment.MapPath("~/Scripts/site/texts/"));
 
+            LookupScriptRegistration.RegisterLookupScripts();
             RunStartupRegistrars<ScriptRegistrarAttribute>();
             FormScriptRegistration.RegisterFormScripts();
 
