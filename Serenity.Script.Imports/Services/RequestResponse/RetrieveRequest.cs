@@ -8,8 +8,16 @@ namespace Serenity
     public class RetrieveRequest : ServiceRequest
     {
         public Int64 EntityId { get; set; }
-        public ColumnSelection ColumnSelection { get; set; }
+        public RetrieveColumnSelection ColumnSelection { get; set; }
         public List<string> IncludeColumns { get; set; }
         public List<string> ExcludeColumns { get; set; }
+    }
+
+    [NamedValues]
+    public enum RetrieveColumnSelection
+    {
+        Details = 0,
+        KeyOnly = 1,
+        List = 2
     }
 }

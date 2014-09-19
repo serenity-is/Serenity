@@ -55,8 +55,8 @@
     <Compile Include="Services\RequestResponse\DeleteResponse.cs" />
     <Compile Include="Services\RequestResponse\DeleteRequest.cs" />
     <Compile Include="Services\PostToServiceOptions.cs" />
-    <Compile Include="Services\ListRequest.cs" />
-    <Compile Include="Services\ListResponse.cs" />
+    <Compile Include="Services\RequestResponse\ListRequest.cs" />
+    <Compile Include="Services\RequestResponse\ListResponse.cs" />
     <Compile Include="Services\ServiceCallOptions.cs" />
     <Compile Include="Services\ServiceRequest.cs" />
     <Compile Include="Services\ServiceResponse.cs" />

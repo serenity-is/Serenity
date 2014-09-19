@@ -25,7 +25,6 @@
     {
         List = 0,
         KeyOnly = 1,
-        Lookup = 2,
-        Details = 3,
+        Details = 2
     }
 }

@@ -8,8 +8,7 @@ namespace Serenity.Services
     {
         Details = 0,
         KeyOnly = 1,
-        Lookup = 2,
-        List = 3,
+        List = 2
     }
 
     public class RetrieveRequest : ServiceRequest, IIncludeExcludeColumns
