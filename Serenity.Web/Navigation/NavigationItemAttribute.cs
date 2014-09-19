@@ -102,7 +102,7 @@ namespace Serenity.Navigation
             return url;
         }
 
-        protected static string GetPermissionFromController(Type controller, string action)
+        public static string GetPermissionFromController(Type controller, string action)
         {
             if (controller == null)
                 throw new ArgumentNullException("controller");

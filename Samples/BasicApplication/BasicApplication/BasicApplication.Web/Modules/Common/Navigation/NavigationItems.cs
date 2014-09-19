@@ -1,6 +1,9 @@
 ﻿using Serenity;
 using Serenity.Navigation;
 using Northwind = BasicApplication.Northwind.Pages;
+using Administration = BasicApplication.Administration.Pages;
+
+[assembly: NavigationLink(1000, "Dashboard", url: "~/", permission: "", icon: "icon-speedometer")]
 
 [assembly: NavigationMenu(8000, "Northwind", icon: "icon-anchor")]
 [assembly: NavigationLink(8200, "Northwind/Customers", typeof(Northwind.CustomerController), icon: "icon-wallet")]
@@ -13,3 +16,4 @@ using Northwind = BasicApplication.Northwind.Pages;
 [assembly: NavigationLink(8800, "Northwind/Territories", typeof(Northwind.TerritoryController), icon: "icon-puzzle")]
 
 [assembly: NavigationMenu(9000, "Administration", icon: "icon-screen-desktop")]
+[assembly: NavigationLink(91000, "Administration/User Management", typeof(Administration.UserController), icon: "icon-users")]

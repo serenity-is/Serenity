@@ -1,18 +1,16 @@
 ﻿
-[assembly:Serenity.Navigation.NavigationLink(91000, "Administration/User Management", url: "~/Administration/User", permission: "Administration", icon: "icon-users")]
-
 namespace BasicApplication.Administration.Pages
 {
     using Serenity;
+    using Serenity.Web;
     using System.Web.Mvc;
 
     [RoutePrefix("Administration/User"), Route("{action=index}")]
     public class UserController : Controller
     {
-        [Authorize]
+        [PageAuthorize("Administration")]
         public ActionResult Index()
         {
-            WebSecurityHelper.EnsurePermission("Administration");
             return View("~/Modules/Administration/User/UserIndex.cshtml");
         }
     }

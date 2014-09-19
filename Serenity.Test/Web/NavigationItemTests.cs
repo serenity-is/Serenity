@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using Serenity.Web;
+using System.Web.Mvc;
 using Xunit;
 
 namespace Serenity.Navigation.Test
@@ -33,7 +34,24 @@ namespace Serenity.Navigation.Test
             Assert.Equal("~/Dummy2", urlRooted);
         }
 
-        [RoutePrefix("Dummy"), Route("{action=index}")]
+        [Fact]
+        public void GetPermissionFromControllerForTypeWorksProperly()
+        {
+            var permission1 = NavigationItemAttribute.GetPermissionFromController(typeof(DummyController1), "Index");
+            Assert.Equal("Admin", permission1);
+
+            var permission2 = NavigationItemAttribute.GetPermissionFromController(typeof(DummyController1), "Another");
+            Assert.Equal("Admin", permission2);
+        }
+
+        [Fact]
+        public void GetPermissionFromControllerForOverridenWorksProperly()
+        {
+            var permission = NavigationItemAttribute.GetPermissionFromController(typeof(DummyController1), "Overridden");
+            Assert.Equal("More", permission);
+        }
+
+        [RoutePrefix("Dummy"), Route("{action=index}"), PageAuthorize("Admin")]
         public class DummyController1
         {
             public ActionResult Index()
@@ -46,7 +64,7 @@ namespace Serenity.Navigation.Test
                 return null;
             }
 
-            [Route("Some")]
+            [Route("Some"), PageAuthorize("More")]
             public ActionResult Overridden()
             {
                 return null;
