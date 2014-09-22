@@ -1,4 +1,5 @@
-﻿namespace Serenity.Abstractions
+﻿
+namespace Serenity.Abstractions
 {
     public interface IPermissionService
     {

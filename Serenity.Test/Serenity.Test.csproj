@@ -77,6 +77,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authorization\AuthorizationTests.cs" />
     <Compile Include="Data\FakeDisplayOrderRow.cs" />
     <Compile Include="Data\RowMappingTests.BasicRow.cs" />
     <Compile Include="Data\RowMappingTests.InvalidColumnRow.cs" />

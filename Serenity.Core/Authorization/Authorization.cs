@@ -1,5 +1,4 @@
 ﻿using Serenity.Abstractions;
-using Serenity.Configuration;
 using Serenity.Services;
 using System;
 
@@ -11,8 +10,7 @@ namespace Serenity
         {
             get
             {
-                var service = Dependency.TryResolve<IAuthorizationService>();
-                return service != null && service.IsLoggedIn;
+                return Dependency.Resolve<IAuthorizationService>().IsLoggedIn;
             }
         }
 
@@ -41,15 +39,13 @@ namespace Serenity
         {
             get
             {
-                var service = Dependency.TryResolve<IAuthorizationService>();
-                return service != null ? service.Username : null;
+                return Dependency.Resolve<IAuthorizationService>().Username;
             }
         }
 
         public static bool HasPermission(string permission)
         {
-            var service = Dependency.TryResolve<IPermissionService>();
-            return service != null && service.HasPermission(permission);
+            return Dependency.Resolve<IPermissionService>().HasPermission(permission);
         }
 
         public static void ValidateLoggedIn()

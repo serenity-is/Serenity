@@ -46,6 +46,10 @@
     <Compile Include="..\Serenity.Core\Properties\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Authorization\TestUserRetrieveService.cs" />
+    <Compile Include="Authorization\TestPermissionService.cs" />
+    <Compile Include="Authorization\TestUserDefinition.cs" />
+    <Compile Include="Authorization\TestAuthorizationService.cs" />
     <Compile Include="DbManager.cs" />
     <Compile Include="DbScript.cs" />
     <Compile Include="DbSettings.cs" />
