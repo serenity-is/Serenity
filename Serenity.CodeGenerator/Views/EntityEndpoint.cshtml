@@ -9,44 +9,42 @@ namespace @(Model.RootNamespace)@(dotModule).Endpoints
     using MyRepository = Repositories.@(Model.ClassName)Repository;
     using MyRow = Entities.@(Model.RowClassName);
 
-    [ServiceAuthorize]
     [RoutePrefix("Services/@(modulePrefix)@(Model.ClassName)"), Route("{action}")]
-    public class @(Model.ClassName)Controller : Controller
+    [ConnectionKey("@Model.Schema"), ServiceAuthorize("@(Model.Permission)")]
+    public class @(Model.ClassName)Controller : ServiceEndpoint
     {
-        [AcceptVerbs("POST"), JsonFilter]
-        public Result<SaveResponse> Create(SaveRequest<MyRow> request)
+        [HttpPost]
+        public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return this.InTransaction("@(Model.Schema)", (uow) => new MyRepository().Create(uow, request));
+            return new MyRepository().Create(uow, request);
         }
 
-        [AcceptVerbs("POST"), JsonFilter]
-        public Result<SaveResponse> Update(SaveRequest<MyRow> request)
+        [HttpPost]
+        public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return this.InTransaction("@(Model.Schema)", (uow) => new MyRepository().Update(uow, request));
+            return new MyRepository().Update(uow, request);
         }
  
-        [AcceptVerbs("POST"), JsonFilter]
-        public Result<DeleteResponse> Delete(DeleteRequest request)
+        [HttpPost]
+        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
         {
-            return this.InTransaction("@(Model.Schema)", (uow) => new MyRepository().Delete(uow, request));
+            return new MyRepository().Delete(uow, request));
         }
 
-        [AcceptVerbs("POST"), JsonFilter]
-        public Result<UndeleteResponse> Undelete(UndeleteRequest request)
+        [HttpPost]
+        public UndeleteResponse Undelete(IUnitOfWork uow, UndeleteRequest request)
         {
-            return this.InTransaction("@(Model.Schema)", (uow) => new MyRepository().Undelete(uow, request));
+            return new MyRepository().Undelete(uow, request);
         }
 
-        [AcceptVerbs("GET", "POST"), JsonFilter]
-        public Result<RetrieveResponse<MyRow>> Retrieve(RetrieveRequest request)
+        public RetrieveResponse<MyRow> Retrieve(IDbConnection cnn, RetrieveRequest request)
         {
-            return this.UseConnection("@(Model.Schema)", (cnn) => new MyRepository().Retrieve(cnn, request));
+            return new MyRepository().Retrieve(cnn, request);
         }
 
-        [AcceptVerbs("GET", "POST"), JsonFilter]
-        public Result<ListResponse<MyRow>> List(ListRequest request)
+        public ListResponse<MyRow> List(IDbConnection cnn, ListRequest request)
         {
-            return this.UseConnection("@(Model.Schema)", (cnn) => new MyRepository().List(cnn, request));
+            return new MyRepository().List(cnn, request);
         }
     }
 }

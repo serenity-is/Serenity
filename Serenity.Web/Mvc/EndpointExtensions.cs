@@ -55,6 +55,9 @@ namespace Serenity.Services
             catch (Exception exception)
             {
                 response = exception.ConvertToResponse<TResponse>();
+                controller.HttpContext.Response.Clear();
+                controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
+                controller.HttpContext.Response.TrySkipIisCustomErrors = true;
             }
 
             return new Result<TResponse>(response);
@@ -72,6 +75,9 @@ namespace Serenity.Services
             catch (Exception exception)
             {
                 response = exception.ConvertToResponse<TResponse>();
+                controller.HttpContext.Response.Clear();
+                controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
+                controller.HttpContext.Response.TrySkipIisCustomErrors = true;
             }
 
             return new Result<TResponse>(response);
@@ -94,6 +100,10 @@ namespace Serenity.Services
             catch (Exception exception)
             {
                 response = exception.ConvertToResponse<TResponse>();
+                controller.HttpContext.Response.Clear();
+                controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
+                controller.HttpContext.Response.TrySkipIisCustomErrors = true;
+
             }
 
             return new Result<TResponse>(response);

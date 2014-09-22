@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Serenity.Services
@@ -12,13 +13,21 @@ namespace Serenity.Services
             var request = filterContext.HttpContext.Request;
             string method = request.HttpMethod ?? "";
 
-            var prms = filterContext.ActionDescriptor.GetParameters();
-            if (prms.Length != 1)
-                throw new ArgumentOutOfRangeException(String.Format(
-                    "Method {0} has {1} parameters. JsonFilter requires an action method with only one parameter!",
-                        filterContext.ActionDescriptor.ActionName, prms.Length));
+            var prms = filterContext.ActionDescriptor
+                .GetParameters()
+                .Where(x => !x.ParameterType.IsInterface);
 
-            var prm = prms[0];
+            if (prms.Count() != 1)
+            {
+                prms = prms.Where(x => x.ParameterName == "request");
+
+                if (prms.Count() != 1)
+                    throw new ArgumentOutOfRangeException(String.Format(
+                        "Method {0} has {1} parameters. JsonFilter requires an action method with only one parameter!",
+                            filterContext.ActionDescriptor.ActionName, filterContext.ActionDescriptor.GetParameters().Length));
+            }
+
+            var prm = prms.Single();
 
             if (method.Equals("POST", StringComparison.InvariantCultureIgnoreCase) ||
                 method.Equals("PUT", StringComparison.InvariantCultureIgnoreCase))

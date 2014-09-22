@@ -8,7 +8,6 @@ using System.Web.Mvc;
 namespace Serenity.Services
 {
     public class Result<TResponse> : ActionResult
-        where TResponse: ServiceResponse
     {
         public Encoding ContentEncoding { get; set; }
         public string ContentType { get; set; }

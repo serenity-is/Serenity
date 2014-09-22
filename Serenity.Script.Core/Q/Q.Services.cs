@@ -16,6 +16,21 @@ namespace Serenity
         public static jQueryXmlHttpRequest ServiceCall<TResponse>(ServiceCallOptions<TResponse> options)
             where TResponse: ServiceResponse
         {
+            Action<ServiceResponse> handleError = delegate(ServiceResponse response) 
+            {
+                if (Q.Config.NotLoggedInHandler != null &&
+                    response != null &&
+                    response.Error != null &&
+                    response.Error.Code == "NotLoggedIn" &&
+                    Q.Config.NotLoggedInHandler(options.As<ServiceCallOptions>(), response))
+                                return;
+
+                    if (options.OnError != null)
+                        options.OnError(response);
+                    else
+                        Q.ErrorHandling.ShowServiceError(response.Error);
+            };
+
             options = jQuery.ExtendObject(new ServiceCallOptions<TResponse>
             {
                 DataType = "json",
@@ -28,80 +43,65 @@ namespace Serenity
                 Data = Q.ToJSON(options.Request),
                 Success = (data, textStatus, request) =>
                 {
-                    //try
+                    var response = data.As<TResponse>();
+                    try
                     {
-                        var response = data.As<TResponse>();
-                        try
+                        if (response.Error == null)
                         {
-                            if (response.Error == null)
-                            {
-                                if (options.OnSuccess != null)
-                                    options.OnSuccess(response);
-                            }
-                            else
-                            {
-                                if (Q.Config.NotLoggedInHandler != null &&
-                                    response != null &&
-                                    response.Error != null &&
-                                    response.Error.Code == "NotLoggedIn" &&
-                                    Q.Config.NotLoggedInHandler(options.As<ServiceCallOptions>(), response))
-                                    return;
-
-                                if (options.OnError != null)
-                                    options.OnError(response);
-                                else
-                                    Q.ErrorHandling.ShowServiceError(response.Error);
-                            }
+                            if (options.OnSuccess != null)
+                                options.OnSuccess(response);
                         }
-                        finally
+                        else
                         {
-                            if (options.BlockUI)
-                                Q.BlockUndo();
-
-                            if (options.OnCleanup != null)
-                                options.OnCleanup();
                         }
                     }
-                    //catch (Exception e)
-                    //{
-                    //    StackTrace.Log(e);
-                    //}
+                    finally
+                    {
+                        if (options.BlockUI)
+                            Q.BlockUndo();
+
+                        if (options.OnCleanup != null)
+                            options.OnCleanup();
+                    }
                 },
                 Error = (xhr, status, ev) =>
                 {
-                    //try
+                    try
                     {
-                        try
+                        if (xhr.Status == 403)
                         {
-                            if (xhr.Status == 403)
+                            string l = null;
+                            try { l = xhr.GetResponseHeader("Location"); }
+                            catch { l = null; }
+                            if (l != null)
                             {
-                                string l = null;
-                                try { l = xhr.GetResponseHeader("Location"); }
-                                catch { l = null; }
-                                if (l != null)
-                                {
-                                    Window.Top.Location.Href = l;
-                                    return;
-                                }
+                                Window.Top.Location.Href = l;
+                                return;
                             }
-
-                            var html = xhr.ResponseText;
-
-                            Q.Externals.IFrameDialog(new { html = html });
                         }
-                        finally
+
+                        if ((xhr.GetResponseHeader("content-type") ?? "").ToLower().IndexOf("application/json") >= 0)
                         {
-                            if (options.BlockUI)
-                                Q.BlockUndo();
-
-                            if (options.OnCleanup != null)
-                                options.OnCleanup();
+                            var json = jQuery.ParseJsonData<ServiceResponse>(xhr.ResponseText);
+                            if (json != null && json.Error != null)
+                            {
+                                handleError(json);
+                                return;
+                            }
                         }
+
+                        var html = xhr.ResponseText;
+
+                        Q.Externals.IFrameDialog(new { html = html });
                     }
-                    //catch (Exception e)
-                    //{
-                    //    StackTrace.Log(e);
-                    //}
+                    finally
+                    {
+                        if (options.BlockUI)
+                            Q.BlockUndo();
+
+                        if (options.OnCleanup != null)
+                            options.OnCleanup();
+                    }
                 }
             }, options);
 
