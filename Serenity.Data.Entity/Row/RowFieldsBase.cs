@@ -297,10 +297,18 @@ namespace Serenity.Data
                         if (property != null)
                         {
                             if (property.PropertyType != null &&
-                                property.PropertyType.IsEnum &&
                                 field is IEnumTypeField)
                             {
-                                (field as IEnumTypeField).EnumType = property.PropertyType;
+                                if (property.PropertyType.IsEnum)
+                                {
+                                    (field as IEnumTypeField).EnumType = property.PropertyType;
+                                }
+                                else
+                                {
+                                    var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
+                                    if (nullableType != null && nullableType.IsEnum)
+                                        (field as IEnumTypeField).EnumType = nullableType;
+                                }
                             }
                             
                             foreach (var attr in property.GetCustomAttributes<LeftJoinAttribute>())
