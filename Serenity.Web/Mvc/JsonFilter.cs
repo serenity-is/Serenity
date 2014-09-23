@@ -23,7 +23,8 @@ namespace Serenity.Services
 
                 if (prms.Count() != 1)
                     throw new ArgumentOutOfRangeException(String.Format(
-                        "Method {0} has {1} parameters. JsonFilter requires an action method with only one parameter!",
+                        "Method {0} has {1} parameters. JsonFilter requires an action method with only one parameter," + 
+                        "or a parameter with name 'request'!",
                             filterContext.ActionDescriptor.ActionName, filterContext.ActionDescriptor.GetParameters().Length));
             }
 
