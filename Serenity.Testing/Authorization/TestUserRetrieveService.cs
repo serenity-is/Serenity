@@ -8,11 +8,11 @@ namespace Serenity.Testing
     public class TestUserRetrieveService : IUserRetrieveService
     {
         private Func<string, IUserDefinition> byUsername;
-        private Func<long, IUserDefinition> byId;
+        private Func<string, IUserDefinition> byId;
 
         public TestUserRetrieveService(
             Func<string, IUserDefinition> byUsername,
-            Func<long, IUserDefinition> byId)
+            Func<string, IUserDefinition> byId)
         {
             this.byId = byId;
             this.byUsername = byUsername;
@@ -24,13 +24,13 @@ namespace Serenity.Testing
                 throw new ArgumentNullException("users");
 
             this.byId = id => (getUsers() ?? new IUserDefinition[0])
-                .FirstOrDefault(x => x.UserId == id);
+                .FirstOrDefault(x => x.Id == id);
             
             this.byUsername = name => (getUsers() ?? new IUserDefinition[0])
                 .FirstOrDefault(x => String.Compare(x.Username, name, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
-        public IUserDefinition ById(long id)
+        public IUserDefinition ById(string id)
         {
  	        return byId(id);
         }

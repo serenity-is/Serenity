@@ -48,12 +48,12 @@ namespace Serenity
         /// <remarks>
         /// This is a shortcut to UserDefinition.UserId.
         /// </remarks>
-        public static long? UserId
+        public static string UserId
         {
             get
             {
                 var user = UserDefinition;
-                return user == null ? (Int64?)null : user.UserId;
+                return user == null ? null : user.Id;
             }
         }
 

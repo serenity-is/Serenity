@@ -152,7 +152,7 @@ namespace Serenity.Test
 
                 testUser = new TestUserDefinition();
 
-                Assert.Equal(testUser.UserId, Authorization.UserId);
+                Assert.Equal(testUser.Id, Authorization.UserId);
             }
         }
 

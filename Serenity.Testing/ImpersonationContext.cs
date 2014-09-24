@@ -78,9 +78,9 @@
             get { return username; }
         }
 
-        public IUserDefinition ById(long id)
+        public IUserDefinition ById(string id)
         {
-            if (userDefinition != null && userDefinition.UserId == id)
+            if (userDefinition != null && userDefinition.Id == id)
                 return userDefinition;
 
             return oldUserRetrieveService == null ? null : oldUserRetrieveService.ById(id);

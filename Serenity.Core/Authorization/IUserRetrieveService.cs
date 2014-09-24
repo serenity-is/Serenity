@@ -11,7 +11,7 @@ namespace Serenity.Abstractions
         /// <summary>
         /// Returns user definition for specified user ID or null if doesn't exist.
         /// </summary>
-        IUserDefinition ById(Int64 id);
+        IUserDefinition ById(string id);
         /// <summary>
         /// Returns user definition for specified username or null if doesn't exist.
         /// </summary>

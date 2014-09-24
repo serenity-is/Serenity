@@ -119,9 +119,7 @@ namespace Serenity.Web.Providers
             if (providerUserKey == null)
                 return null;
 
-            int userId = System.Convert.ToInt32(providerUserKey, Invariants.NumberFormat);
-
-            var user = Dependency.Resolve<IUserRetrieveService>().ById(userId);
+            var user = Dependency.Resolve<IUserRetrieveService>().ById(providerUserKey.ToString());
             if (user != null)
                 return UserCacheItemToMembershipUser(user);
 
@@ -242,7 +240,7 @@ namespace Serenity.Web.Providers
         private MembershipUser UserCacheItemToMembershipUser(IUserDefinition item)
         {
             var empty = new DateTime();
-            return new MembershipUser(this.Name, item.Username, item.UserId, item.Email, String.Empty, null, item.IsActive > 0,
+            return new MembershipUser(this.Name, item.Username, item.Id, item.Email, String.Empty, null, item.IsActive > 0,
                 item.IsActive <= 0, empty, empty, empty, empty, empty);
         }
 

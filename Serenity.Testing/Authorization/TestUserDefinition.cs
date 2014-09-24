@@ -6,16 +6,16 @@ namespace Serenity.Testing
     {
         static int nextId = 789012345;
 
-        public TestUserDefinition(string username = null, int? userId = null)
+        public TestUserDefinition(string username = null, string userId = null)
         {
-            UserId = userId ?? (nextId++);
+            Id = userId ?? (nextId++).ToString();
             Username = username ?? ("user" + userId);
             DisplayName = username + " DisplayName";
             Email = username + "@dummy.com";
             IsActive = 1;
         }
 
-        public Int64 UserId { get; set;  }
+        public string Id { get; set; }
         public string Username { get; set; }
         public string DisplayName { get; set; }
         public string Email { get; set; }

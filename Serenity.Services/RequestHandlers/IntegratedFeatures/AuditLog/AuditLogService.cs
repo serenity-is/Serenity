@@ -335,7 +335,7 @@ namespace Serenity.Services
             if (loggingRow != null)
                 fld.UserIdField[audit] = loggingRow.InsertUserIdField[(Row)request.NewEntity];
             if (fld.UserIdField[audit] == null)
-                fld.UserIdField[audit] = (Int64)Authorization.UserId;
+                fld.UserIdField[audit] = Authorization.UserId.TryParseID().Value;
 
             connection.Insert(audit);
         }
@@ -448,7 +448,7 @@ namespace Serenity.Services
             if (loggingRow != null)
                 fld.UserIdField[audit] = loggingRow.UpdateUserIdField[(Row)request.NewEntity];
             if (fld.UserIdField[audit] == null)
-                fld.UserIdField[audit] = (long)Authorization.UserId;
+                fld.UserIdField[audit] = (long)Authorization.UserId.TryParseID();
 
             return audit;
         }
@@ -471,7 +471,7 @@ namespace Serenity.Services
             fld.NewParentIdField[audit] = request.ParentId;
             fld.DateField[audit] = DateTime.UtcNow;
             fld.AuditTypeIdField[audit] = (Int32)AuditType.Delete;
-            fld.UserIdField[audit] = (long)(request.UserId == null ? Authorization.UserId : request.UserId.Value);
+            fld.UserIdField[audit] = (long)(request.UserId == null ? Authorization.UserId.TryParseID() : request.UserId.Value);
 
             connection.Insert(audit);
         }
@@ -488,7 +488,7 @@ namespace Serenity.Services
             fld.NewParentIdField[audit] = request.ParentId;
             fld.DateField[audit] = DateTime.UtcNow;
             fld.AuditTypeIdField[audit] = (Int32)AuditType.UndoDelete;
-            fld.UserIdField[audit] = (int)(request.UserId == null ? Authorization.UserId : request.UserId.Value);
+            fld.UserIdField[audit] = (int)(request.UserId == null ? Authorization.UserId.TryParseID() : request.UserId.Value);
 
             connection.Insert(audit);
         }

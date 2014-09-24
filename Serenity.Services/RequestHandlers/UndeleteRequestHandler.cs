@@ -80,7 +80,7 @@ namespace Serenity.Services
         protected virtual void DoCaptureLog()
         {
             ((IIsActiveRow)Row).IsActiveField[Row] = 1;
-            captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.Value, isDelete: false);
+            captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.TryParseID().Value, isDelete: false);
         }
 
         protected virtual void DoAudit()

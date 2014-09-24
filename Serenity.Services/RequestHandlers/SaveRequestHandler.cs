@@ -91,11 +91,11 @@ namespace Serenity.Services
                 }
 
                 if (anyChanged)
-                    captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.Value, isDelete: false);
+                    captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.TryParseID().Value, isDelete: false);
             }
             else if (IsCreate)
             {
-                captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.Value, isDelete: false);
+                captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.TryParseID().Value, isDelete: false);
             }
         }
 
@@ -393,12 +393,12 @@ namespace Serenity.Services
             if (updateLogRow != null && (IsUpdate || insertLogRow == null))
             {
                 updateLogRow.UpdateDateField[Row] = DateTimeField.ToDateTimeKind(DateTime.Now, updateLogRow.UpdateDateField.DateTimeKind);
-                updateLogRow.UpdateUserIdField[Row] = Authorization.UserId;
+                updateLogRow.UpdateUserIdField[Row] = Authorization.UserId.TryParseID();
             }
             else if (insertLogRow != null && IsCreate)
             {
                 insertLogRow.InsertDateField[Row] = DateTimeField.ToDateTimeKind(DateTime.Now, insertLogRow.InsertDateField.DateTimeKind);
-                insertLogRow.InsertUserIdField[Row] = Authorization.UserId;
+                insertLogRow.InsertUserIdField[Row] = Authorization.UserId.TryParseID();
             }
         }
 

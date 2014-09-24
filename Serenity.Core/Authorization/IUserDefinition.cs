@@ -10,7 +10,7 @@ namespace Serenity
         /// <summary>
         /// User ID
         /// </summary>
-        Int64 UserId { get; }
+        string Id { get; }
         /// <summary>
         /// User login name
         /// </summary>

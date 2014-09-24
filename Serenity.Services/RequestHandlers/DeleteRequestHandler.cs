@@ -140,7 +140,7 @@ namespace Serenity.Services
 
         protected virtual void DoCaptureLog()
         {
-            captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.Value, isDelete: true);
+            captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.TryParseID().Value, isDelete: true);
         }
 
         protected virtual void DoAudit()
