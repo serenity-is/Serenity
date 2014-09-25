@@ -1,4 +1,5 @@
 ﻿using Serenity.Abstractions;
+using Serenity.Services;
 using Serenity.Testing;
 using System.Collections.Generic;
 using Xunit;
@@ -174,6 +175,49 @@ namespace Serenity.Test
 
                 Assert.Equal(false, Authorization.HasPermission("x"));
                 Assert.Equal(true, Authorization.HasPermission("y"));
+            }
+        }
+
+        [Fact]
+        public void Authorization_ValidateLoggedInThrowsExceptionIfNotLoggedIn()
+        {
+            using (new MunqContext())
+            {
+                TestUserDefinition testUser = null;
+
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                registrar.RegisterInstance<IAuthorizationService>(
+                    new TestAuthorizationService(() => testUser));
+
+                var exception = Assert.Throws<ValidationError>(() =>
+                    Authorization.ValidateLoggedIn());
+
+                Assert.Equal("NotLoggedIn", exception.ErrorCode);
+
+                testUser = new TestUserDefinition();
+                Authorization.ValidateLoggedIn();
+            }
+        }
+
+        [Fact]
+        public void Authorization_ValidatePermissionThrowsExceptionIfDoesntHavePermission()
+        {
+            using (new MunqContext())
+            {
+                bool hasPermission = false;
+
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                registrar.RegisterInstance<IPermissionService>(
+                    new TestPermissionService((s) => hasPermission));
+
+                var exception = Assert.Throws<ValidationError>(() =>
+                    Authorization.ValidatePermission("Dummy"));
+
+                Assert.Equal("AccessDenied", exception.ErrorCode);
+
+                hasPermission = true;
+
+                Authorization.ValidatePermission("Dummy");
             }
         }
     }

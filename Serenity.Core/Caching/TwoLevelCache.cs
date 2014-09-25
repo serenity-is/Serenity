@@ -228,7 +228,7 @@ namespace Serenity
                 var serializedItem = serialize(item);
 
                 // item ı ve jenerasyonunu dist cache e yaz
-                if (remoteExpiration == CacheExpiration.Never)
+                if (remoteExpiration == TimeSpan.Zero)
                 {
                     DistributedCache.Set(cacheKey, serializedItem);
                     DistributedCache.Set(itemGenerationKey, getGlobalGenerationValue());

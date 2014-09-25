@@ -10,7 +10,7 @@ namespace Serenity
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        /// <param name="expiration">Expire time (Use CacheExpiration.Never to make it limitless)</param>
+        /// <param name="expiration">Expire time (Use TimeSpan.Zero to make it limitless)</param>
         public static void AddToCacheWithExpiration(string key, object value, TimeSpan expiration)
         {
             Dependency.Resolve<ICache>().Add(key, value, expiration);
@@ -24,7 +24,7 @@ namespace Serenity
         /// </summary>
         /// <typeparam name="TItem">Veri tipi</typeparam>
         /// <param name="cacheKey">Anahtar</param>
-        /// <param name="expiration">Expire süresi (CacheExpiration.Never ile limitsiz yapılabilir)</param>
+        /// <param name="expiration">Expire süresi (TimeSpan.Zero ile limitsiz yapılabilir)</param>
         /// <param name="loader">Cache'te değer yoksa ilk değerini oluşturacak fonksiyon</param>
         public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, Func<TItem> loader)
             where TItem : class

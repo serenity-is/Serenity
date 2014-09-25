@@ -28,7 +28,7 @@ namespace Serenity.Web
                     if (content.UncompressedBytes == null)
                         return content;
 
-                    TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, CacheExpiration.Never,
+                    TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, TimeSpan.Zero,
                         twoLevel.GlobalGenerationKey, () =>
                         {
                             this.Reset();
@@ -112,7 +112,7 @@ namespace Serenity.Web
                     if (twoLevel == null || twoLevel.GlobalGenerationKey == null)
                         return script;
 
-                    TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, CacheExpiration.Never,
+                    TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, TimeSpan.Zero,
                         twoLevel.GlobalGenerationKey, () =>
                         {
                             return new object();

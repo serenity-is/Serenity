@@ -7,7 +7,7 @@ namespace Serenity
     /// <summary>
     /// Provides a common access point for authorization related services
     /// </summary>
-    public class Authorization
+    public static class Authorization
     {
         /// <summary>
         /// Returns true if user is logged in.

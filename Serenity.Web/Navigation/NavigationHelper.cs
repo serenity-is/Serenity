@@ -70,7 +70,7 @@
 
         private static ILookup<string, NavigationItemAttribute> GetNavigationItemAttributes()
         {
-            return LocalCache.Get("NavigationHelper:NavigationItems", CacheExpiration.Never, () =>
+            return LocalCache.Get("NavigationHelper:NavigationItems", TimeSpan.Zero, () =>
             {
                 var list = new List<NavigationItemAttribute>();
 

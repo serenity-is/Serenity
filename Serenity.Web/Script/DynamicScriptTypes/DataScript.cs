@@ -31,8 +31,8 @@ namespace Serenity.Web
             _right = right;
             _nonCached = nonCached;
 
-            LocalExpiration = CacheExpiration.Never;
-            RemoteExpiration = CacheExpiration.OneDay;
+            LocalExpiration = TimeSpan.Zero;
+            RemoteExpiration = TimeSpan.FromDays(1);
 
             DynamicScriptManager.Register(this);
         }

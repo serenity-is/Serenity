@@ -64,7 +64,6 @@
     <Compile Include="Authorization\IAuthenticationService.cs" />
     <Compile Include="Authorization\IUserDefinition.cs" />
     <Compile Include="Caching\CacheCompression.cs" />
-    <Compile Include="Caching\CacheExpiration.cs" />
     <Compile Include="Caching\CacheSerialization.cs" />
     <Compile Include="Caching\DistributedCache.cs" />
     <Compile Include="Caching\DistributedCacheEmulator.cs" />

@@ -14,8 +14,8 @@ namespace Serenity.Web
         public LookupScript()
         {
             lookupParams = new Dictionary<string, object>();
-            LocalExpiration = CacheExpiration.Never;
-            RemoteExpiration = CacheExpiration.OneDay;
+            LocalExpiration = TimeSpan.Zero;
+            RemoteExpiration = TimeSpan.FromDays(1);
         }
 
         public void Changed()
