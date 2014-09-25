@@ -12,33 +12,19 @@
 
         private UserDefinition GetFirst(IDbConnection connection, BaseCriteria criteria)
         {
-            var row = new MyRow();
-            var query = new SqlQuery()
-                .From(row)
-                .Select(
-                    fld.UserId,
-                    fld.Username,
-                    fld.DisplayName,
-                    fld.Email,
-                    fld.PasswordHash,
-                    fld.PasswordSalt,
-                    fld.Source,
-                    fld.UpdateDate,
-                    fld.IsActive)
-                .Where(criteria);
-
-            if (query.GetFirst(connection))
+            var user = connection.TrySingle<Entities.UserRow>(criteria);
+            if (user != null)
                 return new UserDefinition
                 {
-                    UserId = row.UserId.Value,
-                    Username = row.Username,
-                    Email = row.Email,
-                    DisplayName = row.DisplayName,
-                    IsActive = row.IsActive.Value,
-                    Source = row.Source,
-                    PasswordHash = row.PasswordHash,
-                    PasswordSalt = row.PasswordSalt,
-                    UpdateDate = row.UpdateDate
+                    UserId = user.UserId.Value,
+                    Username = user.Username,
+                    Email = user.Email,
+                    DisplayName = user.DisplayName,
+                    IsActive = user.IsActive.Value,
+                    Source = user.Source,
+                    PasswordHash = user.PasswordHash,
+                    PasswordSalt = user.PasswordSalt,
+                    UpdateDate = user.UpdateDate
                 };
 
             return null;
