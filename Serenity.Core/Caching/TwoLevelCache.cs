@@ -144,7 +144,7 @@ namespace Serenity
 
                 globalGenerationCache = globalGeneration.Value;
                 // local cache e ekle, 1 dk boyunca buradan kullan
-                LocalCache.AddToCacheWithExpiration(globalGenerationKey, globalGenerationCache, GenerationCacheExpiration);
+                LocalCache.Add(globalGenerationKey, globalGenerationCache, GenerationCacheExpiration);
 
                 return globalGeneration.Value;
             };
@@ -208,8 +208,8 @@ namespace Serenity
                     if (serialized != null)
                     {
                         cachedObj = deserialize(serialized);
-                        LocalCache.AddToCacheWithExpiration(cacheKey, (object)cachedObj ?? DBNull.Value, localExpiration);
-                        LocalCache.AddToCacheWithExpiration(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
+                        LocalCache.Add(cacheKey, (object)cachedObj ?? DBNull.Value, localExpiration);
+                        LocalCache.Add(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
                         return (TItem)cachedObj;
                     }
                 }
@@ -219,8 +219,8 @@ namespace Serenity
             var item = loader();
 
             // add item and its version to cache
-            LocalCache.AddToCacheWithExpiration(cacheKey, (object)item ?? DBNull.Value, localExpiration);
-            LocalCache.AddToCacheWithExpiration(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
+            LocalCache.Add(cacheKey, (object)item ?? DBNull.Value, localExpiration);
+            LocalCache.Add(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
 
             if (serialize != null)
             {

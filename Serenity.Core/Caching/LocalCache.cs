@@ -1,8 +1,8 @@
 ﻿
 namespace Serenity
 {
-    using System;
     using Serenity.Abstractions;
+    using System;
 
     /// <summary>
     /// Contains helper functions to access currently registered ILocalCache provider.
@@ -15,12 +15,10 @@ namespace Serenity
         /// <param name="key">key</param>
         /// <param name="value">value</param>
         /// <param name="expiration">Expire time (Use TimeSpan.Zero to hold value with no expiration)</param>
-        public static void AddToCacheWithExpiration(string key, object value, 
-            TimeSpan expiration)
+        public static void Add(string key, object value, TimeSpan expiration)
         {
             Dependency.Resolve<ILocalCache>().Add(key, value, expiration);
         }
-
 
         /// <summary>
         /// Reads the value with specified key from the local cache. If it doesn't exists in cache, calls the loader 
@@ -31,8 +29,7 @@ namespace Serenity
         /// <param name="cacheKey">Key</param>
         /// <param name="expiration">Expiration (TimeSpan.Zero means no expiration)</param>
         /// <param name="loader">Loader function that will be called if item doesn't exist in the cache.</param>
-        public static TItem Get<TItem>(string cacheKey, 
-            TimeSpan expiration, Func<TItem> loader)
+        public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, Func<TItem> loader)
             where TItem : class
         {
             var cachedObj = Dependency.Resolve<ILocalCache>().Get<object>(cacheKey);
@@ -45,7 +42,7 @@ namespace Serenity
             if (cachedObj == null)
             {
                 var item = loader();
-                AddToCacheWithExpiration(cacheKey, (object) item ?? DBNull.Value, expiration);
+                Add(cacheKey, (object) item ?? DBNull.Value, expiration);
                 return item;
             }
 
@@ -76,7 +73,7 @@ namespace Serenity
         /// <summary>
         /// Removes all items from the cache (avoid expect unit tests).
         /// </summary>
-        public static void Reset()
+        public static void RemoveAll()
         {
             Dependency.Resolve<ILocalCache>().RemoveAll();
         }
