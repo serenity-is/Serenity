@@ -6,7 +6,7 @@ namespace Serenity.Caching
     using System.Collections;
     using System.Web;
 
-    public class HttpRuntimeCache : ICache
+    public class HttpRuntimeCache : ILocalCache
     {
         public void Add(string key, object value, TimeSpan expiration)
         {

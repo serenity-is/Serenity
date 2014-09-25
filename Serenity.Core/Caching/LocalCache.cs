@@ -1,8 +1,12 @@
-﻿using System;
-using Serenity.Abstractions;
-
+﻿
 namespace Serenity
 {
+    using System;
+    using Serenity.Abstractions;
+
+    /// <summary>
+    /// Contains helper functions to access currently registered ILocalCache provider.
+    /// </summary>
     public static class LocalCache
     {
         /// <summary>
@@ -10,26 +14,28 @@ namespace Serenity
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        /// <param name="expiration">Expire time (Use TimeSpan.Zero to make it limitless)</param>
-        public static void AddToCacheWithExpiration(string key, object value, TimeSpan expiration)
+        /// <param name="expiration">Expire time (Use TimeSpan.Zero to hold value with no expiration)</param>
+        public static void AddToCacheWithExpiration(string key, object value, 
+            TimeSpan expiration)
         {
-            Dependency.Resolve<ICache>().Add(key, value, expiration);
+            Dependency.Resolve<ILocalCache>().Add(key, value, expiration);
         }
 
 
         /// <summary>
-        /// HttpRuntime.Cache'den verilen anahtara sahip değeri okur. Eğer cache'te değer
-        /// yoksa, loader fonksiyonunu çağırarak değeri üretir ve cache'e yazıp döndürür.
-        /// Load fonksiyonu null sonuç döndürürse, cache e bu değer DBNull.Value olarak yazılır.
+        /// Reads the value with specified key from the local cache. If it doesn't exists in cache, calls the loader 
+        /// function to generate value (from database etc.) and adds it to the cache. If loader returns a null value, 
+        /// it is written to the cache as DBNull.Value.
         /// </summary>
-        /// <typeparam name="TItem">Veri tipi</typeparam>
-        /// <param name="cacheKey">Anahtar</param>
-        /// <param name="expiration">Expire süresi (TimeSpan.Zero ile limitsiz yapılabilir)</param>
-        /// <param name="loader">Cache'te değer yoksa ilk değerini oluşturacak fonksiyon</param>
-        public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, Func<TItem> loader)
+        /// <typeparam name="TItem">Data type</typeparam>
+        /// <param name="cacheKey">Key</param>
+        /// <param name="expiration">Expiration (TimeSpan.Zero means no expiration)</param>
+        /// <param name="loader">Loader function that will be called if item doesn't exist in the cache.</param>
+        public static TItem Get<TItem>(string cacheKey, 
+            TimeSpan expiration, Func<TItem> loader)
             where TItem : class
         {
-            var cachedObj = Dependency.Resolve<ICache>().Get<object>(cacheKey);
+            var cachedObj = Dependency.Resolve<ILocalCache>().Get<object>(cacheKey);
             
             if (cachedObj == DBNull.Value)
             {
@@ -47,32 +53,32 @@ namespace Serenity
         }
 
         /// <summary>
-        /// HttpRuntime.Cache'den verilen anahtara sahip değeri, istenen tiple okumaya çalışır.
-        /// Anahtar cache'te yoksa ya da tipi TItem değilse null döndürür.
+        /// Reads the value of given type with specified key from the local cache. If the value doesn't exist or not
+        /// of given type, it returns null.
         /// </summary>
-        /// <typeparam name="TItem">İstenen tip</typeparam>
-        /// <param name="cacheKey">Anahtar</param>
+        /// <typeparam name="TItem">Expected type</typeparam>
+        /// <param name="cacheKey">Key</param>
         public static TItem TryGet<TItem>(string cacheKey)
             where TItem : class
         {
-            return Dependency.Resolve<ICache>().Get<object>(cacheKey) as TItem;
+            return Dependency.Resolve<ILocalCache>().Get<object>(cacheKey) as TItem;
         }
 
         /// <summary>
-        /// Verilen anahtara sahip değeri cache'ten siler. Yoksa hata vermez.
+        /// Removes the value with specified key from the local cache. If the value doesn't exist, no error is raised.
         /// </summary>
-        /// <param name="cacheKey">Anahtar</param>
+        /// <param name="cacheKey">Key</param>
         public static object Remove(string cacheKey)
         {
-            return Dependency.Resolve<ICache>().Remove(cacheKey);
+            return Dependency.Resolve<ILocalCache>().Remove(cacheKey);
         }
 
         /// <summary>
-        /// Cache'i tümüyle temizler. Yavaş olabileceğinden, birim testleri haricinde gerekmedikçe kullanmayınız.
+        /// Removes all items from the cache (avoid expect unit tests).
         /// </summary>
         public static void Reset()
         {
-            Dependency.Resolve<ICache>().RemoveAll();
+            Dependency.Resolve<ILocalCache>().RemoveAll();
         }
     }
 }

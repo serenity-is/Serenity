@@ -37,6 +37,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\BinarySerialization.cs" />
     <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />
     <Compile Include="Configuration\DevelopmentSettings.cs" />
@@ -63,15 +64,11 @@
     <Compile Include="Authorization\IPermissionService.cs" />
     <Compile Include="Authorization\IAuthenticationService.cs" />
     <Compile Include="Authorization\IUserDefinition.cs" />
-    <Compile Include="Caching\CacheCompression.cs" />
-    <Compile Include="Caching\CacheSerialization.cs" />
     <Compile Include="Caching\DistributedCache.cs" />
     <Compile Include="Caching\DistributedCacheEmulator.cs" />
-    <Compile Include="Caching\ICache.cs" />
+    <Compile Include="Caching\ILocalCache.cs" />
     <Compile Include="Caching\IDistributedCache.cs" />
     <Compile Include="Caching\LocalCache.cs" />
-    <Compile Include="Caching\LruCache\LruCache.cs" />
-    <Compile Include="Caching\LruCache\LruCacheNode.cs" />
     <Compile Include="Caching\TwoLevelCache.cs" />
     <Compile Include="ComponentModel\Common\InsertableAttribute.cs" />
     <Compile Include="ComponentModel\Common\ScriptIncludeAttribute.cs" />

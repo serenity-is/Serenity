@@ -3,47 +3,44 @@
 namespace Serenity.Abstractions
 {
     /// <summary>
-    /// Distributed cache erişimi sağlayan servisler için ortak arayüz. (ör: Redis, MemCached, Couchbase)
-    /// Bu arayüz ile projelerde distributed cache kullanması gereken kodlar, implementasyondan
-    /// bağımsız hale gelir (IoC yardımıyla).
+    /// An abstraction for distributed cache access. (e.g.: Redis, MemCached, Couchbase)
     /// </summary>
     public interface IDistributedCache
     {
         /// <summary>
-        /// Cache'teki belirtilen anahtara sahip değeri arttırır ve arttırılmış değeri döner.
-        /// Eğer cache'te yoksa değer 1 e set edilir.
+        /// Increments value with specified key and returns the new value.
+        /// If value doesn't exist, its new value will be 1.
         /// </summary>
-        /// <param name="key">Anahtar.</param>
-        /// <param name="amount">Artım miktarı.</param>
-        /// <returns>Arttırılmış değer, ya da yoksa 1</returns>
+        /// <param name="key">Key.</param>
+        /// <param name="amount">Increase amount.</param>
+        /// <returns>Increased amount, or 1 if it didn't exist before</returns>
         long Increment(string key, int amount = 1);
 
         /// <summary>
-        /// Cache ten belirtilen anahtara sahip değeri okur. Eğer cache te
-        /// değer yok ya da expire olduysa default(T) değerini döndürür. 
+        /// Reads the value with given key. If value didn't exist in cache, 
+        /// return the default(T) value. 
         /// </summary>
-        /// <typeparam name="TValue">Değerin tipi</typeparam>
-        /// <param name="key">Anahtar.</param>
-        /// <remarks>Okunan değer belirtilen TValue tipinde değilse
-        /// bir exception üretebilir.</remarks>
+        /// <typeparam name="TValue">Value type</typeparam>
+        /// <param name="key">Key</param>
+        /// <remarks>It may raise an exception if the value is not of type TValue.</remarks>
         TValue Get<TValue>(string key);
 
         /// <summary>
-        /// Anahtarı verilen değeri cache e yazar.
+        /// Writes the value to cache with specified key.
         /// </summary>
-        /// <typeparam name="TValue">Değer tipi.</typeparam>
-        /// <param name="key">Anahtar</param>
-        /// <param name="value">Değer.</param>
+        /// <typeparam name="TValue">Value type.</typeparam>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
         void Set<TValue>(string key, TValue value);
 
         /// <summary>
-        /// Anahtarı verilen değeri, belli bir tarihte expire olmak
-        /// üzere cache e yazar.
+        /// Writes the value to cache with specified key and
+        /// expiration date.
         /// </summary>
-        /// <typeparam name="TValue">Değer tipi.</typeparam>
-        /// <param name="key">Anahtar.</param>
-        /// <param name="value">Değer.</param>
-        /// <param name="expiresAt">Değerin expire olacağı tarih.</param>
+        /// <typeparam name="TValue">Value type.</typeparam>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
+        /// <param name="expiresAt">The time the cached item will be expired on.</param>
         void Set<TValue>(string key, TValue value, DateTime expiresAt);
     }
 }

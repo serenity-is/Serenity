@@ -25,12 +25,12 @@ namespace Serenity.Caching
         private Dictionary<string, DateTime> expiration = new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// Cache'teki belirtilen anahtara sahip değeri arttırır ve arttırılmış değeri döner.
-        /// Eğer cache'te yoksa değer 1 e set edilir.
+        /// Increments value with specified key and returns the new value.
+        /// If value doesn't exist, its new value will be 1.
         /// </summary>
-        /// <param name="key">Anahtar.</param>
-        /// <param name="amount">Artım miktarı.</param>
-        /// <returns>Arttırılmış değer, ya da yoksa 1</returns>
+        /// <param name="key">Key.</param>
+        /// <param name="amount">Increase amount.</param>
+        /// <returns>Increased amount, or 1 if it didn't exist before</returns>
         public long Increment(string key, int amount = 1)
         {
             lock (this.sync)
@@ -51,13 +51,12 @@ namespace Serenity.Caching
         }
 
         /// <summary>
-        /// Cache ten belirtilen anahtara sahip değeri okur. Eğer cache te
-        /// değer yok ya da expire olduysa default(T) değerini döndürür. 
+        /// Reads the value with given key. If value didn't exist in cache, 
+        /// return the default(T) value. 
         /// </summary>
-        /// <typeparam name="TValue">Değerin tipi</typeparam>
-        /// <param name="key">Anahtar.</param>
-        /// <remarks>Okunan değer belirtilen TValue tipinde değilse
-        /// bir exception üretebilir.</remarks>
+        /// <typeparam name="TValue">Value type</typeparam>
+        /// <param name="key">Key</param>
+        /// <remarks>It may raise an exception if the value is not of type TValue.</remarks>
         public TValue Get<TValue>(string key)
         {
             lock (this.sync)
@@ -80,11 +79,11 @@ namespace Serenity.Caching
         }
 
         /// <summary>
-        /// Anahtarı verilen değeri cache e yazar.
+        /// Writes the value to cache with specified key.
         /// </summary>
-        /// <typeparam name="TValue">Değer tipi.</typeparam>
-        /// <param name="key">Anahtar</param>
-        /// <param name="value">Değer.</param>
+        /// <typeparam name="TValue">Value type.</typeparam>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
         public void Set<TValue>(string key, TValue value)
         {
             lock (this.sync)
@@ -95,13 +94,11 @@ namespace Serenity.Caching
         }
 
         /// <summary>
-        /// Anahtarı verilen değeri, belli bir tarihte expire olmak
-        /// üzere cache e yazar.
+        /// Writes the value to cache with specified key.
         /// </summary>
-        /// <typeparam name="TValue">Değer tipi.</typeparam>
-        /// <param name="key">Anahtar.</param>
-        /// <param name="value">Değer.</param>
-        /// <param name="expiresAt">Değerin expire olacağı tarih.</param>
+        /// <typeparam name="TValue">Value type.</typeparam>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
         public void Set<TValue>(string key, TValue value, DateTime expiresAt)
         {
             // need a better implementation for expirations
@@ -113,7 +110,7 @@ namespace Serenity.Caching
         }
 
         /// <summary>
-        /// Used for testing
+        /// Used for testing purposes to clear all cache items
         /// </summary>
         public void Reset()
         {

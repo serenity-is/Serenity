@@ -36,8 +36,8 @@ namespace Serenity.Web
             if (Dependency.TryResolve<IConfigurationRepository>() == null)
                 registrar.RegisterInstance<IConfigurationRepository>("Application", new ApplicationConfigurationRepository());
 
-            if (Dependency.TryResolve<ICache>() == null)
-                registrar.RegisterInstance<ICache>(new HttpRuntimeCache());
+            if (Dependency.TryResolve<ILocalCache>() == null)
+                registrar.RegisterInstance<ILocalCache>(new HttpRuntimeCache());
 
             if (Dependency.TryResolve<IDistributedCache>() == null)
                 registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());

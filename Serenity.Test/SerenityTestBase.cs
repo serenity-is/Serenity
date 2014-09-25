@@ -17,7 +17,7 @@ namespace Serenity.Test
         {
             munqContext = new MunqContext();
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
-            registrar.RegisterInstance<ICache>(new HttpRuntimeCache());
+            registrar.RegisterInstance<ILocalCache>(new HttpRuntimeCache());
         }
 
         public void Dispose()
