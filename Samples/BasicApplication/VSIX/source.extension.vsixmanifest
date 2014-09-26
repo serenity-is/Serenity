@@ -1,6 +1,6 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="SerenityBasicApplicationSampleV1" Version="1.1.6" Language="en-US" Publisher="Volkan Ceylan" />
+    <Identity Id="SerenityBasicApplicationSampleV1" Version="1.2.0" Language="en-US" Publisher="Volkan Ceylan" />
     <DisplayName>Serenity Basic Application Sample</DisplayName>
     <Description xml:space="preserve">Contains a basic Web and Script project template for Serenity Platform.</Description>
     <MoreInfo>https://github.com/volkanceylan/Serenity</MoreInfo>

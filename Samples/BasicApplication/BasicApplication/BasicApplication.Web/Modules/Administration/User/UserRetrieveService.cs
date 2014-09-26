@@ -3,6 +3,7 @@
     using Serenity;
     using Serenity.Abstractions;
     using Serenity.Data;
+    using System;
     using System.Data;
     using MyRow = Entities.UserRow;
 
@@ -30,12 +31,12 @@
             return null;
         }
 
-        public IUserDefinition ById(long id)
+        public IUserDefinition ById(string id)
         {
-            return TwoLevelCache.Get<UserDefinition>("UserByID_" + id.ToInvariant(), CacheExpiration.Never, CacheExpiration.OneDay, fld.GenerationKey, () =>
+            return TwoLevelCache.Get<UserDefinition>("UserByID_" + id, TimeSpan.Zero, TimeSpan.FromDays(1), fld.GenerationKey, () =>
             {
                 using (var connection = SqlConnections.NewByKey("Default"))
-                    return GetFirst(connection, new Criteria(fld.UserId) == id);
+                    return GetFirst(connection, new Criteria(fld.UserId) == Int32.Parse(id));
             });
         }
 
@@ -44,10 +45,7 @@
             if (username.IsEmptyOrNull())
                 return null;
 
-            if (username.IndexOf(' ') > 0)
-                return null;
-
-            return TwoLevelCache.Get<UserDefinition>("UserByName_" + username, CacheExpiration.Never, CacheExpiration.OneDay, fld.GenerationKey, () =>
+            return TwoLevelCache.Get<UserDefinition>("UserByName_" + username, TimeSpan.Zero, TimeSpan.FromDays(1), fld.GenerationKey, () =>
             {
                 using (var connection = SqlConnections.NewByKey("Default"))
                     return GetFirst(connection, new Criteria(fld.Username) == username);

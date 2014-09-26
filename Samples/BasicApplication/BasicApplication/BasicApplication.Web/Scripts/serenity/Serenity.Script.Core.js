@@ -328,6 +328,17 @@
 		return $Q$ScriptData.canLoad(name);
 	};
 	$Q.serviceCall = function(options) {
+		var handleError = function(response) {
+			if (!ss.staticEquals($Q$Config.notLoggedInHandler, null) && ss.isValue(response) && ss.isValue(response.Error) && response.Error.Code === 'NotLoggedIn' && $Q$Config.notLoggedInHandler(options, response)) {
+				return;
+			}
+			if (!ss.staticEquals(options.onError, null)) {
+				options.onError(response);
+			}
+			else {
+				$Q$ErrorHandling.showServiceError(response.Error);
+			}
+		};
 		options = $.extend({
 			dataType: 'json',
 			contentType: 'application/json',
@@ -337,74 +348,58 @@
 			url: ((ss.isValue(options.service) && !ss.startsWithString(options.service, String.fromCharCode(126)) && !ss.startsWithString(options.service, String.fromCharCode(47))) ? $Q.resolveUrl('~/services/' + options.service) : $Q.resolveUrl(options.service)),
 			data: $.toJSON(options.request),
 			success: function(data, textStatus, request) {
-				//try
-				{
-					var response = data;
-					try {
-						if (ss.isNullOrUndefined(response.Error)) {
-							if (!ss.staticEquals(options.onSuccess, null)) {
-								options.onSuccess(response);
-							}
-						}
-						else {
-							if (!ss.staticEquals($Q$Config.notLoggedInHandler, null) && ss.isValue(response) && ss.isValue(response.Error) && response.Error.Code === 'NotLoggedIn' && $Q$Config.notLoggedInHandler(options, response)) {
-								return;
-							}
-							if (!ss.staticEquals(options.onError, null)) {
-								options.onError(response);
-							}
-							else {
-								$Q$ErrorHandling.showServiceError(response.Error);
-							}
+				var response1 = data;
+				try {
+					if (ss.isNullOrUndefined(response1.Error)) {
+						if (!ss.staticEquals(options.onSuccess, null)) {
+							options.onSuccess(response1);
 						}
 					}
-					finally {
-						if (options.blockUI) {
-							$Q.blockUndo();
-						}
-						if (!ss.staticEquals(options.onCleanup, null)) {
-							options.onCleanup();
-						}
+					else {
 					}
 				}
-				//catch (Exception e)
-				//{
-				//    StackTrace.Log(e);
-				//}
+				finally {
+					if (options.blockUI) {
+						$Q.blockUndo();
+					}
+					if (!ss.staticEquals(options.onCleanup, null)) {
+						options.onCleanup();
+					}
+				}
 			},
 			error: function(xhr, status, ev) {
-				//try
-				{
-					try {
-						if (xhr.status === 403) {
-							var l = null;
-							try {
-								l = xhr.getResponseHeader('Location');
-							}
-							catch ($t1) {
-								l = null;
-							}
-							if (ss.isValue(l)) {
-								window.top.location.href = l;
-								return;
-							}
+				try {
+					if (xhr.status === 403) {
+						var l = null;
+						try {
+							l = xhr.getResponseHeader('Location');
 						}
-						var html = xhr.responseText;
-						Q$Externals.iframeDialog({ html: html });
+						catch ($t1) {
+							l = null;
+						}
+						if (ss.isValue(l)) {
+							window.top.location.href = l;
+							return;
+						}
 					}
-					finally {
-						if (options.blockUI) {
-							$Q.blockUndo();
+					if (ss.coalesce(xhr.getResponseHeader('content-type'), '').toLowerCase().indexOf('application/json') >= 0) {
+						var json = $.parseJSON(xhr.responseText);
+						if (ss.isValue(json) && ss.isValue(json.Error)) {
+							handleError(json);
+							return;
 						}
-						if (!ss.staticEquals(options.onCleanup, null)) {
-							options.onCleanup();
-						}
+					}
+					var html = xhr.responseText;
+					Q$Externals.iframeDialog({ html: html });
+				}
+				finally {
+					if (options.blockUI) {
+						$Q.blockUndo();
+					}
+					if (!ss.staticEquals(options.onCleanup, null)) {
+						options.onCleanup();
 					}
 				}
-				//catch (Exception e)
-				//{
-				//    StackTrace.Log(e);
-				//}
 			}
 		}, options);
 		if (options.blockUI) {

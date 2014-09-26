@@ -2040,6 +2040,7 @@ div.s-Toolbar .delete-all .button-inner {
 .s-Toolbar .select2-container {
   margin-top: 2px;
   min-width: 150px;
+  margin-right: 6px;
 }
 .s-Toolbar .select2-choice {
   height: 21px;

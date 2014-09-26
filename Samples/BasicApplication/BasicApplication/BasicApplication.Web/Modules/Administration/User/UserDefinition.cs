@@ -6,6 +6,7 @@
     [Serializable]
     public class UserDefinition : IUserDefinition
     {
+        public string Id { get { return UserId.ToInvariant(); } }
         public string DisplayName { get; set; }
         public string Email { get; set; }
         public short IsActive { get; set; }
