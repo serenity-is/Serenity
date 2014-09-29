@@ -17,30 +17,56 @@ namespace Serenity.Web
     {
         public static void Run()
         {
+            InitializeServiceLocator();
+            InitializeSelfAssemblies();
+            InitializeCaching();
+            InitializeConfigurationSystem();
+            InitializeLocalTexts();
+            InitializeDynamicScripts();
+        }
+
+        public static void InitializeServiceLocator()
+        {
             if (!Dependency.HasResolver)
             {
                 var container = new MunqContainer();
                 Dependency.SetResolver(container);
             }
+        }
 
+        public static void InitializeSelfAssemblies()
+        {
             var selfAssemblies = BuildManager.GetReferencedAssemblies()
                 .Cast<Assembly>()
-                .Where(x => 
+                .Where(x =>
                     x.FullName.Contains("Serenity") ||
                     x.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity")));
 
             ExtensibilityHelper.SelfAssemblies = AssemblySorter.Sort(selfAssemblies).ToArray();
+        }
 
+        public static void InitializeCaching()
+        {
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
-
-            if (Dependency.TryResolve<IConfigurationRepository>() == null)
-                registrar.RegisterInstance<IConfigurationRepository>("Application", new ApplicationConfigurationRepository());
 
             if (Dependency.TryResolve<ILocalCache>() == null)
                 registrar.RegisterInstance<ILocalCache>(new HttpRuntimeCache());
 
             if (Dependency.TryResolve<IDistributedCache>() == null)
                 registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());
+        }
+
+        public static void InitializeConfigurationSystem()
+        {
+            var registrar = Dependency.Resolve<IDependencyRegistrar>();
+
+            if (Dependency.TryResolve<IConfigurationRepository>() == null)
+                registrar.RegisterInstance<IConfigurationRepository>("Application", new ApplicationConfigurationRepository());
+        }
+
+        public static void InitializeLocalTexts()
+        {
+            var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
             if (Dependency.TryResolve<ILocalTextRegistry>() == null)
                 registrar.RegisterInstance<ILocalTextRegistry>(new LocalTextRegistry());
@@ -50,7 +76,10 @@ namespace Serenity.Web
             EntityLocalTexts.Initialize();
             NestedLocalTextRegistration.AddFromScripts(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));
             NestedLocalTextRegistration.AddFromScripts(HostingEnvironment.MapPath("~/Scripts/site/texts/"));
+        }
 
+        public static void InitializeDynamicScripts()
+        {
             LookupScriptRegistration.RegisterLookupScripts();
             RunStartupRegistrars<ScriptRegistrarAttribute>();
             FormScriptRegistration.RegisterFormScripts();
