@@ -11,10 +11,6 @@ namespace Serenity.Data
         private static Dictionary<string, Tuple<string, DbProviderFactory>> connections = new Dictionary<string, Tuple<string, DbProviderFactory>>();
         private static Dictionary<string, DbProviderFactory> factories = new Dictionary<string, DbProviderFactory>();
         
-        /// <summary>
-        ///   Uygulamanın varsayılan bağlantı string'ine erişimde kullanılan isim.</summary>
-        public const string DefaultConnectionKey = "Default";
-
         public static DbProviderFactory GetFactory(string providerName)
         {
             DbProviderFactory factory;
@@ -58,21 +54,13 @@ namespace Serenity.Data
             var factory = GetFactory(providerName);
             var connection = factory.CreateConnection();
             connection.ConnectionString = connectionString;
+
+            var profiler = Dependency.TryResolve<IConnectionProfiler>();
+            if (profiler != null)
+                return new WrappedConnection(profiler.Profile(connection));
+
             return new WrappedConnection(connection);
         }
-
-        /// <summary>
-        ///   Varsayılan bağlantı string'ine göre yeni bir <see cref="DbConnection"/> nesnesi oluşturur.</summary>
-        /// <returns>
-        ///   Oluşturulan <see cref="DbConnection"/> nesnesi</returns>
-        public static IDbConnection New()
-        {
-            var connectionSetting = GetConnectionString(DefaultConnectionKey);
-            var connection = connectionSetting.Item2.CreateConnection();
-            connection.ConnectionString = connectionSetting.Item1;
-            return connection;
-        }
-
 
         /// <summary>
         ///   Varsayılan bağlantı string'ine göre yeni bir <see cref="DbConnection"/> nesnesi oluşturur.</summary>
@@ -83,6 +71,11 @@ namespace Serenity.Data
             var connectionSetting = GetConnectionString(connectionKey);
             var connection = connectionSetting.Item2.CreateConnection();
             connection.ConnectionString = connectionSetting.Item1;
+
+            var profiler = Dependency.TryResolve<IConnectionProfiler>();
+            if (profiler != null)
+                return new WrappedConnection(profiler.Profile(connection));
+
             return new WrappedConnection(connection);
         }
 

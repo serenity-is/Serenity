@@ -69,16 +69,5 @@ namespace Serenity.Data
             add { _rollback += value; }
             remove { _rollback -= value; }
         }
-
-        public static T Wrap<T>(Func<IUnitOfWork, T> handler)
-        {
-            using (var connection = SqlConnections.New())
-            using (var unitOfWork = new UnitOfWork(connection))
-            {
-                var response = handler(unitOfWork);
-                unitOfWork.Commit();
-                return response;
-            }
-        }
     }
 }

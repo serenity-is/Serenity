@@ -17,7 +17,7 @@ namespace Serenity.Services
 
             var response = new AuditLogListResponse();
 
-            using (var connection = SqlConnections.New())
+            using (var connection = SqlConnections.NewByKey("Default"))
             {
                 response.Entities = new List<Row>();
 
