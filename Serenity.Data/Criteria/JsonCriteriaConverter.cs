@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections;
+using Newtonsoft.Json.Linq;
 
 namespace Serenity.Data
 {
@@ -58,13 +59,17 @@ namespace Serenity.Data
 
             if (criteria is ParamCriteria)
             {
+                writer.WriteStartArray();
                 serializer.Serialize(writer, ((ParamCriteria)criteria).Name);
+                writer.WriteEndArray();
                 return;
             }
 
             if (criteria is Criteria)
             {
+                writer.WriteStartArray();
                 serializer.Serialize(writer, ((Criteria)criteria).Expression);
+                writer.WriteEndArray();
                 return;
             }
 
@@ -105,61 +110,91 @@ namespace Serenity.Data
         ///   The object value.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
-
-            /*
             if (reader.TokenType == JsonToken.Null)
                 return null;
 
-            var row = (Row)(Activator.CreateInstance(objectType));
-            if (row == null)
-                throw new JsonSerializationException(String.Format("No row of type {0} could be created.", objectType.Name));
+            var value = serializer.Deserialize<JArray>(reader);
+            return Parse(value);
+        }
 
-            row.TrackAssignments = true;
-
-            if (!reader.Read())
-                throw new JsonSerializationException("Unexpected end when deserializing object.");
-
-            int initialDepth = reader.Depth;
-            do
+        private BaseCriteria ParseValue(JToken value)
+        {
+            if (value is JValue)
             {
-                switch (reader.TokenType)
+                return new ValueCriteria(((JValue)value).Value);
+            }
+
+            if (value is JArray)
+            {
+                return Parse((JArray)value);
+            }
+
+            throw new JsonSerializationException(String.Format("Can't deserialize {0} as Criteria value", value.ToString()));
+        }
+
+        private BaseCriteria Parse(JArray array)
+        {
+            if (array == null)
+                return Criteria.Empty;
+
+            if (array.Count == 0)
+                throw new JsonSerializationException("Can't deserialize empty array as Criteria");
+
+            if (array.Count == 1 && array[0] is JArray)
+            {
+                var list = new List<object>();
+                foreach (var item in (JArray)array[0])
                 {
-                    case JsonToken.PropertyName:
-                        string fieldName = (string)reader.Value;
-                        
-                        if (!reader.Read())
-                            throw new JsonSerializationException("Unexpected end when deserializing object.");
+                    if (item == null)
+                        throw new ArgumentNullException("item");
 
-                        var field = row.FindField(fieldName);
-                        if (field == null)
-                            field = row.FindFieldByPropertyName(fieldName);
-                        
-                        if (field == null &&
-                            serializer.MissingMemberHandling == MissingMemberHandling.Error)
-                            throw new JsonSerializationException(String.Format("Could not find field '{0}' on row of type '{1}'", fieldName, objectType.Name));
+                    if (!(item is JValue))
+                        throw new JsonSerializationException(String.Format("Can't deserialize {0} as Criteria value", item.ToString()));
 
-                        while (reader.TokenType == JsonToken.Comment)
-                            reader.Read();
+                    list.Add(((JValue)item).Value);
+                }
 
-                        if (field == null)
-                            reader.Skip();
-                        else
-                            field.ValueFromJson(reader, row, serializer);
-                        
+                return new ValueCriteria(list.ToArray());
+            }
 
-                        break;
+            if (array[0] is JValue && 
+                ((JValue)array[0]).Value is string)
+            {
+                if (array.Count == 1)
+                {
+                    var value = (string)((JValue)array[0]).Value;
+                    if (value == null)
+                        throw new JsonSerializationException(String.Format("Null Criteria expression: {0}", array.ToString()));
 
-                    case JsonToken.EndObject:
-                        return row;
+                    if (value.StartsWith("@"))
+                        return new ParamCriteria(value);
 
-                    default:
-                        throw new JsonSerializationException("Unexpected token when deserializing row: " + reader.TokenType);
+                    return new Criteria(value);
+                }
+
+                var opStr = (string)((JValue)array[0]).Value;
+
+                CriteriaOperator op;
+                if (!KeyToOperator.TryGetValue(opStr, out op))
+                    throw new JsonSerializationException(String.Format("Unknown Criteria operator: {0}", opStr));
+
+                if (op >= CriteriaOperator.Paren && op <= CriteriaOperator.Exists)
+                {
+                    if (array.Count != 2)
+                        throw new JsonSerializationException(String.Format("Invalid Criteria format: {0}", array.ToString()));
+
+                    return new UnaryCriteria(op, ParseValue(array[1]));
+                }
+                else
+                {
+                    if (array.Count != 3)
+                        throw new JsonSerializationException(String.Format("Invalid Criteria format: {0}", array.ToString()));
+
+                    return new BinaryCriteria(ParseValue(array[1]), op, ParseValue(array[2]));
                 }
             }
-            while (reader.Read());
-
-            throw new JsonSerializationException("Unexpected end when deserializing object.");*/
+            else
+                throw new JsonSerializationException(String.Format("Can't deserialize {0} as Criteria item", array[0].ToString()));
         }
         
         /// <summary>

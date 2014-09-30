@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authorization\AuthorizationTests.cs" />
+    <Compile Include="Data\JsonCriteriaConverterDeserializationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />
     <Compile Include="Data\FakeDisplayOrderRow.cs" />
     <Compile Include="Data\RowMappingTests.BasicRow.cs" />
