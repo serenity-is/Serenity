@@ -53,6 +53,15 @@ namespace Serenity.Data
                     break;
             }
         }
-    }
 
+        public CriteriaOperator Operator
+        {
+            get { return op; }
+        }
+
+        public BaseCriteria Operand
+        {
+            get { return operand; }
+        }
+    }
 }

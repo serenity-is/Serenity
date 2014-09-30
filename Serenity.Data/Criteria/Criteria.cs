@@ -178,5 +178,10 @@ namespace Serenity.Data
         {
             sb.Append(this.expression);
         }
+
+        public string Expression
+        {
+            get { return expression; }
+        }
     }
 }

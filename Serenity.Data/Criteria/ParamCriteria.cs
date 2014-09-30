@@ -5,7 +5,7 @@ namespace Serenity.Data
 
     public class ParamCriteria : BaseCriteria
     {
-        private object name;
+        private string name;
 
         public ParamCriteria(string name)
         {
@@ -21,6 +21,11 @@ namespace Serenity.Data
         public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
             sb.Append(this.name);
+        }
+
+        public string Name
+        {
+            get { return name; }
         }
     }
 }

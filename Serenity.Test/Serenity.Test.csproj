@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authorization\AuthorizationTests.cs" />
+    <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />
     <Compile Include="Data\FakeDisplayOrderRow.cs" />
     <Compile Include="Data\RowMappingTests.BasicRow.cs" />
     <Compile Include="Data\RowMappingTests.InvalidColumnRow.cs" />

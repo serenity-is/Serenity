@@ -1,11 +1,13 @@
 namespace Serenity.Data
 {
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Text;
 
     [DebuggerDisplay("{ToStringIgnoreParams()}")]
+    [JsonConverter(typeof(JsonCriteriaConverter))]
     public abstract class BaseCriteria : ICriteria
     {
         private static NoParamsChecker noParamsChecker = new NoParamsChecker();

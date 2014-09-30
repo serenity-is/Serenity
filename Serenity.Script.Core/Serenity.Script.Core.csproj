@@ -119,7 +119,7 @@
     <None Include="Resources\linq.js" />
     <None Include="Resources\mscorlib.js" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.Custom.targets" />
+  <Import Project="$(SolutionDir)tools\Saltarelle\Saltarelle.Compiler.targets" />
   <Target Name="MinimizeScripts" AfterTargets="BuildScript">
     <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.js" DestinationFolder="$(OutDir)">
     </Copy>

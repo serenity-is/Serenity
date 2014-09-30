@@ -17,7 +17,7 @@ namespace Serenity.Data
             if (ReferenceEquals(right, null))
                 throw new ArgumentNullException("right");
 
-            if (op < CriteriaOperator.AND || op > CriteriaOperator.Like)
+            if (op < CriteriaOperator.AND || op > CriteriaOperator.NotLike)
                 throw new ArgumentOutOfRangeException("op");
 
             this.left = left;
@@ -70,5 +70,20 @@ namespace Serenity.Data
             " IN ",
             " NOT IN "
         };
+
+        public CriteriaOperator Operator
+        {
+            get { return op; }
+        }
+
+        public BaseCriteria LeftOperand
+        {
+            get { return left; }
+        }
+
+        public BaseCriteria RightOperand
+        {
+            get { return right; }
+        }
     }
 }
