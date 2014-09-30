@@ -1,4 +1,5 @@
 ﻿using jQueryApi;
+using jQueryApi.UI;
 using jQueryApi.UI.Widgets;
 using System;
 using System.Collections;
@@ -63,7 +64,7 @@ namespace Serenity
 
         public static object CascadedDialogOffset(jQueryObject element)
         {
-            return new { my = "left top", at = "left+20 top+20", of = element[0] };
+            return new PositionOptions { My = "left top", At = "left+20 top+20", Of = element[0] };
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using jQueryApi;
+using jQueryApi.UI;
 using jQueryApi.UI.Widgets;
 using System;
 using System.Collections.Generic;
@@ -250,7 +251,12 @@ namespace Serenity
             opt.AutoOpen = false;
             opt.Resizable = false;
             opt.Modal = true;
-            opt.Position = new string[] { "center", "center" };
+            opt.Position = new PositionOptions
+            {
+                My = "center",
+                At = "center",
+                Of = J(Window.Instance)
+            };
 
             return opt;
         }
