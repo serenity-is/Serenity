@@ -159,10 +159,10 @@ namespace Serenity.Data
                     return new ValueCriteria(list.ToArray());
                 }
 
-                if (!array[0] is JValue ||
+                if (!(array[0] is JValue) ||
                     !(((JValue)array[0]).Value is string))
                 {
-                    throw new JsonSerializationException(String.Format("Couldn't deserialize string criteria: {0}", opStr));
+                    throw new JsonSerializationException(String.Format("Couldn't deserialize string criteria: {0}", array.ToString()));
                 }
 
                 var value = (string)((JValue)array[0]).Value;
@@ -177,10 +177,10 @@ namespace Serenity.Data
 
             if (array.Count == 2)
             {
-                if (!array[0] is JValue ||
+                if (!(array[0] is JValue) ||
                     !(((JValue)array[0]).Value is string))
                 {
-                    throw new JsonSerializationException(String.Format("Couldn't deserialize unary criteria: {0}", opStr));
+                    throw new JsonSerializationException(String.Format("Couldn't deserialize unary criteria: {0}", array.ToString()));
                 }
 
                 var opStr = (string)((JValue)array[0]).Value;
@@ -199,10 +199,10 @@ namespace Serenity.Data
 
             if (array.Count == 3)
             {
-                if (!array[1] is JValue ||
+                if (!(array[1] is JValue) ||
                     !(((JValue)array[1]).Value is string))
                 {
-                    throw new JsonSerializationException(String.Format("Couldn't deserialize unary criteria: {0}", opStr));
+                    throw new JsonSerializationException(String.Format("Couldn't deserialize unary criteria: {0}", array.ToString()));
                 }
 
                 var opStr = (string)((JValue)array[1]).Value;
