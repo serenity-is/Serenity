@@ -400,8 +400,16 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="slick-default-theme.css">slick-default-theme.css</ProjectItem>
         <Folder Name="themes" TargetFolderName="themes">
           <Folder Name="base" TargetFolderName="base">
+            <ProjectItem ReplaceParameters="true" TargetFileName="accordion.css">accordion.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="all.css">all.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="autocomplete.css">autocomplete.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="base.css">base.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="button.css">button.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="core.css">core.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="datepicker.css">datepicker.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="dialog.css">dialog.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="draggable.css">draggable.css</ProjectItem>
             <Folder Name="images" TargetFolderName="images">
-              <ProjectItem ReplaceParameters="false" TargetFileName="animated-overlay.gif">animated-overlay.gif</ProjectItem>
               <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_flat_0_aaaaaa_40x100.png">ui-bg_flat_0_aaaaaa_40x100.png</ProjectItem>
               <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_flat_75_ffffff_40x100.png">ui-bg_flat_75_ffffff_40x100.png</ProjectItem>
               <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_glass_55_fbf9ee_1x400.png">ui-bg_glass_55_fbf9ee_1x400.png</ProjectItem>
@@ -416,58 +424,17 @@
               <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_888888_256x240.png">ui-icons_888888_256x240.png</ProjectItem>
               <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_cd0a0a_256x240.png">ui-icons_cd0a0a_256x240.png</ProjectItem>
             </Folder>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.accordion.css">jquery.ui.accordion.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.all.css">jquery.ui.all.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.autocomplete.css">jquery.ui.autocomplete.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.base.css">jquery.ui.base.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.button.css">jquery.ui.button.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.core.css">jquery.ui.core.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.datepicker.css">jquery.ui.datepicker.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.dialog.css">jquery.ui.dialog.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.menu.css">jquery.ui.menu.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.progressbar.css">jquery.ui.progressbar.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.resizable.css">jquery.ui.resizable.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.selectable.css">jquery.ui.selectable.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.slider.css">jquery.ui.slider.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.spinner.css">jquery.ui.spinner.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.tabs.css">jquery.ui.tabs.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.theme.css">jquery.ui.theme.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.tooltip.css">jquery.ui.tooltip.css</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui.css">jquery-ui.css</ProjectItem>
-            <Folder Name="minified" TargetFolderName="minified">
-              <Folder Name="images" TargetFolderName="images">
-                <ProjectItem ReplaceParameters="false" TargetFileName="animated-overlay.gif">animated-overlay.gif</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_flat_0_aaaaaa_40x100.png">ui-bg_flat_0_aaaaaa_40x100.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_flat_75_ffffff_40x100.png">ui-bg_flat_75_ffffff_40x100.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_glass_55_fbf9ee_1x400.png">ui-bg_glass_55_fbf9ee_1x400.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_glass_65_ffffff_1x400.png">ui-bg_glass_65_ffffff_1x400.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_glass_75_dadada_1x400.png">ui-bg_glass_75_dadada_1x400.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_glass_75_e6e6e6_1x400.png">ui-bg_glass_75_e6e6e6_1x400.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_glass_95_fef1ec_1x400.png">ui-bg_glass_95_fef1ec_1x400.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-bg_highlight-soft_75_cccccc_1x100.png">ui-bg_highlight-soft_75_cccccc_1x100.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_222222_256x240.png">ui-icons_222222_256x240.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_2e83ff_256x240.png">ui-icons_2e83ff_256x240.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_454545_256x240.png">ui-icons_454545_256x240.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_888888_256x240.png">ui-icons_888888_256x240.png</ProjectItem>
-                <ProjectItem ReplaceParameters="false" TargetFileName="ui-icons_cd0a0a_256x240.png">ui-icons_cd0a0a_256x240.png</ProjectItem>
-              </Folder>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.accordion.min.css">jquery.ui.accordion.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.autocomplete.min.css">jquery.ui.autocomplete.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.button.min.css">jquery.ui.button.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.core.min.css">jquery.ui.core.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.datepicker.min.css">jquery.ui.datepicker.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.dialog.min.css">jquery.ui.dialog.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.menu.min.css">jquery.ui.menu.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.progressbar.min.css">jquery.ui.progressbar.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.resizable.min.css">jquery.ui.resizable.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.selectable.min.css">jquery.ui.selectable.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.slider.min.css">jquery.ui.slider.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.spinner.min.css">jquery.ui.spinner.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.tabs.min.css">jquery.ui.tabs.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.theme.min.css">jquery.ui.theme.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery.ui.tooltip.min.css">jquery.ui.tooltip.min.css</ProjectItem>
-              <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui.min.css">jquery-ui.min.css</ProjectItem>
-            </Folder>
+            <ProjectItem ReplaceParameters="true" TargetFileName="menu.css">menu.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="progressbar.css">progressbar.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="resizable.css">resizable.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="selectable.css">selectable.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="selectmenu.css">selectmenu.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="slider.css">slider.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="sortable.css">sortable.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="spinner.css">spinner.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="tabs.css">tabs.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="theme.css">theme.css</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="tooltip.css">tooltip.css</ProjectItem>
           </Folder>
         </Folder>
         <ProjectItem ReplaceParameters="true" TargetFileName="toastr.css">toastr.css</ProjectItem>
@@ -700,8 +667,8 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.js">jquery-2.1.1.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.min.js">jquery-2.1.1.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jquery-2.1.1.min.map">jquery-2.1.1.min.map</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.10.4.js">jquery-ui-1.10.4.js</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.10.4.min.js">jquery-ui-1.10.4.min.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui.min-1.11.1.js">jquery-ui.min-1.11.1.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="jquery-ui-1.11.1.js">jquery-ui-1.11.1.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jsrender.js">jsrender.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="jsrender.min.js">jsrender.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="pace.js">pace.js</ProjectItem>
@@ -906,24 +873,24 @@
   </WizardExtension>
   <WizardData>
     <packages repository="extension" repositoryId="SerenityBasicApplicationSampleV1">
-      <package id="bootstrap" version="3.1.1" />
-      <package id="FontAwesome" version="4.1.0" />
+      <package id="bootstrap" version="3.2.0" />
+      <package id="FontAwesome" version="4.2.0" />
       <package id="jQuery" version="2.1.1" />
       <package id="jquery.event.drag" version="2.2.0" />
-      <package id="jQuery.UI.Combined" version="1.10.4" />
-      <package id="jQuery.Validation" version="1.12.0" />
-      <package id="Microsoft.AspNet.Mvc" version="5.1.2" />
-      <package id="Microsoft.AspNet.Razor" version="3.1.2" />
-      <package id="Microsoft.AspNet.WebPages" version="3.1.2" />
+      <package id="jQuery.UI.Combined" version="1.11.1" />
+      <package id="jQuery.Validation" version="1.13.0" />
+      <package id="Microsoft.AspNet.Mvc" version="5.2.2" />
+      <package id="Microsoft.AspNet.Razor" version="3.2.2" />
+      <package id="Microsoft.AspNet.WebPages" version="3.2.2" />
       <package id="Microsoft.Web.Infrastructure" version="1.0.0.0" />
-      <package id="Newtonsoft.Json" version="6.0.4" />
+      <package id="Newtonsoft.Json" version="6.0.5" />
       <package id="Select2.js" version="3.5.1" />
-      <package id="Serenity.CodeGenerator" version="1.2.0" />
-      <package id="Serenity.Core" version="1.2.0" />
-      <package id="Serenity.Data" version="1.2.0" />
-      <package id="Serenity.Data.Entity" version="1.2.0" />
-      <package id="Serenity.Services" version="1.2.0" />
-      <package id="Serenity.Web" version="1.2.0" />
+      <package id="Serenity.CodeGenerator" version="1.2.1" />
+      <package id="Serenity.Core" version="1.2.1" />
+      <package id="Serenity.Data" version="1.2.1" />
+      <package id="Serenity.Data.Entity" version="1.2.1" />
+      <package id="Serenity.Services" version="1.2.1" />
+      <package id="Serenity.Web" version="1.2.1" />
       <package id="SlickGrid" version="2.2.20140120" />
       <package id="toastr" version="2.0.3" />
     </packages>

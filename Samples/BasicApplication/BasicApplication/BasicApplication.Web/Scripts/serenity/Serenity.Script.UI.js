@@ -4401,7 +4401,7 @@
 				opt.autoOpen = false;
 				opt.resizable = false;
 				opt.modal = true;
-				opt.position = ['center', 'center'];
+				opt.position = { my: 'center', at: 'center', of: $(window.window) };
 				return opt;
 			},
 			dialogClose: function() {
