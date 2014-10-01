@@ -546,7 +546,5 @@ namespace Serenity.Data
         {
             get { return joins; }
         }
-
-        public IFilterFields FilterFields { get; set; }
     }
 }

@@ -18,6 +18,8 @@ namespace Serenity.Services
         public SortBy[] Sort { get; set; }
         public string ContainsText { get; set; }
         public string ContainsField { get; set; }
+        [JsonConverter(typeof(JsonSafeCriteriaConverter))]
+        public BaseCriteria Criteria { get; set; }
         public bool IncludeDeleted { get; set; }
         public bool ExcludeTotalCount { get; set; }
         public Dictionary<string, object> EqualityFilter { get; set; }

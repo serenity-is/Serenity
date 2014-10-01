@@ -25,6 +25,17 @@ namespace Serenity
         }
 
         /// <summary>
+        /// Converts object to its JSON representation (serializes it)
+        /// </summary>
+        /// <param name="o">Object to convert to JSON</param>
+        /// <returns>JSON serialized string</returns>
+        [InlineCode("$.toJSON({o})")]
+        public static string ToJson(this object o)
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Returns true for any other value than false, 0 (number) or null / undefined. 
         /// String '0' also considered true, unlike numeric 0.
         /// </summary>

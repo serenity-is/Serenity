@@ -105,39 +105,5 @@ namespace Serenity.Services
             }
             return null;
         }
-
-        public static SqlQuery ApplyFilters(this SqlQuery query,
-            BasicFilterBase filter,
-            IList<FilterLine> filterLines,
-            Row row,
-            Func<BasicFilter, BaseCriteria> processCriteria,
-            IFilterFields filterFields)
-        {
-            if (Object.ReferenceEquals(filter, null) &&
-                (filterLines == null ||
-                 filterLines.Count == 0))
-                return query;
-
-            var converter = new BasicFilterStringConverter(query, row, processCriteria, filterFields);
-
-            BaseCriteria where;
-
-            if (!Object.ReferenceEquals(filter, null))
-            {
-                where = converter.Convert(filter);
-                if (!where.IsEmpty)
-                    query.Where(where);
-            }
-
-            if (filterLines != null &&
-                filterLines.Count > 0)
-            {
-                var linesFilter = filterLines.ToBasicFilter();
-                where = converter.Convert(linesFilter);
-                if (!where.IsEmpty)
-                    query.Where(where);
-            }
-            return query;
-        }
     }
 }

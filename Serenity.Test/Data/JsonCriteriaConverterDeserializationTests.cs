@@ -1,5 +1,7 @@
 ﻿using Serenity.Data;
+using System.Collections;
 using Xunit;
+using Xunit.Extensions;
 
 namespace Serenity.Test.Data
 {
@@ -37,7 +39,7 @@ namespace Serenity.Test.Data
         [Fact]
         public void JsonCriteriaConverter_DeserializesIsNullCriteriaProperly()
         {
-            var actual = JSON.Parse<BaseCriteria>("[\"(null)\",[\"x\"]]");
+            var actual = JSON.Parse<BaseCriteria>("[\"is null\",[\"x\"]]");
             Assert.NotNull(actual);
             var criteria = Assert.IsType<UnaryCriteria>(actual);
             Assert.Equal(CriteriaOperator.IsNull, criteria.Operator);
@@ -48,7 +50,7 @@ namespace Serenity.Test.Data
         [Fact]
         public void JsonCriteriaConverter_DeserializesIsNotNullCriteriaProperly()
         {
-            var actual = JSON.Parse<BaseCriteria>("[\"(!null)\",[\"b\"]]");
+            var actual = JSON.Parse<BaseCriteria>("[\"is not null\",[\"b\"]]");
             Assert.NotNull(actual);
             var criteria = Assert.IsType<UnaryCriteria>(actual);
             Assert.Equal(CriteriaOperator.IsNotNull, criteria.Operator);
@@ -59,7 +61,7 @@ namespace Serenity.Test.Data
         [Fact]
         public void JsonCriteriaConverter_DeserializesExistsCriteriaProperly()
         {
-            var actual = JSON.Parse<BaseCriteria>("[\"(exists)\",[\"some expression\"]]");
+            var actual = JSON.Parse<BaseCriteria>("[\"exists\",[\"some expression\"]]");
             Assert.NotNull(actual);
             var criteria = Assert.IsType<UnaryCriteria>(actual);
             Assert.Equal(CriteriaOperator.Exists, criteria.Operator);
@@ -68,128 +70,186 @@ namespace Serenity.Test.Data
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesAndCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesAndCriteriaProperly()
         {
-            var actual = (new Criteria("a") & new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"&\",[\"b\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\"and\",[\"b\"]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.AND, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<Criteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.Equal("b", right.Expression);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesMultipleAndCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesMultipleAndCriteriaProperly()
         {
-            var actual = (new Criteria("a") & new Criteria("b") & new Criteria("c")).ToJson();
-            Assert.Equal("[[[\"a\"],\"&\",[\"b\"]],\"&\",[\"c\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[[\"a\"],\"and\",[\"b\"]],\"and\",[\"c\"]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.AND, criteria.Operator);
+            var left = Assert.IsType<BinaryCriteria>(criteria.LeftOperand);
+            Assert.Equal(CriteriaOperator.AND, left.Operator);
+            var leftLeft = Assert.IsType<Criteria>(left.LeftOperand);
+            Assert.Equal("a", leftLeft.Expression);
+            var leftRight = Assert.IsType<Criteria>(left.RightOperand);
+            Assert.Equal("b", leftRight.Expression);
+            var right = Assert.IsType<Criteria>(criteria.RightOperand);
+            Assert.Equal("c", right.Expression);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesOrCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesOrCriteriaProperly()
         {
-            var actual = (new Criteria("c") | new Criteria("d")).ToJson();
-            Assert.Equal("[[\"c\"],\"|\",[\"d\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\"or\",[\"b\"]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.OR, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<Criteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.Equal("b", right.Expression);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesMultipleOrCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesMultipleOrCriteriaProperly()
         {
-            var actual = (new Criteria("a") | new Criteria("b") | new Criteria("c")).ToJson();
-            Assert.Equal("[[[\"a\"],\"|\",[\"b\"]],\"|\",[\"c\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[[\"a\"],\"or\",[\"b\"]],\"or\",[\"c\"]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.OR, criteria.Operator);
+            var left = Assert.IsType<BinaryCriteria>(criteria.LeftOperand);
+            Assert.Equal(CriteriaOperator.OR, left.Operator);
+            var leftLeft = Assert.IsType<Criteria>(left.LeftOperand);
+            Assert.Equal("a", leftLeft.Expression);
+            var leftRight = Assert.IsType<Criteria>(left.RightOperand);
+            Assert.Equal("b", leftRight.Expression);
+            var right = Assert.IsType<Criteria>(criteria.RightOperand);
+            Assert.Equal("c", right.Expression);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesXorCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesXorCriteriaProperly()
         {
-            var actual = (new Criteria("c") | new Criteria("d")).ToJson();
-            Assert.Equal("[[\"c\"],\"|\",[\"d\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\"xor\",[\"b\"]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.XOR, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<Criteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.Equal("b", right.Expression);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesMultipleXorCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesMultipleXorCriteriaProperly()
         {
-            var actual = (new Criteria("a") ^ new Criteria("b") ^ new Criteria("c")).ToJson();
-            Assert.Equal("[[[\"a\"],\"^\",[\"b\"]],\"^\",[\"c\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[[\"a\"],\"xor\",[\"b\"]],\"xor\",[\"c\"]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.XOR, criteria.Operator);
+            var left = Assert.IsType<BinaryCriteria>(criteria.LeftOperand);
+            Assert.Equal(CriteriaOperator.XOR, left.Operator);
+            var leftLeft = Assert.IsType<Criteria>(left.LeftOperand);
+            Assert.Equal("a", leftLeft.Expression);
+            var leftRight = Assert.IsType<Criteria>(left.RightOperand);
+            Assert.Equal("b", leftRight.Expression);
+            var right = Assert.IsType<Criteria>(criteria.RightOperand);
+            Assert.Equal("c", right.Expression);
+        }
+
+        [Theory]
+        [InlineData("=", CriteriaOperator.EQ)]
+        [InlineData("!=", CriteriaOperator.NE)]
+        [InlineData(">", CriteriaOperator.GT)]
+        [InlineData(">=", CriteriaOperator.GE)]
+        [InlineData("<", CriteriaOperator.LT)]
+        [InlineData("<=", CriteriaOperator.LE)]
+        public void JsonCriteriaConverter_DeserializesComparisonCriteriasProperly(string opStr,
+            CriteriaOperator op)
+        {
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\"" + opStr + "\",[\"b\"]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(op, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<Criteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.Equal("b", right.Expression);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesEQCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesINCriteriaProperly()
         {
-            var actual = (new Criteria("a") == new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"=\",[\"b\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\"in\",[[\"b\",\"c\",\"d\"]]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.In, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<ValueCriteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.IsType<object[]>(right.Value);
+            Assert.Equal(new object[] { "b", "c", "d" }, (IEnumerable)right.Value);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesNECriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesNotINCriteriaProperly()
         {
-            var actual = (new Criteria("a") != new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"!=\",[\"b\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\"not in\",[[\"b\"]]]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.NotIn, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<ValueCriteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.IsType<object[]>(right.Value);
+            Assert.Equal(new object[] { "b" }, (IEnumerable)right.Value);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesGTCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesLikeCriteriaProperly()
         {
-            var actual = (new Criteria("a") > new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\">\",[\"b\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\"like\",\"b%\"]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.Like, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<ValueCriteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.Equal("b%", right.Value);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesGECriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesNotLikeCriteriaProperly()
         {
-            var actual = (new Criteria("a") >= new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\">=\",[\"b\"]]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\"not like\",\"%b\"]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.NotLike, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<ValueCriteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.Equal("%b", right.Value);
         }
 
         [Fact]
-        public void JsonCriteriaConverter_SerializesLTCriteriaProperly()
+        public void JsonCriteriaConverter_DeserializesValueCriteriaProperly()
         {
-            var actual = (new Criteria("a") < new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"<\",[\"b\"]]", actual);
-        }
-
-        [Fact]
-        public void JsonCriteriaConverter_SerializesLECriteriaProperly()
-        {
-            var actual = (new Criteria("a") <= new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"<=\",[\"b\"]]", actual);
-        }
-
-        [Fact]
-        public void JsonCriteriaConverter_SerializesINCriteriaProperly()
-        {
-            var actual = (new Criteria("a").In("b", "c", "d")).ToJson();
-            Assert.Equal("[[\"a\"],\"(in)\",[[\"b\",\"c\",\"d\"]]]", actual);
-        }
-
-        [Fact]
-        public void JsonCriteriaConverter_SerializesNotINCriteriaProperly()
-        {
-            var actual = (new Criteria("a").NotIn("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"(!in)\",[[\"b\"]]]", actual);
-        }
-
-        [Fact]
-        public void JsonCriteriaConverter_SerializesLikeCriteriaProperly()
-        {
-            var actual = (new Criteria("a").StartsWith("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"~\",\"b%\"]", actual);
-        }
-
-        [Fact]
-        public void JsonCriteriaConverter_SerializesNotLikeCriteriaProperly()
-        {
-            var actual = (new Criteria("a").NotLike("%b")).ToJson();
-            Assert.Equal("[[\"a\"],\"!~\",\"%b\"]", actual);
-        }
-
-        [Fact]
-        public void JsonCriteriaConverter_SerializesValueCriteriaProperly()
-        {
-            var actual = (new Criteria("a") >= 5).ToJson();
-            Assert.Equal("[[\"a\"],\">=\",5]", actual);
+            var actual = JSON.Parse<BaseCriteria>("[[\"a\"],\">=\",5]");
+            Assert.NotNull(actual);
+            var criteria = Assert.IsType<BinaryCriteria>(actual);
+            Assert.Equal(CriteriaOperator.GE, criteria.Operator);
+            var left = Assert.IsType<Criteria>(criteria.LeftOperand);
+            var right = Assert.IsType<ValueCriteria>(criteria.RightOperand);
+            Assert.Equal("a", left.Expression);
+            Assert.Equal((long)5, right.Value);
         }
 
         [Fact]
         public void JsonCriteriaConverter_DeserializesComplexCriteriaProperly()
         {
-            var actual = JSON.Parse<BaseCriteria>("[[\"()\",[[[\"a\"],\">=\",5],\"&\",[\"(!null)\",[\"c\"]]]],\"|\",[[[\"x\"],\"(in)\",[[4,5,6]]],\"!=\",7]]");
+            var actual = JSON.Parse<BaseCriteria>("[[\"()\",[[[\"a\"],\">=\",5],\"and\",[\"is not null\",[\"c\"]]]],\"or\",[[[\"x\"],\"in\",[[4,5,6]]],\"!=\",7]]");
             Assert.NotNull(actual);
             var criteria = Assert.IsType<BinaryCriteria>(actual);
             Assert.Equal(CriteriaOperator.OR, criteria.Operator);
@@ -207,14 +267,16 @@ namespace Serenity.Test.Data
             Assert.Equal("c", leftRightOperand.Expression);
 
             var right = Assert.IsType<BinaryCriteria>(criteria.RightOperand);
-
-            
-                            /*(~(new Criteria("a") >= 5 & new Criteria("c").IsNotNull())) |
-                              (new Criteria("x").In(4, 5, 6)) != 7)*/
-            /*var actual = (
-                (~(new Criteria("a") >= 5 & new Criteria("c").IsNotNull())) |
-                  (new Criteria("x").In(4, 5, 6)) != 7).ToJson();
-            Assert.Equal("", actual);*/
+            Assert.Equal(CriteriaOperator.NE, right.Operator);
+            var rightLeft = Assert.IsType<BinaryCriteria>(right.LeftOperand);
+            Assert.Equal(CriteriaOperator.In, rightLeft.Operator);
+            var x = Assert.IsType<Criteria>(rightLeft.LeftOperand);
+            Assert.Equal("x", x.Expression);
+            var v = Assert.IsType<ValueCriteria>(rightLeft.RightOperand);
+            Assert.IsType<object[]>(v.Value);
+            Assert.Equal(new object[] { 4L, 5L, 6L }, (IEnumerable)v.Value);
+            var rightRight = Assert.IsType<ValueCriteria>(right.RightOperand);
+            Assert.Equal((long)7, rightRight.Value);
         }
     }
 }

@@ -1,171 +1,172 @@
-﻿using Serenity.Data;
-using Xunit;
+﻿using QUnit;
+using Serenity.Data;
 
-namespace Serenity.Test.Data
+namespace Serenity.Test
 {
+    [TestFixture]
     public class JsonCriteriaConverterSerializationTests
     {
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesStringCriteriaAsIs()
         {
             var actual = (new Criteria("a")).ToJson();
-            Assert.Equal("[\"a\"]", actual);
+            Assert.AreEqual(actual, "[\"a\"]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesParenCriteriaProperly()
         {
             var actual = (~(new Criteria("a"))).ToJson();
-            Assert.Equal("[\"()\",[\"a\"]]", actual);
+            Assert.AreEqual(actual, "[\"()\",[\"a\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesIsNullCriteriaProperly()
         {
             var actual = (new Criteria("x")).IsNull().ToJson();
-            Assert.Equal("[\"is null\",[\"x\"]]", actual);
+            Assert.AreEqual(actual, "[\"is null\",[\"x\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesIsNotNullCriteriaProperly()
         {
             var actual = (new Criteria("b")).IsNotNull().ToJson();
-            Assert.Equal("[\"is not null\",[\"b\"]]", actual);
+            Assert.AreEqual(actual, "[\"is not null\",[\"b\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesExistsCriteriaProperly()
         {
             var actual = Criteria.Exists("some expression").ToJson();
-            Assert.Equal("[\"exists\",[\"some expression\"]]", actual);
+            Assert.AreEqual(actual, "[\"exists\",[\"some expression\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesAndCriteriaProperly()
         {
             var actual = (new Criteria("a") & new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"and\",[\"b\"]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"and\",[\"b\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesMultipleAndCriteriaProperly()
         {
             var actual = (new Criteria("a") & new Criteria("b") & new Criteria("c")).ToJson();
-            Assert.Equal("[[[\"a\"],\"and\",[\"b\"]],\"and\",[\"c\"]]", actual);
+            Assert.AreEqual(actual, "[[[\"a\"],\"and\",[\"b\"]],\"and\",[\"c\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesOrCriteriaProperly()
         {
             var actual = (new Criteria("c") | new Criteria("d")).ToJson();
-            Assert.Equal("[[\"c\"],\"or\",[\"d\"]]", actual);
+            Assert.AreEqual(actual, "[[\"c\"],\"or\",[\"d\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesMultipleOrCriteriaProperly()
         {
             var actual = (new Criteria("a") | new Criteria("b") | new Criteria("c")).ToJson();
-            Assert.Equal("[[[\"a\"],\"or\",[\"b\"]],\"or\",[\"c\"]]", actual);
+            Assert.AreEqual(actual, "[[[\"a\"],\"or\",[\"b\"]],\"or\",[\"c\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesXorCriteriaProperly()
         {
             var actual = (new Criteria("c") | new Criteria("d")).ToJson();
-            Assert.Equal("[[\"c\"],\"or\",[\"d\"]]", actual);
+            Assert.AreEqual(actual, "[[\"c\"],\"or\",[\"d\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesMultipleXorCriteriaProperly()
         {
             var actual = (new Criteria("a") ^ new Criteria("b") ^ new Criteria("c")).ToJson();
-            Assert.Equal("[[[\"a\"],\"xor\",[\"b\"]],\"xor\",[\"c\"]]", actual);
+            Assert.AreEqual(actual, "[[[\"a\"],\"xor\",[\"b\"]],\"xor\",[\"c\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesEQCriteriaProperly()
         {
             var actual = (new Criteria("a") == new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"=\",[\"b\"]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"=\",[\"b\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesNECriteriaProperly()
         {
             var actual = (new Criteria("a") != new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"!=\",[\"b\"]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"!=\",[\"b\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesGTCriteriaProperly()
         {
             var actual = (new Criteria("a") > new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\">\",[\"b\"]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\">\",[\"b\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesGECriteriaProperly()
         {
             var actual = (new Criteria("a") >= new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\">=\",[\"b\"]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\">=\",[\"b\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesLTCriteriaProperly()
         {
             var actual = (new Criteria("a") < new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"<\",[\"b\"]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"<\",[\"b\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesLECriteriaProperly()
         {
             var actual = (new Criteria("a") <= new Criteria("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"<=\",[\"b\"]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"<=\",[\"b\"]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesINCriteriaProperly()
         {
             var actual = (new Criteria("a").In("b", "c", "d")).ToJson();
-            Assert.Equal("[[\"a\"],\"in\",[[\"b\",\"c\",\"d\"]]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"in\",[[\"b\",\"c\",\"d\"]]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesNotINCriteriaProperly()
         {
             var actual = (new Criteria("a").NotIn("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"not in\",[[\"b\"]]]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"not in\",[[\"b\"]]]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesLikeCriteriaProperly()
         {
             var actual = (new Criteria("a").StartsWith("b")).ToJson();
-            Assert.Equal("[[\"a\"],\"like\",\"b%\"]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"like\",\"b%\"]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesNotLikeCriteriaProperly()
         {
             var actual = (new Criteria("a").NotLike("%b")).ToJson();
-            Assert.Equal("[[\"a\"],\"not like\",\"%b\"]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\"not like\",\"%b\"]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesValueCriteriaProperly()
         {
             var actual = (new Criteria("a") >= 5).ToJson();
-            Assert.Equal("[[\"a\"],\">=\",5]", actual);
+            Assert.AreEqual(actual, "[[\"a\"],\">=\",5]");
         }
 
-        [Fact]
+        [Test]
         public void JsonCriteriaConverter_SerializesComplexCriteriaProperly()
         {
             var actual = (
                 (~(new Criteria("a") >= 5 & new Criteria("c").IsNotNull())) | 
                   (new Criteria("x").In(4, 5, 6)) != 7).ToJson();
-            Assert.Equal("[[\"()\",[[[\"a\"],\">=\",5],\"and\",[\"is not null\",[\"c\"]]]],\"or\",[[[\"x\"],\"in\",[[4,5,6]]],\"!=\",7]]", actual);
+            Assert.AreEqual(actual, "[[\"()\",[[[\"a\"],\">=\",5],\"and\",[\"is not null\",[\"c\"]]]],\"or\",[[[\"x\"],\"in\",[[4,5,6]]],\"!=\",7]]");
         }
     }
 }

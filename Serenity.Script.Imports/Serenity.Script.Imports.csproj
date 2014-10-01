@@ -36,6 +36,11 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CKEditor\CKEditor.cs" />
+    <Compile Include="Criteria\BaseCriteria.cs" />
+    <Compile Include="Criteria\BinaryCriteria.cs" />
+    <Compile Include="Criteria\Criteria.cs" />
+    <Compile Include="Criteria\UnaryCriteria.cs" />
+    <Compile Include="Criteria\ValueCriteria.cs" />
     <Compile Include="Select2\Select2.cs" />
     <Compile Include="Dialogs\AlertOptions.cs" />
     <Compile Include="Dialogs\BlockUIOptions.cs" />

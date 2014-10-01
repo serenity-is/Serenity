@@ -47,6 +47,7 @@
     <Compile Include="Attribute\IdPropertyAttribute.cs" />
     <Compile Include="Attribute\IsActivePropertyAttribute.cs" />
     <Compile Include="Attribute\NamePropertyAttribute.cs" />
+    <Compile Include="Data\CriteriaUtil.cs" />
     <Compile Include="Extensions\IdExtensions.cs" />
     <Compile Include="Extensions\TabsExtensions.cs" />
     <Compile Include="LocalText.cs" />

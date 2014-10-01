@@ -263,16 +263,6 @@
             return row;
         }
 
-        protected virtual ICriteria ProcessCriteria(BasicFilter criteria)
-        {
-            return null;
-        }
-
-        protected virtual IFilterFields GetFilterFields()
-        {
-            return Row.GetFields().FilterFields;
-        }
-
         protected virtual void ApplyIncludeDeletedFilter(SqlQuery query)
         {
             if (!Request.IncludeDeleted)
@@ -281,6 +271,25 @@
                 if (isActiveRow != null)
                     query.Where(new Criteria(isActiveRow.IsActiveField) >= 0);
             }
+        }
+
+        protected virtual BaseCriteria ReplaceFieldExpressions(BaseCriteria criteria)
+        {
+            return new CriteriaFieldExpressionReplacer(this.Row)
+                .Process(criteria);
+        }
+
+        protected virtual void ApplyCriteria(SqlQuery query)
+        {
+            if (Object.ReferenceEquals(null, Request.Criteria) ||
+                Request.Criteria.IsEmpty)
+            {
+                return;
+            }
+
+            var criteria = ReplaceFieldExpressions(Request.Criteria);
+
+            query.Where(criteria);
         }
 
         protected virtual void ApplyEqualityFilter(SqlQuery query)
@@ -319,6 +328,7 @@
         protected virtual void ApplyFilters(SqlQuery query)
         {
             ApplyEqualityFilter(query);
+            ApplyCriteria(query);
             ApplyIncludeDeletedFilter(query);
         }
 

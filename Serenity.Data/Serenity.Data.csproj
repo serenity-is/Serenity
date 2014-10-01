@@ -54,7 +54,10 @@
     <Compile Include="Connections\WrappedConnection.cs" />
     <Compile Include="Connections\SqlConnections.cs" />
     <Compile Include="Criteria\BaseCriteria.cs" />
+    <Compile Include="Criteria\JsonSafeCriteriaConverter.cs" />
+    <Compile Include="Criteria\SafeCriteriaValidator.cs" />
     <Compile Include="Criteria\BinaryCriteria.cs" />
+    <Compile Include="Criteria\BaseCriteriaVisitor.cs" />
     <Compile Include="Criteria\Criteria.cs" />
     <Compile Include="Criteria\CriteriaOperator.cs" />
     <Compile Include="Criteria\JsonCriteriaConverter.cs" />

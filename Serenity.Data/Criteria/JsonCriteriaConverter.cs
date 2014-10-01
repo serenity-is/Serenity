@@ -252,23 +252,23 @@ namespace Serenity.Data
         private static readonly string[] OperatorToKey =
         {
             "()", // Paren
-            "!", // Not
-            "(null)", // IsNull
-            "(!null)", // IsNotNull
-            "(exists)", // Exists
-            "&", // AND
-            "|", // |
-            "^", // XOR
+            "not", // Not
+            "is null", // IsNull
+            "is not null", // IsNotNull
+            "exists", // Exists
+            "and", // AND
+            "or", // |
+            "xor", // XOR
             "=", // EQ
             "!=", // NE
             ">", // GT
             ">=", // GE
             "<", // LT
             "<=", // LE
-            "(in)", // IN
-            "(!in)", // NOT IN
-            "~", // LIKE
-            "!~" // NOT LIKE
+            "in", // IN
+            "not in", // NOT IN
+            "like", // LIKE
+            "not like" // NOT LIKE
         };
 
         private static readonly Dictionary<string, CriteriaOperator> KeyToOperator;
