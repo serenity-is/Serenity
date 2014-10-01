@@ -213,7 +213,7 @@ namespace Serenity.PropertyGrid
                     List<string[]> options = new List<string[]>();
                     foreach (var val in Enum.GetValues(enumType))
                     {
-                        string key = Enum.GetName(enumType, val);
+                        string key = Convert.ToInt64(val).ToString();
                         string text = EnumMapper.FormatEnum(enumType, val);
                         options.Add(new string[] { key, text });
                     }
@@ -335,7 +335,7 @@ namespace Serenity.PropertyGrid
                 List<string[]> options = new List<string[]>();
                 foreach (var val in Enum.GetValues(enumType))
                 {
-                    string key = Enum.GetName(enumType, val);
+                    string key = Convert.ToInt64(val).ToString();
                     string text = EnumMapper.FormatEnum(enumType, val);
                     options.Add(new string[] { key, text });
                 }
