@@ -51,6 +51,7 @@
     <Compile Include="Editor\URLEditor.cs" />
     <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
+    <Compile Include="FilterPanel\FilterPanel.cs" />
     <Compile Include="Grid\DataGrid.cs" />
     <Compile Include="Grid\PopupToolButton.cs" />
     <Compile Include="Grid\PopupMenuButton.cs" />
