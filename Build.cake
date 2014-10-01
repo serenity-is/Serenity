@@ -42,7 +42,7 @@ Action<string> minimizeJs = filename => {
 };
 
 Action runGitLink = () => {
-    StartProcess("./Tools/GitHubLink/GitHubLink.exe", new ProcessSettings
+    StartProcess("./Tools/GitLink/GitLink.exe", new ProcessSettings
     { 
         Arguments = System.IO.Path.GetFullPath(@".\") + " -u https://github.com/volkanceylan/serenity"
     });
