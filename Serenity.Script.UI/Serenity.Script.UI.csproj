@@ -163,7 +163,7 @@
       <Name>Serenity.Script.Imports</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(SolutionDir)tools\Saltarelle\Saltarelle.Compiler.targets" />
+  <Import Project="$(ProjectDir)..\tools\Saltarelle\Saltarelle.Compiler.targets" />
   <Target Name="CopyAndMinimize" AfterTargets="BuildScript">
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.UI.js -o $(OutDir)Serenity.Script.UI.min.js --comments --mangle">
     </Exec>

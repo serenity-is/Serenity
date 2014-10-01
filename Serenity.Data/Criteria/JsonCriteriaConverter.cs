@@ -87,8 +87,8 @@ namespace Serenity.Data
             {
                 writer.WriteStartArray();
                 var c = (BinaryCriteria)criteria;
-                writer.WriteValue(OperatorToKey[(int)c.Operator]);
                 ToJson(writer, c.LeftOperand, serializer);
+                writer.WriteValue(OperatorToKey[(int)c.Operator]);
                 ToJson(writer, c.RightOperand, serializer);
                 writer.WriteEndArray();
                 return;
@@ -140,36 +140,47 @@ namespace Serenity.Data
             if (array.Count == 0)
                 throw new JsonSerializationException("Can't deserialize empty array as Criteria");
 
-            if (array.Count == 1 && array[0] is JArray)
+            if (array.Count == 1)
             {
-                var list = new List<object>();
-                foreach (var item in (JArray)array[0])
+                if (array[0] is JArray)
                 {
-                    if (item == null)
-                        throw new ArgumentNullException("item");
+                    var list = new List<object>();
+                    foreach (var item in (JArray)array[0])
+                    {
+                        if (item == null)
+                            throw new ArgumentNullException("item");
 
-                    if (!(item is JValue))
-                        throw new JsonSerializationException(String.Format("Can't deserialize {0} as Criteria value", item.ToString()));
+                        if (!(item is JValue))
+                            throw new JsonSerializationException(String.Format("Can't deserialize {0} as Criteria value", item.ToString()));
 
-                    list.Add(((JValue)item).Value);
+                        list.Add(((JValue)item).Value);
+                    }
+
+                    return new ValueCriteria(list.ToArray());
                 }
 
-                return new ValueCriteria(list.ToArray());
+                if (!array[0] is JValue ||
+                    !(((JValue)array[0]).Value is string))
+                {
+                    throw new JsonSerializationException(String.Format("Couldn't deserialize string criteria: {0}", opStr));
+                }
+
+                var value = (string)((JValue)array[0]).Value;
+                if (value == null)
+                    throw new JsonSerializationException(String.Format("Null Criteria expression: {0}", array.ToString()));
+
+                if (value.StartsWith("@"))
+                    return new ParamCriteria(value);
+
+                return new Criteria(value);
             }
 
-            if (array[0] is JValue && 
-                ((JValue)array[0]).Value is string)
+            if (array.Count == 2)
             {
-                if (array.Count == 1)
+                if (!array[0] is JValue ||
+                    !(((JValue)array[0]).Value is string))
                 {
-                    var value = (string)((JValue)array[0]).Value;
-                    if (value == null)
-                        throw new JsonSerializationException(String.Format("Null Criteria expression: {0}", array.ToString()));
-
-                    if (value.StartsWith("@"))
-                        return new ParamCriteria(value);
-
-                    return new Criteria(value);
+                    throw new JsonSerializationException(String.Format("Couldn't deserialize unary criteria: {0}", opStr));
                 }
 
                 var opStr = (string)((JValue)array[0]).Value;
@@ -178,23 +189,35 @@ namespace Serenity.Data
                 if (!KeyToOperator.TryGetValue(opStr, out op))
                     throw new JsonSerializationException(String.Format("Unknown Criteria operator: {0}", opStr));
 
-                if (op >= CriteriaOperator.Paren && op <= CriteriaOperator.Exists)
+                if (op < CriteriaOperator.Paren || op > CriteriaOperator.Exists)
                 {
-                    if (array.Count != 2)
-                        throw new JsonSerializationException(String.Format("Invalid Criteria format: {0}", array.ToString()));
-
-                    return new UnaryCriteria(op, ParseValue(array[1]));
+                    throw new JsonSerializationException(String.Format("Invalid Unary Criteria format: {0}", array.ToString()));
                 }
-                else
-                {
-                    if (array.Count != 3)
-                        throw new JsonSerializationException(String.Format("Invalid Criteria format: {0}", array.ToString()));
 
-                    return new BinaryCriteria(ParseValue(array[1]), op, ParseValue(array[2]));
-                }
+                return new UnaryCriteria(op, ParseValue(array[1]));
             }
-            else
-                throw new JsonSerializationException(String.Format("Can't deserialize {0} as Criteria item", array[0].ToString()));
+
+            if (array.Count == 3)
+            {
+                if (!array[1] is JValue ||
+                    !(((JValue)array[1]).Value is string))
+                {
+                    throw new JsonSerializationException(String.Format("Couldn't deserialize unary criteria: {0}", opStr));
+                }
+
+                var opStr = (string)((JValue)array[1]).Value;
+
+                CriteriaOperator op;
+                if (!KeyToOperator.TryGetValue(opStr, out op))
+                    throw new JsonSerializationException(String.Format("Unknown Criteria operator: {0}", opStr));
+
+                if (op < CriteriaOperator.AND || op > CriteriaOperator.NotLike)
+                    throw new JsonSerializationException(String.Format("Invalid Criteria format: {0}", array.ToString()));
+
+                return new BinaryCriteria(ParseValue(array[0]), op, ParseValue(array[2]));
+            }
+
+            throw new JsonSerializationException(String.Format("Can't deserialize {0} as Criteria item", array[0].ToString()));
         }
         
         /// <summary>
