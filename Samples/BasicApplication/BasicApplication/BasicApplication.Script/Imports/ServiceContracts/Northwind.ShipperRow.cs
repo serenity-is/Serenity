@@ -15,6 +15,14 @@ namespace BasicApplication.Northwind
         public Int32? ShipperID { get; set; }
         public String CompanyName { get; set; }
         public String Phone { get; set; }
+    
+        [Imported, PreserveMemberCase]
+        public static class Fields
+        {
+            [InlineConstant] public const string ShipperID = "ShipperID";
+            [InlineConstant] public const string CompanyName = "CompanyName";
+            [InlineConstant] public const string Phone = "Phone";
+        }
     }
     
 }

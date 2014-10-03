@@ -26,6 +26,25 @@ namespace BasicApplication.Northwind
         public String CustomerPhone { get; set; }
         public String CustomerFax { get; set; }
         public String CustomerTypeCustomerDesc { get; set; }
+    
+        [Imported, PreserveMemberCase]
+        public static class Fields
+        {
+            [InlineConstant] public const string ID = "ID";
+            [InlineConstant] public const string CustomerID = "CustomerID";
+            [InlineConstant] public const string CustomerTypeID = "CustomerTypeID";
+            [InlineConstant] public const string CustomerCompanyName = "CustomerCompanyName";
+            [InlineConstant] public const string CustomerContactName = "CustomerContactName";
+            [InlineConstant] public const string CustomerContactTitle = "CustomerContactTitle";
+            [InlineConstant] public const string CustomerAddress = "CustomerAddress";
+            [InlineConstant] public const string CustomerCity = "CustomerCity";
+            [InlineConstant] public const string CustomerRegion = "CustomerRegion";
+            [InlineConstant] public const string CustomerPostalCode = "CustomerPostalCode";
+            [InlineConstant] public const string CustomerCountry = "CustomerCountry";
+            [InlineConstant] public const string CustomerPhone = "CustomerPhone";
+            [InlineConstant] public const string CustomerFax = "CustomerFax";
+            [InlineConstant] public const string CustomerTypeCustomerDesc = "CustomerTypeCustomerDesc";
+        }
     }
     
 }

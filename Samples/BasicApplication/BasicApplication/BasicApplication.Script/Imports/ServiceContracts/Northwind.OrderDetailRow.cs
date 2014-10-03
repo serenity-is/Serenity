@@ -39,6 +39,38 @@ namespace BasicApplication.Northwind
         public Int16? ProductUnitsInStock { get; set; }
         public Int16? ProductUnitsOnOrder { get; set; }
         public Int16? ProductReorderLevel { get; set; }
+    
+        [Imported, PreserveMemberCase]
+        public static class Fields
+        {
+            [InlineConstant] public const string OrderID = "OrderID";
+            [InlineConstant] public const string ProductID = "ProductID";
+            [InlineConstant] public const string UnitPrice = "UnitPrice";
+            [InlineConstant] public const string Quantity = "Quantity";
+            [InlineConstant] public const string Discount = "Discount";
+            [InlineConstant] public const string OrderCustomerID = "OrderCustomerID";
+            [InlineConstant] public const string OrderEmployeeID = "OrderEmployeeID";
+            [InlineConstant] public const string OrderOrderDate = "OrderOrderDate";
+            [InlineConstant] public const string OrderRequiredDate = "OrderRequiredDate";
+            [InlineConstant] public const string OrderShippedDate = "OrderShippedDate";
+            [InlineConstant] public const string OrderShipVia = "OrderShipVia";
+            [InlineConstant] public const string OrderFreight = "OrderFreight";
+            [InlineConstant] public const string OrderShipName = "OrderShipName";
+            [InlineConstant] public const string OrderShipAddress = "OrderShipAddress";
+            [InlineConstant] public const string OrderShipCity = "OrderShipCity";
+            [InlineConstant] public const string OrderShipRegion = "OrderShipRegion";
+            [InlineConstant] public const string OrderShipPostalCode = "OrderShipPostalCode";
+            [InlineConstant] public const string OrderShipCountry = "OrderShipCountry";
+            [InlineConstant] public const string ProductProductName = "ProductProductName";
+            [InlineConstant] public const string ProductDiscontinued = "ProductDiscontinued";
+            [InlineConstant] public const string ProductSupplierID = "ProductSupplierID";
+            [InlineConstant] public const string ProductCategoryID = "ProductCategoryID";
+            [InlineConstant] public const string ProductQuantityPerUnit = "ProductQuantityPerUnit";
+            [InlineConstant] public const string ProductUnitPrice = "ProductUnitPrice";
+            [InlineConstant] public const string ProductUnitsInStock = "ProductUnitsInStock";
+            [InlineConstant] public const string ProductUnitsOnOrder = "ProductUnitsOnOrder";
+            [InlineConstant] public const string ProductReorderLevel = "ProductReorderLevel";
+        }
     }
     
 }

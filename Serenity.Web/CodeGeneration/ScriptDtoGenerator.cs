@@ -384,6 +384,7 @@ namespace Serenity.CodeGeneration
         private void GenerateRowMembers(Type rowType)
         {
             Row row = (Row)rowType.GetInstance();
+
             foreach (var field in row.GetFields())
             {
                 cw.Indented("public ");
@@ -404,6 +405,21 @@ namespace Serenity.CodeGeneration
                 sb.Append(field.PropertyName ?? field.Name);
                 sb.AppendLine(" { get; set; }");
             }
+
+            sb.AppendLine();
+            cw.IndentedLine("[Imported, PreserveMemberCase]");
+            cw.IndentedLine("public static class Fields");
+            cw.InBrace(delegate
+            {
+                foreach (var field in row.GetFields())
+                {
+                    cw.Indented("[InlineConstant] public const string ");
+                    sb.Append(field.PropertyName ?? field.Name);
+                    sb.Append(" = \"");
+                    sb.Append(field.PropertyName ?? field.Name);
+                    sb.AppendLine("\";");
+                }
+            });
         }
 
 

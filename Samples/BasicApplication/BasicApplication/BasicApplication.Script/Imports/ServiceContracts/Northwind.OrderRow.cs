@@ -55,6 +55,54 @@ namespace BasicApplication.Northwind
         public String EmployeePhotoPath { get; set; }
         public String ShipViaCompanyName { get; set; }
         public String ShipViaPhone { get; set; }
+    
+        [Imported, PreserveMemberCase]
+        public static class Fields
+        {
+            [InlineConstant] public const string OrderID = "OrderID";
+            [InlineConstant] public const string CustomerID = "CustomerID";
+            [InlineConstant] public const string EmployeeID = "EmployeeID";
+            [InlineConstant] public const string OrderDate = "OrderDate";
+            [InlineConstant] public const string RequiredDate = "RequiredDate";
+            [InlineConstant] public const string ShippedDate = "ShippedDate";
+            [InlineConstant] public const string ShipVia = "ShipVia";
+            [InlineConstant] public const string Freight = "Freight";
+            [InlineConstant] public const string ShipName = "ShipName";
+            [InlineConstant] public const string ShipAddress = "ShipAddress";
+            [InlineConstant] public const string ShipCity = "ShipCity";
+            [InlineConstant] public const string ShipRegion = "ShipRegion";
+            [InlineConstant] public const string ShipPostalCode = "ShipPostalCode";
+            [InlineConstant] public const string ShipCountry = "ShipCountry";
+            [InlineConstant] public const string CustomerCompanyName = "CustomerCompanyName";
+            [InlineConstant] public const string CustomerContactName = "CustomerContactName";
+            [InlineConstant] public const string CustomerContactTitle = "CustomerContactTitle";
+            [InlineConstant] public const string CustomerAddress = "CustomerAddress";
+            [InlineConstant] public const string CustomerCity = "CustomerCity";
+            [InlineConstant] public const string CustomerRegion = "CustomerRegion";
+            [InlineConstant] public const string CustomerPostalCode = "CustomerPostalCode";
+            [InlineConstant] public const string CustomerCountry = "CustomerCountry";
+            [InlineConstant] public const string CustomerPhone = "CustomerPhone";
+            [InlineConstant] public const string CustomerFax = "CustomerFax";
+            [InlineConstant] public const string EmployeeLastName = "EmployeeLastName";
+            [InlineConstant] public const string EmployeeFirstName = "EmployeeFirstName";
+            [InlineConstant] public const string EmployeeTitle = "EmployeeTitle";
+            [InlineConstant] public const string EmployeeTitleOfCourtesy = "EmployeeTitleOfCourtesy";
+            [InlineConstant] public const string EmployeeBirthDate = "EmployeeBirthDate";
+            [InlineConstant] public const string EmployeeHireDate = "EmployeeHireDate";
+            [InlineConstant] public const string EmployeeAddress = "EmployeeAddress";
+            [InlineConstant] public const string EmployeeCity = "EmployeeCity";
+            [InlineConstant] public const string EmployeeRegion = "EmployeeRegion";
+            [InlineConstant] public const string EmployeePostalCode = "EmployeePostalCode";
+            [InlineConstant] public const string EmployeeCountry = "EmployeeCountry";
+            [InlineConstant] public const string EmployeeHomePhone = "EmployeeHomePhone";
+            [InlineConstant] public const string EmployeeExtension = "EmployeeExtension";
+            [InlineConstant] public const string EmployeePhoto = "EmployeePhoto";
+            [InlineConstant] public const string EmployeeNotes = "EmployeeNotes";
+            [InlineConstant] public const string EmployeeReportsTo = "EmployeeReportsTo";
+            [InlineConstant] public const string EmployeePhotoPath = "EmployeePhotoPath";
+            [InlineConstant] public const string ShipViaCompanyName = "ShipViaCompanyName";
+            [InlineConstant] public const string ShipViaPhone = "ShipViaPhone";
+        }
     }
     
 }

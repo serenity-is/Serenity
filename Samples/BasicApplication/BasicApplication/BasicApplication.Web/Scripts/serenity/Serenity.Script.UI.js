@@ -2738,7 +2738,7 @@
 		var self = this;
 		var config = this.getConfig();
 		CKEDITOR.replace(id, config);
-		$Serenity_WX.addValidationRule(this, this.uniqueName, function(e) {
+		$Serenity_VX.addValidationRule(this, this.uniqueName, function(e) {
 			if (e.hasClass('required')) {
 				var value = Q.trimToNull(self.get_value());
 				if (ss.isNullOrUndefined(value)) {
@@ -2785,6 +2785,12 @@
 	};
 	$Serenity_HtmlReportContentEditor.__typeName = 'Serenity.HtmlReportContentEditor';
 	global.Serenity.HtmlReportContentEditor = $Serenity_HtmlReportContentEditor;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.IAsyncWidget
+	var $Serenity_IAsyncWidget = function() {
+	};
+	$Serenity_IAsyncWidget.__typeName = 'Serenity.IAsyncWidget';
+	global.Serenity.IAsyncWidget = $Serenity_IAsyncWidget;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.IBooleanValue
 	var $Serenity_IBooleanValue = function() {
@@ -3224,7 +3230,7 @@
 	// Serenity.PersonNameEditor
 	var $Serenity_PersonNameEditor = function(input) {
 		ss.makeGenericType($Serenity_Widget$1, [Object]).call(this, input, new Object());
-		$Serenity_WX.addValidationRule(this, this.uniqueName, ss.mkdel(this, function() {
+		$Serenity_VX.addValidationRule(this, this.uniqueName, ss.mkdel(this, function() {
 			if (!(new RegExp('^[ A-Za-zıİğĞöÖüÜşŞÇç]+$')).test(Q.trimToEmpty(this.get_value()))) {
 				return 'Lütfen sadece harflerden oluşan bir metin giriniz!';
 			}
@@ -3238,7 +3244,7 @@
 	var $Serenity_PhoneEditor = function(input, opt) {
 		ss.makeGenericType($Serenity_Widget$1, [$Serenity_PhoneEditorOptions]).call(this, input, opt);
 		var self = this;
-		$Serenity_WX.addValidationRule(this, this.uniqueName, ss.mkdel(this, function(e) {
+		$Serenity_VX.addValidationRule(this, this.uniqueName, ss.mkdel(this, function(e) {
 			var value = Q.trimToNull(this.get_value());
 			if (ss.isNullOrUndefined(value)) {
 				return null;
@@ -5383,6 +5389,32 @@
 	};
 	global.Serenity.ValidationHelper = $Serenity_ValidationHelper;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.ValidationExtensions
+	var $Serenity_VX = function() {
+	};
+	$Serenity_VX.__typeName = 'Serenity.VX';
+	$Serenity_VX.addValidationRule = function(widget, eventClass, rule) {
+		return $Serenity_VX.addValidationRule$1(widget.get_element(), eventClass, rule);
+	};
+	$Serenity_VX.addValidationRule$1 = function(element, eventClass, rule) {
+		if (element.length === 0) {
+			return element;
+		}
+		if (ss.staticEquals(rule, null)) {
+			throw new ss.Exception('rule is null!');
+		}
+		element.addClass('customValidate').bind('customValidate.' + eventClass, rule);
+		return element;
+	};
+	$Serenity_VX.removeValidationRule = function(element, eventClass) {
+		element.unbind('customValidate.' + eventClass);
+		return element;
+	};
+	$Serenity_VX.validateElement = function(validator, widget) {
+		return validator.element(widget.get_element()[0]);
+	};
+	global.Serenity.VX = $Serenity_VX;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Widget
 	var $Serenity_Widget = function(element) {
 		this.widgetName = null;
@@ -5403,6 +5435,121 @@
 		this.onInit();
 	};
 	$Serenity_Widget.__typeName = 'Serenity.Widget';
+	$Serenity_Widget.elementFor = function(TEditor) {
+		return function() {
+			return $Serenity_Widget.elementFor$1(TEditor);
+		};
+	};
+	$Serenity_Widget.elementFor$1 = function(editorType) {
+		var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
+		var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].get_html() : '<input/>');
+		return $(elementHtml);
+	};
+	$Serenity_Widget.create = function(TWidget) {
+		return function(initElement, options) {
+			var element = $Serenity_Widget.elementFor$1(TWidget);
+			if (!ss.staticEquals(initElement, null)) {
+				initElement(element);
+			}
+			var widget = ss.cast(new TWidget(element, options), TWidget);
+			if (widget.isAsyncWidget()) {
+				throw new ss.InvalidOperationException('Use Widget.CreateAsync to create async widgets');
+			}
+			return widget;
+		};
+	};
+	$Serenity_Widget.createAsync = function(TWidget) {
+		return function(initElement, options) {
+			var $state = 0, $tcs = new ss.TaskCompletionSource(), element, widget, $t1;
+			var $sm = function() {
+				try {
+					$sm1:
+					for (;;) {
+						switch ($state) {
+							case 0: {
+								$state = -1;
+								element = $Serenity_Widget.elementFor$1(TWidget);
+								if (!ss.staticEquals(initElement, null)) {
+									initElement(element);
+								}
+								widget = ss.cast(new TWidget(element, options), TWidget);
+								if (widget.isAsyncWidget()) {
+									$t1 = widget.initalizeAsync();
+									$state = 2;
+									$t1.continueWith($sm);
+									return;
+								}
+								$state = 1;
+								continue $sm1;
+							}
+							case 2: {
+								$state = -1;
+								$t1.getAwaitedResult();
+								$state = 1;
+								continue $sm1;
+							}
+							case 1: {
+								$state = -1;
+								$tcs.setResult(widget);
+								return;
+							}
+							default: {
+								break $sm1;
+							}
+						}
+					}
+				}
+				catch ($t2) {
+					$tcs.setException(ss.Exception.wrap($t2));
+				}
+			};
+			$sm();
+			return $tcs.task;
+		};
+	};
+	$Serenity_Widget.createInside = function(TWidget) {
+		return function(container, options) {
+			return $Serenity_Widget.create(TWidget).call(null, function(e) {
+				container.append(e);
+			}, options);
+		};
+	};
+	$Serenity_Widget.createInsideAsync = function(TWidget) {
+		return function(container, options) {
+			var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+			var $sm = function() {
+				try {
+					$sm1:
+					for (;;) {
+						switch ($state) {
+							case 0: {
+								$state = -1;
+								$t1 = $Serenity_Widget.createAsync(TWidget).call(null, function(e) {
+									container.append(e);
+								}, options);
+								$state = 1;
+								$t1.continueWith($sm);
+								return;
+							}
+							case 1: {
+								$state = -1;
+								$tcs.setResult($t1.getAwaitedResult());
+								return;
+							}
+							default: {
+								break $sm1;
+							}
+						}
+					}
+				}
+				catch ($t2) {
+					$tcs.setException(ss.Exception.wrap($t2));
+				}
+			};
+			$sm();
+			return $tcs.task;
+		};
+	};
 	global.Serenity.Widget = $Serenity_Widget;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Widget
@@ -5472,9 +5619,6 @@
 	$Serenity_WX.hasOriginalEvent = function(e) {
 		return !!!(typeof(e.originalEvent) === 'undefined');
 	};
-	$Serenity_WX.validateElement = function(validator, widget) {
-		return validator.element(widget.get_element()[0]);
-	};
 	$Serenity_WX.change = function(widget, handler) {
 		widget.get_element().bind('change.' + widget.get_uniqueName(), handler);
 	};
@@ -5488,41 +5632,30 @@
 	$Serenity_WX.getGridField = function(widget) {
 		return widget.get_element().closest('.field');
 	};
-	$Serenity_WX.addValidationRule = function(widget, eventClass, rule) {
-		return $Serenity_WX.addValidationRule$1(widget.get_element(), eventClass, rule);
-	};
-	$Serenity_WX.addValidationRule$1 = function(element, eventClass, rule) {
-		if (element.length === 0) {
-			return element;
-		}
-		if (ss.staticEquals(rule, null)) {
-			throw new ss.Exception('rule is null!');
-		}
-		element.addClass('customValidate').bind('customValidate.' + eventClass, rule);
-		return element;
-	};
-	$Serenity_WX.removeValidationRule = function(element, eventClass) {
-		element.unbind('customValidate.' + eventClass);
-		return element;
-	};
 	$Serenity_WX.createElementFor = function(TEditor) {
 		return function() {
-			return $Serenity_WX.createElementFor$1(TEditor);
+			return $Serenity_Widget.elementFor(TEditor).call(null);
 		};
 	};
 	$Serenity_WX.createElementFor$1 = function(editorType) {
-		var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
-		var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].get_html() : '<input/>');
-		return $(elementHtml);
+		return $Serenity_Widget.elementFor$1(editorType);
 	};
 	$Serenity_WX.create = function(TWidget) {
 		return function(initElement, options) {
-			var element = $Serenity_WX.createElementFor$1(TWidget);
-			if (!ss.staticEquals(initElement, null)) {
-				initElement(element);
-			}
-			return ss.cast(new TWidget(element, options), TWidget);
+			return $Serenity_Widget.create(TWidget).call(null, initElement, options);
 		};
+	};
+	$Serenity_WX.validateElement = function(validator, widget) {
+		return $Serenity_VX.validateElement(validator, widget);
+	};
+	$Serenity_WX.addValidationRule = function(widget, eventClass, rule) {
+		return $Serenity_VX.addValidationRule$1(widget.get_element(), eventClass, rule);
+	};
+	$Serenity_WX.addValidationRule$1 = function(element, eventClass, rule) {
+		return $Serenity_VX.addValidationRule$1(element, eventClass, rule);
+	};
+	$Serenity_WX.removeValidationRule = function(element, eventClass) {
+		return $Serenity_VX.removeValidationRule(element, eventClass);
 	};
 	global.Serenity.WX = $Serenity_WX;
 	////////////////////////////////////////////////////////////////////////////////
@@ -5699,8 +5832,42 @@
 	$System_ComponentModel_DisplayNameAttribute.__typeName = 'System.ComponentModel.DisplayNameAttribute';
 	global.System.ComponentModel.DisplayNameAttribute = $System_ComponentModel_DisplayNameAttribute;
 	ss.initClass($Serenity_Widget, $asm, {
+		initalizeAsync: function() {
+			var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+			var $sm = function() {
+				try {
+					$sm1:
+					for (;;) {
+						switch ($state) {
+							case 0: {
+								$state = -1;
+								$t1 = ss.Task.fromResult(0);
+								$state = 1;
+								$t1.continueWith($sm);
+								return;
+							}
+							case 1: {
+								$state = -1;
+								$t1.getAwaitedResult();
+								$state = -1;
+								break $sm1;
+							}
+							default: {
+								break $sm1;
+							}
+						}
+					}
+					$tcs.setResult(null);
+				}
+				catch ($t2) {
+					$tcs.setException(ss.Exception.wrap($t2));
+				}
+			};
+			$sm();
+			return $tcs.task;
+		},
 		isAsyncWidget: function() {
-			return ss.isValue(ss.getMembers(ss.getInstanceType(this), 8, 8 | 256, 'createAsync'));
+			return ss.isInstanceOfType(this, $Serenity_IAsyncWidget);
 		},
 		destroy: function() {
 			this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
@@ -6597,6 +6764,7 @@
 			return config;
 		}
 	}, $Serenity_HtmlContentEditor, [$Serenity_IStringValue]);
+	ss.initInterface($Serenity_IAsyncWidget, $asm, {});
 	ss.initInterface($Serenity_IFilterHandler, $asm, { getOperators: null, operatorTitle: null, operatorFormat: null, createEditor: null, toFilterLine: null });
 	ss.initClass($Serenity_ImageUploadEditor, $asm, {
 		getToolButtons: function() {
@@ -6865,7 +7033,7 @@
 			var editorType = $Serenity_PropertyGrid.$getEditorType(item.editorType);
 			var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
 			var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].get_html() : '<input/>');
-			var element = $Serenity_WX.createElementFor$1(editorType).addClass('editor').addClass('flexify').attr('id', editorId).appendTo(fieldDiv);
+			var element = $Serenity_Widget.elementFor$1(editorType).addClass('editor').addClass('flexify').attr('id', editorId).appendTo(fieldDiv);
 			if (element.is(':input')) {
 				element.attr('name', ss.coalesce(item.name, ''));
 			}
@@ -7226,6 +7394,7 @@
 	ss.initClass($Serenity_UploadHelper, $asm, {});
 	ss.initClass($Serenity_URLEditor, $asm, {}, $Serenity_StringEditor, [$Serenity_IStringValue]);
 	ss.initClass($Serenity_ValidationHelper, $asm, {});
+	ss.initClass($Serenity_VX, $asm, {});
 	ss.initClass($Serenity_WX, $asm, {});
 	ss.initClass($Serenity_ComponentModel_CategoryAttribute, $asm, {
 		get_category: function() {

@@ -40,10 +40,14 @@ namespace BasicApplication.Northwind
         {
             base.CreateToolbarExtensions();
 
-            country = WidgetExtensions.Create<LookupEditor>(
-                    initElement: e => e.AppendTo(toolbar.Element)
-                        .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Customer.Country") + " ---"),
-                    options: new LookupEditorOptions { LookupKey = "Northwind.CustomerCountry" });
+            country = Widget.Create<LookupEditor>(
+                initElement: e => e.AppendTo(toolbar.Element)
+                    .Attribute("placeholder", 
+                    "--- " + Q.Text("Db.Northwind.Customer.Country") + " ---"),
+                options: new LookupEditorOptions 
+                { 
+                    LookupKey = "Northwind.CustomerCountry" 
+                });
 
             country.Change(e => Refresh());
         }

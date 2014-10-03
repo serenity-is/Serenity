@@ -41,14 +41,14 @@ namespace BasicApplication.Northwind
         {
             base.CreateToolbarExtensions();
 
-            supplier = WidgetExtensions.Create<LookupEditor>(
+            supplier = Widget.Create<LookupEditor>(
                     initElement: e => e.AppendTo(toolbar.Element)
                         .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Product.SupplierCompanyName") + " ---"),
                     options: new LookupEditorOptions { LookupKey = "Northwind.Supplier" });
 
             supplier.Change(e => Refresh());
 
-            category = WidgetExtensions.Create<LookupEditor>(
+            category = Widget.Create<LookupEditor>(
                     initElement: e => e.AppendTo(toolbar.Element)
                         .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Product.CategoryName") + " ---"),
                     options: new LookupEditorOptions { LookupKey = "Northwind.Category" });

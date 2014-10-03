@@ -33,7 +33,7 @@ namespace BasicApplication.Northwind
         {
             base.CreateToolbarExtensions();
 
-            region = WidgetExtensions.Create<LookupEditor>(
+            region = Widget.Create<LookupEditor>(
                     initElement: e => e.AppendTo(toolbar.Element)
                         .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Territory.RegionDescription") + " ---"),
                     options: new LookupEditorOptions { LookupKey = "Northwind.Region" });

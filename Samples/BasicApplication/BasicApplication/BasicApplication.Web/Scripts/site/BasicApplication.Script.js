@@ -19,13 +19,13 @@
 		this.$form = null;
 		ss.makeGenericType(Serenity.EntityDialog$1, [Object]).call(this);
 		this.$form = new $BasicApplication_Administration_UserForm(this.get_idPrefix());
-		Serenity.WX.addValidationRule(this.$form.get_password(), this.uniqueName, ss.mkdel(this, function(e) {
+		Serenity.VX.addValidationRule(this.$form.get_password(), this.uniqueName, ss.mkdel(this, function(e) {
 			if (this.$form.get_password().get_value().length < 7) {
 				return 'Password must be at least 7 characters!';
 			}
 			return null;
 		}));
-		Serenity.WX.addValidationRule(this.$form.get_passwordConfirm(), this.uniqueName, ss.mkdel(this, function(e1) {
+		Serenity.VX.addValidationRule(this.$form.get_passwordConfirm(), this.uniqueName, ss.mkdel(this, function(e1) {
 			if (!ss.referenceEquals(this.$form.get_password().get_value(), this.$form.get_passwordConfirm().get_value())) {
 				return "The passwords entered doesn't match!";
 			}
@@ -194,6 +194,7 @@
 	// BasicApplication.Northwind.CategoryDialog
 	var $BasicApplication_Northwind_CategoryDialog = function() {
 		ss.makeGenericType(Serenity.EntityDialog$1, [Object]).call(this);
+		Q.alert('DisplayName');
 	};
 	$BasicApplication_Northwind_CategoryDialog.__typeName = 'BasicApplication.Northwind.CategoryDialog';
 	global.BasicApplication.Northwind.CategoryDialog = $BasicApplication_Northwind_CategoryDialog;
@@ -556,7 +557,7 @@
 	var $BasicApplication_Northwind_PhoneEditor = function(input) {
 		this.$5$MultipleField = false;
 		Serenity.StringEditor.call(this, input);
-		Serenity.WX.addValidationRule(this, this.uniqueName, ss.mkdel(this, function(e) {
+		Serenity.VX.addValidationRule(this, this.uniqueName, ss.mkdel(this, function(e) {
 			var value = Q.trimToNull(this.get_value());
 			if (ss.isNullOrUndefined(value)) {
 				return null;
@@ -1084,7 +1085,7 @@
 			});
 			var $t1 = Serenity.LookupEditorOptions.$ctor();
 			$t1.lookupKey = 'Northwind.CustomerCountry';
-			this.$country = Serenity.WX.create(Serenity.LookupEditor).call(null, $t2, $t1);
+			this.$country = Serenity.Widget.create(Serenity.LookupEditor).call(null, $t2, $t1);
 			Serenity.WX.change(this.$country, ss.mkdel(this, function(e1) {
 				this.refresh();
 			}));
@@ -1360,7 +1361,7 @@
 			});
 			var $t1 = Serenity.LookupEditorOptions.$ctor();
 			$t1.lookupKey = 'Northwind.Supplier';
-			this.$supplier = Serenity.WX.create(Serenity.LookupEditor).call(null, $t2, $t1);
+			this.$supplier = Serenity.Widget.create(Serenity.LookupEditor).call(null, $t2, $t1);
 			Serenity.WX.change(this.$supplier, ss.mkdel(this, function(e1) {
 				this.refresh();
 			}));
@@ -1369,7 +1370,7 @@
 			});
 			var $t3 = Serenity.LookupEditorOptions.$ctor();
 			$t3.lookupKey = 'Northwind.Category';
-			this.$category = Serenity.WX.create(Serenity.LookupEditor).call(null, $t4, $t3);
+			this.$category = Serenity.Widget.create(Serenity.LookupEditor).call(null, $t4, $t3);
 			Serenity.WX.change(this.$category, ss.mkdel(this, function(e3) {
 				this.refresh();
 			}));
@@ -1479,7 +1480,7 @@
 			});
 			var $t1 = Serenity.LookupEditorOptions.$ctor();
 			$t1.lookupKey = 'Northwind.SupplierCountry';
-			this.$country = Serenity.WX.create(Serenity.LookupEditor).call(null, $t2, $t1);
+			this.$country = Serenity.Widget.create(Serenity.LookupEditor).call(null, $t2, $t1);
 			Serenity.WX.change(this.$country, ss.mkdel(this, function(e1) {
 				this.refresh();
 			}));
@@ -1522,7 +1523,7 @@
 			});
 			var $t1 = Serenity.LookupEditorOptions.$ctor();
 			$t1.lookupKey = 'Northwind.Region';
-			this.$region = Serenity.WX.create(Serenity.LookupEditor).call(null, $t2, $t1);
+			this.$region = Serenity.Widget.create(Serenity.LookupEditor).call(null, $t2, $t1);
 			Serenity.WX.change(this.$region, ss.mkdel(this, function(e1) {
 				this.refresh();
 			}));
