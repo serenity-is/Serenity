@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -582,9 +583,9 @@ namespace Serenity
                 "<div style=\"clear: both\"></div>" +
             "</div>";
 
-        protected override string GetTemplate()
+        protected override async Task<string> GetTemplateAsync()
         {
-            return PanelTemplate;
+            return await Task.FromResult<string>(PanelTemplate);
         }
 
         public void OnFilterChange()

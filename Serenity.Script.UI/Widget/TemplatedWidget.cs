@@ -29,7 +29,7 @@ namespace Serenity
 
         protected virtual async Task InitializeAsync()
         {
-            string widgetMarkup = GetTemplate().Replace(new Regex("~_", "g"), idPrefix);
+            string widgetMarkup = (await GetTemplateAsync()).Replace(new Regex("~_", "g"), idPrefix);
             widgetMarkup = JsRender.Render(widgetMarkup);
 
             this.element.Html(widgetMarkup);
