@@ -4,8 +4,6 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    public delegate string CustomValidationRule(jQueryObject element);
-
     [ScriptName("WX")]
     public static class WidgetExtensions
     {
@@ -64,11 +62,6 @@ namespace Serenity
             return !Script.IsUndefined(((dynamic)e).originalEvent);
         }
 
-        public static bool ValidateElement(this jQueryValidator validator, Widget widget)
-        {
-            return validator.ValidateElement(widget.Element[0]);
-        }
-
         [IncludeGenericArguments(false)] // saltarelle bug ı var, değiştirme
         public static void Change<TWidget>(this TWidget widget, jQueryEventHandler handler)
             where TWidget: Widget
@@ -100,54 +93,49 @@ namespace Serenity
             return null;
         }
 
-        public static jQueryObject AddValidationRule(this Widget widget, string eventClass,
-            Func<jQueryObject, string> rule)
-        {
-            return AddValidationRule(widget.Element, eventClass, rule);
-        }
-
-        public static jQueryObject AddValidationRule(this jQueryObject element, string eventClass,
-            Func<jQueryObject, string> rule)
-        {
-            if (element.Length == 0)
-                return element;
-
-            if (rule == null)
-                throw new Exception("rule is null!");
-
-            element.AddClass("customValidate")
-                .Bind("customValidate." + eventClass, rule.As<jQueryEventHandler>());
-
-            return element;
-        }
-
-        public static jQueryObject RemoveValidationRule(this jQueryObject element, string eventClass)
-        {
-            element.Unbind("customValidate." + eventClass);
-            return element;
-        }
-
+        [Obsolete("Use Widget.ElementFor")]
         public static jQueryObject CreateElementFor<TEditor>()
         {
-            return CreateElementFor(typeof(TEditor));
+            return Widget.ElementFor<TEditor>();
         }
 
-        public static jQueryObject CreateElementFor(this Type editorType)
+        [Obsolete("Use Widget.ElementFor")]
+        public static jQueryObject CreateElementFor(Type editorType)
         {
-            var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
-            string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
-            return jQuery.FromHtml(elementHtml);
+            return Widget.ElementFor(editorType);
         }
 
+        [Obsolete("Use Widget.Create")]
         public static TWidget Create<TWidget>(Action<jQueryObject> initElement, object options = null)
             where TWidget : Widget
         {
-            var element = CreateElementFor(typeof(TWidget));
-            
-            if (initElement != null)
-                initElement(element);
+            return Widget.Create<TWidget>(initElement, options);
+        }
 
-            return (TWidget)Activator.CreateInstance(typeof(TWidget), element, options);
+        [Obsolete("Use ValidationExtensions.ValidateElement")]
+        public static bool ValidateElement(jQueryValidator validator, Widget widget)
+        {
+            return ValidationExtensions.ValidateElement(validator, widget);
+        }
+
+        [Obsolete("Use ValidationExtensions.AddValidationRule")]
+        public static jQueryObject AddValidationRule(Widget widget, string eventClass,
+            Func<jQueryObject, string> rule)
+        {
+            return ValidationExtensions.AddValidationRule(widget.Element, eventClass, rule);
+        }
+
+        [Obsolete("Use ValidationExtensions.AddValidationRule")]
+        public static jQueryObject AddValidationRule(jQueryObject element, string eventClass,
+            Func<jQueryObject, string> rule)
+        {
+            return ValidationExtensions.AddValidationRule(element, eventClass, rule);
+        }
+
+        [Obsolete("Use ValidationExtensions.RemoveValidationRule")]
+        public static jQueryObject RemoveValidationRule(jQueryObject element, string eventClass)
+        {
+            return ValidationExtensions.RemoveValidationRule(element, eventClass);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -46,9 +47,14 @@ namespace Serenity
             OnInit();
         }
 
+        protected virtual async Task InitalizeAsync()
+        {
+            await Task.FromResult(0);
+        }
+
         protected virtual bool IsAsyncWidget()
         {
-            return this.GetType().GetMethod("createAsync", BindingFlags.Static) != null;
+            return this is IAsyncWidget;
         }
 
         /// <summary>
@@ -103,6 +109,63 @@ namespace Serenity
         public string WidgetName
         {
             get { return widgetName; }
+        }
+
+        public static jQueryObject ElementFor<TEditor>()
+        {
+            return ElementFor(typeof(TEditor));
+        }
+
+        public static jQueryObject ElementFor(Type editorType)
+        {
+            var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
+            string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
+            return jQuery.FromHtml(elementHtml);
+        }
+
+        public static TWidget Create<TWidget>(Action<jQueryObject> initElement = null, object options = null)
+            where TWidget : Widget
+        {
+            var element = ElementFor(typeof(TWidget));
+
+            if (initElement != null)
+                initElement(element);
+
+            var widget = (TWidget)Activator.CreateInstance(typeof(TWidget), element, options);
+            if (widget.IsAsyncWidget())
+                throw new InvalidOperationException("Use Widget.CreateAsync to create async widgets");
+
+            return widget;
+        }
+
+        public static async Task<TWidget> CreateAsync<TWidget>(Action<jQueryObject> initElement = null, object options = null)
+            where TWidget : Widget, IAsyncWidget
+        {
+            var element = ElementFor(typeof(TWidget));
+
+            if (initElement != null)
+                initElement(element);
+
+            var widget = (TWidget)Activator.CreateInstance(typeof(TWidget), element, options);
+
+            if (widget.IsAsyncWidget())
+            {
+                await widget.InitalizeAsync();
+            }
+
+            return widget;
+        }
+
+        public static TWidget CreateInside<TWidget>(jQueryObject container, object options = null)
+            where TWidget : Widget
+        {
+            return Create<TWidget>(e => container.Append(e), options);
+        }
+
+        public static async Task<TWidget> CreateInsideAsync<TWidget>(jQueryObject container, object options = null)
+            where TWidget : Widget, IAsyncWidget
+        {
+            return await CreateAsync<TWidget>(e => container.Append(e), options);
         }
     }
 }

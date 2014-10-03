@@ -210,8 +210,7 @@ namespace Serenity
             var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
             string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
 
-            var element = editorType
-                .CreateElementFor()
+            var element = Widget.ElementFor(editorType)
                 .AddClass("editor")
                 .AddClass("flexify")
                 .Attribute("id", editorId)
