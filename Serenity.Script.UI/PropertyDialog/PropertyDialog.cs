@@ -3,6 +3,7 @@ using jQueryApi.UI.Widgets;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -33,7 +34,19 @@ namespace Serenity
         protected PropertyDialog(jQueryObject div, TOptions opt)
             : base(div, opt)
         {
-            InitPropertyGrid();
+            if (!IsAsyncWidget())
+            {
+                #pragma warning disable 618
+                InitPropertyGrid();
+                LoadInitialEntity();
+                #pragma warning restore 618
+            }
+        }
+
+        protected override async Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+            await InitPropertyGridAsync();
             LoadInitialEntity();
         }
 
@@ -141,13 +154,27 @@ namespace Serenity
 
         protected PropertyGrid propertyGrid;
 
+        [Obsolete("Prefer async version")]
         private void InitPropertyGrid()
         {
             var pgDiv = this.ById("PropertyGrid");
             if (pgDiv.Length <= 0)
                 return;
 
+            #pragma warning disable 618
             var pgOptions = GetPropertyGridOptions();
+            #pragma warning restore 618
+
+            propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+        }
+
+        private async Task InitPropertyGridAsync()
+        {
+            var pgDiv = this.ById("PropertyGrid");
+            if (pgDiv.Length <= 0)
+                return;
+
+            var pgOptions = await GetPropertyGridOptionsAsync();
 
             propertyGrid = new PropertyGrid(pgDiv, pgOptions);
         }
@@ -173,14 +200,25 @@ namespace Serenity
             }
         }
 
+        [Obsolete("Prefer async version")]
         protected virtual List<PropertyItem> GetPropertyItems()
         {
+            #pragma warning disable 618
             var formKey = GetFormKey();
             return Q.GetForm(formKey);
+            #pragma warning restore 618
         }
 
+        protected async virtual Task<List<PropertyItem>> GetPropertyItemsAsync()
+        {
+            var formKey = GetFormKey();
+            return await Q.GetFormAsync(formKey);
+        }
+
+        [Obsolete("Prefer async version")]
         protected virtual PropertyGridOptions GetPropertyGridOptions()
         {
+            #pragma warning disable 618
             return new PropertyGridOptions
             {
                 IdPrefix = this.idPrefix,
@@ -188,6 +226,18 @@ namespace Serenity
                 Mode = PropertyGridMode.Insert,
                 UseCategories = false,
                 LocalTextPrefix = "Forms." + GetFormKey() + "."
+            };
+            #pragma warning restore 618
+        }
+
+        protected async virtual Task<PropertyGridOptions> GetPropertyGridOptionsAsync()
+        {
+            return new PropertyGridOptions
+            {
+                IdPrefix = this.idPrefix,
+                Items = await GetPropertyItemsAsync(),
+                Mode = PropertyGridMode.Insert,
+                UseCategories = false
             };
         }
 

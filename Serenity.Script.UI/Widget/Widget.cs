@@ -1,6 +1,7 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Serenity
 {
@@ -43,6 +44,11 @@ namespace Serenity
             AddCssClass();
 
             OnInit();
+        }
+
+        protected virtual bool IsAsyncWidget()
+        {
+            return this.GetType().GetMethod("createAsync", BindingFlags.Static) != null;
         }
 
         /// <summary>

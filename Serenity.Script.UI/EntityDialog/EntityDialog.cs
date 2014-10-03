@@ -2,6 +2,7 @@
 using System.Collections;
 using jQueryApi.UI.Widgets;
 using jQueryApi;
+using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -25,8 +26,20 @@ namespace Serenity
         protected EntityDialog(jQueryObject div, TOptions opt)
             : base(div, opt)
         {
-            InitPropertyGrid();
-            InitLocalizationGrid();
+            if (!IsAsyncWidget())
+            {
+                #pragma warning disable 618
+                InitPropertyGrid();
+                InitLocalizationGrid();
+                #pragma warning restore 618
+            }
+        }
+
+        protected override async Task InitializeAsync()
+        {
+            await base.InitializeAsync();
+            await InitPropertyGridAsync();
+            await InitLocalizationGridAsync();
         }
 
         public override void Destroy()

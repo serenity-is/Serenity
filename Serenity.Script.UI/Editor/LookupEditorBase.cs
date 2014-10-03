@@ -3,6 +3,7 @@ using jQueryApi;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -11,13 +12,25 @@ namespace Serenity
         where TOptions: class, new()
         where TItem: class, new()
     {
-        public LookupEditorBase(jQueryObject hidden, TOptions opt)
+        protected LookupEditorBase(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)
         {
             var self = this;
 
-            UpdateItems();
-            Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, () => self.UpdateItems());
+            if (!IsAsyncWidget())
+            {
+                #pragma warning disable 618
+                UpdateItems();
+                Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, () => self.UpdateItems());
+                #pragma warning restore 618
+            }
+        }
+
+        protected async virtual Task InitializeAsync()
+        {
+            var self = this;
+            await UpdateItemsAsync();
+            Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, () => self.UpdateItemsAsync().Start());
         }
 
         public override void Destroy()
@@ -41,9 +54,15 @@ namespace Serenity
             return key;
         }
 
+        [Obsolete("Prefer async version")]
         protected virtual Lookup<TItem> GetLookup()
         {
             return Q.GetLookup<TItem>(GetLookupKey());
+        }
+
+        protected async virtual Task<Lookup<TItem>> GetLookupAsync()
+        {
+            return await Q.GetLookupAsync<TItem>(GetLookupKey());
         }
 
         protected virtual IEnumerable<TItem> GetItems(Lookup<TItem> lookup)
@@ -62,9 +81,37 @@ namespace Serenity
             return false;
         }
 
+        [Obsolete("Prefer async version")]
         protected virtual void UpdateItems()
         {
+            #pragma warning disable 618
             var lookup = GetLookup();
+            #pragma warning restore 618
+
+            ClearItems();
+
+            var items = GetItems(lookup);
+            foreach (dynamic item in items)
+            {
+                var text = GetItemText(item, lookup);
+                var disabled = GetItemDisabled(item, lookup);
+
+                object idValue = item[lookup.IdField];
+                string id = idValue == null ? "" : idValue.ToString();
+
+                this.items.Add(new Select2Item
+                {
+                    Id = id,
+                    Text = text,
+                    Source = item,
+                    Disabled = disabled
+                });
+            }
+        }
+
+        protected async virtual Task UpdateItemsAsync()
+        {
+            var lookup = await GetLookupAsync();
 
             ClearItems();
 

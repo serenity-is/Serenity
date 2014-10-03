@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -15,6 +16,19 @@ namespace Serenity
         {
             idPrefix = this.uniqueName + "_";
 
+            if (IsAsyncWidget())
+            {
+                #pragma warning disable 618
+                string widgetMarkup = GetTemplate().Replace(new Regex("~_", "g"), idPrefix);
+                widgetMarkup = JsRender.Render(widgetMarkup);
+                #pragma warning restore 618
+
+                this.element.Html(widgetMarkup);
+            }
+        }
+
+        protected virtual async Task InitializeAsync()
+        {
             string widgetMarkup = GetTemplate().Replace(new Regex("~_", "g"), idPrefix);
             widgetMarkup = JsRender.Render(widgetMarkup);
 
@@ -37,6 +51,7 @@ namespace Serenity
             return this.GetType().Name;
         }
 
+        [Obsolete("Prefer async version")]
         protected virtual string GetTemplate()
         {
             string templateName = this.GetTemplateName();
@@ -47,7 +62,29 @@ namespace Serenity
                 template = script.GetHtml();
             else
             {
+                #pragma warning disable 618
                 template = Q.GetTemplate(templateName);
+                #pragma warning restore 618
+
+                if (!Script.IsValue(template))
+                    throw new Exception(String.Format(
+                        "Can't locate template for widget '{0}' with name '{1}'!", this.GetType().Name, templateName));
+            }
+
+            return template;
+        }
+
+        protected async virtual Task<string> GetTemplateAsync()
+        {
+            string templateName = this.GetTemplateName();
+            string template;
+
+            var script = J("script#Template_" + templateName);
+            if (script.Length > 0)
+                template = script.GetHtml();
+            else
+            {
+                template = await Q.GetTemplateAsync(templateName);
 
                 if (!Script.IsValue(template))
                     throw new Exception(String.Format(

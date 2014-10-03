@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -18,7 +19,25 @@ namespace Serenity
             if (pgDiv.Length <= 0)
                 return;
 
+            #pragma warning disable 618
             var pgOptions = GetPropertyGridOptions();
+            #pragma warning restore 618
+            InitLocalizationGridCommon(pgOptions);
+        }
+
+        private async Task InitLocalizationGridAsync()
+        {
+            var pgDiv = this.ById("PropertyGrid");
+            if (pgDiv.Length <= 0)
+                return;
+
+            var pgOptions = await GetPropertyGridOptionsAsync();
+            InitLocalizationGridCommon(pgOptions);
+        }
+
+        private void InitLocalizationGridCommon(PropertyGridOptions pgOptions)
+        {
+            var pgDiv = this.ById("PropertyGrid");
             var anyLocalizable = false;
             foreach (var item in pgOptions.Items)
                 if (item.Localizable)
