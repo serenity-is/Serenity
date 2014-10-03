@@ -16,7 +16,7 @@ namespace Serenity
         {
             idPrefix = this.uniqueName + "_";
 
-            if (IsAsyncWidget())
+            if (!IsAsyncWidget())
             {
                 #pragma warning disable 618
                 string widgetMarkup = GetTemplate().Replace(new Regex("~_", "g"), idPrefix);

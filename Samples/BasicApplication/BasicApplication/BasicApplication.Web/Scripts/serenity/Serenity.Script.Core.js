@@ -312,17 +312,177 @@
 	$Q.getRemoteData = function(key) {
 		return $Q$ScriptData.ensure('RemoteData.' + key);
 	};
+	$Q.getRemoteDataAsync = function(key) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							$t1 = $Q$ScriptData.ensureAsync('RemoteData.' + key);
+							$state = 1;
+							$t1.continueWith($sm);
+							return;
+						}
+						case 1: {
+							$state = -1;
+							$tcs.setResult($t1.getAwaitedResult());
+							return;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
+	};
 	$Q.getLookup = function(key) {
 		return $Q$ScriptData.ensure('Lookup.' + key);
+	};
+	$Q.getLookupAsync = function(key) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							$t1 = $Q$ScriptData.ensureAsync('Lookup.' + key);
+							$state = 1;
+							$t1.continueWith($sm);
+							return;
+						}
+						case 1: {
+							$state = -1;
+							$tcs.setResult($t1.getAwaitedResult());
+							return;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
 	};
 	$Q.reloadLookup = function(key) {
 		$Q$ScriptData.reload('Lookup.' + key);
 	};
+	$Q.reloadLookupAsync = function(key) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							$t1 = $Q$ScriptData.reloadAsync('Lookup.' + key);
+							$state = 1;
+							$t1.continueWith($sm);
+							return;
+						}
+						case 1: {
+							$state = -1;
+							$tcs.setResult($t1.getAwaitedResult());
+							return;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
+	};
 	$Q.getForm = function(key) {
 		return $Q$ScriptData.ensure('Form.' + key);
 	};
+	$Q.getFormAsync = function(key) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							$t1 = $Q$ScriptData.ensureAsync('Form.' + key);
+							$state = 1;
+							$t1.continueWith($sm);
+							return;
+						}
+						case 1: {
+							$state = -1;
+							$tcs.setResult($t1.getAwaitedResult());
+							return;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
+	};
 	$Q.getTemplate = function(key) {
 		return $Q$ScriptData.ensure('Template.' + key);
+	};
+	$Q.getTemplateAsync = function(key) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							$t1 = $Q$ScriptData.ensureAsync('Template.' + key);
+							$state = 1;
+							$t1.continueWith($sm);
+							return;
+						}
+						case 1: {
+							$state = -1;
+							$tcs.setResult($t1.getAwaitedResult());
+							return;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
 	};
 	$Q.canLoadScriptData = function(name) {
 		return $Q$ScriptData.canLoad(name);
@@ -613,8 +773,83 @@
 		name = name + '.js?' + $Q$ScriptData.$registered[name];
 		$Q$ScriptData.$syncLoadScript($Q.resolveUrl('~/DynJS.axd/') + name);
 	};
+	$Q$ScriptData.$loadScriptDataAsync = function(name) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							if (!ss.keyExists($Q$ScriptData.$registered, name)) {
+								throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+							}
+							name = name + '.js?' + $Q$ScriptData.$registered[name];
+							$t1 = $Q$ScriptData.$loadScriptAsync($Q.resolveUrl('~/DynJS.axd/') + name);
+							$state = 1;
+							$t1.continueWith($sm);
+							return;
+						}
+						case 1: {
+							$state = -1;
+							$t1.getAwaitedResult();
+							$state = -1;
+							break $sm1;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+				$tcs.setResult(null);
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
+	};
 	$Q$ScriptData.$syncLoadScript = function(url) {
 		$.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
+	};
+	$Q$ScriptData.$loadScriptAsync = function(url) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							$Q.blockUI(null);
+							$t1 = ss.Task.fromPromise($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function() {
+								$Q.blockUndo();
+							}));
+							$state = 1;
+							$t1.continueWith($sm);
+							return;
+						}
+						case 1: {
+							$state = -1;
+							$t1.getAwaitedResult();
+							$state = -1;
+							break $sm1;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+				$tcs.setResult(null);
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
 	};
 	$Q$ScriptData.ensure = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];
@@ -627,6 +862,53 @@
 		}
 		return data;
 	};
+	$Q$ScriptData.ensureAsync = function(name) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), data, $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							data = $Q$ScriptData.$loadedData[name];
+							if (!ss.isValue(data)) {
+								$t1 = $Q$ScriptData.$loadScriptDataAsync(name);
+								$state = 2;
+								$t1.continueWith($sm);
+								return;
+							}
+							$state = 1;
+							continue $sm1;
+						}
+						case 2: {
+							$state = -1;
+							$t1.getAwaitedResult();
+							data = $Q$ScriptData.$loadedData[name];
+							if (!ss.isValue(data)) {
+								throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
+							}
+							$state = 1;
+							continue $sm1;
+						}
+						case 1: {
+							$state = -1;
+							$tcs.setResult(data);
+							return;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
+	};
 	$Q$ScriptData.reload = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
 			throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
@@ -635,6 +917,43 @@
 		$Q$ScriptData.$loadScriptData(name);
 		var data = $Q$ScriptData.$loadedData[name];
 		return data;
+	};
+	$Q$ScriptData.reloadAsync = function(name) {
+		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
+		var $sm = function() {
+			try {
+				$sm1:
+				for (;;) {
+					switch ($state) {
+						case 0: {
+							$state = -1;
+							if (!ss.keyExists($Q$ScriptData.$registered, name)) {
+								throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
+							}
+							$Q$ScriptData.$registered[name] = (new Date()).getTime().toString();
+							$t1 = $Q$ScriptData.$loadScriptDataAsync(name);
+							$state = 1;
+							$t1.continueWith($sm);
+							return;
+						}
+						case 1: {
+							$state = -1;
+							$t1.getAwaitedResult();
+							$tcs.setResult($Q$ScriptData.$loadedData[name]);
+							return;
+						}
+						default: {
+							break $sm1;
+						}
+					}
+				}
+			}
+			catch ($t2) {
+				$tcs.setException(ss.Exception.wrap($t2));
+			}
+		};
+		$sm();
+		return $tcs.task;
 	};
 	$Q$ScriptData.canLoad = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];
@@ -709,6 +1028,37 @@
 	};
 	$Texts$Dialogs.__typeName = 'Texts$Dialogs';
 	global.Texts$Dialogs = $Texts$Dialogs;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.CriteriaUtil
+	var $Serenity_Criteria = function() {
+	};
+	$Serenity_Criteria.__typeName = 'Serenity.Criteria';
+	$Serenity_Criteria.isEmpty = function(criteria) {
+		var array = criteria;
+		return array.length === 0 || array.length === 1 && ss.isInstanceOfType(array[0], String) && ss.cast(array[0], String).length === 0;
+	};
+	$Serenity_Criteria.join = function(criteria1, op, criteria2) {
+		if (ss.referenceEquals(null, criteria1)) {
+			throw new ss.ArgumentNullException('criteria1');
+		}
+		if (ss.referenceEquals(null, criteria2)) {
+			throw new ss.ArgumentNullException('criteria2');
+		}
+		if (Serenity.Criteria.isEmpty(criteria1)) {
+			return criteria2;
+		}
+		if (Serenity.Criteria.isEmpty(criteria2)) {
+			return criteria1;
+		}
+		return [criteria1, op, criteria2];
+	};
+	$Serenity_Criteria.paren = function(criteria) {
+		if (!Serenity.Criteria.isEmpty(criteria)) {
+			return ['()', criteria];
+		}
+		return criteria;
+	};
+	global.Serenity.Criteria = $Serenity_Criteria;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.DialogTypeAttribute
 	var $Serenity_DialogTypeAttribute = function(value) {
@@ -1364,6 +1714,7 @@
 	ss.initClass($Texts$Controls$PropertyGrid, $asm, {});
 	ss.initClass($Texts$Controls$QuickSearch, $asm, {});
 	ss.initClass($Texts$Dialogs, $asm, {});
+	ss.initClass($Serenity_Criteria, $asm, {});
 	ss.initClass($Serenity_DialogTypeAttribute, $asm, {
 		get_value: function() {
 			return this.$2$ValueField;

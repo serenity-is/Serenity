@@ -243,8 +243,8 @@ P {
   display: inline-block;
   width: 8px;
   height: 5px;
-  margin-left: 4px;
-  float: right;
+  position: absolute;
+  right: 4px;
 }
 .slick-row {
   line-height: 20px;

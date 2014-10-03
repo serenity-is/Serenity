@@ -57,7 +57,9 @@ namespace Serenity
         [Obsolete("Prefer async version")]
         protected virtual Lookup<TItem> GetLookup()
         {
+            #pragma warning disable 618
             return Q.GetLookup<TItem>(GetLookupKey());
+            #pragma warning restore 618
         }
 
         protected async virtual Task<Lookup<TItem>> GetLookupAsync()

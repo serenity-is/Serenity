@@ -43,28 +43,22 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Core, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Core">
       <HintPath>..\..\packages\Serenity.Core.1.2.1\lib\net45\Serenity.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Data">
       <HintPath>..\..\packages\Serenity.Data.1.2.1\lib\net45\Serenity.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Data.Entity, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Data.Entity">
       <HintPath>..\..\packages\Serenity.Data.Entity.1.2.1\lib\net45\Serenity.Data.Entity.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Services, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Services">
       <HintPath>..\..\packages\Serenity.Services.1.2.1\lib\net45\Serenity.Services.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Web, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Serenity.Web">
       <HintPath>..\..\packages\Serenity.Web.1.2.1\lib\net45\Serenity.Web.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
@@ -506,9 +500,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="fonts\Simple-Line-Icons.dev.svg" />
     <Content Include="fonts\Simple-Line-Icons.svg" />
-    <Content Include="packages.config" />
-    <Content Include="Content\toastr.scss" />
-    <Content Include="Content\toastr.less" />
     <Content Include="Modules\Common\Imports\ScriptEditorTypes.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ScriptEditorTypes.log</LastGenOutput>
@@ -519,16 +510,14 @@
       <DependentUpon>ScriptEditorTypes.tt</DependentUpon>
     </Content>
     <Content Include="Modules\Common\Imports\MultipleOutputHelper.ttinclude" />
-    <Content Include="fonts\Simple-Line-Icons.woff" />
-    <Content Include="fonts\Simple-Line-Icons.ttf" />
-    <Content Include="fonts\Simple-Line-Icons.eot" />
-    <Content Include="fonts\fontawesome-webfont.woff" />
-    <Content Include="fonts\fontawesome-webfont.ttf" />
-    <Content Include="fonts\fontawesome-webfont.eot" />
-    <Content Include="fonts\FontAwesome.otf" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\toastr.scss" />
+    <Content Include="Content\toastr.less" />
+    <Content Include="fonts\Simple-Line-Icons.woff" />
+    <Content Include="fonts\Simple-Line-Icons.ttf" />
+    <Content Include="fonts\Simple-Line-Icons.eot" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
     <Content Include="Readme.CodeGenerator.txt" />
     <Content Include="Scripts\bootstrap.js" />
@@ -537,7 +526,6 @@
     <Content Include="Scripts\jlayout.border.min.js" />
     <Content Include="Scripts\jquery-2.1.1.js" />
     <Content Include="Scripts\jquery-2.1.1.min.js" />
-    <Content Include="Scripts\jquery-2.1.1.min.map" />
     <Content Include="Scripts\jquery-ui-1.11.1.js" />
     <Content Include="Scripts\jquery-ui.min-1.11.1.js" />
     <Content Include="Scripts\jquery.autoNumeric.js" />
@@ -552,6 +540,11 @@
     <Content Include="Scripts\jquery.cropzoom.min.js" />
     <Content Include="Scripts\jquery.dialogextendQ.js" />
     <Content Include="Scripts\jquery.dialogextendQ.min.js" />
+    <Content Include="Scripts\jquery.event.drag.js" />
+    <Content Include="Scripts\jquery.event.drag.live.js" />
+    <Content Include="Scripts\jquery.event.drag.live.min.js" />
+    <Content Include="Scripts\jquery.event.drag.min.js" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.jlayout.js" />
     <Content Include="Scripts\jquery.jlayout.min.js" />
     <Content Include="Scripts\jquery.json.js" />
@@ -562,7 +555,6 @@
     <Content Include="Scripts\jquery.scrollintoview.min.js" />
     <Content Include="Scripts\jquery.slimscroll.js" />
     <Content Include="Scripts\jquery.slimscroll.min.js" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jsrender.js" />
@@ -573,32 +565,6 @@
     <Content Include="Scripts\saltarelle\linq.min.js" />
     <Content Include="Scripts\saltarelle\mscorlib.js" />
     <Content Include="Scripts\saltarelle\mscorlib.min.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.min.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.Slick.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.Slick.min.js" />
-    <Content Include="Scripts\serenity\Serenity.Script.Core.js" />
-    <Content Include="Scripts\serenity\Serenity.Script.Core.min.js" />
-    <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
-    <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
-    <Content Include="Scripts\serenity\texts\serenity.texts.tr.json" />
-    <Content Include="Scripts\serenity\texts\serenity.texts.ru.json" />
-    <None Include="Scripts\site\texts\site.texts.tr.json" />
-    <Content Include="Modules\Membership\Account\AccountLogin.cshtml" />
-    <Content Include="Modules\Web.config" />
-    <Content Include="fonts\OpenSans.woff" />
-    <Content Include="fonts\OpenSansBold.woff" />
-    <Content Include="fonts\OpenSansItalic.woff" />
-    <Content Include="fonts\OpenSansLight.woff" />
-    <Content Include="fonts\OpenSansSemiBold.woff" />
-    <Content Include="Modules\Common\Dashboard\DashboardIndex.cshtml" />
-    <Content Include="Modules\Membership\_ViewStart.cshtml" />
-    <Content Include="Modules\_ViewStart.cshtml" />
-    <Content Include="Content\site\site.layout.less" />
-    <Content Include="Scripts\jquery.event.drag.js" />
-    <Content Include="Scripts\jquery.event.drag.live.js" />
-    <Content Include="Scripts\jquery.event.drag.live.min.js" />
-    <Content Include="Scripts\jquery.event.drag.min.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_az.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
@@ -647,6 +613,34 @@
     <Content Include="Scripts\Select2-locales\select2_locale_zh-TW.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Externals.js" />
+    <Content Include="Scripts\serenity\Serenity.Externals.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Externals.Slick.js" />
+    <Content Include="Scripts\serenity\Serenity.Externals.Slick.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Script.Core.js" />
+    <Content Include="Scripts\serenity\Serenity.Script.Core.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
+    <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
+    <Content Include="packages.config" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="Scripts\jquery-2.1.1.min.map" />
+    <Content Include="Scripts\serenity\texts\serenity.texts.tr.json" />
+    <Content Include="Scripts\serenity\texts\serenity.texts.ru.json" />
+    <None Include="Scripts\site\texts\site.texts.tr.json" />
+    <Content Include="Modules\Membership\Account\AccountLogin.cshtml" />
+    <Content Include="Modules\Web.config" />
+    <Content Include="fonts\OpenSans.woff" />
+    <Content Include="fonts\OpenSansBold.woff" />
+    <Content Include="fonts\OpenSansItalic.woff" />
+    <Content Include="fonts\OpenSansLight.woff" />
+    <Content Include="fonts\OpenSansSemiBold.woff" />
+    <Content Include="Modules\Common\Dashboard\DashboardIndex.cshtml" />
+    <Content Include="Modules\Membership\_ViewStart.cshtml" />
+    <Content Include="Modules\_ViewStart.cshtml" />
+    <Content Include="Content\site\site.layout.less" />
     <Content Include="Scripts\site\BasicApplication.Script.js" />
     <Content Include="Scripts\SlickGrid\Controls\slick.columnpicker.js" />
     <Content Include="Scripts\SlickGrid\Controls\slick.pager.js" />
