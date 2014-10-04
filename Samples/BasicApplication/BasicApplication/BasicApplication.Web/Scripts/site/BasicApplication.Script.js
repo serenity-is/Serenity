@@ -194,7 +194,6 @@
 	// BasicApplication.Northwind.CategoryDialog
 	var $BasicApplication_Northwind_CategoryDialog = function() {
 		ss.makeGenericType(Serenity.EntityDialog$1, [Object]).call(this);
-		Q.alert('DisplayName');
 	};
 	$BasicApplication_Northwind_CategoryDialog.__typeName = 'BasicApplication.Northwind.CategoryDialog';
 	global.BasicApplication.Northwind.CategoryDialog = $BasicApplication_Northwind_CategoryDialog;
