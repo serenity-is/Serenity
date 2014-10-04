@@ -6,7 +6,7 @@ using Serenity.ComponentModel;
 
 namespace Serenity
 {
-    public static class PropertyEditorHelper
+    public class PropertyItemHelper
     {
         public static List<PropertyItem> GetPropertyItemsFor(Type type)
         {
@@ -180,5 +180,10 @@ namespace Serenity
 
             return list;
         }
+    }
+
+    [Obsolete("Use PropertyItemHelper")]
+    public class PropertyEditorHelper : PropertyItemHelper
+    {
     }
 }
