@@ -47,7 +47,7 @@
     </Compile>
     <Compile Include="Json\JsonServiceClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyGrid\PropertyEditorHelper.cs" />
+    <Compile Include="PropertyGrid\PropertyItemHelper.cs" />
     <Compile Include="RequestHandlers\DeleteRequestHandler.cs" />
     <Compile Include="RequestHandlers\Helpers\BatchGenerationUpdater.cs" />
     <Compile Include="RequestHandlers\Behaviours\ValidateParentAttribute.cs" />

@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Serenity.PropertyGrid
 {
-    public static class PropertyEditorHelper
+    public class PropertyItemHelper
     {
         public static List<PropertyItem> GetPropertyItemsFor(Type type)
         {
@@ -377,5 +377,10 @@ namespace Serenity.PropertyGrid
 
             return pi;
         }
+    }
+
+    [Obsolete("Use PropertyItemHelper")]
+    public class PropertyEditorHelper : PropertyItemHelper
+    {
     }
 }

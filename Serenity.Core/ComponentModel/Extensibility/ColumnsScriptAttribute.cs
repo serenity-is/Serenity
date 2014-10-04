@@ -3,9 +3,9 @@
 namespace Serenity.ComponentModel
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple=false)]
-    public sealed class FormScriptAttribute : Attribute
+    public sealed class ColumnsScriptAttribute : Attribute
     {
-        public FormScriptAttribute(string key)
+        public ColumnsScriptAttribute(string key)
         {
             if (key.IsEmptyOrNull())
                 throw new ArgumentNullException("key");

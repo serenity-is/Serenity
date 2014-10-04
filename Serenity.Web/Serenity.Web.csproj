@@ -126,6 +126,8 @@
     <Compile Include="Reporting\Worksheet\ReportColumnConverter.cs" />
     <Compile Include="Script\DynamicScriptTypes\RowLookupScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\LookupScript.cs" />
+    <Compile Include="Script\PropertyEditor\ColumnsScript.cs" />
+    <Compile Include="Script\PropertyEditor\FormScript.cs" />
     <Compile Include="Script\PropertyEditor\LookupScriptRegistration.cs" />
     <Compile Include="Script\PropertyEditor\FormScriptRegistration.cs" />
     <Compile Include="Mvc\TemplateHelper.cs" />
@@ -170,7 +172,7 @@
     <Compile Include="Script\DynamicScriptTypes\LocalInitScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\LocalTextScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\DbLookupScript.cs" />
-    <Compile Include="Script\PropertyEditor\FormScript.cs" />
+    <Compile Include="Script\PropertyEditor\PropertyItemsScript.cs" />
     <Compile Include="Script\PropertyEditor\ICustomizedFormScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\RegisteredScripts.cs" />
     <Compile Include="Script\ScriptBundleManager.cs" />
