@@ -27,12 +27,18 @@ namespace Serenity
             }
         }
 
-        protected virtual async Task InitializeAsync()
+        protected override void InitializeAsync(Action callback)
         {
-            string widgetMarkup = (await GetTemplateAsync()).Replace(new Regex("~_", "g"), idPrefix);
-            widgetMarkup = JsRender.Render(widgetMarkup);
-
-            this.element.Html(widgetMarkup);
+            base.InitializeAsync(() =>
+            {
+                GetTemplate(template =>
+                {
+                    string widgetMarkup = template.Replace(new Regex("~_", "g"), idPrefix);
+                    widgetMarkup = JsRender.Render(widgetMarkup);
+                    this.element.Html(widgetMarkup);
+                    callback();
+                });
+            });
         }
 
         public jQueryObject ById(string id)
@@ -74,24 +80,27 @@ namespace Serenity
             return template;
         }
 
-        protected async virtual Task<string> GetTemplateAsync()
+        protected virtual void GetTemplate(Action<string> callback)
         {
             string templateName = this.GetTemplateName();
-            string template;
 
             var script = J("script#Template_" + templateName);
             if (script.Length > 0)
-                template = script.GetHtml();
+            {
+                var template = script.GetHtml();
+                callback(template);
+            }
             else
             {
-                template = await Q.GetTemplateAsync(templateName);
+                Q.GetTemplate(templateName, template =>
+                {
+                    if (!Script.IsValue(template))
+                        throw new Exception(String.Format(
+                            "Can't locate template for widget '{0}' with name '{1}'!", this.GetType().Name, templateName));
 
-                if (!Script.IsValue(template))
-                    throw new Exception(String.Format(
-                        "Can't locate template for widget '{0}' with name '{1}'!", this.GetType().Name, templateName));
+                    callback(template);
+                });
             }
-
-            return template;
         }
     }
 

@@ -108,7 +108,7 @@
     <Compile Include="PropertyGrid\IValidateRequired.cs" />
     <Compile Include="PropertyGrid\Attributes\MaxLengthAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\OneWayAttribute.cs" />
-    <Compile Include="PropertyGrid\PropertyEditorHelper.cs" />
+    <Compile Include="PropertyGrid\PropertyItemHelper.cs" />
     <Compile Include="PropertyGrid\PropertyGrid.cs" />
     <Compile Include="PropertyGrid\Attributes\RequiredAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\UpdatableAttribute.cs" />

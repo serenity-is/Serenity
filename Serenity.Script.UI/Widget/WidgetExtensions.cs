@@ -87,6 +87,18 @@ namespace Serenity
             return widget.Element.Closest(".field");
         }
 
+        [IncludeGenericArguments(false)]
+        public static TWidget Init<TWidget>(this TWidget widget, Action<TWidget> action = null)
+            where TWidget: Widget
+        {
+            widget.Init(w =>
+            {
+                action(widget);
+            });
+
+            return widget;
+        }
+
         [InlineCode("{obj}.bind({eventName}, {handler})")]
         public static jQueryObject Bind2(this jQueryObject obj, string eventName, Action<jQueryEvent, dynamic> handler)
         {

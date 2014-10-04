@@ -35,11 +35,11 @@ namespace Serenity
             }
         }
 
-        protected override async Task InitializeAsync()
+        protected override void InitializeAsync(Action callback)
         {
-            await base.InitializeAsync();
-            await InitPropertyGridAsync();
-            await InitLocalizationGridAsync();
+            base.InitializeAsync(() => 
+                InitPropertyGrid(() => 
+                    InitLocalizationGrid(() => callback())));
         }
 
         public override void Destroy()
@@ -149,7 +149,7 @@ namespace Serenity
     public abstract class EntityDialog<TEntity> : EntityDialog<TEntity, object>
         where TEntity : class, new()
     {
-        public EntityDialog()
+        protected EntityDialog()
             : base(null)
         {
         }

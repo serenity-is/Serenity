@@ -25,21 +25,20 @@ namespace Serenity
             propertyGrid = new PropertyGrid(pgDiv, pgOptions);
         }
 
-        private async Task InitPropertyGridAsync()
+        private void InitPropertyGrid(Action callback)
         {
             var pgDiv = this.ById("PropertyGrid");
             if (pgDiv.Length <= 0)
+            {
+                callback();
                 return;
+            }
 
-            var pgOptions = await GetPropertyGridOptionsAsync();
-
-            propertyGrid = new PropertyGrid(pgDiv, pgOptions);
-        }
-
-        protected async virtual Task<List<PropertyItem>> GetPropertyItemsAsync()
-        {
-            var formKey = GetFormKey();
-            return await Q.GetFormAsync(formKey);
+            GetPropertyGridOptions(pgOptions =>
+            {
+                propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+                callback();
+            });
         }
 
         [Obsolete("Prefer async version")]
@@ -65,14 +64,21 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected async virtual Task<PropertyGridOptions> GetPropertyGridOptionsAsync()
+        protected virtual void GetPropertyGridOptions(Action<PropertyGridOptions> callback)
         {
-            return new PropertyGridOptions
-            {
-                IdPrefix = this.idPrefix,
-                Items = await GetPropertyItemsAsync(),
-                Mode = PropertyGridMode.Insert
-            };
+            GetPropertyItems(propertyItems =>
+                callback(new PropertyGridOptions
+                {
+                    IdPrefix = this.idPrefix,
+                    Items = propertyItems,
+                    Mode = PropertyGridMode.Insert
+                }));
+        }
+
+        protected virtual void GetPropertyItems(Action<List<PropertyItem>> callback)
+        {
+            var formKey = GetFormKey();
+            Q.GetForm(formKey, callback);
         }
     }
 }

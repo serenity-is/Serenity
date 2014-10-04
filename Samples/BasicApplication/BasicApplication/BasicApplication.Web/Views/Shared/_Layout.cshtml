@@ -90,7 +90,7 @@ else
     <script type="text/javascript">
     $().ready(function () {
         $('#side-menu').metisMenu();
-        new BasicApplication.Common.SidebarSearch($('#SidebarSearch'), $('#side-menu'));
+        new BasicApplication.Common.SidebarSearch($('#SidebarSearch'), $('#side-menu')).init();
         @RenderSection("PageInitScript", false);
 
         var doLayout = function () {

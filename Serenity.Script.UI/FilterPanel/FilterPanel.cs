@@ -583,9 +583,9 @@ namespace Serenity
                 "<div style=\"clear: both\"></div>" +
             "</div>";
 
-        protected override async Task<string> GetTemplateAsync()
+        protected override void GetTemplate(Action<string> callback)
         {
-            return await Task.FromResult<string>(PanelTemplate);
+            callback(PanelTemplate);
         }
 
         public void OnFilterChange()

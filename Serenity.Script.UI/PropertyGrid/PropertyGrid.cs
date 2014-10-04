@@ -244,22 +244,25 @@ namespace Serenity
                 editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
             }
 
-            if (item.EditorParams != null)
+            editor.Init(delegate
             {
-                var props = editor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                var propByName = props.Where(x => x.CanWrite && 
-                        (x.GetCustomAttributes(typeof(OptionAttribute)).Length > 0 ||
-                         x.GetCustomAttributes(typeof(DisplayNameAttribute)).Length > 0))
-                    .ToDictionary(x => ReflectionUtils.MakeCamelCase(x.Name));
-
-                foreach (var k in item.EditorParams.Keys)
+                if (item.EditorParams != null)
                 {
-                    PropertyInfo p;
-                    if (propByName.TryGetValue(ReflectionUtils.MakeCamelCase(k), out p))
-                        p.SetValue(editor, item.EditorParams[k]);
+                    var props = editor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                    var propByName = props.Where(x => x.CanWrite && 
+                            (x.GetCustomAttributes(typeof(OptionAttribute)).Length > 0 ||
+                             x.GetCustomAttributes(typeof(DisplayNameAttribute)).Length > 0))
+                        .ToDictionary(x => ReflectionUtils.MakeCamelCase(x.Name));
+
+                    foreach (var k in item.EditorParams.Keys)
+                    {
+                        PropertyInfo p;
+                        if (propByName.TryGetValue(ReflectionUtils.MakeCamelCase(k), out p))
+                            p.SetValue(editor, item.EditorParams[k]);
+                    }
                 }
-            }
+            });
 
             if (editor is BooleanEditor)
                 label.RemoveAttr("for");

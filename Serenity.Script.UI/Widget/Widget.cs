@@ -1,6 +1,7 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
+using System.Html;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace Serenity
         /// </summary>
         private static int NextWidgetNumber = 0;
 
+        protected bool? initialized;
         protected string widgetName;
         protected string uniqueName;
         protected jQueryObject element;
@@ -43,18 +45,42 @@ namespace Serenity
                 .Data(widgetName, this);
 
             AddCssClass();
-
-            OnInit();
         }
 
-        protected virtual async Task InitalizeAsync()
+        protected internal Widget Init(Action<Widget> callback = null)
         {
-            await Task.FromResult(0);
+            if (initialized == true || !IsAsyncWidget())
+            {
+                initialized = true;
+
+                if (callback != null)
+                    callback(this);
+
+                return this;
+            }
+
+            if (initialized != null)
+                throw new InvalidOperationException("Widget already initializing!");
+
+            initialized = false;
+
+            InitializeAsync(delegate {
+                initialized = true;
+                if (callback != null)
+                    callback(this);
+            });
+
+            return this;
         }
 
         protected virtual bool IsAsyncWidget()
         {
             return this is IAsyncWidget;
+        }
+
+        protected virtual void InitializeAsync(Action callback)
+        {
+            callback();
         }
 
         /// <summary>
@@ -76,13 +102,6 @@ namespace Serenity
         protected virtual void AddCssClass()
         {
             this.element.AddClass("s-" + this.GetType().Name);
-        }
-
-        /// <summary>
-        /// Can be overridden to do something after widget constructor (only the base one not derived) is run
-        /// </summary>
-        protected virtual void OnInit()
-        {
         }
 
         /// <summary>
@@ -123,49 +142,50 @@ namespace Serenity
             return jQuery.FromHtml(elementHtml);
         }
 
-        public static TWidget Create<TWidget>(Action<jQueryObject> initElement = null, object options = null)
-            where TWidget : Widget
+        public static Widget CreateOfType(Type widgetType, Action<jQueryObject> element = null,
+            object options = null, Action<Widget> init = null)
         {
-            var element = ElementFor(typeof(TWidget));
+            Widget widget;
 
-            if (initElement != null)
-                initElement(element);
-
-            var widget = (TWidget)Activator.CreateInstance(typeof(TWidget), element, options);
-            if (widget.IsAsyncWidget())
-                throw new InvalidOperationException("Use Widget.CreateAsync to create async widgets");
-
-            return widget;
-        }
-
-        public static async Task<TWidget> CreateAsync<TWidget>(Action<jQueryObject> initElement = null, object options = null)
-            where TWidget : Widget, IAsyncWidget
-        {
-            var element = ElementFor(typeof(TWidget));
-
-            if (initElement != null)
-                initElement(element);
-
-            var widget = (TWidget)Activator.CreateInstance(typeof(TWidget), element, options);
-
-            if (widget.IsAsyncWidget())
+            if (typeof(IDialog).IsAssignableFrom(widgetType))
             {
-                await widget.InitalizeAsync();
+                widget = (Widget)Activator.CreateInstance(widgetType, options);
+
+                if (element != null)
+                    element(widget.element);
+            }
+            else
+            {
+                var e = ElementFor(widgetType);
+
+                if (element != null)
+                    element(e);
+
+                widget = (Widget)Activator.CreateInstance(widgetType, e, options);
             }
 
+            widget.Init(delegate
+            {
+                if (init != null)
+                    init(widget);
+            });
+
             return widget;
         }
 
-        public static TWidget CreateInside<TWidget>(jQueryObject container, object options = null)
+        public static TWidget Create<TWidget>(Action<jQueryObject> element = null, object options = null,
+                Action<TWidget> init = null) 
             where TWidget : Widget
         {
-            return Create<TWidget>(e => container.Append(e), options);
+            return Widget.CreateOfType(typeof(TWidget), element, options,
+                init == null ? (Action<Widget>)null : (w => init(w.As<TWidget>()))).As<TWidget>();
         }
 
-        public static async Task<TWidget> CreateInsideAsync<TWidget>(jQueryObject container, object options = null)
-            where TWidget : Widget, IAsyncWidget
+        public static TWidget CreateInside<TWidget>(jQueryObject container, object options = null,
+                Action<TWidget> init = null)
+            where TWidget : Widget
         {
-            return await CreateAsync<TWidget>(e => container.Append(e), options);
+            return Create<TWidget>(e => container.Append(e), options, init);
         }
     }
 }

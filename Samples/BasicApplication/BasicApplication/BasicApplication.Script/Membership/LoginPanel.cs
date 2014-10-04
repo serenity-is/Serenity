@@ -3,6 +3,7 @@ namespace BasicApplication.Membership
 {
     using jQueryApi;
     using Serenity;
+    using System;
     using System.Collections.Generic;
     using System.Html;
 
@@ -11,28 +12,38 @@ namespace BasicApplication.Membership
     {
         public LoginPanel()
         {
-            this.ById("LoginButton").Click((s, e) => {
-                e.PreventDefault();
+        }
 
-                if (!ValidateForm())
-                    return;
-
-                var request = GetSaveEntity();
-                Q.ServiceCall(new ServiceCallOptions
+        protected override void InitializeAsync(Action callback)
+        {
+            base.InitializeAsync(() =>
+            {
+                this.ById("LoginButton").Click((s, e) =>
                 {
-                    Url = Q.ResolveUrl("~/Account/Login"),
-                    Request = request.As<ServiceRequest>(),
-                    OnSuccess = response =>
+                    e.PreventDefault();
+
+                    if (!ValidateForm())
+                        return;
+
+                    var request = GetSaveEntity();
+                    Q.ServiceCall(new ServiceCallOptions
                     {
-                        var q = Q.Externals.ParseQueryString();
-                        var r = q["returnUrl"] ?? q["ReturnUrl"];
-                        if (!string.IsNullOrEmpty(r))
-                            Window.Location.Href = r;
-                        else
-                            Window.Location.Href = Q.ResolveUrl("~/");
-                    }
+                        Url = Q.ResolveUrl("~/Account/Login"),
+                        Request = request.As<ServiceRequest>(),
+                        OnSuccess = response =>
+                        {
+                            var q = Q.Externals.ParseQueryString();
+                            var r = q["returnUrl"] ?? q["ReturnUrl"];
+                            if (!string.IsNullOrEmpty(r))
+                                Window.Location.Href = r;
+                            else
+                                Window.Location.Href = Q.ResolveUrl("~/");
+                        }
+                    });
+
                 });
-                
+
+                callback();
             });
         }
     }

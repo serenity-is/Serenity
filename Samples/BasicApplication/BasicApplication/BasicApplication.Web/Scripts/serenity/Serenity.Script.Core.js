@@ -312,177 +312,40 @@
 	$Q.getRemoteData = function(key) {
 		return $Q$ScriptData.ensure('RemoteData.' + key);
 	};
-	$Q.getRemoteDataAsync = function(key) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							$t1 = $Q$ScriptData.ensureAsync('RemoteData.' + key);
-							$state = 1;
-							$t1.continueWith($sm);
-							return;
-						}
-						case 1: {
-							$state = -1;
-							$tcs.setResult($t1.getAwaitedResult());
-							return;
-						}
-						default: {
-							break $sm1;
-						}
-					}
-				}
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
+	$Q.getRemoteData$1 = function(key, callback) {
+		$Q$ScriptData.ensure$1('RemoteData.' + key, callback);
 	};
 	$Q.getLookup = function(key) {
 		return $Q$ScriptData.ensure('Lookup.' + key);
 	};
-	$Q.getLookupAsync = function(key) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							$t1 = $Q$ScriptData.ensureAsync('Lookup.' + key);
-							$state = 1;
-							$t1.continueWith($sm);
-							return;
-						}
-						case 1: {
-							$state = -1;
-							$tcs.setResult($t1.getAwaitedResult());
-							return;
-						}
-						default: {
-							break $sm1;
-						}
-					}
-				}
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
+	$Q.getLookup$1 = function(key, callback) {
+		$Q$ScriptData.ensure$1('Lookup.' + key, callback);
 	};
 	$Q.reloadLookup = function(key) {
 		$Q$ScriptData.reload('Lookup.' + key);
 	};
-	$Q.reloadLookupAsync = function(key) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							$t1 = $Q$ScriptData.reloadAsync('Lookup.' + key);
-							$state = 1;
-							$t1.continueWith($sm);
-							return;
-						}
-						case 1: {
-							$state = -1;
-							$tcs.setResult($t1.getAwaitedResult());
-							return;
-						}
-						default: {
-							break $sm1;
-						}
-					}
-				}
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
+	$Q.reloadLookup$1 = function(key, callback) {
+		$Q$ScriptData.reload$1('Lookup.' + key, function(o) {
+			callback();
+		});
+	};
+	$Q.getColumns = function(key) {
+		return $Q$ScriptData.ensure('Columns.' + key);
+	};
+	$Q.getColumns$1 = function(key, callback) {
+		$Q$ScriptData.ensure$1('Columns.' + key, callback);
 	};
 	$Q.getForm = function(key) {
 		return $Q$ScriptData.ensure('Form.' + key);
 	};
-	$Q.getFormAsync = function(key) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							$t1 = $Q$ScriptData.ensureAsync('Form.' + key);
-							$state = 1;
-							$t1.continueWith($sm);
-							return;
-						}
-						case 1: {
-							$state = -1;
-							$tcs.setResult($t1.getAwaitedResult());
-							return;
-						}
-						default: {
-							break $sm1;
-						}
-					}
-				}
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
+	$Q.getForm$1 = function(key, callback) {
+		$Q$ScriptData.ensure$1('Form.' + key, callback);
 	};
 	$Q.getTemplate = function(key) {
 		return $Q$ScriptData.ensure('Template.' + key);
 	};
-	$Q.getTemplateAsync = function(key) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							$t1 = $Q$ScriptData.ensureAsync('Template.' + key);
-							$state = 1;
-							$t1.continueWith($sm);
-							return;
-						}
-						case 1: {
-							$state = -1;
-							$tcs.setResult($t1.getAwaitedResult());
-							return;
-						}
-						default: {
-							break $sm1;
-						}
-					}
-				}
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
+	$Q.getTemplate$1 = function(key, callback) {
+		$Q$ScriptData.ensure$1('Template.' + key, callback);
 	};
 	$Q.canLoadScriptData = function(name) {
 		return $Q$ScriptData.canLoad(name);
@@ -766,6 +629,17 @@
 	$Q$ScriptData.unbindFromChange = function(regClass) {
 		$(document.body).unbind('scriptdatachange.' + regClass);
 	};
+	$Q$ScriptData.$syncLoadScript = function(url) {
+		$.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
+	};
+	$Q$ScriptData.$loadScript = function(url, callback) {
+		$Q.blockUI(null);
+		$.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function() {
+			$Q.blockUndo();
+		}).done(function() {
+			callback();
+		});
+	};
 	$Q$ScriptData.$loadScriptData = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
 			throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
@@ -773,83 +647,12 @@
 		name = name + '.js?' + $Q$ScriptData.$registered[name];
 		$Q$ScriptData.$syncLoadScript($Q.resolveUrl('~/DynJS.axd/') + name);
 	};
-	$Q$ScriptData.$loadScriptDataAsync = function(name) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							if (!ss.keyExists($Q$ScriptData.$registered, name)) {
-								throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
-							}
-							name = name + '.js?' + $Q$ScriptData.$registered[name];
-							$t1 = $Q$ScriptData.$loadScriptAsync($Q.resolveUrl('~/DynJS.axd/') + name);
-							$state = 1;
-							$t1.continueWith($sm);
-							return;
-						}
-						case 1: {
-							$state = -1;
-							$t1.getAwaitedResult();
-							$state = -1;
-							break $sm1;
-						}
-						default: {
-							break $sm1;
-						}
-					}
-				}
-				$tcs.setResult(null);
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
-	};
-	$Q$ScriptData.$syncLoadScript = function(url) {
-		$.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
-	};
-	$Q$ScriptData.$loadScriptAsync = function(url) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							$Q.blockUI(null);
-							$t1 = ss.Task.fromPromise($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function() {
-								$Q.blockUndo();
-							}));
-							$state = 1;
-							$t1.continueWith($sm);
-							return;
-						}
-						case 1: {
-							$state = -1;
-							$t1.getAwaitedResult();
-							$state = -1;
-							break $sm1;
-						}
-						default: {
-							break $sm1;
-						}
-					}
-				}
-				$tcs.setResult(null);
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
+	$Q$ScriptData.$loadScriptData$1 = function(name, callback) {
+		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
+			throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+		}
+		name = name + '.js?' + $Q$ScriptData.$registered[name];
+		$Q$ScriptData.$loadScript($Q.resolveUrl('~/DynJS.axd/') + name, callback);
 	};
 	$Q$ScriptData.ensure = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];
@@ -862,52 +665,19 @@
 		}
 		return data;
 	};
-	$Q$ScriptData.ensureAsync = function(name) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), data, $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							data = $Q$ScriptData.$loadedData[name];
-							if (!ss.isValue(data)) {
-								$t1 = $Q$ScriptData.$loadScriptDataAsync(name);
-								$state = 2;
-								$t1.continueWith($sm);
-								return;
-							}
-							$state = 1;
-							continue $sm1;
-						}
-						case 2: {
-							$state = -1;
-							$t1.getAwaitedResult();
-							data = $Q$ScriptData.$loadedData[name];
-							if (!ss.isValue(data)) {
-								throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
-							}
-							$state = 1;
-							continue $sm1;
-						}
-						case 1: {
-							$state = -1;
-							$tcs.setResult(data);
-							return;
-						}
-						default: {
-							break $sm1;
-						}
-					}
+	$Q$ScriptData.ensure$1 = function(name, callback) {
+		var data = $Q$ScriptData.$loadedData[name];
+		if (!ss.isValue(data)) {
+			$Q$ScriptData.$loadScriptData$1(name, function() {
+				data = $Q$ScriptData.$loadedData[name];
+				if (!ss.isValue(data)) {
+					throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
 				}
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
+				callback(data);
+			});
+			return;
+		}
+		callback(data);
 	};
 	$Q$ScriptData.reload = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
@@ -918,42 +688,14 @@
 		var data = $Q$ScriptData.$loadedData[name];
 		return data;
 	};
-	$Q$ScriptData.reloadAsync = function(name) {
-		var $state = 0, $tcs = new ss.TaskCompletionSource(), $t1;
-		var $sm = function() {
-			try {
-				$sm1:
-				for (;;) {
-					switch ($state) {
-						case 0: {
-							$state = -1;
-							if (!ss.keyExists($Q$ScriptData.$registered, name)) {
-								throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
-							}
-							$Q$ScriptData.$registered[name] = (new Date()).getTime().toString();
-							$t1 = $Q$ScriptData.$loadScriptDataAsync(name);
-							$state = 1;
-							$t1.continueWith($sm);
-							return;
-						}
-						case 1: {
-							$state = -1;
-							$t1.getAwaitedResult();
-							$tcs.setResult($Q$ScriptData.$loadedData[name]);
-							return;
-						}
-						default: {
-							break $sm1;
-						}
-					}
-				}
-			}
-			catch ($t2) {
-				$tcs.setException(ss.Exception.wrap($t2));
-			}
-		};
-		$sm();
-		return $tcs.task;
+	$Q$ScriptData.reload$1 = function(name, callback) {
+		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
+			throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
+		}
+		$Q$ScriptData.$registered[name] = (new Date()).getTime().toString();
+		$Q$ScriptData.$loadScriptData$1(name, function() {
+			callback($Q$ScriptData.$loadedData[name]);
+		});
 	};
 	$Q$ScriptData.canLoad = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];

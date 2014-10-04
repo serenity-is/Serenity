@@ -129,8 +129,13 @@ namespace Serenity
                             return;
 
                         var cloneEntity = GetCloningEntity();
-                        var cloneDialog = Activator.CreateInstance(this.GetType(), new object()).As<EntityDialog<TEntity, TOptions>>();
-                        cloneDialog.Cascade(this.element).BubbleDataChange(this).LoadEntityAndOpenDialog(cloneEntity);
+                        Widget.CreateOfType(
+                            widgetType: this.GetType(),
+                            options: new object(),
+                            init: w => w.As<EntityDialog<TEntity, TOptions>>()
+                                    .Cascade(this.element)
+                                    .BubbleDataChange(this)
+                                    .LoadEntityAndOpenDialog(cloneEntity));
                     }
                 });
             }

@@ -36,29 +36,6 @@ namespace Serenity
             }
 
             [Obsolete("Prefer asynchronous version")]
-            private static void LoadScriptData(string name)
-            {
-                if (!registered.ContainsKey(name))
-                    throw new Exception(String.Format("Script data {0} is not found in registered script list!", name));
-
-                name = name + ".js?" + registered[name];
-
-                #pragma warning disable 618
-                SyncLoadScript(Q.ResolveUrl("~/DynJS.axd/") + name);
-                #pragma warning restore 618
-            }
-
-            private static async Task LoadScriptDataAsync(string name)
-            {
-                if (!registered.ContainsKey(name))
-                    throw new Exception(String.Format("Script data {0} is not found in registered script list!", name));
-
-                name = name + ".js?" + registered[name];
-
-                await LoadScriptAsync(Q.ResolveUrl("~/DynJS.axd/") + name);
-            }
-
-            [Obsolete("Prefer asynchronous version")]
             private static void SyncLoadScript(string url)
             {
                 jQuery.Ajax(new jQueryAjaxOptions
@@ -72,11 +49,11 @@ namespace Serenity
                 });
             }
 
-            private static async Task LoadScriptAsync(string url)
+            private static void LoadScript(string url, Action callback)
             {
                 Q.BlockUI();
 
-                await Task.FromPromise(jQuery.Ajax(new jQueryAjaxOptions
+                jQuery.Ajax(new jQueryAjaxOptions
                 {
                     Async = true,
                     Cache = true,
@@ -84,9 +61,35 @@ namespace Serenity
                     Url = url,
                     Data = null,
                     DataType = "script"
-                }).Always(delegate() {
-                    Q.BlockUndo();
-                }));
+                })
+                .Always(() => Q.BlockUndo())
+                .Done(() =>
+                {
+                    callback();
+                });
+            }
+
+            [Obsolete("Prefer asynchronous version")]
+            private static void LoadScriptData(string name)
+            {
+                if (!registered.ContainsKey(name))
+                    throw new Exception(String.Format("Script data {0} is not found in registered script list!", name));
+
+                name = name + ".js?" + registered[name];
+
+                #pragma warning disable 618
+                SyncLoadScript(Q.ResolveUrl("~/DynJS.axd/") + name);
+                #pragma warning restore 618
+            }
+
+            private static void LoadScriptData(string name, Action callback)
+            {
+                if (!registered.ContainsKey(name))
+                    throw new Exception(String.Format("Script data {0} is not found in registered script list!", name));
+
+                name = name + ".js?" + registered[name];
+
+                LoadScript(Q.ResolveUrl("~/DynJS.axd/") + name, callback);
             }
 
             [Obsolete("Prefer asynchronous version")]
@@ -107,20 +110,27 @@ namespace Serenity
                 return data;
             }
 
-            public static async Task<object> EnsureAsync(string name)
+            [IncludeGenericArguments(false)]
+            public static void Ensure<TData>(string name, Action<TData> callback)
             {
-                var data = loadedData[name];
+                var data = loadedData[name].As<TData>();
 
                 if (!Script.IsValue(data))
                 {
-                    await LoadScriptDataAsync(name);
-                    data = loadedData[name];
+                    LoadScriptData(name, delegate
+                    {
+                        data = loadedData[name].As<TData>();
 
-                    if (!Script.IsValue(data))
-                        throw new NotSupportedException(String.Format("Can't load script data: {0}!", name));
+                        if (!Script.IsValue(data))
+                            throw new NotSupportedException(String.Format("Can't load script data: {0}!", name));
+
+                        callback(data);
+                    });
+
+                    return;
                 }
 
-                return data;
+                callback(data);
             }
 
             [Obsolete("Prefer asynchronous version")]
@@ -131,23 +141,27 @@ namespace Serenity
 
                 registered[name] = new JsDate().GetTime().ToString();
 
+                #pragma warning disable 618
                 LoadScriptData(name);
+                #pragma warning restore 618
 
                 var data = loadedData[name];
 
                 return data;
             }
 
-            public static async Task<object> ReloadAsync(string name)
+            [IncludeGenericArguments(false)]
+            public static void Reload<TData>(string name, Action<TData> callback)
             {
                 if (!registered.ContainsKey(name))
                     throw new NotSupportedException(String.Format("Script data {0} is not found in registered script list!"));
 
                 registered[name] = new JsDate().GetTime().ToString();
 
-                await LoadScriptDataAsync(name);
-                
-                return loadedData[name];
+                LoadScriptData(name, delegate
+                {
+                    callback(loadedData[name].As<TData>());
+                });
             }
 
             public static bool CanLoad(string name)
@@ -185,9 +199,9 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        public static async Task<TData> GetRemoteDataAsync<TData>(string key)
+        public static void GetRemoteData<TData>(string key, Action<TData> callback)
         {
-            return (await ScriptData.EnsureAsync("RemoteData." + key)).As<TData>();
+            ScriptData.Ensure<TData>("RemoteData." + key, callback);
         }
 
         [IncludeGenericArguments(false)]
@@ -200,9 +214,9 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        public static async Task<Lookup<TItem>> GetLookupAsync<TItem>(string key)
+        public static void GetLookup<TItem>(string key, Action<Lookup<TItem>> callback)
         {
-            return (await ScriptData.EnsureAsync("Lookup." + key)).As<Lookup<TItem>>();
+            ScriptData.Ensure<Lookup<TItem>>("Lookup." + key, callback);
         }
 
         [Obsolete("Prefer asynchronous version")]
@@ -213,9 +227,23 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        public static async Task<object> ReloadLookupAsync(string key)
+        public static void ReloadLookup(string key, Action callback)
         {
-            return await ScriptData.ReloadAsync("Lookup." + key);
+            ScriptData.Reload<object>("Lookup." + key, o => callback());
+        }
+
+        [IncludeGenericArguments(false)]
+        [Obsolete("Prefer asynchronous version")]
+        public static List<PropertyItem> GetColumns(string key)
+        {
+            #pragma warning disable 618
+            return ScriptData.Ensure("Columns." + key).As<List<PropertyItem>>();
+            #pragma warning restore 618
+        }
+
+        public static void GetColumns(string key, Action<List<PropertyItem>> callback)
+        {
+            ScriptData.Ensure<List<PropertyItem>>("Columns." + key, callback);
         }
 
         [IncludeGenericArguments(false)]
@@ -227,10 +255,9 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        [IncludeGenericArguments(false)]
-        public static async Task<List<PropertyItem>> GetFormAsync(string key)
+        public static void GetForm(string key, Action<List<PropertyItem>> callback)
         {
-            return (await ScriptData.EnsureAsync("Form." + key)).As<List<PropertyItem>>();
+            ScriptData.Ensure<List<PropertyItem>>("Form." + key, callback);
         }
 
         [Obsolete("Prefer asynchronous version")]
@@ -241,9 +268,9 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        public static async Task<string> GetTemplateAsync(string key)
+        public static void GetTemplate(string key, Action<string> callback)
         {
-            return (await ScriptData.EnsureAsync("Template." + key)).As<string>();
+            ScriptData.Ensure<string>("Template." + key, callback);
         }
 
         public static bool CanLoadScriptData(string name)

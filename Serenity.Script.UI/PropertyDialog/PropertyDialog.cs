@@ -43,11 +43,14 @@ namespace Serenity
             }
         }
 
-        protected override async Task InitializeAsync()
+        protected override void InitializeAsync(Action callback)
         {
-            await base.InitializeAsync();
-            await InitPropertyGridAsync();
-            LoadInitialEntity();
+            base.InitializeAsync(() =>
+                InitPropertyGrid(() => 
+                {
+                    LoadInitialEntity();
+                    callback();
+                }));
         }
 
         protected virtual void LoadInitialEntity()
@@ -168,15 +171,20 @@ namespace Serenity
             propertyGrid = new PropertyGrid(pgDiv, pgOptions);
         }
 
-        private async Task InitPropertyGridAsync()
+        private void InitPropertyGrid(Action callback)
         {
             var pgDiv = this.ById("PropertyGrid");
             if (pgDiv.Length <= 0)
+            {
+                callback();
                 return;
+            }
 
-            var pgOptions = await GetPropertyGridOptionsAsync();
-
-            propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+            GetPropertyGridOptions(pgOptions =>
+            {
+                propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+                callback();
+            });
         }
 
         protected virtual string GetFormKey()
@@ -209,10 +217,10 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected async virtual Task<List<PropertyItem>> GetPropertyItemsAsync()
+        protected virtual void GetPropertyItems(Action<List<PropertyItem>> callback)
         {
             var formKey = GetFormKey();
-            return await Q.GetFormAsync(formKey);
+            Q.GetForm(formKey, callback);
         }
 
         [Obsolete("Prefer async version")]
@@ -230,15 +238,18 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected async virtual Task<PropertyGridOptions> GetPropertyGridOptionsAsync()
+        protected virtual void GetPropertyGridOptions(Action<PropertyGridOptions> callback)
         {
-            return new PropertyGridOptions
+            GetPropertyItems(propertyItems =>
             {
-                IdPrefix = this.idPrefix,
-                Items = await GetPropertyItemsAsync(),
-                Mode = PropertyGridMode.Insert,
-                UseCategories = false
-            };
+                callback(new PropertyGridOptions
+                {
+                    IdPrefix = this.idPrefix,
+                    Items = propertyItems,
+                    Mode = PropertyGridMode.Insert,
+                    UseCategories = false
+                });
+            });
         }
 
         protected virtual bool ValidateBeforeSave()

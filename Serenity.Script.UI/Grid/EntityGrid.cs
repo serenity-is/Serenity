@@ -209,7 +209,9 @@ namespace Serenity
         protected virtual Widget CreateEntityDialog()
         {
             var dialogClass = GetEntityDialogType();
-            Widget dialog = Activator.CreateInstance(dialogClass, GetEntityDialogOptions());
+            Widget dialog = Widget.CreateOfType(
+                widgetType: dialogClass,
+                options: GetEntityDialogOptions());
             InitEntityDialog(dialog);
             return dialog;
         }

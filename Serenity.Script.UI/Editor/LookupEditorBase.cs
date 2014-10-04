@@ -26,11 +26,18 @@ namespace Serenity
             }
         }
 
-        protected async virtual Task InitializeAsync()
+        protected override void InitializeAsync(Action callback)
         {
             var self = this;
-            await UpdateItemsAsync();
-            Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, () => self.UpdateItemsAsync().Start());
+
+            UpdateItems(() =>
+            {
+                Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, delegate() {
+                    UpdateItems(() => { });
+                });
+
+                callback();
+            });
         }
 
         public override void Destroy()
@@ -61,10 +68,9 @@ namespace Serenity
             return Q.GetLookup<TItem>(GetLookupKey());
             #pragma warning restore 618
         }
-
-        protected async virtual Task<Lookup<TItem>> GetLookupAsync()
+        protected virtual void GetLookup(Action<Lookup<TItem>> callback)
         {
-            return await Q.GetLookupAsync<TItem>(GetLookupKey());
+            Q.GetLookup<TItem>(GetLookupKey(), callback);
         }
 
         protected virtual IEnumerable<TItem> GetItems(Lookup<TItem> lookup)
@@ -110,30 +116,30 @@ namespace Serenity
                 });
             }
         }
-
-        protected async virtual Task UpdateItemsAsync()
+        protected virtual void UpdateItems(Action callback)
         {
-            var lookup = await GetLookupAsync();
-
-            ClearItems();
-
-            var items = GetItems(lookup);
-            foreach (dynamic item in items)
+            GetLookup(lookup =>
             {
-                var text = GetItemText(item, lookup);
-                var disabled = GetItemDisabled(item, lookup);
+                ClearItems();
 
-                object idValue = item[lookup.IdField];
-                string id = idValue == null ? "" : idValue.ToString();
-
-                this.items.Add(new Select2Item
+                var items = GetItems(lookup);
+                foreach (dynamic item in items)
                 {
-                    Id = id,
-                    Text = text,
-                    Source = item,
-                    Disabled = disabled
-                });
-            }
+                    var text = GetItemText(item, lookup);
+                    var disabled = GetItemDisabled(item, lookup);
+
+                    object idValue = item[lookup.IdField];
+                    string id = idValue == null ? "" : idValue.ToString();
+
+                    this.items.Add(new Select2Item
+                    {
+                        Id = id,
+                        Text = text,
+                        Source = item,
+                        Disabled = disabled
+                    });
+                }
+            });
         }
     }
 

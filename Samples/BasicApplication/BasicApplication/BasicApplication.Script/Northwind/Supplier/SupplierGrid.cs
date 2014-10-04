@@ -39,9 +39,9 @@ namespace BasicApplication.Northwind
             base.CreateToolbarExtensions();
 
             country = Widget.Create<LookupEditor>(
-                    initElement: e => e.AppendTo(toolbar.Element)
+                    element: e => e.AppendTo(toolbar.Element)
                         .Attribute("placeholder", "--- " + Q.Text("Db.Northwind.Supplier.Country") + " ---"),
-                        options: new LookupEditorOptions { LookupKey = "Northwind.SupplierCountry" });
+                    options: new LookupEditorOptions { LookupKey = "Northwind.SupplierCountry" });
 
             country.Change(e => Refresh());
         }
