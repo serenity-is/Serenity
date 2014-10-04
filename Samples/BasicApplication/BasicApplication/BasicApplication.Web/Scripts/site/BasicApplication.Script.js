@@ -162,6 +162,31 @@
 	// BasicApplication.Membership.LoginPanel
 	var $BasicApplication_Membership_LoginPanel = function() {
 		ss.makeGenericType(Serenity.PropertyDialog$1, [Object]).call(this);
+		this.byId$1('LoginButton').click(ss.thisFix(ss.mkdel(this, function(s, e) {
+			e.preventDefault();
+			if (!this.validateForm()) {
+				return;
+			}
+			var request = this.getSaveEntity();
+			Q.serviceCall({
+				url: Q.resolveUrl('~/Account/Login'),
+				request: request,
+				onSuccess: function(response) {
+					var q = Q$Externals.parseQueryString();
+					var $t1 = q['returnUrl'];
+					if (ss.isNullOrUndefined($t1)) {
+						$t1 = q['ReturnUrl'];
+					}
+					var r = $t1;
+					if (!ss.isNullOrEmptyString(r)) {
+						window.location.href = r;
+					}
+					else {
+						window.location.href = Q.resolveUrl('~/');
+					}
+				}
+			});
+		})));
 	};
 	$BasicApplication_Membership_LoginPanel.__typeName = 'BasicApplication.Membership.LoginPanel';
 	global.BasicApplication.Membership.LoginPanel = $BasicApplication_Membership_LoginPanel;
@@ -183,9 +208,6 @@
 	// BasicApplication.Northwind.CategoryGrid
 	var $BasicApplication_Northwind_CategoryGrid = function(container) {
 		ss.makeGenericType(Serenity.EntityGrid$1, [Object]).call(this, container);
-		Serenity.Widget.create($BasicApplication_Northwind_CategoryDialog).call(null, null, null, function(w) {
-			w.loadByIdAndOpenDialog(1);
-		});
 	};
 	$BasicApplication_Northwind_CategoryGrid.__typeName = 'BasicApplication.Northwind.CategoryGrid';
 	global.BasicApplication.Northwind.CategoryGrid = $BasicApplication_Northwind_CategoryGrid;
@@ -946,39 +968,8 @@
 			return this.byId(Serenity.PasswordEditor).call(this, 'Password');
 		}
 	}, Serenity.PrefixedContext);
-	ss.initClass($BasicApplication_Membership_LoginPanel, $asm, {
-		initializeAsync: function(callback) {
-			ss.makeGenericType(Serenity.PropertyDialog$2, [Object, Object]).prototype.initializeAsync.call(this, ss.mkdel(this, function() {
-				this.byId$1('LoginButton').click(ss.thisFix(ss.mkdel(this, function(s, e) {
-					e.preventDefault();
-					if (!this.validateForm()) {
-						return;
-					}
-					var request = this.getSaveEntity();
-					Q.serviceCall({
-						url: Q.resolveUrl('~/Account/Login'),
-						request: request,
-						onSuccess: function(response) {
-							var q = Q$Externals.parseQueryString();
-							var $t1 = q['returnUrl'];
-							if (ss.isNullOrUndefined($t1)) {
-								$t1 = q['ReturnUrl'];
-							}
-							var r = $t1;
-							if (!ss.isNullOrEmptyString(r)) {
-								window.location.href = r;
-							}
-							else {
-								window.location.href = Q.resolveUrl('~/');
-							}
-						}
-					});
-				})));
-				callback();
-			}));
-		}
-	}, ss.makeGenericType(Serenity.PropertyDialog$1, [Object]), [Serenity.IDialog]);
-	ss.initClass($BasicApplication_Northwind_CategoryDialog, $asm, {}, ss.makeGenericType(Serenity.EntityDialog$1, [Object]), [Serenity.IDialog]);
+	ss.initClass($BasicApplication_Membership_LoginPanel, $asm, {}, ss.makeGenericType(Serenity.PropertyDialog$1, [Object]), [Serenity.IDialog]);
+	ss.initClass($BasicApplication_Northwind_CategoryDialog, $asm, {}, ss.makeGenericType(Serenity.EntityDialog$1, [Object]), [Serenity.IDialog, Serenity.IAsyncWidget]);
 	ss.initClass($BasicApplication_Northwind_CategoryForm, $asm, {
 		get_categoryName: function() {
 			return this.byId(Serenity.StringEditor).call(this, 'CategoryName');
@@ -995,7 +986,7 @@
 			ss.add(columns, { field: 'Description', width: 450 });
 			return columns;
 		}
-	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
+	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid, Serenity.IAsyncWidget]);
 	ss.initClass($BasicApplication_Northwind_CategoryService, $asm, {});
 	ss.initClass($BasicApplication_Northwind_CustomerCustomerDemoDialog, $asm, {}, ss.makeGenericType(Serenity.EntityDialog$1, [Object]), [Serenity.IDialog]);
 	ss.initClass($BasicApplication_Northwind_CustomerCustomerDemoForm, $asm, {

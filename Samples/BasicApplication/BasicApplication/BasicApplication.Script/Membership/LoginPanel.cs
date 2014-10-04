@@ -12,38 +12,29 @@ namespace BasicApplication.Membership
     {
         public LoginPanel()
         {
-        }
-
-        protected override void InitializeAsync(Action callback)
-        {
-            base.InitializeAsync(() =>
+            this.ById("LoginButton").Click((s, e) =>
             {
-                this.ById("LoginButton").Click((s, e) =>
+                e.PreventDefault();
+
+                if (!ValidateForm())
+                    return;
+
+                var request = GetSaveEntity();
+                Q.ServiceCall(new ServiceCallOptions
                 {
-                    e.PreventDefault();
-
-                    if (!ValidateForm())
-                        return;
-
-                    var request = GetSaveEntity();
-                    Q.ServiceCall(new ServiceCallOptions
+                    Url = Q.ResolveUrl("~/Account/Login"),
+                    Request = request.As<ServiceRequest>(),
+                    OnSuccess = response =>
                     {
-                        Url = Q.ResolveUrl("~/Account/Login"),
-                        Request = request.As<ServiceRequest>(),
-                        OnSuccess = response =>
-                        {
-                            var q = Q.Externals.ParseQueryString();
-                            var r = q["returnUrl"] ?? q["ReturnUrl"];
-                            if (!string.IsNullOrEmpty(r))
-                                Window.Location.Href = r;
-                            else
-                                Window.Location.Href = Q.ResolveUrl("~/");
-                        }
-                    });
-
+                        var q = Q.Externals.ParseQueryString();
+                        var r = q["returnUrl"] ?? q["ReturnUrl"];
+                        if (!string.IsNullOrEmpty(r))
+                            Window.Location.Href = r;
+                        else
+                            Window.Location.Href = Q.ResolveUrl("~/");
+                    }
                 });
 
-                callback();
             });
         }
     }

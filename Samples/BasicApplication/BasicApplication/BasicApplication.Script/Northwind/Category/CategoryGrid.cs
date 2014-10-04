@@ -14,7 +14,6 @@ namespace BasicApplication.Northwind
         public CategoryGrid(jQueryObject container)
             : base(container)
         {
-            Widget.Create<CategoryDialog>(init: w => w.LoadByIdAndOpenDialog(1));
         }
 
         protected override List<SlickColumn> GetColumns()

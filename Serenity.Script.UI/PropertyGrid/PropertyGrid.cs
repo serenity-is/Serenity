@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 namespace Serenity
 {
-    public class PropertyGrid : Widget<PropertyGridOptions>
+    public class PropertyGrid : Widget<PropertyGridOptions>, IAsyncWidget
     {
         private static JsDictionary<string, Type> KnownEditorTypes;
 
@@ -18,8 +18,10 @@ namespace Serenity
             KnownEditorTypes = new JsDictionary<string, Type>();
         }
 
+        private int initializingEditors;
         private List<Widget> editors;
         private List<PropertyItem> items;
+        private Action asyncCallback;
 
         public PropertyGrid(jQueryObject div, PropertyGridOptions opt)
             : base(div, opt)
@@ -58,6 +60,8 @@ namespace Serenity
 
             string priorCategory = null;
 
+            initializingEditors += items.Count;
+
             for (int i = 0; i < items.Count; i++)
             {
                 var item = items[i];
@@ -79,6 +83,23 @@ namespace Serenity
             }
 
             UpdateReadOnly();
+        }
+
+        protected override void InitializeAsync(Action callback)
+        {
+            base.InitializeAsync(() => {
+
+                if (initializingEditors <= 0)
+                {
+                    UpdateReadOnly();
+                    callback();
+                    asyncCallback = null;
+                }
+                else
+                {
+                    asyncCallback = callback;
+                }
+            });
         }
 
         public override void Destroy()
@@ -261,6 +282,14 @@ namespace Serenity
                         if (propByName.TryGetValue(ReflectionUtils.MakeCamelCase(k), out p))
                             p.SetValue(editor, item.EditorParams[k]);
                     }
+                }
+
+                initializingEditors--;
+
+                if (IsAsyncWidget() && initializingEditors <= 0 && asyncCallback != null)
+                {
+                    asyncCallback();
+                    asyncCallback = null;
                 }
             });
 

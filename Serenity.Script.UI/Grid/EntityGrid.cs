@@ -163,15 +163,18 @@ namespace Serenity
 
         protected override void EditItem(object entityOrId)
         {
-            dynamic dialog = CreateEntityDialog();
-            var scriptType = Script.TypeOf(entityOrId);
-            if (scriptType == "string" || scriptType == "number")
-                dialog.loadByIdAndOpenDialog(entityOrId.As<long>());
-            else
+            CreateEntityDialog(dlg =>
             {
-                var entity = entityOrId.As<TEntity>() ?? new TEntity();
-                dialog.loadEntityAndOpenDialog(entity);
-            }
+                var dialog = dlg.As<dynamic>();
+                var scriptType = Script.TypeOf(entityOrId);
+                if (scriptType == "string" || scriptType == "number")
+                    dialog.loadByIdAndOpenDialog(entityOrId.As<long>());
+                else
+                {
+                    var entity = entityOrId.As<TEntity>() ?? new TEntity();
+                    dialog.loadEntityAndOpenDialog(entity);
+                }
+            });
         }
 
         protected virtual string GetService()
@@ -206,13 +209,25 @@ namespace Serenity
             dialog.BindToDataChange(this, (e, dci) => self.SubDialogDataChange());
         }
 
+        [Obsolete("Prefer async version")]
         protected virtual Widget CreateEntityDialog()
         {
+            return CreateEntityDialog(null);
+        }
+
+        protected virtual Widget CreateEntityDialog(Action<Widget> callback)
+        {
             var dialogClass = GetEntityDialogType();
-            Widget dialog = Widget.CreateOfType(
+            var dialog = Serenity.Widget.CreateOfType(
                 widgetType: dialogClass,
-                options: GetEntityDialogOptions());
-            InitEntityDialog(dialog);
+                options: (object)GetEntityDialogOptions(),
+                init: (d) =>
+                {
+                    InitEntityDialog(d);
+                    if (callback != null)
+                        callback(d);
+                });
+            
             return dialog;
         }
 

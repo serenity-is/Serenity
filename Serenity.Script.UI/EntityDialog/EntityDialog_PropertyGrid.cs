@@ -37,7 +37,10 @@ namespace Serenity
             GetPropertyGridOptions(pgOptions =>
             {
                 propertyGrid = new PropertyGrid(pgDiv, pgOptions);
-                callback();
+                propertyGrid.Init(pg =>
+                {
+                    callback();
+                });
             });
         }
 

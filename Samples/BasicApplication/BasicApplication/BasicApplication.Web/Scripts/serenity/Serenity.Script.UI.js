@@ -1791,7 +1791,9 @@
 				}
 				this.getPropertyGridOptions$1(ss.mkdel(this, function(pgOptions) {
 					this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
-					callback();
+					this.propertyGrid.init(function(pg) {
+						callback();
+					});
 				}));
 			},
 			getPropertyItems: function() {
@@ -2193,15 +2195,17 @@
 				this.editItem(ss.createInstance(TEntity));
 			},
 			editItem: function(entityOrId) {
-				var dialog = this.createEntityDialog();
-				var scriptType = typeof(entityOrId);
-				if (scriptType === 'string' || scriptType === 'number') {
-					dialog.loadByIdAndOpenDialog(entityOrId);
-				}
-				else {
-					var entity = entityOrId || ss.createInstance(TEntity);
-					dialog.loadEntityAndOpenDialog(entity);
-				}
+				this.createEntityDialog$1(function(dlg) {
+					var dialog = dlg;
+					var scriptType = typeof(entityOrId);
+					if (scriptType === 'string' || scriptType === 'number') {
+						dialog.loadByIdAndOpenDialog(entityOrId);
+					}
+					else {
+						var entity = entityOrId || ss.createInstance(TEntity);
+						dialog.loadEntityAndOpenDialog(entity);
+					}
+				});
 			},
 			getService: function() {
 				if (ss.isNullOrUndefined(this.$service)) {
@@ -2230,9 +2234,16 @@
 				}, true);
 			},
 			createEntityDialog: function() {
+				return this.createEntityDialog$1(null);
+			},
+			createEntityDialog$1: function(callback) {
 				var dialogClass = this.getEntityDialogType();
-				var dialog = ss.cast($Serenity_Widget.createOfType(dialogClass, null, this.getEntityDialogOptions(), null), $Serenity_Widget);
-				this.initEntityDialog(dialog);
+				var dialog = $Serenity_Widget.createOfType(dialogClass, null, this.getEntityDialogOptions(), ss.mkdel(this, function(d) {
+					this.initEntityDialog(d);
+					if (!ss.staticEquals(callback, null)) {
+						callback(d);
+					}
+				}));
 				return dialog;
 			},
 			getEntityDialogOptions: function() {
@@ -3398,7 +3409,9 @@
 				}
 				this.getPropertyGridOptions$1(ss.mkdel(this, function(pgOptions) {
 					this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
-					callback();
+					this.propertyGrid.init(function(pg) {
+						callback();
+					});
 				}));
 			},
 			getFormKey: function() {
@@ -3479,8 +3492,10 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.PropertyGrid
 	var $Serenity_PropertyGrid = function(div, opt) {
+		this.$initializingEditors = 0;
 		this.$editors = null;
 		this.$items = null;
+		this.$asyncCallback = null;
 		ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]).call(this, div, opt);
 		if (!ss.isValue(opt.mode)) {
 			opt.mode = 0;
@@ -3503,6 +3518,7 @@
 		}
 		var fieldContainer = categoriesDiv;
 		var priorCategory = null;
+		this.$initializingEditors += this.$items.length;
 		for (var i = 0; i < this.$items.length; i++) {
 			var item = this.$items[i];
 			if (this.options.useCategories && !ss.referenceEquals(priorCategory, item.category)) {
@@ -6461,6 +6477,18 @@
 	ss.initClass($Serenity_PropertyItemHelper, $asm, {});
 	ss.initClass($Serenity_PropertyEditorHelper, $asm, {}, $Serenity_PropertyItemHelper);
 	ss.initClass($Serenity_PropertyGrid, $asm, {
+		initializeAsync: function(callback) {
+			$Serenity_Widget.prototype.initializeAsync.call(this, ss.mkdel(this, function() {
+				if (this.$initializingEditors <= 0) {
+					this.$updateReadOnly();
+					callback();
+					this.$asyncCallback = null;
+				}
+				else {
+					this.$asyncCallback = callback;
+				}
+			}));
+		},
 		destroy: function() {
 			if (ss.isValue(this.$editors)) {
 				for (var i = 0; i < this.$editors.length; i++) {
@@ -6537,7 +6565,7 @@
 				editorParams = $.extend(new Object(), item.editorParams);
 				editor = ss.cast(new editorType(element, editorParams), $Serenity_Widget);
 			}
-			editor.init(function() {
+			editor.init(ss.mkdel(this, function() {
 				if (ss.isValue(item.editorParams)) {
 					var props = ss.getMembers(ss.getInstanceType(editor), 16, 20);
 					var propByName = Enumerable.from(props).where(function(x) {
@@ -6563,7 +6591,12 @@
 						$t3.dispose();
 					}
 				}
-			});
+				this.$initializingEditors--;
+				if (this.isAsyncWidget() && this.$initializingEditors <= 0 && !ss.staticEquals(this.$asyncCallback, null)) {
+					this.$asyncCallback();
+					this.$asyncCallback = null;
+				}
+			}));
 			if (ss.isInstanceOfType(editor, $Serenity_BooleanEditor)) {
 				label.removeAttr('for');
 			}
@@ -6775,7 +6808,7 @@
 				callback(item, editor);
 			}
 		}
-	}, ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]));
+	}, ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]), [$Serenity_IAsyncWidget]);
 	ss.initEnum($Serenity_PropertyGridMode, $asm, { insert: 0, update: 1 });
 	ss.initClass($Serenity_PropertyGridOptions, $asm, {});
 	ss.initClass($Serenity_QuickSearchInput, $asm, {
