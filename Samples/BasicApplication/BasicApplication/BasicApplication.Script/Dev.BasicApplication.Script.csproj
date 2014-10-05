@@ -188,13 +188,14 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ServiceEndpoints.log</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.5.0\tools\Assemblies\mscorlib.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.6.0\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="Saltarelle.jQuery">
       <HintPath>..\..\packages\Saltarelle.jQuery.1.10.1\lib\Saltarelle.jQuery.dll</HintPath>
@@ -223,15 +224,16 @@
       <Name>Serenity.Script.UI</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.5.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.6.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.6.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.6.0\tools\Saltarelle.Compiler.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   -->
   <Target Name="AfterBuild">
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\site\$(AssemblyName).js"></Copy>
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\site\$(AssemblyName).js">
+    </Copy>
     <Copy SourceFiles="$(SolutionDir)..\..\Serenity.Script.Core\Resources\mscorlib.js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\Saltarelle\mscorlib.js" />
     <Copy SourceFiles="$(SolutionDir)..\..\Serenity.Script.Core\Resources\linq.js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\Saltarelle\linq.js" />
     <Copy SourceFiles="$(SolutionDir)..\..\Serenity.Script.Core\bin\$(ConfigurationName)\Serenity.Script.Core.js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\Serenity\Serenity.Script.Core.js" />

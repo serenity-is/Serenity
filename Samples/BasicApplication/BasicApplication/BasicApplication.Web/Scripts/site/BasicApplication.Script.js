@@ -915,11 +915,11 @@
 	ss.initClass($BasicApplication_Administration_UserGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'UserId', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'Username', width: 150, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'DisplayName', width: 150 });
-			ss.add(columns, { field: 'Email', width: 250 });
-			ss.add(columns, { field: 'Source', width: 100 });
+			columns.push({ field: 'UserId', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'Username', width: 150, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'DisplayName', width: 150 });
+			columns.push({ field: 'Email', width: 250 });
+			columns.push({ field: 'Source', width: 100 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -981,9 +981,9 @@
 	ss.initClass($BasicApplication_Northwind_CategoryGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'CategoryID', width: 65, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'CategoryName', width: 250, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'Description', width: 450 });
+			columns.push({ field: 'CategoryID', width: 65, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'CategoryName', width: 250, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'Description', width: 450 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1000,9 +1000,9 @@
 	ss.initClass($BasicApplication_Northwind_CustomerCustomerDemoGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'ID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'CustomerID', width: 200, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'CustomerTypeID', width: 80 });
+			columns.push({ field: 'ID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'CustomerID', width: 200, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'CustomerTypeID', width: 80 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1019,9 +1019,9 @@
 	ss.initClass($BasicApplication_Northwind_CustomerDemographicGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'ID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'CustomerTypeID', width: 200, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'CustomerDesc', width: 80 });
+			columns.push({ field: 'ID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'CustomerTypeID', width: 200, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'CustomerDesc', width: 80 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1065,16 +1065,16 @@
 	ss.initClass($BasicApplication_Northwind_CustomerGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'CustomerID', width: 100, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'CompanyName', width: 250, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'ContactName', width: 150 });
-			ss.add(columns, { field: 'ContactTitle', width: 150 });
-			ss.add(columns, { field: 'City', width: 120 });
-			ss.add(columns, { field: 'Region', width: 60 });
-			ss.add(columns, { field: 'PostalCode', width: 100 });
-			ss.add(columns, { field: 'Country', width: 130 });
-			ss.add(columns, { field: 'Phone', width: 120 });
-			ss.add(columns, { field: 'Fax', width: 120 });
+			columns.push({ field: 'CustomerID', width: 100, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'CompanyName', width: 250, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'ContactName', width: 150 });
+			columns.push({ field: 'ContactTitle', width: 150 });
+			columns.push({ field: 'City', width: 120 });
+			columns.push({ field: 'Region', width: 60 });
+			columns.push({ field: 'PostalCode', width: 100 });
+			columns.push({ field: 'Country', width: 130 });
+			columns.push({ field: 'Phone', width: 120 });
+			columns.push({ field: 'Fax', width: 120 });
 			return columns;
 		},
 		createToolbarExtensions: function() {
@@ -1157,24 +1157,24 @@
 	ss.initClass($BasicApplication_Northwind_EmployeeGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'EmployeeID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'LastName', width: 200, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'FirstName', width: 80 });
-			ss.add(columns, { field: 'Title', width: 80 });
-			ss.add(columns, { field: 'TitleOfCourtesy', width: 80 });
-			ss.add(columns, { field: 'BirthDate', width: 80 });
-			ss.add(columns, { field: 'HireDate', width: 80 });
-			ss.add(columns, { field: 'Address', width: 80 });
-			ss.add(columns, { field: 'City', width: 80 });
-			ss.add(columns, { field: 'Region', width: 80 });
-			ss.add(columns, { field: 'PostalCode', width: 80 });
-			ss.add(columns, { field: 'Country', width: 80 });
-			ss.add(columns, { field: 'HomePhone', width: 80 });
-			ss.add(columns, { field: 'Extension', width: 80 });
-			ss.add(columns, { field: 'Photo', width: 80 });
-			ss.add(columns, { field: 'Notes', width: 80 });
-			ss.add(columns, { field: 'ReportsTo', width: 80 });
-			ss.add(columns, { field: 'PhotoPath', width: 80 });
+			columns.push({ field: 'EmployeeID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'LastName', width: 200, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'FirstName', width: 80 });
+			columns.push({ field: 'Title', width: 80 });
+			columns.push({ field: 'TitleOfCourtesy', width: 80 });
+			columns.push({ field: 'BirthDate', width: 80 });
+			columns.push({ field: 'HireDate', width: 80 });
+			columns.push({ field: 'Address', width: 80 });
+			columns.push({ field: 'City', width: 80 });
+			columns.push({ field: 'Region', width: 80 });
+			columns.push({ field: 'PostalCode', width: 80 });
+			columns.push({ field: 'Country', width: 80 });
+			columns.push({ field: 'HomePhone', width: 80 });
+			columns.push({ field: 'Extension', width: 80 });
+			columns.push({ field: 'Photo', width: 80 });
+			columns.push({ field: 'Notes', width: 80 });
+			columns.push({ field: 'ReportsTo', width: 80 });
+			columns.push({ field: 'PhotoPath', width: 80 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1188,8 +1188,8 @@
 	ss.initClass($BasicApplication_Northwind_EmployeeTerritoryGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'EmployeeID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'TerritoryID', width: 200, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'EmployeeID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'TerritoryID', width: 200, format: this.itemLink(null, null, null, null) });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1212,11 +1212,11 @@
 	ss.initClass($BasicApplication_Northwind_OrderDetailGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'OrderID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'ProductID', width: 80 });
-			ss.add(columns, { field: 'UnitPrice', width: 80 });
-			ss.add(columns, { field: 'Quantity', width: 80 });
-			ss.add(columns, { field: 'Discount', width: 80 });
+			columns.push({ field: 'OrderID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'ProductID', width: 80 });
+			columns.push({ field: 'UnitPrice', width: 80 });
+			columns.push({ field: 'Quantity', width: 80 });
+			columns.push({ field: 'Discount', width: 80 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1266,20 +1266,20 @@
 	ss.initClass($BasicApplication_Northwind_OrderGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'OrderID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'CustomerID', width: 200, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'EmployeeID', width: 80 });
-			ss.add(columns, { field: 'OrderDate', width: 80 });
-			ss.add(columns, { field: 'RequiredDate', width: 80 });
-			ss.add(columns, { field: 'ShippedDate', width: 80 });
-			ss.add(columns, { field: 'ShipVia', width: 80 });
-			ss.add(columns, { field: 'Freight', width: 80 });
-			ss.add(columns, { field: 'ShipName', width: 80 });
-			ss.add(columns, { field: 'ShipAddress', width: 80 });
-			ss.add(columns, { field: 'ShipCity', width: 80 });
-			ss.add(columns, { field: 'ShipRegion', width: 80 });
-			ss.add(columns, { field: 'ShipPostalCode', width: 80 });
-			ss.add(columns, { field: 'ShipCountry', width: 80 });
+			columns.push({ field: 'OrderID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'CustomerID', width: 200, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'EmployeeID', width: 80 });
+			columns.push({ field: 'OrderDate', width: 80 });
+			columns.push({ field: 'RequiredDate', width: 80 });
+			columns.push({ field: 'ShippedDate', width: 80 });
+			columns.push({ field: 'ShipVia', width: 80 });
+			columns.push({ field: 'Freight', width: 80 });
+			columns.push({ field: 'ShipName', width: 80 });
+			columns.push({ field: 'ShipAddress', width: 80 });
+			columns.push({ field: 'ShipCity', width: 80 });
+			columns.push({ field: 'ShipRegion', width: 80 });
+			columns.push({ field: 'ShipPostalCode', width: 80 });
+			columns.push({ field: 'ShipCountry', width: 80 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1341,16 +1341,16 @@
 	ss.initClass($BasicApplication_Northwind_ProductGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'ProductID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'ProductName', width: 250, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'Discontinued', width: 40, format: Serenity.SlickFormatting.checkBox(), cssClass: 'align-center' });
-			ss.add(columns, { field: 'SupplierCompanyName', width: 200 });
-			ss.add(columns, { field: 'CategoryName', width: 200 });
-			ss.add(columns, { field: 'QuantityPerUnit', width: 130 });
-			ss.add(columns, { field: 'UnitPrice', width: 80, cssClass: 'align-right' });
-			ss.add(columns, { field: 'UnitsInStock', width: 80, cssClass: 'align-right' });
-			ss.add(columns, { field: 'UnitsOnOrder', width: 80, cssClass: 'align-right' });
-			ss.add(columns, { field: 'ReorderLevel', width: 80, cssClass: 'align-right' });
+			columns.push({ field: 'ProductID', width: 55, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'ProductName', width: 250, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'Discontinued', width: 40, format: Serenity.SlickFormatting.checkBox(), cssClass: 'align-center' });
+			columns.push({ field: 'SupplierCompanyName', width: 200 });
+			columns.push({ field: 'CategoryName', width: 200 });
+			columns.push({ field: 'QuantityPerUnit', width: 130 });
+			columns.push({ field: 'UnitPrice', width: 80, cssClass: 'align-right' });
+			columns.push({ field: 'UnitsInStock', width: 80, cssClass: 'align-right' });
+			columns.push({ field: 'UnitsOnOrder', width: 80, cssClass: 'align-right' });
+			columns.push({ field: 'ReorderLevel', width: 80, cssClass: 'align-right' });
 			return columns;
 		},
 		createToolbarExtensions: function() {
@@ -1398,8 +1398,8 @@
 	ss.initClass($BasicApplication_Northwind_RegionGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'RegionID', width: 65, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'RegionDescription', width: 300, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'RegionID', width: 65, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'RegionDescription', width: 300, format: this.itemLink(null, null, null, null) });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1416,9 +1416,9 @@
 	ss.initClass($BasicApplication_Northwind_ShipperGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'ShipperID', width: 65, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'CompanyName', width: 300, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'Phone', width: 150 });
+			columns.push({ field: 'ShipperID', width: 65, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'CompanyName', width: 300, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'Phone', width: 150 });
 			return columns;
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
@@ -1462,14 +1462,14 @@
 	ss.initClass($BasicApplication_Northwind_SupplierGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'SupplierID', width: 65, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
-			ss.add(columns, { field: 'CompanyName', width: 250, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'ContactName', width: 150 });
-			ss.add(columns, { field: 'ContactTitle', width: 150 });
-			ss.add(columns, { field: 'Phone', width: 120 });
-			ss.add(columns, { field: 'City', width: 130 });
-			ss.add(columns, { field: 'Region', width: 80 });
-			ss.add(columns, { field: 'Country', width: 130 });
+			columns.push({ field: 'SupplierID', width: 65, cssClass: 'align-right', name: Q.text('Db.Shared.RecordId') });
+			columns.push({ field: 'CompanyName', width: 250, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'ContactName', width: 150 });
+			columns.push({ field: 'ContactTitle', width: 150 });
+			columns.push({ field: 'Phone', width: 120 });
+			columns.push({ field: 'City', width: 130 });
+			columns.push({ field: 'Region', width: 80 });
+			columns.push({ field: 'Country', width: 130 });
 			return columns;
 		},
 		createToolbarExtensions: function() {
@@ -1510,9 +1510,9 @@
 	ss.initClass($BasicApplication_Northwind_TerritoryGrid, $asm, {
 		getColumns: function() {
 			var columns = ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.getColumns.call(this);
-			ss.add(columns, { field: 'TerritoryID', width: 100, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'TerritoryDescription', width: 200, format: this.itemLink(null, null, null, null) });
-			ss.add(columns, { field: 'RegionDescription', width: 150 });
+			columns.push({ field: 'TerritoryID', width: 100, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'TerritoryDescription', width: 200, format: this.itemLink(null, null, null, null) });
+			columns.push({ field: 'RegionDescription', width: 150 });
 			return columns;
 		},
 		createToolbarExtensions: function() {
@@ -1568,5 +1568,7 @@
 	ss.setMetadata($BasicApplication_Northwind_SupplierGrid, { attr: [new Serenity.IdPropertyAttribute('SupplierID'), new Serenity.NamePropertyAttribute('CompanyName'), new Serenity.DialogTypeAttribute($BasicApplication_Northwind_SupplierDialog), new Serenity.LocalTextPrefixAttribute('Northwind.Supplier'), new Serenity.ServiceAttribute('Northwind/Supplier')] });
 	ss.setMetadata($BasicApplication_Northwind_TerritoryDialog, { attr: [new Serenity.IdPropertyAttribute('ID'), new Serenity.NamePropertyAttribute('TerritoryID'), new Serenity.FormKeyAttribute('Northwind.Territory'), new Serenity.LocalTextPrefixAttribute('Northwind.Territory'), new Serenity.ServiceAttribute('Northwind/Territory')] });
 	ss.setMetadata($BasicApplication_Northwind_TerritoryGrid, { attr: [new Serenity.IdPropertyAttribute('ID'), new Serenity.NamePropertyAttribute('TerritoryID'), new Serenity.DialogTypeAttribute($BasicApplication_Northwind_TerritoryDialog), new Serenity.LocalTextPrefixAttribute('Northwind.Territory'), new Serenity.ServiceAttribute('Northwind/Territory')] });
-	ss.add(Q$Config.rootNamespaces, 'BasicApplication');
+	(function() {
+		Q$Config.rootNamespaces.push('BasicApplication');
+	})();
 })();

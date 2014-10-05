@@ -1574,64 +1574,88 @@
 	ss.initClass($Serenity_SlickHelper, $asm, {});
 	ss.initClass($Serenity_SlickTreeHelper, $asm, {});
 	ss.initClass($Serenity_TabsExtensions, $asm, {});
-	$Q$Culture.decimalSeparator = '.';
-	$Q$Culture.dateSeparator = '/';
-	$Q$Culture.dateOrder = 'dmy';
-	$Q$Culture.dateFormat = 'dd/MM/yyyy';
-	$Q$Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
-	$Q$LT.$table = {};
-	$Q$LT.empty = new $Q$LT('');
-	$Texts$Dialogs.OkButton = new Q$LT('OK');
-	$Texts$Dialogs.YesButton = new Q$LT('Yes');
-	$Texts$Dialogs.NoButton = new Q$LT('No');
-	$Texts$Dialogs.CancelButton = new Q$LT('Cancel');
-	$Texts$Dialogs.AlertTitle = new Q$LT('Alert');
-	$Texts$Dialogs.ConfirmationTitle = new Q$LT('Confirm');
-	$Texts$Dialogs.InformationTitle = new Q$LT('Information');
-	$Texts$Dialogs.WarningTitle = new Q$LT('Warning');
-	$Q$LT.initializeTextClass($Texts$Dialogs, 'Dialogs.');
-	$Serenity_LazyLoadHelper.$autoIncrement = 0;
-	$Q$Config.applicationPath = '/';
-	$Q$Config.emailAllowOnlyAscii = false;
-	$Q$Config.rootNamespaces = null;
-	$Q$Config.notLoggedInHandler = null;
-	var pathLink = $('link#ApplicationPath');
-	if (pathLink.length > 0) {
-		$Q$Config.applicationPath = pathLink.attr('href');
-	}
-	$Q$Config.rootNamespaces = [];
-	ss.add($Q$Config.rootNamespaces, 'Serenity');
-	$Q$Config.emailAllowOnlyAscii = true;
-	$Q$ScriptData.$registered = {};
-	$Q$ScriptData.$loadedData = {};
-	$Q.$blockUICount = 0;
-	$Texts$Controls$EntityDialog.DeleteConfirmation = new Q$LT('Delete record?');
-	$Texts$Controls$EntityDialog.UndeleteButton = new Q$LT('Undelete');
-	$Texts$Controls$EntityDialog.UndeleteConfirmation = new Q$LT('Undelete record?');
-	$Texts$Controls$EntityDialog.CloneButton = new Q$LT('Clone');
-	$Texts$Controls$EntityDialog.SaveSuccessMessage = new Q$LT('Save success');
-	$Texts$Controls$EntityDialog.SaveButton = new Q$LT('Save');
-	$Texts$Controls$EntityDialog.UpdateButton = new Q$LT('Update');
-	$Texts$Controls$EntityDialog.ApplyChangesButton = new Q$LT('Apply Changes');
-	$Texts$Controls$EntityDialog.DeleteButton = new Q$LT('Delete');
-	$Texts$Controls$EntityDialog.NewRecordTitle = new Q$LT('New {0}');
-	$Texts$Controls$EntityDialog.EditRecordTitle = new Q$LT('Edit {0}{1}');
-	$Q$LT.initializeTextClass($Texts$Controls$EntityDialog, 'Controls.EntityDialog.');
-	$Texts$Controls$EntityGrid.NewButton = new Q$LT('New {0}');
-	$Texts$Controls$EntityGrid.RefreshButton = new Q$LT('Refresh');
-	$Texts$Controls$EntityGrid.IncludeDeletedToggle = new Q$LT('display inactive records');
-	$Q$LT.initializeTextClass($Texts$Controls$EntityGrid, 'Controls.EntityGrid.');
-	$Texts$Controls$Pager.Page = new Q$LT('Page');
-	$Texts$Controls$Pager.PageStatus = new Q$LT('Showing {from} to {to} of {total} total records');
-	$Texts$Controls$Pager.NoRowStatus = new Q$LT('No records');
-	$Texts$Controls$Pager.LoadingStatus = new Q$LT('Please wait, loading data...');
-	$Texts$Controls$Pager.DefaultLoadError = new Q$LT('An error occured while loading data!');
-	$Q$LT.initializeTextClass($Texts$Controls$Pager, 'Controls.Pager.');
-	$Texts$Controls$PropertyGrid.DefaultCategory = new Q$LT('Properties');
-	$Texts$Controls$PropertyGrid.RequiredHint = new Q$LT('this field is required');
-	$Q$LT.initializeTextClass($Texts$Controls$PropertyGrid, 'Controls.PropertyGrid.');
-	$Texts$Controls$QuickSearch.Placeholder = new Q$LT('search...');
-	$Texts$Controls$QuickSearch.Hint = new Q$LT('enter the text to search for...');
-	$Texts$Controls$QuickSearch.FieldSelection = new Q$LT('select the field to search on');
-	$Q$LT.initializeTextClass($Texts$Controls$QuickSearch, 'Controls.QuickSearch.');
+	(function() {
+		$Q$Culture.decimalSeparator = '.';
+		$Q$Culture.dateSeparator = '/';
+		$Q$Culture.dateOrder = 'dmy';
+		$Q$Culture.dateFormat = 'dd/MM/yyyy';
+		$Q$Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
+	})();
+	(function() {
+		$Q$LT.$table = {};
+		$Q$LT.empty = new $Q$LT('');
+	})();
+	(function() {
+		$Texts$Dialogs.OkButton = new Q$LT('OK');
+		$Texts$Dialogs.YesButton = new Q$LT('Yes');
+		$Texts$Dialogs.NoButton = new Q$LT('No');
+		$Texts$Dialogs.CancelButton = new Q$LT('Cancel');
+		$Texts$Dialogs.AlertTitle = new Q$LT('Alert');
+		$Texts$Dialogs.ConfirmationTitle = new Q$LT('Confirm');
+		$Texts$Dialogs.InformationTitle = new Q$LT('Information');
+		$Texts$Dialogs.WarningTitle = new Q$LT('Warning');
+		$Q$LT.initializeTextClass($Texts$Dialogs, 'Dialogs.');
+	})();
+	(function() {
+		$Serenity_LazyLoadHelper.$autoIncrement = 0;
+	})();
+	(function() {
+		$Q$Config.applicationPath = '/';
+		$Q$Config.emailAllowOnlyAscii = false;
+		$Q$Config.rootNamespaces = null;
+		$Q$Config.notLoggedInHandler = null;
+		var pathLink = $('link#ApplicationPath');
+		if (pathLink.length > 0) {
+			$Q$Config.applicationPath = pathLink.attr('href');
+		}
+		$Q$Config.rootNamespaces = [];
+		$Q$Config.rootNamespaces.push('Serenity');
+		$Q$Config.emailAllowOnlyAscii = true;
+	})();
+	(function() {
+		$Q$ScriptData.$registered = {};
+		$Q$ScriptData.$loadedData = {};
+	})();
+	(function() {
+		$Q.$blockUICount = 0;
+	})();
+	(function() {
+		$Texts$Controls$EntityDialog.DeleteConfirmation = new Q$LT('Delete record?');
+		$Texts$Controls$EntityDialog.UndeleteButton = new Q$LT('Undelete');
+		$Texts$Controls$EntityDialog.UndeleteConfirmation = new Q$LT('Undelete record?');
+		$Texts$Controls$EntityDialog.CloneButton = new Q$LT('Clone');
+		$Texts$Controls$EntityDialog.SaveSuccessMessage = new Q$LT('Save success');
+		$Texts$Controls$EntityDialog.SaveButton = new Q$LT('Save');
+		$Texts$Controls$EntityDialog.UpdateButton = new Q$LT('Update');
+		$Texts$Controls$EntityDialog.ApplyChangesButton = new Q$LT('Apply Changes');
+		$Texts$Controls$EntityDialog.DeleteButton = new Q$LT('Delete');
+		$Texts$Controls$EntityDialog.NewRecordTitle = new Q$LT('New {0}');
+		$Texts$Controls$EntityDialog.EditRecordTitle = new Q$LT('Edit {0}{1}');
+		$Q$LT.initializeTextClass($Texts$Controls$EntityDialog, 'Controls.EntityDialog.');
+	})();
+	(function() {
+		$Texts$Controls$EntityGrid.NewButton = new Q$LT('New {0}');
+		$Texts$Controls$EntityGrid.RefreshButton = new Q$LT('Refresh');
+		$Texts$Controls$EntityGrid.IncludeDeletedToggle = new Q$LT('display inactive records');
+		$Q$LT.initializeTextClass($Texts$Controls$EntityGrid, 'Controls.EntityGrid.');
+	})();
+	(function() {
+		$Texts$Controls$Pager.Page = new Q$LT('Page');
+		$Texts$Controls$Pager.PageStatus = new Q$LT('Showing {from} to {to} of {total} total records');
+		$Texts$Controls$Pager.NoRowStatus = new Q$LT('No records');
+		$Texts$Controls$Pager.LoadingStatus = new Q$LT('Please wait, loading data...');
+		$Texts$Controls$Pager.DefaultLoadError = new Q$LT('An error occured while loading data!');
+		$Q$LT.initializeTextClass($Texts$Controls$Pager, 'Controls.Pager.');
+	})();
+	(function() {
+		$Texts$Controls$PropertyGrid.DefaultCategory = new Q$LT('Properties');
+		$Texts$Controls$PropertyGrid.RequiredHint = new Q$LT('this field is required');
+		$Q$LT.initializeTextClass($Texts$Controls$PropertyGrid, 'Controls.PropertyGrid.');
+	})();
+	(function() {
+		$Texts$Controls$QuickSearch.Placeholder = new Q$LT('search...');
+		$Texts$Controls$QuickSearch.Hint = new Q$LT('enter the text to search for...');
+		$Texts$Controls$QuickSearch.FieldSelection = new Q$LT('select the field to search on');
+		$Q$LT.initializeTextClass($Texts$Controls$QuickSearch, 'Controls.QuickSearch.');
+	})();
 })();

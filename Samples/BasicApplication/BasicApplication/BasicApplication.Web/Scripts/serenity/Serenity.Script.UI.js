@@ -84,7 +84,7 @@
 					if (!Q.isEmptyOrNull(item.parentId)) {
 						var parent = itemById[item.parentId];
 						if (ss.isValue(parent)) {
-							ss.add(parent.children, item);
+							parent.children.push(item);
 						}
 					}
 				}
@@ -108,7 +108,7 @@
 				}
 				var self = this;
 				var $t1 = [];
-				ss.add($t1, $Serenity_GridSelectAllButtonHelper.define(TItem).call(null, function() {
+				$t1.push($Serenity_GridSelectAllButtonHelper.define(TItem).call(null, function() {
 					return self;
 				}, function(x) {
 					return x.id;
@@ -122,7 +122,6 @@
 				}), null, ss.mkdel(this, function() {
 					this.updateFlags();
 				})));
-				null;
 				return $t1;
 			},
 			itemSelectedChanged: function(item) {
@@ -309,7 +308,7 @@
 			getColumns: function() {
 				var self = this;
 				var $t1 = [];
-				ss.add($t1, { field: 'text', name: 'Kayıt', width: 80, format: Serenity.SlickFormatting.treeToggle(TItem).call(null, function() {
+				$t1.push({ field: 'text', name: 'Kayıt', width: 80, format: Serenity.SlickFormatting.treeToggle(TItem).call(null, function() {
 					return self.view;
 				}, function(x) {
 					return x.id;
@@ -327,7 +326,6 @@
 					}
 					return '<span class="' + cls + '"></span>' + this.getItemText(ctx);
 				})) });
-				null;
 				return $t1;
 			},
 			getItemText: function(ctx) {
@@ -343,7 +341,7 @@
 				var items = this.get_view().getItems();
 				for (var i = 0; i < items.length; i++) {
 					if (items[i].isSelected) {
-						ss.add(list, items[i].id);
+						list.push(items[i].id);
 					}
 				}
 				return list;
@@ -629,7 +627,7 @@
 									$t1 = {};
 								}
 								var col = $t1;
-								ss.add(sortBy, ss.cast(col.field + (!!x.sortAsc ? '' : ' DESC'), String));
+								sortBy.push(ss.cast(col.field + (!!x.sortAsc ? '' : ' DESC'), String));
 							}
 						}
 						else {
@@ -638,7 +636,7 @@
 								$t2 = {};
 							}
 							var col1 = $t2;
-							ss.add(sortBy, ss.cast(col1.field + (!!p.sortAsc ? '' : ' DESC'), String));
+							sortBy.push(ss.cast(col1.field + (!!p.sortAsc ? '' : ' DESC'), String));
 						}
 						self.view.sortBy = sortBy;
 					}
@@ -732,7 +730,7 @@
 					try {
 						while ($t3.moveNext()) {
 							var key1 = $t3.current();
-							ss.add(array, key1);
+							array.push(key1);
 						}
 					}
 					finally {
@@ -760,8 +758,7 @@
 			},
 			getDefaultSortBy: function() {
 				var $t1 = [];
-				ss.add($t1, this.getIdFieldName());
-				null;
+				$t1.push(this.getIdFieldName());
 				return $t1;
 			},
 			usePager: function() {
@@ -996,7 +993,7 @@
 				break;
 			}
 			var t = (ss.Nullable$1.ge(hour, 10) ? '' : '0') + hour + ':' + (ss.Nullable$1.ge(min, 10) ? '' : '0') + min;
-			ss.add(list, t);
+			list.push(t);
 			min = ss.Nullable$1.add(min, stepMins);
 			if (ss.Nullable$1.ge(min, 60)) {
 				min = ss.Nullable$1.sub(min, 60);
@@ -1342,12 +1339,9 @@
 		};
 		$type.$getLanguages = function() {
 			var $t1 = [];
-			ss.add($t1, { item1: '', item2: 'Türkçe' });
-			null;
-			ss.add($t1, { item1: 1033, item2: 'English' });
-			null;
-			ss.add($t1, { item1: 3082, item2: 'Espanol' });
-			null;
+			$t1.push({ item1: '', item2: 'Türkçe' });
+			$t1.push({ item1: 1033, item2: 'English' });
+			$t1.push({ item1: 3082, item2: 'Espanol' });
 			return $t1;
 		};
 		ss.registerGenericClassInstance($type, $Serenity_EntityDialog$2, [TEntity, TOptions], {
@@ -1704,7 +1698,7 @@
 						copy.required = false;
 						copy.localizable = false;
 						copy.defaultValue = null;
-						ss.add(items, copy);
+						items.push(copy);
 					}
 				}
 				pgOptions.items = items;
@@ -1925,7 +1919,7 @@
 				var list = [];
 				var self = this;
 				if (!this.isPanel) {
-					ss.add(list, {
+					list.push({
 						title: Texts$Controls$EntityDialog.SaveButton.get(),
 						cssClass: 'save-and-close-button',
 						onClick: function() {
@@ -1935,7 +1929,7 @@
 						}
 					});
 				}
-				ss.add(list, { title: (this.isPanel ? Texts$Controls$EntityDialog.SaveButton : Q$LT.empty).get(), hint: (this.isPanel ? Texts$Controls$EntityDialog.SaveButton : Texts$Controls$EntityDialog.ApplyChangesButton).get(), cssClass: 'apply-changes-button', onClick: ss.mkdel(this, function() {
+				list.push({ title: (this.isPanel ? Texts$Controls$EntityDialog.SaveButton : Q$LT.empty).get(), hint: (this.isPanel ? Texts$Controls$EntityDialog.SaveButton : Texts$Controls$EntityDialog.ApplyChangesButton).get(), cssClass: 'apply-changes-button', onClick: ss.mkdel(this, function() {
 					if (self.get_$isLocalizationMode()) {
 						self.$saveLocalization();
 						return;
@@ -1951,7 +1945,7 @@
 					}));
 				}) });
 				if (!this.isPanel) {
-					ss.add(list, {
+					list.push({
 						title: Texts$Controls$EntityDialog.DeleteButton.get(),
 						cssClass: 'delete-button',
 						onClick: function() {
@@ -1962,7 +1956,7 @@
 							});
 						}
 					});
-					ss.add(list, {
+					list.push({
 						title: Texts$Controls$EntityDialog.UndeleteButton.get(),
 						cssClass: 'undo-delete-button',
 						onClick: function() {
@@ -1975,7 +1969,7 @@
 							}
 						}
 					});
-					ss.add(list, { title: Texts$Controls$EntityDialog.CloneButton.get(), cssClass: 'clone-button', onClick: ss.mkdel(this, function() {
+					list.push({ title: Texts$Controls$EntityDialog.CloneButton.get(), cssClass: 'clone-button', onClick: ss.mkdel(this, function() {
 						if (!self.get_isEditMode()) {
 							return;
 						}
@@ -2181,14 +2175,14 @@
 			getButtons: function() {
 				var self = this;
 				var buttons = [];
-				ss.add(buttons, {
+				buttons.push({
 					title: this.getAddButtonCaption(),
 					cssClass: 'add-button',
 					onClick: function() {
 						self.addButtonClick();
 					}
 				});
-				ss.add(buttons, this.newRefreshButton());
+				buttons.push(this.newRefreshButton());
 				return buttons;
 			},
 			newRefreshButton: function() {
@@ -2916,7 +2910,7 @@
 						var disabled = this.getItemDisabled(ss.cast(item, TItem), lookup);
 						var idValue = item[lookup.get_idField()];
 						var id = (ss.isNullOrUndefined(idValue) ? '' : idValue.toString());
-						ss.add(this.items, { id: id, text: ss.cast(text, String), source: item, disabled: !!disabled });
+						this.items.push({ id: id, text: ss.cast(text, String), source: item, disabled: !!disabled });
 					}
 				}
 				finally {
@@ -2937,7 +2931,7 @@
 									var disabled = this.getItemDisabled(ss.cast(item, TItem), lookup);
 									var idValue = item[lookup.get_idField()];
 									var id = (ss.isNullOrUndefined(idValue) ? '' : idValue.toString());
-									ss.add(this.items, { id: id, text: ss.cast(text, String), source: item, disabled: !!disabled });
+									this.items.push({ id: id, text: ss.cast(text, String), source: item, disabled: !!disabled });
 								}
 							}
 							finally {
@@ -3368,10 +3362,8 @@
 			},
 			getDialogButtons: function() {
 				var $t1 = [];
-				ss.add($t1, { text: 'Tamam', click: ss.mkdel(this, this.okClick) });
-				null;
-				ss.add($t1, { text: 'İptal', click: ss.mkdel(this, this.cancelClick) });
-				null;
+				$t1.push({ text: 'Tamam', click: ss.mkdel(this, this.okClick) });
+				$t1.push({ text: 'İptal', click: ss.mkdel(this, this.cancelClick) });
 				return $t1;
 			},
 			destroy: function() {
@@ -3895,7 +3887,7 @@
 				}
 				pi.editorParams[key] = param.get_value();
 			}
-			ss.add(list, pi);
+			list.push(pi);
 		}
 		return list;
 	};
@@ -4196,7 +4188,7 @@
 				ss.clear(this.items);
 			},
 			addItem: function(key, text, source, disabled) {
-				ss.add(this.items, { id: key, text: text, source: source, disabled: disabled });
+				this.items.push({ id: key, text: text, source: source, disabled: disabled });
 			},
 			addInplaceCreate: function(title) {
 				var self = this;
@@ -4281,82 +4273,82 @@
 			return;
 		}
 		var plural = [];
-		ss.add(plural, [new RegExp('move', 'i'), 'moves']);
-		ss.add(plural, [new RegExp('sex', 'i'), 'sexes']);
-		ss.add(plural, [new RegExp('child', 'i'), 'children']);
-		ss.add(plural, [new RegExp('man', 'i'), 'men']);
-		ss.add(plural, [new RegExp('foot', 'i'), 'feet']);
-		ss.add(plural, [new RegExp('person', 'i'), 'people']);
-		ss.add(plural, [new RegExp('taxon', 'i'), 'taxa']);
-		ss.add(plural, [new RegExp('(quiz)', 'i'), '$1zes']);
-		ss.add(plural, [new RegExp('^(ox)$', 'i'), '$1en']);
-		ss.add(plural, [new RegExp('(m|l)ouse$', 'i'), '$1ice']);
-		ss.add(plural, [new RegExp('(matr|vert|ind|suff)ix|ex$', 'i'), '$1ices']);
-		ss.add(plural, [new RegExp('(x|ch|ss|sh)$', 'i'), '$1es']);
-		ss.add(plural, [new RegExp('([^aeiouy]|qu)y$', 'i'), '$1ies']);
-		ss.add(plural, [new RegExp('(?:([^f])fe|([lr])f)$', 'i'), '$1$2ves']);
-		ss.add(plural, [new RegExp('sis$', 'i'), 'ses']);
-		ss.add(plural, [new RegExp('([ti]|addend)um$', 'i'), '$1a']);
-		ss.add(plural, [new RegExp('(alumn|formul)a$', 'i'), '$1ae']);
-		ss.add(plural, [new RegExp('(buffal|tomat|her)o$', 'i'), '$1oes']);
-		ss.add(plural, [new RegExp('(bu)s$', 'i'), '$1ses']);
-		ss.add(plural, [new RegExp('(alias|status)$', 'i'), '$1es']);
-		ss.add(plural, [new RegExp('(octop|vir)us$', 'i'), '$1i']);
-		ss.add(plural, [new RegExp('(gen)us$', 'i'), '$1era']);
-		ss.add(plural, [new RegExp('(ax|test)is$', 'i'), '$1es']);
-		ss.add(plural, [new RegExp('s$', 'i'), 's']);
-		ss.add(plural, [new RegExp('$', 'i'), 's']);
+		plural.push([new RegExp('move', 'i'), 'moves']);
+		plural.push([new RegExp('sex', 'i'), 'sexes']);
+		plural.push([new RegExp('child', 'i'), 'children']);
+		plural.push([new RegExp('man', 'i'), 'men']);
+		plural.push([new RegExp('foot', 'i'), 'feet']);
+		plural.push([new RegExp('person', 'i'), 'people']);
+		plural.push([new RegExp('taxon', 'i'), 'taxa']);
+		plural.push([new RegExp('(quiz)', 'i'), '$1zes']);
+		plural.push([new RegExp('^(ox)$', 'i'), '$1en']);
+		plural.push([new RegExp('(m|l)ouse$', 'i'), '$1ice']);
+		plural.push([new RegExp('(matr|vert|ind|suff)ix|ex$', 'i'), '$1ices']);
+		plural.push([new RegExp('(x|ch|ss|sh)$', 'i'), '$1es']);
+		plural.push([new RegExp('([^aeiouy]|qu)y$', 'i'), '$1ies']);
+		plural.push([new RegExp('(?:([^f])fe|([lr])f)$', 'i'), '$1$2ves']);
+		plural.push([new RegExp('sis$', 'i'), 'ses']);
+		plural.push([new RegExp('([ti]|addend)um$', 'i'), '$1a']);
+		plural.push([new RegExp('(alumn|formul)a$', 'i'), '$1ae']);
+		plural.push([new RegExp('(buffal|tomat|her)o$', 'i'), '$1oes']);
+		plural.push([new RegExp('(bu)s$', 'i'), '$1ses']);
+		plural.push([new RegExp('(alias|status)$', 'i'), '$1es']);
+		plural.push([new RegExp('(octop|vir)us$', 'i'), '$1i']);
+		plural.push([new RegExp('(gen)us$', 'i'), '$1era']);
+		plural.push([new RegExp('(ax|test)is$', 'i'), '$1es']);
+		plural.push([new RegExp('s$', 'i'), 's']);
+		plural.push([new RegExp('$', 'i'), 's']);
 		var singular = [];
-		ss.add(singular, [new RegExp('cookies$', 'i'), 'cookie']);
-		ss.add(singular, [new RegExp('moves$', 'i'), 'move']);
-		ss.add(singular, [new RegExp('sexes$', 'i'), 'sex']);
-		ss.add(singular, [new RegExp('children$', 'i'), 'child']);
-		ss.add(singular, [new RegExp('men$', 'i'), 'man']);
-		ss.add(singular, [new RegExp('feet$', 'i'), 'foot']);
-		ss.add(singular, [new RegExp('people$', 'i'), 'person']);
-		ss.add(singular, [new RegExp('taxa$', 'i'), 'taxon']);
-		ss.add(singular, [new RegExp('databases$', 'i'), 'database']);
-		ss.add(singular, [new RegExp('(quiz)zes$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('(matr|suff)ices$', 'i'), '$1ix']);
-		ss.add(singular, [new RegExp('(vert|ind)ices$', 'i'), '$1ex']);
-		ss.add(singular, [new RegExp('^(ox)en', 'i'), '$1']);
-		ss.add(singular, [new RegExp('(alias|status)es$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('(tomato|hero|buffalo)es$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('([octop|vir])i$', 'i'), '$1us']);
-		ss.add(singular, [new RegExp('(gen)era$', 'i'), '$1us']);
-		ss.add(singular, [new RegExp('(cris|ax|test)es$', 'i'), '$1is']);
-		ss.add(singular, [new RegExp('(shoe)s$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('(o)es$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('(bus)es$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('([m|l])ice$', 'i'), '$1ouse']);
-		ss.add(singular, [new RegExp('(x|ch|ss|sh)es$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('(m)ovies$', 'i'), '$1ovie']);
-		ss.add(singular, [new RegExp('(s)eries$', 'i'), '$1eries']);
-		ss.add(singular, [new RegExp('([^aeiouy]|qu)ies$', 'i'), '$1y']);
-		ss.add(singular, [new RegExp('([lr])ves$', 'i'), '$1f']);
-		ss.add(singular, [new RegExp('(tive)s$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('(hive)s$', 'i'), '$1']);
-		ss.add(singular, [new RegExp('([^f])ves$', 'i'), '$1fe']);
-		ss.add(singular, [new RegExp('(^analy)ses$', 'i'), '$1sis']);
-		ss.add(singular, [new RegExp('((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$', 'i'), '$1\\2sis']);
-		ss.add(singular, [new RegExp('([ti]|addend)a$', 'i'), '$1um']);
-		ss.add(singular, [new RegExp('(alumn|formul)ae$', 'i'), '$1a']);
-		ss.add(singular, [new RegExp('(n)ews$', 'i'), '$1ews']);
-		ss.add(singular, [new RegExp('(.*)s$', 'i'), '$1']);
+		singular.push([new RegExp('cookies$', 'i'), 'cookie']);
+		singular.push([new RegExp('moves$', 'i'), 'move']);
+		singular.push([new RegExp('sexes$', 'i'), 'sex']);
+		singular.push([new RegExp('children$', 'i'), 'child']);
+		singular.push([new RegExp('men$', 'i'), 'man']);
+		singular.push([new RegExp('feet$', 'i'), 'foot']);
+		singular.push([new RegExp('people$', 'i'), 'person']);
+		singular.push([new RegExp('taxa$', 'i'), 'taxon']);
+		singular.push([new RegExp('databases$', 'i'), 'database']);
+		singular.push([new RegExp('(quiz)zes$', 'i'), '$1']);
+		singular.push([new RegExp('(matr|suff)ices$', 'i'), '$1ix']);
+		singular.push([new RegExp('(vert|ind)ices$', 'i'), '$1ex']);
+		singular.push([new RegExp('^(ox)en', 'i'), '$1']);
+		singular.push([new RegExp('(alias|status)es$', 'i'), '$1']);
+		singular.push([new RegExp('(tomato|hero|buffalo)es$', 'i'), '$1']);
+		singular.push([new RegExp('([octop|vir])i$', 'i'), '$1us']);
+		singular.push([new RegExp('(gen)era$', 'i'), '$1us']);
+		singular.push([new RegExp('(cris|ax|test)es$', 'i'), '$1is']);
+		singular.push([new RegExp('(shoe)s$', 'i'), '$1']);
+		singular.push([new RegExp('(o)es$', 'i'), '$1']);
+		singular.push([new RegExp('(bus)es$', 'i'), '$1']);
+		singular.push([new RegExp('([m|l])ice$', 'i'), '$1ouse']);
+		singular.push([new RegExp('(x|ch|ss|sh)es$', 'i'), '$1']);
+		singular.push([new RegExp('(m)ovies$', 'i'), '$1ovie']);
+		singular.push([new RegExp('(s)eries$', 'i'), '$1eries']);
+		singular.push([new RegExp('([^aeiouy]|qu)ies$', 'i'), '$1y']);
+		singular.push([new RegExp('([lr])ves$', 'i'), '$1f']);
+		singular.push([new RegExp('(tive)s$', 'i'), '$1']);
+		singular.push([new RegExp('(hive)s$', 'i'), '$1']);
+		singular.push([new RegExp('([^f])ves$', 'i'), '$1fe']);
+		singular.push([new RegExp('(^analy)ses$', 'i'), '$1sis']);
+		singular.push([new RegExp('((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$', 'i'), '$1\\2sis']);
+		singular.push([new RegExp('([ti]|addend)a$', 'i'), '$1um']);
+		singular.push([new RegExp('(alumn|formul)ae$', 'i'), '$1a']);
+		singular.push([new RegExp('(n)ews$', 'i'), '$1ews']);
+		singular.push([new RegExp('(.*)s$', 'i'), '$1']);
 		var countable = [];
-		ss.add(countable, 'aircraft');
-		ss.add(countable, 'cannon');
-		ss.add(countable, 'deer');
-		ss.add(countable, 'equipment');
-		ss.add(countable, 'fish');
-		ss.add(countable, 'information');
-		ss.add(countable, 'money');
-		ss.add(countable, 'moose');
-		ss.add(countable, 'rice');
-		ss.add(countable, 'series');
-		ss.add(countable, 'sheep');
-		ss.add(countable, 'species');
-		ss.add(countable, 'swin');
+		countable.push('aircraft');
+		countable.push('cannon');
+		countable.push('deer');
+		countable.push('equipment');
+		countable.push('fish');
+		countable.push('information');
+		countable.push('money');
+		countable.push('moose');
+		countable.push('rice');
+		countable.push('series');
+		countable.push('sheep');
+		countable.push('species');
+		countable.push('swin');
 		$Serenity_StringInflector.$plural = plural;
 		$Serenity_StringInflector.$singular = singular;
 		$Serenity_StringInflector.$countable = countable;
@@ -5616,12 +5608,12 @@
 			}
 			if (opt.descending) {
 				for (var i = maxYear; i >= minYear; i--) {
-					ss.add(years, i.toString());
+					years.push(i.toString());
 				}
 			}
 			else {
 				for (var i1 = minYear; i1 <= maxYear; i1++) {
-					ss.add(years, i1.toString());
+					years.push(i1.toString());
 				}
 			}
 			return years;
@@ -5663,7 +5655,7 @@
 				try {
 					while ($t1.moveNext()) {
 						var info = $t1.current();
-						ss.add($Serenity_EditorTypeEditor.$editorTypeList, [info.key, info.value.displayName]);
+						$Serenity_EditorTypeEditor.$editorTypeList.push([info.key, info.value.displayName]);
 					}
 				}
 				finally {
@@ -6061,7 +6053,7 @@
 				if (lineEx.isOr) {
 					line.isOr = 1;
 				}
-				ss.add(filterLines, line);
+				filterLines.push(line);
 				if (inParens && (lineEx.rightParen || lineEx.leftParen)) {
 					filterText += ')';
 					inParens = false;
@@ -6299,14 +6291,13 @@
 		getToolButtons: function() {
 			var self = this;
 			var $t1 = [];
-			ss.add($t1, {
+			$t1.push({
 				title: 'Dosya Seç',
 				cssClass: 'add-file-button',
 				onClick: function() {
 				}
 			});
-			null;
-			ss.add($t1, {
+			$t1.push({
 				title: 'Kaldır',
 				cssClass: 'delete-button',
 				onClick: function() {
@@ -6315,7 +6306,6 @@
 					self.updateInterface();
 				}
 			});
-			null;
 			return $t1;
 		},
 		populate: function() {
@@ -6326,8 +6316,7 @@
 			else {
 				var $t2 = this.fileSymbols;
 				var $t1 = [];
-				ss.add($t1, this.entity);
-				null;
+				$t1.push(this.entity);
 				$Serenity_UploadHelper.populateFileSymbols($t2, $t1, displayOriginalName);
 			}
 		},
@@ -7154,22 +7143,18 @@
 		},
 		getToolbarButtons: function() {
 			var $t1 = [];
-			ss.add($t1, { title: 'Önizleme', cssClass: 'print-preview-button', onClick: ss.mkdel(this, function() {
+			$t1.push({ title: 'Önizleme', cssClass: 'print-preview-button', onClick: ss.mkdel(this, function() {
 				this.executeReport('_blank', null);
 			}) });
-			null;
-			ss.add($t1, { title: 'PDF', cssClass: 'export-pdf-button', onClick: ss.mkdel(this, function() {
+			$t1.push({ title: 'PDF', cssClass: 'export-pdf-button', onClick: ss.mkdel(this, function() {
 				this.executeReport('', 'Pdf');
 			}) });
-			null;
-			ss.add($t1, { title: 'Excel', cssClass: 'export-xlsx-button', onClick: ss.mkdel(this, function() {
+			$t1.push({ title: 'Excel', cssClass: 'export-xlsx-button', onClick: ss.mkdel(this, function() {
 				this.executeReport('', 'Xlsx');
 			}) });
-			null;
-			ss.add($t1, { title: 'Word', cssClass: 'export-docx-button', onClick: ss.mkdel(this, function() {
+			$t1.push({ title: 'Word', cssClass: 'export-docx-button', onClick: ss.mkdel(this, function() {
 				this.executeReport('', 'Docx');
 			}) });
-			null;
 			return $t1;
 		}
 	}, ss.makeGenericType($Serenity_TemplatedDialog$1, [Object]), [$Serenity_IDialog]);
@@ -7274,19 +7259,33 @@
 	ss.setMetadata($Serenity_TextAreaEditorOptions, { members: [{ attr: [new $Serenity_ComponentModel_HiddenAttribute()], name: 'Cols', type: 16, returnType: ss.Int32, getter: { name: 'get_Cols', type: 8, params: [], returnType: ss.Int32, fget: 'cols' }, setter: { name: 'set_Cols', type: 8, params: [ss.Int32], returnType: Object, fset: 'cols' }, fname: 'cols' }, { attr: [new $Serenity_ComponentModel_HiddenAttribute()], name: 'Rows', type: 16, returnType: ss.Int32, getter: { name: 'get_Rows', type: 8, params: [], returnType: ss.Int32, fget: 'rows' }, setter: { name: 'set_Rows', type: 8, params: [ss.Int32], returnType: Object, fset: 'rows' }, fname: 'rows' }] });
 	ss.setMetadata($Serenity_URLEditor, { attr: [new Serenity.EditorAttribute(), new $System_ComponentModel_DisplayNameAttribute('URL')] });
 	ss.setMetadata($Serenity_ComponentModel_EditorOptionAttribute, { attrAllowMultiple: true });
-	$Serenity_Widget.$nextWidgetNumber = 0;
-	$Serenity_DialogExtensions.$enterKeyCode = 13;
-	$Serenity_EditorTypeCache.$visited = null;
-	$Serenity_EditorTypeCache.$registeredTypes = null;
-	$Serenity_EditorTypeEditor.$editorTypeList = null;
-	$Serenity_PropertyGrid.$knownEditorTypes = null;
-	$Serenity_PropertyGrid.$knownEditorTypes = {};
-	$Serenity_FilterPanel.panelTemplate = '<div id="~_Rows" class="rows"></div><div id="~_Buttons" class="buttons"><button id="~_AddButton" class="add"></button><button id="~_SearchButton" class="search"></button><button id="~_ResetButton" class="reset"></button></div><div style="clear: both"></div><div id="~_DisplayText" class="display" style="display: none;"></div>';
-	$Serenity_FilterPanel.rowTemplate = '<div class="row"><a class="delete"><span></span></a><div class="l"><a class="rightparen" href="#">)</a><a class="andor" href="#"></a><a class="leftparen" href="#">(</a></div><div class="f"><select></select></div><div class="o"></div><div class="v"></div><div style="clear: both"></div></div>';
-	$Serenity_StringInflector.$plural = null;
-	$Serenity_StringInflector.$singular = null;
-	$Serenity_StringInflector.$countable = null;
-	$Serenity_StringInflector.$pluralizeCache = null;
-	$Serenity_StringInflector.$singularizeCache = null;
-	$Serenity_StringInflector.$initialized = false;
+	(function() {
+		$Serenity_Widget.$nextWidgetNumber = 0;
+	})();
+	(function() {
+		$Serenity_DialogExtensions.$enterKeyCode = 13;
+	})();
+	(function() {
+		$Serenity_EditorTypeCache.$visited = null;
+		$Serenity_EditorTypeCache.$registeredTypes = null;
+	})();
+	(function() {
+		$Serenity_EditorTypeEditor.$editorTypeList = null;
+	})();
+	(function() {
+		$Serenity_PropertyGrid.$knownEditorTypes = null;
+		$Serenity_PropertyGrid.$knownEditorTypes = {};
+	})();
+	(function() {
+		$Serenity_FilterPanel.panelTemplate = '<div id="~_Rows" class="rows"></div><div id="~_Buttons" class="buttons"><button id="~_AddButton" class="add"></button><button id="~_SearchButton" class="search"></button><button id="~_ResetButton" class="reset"></button></div><div style="clear: both"></div><div id="~_DisplayText" class="display" style="display: none;"></div>';
+		$Serenity_FilterPanel.rowTemplate = '<div class="row"><a class="delete"><span></span></a><div class="l"><a class="rightparen" href="#">)</a><a class="andor" href="#"></a><a class="leftparen" href="#">(</a></div><div class="f"><select></select></div><div class="o"></div><div class="v"></div><div style="clear: both"></div></div>';
+	})();
+	(function() {
+		$Serenity_StringInflector.$plural = null;
+		$Serenity_StringInflector.$singular = null;
+		$Serenity_StringInflector.$countable = null;
+		$Serenity_StringInflector.$pluralizeCache = null;
+		$Serenity_StringInflector.$singularizeCache = null;
+		$Serenity_StringInflector.$initialized = false;
+	})();
 })();
