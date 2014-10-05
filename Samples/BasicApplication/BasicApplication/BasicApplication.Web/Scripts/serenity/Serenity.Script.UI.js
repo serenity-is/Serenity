@@ -1351,14 +1351,12 @@
 			return $t1;
 		};
 		ss.registerGenericClassInstance($type, $Serenity_EntityDialog$2, [TEntity, TOptions], {
-			initializeAsync: function(callback) {
+			initializeAsync: function(complete, fail) {
 				ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).prototype.initializeAsync.call(this, ss.mkdel(this, function() {
 					this.$initPropertyGrid$1(ss.mkdel(this, function() {
-						this.$initLocalizationGrid$1(function() {
-							callback();
-						});
-					}));
-				}));
+						this.$initLocalizationGrid$1(complete, fail);
+					}), fail);
+				}), fail);
 			},
 			destroy: function() {
 				if (ss.isValue(this.propertyGrid)) {
@@ -1666,16 +1664,20 @@
 				var pgOptions = this.getPropertyGridOptions();
 				this.$initLocalizationGridCommon(pgOptions);
 			},
-			$initLocalizationGrid$1: function(callback) {
-				var pgDiv = this.byId$1('PropertyGrid');
-				if (pgDiv.length <= 0) {
-					callback();
-					return;
-				}
-				this.getPropertyGridOptions$1(ss.mkdel(this, function(pgOptions) {
-					this.$initLocalizationGridCommon(pgOptions);
-					callback();
-				}));
+			$initLocalizationGrid$1: function(complete, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					var pgDiv = this.byId$1('PropertyGrid');
+					if (pgDiv.length <= 0) {
+						complete();
+						return;
+					}
+					this.getPropertyGridOptions$1(ss.mkdel(this, function(pgOptions) {
+						Q.tryCatch(fail, ss.mkdel(this, function() {
+							this.$initLocalizationGridCommon(pgOptions);
+							complete();
+						}))();
+					}), fail);
+				}))();
 			},
 			$initLocalizationGridCommon: function(pgOptions) {
 				var pgDiv = this.byId$1('PropertyGrid');
@@ -1783,18 +1785,22 @@
 				var pgOptions = this.getPropertyGridOptions();
 				this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
 			},
-			$initPropertyGrid$1: function(callback) {
-				var pgDiv = this.byId$1('PropertyGrid');
-				if (pgDiv.length <= 0) {
-					callback();
-					return;
-				}
-				this.getPropertyGridOptions$1(ss.mkdel(this, function(pgOptions) {
-					this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
-					this.propertyGrid.init(function(pg) {
-						callback();
-					});
-				}));
+			$initPropertyGrid$1: function(complete, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					var pgDiv = this.byId$1('PropertyGrid');
+					if (pgDiv.length <= 0) {
+						complete();
+						return;
+					}
+					this.getPropertyGridOptions$1(ss.mkdel(this, function(pgOptions) {
+						Q.tryCatch(fail, ss.mkdel(this, function() {
+							this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
+							this.propertyGrid.init(function(pg) {
+								complete();
+							}, fail);
+						}))();
+					}), fail);
+				}))();
 			},
 			getPropertyItems: function() {
 				var formKey = this.getFormKey();
@@ -1808,18 +1814,22 @@
 				$t1.localTextPrefix = 'Forms.' + this.getFormKey() + '.';
 				return $t1;
 			},
-			getPropertyGridOptions$1: function(callback) {
+			getPropertyGridOptions$1: function(complete, fail) {
 				this.getPropertyItems$1(ss.mkdel(this, function(propertyItems) {
-					var $t1 = $Serenity_PropertyGridOptions.$ctor();
-					$t1.idPrefix = this.idPrefix;
-					$t1.items = propertyItems;
-					$t1.mode = 0;
-					callback($t1);
-				}));
+					Q.tryCatch(fail, ss.mkdel(this, function() {
+						var $t1 = $Serenity_PropertyGridOptions.$ctor();
+						$t1.idPrefix = this.idPrefix;
+						$t1.items = propertyItems;
+						$t1.mode = 0;
+						complete($t1);
+					}))();
+				}), fail);
 			},
-			getPropertyItems$1: function(callback) {
-				var formKey = this.getFormKey();
-				Q.getForm$1(formKey, callback);
+			getPropertyItems$1: function(complete, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					var formKey = this.getFormKey();
+					Q.getForm$1(formKey, complete, fail);
+				}))();
 			},
 			validateBeforeSave: function() {
 				return true;
@@ -2643,11 +2653,11 @@
 	$Serenity_HtmlReportContentEditor.__typeName = 'Serenity.HtmlReportContentEditor';
 	global.Serenity.HtmlReportContentEditor = $Serenity_HtmlReportContentEditor;
 	////////////////////////////////////////////////////////////////////////////////
-	// Serenity.IAsyncWidget
-	var $Serenity_IAsyncWidget = function() {
+	// Serenity.IAsyncInit
+	var $Serenity_IAsyncInit = function() {
 	};
-	$Serenity_IAsyncWidget.__typeName = 'Serenity.IAsyncWidget';
-	global.Serenity.IAsyncWidget = $Serenity_IAsyncWidget;
+	$Serenity_IAsyncInit.__typeName = 'Serenity.IAsyncInit';
+	global.Serenity.IAsyncInit = $Serenity_IAsyncInit;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.IBooleanValue
 	var $Serenity_IBooleanValue = function() {
@@ -2851,15 +2861,14 @@
 			}
 		};
 		ss.registerGenericClassInstance($type, $Serenity_LookupEditorBase$2, [TOptions, TItem], {
-			initializeAsync: function(callback) {
-				var self = this;
-				this.updateItems$1(ss.mkdel(this, function() {
+			initializeAsync: function(complete, fail) {
+				this.updateItems$1(Q.tryCatch(fail, ss.mkdel(this, function() {
 					Q$ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, ss.mkdel(this, function() {
 						this.updateItems$1(function() {
-						});
+						}, null);
 					}));
-					callback();
-				}));
+					complete();
+				})), fail);
 			},
 			destroy: function() {
 				Q$ScriptData.unbindFromChange(this.uniqueName);
@@ -2880,8 +2889,10 @@
 			getLookup: function() {
 				return Q.getLookup(this.getLookupKey());
 			},
-			getLookup$1: function(callback) {
-				Q.getLookup$1(this.getLookupKey(), callback);
+			getLookup$1: function(complete, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					Q.getLookup$1(this.getLookupKey(), complete, fail);
+				}))();
 			},
 			getItems: function(lookup) {
 				return lookup.get_items();
@@ -2912,25 +2923,30 @@
 					$t1.dispose();
 				}
 			},
-			updateItems$1: function(callback) {
-				this.getLookup$1(ss.mkdel(this, function(lookup) {
-					this.clearItems();
-					var items = this.getItems(lookup);
-					var $t1 = ss.getEnumerator(items);
-					try {
-						while ($t1.moveNext()) {
-							var item = $t1.current();
-							var text = this.getItemText(ss.cast(item, TItem), lookup);
-							var disabled = this.getItemDisabled(ss.cast(item, TItem), lookup);
-							var idValue = item[lookup.get_idField()];
-							var id = (ss.isNullOrUndefined(idValue) ? '' : idValue.toString());
-							ss.add(this.items, { id: id, text: ss.cast(text, String), source: item, disabled: !!disabled });
-						}
-					}
-					finally {
-						$t1.dispose();
-					}
-				}));
+			updateItems$1: function(complete, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					this.getLookup$1(ss.mkdel(this, function(lookup) {
+						Q.tryCatch(fail, ss.mkdel(this, function() {
+							this.clearItems();
+							var items = this.getItems(lookup);
+							var $t1 = ss.getEnumerator(items);
+							try {
+								while ($t1.moveNext()) {
+									var item = $t1.current();
+									var text = this.getItemText(ss.cast(item, TItem), lookup);
+									var disabled = this.getItemDisabled(ss.cast(item, TItem), lookup);
+									var idValue = item[lookup.get_idField()];
+									var id = (ss.isNullOrUndefined(idValue) ? '' : idValue.toString());
+									ss.add(this.items, { id: id, text: ss.cast(text, String), source: item, disabled: !!disabled });
+								}
+							}
+							finally {
+								$t1.dispose();
+							}
+							complete();
+						}))();
+					}), fail);
+				}))();
 			}
 		}, function() {
 			return ss.makeGenericType($Serenity_Select2Editor$2, [TOptions, TItem]);
@@ -3315,13 +3331,13 @@
 			}
 		};
 		ss.registerGenericClassInstance($type, $Serenity_PropertyDialog$2, [TEntity, TOptions], {
-			initializeAsync: function(callback) {
+			initializeAsync: function(complete, fail) {
 				ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).prototype.initializeAsync.call(this, ss.mkdel(this, function() {
-					this.$initPropertyGrid$1(ss.mkdel(this, function() {
+					this.$initPropertyGrid$1(Q.tryCatch(fail, ss.mkdel(this, function() {
 						this.loadInitialEntity();
-						callback();
-					}));
-				}));
+						complete();
+					})), fail);
+				}), fail);
 			},
 			loadInitialEntity: function() {
 				if (ss.isValue(this.propertyGrid)) {
@@ -3401,18 +3417,22 @@
 				var pgOptions = this.getPropertyGridOptions();
 				this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
 			},
-			$initPropertyGrid$1: function(callback) {
-				var pgDiv = this.byId$1('PropertyGrid');
-				if (pgDiv.length <= 0) {
-					callback();
-					return;
-				}
-				this.getPropertyGridOptions$1(ss.mkdel(this, function(pgOptions) {
-					this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
-					this.propertyGrid.init(function(pg) {
-						callback();
-					});
-				}));
+			$initPropertyGrid$1: function(complete, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					var pgDiv = this.byId$1('PropertyGrid');
+					if (pgDiv.length <= 0) {
+						complete();
+						return;
+					}
+					this.getPropertyGridOptions$1(ss.mkdel(this, function(pgOptions) {
+						Q.tryCatch(fail, ss.mkdel(this, function() {
+							this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
+							this.propertyGrid.init(function(pg) {
+								complete();
+							}, fail);
+						}))();
+					}), fail);
+				}))();
 			},
 			getFormKey: function() {
 				var attributes = ss.getAttributes(ss.getInstanceType(this), Serenity.FormKeyAttribute, true);
@@ -3438,9 +3458,11 @@
 				var formKey = this.getFormKey();
 				return Q.getForm(formKey);
 			},
-			getPropertyItems$1: function(callback) {
-				var formKey = this.getFormKey();
-				Q.getForm$1(formKey, callback);
+			getPropertyItems$1: function(callback, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					var formKey = this.getFormKey();
+					Q.getForm$1(formKey, callback, fail);
+				}))();
 			},
 			getPropertyGridOptions: function() {
 				var $t1 = $Serenity_PropertyGridOptions.$ctor();
@@ -3451,15 +3473,18 @@
 				$t1.localTextPrefix = 'Forms.' + this.getFormKey() + '.';
 				return $t1;
 			},
-			getPropertyGridOptions$1: function(callback) {
+			getPropertyGridOptions$1: function(callback, fail) {
 				this.getPropertyItems$1(ss.mkdel(this, function(propertyItems) {
-					var $t1 = $Serenity_PropertyGridOptions.$ctor();
-					$t1.idPrefix = this.idPrefix;
-					$t1.items = propertyItems;
-					$t1.mode = 0;
-					$t1.useCategories = false;
-					callback($t1);
-				}));
+					Q.tryCatch(fail, ss.mkdel(this, function() {
+						var $t1 = $Serenity_PropertyGridOptions.$ctor();
+						$t1.idPrefix = this.idPrefix;
+						$t1.items = propertyItems;
+						$t1.mode = 0;
+						$t1.useCategories = false;
+						var options = $t1;
+						callback(options);
+					}))();
+				}), fail);
 			},
 			validateBeforeSave: function() {
 				return this.validator.form();
@@ -3495,7 +3520,8 @@
 		this.$initializingEditors = 0;
 		this.$editors = null;
 		this.$items = null;
-		this.$asyncCallback = null;
+		this.$asyncComplete = null;
+		this.$asyncFail = null;
 		ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]).call(this, div, opt);
 		if (!ss.isValue(opt.mode)) {
 			opt.mode = 0;
@@ -4656,15 +4682,17 @@
 			}
 		};
 		ss.registerGenericClassInstance($type, $Serenity_TemplatedWidget$1, [TOptions], {
-			initializeAsync: function(callback) {
+			initializeAsync: function(complete, fail) {
 				$Serenity_Widget.prototype.initializeAsync.call(this, ss.mkdel(this, function() {
 					this.getTemplate$1(ss.mkdel(this, function(template) {
-						var widgetMarkup = template.replace(new RegExp('~_', 'g'), this.idPrefix);
-						widgetMarkup = $Serenity_JsRender.render(widgetMarkup, null);
-						this.element.html(widgetMarkup);
-						callback();
-					}));
-				}));
+						Q.tryCatch(fail, ss.mkdel(this, function() {
+							var widgetMarkup = template.replace(new RegExp('~_', 'g'), this.idPrefix);
+							widgetMarkup = $Serenity_JsRender.render(widgetMarkup, null);
+							this.element.html(widgetMarkup);
+							complete();
+						}))();
+					}), fail);
+				}), fail);
 			},
 			byId$1: function(id) {
 				return $('#' + this.idPrefix + id);
@@ -4692,21 +4720,25 @@
 				}
 				return template;
 			},
-			getTemplate$1: function(callback) {
-				var templateName = this.getTemplateName();
-				var script = $('script#Template_' + templateName);
-				if (script.length > 0) {
-					var template = script.html();
-					callback(template);
-				}
-				else {
-					Q.getTemplate$1(templateName, ss.mkdel(this, function(template1) {
-						if (!ss.isValue(template1)) {
-							throw new ss.Exception(ss.formatString("Can't locate template for widget '{0}' with name '{1}'!", ss.getTypeName(ss.getInstanceType(this)), templateName));
-						}
-						callback(template1);
-					}));
-				}
+			getTemplate$1: function(complete, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					var templateName = this.getTemplateName();
+					var script = $('script#Template_' + templateName);
+					if (script.length > 0) {
+						var template = script.html();
+						complete(template);
+					}
+					else {
+						Q.getTemplate$1(templateName, ss.mkdel(this, function(template1) {
+							Q.tryCatch(fail, ss.mkdel(this, function() {
+								if (!ss.isValue(template1)) {
+									throw new ss.Exception(ss.formatString("Can't locate template for widget '{0}' with name '{1}'!", ss.getTypeName(ss.getInstanceType(this)), templateName));
+								}
+								complete(template1);
+							}))();
+						}), fail);
+					}
+				}))();
 			}
 		}, function() {
 			return ss.makeGenericType($Serenity_Widget$1, [TOptions]);
@@ -5066,7 +5098,7 @@
 			if (!ss.staticEquals(init, null)) {
 				init(widget);
 			}
-		});
+		}, null);
 		return widget;
 	};
 	$Serenity_Widget.create = function(TWidget) {
@@ -5168,7 +5200,7 @@
 	$Serenity_WX.init = function(widget, action) {
 		widget.init(function(w) {
 			action(widget);
-		});
+		}, null);
 		return widget;
 	};
 	$Serenity_WX.createElementFor = function(TEditor) {
@@ -5371,31 +5403,33 @@
 	$System_ComponentModel_DisplayNameAttribute.__typeName = 'System.ComponentModel.DisplayNameAttribute';
 	global.System.ComponentModel.DisplayNameAttribute = $System_ComponentModel_DisplayNameAttribute;
 	ss.initClass($Serenity_Widget, $asm, {
-		init: function(callback) {
-			if (this.initialized === true || !this.isAsyncWidget()) {
-				this.initialized = true;
-				if (!ss.staticEquals(callback, null)) {
-					callback(this);
+		init: function(callback, fail) {
+			Q.tryCatch(fail, ss.mkdel(this, function() {
+				if (this.initialized === true || !this.isAsyncWidget()) {
+					this.initialized = true;
+					if (!ss.staticEquals(callback, null)) {
+						callback(this);
+					}
+					return;
 				}
-				return this;
-			}
-			if (ss.isValue(this.initialized)) {
-				throw new ss.InvalidOperationException('Widget already initializing!');
-			}
-			this.initialized = false;
-			this.initializeAsync(ss.mkdel(this, function() {
-				this.initialized = true;
-				if (!ss.staticEquals(callback, null)) {
-					callback(this);
+				if (ss.isValue(this.initialized)) {
+					throw new ss.InvalidOperationException('Widget already initializing!');
 				}
-			}));
+				this.initialized = false;
+				this.initializeAsync(ss.mkdel(this, function() {
+					this.initialized = true;
+					if (!ss.staticEquals(callback, null)) {
+						callback(this);
+					}
+				}), fail);
+			}))();
 			return this;
 		},
 		isAsyncWidget: function() {
-			return ss.isInstanceOfType(this, $Serenity_IAsyncWidget);
+			return ss.isInstanceOfType(this, $Serenity_IAsyncInit);
 		},
-		initializeAsync: function(callback) {
-			callback();
+		initializeAsync: function(complete, fail) {
+			complete();
 		},
 		destroy: function() {
 			this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
@@ -6084,7 +6118,7 @@
 		get_currentFilter: function() {
 			return this.$currentFilter;
 		},
-		getTemplate$1: function(callback) {
+		getTemplate$1: function(callback, fail) {
 			callback($Serenity_FilterPanel.panelTemplate);
 		},
 		onFilterChange: function() {
@@ -6261,7 +6295,7 @@
 			return config;
 		}
 	}, $Serenity_HtmlContentEditor, [$Serenity_IStringValue]);
-	ss.initInterface($Serenity_IAsyncWidget, $asm, {});
+	ss.initInterface($Serenity_IAsyncInit, $asm, {});
 	ss.initInterface($Serenity_IFilterHandler, $asm, { getOperators: null, operatorTitle: null, operatorFormat: null, createEditor: null, toFilterLine: null });
 	ss.initClass($Serenity_ImageUploadEditor, $asm, {
 		getToolButtons: function() {
@@ -6388,7 +6422,7 @@
 			}
 			return $t1;
 		}
-	}, ss.makeGenericType($Serenity_LookupEditorBase$2, [$Serenity_LookupEditorOptions, Object]), [$Serenity_IStringValue]);
+	}, ss.makeGenericType($Serenity_LookupEditorBase$2, [$Serenity_LookupEditorOptions, Object]), [$Serenity_IStringValue, $Serenity_IAsyncInit]);
 	ss.initClass($Serenity_LookupEditorOptions, $asm, {});
 	ss.initClass($Serenity_MaskedEditor, $asm, {
 		get_value: function() {
@@ -6477,17 +6511,19 @@
 	ss.initClass($Serenity_PropertyItemHelper, $asm, {});
 	ss.initClass($Serenity_PropertyEditorHelper, $asm, {}, $Serenity_PropertyItemHelper);
 	ss.initClass($Serenity_PropertyGrid, $asm, {
-		initializeAsync: function(callback) {
-			$Serenity_Widget.prototype.initializeAsync.call(this, ss.mkdel(this, function() {
+		initializeAsync: function(complete, fail) {
+			$Serenity_Widget.prototype.initializeAsync.call(this, Q.tryCatch(fail, ss.mkdel(this, function() {
 				if (this.$initializingEditors <= 0) {
 					this.$updateReadOnly();
-					callback();
-					this.$asyncCallback = null;
+					complete();
+					this.$asyncComplete = null;
+					this.$asyncFail = null;
 				}
 				else {
-					this.$asyncCallback = callback;
+					this.$asyncComplete = complete;
+					this.$asyncFail = fail;
 				}
-			}));
+			})), fail);
 		},
 		destroy: function() {
 			if (ss.isValue(this.$editors)) {
@@ -6592,11 +6628,12 @@
 					}
 				}
 				this.$initializingEditors--;
-				if (this.isAsyncWidget() && this.$initializingEditors <= 0 && !ss.staticEquals(this.$asyncCallback, null)) {
-					this.$asyncCallback();
-					this.$asyncCallback = null;
+				if (this.isAsyncWidget() && this.$initializingEditors <= 0 && !ss.staticEquals(this.$asyncComplete, null)) {
+					this.$asyncComplete();
+					this.$asyncComplete = null;
+					this.$asyncFail = null;
 				}
-			}));
+			}), this.$asyncFail);
 			if (ss.isInstanceOfType(editor, $Serenity_BooleanEditor)) {
 				label.removeAttr('for');
 			}
@@ -6808,7 +6845,7 @@
 				callback(item, editor);
 			}
 		}
-	}, ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]), [$Serenity_IAsyncWidget]);
+	}, ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]), [$Serenity_IAsyncInit]);
 	ss.initEnum($Serenity_PropertyGridMode, $asm, { insert: 0, update: 1 });
 	ss.initClass($Serenity_PropertyGridOptions, $asm, {});
 	ss.initClass($Serenity_QuickSearchInput, $asm, {

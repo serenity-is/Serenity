@@ -27,18 +27,21 @@ namespace Serenity
             }
         }
 
-        protected override void InitializeAsync(Action callback)
+        protected override void InitializeAsync(Action complete, Action<object> fail)
         {
-            base.InitializeAsync(() =>
+            base.InitializeAsync(delegate()
             {
                 GetTemplate(template =>
                 {
-                    string widgetMarkup = template.Replace(new Regex("~_", "g"), idPrefix);
-                    widgetMarkup = JsRender.Render(widgetMarkup);
-                    this.element.Html(widgetMarkup);
-                    callback();
-                });
-            });
+                    fail.TryCatch(delegate()
+                    {
+                        string widgetMarkup = template.Replace(new Regex("~_", "g"), idPrefix);
+                        widgetMarkup = JsRender.Render(widgetMarkup);
+                        this.element.Html(widgetMarkup);
+                        complete();
+                    })();
+                }, fail);
+            }, fail);
         }
 
         public jQueryObject ById(string id)
@@ -80,27 +83,35 @@ namespace Serenity
             return template;
         }
 
-        protected virtual void GetTemplate(Action<string> callback)
+        protected virtual void GetTemplate(Action<string> complete, Action<object> fail)
         {
-            string templateName = this.GetTemplateName();
+            fail.TryCatch(delegate()
+            {
+                string templateName = this.GetTemplateName();
 
-            var script = J("script#Template_" + templateName);
-            if (script.Length > 0)
-            {
-                var template = script.GetHtml();
-                callback(template);
-            }
-            else
-            {
-                Q.GetTemplate(templateName, template =>
+                var script = J("script#Template_" + templateName);
+                if (script.Length > 0)
                 {
-                    if (!Script.IsValue(template))
-                        throw new Exception(String.Format(
-                            "Can't locate template for widget '{0}' with name '{1}'!", this.GetType().Name, templateName));
+                    var template = script.GetHtml();
+                    complete(template);
+                }
+                else
+                {
+                    Q.GetTemplate(templateName, template =>
+                    {
+                        fail.TryCatch(delegate()
+                        {
+                            if (!Script.IsValue(template))
+                            {
+                                throw new Exception(String.Format("Can't locate template for widget '{0}' with name '{1}'!",
+                                    this.GetType().Name, templateName));
+                            }
 
-                    callback(template);
-                });
-            }
+                            complete(template);
+                        })();
+                    }, fail);
+                }
+            })();
         }
     }
 

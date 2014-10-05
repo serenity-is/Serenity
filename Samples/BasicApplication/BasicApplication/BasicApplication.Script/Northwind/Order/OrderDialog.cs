@@ -7,7 +7,7 @@ namespace BasicApplication.Northwind
 
     [IdProperty("OrderID"), NameProperty("CustomerID")]
     [FormKey("Northwind.Order"), LocalTextPrefix("Northwind.Order"), Service("Northwind/Order")]
-    public class OrderDialog : EntityDialog<OrderRow>
+    public class OrderDialog : EntityDialog<OrderRow>, IAsyncInit
     {
     }
 }

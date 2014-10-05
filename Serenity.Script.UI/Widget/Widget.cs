@@ -47,40 +47,45 @@ namespace Serenity
             AddCssClass();
         }
 
-        protected internal Widget Init(Action<Widget> callback = null)
+        protected internal Widget Init(Action<Widget> callback = null, Action<object> fail = null)
         {
-            if (initialized == true || !IsAsyncWidget())
+            fail.TryCatch(delegate()
             {
-                initialized = true;
+                if (initialized == true || !IsAsyncWidget())
+                {
+                    initialized = true;
 
-                if (callback != null)
-                    callback(this);
+                    if (callback != null)
+                        callback(this);
 
-                return this;
-            }
+                    return;
+                }
 
-            if (initialized != null)
-                throw new InvalidOperationException("Widget already initializing!");
+                if (initialized != null)
+                    throw new InvalidOperationException("Widget already initializing!");
 
-            initialized = false;
+                initialized = false;
 
-            InitializeAsync(delegate {
-                initialized = true;
-                if (callback != null)
-                    callback(this);
-            });
+                InitializeAsync(delegate
+                {
+                    initialized = true;
+
+                    if (callback != null)
+                        callback(this);
+                }, fail);
+            })();
 
             return this;
         }
 
         protected virtual bool IsAsyncWidget()
         {
-            return this is IAsyncWidget;
+            return this is IAsyncInit;
         }
 
-        protected virtual void InitializeAsync(Action callback)
+        protected virtual void InitializeAsync(Action complete, Action<object> fail)
         {
-            callback();
+            complete();
         }
 
         /// <summary>

@@ -136,6 +136,20 @@
 	$Q.information = function(message, onOk, options) {
 		Q$Externals.confirmDialog(message, onOk, $.extend({ title: $Texts$Dialogs.InformationTitle.get(), yesButton: $Texts$Dialogs.OkButton.get(), noButton: null, dialogClass: 's-MessageDialog s-InformationDialog' }, options));
 	};
+	$Q.tryCatch = function(fail, callback) {
+		if (ss.staticEquals(fail, null)) {
+			return callback;
+		}
+		return function() {
+			try {
+				callback();
+			}
+			catch ($t1) {
+				var ex = ss.Exception.wrap($t1);
+				fail(ex);
+			}
+		};
+	};
 	$Q.htmlEncode = function(value) {
 		var text = (ss.isNullOrUndefined(value) ? '' : value.toString());
 		if ((new RegExp('[><&]', 'g')).test(text)) {
@@ -312,40 +326,40 @@
 	$Q.getRemoteData = function(key) {
 		return $Q$ScriptData.ensure('RemoteData.' + key);
 	};
-	$Q.getRemoteData$1 = function(key, callback) {
-		$Q$ScriptData.ensure$1('RemoteData.' + key, callback);
+	$Q.getRemoteData$1 = function(key, complete, fail) {
+		$Q$ScriptData.ensure$1('RemoteData.' + key, complete, fail);
 	};
 	$Q.getLookup = function(key) {
 		return $Q$ScriptData.ensure('Lookup.' + key);
 	};
-	$Q.getLookup$1 = function(key, callback) {
-		$Q$ScriptData.ensure$1('Lookup.' + key, callback);
+	$Q.getLookup$1 = function(key, complete, fail) {
+		$Q$ScriptData.ensure$1('Lookup.' + key, complete, fail);
 	};
 	$Q.reloadLookup = function(key) {
 		$Q$ScriptData.reload('Lookup.' + key);
 	};
-	$Q.reloadLookup$1 = function(key, callback) {
+	$Q.reloadLookup$1 = function(key, complete, fail) {
 		$Q$ScriptData.reload$1('Lookup.' + key, function(o) {
-			callback();
-		});
+			complete();
+		}, fail);
 	};
 	$Q.getColumns = function(key) {
 		return $Q$ScriptData.ensure('Columns.' + key);
 	};
-	$Q.getColumns$1 = function(key, callback) {
-		$Q$ScriptData.ensure$1('Columns.' + key, callback);
+	$Q.getColumns$1 = function(key, complete, fail) {
+		$Q$ScriptData.ensure$1('Columns.' + key, complete, fail);
 	};
 	$Q.getForm = function(key) {
 		return $Q$ScriptData.ensure('Form.' + key);
 	};
-	$Q.getForm$1 = function(key, callback) {
-		$Q$ScriptData.ensure$1('Form.' + key, callback);
+	$Q.getForm$1 = function(key, complete, fail) {
+		$Q$ScriptData.ensure$1('Form.' + key, complete, fail);
 	};
 	$Q.getTemplate = function(key) {
 		return $Q$ScriptData.ensure('Template.' + key);
 	};
-	$Q.getTemplate$1 = function(key, callback) {
-		$Q$ScriptData.ensure$1('Template.' + key, callback);
+	$Q.getTemplate$1 = function(key, complete, fail) {
+		$Q$ScriptData.ensure$1('Template.' + key, complete, fail);
 	};
 	$Q.canLoadScriptData = function(name) {
 		return $Q$ScriptData.canLoad(name);
@@ -632,13 +646,17 @@
 	$Q$ScriptData.$syncLoadScript = function(url) {
 		$.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
 	};
-	$Q$ScriptData.$loadScript = function(url, callback) {
-		$Q.blockUI(null);
-		$.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function() {
-			$Q.blockUndo();
-		}).done(function() {
-			callback();
-		});
+	$Q$ScriptData.$loadScript = function(url, complete, fail) {
+		$Q.tryCatch(fail, function() {
+			$Q.blockUI(null);
+			$.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function() {
+				$Q.blockUndo();
+			}).done(function(response) {
+				complete(response);
+			}).fail(function(response1) {
+				fail(response1);
+			});
+		})();
 	};
 	$Q$ScriptData.$loadScriptData = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
@@ -647,12 +665,14 @@
 		name = name + '.js?' + $Q$ScriptData.$registered[name];
 		$Q$ScriptData.$syncLoadScript($Q.resolveUrl('~/DynJS.axd/') + name);
 	};
-	$Q$ScriptData.$loadScriptData$1 = function(name, callback) {
-		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
-			throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
-		}
-		name = name + '.js?' + $Q$ScriptData.$registered[name];
-		$Q$ScriptData.$loadScript($Q.resolveUrl('~/DynJS.axd/') + name, callback);
+	$Q$ScriptData.$loadScriptData$1 = function(name, complete, fail) {
+		$Q.tryCatch(fail, function() {
+			if (!ss.keyExists($Q$ScriptData.$registered, name)) {
+				throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+			}
+			name = name + '.js?' + $Q$ScriptData.$registered[name];
+			$Q$ScriptData.$loadScript($Q.resolveUrl('~/DynJS.axd/') + name, complete, fail);
+		})();
 	};
 	$Q$ScriptData.ensure = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];
@@ -665,19 +685,21 @@
 		}
 		return data;
 	};
-	$Q$ScriptData.ensure$1 = function(name, callback) {
-		var data = $Q$ScriptData.$loadedData[name];
-		if (!ss.isValue(data)) {
-			$Q$ScriptData.$loadScriptData$1(name, function() {
-				data = $Q$ScriptData.$loadedData[name];
-				if (!ss.isValue(data)) {
-					throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
-				}
-				callback(data);
-			});
-			return;
-		}
-		callback(data);
+	$Q$ScriptData.ensure$1 = function(name, complete, fail) {
+		$Q.tryCatch(fail, function() {
+			var data = $Q$ScriptData.$loadedData[name];
+			if (!ss.isValue(data)) {
+				$Q$ScriptData.$loadScriptData$1(name, $Q.tryCatch(fail, function() {
+					data = $Q$ScriptData.$loadedData[name];
+					if (!ss.isValue(data)) {
+						throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
+					}
+					complete(data);
+				}), fail);
+				return;
+			}
+			complete(data);
+		})();
 	};
 	$Q$ScriptData.reload = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
@@ -688,14 +710,16 @@
 		var data = $Q$ScriptData.$loadedData[name];
 		return data;
 	};
-	$Q$ScriptData.reload$1 = function(name, callback) {
-		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
-			throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
-		}
-		$Q$ScriptData.$registered[name] = (new Date()).getTime().toString();
-		$Q$ScriptData.$loadScriptData$1(name, function() {
-			callback($Q$ScriptData.$loadedData[name]);
-		});
+	$Q$ScriptData.reload$1 = function(name, complete, fail) {
+		$Q.tryCatch(fail, function() {
+			if (!ss.keyExists($Q$ScriptData.$registered, name)) {
+				throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
+			}
+			$Q$ScriptData.$registered[name] = (new Date()).getTime().toString();
+			$Q$ScriptData.$loadScriptData$1(name, $Q.tryCatch(fail, function() {
+				complete($Q$ScriptData.$loadedData[name]);
+			}), fail);
+		})();
 	};
 	$Q$ScriptData.canLoad = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];

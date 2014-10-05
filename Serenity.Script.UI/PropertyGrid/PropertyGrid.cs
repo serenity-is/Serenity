@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 namespace Serenity
 {
-    public class PropertyGrid : Widget<PropertyGridOptions>, IAsyncWidget
+    public class PropertyGrid : Widget<PropertyGridOptions>, IAsyncInit
     {
         private static JsDictionary<string, Type> KnownEditorTypes;
 
@@ -21,7 +21,8 @@ namespace Serenity
         private int initializingEditors;
         private List<Widget> editors;
         private List<PropertyItem> items;
-        private Action asyncCallback;
+        private Action asyncComplete;
+        private Action<object> asyncFail;
 
         public PropertyGrid(jQueryObject div, PropertyGridOptions opt)
             : base(div, opt)
@@ -85,21 +86,23 @@ namespace Serenity
             UpdateReadOnly();
         }
 
-        protected override void InitializeAsync(Action callback)
+        protected override void InitializeAsync(Action complete, Action<object> fail)
         {
-            base.InitializeAsync(() => {
-
+            base.InitializeAsync(fail.TryCatch(delegate()
+            {
                 if (initializingEditors <= 0)
                 {
                     UpdateReadOnly();
-                    callback();
-                    asyncCallback = null;
+                    complete();
+                    asyncComplete = null;
+                    asyncFail = null;
                 }
                 else
                 {
-                    asyncCallback = callback;
+                    asyncComplete = complete;
+                    asyncFail = fail;
                 }
-            });
+            }), fail);
         }
 
         public override void Destroy()
@@ -286,12 +289,13 @@ namespace Serenity
 
                 initializingEditors--;
 
-                if (IsAsyncWidget() && initializingEditors <= 0 && asyncCallback != null)
+                if (IsAsyncWidget() && initializingEditors <= 0 && asyncComplete != null)
                 {
-                    asyncCallback();
-                    asyncCallback = null;
+                    asyncComplete();
+                    asyncComplete = null;
+                    asyncFail = null;
                 }
-            });
+            }, asyncFail);
 
             if (editor is BooleanEditor)
                 label.RemoveAttr("for");

@@ -2,7 +2,7 @@
 
 namespace Serenity
 {
-    public interface IAsyncWidget
+    public interface IAsyncInit
     {
     }
 }

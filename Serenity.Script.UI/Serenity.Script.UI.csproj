@@ -118,7 +118,7 @@
     <Compile Include="Reporting\ReportDesignPanel.cs" />
     <Compile Include="Reporting\ReportDialog.cs" />
     <Compile Include="Reporting\ReportPage.cs" />
-    <Compile Include="Widget\AsyncAttribute.cs" />
+    <Compile Include="Widget\IAsyncInit.cs" />
     <Compile Include="Widget\ValidationExtensions.cs" />
     <Compile Include="Widget\DialogExtensions.cs" />
     <Compile Include="Widget\Flexify.cs">

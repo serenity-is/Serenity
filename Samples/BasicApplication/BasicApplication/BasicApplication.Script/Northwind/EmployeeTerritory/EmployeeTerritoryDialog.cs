@@ -7,7 +7,7 @@ namespace BasicApplication.Northwind
 
     [IdProperty("EmployeeID"), NameProperty("TerritoryID")]
     [FormKey("Northwind.EmployeeTerritory"), LocalTextPrefix("Northwind.EmployeeTerritory"), Service("Northwind/EmployeeTerritory")]
-    public class EmployeeTerritoryDialog : EntityDialog<EmployeeTerritoryRow>
+    public class EmployeeTerritoryDialog : EntityDialog<EmployeeTerritoryRow>, IAsyncInit
     {
     }
 }

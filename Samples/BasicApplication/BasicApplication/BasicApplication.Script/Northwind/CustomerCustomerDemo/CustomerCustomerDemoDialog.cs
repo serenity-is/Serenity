@@ -7,7 +7,7 @@ namespace BasicApplication.Northwind
 
     [IdProperty("ID"), NameProperty("CustomerID")]
     [FormKey("Northwind.CustomerCustomerDemo"), LocalTextPrefix("Northwind.CustomerCustomerDemo"), Service("Northwind/CustomerCustomerDemo")]
-    public class CustomerCustomerDemoDialog : EntityDialog<CustomerCustomerDemoRow>
+    public class CustomerCustomerDemoDialog : EntityDialog<CustomerCustomerDemoRow>, IAsyncInit
     {
     }
 }

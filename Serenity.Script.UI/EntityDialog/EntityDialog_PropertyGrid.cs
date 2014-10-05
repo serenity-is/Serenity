@@ -25,23 +25,29 @@ namespace Serenity
             propertyGrid = new PropertyGrid(pgDiv, pgOptions);
         }
 
-        private void InitPropertyGrid(Action callback)
+        private void InitPropertyGrid(Action complete, Action<object> fail)
         {
-            var pgDiv = this.ById("PropertyGrid");
-            if (pgDiv.Length <= 0)
+            fail.TryCatch(delegate()
             {
-                callback();
-                return;
-            }
-
-            GetPropertyGridOptions(pgOptions =>
-            {
-                propertyGrid = new PropertyGrid(pgDiv, pgOptions);
-                propertyGrid.Init(pg =>
+                var pgDiv = this.ById("PropertyGrid");
+                if (pgDiv.Length <= 0)
                 {
-                    callback();
-                });
-            });
+                    complete();
+                    return;
+                }
+
+                GetPropertyGridOptions(pgOptions =>
+                {
+                    fail.TryCatch(delegate()
+                    {
+                        propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+                        propertyGrid.Init(pg =>
+                        {
+                            complete();
+                        }, fail);
+                    })();
+                }, fail);
+            })();
         }
 
         [Obsolete("Prefer async version")]
@@ -67,21 +73,29 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected virtual void GetPropertyGridOptions(Action<PropertyGridOptions> callback)
+        protected virtual void GetPropertyGridOptions(Action<PropertyGridOptions> complete, Action<object> fail)
         {
             GetPropertyItems(propertyItems =>
-                callback(new PropertyGridOptions
+            {
+                fail.TryCatch(delegate() 
                 {
-                    IdPrefix = this.idPrefix,
-                    Items = propertyItems,
-                    Mode = PropertyGridMode.Insert
-                }));
+                    complete(new PropertyGridOptions
+                    {
+                        IdPrefix = this.idPrefix,
+                        Items = propertyItems,
+                        Mode = PropertyGridMode.Insert
+                    });
+                })();
+            }, fail);
         }
 
-        protected virtual void GetPropertyItems(Action<List<PropertyItem>> callback)
+        protected virtual void GetPropertyItems(Action<List<PropertyItem>> complete, Action<object> fail)
         {
-            var formKey = GetFormKey();
-            Q.GetForm(formKey, callback);
+            fail.TryCatch(delegate()
+            {
+                var formKey = GetFormKey();
+                Q.GetForm(formKey, complete, fail);
+            })();
         }
     }
 }

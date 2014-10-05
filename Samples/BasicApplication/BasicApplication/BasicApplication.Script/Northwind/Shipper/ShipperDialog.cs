@@ -7,7 +7,7 @@ namespace BasicApplication.Northwind
 
     [IdProperty("ShipperID"), NameProperty("CompanyName")]
     [FormKey("Northwind.Shipper"), LocalTextPrefix("Northwind.Shipper"), Service("Northwind/Shipper")]
-    public class ShipperDialog : EntityDialog<ShipperRow>
+    public class ShipperDialog : EntityDialog<ShipperRow>, IAsyncInit
     {
     }
 }

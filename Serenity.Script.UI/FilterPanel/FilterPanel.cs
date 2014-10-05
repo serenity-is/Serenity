@@ -583,7 +583,7 @@ namespace Serenity
                 "<div style=\"clear: both\"></div>" +
             "</div>";
 
-        protected override void GetTemplate(Action<string> callback)
+        protected override void GetTemplate(Action<string> callback, Action<object> fail)
         {
             callback(PanelTemplate);
         }

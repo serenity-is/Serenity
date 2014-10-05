@@ -15,5 +15,25 @@ namespace Serenity
                 Q.Alert(error == null ? "??ERROR??" : (error.Message ?? error.Code));
             }
         }
+
+        public static Action TryCatch(this Action<object> fail, Action callback)
+        {
+            if (fail == null)
+            {
+                return callback;
+            }
+
+            return delegate()
+            {
+                try
+                {
+                    callback();
+                }
+                catch (Exception ex)
+                {
+                    fail(ex);
+                }
+            };
+        }
     }
 }

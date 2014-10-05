@@ -43,14 +43,16 @@ namespace Serenity
             }
         }
 
-        protected override void InitializeAsync(Action callback)
+        protected override void InitializeAsync(Action complete, Action<object> fail)
         {
-            base.InitializeAsync(() =>
-                InitPropertyGrid(() => 
+            base.InitializeAsync(delegate()
+            {
+                InitPropertyGrid(fail.TryCatch(delegate()
                 {
                     LoadInitialEntity();
-                    callback();
-                }));
+                    complete();
+                }), fail);
+            }, fail);
         }
 
         protected virtual void LoadInitialEntity()
@@ -171,23 +173,29 @@ namespace Serenity
             propertyGrid = new PropertyGrid(pgDiv, pgOptions);
         }
 
-        private void InitPropertyGrid(Action callback)
+        private void InitPropertyGrid(Action complete, Action<object> fail)
         {
-            var pgDiv = this.ById("PropertyGrid");
-            if (pgDiv.Length <= 0)
+            fail.TryCatch(delegate()
             {
-                callback();
-                return;
-            }
-
-            GetPropertyGridOptions(pgOptions =>
-            {
-                propertyGrid = new PropertyGrid(pgDiv, pgOptions);
-                propertyGrid.Init(pg =>
+                var pgDiv = this.ById("PropertyGrid");
+                if (pgDiv.Length <= 0)
                 {
-                    callback();
-                });
-            });
+                    complete();
+                    return;
+                }
+
+                GetPropertyGridOptions(pgOptions =>
+                {
+                    fail.TryCatch(delegate()
+                    {
+                        propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+                        propertyGrid.Init(pg =>
+                        {
+                            complete();
+                        }, fail);
+                    })();
+                }, fail);
+            })();
         }
 
         protected virtual string GetFormKey()
@@ -220,10 +228,13 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected virtual void GetPropertyItems(Action<List<PropertyItem>> callback)
+        protected virtual void GetPropertyItems(Action<List<PropertyItem>> callback, Action<object> fail)
         {
-            var formKey = GetFormKey();
-            Q.GetForm(formKey, callback);
+            fail.TryCatch(delegate()
+            {
+                var formKey = GetFormKey();
+                Q.GetForm(formKey, callback, fail);
+            })();
         }
 
         [Obsolete("Prefer async version")]
@@ -241,18 +252,23 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected virtual void GetPropertyGridOptions(Action<PropertyGridOptions> callback)
+        protected virtual void GetPropertyGridOptions(Action<PropertyGridOptions> callback, Action<object> fail)
         {
             GetPropertyItems(propertyItems =>
             {
-                callback(new PropertyGridOptions
+                fail.TryCatch(delegate()
                 {
-                    IdPrefix = this.idPrefix,
-                    Items = propertyItems,
-                    Mode = PropertyGridMode.Insert,
-                    UseCategories = false
-                });
-            });
+                    var options = new PropertyGridOptions
+                    {
+                        IdPrefix = this.idPrefix,
+                        Items = propertyItems,
+                        Mode = PropertyGridMode.Insert,
+                        UseCategories = false
+                    };
+
+                    callback(options);
+                })();
+            }, fail);
         }
 
         protected virtual bool ValidateBeforeSave()

@@ -7,7 +7,7 @@ namespace BasicApplication.Northwind
 
     [IdProperty("CategoryID"), NameProperty("CategoryName")]
     [FormKey("Northwind.Category"), LocalTextPrefix("Northwind.Category"), Service("Northwind/Category")]
-    public class CategoryDialog : EntityDialog<CategoryRow>
+    public class CategoryDialog : EntityDialog<CategoryRow>, IAsyncInit
     {
     }
 }

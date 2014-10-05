@@ -24,20 +24,27 @@ namespace Serenity
             #pragma warning restore 618
             InitLocalizationGridCommon(pgOptions);
         }
-        private void InitLocalizationGrid(Action callback)
-        {
-            var pgDiv = this.ById("PropertyGrid");
-            if (pgDiv.Length <= 0)
-            {
-                callback();
-                return;
-            }
 
-            GetPropertyGridOptions(pgOptions =>
+        private void InitLocalizationGrid(Action complete, Action<object> fail)
+        {
+            fail.TryCatch(delegate()
             {
-                InitLocalizationGridCommon(pgOptions);
-                callback();
-            });
+                var pgDiv = this.ById("PropertyGrid");
+                if (pgDiv.Length <= 0)
+                {
+                    complete();
+                    return;
+                }
+
+                GetPropertyGridOptions(pgOptions =>
+                {
+                    fail.TryCatch(delegate()
+                    {
+                        InitLocalizationGridCommon(pgOptions);
+                        complete();
+                    })();
+                }, fail);
+            })();
         }
 
         private void InitLocalizationGridCommon(PropertyGridOptions pgOptions)
