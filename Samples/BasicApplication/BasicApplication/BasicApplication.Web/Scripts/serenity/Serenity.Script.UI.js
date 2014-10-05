@@ -3517,11 +3517,9 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.PropertyGrid
 	var $Serenity_PropertyGrid = function(div, opt) {
-		this.$initializingEditors = 0;
 		this.$editors = null;
 		this.$items = null;
-		this.$asyncComplete = null;
-		this.$asyncFail = null;
+		this.$asyncInitList = null;
 		ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]).call(this, div, opt);
 		if (!ss.isValue(opt.mode)) {
 			opt.mode = 0;
@@ -3544,7 +3542,7 @@
 		}
 		var fieldContainer = categoriesDiv;
 		var priorCategory = null;
-		this.$initializingEditors += this.$items.length;
+		this.$asyncInitList = new Array();
 		for (var i = 0; i < this.$items.length; i++) {
 			var item = this.$items[i];
 			if (this.options.useCategories && !ss.referenceEquals(priorCategory, item.category)) {
@@ -6512,18 +6510,30 @@
 	ss.initClass($Serenity_PropertyEditorHelper, $asm, {}, $Serenity_PropertyItemHelper);
 	ss.initClass($Serenity_PropertyGrid, $asm, {
 		initializeAsync: function(complete, fail) {
-			$Serenity_Widget.prototype.initializeAsync.call(this, Q.tryCatch(fail, ss.mkdel(this, function() {
-				if (this.$initializingEditors <= 0) {
-					this.$updateReadOnly();
-					complete();
-					this.$asyncComplete = null;
-					this.$asyncFail = null;
-				}
-				else {
-					this.$asyncComplete = complete;
-					this.$asyncFail = fail;
-				}
-			})), fail);
+			$Serenity_Widget.prototype.initializeAsync.call(this, ss.mkdel(this, function() {
+				var initNext = null;
+				initNext = Q.tryCatch(fail, ss.mkdel(this, function() {
+					if (this.$asyncInitList.length === 0) {
+						complete();
+						return;
+					}
+					var item = this.$asyncInitList.shift();
+					item.item1.init(function(w) {
+						Q.tryCatch(fail, function() {
+							item.item2();
+							initNext();
+						})();
+					}, ss.mkdel(this, function(error) {
+						ss.clear(this.$asyncInitList);
+						if (!ss.staticEquals(fail, null)) {
+							fail(error);
+							return;
+						}
+						throw new ss.Exception(error.toString());
+					}));
+				}));
+				initNext();
+			}), fail);
 		},
 		destroy: function() {
 			if (ss.isValue(this.$editors)) {
@@ -6601,42 +6611,39 @@
 				editorParams = $.extend(new Object(), item.editorParams);
 				editor = ss.cast(new editorType(element, editorParams), $Serenity_Widget);
 			}
-			editor.init(ss.mkdel(this, function() {
-				if (ss.isValue(item.editorParams)) {
-					var props = ss.getMembers(ss.getInstanceType(editor), 16, 20);
-					var propByName = Enumerable.from(props).where(function(x) {
-						return !!x.setter && ((x.attr || []).filter(function(a) {
-							return ss.isInstanceOfType(a, $Serenity_ComponentModel_OptionAttribute);
-						}).length > 0 || (x.attr || []).filter(function(a) {
-							return ss.isInstanceOfType(a, $System_ComponentModel_DisplayNameAttribute);
-						}).length > 0);
-					}).toDictionary(function(x1) {
-						return $Serenity_ReflectionUtils.makeCamelCase(x1.name);
-					}, null, String, Object);
-					var $t3 = ss.getEnumerator(Object.keys(item.editorParams));
-					try {
-						while ($t3.moveNext()) {
-							var k = $t3.current();
-							var p = {};
-							if (propByName.tryGetValue($Serenity_ReflectionUtils.makeCamelCase(k), p)) {
-								ss.midel(p.$.setter, editor)(item.editorParams[k]);
-							}
-						}
-					}
-					finally {
-						$t3.dispose();
-					}
-				}
-				this.$initializingEditors--;
-				if (this.isAsyncWidget() && this.$initializingEditors <= 0 && !ss.staticEquals(this.$asyncComplete, null)) {
-					this.$asyncComplete();
-					this.$asyncComplete = null;
-					this.$asyncFail = null;
-				}
-			}), this.$asyncFail);
 			if (ss.isInstanceOfType(editor, $Serenity_BooleanEditor)) {
 				label.removeAttr('for');
 			}
+			this.$asyncInitList.push({
+				item1: editor,
+				item2: function() {
+					if (ss.isValue(item.editorParams)) {
+						var props = ss.getMembers(ss.getInstanceType(editor), 16, 20);
+						var propByName = Enumerable.from(props).where(function(x) {
+							return !!x.setter && ((x.attr || []).filter(function(a) {
+								return ss.isInstanceOfType(a, $Serenity_ComponentModel_OptionAttribute);
+							}).length > 0 || (x.attr || []).filter(function(a) {
+								return ss.isInstanceOfType(a, $System_ComponentModel_DisplayNameAttribute);
+							}).length > 0);
+						}).toDictionary(function(x1) {
+							return $Serenity_ReflectionUtils.makeCamelCase(x1.name);
+						}, null, String, Object);
+						var $t3 = ss.getEnumerator(Object.keys(item.editorParams));
+						try {
+							while ($t3.moveNext()) {
+								var k = $t3.current();
+								var p = {};
+								if (propByName.tryGetValue($Serenity_ReflectionUtils.makeCamelCase(k), p)) {
+									ss.midel(p.$.setter, editor)(item.editorParams[k]);
+								}
+							}
+						}
+						finally {
+							$t3.dispose();
+						}
+					}
+				}
+			});
 			if (ss.isValue(item.maxLength)) {
 				$Serenity_PropertyGrid.$setMaxLength(editor, ss.unbox(item.maxLength));
 			}

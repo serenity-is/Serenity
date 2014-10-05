@@ -18,11 +18,9 @@ namespace Serenity
             KnownEditorTypes = new JsDictionary<string, Type>();
         }
 
-        private int initializingEditors;
         private List<Widget> editors;
         private List<PropertyItem> items;
-        private Action asyncComplete;
-        private Action<object> asyncFail;
+        private Queue<Tuple<Widget, Action>> asyncInitList;
 
         public PropertyGrid(jQueryObject div, PropertyGridOptions opt)
             : base(div, opt)
@@ -61,7 +59,7 @@ namespace Serenity
 
             string priorCategory = null;
 
-            initializingEditors += items.Count;
+            asyncInitList = new Queue<Tuple<Widget, Action>>();
 
             for (int i = 0; i < items.Count; i++)
             {
@@ -88,21 +86,44 @@ namespace Serenity
 
         protected override void InitializeAsync(Action complete, Action<object> fail)
         {
-            base.InitializeAsync(fail.TryCatch(delegate()
+            base.InitializeAsync(delegate()
             {
-                if (initializingEditors <= 0)
+                Action initNext = null;
+
+                initNext = fail.TryCatch(delegate()
                 {
-                    UpdateReadOnly();
-                    complete();
-                    asyncComplete = null;
-                    asyncFail = null;
-                }
-                else
-                {
-                    asyncComplete = complete;
-                    asyncFail = fail;
-                }
-            }), fail);
+                    if (asyncInitList.Count == 0)
+                    {
+                        complete();
+                        return;
+                    }
+
+                    var item = asyncInitList.Dequeue();
+
+                    item.Item1.Init(delegate(Widget w)
+                    {
+                        fail.TryCatch(delegate()
+                        {
+                            item.Item2();
+                            initNext();
+                        })();
+                    }, error =>
+                    {
+                        asyncInitList.Clear();
+
+                        if (fail != null)
+                        {
+                            fail(error);
+                            return;
+                        }
+
+                        throw new Exception(error.ToString());
+                    });
+                });
+
+                initNext();
+
+            }, fail);
         }
 
         public override void Destroy()
@@ -268,7 +289,10 @@ namespace Serenity
                 editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
             }
 
-            editor.Init(delegate
+            if (editor is BooleanEditor)
+                label.RemoveAttr("for");
+
+            asyncInitList.Enqueue(new Tuple<Widget,Action>(editor, delegate
             {
                 if (item.EditorParams != null)
                 {
@@ -286,19 +310,7 @@ namespace Serenity
                             p.SetValue(editor, item.EditorParams[k]);
                     }
                 }
-
-                initializingEditors--;
-
-                if (IsAsyncWidget() && initializingEditors <= 0 && asyncComplete != null)
-                {
-                    asyncComplete();
-                    asyncComplete = null;
-                    asyncFail = null;
-                }
-            }, asyncFail);
-
-            if (editor is BooleanEditor)
-                label.RemoveAttr("for");
+            }));
 
             if (Script.IsValue(item.MaxLength))
                 SetMaxLength(editor, item.MaxLength.Value);
