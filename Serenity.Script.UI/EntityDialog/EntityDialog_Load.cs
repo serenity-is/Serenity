@@ -10,6 +10,21 @@ namespace Serenity
         where TEntity : class, new()
         where TOptions : class, new()
     {
+        public void LoadAndOpenDialog(object entityOrId)
+        {
+            if (entityOrId == null)
+                LoadNewAndOpenDialog();
+
+            var scriptType = Script.TypeOf(entityOrId);
+            if (scriptType == "string" || scriptType == "number")
+                LoadByIdAndOpenDialog(entityOrId.As<long>());
+            else
+            {
+                var entity = entityOrId.As<TEntity>() ?? new TEntity();
+                LoadEntityAndOpenDialog(entity);
+            }
+        }
+
         public void LoadNewAndOpenDialog()
         {
             LoadResponse(new RetrieveResponse<TEntity>());

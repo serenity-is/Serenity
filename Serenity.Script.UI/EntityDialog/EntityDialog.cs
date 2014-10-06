@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Serenity
 {
-    public abstract partial class EntityDialog<TEntity, TOptions> : TemplatedDialog<TOptions>
+    public interface IEditDialog
+    {
+        void LoadAndOpenDialog(object entityOrId);
+    }
+
+    public abstract partial class EntityDialog<TEntity, TOptions> : TemplatedDialog<TOptions>, IEditDialog
         where TEntity : class, new()
         where TOptions: class, new()
     {

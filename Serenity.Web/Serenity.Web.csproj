@@ -127,6 +127,7 @@
     <Compile Include="Script\DynamicScriptTypes\RowLookupScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\LookupScript.cs" />
     <Compile Include="Script\PropertyEditor\ColumnsScript.cs" />
+    <Compile Include="Script\PropertyEditor\ColumnsScriptRegistration.cs" />
     <Compile Include="Script\PropertyEditor\FormScript.cs" />
     <Compile Include="Script\PropertyEditor\LookupScriptRegistration.cs" />
     <Compile Include="Script\PropertyEditor\FormScriptRegistration.cs" />

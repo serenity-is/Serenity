@@ -73,7 +73,7 @@ namespace Serenity
                     {
                         fail(response);
                     });
-                })();
+                });
             }
 
             [Obsolete("Prefer asynchronous version")]
@@ -99,7 +99,7 @@ namespace Serenity
                     name = name + ".js?" + registered[name];
 
                     LoadScript(Q.ResolveUrl("~/DynJS.axd/") + name, complete, fail);
-                })();
+                });
             }
 
             [Obsolete("Prefer asynchronous version")]
@@ -129,7 +129,7 @@ namespace Serenity
 
                     if (!Script.IsValue(data))
                     {
-                        LoadScriptData(name, fail.TryCatch(delegate()
+                        LoadScriptData(name, fail.TryCatchDelegate(delegate()
                         {
                             data = loadedData[name].As<TData>();
 
@@ -143,7 +143,7 @@ namespace Serenity
                     }
 
                     complete(data);
-                })();
+                });
             }
 
             [Obsolete("Prefer asynchronous version")]
@@ -173,11 +173,11 @@ namespace Serenity
 
                     registered[name] = new JsDate().GetTime().ToString();
 
-                    LoadScriptData(name, fail.TryCatch(delegate()
+                    LoadScriptData(name, fail.TryCatchDelegate(delegate()
                     {
                         complete(loadedData[name].As<TData>());
                     }), fail);
-                })();
+                });
             }
 
             public static bool CanLoad(string name)

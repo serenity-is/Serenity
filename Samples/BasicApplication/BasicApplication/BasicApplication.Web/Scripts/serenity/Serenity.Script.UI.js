@@ -475,16 +475,8 @@
 				this.createToolbarExtensions();
 			}
 			this.updateDisabledState();
-			if (this.populateWhenVisible()) {
-				Serenity.LazyLoadHelper.executeEverytimeWhenShown(this.element, function() {
-					self.$refreshIfNeeded();
-				}, false);
-				if (this.element.is(':visible')) {
-					this.view.populate();
-				}
-			}
-			else {
-				this.view.populate();
+			if (!this.isAsyncWidget()) {
+				this.initialPopulate();
 			}
 		};
 		ss.registerGenericClassInstance($type, $Serenity_DataGrid$2, [TItem, TOptions], {
@@ -582,8 +574,42 @@
 				Serenity.SlickHelper.setDefaults(columns, this.getLocalTextPrefix());
 				return columns;
 			},
+			initialPopulate: function() {
+				var self = this;
+				if (this.populateWhenVisible()) {
+					Serenity.LazyLoadHelper.executeEverytimeWhenShown(this.element, function() {
+						self.$refreshIfNeeded();
+					}, false);
+					if (this.element.is(':visible')) {
+						this.view.populate();
+					}
+				}
+				else {
+					this.view.populate();
+				}
+			},
+			initializeAsync: function(complete, fail) {
+				$Serenity_Widget.prototype.initializeAsync.call(this, ss.mkdel(this, function() {
+					this.getColumns$1(ss.mkdel(this, function(columns) {
+						Q.tryCatch(fail, ss.mkdel(this, function() {
+							columns = this.postProcessColumns(columns);
+							if (ss.isValue(this.slickGrid)) {
+								this.slickGrid.setColumns(columns);
+							}
+							this.initialPopulate();
+							complete();
+						}));
+					}), fail);
+				}), fail);
+			},
 			createSlickGrid: function() {
-				var slickColumns = this.postProcessColumns(this.getColumns());
+				var slickColumns;
+				if (this.isAsyncWidget()) {
+					slickColumns = [];
+				}
+				else {
+					slickColumns = this.postProcessColumns(this.getColumns());
+				}
 				var slickOptions = this.getSlickOptions();
 				var self = this;
 				var viewRows = this.view.rows;
@@ -658,12 +684,23 @@
 				return [];
 			},
 			editItem: function(entityOrId) {
+				throw new ss.NotImplementedException();
+			},
+			editItem$1: function(itemType, entityOrId) {
+				if (ss.referenceEquals(itemType, this.getItemType())) {
+					this.editItem(entityOrId);
+					return;
+				}
+				throw new ss.NotImplementedException();
 			},
 			onClick: function(e, row, cell) {
+				if (e.isDefaultPrevented()) {
+					return;
+				}
 				var target = $(e.target);
-				if (target.hasClass('s-' + this.getItemType() + 'Link')) {
+				if (target.hasClass('s-EditLink')) {
 					e.preventDefault();
-					this.editItem(Serenity.SlickFormatting.getItemId$1(target));
+					this.editItem$1(Serenity.SlickFormatting.getItemType$1(target), Serenity.SlickFormatting.getItemId$1(target));
 				}
 			},
 			$viewRowCountChanged: function(e, d) {
@@ -824,8 +861,56 @@
 				idField = $t2;
 				return Serenity.SlickFormatting.itemLink(itemType, idField, text, cssClass);
 			},
-			getColumns: function() {
+			getPropertyItems$1: function(complete, fail) {
+				Q.tryCatch(fail, ss.mkdel(this, function() {
+					var attr = ss.getAttributes(ss.getInstanceType(this), Serenity.ColumnsKeyAttribute, true);
+					if (ss.isValue(attr) && attr.length > 0) {
+						Q.getColumns$1(attr[0].get_value(), complete, fail);
+						return;
+					}
+					complete([]);
+				}));
+			},
+			getPropertyItems: function() {
+				var attr = ss.getAttributes(ss.getInstanceType(this), Serenity.ColumnsKeyAttribute, true);
+				if (ss.isValue(attr) && attr.length > 0) {
+					return Q.getColumns(attr[0].get_value());
+				}
 				return [];
+			},
+			getColumns: function() {
+				var columnItems = this.getPropertyItems();
+				return $Serenity_GridUtils.propertyItemsToSlickColumns(columnItems);
+			},
+			propertyItemsToSlickColumns: function(propertyItems) {
+				var columns = $Serenity_GridUtils.propertyItemsToSlickColumns(propertyItems);
+				if (ss.isValue(propertyItems)) {
+					for (var i = 0; i < propertyItems.length; i++) {
+						var item = propertyItems[i];
+						var column = columns[i];
+						if (item.editLink) {
+							var oldFormat = { $: column.format };
+							var css = { $: (ss.isValue(item.editLinkCssClass) ? item.editLinkCssClass : null) };
+							column.format = this.itemLink((ss.isValue(item.editLinkItemType) ? item.editLinkItemType : null), (ss.isValue(item.editLinkIdField) ? item.editLinkIdField : null), ss.mkdel({ oldFormat: oldFormat }, function(ctx) {
+								if (!ss.staticEquals(this.oldFormat.$, null)) {
+									return this.oldFormat.$(ctx);
+								}
+								return Q.htmlEncode(ctx.value);
+							}), ss.mkdel({ css: css }, function(ctx1) {
+								return ss.coalesce(this.css.$, '');
+							}));
+						}
+					}
+				}
+				return columns;
+			},
+			getColumns$1: function(complete, fail) {
+				this.getPropertyItems$1(ss.mkdel(this, function(propertyItems) {
+					Q.tryCatch(fail, ss.mkdel(this, function() {
+						var columns = this.propertyItemsToSlickColumns(propertyItems);
+						complete(columns);
+					}));
+				}), fail);
 			},
 			getSlickOptions: function() {
 				var opt = {};
@@ -1296,7 +1381,7 @@
 		ss.registerGenericClassInstance($type, $Serenity_EntityDialog$1, [TEntity], {}, function() {
 			return ss.makeGenericType($Serenity_EntityDialog$2, [TEntity, Object]);
 		}, function() {
-			return [$Serenity_IDialog];
+			return [$Serenity_IDialog, $Serenity_IEditDialog];
 		});
 		return $type;
 	};
@@ -1565,6 +1650,19 @@
 				}
 				return this.$service;
 			},
+			loadAndOpenDialog: function(entityOrId) {
+				if (ss.isNullOrUndefined(entityOrId)) {
+					this.loadNewAndOpenDialog();
+				}
+				var scriptType = typeof(entityOrId);
+				if (scriptType === 'string' || scriptType === 'number') {
+					this.loadByIdAndOpenDialog(entityOrId);
+				}
+				else {
+					var entity = entityOrId || ss.createInstance(TEntity);
+					this.loadEntityAndOpenDialog(entity);
+				}
+			},
 			loadNewAndOpenDialog: function() {
 				this.loadResponse({});
 				if (!this.isPanel) {
@@ -1669,9 +1767,9 @@
 						Q.tryCatch(fail, ss.mkdel(this, function() {
 							this.$initLocalizationGridCommon(pgOptions);
 							complete();
-						}))();
+						}));
 					}), fail);
-				}))();
+				}));
 			},
 			$initLocalizationGridCommon: function(pgOptions) {
 				var pgDiv = this.byId$1('PropertyGrid');
@@ -1792,9 +1890,9 @@
 							this.propertyGrid.init(function(pg) {
 								complete();
 							}, fail);
-						}))();
+						}));
 					}), fail);
-				}))();
+				}));
 			},
 			getPropertyItems: function() {
 				var formKey = this.getFormKey();
@@ -1816,14 +1914,14 @@
 						$t1.items = propertyItems;
 						$t1.mode = 0;
 						complete($t1);
-					}))();
+					}));
 				}), fail);
 			},
 			getPropertyItems$1: function(complete, fail) {
 				Q.tryCatch(fail, ss.mkdel(this, function() {
 					var formKey = this.getFormKey();
 					Q.getForm$1(formKey, complete, fail);
-				}))();
+				}));
 			},
 			validateBeforeSave: function() {
 				return true;
@@ -2052,7 +2150,7 @@
 		}, function() {
 			return ss.makeGenericType($Serenity_TemplatedDialog$1, [TOptions]);
 		}, function() {
-			return [$Serenity_IDialog];
+			return [$Serenity_IDialog, $Serenity_IEditDialog];
 		});
 		$type.$ctor1.prototype = $type.$ctor2.prototype = $type.prototype;
 		return $type;
@@ -2199,16 +2297,27 @@
 				this.editItem(ss.createInstance(TEntity));
 			},
 			editItem: function(entityOrId) {
-				this.createEntityDialog$1(function(dlg) {
-					var dialog = dlg;
-					var scriptType = typeof(entityOrId);
-					if (scriptType === 'string' || scriptType === 'number') {
-						dialog.loadByIdAndOpenDialog(entityOrId);
+				this.createEntityDialog(this.getItemType(), function(dlg) {
+					var dialog = ss.safeCast(dlg, $Serenity_IEditDialog);
+					if (ss.isValue(dialog)) {
+						dialog.loadAndOpenDialog(entityOrId);
+						return;
 					}
-					else {
-						var entity = entityOrId || ss.createInstance(TEntity);
-						dialog.loadEntityAndOpenDialog(entity);
+					throw new ss.InvalidOperationException(ss.formatString("{0} doesn't implement IEditDialog!", ss.getTypeFullName(ss.getInstanceType(dlg))));
+				});
+			},
+			editItem$1: function(itemType, entityOrId) {
+				if (ss.referenceEquals(itemType, this.getItemType())) {
+					this.editItem(entityOrId);
+					return;
+				}
+				this.createEntityDialog(itemType, function(dlg) {
+					var dialog = ss.safeCast(dlg, $Serenity_IEditDialog);
+					if (ss.isValue(dialog)) {
+						dialog.loadAndOpenDialog(entityOrId);
+						return;
 					}
+					throw new ss.InvalidOperationException(ss.formatString("{0} doesn't implement IEditDialog!", ss.getTypeFullName(ss.getInstanceType(dlg))));
 				});
 			},
 			getService: function() {
@@ -2229,7 +2338,7 @@
 				return opt;
 			},
 			getItemType: function() {
-				return ss.replaceAllString(this.getEntityType(), String.fromCharCode(46), String.fromCharCode(45));
+				return this.getEntityType();
 			},
 			initEntityDialog: function(dialog) {
 				var self = this;
@@ -2237,13 +2346,20 @@
 					self.subDialogDataChange();
 				}, true);
 			},
-			createEntityDialog: function() {
-				return this.createEntityDialog$1(null);
+			initEntityDialog$1: function(itemType, dialog) {
+				if (ss.referenceEquals(itemType, this.getItemType())) {
+					this.initEntityDialog(dialog);
+					return;
+				}
+				var self = this;
+				$Serenity_SubDialogHelper.bindToDataChange(dialog, this, function(e, dci) {
+					self.subDialogDataChange();
+				}, true);
 			},
-			createEntityDialog$1: function(callback) {
-				var dialogClass = this.getEntityDialogType();
-				var dialog = $Serenity_Widget.createOfType(dialogClass, null, this.getEntityDialogOptions(), ss.mkdel(this, function(d) {
-					this.initEntityDialog(d);
+			createEntityDialog: function(itemType, callback) {
+				var dialogClass = this.getEntityDialogType$1(itemType);
+				var dialog = $Serenity_Widget.createOfType(dialogClass, null, this.getEntityDialogOptions$1(itemType), ss.mkdel(this, function(d) {
+					this.initEntityDialog$1(itemType, d);
 					if (!ss.staticEquals(callback, null)) {
 						callback(d);
 					}
@@ -2253,6 +2369,18 @@
 			getEntityDialogOptions: function() {
 				return {};
 			},
+			getEntityDialogOptions$1: function(itemType) {
+				if (ss.referenceEquals(itemType, this.getItemType())) {
+					return this.getEntityDialogOptions();
+				}
+				return {};
+			},
+			getEntityDialogType$1: function(itemType) {
+				if (ss.referenceEquals(itemType, this.getItemType())) {
+					return this.getEntityDialogType();
+				}
+				return $Serenity_GridUtils.findDialogTypeFor(itemType);
+			},
 			getEntityDialogType: function() {
 				if (ss.isNullOrUndefined(this.$entityDialogType)) {
 					var attributes = ss.getAttributes(ss.getInstanceType(this), Serenity.DialogTypeAttribute, true);
@@ -2260,20 +2388,7 @@
 						this.$entityDialogType = attributes[0].get_value();
 					}
 					else {
-						var entityClass = this.getEntityType();
-						var typeName = entityClass + 'Dialog';
-						var dialogType = null;
-						for (var $t1 = 0; $t1 < Q$Config.rootNamespaces.length; $t1++) {
-							var ns = Q$Config.rootNamespaces[$t1];
-							dialogType = ss.getType(ns + '.' + typeName);
-							if (ss.isValue(dialogType)) {
-								break;
-							}
-						}
-						if (ss.isNullOrUndefined(dialogType)) {
-							throw new ss.Exception(typeName + ' dialog class is not found!');
-						}
-						this.$entityDialogType = dialogType;
+						this.$entityDialogType = $Serenity_GridUtils.findDialogTypeFor(this.getEntityType());
 					}
 				}
 				return this.$entityDialogType;
@@ -2578,6 +2693,46 @@
 			});
 		};
 	};
+	$Serenity_GridUtils.propertyItemsToSlickColumns = function(items) {
+		var result = [];
+		if (ss.isNullOrUndefined(items)) {
+			return result;
+		}
+		for (var i = 0; i < items.length; i++) {
+			result.push($Serenity_GridUtils.propertyItemToSlickColumn(items[i]));
+		}
+		return result;
+	};
+	$Serenity_GridUtils.propertyItemToSlickColumn = function(item) {
+		var result = {};
+		result.field = item.name;
+		var $t1 = Q.tryGetText(item.title);
+		if (ss.isNullOrUndefined($t1)) {
+			$t1 = item.title;
+		}
+		result.name = $t1;
+		result.cssClass = item.cssClass;
+		result.width = (ss.isValue(item.width) ? item.width : 80);
+		result.minWidth = ((!ss.isValue(item.minWidth) || item.minWidth === 0) ? 30 : item.minWidth);
+		result.maxWidth = ((!ss.isValue(item.maxWidth) || item.maxWidth === 0) ? null : item.maxWidth);
+		result.resizable = !ss.isValue(item.resizable) || item.resizable;
+		return result;
+	};
+	$Serenity_GridUtils.findDialogTypeFor = function(itemType) {
+		var typeName = itemType + 'Dialog';
+		var dialogType = null;
+		for (var $t1 = 0; $t1 < Q$Config.rootNamespaces.length; $t1++) {
+			var ns = Q$Config.rootNamespaces[$t1];
+			dialogType = ss.getType(ns + '.' + typeName);
+			if (ss.isValue(dialogType)) {
+				break;
+			}
+		}
+		if (ss.isNullOrUndefined(dialogType)) {
+			throw new ss.Exception(typeName + ' dialog class is not found!');
+		}
+		return dialogType;
+	};
 	global.Serenity.GridUtils = $Serenity_GridUtils;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.HtmlContentEditor
@@ -2676,6 +2831,12 @@
 	};
 	$Serenity_IDoubleValue.__typeName = 'Serenity.IDoubleValue';
 	global.Serenity.IDoubleValue = $Serenity_IDoubleValue;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.IEditDialog
+	var $Serenity_IEditDialog = function() {
+	};
+	$Serenity_IEditDialog.__typeName = 'Serenity.IEditDialog';
+	global.Serenity.IEditDialog = $Serenity_IEditDialog;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.IFilterHandler
 	var $Serenity_IFilterHandler = function() {
@@ -2856,7 +3017,7 @@
 		};
 		ss.registerGenericClassInstance($type, $Serenity_LookupEditorBase$2, [TOptions, TItem], {
 			initializeAsync: function(complete, fail) {
-				this.updateItems$1(Q.tryCatch(fail, ss.mkdel(this, function() {
+				this.updateItems$1(Q.tryCatchDelegate(fail, ss.mkdel(this, function() {
 					Q$ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName, ss.mkdel(this, function() {
 						this.updateItems$1(function() {
 						}, null);
@@ -2886,7 +3047,7 @@
 			getLookup$1: function(complete, fail) {
 				Q.tryCatch(fail, ss.mkdel(this, function() {
 					Q.getLookup$1(this.getLookupKey(), complete, fail);
-				}))();
+				}));
 			},
 			getItems: function(lookup) {
 				return lookup.get_items();
@@ -2938,9 +3099,9 @@
 								$t1.dispose();
 							}
 							complete();
-						}))();
+						}));
 					}), fail);
-				}))();
+				}));
 			}
 		}, function() {
 			return ss.makeGenericType($Serenity_Select2Editor$2, [TOptions, TItem]);
@@ -3327,7 +3488,7 @@
 		ss.registerGenericClassInstance($type, $Serenity_PropertyDialog$2, [TEntity, TOptions], {
 			initializeAsync: function(complete, fail) {
 				ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).prototype.initializeAsync.call(this, ss.mkdel(this, function() {
-					this.$initPropertyGrid$1(Q.tryCatch(fail, ss.mkdel(this, function() {
+					this.$initPropertyGrid$1(Q.tryCatchDelegate(fail, ss.mkdel(this, function() {
 						this.loadInitialEntity();
 						complete();
 					})), fail);
@@ -3422,9 +3583,9 @@
 							this.propertyGrid.init(function(pg) {
 								complete();
 							}, fail);
-						}))();
+						}));
 					}), fail);
-				}))();
+				}));
 			},
 			getFormKey: function() {
 				var attributes = ss.getAttributes(ss.getInstanceType(this), Serenity.FormKeyAttribute, true);
@@ -3454,7 +3615,7 @@
 				Q.tryCatch(fail, ss.mkdel(this, function() {
 					var formKey = this.getFormKey();
 					Q.getForm$1(formKey, callback, fail);
-				}))();
+				}));
 			},
 			getPropertyGridOptions: function() {
 				var $t1 = $Serenity_PropertyGridOptions.$ctor();
@@ -3475,7 +3636,7 @@
 						$t1.useCategories = false;
 						var options = $t1;
 						callback(options);
-					}))();
+					}));
 				}), fail);
 			},
 			validateBeforeSave: function() {
@@ -4680,7 +4841,7 @@
 							widgetMarkup = $Serenity_JsRender.render(widgetMarkup, null);
 							this.element.html(widgetMarkup);
 							complete();
-						}))();
+						}));
 					}), fail);
 				}), fail);
 			},
@@ -4725,10 +4886,10 @@
 									throw new ss.Exception(ss.formatString("Can't locate template for widget '{0}' with name '{1}'!", ss.getTypeName(ss.getInstanceType(this)), templateName));
 								}
 								complete(template1);
-							}))();
+							}));
 						}), fail);
 					}
-				}))();
+				}));
 			}
 		}, function() {
 			return ss.makeGenericType($Serenity_Widget$1, [TOptions]);
@@ -5057,6 +5218,13 @@
 			self.destroy();
 		}).data(this.widgetName, this);
 		this.addCssClass();
+		if (this.isAsyncWidget()) {
+			window.setTimeout(function() {
+				if (ss.isNullOrUndefined(self.initialized)) {
+					console.log(ss.formatString("Async widget of type '{0}' is created but init not called!", ss.getTypeName(ss.getInstanceType(self))));
+				}
+			}, 0);
+		}
 	};
 	$Serenity_Widget.__typeName = 'Serenity.Widget';
 	$Serenity_Widget.elementFor = function(TEditor) {
@@ -5412,7 +5580,7 @@
 						callback(this);
 					}
 				}), fail);
-			}))();
+			}));
 			return this;
 		},
 		isAsyncWidget: function() {
@@ -5719,6 +5887,7 @@
 	}, ss.makeGenericType($Serenity_Widget$1, [$Serenity_EmailEditorOptions]), [$Serenity_IStringValue]);
 	ss.initClass($Serenity_EmailEditorOptions, $asm, {});
 	ss.initInterface($Serenity_IDialog, $asm, {});
+	ss.initInterface($Serenity_IEditDialog, $asm, { loadAndOpenDialog: null });
 	ss.initClass($Serenity_FilterField, $asm, {});
 	ss.initClass($Serenity_FilterLine, $asm, {});
 	ss.initClass($Serenity_FilterPanel, $asm, {
@@ -6501,7 +6670,7 @@
 		initializeAsync: function(complete, fail) {
 			$Serenity_Widget.prototype.initializeAsync.call(this, ss.mkdel(this, function() {
 				var initNext = null;
-				initNext = Q.tryCatch(fail, ss.mkdel(this, function() {
+				initNext = Q.tryCatchDelegate(fail, ss.mkdel(this, function() {
 					if (this.$asyncInitList.length === 0) {
 						complete();
 						return;
@@ -6511,7 +6680,7 @@
 						Q.tryCatch(fail, function() {
 							item.item2();
 							initNext();
-						})();
+						});
 					}, ss.mkdel(this, function(error) {
 						ss.clear(this.$asyncInitList);
 						if (!ss.staticEquals(fail, null)) {

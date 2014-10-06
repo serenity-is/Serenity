@@ -23,5 +23,13 @@ namespace Serenity
         public bool OneWay { get; set; }
         public object DefaultValue { get; set; }
         public bool Localizable { get; set; }
+        public int Width { get; set; }
+        public int MinWidth { get; set; }
+        public int MaxWidth { get; set; }
+        public bool Resizable { get; set; }
+        public bool EditLink { get; set; }
+        public string EditLinkItemType { get; set; }
+        public string EditLinkIdField { get; set; }
+        public string EditLinkCssClass { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace Serenity
 
         protected override void InitializeAsync(Action complete, Action<object> fail)
         {
-            UpdateItems(fail.TryCatch(delegate()
+            UpdateItems(fail.TryCatchDelegate(delegate()
             {
                 Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, delegate()
                 {
@@ -73,7 +73,7 @@ namespace Serenity
             fail.TryCatch(delegate()
             {
                 Q.GetLookup<TItem>(GetLookupKey(), complete, fail);
-            })();
+            });
         }
 
         protected virtual IEnumerable<TItem> GetItems(Lookup<TItem> lookup)
@@ -149,9 +149,9 @@ namespace Serenity
                         }
 
                         complete();
-                    })();
+                    });
                 }, fail);
-            })();
+            });
         }
     }
 

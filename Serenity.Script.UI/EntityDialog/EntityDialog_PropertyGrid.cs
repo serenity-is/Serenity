@@ -45,9 +45,9 @@ namespace Serenity
                         {
                             complete();
                         }, fail);
-                    })();
+                    });
                 }, fail);
-            })();
+            });
         }
 
         [Obsolete("Prefer async version")]
@@ -85,7 +85,7 @@ namespace Serenity
                         Items = propertyItems,
                         Mode = PropertyGridMode.Insert
                     });
-                })();
+                });
             }, fail);
         }
 
@@ -95,7 +95,7 @@ namespace Serenity
             {
                 var formKey = GetFormKey();
                 Q.GetForm(formKey, complete, fail);
-            })();
+            });
         }
     }
 }

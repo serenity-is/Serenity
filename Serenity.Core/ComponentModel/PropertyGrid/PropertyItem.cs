@@ -43,6 +43,24 @@ namespace Serenity.ComponentModel
         [JsonProperty("localizable")]
         public bool Localizable { get; set; }
 
+        [JsonProperty("width")]
+        public int Width { get; set; }
+        [JsonProperty("minWidth")]
+        public int MinWidth { get; set; }
+        [JsonProperty("maxWidth")]
+        public int MaxWidth { get; set; }
+        [JsonProperty("resizable")]
+        public bool Resizable { get; set; }
+        
+        [JsonProperty("editLink")]
+        public bool EditLink { get; set; }
+        [JsonProperty("editLinkItemType")]
+        public string EditLinkItemType { get; set; }
+        [JsonProperty("editLinkIdField")]
+        public string EditLinkIdField { get; set; }
+        [JsonProperty("editLinkCssClass")]
+        public string EditLinkCssClass { get; set; }
+
         public PropertyItem()
         {
             EditorParams = new Dictionary<string, object>();

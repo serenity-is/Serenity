@@ -45,6 +45,16 @@ namespace Serenity
                 .Data(widgetName, this);
 
             AddCssClass();
+
+            if (IsAsyncWidget())
+            {
+                Window.SetTimeout(delegate()
+                {
+                    if (self.initialized == null)
+                        Console.WriteLine(String.Format("Async widget of type '{0}' is created but init not called!", 
+                            self.GetType().Name));
+                }, 0);
+            }
         }
 
         protected internal Widget Init(Action<Widget> callback = null, Action<object> fail = null)
@@ -73,7 +83,7 @@ namespace Serenity
                     if (callback != null)
                         callback(this);
                 }, fail);
-            })();
+            });
 
             return this;
         }

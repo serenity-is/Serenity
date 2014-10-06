@@ -39,7 +39,7 @@ namespace Serenity
                         widgetMarkup = JsRender.Render(widgetMarkup);
                         this.element.Html(widgetMarkup);
                         complete();
-                    })();
+                    });
                 }, fail);
             }, fail);
         }
@@ -108,10 +108,10 @@ namespace Serenity
                             }
 
                             complete(template);
-                        })();
+                        });
                     }, fail);
                 }
-            })();
+            });
         }
     }
 

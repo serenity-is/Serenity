@@ -163,17 +163,39 @@ namespace Serenity
 
         protected override void EditItem(object entityOrId)
         {
-            CreateEntityDialog(dlg =>
+            CreateEntityDialog(GetItemType(), dlg =>
             {
-                var dialog = dlg.As<dynamic>();
-                var scriptType = Script.TypeOf(entityOrId);
-                if (scriptType == "string" || scriptType == "number")
-                    dialog.loadByIdAndOpenDialog(entityOrId.As<long>());
-                else
+                var dialog = dlg as IEditDialog;
+                if (dialog != null)
                 {
-                    var entity = entityOrId.As<TEntity>() ?? new TEntity();
-                    dialog.loadEntityAndOpenDialog(entity);
+                    dialog.LoadAndOpenDialog(entityOrId);
+                    return;
                 }
+
+                throw new InvalidOperationException(String.Format(
+                    "{0} doesn't implement IEditDialog!", dlg.GetType().FullName));
+            });
+        }
+
+        protected override void EditItem(string itemType, object entityOrId)
+        {
+            if (itemType == GetItemType())
+            {
+                EditItem(entityOrId);
+                return;
+            }
+
+            CreateEntityDialog(itemType, dlg =>
+            {
+                var dialog = dlg as IEditDialog;
+                if (dialog != null)
+                {
+                    dialog.LoadAndOpenDialog(entityOrId);
+                    return;
+                }
+
+                throw new InvalidOperationException(String.Format(
+                    "{0} doesn't implement IEditDialog!", dlg.GetType().FullName));
             });
         }
 
@@ -200,7 +222,7 @@ namespace Serenity
 
         protected override string GetItemType()
         {
-            return GetEntityType().Replace('.', '-');
+            return GetEntityType();
         }
 
         protected virtual void InitEntityDialog(Widget dialog)
@@ -209,31 +231,54 @@ namespace Serenity
             dialog.BindToDataChange(this, (e, dci) => self.SubDialogDataChange());
         }
 
-        [Obsolete("Prefer async version")]
-        protected virtual Widget CreateEntityDialog()
+        protected virtual void InitEntityDialog(string itemType, Widget dialog)
         {
-            return CreateEntityDialog(null);
+            if (itemType == GetItemType())
+            {
+                InitEntityDialog(dialog);
+                return;
+            }
+
+            var self = this;
+            dialog.BindToDataChange(this, (e, dci) => self.SubDialogDataChange());
         }
 
-        protected virtual Widget CreateEntityDialog(Action<Widget> callback)
+        protected virtual Widget CreateEntityDialog(string itemType, Action<Widget> callback)
         {
-            var dialogClass = GetEntityDialogType();
+            var dialogClass = GetEntityDialogType(itemType);
+
             var dialog = Serenity.Widget.CreateOfType(
                 widgetType: dialogClass,
-                options: (object)GetEntityDialogOptions(),
+                options: (object)GetEntityDialogOptions(itemType),
                 init: (d) =>
                 {
-                    InitEntityDialog(d);
+                    InitEntityDialog(itemType, d);
                     if (callback != null)
                         callback(d);
                 });
-            
+
             return dialog;
         }
 
         protected virtual dynamic GetEntityDialogOptions()
         {
             return new { };
+        }
+
+        protected virtual dynamic GetEntityDialogOptions(string itemType)
+        {
+            if (itemType == GetItemType())
+                return GetEntityDialogOptions();
+
+            return new { };
+        }
+
+        protected virtual Type GetEntityDialogType(string itemType)
+        {
+            if (itemType == GetItemType())
+                return GetEntityDialogType();
+
+            return GridUtils.FindDialogTypeFor(itemType);
         }
 
         protected virtual Type GetEntityDialogType()
@@ -245,22 +290,8 @@ namespace Serenity
                     entityDialogType = attributes[0].As<DialogTypeAttribute>().Value;
                 else
                 {
-                    var entityClass = GetEntityType();
-                    string typeName = entityClass + "Dialog";
-
-                    Type dialogType = null;
-                    foreach (var ns in Q.Config.RootNamespaces)
-                    {
-                        dialogType = Type.GetType(ns + "." + typeName);
-                        if (dialogType != null)
-                            break;
-                    }
-
-                    if (dialogType == null)
-                        throw new Exception(typeName + " dialog class is not found!");
-
-                    entityDialogType = dialogType;
-                }              
+                    entityDialogType = GridUtils.FindDialogTypeFor(GetEntityType());
+                }
             }
 
             return entityDialogType;

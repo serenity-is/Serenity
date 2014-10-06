@@ -90,7 +90,7 @@ namespace Serenity
             {
                 Action initNext = null;
 
-                initNext = fail.TryCatch(delegate()
+                initNext = fail.TryCatchDelegate(delegate()
                 {
                     if (asyncInitList.Count == 0)
                     {
@@ -106,7 +106,7 @@ namespace Serenity
                         {
                             item.Item2();
                             initNext();
-                        })();
+                        });
                     }, error =>
                     {
                         asyncInitList.Clear();

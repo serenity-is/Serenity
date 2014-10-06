@@ -123,6 +123,20 @@ namespace Serenity.PropertyGrid
                 if (getAttribute(typeof(ReadOnlyAttribute)) != null)
                     pi.ReadOnly = true;
 
+                var resizableAttr = (ResizableAttribute)getAttribute(typeof(ResizableAttribute));
+                pi.Resizable = resizableAttr == null || resizableAttr.Value;
+
+                var widthAttr = (WidthAttribute)getAttribute(typeof(WidthAttribute));
+                pi.Width = widthAttr == null ? (basedOnField != null ? AutoWidth(basedOnField) : 80)  : widthAttr.Value;
+                pi.MinWidth = widthAttr == null ? 0 : widthAttr.Min;
+                pi.MaxWidth = widthAttr == null ? 0 : widthAttr.Max;
+
+                var editLinkAttr = (EditLinkAttribute)getAttribute(typeof(EditLinkAttribute));
+                pi.EditLink = editLinkAttr != null && editLinkAttr.Value;
+                pi.EditLinkItemType = editLinkAttr != null ? editLinkAttr.ItemType : (string)null;
+                pi.EditLinkIdField = editLinkAttr != null ? editLinkAttr.IdField : null;
+                pi.EditLinkCssClass = editLinkAttr != null ? editLinkAttr.CssClass : null;
+
                 if (pi.Title == null)
                 {
                     if (basedOnField != null)
@@ -275,6 +289,35 @@ namespace Serenity.PropertyGrid
             }
 
             return list;
+        }
+
+        public static int AutoWidth(Field field)
+        {
+            var name = field.Name;
+
+            switch (field.Type)
+            {
+                case FieldType.String:
+                    if (field.Size != 0 && field.Size <= 25)
+                        return Math.Max(field.Size * 6, 150);
+                    else if (field.Size == 0)
+                        return 250;
+                    else
+                        return 150;
+                case FieldType.Boolean:
+                    return 40;
+                case FieldType.DateTime:
+                    return 85;
+                case FieldType.Int16:
+                    return 55;
+                case FieldType.Int32:
+                    return 65;
+                case FieldType.Double:
+                case FieldType.Decimal:
+                    return 85;
+                default:
+                    return 80;
+            }
         }
 
         public static List<PropertyItem> GetCustomFieldPropertyItems(IEnumerable<ICustomFieldDefinition> definitions, Row row, string fieldPrefix)

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Runtime.CompilerServices;
-using System.Collections.Generic;
-using jQueryApi;
+﻿using jQueryApi;
+using System;
 
 namespace Serenity
 {
-    /// <summary>
-    /// Helper for slick grid formatting
-    /// </summary>
     public static class SlickFormatting
     {
         public static string GetEnumText<TEnum>(this TEnum value)
@@ -64,29 +58,6 @@ namespace Serenity
                 return spacer + "<span class=\"s-TreeToggle\"></span>" + text;
             };
         }
-
-        //public static string HtmlEncode(SlickFormatterContext ctx)
-        //{
-        //    if (!Script.IsValue(ctx.Value))
-        //        return "";
-        //    else
-        //        return Q.HtmlEncode(ctx.Value.As<string>());
-        //}
-
-        //public static string YesNoNull(SlickFormatterContext ctx)
-        //{
-        //    if (ctx.Value == null)
-        //        return "";
-        //    else if (ctx.Value == (object)false)
-        //        return "Hayır";
-        //    else
-        //        return "Evet";
-        //}       
-
-        //public static string DayHourAndMin(SlickFormatterContext ctx)
-        //{
-        //    return Pi.formatDayHourAndMin(ctx.Value);
-        //}
 
         private static string FormatDate(object value, string format)
         {
@@ -157,9 +128,10 @@ namespace Serenity
 
         public static string GetItemType(jQueryObject link)
         {
-            return GetItemType(link.GetAttribute("href"));
+            return link.GetDataValue("item-type") as string;
         }
 
+        [Obsolete("Use GetItemType(link)")]
         public static string GetItemType(string href)
         {
             if (href.IsEmptyOrNull())
@@ -177,9 +149,11 @@ namespace Serenity
 
         public static string GetItemId(jQueryObject link)
         {
-            return GetItemId(link.GetAttribute("href"));
+            var value = link.GetDataValue("item-id");
+            return value == null ? null : value.ToString();
         }
 
+        [Obsolete("Use GetItemId(link)")]
         public static string GetItemId(string href)
         {
             if (href.IsEmptyOrNull())
@@ -197,8 +171,10 @@ namespace Serenity
 
         public static string ItemLinkText(string itemType, object id, object text, string extraClass)
         {
-            return "<a" + (Script.IsValue(id) ? (" href=\"#" + itemType + "/" + id + "\"") : "") +
-                " class=\"s-" + itemType + "Link" + (extraClass.IsEmptyOrNull() ? "" : (" " + extraClass)) + "\">" +
+            return "<a" + (Script.IsValue(id) ? (" href=\"#" + itemType.Replace(".", "-") + "/" + id + "\"") : "") +
+                " data-item-type=\"" + itemType + "\"" +
+                " data-item-id=\"" + id + "\"" +
+                " class=\"s-EditLink s-" + itemType.Replace(".", "-") + "Link" + (extraClass.IsEmptyOrNull() ? "" : (" " + extraClass)) + "\">" +
                 Q.HtmlEncode(text ?? "") + "</a>";
         }
 
@@ -212,13 +188,5 @@ namespace Serenity
                     cssClass == null ? "" : cssClass(ctx));
             };
         }
-
-        //public static string YesNo(SlickFormatterContext ctx)
-        //{
-        //    if (ctx.Value == null || ctx.Value == (object)false)
-        //        return "Hayır";
-        //    else
-        //        return "Evet";
-        //}
     }
 }

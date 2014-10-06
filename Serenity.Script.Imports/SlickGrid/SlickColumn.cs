@@ -88,7 +88,7 @@ namespace Serenity
         /// <summary>
         /// Set the maximum allowable width of this column, in pixels. (default: null)
         /// </summary>
-        public int MaxWidth { get; set; }
+        public int? MaxWidth { get; set; }
 
         /// <summary>
         /// Set the minimum allowable width of this column, in pixels. (default: 30)

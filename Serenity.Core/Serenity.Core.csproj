@@ -39,6 +39,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\Extensibility\ColumnsScriptAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\EditLinkAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\WidthAttribute.cs" />
     <Compile Include="Helpers\BinarySerialization.cs" />
     <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />

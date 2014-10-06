@@ -205,5 +205,51 @@ namespace Serenity
                 next();
             });
         }
+
+        public static List<SlickColumn> PropertyItemsToSlickColumns(List<PropertyItem> items)
+        {
+            var result = new List<SlickColumn>();
+
+            if (items == null)
+                return result;
+
+            for (var i = 0; i < items.Count; i++)
+                result.Add(PropertyItemToSlickColumn(items[i]));
+
+            return result;
+        }
+
+        public static SlickColumn PropertyItemToSlickColumn(PropertyItem item)
+        {
+            var result = new SlickColumn();
+
+            result.Field = item.Name;
+            result.Title = Q.TryGetText(item.Title) ?? item.Title;
+            result.CssClass = item.CssClass;
+            result.Width = Script.IsValue(item.Width) ? item.Width : 80;
+            result.MinWidth = (!Script.IsValue(item.MinWidth) || item.MinWidth == 0) ? 30 : item.MinWidth;
+            result.MaxWidth = (!Script.IsValue(item.MaxWidth) || item.MaxWidth == 0) ? null : (int?)item.MaxWidth;
+            result.Resizable = !Script.IsValue(item.Resizable) || item.Resizable;
+
+            return result;
+        }
+
+        public static Type FindDialogTypeFor(string itemType)
+        {
+            string typeName = itemType + "Dialog";
+
+            Type dialogType = null;
+            foreach (var ns in Q.Config.RootNamespaces)
+            {
+                dialogType = Type.GetType(ns + "." + typeName);
+                if (dialogType != null)
+                    break;
+            }
+
+            if (dialogType == null)
+                throw new Exception(typeName + " dialog class is not found!");
+
+            return dialogType;
+        }
     }
 }

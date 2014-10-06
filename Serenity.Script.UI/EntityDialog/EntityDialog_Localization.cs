@@ -42,9 +42,9 @@ namespace Serenity
                     {
                         InitLocalizationGridCommon(pgOptions);
                         complete();
-                    })();
+                    });
                 }, fail);
-            })();
+            });
         }
 
         private void InitLocalizationGridCommon(PropertyGridOptions pgOptions)

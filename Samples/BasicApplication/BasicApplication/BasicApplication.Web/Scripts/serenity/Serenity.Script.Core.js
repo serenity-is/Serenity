@@ -138,6 +138,19 @@
 	};
 	$Q.tryCatch = function(fail, callback) {
 		if (ss.staticEquals(fail, null)) {
+			callback();
+			return;
+		}
+		try {
+			callback();
+		}
+		catch ($t1) {
+			var ex = ss.Exception.wrap($t1);
+			fail(ex);
+		}
+	};
+	$Q.tryCatchDelegate = function(fail, callback) {
+		if (ss.staticEquals(fail, null)) {
 			return callback;
 		}
 		return function() {
@@ -656,7 +669,7 @@
 			}).fail(function(response1) {
 				fail(response1);
 			});
-		})();
+		});
 	};
 	$Q$ScriptData.$loadScriptData = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
@@ -672,7 +685,7 @@
 			}
 			name = name + '.js?' + $Q$ScriptData.$registered[name];
 			$Q$ScriptData.$loadScript($Q.resolveUrl('~/DynJS.axd/') + name, complete, fail);
-		})();
+		});
 	};
 	$Q$ScriptData.ensure = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];
@@ -689,7 +702,7 @@
 		$Q.tryCatch(fail, function() {
 			var data = $Q$ScriptData.$loadedData[name];
 			if (!ss.isValue(data)) {
-				$Q$ScriptData.$loadScriptData$1(name, $Q.tryCatch(fail, function() {
+				$Q$ScriptData.$loadScriptData$1(name, $Q.tryCatchDelegate(fail, function() {
 					data = $Q$ScriptData.$loadedData[name];
 					if (!ss.isValue(data)) {
 						throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
@@ -699,7 +712,7 @@
 				return;
 			}
 			complete(data);
-		})();
+		});
 	};
 	$Q$ScriptData.reload = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
@@ -716,10 +729,10 @@
 				throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
 			}
 			$Q$ScriptData.$registered[name] = (new Date()).getTime().toString();
-			$Q$ScriptData.$loadScriptData$1(name, $Q.tryCatch(fail, function() {
+			$Q$ScriptData.$loadScriptData$1(name, $Q.tryCatchDelegate(fail, function() {
 				complete($Q$ScriptData.$loadedData[name]);
 			}), fail);
-		})();
+		});
 	};
 	$Q$ScriptData.canLoad = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];
@@ -794,6 +807,14 @@
 	};
 	$Texts$Dialogs.__typeName = 'Texts$Dialogs';
 	global.Texts$Dialogs = $Texts$Dialogs;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.ColumnsKeyAttribute
+	var $Serenity_ColumnsKeyAttribute = function(value) {
+		this.$2$ValueField = null;
+		this.set_value(value);
+	};
+	$Serenity_ColumnsKeyAttribute.__typeName = 'Serenity.ColumnsKeyAttribute';
+	global.Serenity.ColumnsKeyAttribute = $Serenity_ColumnsKeyAttribute;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.CriteriaUtil
 	var $Serenity_Criteria = function() {
@@ -1168,7 +1189,7 @@
 		};
 	};
 	$Serenity_SlickFormatting.getItemType$1 = function(link) {
-		return $Serenity_SlickFormatting.getItemType(link.attr('href'));
+		return ss.safeCast(link.data('item-type'), String);
 	};
 	$Serenity_SlickFormatting.getItemType = function(href) {
 		if ($Q.isEmptyOrNull(href)) {
@@ -1184,7 +1205,8 @@
 		return href;
 	};
 	$Serenity_SlickFormatting.getItemId$1 = function(link) {
-		return $Serenity_SlickFormatting.getItemId(link.attr('href'));
+		var value = link.data('item-id');
+		return (ss.isNullOrUndefined(value) ? null : value.toString());
 	};
 	$Serenity_SlickFormatting.getItemId = function(href) {
 		if ($Q.isEmptyOrNull(href)) {
@@ -1200,7 +1222,7 @@
 		return href;
 	};
 	$Serenity_SlickFormatting.itemLinkText = function(itemType, id, text, extraClass) {
-		return '<a' + (ss.isValue(id) ? (' href="#' + itemType + '/' + id + '"') : '') + ' class="s-' + itemType + 'Link' + ($Q.isEmptyOrNull(extraClass) ? '' : (' ' + extraClass)) + '">' + $Q.htmlEncode(ss.coalesce(text, '')) + '</a>';
+		return '<a' + (ss.isValue(id) ? (' href="#' + ss.replaceAllString(itemType, '.', '-') + '/' + id + '"') : '') + ' data-item-type="' + itemType + '"' + ' data-item-id="' + id + '"' + ' class="s-EditLink s-' + ss.replaceAllString(itemType, '.', '-') + 'Link' + ($Q.isEmptyOrNull(extraClass) ? '' : (' ' + extraClass)) + '">' + $Q.htmlEncode(ss.coalesce(text, '')) + '</a>';
 	};
 	$Serenity_SlickFormatting.itemLink = function(itemType, idField, getText, cssClass) {
 		return function(ctx) {
@@ -1480,6 +1502,14 @@
 	ss.initClass($Texts$Controls$PropertyGrid, $asm, {});
 	ss.initClass($Texts$Controls$QuickSearch, $asm, {});
 	ss.initClass($Texts$Dialogs, $asm, {});
+	ss.initClass($Serenity_ColumnsKeyAttribute, $asm, {
+		get_value: function() {
+			return this.$2$ValueField;
+		},
+		set_value: function(value) {
+			this.$2$ValueField = value;
+		}
+	});
 	ss.initClass($Serenity_Criteria, $asm, {});
 	ss.initClass($Serenity_DialogTypeAttribute, $asm, {
 		get_value: function() {

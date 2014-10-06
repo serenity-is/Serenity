@@ -62,14 +62,8 @@ namespace Serenity
 
             UpdateDisabledState();
 
-            if (PopulateWhenVisible())
-            {
-                LazyLoadHelper.ExecuteEverytimeWhenShown(element, () => self.RefreshIfNeeded(), false);
-                if (element.Is(":visible"))
-                    view.Populate();
-            }
-            else
-                view.Populate();
+            if (!IsAsyncWidget())
+                InitialPopulate();
         }
 
         protected void Layout()
@@ -195,9 +189,56 @@ namespace Serenity
             return columns;
         }
 
+        protected void InitialPopulate()
+        {
+            var self = this;
+
+            if (PopulateWhenVisible())
+            {
+                LazyLoadHelper.ExecuteEverytimeWhenShown(element, () => self.RefreshIfNeeded(), false);
+                if (element.Is(":visible"))
+                    view.Populate();
+            }
+            else
+                view.Populate();
+        }
+
+        protected override void InitializeAsync(Action complete, Action<object> fail)
+        {
+            base.InitializeAsync(delegate()
+            {
+                GetColumns(columns => 
+                {
+                    fail.TryCatch(delegate
+                    {
+                        columns = PostProcessColumns(columns);
+
+                        if (this.slickGrid != null)
+                            this.slickGrid.SetColumns(columns);
+
+                        InitialPopulate();
+
+                        complete();
+                    });
+                }, fail);
+            }, fail);
+        }
+
         protected virtual SlickGrid CreateSlickGrid()
         {
-            var slickColumns = PostProcessColumns(GetColumns());
+            List<SlickColumn> slickColumns;
+
+            if (this.IsAsyncWidget())
+            {
+                slickColumns = new List<SlickColumn>();
+            }
+            else
+            {
+                #pragma warning disable 618
+                slickColumns = PostProcessColumns(GetColumns());
+                #pragma warning restore 618
+            }
+
             var slickOptions = GetSlickOptions();
             var self = this;
             dynamic viewRows = view.Rows;
@@ -304,15 +345,31 @@ namespace Serenity
 
         protected virtual void EditItem(object entityOrId)
         {
+            throw new NotImplementedException();
+        }
+
+        protected virtual void EditItem(string itemType, object entityOrId)
+        {
+            if (itemType == GetItemType())
+            {
+                EditItem(entityOrId);
+                return;
+            }
+
+            throw new NotImplementedException();
         }
 
         protected virtual void OnClick(jQueryEvent e, int row, int cell)
         {
+            if (e.IsDefaultPrevented())
+                return;
+
             var target = J(e.Target);
-            if (target.HasClass("s-" + GetItemType() + "Link"))
+            if (target.HasClass("s-EditLink"))
             {
                 e.PreventDefault();
-                EditItem(SlickFormatting.GetItemId(target));
+
+                EditItem(SlickFormatting.GetItemType(target), SlickFormatting.GetItemId(target));
             }
         }
 
@@ -516,9 +573,90 @@ namespace Serenity
             return SlickFormatting.ItemLink(itemType, idField, text, cssClass);
         }
 
+        protected virtual void GetPropertyItems(Action<List<PropertyItem>> complete, Action<object> fail)
+        {
+            fail.TryCatch(delegate()
+            {
+                var attr = this.GetType().GetCustomAttributes(typeof(ColumnsKeyAttribute), true);
+            
+                if (attr != null && attr.Length > 0)
+                {
+                    Q.GetColumns(attr[0].As<ColumnsKeyAttribute>().Value, complete, fail);
+                    return;
+                }
+
+                complete(new List<PropertyItem>());
+            });
+        }
+
+        [Obsolete("Prefer async version")]
+        protected virtual List<PropertyItem> GetPropertyItems()
+        {
+            var attr = this.GetType().GetCustomAttributes(typeof(ColumnsKeyAttribute), true);
+
+            if (attr != null && attr.Length > 0)
+            {
+                #pragma warning disable 618
+                return Q.GetColumns(attr[0].As<ColumnsKeyAttribute>().Value);
+                #pragma warning restore 618
+            }
+
+            return new List<PropertyItem>();
+        }
+
+        [Obsolete("Prefer async version")]
         protected virtual List<SlickColumn> GetColumns()
         {
-            return new List<SlickColumn>();
+            #pragma warning disable 618
+            var columnItems = GetPropertyItems();
+            #pragma warning restore 618
+            return GridUtils.PropertyItemsToSlickColumns(columnItems);
+        }
+
+        protected virtual List<SlickColumn> PropertyItemsToSlickColumns(List<PropertyItem> propertyItems)
+        {
+            var columns = GridUtils.PropertyItemsToSlickColumns(propertyItems);
+
+            if (propertyItems != null)
+            {
+                for (var i = 0; i < propertyItems.Count; i++)
+                {
+                    var item = propertyItems[i];
+                    var column = columns[i];
+
+                    if (item.EditLink)
+                    {
+                        var oldFormat = column.Format;
+                        var css = Script.IsValue(item.EditLinkCssClass) ? item.EditLinkCssClass : null;
+
+                        column.Format = this.ItemLink(
+                            itemType: Script.IsValue(item.EditLinkItemType) ? item.EditLinkItemType : (string)null,
+                            idField: Script.IsValue(item.EditLinkIdField) ? item.EditLinkIdField : (string)null,
+                            text: ctx =>
+                            {
+                                if (oldFormat != null)
+                                    return oldFormat(ctx);
+
+                                return Q.HtmlEncode(ctx.Value);
+                            },
+                            cssClass: ctx => css ?? "");
+                    }
+                }
+            }
+
+            return columns;
+        }
+
+        protected virtual void GetColumns(Action<List<SlickColumn>> complete, Action<object> fail)
+        {
+            GetPropertyItems(propertyItems =>
+            {
+                fail.TryCatch(delegate()
+                {
+                    var columns = PropertyItemsToSlickColumns(propertyItems);
+                    complete(columns);
+                });
+            }, fail);
         }
 
         protected virtual SlickGridOptions GetSlickOptions()

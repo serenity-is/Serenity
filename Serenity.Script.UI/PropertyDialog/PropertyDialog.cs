@@ -47,7 +47,7 @@ namespace Serenity
         {
             base.InitializeAsync(delegate()
             {
-                InitPropertyGrid(fail.TryCatch(delegate()
+                InitPropertyGrid(fail.TryCatchDelegate(delegate()
                 {
                     LoadInitialEntity();
                     complete();
@@ -193,9 +193,9 @@ namespace Serenity
                         {
                             complete();
                         }, fail);
-                    })();
+                    });
                 }, fail);
-            })();
+            });
         }
 
         protected virtual string GetFormKey()
@@ -234,7 +234,7 @@ namespace Serenity
             {
                 var formKey = GetFormKey();
                 Q.GetForm(formKey, callback, fail);
-            })();
+            });
         }
 
         [Obsolete("Prefer async version")]
@@ -267,7 +267,7 @@ namespace Serenity
                     };
 
                     callback(options);
-                })();
+                });
             }, fail);
         }
 

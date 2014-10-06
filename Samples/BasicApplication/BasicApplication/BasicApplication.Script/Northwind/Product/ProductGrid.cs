@@ -7,9 +7,9 @@ namespace BasicApplication.Northwind
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
-    [IdProperty("ProductID"), NameProperty("ProductName")]
+    [ColumnsKey("Northwind.Product"), IdProperty("ProductID"), NameProperty("ProductName")]
     [DialogType(typeof(ProductDialog)), LocalTextPrefix("Northwind.Product"), Service("Northwind/Product")]
-    public class ProductGrid : EntityGrid<ProductRow>
+    public class ProductGrid : EntityGrid<ProductRow>, IAsyncInit
     {
         private LookupEditor supplier;
         private LookupEditor category;
@@ -17,24 +17,6 @@ namespace BasicApplication.Northwind
         public ProductGrid(jQueryObject container)
             : base(container)
         {
-        }
-
-        protected override List<SlickColumn> GetColumns()
-        {
-            var columns = base.GetColumns();
-
-            columns.Add(new SlickColumn { Field = "ProductID", Width = 55, CssClass = "align-right", Title = Q.Text("Db.Shared.RecordId") });
-            columns.Add(new SlickColumn { Field = "ProductName", Width = 250, Format = ItemLink() });
-            columns.Add(new SlickColumn { Field = "Discontinued", Width = 40, Format = SlickFormatting.CheckBox(), CssClass = "align-center" });
-            columns.Add(new SlickColumn { Field = "SupplierCompanyName", Width = 200 });
-            columns.Add(new SlickColumn { Field = "CategoryName", Width = 200 });
-            columns.Add(new SlickColumn { Field = "QuantityPerUnit", Width = 130 });
-            columns.Add(new SlickColumn { Field = "UnitPrice", Width = 80, CssClass = "align-right" });
-            columns.Add(new SlickColumn { Field = "UnitsInStock", Width = 80, CssClass = "align-right" });
-            columns.Add(new SlickColumn { Field = "UnitsOnOrder", Width = 80, CssClass = "align-right" });
-            columns.Add(new SlickColumn { Field = "ReorderLevel", Width = 80, CssClass = "align-right" });
-
-            return columns;
         }
 
         protected override void CreateToolbarExtensions()

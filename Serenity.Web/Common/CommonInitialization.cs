@@ -83,6 +83,7 @@ namespace Serenity.Web
             LookupScriptRegistration.RegisterLookupScripts();
             RunStartupRegistrars<ScriptRegistrarAttribute>();
             FormScriptRegistration.RegisterFormScripts();
+            ColumnsScriptRegistration.RegisterColumnsScripts();
 
             var templateRegistrar = new TemplateScriptRegistrar();
             templateRegistrar.Initialize("~/Views/Templates", watchForChanges: true);

@@ -16,7 +16,25 @@ namespace Serenity
             }
         }
 
-        public static Action TryCatch(this Action<object> fail, Action callback)
+        public static void TryCatch(this Action<object> fail, Action callback)
+        {
+            if (fail == null)
+            {
+                callback();
+                return;
+            }
+
+            try
+            {
+                callback();
+            }
+            catch (Exception ex)
+            {
+                fail(ex);
+            }
+        }
+
+        public static Action TryCatchDelegate(this Action<object> fail, Action callback)
         {
             if (fail == null)
             {
