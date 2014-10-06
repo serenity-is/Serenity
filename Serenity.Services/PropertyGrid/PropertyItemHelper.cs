@@ -185,8 +185,6 @@ namespace Serenity.PropertyGrid
                 pi.Localizable = getAttribute(typeof(LocalizableAttribute)) != null ||
                     (basedOnField != null && localizationRowHandler != null && localizationRowHandler.IsLocalized(basedOnField));
 
-                var editorTypeAttr = (EditorTypeAttribute)getAttribute(typeof(EditorTypeAttribute));
-
                 Type nullableType = Nullable.GetUnderlyingType(memberType);
                 Type enumType = null;
                 if (memberType.IsEnum)
@@ -199,6 +197,8 @@ namespace Serenity.PropertyGrid
                     if (enumType != null && !enumType.IsEnum)
                         enumType = null;
                 }
+
+                var editorTypeAttr = (EditorTypeAttribute)getAttribute(typeof(EditorTypeAttribute));
 
                 if (editorTypeAttr == null)
                 {
@@ -237,6 +237,48 @@ namespace Serenity.PropertyGrid
                         options.RemoveAt(0);
                     }
                     pi.EditorParams["items"] = options.ToArray();
+                }
+
+                var formatterTypeAttr = (FormatterTypeAttribute)getAttribute(typeof(FormatterTypeAttribute));
+                if (formatterTypeAttr == null)
+                {
+                    if (enumType != null)
+                    {
+                        pi.FormatterType = "Enum";
+                        var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
+                        var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
+                        pi.FormatterParams["enumKey"] = enumKey;
+                    }
+                    else if (memberType == typeof(DateTime) || memberType == typeof(DateTime?))
+                    {
+                        if (basedOnField != null && basedOnField is DateTimeField)
+                        {
+                            switch (((DateTimeField)basedOnField).DateTimeKind)
+                            {
+                                case DateTimeKind.Unspecified:
+                                    pi.FormatterType = "Date";
+                                    break;
+                                default:
+                                    pi.FormatterType = "DateTime";
+                                    break;
+                            }
+                        }
+                        else
+                            pi.FormatterType = "Date";
+                    }
+                    else if (memberType == typeof(Boolean))
+                        pi.FormatterType = "Checkbox";
+                    else if (memberType == typeof(Decimal) || memberType == typeof(Decimal?) ||
+                        memberType == typeof(Double) || memberType == typeof(Double?) ||
+                        memberType == typeof(Int32) || memberType == typeof(Int32?))
+                    {
+                        pi.FormatterType = "Number";
+                    }
+                }
+                else
+                {
+                    pi.FormatterType = formatterTypeAttr.FormatterType;
+                    formatterTypeAttr.SetParams(pi.FormatterParams);
                 }
 
                 if (basedOnField != null)
@@ -283,6 +325,23 @@ namespace Serenity.PropertyGrid
                         key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
                         
                     pi.EditorParams[key] = param.Value;
+                }
+
+                var displayFormatAttr = (DisplayFormatAttribute)getAttribute(typeof(DisplayFormatAttribute));
+                if (displayFormatAttr != null)
+                {
+                    pi.DisplayFormat = displayFormatAttr.Value;
+                    pi.FormatterParams["displayFormat"] = displayFormatAttr.Value;
+                }
+
+                foreach (FormatterOptionAttribute param in getAttributes(typeof(FormatterOptionAttribute)))
+                {
+                    var key = param.Key;
+                    if (key != null &&
+                        key.Length >= 1)
+                        key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+
+                    pi.FormatterParams[key] = param.Value;
                 }
 
                 list.Add(pi);

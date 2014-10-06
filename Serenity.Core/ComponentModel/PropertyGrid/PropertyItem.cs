@@ -43,6 +43,12 @@ namespace Serenity.ComponentModel
         [JsonProperty("localizable")]
         public bool Localizable { get; set; }
 
+        [JsonProperty("formatterType")]
+        public string FormatterType { get; set; }
+        [JsonProperty("formatterParams")]
+        public Dictionary<string, object> FormatterParams { get; set; }
+        [JsonProperty("displayFormat")]
+        public string DisplayFormat { get; set; }
         [JsonProperty("width")]
         public int Width { get; set; }
         [JsonProperty("minWidth")]
@@ -64,6 +70,7 @@ namespace Serenity.ComponentModel
         public PropertyItem()
         {
             EditorParams = new Dictionary<string, object>();
+            FormatterParams = new Dictionary<string, object>();
         }
     }
 }

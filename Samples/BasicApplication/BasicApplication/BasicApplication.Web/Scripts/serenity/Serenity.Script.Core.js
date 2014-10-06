@@ -2,6 +2,7 @@
 	'use strict';
 	var $asm = {};
 	global.Serenity = global.Serenity || {};
+	global.Serenity.ComponentModel = global.Serenity.ComponentModel || {};
 	ss.initAssembly($asm, 'Serenity.Script.Core');
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Q
@@ -808,6 +809,12 @@
 	$Texts$Dialogs.__typeName = 'Texts$Dialogs';
 	global.Texts$Dialogs = $Texts$Dialogs;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.CheckboxFormatter
+	var $Serenity_CheckboxFormatter = function() {
+	};
+	$Serenity_CheckboxFormatter.__typeName = 'Serenity.CheckboxFormatter';
+	global.Serenity.CheckboxFormatter = $Serenity_CheckboxFormatter;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.ColumnsKeyAttribute
 	var $Serenity_ColumnsKeyAttribute = function(value) {
 		this.$2$ValueField = null;
@@ -847,6 +854,41 @@
 	};
 	global.Serenity.Criteria = $Serenity_Criteria;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.DateFormatter
+	var $Serenity_DateFormatter = function() {
+		this.$1$DisplayFormatField = null;
+		this.set_displayFormat($Q$Culture.dateFormat);
+	};
+	$Serenity_DateFormatter.__typeName = 'Serenity.DateFormatter';
+	$Serenity_DateFormatter.format = function(value, format) {
+		if (!ss.isValue(value)) {
+			return '';
+		}
+		var date;
+		if (typeof(value) === 'date') {
+			date = value;
+		}
+		else if (typeof(value) === 'string') {
+			date = Q$Externals.parseISODateTime(value);
+			if (ss.staticEquals(date, null)) {
+				return $Q.htmlEncode(value);
+			}
+		}
+		else {
+			return value.toString();
+		}
+		return $Q.htmlEncode($Q.formatDate(date, format));
+	};
+	global.Serenity.DateFormatter = $Serenity_DateFormatter;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.DateTimeFormatter
+	var $Serenity_DateTimeFormatter = function() {
+		$Serenity_DateFormatter.call(this);
+		this.set_displayFormat($Q$Culture.dateTimeFormat);
+	};
+	$Serenity_DateTimeFormatter.__typeName = 'Serenity.DateTimeFormatter';
+	global.Serenity.DateTimeFormatter = $Serenity_DateTimeFormatter;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.DialogTypeAttribute
 	var $Serenity_DialogTypeAttribute = function(value) {
 		this.$2$ValueField = null;
@@ -876,6 +918,78 @@
 	};
 	$Serenity_EntityTypeAttribute.__typeName = 'Serenity.EntityTypeAttribute';
 	global.Serenity.EntityTypeAttribute = $Serenity_EntityTypeAttribute;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.EnumFormatter
+	var $Serenity_EnumFormatter = function() {
+		this.$1$EnumKeyField = null;
+	};
+	$Serenity_EnumFormatter.__typeName = 'Serenity.EnumFormatter';
+	$Serenity_EnumFormatter.format = function(enumType, value) {
+		if (!ss.isValue(value)) {
+			return '';
+		}
+		var name = ss.Enum.toString(enumType, value);
+		var enumKeyAttr = ss.getAttributes(enumType, $Serenity_EnumKeyAttribute, false);
+		var enumKey = ((enumKeyAttr.length > 0) ? ss.cast(enumKeyAttr[0], $Serenity_EnumKeyAttribute).get_value() : ss.getTypeFullName(enumType));
+		return $Serenity_EnumFormatter.getText$1(enumKey, name);
+	};
+	$Serenity_EnumFormatter.getText$1 = function(enumKey, name) {
+		return $Q.htmlEncode(ss.coalesce($Q.tryGetText('Enums.' + enumKey + '.' + name), name));
+	};
+	$Serenity_EnumFormatter.getText = function(TEnum) {
+		return function(value) {
+			if (!ss.isValue(value)) {
+				return '';
+			}
+			return $Serenity_EnumFormatter.format(TEnum, ss.unbox(value));
+		};
+	};
+	global.Serenity.EnumFormatter = $Serenity_EnumFormatter;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.EnumKeyAttribute
+	var $Serenity_EnumKeyAttribute = function(value) {
+		this.$2$ValueField = null;
+		this.set_value(value);
+	};
+	$Serenity_EnumKeyAttribute.__typeName = 'Serenity.EnumKeyAttribute';
+	global.Serenity.EnumKeyAttribute = $Serenity_EnumKeyAttribute;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.EnumTypeRegistry
+	var $Serenity_EnumTypeRegistry = function() {
+	};
+	$Serenity_EnumTypeRegistry.__typeName = 'Serenity.EnumTypeRegistry';
+	$Serenity_EnumTypeRegistry.get = function(key) {
+		if (ss.isNullOrUndefined($Serenity_EnumTypeRegistry.$knownTypes)) {
+			$Serenity_EnumTypeRegistry.$knownTypes = {};
+			var $t1 = ss.getAssemblies();
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var assembly = $t1[$t2];
+				var $t3 = ss.getAssemblyTypes(assembly);
+				for (var $t4 = 0; $t4 < $t3.length; $t4++) {
+					var type = $t3[$t4];
+					if (ss.isEnum(type)) {
+						var fullName = ss.getTypeFullName(type);
+						$Serenity_EnumTypeRegistry.$knownTypes[fullName] = type;
+						var enumKeyAttr = ss.getAttributes(type, $Serenity_EnumKeyAttribute, false);
+						if (ss.isValue(enumKeyAttr) && enumKeyAttr.length > 0) {
+							$Serenity_EnumTypeRegistry.$knownTypes[ss.cast(enumKeyAttr[0], $Serenity_EnumKeyAttribute).get_value()] = type;
+						}
+						for (var $t5 = 0; $t5 < $Q$Config.rootNamespaces.length; $t5++) {
+							var k = $Q$Config.rootNamespaces[$t5];
+							if (ss.startsWithString(fullName, k + '.')) {
+								$Serenity_EnumTypeRegistry.$knownTypes[fullName.substr(k.length + 1)] = type;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (!ss.keyExists($Serenity_EnumTypeRegistry.$knownTypes, key)) {
+			throw new ss.Exception(ss.formatString("Can't find {0} enum type!", key));
+		}
+		return $Serenity_EnumTypeRegistry.$knownTypes[key];
+	};
+	global.Serenity.EnumTypeRegistry = $Serenity_EnumTypeRegistry;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.FormKeyAttribute
 	var $Serenity_FormKeyAttribute = function(value) {
@@ -945,6 +1059,12 @@
 	};
 	$Serenity_IsActivePropertyAttribute.__typeName = 'Serenity.IsActivePropertyAttribute';
 	global.Serenity.IsActivePropertyAttribute = $Serenity_IsActivePropertyAttribute;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.ISlickFormatter
+	var $Serenity_ISlickFormatter = function() {
+	};
+	$Serenity_ISlickFormatter.__typeName = 'Serenity.ISlickFormatter';
+	global.Serenity.ISlickFormatter = $Serenity_ISlickFormatter;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.ItemNameAttribute
 	var $Serenity_ItemNameAttribute = function(value) {
@@ -1053,6 +1173,27 @@
 	$Serenity_NamePropertyAttribute.__typeName = 'Serenity.NamePropertyAttribute';
 	global.Serenity.NamePropertyAttribute = $Serenity_NamePropertyAttribute;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.NumberFormatter
+	var $Serenity_NumberFormatter = function() {
+		this.$1$DisplayFormatField = null;
+	};
+	$Serenity_NumberFormatter.__typeName = 'Serenity.NumberFormatter';
+	$Serenity_NumberFormatter.format = function(value, format) {
+		format = ss.coalesce(format, '');
+		if (!ss.isValue(value) || isNaN(value)) {
+			return '';
+		}
+		if (typeof(value) === 'number') {
+			return $Q.htmlEncode($Q.formatNumber(value, format));
+		}
+		var dbl = $Q.parseDecimal(value.toString());
+		if (ss.isNullOrUndefined(dbl)) {
+			return '';
+		}
+		return $Q.htmlEncode(value.toString());
+	};
+	global.Serenity.NumberFormatter = $Serenity_NumberFormatter;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.OptionsTypeAttribute
 	var $Serenity_OptionsTypeAttribute = function(optionsType) {
 		this.$2$OptionsTypeField = null;
@@ -1081,17 +1222,11 @@
 	$Serenity_SlickFormatting.__typeName = 'Serenity.SlickFormatting';
 	$Serenity_SlickFormatting.getEnumText = function(TEnum) {
 		return function(value) {
-			var key = ss.Enum.toString(TEnum, value);
-			return $Serenity_SlickFormatting.getEnumText$1(ss.getTypeName(TEnum), key);
+			return $Serenity_EnumFormatter.getText(TEnum).call(null, value);
 		};
 	};
-	$Serenity_SlickFormatting.getEnumText$1 = function(enumKey, enumValue) {
-		if (ss.isValue(enumValue)) {
-			return $Q.htmlEncode($Q.text('Enums.' + enumKey + '.' + enumValue));
-		}
-		else {
-			return '';
-		}
+	$Serenity_SlickFormatting.getEnumText$1 = function(enumKey, name) {
+		return $Serenity_EnumFormatter.getText$1(enumKey, name);
 	};
 	$Serenity_SlickFormatting.enum$1 = function(enumKey) {
 		return function(ctx) {
@@ -1128,25 +1263,6 @@
 			};
 		};
 	};
-	$Serenity_SlickFormatting.$formatDate = function(value, format) {
-		if (!ss.isValue(value)) {
-			return '';
-		}
-		var date;
-		if (typeof(value) === 'date') {
-			date = value;
-		}
-		else if (typeof(value) === 'string') {
-			date = Q$Externals.parseISODateTime(value);
-			if (ss.staticEquals(date, null)) {
-				return $Q.htmlEncode(value);
-			}
-		}
-		else {
-			return value.toString();
-		}
-		return $Q.htmlEncode($Q.formatDate(date, format));
-	};
 	$Serenity_SlickFormatting.date = function(format) {
 		var $t1 = format;
 		if (ss.isNullOrUndefined($t1)) {
@@ -1154,7 +1270,7 @@
 		}
 		format = $t1;
 		return function(ctx) {
-			return $Q.htmlEncode($Serenity_SlickFormatting.$formatDate(ctx.value, format));
+			return $Q.htmlEncode($Serenity_DateFormatter.format(ctx.value, format));
 		};
 	};
 	$Serenity_SlickFormatting.dateTime = function(format) {
@@ -1164,7 +1280,7 @@
 		}
 		format = $t1;
 		return function(ctx) {
-			return $Q.htmlEncode($Serenity_SlickFormatting.$formatDate(ctx.value, format));
+			return $Q.htmlEncode($Serenity_DateFormatter.format(ctx.value, format));
 		};
 	};
 	$Serenity_SlickFormatting.checkBox = function() {
@@ -1174,18 +1290,7 @@
 	};
 	$Serenity_SlickFormatting.number = function(format) {
 		return function(ctx) {
-			var value = ctx.value;
-			if (!ss.isValue(ctx.value) || isNaN(value)) {
-				return '';
-			}
-			if (typeof(value) === 'number') {
-				return $Q.htmlEncode($Q.formatNumber(value, format));
-			}
-			var dbl = $Q.parseDecimal(value.toString());
-			if (ss.isNullOrUndefined(dbl)) {
-				return '';
-			}
-			return $Q.htmlEncode(value.toString());
+			return $Serenity_NumberFormatter.format(ctx.value, format);
 		};
 	};
 	$Serenity_SlickFormatting.getItemType$1 = function(link) {
@@ -1435,6 +1540,12 @@
 		return indexByKey;
 	};
 	global.Serenity.TabsExtensions = $Serenity_TabsExtensions;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.ComponentModel.OptionAttribute
+	var $Serenity_ComponentModel_OptionAttribute = function() {
+	};
+	$Serenity_ComponentModel_OptionAttribute.__typeName = 'Serenity.ComponentModel.OptionAttribute';
+	global.Serenity.ComponentModel.OptionAttribute = $Serenity_ComponentModel_OptionAttribute;
 	ss.initClass($Q, $asm, {});
 	ss.initClass($Q$Config, $asm, {});
 	ss.initClass($Q$Culture, $asm, {});
@@ -1502,6 +1613,12 @@
 	ss.initClass($Texts$Controls$PropertyGrid, $asm, {});
 	ss.initClass($Texts$Controls$QuickSearch, $asm, {});
 	ss.initClass($Texts$Dialogs, $asm, {});
+	ss.initInterface($Serenity_ISlickFormatter, $asm, { format: null });
+	ss.initClass($Serenity_CheckboxFormatter, $asm, {
+		format: function(ctx) {
+			return '<span class="check-box no-float ' + (!!ctx.value ? ' checked' : '') + '"></span>';
+		}
+	}, null, [$Serenity_ISlickFormatter]);
 	ss.initClass($Serenity_ColumnsKeyAttribute, $asm, {
 		get_value: function() {
 			return this.$2$ValueField;
@@ -1511,6 +1628,18 @@
 		}
 	});
 	ss.initClass($Serenity_Criteria, $asm, {});
+	ss.initClass($Serenity_DateFormatter, $asm, {
+		get_displayFormat: function() {
+			return this.$1$DisplayFormatField;
+		},
+		set_displayFormat: function(value) {
+			this.$1$DisplayFormatField = value;
+		},
+		format: function(ctx) {
+			return $Serenity_DateFormatter.format(ctx.value, this.get_displayFormat());
+		}
+	}, null, [$Serenity_ISlickFormatter]);
+	ss.initClass($Serenity_DateTimeFormatter, $asm, {}, $Serenity_DateFormatter, [$Serenity_ISlickFormatter]);
 	ss.initClass($Serenity_DialogTypeAttribute, $asm, {
 		get_value: function() {
 			return this.$2$ValueField;
@@ -1533,6 +1662,26 @@
 			this.$2$ValueField = value;
 		}
 	});
+	ss.initClass($Serenity_EnumFormatter, $asm, {
+		get_enumKey: function() {
+			return this.$1$EnumKeyField;
+		},
+		set_enumKey: function(value) {
+			this.$1$EnumKeyField = value;
+		},
+		format: function(ctx) {
+			return $Serenity_EnumFormatter.format($Serenity_EnumTypeRegistry.get(this.get_enumKey()), ctx.value);
+		}
+	}, null, [$Serenity_ISlickFormatter]);
+	ss.initClass($Serenity_EnumKeyAttribute, $asm, {
+		get_value: function() {
+			return this.$2$ValueField;
+		},
+		set_value: function(value) {
+			this.$2$ValueField = value;
+		}
+	});
+	ss.initClass($Serenity_EnumTypeRegistry, $asm, {});
 	ss.initClass($Serenity_FormKeyAttribute, $asm, {
 		get_value: function() {
 			return this.$2$ValueField;
@@ -1583,6 +1732,17 @@
 			this.$2$ValueField = value;
 		}
 	});
+	ss.initClass($Serenity_NumberFormatter, $asm, {
+		get_displayFormat: function() {
+			return this.$1$DisplayFormatField;
+		},
+		set_displayFormat: function(value) {
+			this.$1$DisplayFormatField = value;
+		},
+		format: function(ctx) {
+			return $Serenity_NumberFormatter.format(ctx.value, this.get_displayFormat());
+		}
+	}, null, [$Serenity_ISlickFormatter]);
 	ss.initClass($Serenity_OptionsTypeAttribute, $asm, {
 		get_optionsType: function() {
 			return this.$2$OptionsTypeField;
@@ -1604,6 +1764,10 @@
 	ss.initClass($Serenity_SlickHelper, $asm, {});
 	ss.initClass($Serenity_SlickTreeHelper, $asm, {});
 	ss.initClass($Serenity_TabsExtensions, $asm, {});
+	ss.initClass($Serenity_ComponentModel_OptionAttribute, $asm, {});
+	ss.setMetadata($Serenity_DateFormatter, { members: [{ attr: [new $Serenity_ComponentModel_OptionAttribute()], name: 'DisplayFormat', type: 16, returnType: String, getter: { name: 'get_DisplayFormat', type: 8, sname: 'get_displayFormat', returnType: String, params: [] }, setter: { name: 'set_DisplayFormat', type: 8, sname: 'set_displayFormat', returnType: Object, params: [String] } }] });
+	ss.setMetadata($Serenity_EnumFormatter, { members: [{ attr: [new $Serenity_ComponentModel_OptionAttribute()], name: 'EnumKey', type: 16, returnType: String, getter: { name: 'get_EnumKey', type: 8, sname: 'get_enumKey', returnType: String, params: [] }, setter: { name: 'set_EnumKey', type: 8, sname: 'set_enumKey', returnType: Object, params: [String] } }] });
+	ss.setMetadata($Serenity_NumberFormatter, { members: [{ attr: [new $Serenity_ComponentModel_OptionAttribute()], name: 'DisplayFormat', type: 16, returnType: String, getter: { name: 'get_DisplayFormat', type: 8, sname: 'get_displayFormat', returnType: String, params: [] }, setter: { name: 'set_DisplayFormat', type: 8, sname: 'set_displayFormat', returnType: Object, params: [String] } }] });
 	(function() {
 		$Q$Culture.decimalSeparator = '.';
 		$Q$Culture.dateSeparator = '/';
@@ -1687,5 +1851,8 @@
 		$Texts$Controls$QuickSearch.Hint = new Q$LT('enter the text to search for...');
 		$Texts$Controls$QuickSearch.FieldSelection = new Q$LT('select the field to search on');
 		$Q$LT.initializeTextClass($Texts$Controls$QuickSearch, 'Controls.QuickSearch.');
+	})();
+	(function() {
+		$Serenity_EnumTypeRegistry.$knownTypes = null;
 	})();
 })();

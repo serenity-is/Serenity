@@ -292,25 +292,13 @@ namespace Serenity
             if (editor is BooleanEditor)
                 label.RemoveAttr("for");
 
-            asyncInitList.Enqueue(new Tuple<Widget,Action>(editor, delegate
+            if (item.EditorParams != null)
             {
-                if (item.EditorParams != null)
+                asyncInitList.Enqueue(new Tuple<Widget, Action>(editor, delegate
                 {
-                    var props = editor.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                    var propByName = props.Where(x => x.CanWrite && 
-                            (x.GetCustomAttributes(typeof(OptionAttribute)).Length > 0 ||
-                             x.GetCustomAttributes(typeof(DisplayNameAttribute)).Length > 0))
-                        .ToDictionary(x => ReflectionUtils.MakeCamelCase(x.Name));
-
-                    foreach (var k in item.EditorParams.Keys)
-                    {
-                        PropertyInfo p;
-                        if (propByName.TryGetValue(ReflectionUtils.MakeCamelCase(k), out p))
-                            p.SetValue(editor, item.EditorParams[k]);
-                    }
-                }
-            }));
+                    ReflectionOptionsSetter.Set(editor, item.EditorParams);
+                }));
+            }
 
             if (Script.IsValue(item.MaxLength))
                 SetMaxLength(editor, item.MaxLength.Value);

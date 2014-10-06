@@ -16,6 +16,7 @@ namespace BasicApplication.Northwind
         {
         }
 
+        [Obsolete]
         protected override List<SlickColumn> GetColumns()
         {
             var columns = base.GetColumns();

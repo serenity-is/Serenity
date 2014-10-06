@@ -73,7 +73,6 @@
     <Compile Include="Mapping\AutoIncrementAttribute.cs" />
     <Compile Include="Mapping\ColumnAttribute.cs" />
     <Compile Include="Mapping\ConnectionKeyAttribute.cs" />
-    <Compile Include="Mapping\DisplayFormatAttribute.cs" />
     <Compile Include="Mapping\ExpressionAttribute.cs" />
     <Compile Include="Mapping\FieldFlags.cs" />
     <Compile Include="Mapping\LookupIncludeAttribute.cs" />

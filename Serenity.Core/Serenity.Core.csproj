@@ -39,6 +39,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\Extensibility\ColumnsScriptAttribute.cs" />
+    <Compile Include="ComponentModel\Extensibility\EnumKeyAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\DisplayFormatAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\FormatterOptionAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\FormatterTypeAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\CustomFormatterAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\EditLinkAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\WidthAttribute.cs" />
@@ -94,7 +99,6 @@
     <Compile Include="ComponentModel\PropertyGrid\CustomEditorAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\EditorOptionAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\EditorTypeAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\EditorTypeAttributeBase.cs" />
     <Compile Include="ComponentModel\PropertyGrid\BasicEditorTypes.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HiddenAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HintAttribute.cs" />

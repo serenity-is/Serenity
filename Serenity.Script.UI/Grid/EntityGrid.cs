@@ -278,7 +278,7 @@ namespace Serenity
             if (itemType == GetItemType())
                 return GetEntityDialogType();
 
-            return GridUtils.FindDialogTypeFor(itemType);
+            return DialogTypeRegistry.Get(itemType);
         }
 
         protected virtual Type GetEntityDialogType()
@@ -290,7 +290,7 @@ namespace Serenity
                     entityDialogType = attributes[0].As<DialogTypeAttribute>().Value;
                 else
                 {
-                    entityDialogType = GridUtils.FindDialogTypeFor(GetEntityType());
+                    entityDialogType = DialogTypeRegistry.Get(GetEntityType());
                 }
             }
 

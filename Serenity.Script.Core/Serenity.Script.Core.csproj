@@ -37,12 +37,14 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Attribute\ColumnsKeyAttribute.cs" />
+    <Compile Include="Attribute\EnumKeyAttribute.cs" />
     <Compile Include="Attribute\EditorAttribute.cs" />
     <Compile Include="Attribute\ElementAttribute.cs" />
     <Compile Include="Attribute\DialogTypeAttribute.cs" />
     <Compile Include="Attribute\FormKeyAttribute.cs" />
     <Compile Include="Attribute\ItemNameAttribute.cs" />
     <Compile Include="Attribute\LocalTextPrefixAttribute.cs" />
+    <Compile Include="Attribute\OptionAttribute.cs" />
     <Compile Include="Attribute\ServiceAttribute.cs" />
     <Compile Include="Attribute\EntityTypeAttribute.cs" />
     <Compile Include="Attribute\IdPropertyAttribute.cs" />
@@ -72,6 +74,13 @@
     <Compile Include="Q\Q.Text.cs" />
     <Compile Include="Q\Q.UrlUtils.cs" />
     <Compile Include="ScriptContext.cs" />
+    <Compile Include="SlickGrid\Formatters\CheckboxFormatter.cs" />
+    <Compile Include="SlickGrid\Formatters\EnumFormatter.cs" />
+    <Compile Include="SlickGrid\Formatters\EnumTypeRegistry.cs" />
+    <Compile Include="SlickGrid\Formatters\NumberFormatter.cs" />
+    <Compile Include="SlickGrid\Formatters\DateTimeFormatter.cs" />
+    <Compile Include="SlickGrid\Formatters\ISlickFormatter.cs" />
+    <Compile Include="SlickGrid\Formatters\DateFormatter.cs" />
     <Compile Include="SlickGrid\SlickTreeHelper.cs" />
     <Compile Include="SlickGrid\LazyLoadHelper.cs" />
     <Compile Include="SlickGrid\SlickColumnHelper.cs" />

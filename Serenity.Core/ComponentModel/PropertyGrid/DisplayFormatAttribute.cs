@@ -1,14 +1,14 @@
-using System;
+﻿using System;
 
-namespace Serenity.Data.Mapping
+namespace Serenity.ComponentModel
 {
     public class DisplayFormatAttribute : Attribute
     {
         public DisplayFormatAttribute(string value)
         {
-            this.Value = value;
+            Value = value;
         }
 
-        public string Value { get; set; }
+        public string Value { get; private set; }
     }
 }

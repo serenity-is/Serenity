@@ -3,11 +3,17 @@ using System.Collections.Generic;
 
 namespace Serenity.ComponentModel
 {
-    public class EditorTypeAttribute : EditorTypeAttributeBase
+    public class EditorTypeAttribute : Attribute
     {
-        public EditorTypeAttribute(string editorType)
-            : base(editorType)
+        protected EditorTypeAttribute(string type)
+        {
+            EditorType = type;
+        }
+
+        public virtual void SetParams(IDictionary<string, object> editorParams)
         {
         }
+
+        public string EditorType { get; private set; }
     }
 }

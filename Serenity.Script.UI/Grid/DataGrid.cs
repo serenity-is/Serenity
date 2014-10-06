@@ -610,12 +610,12 @@ namespace Serenity
             #pragma warning disable 618
             var columnItems = GetPropertyItems();
             #pragma warning restore 618
-            return GridUtils.PropertyItemsToSlickColumns(columnItems);
+            return PropertyItemSlickConverter.ToSlickColumns(columnItems);
         }
 
         protected virtual List<SlickColumn> PropertyItemsToSlickColumns(List<PropertyItem> propertyItems)
         {
-            var columns = GridUtils.PropertyItemsToSlickColumns(propertyItems);
+            var columns = PropertyItemSlickConverter.ToSlickColumns(propertyItems);
 
             if (propertyItems != null)
             {

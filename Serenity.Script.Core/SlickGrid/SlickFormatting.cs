@@ -6,19 +6,17 @@ namespace Serenity
     public static class SlickFormatting
     {
         public static string GetEnumText<TEnum>(this TEnum value)
+            where TEnum: struct
         {
-            var key = System.Enum.ToString(typeof (TEnum), value.As<System.Enum>());
-            return GetEnumText(typeof (TEnum).Name, key);
+            return EnumFormatter.GetText<TEnum>(value);
         }
 
-        public static string GetEnumText(string enumKey, string enumValue)
+        public static string GetEnumText(string enumKey, string name)
         {
-            if (Script.IsValue(enumValue))
-                return Q.HtmlEncode(Q.Text("Enums." + enumKey + "." + enumValue));
-            else
-                return "";
+            return EnumFormatter.GetText(enumKey, name);
         }
 
+        [Obsolete("Use EnumFormatter. This might not function properly!")]
         public static SlickFormatter Enum(string enumKey)
         {
             return delegate(SlickFormatterContext ctx)
@@ -59,35 +57,13 @@ namespace Serenity
             };
         }
 
-        private static string FormatDate(object value, string format)
-        {
-            if (!Script.IsValue(value))
-                return "";
-
-            JsDate date;
-
-            if (Script.TypeOf(value) == "date")
-                date = value.As<JsDate>();
-            else if (Script.TypeOf(value) == "string")
-            {
-                date = Q.Externals.ParseISODateTime(value.As<string>());
-                if (date == null)
-                    return Q.HtmlEncode(value.As<string>());
-            }
-            else
-                return value.ToString();
-
-            return Q.HtmlEncode(Q.FormatDate(date, format));
-
-        }
-
         public static SlickFormatter Date(string format = null)
         {
             format = format ?? Q.Culture.DateFormat;
 
             return delegate(SlickFormatterContext ctx)
             {
-                return Q.HtmlEncode(FormatDate(ctx.Value, format));
+                return Q.HtmlEncode(DateFormatter.Format(ctx.Value, format));
             };
         }
 
@@ -97,7 +73,7 @@ namespace Serenity
 
             return delegate(SlickFormatterContext ctx)
             {
-                return Q.HtmlEncode(FormatDate(ctx.Value, format));
+                return Q.HtmlEncode(DateFormatter.Format(ctx.Value, format));
             };
         }
 
@@ -110,19 +86,7 @@ namespace Serenity
         {
             return delegate(SlickFormatterContext ctx)
             {
-                var value = ctx.Value;
-                if (!Script.IsValue(ctx.Value) ||
-                    Double.IsNaN(value.As<double>()))
-                    return "";
-
-                if (Script.TypeOf(value) == "number")
-                    return Q.HtmlEncode(Q.FormatNumber(value.As<double>(), format));
-
-                var dbl = Q.ParseDecimal(value.ToString());
-                if (dbl == null)
-                    return "";
-
-                return Q.HtmlEncode(value.ToString());
+                return NumberFormatter.Format(ctx.Value, format);
             };
         }
 

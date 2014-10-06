@@ -70,6 +70,11 @@ namespace Serenity
         public SlickColumnFormatter Formatter { get; set; }
 
         /// <summary>
+        /// My extension to access source PropertyItem object if available
+        /// </summary>
+        public PropertyItem SourceItem { get; set; }
+
+        /// <summary>
         /// My hack to allow formatters with single argument and intellisen
         /// </summary>
         public SlickFormatter Format { get; set; }

@@ -2,6 +2,7 @@
 namespace Serenity.Localization
 {
     using Localization;
+    using Serenity.ComponentModel;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -20,6 +21,9 @@ namespace Serenity.Localization
                 {
                     if (type.IsEnum)
                     {
+                        var enumKeyAttr = type.GetCustomAttribute<EnumKeyAttribute>();
+                        var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : type.FullName;
+
                         foreach (var name in Enum.GetNames(type))
                         {
                             var member = type.GetMember(name);
@@ -28,7 +32,7 @@ namespace Serenity.Localization
 
                             var descAttr = member[0].GetCustomAttribute<DescriptionAttribute>();
                             if (descAttr != null)
-                                provider.Add(languageID, "Enums." + type.Name + "." + name, descAttr.Description);
+                                provider.Add(languageID, "Enums." + enumKey + "." + name, descAttr.Description);
                         }
                     }
                 }

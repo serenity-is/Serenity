@@ -52,6 +52,10 @@
     <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
     <Compile Include="FilterPanel\FilterPanel.cs" />
+    <Compile Include="Grid\ReflectionOptionsSetter.cs" />
+    <Compile Include="Grid\PropertyItemSlickConverter.cs" />
+    <Compile Include="Grid\FormatterTypeRegistry.cs" />
+    <Compile Include="Grid\DialogTypeRegistry.cs" />
     <Compile Include="Grid\DataGrid.cs" />
     <Compile Include="Grid\PopupToolButton.cs" />
     <Compile Include="Grid\PopupMenuButton.cs" />
@@ -88,7 +92,6 @@
     <Compile Include="PropertyGrid\Attributes\CssClassAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\DisplayNameAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\PlaceholderAttribute.cs" />
-    <Compile Include="PropertyGrid\Attributes\OptionAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorOptionAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />

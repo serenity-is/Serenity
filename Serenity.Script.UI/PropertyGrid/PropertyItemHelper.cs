@@ -137,23 +137,6 @@ namespace Serenity
                     et.SetParams(pi.EditorParams);
                 }
 
-                if (enumType != null)
-                {
-                    //List<string[]> options = new List<string[]>();
-                    //foreach (var val in Enum.GetValues(enumType))
-                    //{
-                    //    string key = Enum.GetName(enumType, val);
-                    //    string text = ValueFormatters.FormatEnum(enumType, val);
-                    //    options.Add(new string[] { key, text });
-                    //}
-                    //if (memberType == typeof(DayOfWeek)) // şimdilik tek bir özel durum
-                    //{
-                    //    options.Add(options[0]);
-                    //    options.RemoveAt(0);
-                    //}
-                    //pi.EditorParams["items"] = options.ToArray();
-                }
-
                 var reqAttr = member.GetCustomAttributes(typeof(RequiredAttribute), true);
                 if (reqAttr.Length > 0)
                     pi.Required = reqAttr[0].As<RequiredAttribute>().IsRequired;
