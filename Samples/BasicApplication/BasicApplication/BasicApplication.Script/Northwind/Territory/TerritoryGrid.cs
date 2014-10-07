@@ -7,27 +7,15 @@ namespace BasicApplication.Northwind
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
-    [IdProperty("ID"), NameProperty("TerritoryID")]
+    [ColumnsKey("Northwind.Territory"), IdProperty("ID"), NameProperty("TerritoryID")]
     [DialogType(typeof(TerritoryDialog)), LocalTextPrefix("Northwind.Territory"), Service("Northwind/Territory")]
-    public class TerritoryGrid : EntityGrid<TerritoryRow>
+    public class TerritoryGrid : EntityGrid<TerritoryRow>, IAsyncInit
     {
         private LookupEditor region;
 
         public TerritoryGrid(jQueryObject container)
             : base(container)
         {
-        }
-
-        [Obsolete]
-        protected override List<SlickColumn> GetColumns()
-        {
-            var columns = base.GetColumns();
-
-            columns.Add(new SlickColumn { Field = "TerritoryID", Width = 100, Format = ItemLink() });
-            columns.Add(new SlickColumn { Field = "TerritoryDescription", Width = 200, Format = ItemLink() });
-            columns.Add(new SlickColumn { Field = "RegionDescription", Width = 150 });
-
-            return columns;
         }
 
         protected override void CreateToolbarExtensions()
