@@ -46,7 +46,7 @@ namespace @(Model.RootNamespace)@(dotModule).Endpoints
             return new MyRepository().Retrieve(connection, request);
         }
 
-        public ListResponse<MyRow> List(IDbConnection cnn, ListRequest request)
+        public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
             return new MyRepository().List(connection, request);
         }

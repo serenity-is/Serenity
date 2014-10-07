@@ -179,7 +179,7 @@ WriteLiteral(@"        public RetrieveResponse<MyRow> Retrieve(IDbConnection con
             return new MyRepository().Retrieve(connection, request);
         }
 
-        public ListResponse<MyRow> List(IDbConnection cnn, ListRequest request)
+        public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
             return new MyRepository().List(connection, request);
         }

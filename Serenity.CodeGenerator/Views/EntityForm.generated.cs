@@ -63,12 +63,12 @@ WriteLiteral("namespace ");
             #line default
             #line hidden
 WriteLiteral(".Forms\r\n{\r\n    using Serenity;\r\n    using Serenity.ComponentModel;\r\n    using Ser" +
-"enity.Data;\r\n    using System;\r\n    using System.Collections.Generic;\r\n    using" +
-" System.IO;\r\n\r\n    [FormScript(\"");
+"enity.Data;\r\n    using System;\r\n    using System.ComponentModel;\r\n    using Syst" +
+"em.Collections.Generic;\r\n    using System.IO;\r\n\r\n    [FormScript(\"");
 
 
             
-            #line 15 "..\..\Views\EntityForm.cshtml"
+            #line 16 "..\..\Views\EntityForm.cshtml"
              Write(moduleDot);
 
             
@@ -76,7 +76,7 @@ WriteLiteral(".Forms\r\n{\r\n    using Serenity;\r\n    using Serenity.Component
             #line hidden
 
             
-            #line 15 "..\..\Views\EntityForm.cshtml"
+            #line 16 "..\..\Views\EntityForm.cshtml"
                          Write(Model.ClassName);
 
             
@@ -86,7 +86,7 @@ WriteLiteral("\")]\r\n    [BasedOnRow(typeof(Entities.");
 
 
             
-            #line 16 "..\..\Views\EntityForm.cshtml"
+            #line 17 "..\..\Views\EntityForm.cshtml"
                             Write(Model.RowClassName);
 
             
@@ -96,7 +96,7 @@ WriteLiteral("))]\r\n    public class ");
 
 
             
-            #line 17 "..\..\Views\EntityForm.cshtml"
+            #line 18 "..\..\Views\EntityForm.cshtml"
              Write(Model.ClassName);
 
             
@@ -104,14 +104,14 @@ WriteLiteral("))]\r\n    public class ");
             #line hidden
 
             
-            #line 17 "..\..\Views\EntityForm.cshtml"
+            #line 18 "..\..\Views\EntityForm.cshtml"
                                    WriteLiteral("Form\r\n    {");
 
             
             #line default
             #line hidden
             
-            #line 18 "..\..\Views\EntityForm.cshtml"
+            #line 19 "..\..\Views\EntityForm.cshtml"
       foreach (var x in Model.Fields)
     {
         if (x.Ident != Model.IdField)
@@ -123,7 +123,7 @@ WriteLiteral("\r\n        public ");
 
 
             
-            #line 22 "..\..\Views\EntityForm.cshtml"
+            #line 23 "..\..\Views\EntityForm.cshtml"
           Write(x.Type);
 
             
@@ -133,7 +133,7 @@ WriteLiteral(" ");
 
 
             
-            #line 22 "..\..\Views\EntityForm.cshtml"
+            #line 23 "..\..\Views\EntityForm.cshtml"
                   Write(x.Ident);
 
             
@@ -143,7 +143,7 @@ WriteLiteral(" { get; set; }");
 
 
             
-            #line 22 "..\..\Views\EntityForm.cshtml"
+            #line 23 "..\..\Views\EntityForm.cshtml"
                                                     }
     }
 

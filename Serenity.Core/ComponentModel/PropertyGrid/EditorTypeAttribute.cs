@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
 {
     public class EditorTypeAttribute : Attribute
     {
-        protected EditorTypeAttribute(string type)
+        public EditorTypeAttribute(string type)
         {
             EditorType = type;
         }

@@ -63,12 +63,12 @@ WriteLiteral("namespace ");
             #line default
             #line hidden
 WriteLiteral(".Forms\r\n{\r\n    using Serenity;\r\n    using Serenity.ComponentModel;\r\n    using Ser" +
-"enity.Data;\r\n    using System;\r\n    using System.Collections.Generic;\r\n    using" +
-" System.IO;\r\n\r\n    [ColumnsScript(\"");
+"enity.Data;\r\n    using System;\r\n    using System.ComponentModel;\r\n    using Syst" +
+"em.Collections.Generic;\r\n    using System.IO;\r\n\r\n    [ColumnsScript(\"");
 
 
             
-            #line 15 "..\..\Views\EntityColumns.cshtml"
+            #line 16 "..\..\Views\EntityColumns.cshtml"
                 Write(moduleDot);
 
             
@@ -76,7 +76,7 @@ WriteLiteral(".Forms\r\n{\r\n    using Serenity;\r\n    using Serenity.Component
             #line hidden
 
             
-            #line 15 "..\..\Views\EntityColumns.cshtml"
+            #line 16 "..\..\Views\EntityColumns.cshtml"
                             Write(Model.ClassName);
 
             
@@ -86,7 +86,7 @@ WriteLiteral("\")]\r\n    [BasedOnRow(typeof(Entities.");
 
 
             
-            #line 16 "..\..\Views\EntityColumns.cshtml"
+            #line 17 "..\..\Views\EntityColumns.cshtml"
                             Write(Model.RowClassName);
 
             
@@ -96,7 +96,7 @@ WriteLiteral("))]\r\n    public class ");
 
 
             
-            #line 17 "..\..\Views\EntityColumns.cshtml"
+            #line 18 "..\..\Views\EntityColumns.cshtml"
              Write(Model.ClassName);
 
             
@@ -104,14 +104,14 @@ WriteLiteral("))]\r\n    public class ");
             #line hidden
 
             
-            #line 17 "..\..\Views\EntityColumns.cshtml"
+            #line 18 "..\..\Views\EntityColumns.cshtml"
                                    WriteLiteral("Columns\r\n    {");
 
             
             #line default
             #line hidden
             
-            #line 18 "..\..\Views\EntityColumns.cshtml"
+            #line 19 "..\..\Views\EntityColumns.cshtml"
       foreach (var x in Model.Fields) {
         var attrs = new List<string>();
         if (x.Ident == Model.IdField) {
@@ -131,7 +131,7 @@ WriteLiteral("\r\n        [");
 
 
             
-            #line 30 "..\..\Views\EntityColumns.cshtml"
+            #line 31 "..\..\Views\EntityColumns.cshtml"
     Write(string.Join(", ", attrs));
 
             
@@ -141,7 +141,7 @@ WriteLiteral("]");
 
 
             
-            #line 30 "..\..\Views\EntityColumns.cshtml"
+            #line 31 "..\..\Views\EntityColumns.cshtml"
                                           }
             
             #line default
@@ -150,7 +150,7 @@ WriteLiteral("\r\n        public ");
 
 
             
-            #line 31 "..\..\Views\EntityColumns.cshtml"
+            #line 32 "..\..\Views\EntityColumns.cshtml"
           Write(x.Type);
 
             
@@ -160,7 +160,7 @@ WriteLiteral(" ");
 
 
             
-            #line 31 "..\..\Views\EntityColumns.cshtml"
+            #line 32 "..\..\Views\EntityColumns.cshtml"
                   Write(x.Ident);
 
             
@@ -170,7 +170,7 @@ WriteLiteral(" { get; set; }");
 
 
             
-            #line 31 "..\..\Views\EntityColumns.cshtml"
+            #line 32 "..\..\Views\EntityColumns.cshtml"
                                                     }
 
             
