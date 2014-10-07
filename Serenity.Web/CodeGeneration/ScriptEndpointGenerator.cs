@@ -18,21 +18,32 @@ namespace Serenity.CodeGeneration
         public Func<Type, bool> IsEndpoint { get; set; }
         public Func<Type, string> GetNamespace { get; set; }
         public Func<Type, string> GetServiceUrl { get; set; }
+        public HashSet<string> RootNamespaces { get; private set; }
 
         public ScriptEndpointGenerator(Assembly assembly)
         {
             if (assembly == null)
                 throw new ArgumentNullException("assembly");
 
+            RootNamespaces = new HashSet<string> { };
+
             this.Assembly = assembly;
         }
 
-        public string Generate()
+        public SortedDictionary<string, string> GenerateCode()
         {
             var endpointCodes = new Dictionary<Type, string>();
             var usedNamespaces = new HashSet<string>();
             var sb = new StringBuilder();
             var cw = new CodeWriter(sb, 4);
+            var result = new SortedDictionary<string, string>();
+
+            Func<Type, string> getClassName = (t) => {
+                string className = t.Name;
+                if (className.EndsWith("Controller"))
+                    className = className.Substring(0, className.Length - 10);
+                return className;
+            };
 
             foreach (var type in this.Assembly.GetTypes())
             {
@@ -45,9 +56,7 @@ namespace Serenity.CodeGeneration
                 if (this.IsEndpoint != null && !this.IsEndpoint(type))
                     continue;
 
-                string className = type.Name;
-                if (className.EndsWith("Controller"))
-                    className = className.Substring(0, className.Length - 10);
+                var className = getClassName(type);
 
                 string ns = GetNamespace != null ? GetNamespace(type) : type.Namespace;
 
@@ -127,7 +136,7 @@ namespace Serenity.CodeGeneration
                 if (hasAnyMethod)
                 {
                     endpointCodes.Add(type, sb.ToString());
-                    usedNamespaces.Add(ns);
+                    //usedNamespaces.Add(ns);
                 }
 
                 sb.Clear();
@@ -138,30 +147,53 @@ namespace Serenity.CodeGeneration
             usedNamespaces.Add("System.Collections");
             usedNamespaces.Add("System.Collections.Generic");
 
-            foreach (var ns in usedNamespaces)
-            {
-                cw.Indented("using ");
-                sb.Append(ns);
-                sb.AppendLine(";");
-            }
-
-            sb.AppendLine();
             var ordered = endpointCodes.Keys.OrderBy(x => GetNamespace != null ? GetNamespace(x) : x.Namespace).ThenBy(x => x.Name);
             var byNameSpace = ordered.ToLookup(x => GetNamespace != null ? GetNamespace(x) : x.Namespace);
 
+            sb.Clear();
+
             foreach (var ns in byNameSpace.ToArray().OrderBy(x => x.Key))
             {
-                sb.AppendLine();
-                cw.Indented("namespace ");
-                sb.AppendLine(ns.Key);
-                cw.InBrace(delegate
+                Action<Type> outputType = delegate(Type type)
                 {
-                    foreach (var type in ns)
+                    var filename = ns.Key + "." + getClassName(type) + "Service.cs";
+
+                    foreach (var rn in RootNamespaces)
+                    {
+                        if (filename.StartsWith(rn + "."))
+                            filename = filename.Substring(rn.Length + 1);
+                    }
+
+                    result.Add(filename, sb.ToString());
+                };
+
+                foreach (var type in ns)
+                {
+                    foreach (var nsStr in usedNamespaces)
+                    {
+                        cw.Indented("using ");
+                        sb.Append(nsStr);
+                        sb.AppendLine(";");
+                    }
+
+                    sb.AppendLine();
+
+                    cw.Indented("namespace ");
+                    sb.AppendLine(ns.Key);
+
+                    cw.InBrace(delegate
+                    {
+
                         cw.IndentedMultiLine(endpointCodes[type]);
-                });
+                    });
+
+                    outputType(type);
+
+                    sb.Clear();
+                }
             }
 
-            return sb.ToString();
+            return result;
         }
     }
 }

@@ -12,11 +12,21 @@
 <#@ include file="..\MultipleOutputHelper.ttinclude" #>
 <#@ output extension=".log" #>
 <# 
-    var generator = new ScriptDtoGenerator(typeof(BasicApplication.SiteInitialization).Assembly);
-    generator.RootNamespaces.Add("BasicApplication");
-    var codes = generator.GenerateCode();
     var manager = Manager.Create(Host, GenerationEnvironment);
-    foreach (var pair in codes) 
+
+	var contractGenerator = new ScriptDtoGenerator(typeof(BasicApplication.SiteInitialization).Assembly);
+    contractGenerator.RootNamespaces.Add("BasicApplication");
+    var contractCodes = contractGenerator.GenerateCode();
+    
+
+    var endpointGenerator = new ScriptEndpointGenerator(typeof(BasicApplication.SiteInitialization).Assembly);
+    endpointGenerator.IsEndpoint = type => type.Namespace.EndsWith(".Endpoints");
+    endpointGenerator.GetNamespace = type => type.Namespace.Substring(0, type.Namespace.Length - (".Endpoints").Length);
+    endpointGenerator.GetServiceUrl = type => { var ns = type.Namespace; ns = ns.Substring(0, ns.Length - (".Endpoints").Length); ns = ns.Substring("BasicApplication.".Length); if (ns == "Common") return ""; return ns; };
+	endpointGenerator.RootNamespaces.Add("BasicApplication");
+    var endpointCodes = endpointGenerator.GenerateCode();
+    
+    foreach (var pair in contractCodes) 
     {
         manager.StartNewFile(pair.Key);
 #>
@@ -24,6 +34,16 @@
 <# 
         manager.EndBlock(); 
     }
+	
+	foreach (var pair in endpointCodes) 
+    {
+        manager.StartNewFile(pair.Key);
+#>
+<#=pair.Value#>
+<# 
+        manager.EndBlock(); 
+    }
+
     manager.Process(true);
 #>
 Executed on <#=DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")#>

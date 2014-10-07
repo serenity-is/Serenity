@@ -81,50 +81,89 @@
     <Compile Include="Imports\ServiceContracts\Administration.UserRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
+    <Compile Include="Imports\ServiceContracts\Administration.UserService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\ServiceContracts\Membership.LoginRequest.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.CategoryRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.CategoryService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.CustomerCustomerDemoRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.CustomerCustomerDemoService.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.CustomerDemographicRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.CustomerDemographicService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.CustomerRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.CustomerService.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.EmployeeRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.EmployeeService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.EmployeeTerritoryRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.EmployeeTerritoryService.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.OrderDetailRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.OrderDetailService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.OrderRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.OrderService.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.ProductRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.ProductService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.RegionRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.RegionService.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.ShipperRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.ShipperService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.SupplierRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Northwind.SupplierService.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Northwind.TerritoryRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
-    <Compile Include="Imports\ServiceEndpoints\ServiceEndpoints.cs">
-      <DependentUpon>ServiceEndpoints.tt</DependentUpon>
+    <Compile Include="Imports\ServiceContracts\Northwind.TerritoryService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Membership\LoginPanel.cs" />
     <Compile Include="Northwind\Shared\PhoneEditor.cs" />
@@ -178,15 +217,6 @@
     <None Include="Imports\ServiceContracts\ServiceContracts.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ServiceContracts.log</LastGenOutput>
-    </None>
-    <None Include="Imports\ServiceEndpoints\ServiceEndpoints.log">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ServiceEndpoints.tt</DependentUpon>
-    </None>
-    <None Include="Imports\ServiceEndpoints\ServiceEndpoints.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ServiceEndpoints.log</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
