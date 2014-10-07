@@ -56,6 +56,7 @@ namespace Serenity.Services
                         parameters[uowParam.ParameterName] = uow;
                         var result = base.InvokeActionMethod(controllerContext, actionDescriptor, parameters);
                         uow.Commit();
+                        return result;
                     }
                 }
                 

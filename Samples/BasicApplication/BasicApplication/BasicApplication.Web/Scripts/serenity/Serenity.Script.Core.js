@@ -809,6 +809,14 @@
 	$Texts$Dialogs.__typeName = 'Texts$Dialogs';
 	global.Texts$Dialogs = $Texts$Dialogs;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.BooleanFormatter
+	var $Serenity_BooleanFormatter = function() {
+		this.$1$FalseTextField = null;
+		this.$1$TrueTextField = null;
+	};
+	$Serenity_BooleanFormatter.__typeName = 'Serenity.BooleanFormatter';
+	global.Serenity.BooleanFormatter = $Serenity_BooleanFormatter;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.CheckboxFormatter
 	var $Serenity_CheckboxFormatter = function() {
 	};
@@ -1614,9 +1622,48 @@
 	ss.initClass($Texts$Controls$QuickSearch, $asm, {});
 	ss.initClass($Texts$Dialogs, $asm, {});
 	ss.initInterface($Serenity_ISlickFormatter, $asm, { format: null });
+	ss.initClass($Serenity_BooleanFormatter, $asm, {
+		format: function(ctx) {
+			if (!ss.isValue(ctx.value)) {
+				return '';
+			}
+			if (!!ctx.value) {
+				var $t2 = $Q.tryGetText(this.get_trueText());
+				if (ss.isNullOrUndefined($t2)) {
+					var $t1 = this.get_trueText();
+					if (ss.isNullOrUndefined($t1)) {
+						$t1 = ss.coalesce($Q.tryGetText('Forms.YesButton'), 'Yes');
+					}
+					$t2 = $t1;
+				}
+				return $Q.htmlEncode($t2);
+			}
+			var $t4 = $Q.tryGetText(this.get_falseText());
+			if (ss.isNullOrUndefined($t4)) {
+				var $t3 = this.get_falseText();
+				if (ss.isNullOrUndefined($t3)) {
+					$t3 = ss.coalesce($Q.tryGetText('Forms.NoButton'), 'No');
+				}
+				$t4 = $t3;
+			}
+			return $Q.htmlEncode($t4);
+		},
+		get_falseText: function() {
+			return this.$1$FalseTextField;
+		},
+		set_falseText: function(value) {
+			this.$1$FalseTextField = value;
+		},
+		get_trueText: function() {
+			return this.$1$TrueTextField;
+		},
+		set_trueText: function(value) {
+			this.$1$TrueTextField = value;
+		}
+	}, null, [$Serenity_ISlickFormatter]);
 	ss.initClass($Serenity_CheckboxFormatter, $asm, {
 		format: function(ctx) {
-			return '<span class="check-box no-float ' + (!!ctx.value ? ' checked' : '') + '"></span>';
+			return '<span class="check-box no-float readonly ' + (!!ctx.value ? ' checked' : '') + '"></span>';
 		}
 	}, null, [$Serenity_ISlickFormatter]);
 	ss.initClass($Serenity_ColumnsKeyAttribute, $asm, {
@@ -1765,6 +1812,7 @@
 	ss.initClass($Serenity_SlickTreeHelper, $asm, {});
 	ss.initClass($Serenity_TabsExtensions, $asm, {});
 	ss.initClass($Serenity_ComponentModel_OptionAttribute, $asm, {});
+	ss.setMetadata($Serenity_BooleanFormatter, { members: [{ attr: [new $Serenity_ComponentModel_OptionAttribute()], name: 'FalseText', type: 16, returnType: String, getter: { name: 'get_FalseText', type: 8, sname: 'get_falseText', returnType: String, params: [] }, setter: { name: 'set_FalseText', type: 8, sname: 'set_falseText', returnType: Object, params: [String] } }, { attr: [new $Serenity_ComponentModel_OptionAttribute()], name: 'TrueText', type: 16, returnType: String, getter: { name: 'get_TrueText', type: 8, sname: 'get_trueText', returnType: String, params: [] }, setter: { name: 'set_TrueText', type: 8, sname: 'set_trueText', returnType: Object, params: [String] } }] });
 	ss.setMetadata($Serenity_DateFormatter, { members: [{ attr: [new $Serenity_ComponentModel_OptionAttribute()], name: 'DisplayFormat', type: 16, returnType: String, getter: { name: 'get_DisplayFormat', type: 8, sname: 'get_displayFormat', returnType: String, params: [] }, setter: { name: 'set_DisplayFormat', type: 8, sname: 'set_displayFormat', returnType: Object, params: [String] } }] });
 	ss.setMetadata($Serenity_EnumFormatter, { members: [{ attr: [new $Serenity_ComponentModel_OptionAttribute()], name: 'EnumKey', type: 16, returnType: String, getter: { name: 'get_EnumKey', type: 8, sname: 'get_enumKey', returnType: String, params: [] }, setter: { name: 'set_EnumKey', type: 8, sname: 'set_enumKey', returnType: Object, params: [String] } }] });
 	ss.setMetadata($Serenity_NumberFormatter, { members: [{ attr: [new $Serenity_ComponentModel_OptionAttribute()], name: 'DisplayFormat', type: 16, returnType: String, getter: { name: 'get_DisplayFormat', type: 8, sname: 'get_displayFormat', returnType: String, params: [] }, setter: { name: 'set_DisplayFormat', type: 8, sname: 'set_displayFormat', returnType: Object, params: [String] } }] });

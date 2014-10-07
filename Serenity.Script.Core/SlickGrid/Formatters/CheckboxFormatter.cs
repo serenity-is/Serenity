@@ -7,7 +7,7 @@ namespace Serenity
     {
         public string Format(SlickFormatterContext ctx)
         {
-            return "<span class=\"check-box no-float " + (Q.IsTrue(ctx.Value) ? " checked" : "") + "\"></span>";
+            return "<span class=\"check-box no-float readonly " + (Q.IsTrue(ctx.Value) ? " checked" : "") + "\"></span>";
         }
     }
 }

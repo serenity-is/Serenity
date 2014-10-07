@@ -1,51 +1,43 @@
 ﻿
-
 namespace BasicApplication.Northwind.Endpoints
 {
-    using Serenity;
+    using Serenity.Data;
     using Serenity.Services;
+    using System.Data;
     using System.Web.Mvc;
     using MyRepository = Repositories.OrderDetailRepository;
     using MyRow = Entities.OrderDetailRow;
 
-    [ServiceAuthorize]
     [RoutePrefix("Services/Northwind/OrderDetail"), Route("{action}")]
-    public class OrderDetailController : Controller
+    [ConnectionKey("Default"), ServiceAuthorize("Northwind")]
+    public class OrderDetailController : ServiceEndpoint
     {
-        [AcceptVerbs("POST"), JsonFilter]
-        public Result<SaveResponse> Create(SaveRequest<MyRow> request)
+        [HttpPost]
+        public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return this.InTransaction("Default", (uow) => new MyRepository().Create(uow, request));
+            return new MyRepository().Create(uow, request);
         }
 
-        [AcceptVerbs("POST"), JsonFilter]
-        public Result<SaveResponse> Update(SaveRequest<MyRow> request)
+        [HttpPost]
+        public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
-            return this.InTransaction("Default", (uow) => new MyRepository().Update(uow, request));
-        }
- 
-        [AcceptVerbs("POST"), JsonFilter]
-        public Result<DeleteResponse> Delete(DeleteRequest request)
-        {
-            return this.InTransaction("Default", (uow) => new MyRepository().Delete(uow, request));
+            return new MyRepository().Update(uow, request);
         }
 
-        [AcceptVerbs("POST"), JsonFilter]
-        public Result<UndeleteResponse> Undelete(UndeleteRequest request)
+        [HttpPost]
+        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
         {
-            return this.InTransaction("Default", (uow) => new MyRepository().Undelete(uow, request));
+            return new MyRepository().Delete(uow, request);
         }
 
-        [AcceptVerbs("GET", "POST"), JsonFilter]
-        public Result<RetrieveResponse<MyRow>> Retrieve(RetrieveRequest request)
+        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
         {
-            return this.UseConnection("Default", (cnn) => new MyRepository().Retrieve(cnn, request));
+            return new MyRepository().Retrieve(connection, request);
         }
 
-        [AcceptVerbs("GET", "POST"), JsonFilter]
-        public Result<ListResponse<MyRow>> List(ListRequest request)
+        public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
         {
-            return this.UseConnection("Default", (cnn) => new MyRepository().List(cnn, request));
+            return new MyRepository().List(connection, request);
         }
     }
 }

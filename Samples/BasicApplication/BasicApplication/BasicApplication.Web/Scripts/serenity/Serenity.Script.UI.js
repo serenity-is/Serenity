@@ -1455,7 +1455,7 @@
 		};
 		ss.registerGenericClassInstance($type, $Serenity_EntityDialog$2, [TEntity, TOptions], {
 			initializeAsync: function(complete, fail) {
-				ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).prototype.initializeAsync.call(this, ss.mkdel(this, function() {
+				ss.makeGenericType($Serenity_TemplatedDialog$1, [TOptions]).prototype.initializeAsync.call(this, ss.mkdel(this, function() {
 					this.$initPropertyGrid$1(ss.mkdel(this, function() {
 						this.$initLocalizationGrid$1(complete, fail);
 					}), fail);
@@ -3506,7 +3506,7 @@
 		};
 		ss.registerGenericClassInstance($type, $Serenity_PropertyDialog$2, [TEntity, TOptions], {
 			initializeAsync: function(complete, fail) {
-				ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).prototype.initializeAsync.call(this, ss.mkdel(this, function() {
+				ss.makeGenericType($Serenity_TemplatedDialog$1, [TOptions]).prototype.initializeAsync.call(this, ss.mkdel(this, function() {
 					this.$initPropertyGrid$1(Q.tryCatchDelegate(fail, ss.mkdel(this, function() {
 						this.loadInitialEntity();
 						complete();
@@ -4713,12 +4713,9 @@
 			this.toolbar = null;
 			ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).call(this, div, opt);
 			this.isPanel = ss.getAttributes(ss.getInstanceType(this), $Serenity_PanelAttribute, true).length > 0;
-			if (!this.isPanel) {
-				this.initDialog();
+			if (!this.isAsyncWidget()) {
+				this.$initTemplatedDialog();
 			}
-			this.initValidator();
-			this.initTabs();
-			this.initToolbar();
 		};
 		$type.$ctor1 = function(opt) {
 			$type.$ctor2.call(this, Q.newBodyDiv(), opt);
@@ -4761,6 +4758,20 @@
 			}
 		};
 		ss.registerGenericClassInstance($type, $Serenity_TemplatedDialog$1, [TOptions], {
+			initializeAsync: function(complete, fail) {
+				ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).prototype.initializeAsync.call(this, Q.tryCatchDelegate(fail, ss.mkdel(this, function() {
+					this.$initTemplatedDialog();
+					complete();
+				})), fail);
+			},
+			$initTemplatedDialog: function() {
+				if (!this.isPanel) {
+					this.initDialog();
+				}
+				this.initValidator();
+				this.initTabs();
+				this.initToolbar();
+			},
 			destroy: function() {
 				if (ss.isValue(this.tabs)) {
 					this.tabs.tabs('destroy');

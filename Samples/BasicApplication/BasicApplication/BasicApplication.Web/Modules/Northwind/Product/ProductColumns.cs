@@ -13,7 +13,7 @@ namespace BasicApplication.Northwind.Forms
         public String ProductID { get; set; }
         [EditLink, Width(250)]
         public String ProductName { get; set; }
-        [Width(40)] // make it checkbox
+        [Width(40)]
         public Boolean Discontinued { get; set; }
         [Width(200)]
         public String SupplierCompanyName { get; set; }

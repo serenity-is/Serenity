@@ -1134,6 +1134,9 @@ textarea,
   float: none;
   display: inline-block;
 }
+.check-box.readonly {
+    cursor: default;
+}
 .s-CheckTreeEditor.s-DataGrid .grid-container {
   height: 130px;
 }
