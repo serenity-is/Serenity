@@ -207,7 +207,7 @@ WriteLiteral("Dialog : EntityDialog<");
             
             #line default
             #line hidden
-WriteLiteral(">\r\n    {\r\n    }\r\n}");
+WriteLiteral(">, IAsyncInit\r\n    {\r\n    }\r\n}");
 
 
         }

@@ -12,30 +12,18 @@ namespace @(Model.RootNamespace)@(dotModule)
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
-    [IdProperty("@Model.Identity")@if (Model.NameField != null){<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
+    [ColumnsKey("@(moduleDot)@(Model.ClassName)"), IdProperty("@Model.Identity")@if (Model.NameField != null){<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
     [DialogType(typeof(@(Model.ClassName)Dialog)), LocalTextPrefix("@(moduleDot)@(Model.ClassName)"), Service("@(moduleSlash)@(Model.ClassName)")]
-    public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>
+    public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>, IAsyncInit
     {
         public @(Model.ClassName)Grid(jQueryObject container)
             : base(container)
         {
         }
-
-        protected override List<SlickColumn> GetColumns()
-        {
-            var columns = base.GetColumns();
-
-            columns.Add(new SlickColumn { Field = "@(Model.Identity)", Width = 65, CssClass = "align-right", Title = Q.Text("Db.Shared.RecordId") });@if (Model.NameField != null) {<text>
-            columns.Add(new SlickColumn { Field = "@(Model.NameField)", Width = 250, Format = ItemLink() });</text>}
-@foreach (var x in Model.Fields) { if (x.Ident != Model.NameField && x.Ident != Model.Identity) {<text>
-            columns.Add(new SlickColumn { Field = "@(x.Ident)", Width = 80 });</text>}}
-
-
-            return columns;
-        }
     }
 
-    [Imported, Serializable, PreserveMemberCase]
+    // Please remove this partial class or the first line below, after you run ScriptContexts.tt
+    [Imported, Serializable, PreserveMemberCase] 
     public partial class @(Model.ClassName)Row
     {
     }

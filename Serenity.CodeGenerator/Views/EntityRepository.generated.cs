@@ -81,26 +81,82 @@ WriteLiteral(";\r\n\r\n    public class ");
             
             #line default
             #line hidden
-WriteLiteral("Repository\r\n    {\r\n        private static MyRow.RowFields fld { get { return MyRo" +
-"w.Fields; } }\r\n\r\n        public SaveResponse Create(IUnitOfWork uow, SaveRequest" +
-"<MyRow> request)\r\n        {\r\n            return new MySaveHandler().Process(uow," +
-" request, SaveRequestType.Create);\r\n        }\r\n\r\n        public SaveResponse Upd" +
-"ate(IUnitOfWork uow, SaveRequest<MyRow> request)\r\n        {\r\n            return " +
-"new MySaveHandler().Process(uow, request, SaveRequestType.Update);\r\n        }\r\n\r" +
-"\n        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)\r\n " +
-"       {\r\n            return new MyDeleteHandler().Process(uow, request);\r\n     " +
-"   }\r\n\r\n        public UndeleteResponse Undelete(IUnitOfWork uow, UndeleteReques" +
-"t request)\r\n        {\r\n            return new MyUndeleteHandler().Process(uow, r" +
-"equest);\r\n        }\r\n\r\n        public RetrieveResponse<MyRow> Retrieve(IDbConnec" +
-"tion connection, RetrieveRequest request)\r\n        {\r\n            return new MyR" +
-"etrieveHandler().Process(connection, request);\r\n        }\r\n\r\n        public List" +
-"Response<MyRow> List(IDbConnection connection, ListRequest request)\r\n        {\r\n" +
-"            return new MyListHandler().Process(connection, request);\r\n        }\r" +
-"\n\r\n        private class MySaveHandler : SaveRequestHandler<MyRow> { }\r\n        " +
-"private class MyDeleteHandler : DeleteRequestHandler<MyRow> { }\r\n        private" +
-" class MyUndeleteHandler : UndeleteRequestHandler<MyRow> { }\r\n        private cl" +
-"ass MyRetrieveHandler : RetrieveRequestHandler<MyRow> { }\r\n        private class" +
-" MyListHandler : ListRequestHandler<MyRow> { }\r\n    }\r\n}");
+WriteLiteral(@"Repository
+    {
+        private static MyRow.RowFields fld { get { return MyRow.Fields; } }
+
+        public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
+        {
+            return new MySaveHandler().Process(uow, request, SaveRequestType.Create);
+        }
+
+        public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
+        {
+            return new MySaveHandler().Process(uow, request, SaveRequestType.Update);
+        }
+
+        public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
+        {
+            return new MyDeleteHandler().Process(uow, request);
+        }
+
+");
+
+
+            
+            #line 32 "..\..\Views\EntityRepository.cshtml"
+ if (Model.IsActiveField != null) {
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        public UndeleteResponse Undelete(IUnitOfWork uow, UndeleteRequest request" +
+")\r\n        {\r\n            return new MyUndeleteHandler().Process(uow, request);\r" +
+"\n        }\r\n");
+
+WriteLiteral("\r\n");
+
+
+            
+            #line 38 "..\..\Views\EntityRepository.cshtml"
+}
+
+            
+            #line default
+            #line hidden
+WriteLiteral(@"        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
+        {
+            return new MyRetrieveHandler().Process(connection, request);
+        }
+
+        public ListResponse<MyRow> List(IDbConnection connection, ListRequest request)
+        {
+            return new MyListHandler().Process(connection, request);
+        }
+
+        private class MySaveHandler : SaveRequestHandler<MyRow> { }
+        private class MyDeleteHandler : DeleteRequestHandler<MyRow> { }
+");
+
+
+            
+            #line 51 "..\..\Views\EntityRepository.cshtml"
+ if (Model.IsActiveField != null) {
+            
+            #line default
+            #line hidden
+WriteLiteral("\r\n        private class MyUndeleteHandler : UndeleteRequestHandler<MyRow> { }\r\n");
+
+
+            
+            #line 53 "..\..\Views\EntityRepository.cshtml"
+       }
+
+            
+            #line default
+            #line hidden
+WriteLiteral("        private class MyRetrieveHandler : RetrieveRequestHandler<MyRow> { }\r\n    " +
+"    private class MyListHandler : ListRequestHandler<MyRow> { }\r\n    }\r\n}");
 
 
         }

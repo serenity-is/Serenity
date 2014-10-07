@@ -19,8 +19,8 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     using Serenity.Data;
     using Serenity.Data.Mapping;
     using System;
-    using System.IO;
     using System.ComponentModel;
+    using System.IO;
 
     [ConnectionKey("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), TwoLevelCached]
     [ReadPermission("@Model.Permission")]
@@ -100,6 +100,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 <text>
             public readonly @(y.Type)Field @(jf(x.Name, y.Ident));</text>}</text>
 }
+
 
             public RowFields()
                 : base("@Model.Tablename"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))

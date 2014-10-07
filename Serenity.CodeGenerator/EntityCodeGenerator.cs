@@ -56,6 +56,7 @@ namespace Serenity.CodeGenerator
 
             GenerateRow();
             GenerateCss();
+            GenerateColumns(); 
             GenerateForm();
             GenerateRepository();
             GenerateEndpoint();
@@ -195,6 +196,20 @@ namespace Serenity.CodeGenerator
             AddFileToProject(siteWebProj, relativeFile);
         }
 
+        private void GenerateColumns()
+        {
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityColumns(), new
+            {
+                ClassName = model.ClassName,
+                RowClassName = model.RowClassName,
+                Module = model.Module,
+                RootNamespace = model.RootNamespace,
+                Fields = model.Fields,
+                IdField = model.Identity,
+                NameField = model.NameField
+            }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
+        }
+
         private void GenerateForm()
         {
             CreateNewSiteWebFile(Templates.Render(new Views.EntityForm(), new 
@@ -204,7 +219,8 @@ namespace Serenity.CodeGenerator
                 Module = model.Module,
                 RootNamespace = model.RootNamespace,
                 Fields = model.Fields,
-                IdField = model.Identity
+                IdField = model.Identity,
+                NameField = model.NameField
             }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
         }
 
@@ -216,7 +232,8 @@ namespace Serenity.CodeGenerator
                 ClassName = model.ClassName,
                 RowClassName = model.RowClassName,
                 Module = model.Module,
-                Permission = model.Permission
+                Permission = model.Permission,
+                IsActiveField = model.IsActiveField
             }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Repository.cs"))));
         }
 
@@ -229,7 +246,8 @@ namespace Serenity.CodeGenerator
                 ClassName = model.ClassName,
                 RowClassName = model.RowClassName,
                 Module = model.Module,
-                Permission = model.Permission
+                Permission = model.Permission,
+                IsActiveField = model.IsActiveField
             }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Endpoint.cs"))));
         }
 

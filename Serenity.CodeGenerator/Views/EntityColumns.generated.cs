@@ -17,11 +17,11 @@ namespace Serenity.CodeGenerator.Views
     using System.Text;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
-    public partial class EntityForm : RazorGenerator.Templating.RazorTemplateBase
+    public partial class EntityColumns : RazorGenerator.Templating.RazorTemplateBase
     {
 #line hidden
 
-        #line 2 "..\..\Views\EntityForm.cshtml"
+        #line 2 "..\..\Views\EntityColumns.cshtml"
  public dynamic Model { get; set; } 
         #line default
         #line hidden
@@ -35,7 +35,7 @@ WriteLiteral("\r\n");
 
 
             
-            #line 2 "..\..\Views\EntityForm.cshtml"
+            #line 2 "..\..\Views\EntityColumns.cshtml"
                                                    
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
@@ -48,7 +48,7 @@ WriteLiteral("namespace ");
 
 
             
-            #line 6 "..\..\Views\EntityForm.cshtml"
+            #line 6 "..\..\Views\EntityColumns.cshtml"
       Write(Model.RootNamespace);
 
             
@@ -56,7 +56,7 @@ WriteLiteral("namespace ");
             #line hidden
 
             
-            #line 6 "..\..\Views\EntityForm.cshtml"
+            #line 6 "..\..\Views\EntityColumns.cshtml"
                             Write(dotModule);
 
             
@@ -68,7 +68,7 @@ WriteLiteral(".Forms\r\n{\r\n    using Serenity;\r\n    using Serenity.Component
 
 
             
-            #line 15 "..\..\Views\EntityForm.cshtml"
+            #line 15 "..\..\Views\EntityColumns.cshtml"
                 Write(moduleDot);
 
             
@@ -76,7 +76,7 @@ WriteLiteral(".Forms\r\n{\r\n    using Serenity;\r\n    using Serenity.Component
             #line hidden
 
             
-            #line 15 "..\..\Views\EntityForm.cshtml"
+            #line 15 "..\..\Views\EntityColumns.cshtml"
                             Write(Model.ClassName);
 
             
@@ -86,7 +86,7 @@ WriteLiteral("\")]\r\n    [BasedOnRow(typeof(Entities.");
 
 
             
-            #line 16 "..\..\Views\EntityForm.cshtml"
+            #line 16 "..\..\Views\EntityColumns.cshtml"
                             Write(Model.RowClassName);
 
             
@@ -96,7 +96,7 @@ WriteLiteral("))]\r\n    public class ");
 
 
             
-            #line 17 "..\..\Views\EntityForm.cshtml"
+            #line 17 "..\..\Views\EntityColumns.cshtml"
              Write(Model.ClassName);
 
             
@@ -104,14 +104,14 @@ WriteLiteral("))]\r\n    public class ");
             #line hidden
 
             
-            #line 17 "..\..\Views\EntityForm.cshtml"
+            #line 17 "..\..\Views\EntityColumns.cshtml"
                                    WriteLiteral("Columns\r\n    {");
 
             
             #line default
             #line hidden
             
-            #line 18 "..\..\Views\EntityForm.cshtml"
+            #line 18 "..\..\Views\EntityColumns.cshtml"
       foreach (var x in Model.Fields)
     {
         var attrs = new List<string>();
@@ -131,7 +131,7 @@ WriteLiteral("\r\n        [");
 
 
             
-            #line 30 "..\..\Views\EntityForm.cshtml"
+            #line 30 "..\..\Views\EntityColumns.cshtml"
     Write(string.Join(", ", attrs));
 
             
@@ -141,7 +141,7 @@ WriteLiteral("]");
 
 
             
-            #line 30 "..\..\Views\EntityForm.cshtml"
+            #line 30 "..\..\Views\EntityColumns.cshtml"
                                           }
             
             #line default
@@ -150,7 +150,7 @@ WriteLiteral("\r\n        public ");
 
 
             
-            #line 31 "..\..\Views\EntityForm.cshtml"
+            #line 31 "..\..\Views\EntityColumns.cshtml"
           Write(x.Type);
 
             
@@ -160,7 +160,7 @@ WriteLiteral(" ");
 
 
             
-            #line 31 "..\..\Views\EntityForm.cshtml"
+            #line 31 "..\..\Views\EntityColumns.cshtml"
                   Write(x.Ident);
 
             
@@ -170,7 +170,7 @@ WriteLiteral(" { get; set; }");
 
 
             
-            #line 31 "..\..\Views\EntityForm.cshtml"
+            #line 31 "..\..\Views\EntityColumns.cshtml"
                                                     }
 
             

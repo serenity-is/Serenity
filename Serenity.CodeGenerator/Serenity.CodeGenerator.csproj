@@ -120,6 +120,11 @@
     <Compile Include="GeneratorModels.cs" />
     <Compile Include="SqlSchemaInfo.cs" />
     <Compile Include="Templates.cs" />
+    <Compile Include="Views\EntityColumns.generated.cs">
+      <DependentUpon>EntityColumns.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Views\EntityEndpoint.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -214,6 +219,10 @@
     <None Include="SampleTemplate.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SampleTemplate.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityColumns.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityColumns.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityCss.cshtml">
       <Generator>RazorGenerator</Generator>
