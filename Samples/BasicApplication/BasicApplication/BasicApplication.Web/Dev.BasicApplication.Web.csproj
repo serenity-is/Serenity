@@ -753,6 +753,9 @@
     <Compile Include="Modules\Northwind\Customer\CustomerColumns.cs" />
     <Compile Include="Modules\Northwind\Customer\CustomerCountryLookup.cs" />
     <Compile Include="Modules\Northwind\Product\ProductColumns.cs" />
+    <Compile Include="Modules\Northwind\Region\RegionColumns.cs" />
+    <Compile Include="Modules\Northwind\Shipper\ShipperColumns.cs" />
+    <Compile Include="Modules\Northwind\Supplier\SupplierColumns.cs" />
     <Compile Include="Modules\Northwind\Supplier\SupplierCountryLookup.cs" />
     <Compile Include="Modules\Texts.cs" />
     <Compile Include="Modules\Membership\Account\AccountPage.cs" />

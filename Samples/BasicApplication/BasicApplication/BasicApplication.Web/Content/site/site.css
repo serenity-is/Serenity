@@ -1223,3 +1223,85 @@ a,
 .s-OrderDialog .categories {
   height: 260px;
 }
+/* ------------------------------------------------------------------------- */
+/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
+/* ------------------------------------------------------------------------- */
+.s-CategoryDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-CategoryDialog .tab-pane {
+  height: auto;
+}
+.s-CategoryDialog .caption {
+  width: 150px;
+}
+.s-CategoryDialog .editor {
+  width: 400px;
+}
+.s-CategoryDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-CategoryDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-CategoryDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-CategoryDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-CategoryDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-CategoryDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-CategoryDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-CategoryDialog .s-PropertyGrid .categories {
+  height: 260px;
+}
+/* ------------------------------------------------------------------------- */
+/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */
+/* ------------------------------------------------------------------------- */
+.s-CategoryDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-CategoryDialog .tab-pane {
+  height: auto;
+}
+.s-CategoryDialog .caption {
+  width: 150px;
+}
+.s-CategoryDialog .editor {
+  width: 400px;
+}
+.s-CategoryDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-CategoryDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-CategoryDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-CategoryDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-CategoryDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-CategoryDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-CategoryDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-CategoryDialog .s-PropertyGrid .categories {
+  height: 260px;
+}

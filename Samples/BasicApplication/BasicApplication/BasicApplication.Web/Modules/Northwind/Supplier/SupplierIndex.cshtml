@@ -7,8 +7,7 @@
 
 <script type="text/javascript">
     jQuery(function () {
-        new BasicApplication.Northwind.SupplierGrid($('#GridDiv'), {
-        });
+        new BasicApplication.Northwind.SupplierGrid($('#GridDiv'), {}).init();
 
         Q.initFullHeightGridPage($('#GridDiv'));
     });

@@ -4082,6 +4082,14 @@
 		}
 		result.name = $t1;
 		result.cssClass = item.cssClass;
+		if (ss.isValue(item.alignment) && item.alignment.length > 0) {
+			if (!Q.isEmptyOrNull(result.cssClass)) {
+				result.cssClass += ' align-' + item.alignment;
+			}
+			else {
+				result.cssClass = 'align-' + item.alignment;
+			}
+		}
 		result.width = (ss.isValue(item.width) ? item.width : 80);
 		result.minWidth = ((!ss.isValue(item.minWidth) || item.minWidth === 0) ? 30 : item.minWidth);
 		result.maxWidth = ((!ss.isValue(item.maxWidth) || item.maxWidth === 0) ? null : item.maxWidth);

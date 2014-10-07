@@ -9,7 +9,7 @@ namespace BasicApplication.Northwind.Forms
     [BasedOnRow(typeof(Entities.CategoryRow))]
     public class CategoryColumns
     {
-        [EditLink, CssClass("align-right"), DisplayName("Db.Shared.RecordId")]
+        [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
         public Int32 CategoryID { get; set; }
         [EditLink, Width(250)]
         public String CategoryName { get; set; }

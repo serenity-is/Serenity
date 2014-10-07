@@ -9,25 +9,24 @@ namespace BasicApplication.Northwind.Forms
     [BasedOnRow(typeof(Entities.ProductRow))]
     public class ProductColumns
     {
-        [EditLink, CssClass("align-right"), DisplayName("Db.Shared.RecordId"), Width(55)]
+        [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
         public String ProductID { get; set; }
         [EditLink, Width(250)]
         public String ProductName { get; set; }
-        [Width(40)]
         public Boolean Discontinued { get; set; }
-        [Width(200)]
+        [EditLink(ItemType = "Northwind.Supplier", IdField = "SupplierID")]
         public String SupplierCompanyName { get; set; }
-        [Width(200)]
+        [EditLink(ItemType = "Northwind.Category", IdField = "CategoryID"), Width(150)]
         public String CategoryName { get; set; }
         [Width(130)]
         public String QuantityPerUnit { get; set; }
-        [CssClass("align-right"), Width(80)]
+        [Width(80), AlignRight]
         public Decimal UnitPrice { get; set; }
-        [CssClass("align-right"), Width(80)]
+        [Width(80), AlignRight]
         public Int16 UnitsInStock { get; set; }
-        [CssClass("align-right"), Width(80)]
+        [Width(80), AlignRight]
         public Int16 UnitsOnOrder { get; set; }
-        [CssClass("align-right"), Width(80)]
+        [Width(80), AlignRight]
         public Int16 ReorderLevel { get; set; }
     }
 }
