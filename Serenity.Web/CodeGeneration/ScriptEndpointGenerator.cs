@@ -169,20 +169,19 @@ namespace Serenity.CodeGeneration
 
                 foreach (var type in ns)
                 {
-                    foreach (var nsStr in usedNamespaces)
-                    {
-                        cw.Indented("using ");
-                        sb.Append(nsStr);
-                        sb.AppendLine(";");
-                    }
-
-                    sb.AppendLine();
-
                     cw.Indented("namespace ");
                     sb.AppendLine(ns.Key);
 
                     cw.InBrace(delegate
                     {
+                        foreach (var nsStr in usedNamespaces)
+                        {
+                            cw.Indented("using ");
+                            sb.Append(nsStr);
+                            sb.AppendLine(";");
+                        }
+
+                        sb.AppendLine();
 
                         cw.IndentedMultiLine(endpointCodes[type]);
                     });

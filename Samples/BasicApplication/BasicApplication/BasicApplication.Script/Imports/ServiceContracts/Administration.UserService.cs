@@ -1,10 +1,10 @@
-using Serenity;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
 namespace BasicApplication.Administration
 {
+    using Serenity;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     public partial class UserService
     {
         public static void Create(SaveRequest<UserRow> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)

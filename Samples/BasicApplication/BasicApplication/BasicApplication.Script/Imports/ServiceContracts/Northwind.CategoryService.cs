@@ -1,10 +1,10 @@
-using Serenity;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
 namespace BasicApplication.Northwind
 {
+    using Serenity;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     public partial class CategoryService
     {
         public static void Create(SaveRequest<CategoryRow> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)
