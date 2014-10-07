@@ -18,8 +18,9 @@ namespace @(Model.RootNamespace)@(dotModule).Forms
     {@foreach (var x in Model.Fields) {
         var attrs = new List<string>();
         if (x.Ident == Model.IdField) {
-            attrs.Add("DisplayName(\"Db.Shared.RecordId\")");
             attrs.Add("EditLink");
+            attrs.Add("DisplayName(\"Db.Shared.RecordId\")");
+            attrs.Add("AlignRight");
         }
         else if (x.Ident == Model.NameField) {
             attrs.Add("EditLink");

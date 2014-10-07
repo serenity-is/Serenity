@@ -26,6 +26,8 @@ namespace Serenity
 
         public string FormatterType { get; set; }
         public JsDictionary FormatterParams { get; set; }
+        public string DisplayFormat { get; set; }
+        public string Alignment { get; set; }
         public int Width { get; set; }
         public int MinWidth { get; set; }
         public int MaxWidth { get; set; }

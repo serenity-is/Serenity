@@ -49,6 +49,8 @@ namespace Serenity.ComponentModel
         public Dictionary<string, object> FormatterParams { get; set; }
         [JsonProperty("displayFormat")]
         public string DisplayFormat { get; set; }
+        [JsonProperty("alignment")]
+        public string Alignment { get; set; }
         [JsonProperty("width")]
         public int Width { get; set; }
         [JsonProperty("minWidth")]

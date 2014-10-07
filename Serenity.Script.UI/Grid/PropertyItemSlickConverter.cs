@@ -26,6 +26,15 @@ namespace Serenity
             result.Field = item.Name;
             result.Title = Q.TryGetText(item.Title) ?? item.Title;
             result.CssClass = item.CssClass;
+            
+            if (Script.IsValue(item.Alignment) && item.Alignment.Length > 0)
+            {
+                if (!result.CssClass.IsEmptyOrNull())
+                    result.CssClass += " align-" + item.Alignment;
+                else
+                    result.CssClass = "align-" + item.Alignment;
+            }
+
             result.Width = Script.IsValue(item.Width) ? item.Width : 80;
             result.MinWidth = (!Script.IsValue(item.MinWidth) || item.MinWidth == 0) ? 30 : item.MinWidth;
             result.MaxWidth = (!Script.IsValue(item.MaxWidth) || item.MaxWidth == 0) ? null : (int?)item.MaxWidth;

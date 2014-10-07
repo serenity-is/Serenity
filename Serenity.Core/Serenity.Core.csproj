@@ -41,6 +41,9 @@
     <Compile Include="ComponentModel\Extensibility\ColumnsScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\EnumKeyAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\BasicFormatterTypes.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\AlignRightAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\AlignmentAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\AlignCenterAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\DisplayFormatAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\FormatterOptionAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\FormatterTypeAttribute.cs" />

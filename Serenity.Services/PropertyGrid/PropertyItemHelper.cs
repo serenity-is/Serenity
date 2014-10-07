@@ -117,6 +117,10 @@ namespace Serenity.PropertyGrid
                 if (cssClassAttr != null)
                     pi.CssClass = cssClassAttr.CssClass;
 
+                var alignmentAttr = (AlignmentAttribute)getAttribute(typeof(AlignmentAttribute));
+                if (alignmentAttr != null)
+                    pi.Alignment = alignmentAttr.Value;
+
                 if (getAttribute(typeof(OneWayAttribute)) != null)
                     pi.OneWay = true;
 
