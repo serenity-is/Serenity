@@ -262,8 +262,7 @@
   </Target>
   -->
   <Target Name="AfterBuild">
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\site\$(AssemblyName).js">
-    </Copy>
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\site\$(AssemblyName).js"></Copy>
     <Copy SourceFiles="$(SolutionDir)..\..\Serenity.Script.Core\Resources\mscorlib.js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\Saltarelle\mscorlib.js" />
     <Copy SourceFiles="$(SolutionDir)..\..\Serenity.Script.Core\Resources\linq.js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\Saltarelle\linq.js" />
     <Copy SourceFiles="$(SolutionDir)..\..\Serenity.Script.Core\bin\$(ConfigurationName)\Serenity.Script.Core.js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\Serenity\Serenity.Script.Core.js" />

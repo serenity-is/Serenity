@@ -147,7 +147,7 @@ WriteLiteral(@"Controller : ServiceEndpoint
         [HttpPost]
         public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
         {
-            return new MyRepository().Delete(uow, request));
+            return new MyRepository().Delete(uow, request);
         }
 
 ");

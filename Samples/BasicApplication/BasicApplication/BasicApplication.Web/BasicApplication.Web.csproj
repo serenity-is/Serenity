@@ -61,7 +61,6 @@
     <Reference Include="Serenity.Web">
       <HintPath>..\..\packages\Serenity.Web.1.2.1\lib\net45\Serenity.Web.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -100,7 +99,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
-    <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Start\NorthwindDBScript.sql" />
@@ -766,7 +764,10 @@
     <Compile Include="Modules\Common\Navigation\NavigationItems.cs" />
     <Compile Include="Modules\Common\Navigation\NavigationModel.cs" />
     <Compile Include="Modules\Northwind.DynamicScripts.cs" />
+    <Compile Include="Modules\Northwind\Category\CategoryColumns.cs" />
+    <Compile Include="Modules\Northwind\Customer\CustomerColumns.cs" />
     <Compile Include="Modules\Northwind\Customer\CustomerCountryLookup.cs" />
+    <Compile Include="Modules\Northwind\Product\ProductColumns.cs" />
     <Compile Include="Modules\Northwind\Supplier\SupplierCountryLookup.cs" />
     <Compile Include="Modules\Texts.cs" />
     <Compile Include="Modules\Membership\Account\AccountPage.cs" />

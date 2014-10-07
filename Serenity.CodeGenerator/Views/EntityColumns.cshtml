@@ -15,8 +15,7 @@ namespace @(Model.RootNamespace)@(dotModule).Forms
     [ColumnsScript("@(moduleDot)@(Model.ClassName)")]
     [BasedOnRow(typeof(Entities.@(Model.RowClassName)))]
     public class @(Model.ClassName)Columns
-    {@foreach (var x in Model.Fields)
-    {
+    {@foreach (var x in Model.Fields) {
         var attrs = new List<string>();
         if (x.Ident == Model.IdField) {
             attrs.Add("DisplayName(\"Db.Shared.RecordId\")");
@@ -29,7 +28,6 @@ namespace @(Model.RootNamespace)@(dotModule).Forms
         {<text>
         [@string.Join(", ", attrs)]</text>}<text>
         public @x.Type @x.Ident { get; set; }</text>}
-    }
 
     }
 }

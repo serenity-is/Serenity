@@ -207,7 +207,7 @@ namespace Serenity.CodeGenerator
                 Fields = model.Fields,
                 IdField = model.Identity,
                 NameField = model.NameField
-            }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
+            }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Columns.cs"))));
         }
 
         private void GenerateForm()

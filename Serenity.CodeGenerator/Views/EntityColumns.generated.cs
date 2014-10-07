@@ -112,8 +112,7 @@ WriteLiteral("))]\r\n    public class ");
             #line hidden
             
             #line 18 "..\..\Views\EntityColumns.cshtml"
-      foreach (var x in Model.Fields)
-    {
+      foreach (var x in Model.Fields) {
         var attrs = new List<string>();
         if (x.Ident == Model.IdField) {
             attrs.Add("DisplayName(\"Db.Shared.RecordId\")");
@@ -131,7 +130,7 @@ WriteLiteral("\r\n        [");
 
 
             
-            #line 30 "..\..\Views\EntityColumns.cshtml"
+            #line 29 "..\..\Views\EntityColumns.cshtml"
     Write(string.Join(", ", attrs));
 
             
@@ -141,7 +140,7 @@ WriteLiteral("]");
 
 
             
-            #line 30 "..\..\Views\EntityColumns.cshtml"
+            #line 29 "..\..\Views\EntityColumns.cshtml"
                                           }
             
             #line default
@@ -150,7 +149,7 @@ WriteLiteral("\r\n        public ");
 
 
             
-            #line 31 "..\..\Views\EntityColumns.cshtml"
+            #line 30 "..\..\Views\EntityColumns.cshtml"
           Write(x.Type);
 
             
@@ -160,7 +159,7 @@ WriteLiteral(" ");
 
 
             
-            #line 31 "..\..\Views\EntityColumns.cshtml"
+            #line 30 "..\..\Views\EntityColumns.cshtml"
                   Write(x.Ident);
 
             
@@ -170,13 +169,13 @@ WriteLiteral(" { get; set; }");
 
 
             
-            #line 31 "..\..\Views\EntityColumns.cshtml"
+            #line 30 "..\..\Views\EntityColumns.cshtml"
                                                     }
 
             
             #line default
             #line hidden
-WriteLiteral("    }\r\n\r\n    }\r\n}");
+WriteLiteral("\r\n    }\r\n}");
 
 
         }
