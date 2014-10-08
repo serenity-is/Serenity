@@ -20,7 +20,7 @@ namespace Serenity
 
         private List<Widget> editors;
         private List<PropertyItem> items;
-        private Queue<Tuple<Widget, Action>> asyncInitList;
+        private List<Promise> asyncInitList;
 
         public PropertyGrid(jQueryObject div, PropertyGridOptions opt)
             : base(div, opt)
@@ -59,7 +59,7 @@ namespace Serenity
 
             string priorCategory = null;
 
-            asyncInitList = new Queue<Tuple<Widget, Action>>();
+            asyncInitList = new List<Promise>();
 
             for (int i = 0; i < items.Count; i++)
             {
@@ -84,46 +84,17 @@ namespace Serenity
             UpdateReadOnly();
         }
 
-        protected override void InitializeAsync(Action complete, Action<object> fail)
+        protected override Promise InitializeAsync()
         {
-            base.InitializeAsync(delegate()
+            return base.InitializeAsync().ThenAwait(() =>
             {
-                Action initNext = null;
+                var promise = Promise.Void;
+                
+                foreach (var k in asyncInitList)
+                    promise = promise.ThenAwait(() => k);
 
-                initNext = fail.TryCatchDelegate(delegate()
-                {
-                    if (asyncInitList.Count == 0)
-                    {
-                        complete();
-                        return;
-                    }
-
-                    var item = asyncInitList.Dequeue();
-
-                    item.Item1.Init(delegate(Widget w)
-                    {
-                        fail.TryCatch(delegate()
-                        {
-                            item.Item2();
-                            initNext();
-                        });
-                    }, error =>
-                    {
-                        asyncInitList.Clear();
-
-                        if (fail != null)
-                        {
-                            fail(error);
-                            return;
-                        }
-
-                        throw new Exception(error.ToString());
-                    });
-                });
-
-                initNext();
-
-            }, fail);
+                return promise;
+            });
         }
 
         public override void Destroy()
@@ -294,7 +265,7 @@ namespace Serenity
 
             if (item.EditorParams != null)
             {
-                asyncInitList.Enqueue(new Tuple<Widget, Action>(editor, delegate
+                asyncInitList.Add(editor.Initialize().Then(delegate()
                 {
                     ReflectionOptionsSetter.Set(editor, item.EditorParams);
                 }));

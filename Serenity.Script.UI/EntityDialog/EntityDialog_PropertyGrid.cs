@@ -25,28 +25,20 @@ namespace Serenity
             propertyGrid = new PropertyGrid(pgDiv, pgOptions);
         }
 
-        private void InitPropertyGrid(Action complete, Action<object> fail)
+        private Promise InitPropertyGridAsync()
         {
-            fail.TryCatch(delegate()
+            return Promise.Void.ThenAwait(() =>
             {
                 var pgDiv = this.ById("PropertyGrid");
                 if (pgDiv.Length <= 0)
-                {
-                    complete();
-                    return;
-                }
+                    return Promise.Void;
 
-                GetPropertyGridOptions(pgOptions =>
-                {
-                    fail.TryCatch(delegate()
+                return GetPropertyGridOptionsAsync()
+                    .ThenAwait(pgOptions =>
                     {
                         propertyGrid = new PropertyGrid(pgDiv, pgOptions);
-                        propertyGrid.Init(pg =>
-                        {
-                            complete();
-                        }, fail);
+                        return propertyGrid.Initialize();
                     });
-                }, fail);
             });
         }
 
@@ -71,28 +63,28 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected virtual void GetPropertyGridOptions(Action<PropertyGridOptions> complete, Action<object> fail)
+        protected virtual Promise<PropertyGridOptions> GetPropertyGridOptionsAsync()
         {
-            GetPropertyItems(propertyItems =>
+            return new Promise<PropertyGridOptions>((done, fail) =>
             {
-                fail.TryCatch(delegate() 
+                GetPropertyItemsAsync().Then(propertyItems =>
                 {
-                    complete(new PropertyGridOptions
+                    done(new PropertyGridOptions
                     {
                         IdPrefix = this.idPrefix,
                         Items = propertyItems,
                         Mode = PropertyGridMode.Insert
                     });
                 });
-            }, fail);
+            });
         }
 
-        protected virtual void GetPropertyItems(Action<List<PropertyItem>> complete, Action<object> fail)
+        protected virtual Promise<List<PropertyItem>> GetPropertyItemsAsync()
         {
-            fail.TryCatch(delegate()
+            return new Promise<List<PropertyItem>>((done, fail) => 
             {
                 var formKey = GetFormKey();
-                Q.GetForm(formKey, complete, fail);
+                Q.GetFormAsync(formKey).Then(done, fail);
             });
         }
     }

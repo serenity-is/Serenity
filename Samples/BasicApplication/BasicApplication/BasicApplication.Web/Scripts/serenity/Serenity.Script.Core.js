@@ -340,40 +340,38 @@
 	$Q.getRemoteData = function(key) {
 		return $Q$ScriptData.ensure('RemoteData.' + key);
 	};
-	$Q.getRemoteData$1 = function(key, complete, fail) {
-		$Q$ScriptData.ensure$1('RemoteData.' + key, complete, fail);
+	$Q.getRemoteDataAsync = function(key) {
+		return $Q$ScriptData.ensureAsync('RemoteData.' + key);
 	};
 	$Q.getLookup = function(key) {
 		return $Q$ScriptData.ensure('Lookup.' + key);
 	};
-	$Q.getLookup$1 = function(key, complete, fail) {
-		$Q$ScriptData.ensure$1('Lookup.' + key, complete, fail);
+	$Q.getLookupAsync = function(key) {
+		return $Q$ScriptData.ensureAsync('Lookup.' + key);
 	};
 	$Q.reloadLookup = function(key) {
 		$Q$ScriptData.reload('Lookup.' + key);
 	};
-	$Q.reloadLookup$1 = function(key, complete, fail) {
-		$Q$ScriptData.reload$1('Lookup.' + key, function(o) {
-			complete();
-		}, fail);
+	$Q.reloadLookupAsync = function(key) {
+		return $Q$ScriptData.reloadAsync('Lookup.' + key);
 	};
 	$Q.getColumns = function(key) {
 		return $Q$ScriptData.ensure('Columns.' + key);
 	};
-	$Q.getColumns$1 = function(key, complete, fail) {
-		$Q$ScriptData.ensure$1('Columns.' + key, complete, fail);
+	$Q.getColumnsAsync = function(key) {
+		return $Q$ScriptData.ensureAsync('Columns.' + key);
 	};
 	$Q.getForm = function(key) {
 		return $Q$ScriptData.ensure('Form.' + key);
 	};
-	$Q.getForm$1 = function(key, complete, fail) {
-		$Q$ScriptData.ensure$1('Form.' + key, complete, fail);
+	$Q.getFormAsync = function(key) {
+		return $Q$ScriptData.ensureAsync('Form.' + key);
 	};
 	$Q.getTemplate = function(key) {
 		return $Q$ScriptData.ensure('Template.' + key);
 	};
-	$Q.getTemplate$1 = function(key, complete, fail) {
-		$Q$ScriptData.ensure$1('Template.' + key, complete, fail);
+	$Q.getTemplateAsync = function(key) {
+		return $Q$ScriptData.ensureAsync('Template.' + key);
 	};
 	$Q.canLoadScriptData = function(name) {
 		return $Q$ScriptData.canLoad(name);
@@ -660,17 +658,11 @@
 	$Q$ScriptData.$syncLoadScript = function(url) {
 		$.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
 	};
-	$Q$ScriptData.$loadScript = function(url, complete, fail) {
-		$Q.tryCatch(fail, function() {
+	$Q$ScriptData.$loadScriptAsync = function(url) {
+		return Promise.resolve().then(function() {
 			$Q.blockUI(null);
-			$.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function() {
-				$Q.blockUndo();
-			}).done(function(response) {
-				complete(response);
-			}).fail(function(response1) {
-				fail(response1);
-			});
-		});
+			return Promise.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always($Q.blockUndo));
+		}, null);
 	};
 	$Q$ScriptData.$loadScriptData = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
@@ -679,14 +671,14 @@
 		name = name + '.js?' + $Q$ScriptData.$registered[name];
 		$Q$ScriptData.$syncLoadScript($Q.resolveUrl('~/DynJS.axd/') + name);
 	};
-	$Q$ScriptData.$loadScriptData$1 = function(name, complete, fail) {
-		$Q.tryCatch(fail, function() {
+	$Q$ScriptData.$loadScriptDataAsync = function(name) {
+		return Promise.resolve().then(function() {
 			if (!ss.keyExists($Q$ScriptData.$registered, name)) {
 				throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
 			}
 			name = name + '.js?' + $Q$ScriptData.$registered[name];
-			$Q$ScriptData.$loadScript($Q.resolveUrl('~/DynJS.axd/') + name, complete, fail);
-		});
+			return $Q$ScriptData.$loadScriptAsync($Q.resolveUrl('~/DynJS.axd/') + name);
+		}, null);
 	};
 	$Q$ScriptData.ensure = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];
@@ -699,21 +691,20 @@
 		}
 		return data;
 	};
-	$Q$ScriptData.ensure$1 = function(name, complete, fail) {
-		$Q.tryCatch(fail, function() {
+	$Q$ScriptData.ensureAsync = function(name) {
+		return Promise.resolve().then(function() {
 			var data = $Q$ScriptData.$loadedData[name];
-			if (!ss.isValue(data)) {
-				$Q$ScriptData.$loadScriptData$1(name, $Q.tryCatchDelegate(fail, function() {
-					data = $Q$ScriptData.$loadedData[name];
-					if (!ss.isValue(data)) {
-						throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
-					}
-					complete(data);
-				}), fail);
-				return;
+			if (ss.isValue(data)) {
+				return Promise.resolve(data);
 			}
-			complete(data);
-		});
+			return $Q$ScriptData.$loadScriptDataAsync(name).then(function() {
+				data = $Q$ScriptData.$loadedData[name];
+				if (!ss.isValue(data)) {
+					throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
+				}
+				return data;
+			}, null);
+		}, null);
 	};
 	$Q$ScriptData.reload = function(name) {
 		if (!ss.keyExists($Q$ScriptData.$registered, name)) {
@@ -724,16 +715,16 @@
 		var data = $Q$ScriptData.$loadedData[name];
 		return data;
 	};
-	$Q$ScriptData.reload$1 = function(name, complete, fail) {
-		$Q.tryCatch(fail, function() {
+	$Q$ScriptData.reloadAsync = function(name) {
+		return Promise.resolve().then(function() {
 			if (!ss.keyExists($Q$ScriptData.$registered, name)) {
 				throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
 			}
 			$Q$ScriptData.$registered[name] = (new Date()).getTime().toString();
-			$Q$ScriptData.$loadScriptData$1(name, $Q.tryCatchDelegate(fail, function() {
-				complete($Q$ScriptData.$loadedData[name]);
-			}), fail);
-		});
+			return $Q$ScriptData.$loadScriptDataAsync(name).then(function() {
+				return $Q$ScriptData.$loadedData[name];
+			}, null);
+		}, null);
 	};
 	$Q$ScriptData.canLoad = function(name) {
 		var data = $Q$ScriptData.$loadedData[name];

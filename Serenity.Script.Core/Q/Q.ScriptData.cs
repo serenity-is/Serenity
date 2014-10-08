@@ -49,13 +49,13 @@ namespace Serenity
                 });
             }
 
-            private static void LoadScript(string url, Action complete, Action<object> fail)
+            private static Promise LoadScriptAsync(string url)
             {
-                fail.TryCatch(delegate()
+                return Promise.Void.ThenAwait(() => 
                 {
                     Q.BlockUI();
 
-                    jQuery.Ajax(new jQueryAjaxOptions
+                    return Promise.Resolve(jQuery.Ajax(new jQueryAjaxOptions
                     {
                         Async = true,
                         Cache = true,
@@ -63,16 +63,7 @@ namespace Serenity
                         Url = url,
                         Data = null,
                         DataType = "script"
-                    })
-                    .Always(() => Q.BlockUndo())
-                    .Done(response =>
-                    {
-                        ((dynamic)complete)(response);
-                    })
-                    .Fail(response =>
-                    {
-                        fail(response);
-                    });
+                    }).Always(Q.BlockUndo));
                 });
             }
 
@@ -89,16 +80,16 @@ namespace Serenity
                 #pragma warning restore 618
             }
 
-            private static void LoadScriptData(string name, Action complete, Action<object> fail)
+            private static Promise LoadScriptDataAsync(string name)
             {
-                fail.TryCatch(delegate()
+                return Promise.Void.ThenAwait(() =>
                 {
                     if (!registered.ContainsKey(name))
                         throw new Exception(String.Format("Script data {0} is not found in registered script list!", name));
 
                     name = name + ".js?" + registered[name];
 
-                    LoadScript(Q.ResolveUrl("~/DynJS.axd/") + name, complete, fail);
+                    return LoadScriptAsync(Q.ResolveUrl("~/DynJS.axd/") + name);
                 });
             }
 
@@ -121,28 +112,24 @@ namespace Serenity
             }
 
             [IncludeGenericArguments(false)]
-            public static void Ensure<TData>(string name, Action<TData> complete, Action<object> fail = null)
+            public static Promise<TData> EnsureAsync<TData>(string name)
             {
-                fail.TryCatch(delegate()
+                return Promise.Void.ThenAwait(() =>
                 {
                     var data = loadedData[name].As<TData>();
 
-                    if (!Script.IsValue(data))
+                    if (Script.IsValue(data))
+                        return Promise.FromValue(data);
+
+                    return LoadScriptDataAsync(name).ThenSelect(() =>
                     {
-                        LoadScriptData(name, fail.TryCatchDelegate(delegate()
-                        {
-                            data = loadedData[name].As<TData>();
+                        data = loadedData[name].As<TData>();
 
-                            if (!Script.IsValue(data))
-                                throw new NotSupportedException(String.Format("Can't load script data: {0}!", name));
+                        if (!Script.IsValue(data))
+                            throw new NotSupportedException(String.Format("Can't load script data: {0}!", name));
 
-                            complete(data);
-                        }), fail);
-
-                        return;
-                    }
-
-                    complete(data);
+                        return data;
+                    });
                 });
             }
 
@@ -163,19 +150,17 @@ namespace Serenity
             }
 
             [IncludeGenericArguments(false)]
-            public static void Reload<TData>(string name, Action<TData> complete, Action<object> fail = null)
+            public static Promise<TData> ReloadAsync<TData>(string name)
             {
-                fail.TryCatch(delegate()
+                return Promise.Void.ThenAwait(() =>
                 {
                     if (!registered.ContainsKey(name))
                         throw new NotSupportedException(String.Format("Script data {0} is not found in registered script list!"));
 
                     registered[name] = new JsDate().GetTime().ToString();
 
-                    LoadScriptData(name, fail.TryCatchDelegate(delegate()
-                    {
-                        complete(loadedData[name].As<TData>());
-                    }), fail);
+                    return LoadScriptDataAsync(name)
+                        .ThenSelect(() => loadedData[name].As<TData>());
                 });
             }
 
@@ -213,9 +198,9 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        public static void GetRemoteData<TData>(string key, Action<TData> complete, Action<object> fail = null)
+        public static Promise<TData> GetRemoteDataAsync<TData>(string key)
         {
-            ScriptData.Ensure<TData>("RemoteData." + key, complete, fail);
+            return ScriptData.EnsureAsync<TData>("RemoteData." + key);
         }
 
         [IncludeGenericArguments(false)]
@@ -227,9 +212,9 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        public static void GetLookup<TItem>(string key, Action<Lookup<TItem>> complete, Action<object> fail = null)
+        public static Promise<Lookup<TItem>> GetLookupAsync<TItem>(string key)
         {
-            ScriptData.Ensure<Lookup<TItem>>("Lookup." + key, complete, fail);
+            return ScriptData.EnsureAsync<Lookup<TItem>>("Lookup." + key);
         }
 
         public static void ReloadLookup(string key)
@@ -239,9 +224,9 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        public static void ReloadLookup(string key, Action complete, Action<object> fail = null)
+        public static Promise ReloadLookupAsync(string key)
         {
-            ScriptData.Reload<object>("Lookup." + key, o => complete(), fail);
+            return ScriptData.ReloadAsync<object>("Lookup." + key);
         }
 
         [IncludeGenericArguments(false)]
@@ -253,9 +238,9 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        public static void GetColumns(string key, Action<List<PropertyItem>> complete, Action<object> fail = null)
+        public static Promise<List<PropertyItem>> GetColumnsAsync(string key)
         {
-            ScriptData.Ensure<List<PropertyItem>>("Columns." + key, complete, fail);
+            return ScriptData.EnsureAsync<List<PropertyItem>>("Columns." + key);
         }
 
         [IncludeGenericArguments(false)]
@@ -266,9 +251,9 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        public static void GetForm(string key, Action<List<PropertyItem>> complete, Action<object> fail = null)
+        public static Promise<List<PropertyItem>> GetFormAsync(string key)
         {
-            ScriptData.Ensure<List<PropertyItem>>("Form." + key, complete, fail);
+            return ScriptData.EnsureAsync<List<PropertyItem>>("Form." + key);
         }
 
         public static string GetTemplate(string key)
@@ -278,9 +263,9 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        public static void GetTemplate(string key, Action<string> complete, Action<object> fail = null)
+        public static Promise<string> GetTemplateAsync(string key)
         {
-            ScriptData.Ensure<string>("Template." + key, complete, fail);
+            return ScriptData.EnsureAsync<string>("Template." + key);
         }
 
         public static bool CanLoadScriptData(string name)

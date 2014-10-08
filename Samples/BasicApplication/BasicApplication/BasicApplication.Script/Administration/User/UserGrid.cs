@@ -16,7 +16,6 @@ namespace BasicApplication.Administration
         {
         }
 
-        [Obsolete]
         protected override List<SlickColumn> GetColumns()
         {
             var columns = base.GetColumns();

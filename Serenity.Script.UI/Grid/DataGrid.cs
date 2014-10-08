@@ -203,25 +203,18 @@ namespace Serenity
                 view.Populate();
         }
 
-        protected override void InitializeAsync(Action complete, Action<object> fail)
+        protected override Promise InitializeAsync()
         {
-            base.InitializeAsync(delegate()
-            {
-                GetColumns(columns => 
-                {
-                    fail.TryCatch(delegate
-                    {
-                        columns = PostProcessColumns(columns);
+            return base.InitializeAsync()
+                .ThenAwait(GetColumnsAsync)
+                .Then((columns) => {
+                    columns = PostProcessColumns(columns);
 
-                        if (this.slickGrid != null)
-                            this.slickGrid.SetColumns(columns);
+                    if (this.slickGrid != null)
+                        this.slickGrid.SetColumns(columns);
 
-                        InitialPopulate();
-
-                        complete();
-                    });
-                }, fail);
-            }, fail);
+                    InitialPopulate();
+                });
         }
 
         protected virtual SlickGrid CreateSlickGrid()
@@ -571,19 +564,16 @@ namespace Serenity
             return SlickFormatting.ItemLink(itemType, idField, text, cssClass);
         }
 
-        protected virtual void GetPropertyItems(Action<List<PropertyItem>> complete, Action<object> fail)
+        protected virtual Promise<List<PropertyItem>> GetPropertyItemsAsync()
         {
-            fail.TryCatch(delegate()
+            return Promise.Void.ThenAwait(() => 
             {
                 var attr = this.GetType().GetCustomAttributes(typeof(ColumnsKeyAttribute), true);
             
                 if (attr != null && attr.Length > 0)
-                {
-                    Q.GetColumns(attr[0].As<ColumnsKeyAttribute>().Value, complete, fail);
-                    return;
-                }
+                    return Q.GetColumnsAsync(attr[0].As<ColumnsKeyAttribute>().Value);
 
-                complete(new List<PropertyItem>());
+                return Promise.FromValue(new List<PropertyItem>());
             });
         }
 
@@ -644,16 +634,12 @@ namespace Serenity
             return columns;
         }
 
-        protected virtual void GetColumns(Action<List<SlickColumn>> complete, Action<object> fail)
+        protected virtual Promise<List<SlickColumn>> GetColumnsAsync()
         {
-            GetPropertyItems(propertyItems =>
+            return GetPropertyItemsAsync().ThenSelect(propertyItems =>
             {
-                fail.TryCatch(delegate()
-                {
-                    var columns = PropertyItemsToSlickColumns(propertyItems);
-                    complete(columns);
-                });
-            }, fail);
+                return PropertyItemsToSlickColumns(propertyItems);
+            });
         }
 
         protected virtual SlickGridOptions GetSlickOptions()

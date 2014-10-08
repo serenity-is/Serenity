@@ -43,16 +43,14 @@ namespace Serenity
             }
         }
 
-        protected override void InitializeAsync(Action complete, Action<object> fail)
+        protected override Promise InitializeAsync()
         {
-            base.InitializeAsync(delegate()
-            {
-                InitPropertyGrid(fail.TryCatchDelegate(delegate()
+            return base.InitializeAsync()
+                .ThenAwait(InitPropertyGridAsync)
+                .Then(() =>
                 {
                     LoadInitialEntity();
-                    complete();
-                }), fail);
-            }, fail);
+                });
         }
 
         protected virtual void LoadInitialEntity()
@@ -173,28 +171,20 @@ namespace Serenity
             propertyGrid = new PropertyGrid(pgDiv, pgOptions);
         }
 
-        private void InitPropertyGrid(Action complete, Action<object> fail)
+        private Promise InitPropertyGridAsync()
         {
-            fail.TryCatch(delegate()
+            return Promise.Void.ThenAwait(() =>
             {
                 var pgDiv = this.ById("PropertyGrid");
                 if (pgDiv.Length <= 0)
-                {
-                    complete();
-                    return;
-                }
+                    return Promise.Void;
 
-                GetPropertyGridOptions(pgOptions =>
-                {
-                    fail.TryCatch(delegate()
+                return GetPropertyGridOptionsAsync()
+                    .ThenAwait(pgOptions =>
                     {
                         propertyGrid = new PropertyGrid(pgDiv, pgOptions);
-                        propertyGrid.Init(pg =>
-                        {
-                            complete();
-                        }, fail);
+                        return propertyGrid.Initialize();
                     });
-                }, fail);
             });
         }
 
@@ -227,12 +217,12 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected virtual void GetPropertyItems(Action<List<PropertyItem>> callback, Action<object> fail)
+        protected virtual Promise<List<PropertyItem>> GetPropertyItemsAsync()
         {
-            fail.TryCatch(delegate()
+            return Promise.Void.ThenAwait(() => 
             {
                 var formKey = GetFormKey();
-                Q.GetForm(formKey, callback, fail);
+                return Q.GetFormAsync(formKey);
             });
         }
 
@@ -251,23 +241,18 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected virtual void GetPropertyGridOptions(Action<PropertyGridOptions> callback, Action<object> fail)
+        protected virtual Promise<PropertyGridOptions> GetPropertyGridOptionsAsync()
         {
-            GetPropertyItems(propertyItems =>
+            return GetPropertyItemsAsync().ThenSelect(propertyItems =>
             {
-                fail.TryCatch(delegate()
+                return new PropertyGridOptions
                 {
-                    var options = new PropertyGridOptions
-                    {
-                        IdPrefix = this.idPrefix,
-                        Items = propertyItems,
-                        Mode = PropertyGridMode.Insert,
-                        UseCategories = false
-                    };
-
-                    callback(options);
-                });
-            }, fail);
+                    IdPrefix = this.idPrefix,
+                    Items = propertyItems,
+                    Mode = PropertyGridMode.Insert,
+                    UseCategories = false
+                };
+            });
         }
 
         protected virtual bool ValidateBeforeSave()

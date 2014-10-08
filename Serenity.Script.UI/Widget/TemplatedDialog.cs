@@ -38,13 +38,12 @@ namespace Serenity
             }
         }
 
-        protected override void InitializeAsync(Action complete, Action<object> fail)
+        protected override Promise InitializeAsync()
         {
-            base.InitializeAsync(fail.TryCatchDelegate(delegate()
+            return base.InitializeAsync().Then(() =>
             {
                 InitTemplatedDialog();
-                complete();
-            }), fail);
+            });
         }
 
         private void InitTemplatedDialog()

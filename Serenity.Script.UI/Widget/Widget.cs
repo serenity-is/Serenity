@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Html;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Serenity
@@ -17,7 +18,7 @@ namespace Serenity
         /// </summary>
         private static int NextWidgetNumber = 0;
 
-        protected bool? initialized;
+        protected Promise asyncPromise;
         protected string widgetName;
         protected string uniqueName;
         protected jQueryObject element;
@@ -50,42 +51,37 @@ namespace Serenity
             {
                 Window.SetTimeout(delegate()
                 {
-                    if (self.initialized == null)
-                        Console.WriteLine(String.Format("Async widget of type '{0}' is created but init not called!", 
-                            self.GetType().Name));
+                    if (element != null && asyncPromise == null)
+                        asyncPromise = this.InitializeAsync();
                 }, 0);
             }
         }
 
-        protected internal Widget Init(Action<Widget> callback = null, Action<object> fail = null)
+        [ScriptName("init")]
+        private Widget InitializeAndReturnThis(Action<Widget> action)
         {
-            fail.TryCatch(delegate()
+            var promise = this.Initialize();
+
+            if (action != null)
             {
-                if (initialized == true || !IsAsyncWidget())
+                promise.Then(() =>
                 {
-                    initialized = true;
-
-                    if (callback != null)
-                        callback(this);
-
-                    return;
-                }
-
-                if (initialized != null)
-                    throw new InvalidOperationException("Widget already initializing!");
-
-                initialized = false;
-
-                InitializeAsync(delegate
-                {
-                    initialized = true;
-
-                    if (callback != null)
-                        callback(this);
-                }, fail);
-            });
+                    action(this);
+                });
+            }
 
             return this;
+        }
+
+        public Promise Initialize()
+        {
+            if (!IsAsyncWidget())
+                return Promise.FromValue(0);
+
+            if (asyncPromise == null)
+                asyncPromise = this.InitializeAsync();
+
+            return asyncPromise;
         }
 
         protected virtual bool IsAsyncWidget()
@@ -93,9 +89,9 @@ namespace Serenity
             return this is IAsyncInit;
         }
 
-        protected virtual void InitializeAsync(Action complete, Action<object> fail)
+        protected virtual Promise InitializeAsync()
         {
-            complete();
+            return Promise.FromValue(0);
         }
 
         /// <summary>
@@ -179,11 +175,7 @@ namespace Serenity
                 widget = (Widget)Activator.CreateInstance(widgetType, e, options);
             }
 
-            widget.Init(delegate
-            {
-                if (init != null)
-                    init(widget);
-            });
+            widget.Init(init);
 
             return widget;
         }

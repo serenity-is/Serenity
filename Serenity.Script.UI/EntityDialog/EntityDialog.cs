@@ -40,15 +40,11 @@ namespace Serenity
             }
         }
 
-        protected override void InitializeAsync(Action complete, Action<object> fail)
+        protected override Promise InitializeAsync()
         {
-            base.InitializeAsync(delegate()
-            {
-                InitPropertyGrid(delegate()
-                {
-                    InitLocalizationGrid(complete, fail);
-                }, fail);
-            }, fail);
+            return base.InitializeAsync()
+                .ThenAwait(InitPropertyGridAsync)
+                .ThenAwait(InitLocalizationGridAsync);
         }
 
         public override void Destroy()

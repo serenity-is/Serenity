@@ -26,17 +26,15 @@ namespace Serenity
             }
         }
 
-        protected override void InitializeAsync(Action complete, Action<object> fail)
+        protected override Promise InitializeAsync()
         {
-            UpdateItems(fail.TryCatchDelegate(delegate()
+            return UpdateItemsAsync().Then(() => 
             {
                 Q.ScriptData.BindToChange("Lookup." + GetLookupKey(), this.uniqueName, delegate()
                 {
-                    UpdateItems(() => { }, null);
+                    UpdateItemsAsync();
                 });
-
-                complete();
-            }), fail);
+            });
         }
 
         public override void Destroy()
@@ -67,11 +65,11 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        protected virtual void GetLookup(Action<Lookup<TItem>> complete, Action<object> fail)
+        protected virtual Promise<Lookup<TItem>> GetLookupAsync()
         {
-            fail.TryCatch(delegate()
-            {
-                Q.GetLookup<TItem>(GetLookupKey(), complete, fail);
+            return Promise.Void.ThenAwait(() => {
+                var key = GetLookupKey();
+                return Q.GetLookupAsync<TItem>(key);
             });
         }
 
@@ -118,37 +116,29 @@ namespace Serenity
             }
         }
 
-        protected virtual void UpdateItems(Action complete, Action<object> fail)
+        protected virtual Promise UpdateItemsAsync()
         {
-            fail.TryCatch(delegate
+            return GetLookupAsync().Then(lookup =>
             {
-                GetLookup(lookup =>
+                ClearItems();
+
+                var items = GetItems(lookup);
+                foreach (dynamic item in items)
                 {
-                    fail.TryCatch(delegate()
+                    var text = GetItemText(item, lookup);
+                    var disabled = GetItemDisabled(item, lookup);
+
+                    object idValue = item[lookup.IdField];
+                    string id = idValue == null ? "" : idValue.ToString();
+
+                    this.items.Add(new Select2Item
                     {
-                        ClearItems();
-
-                        var items = GetItems(lookup);
-                        foreach (dynamic item in items)
-                        {
-                            var text = GetItemText(item, lookup);
-                            var disabled = GetItemDisabled(item, lookup);
-
-                            object idValue = item[lookup.IdField];
-                            string id = idValue == null ? "" : idValue.ToString();
-
-                            this.items.Add(new Select2Item
-                            {
-                                Id = id,
-                                Text = text,
-                                Source = item,
-                                Disabled = disabled
-                            });
-                        }
-
-                        complete();
+                        Id = id,
+                        Text = text,
+                        Source = item,
+                        Disabled = disabled
                     });
-                }, fail);
+                }
             });
         }
     }

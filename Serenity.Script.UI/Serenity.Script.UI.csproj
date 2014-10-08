@@ -133,6 +133,7 @@
     <Compile Include="Widget\Toolbar.cs" />
     <Compile Include="Widget\Widget.cs" />
     <Compile Include="Widget\PrefixedContext.cs" />
+    <Compile Include="Widget\WidgetPrototype.cs" />
     <Compile Include="Widget\WidgetExtensions.cs" />
     <Compile Include="Widget\WidgetWithOptions.cs" />
   </ItemGroup>

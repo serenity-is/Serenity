@@ -25,25 +25,19 @@ namespace Serenity
             InitLocalizationGridCommon(pgOptions);
         }
 
-        private void InitLocalizationGrid(Action complete, Action<object> fail)
+        private Promise InitLocalizationGridAsync()
         {
-            fail.TryCatch(delegate()
+            return Promise.Void.ThenAwait(() =>
             {
                 var pgDiv = this.ById("PropertyGrid");
                 if (pgDiv.Length <= 0)
-                {
-                    complete();
-                    return;
-                }
+                    return Promise.Void;
 
-                GetPropertyGridOptions(pgOptions =>
-                {
-                    fail.TryCatch(delegate()
-                    {
+                return GetPropertyGridOptionsAsync()
+                    .Then(pgOptions => 
+                    { 
                         InitLocalizationGridCommon(pgOptions);
-                        complete();
                     });
-                }, fail);
             });
         }
 
