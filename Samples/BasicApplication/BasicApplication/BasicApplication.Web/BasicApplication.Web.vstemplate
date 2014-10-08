@@ -515,6 +515,7 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.DynamicScripts.cs">Northwind.DynamicScripts.cs</ProjectItem>
         <Folder Name="Northwind" TargetFolderName="Northwind">
           <Folder Name="Category" TargetFolderName="Category">
+            <ProjectItem ReplaceParameters="true" TargetFileName="CategoryColumns.cs">CategoryColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="CategoryEndpoint.cs">CategoryEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="CategoryForm.cs">CategoryForm.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="CategoryIndex.cshtml">CategoryIndex.cshtml</ProjectItem>
@@ -523,6 +524,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="CategoryRow.cs">CategoryRow.cs</ProjectItem>
           </Folder>
           <Folder Name="Customer" TargetFolderName="Customer">
+            <ProjectItem ReplaceParameters="true" TargetFileName="CustomerColumns.cs">CustomerColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="CustomerCountryLookup.cs">CustomerCountryLookup.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="CustomerEndpoint.cs">CustomerEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="CustomerForm.cs">CustomerForm.cs</ProjectItem>
@@ -580,6 +582,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="OrderDetailRow.cs">OrderDetailRow.cs</ProjectItem>
           </Folder>
           <Folder Name="Product" TargetFolderName="Product">
+            <ProjectItem ReplaceParameters="true" TargetFileName="ProductColumns.cs">ProductColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="ProductEndpoint.cs">ProductEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="ProductForm.cs">ProductForm.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="ProductIndex.cshtml">ProductIndex.cshtml</ProjectItem>
@@ -588,6 +591,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="ProductRow.cs">ProductRow.cs</ProjectItem>
           </Folder>
           <Folder Name="Region" TargetFolderName="Region">
+            <ProjectItem ReplaceParameters="true" TargetFileName="RegionColumns.cs">RegionColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RegionEndpoint.cs">RegionEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RegionForm.cs">RegionForm.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RegionIndex.cshtml">RegionIndex.cshtml</ProjectItem>
@@ -596,6 +600,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="RegionRow.cs">RegionRow.cs</ProjectItem>
           </Folder>
           <Folder Name="Shipper" TargetFolderName="Shipper">
+            <ProjectItem ReplaceParameters="true" TargetFileName="ShipperColumns.cs">ShipperColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="ShipperEndpoint.cs">ShipperEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="ShipperForm.cs">ShipperForm.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="ShipperIndex.cshtml">ShipperIndex.cshtml</ProjectItem>
@@ -604,6 +609,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="ShipperRow.cs">ShipperRow.cs</ProjectItem>
           </Folder>
           <Folder Name="Supplier" TargetFolderName="Supplier">
+            <ProjectItem ReplaceParameters="true" TargetFileName="SupplierColumns.cs">SupplierColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="SupplierCountryLookup.cs">SupplierCountryLookup.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="SupplierEndpoint.cs">SupplierEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="SupplierForm.cs">SupplierForm.cs</ProjectItem>
@@ -613,6 +619,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="SupplierRow.cs">SupplierRow.cs</ProjectItem>
           </Folder>
           <Folder Name="Territory" TargetFolderName="Territory">
+            <ProjectItem ReplaceParameters="true" TargetFileName="TerritoryColumns.cs">TerritoryColumns.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="TerritoryEndpoint.cs">TerritoryEndpoint.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="TerritoryForm.cs">TerritoryForm.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="TerritoryIndex.cshtml">TerritoryIndex.cshtml</ProjectItem>
@@ -673,6 +680,8 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="jsrender.min.js">jsrender.min.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="pace.js">pace.js</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="pace.min.js">pace.min.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="rsvp.js">rsvp.js</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="rsvp.min.js">rsvp.min.js</ProjectItem>
         <Folder Name="saltarelle" TargetFolderName="saltarelle">
           <ProjectItem ReplaceParameters="true" TargetFileName="linq.js">linq.js</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="linq.min.js">linq.min.js</ProjectItem>
@@ -885,12 +894,12 @@
       <package id="Microsoft.Web.Infrastructure" version="1.0.0.0" />
       <package id="Newtonsoft.Json" version="6.0.5" />
       <package id="Select2.js" version="3.5.1" />
-      <package id="Serenity.CodeGenerator" version="1.2.1" />
-      <package id="Serenity.Core" version="1.2.1" />
-      <package id="Serenity.Data" version="1.2.1" />
-      <package id="Serenity.Data.Entity" version="1.2.1" />
-      <package id="Serenity.Services" version="1.2.1" />
-      <package id="Serenity.Web" version="1.2.1" />
+      <package id="Serenity.CodeGenerator" version="1.3.0" />
+      <package id="Serenity.Core" version="1.3.0" />
+      <package id="Serenity.Data" version="1.3.0" />
+      <package id="Serenity.Data.Entity" version="1.3.0" />
+      <package id="Serenity.Services" version="1.3.0" />
+      <package id="Serenity.Web" version="1.3.0" />
       <package id="SlickGrid" version="2.2.20140120" />
       <package id="toastr" version="2.0.3" />
     </packages>

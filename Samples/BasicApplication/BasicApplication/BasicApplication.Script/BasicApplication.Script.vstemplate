@@ -52,26 +52,35 @@
         <Folder Name="ServiceContracts" TargetFolderName="ServiceContracts">
           <ProjectItem ReplaceParameters="true" TargetFileName="ServiceContracts.tt">ServiceContracts.tt</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserRow.cs">Administration.UserRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserService.cs">Administration.UserService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginRequest.cs">Membership.LoginRequest.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CategoryRow.cs">Northwind.CategoryRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CategoryService.cs">Northwind.CategoryService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerCustomerDemoRow.cs">Northwind.CustomerCustomerDemoRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerCustomerDemoService.cs">Northwind.CustomerCustomerDemoService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerDemographicRow.cs">Northwind.CustomerDemographicRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerDemographicService.cs">Northwind.CustomerDemographicService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerRow.cs">Northwind.CustomerRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.CustomerService.cs">Northwind.CustomerService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.EmployeeRow.cs">Northwind.EmployeeRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.EmployeeService.cs">Northwind.EmployeeService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.EmployeeTerritoryRow.cs">Northwind.EmployeeTerritoryRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.EmployeeTerritoryService.cs">Northwind.EmployeeTerritoryService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.OrderDetailRow.cs">Northwind.OrderDetailRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.OrderDetailService.cs">Northwind.OrderDetailService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.OrderRow.cs">Northwind.OrderRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.OrderService.cs">Northwind.OrderService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.ProductRow.cs">Northwind.ProductRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.ProductService.cs">Northwind.ProductService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.RegionRow.cs">Northwind.RegionRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.RegionService.cs">Northwind.RegionService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.ShipperRow.cs">Northwind.ShipperRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.ShipperService.cs">Northwind.ShipperService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.SupplierRow.cs">Northwind.SupplierRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.SupplierService.cs">Northwind.SupplierService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.TerritoryRow.cs">Northwind.TerritoryRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Northwind.TerritoryService.cs">Northwind.TerritoryService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="ServiceContracts.log">ServiceContracts.log</ProjectItem>
-        </Folder>
-        <Folder Name="ServiceEndpoints" TargetFolderName="ServiceEndpoints">
-          <ProjectItem ReplaceParameters="true" TargetFileName="ServiceEndpoints.tt">ServiceEndpoints.tt</ProjectItem>
-          <ProjectItem ReplaceParameters="true" TargetFileName="ServiceEndpoints.cs">ServiceEndpoints.cs</ProjectItem>
-          <ProjectItem ReplaceParameters="false" TargetFileName="ServiceEndpoints.log">ServiceEndpoints.log</ProjectItem>
         </Folder>
       </Folder>
       <Folder Name="Membership" TargetFolderName="Membership">
@@ -147,13 +156,13 @@
   </WizardExtension>
   <WizardData>
     <packages repository="extension" repositoryId="SerenityBasicApplicationSampleV1">
-      <package id="Saltarelle.Compiler" version="2.5.0" />
+      <package id="Saltarelle.Compiler" version="2.6.0" />
       <package id="Saltarelle.jQuery" version="1.10.1" />
       <package id="Saltarelle.jQuery.UI" version="1.10.1" />
       <package id="Saltarelle.Linq" version="2.4.0" />
-      <package id="Saltarelle.Runtime" version="2.5.0" />
+      <package id="Saltarelle.Runtime" version="2.6.0" />
       <package id="Saltarelle.Web" version="3.1.0" />
-      <package id="Serenity.Script" version="1.2.1" />
+      <package id="Serenity.Script" version="1.3.0" />
     </packages>
   </WizardData>
 </VSTemplate>

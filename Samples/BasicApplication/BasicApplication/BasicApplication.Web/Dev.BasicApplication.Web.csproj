@@ -544,6 +544,8 @@
     <Content Include="Scripts\jsrender.min.js" />
     <Content Include="Scripts\pace.js" />
     <Content Include="Scripts\pace.min.js" />
+    <Content Include="Scripts\rsvp.js" />
+    <Content Include="Scripts\rsvp.min.js" />
     <Content Include="Scripts\saltarelle\linq.js" />
     <Content Include="Scripts\saltarelle\linq.min.js" />
     <Content Include="Scripts\saltarelle\mscorlib.js" />
@@ -596,6 +598,12 @@
     <Content Include="Scripts\Select2-locales\select2_locale_zh-TW.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="packages.config" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="Scripts\jquery-2.1.1.min.map" />
     <Content Include="Scripts\serenity\Serenity.Externals.js" />
     <Content Include="Scripts\serenity\Serenity.Externals.min.js" />
     <Content Include="Scripts\serenity\Serenity.Externals.Slick.js" />
@@ -604,12 +612,6 @@
     <Content Include="Scripts\serenity\Serenity.Script.Core.min.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
-    <Content Include="packages.config" />
-    <Content Include="fonts\fontawesome-webfont.woff" />
-    <Content Include="fonts\fontawesome-webfont.ttf" />
-    <Content Include="fonts\fontawesome-webfont.eot" />
-    <Content Include="fonts\FontAwesome.otf" />
-    <Content Include="Scripts\jquery-2.1.1.min.map" />
     <Content Include="Scripts\serenity\texts\serenity.texts.tr.json" />
     <Content Include="Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Scripts\site\texts\site.texts.tr.json" />

@@ -239,14 +239,17 @@
     <Reference Include="Saltarelle.Web">
       <HintPath>..\..\packages\Saltarelle.Web.3.1.0\lib\Saltarelle.Web.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Script.Core">
-      <HintPath>..\..\packages\Serenity.Script.1.2.1\lib\net20\Serenity.Script.Core.dll</HintPath>
+    <Reference Include="Serenity.Script.Core, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Serenity.Script.1.3.0\lib\net20\Serenity.Script.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Script.Imports">
-      <HintPath>..\..\packages\Serenity.Script.1.2.1\lib\net20\Serenity.Script.Imports.dll</HintPath>
+    <Reference Include="Serenity.Script.Imports, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Serenity.Script.1.3.0\lib\net20\Serenity.Script.Imports.dll</HintPath>
     </Reference>
-    <Reference Include="Serenity.Script.UI">
-      <HintPath>..\..\packages\Serenity.Script.1.2.1\lib\net20\Serenity.Script.UI.dll</HintPath>
+    <Reference Include="Serenity.Script.UI, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Serenity.Script.1.3.0\lib\net20\Serenity.Script.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.6.0\tools\Saltarelle.Compiler.targets')" />
@@ -257,6 +260,7 @@
   </Target>
   -->
   <Target Name="AfterBuild">
-    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\site\$(AssemblyName).js"></Copy>
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).js" DestinationFiles="$(SolutionDir)BasicApplication\BasicApplication.Web\Scripts\site\$(AssemblyName).js">
+    </Copy>
   </Target>
 </Project>
