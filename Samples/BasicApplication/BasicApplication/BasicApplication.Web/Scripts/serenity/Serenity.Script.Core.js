@@ -150,20 +150,6 @@
 			fail(ex);
 		}
 	};
-	$Q.tryCatchDelegate = function(fail, callback) {
-		if (ss.staticEquals(fail, null)) {
-			return callback;
-		}
-		return function() {
-			try {
-				callback();
-			}
-			catch ($t1) {
-				var ex = ss.Exception.wrap($t1);
-				fail(ex);
-			}
-		};
-	};
 	$Q.htmlEncode = function(value) {
 		var text = (ss.isNullOrUndefined(value) ? '' : value.toString());
 		if ((new RegExp('[><&]', 'g')).test(text)) {
@@ -659,9 +645,9 @@
 		$.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
 	};
 	$Q$ScriptData.$loadScriptAsync = function(url) {
-		return Promise.resolve().then(function() {
+		return RSVP.resolve().then(function() {
 			$Q.blockUI(null);
-			return Promise.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always($Q.blockUndo));
+			return RSVP.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always($Q.blockUndo));
 		}, null);
 	};
 	$Q$ScriptData.$loadScriptData = function(name) {
@@ -672,7 +658,7 @@
 		$Q$ScriptData.$syncLoadScript($Q.resolveUrl('~/DynJS.axd/') + name);
 	};
 	$Q$ScriptData.$loadScriptDataAsync = function(name) {
-		return Promise.resolve().then(function() {
+		return RSVP.resolve().then(function() {
 			if (!ss.keyExists($Q$ScriptData.$registered, name)) {
 				throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
 			}
@@ -692,10 +678,10 @@
 		return data;
 	};
 	$Q$ScriptData.ensureAsync = function(name) {
-		return Promise.resolve().then(function() {
+		return RSVP.resolve().then(function() {
 			var data = $Q$ScriptData.$loadedData[name];
 			if (ss.isValue(data)) {
-				return Promise.resolve(data);
+				return RSVP.resolve(data);
 			}
 			return $Q$ScriptData.$loadScriptDataAsync(name).then(function() {
 				data = $Q$ScriptData.$loadedData[name];
@@ -716,7 +702,7 @@
 		return data;
 	};
 	$Q$ScriptData.reloadAsync = function(name) {
-		return Promise.resolve().then(function() {
+		return RSVP.resolve().then(function() {
 			if (!ss.keyExists($Q$ScriptData.$registered, name)) {
 				throw new ss.NotSupportedException(ss.formatString('Script data {0} is not found in registered script list!'));
 			}
@@ -1851,6 +1837,14 @@
 	})();
 	(function() {
 		$Q.$blockUICount = 0;
+		var window1 = window.window;
+		var rsvp = window1.RSVP;
+		if (!!(ss.isValue(rsvp) && ss.isValue(rsvp.on))) {
+			rsvp.on('error', function(e) {
+				window1.console.log(e);
+				window1.console.log((!!ss.isValue(e.get_stack) ? e.get_stack() : e.stack));
+			});
+		}
 	})();
 	(function() {
 		$Texts$Controls$EntityDialog.DeleteConfirmation = new Q$LT('Delete record?');

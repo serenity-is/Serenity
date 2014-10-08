@@ -92,13 +92,15 @@ namespace Serenity
                 }
                 else
                 {
-                    return Q.GetTemplateAsync(templateName).Then(template =>
+                    return Q.GetTemplateAsync(templateName).ThenSelect(template =>
                     {
                         if (!Script.IsValue(template))
                         {
                             throw new Exception(String.Format("Can't locate template for widget '{0}' with name '{1}'!",
                                 this.GetType().Name, templateName));
                         }
+
+                        return template;
                     });
                 }
             });

@@ -76,6 +76,10 @@ ss.mkdict = function ss$mkdict() {
 	return r;
 };
 
+ss.clone = function ss$clone(t, o) {
+	return o ? t.$clone(o) : o;
+}
+
 ss.coalesce = function ss$coalesce(a, b) {
 	return ss.isValue(a) ? a : b;
 };
@@ -488,7 +492,7 @@ ss.getTypeAssembly = function ss$getTypeAssembly(type) {
 		return type.__assembly || null;
 };
 
-ss.getAssemblyType = function ss$getAssemblyTypes(asm, name) {
+ss._getAssemblyType = function ss$_getAssemblyType(asm, name) {
 	var result = [];
 	if (asm.__types) {
 		return asm.__types[name] || null;
@@ -529,7 +533,7 @@ ss.getAssemblyTypes = function ss$getAssemblyTypes(asm) {
 };
 
 ss.createAssemblyInstance = function ss$createAssemblyInstance(asm, typeName) {
-	var t = ss.getAssemblyType(asm, typeName);
+	var t = ss.getType(typeName, asm);
 	return t ? ss.createInstance(t) : null;
 };
 
@@ -607,13 +611,59 @@ ss.getInstanceType = function ss$getInstanceType(instance) {
 	}
 };
 
-ss.getType = function ss$getType(typeName) {
-	if (!typeName)
+ss._getType = function (typeName, asm, re) {
+	var outer = !re;
+	re = re || /[[,\]]/g;
+	var last = re.lastIndex, m = re.exec(typeName), tname, targs = [];
+	if (m) {
+		tname = typeName.substring(last, m.index);
+		switch (m[0]) {
+			case '[':
+				if (typeName[m.index + 1] != '[')
+					return null;
+				for (;;) {
+					re.exec(typeName);
+					var t = ss._getType(typeName, global, re);
+					if (!t)
+						return null;
+					targs.push(t);
+					m = re.exec(typeName);
+					if (m[0] === ']')
+						break;
+					else if (m[0] !== ',')
+						return null;
+				}
+				m = re.exec(typeName);
+				if (m && m[0] === ',') {
+					re.exec(typeName);
+					if (!(asm = ss.__assemblies[(re.lastIndex > 0 ? typeName.substring(m.index + 1, re.lastIndex - 1) : typeName.substring(m.index + 1)).trim()]))
+						return null;
+				}
+				break;
+
+			case ']':
+				break;
+
+			case ',':
+				re.exec(typeName);
+				if (!(asm = ss.__assemblies[(re.lastIndex > 0 ? typeName.substring(m.index + 1, re.lastIndex - 1) : typeName.substring(m.index + 1)).trim()]))
+					return null;
+				break;
+		}
+	}
+	else {
+		tname = typeName.substring(last);
+	}
+
+	if (outer && re.lastIndex)
 		return null;
 
-	var arr = typeName.split(',');
-	var module = (arr.length > 1 ? ss.__assemblies[arr[1].trim()] : global);
-	return module ? ss.getAssemblyType(module, arr[0].trim()) : null;
+	var t = ss._getAssemblyType(asm, tname.trim());
+	return targs.length ? ss.makeGenericType(t, targs) : t;
+}
+
+ss.getType = function ss$getType(typeName, asm) {
+	return typeName ? ss._getType(typeName, asm || global) : null;
 };
 
 ss.getDefaultValue = function ss$getDefaultValue(type) {
@@ -912,7 +962,7 @@ ss.netFormatNumber = function ss$netFormatNumber(num, format, numberFormat) {
 	var precision = -1;
 	
 	if (format.length > 1) {
-		precision = parseInt(format.substr(1));
+		precision = parseInt(format.substr(1), 10);
 	}
 
 	var fs = format.charAt(0);
@@ -1062,7 +1112,7 @@ ss._formatString = function ss$_formatString(format, values, useLocale) {
 		function(m) {
 			if (m === '{{' || m === '}}')
 				return m.charAt(0);
-			var index = parseInt(m.substr(1));
+			var index = parseInt(m.substr(1), 10);
 			var value = values[index + 1];
 			if (ss.isNullOrUndefined(value)) {
 				return '';
@@ -1096,7 +1146,7 @@ ss.stringFromChar = function ss$stringFromChar(ch, count) {
 ss.htmlDecode = function ss$htmlDecode(s) {
 	return s.replace(/&([^;]+);/g, function(_, e) {
 		if (e[0] === '#')
-			return String.fromCharCode(parseInt(e.substr(1)));
+			return String.fromCharCode(parseInt(e.substr(1), 10));
 		switch (e) {
 			case 'quot': return '"';
 			case 'apos': return "'";
@@ -2636,18 +2686,18 @@ ss_Int32.getDefaultValue = ss_Int32.createInstance = function Int32$getDefaultVa
 ss_Int32.div = function Int32$div(a, b) {
 	if (!ss.isValue(a) || !ss.isValue(b)) return null;
 	if (b === 0) throw new ss_DivideByZeroException();
-	return a / b | 0;
+	return ss_Int32.trunc(a / b);
 };
 
 ss_Int32.trunc = function Int32$trunc(n) {
-	return ss.isValue(n) ? n | 0 : null;
+	return ss.isValue(n) ? (n > 0 ? Math.floor(n) : Math.ceil(n)) : null;
 };
 
 ss_Int32.tryParse = function Int32$tryParse(s, result, min, max) {
 	result.$ = 0;
 	if (!/^[+-]?[0-9]+$/.test(s))
 		return 0;
-	var n = parseInt(s);
+	var n = parseInt(s, 10);
 	if (n < min || n > max)
 		return false;
 	result.$ = n;
@@ -3110,6 +3160,7 @@ ss_EventArgs.Empty = new ss_EventArgs();
 var ss_Exception = function Exception$(message, innerException) {
 	this._message = message || 'An error occurred.';
 	this._innerException = innerException || null;
+	this._error = new Error();
 }
 
 ss_Exception.__typeName = 'ss.Exception';
@@ -3120,6 +3171,9 @@ ss.initClass(ss_Exception, ss, {
 	},
 	get_innerException: function Exception$get_innerException() {
 		return this._innerException;
+	},
+	get_stack: function Exception$get_stack() {
+		return this._error.stack;
 	}
 });
 
@@ -3130,10 +3184,10 @@ ss_Exception.wrap = function Exception$wrap(o) {
 	else if (o instanceof TypeError) {
 		// TypeError can either be 'cannot read property blah of null/undefined' (proper NullReferenceException), or it can be eg. accessing a non-existent method of an object.
 		// As long as all code is compiled, they should with a very high probability indicate the use of a null reference.
-		return new ss_NullReferenceException(o.message);
+		return new ss_NullReferenceException(o.message, new ss_JsErrorException(o));
 	}
 	else if (o instanceof RangeError) {
-		return new ss_ArgumentOutOfRangeException(null, o.message);
+		return new ss_ArgumentOutOfRangeException(null, o.message, new ss_JsErrorException(o));
 	}
 	else if (o instanceof Error) {
 		return new ss_JsErrorException(o);
@@ -3214,7 +3268,11 @@ var ss_JsErrorException = function JsErrorException$(error, message, innerExcept
 };
 ss_JsErrorException.__typeName = 'ss.JsErrorException';
 ss.JsErrorException = ss_JsErrorException;
-ss.initClass(ss_JsErrorException, ss, {}, ss_Exception);
+ss.initClass(ss_JsErrorException, ss, {
+	get_stack: function Exception$get_stack() {
+		return this.error.stack;
+	}
+}, ss_Exception);
 
 ////////////////////////////////////////////////////////////////////////////////
 // ArgumentException
@@ -3572,24 +3630,11 @@ ss_Task.fromNode = function  Task$fromNode(t, f, m) {
 ss_Task.__typeName = 'ss.Task';
 ss.Task = ss_Task;
 ss.initClass(ss_Task, ss, {
+	onCompleted: function Task$continueWith(continuation) {
+		return this._continueWith(continuation, false);
+	},
 	continueWith: function Task$continueWith(continuation) {
-		var tcs = new ss_TaskCompletionSource();
-		var _this = this;
-		var fn = function() {
-			try {
-				tcs.setResult(continuation(_this));
-			}
-			catch (e) {
-				tcs.setException(ss_Exception.wrap(e));
-			}
-		};
-		if (this.isCompleted()) {
-			setTimeout(fn, 0);
-		}
-		else {
-			this._thens.push(fn);
-		}
-		return tcs.task;
+		return this._continueWith(continuation, true);
 	},
 	start: function Task$start() {
 		if (this.status !== 0)
@@ -3607,6 +3652,30 @@ ss.initClass(ss_Task, ss, {
 				_this._fail(new ss_AggregateException(null, [ss_Exception.wrap(e)]));
 			}
 		}, 0);
+	},
+	_continueWith: function Task$_continueWith(continuation, catchExceptions) {
+		var tcs = new ss_TaskCompletionSource();
+		var _this = this;
+		var fn = catchExceptions ?
+			function() {
+				try {
+					tcs.setResult(continuation(_this));
+				}
+				catch (e) {
+					tcs.setException(ss_Exception.wrap(e));
+				}
+			} :
+			function() {
+				tcs.setResult(continuation(_this));
+			};
+
+		if (this.isCompleted()) {
+			setTimeout(fn, 0);
+		}
+		else {
+			this._thens.push(fn);
+		}
+		return tcs.task;
 	},
 	_runCallbacks: function Task$_runCallbacks() {
 		for (var i = 0; i < this._thens.length; i++)

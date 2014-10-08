@@ -33,25 +33,5 @@ namespace Serenity
                 fail(ex);
             }
         }
-
-        public static Action TryCatchDelegate(this Action<object> fail, Action callback)
-        {
-            if (fail == null)
-            {
-                return callback;
-            }
-
-            return delegate()
-            {
-                try
-                {
-                    callback();
-                }
-                catch (Exception ex)
-                {
-                    fail(ex);
-                }
-            };
-        }
     }
 }

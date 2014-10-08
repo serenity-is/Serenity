@@ -1,4 +1,6 @@
 ﻿using jQueryApi;
+using System;
+using System.Html;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -11,6 +13,14 @@ namespace Serenity
     {
         static Q()
         {
+            var window = ((dynamic)Window.Instance);
+            var rsvp = window.RSVP;
+            if (Script.IsValue(rsvp) && Script.IsValue(rsvp.on))
+                rsvp.on("error", new Action<dynamic>(e =>
+                {
+                    window.console.log(e);
+                    window.console.log((e.get_stack != null ? e.get_stack() : e.stack));
+                }));
         }
 
         /// <summary>

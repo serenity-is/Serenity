@@ -4,19 +4,10 @@ using System.Threading.Tasks;
 
 namespace System
 {
-    [Imported, IgnoreNamespace, ScriptName("Promise")]
+    [Imported, IgnoreNamespace, ScriptName("RSVP")]
     public class Promise : IPromise
     {
-        public Promise()
-        {
-        }
-
-        public static Promise Void
-        {
-            [InlineCode("Promise.resolve()")]
-            get { return null; }
-        }
-
+        [InlineCode("new RSVP.Promise({constructor})")]
         public Promise(Action<Delegate, Delegate> constructor)
         {
         }
@@ -35,12 +26,6 @@ namespace System
 
         [PreserveName, ScriptName("then")]
         public Promise Then(Action onFulfilled, Callback onRejected = null)
-        {
-            return null;
-        }
-
-        [PreserveName, ScriptName("then")]
-        public Promise Then<TObject>(Action<TObject> onFulfilled, Callback onRejected = null)
         {
             return null;
         }
@@ -104,12 +89,19 @@ namespace System
         {
             return null;
         }
+
+        public static Promise Void
+        {
+            [InlineCode("RSVP.resolve()")]
+            get { return null; }
+        }
     }
 
 
-    [Imported, IgnoreNamespace, ScriptName("Promise")]
+    [Imported, IgnoreNamespace, ScriptName("RSVP")]
     public class Promise<TValue> : Promise
     {
+        [InlineCode("new RSVP.Promise({constructor})")]
         public Promise(Action<Action<TValue>, Callback> constructor)
             : base((Action<Delegate, Delegate>)null)
         {

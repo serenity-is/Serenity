@@ -857,12 +857,12 @@
 				return Serenity.SlickFormatting.itemLink(itemType, idField, text, cssClass);
 			},
 			getPropertyItemsAsync: function() {
-				return Promise.resolve().then(ss.mkdel(this, function() {
+				return RSVP.resolve().then(ss.mkdel(this, function() {
 					var attr = ss.getAttributes(ss.getInstanceType(this), Serenity.ColumnsKeyAttribute, true);
 					if (ss.isValue(attr) && attr.length > 0) {
 						return Q.getColumnsAsync(attr[0].get_value());
 					}
-					return Promise.resolve([]);
+					return RSVP.resolve([]);
 				}), null);
 			},
 			getPropertyItems: function() {
@@ -1775,10 +1775,10 @@
 				this.$initLocalizationGridCommon(pgOptions);
 			},
 			$initLocalizationGridAsync: function() {
-				return Promise.resolve().then(ss.mkdel(this, function() {
+				return RSVP.resolve().then(ss.mkdel(this, function() {
 					var pgDiv = this.byId$1('PropertyGrid');
 					if (pgDiv.length <= 0) {
-						return Promise.resolve();
+						return RSVP.resolve();
 					}
 					return this.getPropertyGridOptionsAsync().then(ss.mkdel(this, function(pgOptions) {
 						this.$initLocalizationGridCommon(pgOptions);
@@ -1892,10 +1892,10 @@
 				this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
 			},
 			$initPropertyGridAsync: function() {
-				return Promise.resolve().then(ss.mkdel(this, function() {
+				return RSVP.resolve().then(ss.mkdel(this, function() {
 					var pgDiv = this.byId$1('PropertyGrid');
 					if (pgDiv.length <= 0) {
-						return Promise.resolve();
+						return RSVP.resolve();
 					}
 					return this.getPropertyGridOptionsAsync().then(ss.mkdel(this, function(pgOptions) {
 						this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
@@ -1916,21 +1916,19 @@
 				return $t1;
 			},
 			getPropertyGridOptionsAsync: function() {
-				return new Promise(ss.mkdel(this, function(done, fail) {
-					this.getPropertyItemsAsync().then(ss.mkdel(this, function(propertyItems) {
-						var $t1 = $Serenity_PropertyGridOptions.$ctor();
-						$t1.idPrefix = this.idPrefix;
-						$t1.items = propertyItems;
-						$t1.mode = 0;
-						done($t1);
-					}), null);
-				}));
+				return this.getPropertyItemsAsync().then(ss.mkdel(this, function(propertyItems) {
+					var $t1 = $Serenity_PropertyGridOptions.$ctor();
+					$t1.idPrefix = this.idPrefix;
+					$t1.items = propertyItems;
+					$t1.mode = 0;
+					return $t1;
+				}), null);
 			},
 			getPropertyItemsAsync: function() {
-				return new Promise(ss.mkdel(this, function(done, fail) {
+				return RSVP.resolve().then(ss.mkdel(this, function() {
 					var formKey = this.getFormKey();
-					Q.getFormAsync(formKey).then(done, fail);
-				}));
+					return Q.getFormAsync(formKey);
+				}), null);
 			},
 			validateBeforeSave: function() {
 				return true;
@@ -3051,7 +3049,7 @@
 				return Q.getLookup(this.getLookupKey());
 			},
 			getLookupAsync: function() {
-				return Promise.resolve().then(ss.mkdel(this, function() {
+				return RSVP.resolve().then(ss.mkdel(this, function() {
 					var key = this.getLookupKey();
 					return Q.getLookupAsync(key);
 				}), null);
@@ -3570,10 +3568,10 @@
 				this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
 			},
 			$initPropertyGridAsync: function() {
-				return Promise.resolve().then(ss.mkdel(this, function() {
+				return RSVP.resolve().then(ss.mkdel(this, function() {
 					var pgDiv = this.byId$1('PropertyGrid');
 					if (pgDiv.length <= 0) {
-						return Promise.resolve();
+						return RSVP.resolve();
 					}
 					return this.getPropertyGridOptionsAsync().then(ss.mkdel(this, function(pgOptions) {
 						this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
@@ -3606,7 +3604,7 @@
 				return Q.getForm(formKey);
 			},
 			getPropertyItemsAsync: function() {
-				return Promise.resolve().then(ss.mkdel(this, function() {
+				return RSVP.resolve().then(ss.mkdel(this, function() {
 					var formKey = this.getFormKey();
 					return Q.getFormAsync(formKey);
 				}), null);
@@ -4934,18 +4932,19 @@
 				return template;
 			},
 			getTemplateAsync: function() {
-				return Promise.resolve().then(ss.mkdel(this, function() {
+				return RSVP.resolve().then(ss.mkdel(this, function() {
 					var templateName = this.getTemplateName();
 					var script = $('script#Template_' + templateName);
 					if (script.length > 0) {
 						var template = script.html();
-						return Promise.resolve(template);
+						return RSVP.resolve(template);
 					}
 					else {
 						return Q.getTemplateAsync(templateName).then(ss.mkdel(this, function(template1) {
 							if (!ss.isValue(template1)) {
 								throw new ss.Exception(ss.formatString("Can't locate template for widget '{0}' with name '{1}'!", ss.getTypeName(ss.getInstanceType(this)), templateName));
 							}
+							return template1;
 						}), null);
 					}
 				}), null);
@@ -5601,7 +5600,7 @@
 		},
 		initialize: function() {
 			if (!this.isAsyncWidget()) {
-				return Promise.resolve(0);
+				return RSVP.resolve(0);
 			}
 			if (ss.isNullOrUndefined(this.asyncPromise)) {
 				this.asyncPromise = this.initializeAsync();
@@ -5612,7 +5611,7 @@
 			return ss.isInstanceOfType(this, $Serenity_IAsyncInit);
 		},
 		initializeAsync: function() {
-			return Promise.resolve(0);
+			return RSVP.resolve(0);
 		},
 		destroy: function() {
 			this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
@@ -6304,7 +6303,7 @@
 			return this.$currentFilter;
 		},
 		getTemplateAsync: function() {
-			return Promise.resolve($Serenity_FilterPanel.panelTemplate);
+			return RSVP.resolve($Serenity_FilterPanel.panelTemplate);
 		},
 		onFilterChange: function() {
 			if (!ss.staticEquals(this.options.filterChange, null)) {
@@ -6696,7 +6695,7 @@
 	ss.initClass($Serenity_PropertyGrid, $asm, {
 		initializeAsync: function() {
 			return $Serenity_Widget.prototype.initializeAsync.call(this).then(ss.mkdel(this, function() {
-				var promise = Promise.resolve();
+				var promise = RSVP.resolve();
 				for (var $t1 = 0; $t1 < this.$asyncInitList.length; $t1++) {
 					var k = { $: this.$asyncInitList[$t1] };
 					promise = promise.then(ss.mkdel({ k: k }, function() {

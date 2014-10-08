@@ -65,26 +65,23 @@ namespace Serenity
 
         protected virtual Promise<PropertyGridOptions> GetPropertyGridOptionsAsync()
         {
-            return new Promise<PropertyGridOptions>((done, fail) =>
+            return GetPropertyItemsAsync().ThenSelect(propertyItems =>
             {
-                GetPropertyItemsAsync().Then(propertyItems =>
+                return new PropertyGridOptions
                 {
-                    done(new PropertyGridOptions
-                    {
-                        IdPrefix = this.idPrefix,
-                        Items = propertyItems,
-                        Mode = PropertyGridMode.Insert
-                    });
-                });
+                    IdPrefix = this.idPrefix,
+                    Items = propertyItems,
+                    Mode = PropertyGridMode.Insert
+                };
             });
         }
 
         protected virtual Promise<List<PropertyItem>> GetPropertyItemsAsync()
         {
-            return new Promise<List<PropertyItem>>((done, fail) => 
+            return Promise.Void.ThenAwait(() =>
             {
                 var formKey = GetFormKey();
-                Q.GetFormAsync(formKey).Then(done, fail);
+                return Q.GetFormAsync(formKey);
             });
         }
     }

@@ -265,7 +265,7 @@ namespace Serenity
 
             if (item.EditorParams != null)
             {
-                asyncInitList.Add(editor.Initialize().Then(delegate()
+                asyncInitList.Add(editor.Initialize().Then(() =>
                 {
                     ReflectionOptionsSetter.Set(editor, item.EditorParams);
                 }));
