@@ -10,6 +10,7 @@ namespace Serenity
 {
     public interface IDialog
     {
+        void DialogOpen();
     }
 
     public class PanelAttribute : Attribute

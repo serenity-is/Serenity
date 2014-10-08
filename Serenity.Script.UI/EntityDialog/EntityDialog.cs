@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Serenity
 {
-    public interface IEditDialog
+    public interface IEditDialog : IDialog
     {
-        void LoadAndOpenDialog(object entityOrId);
+        void Load(object entityOrId, Action done, Action<object> fail);
     }
 
     public abstract partial class EntityDialog<TEntity, TOptions> : TemplatedDialog<TOptions>, IEditDialog

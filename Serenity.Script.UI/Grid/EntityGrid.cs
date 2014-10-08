@@ -168,7 +168,7 @@ namespace Serenity
                 var dialog = dlg as IEditDialog;
                 if (dialog != null)
                 {
-                    dialog.LoadAndOpenDialog(entityOrId);
+                    dialog.Load(entityOrId, () => dialog.DialogOpen(), null);
                     return;
                 }
 
@@ -190,7 +190,7 @@ namespace Serenity
                 var dialog = dlg as IEditDialog;
                 if (dialog != null)
                 {
-                    dialog.LoadAndOpenDialog(entityOrId);
+                    dialog.Load(entityOrId, () => dialog.DialogOpen(), null);
                     return;
                 }
 
