@@ -234,9 +234,7 @@ namespace Serenity
             }
             else
             {
-                #pragma warning disable 618
                 slickColumns = PostProcessColumns(GetColumns());
-                #pragma warning restore 618
             }
 
             var slickOptions = GetSlickOptions();
@@ -604,7 +602,6 @@ namespace Serenity
             return new List<PropertyItem>();
         }
 
-        [Obsolete("Prefer async version")]
         protected virtual List<SlickColumn> GetColumns()
         {
             #pragma warning disable 618

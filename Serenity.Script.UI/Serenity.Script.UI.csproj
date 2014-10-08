@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NoStdLib>True</NoStdLib>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -160,13 +160,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Script.Core\Serenity.Script.Core.csproj">
-      <Project>{55fcc86f-c622-4909-819f-19ddd5263579}</Project>
-      <Name>Serenity.Script.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Serenity.Script.Imports\Serenity.Script.Imports.csproj">
       <Project>{1e32ed5b-d96e-41d9-b532-577005b0ddb0}</Project>
       <Name>Serenity.Script.Imports</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Script.Core\Serenity.Script.Core.csproj">
+      <Project>{55fcc86f-c622-4909-819f-19ddd5263579}</Project>
+      <Name>Serenity.Script.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\tools\Saltarelle\Saltarelle.Compiler.targets" />

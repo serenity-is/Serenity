@@ -317,7 +317,6 @@ namespace Serenity
             return false;
         }
 
-        [Obsolete("Prefer async version")]
         protected override List<SlickColumn> GetColumns()
         {
             var self = this;
