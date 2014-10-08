@@ -32,31 +32,4 @@ namespace Serenity.Data.Mapping
         public String ToTable { get; private set; }
         public String OnCriteria { get; private set; }
     }
-
-    [Obsolete("Use LeftJoinAttribute instead")]
-    public class AddJoinAttribute : LeftJoinAttribute
-    {
-        public AddJoinAttribute(string alias)
-            : base(alias)
-        {
-        }
-    }
-
-    [Obsolete("Use LeftJoinAttribute instead")]
-    public class AddJoinToAttribute : LeftJoinAttribute
-    {
-        public AddJoinToAttribute(string alias, string toTable, string field)
-            : base(alias, toTable, field)
-        {
-        }
-    }
-
-    [Obsolete("Use LeftJoinAttribute instead")]
-    public class AddLeftJoinAttribute : LeftJoinAttribute
-    {
-        public AddLeftJoinAttribute(string alias, string toTable, string criteria)
-            : base(alias, toTable, criteria)
-        {
-        }
-    }
 }

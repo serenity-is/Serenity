@@ -14,13 +14,4 @@ namespace Serenity.Data.Mapping
         public String Alias { get; private set; }
         public String InnerQuery { get; private set; }
     }
-
-    [Obsolete("Use OuterApplyAttribute instead")]
-    public class AddOuterApplyAttribute : OuterApplyAttribute
-    {
-        public AddOuterApplyAttribute(string alias, string innerQuery)
-            : base(alias, innerQuery)
-        {
-        }
-    }
 }

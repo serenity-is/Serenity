@@ -70,21 +70,6 @@ namespace Serenity
         }
 
         /// <summary>
-        ///   Converts an object to its JSON representation</summary>
-        /// <param name="value">
-        ///   Object</param>
-        /// <returns>
-        ///   JSON representation string.</returns>
-        /// <remarks>
-        ///   null, Int32, Boolean, DateTime, Decimal, Double, Guid types handled automatically.
-        ///   If object has a ToJson method it is used, otherwise value.ToString() is used as last fallback.</remarks>
-        [Obsolete("Use ToJson()")]
-        public static string ToJsonString(this object value)
-        {
-            return Stringify(value);
-        }
-
-        /// <summary>
         ///   Converts an object to its JSON representation (extension method for Stringify)</summary>
         /// <param name="value">
         ///   Object</param>

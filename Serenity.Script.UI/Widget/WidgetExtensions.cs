@@ -104,50 +104,12 @@ namespace Serenity
         {
             return null;
         }
-
-        [Obsolete("Use Widget.ElementFor")]
-        public static jQueryObject CreateElementFor<TEditor>()
-        {
-            return Widget.ElementFor<TEditor>();
-        }
-
-        [Obsolete("Use Widget.ElementFor")]
-        public static jQueryObject CreateElementFor(Type editorType)
-        {
-            return Widget.ElementFor(editorType);
-        }
-
+        
         [Obsolete("Use Widget.Create")]
         public static TWidget Create<TWidget>(Action<jQueryObject> initElement, object options = null)
             where TWidget : Widget
         {
             return Widget.Create<TWidget>(initElement, options);
-        }
-
-        [Obsolete("Use ValidationExtensions.ValidateElement")]
-        public static bool ValidateElement(jQueryValidator validator, Widget widget)
-        {
-            return ValidationExtensions.ValidateElement(validator, widget);
-        }
-
-        [Obsolete("Use ValidationExtensions.AddValidationRule")]
-        public static jQueryObject AddValidationRule(Widget widget, string eventClass,
-            Func<jQueryObject, string> rule)
-        {
-            return ValidationExtensions.AddValidationRule(widget.Element, eventClass, rule);
-        }
-
-        [Obsolete("Use ValidationExtensions.AddValidationRule")]
-        public static jQueryObject AddValidationRule(jQueryObject element, string eventClass,
-            Func<jQueryObject, string> rule)
-        {
-            return ValidationExtensions.AddValidationRule(element, eventClass, rule);
-        }
-
-        [Obsolete("Use ValidationExtensions.RemoveValidationRule")]
-        public static jQueryObject RemoveValidationRule(jQueryObject element, string eventClass)
-        {
-            return ValidationExtensions.RemoveValidationRule(element, eventClass);
         }
     }
 }

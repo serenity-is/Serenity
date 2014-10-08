@@ -484,9 +484,4 @@ namespace Serenity.PropertyGrid
             return pi;
         }
     }
-
-    [Obsolete("Use PropertyItemHelper")]
-    public class PropertyEditorHelper : PropertyItemHelper
-    {
-    }
 }

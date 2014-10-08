@@ -50,7 +50,6 @@ namespace Serenity
             });
         }
 
-        [Obsolete("Prefer async version")]
         protected virtual List<PropertyItem> GetPropertyItems()
         {
             var formKey = GetFormKey();
@@ -59,7 +58,6 @@ namespace Serenity
             #pragma warning restore 618
         }
 
-        [Obsolete("Prefer async version")]
         protected virtual PropertyGridOptions GetPropertyGridOptions()
         {
             #pragma warning disable 618

@@ -219,7 +219,6 @@ namespace Serenity
             }
         }
 
-        [Obsolete("Prefer async version")]
         protected virtual List<PropertyItem> GetPropertyItems()
         {
             #pragma warning disable 618

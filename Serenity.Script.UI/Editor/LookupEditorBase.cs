@@ -60,7 +60,6 @@ namespace Serenity
             return key;
         }
 
-        [Obsolete("Prefer async version")]
         protected virtual Lookup<TItem> GetLookup()
         {
             #pragma warning disable 618
@@ -92,7 +91,6 @@ namespace Serenity
             return false;
         }
 
-        [Obsolete("Prefer async version")]
         protected virtual void UpdateItems()
         {
             #pragma warning disable 618

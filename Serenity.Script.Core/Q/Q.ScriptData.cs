@@ -146,7 +146,6 @@ namespace Serenity
                 });
             }
 
-            [Obsolete("Prefer asynchronous version")]
             public static object Reload(string name)
             {
                 if (!registered.ContainsKey(name))
@@ -206,7 +205,6 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        [Obsolete("Prefer asynchronous version")]
         public static TData GetRemoteData<TData>(string key)
         {
             #pragma warning disable 618
@@ -221,7 +219,6 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        [Obsolete("Prefer asynchronous version")]
         public static Lookup<TItem> GetLookup<TItem>(string key)
         {
             #pragma warning disable 618
@@ -235,7 +232,6 @@ namespace Serenity
             ScriptData.Ensure<Lookup<TItem>>("Lookup." + key, complete, fail);
         }
 
-        [Obsolete("Prefer asynchronous version")]
         public static void ReloadLookup(string key)
         {
             #pragma warning disable 618
@@ -263,7 +259,6 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        [Obsolete("Prefer asynchronous version")]
         public static List<PropertyItem> GetForm(string key)
         {
             #pragma warning disable 618
@@ -276,7 +271,6 @@ namespace Serenity
             ScriptData.Ensure<List<PropertyItem>>("Form." + key, complete, fail);
         }
 
-        [Obsolete("Prefer asynchronous version")]
         public static string GetTemplate(string key)
         {
             #pragma warning disable 618
