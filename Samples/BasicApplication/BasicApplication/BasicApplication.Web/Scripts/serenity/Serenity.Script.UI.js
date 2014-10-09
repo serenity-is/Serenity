@@ -5600,7 +5600,7 @@
 		},
 		initialize: function() {
 			if (!this.isAsyncWidget()) {
-				return RSVP.resolve(0);
+				return RSVP.resolve();
 			}
 			if (ss.isNullOrUndefined(this.asyncPromise)) {
 				this.asyncPromise = this.initializeAsync();
@@ -5611,12 +5611,13 @@
 			return ss.isInstanceOfType(this, $Serenity_IAsyncInit);
 		},
 		initializeAsync: function() {
-			return RSVP.resolve(0);
+			return RSVP.resolve();
 		},
 		destroy: function() {
 			this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
 			this.element.unbind('.' + this.widgetName).removeData(this.widgetName);
 			this.element = null;
+			this.asyncPromise = null;
 		},
 		addCssClass: function() {
 			this.element.addClass('s-' + ss.getTypeName(ss.getInstanceType(this)));

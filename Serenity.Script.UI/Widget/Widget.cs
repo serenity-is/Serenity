@@ -76,7 +76,7 @@ namespace Serenity
         public Promise Initialize()
         {
             if (!IsAsyncWidget())
-                return Promise.FromValue(0);
+                return Promise.Void;
 
             if (asyncPromise == null)
                 asyncPromise = this.InitializeAsync();
@@ -91,7 +91,7 @@ namespace Serenity
 
         protected virtual Promise InitializeAsync()
         {
-            return Promise.FromValue(0);
+            return Promise.Void;
         }
 
         /// <summary>
@@ -105,6 +105,7 @@ namespace Serenity
                 .RemoveData(widgetName);
 
             element = null;
+            asyncPromise = null;
         }
 
         /// <summary>

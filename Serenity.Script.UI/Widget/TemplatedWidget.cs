@@ -30,13 +30,13 @@ namespace Serenity
         protected override Promise InitializeAsync()
         {
             return base.InitializeAsync()
-                .ThenAwait(GetTemplateAsync)
-                .Then(template =>
+                .ThenAwait(new Func<Promise<string>>(GetTemplateAsync))
+                .Then(new Action<string>((string template) =>
                 {
                     string widgetMarkup = template.Replace(new Regex("~_", "g"), idPrefix);
                     widgetMarkup = JsRender.Render(widgetMarkup);
                     this.element.Html(widgetMarkup);
-                });
+                }));
         }
 
         public jQueryObject ById(string id)
