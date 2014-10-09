@@ -343,6 +343,7 @@
         "height": newHeight,
         "width": newWidth,
         "position": {
+          of: window,
           my: "left top",
           at: "left top"
         }
@@ -366,6 +367,7 @@
         "width": original.size.width,
         "maxHeight": original.size.maxHeight,
         "position": {
+          of: window,
           my: "left top",
           at: "left+" + original.position.left + " top+" + original.position.top
         }
