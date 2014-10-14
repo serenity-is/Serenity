@@ -1666,6 +1666,7 @@
 					if (ss.isNullOrUndefined(entityOrId)) {
 						this.loadResponse({});
 						done();
+						return;
 					}
 					var scriptType = typeof(entityOrId);
 					if (scriptType === 'string' || scriptType === 'number') {
@@ -1674,11 +1675,11 @@
 						this.loadById(entityId, function(response) {
 							window.setTimeout(done, 0);
 						});
+						return;
 					}
-					else {
-						var entity = entityOrId || ss.createInstance(TEntity);
-						this.loadResponse({ Entity: entity });
-					}
+					var entity = entityOrId || ss.createInstance(TEntity);
+					this.loadResponse({ Entity: entity });
+					done();
 				}));
 			},
 			loadNewAndOpenDialog: function() {

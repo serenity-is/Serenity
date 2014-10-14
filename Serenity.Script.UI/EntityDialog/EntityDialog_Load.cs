@@ -18,6 +18,7 @@ namespace Serenity
                 {
                     LoadResponse(new RetrieveResponse<TEntity>());
                     done();
+                    return;
                 }
 
                 var scriptType = Script.TypeOf(entityOrId);
@@ -26,12 +27,12 @@ namespace Serenity
                     var self = this;
                     var entityId = entityOrId.As<long>();
                     LoadById(entityId, response => Window.SetTimeout(done, 0));
+                    return;
                 }
-                else
-                {
-                    var entity = entityOrId.As<TEntity>() ?? new TEntity();
-                    LoadResponse(new RetrieveResponse<TEntity> { Entity = entity });
-                }
+                 
+                var entity = entityOrId.As<TEntity>() ?? new TEntity();
+                LoadResponse(new RetrieveResponse<TEntity> { Entity = entity });
+                done();
             });
         }
 
