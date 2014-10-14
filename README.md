@@ -27,7 +27,11 @@ When application launches use `admin` user and `serenity` password to login. You
 
 The sample application includes old and famous Nortwind data along with services and user interface for editing it that is mostly produced by Serenity Code Generator.
 
-You can take a look at the code for this application while more documentation is on the way...
+## Documentation
+
+[Serenity Guide](https://github.com/volkanceylan/SerenityGuide/blob/master/en/SUMMARY.md)
+
+Currently documentation is a bit scarce, but is worked on.
 
 ## What's In The Name
 
