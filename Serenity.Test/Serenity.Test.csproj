@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FakeItEasy">
+      <HintPath>..\Samples\BasicApplication\packages\FakeItEasy.1.24.0\lib\net40\FakeItEasy.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>$(SolutionDir)packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -77,7 +80,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authorization\AuthorizationTests.cs" />
+    <Compile Include="Core\LocalCacheTests.cs" />
+    <Compile Include="Core\AuthorizationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterDeserializationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />
     <Compile Include="Data\FakeDisplayOrderRow.cs" />
