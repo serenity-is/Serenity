@@ -6,7 +6,7 @@ Bugfixes:
   - dialog fills page correctly when maximized (breaking change in jQuery UI 1.11)
   - make select editor non-abstract. required for enums to work
 
-## 1.3.0 (2014-08-23)
+## 1.3.0 (2014-10-09)
 
 Features:
 
