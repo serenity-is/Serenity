@@ -9,7 +9,7 @@ namespace Serenity
 {
     [Editor, DisplayName("Açılır Liste"), OptionsType(typeof(SelectEditorOptions))]
     [Element("<input type=\"hidden\"/>")]
-    public abstract class SelectEditor : Select2Editor<SelectEditorOptions, Select2Item>, IStringValue
+    public class SelectEditor : Select2Editor<SelectEditorOptions, Select2Item>, IStringValue
     {
         public SelectEditor(jQueryObject hidden, SelectEditorOptions opt)
             : base(hidden, opt)
