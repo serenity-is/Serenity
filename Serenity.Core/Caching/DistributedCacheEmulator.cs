@@ -43,7 +43,7 @@ namespace Serenity.Caching
                 }
                 else
                 {
-                    var l = Convert.ToInt64(value) + 1;
+                    var l = Convert.ToInt64(value) + amount;
                     this.dictionary[key] = l;
                     return l;
                 }
@@ -67,7 +67,7 @@ namespace Serenity.Caching
 
                 DateTime expires;
                 if (this.expiration.TryGetValue(key, out expires) &&
-                    expires >= DateTime.Now)
+                    expires <= DateTime.Now)
                 {
                     this.dictionary.Remove(key);
                     this.expiration.Remove(key);

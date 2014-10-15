@@ -80,7 +80,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\LocalCacheTests.cs" />
+    <Compile Include="Core\Caching\DistributedCacheEmulatorTests.cs" />
+    <Compile Include="Core\Caching\DistributedCacheTests.cs" />
+    <Compile Include="Core\Caching\LocalCacheTests.cs" />
     <Compile Include="Core\AuthorizationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterDeserializationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />
