@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FakeItEasy">
-      <HintPath>..\Samples\BasicApplication\packages\FakeItEasy.1.24.0\lib\net40\FakeItEasy.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\FakeItEasy.1.24.0\lib\net40\FakeItEasy.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
