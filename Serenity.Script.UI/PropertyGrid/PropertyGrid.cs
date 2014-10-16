@@ -265,10 +265,15 @@ namespace Serenity
 
             if (item.EditorParams != null)
             {
-                asyncInitList.Add(editor.Initialize().Then(() =>
+                Action init = () =>
                 {
                     ReflectionOptionsSetter.Set(editor, item.EditorParams);
-                }));
+                };
+
+                if (editor.IsAsyncWidget())
+                    asyncInitList.Add(editor.Initialize().Then(init));
+                else
+                    init();
             }
 
             if (Script.IsValue(item.MaxLength))

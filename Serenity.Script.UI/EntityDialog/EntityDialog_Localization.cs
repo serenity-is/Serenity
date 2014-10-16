@@ -73,7 +73,7 @@ namespace Serenity
                 }
 
             pgOptions.Items = items;
-            localizationGrid = new PropertyGrid(localGridDiv, pgOptions);
+            localizationGrid = new PropertyGrid(localGridDiv, pgOptions).Init();
 
             localGridDiv.AddClass("s-LocalizationGrid");
 

@@ -84,7 +84,7 @@ namespace Serenity
             return asyncPromise;
         }
 
-        protected virtual bool IsAsyncWidget()
+        public virtual bool IsAsyncWidget()
         {
             return this is IAsyncInit;
         }

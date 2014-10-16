@@ -22,7 +22,7 @@ namespace Serenity
             var pgOptions = GetPropertyGridOptions();
             #pragma warning restore 618
 
-            propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+            propertyGrid = new PropertyGrid(pgDiv, pgOptions).Init();
         }
 
         private Promise InitPropertyGridAsync()

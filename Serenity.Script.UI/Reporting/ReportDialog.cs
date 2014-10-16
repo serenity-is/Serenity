@@ -32,7 +32,7 @@ namespace Serenity.Reporting
                 IdPrefix = this.IdPrefix,
                 UseCategories = true,
                 Items = propertyItems
-            });
+            }).Init();
         }
 
         public void LoadReport(string reportKey)
