@@ -1,7 +1,7 @@
-﻿using Serenity.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Serenity.Services;
 
 namespace Serenity.Data
 {
@@ -80,7 +80,7 @@ namespace Serenity.Data
         }
 
         public static TRow Single<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, IIdRow, new()
+            where TRow : Row, new()
         {
             var row = TrySingle<TRow>(connection, editQuery);
 
@@ -91,7 +91,7 @@ namespace Serenity.Data
         }
 
         public static TRow TrySingle<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, IIdRow, new()
+            where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             var query = new SqlQuery().From(row);
@@ -129,7 +129,7 @@ namespace Serenity.Data
         }
 
         public static TRow First<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, IIdRow, new()
+            where TRow : Row, new()
         {
             var row = TryFirst<TRow>(connection, editQuery);
 
@@ -140,7 +140,7 @@ namespace Serenity.Data
         }
 
         public static TRow TryFirst<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
-            where TRow : Row, IIdRow, new()
+            where TRow : Row, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             var query = new SqlQuery().From(row);
