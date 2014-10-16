@@ -1,13 +1,10 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Web.Mvc;
-using Newtonsoft.Json;
-using Serenity.Data;
-using Serenity.Reflection;
-using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Web.Mvc;
+using Serenity.Reflection;
 using Serenity.Services;
 
 namespace Serenity.CodeGeneration
@@ -79,7 +76,7 @@ namespace Serenity.CodeGeneration
                             continue;
 
                         // belki burada daha sonra metod listesini de verebiliriz (ayrı bir namespace de?)
-                        var parameters = method.GetParameters();
+                        var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
                         if (parameters.Length != 1)
                         {
                             // tek parametreli olmalı
