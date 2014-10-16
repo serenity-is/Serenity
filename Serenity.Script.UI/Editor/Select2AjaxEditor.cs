@@ -8,7 +8,7 @@ namespace Serenity
     [Element("<input type=\"hidden\"/>")]
     public abstract class Select2AjaxEditor<TOptions, TItem> : Widget<TOptions>, IStringValue
         where TOptions : class, new()
-        where TItem: class, new()
+        where TItem: class
     {
         protected int pageSize = 50;
 

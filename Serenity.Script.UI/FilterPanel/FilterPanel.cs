@@ -2,72 +2,86 @@
 using System;
 using System.Collections.Generic;
 using System.Html;
+using System.Linq;
 
 namespace Serenity
 {
-    public class FilterField
+    public class FilterPanelTest : ScriptContext
     {
-        public string Name;
-        public string Title;
-        public string Handler;
+        public void Run()
+        {
+            Type t = Window.Instance.As<dynamic>().Marmara.Personel.PersonelIletisimGrid;
+            dynamic grid = Activator.CreateInstance(t, Q.NewBodyDiv());
+            var filterable = new FilterableColumns(grid.slickGrid.getColumns());
+            var panel = new FilterPanel(J(".page-content"));
+            panel.Source = filterable;
+        }
+
+        private class FilterableColumns : IFilterableSource
+        {
+            private SlickColumn[] columns;
+
+            public FilterableColumns(SlickColumn[] columns)
+            {
+                this.columns = columns;
+            }
+
+            private class MyFilterField : IFilterField
+            {
+                private SlickColumn column;
+
+                public MyFilterField(SlickColumn column)
+                {
+                    this.column = column;
+                }
+
+                public string Name
+                {
+                    get 
+                    { 
+                        return column.Field; 
+                    }
+                }
+
+                public string Title
+                {
+                    get 
+                    {
+                        return column.Title; 
+                    }
+                }
+            }
+
+            public IFilterField FindField(string fieldName)
+            {
+                var column = columns.FirstOrDefault(x => x.Field == fieldName);
+                return column == null ? null : new MyFilterField(column);
+            }
+
+            public IEnumerable<IFilterField> GetFields()
+            {
+                return columns.Select(x => (IFilterField)new MyFilterField(x));
+            }
+        }
     }
 
-    public interface IFilterHandler
-    {
-        List<string> GetOperators();
-        string OperatorTitle(string op);
-        string OperatorFormat(string op);
-        void CreateEditor(string op);
-        void ToFilterLine(FilterLine line);
-    }
-
-    public class FilterLine
-    {
-        public string Field;
-        public string Title;
-        public string Operator;
-        public bool IsOr;
-        public bool LeftParen;
-        public bool RightParen;
-        public string ValidationError;
-        public string Value;
-        public string Value2;
-        public List<string> Values;
-        public string DisplayText;
-    }
-
-    public class FilterPanelOptions
-    {
-        public List<FilterField> Fields;
-        public Action<List<FilterLine>> FilterChange;
-    }
-
-    public class FilterPanel : TemplatedWidget<FilterPanelOptions>
+    public partial class FilterPanel : FilterWidgetBase<object>
     {
         private jQueryObject rowsDiv;
-        private JsDictionary<string, FilterField> fieldByName;
-        private List<FilterLine> currentFilter;
 
-        public FilterPanel(jQueryObject div, FilterPanelOptions opt)
-            : base(div, opt)
+        public FilterPanel(jQueryObject div)
+            : base(div, null)
         {
-            fieldByName = new JsDictionary<string, FilterField>();
-
             this.Element.AddClass("s-FilterPanel");
             rowsDiv = this.ById("Rows");
 
             InitButtons();
-            InitFieldByName();
-            BindSearchToEnterKey();
-
             UpdateButtons();
         }
 
-        private void InitFieldByName()
+        protected override string GetTemplate()
         {
-            if (options.Fields != null)
-                foreach (FilterField field in options.Fields)
-                    fieldByName[field.Name] = field;
+            return PanelTemplate;
         }
 
         private void InitButtons()
@@ -77,38 +91,39 @@ namespace Serenity
             this.ById("ResetButton").Text(Q.Text("Controls.FilterPanel.ResetButton")).Click(ResetButtonClick);
         }
 
-        private void BindSearchToEnterKey()
+        private void SearchButtonClick(jQueryEvent e)
         {
-            this.Element.Bind("keypress", delegate(jQueryEvent e)
-            {
-                if (e.Which != 13)
-                    return;
-
-                if (rowsDiv.Children().Length == 0)
-                    return;
-
-                Search();
-            });
+            e.PreventDefault();
         }
 
         private void AddButtonClick(jQueryEvent e)
         {
+            AddEmptyRow();
+            e.PreventDefault();
+        }
+
+        private void ResetButtonClick(jQueryEvent e)
+        {
             e.PreventDefault();
 
-            AddEmptyRow();
+            rowsDiv.Empty();
+            Store.Items.Clear();
+            Store.RaiseChanged();
+            UpdateButtons();
+            //OnHeightChange();
         }
 
         private jQueryObject FindEmptyRow()
         {
             jQueryObject result = null;
 
-            rowsDiv.Children().Each(delegate(int index, System.Html.Element row)
+            rowsDiv.Children().Each((index, row) =>
             {
-                jQueryObject fieldSelect = J(row).Children("div.f").Children("select");
-                if (fieldSelect.Length == 0)
+                jQueryObject fieldInput = J(row).Children("div.f").Children("input.field-select").First();
+                if (fieldInput.Length == 0)
                     return true;
 
-                string val = fieldSelect.GetValue();
+                string val = fieldInput.GetValue();
                 if (val == null || val.Length == 0)
                 {
                     result = J(row);
@@ -147,17 +162,13 @@ namespace Serenity
 
             row.Children("a.delete").Attribute("title", Q.Text("Controls.FilterPanel.RemoveField")).Click(DeleteRowClick);
 
-            jQueryObject fieldSel = row.Children("div.f").Children("select");
-
-            fieldSel.Change(OnRowFieldChange);
-
-            PopulateFieldList(fieldSel);
+            var fieldSel = new FieldSelect(row.Children("div.f").Children("input"), () => this.Source);
+            fieldSel.ChangeSelect2(OnRowFieldChange);
 
             UpdateParens();
             UpdateButtons();
-            OnHeightChange();
 
-            fieldSel.Focus();
+            fieldSel.Element.Focus();
 
             return row;
         }
@@ -171,114 +182,12 @@ namespace Serenity
             catch { }
         }
 
-        private void PopulateFieldList(jQueryObject select)
-        {
-            if (select.Length == 0)
-                return;
-
-            SelectElement sel = (SelectElement)select[0];
-
-            Q.AddOption(select, "", Q.Text("Controls.FilterPanel.SelectField"));
-            List<FilterField> fields = options.Fields;
-            if (fields != null)
-            {
-                foreach (FilterField field in fields)
-                    Q.AddOption(select, field.Name, field.Title ?? field.Name);
-            }
-        }
-
-        private void RemoveFilterHandler(jQueryObject row)
-        {
-            row.Data("FilterHandler", null);
-            row.Data("FilterHandlerField", null);
-        }
-
-        private FilterField GetFieldFor(jQueryObject row)
-        {
-            if (row.Length == 0)
-                return null;
-
-            string fieldName = row.Children("div.f").Children("select").GetValue();
-            if (fieldName == null || fieldName == "")
-                return null;
-
-            FilterField field = fieldByName[fieldName];
-            return field;
-        }
-
-        private IFilterHandler GetFilterHandlerFor(jQueryObject row)
-        {
-            FilterField field = GetFieldFor(row);
-            if (field == null)
-                return null;
-
-            IFilterHandler handler = (IFilterHandler)row.GetDataValue("FilterHandler");
-            string handlerField = row.GetDataValue("FilterHandlerField").As<string>();
-
-            if (handler != null)
-            {
-                if (handlerField != field.Name)
-                {
-                    row.Data("FilterHandler", null);
-                    handler = null;
-                }
-                else
-                {
-                    return handler;
-                }
-            }
-
-            Type handlerType = Type.GetType("Sinerji." + (field.Handler ?? "??") + "FilterHandler");
-            if (handlerType == null)
-                throw new Exception(String.Format("FilterHandler type Sinerji.{0}FilterHandler is not defined!", field.Handler));
-
-            jQueryObject editorDiv = row.Children("div.v");
-
-            handler = (IFilterHandler)Activator.CreateInstance(handlerType, editorDiv, field);
-
-            return handler;
-        }
-
-        private void PopulateOperatorList(jQueryObject select)
-        {
-            jQueryObject row = select.Closest("div.row");
-
-            IFilterHandler handler = GetFilterHandlerFor(row);
-            if (handler == null)
-                return;
-
-            List<string> operators = handler.GetOperators();
-
-            SelectElement sel = (SelectElement)select[0];
-
-            if (operators != null)
-                foreach (string op in operators)
-                    Q.AddOption(select, op, handler.OperatorTitle(op));
-        }
-
-        private void OnRowOperatorChange(jQueryEvent e)
-        {
-            jQueryObject row = J(e.Target).Closest("div.row");
-            RowOperatorChange(row);
-            jQueryObject firstInput = row.Children("div.v").Find(":input:visible").First();
-            try { firstInput.Focus(); }
-            catch { };
-        }
-
         private void RowFieldChange(jQueryObject row)
         {
-            jQueryObject select = row.Children("div.f").Children("select");
-            string fieldName = select.GetValue();
+            var select = row.Children("div.f").Children("input.field-select").GetWidget<FieldSelect>();
+            string fieldName = select.Value;
 
             bool isEmpty = (fieldName == null || fieldName == "");
-
-            // if a field is selected and first option is "---please select---", remove it
-            if (!isEmpty)
-            {
-                OptionElement firstOption = (OptionElement)select.Children("option").First()[0];
-                if (firstOption.Value == null || firstOption.Value == "")
-                    J(firstOption).Remove();
-            }
 
             jQueryObject opDiv = row.Children("div.o");
             jQueryObject opSelect = opDiv.Children("select");
@@ -288,13 +197,40 @@ namespace Serenity
             else
                 Q.ClearOptions(opSelect);
 
-            RemoveFilterHandler(row);
+            //RemoveFilterHandler(row);
 
             PopulateOperatorList(opSelect);
 
             RowOperatorChange(row);
             UpdateParens();
             UpdateButtons();
+        }
+
+        private void PopulateOperatorList(jQueryObject select)
+        {
+            jQueryObject row = select.Closest("div.row");
+
+            /*IFilterHandler handler = GetFilterHandlerFor(row);
+            if (handler == null)
+                return;
+
+            List<string> operators = handler.GetOperators();
+
+            SelectElement sel = (SelectElement)select[0];
+
+            if (operators != null)
+                foreach (string op in operators)
+                    Q.AddOption(select, op, handler.OperatorTitle(op));*/
+        }
+
+
+        private void OnRowOperatorChange(jQueryEvent e)
+        {
+            jQueryObject row = J(e.Target).Closest("div.row");
+            RowOperatorChange(row);
+            jQueryObject firstInput = row.Children("div.v").Find(":input:visible").First();
+            try { firstInput.Focus(); }
+            catch { };
         }
 
         private void RowOperatorChange(jQueryObject row)
@@ -306,16 +242,16 @@ namespace Serenity
 
             editorDiv.Html("");
 
-            IFilterHandler handler = GetFilterHandlerFor(row);
+            //IFilterHandler handler = null;//GetFilterHandlerFor(row);
 
-            if (handler == null)
-                return;
+            //if (handler == null)
+            //    return;
 
-            string op = row.Children("div.o").Children("select").GetValue();
-            if (op == null || op == "")
-                return;
+            //string op = row.Children("div.o").Children("select").GetValue();
+            //if (op == null || op == "")
+            //    return;
 
-            handler.CreateEditor(op);
+            //handler.CreateEditor(op);
         }
 
         private void DeleteRowClick(jQueryEvent e)
@@ -328,7 +264,18 @@ namespace Serenity
 
             UpdateParens();
             UpdateButtons();
-            OnHeightChange();
+            //OnHeightChange();
+        }
+
+        private void Search()
+        {
+        }
+
+        private void UpdateButtons()
+        {
+            this.ById("SearchButton").Toggle(rowsDiv.Children().Length >= 1);
+            this.ById("ResetButton").Toggle(rowsDiv.Children().Length >= 1 ||
+                this.Store.Items.Count > 0);
         }
 
         private void AndOrClick(jQueryEvent e)
@@ -389,204 +336,31 @@ namespace Serenity
             }
         }
 
-        private void UpdateButtons()
-        {
-            this.ById("SearchButton").Toggle(rowsDiv.Children().Length >= 1);
-            this.ById("ResetButton").Toggle(rowsDiv.Children().Length >= 1 ||
-                this.currentFilter != null);
-        }
-
-        private void OnHeightChange()
-        {
-            //if (Options.HeightChange != null)
-            //    Options.HeightChange();
-        }
-
-        private void SearchButtonClick(jQueryEvent e)
-        {
-            e.PreventDefault();
-
-            Search();
-        }
-
-        private void Search()
-        {
-            List<FilterLine> filterLines = new List<FilterLine>();
-            string filterText = "";
-            string errorText = null;
-            jQueryObject row = null;
-
-            this.rowsDiv.Children().Children("div.v").Children("span.error").Remove();
-
-            bool inParens = false;
-
-            for (int i = 0; i < rowsDiv.Children().Length; i++)
-            {
-                row = rowsDiv.Children().Eq(i);
-
-                IFilterHandler handler = GetFilterHandlerFor(row);
-                if (handler == null)
-                    continue;
-
-                FilterField field = GetFieldFor(row);
-
-                string op = row.Children("div.o").Children("select").GetValue();
-                if (op == null || op.Length == 0)
-                {
-                    errorText = Q.Text("Controls.FilterPanel.InvalidOperator");
-                    break;
-                }
-
-                FilterLine lineEx = new FilterLine();
-                lineEx.Field = field.Name;
-                lineEx.Title = field.Title ?? field.Name;
-                lineEx.Operator = op;
-                lineEx.IsOr = row.Children("div.l").Children("a.andor").HasClass("or");
-                lineEx.LeftParen = row.Children("div.l").Children("a.leftparen").HasClass("active");
-                lineEx.RightParen = row.Children("div.l").Children("a.rightparen").HasClass("active");
-
-                handler.ToFilterLine(lineEx);
-
-                if (lineEx.ValidationError != null)
-                {
-                    errorText = lineEx.ValidationError;
-                    break;
-                }
-
-                FilterLine line = new FilterLine();
-                line.Field = lineEx.Field;
-                line.Operator = lineEx.Operator;
-
-                if (Script.IsValue(lineEx.Value))
-                    line.Value = lineEx.Value;
-
-                if (Script.IsValue(lineEx.Value2))
-                    line.Value2 = lineEx.Value2;
-
-                if (Script.IsValue(lineEx.Values) &&
-                    lineEx.Values.Count > 0)
-                    line.Values = lineEx.Values;
-
-                if (lineEx.LeftParen)
-                    line.LeftParen = 1.As<bool>();
-
-                if (lineEx.RightParen)
-                    line.RightParen = 1.As<bool>();
-
-                if (lineEx.IsOr)
-                    line.IsOr = 1.As<bool>();
-
-                filterLines.Add(line);
-
-                if (inParens && (lineEx.RightParen || lineEx.LeftParen))
-                {
-                    filterText += ")";
-                    inParens = false;
-                }
-
-                if (filterText.Length > 0)
-                    filterText += " " + Q.Text("Controls.FilterPanel." + (lineEx.IsOr ? "Or" : "And")) + " ";
-
-                if (lineEx.LeftParen)
-                {
-                    filterText += "(";
-                    inParens = true;
-                }
-
-                filterText += lineEx.DisplayText;
-            }
-
-            // if an error occured, display it, otherwise set current filters
-            if (errorText != null)
-            {
-                J("<span/>").AddClass("error").Text(errorText).AppendTo(row.Children("div.v"));
-                row.Children("div.v").Find("input:first").Focus();
-                return;
-            }
-
-            if (filterLines.Count == 0)
-                this.SetCurrentFilter(null, null);
-            else
-                this.SetCurrentFilter(filterLines, filterText);
-        }
-
-        private void ResetButtonClick(jQueryEvent e)
-        {
-            e.PreventDefault();
-
-            rowsDiv.Empty();
-            SetCurrentFilter(null, null);
-            UpdateParens();
-            UpdateButtons();
-            OnHeightChange();
-        }
-
-        private void SetCurrentFilter(List<FilterLine> value, string text)
-        {
-            if (Q.ToJson(value) != Q.ToJson(currentFilter))
-            {
-                if (value != null)
-                {
-                    this.currentFilter = value;
-                    text = String.Format(Q.Text("Controls.FilterPanel.CurrentFilter"), text);
-                    this.ById("DisplayText").Text(text).Show();
-                }
-                else
-                {
-                    currentFilter = null;
-                    this.ById("DisplayText").Text("").Hide();
-                }
-
-                UpdateParens();
-                UpdateButtons();
-                OnFilterChange();
-                OnHeightChange();
-            }
-        }
-
-        public List<FilterLine> CurrentFilter
-        {
-            get { return currentFilter; }
-        }
-
         public const string PanelTemplate =
-            "<div id=\"~_Rows\" class=\"rows\">" +
+            "<div id='~_Rows' class='rows'>" +
             "</div>" +
-            "<div id=\"~_Buttons\" class=\"buttons\">" +
-                "<button id=\"~_AddButton\" class=\"add\"></button>" +
-                "<button id=\"~_SearchButton\" class=\"search\"></button>" +
-                "<button id=\"~_ResetButton\" class=\"reset\"></button>" +
+            "<div id='~_Buttons' class='buttons'>" +
+                "<button id='~_AddButton' class='add'></button>" +
+                "<button id='~_SearchButton' class='search'></button>" +
+                "<button id='~_ResetButton' class='reset'></button>" +
             "</div>" +
-            "<div style=\"clear: both\">" +
-            "</div>" +
-            "<div id=\"~_DisplayText\" class=\"display\" style=\"display: none;\">" +
+            "<div style='clear: both'>" +
             "</div>";
 
         public const string RowTemplate =
-            "<div class=\"row\">" +
-                "<a class=\"delete\"><span></span></a>" +
-                "<div class=\"l\">" +
-                    "<a class=\"rightparen\" href=\"#\">)</a>" +
-                    "<a class=\"andor\" href=\"#\"></a>" +
-                    "<a class=\"leftparen\" href=\"#\">(</a>" +
+            "<div class='row'>" +
+                "<a class='delete'><span></span></a>" +
+                "<div class='l'>" +
+                    "<a class='rightparen' href='#'>)</a>" +
+                    "<a class='andor' href='#'></a>" +
+                    "<a class='leftparen' href='#'>(</a>" +
                 "</div>" +
-                "<div class=\"f\">" +
-                    "<select></select>" +
+                "<div class='f'>" +
+                    "<input type='hidden' class='field-select'>" +
                 "</div>" +
-                "<div class=\"o\"></div>" +
-                "<div class=\"v\"></div>" +
-                "<div style=\"clear: both\"></div>" +
+                "<div class='o'></div>" +
+                "<div class='v'></div>" +
+                "<div style='clear: both'></div>" +
             "</div>";
-
-        protected override string GetTemplate()
-        {
-            return PanelTemplate;
-        }
-
-        public void OnFilterChange()
-        {
-            if (options.FilterChange != null)
-                options.FilterChange(this.currentFilter);
-        }
     }
 }

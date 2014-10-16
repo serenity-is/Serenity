@@ -15,6 +15,7 @@ namespace Serenity
     {
         protected jQueryObject titleDiv;
         protected Toolbar toolbar;
+        protected FilterBar filterBar;
         protected SlickRemoteView<TItem> view;
         protected jQueryObject slickContainer;
         protected SlickGrid slickGrid;
@@ -46,6 +47,9 @@ namespace Serenity
             this.view = CreateView();
 
             this.slickGrid = CreateSlickGrid();
+
+            if (EnableFiltering())
+                CreateFilterBar();
 
             if (UsePager())
                 CreatePager();
@@ -467,9 +471,23 @@ namespace Serenity
             return false;
         }
 
+        protected virtual bool EnableFiltering()
+        {
+            var attr = this.GetType().GetCustomAttributes(typeof(FilterableAttribute), true);
+            return attr.Length > 0 && attr[0].As<FilterableAttribute>().Value;
+        }
+
         protected virtual bool PopulateWhenVisible()
         {
             return false;
+        }
+
+        protected virtual void CreateFilterBar()
+        {
+            var filterBarDiv = J("<div/>")
+                .AppendTo(this.element);
+
+            filterBar = new FilterBar(filterBarDiv);
         }
 
         protected void CreatePager()
