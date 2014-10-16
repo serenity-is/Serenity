@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 namespace Serenity
 {
-    public class PropertyGrid : Widget<PropertyGridOptions>, IAsyncInit
+    public class PropertyGrid : Widget<PropertyGridOptions>
     {
         private static JsDictionary<string, Type> KnownEditorTypes;
 
@@ -20,7 +20,6 @@ namespace Serenity
 
         private List<Widget> editors;
         private List<PropertyItem> items;
-        private List<Promise> asyncInitList;
 
         public PropertyGrid(jQueryObject div, PropertyGridOptions opt)
             : base(div, opt)
@@ -59,8 +58,6 @@ namespace Serenity
 
             string priorCategory = null;
 
-            asyncInitList = new List<Promise>();
-
             for (int i = 0; i < items.Count; i++)
             {
                 var item = items[i];
@@ -82,19 +79,6 @@ namespace Serenity
             }
 
             UpdateReadOnly();
-        }
-
-        protected override Promise InitializeAsync()
-        {
-            return base.InitializeAsync().ThenAwait(() =>
-            {
-                var promise = Promise.Void;
-                
-                foreach (var k in asyncInitList)
-                    promise = promise.ThenAwait(() => k);
-
-                return promise;
-            });
         }
 
         public override void Destroy()
@@ -260,24 +244,16 @@ namespace Serenity
                 editor = (Widget)(Activator.CreateInstance(editorType, element, editorParams));
             }
 
+            editor.Initialize();
+
             if (editor is BooleanEditor)
                 label.RemoveAttr("for");
 
-            if (item.EditorParams != null)
-            {
-                Action init = () =>
-                {
-                    ReflectionOptionsSetter.Set(editor, item.EditorParams);
-                };
-
-                if (editor.IsAsyncWidget())
-                    asyncInitList.Add(editor.Initialize().Then(init));
-                else
-                    init();
-            }
-
             if (Script.IsValue(item.MaxLength))
                 SetMaxLength(editor, item.MaxLength.Value);
+
+            if (item.EditorParams != null)
+                ReflectionOptionsSetter.Set(editor, item.EditorParams);
 
             J("<div/>")
                 .AddClass("vx")
