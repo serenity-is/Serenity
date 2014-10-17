@@ -71,7 +71,7 @@ namespace Serenity.Test
         {
             using (new MunqContext())
             {
-                var exception = Assert.Throws<KeyNotFoundException>(() => DistributedCache.Set("x", 1, DateTime.Now));
+                var exception = Assert.Throws<KeyNotFoundException>(() => DistributedCache.Set("x", 1, TimeSpan.FromSeconds(1)));
                 Assert.Contains(typeof(IDistributedCache).Name, exception.Message);
             }
         }
@@ -86,7 +86,7 @@ namespace Serenity.Test
                 var cache = A.Fake<IDistributedCache>();
                 registrar.RegisterInstance(cache);
 
-                var expiration = DateTime.Now.Add(TimeSpan.FromMinutes(5));
+                var expiration = TimeSpan.FromMinutes(5);
 
                 DistributedCache.Set("SomeKey", 789, expiration);
 

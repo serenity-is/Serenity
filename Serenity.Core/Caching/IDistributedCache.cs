@@ -40,7 +40,7 @@ namespace Serenity.Abstractions
         /// <typeparam name="TValue">Value type.</typeparam>
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
-        /// <param name="expiresAt">The time the cached item will be expired on.</param>
-        void Set<TValue>(string key, TValue value, DateTime expiresAt);
+        /// <param name="expiration">The time the cached item will be expired on.</param>
+        void Set<TValue>(string key, TValue value, TimeSpan expiration);
     }
 }

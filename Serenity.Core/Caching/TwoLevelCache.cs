@@ -8,8 +8,8 @@ namespace Serenity
     /// </summary>
     public static class TwoLevelCache
     {
-        private static readonly TimeSpan GenerationCacheExpiration = TimeSpan.FromSeconds(5);
-        private const string GenerationSuffix = "$Generation$";
+        public static readonly TimeSpan GenerationCacheExpiration = TimeSpan.FromSeconds(5);
+        public const string GenerationSuffix = "$Generation$";
         private static readonly Random GenerationRandomizer;
 
         static TwoLevelCache()
@@ -25,8 +25,8 @@ namespace Serenity
         /// <remarks>
         /// To not check generation number every time an item is requested, generation number itself is also
         /// cached in local cache. Thus, when a generation number changes, local cached items might expire
-        /// after about one minute. This means that, if you use this strategy in a web farm setup, when a change 
-        /// occurs in one server, other servers might continue to use old local cached data for one minute more.
+        /// after about 5 seconds. This means that, if you use this strategy in a web farm setup, when a change 
+        /// occurs in one server, other servers might continue to use old local cached data for 5 seconds more.
         /// If this is a problem for your configuration, use DistributedCache directly.
         /// </remarks>
         /// <typeparam name="TItem">Data type</typeparam>
@@ -54,8 +54,35 @@ namespace Serenity
         /// <remarks>
         /// To not check generation number every time an item is requested, generation number itself is also
         /// cached in local cache. Thus, when a generation number changes, local cached items might expire
-        /// after about one minute. This means that, if you use this strategy in a web farm setup, when a change 
-        /// occurs in one server, other servers might continue to use old local cached data for one minute more.
+        /// after about 5 seconds. This means that, if you use this strategy in a web farm setup, when a change 
+        /// occurs in one server, other servers might continue to use old local cached data for 5 seconds more.
+        /// If this is a problem for your configuration, use DistributedCache directly.
+        /// </remarks>
+        /// <typeparam name="TItem">Data type</typeparam>
+        /// <param name="cacheKey">The item key for local and distributed cache</param>
+        /// <param name="expiration">Local and remote expiration</param>
+        /// <param name="globalGenerationKey">Global generation (version) key. Can be used to expire all items
+        /// that depend on it. This can be a table name. When a table changes, you change its version, and all
+        /// cached data that depends on that table is expired.</param>
+        /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
+        /// or distributed cache, or all found items are expired.</param>
+        public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, string globalGenerationKey, Func<TItem> loader)
+            where TItem : class
+        {
+            return GetInternal<TItem, TItem>(cacheKey, expiration, expiration, 
+                globalGenerationKey, loader, x => x, x => x);
+        }
+
+        /// <summary>
+        /// Tries to read a value from local cache. If it is not found there, tries the distributed cache. 
+        /// If neither contains the specified key, produces value by calling a loader function and adds the
+        /// value to local and distributed cache for a given expiration time. By using a generation (item version)
+        /// key, all items on both cache types that depend on this generation can be expired at once. </summary>
+        /// <remarks>
+        /// To not check generation number every time an item is requested, generation number itself is also
+        /// cached in local cache. Thus, when a generation number changes, local cached items might expire
+        /// after about 5 seconds. This means that, if you use this strategy in a web farm setup, when a change 
+        /// occurs in one server, other servers might continue to use old local cached data for 5 seconds more.
         /// If this is a problem for your configuration, use DistributedCache directly.
         /// </remarks>
         /// <typeparam name="TItem">Data type</typeparam>
@@ -95,9 +122,9 @@ namespace Serenity
         /// The difference between this and Get method is that this one only caches items in local cache, but 
         /// uses distributed cache for versioning. To not check generation number every time an item is requested, 
         /// generation number itself is also cached in local cache. Thus, when a generation number changes, local 
-        /// cached items might expire after about one minute. This means that, if you use this strategy in a web farm 
+        /// cached items might expire after about 5 seconds. This means that, if you use this strategy in a web farm 
         /// setup, when a change occurs in one server, other servers might continue to use old local cached data for 
-        /// one minute more. If this is a problem for your configuration, use DistributedCache directly.
+        /// 5 seconds more. If this is a problem for your configuration, use DistributedCache directly.
         /// </remarks>
         /// <typeparam name="TItem">Data type</typeparam>
         /// <param name="cacheKey">The item key for local and distributed cache</param>
@@ -129,21 +156,24 @@ namespace Serenity
 
             string itemGenerationKey = cacheKey + GenerationSuffix;
 
+            var localCache = Dependency.Resolve<ILocalCache>();
+            var distributedCache = Dependency.Resolve<IDistributedCache>();
+
             // retrieves distributed cache global generation number lazily
             Func<ulong> getGlobalGenerationValue = delegate()
             {
                 if (globalGeneration != null)
                     return globalGeneration.Value;
 
-                globalGeneration = DistributedCache.Get<ulong?>(globalGenerationKey);
+                globalGeneration = distributedCache.Get<ulong?>(globalGenerationKey);
                 if (globalGeneration == null || globalGeneration == 0)
                 {
                     globalGeneration = RandomGeneration();
-                    DistributedCache.Set(globalGenerationKey, globalGeneration.Value);
+                    distributedCache.Set(globalGenerationKey, globalGeneration.Value);
                 }
 
                 globalGenerationCache = globalGeneration.Value;
-                // local cache e ekle, 1 dk boyunca buradan kullan
+                // add to local cache, use 5 seconds from there
                 LocalCache.Add(globalGenerationKey, globalGenerationCache, GenerationCacheExpiration);
 
                 return globalGeneration.Value;
@@ -156,8 +186,8 @@ namespace Serenity
                     return globalGenerationCache.Value;
 
                 // check cached local value of global generation key 
-                // it expires in 1 minute and read from server again
-                globalGenerationCache = Dependency.Resolve<ILocalCache>().Get<object>(globalGenerationKey) as ulong?;
+                // it expires in 5 seconds and read from server again
+                globalGenerationCache = localCache.Get<object>(globalGenerationKey) as ulong?;
 
                 // if its in local cache, return it
                 if (globalGenerationCache != null)
@@ -166,12 +196,14 @@ namespace Serenity
                 return getGlobalGenerationValue();
             };
 
+            
+
             // first check local cache, if item exists and not expired (global version = item version) return it
-            var cachedObj = Dependency.Resolve<ILocalCache>().Get<object>(cacheKey);
+            var cachedObj = localCache.Get<object>(cacheKey);
             if (cachedObj != null)
             {
                 // check local cache, if exists, compare version with global one
-                var itemGenerationCache = Dependency.Resolve<ILocalCache>().Get<object>(itemGenerationKey) as ulong?;
+                var itemGenerationCache = localCache.Get<object>(itemGenerationKey) as ulong?;
                 if (itemGenerationCache != null &&
                     itemGenerationCache == getGlobalGenerationCacheValue())
                 {
@@ -185,9 +217,9 @@ namespace Serenity
 
                 // local cached item is expired, remove all information
                 if (itemGenerationCache != null)
-                    Dependency.Resolve<ILocalCache>().Remove(itemGenerationKey);
+                    localCache.Remove(itemGenerationKey);
 
-                Dependency.Resolve<ILocalCache>().Remove(cacheKey);
+                localCache.Remove(cacheKey);
 
                 cachedObj = null;
             }
@@ -196,14 +228,14 @@ namespace Serenity
             if (serialize != null)
             {
                 // no item in local cache or expired, now check distributed cache
-                var itemGeneration = DistributedCache.Get<ulong?>(itemGenerationKey);
+                var itemGeneration = distributedCache.Get<ulong?>(itemGenerationKey);
 
                 // if item has version number in distributed cache and this is equal to global version
                 if (itemGeneration != null &&
                     itemGeneration.Value == getGlobalGenerationValue())
                 {
                     // get item from distributed cache
-                    var serialized = DistributedCache.Get<TSerialized>(cacheKey);
+                    var serialized = distributedCache.Get<TSerialized>(cacheKey);
                     // if item exists in distributed cache
                     if (serialized != null)
                     {
@@ -229,13 +261,13 @@ namespace Serenity
                 // add item and generation to distributed cache
                 if (remoteExpiration == TimeSpan.Zero)
                 {
-                    DistributedCache.Set(cacheKey, serializedItem);
-                    DistributedCache.Set(itemGenerationKey, getGlobalGenerationValue());
+                    distributedCache.Set(cacheKey, serializedItem);
+                    distributedCache.Set(itemGenerationKey, getGlobalGenerationValue());
                 }
                 else
                 {
-                    DistributedCache.Set(cacheKey, serializedItem, DateTime.Now.Add(remoteExpiration));
-                    DistributedCache.Set(itemGenerationKey, getGlobalGenerationValue(), DateTime.Now.Add(remoteExpiration));
+                    distributedCache.Set(cacheKey, serializedItem, remoteExpiration);
+                    distributedCache.Set(itemGenerationKey, getGlobalGenerationValue(), remoteExpiration);
                 }
             }
 
@@ -295,10 +327,13 @@ namespace Serenity
         {
             string itemGenerationKey = cacheKey + GenerationSuffix;
 
-            Dependency.Resolve<ILocalCache>().Remove(cacheKey);
-            Dependency.Resolve<ILocalCache>().Remove(itemGenerationKey);
-            DistributedCache.Set<object>(cacheKey, null);
-            DistributedCache.Set<object>(itemGenerationKey, null);
+            var localCache = Dependency.Resolve<ILocalCache>();
+            var distributedCache = Dependency.Resolve<IDistributedCache>();
+
+            localCache.Remove(cacheKey);
+            localCache.Remove(itemGenerationKey);
+            distributedCache.Set<object>(cacheKey, null);
+            distributedCache.Set<object>(itemGenerationKey, null);
         }
     }
 }

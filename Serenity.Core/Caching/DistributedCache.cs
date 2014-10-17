@@ -50,9 +50,9 @@
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
         /// <param name="expiresAt">The time the cached item will be expired on.</param>
-        public static void Set<TValue>(string key, TValue value, DateTime expiresAt)
+        public static void Set<TValue>(string key, TValue value, TimeSpan expiration)
         {
-            Dependency.Resolve<IDistributedCache>().Set(key, value, expiresAt);
+            Dependency.Resolve<IDistributedCache>().Set(key, value, expiration);
         }
     }
 }

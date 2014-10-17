@@ -179,7 +179,7 @@ namespace Serenity
         /// <param name="key">Anahtar.</param>
         /// <param name="value">Değer.</param>
         /// <param name="expiresAt">Değerin expire olacağı tarih.</param>
-        public void Set<TValue>(string key, TValue value, DateTime expiresAt)
+        public void Set<TValue>(string key, TValue value, TimeSpan expiration)
         {
             key = this.configuration.KeyPrefix + key;
             if (Object.ReferenceEquals(null, value))
@@ -200,7 +200,7 @@ namespace Serenity
                 }
             }
             else
-                cacheClient.Store(StoreMode.Set, key, value, expiresAt);
+                cacheClient.Store(StoreMode.Set, key, value, DateTime.Now.Add(expiration));
         }
 
         /// <summary>

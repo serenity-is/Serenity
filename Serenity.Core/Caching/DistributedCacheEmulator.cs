@@ -99,13 +99,13 @@ namespace Serenity.Caching
         /// <typeparam name="TValue">Value type.</typeparam>
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
-        public void Set<TValue>(string key, TValue value, DateTime expiresAt)
+        public void Set<TValue>(string key, TValue value, TimeSpan expiration)
         {
             // need a better implementation for expirations
             lock (this.sync)
             {
                 this.dictionary[key] = value;
-                this.expiration[key] = expiresAt;
+                this.expiration[key] = DateTime.Now.Add(expiration);
             }
         }
 

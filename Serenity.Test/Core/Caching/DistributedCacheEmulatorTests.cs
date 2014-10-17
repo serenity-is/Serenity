@@ -132,7 +132,7 @@ namespace Serenity.Test
         {
             var cache = new DistributedCacheEmulator();
 
-            cache.Set("SomeInt", 13579, DateTime.Now.Add(TimeSpan.FromMilliseconds(100)));
+            cache.Set("SomeInt", 13579, TimeSpan.FromMilliseconds(100));
             var actualInt = cache.Get<int>("SomeInt");
             Assert.Equal(13579, actualInt);
 
@@ -158,7 +158,7 @@ namespace Serenity.Test
 
             Parallel.ForEach(threads, x =>
             {
-                cache.Set("MultiThreadedValue" + x, x * 7, DateTime.Now.Add(TimeSpan.FromMilliseconds(100)));
+                cache.Set("MultiThreadedValue" + x, x * 7, TimeSpan.FromMilliseconds(100));
             });
 
             Thread.Sleep(1);
