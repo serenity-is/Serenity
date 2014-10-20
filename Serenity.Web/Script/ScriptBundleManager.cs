@@ -19,11 +19,11 @@ namespace Serenity.Web
         {
             public bool? Enabled { get; set; }
             public bool? Minimize { get; set; }
-            public Dictionary<string, string[]> Bundles { get; set; }
         }
 
         private static bool isEnabled;
         private static bool isInitialized;
+        private static Dictionary<string, string[]> scriptBundles;
         private static Dictionary<string, string> bundleKeyBySourceUrl;
         private static Dictionary<string, ConcatenatedScript> bundleByKey;
         private static ConcurrentDictionary<string, string> expandVersion;
@@ -32,6 +32,20 @@ namespace Serenity.Web
         static ScriptBundleManager()
         {
             expandVersion = new ConcurrentDictionary<string, string>();
+        }
+
+        public static Dictionary<string, string[]> ScriptBundles
+        {
+            get
+            {
+                if (scriptBundles == null)
+                {
+                    scriptBundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
+                        HostingEnvironment.MapPath("~/Scripts/Site/ScriptBundles.json"));
+                }
+
+                return scriptBundles;
+            }
         }
 
         public static bool IsEnabled
@@ -66,22 +80,19 @@ namespace Serenity.Web
                     settings.Enabled != true)
                     return;
 
-                if (settings.Bundles == null ||
-                    settings.Bundles.Count == 0)
-                {
-                    settings.Bundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
-                        HostingEnvironment.MapPath("~/Scripts/Site/ScriptBundles.json"));
+                var bundles = ScriptBundles;
 
-                    if (settings.Bundles == null ||
-                        settings.Bundles.Count == 0)
-                        return;
+                if (bundles == null ||
+                    bundles.Count == 0)
+                {
+                    return;
                 }
 
                 var bundleKeyBySourceUrlNew = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 var bundleByKeyNew = new Dictionary<string, ConcatenatedScript>(StringComparer.OrdinalIgnoreCase);
                 bool minimize = settings.Minimize == true;
 
-                foreach (var pair in settings.Bundles)
+                foreach (var pair in bundles)
                 {
                     var sourceFiles = pair.Value;
                     if (sourceFiles == null ||
@@ -145,6 +156,7 @@ namespace Serenity.Web
         public static void ScriptsChanged()
         {
             expandVersion.Clear();
+            scriptBundles = null;
 
             if (isEnabled && bundleByKey != null)
             {
