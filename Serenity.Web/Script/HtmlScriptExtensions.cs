@@ -13,7 +13,7 @@ namespace Serenity.Web
     {
         public static IHtmlString Stylesheet(this HtmlHelper helper, string cssUrl)
         {
-            return new HtmlString(string.Format("<link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>",
+            return new HtmlString(string.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
                 ContentHashCache.ResolveWithHash(cssUrl)));
         }
 
@@ -33,7 +33,7 @@ namespace Serenity.Web
             {
                 scripts.Add(script);
 
-                return new HtmlString(String.Format("<script src=\"{0}\" type=\"text/javascript\"></script>",
+                return new HtmlString(String.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
                     HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(script))));
             }
             else

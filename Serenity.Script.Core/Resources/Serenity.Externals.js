@@ -1063,3 +1063,5 @@ function showInFrame(code) {
         ", scrollbars=1, resizable=yes, left=" + x + ", top=" + y);
     winPopup.document.body.innerHTML = code;
 }
+
+var btn = $.fn.button.noConflict(); $.fn.btn = btn;
