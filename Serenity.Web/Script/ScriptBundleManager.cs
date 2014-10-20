@@ -155,6 +155,59 @@ namespace Serenity.Web
             }
         }
 
+        public static string GetLatestVersion(string path, string mask)
+        {
+            if (path == null)
+                throw new ArgumentNullException("path");
+
+            if (mask.IsNullOrEmpty())
+                return null;
+
+            var idx = mask.IndexOf("*");
+            if (idx <= 0)
+                throw new ArgumentOutOfRangeException("mask");
+
+            var before = mask.Substring(0, idx);
+            var after = mask.Substring(idx + 1);
+            var extension = Path.GetExtension(mask);
+
+            var files = Directory.GetFiles(path, mask)
+                .Select(x =>
+                {
+                    var filename = Path.GetFileName(x);
+                    return filename.Substring(before.Length, filename.Length - before.Length - after.Length);
+                })
+                .Where(s =>
+                {
+                    if (s.Length < 0)
+                        return false;
+
+                    int y;
+                    return s.Split('.').All(x => Int32.TryParse(x, out y));
+                })
+                .ToArray();
+
+            if (!files.Any())
+                return null;
+
+            Array.Sort(files, (x, y) =>
+            {
+                var px = x.Split('.');
+                var py = y.Split('.');
+
+                for (var i = 0; i < Math.Min(px.Length, py.Length); i++)
+                {
+                    var c = Int32.Parse(px[i]).CompareTo(Int32.Parse(py[i]));
+                    if (c != 0)
+                        return c;
+                }
+
+                return px.Length.CompareTo(py.Length);
+            });
+
+            return files.Last();
+        }
+
         public static string ExpandVersionVariable(string scriptUrl)
         {
             if (scriptUrl.IsNullOrEmpty())
@@ -178,45 +231,15 @@ namespace Serenity.Web
 
             path = Path.GetDirectoryName(path);
 
-            Func<string, bool> isVersion = s => {
-                if (s.Length < 0)
-                    return false;
-
-                int y;
-                return s.Split('.').All(x => Int32.TryParse(x, out y));
-            };
-
             var beforeName = Path.GetFileName(before.Replace('/', '\\'));
 
-            var files = Directory.GetFiles(path, beforeName + "*" + extension.Replace('/', '\\'))
-                .Select(x =>
-                {
-                    var filename = Path.GetFileName(x);
-                    return filename.Substring(beforeName.Length, filename.Length - beforeName.Length - after.Length);
-                })
-                .Where(isVersion)
-                .ToArray();
-
-            if (!files.Any())
-                return scriptUrl;
-
-            Array.Sort(files, (x, y) =>
+            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', '\\'));
+            if (latest == null)
             {
-                var px = x.Split('.');
-                var py = y.Split('.');
-
-                for (var i = 0; i < Math.Min(px.Length, py.Length); i++)
-                {
-                    var c = Int32.Parse(px[i]).CompareTo(Int32.Parse(py[i]));
-                    if (c != 0)
-                        return c;
-                }
-
-                return px.Length.CompareTo(py.Length);
-            });
-
-            var latest = files.Last();
-
+                expandVersion[scriptUrl] = scriptUrl;
+                return scriptUrl;
+            }
+            
             result = before + latest + after;
             expandVersion[scriptUrl] = result;
             return result;
