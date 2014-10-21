@@ -101,6 +101,7 @@
     <Compile Include="Mvc\JsonFilter.cs" />
     <Compile Include="Mvc\Result.cs" />
     <Compile Include="Mvc\PageAuthorizeAttribute.cs" />
+    <Compile Include="Mvc\ServiceModelBinder.cs" />
     <Compile Include="Mvc\ServiceEndpoint.cs" />
     <Compile Include="Mvc\ServiceAuthorizeAttribute.cs" />
     <Compile Include="Mvc\TokenAuthorizeFilter.cs" />
