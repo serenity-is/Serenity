@@ -23,7 +23,7 @@ namespace Serenity
         /// value to local and distributed cache for a given expiration time. By using a group key, 
         /// all items on both cache types that are members of this group can be expired at once. </summary>
         /// <remarks>
-        /// To not check generation number every time an item is requested, generation number itself is also
+        /// To not check group generation every time an item is requested, generation number itself is also
         /// cached in local cache. Thus, when a generation number changes, local cached items might expire
         /// after about 5 seconds. This means that, if you use this strategy in a web farm setup, when a change 
         /// occurs in one server, other servers might continue to use old local cached data for 5 seconds more.
@@ -52,7 +52,7 @@ namespace Serenity
         /// value to local and distributed cache for a given expiration time. By using a group key, 
         /// all items on both cache types that are members of this group can be expired at once. </summary>
         /// <remarks>
-        /// To not check generation number every time an item is requested, generation number itself is also
+        /// To not check group generation every time an item is requested, generation number itself is also
         /// cached in local cache. Thus, when a generation number changes, local cached items might expire
         /// after about 5 seconds. This means that, if you use this strategy in a web farm setup, when a change 
         /// occurs in one server, other servers might continue to use old local cached data for 5 seconds more.
@@ -79,7 +79,7 @@ namespace Serenity
         /// value to local and distributed cache for a given expiration time. By using a group
         /// key, all items on both cache types that are members of this group can be expired at once. </summary>
         /// <remarks>
-        /// To not check generation number every time an item is requested, generation number itself is also
+        /// To not check group generation every time an item is requested, generation number itself is also
         /// cached in local cache. Thus, when a generation number changes, local cached items might expire
         /// after about 5 seconds. This means that, if you use this strategy in a web farm setup, when a change 
         /// occurs in one server, other servers might continue to use old local cached data for 5 seconds more.
@@ -120,7 +120,7 @@ namespace Serenity
         /// at once. </summary>
         /// <remarks>
         /// The difference between this and Get method is that this one only caches items in local cache, but 
-        /// uses distributed cache for versioning. To not check generation number every time an item is requested, 
+        /// uses distributed cache for versioning. To not check group generation every time an item is requested, 
         /// generation number itself is also cached in local cache. Thus, when a generation number changes, local 
         /// cached items might expire after about 5 seconds. This means that, if you use this strategy in a web farm 
         /// setup, when a change occurs in one server, other servers might continue to use old local cached data for 
