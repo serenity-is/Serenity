@@ -20,8 +20,8 @@ namespace Serenity
         /// <summary>
         /// Tries to read a value from local cache. If it is not found there, tries the distributed cache. 
         /// If neither contains the specified key, produces value by calling a loader function and adds the
-        /// value to local and distributed cache for a given expiration time. By using a generation (item version)
-        /// key, all items on both cache types that depend on this generation can be expired at once. </summary>
+        /// value to local and distributed cache for a given expiration time. By using a group key, 
+        /// all items on both cache types that are members of this group can be expired at once. </summary>
         /// <remarks>
         /// To not check generation number every time an item is requested, generation number itself is also
         /// cached in local cache. Thus, when a generation number changes, local cached items might expire
@@ -33,24 +33,24 @@ namespace Serenity
         /// <param name="cacheKey">The item key for local and distributed cache</param>
         /// <param name="localExpiration">Local expiration</param>
         /// <param name="remoteExpiration">Distributed cache expiration (is usually same with local expiration)</param>
-        /// <param name="globalGenerationKey">Global generation (version) key. Can be used to expire all items
+        /// <param name="groupKey">Group key that will hold generation (version). Can be used to expire all items
         /// that depend on it. This can be a table name. When a table changes, you change its version, and all
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
         public static TItem Get<TItem>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration, 
-            string globalGenerationKey, Func<TItem> loader)
+            string groupKey, Func<TItem> loader)
             where TItem : class
         {
             return GetInternal<TItem, TItem>(cacheKey, localExpiration, remoteExpiration, 
-                globalGenerationKey, loader, x => x, x => x);
+                groupKey, loader, x => x, x => x);
         }
 
         /// <summary>
         /// Tries to read a value from local cache. If it is not found there, tries the distributed cache. 
         /// If neither contains the specified key, produces value by calling a loader function and adds the
-        /// value to local and distributed cache for a given expiration time. By using a generation (item version)
-        /// key, all items on both cache types that depend on this generation can be expired at once. </summary>
+        /// value to local and distributed cache for a given expiration time. By using a group key, 
+        /// all items on both cache types that are members of this group can be expired at once. </summary>
         /// <remarks>
         /// To not check generation number every time an item is requested, generation number itself is also
         /// cached in local cache. Thus, when a generation number changes, local cached items might expire
@@ -61,23 +61,23 @@ namespace Serenity
         /// <typeparam name="TItem">Data type</typeparam>
         /// <param name="cacheKey">The item key for local and distributed cache</param>
         /// <param name="expiration">Local and remote expiration</param>
-        /// <param name="globalGenerationKey">Global generation (version) key. Can be used to expire all items
+        /// <param name="groupKey">Group key that will hold generation (version). Can be used to expire all items
         /// that depend on it. This can be a table name. When a table changes, you change its version, and all
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
-        public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, string globalGenerationKey, Func<TItem> loader)
+        public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, string groupKey, Func<TItem> loader)
             where TItem : class
         {
             return GetInternal<TItem, TItem>(cacheKey, expiration, expiration, 
-                globalGenerationKey, loader, x => x, x => x);
+                groupKey, loader, x => x, x => x);
         }
 
         /// <summary>
         /// Tries to read a value from local cache. If it is not found there, tries the distributed cache. 
         /// If neither contains the specified key, produces value by calling a loader function and adds the
-        /// value to local and distributed cache for a given expiration time. By using a generation (item version)
-        /// key, all items on both cache types that depend on this generation can be expired at once. </summary>
+        /// value to local and distributed cache for a given expiration time. By using a group
+        /// key, all items on both cache types that are members of this group can be expired at once. </summary>
         /// <remarks>
         /// To not check generation number every time an item is requested, generation number itself is also
         /// cached in local cache. Thus, when a generation number changes, local cached items might expire
@@ -90,7 +90,7 @@ namespace Serenity
         /// <param name="localExpiration">Local expiration</param>
         /// <param name="remoteExpiration">Distributed cache expiration (is usually same with local 
         /// expiration)</param>
-        /// <param name="globalGenerationKey">Global generation (version) key. Can be used to expire all items
+        /// <param name="groupKey">Group key that will hold generation (version). Can be used to expire all items
         /// that depend on it. This can be a table name. When a table changes, you change its version, and all
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
@@ -98,7 +98,7 @@ namespace Serenity
         /// <param name="serialize">A function used to serialize items before cached.</param>
         /// <param name="deserialize">A function used to deserialize items before cached.</param>
         public static TItem GetWithCustomSerializer<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration, 
-            TimeSpan remoteExpiration, string globalGenerationKey, Func<TItem> loader, 
+            TimeSpan remoteExpiration, string groupKey, Func<TItem> loader, 
             Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
             where TItem : class
             where TSerialized : class
@@ -110,13 +110,13 @@ namespace Serenity
                 throw new ArgumentNullException("deserialize");
 
             return GetInternal<TItem, TSerialized>(cacheKey, localExpiration, remoteExpiration, 
-                globalGenerationKey, loader, serialize, deserialize);
+                groupKey, loader, serialize, deserialize);
         }
 
         /// <summary>
         /// Tries to read a value from local cache. If it is not found there produces value by calling a loader 
         /// function and adds the value to local cache for a given expiration time. By using a generation 
-        /// (item version) key, all items on local cache that depend on this generation can be expired 
+        /// (item version) key, all items on local cache that are members of this group can be expired 
         /// at once. </summary>
         /// <remarks>
         /// The difference between this and Get method is that this one only caches items in local cache, but 
@@ -131,7 +131,7 @@ namespace Serenity
         /// <param name="localExpiration">Local expiration</param>
         /// <param name="remoteExpiration">Distributed cache expiration (is usually same with 
         /// local expiration)</param>
-        /// <param name="globalGenerationKey">Global generation (version) key. Can be used to expire all items
+        /// <param name="groupKey">Group key that will hold generation (version). Can be used to expire all items
         /// that depend on it. This can be a table name. When a table changes, you change its version, and all
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
@@ -139,73 +139,73 @@ namespace Serenity
         /// <param name="serialize">A function used to serialize items before cached.</param>
         /// <param name="deserialize">A function used to deserialize items before cached.</param>        
         public static TItem GetLocalStoreOnly<TItem>(string cacheKey, TimeSpan localExpiration, 
-            string globalGenerationKey, Func<TItem> loader)
+            string groupKey, Func<TItem> loader)
             where TItem : class
         {
             return GetInternal<TItem, TItem>(cacheKey, localExpiration, TimeSpan.FromSeconds(0), 
-                globalGenerationKey, loader, null, null);
+                groupKey, loader, null, null);
         }
 
         private static TItem GetInternal<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration, 
-            string globalGenerationKey, Func<TItem> loader, Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
+            string groupKey, Func<TItem> loader, Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
             where TItem : class
             where TSerialized : class
         {
-            ulong? globalGeneration = null;
-            ulong? globalGenerationCache = null;
+            ulong? groupGeneration = null;
+            ulong? groupGenerationCache = null;
 
             string itemGenerationKey = cacheKey + GenerationSuffix;
 
             var localCache = Dependency.Resolve<ILocalCache>();
             var distributedCache = Dependency.Resolve<IDistributedCache>();
 
-            // retrieves distributed cache global generation number lazily
-            Func<ulong> getGlobalGenerationValue = delegate()
+            // retrieves distributed cache group generation number lazily
+            Func<ulong> getGroupGenerationValue = delegate()
             {
-                if (globalGeneration != null)
-                    return globalGeneration.Value;
+                if (groupGeneration != null)
+                    return groupGeneration.Value;
 
-                globalGeneration = distributedCache.Get<ulong?>(globalGenerationKey);
-                if (globalGeneration == null || globalGeneration == 0)
+                groupGeneration = distributedCache.Get<ulong?>(groupKey);
+                if (groupGeneration == null || groupGeneration == 0)
                 {
-                    globalGeneration = RandomGeneration();
-                    distributedCache.Set(globalGenerationKey, globalGeneration.Value);
+                    groupGeneration = RandomGeneration();
+                    distributedCache.Set(groupKey, groupGeneration.Value);
                 }
 
-                globalGenerationCache = globalGeneration.Value;
+                groupGenerationCache = groupGeneration.Value;
                 // add to local cache, use 5 seconds from there
-                LocalCache.Add(globalGenerationKey, globalGenerationCache, GenerationCacheExpiration);
+                LocalCache.Add(groupKey, groupGenerationCache, GenerationCacheExpiration);
 
-                return globalGeneration.Value;
+                return groupGeneration.Value;
             };
 
-            // retrieves local cache global generation number lazily
-            Func<ulong> getGlobalGenerationCacheValue = delegate()
+            // retrieves local cache group generation number lazily
+            Func<ulong> getGroupGenerationCacheValue = delegate()
             {
-                if (globalGenerationCache != null)
-                    return globalGenerationCache.Value;
+                if (groupGenerationCache != null)
+                    return groupGenerationCache.Value;
 
-                // check cached local value of global generation key 
+                // check cached local value of group key 
                 // it expires in 5 seconds and read from server again
-                globalGenerationCache = localCache.Get<object>(globalGenerationKey) as ulong?;
+                groupGenerationCache = localCache.Get<object>(groupKey) as ulong?;
 
                 // if its in local cache, return it
-                if (globalGenerationCache != null)
-                    return globalGenerationCache.Value;
+                if (groupGenerationCache != null)
+                    return groupGenerationCache.Value;
 
-                return getGlobalGenerationValue();
+                return getGroupGenerationValue();
             };
 
             
 
-            // first check local cache, if item exists and not expired (global version = item version) return it
+            // first check local cache, if item exists and not expired (group version = item version) return it
             var cachedObj = localCache.Get<object>(cacheKey);
             if (cachedObj != null)
             {
-                // check local cache, if exists, compare version with global one
+                // check local cache, if exists, compare version with group one
                 var itemGenerationCache = localCache.Get<object>(itemGenerationKey) as ulong?;
                 if (itemGenerationCache != null &&
-                    itemGenerationCache == getGlobalGenerationCacheValue())
+                    itemGenerationCache == getGroupGenerationCacheValue())
                 {
                     // local cached item is not expired yet
 
@@ -230,9 +230,9 @@ namespace Serenity
                 // no item in local cache or expired, now check distributed cache
                 var itemGeneration = distributedCache.Get<ulong?>(itemGenerationKey);
 
-                // if item has version number in distributed cache and this is equal to global version
+                // if item has version number in distributed cache and this is equal to group version
                 if (itemGeneration != null &&
-                    itemGeneration.Value == getGlobalGenerationValue())
+                    itemGeneration.Value == getGroupGenerationValue())
                 {
                     // get item from distributed cache
                     var serialized = distributedCache.Get<TSerialized>(cacheKey);
@@ -241,7 +241,7 @@ namespace Serenity
                     {
                         cachedObj = deserialize(serialized);
                         LocalCache.Add(cacheKey, (object)cachedObj ?? DBNull.Value, localExpiration);
-                        LocalCache.Add(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
+                        LocalCache.Add(itemGenerationKey, getGroupGenerationValue(), localExpiration);
                         return (TItem)cachedObj;
                     }
                 }
@@ -252,7 +252,7 @@ namespace Serenity
 
             // add item and its version to cache
             LocalCache.Add(cacheKey, (object)item ?? DBNull.Value, localExpiration);
-            LocalCache.Add(itemGenerationKey, getGlobalGenerationValue(), localExpiration);
+            LocalCache.Add(itemGenerationKey, getGroupGenerationValue(), localExpiration);
 
             if (serialize != null)
             {
@@ -262,12 +262,12 @@ namespace Serenity
                 if (remoteExpiration == TimeSpan.Zero)
                 {
                     distributedCache.Set(cacheKey, serializedItem);
-                    distributedCache.Set(itemGenerationKey, getGlobalGenerationValue());
+                    distributedCache.Set(itemGenerationKey, getGroupGenerationValue());
                 }
                 else
                 {
                     distributedCache.Set(cacheKey, serializedItem, remoteExpiration);
-                    distributedCache.Set(itemGenerationKey, getGlobalGenerationValue(), remoteExpiration);
+                    distributedCache.Set(itemGenerationKey, getGroupGenerationValue(), remoteExpiration);
                 }
             }
 
@@ -310,13 +310,23 @@ namespace Serenity
 
 
         /// <summary>
-        /// Changes a global generation value, so that all items that depend on it are expired.
+        /// Changes a group generation value, so that all items that depend on it are expired.
         /// </summary>
-        /// <param name="globalGenerationKey">Generation key</param>
-        public static void ChangeGlobalGeneration(string globalGenerationKey)
+        /// <param name="groupKey">Group key</param>
+        [Obsolete("Use ExpireGroupItems")]
+        public static void ChangeGlobalGeneration(string groupKey)
         {
-            Dependency.Resolve<ILocalCache>().Remove(globalGenerationKey);
-            DistributedCache.Set<object>(globalGenerationKey, null);
+            ExpireGroupItems(groupKey);
+        }
+
+        /// <summary>
+        /// Changes a group generation value, so that all items that depend on it are expired.
+        /// </summary>
+        /// <param name="groupKey">Group key</param>
+        public static void ExpireGroupItems(string groupKey)
+        {
+            Dependency.Resolve<ILocalCache>().Remove(groupKey);
+            DistributedCache.Set<object>(groupKey, null);
         }
 
         /// <summary>
