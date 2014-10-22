@@ -6,6 +6,9 @@ using Serenity.Localization;
 
 namespace Serenity
 {
+    using System.Reflection;
+    using Serenity.ComponentModel;
+
     public static class EnumMapper
     {
         private static Hashtable cache;
@@ -105,9 +108,11 @@ namespace Serenity
                 enumType.IsEnum &&
                 System.Enum.GetName(enumType, value) != null)
             {
-                var typeName = enumType.Name;
+                var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
+                var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
+
                 var enumName = System.Enum.GetName(enumType, value);
-                var key = "Enums." + typeName + "." + enumName;
+                var key = "Enums." + enumKey + "." + enumName;
                 var text = LocalText.TryGet(key);
                 if (text == null)
                 {
