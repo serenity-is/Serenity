@@ -1815,7 +1815,7 @@
 					}
 				}
 				pgOptions.items = items;
-				this.localizationGrid = new $Serenity_PropertyGrid(localGridDiv, pgOptions);
+				this.localizationGrid = (new $Serenity_PropertyGrid(localGridDiv, pgOptions)).init(null);
 				localGridDiv.addClass('s-LocalizationGrid');
 				var self = this;
 				this.localizationSelect = $('<select/>').addClass('s-LocalizationSelect').appendTo(this.toolbar.get_element()).change(function(e) {
@@ -1890,7 +1890,7 @@
 					return;
 				}
 				var pgOptions = this.getPropertyGridOptions();
-				this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
+				this.propertyGrid = (new $Serenity_PropertyGrid(pgDiv, pgOptions)).init(null);
 			},
 			$initPropertyGridAsync: function() {
 				return RSVP.resolve().then(ss.mkdel(this, function() {
@@ -3566,7 +3566,7 @@
 					return;
 				}
 				var pgOptions = this.getPropertyGridOptions();
-				this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
+				this.propertyGrid = (new $Serenity_PropertyGrid(pgDiv, pgOptions)).init(null);
 			},
 			$initPropertyGridAsync: function() {
 				return RSVP.resolve().then(ss.mkdel(this, function() {
@@ -3662,7 +3662,6 @@
 	var $Serenity_PropertyGrid = function(div, opt) {
 		this.$editors = null;
 		this.$items = null;
-		this.$asyncInitList = null;
 		ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]).call(this, div, opt);
 		if (!ss.isValue(opt.mode)) {
 			opt.mode = 0;
@@ -3685,7 +3684,6 @@
 		}
 		var fieldContainer = categoriesDiv;
 		var priorCategory = null;
-		this.$asyncInitList = [];
 		for (var i = 0; i < this.$items.length; i++) {
 			var item = this.$items[i];
 			if (this.options.useCategories && !ss.referenceEquals(priorCategory, item.category)) {
@@ -6695,18 +6693,6 @@
 	ss.initClass($Serenity_PropertyItemHelper, $asm, {});
 	ss.initClass($Serenity_PropertyEditorHelper, $asm, {}, $Serenity_PropertyItemHelper);
 	ss.initClass($Serenity_PropertyGrid, $asm, {
-		initializeAsync: function() {
-			return $Serenity_Widget.prototype.initializeAsync.call(this).then(ss.mkdel(this, function() {
-				var promise = RSVP.resolve();
-				for (var $t1 = 0; $t1 < this.$asyncInitList.length; $t1++) {
-					var k = { $: this.$asyncInitList[$t1] };
-					promise = promise.then(ss.mkdel({ k: k }, function() {
-						return this.k.$;
-					}), null);
-				}
-				return promise;
-			}), null);
-		},
 		destroy: function() {
 			if (ss.isValue(this.$editors)) {
 				for (var i = 0; i < this.$editors.length; i++) {
@@ -6783,16 +6769,15 @@
 				editorParams = $.extend(new Object(), item.editorParams);
 				editor = ss.cast(new editorType(element, editorParams), $Serenity_Widget);
 			}
+			editor.initialize();
 			if (ss.isInstanceOfType(editor, $Serenity_BooleanEditor)) {
 				label.removeAttr('for');
 			}
-			if (ss.isValue(item.editorParams)) {
-				this.$asyncInitList.push(editor.initialize().then(function() {
-					$Serenity_ReflectionOptionsSetter.set(editor, item.editorParams);
-				}, null));
-			}
 			if (ss.isValue(item.maxLength)) {
 				$Serenity_PropertyGrid.$setMaxLength(editor, ss.unbox(item.maxLength));
+			}
+			if (ss.isValue(item.editorParams)) {
+				$Serenity_ReflectionOptionsSetter.set(editor, item.editorParams);
 			}
 			$('<div/>').addClass('vx').appendTo(fieldDiv);
 			$('<div/>').addClass('clear').appendTo(fieldDiv);
@@ -6999,7 +6984,7 @@
 				callback(item, editor);
 			}
 		}
-	}, ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]), [$Serenity_IAsyncInit]);
+	}, ss.makeGenericType($Serenity_Widget$1, [$Serenity_PropertyGridOptions]));
 	ss.initEnum($Serenity_PropertyGridMode, $asm, { insert: 0, update: 1 });
 	ss.initClass($Serenity_PropertyGridOptions, $asm, {});
 	ss.initClass($Serenity_PropertyItemSlickConverter, $asm, {});
@@ -7273,7 +7258,7 @@
 			$t1.idPrefix = this.get_idPrefix();
 			$t1.useCategories = true;
 			$t1.items = this.$propertyItems;
-			this.$propertyGrid = new $Serenity_PropertyGrid($t2, $t1);
+			this.$propertyGrid = (new $Serenity_PropertyGrid($t2, $t1)).init(null);
 		},
 		loadReport: function(reportKey) {
 			Q.serviceCall({ service: 'Report/Retrieve', request: { ReportKey: reportKey }, onSuccess: ss.mkdel(this, function(response) {
