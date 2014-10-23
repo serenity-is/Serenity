@@ -473,6 +473,73 @@ namespace Serenity.Test
         }
 
         [Fact]
+        public void TwoLevelCache_GetSingleExpirationOverload_WorksProperly()
+        {
+            using (new MunqContext())
+            {
+                var localCache = A.Fake<ILocalCache>();
+                var distributedCache = A.Fake<IDistributedCache>();
+
+                A.CallTo(() => localCache.Get<object>("SomeKey"))
+                    .Returns(null);
+
+                A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
+                    .Returns(null);
+
+                ulong? generationKey = null;
+
+                A.CallTo(() => distributedCache.Set<ulong>("SomeGenerationKey", A<ulong>.Ignored))
+                    .Invokes((string x, ulong y) =>
+                    {
+                        generationKey = y;
+                    });
+
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                registrar.RegisterInstance<ILocalCache>(localCache);
+                registrar.RegisterInstance<IDistributedCache>(distributedCache);
+
+                var value = TwoLevelCache.Get("SomeKey", TimeSpan.FromMinutes(5),
+                    "SomeGenerationKey", () => "AnotherValue");
+
+                Assert.NotNull(generationKey);
+                Assert.Equal("AnotherValue", value);
+
+                A.CallTo(() => localCache.Get<object>("SomeKey"))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => localCache.Get<object>("SomeKey" + TwoLevelCache.GenerationSuffix))
+                    .MustNotHaveHappened();
+
+                A.CallTo(() => localCache.Add("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => localCache.Add("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(5)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => localCache.Add("SomeGenerationKey", generationKey.Value, TwoLevelCache.GenerationCacheExpiration))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => distributedCache.Get<ulong?>("SomeGenerationKey"))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => distributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => distributedCache.Get<string>("SomeKey"))
+                    .MustNotHaveHappened();
+
+                A.CallTo(() => distributedCache.Set("SomeGenerationKey", generationKey.Value))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => distributedCache.Set("SomeKey", "AnotherValue", TimeSpan.FromMinutes(5)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => distributedCache.Set("SomeKey" + TwoLevelCache.GenerationSuffix, generationKey.Value, TimeSpan.FromMinutes(5)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+            }
+        }
+
+        [Fact]
         public void TwoLevelCache_GetWithCustomSerializer_ThrowsExceptionIfNoLocalCacheProviderIsRegistered()
         {
             using (new MunqContext())
@@ -935,6 +1002,94 @@ namespace Serenity.Test
 
                 A.CallTo(() => distributedCache.Set<ulong>(A<string>.Ignored, A<ulong>.Ignored, A<TimeSpan>.Ignored))
                     .MustNotHaveHappened();
+            }
+        }
+
+        [Fact]
+        public static void TwoLevelCache_ChangeGlobalGeneration_ExpiresItems()
+        {
+            using (new MunqContext())
+            {
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                registrar.RegisterInstance<ILocalCache>(new LocalCacheEmulator());
+                registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());
+
+                var value = TwoLevelCache.Get("SomeKey", TimeSpan.FromDays(5), "GroupKey", () => "FirstValue");
+                Assert.Equal("FirstValue", value);
+                Assert.Equal("FirstValue", LocalCache.TryGet<string>("SomeKey"));
+                Assert.Equal("FirstValue", DistributedCache.Get<string>("SomeKey"));
+                var generation = DistributedCache.Get<ulong?>("GroupKey");
+                Assert.Equal(generation, DistributedCache.Get<ulong>("SomeKey" + TwoLevelCache.GenerationSuffix));
+                Assert.Equal(generation, LocalCache.TryGet<object>("GroupKey") as ulong?);
+                Assert.Equal(generation, LocalCache.TryGet<object>("SomeKey" + TwoLevelCache.GenerationSuffix));
+
+                value = TwoLevelCache.Get("SomeKey", TimeSpan.FromDays(5), "GroupKey", () => "SecondValue");
+                Assert.Equal("FirstValue", value);
+
+                #pragma warning disable 618
+                TwoLevelCache.ChangeGlobalGeneration("GroupKey");
+                #pragma warning restore 618
+                Assert.Null(DistributedCache.Get<ulong?>("GroupKey"));
+                Assert.Null(LocalCache.TryGet<object>("GroupKey"));
+
+                value = TwoLevelCache.Get("SomeKey", TimeSpan.FromDays(5), "GroupKey", () => "ThirdValue");
+                Assert.Equal("ThirdValue", value);
+            }
+        }
+
+        [Fact]
+        public static void TwoLevelCache_ExpireGroupItems_ExpiresItems()
+        {
+            using (new MunqContext())
+            {
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                registrar.RegisterInstance<ILocalCache>(new LocalCacheEmulator());
+                registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());
+
+                var value = TwoLevelCache.Get("SomeKey", TimeSpan.FromDays(5), "GroupKey", () => "FirstValue");
+                Assert.Equal("FirstValue", value);
+                Assert.Equal("FirstValue", LocalCache.TryGet<string>("SomeKey"));
+                Assert.Equal("FirstValue", DistributedCache.Get<string>("SomeKey"));
+                var generation = DistributedCache.Get<ulong?>("GroupKey");
+                Assert.Equal(generation, DistributedCache.Get<ulong>("SomeKey" + TwoLevelCache.GenerationSuffix));
+                Assert.Equal(generation, LocalCache.TryGet<object>("GroupKey") as ulong?);
+                Assert.Equal(generation, LocalCache.TryGet<object>("SomeKey" + TwoLevelCache.GenerationSuffix));
+
+                value = TwoLevelCache.Get("SomeKey", TimeSpan.FromDays(5), "GroupKey", () => "SecondValue");
+                Assert.Equal("FirstValue", value);
+
+                TwoLevelCache.ExpireGroupItems("GroupKey");
+                Assert.Null(DistributedCache.Get<ulong?>("GroupKey"));
+                Assert.Null(LocalCache.TryGet<object>("GroupKey"));
+
+                value = TwoLevelCache.Get("SomeKey", TimeSpan.FromDays(5), "GroupKey", () => "ThirdValue");
+                Assert.Equal("ThirdValue", value);
+            }
+        }
+
+        [Fact]
+        public static void TwoLevelCache_Remove_RemovesCachedItemsFromLocalAndDistributedCaches()
+        {
+            using (new MunqContext())
+            {
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                registrar.RegisterInstance<ILocalCache>(new LocalCacheEmulator());
+                registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());
+
+                var value = TwoLevelCache.Get("SomeKey", TimeSpan.FromDays(5), "GroupKey", () => "FirstValue");
+                Assert.Equal("FirstValue", value);
+                Assert.Equal("FirstValue", LocalCache.TryGet<string>("SomeKey"));
+                Assert.Equal("FirstValue", DistributedCache.Get<string>("SomeKey"));
+                var generation = DistributedCache.Get<ulong?>("GroupKey");
+                Assert.Equal(generation, DistributedCache.Get<ulong>("SomeKey" + TwoLevelCache.GenerationSuffix));
+                Assert.Equal(generation, LocalCache.TryGet<object>("GroupKey") as ulong?);
+                Assert.Equal(generation, LocalCache.TryGet<object>("SomeKey" + TwoLevelCache.GenerationSuffix));
+
+                TwoLevelCache.Remove("SomeKey");
+                Assert.Null(LocalCache.TryGet<string>("SomeKey"));
+                Assert.Null(LocalCache.TryGet<object>("SomeKey" + TwoLevelCache.GenerationSuffix));
+                Assert.Null(DistributedCache.Get<string>("SomeKey"));
+                Assert.Null(DistributedCache.Get<ulong?>("SomeKey" + TwoLevelCache.GenerationSuffix));
             }
         }
     }
