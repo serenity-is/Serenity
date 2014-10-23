@@ -85,6 +85,7 @@
     <Compile Include="Core\Caching\TwoLevelCacheTests.cs" />
     <Compile Include="Core\Caching\LocalCacheTests.cs" />
     <Compile Include="Core\AuthorizationTests.cs" />
+    <Compile Include="Core\DependencyTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterDeserializationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />
     <Compile Include="Data\FakeDisplayOrderRow.cs" />
