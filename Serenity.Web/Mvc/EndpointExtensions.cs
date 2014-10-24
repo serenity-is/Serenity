@@ -24,14 +24,14 @@ namespace Serenity.Services
                 error.Code = ve.ErrorCode;
                 error.Arguments = ve.Arguments;
                 error.Message = ve.Message;
-                if (!Config.Get<DevelopmentSettings>().HideExceptionDetails)
+                if (HttpContext.Current != null && !HttpContext.Current.IsCustomErrorEnabled)
                     error.Details = ve.ToString();
             }
             else
             {
                 error.Code = "Exception";
 
-                if (!Config.Get<DevelopmentSettings>().HideExceptionDetails)
+                if (HttpContext.Current != null && !HttpContext.Current.IsCustomErrorEnabled)
                 {
                     error.Message = exception.Message;
                     error.Details = exception.ToString();

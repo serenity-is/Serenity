@@ -54,7 +54,6 @@
     <Compile Include="Helpers\BinarySerialization.cs" />
     <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />
-    <Compile Include="Configuration\DevelopmentSettings.cs" />
     <Compile Include="Json\JsonLocalTextsHelper.cs" />
     <Compile Include="Json\JsonConfigHelper.cs" />
     <Compile Include="Munq\AlwaysNewLifetime.cs" />
