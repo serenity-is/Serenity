@@ -1,5 +1,5 @@
 ﻿
-namespace Serenity.Web
+namespace Serenity.Configuration
 {
     using Serenity;
     using Serenity.Abstractions;
