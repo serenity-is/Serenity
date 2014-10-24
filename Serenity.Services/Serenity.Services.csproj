@@ -51,7 +51,6 @@
     <Compile Include="RequestHandlers\DeleteRequestHandler.cs" />
     <Compile Include="RequestHandlers\Helpers\BatchGenerationUpdater.cs" />
     <Compile Include="RequestHandlers\Behaviours\ValidateParentAttribute.cs" />
-    <Compile Include="RequestHandlers\Helpers\EntityCacheExtensions.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\DisplayOrder\DisplayOrderFilterHelper.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\DisplayOrder\DisplayOrderHelper.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\Validation\DataValidation.cs" />

@@ -95,7 +95,6 @@
     <Compile Include="Common\CommonInitialization.cs" />
     <Compile Include="Common\CssFileWatcher.cs" />
     <Compile Include="Common\ScriptFileWatcher.cs" />
-    <Compile Include="Common\ApplicationConfigurationRepository.cs" />
     <Compile Include="Common\TemplateScriptRegistrar.cs" />
     <Compile Include="Mvc\HttpRuntimeCache.cs" />
     <Compile Include="Mvc\JsonFilter.cs" />

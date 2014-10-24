@@ -8,38 +8,38 @@ namespace Serenity.Services
     {
         public class GenerationUpdater
         {
-            private string generationKey;
+            private string groupKey;
 
-            public GenerationUpdater(string generationKey)
+            public GenerationUpdater(string groupKey)
             {
-                this.generationKey = generationKey;
+                this.groupKey = groupKey;
             }
 
             public void Update()
             {
-                TwoLevelCache.ChangeGlobalGeneration(this.generationKey);
+                TwoLevelCache.ExpireGroupItems(this.groupKey);
             }
         }
 
-        private static Hashtable byGenerationKey;
+        private static Hashtable byGroupKey;
 
         static BatchGenerationUpdater()
         {
-            byGenerationKey = new Hashtable();
+            byGroupKey = new Hashtable();
         }
 
-        public static GenerationUpdater GetUpdater(string generationKey)
+        public static GenerationUpdater GetUpdater(string groupKey)
         {
-            if (generationKey.IsNullOrEmpty())
+            if (groupKey.IsNullOrEmpty())
                 throw new ArgumentNullException("generationKey");
 
-            var updater = byGenerationKey[generationKey] as GenerationUpdater;
+            var updater = byGroupKey[groupKey] as GenerationUpdater;
 
             if (updater == null)
             {
-                var locked = Hashtable.Synchronized(byGenerationKey);
-                updater = new GenerationUpdater(generationKey);
-                byGenerationKey[generationKey] = byGenerationKey[generationKey] ?? updater;
+                var locked = Hashtable.Synchronized(byGroupKey);
+                updater = new GenerationUpdater(groupKey);
+                byGroupKey[groupKey] = byGroupKey[groupKey] ?? updater;
             }
 
             return updater;
