@@ -83,6 +83,7 @@
     <Compile Include="Core\Caching\DistributedCacheEmulatorTests.cs" />
     <Compile Include="Core\Caching\DistributedCacheTests.cs" />
     <Compile Include="Core\Caching\LocalCacheEmulator.cs" />
+    <Compile Include="Core\ConfigTests.cs" />
     <Compile Include="Core\Caching\TwoLevelCacheTests.cs" />
     <Compile Include="Core\Caching\LocalCacheTests.cs" />
     <Compile Include="Core\AuthorizationTests.cs" />
@@ -145,6 +146,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SqlScript\DbSerenity.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
