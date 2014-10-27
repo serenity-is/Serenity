@@ -8,7 +8,7 @@ namespace Serenity.Configuration
     using System.Configuration;
     using System.Reflection;
 
-    public class ApplicationConfigurationRepository : IConfigurationRepository
+    public class AppSettingsJsonConfigRepository : IConfigurationRepository
     {
         public void Save(Type settingType, object value)
         {
