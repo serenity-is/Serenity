@@ -225,6 +225,9 @@ Task("PrepareVSIX")
     File.Copy(r + @"BasicApplication\BasicApplication.vstemplate", 
         System.IO.Path.Combine(templateFolder, "BasicApplication.vstemplate")); 
         
+    CleanDirectory("./ProjectTemplates");
+    CleanDirectory("./bin/Debug");
+    CleanDirectory("./bin/Release");
     Zip(templateFolder, r + @"VSIX\ProjectTemplates\BasicApplication.Template.zip");
 });
 
