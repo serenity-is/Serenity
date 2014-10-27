@@ -3,6 +3,7 @@ namespace Serenity.Localization
 {
     using Extensibility;
     using Newtonsoft.Json.Linq;
+    using Serenity.Abstractions;
     using Serenity.Configuration;
     using System;
     using System.Collections.Generic;

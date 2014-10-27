@@ -1,6 +1,7 @@
 
 namespace Serenity.Localization
 {
+    using Serenity.Abstractions;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
@@ -9,9 +10,14 @@ namespace Serenity.Localization
 
     public class LocalTextRegistry : ILocalTextRegistry
     {
-        private readonly ConcurrentDictionary<string, string> languageParents = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
-        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
+        private readonly ConcurrentDictionary<string, string> languageParents = 
+            new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        private readonly ConcurrentDictionary<ItemKey, string> approvedTexts = 
+            new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
+
+        private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = 
+            new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
 
         public bool ContextIsApprovalMode
         {
@@ -54,6 +60,11 @@ namespace Serenity.Localization
         public void Add(string languageID, string key, string text)
         {
             approvedTexts[new ItemKey(languageID, key)] = text;
+        }
+
+        public void AddPending(string languageID, string key, string text)
+        {
+            pendingTexts[new ItemKey(languageID, key)] = text;
         }
 
         /// <summary>

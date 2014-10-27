@@ -140,7 +140,7 @@
     <Compile Include="Json\JsonSettings.cs" />
     <Compile Include="Json\JsonStringHashSetConverter.cs" />
     <Compile Include="Localization\ILocalTextContext.cs" />
-    <Compile Include="Localization\ILocalTextProvider.cs" />
+    <Compile Include="Localization\ILocalTextRegistry.cs" />
     <Compile Include="Helpers\Invariants.cs" />
     <Compile Include="Interface\ISupportAttached.cs" />
     <Compile Include="Localization\LocalText.cs" />

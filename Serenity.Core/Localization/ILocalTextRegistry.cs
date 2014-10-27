@@ -1,4 +1,4 @@
-namespace Serenity.Localization
+namespace Serenity.Abstractions
 {
     public interface ILocalTextRegistry
     {

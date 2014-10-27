@@ -7,6 +7,7 @@ using Serenity.Localization;
 namespace Serenity
 {
     using System.Reflection;
+    using Serenity.Abstractions;
     using Serenity.ComponentModel;
 
     public static class EnumMapper

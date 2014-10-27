@@ -2,6 +2,7 @@
 namespace Serenity.Localization
 {
     using Localization;
+    using Serenity.Abstractions;
     using Serenity.Data;
     using System;
     using System.Collections.Generic;
