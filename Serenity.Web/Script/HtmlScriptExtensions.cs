@@ -1,12 +1,9 @@
-﻿using Serenity.Data;
+﻿using Serenity.Localization;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 using System.Web;
 using System.Web.Mvc;
-using Serenity.Abstractions;
-using Serenity.Localization;
-using System.Globalization;
 
 namespace Serenity.Web
 {
@@ -57,10 +54,9 @@ namespace Serenity.Web
 
         public static string GetLocalTextInclude(this HtmlHelper page, string package)
         {
-            var provider = Dependency.Resolve<ILocalTextRegistry>() as LocalTextRegistry;
-
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
-            bool isPending = provider != null && provider.ContextIsApprovalMode;
+            var context = Dependency.TryResolve<ILocalTextContext>();
+            var isPending = context != null && context.IsApprovalMode;
             string scriptName = LocalTextScript.GetScriptName(package, languageId, isPending);
             DynamicScriptManager.IfNotRegistered(scriptName, () =>
             {
