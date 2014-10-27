@@ -753,7 +753,7 @@
           </Folder>
         </Folder>
         <Folder Name="site" TargetFolderName="site">
-          <ProjectItem ReplaceParameters="true" TargetFileName="$ext_safeprojectname$.Script.js">BasicApplication.Script.js</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="$ext_projectname$.Script.js">BasicApplication.Script.js</ProjectItem>
           <Folder Name="texts" TargetFolderName="texts">
             <ProjectItem ReplaceParameters="true" TargetFileName="site.texts.tr.json">site.texts.tr.json</ProjectItem>
           </Folder>

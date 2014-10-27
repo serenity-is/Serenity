@@ -171,7 +171,7 @@ Task("PrepareVSIX")
                 extension == ".html";
             
             item.SetAttributeValue("ReplaceParameters", replaceParameters ? "true" : "false");
-            item.SetAttributeValue("TargetFileName", parts[parts.Length - 1].Replace("BasicApplication", "$ext_safeprojectname$"));
+            item.SetAttributeValue("TargetFileName", parts[parts.Length - 1].Replace("BasicApplication", "$ext_projectname$"));
             item.SetValue(parts[parts.Length - 1]);
             folder.Add(item);
             

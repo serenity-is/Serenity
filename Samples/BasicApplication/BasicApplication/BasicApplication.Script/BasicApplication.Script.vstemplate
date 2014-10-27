@@ -13,7 +13,7 @@
     <Icon>__TemplateIcon.png</Icon>
   </TemplateData>
   <TemplateContent>
-    <Project TargetFileName="$ext_projectname$.Script.csproj" File="BasicApplication.Script.csproj" ReplaceParameters="true">
+    <Project TargetFileName="$projectname$.csproj" File="BasicApplication.Script.csproj" ReplaceParameters="true">
       <Folder Name="Administration" TargetFolderName="Administration">
         <Folder Name="User" TargetFolderName="User">
           <ProjectItem ReplaceParameters="true" TargetFileName="UserDialog.cs">UserDialog.cs</ProjectItem>
