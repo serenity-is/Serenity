@@ -120,6 +120,50 @@ namespace Serenity.Test
         }
 
         [Fact]
+        public void Config_GetGeneric_UsesRegisteredConfigurationProviderUsingScopeAttribute()
+        {
+            using (new MunqContext())
+            {
+                var repository = A.Fake<IConfigurationRepository>();
+                A.CallTo(() => repository.Load(A<Type>.Ignored))
+                    .ReturnsLazily((Type x) => Activator.CreateInstance(x));
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance<IConfigurationRepository>("Server", repository);
+
+                Assert.DoesNotThrow(() => Config.Get<ServerSettings>());
+
+                A.CallTo(() => repository.Load(typeof(ServerSettings)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ServerSettings))))
+                    .MustNotHaveHappened();
+            }
+        }
+
+        [Fact]
+        public void Config_GetGeneric_UsesApplicationScopeIfScopeIsNotSpecified()
+        {
+            using (new MunqContext())
+            {
+                var repository = A.Fake<IConfigurationRepository>();
+                A.CallTo(() => repository.Load(A<Type>.Ignored))
+                    .ReturnsLazily((Type x) => Activator.CreateInstance(x));
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance<IConfigurationRepository>("Application", repository);
+
+                Assert.DoesNotThrow(() => Config.Get<ApplicationSettings>());
+
+                A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ApplicationSettings))))
+                    .MustNotHaveHappened();
+            }
+        }
+
+        [Fact]
         public void Config_TryGetWithType_ReturnsNullIfNoConfigurationRepositoryIsRegistered()
         {
             using (new MunqContext())
@@ -138,6 +182,50 @@ namespace Serenity.Test
 
                 Assert.NotNull(Config.TryGet(typeof(ServerSettings)));
                 Assert.Null(Config.TryGet(typeof(ApplicationSettings)));
+            }
+        }
+
+        [Fact]
+        public void Config_TryGetWithType_UsesRegisteredConfigurationProviderUsingScopeAttribute()
+        {
+            using (new MunqContext())
+            {
+                var repository = A.Fake<IConfigurationRepository>();
+                A.CallTo(() => repository.Load(A<Type>.Ignored))
+                    .ReturnsLazily((Type x) => Activator.CreateInstance(x));
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance<IConfigurationRepository>("Server", repository);
+
+                Assert.DoesNotThrow(() => Config.TryGet(typeof(ServerSettings)));
+
+                A.CallTo(() => repository.Load(typeof(ServerSettings)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ServerSettings))))
+                    .MustNotHaveHappened();
+            }
+        }
+
+        [Fact]
+        public void Config_TryGetWithType_UsesApplicationScopeIfScopeIsNotSpecified()
+        {
+            using (new MunqContext())
+            {
+                var repository = A.Fake<IConfigurationRepository>();
+                A.CallTo(() => repository.Load(A<Type>.Ignored))
+                    .ReturnsLazily((Type x) => Activator.CreateInstance(x));
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance<IConfigurationRepository>("Application", repository);
+
+                Assert.DoesNotThrow(() => Config.TryGet(typeof(ApplicationSettings)));
+
+                A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ApplicationSettings))))
+                    .MustNotHaveHappened();
             }
         }
 
@@ -165,6 +253,50 @@ namespace Serenity.Test
                 Assert.NotNull(Config.TryGet<ServerSettings>());
 
                 Assert.Null(Config.TryGet<ApplicationSettings>());
+            }
+        }
+
+        [Fact]
+        public void Config_TryGetGeneric_UsesRegisteredConfigurationProviderUsingScopeAttribute()
+        {
+            using (new MunqContext())
+            {
+                var repository = A.Fake<IConfigurationRepository>();
+                A.CallTo(() => repository.Load(A<Type>.Ignored))
+                    .ReturnsLazily((Type x) => Activator.CreateInstance(x));
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance<IConfigurationRepository>("Server", repository);
+
+                Assert.DoesNotThrow(() => Config.Get(typeof(ServerSettings)));
+
+                A.CallTo(() => repository.Load(typeof(ServerSettings)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ServerSettings))))
+                    .MustNotHaveHappened();
+            }
+        }
+
+        [Fact]
+        public void Config_TryGetGeneric_UsesApplicationScopeIfScopeIsNotSpecified()
+        {
+            using (new MunqContext())
+            {
+                var repository = A.Fake<IConfigurationRepository>();
+                A.CallTo(() => repository.Load(A<Type>.Ignored))
+                    .ReturnsLazily((Type x) => Activator.CreateInstance(x));
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance<IConfigurationRepository>("Application", repository);
+
+                Assert.DoesNotThrow(() => Config.Get<ApplicationSettings>());
+
+                A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+
+                A.CallTo(() => repository.Load(A<Type>.That.Not.Matches(x => x == typeof(ApplicationSettings))))
+                    .MustNotHaveHappened();
             }
         }
     }
