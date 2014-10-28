@@ -24,7 +24,7 @@ namespace BasicApplication.Northwind.Entities
             set { Fields.ID[this] = value; }
         }
 
-        [DisplayName("Customer Id"), Size(5), PrimaryKey, QuickSearch, Updatable(false)]
+        [DisplayName("Customer Id"), Size(5), PrimaryKey, NotNull, QuickSearch, Updatable(false)]
         public String CustomerID
         {
             get { return Fields.CustomerID[this]; }
