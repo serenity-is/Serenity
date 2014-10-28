@@ -1,10 +1,32 @@
+## 1.3.2 (2014-10-28)
+
+Features:
+  - CommonIncludes class for easier script/css includes
+  - support {version} variable in script include statements (e.g. jquery-{version}).
+  - editors can be referenced with full namespace from server side (e.g. Serenity.StringEditor). EditorTypes.tt now uses full namespace to avoid confusion.
+  - embed bootstrap / jquery ui button conflict resolution to Serenity.Externals.js
+  - added tests and xml doc comments for service locator, configuration, authorization, caching features.
+  - TwoLevelCache now has a Get overload that takes only one expiration instead of two.
+  - [BREAKING CHANGE] moved ILocalTextRegistry interface to Serenity.Abstraction for consistency
+  - [BREAKING CHANGE] renamed ApplicationConfigurationRepository to AppSettingsJsonConfigRepository and moved it to Serenity.Data (from Serenity.Web)
+  - [BREAKING CHANGE] removed unused DevelopmentSettings and used ASP.NET settings like compilation debug=true,
+    customErrors etc.
+  - [BREAKING CHANGE] Distributed.Set now takes a TimeSpan instead of DateTime, for consistency with LocalCache class.
+
+Bugfixes:
+
+  - fixed an interop problem with glimpse for service endpoints (ServiceModelBinder should be registered)
+  - PropertyGrid is no longer an async initialized widget. It will be async widget's own responsibility to attach to another async widget.
+  - EntityConnectionExtension First and Single methods no longer require an entity with IIdRow interface.
+
+
 ## 1.3.1 (2014-10-14)
 
 Bugfixes:
 
-  - new item dialogs can open again (bug related to new async feature)
   - dialog fills page correctly when maximized (breaking change in jQuery UI 1.11)
   - make select editor non-abstract. required for enums to work
+
 
 ## 1.3.0 (2014-10-09)
 
