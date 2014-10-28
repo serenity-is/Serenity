@@ -88,11 +88,9 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(ProjectDir)..\tools\Saltarelle\Saltarelle.Compiler.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
+    <Copy SourceFiles="$(OutDir)Serenity.Script.Test.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\WebRoot\serenity\"></Copy>
   </Target>
-  -->
 </Project>

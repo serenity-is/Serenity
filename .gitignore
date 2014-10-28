@@ -22,3 +22,4 @@ Samples/BasicApplication/BasicApplication/BasicApplication.Web/App_Data/
 Samples/BasicApplication.VSIX/packages/
 Samples/BasicApplication/VSIX/packages/
 BasicApplication.Template.zip
+Serenity.Test/WebRoot/serenity/Serenity*.js

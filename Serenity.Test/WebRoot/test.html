@@ -1,0 +1,49 @@
+<html>
+<head>
+    <title>Serenity Tests</title>
+    <link href="lib/qunit-1.12.0.css" rel="stylesheet" />
+
+    <script src="lib/rsvp.js"></script>
+    <script src="lib/jquery-2.1.1.js"></script>
+    <script src="lib/jquery-ui-1.11.1.js"></script>
+    <script src="lib/jquery.validate.js"></script>
+    <script src="lib/jquery.blockUI.js"></script>
+    <script src="lib/jquery.json.js"></script>
+    <script src="lib/jquery.autoNumeric.js"></script>
+    <script src="lib/jquery.colorbox.js"></script>
+    <script src="lib/jquery.dialogextendQ.js"></script>
+    <script src="lib/jquery.event.drag.js"></script>
+    <script src="lib/jquery.scrollintoview.js"></script>
+    <script src="lib/jquery.slimscroll.js"></script>
+    <script src="lib/jsrender.js"></script>
+    <script src="lib/toastr.js"></script>
+    <script src="lib/select2.js"></script>
+    <script src="lib/slick.core.js"></script>
+    <script src="lib/slick.grid.js"></script>
+    <script src="lib/slick.autotooltips.js"></script>
+    <script src="lib/bootstrap.js"></script>
+    <script src="saltarelle/mscorlib.js"></script>
+    <script src="saltarelle/linq.js"></script>
+    <script src="serenity/Serenity.Script.Core.js"></script>
+    <script src="serenity/Serenity.Script.UI.js"></script>
+    <script src="serenity/Serenity.Externals.js"></script>
+    <script src="serenity/Serenity.Externals.Slick.js"></script>
+    <script src="lib/qunit-1.12.0.js"></script>
+    <script src="serenity/Serenity.Script.Test.js"></script>
+</head>
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+
+    <script type="text/javascript">
+    QUnit.config.autostart = window.location.search.indexOf("noautostart=1") < 0;
+    for (var k in Serenity.Test) {
+        var t = Serenity.Test[k];
+        if (t && t.prototype && t.prototype.runTests) {
+            QUnit.module(k);
+            new t().runTests();
+        }
+    }
+    </script>
+</body>
+</html>

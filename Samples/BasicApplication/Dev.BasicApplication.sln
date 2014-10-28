@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dev.BasicApplication.Web", "BasicApplication\BasicApplication.Web\Dev.BasicApplication.Web.csproj", "{E298DC33-D240-4585-AC47-775575246780}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dev.BasicApplication.Script", "BasicApplication\BasicApplication.Script\Dev.BasicApplication.Script.csproj", "{A0098374-9055-40BA-9F81-1C73AE7F3670}"
@@ -18,6 +20,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.CodeGenerator", "..\..\Serenity.CodeGenerator\Serenity.CodeGenerator.csproj", "{49704C9A-30A2-43DE-AE3D-D13073BA50A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Test", "..\..\Serenity.Test\Serenity.Test.csproj", "{3A47ACB0-E6D4-4014-8DCA-6C27ED8DEC6D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{56E9E208-55D9-4A50-A5B9-6EB22DF6AF0E} = {56E9E208-55D9-4A50-A5B9-6EB22DF6AF0E}
+		{55FCC86F-C622-4909-819F-19DDD5263579} = {55FCC86F-C622-4909-819F-19DDD5263579}
+		{95EC24BE-CAF7-4E1B-BB45-5FF88F763827} = {95EC24BE-CAF7-4E1B-BB45-5FF88F763827}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Testing", "..\..\Serenity.Testing\Serenity.Testing.csproj", "{E5FD07EF-84B5-48C4-8640-46CDC9219AE8}"
 EndProject
