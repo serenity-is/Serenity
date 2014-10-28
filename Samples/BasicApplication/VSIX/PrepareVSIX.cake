@@ -199,7 +199,9 @@ Task("PrepareVSIX")
             System.IO.Path.Combine(copyTargetRoot, "__TemplateIcon.png"));
         File.WriteAllText(vsTemplate, xv.ToString(SaveOptions.OmitDuplicateNamespaces));
         var targetProj = System.IO.Path.Combine(copyTargetRoot, System.IO.Path.GetFileName(csproj));
-        File.Copy(csproj, targetProj);
+        File.WriteAllText(targetProj, File.ReadAllText(csproj)
+            .Replace("http://localhost:55555/", "")
+            .Replace("<DevelopmentServerPort>55556</DevelopmentServerPort>", "<DevelopmentServerPort></DevelopmentServerPort>"));
         replaceParams(targetProj);
     };
 
