@@ -1,15 +1,37 @@
 ﻿(function() {
 	'use strict';
 	var $asm = {};
+	global.EditorTypeRegistryTestNamespace = global.EditorTypeRegistryTestNamespace || {};
+	global.FormatterTypeRegistryTestNamespace = global.FormatterTypeRegistryTestNamespace || {};
 	global.Serenity = global.Serenity || {};
 	global.Serenity.Test = global.Serenity.Test || {};
 	ss.initAssembly($asm, 'Serenity.Script.Test');
+	////////////////////////////////////////////////////////////////////////////////
+	// EditorTypeRegistryTestNamespace.DummyEditor
+	var $EditorTypeRegistryTestNamespace_DummyEditor = function(element) {
+		Serenity.Widget.call(this, element);
+	};
+	$EditorTypeRegistryTestNamespace_DummyEditor.__typeName = 'EditorTypeRegistryTestNamespace.DummyEditor';
+	global.EditorTypeRegistryTestNamespace.DummyEditor = $EditorTypeRegistryTestNamespace_DummyEditor;
+	////////////////////////////////////////////////////////////////////////////////
+	// FormatterTypeRegistryTestNamespace.DummyFormatter
+	var $FormatterTypeRegistryTestNamespace_DummyFormatter = function() {
+	};
+	$FormatterTypeRegistryTestNamespace_DummyFormatter.__typeName = 'FormatterTypeRegistryTestNamespace.DummyFormatter';
+	global.FormatterTypeRegistryTestNamespace.DummyFormatter = $FormatterTypeRegistryTestNamespace_DummyFormatter;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Test.ScriptContextTests.SubClass
 	var $Serenity_$Test_ScriptContextTests$SubClass = function() {
 		Serenity.ScriptContext.call(this);
 	};
 	$Serenity_$Test_ScriptContextTests$SubClass.__typeName = 'Serenity.$Test.ScriptContextTests$SubClass';
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.Test.EditorTypeRegistryTests
+	var $Serenity_Test_EditorTypeRegistryTests = function() {
+		Serenity.ScriptContext.call(this);
+	};
+	$Serenity_Test_EditorTypeRegistryTests.__typeName = 'Serenity.Test.EditorTypeRegistryTests';
+	global.Serenity.Test.EditorTypeRegistryTests = $Serenity_Test_EditorTypeRegistryTests;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Test.EmailEditorTests
 	var $Serenity_Test_EmailEditorTests = function() {
@@ -30,6 +52,13 @@
 		};
 	};
 	global.Serenity.Test.EmailEditorTests = $Serenity_Test_EmailEditorTests;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.Test.FormatterTypeRegistryTests
+	var $Serenity_Test_FormatterTypeRegistryTests = function() {
+		Serenity.ScriptContext.call(this);
+	};
+	$Serenity_Test_FormatterTypeRegistryTests.__typeName = 'Serenity.Test.FormatterTypeRegistryTests';
+	global.Serenity.Test.FormatterTypeRegistryTests = $Serenity_Test_FormatterTypeRegistryTests;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Test.JsonCriteriaConverterSerializationTests
 	var $Serenity_Test_JsonCriteriaConverterSerializationTests = function() {
@@ -96,12 +125,48 @@
 	};
 	$Serenity_Test_ScriptContextTests.__typeName = 'Serenity.Test.ScriptContextTests';
 	global.Serenity.Test.ScriptContextTests = $Serenity_Test_ScriptContextTests;
+	ss.initClass($EditorTypeRegistryTestNamespace_DummyEditor, $asm, {}, Serenity.Widget);
+	ss.initClass($FormatterTypeRegistryTestNamespace_DummyFormatter, $asm, {
+		format: function(ctx) {
+			throw new ss.NotImplementedException();
+		}
+	}, null, [Serenity.ISlickFormatter]);
 	ss.initClass($Serenity_$Test_ScriptContextTests$SubClass, $asm, {
 		$select: function(x) {
 			return $(x);
 		},
 		$select$1: function(x, y) {
 			return $(x, y);
+		}
+	}, Serenity.ScriptContext);
+	ss.initClass($Serenity_Test_EditorTypeRegistryTests, $asm, {
+		runTests: function() {
+			test('EditorTypeRegistry_CanLocateSerenityEditors', ss.mkdel(this, function() {
+				strictEqual(Serenity.StringEditor, Serenity.EditorTypeRegistry.get('String'), 'shortest');
+				strictEqual(Serenity.StringEditor, Serenity.EditorTypeRegistry.get('StringEditor'), 'with editor suffix');
+				strictEqual(Serenity.StringEditor, Serenity.EditorTypeRegistry.get('Serenity.String'), 'with namespace no suffix');
+				strictEqual(Serenity.StringEditor, Serenity.EditorTypeRegistry.get('Serenity.StringEditor'), 'with namespace and suffix');
+			}));
+			test('EditorTypeRegistry_CanLocateDummyEditor', ss.mkdel(this, function() {
+				strictEqual($EditorTypeRegistryTestNamespace_DummyEditor, Serenity.EditorTypeRegistry.get('SomeOtherKeyForDummyEditor'), 'with editor key');
+				strictEqual($EditorTypeRegistryTestNamespace_DummyEditor, Serenity.EditorTypeRegistry.get('EditorTypeRegistryTestNamespace.Dummy'), 'with namespace and no suffix');
+				strictEqual($EditorTypeRegistryTestNamespace_DummyEditor, Serenity.EditorTypeRegistry.get('EditorTypeRegistryTestNamespace.DummyEditor'), 'with namespace and suffix');
+				throws(function() {
+					Serenity.EditorTypeRegistry.get('DummyEditor');
+				}, function() {
+					return ss.isInstanceOfType(arguments[0], ss.Exception);
+				}, "can't find if no root namespace");
+				Q$Config.rootNamespaces.push('EditorTypeRegistryTestNamespace');
+				try {
+					Serenity.EditorTypeRegistry.reset();
+					strictEqual($EditorTypeRegistryTestNamespace_DummyEditor, Serenity.EditorTypeRegistry.get('DummyEditor'), 'can find if root namespace and suffix');
+					strictEqual($EditorTypeRegistryTestNamespace_DummyEditor, Serenity.EditorTypeRegistry.get('Dummy'), 'can find if root namespace and no suffix');
+				}
+				finally {
+					ss.remove(Q$Config.rootNamespaces, 'EditorTypeRegistryTestNamespace');
+					Serenity.EditorTypeRegistry.reset();
+				}
+			}));
 		}
 	}, Serenity.ScriptContext);
 	ss.initClass($Serenity_Test_EmailEditorTests, $asm, {
@@ -196,6 +261,35 @@
 				input.val('invalid.email@');
 				ok(!validator.element(input[0]));
 				form.parent().remove();
+			}));
+		}
+	}, Serenity.ScriptContext);
+	ss.initClass($Serenity_Test_FormatterTypeRegistryTests, $asm, {
+		runTests: function() {
+			test('FormatterTypeRegistry_CanLocateSerenityFormatters', ss.mkdel(this, function() {
+				strictEqual(Serenity.EnumFormatter, Serenity.FormatterTypeRegistry.get('Enum'), 'shortest');
+				strictEqual(Serenity.EnumFormatter, Serenity.FormatterTypeRegistry.get('EnumFormatter'), 'with suffix');
+				strictEqual(Serenity.EnumFormatter, Serenity.FormatterTypeRegistry.get('Serenity.Enum'), 'with namespace no suffix');
+				strictEqual(Serenity.EnumFormatter, Serenity.FormatterTypeRegistry.get('Serenity.EnumFormatter'), 'with namespace and suffix');
+			}));
+			test('FormatterTypeRegistry_CanLocateDummyFormatter', ss.mkdel(this, function() {
+				strictEqual($FormatterTypeRegistryTestNamespace_DummyFormatter, Serenity.FormatterTypeRegistry.get('FormatterTypeRegistryTestNamespace.Dummy'), 'with namespace and no suffix');
+				strictEqual($FormatterTypeRegistryTestNamespace_DummyFormatter, Serenity.FormatterTypeRegistry.get('FormatterTypeRegistryTestNamespace.DummyFormatter'), 'with namespace and suffix');
+				throws(function() {
+					Serenity.FormatterTypeRegistry.get('DummyFormatter');
+				}, function() {
+					return ss.isInstanceOfType(arguments[0], ss.Exception);
+				}, "can't find if no root namespace");
+				Q$Config.rootNamespaces.push('FormatterTypeRegistryTestNamespace');
+				try {
+					Serenity.FormatterTypeRegistry.reset();
+					strictEqual($FormatterTypeRegistryTestNamespace_DummyFormatter, Serenity.FormatterTypeRegistry.get('DummyFormatter'), 'can find if root namespace and suffix');
+					strictEqual($FormatterTypeRegistryTestNamespace_DummyFormatter, Serenity.FormatterTypeRegistry.get('Dummy'), 'can find if root namespace and no suffix');
+				}
+				finally {
+					ss.remove(Q$Config.rootNamespaces, 'FormatterTypeRegistryTestNamespace');
+					Serenity.FormatterTypeRegistry.reset();
+				}
 			}));
 		}
 	}, Serenity.ScriptContext);
@@ -595,4 +689,9 @@
 			}));
 		}
 	});
+	ss.setMetadata($EditorTypeRegistryTestNamespace_DummyEditor, { attr: [(function() {
+		var $t1 = new Serenity.EditorAttribute();
+		$t1.set_key('SomeOtherKeyForDummyEditor');
+		return $t1;
+	})()] });
 })();

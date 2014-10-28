@@ -1230,80 +1230,6 @@
 	};
 	global.Serenity.DialogTypeRegistry = $Serenity_DialogTypeRegistry;
 	////////////////////////////////////////////////////////////////////////////////
-	// Serenity.EditorTypeCache
-	var $Serenity_EditorTypeCache = function() {
-	};
-	$Serenity_EditorTypeCache.__typeName = 'Serenity.EditorTypeCache';
-	$Serenity_EditorTypeCache.$registerTypesInNamespace = function(ns) {
-		var nsObj = window.window;
-		var $t1 = ss.netSplit(ns, [46].map(function(i) {
-			return String.fromCharCode(i);
-		}), null, 1);
-		for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-			var x = $t1[$t2];
-			nsObj = nsObj[x];
-			if (ss.isNullOrUndefined(nsObj)) {
-				return;
-			}
-		}
-		var $t3 = Object.keys(nsObj);
-		for (var $t4 = 0; $t4 < $t3.length; $t4++) {
-			var k = $t3[$t4];
-			var obj = nsObj[k];
-			if (ss.isNullOrUndefined(obj)) {
-				continue;
-			}
-			var name = ns + '.' + k;
-			$Serenity_EditorTypeCache.$visited[name] = true;
-			if (typeof(obj) === 'function') {
-				var type = ss.getType(name);
-				if (ss.isNullOrUndefined(type)) {
-					continue;
-				}
-				var attr = ss.getAttributes(type, Serenity.EditorAttribute, true);
-				if (ss.isValue(attr) && attr.length > 0) {
-					$Serenity_EditorTypeCache.$registerType(type);
-				}
-			}
-			else {
-				$Serenity_EditorTypeCache.$registerTypesInNamespace(name);
-				continue;
-			}
-		}
-	};
-	$Serenity_EditorTypeCache.$registerType = function(type) {
-		var name = ss.getTypeFullName(type);
-		var idx = name.indexOf(String.fromCharCode(46));
-		if (idx >= 0) {
-			name = name.substr(idx + 1);
-		}
-		var info = { type: type };
-		var displayAttr = ss.getAttributes(type, $System_ComponentModel_DisplayNameAttribute, true);
-		if (ss.isValue(displayAttr) && displayAttr.length > 0) {
-			info.displayName = ss.cast(displayAttr[0], $System_ComponentModel_DisplayNameAttribute).get_displayName();
-		}
-		else {
-			info.displayName = ss.getTypeFullName(type);
-		}
-		var optionsAttr = ss.getAttributes(type, Serenity.OptionsTypeAttribute, true);
-		if (ss.isValue(optionsAttr) && optionsAttr.length > 0) {
-			info.optionsType = ss.cast(optionsAttr[0], Serenity.OptionsTypeAttribute).get_optionsType();
-		}
-		$Serenity_EditorTypeCache.$registeredTypes[name] = info;
-	};
-	$Serenity_EditorTypeCache.get_registeredTypes = function() {
-		if (ss.isNullOrUndefined($Serenity_EditorTypeCache.$registeredTypes)) {
-			$Serenity_EditorTypeCache.$visited = {};
-			$Serenity_EditorTypeCache.$registeredTypes = {};
-			for (var $t1 = 0; $t1 < Q$Config.rootNamespaces.length; $t1++) {
-				var ns = Q$Config.rootNamespaces[$t1];
-				$Serenity_EditorTypeCache.$registerTypesInNamespace(ns);
-			}
-		}
-		return $Serenity_EditorTypeCache.$registeredTypes;
-	};
-	global.Serenity.EditorTypeCache = $Serenity_EditorTypeCache;
-	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.EditorTypeEditor
 	var $Serenity_EditorTypeEditor = function(select) {
 		var $t1 = $Serenity_SelectEditorOptions.$ctor();
@@ -1312,6 +1238,83 @@
 	};
 	$Serenity_EditorTypeEditor.__typeName = 'Serenity.EditorTypeEditor';
 	global.Serenity.EditorTypeEditor = $Serenity_EditorTypeEditor;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.EditorTypeRegistry
+	var $Serenity_EditorTypeRegistry = function() {
+	};
+	$Serenity_EditorTypeRegistry.__typeName = 'Serenity.EditorTypeRegistry';
+	$Serenity_EditorTypeRegistry.get = function(key) {
+		if (Q.isEmptyOrNull(key)) {
+			throw new ss.ArgumentNullException('key');
+		}
+		$Serenity_EditorTypeRegistry.$initialize();
+		var editorType = $Serenity_EditorTypeRegistry.$knownTypes[key.toLowerCase()];
+		if (ss.isNullOrUndefined(editorType)) {
+			throw new ss.Exception(ss.formatString("Can't find {0} editor type!", key));
+		}
+		return editorType;
+	};
+	$Serenity_EditorTypeRegistry.$initialize = function() {
+		if (ss.isValue($Serenity_EditorTypeRegistry.$knownTypes)) {
+			return;
+		}
+		$Serenity_EditorTypeRegistry.$knownTypes = {};
+		var $t1 = ss.getAssemblies();
+		for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+			var assembly = $t1[$t2];
+			var $t3 = ss.getAssemblyTypes(assembly);
+			for (var $t4 = 0; $t4 < $t3.length; $t4++) {
+				var type = $t3[$t4];
+				if (!(type.prototype instanceof $Serenity_Widget)) {
+					continue;
+				}
+				if (ss.isGenericTypeDefinition(type)) {
+					continue;
+				}
+				var fullName = ss.getTypeFullName(type).toLowerCase();
+				$Serenity_EditorTypeRegistry.$knownTypes[fullName] = type;
+				var editorAttr = ss.getAttributes(type, Serenity.EditorAttribute, false);
+				if (ss.isValue(editorAttr) && editorAttr.length > 0) {
+					var attrKey = ss.cast(editorAttr[0], Serenity.EditorAttribute).get_key();
+					if (!Q.isEmptyOrNull(attrKey)) {
+						$Serenity_EditorTypeRegistry.$knownTypes[attrKey.toLowerCase()] = type;
+					}
+				}
+				for (var $t5 = 0; $t5 < Q$Config.rootNamespaces.length; $t5++) {
+					var k = Q$Config.rootNamespaces[$t5];
+					if (ss.startsWithString(fullName, k.toLowerCase() + '.')) {
+						var kx = fullName.substr(k.length + 1).toLowerCase();
+						if (ss.isNullOrUndefined($Serenity_EditorTypeRegistry.$knownTypes[kx])) {
+							$Serenity_EditorTypeRegistry.$knownTypes[kx] = type;
+						}
+					}
+				}
+			}
+		}
+		$Serenity_EditorTypeRegistry.$setTypeKeysWithoutEditorSuffix();
+	};
+	$Serenity_EditorTypeRegistry.reset = function() {
+		$Serenity_EditorTypeRegistry.$knownTypes = null;
+	};
+	$Serenity_EditorTypeRegistry.$setTypeKeysWithoutEditorSuffix = function() {
+		var suffix = 'editor';
+		var $t1 = Enumerable.from(Object.keys($Serenity_EditorTypeRegistry.$knownTypes)).toArray();
+		for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+			var k = $t1[$t2];
+			if (!ss.endsWithString(k, suffix)) {
+				continue;
+			}
+			var p = k.substr(0, k.length - suffix.length);
+			if (Q.isEmptyOrNull(p)) {
+				continue;
+			}
+			if (ss.isValue($Serenity_EditorTypeRegistry.$knownTypes[p])) {
+				continue;
+			}
+			$Serenity_EditorTypeRegistry.$knownTypes[p] = $Serenity_EditorTypeRegistry.$knownTypes[k];
+		}
+	};
+	global.Serenity.EditorTypeRegistry = $Serenity_EditorTypeRegistry;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.EmailEditor
 	var $Serenity_EmailEditor = function(input, opt) {
@@ -2506,33 +2509,68 @@
 	};
 	$Serenity_FormatterTypeRegistry.__typeName = 'Serenity.FormatterTypeRegistry';
 	$Serenity_FormatterTypeRegistry.get = function(key) {
-		if (ss.isNullOrUndefined(key)) {
+		if (Q.isEmptyOrNull(key)) {
 			throw new ss.ArgumentNullException('key');
 		}
-		if (!ss.keyExists($Serenity_FormatterTypeRegistry.$knownTypes, key)) {
-			var formatterType = null;
-			for (var $t1 = 0; $t1 < Q$Config.rootNamespaces.length; $t1++) {
-				var ns = Q$Config.rootNamespaces[$t1];
-				var withoutSuffix = ss.getType(ns + '.' + key);
-				var withSuffix = ss.getType(ns + '.' + key + 'Formatter');
-				formatterType = withoutSuffix || withSuffix;
-				if (ss.isValue(withoutSuffix) && ss.isValue(withSuffix) && !ss.isAssignableFrom(Serenity.ISlickFormatter, withoutSuffix) && ss.isAssignableFrom(Serenity.ISlickFormatter, withSuffix)) {
-					formatterType = withSuffix;
-				}
-				if (ss.isValue(formatterType)) {
-					break;
-				}
-			}
-			if (ss.isValue(formatterType)) {
-				if (!ss.isAssignableFrom(Serenity.ISlickFormatter, formatterType)) {
-					throw new ss.Exception(ss.formatString("{0} formatter type doesn't implement ISlickFormatter interface", ss.getTypeFullName(formatterType)));
-				}
-				$Serenity_FormatterTypeRegistry.$knownTypes[key] = formatterType;
-				return formatterType;
-			}
+		$Serenity_FormatterTypeRegistry.$initialize();
+		var formatterType = $Serenity_FormatterTypeRegistry.$knownTypes[key.toLowerCase()];
+		if (ss.isNullOrUndefined(formatterType)) {
 			throw new ss.Exception(ss.formatString("Can't find {0} formatter type!", key));
 		}
-		return $Serenity_FormatterTypeRegistry.$knownTypes[key];
+		return formatterType;
+	};
+	$Serenity_FormatterTypeRegistry.$initialize = function() {
+		if (ss.isValue($Serenity_FormatterTypeRegistry.$knownTypes)) {
+			return;
+		}
+		$Serenity_FormatterTypeRegistry.$knownTypes = {};
+		var $t1 = ss.getAssemblies();
+		for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+			var assembly = $t1[$t2];
+			var $t3 = ss.getAssemblyTypes(assembly);
+			for (var $t4 = 0; $t4 < $t3.length; $t4++) {
+				var type = $t3[$t4];
+				if (!ss.isAssignableFrom(Serenity.ISlickFormatter, type)) {
+					continue;
+				}
+				if (ss.isGenericTypeDefinition(type)) {
+					continue;
+				}
+				var fullName = ss.getTypeFullName(type).toLowerCase();
+				$Serenity_FormatterTypeRegistry.$knownTypes[fullName] = type;
+				for (var $t5 = 0; $t5 < Q$Config.rootNamespaces.length; $t5++) {
+					var k = Q$Config.rootNamespaces[$t5];
+					if (ss.startsWithString(fullName, k.toLowerCase() + '.')) {
+						var kx = fullName.substr(k.length + 1).toLowerCase();
+						if (ss.isNullOrUndefined($Serenity_FormatterTypeRegistry.$knownTypes[kx])) {
+							$Serenity_FormatterTypeRegistry.$knownTypes[kx] = type;
+						}
+					}
+				}
+			}
+		}
+		$Serenity_FormatterTypeRegistry.$setTypeKeysWithoutFormatterSuffix();
+	};
+	$Serenity_FormatterTypeRegistry.reset = function() {
+		$Serenity_FormatterTypeRegistry.$knownTypes = null;
+	};
+	$Serenity_FormatterTypeRegistry.$setTypeKeysWithoutFormatterSuffix = function() {
+		var suffix = 'formatter';
+		var $t1 = Enumerable.from(Object.keys($Serenity_FormatterTypeRegistry.$knownTypes)).toArray();
+		for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+			var k = $t1[$t2];
+			if (!ss.endsWithString(k, suffix)) {
+				continue;
+			}
+			var p = k.substr(0, k.length - suffix.length);
+			if (Q.isEmptyOrNull(p)) {
+				continue;
+			}
+			if (ss.isValue($Serenity_FormatterTypeRegistry.$knownTypes[p])) {
+				continue;
+			}
+			$Serenity_FormatterTypeRegistry.$knownTypes[p] = $Serenity_FormatterTypeRegistry.$knownTypes[k];
+		}
 	};
 	global.Serenity.FormatterTypeRegistry = $Serenity_FormatterTypeRegistry;
 	////////////////////////////////////////////////////////////////////////////////
@@ -3700,39 +3738,6 @@
 		this.$updateReadOnly();
 	};
 	$Serenity_PropertyGrid.__typeName = 'Serenity.PropertyGrid';
-	$Serenity_PropertyGrid.$getEditorType = function(editorTypeKey) {
-		if (ss.isNullOrUndefined(editorTypeKey)) {
-			throw new ss.ArgumentNullException('editorTypeKey');
-		}
-		if (!ss.keyExists($Serenity_PropertyGrid.$knownEditorTypes, editorTypeKey)) {
-			var editorType = null;
-			for (var $t1 = 0; $t1 < Q$Config.rootNamespaces.length; $t1++) {
-				var ns = Q$Config.rootNamespaces[$t1];
-				var withoutSuffix = ss.getType(ns + '.' + editorTypeKey);
-				var withSuffix = ss.getType(ns + '.' + editorTypeKey + 'Editor');
-				editorType = withoutSuffix || withSuffix;
-				if (ss.isValue(withoutSuffix) && ss.isValue(withSuffix) && !ss.isAssignableFrom($Serenity_Widget, withoutSuffix) && ss.isAssignableFrom($Serenity_Widget, withSuffix)) {
-					editorType = withSuffix;
-				}
-				if (ss.isValue(editorType)) {
-					break;
-				}
-			}
-			if (ss.isValue(editorType)) {
-				if (!ss.isAssignableFrom($Serenity_Widget, editorType)) {
-					throw new ss.Exception(ss.formatString('{0} editor type is not a subclass of Widget', ss.getTypeFullName(editorType)));
-				}
-				$Serenity_PropertyGrid.$knownEditorTypes[editorTypeKey] = editorType;
-				return editorType;
-			}
-			else {
-				throw new ss.Exception(ss.formatString("PropertyGrid: Can't find {0} editor type!", editorTypeKey));
-			}
-		}
-		else {
-			return $Serenity_PropertyGrid.$knownEditorTypes[editorTypeKey];
-		}
-	};
 	$Serenity_PropertyGrid.$categoryLinkClick = function(e) {
 		e.preventDefault();
 		var title = $('a[name=' + e.target.getAttribute('href').toString().substr(1) + ']');
@@ -4073,6 +4078,48 @@
 		return result;
 	};
 	global.Serenity.PropertyItemSlickConverter = $Serenity_PropertyItemSlickConverter;
+	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.PublicEditorTypes
+	var $Serenity_PublicEditorTypes = function() {
+	};
+	$Serenity_PublicEditorTypes.__typeName = 'Serenity.PublicEditorTypes';
+	$Serenity_PublicEditorTypes.$registerType = function(type) {
+		var name = ss.getTypeFullName(type);
+		var info = { type: type };
+		var displayAttr = ss.getAttributes(type, $System_ComponentModel_DisplayNameAttribute, true);
+		if (ss.isValue(displayAttr) && displayAttr.length > 0) {
+			info.displayName = ss.cast(displayAttr[0], $System_ComponentModel_DisplayNameAttribute).get_displayName();
+		}
+		else {
+			info.displayName = ss.getTypeFullName(type);
+		}
+		var optionsAttr = ss.getAttributes(type, Serenity.OptionsTypeAttribute, true);
+		if (ss.isValue(optionsAttr) && optionsAttr.length > 0) {
+			info.optionsType = ss.cast(optionsAttr[0], Serenity.OptionsTypeAttribute).get_optionsType();
+		}
+		$Serenity_PublicEditorTypes.$registeredTypes[name] = info;
+	};
+	$Serenity_PublicEditorTypes.get_registeredTypes = function() {
+		if (ss.isNullOrUndefined($Serenity_PublicEditorTypes.$registeredTypes)) {
+			$Serenity_PublicEditorTypes.$registeredTypes = {};
+			$Serenity_EditorTypeRegistry.$initialize();
+			var $t1 = new ss.ObjectEnumerator($Serenity_EditorTypeRegistry.$knownTypes);
+			try {
+				while ($t1.moveNext()) {
+					var pair = $t1.current();
+					if (ss.keyExists($Serenity_PublicEditorTypes.$registeredTypes, ss.getTypeFullName(pair.value))) {
+						continue;
+					}
+					$Serenity_PublicEditorTypes.$registerType(pair.value);
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+		}
+		return $Serenity_PublicEditorTypes.$registeredTypes;
+	};
+	global.Serenity.PublicEditorTypes = $Serenity_PublicEditorTypes;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.QuickSearchInput
 	var $Serenity_QuickSearchInput = function(input, opt) {
@@ -5839,12 +5886,11 @@
 	ss.initClass($Serenity_DecimalEditorOptions, $asm, {});
 	ss.initClass($Serenity_DialogExtensions, $asm, {});
 	ss.initClass($Serenity_DialogTypeRegistry, $asm, {});
-	ss.initClass($Serenity_EditorTypeCache, $asm, {});
 	ss.initClass($Serenity_EditorTypeEditor, $asm, {
 		getItems: function() {
 			if (ss.isNullOrUndefined($Serenity_EditorTypeEditor.$editorTypeList)) {
 				$Serenity_EditorTypeEditor.$editorTypeList = [];
-				var $t1 = new ss.ObjectEnumerator($Serenity_EditorTypeCache.get_registeredTypes());
+				var $t1 = new ss.ObjectEnumerator($Serenity_PublicEditorTypes.get_registeredTypes());
 				try {
 					while ($t1.moveNext()) {
 						var info = $t1.current();
@@ -5863,6 +5909,7 @@
 			return $Serenity_EditorTypeEditor.$editorTypeList;
 		}
 	}, $Serenity_SelectEditor, [$Serenity_IStringValue]);
+	ss.initClass($Serenity_EditorTypeRegistry, $asm, {});
 	ss.initClass($Serenity_EmailEditor, $asm, {
 		get_value: function() {
 			var domain = this.element.nextAll('.emaildomain');
@@ -6744,7 +6791,7 @@
 			if (item.required) {
 				$('<sup>*</sup>').attr('title', Texts$Controls$PropertyGrid.RequiredHint.get()).prependTo(label);
 			}
-			var editorType = $Serenity_PropertyGrid.$getEditorType(item.editorType);
+			var editorType = $Serenity_EditorTypeRegistry.get(item.editorType);
 			var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
 			var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].get_html() : '<input/>');
 			var element = $Serenity_Widget.elementFor$1(editorType).addClass('editor').addClass('flexify').attr('id', editorId).appendTo(fieldDiv);
@@ -6988,6 +7035,7 @@
 	ss.initEnum($Serenity_PropertyGridMode, $asm, { insert: 0, update: 1 });
 	ss.initClass($Serenity_PropertyGridOptions, $asm, {});
 	ss.initClass($Serenity_PropertyItemSlickConverter, $asm, {});
+	ss.initClass($Serenity_PublicEditorTypes, $asm, {});
 	ss.initClass($Serenity_QuickSearchInput, $asm, {
 		$updateInputPlaceHolder: function() {
 			var qsf = this.element.prevAll('.quick-search-field');
@@ -7408,7 +7456,7 @@
 		$Serenity_Widget.$nextWidgetNumber = 0;
 	})();
 	(function() {
-		$Serenity_FormatterTypeRegistry.$knownTypes = {};
+		$Serenity_FormatterTypeRegistry.$knownTypes = null;
 	})();
 	(function() {
 		$Serenity_DialogExtensions.$enterKeyCode = 13;
@@ -7417,8 +7465,10 @@
 		$Serenity_DialogTypeRegistry.$knownTypes = {};
 	})();
 	(function() {
-		$Serenity_EditorTypeCache.$visited = null;
-		$Serenity_EditorTypeCache.$registeredTypes = null;
+		$Serenity_EditorTypeRegistry.$knownTypes = null;
+	})();
+	(function() {
+		$Serenity_PublicEditorTypes.$registeredTypes = null;
 	})();
 	(function() {
 		$Serenity_EditorTypeEditor.$editorTypeList = null;

@@ -23,7 +23,7 @@ namespace Serenity
             if (editorTypeList == null)
             {
                 editorTypeList = new List<object>();
-                foreach (var info in EditorTypeCache.RegisteredTypes)
+                foreach (var info in PublicEditorTypes.RegisteredTypes)
                     editorTypeList.Add(new object[] { info.Key, info.Value.DisplayName });
 
                 editorTypeList.Sort((x, y) =>

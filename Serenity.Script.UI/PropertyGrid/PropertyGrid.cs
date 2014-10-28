@@ -95,48 +95,6 @@ namespace Serenity
             base.Destroy();
         }
 
-        private static Type GetEditorType(string editorTypeKey)
-        {
-            if (editorTypeKey == null)
-                throw new ArgumentNullException("editorTypeKey");
-
-            if (!KnownEditorTypes.ContainsKey(editorTypeKey))
-            {
-                Type editorType = null;
-                foreach (var ns in Q.Config.RootNamespaces)
-                {
-                    var withoutSuffix = Type.GetType(ns + "." + editorTypeKey);
-                    var withSuffix = Type.GetType(ns + "." + editorTypeKey + "Editor");
-                    editorType = withoutSuffix ?? withSuffix;
-                    if (withoutSuffix != null && 
-                        withSuffix != null && 
-                        !typeof(Widget).IsAssignableFrom(withoutSuffix) &&
-                        typeof(Widget).IsAssignableFrom(withSuffix))
-                    {
-                        editorType = withSuffix;
-                    }
-
-                    if (editorType != null)
-                        break;
-                }
-
-                if (editorType != null)
-                {
-                    if (!typeof(Widget).IsAssignableFrom(editorType))
-                        throw new Exception(String.Format("{0} editor type is not a subclass of Widget", editorType.FullName));
-
-                    KnownEditorTypes[editorTypeKey] = editorType;
-
-                    return editorType;
-                }
-                else
-                    throw new Exception(String.Format("PropertyGrid: Can't find {0} editor type!", editorTypeKey));
-            }
-            else
-                return KnownEditorTypes[editorTypeKey];
-
-        }
-
         private jQueryObject CreateCategoryDiv(jQueryObject categoriesDiv, JsDictionary<string, int> categoryIndexes, string category)
         {
             var categoryDiv = J("<div/>")
@@ -206,7 +164,7 @@ namespace Serenity
                     .Attribute("title", Texts.Controls.PropertyGrid.RequiredHint)
                     .PrependTo(label);
 
-            var editorType = GetEditorType(item.EditorType);
+            var editorType = EditorTypeRegistry.Get(item.EditorType);
             var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
             string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
 

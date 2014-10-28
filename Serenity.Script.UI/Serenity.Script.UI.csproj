@@ -98,8 +98,9 @@
     <Compile Include="PropertyGrid\Attributes\InsertableAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\ReadOnlyAttribute.cs" />
     <Compile Include="PropertyGrid\CustomValidation.cs" />
+    <Compile Include="PropertyGrid\EditorTypeRegistry.cs" />
     <Compile Include="PropertyGrid\ReflectionUtils.cs" />
-    <Compile Include="PropertyGrid\EditorTypeCache.cs" />
+    <Compile Include="PropertyGrid\PublicEditorTypes.cs" />
     <Compile Include="PropertyGrid\Attributes\HiddenAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\HintAttribute.cs" />
     <Compile Include="PropertyGrid\IDoubleValue.cs" />
@@ -174,7 +175,8 @@
   <Target Name="CopyAndMinimize" AfterTargets="BuildScript">
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.UI.js -o $(OutDir)Serenity.Script.UI.min.js --comments --mangle">
     </Exec>
-    <Copy SourceFiles="$(OutDir)Serenity.Script.UI.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\Scripts\serenity\"></Copy>
+    <Copy SourceFiles="$(OutDir)Serenity.Script.UI.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\Scripts\serenity\">
+    </Copy>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

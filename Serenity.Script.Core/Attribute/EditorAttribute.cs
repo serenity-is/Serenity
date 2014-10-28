@@ -8,6 +8,8 @@ namespace Serenity
         public EditorAttribute()
         {
         }
+
+        public string Key { get; set; }
     }
 
     public class OptionsTypeAttribute : Attribute

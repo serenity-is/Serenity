@@ -884,6 +884,7 @@
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.EditorAttribute
 	var $Serenity_EditorAttribute = function() {
+		this.$2$KeyField = null;
 	};
 	$Serenity_EditorAttribute.__typeName = 'Serenity.EditorAttribute';
 	global.Serenity.EditorAttribute = $Serenity_EditorAttribute;
@@ -1672,7 +1673,14 @@
 			this.$2$ValueField = value;
 		}
 	});
-	ss.initClass($Serenity_EditorAttribute, $asm, {});
+	ss.initClass($Serenity_EditorAttribute, $asm, {
+		get_key: function() {
+			return this.$2$KeyField;
+		},
+		set_key: function(value) {
+			this.$2$KeyField = value;
+		}
+	});
 	ss.initClass($Serenity_ElementAttribute, $asm, {
 		get_html: function() {
 			return this.$html;

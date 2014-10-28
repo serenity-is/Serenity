@@ -73,19 +73,7 @@ namespace Serenity.CodeGeneration
             {
                 var ns = DoGetNamespace(key);
 
-                var editorKey = key;
                 var editorInfo = EditorTypes[key];
-                foreach (var rn in RootNamespaces)
-                {
-                    if (key.StartsWith(rn + "."))
-                    {
-                        editorKey = editorKey.Substring(rn.Length + 1);
-                        break;
-                    }
-                }
-
-                if (editorKey.EndsWith("Editor"))
-                    editorKey = editorKey.Substring(0, editorKey.Length - "Editor".Length);
 
                 sb.Clear();
                 cw.Indented("public partial class ");
@@ -98,7 +86,7 @@ namespace Serenity.CodeGeneration
                     sb.Append(type);
                     sb.AppendLine("()");
                     cw.Indented("    : base(\"");
-                    sb.Append(editorKey);
+                    sb.Append(key);
                     sb.AppendLine("\")");
                     cw.IndentedLine("{");
                     cw.IndentedLine("}");

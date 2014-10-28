@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Serenity
 {
-    public static class FormatterTypeRegistry
+    public static class EditorTypeRegistry
     {
         internal static JsDictionary<string, Type> knownTypes;
 
@@ -15,11 +15,11 @@ namespace Serenity
 
             Initialize();
 
-            var formatterType = knownTypes[key.ToLower()];
-            if (formatterType == null)
-                throw new Exception(String.Format("Can't find {0} formatter type!", key));
+            var editorType = knownTypes[key.ToLower()];
+            if (editorType == null)
+                throw new Exception(String.Format("Can't find {0} editor type!", key));
 
-            return formatterType;
+            return editorType;
         }
 
         internal static void Initialize()
@@ -32,7 +32,7 @@ namespace Serenity
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (!typeof(ISlickFormatter).IsAssignableFrom(type))
+                    if (!type.IsSubclassOf(typeof(Widget)))
                         continue;
 
                     if (type.IsGenericTypeDefinition)
@@ -41,6 +41,14 @@ namespace Serenity
                     var fullName = type.FullName.ToLower();
                     knownTypes[fullName] = type;
 
+                    var editorAttr = type.GetCustomAttributes(typeof(EditorAttribute), false);
+                    if (editorAttr != null && editorAttr.Length > 0)
+                    {
+                        var attrKey = ((EditorAttribute)editorAttr[0]).Key;
+                        if (!attrKey.IsEmptyOrNull())
+                            knownTypes[attrKey.ToLower()] = type;
+                    }
+                            
                     foreach (var k in Q.Config.RootNamespaces)
                     {
                         if (fullName.StartsWith(k.ToLower() + "."))
@@ -53,7 +61,7 @@ namespace Serenity
                 }
             }
 
-            SetTypeKeysWithoutFormatterSuffix();
+            SetTypeKeysWithoutEditorSuffix();
         }
 
         public static void Reset()
@@ -61,15 +69,15 @@ namespace Serenity
             knownTypes = null;
         }
 
-        private static void SetTypeKeysWithoutFormatterSuffix()
+        private static void SetTypeKeysWithoutEditorSuffix()
         {
-            const string suffix = "formatter";
+            const string suffix = "editor";
 
             foreach (var k in knownTypes.Keys.ToArray())
             {
                 if (!k.EndsWith(suffix))
                     continue;
-
+                        
                 var p = k.Substr(0, k.Length - suffix.Length);
                 if (p.IsEmptyOrNull())
                     continue;
