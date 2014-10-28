@@ -22,11 +22,6 @@ namespace BasicApplication.Northwind
             Q.ServiceRequest("Northwind/Product/Delete", request, onSuccess, options);
         }
     
-        public static void Undelete(UndeleteRequest request, Action<UndeleteResponse> onSuccess, ServiceCallOptions options = null)
-        {
-            Q.ServiceRequest("Northwind/Product/Undelete", request, onSuccess, options);
-        }
-    
         public static void Retrieve(RetrieveRequest request, Action<RetrieveResponse<ProductRow>> onSuccess, ServiceCallOptions options = null)
         {
             Q.ServiceRequest("Northwind/Product/Retrieve", request, onSuccess, options);

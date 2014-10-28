@@ -11,7 +11,7 @@ namespace BasicApplication.Northwind
     public partial class PhoneEditorAttribute : CustomEditorAttribute
     {
         public PhoneEditorAttribute()
-            : base("Northwind.Phone")
+            : base("BasicApplication.Northwind.PhoneEditor")
         {
         }
     

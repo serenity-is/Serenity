@@ -22,11 +22,6 @@ namespace BasicApplication.Northwind
             Q.ServiceRequest("Northwind/Region/Delete", request, onSuccess, options);
         }
     
-        public static void Undelete(UndeleteRequest request, Action<UndeleteResponse> onSuccess, ServiceCallOptions options = null)
-        {
-            Q.ServiceRequest("Northwind/Region/Undelete", request, onSuccess, options);
-        }
-    
         public static void Retrieve(RetrieveRequest request, Action<RetrieveResponse<RegionRow>> onSuccess, ServiceCallOptions options = null)
         {
             Q.ServiceRequest("Northwind/Region/Retrieve", request, onSuccess, options);

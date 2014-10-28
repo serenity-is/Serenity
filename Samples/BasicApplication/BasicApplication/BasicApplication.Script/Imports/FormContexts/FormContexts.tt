@@ -16,7 +16,7 @@
 <# 
 	var container = new Serenity.MunqContainer();
     Serenity.Dependency.SetResolver(container);
-    container.RegisterInstance<Serenity.Localization.ILocalTextRegistry>(new Serenity.Localization.LocalTextRegistry());
+    container.RegisterInstance<Serenity.Abstractions.ILocalTextRegistry>(new Serenity.Localization.LocalTextRegistry());
     var solutionDir = Host.ResolvePath(@"..\..\..");
     var scriptAssembly1 =(solutionDir + @"\BasicApplication.Script\bin\debug\Serenity.Script.UI.dll");
     var scriptAssembly2 =(solutionDir + @"\BasicApplication.Script\bin\debug\BasicApplication.Script.dll");
