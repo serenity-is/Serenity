@@ -894,12 +894,12 @@
       <package id="Microsoft.Web.Infrastructure" version="1.0.0.0" />
       <package id="Newtonsoft.Json" version="6.0.5" />
       <package id="Select2.js" version="3.5.1" />
-      <package id="Serenity.CodeGenerator" version="1.3.1" />
-      <package id="Serenity.Core" version="1.3.1" />
-      <package id="Serenity.Data" version="1.3.1" />
-      <package id="Serenity.Data.Entity" version="1.3.1" />
-      <package id="Serenity.Services" version="1.3.1" />
-      <package id="Serenity.Web" version="1.3.1" />
+      <package id="Serenity.CodeGenerator" version="1.3.3" />
+      <package id="Serenity.Core" version="1.3.3" />
+      <package id="Serenity.Data" version="1.3.3" />
+      <package id="Serenity.Data.Entity" version="1.3.3" />
+      <package id="Serenity.Services" version="1.3.3" />
+      <package id="Serenity.Web" version="1.3.3" />
       <package id="SlickGrid" version="2.2.20140120" />
       <package id="toastr" version="2.0.3" />
     </packages>
