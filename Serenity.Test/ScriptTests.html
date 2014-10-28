@@ -1,0 +1,49 @@
+<html>
+<head>
+    <title>Serenity Tests</title>
+    <link href="lib/qunit-1.12.0.css" rel="stylesheet" />
+
+    <script src="Scripts/rsvp.js"></script>
+    <script src="Scripts/jquery-2.1.1.js"></script>
+    <script src="Scripts/jquery-ui-1.11.1.js"></script>
+    <script src="Scripts/jquery.validate.js"></script>
+    <script src="Scripts/jquery.blockUI.js"></script>
+    <script src="Scripts/jquery.json.js"></script>
+    <script src="Scripts/jquery.autoNumeric.js"></script>
+    <script src="Scripts/jquery.colorbox.js"></script>
+    <script src="Scripts/jquery.dialogextendQ.js"></script>
+    <script src="Scripts/jquery.event.drag.js"></script>
+    <script src="Scripts/jquery.scrollintoview.js"></script>
+    <script src="Scripts/jquery.slimscroll.js"></script>
+    <script src="Scripts/jsrender.js"></script>
+    <script src="Scripts/toastr.js"></script>
+    <script src="Scripts/select2.js"></script>
+    <script src="Scripts/slick.core.js"></script>
+    <script src="Scripts/slick.grid.js"></script>
+    <script src="Scripts/plugins/slick.autotooltips.js"></script>
+    <script src="Scripts/bootstrap.js"></script>
+    <script src="Scripts/saltarelle/mscorlib.js"></script>
+    <script src="Scripts/saltarelle/linq.js"></script>
+    <script src="Scripts/serenity/Serenity.Script.Core.js"></script>
+    <script src="Scripts/serenity/Serenity.Script.UI.js"></script>
+    <script src="Scripts/serenity/Serenity.Externals.js"></script>
+    <script src="Scripts/serenity/Serenity.Externals.Slick.js"></script>
+    <script src="Scripts/qunit-1.12.0.js"></script>
+    <script src="Scripts/serenity/Serenity.Script.Test.js"></script>
+</head>
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+
+    <script type="text/javascript">
+    QUnit.config.autostart = window.location.search.indexOf("noautostart=1") < 0;
+    for (var k in Serenity.Test) {
+        var t = Serenity.Test[k];
+        if (t && t.prototype && t.prototype.runTests) {
+            QUnit.module(k);
+            new t().runTests();
+        }
+    }
+    </script>
+</body>
+</html>

@@ -89,6 +89,6 @@
   </ItemGroup>
   <Import Project="$(ProjectDir)..\tools\Saltarelle\Saltarelle.Compiler.targets" />
   <Target Name="CopyAndMinimize" AfterTargets="BuildScript">
-    <Copy SourceFiles="$(OutDir)Serenity.Script.Test.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\WebRoot\serenity\"></Copy>
+    <Copy SourceFiles="$(OutDir)Serenity.Script.Test.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\Scripts\serenity\"></Copy>
   </Target>
 </Project>

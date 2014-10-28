@@ -137,7 +137,7 @@
     </Copy>
     <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.Slick.js" DestinationFolder="$(OutDir)">
     </Copy>
-    <Copy SourceFiles="$(OutDir)Serenity.Script.Core.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\WebRoot\serenity\"></Copy>
+    <Copy SourceFiles="$(OutDir)Serenity.Script.Core.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\Scripts\serenity\"></Copy>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.Core.js -o $(OutDir)Serenity.Script.Core.min.js --comments --mangle">
     </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Externals.js -o $(OutDir)Serenity.Externals.min.js --comments --mangle">

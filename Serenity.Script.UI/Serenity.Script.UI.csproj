@@ -174,7 +174,7 @@
   <Target Name="CopyAndMinimize" AfterTargets="BuildScript">
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.UI.js -o $(OutDir)Serenity.Script.UI.min.js --comments --mangle">
     </Exec>
-    <Copy SourceFiles="$(OutDir)Serenity.Script.UI.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\WebRoot\serenity\"></Copy>
+    <Copy SourceFiles="$(OutDir)Serenity.Script.UI.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\Scripts\serenity\"></Copy>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

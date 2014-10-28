@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.PhantomJS;
+using Serenity.Testing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,13 +8,13 @@ using System.Drawing.Imaging;
 using System.IO;
 using Xunit;
 
-namespace Serenity.Testing
+namespace Serenity.Test
 {
     public class ScriptTests : SeleniumTestBase
     {
         protected override string GetWebPath()
         {
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "webroot");
+            return AppDomain.CurrentDomain.BaseDirectory;
         }
 
         private Dictionary<string, object> ExecuteQunitTests()
@@ -29,9 +30,9 @@ namespace Serenity.Testing
         }
 
         [Fact]
-        public void SerenityTestsPasses()
+        public void ScriptTestsPasses()
         {
-            GoToUrl("~/test.html?noautostart=1");
+            GoToUrl("~/ScriptTests.html?noautostart=1");
             try
             {
                 var qunitResults = ExecuteQunitTests();
