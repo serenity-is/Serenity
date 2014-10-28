@@ -1,5 +1,12 @@
 ## 1.3.2 (2014-10-28)
 
+Bugfixes:
+
+  - fix default location of select2.js in CommonIncludes
+ 
+ 
+## 1.3.2 (2014-10-28)
+
 Features:
   - CommonIncludes class for easier script/css includes
   - support {version} variable in script include statements (e.g. jquery-{version}).
