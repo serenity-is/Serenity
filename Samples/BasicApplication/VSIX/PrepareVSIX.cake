@@ -194,10 +194,10 @@ Task("PrepareVSIX")
             pkg.Add(pk);
         }
         
+        File.WriteAllText(vsTemplate, xv.ToString(SaveOptions.OmitDuplicateNamespaces));
         File.Copy(vsTemplate, System.IO.Path.Combine(copyTargetRoot, System.IO.Path.GetFileName(vsTemplate)));
         File.Copy(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(vsTemplate), "__TemplateIcon.png"), 
             System.IO.Path.Combine(copyTargetRoot, "__TemplateIcon.png"));
-        File.WriteAllText(vsTemplate, xv.ToString(SaveOptions.OmitDuplicateNamespaces));
         var targetProj = System.IO.Path.Combine(copyTargetRoot, System.IO.Path.GetFileName(csproj));
         File.WriteAllText(targetProj, File.ReadAllText(csproj)
             .Replace("http://localhost:55555/", "")
