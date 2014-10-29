@@ -5,7 +5,7 @@ namespace Serenity.ComponentModel
 {
     public class FormatterTypeAttribute : Attribute
     {
-        protected FormatterTypeAttribute(string type)
+        public FormatterTypeAttribute(string type)
         {
             FormatterType = type;
         }
