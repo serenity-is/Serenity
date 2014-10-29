@@ -1,3 +1,10 @@
+## 1.3.4 (2014-10-29)
+
+Bugfixes:
+  - Make FormatterType constructor public
+  - Promise.Then method should return a Promise without value
+
+
 ## 1.3.3 (2014-10-28)
 
 Bugfixes:
