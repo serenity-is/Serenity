@@ -5,6 +5,12 @@ var target = Argument("target", "PrepareVSIX");
 Task("PrepareVSIX")
   .Does(() => 
 {
+    CleanDirectory("./ProjectTemplates");
+    CreateDirectory("./ProjectTemplates");
+    CreateDirectory("./packages");
+    CleanDirectory("./bin/Debug");
+    CleanDirectory("./bin/Release");
+
     var r = System.IO.Path.GetFullPath(@"..\");
     var samplePackagesFolder = r + @"packages\";
     var vsixPackagesFolder = r + @"VSIX\packages\";
@@ -227,9 +233,6 @@ Task("PrepareVSIX")
     File.Copy(r + @"BasicApplication\BasicApplication.vstemplate", 
         System.IO.Path.Combine(templateFolder, "BasicApplication.vstemplate")); 
         
-    CleanDirectory("./ProjectTemplates");
-    CleanDirectory("./bin/Debug");
-    CleanDirectory("./bin/Release");
     Zip(templateFolder, r + @"VSIX\ProjectTemplates\BasicApplication.Template.zip");
 });
 
