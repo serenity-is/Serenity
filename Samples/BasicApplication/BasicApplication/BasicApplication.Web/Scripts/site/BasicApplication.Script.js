@@ -225,9 +225,6 @@
 	$BasicApplication_Northwind_CategoryService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Category/Delete', request, onSuccess, options);
 	};
-	$BasicApplication_Northwind_CategoryService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Category/Undelete', request, onSuccess, options);
-	};
 	$BasicApplication_Northwind_CategoryService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Category/Retrieve', request, onSuccess, options);
 	};
@@ -270,9 +267,6 @@
 	$BasicApplication_Northwind_CustomerCustomerDemoService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/CustomerCustomerDemo/Delete', request, onSuccess, options);
 	};
-	$BasicApplication_Northwind_CustomerCustomerDemoService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerCustomerDemo/Undelete', request, onSuccess, options);
-	};
 	$BasicApplication_Northwind_CustomerCustomerDemoService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/CustomerCustomerDemo/Retrieve', request, onSuccess, options);
 	};
@@ -314,9 +308,6 @@
 	};
 	$BasicApplication_Northwind_CustomerDemographicService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/CustomerDemographic/Delete', request, onSuccess, options);
-	};
-	$BasicApplication_Northwind_CustomerDemographicService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerDemographic/Undelete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerDemographicService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/CustomerDemographic/Retrieve', request, onSuccess, options);
@@ -361,9 +352,6 @@
 	$BasicApplication_Northwind_CustomerService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Customer/Delete', request, onSuccess, options);
 	};
-	$BasicApplication_Northwind_CustomerService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Customer/Undelete', request, onSuccess, options);
-	};
 	$BasicApplication_Northwind_CustomerService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Customer/Retrieve', request, onSuccess, options);
 	};
@@ -405,9 +393,6 @@
 	};
 	$BasicApplication_Northwind_EmployeeService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Employee/Delete', request, onSuccess, options);
-	};
-	$BasicApplication_Northwind_EmployeeService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Employee/Undelete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Employee/Retrieve', request, onSuccess, options);
@@ -451,9 +436,6 @@
 	$BasicApplication_Northwind_EmployeeTerritoryService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/EmployeeTerritory/Delete', request, onSuccess, options);
 	};
-	$BasicApplication_Northwind_EmployeeTerritoryService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/EmployeeTerritory/Undelete', request, onSuccess, options);
-	};
 	$BasicApplication_Northwind_EmployeeTerritoryService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/EmployeeTerritory/Retrieve', request, onSuccess, options);
 	};
@@ -496,9 +478,6 @@
 	$BasicApplication_Northwind_OrderDetailService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/OrderDetail/Delete', request, onSuccess, options);
 	};
-	$BasicApplication_Northwind_OrderDetailService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/OrderDetail/Undelete', request, onSuccess, options);
-	};
 	$BasicApplication_Northwind_OrderDetailService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/OrderDetail/Retrieve', request, onSuccess, options);
 	};
@@ -540,9 +519,6 @@
 	};
 	$BasicApplication_Northwind_OrderService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Order/Delete', request, onSuccess, options);
-	};
-	$BasicApplication_Northwind_OrderService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Order/Undelete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Order/Retrieve', request, onSuccess, options);
@@ -698,9 +674,6 @@
 	$BasicApplication_Northwind_ProductService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Product/Delete', request, onSuccess, options);
 	};
-	$BasicApplication_Northwind_ProductService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Product/Undelete', request, onSuccess, options);
-	};
 	$BasicApplication_Northwind_ProductService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Product/Retrieve', request, onSuccess, options);
 	};
@@ -743,9 +716,6 @@
 	$BasicApplication_Northwind_RegionService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Region/Delete', request, onSuccess, options);
 	};
-	$BasicApplication_Northwind_RegionService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Region/Undelete', request, onSuccess, options);
-	};
 	$BasicApplication_Northwind_RegionService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Region/Retrieve', request, onSuccess, options);
 	};
@@ -787,9 +757,6 @@
 	};
 	$BasicApplication_Northwind_ShipperService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Shipper/Delete', request, onSuccess, options);
-	};
-	$BasicApplication_Northwind_ShipperService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Shipper/Undelete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ShipperService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Shipper/Retrieve', request, onSuccess, options);
@@ -834,9 +801,6 @@
 	$BasicApplication_Northwind_SupplierService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Supplier/Delete', request, onSuccess, options);
 	};
-	$BasicApplication_Northwind_SupplierService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Supplier/Undelete', request, onSuccess, options);
-	};
 	$BasicApplication_Northwind_SupplierService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Supplier/Retrieve', request, onSuccess, options);
 	};
@@ -879,9 +843,6 @@
 	};
 	$BasicApplication_Northwind_TerritoryService.delete$1 = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Territory/Delete', request, onSuccess, options);
-	};
-	$BasicApplication_Northwind_TerritoryService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Territory/Undelete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_TerritoryService.retrieve = function(request, onSuccess, options) {
 		Q.serviceRequest('Northwind/Territory/Retrieve', request, onSuccess, options);
