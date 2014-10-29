@@ -108,7 +108,7 @@ namespace System
         }
 
         [PreserveName, IncludeGenericArguments(false)]
-        public Promise<TValue> Then(Action<TValue> onFulfilled, Callback onRejected = null)
+        public Promise Then(Action<TValue> onFulfilled, Callback onRejected = null)
         {
             return null;
         }
