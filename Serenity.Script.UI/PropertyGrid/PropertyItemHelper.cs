@@ -63,6 +63,8 @@ namespace Serenity
                     pi.Category = ((CategoryAttribute)categoryAttribute[0]).Category;
                 else if (categoryAttribute.Length > 1)
                     throw new Exception(String.Format("{0}.{1} için birden fazla kategori belirlenmiş!", type.Name, pi.Name));
+                else if (list.Count > 0)
+                    pi.Category = list[list.Count - 1].Category;
 
                 var cssClassAttr = member.GetCustomAttributes(typeof(CssClassAttribute), false);
                 if (cssClassAttr.Length == 1)

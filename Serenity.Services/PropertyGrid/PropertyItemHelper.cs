@@ -112,6 +112,8 @@ namespace Serenity.PropertyGrid
                 var categoryAttribute = (CategoryAttribute)getAttribute(typeof(CategoryAttribute));
                 if (categoryAttribute != null)
                     pi.Category = categoryAttribute.Category;
+                else if (list.Count > 0)
+                    pi.Category = list[list.Count - 1].Category;
                 
                 var cssClassAttr = (CssClassAttribute)getAttribute(typeof(CssClassAttribute));
                 if (cssClassAttr != null)
