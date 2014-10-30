@@ -25,7 +25,7 @@ namespace Serenity.Localization
         private readonly ConcurrentDictionary<ItemKey, string> pendingTexts = 
             new ConcurrentDictionary<ItemKey, string>(ItemKeyComparer.Default);
 
-        private readonly ConcurrentDictionary<string, string> languageParents =
+        private readonly ConcurrentDictionary<string, string> languageFallbacks =
             new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
@@ -66,8 +66,8 @@ namespace Serenity.Localization
 
         /// <summary>
         /// Converts the local text key to its representation in requested language. Looks up text
-        /// in requested language, its parents and invariant language in order. If not found in any,
-        /// null is returned. See SetParentLanguageID for information about parent languages.
+        /// in requested language, its Fallbacks and invariant language in order. If not found in any,
+        /// null is returned. See SetLanguageFallback for information about language fallbacks.
         /// </summary>
         /// <param name="languageID"/>Language ID.</param>
         /// <param name="textKey">Local text key (can be null).</param>
@@ -107,14 +107,14 @@ namespace Serenity.Localization
                 var circularCheck1 = 0;
                 while (true)
                 {
-                    languageID = TryGetParentLanguageID(languageID) ?? LocalText.InvariantLanguageID;
+                    languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
 
-                    // search in parent or default language
+                    // search in fallback or default language
                     k = new ItemKey(languageID, textKey);
 
                     if (pendingTexts.TryGetValue(k, out s))
                     {
-                        // text available in pending parent language
+                        // text available in pending language fallback
                         if (s != null)
                             return s;
 
@@ -133,11 +133,11 @@ namespace Serenity.Localization
                         return null;
                     }
                     
-                    // check for possible circular parents
+                    // check for possible circular Fallbacks
                     if (circularCheck1++ >= 10)
                         return null;
 
-                    // try again for parent language...
+                    // try again for language fallback...
                 }
             }
 
@@ -149,9 +149,9 @@ namespace Serenity.Localization
                     int circularCheck2 = 0;
                     while (true)
                     {
-                        languageID = TryGetParentLanguageID(languageID) ?? LocalText.InvariantLanguageID;
+                        languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
 
-                        // search in parent or default language
+                        // search in fallback or default language
                         k = new ItemKey(languageID, textKey);
 
                         // search again
@@ -164,7 +164,7 @@ namespace Serenity.Localization
                     }
                 }
 
-                // couldn't find in requested language or its parents, return key itself
+                // couldn't find in requested language or its Fallbacks, return key itself
                 return null;
             }
 
@@ -173,24 +173,24 @@ namespace Serenity.Localization
         }
 
         /// <summary>
-        /// Sets the parent language of the specified language.
-        /// When a text is not found in one language, LocalTextRegistry checks its parent language for
-        /// a translation. Some implicit parent language definitions exist even if none set. For example, "en" is 
-        /// parent language ID of "en-US" and "en-UK", "tr" is parent language ID of "tr-TR". Also, 
-        /// invariant language ID ("") is an implicit parent of all languages.
+        /// Sets the language fallback of the specified language.
+        /// When a text is not found in one language, LocalTextRegistry checks its language fallback for
+        /// a translation. Some implicit language fallback definitions exist even if none set. For example, "en" is 
+        /// language fallback ID of "en-US" and "en-UK", "tr" is language fallback ID of "tr-TR". Also, 
+        /// invariant language ID ("") is an implicit fallback of all languages.
         /// </summary>
         /// <param name="languageID">Language identifier. (e.g. en-US)</param>
-        /// <param name="parentLanguageID">Parent language identifier. (e.g. en)</param>
-        public void SetParentLanguageID(string languageID, string parentLanguageID)
+        /// <param name="LanguageFallbackID">language fallback identifier. (e.g. en)</param>
+        public void SetLanguageFallback(string languageID, string LanguageFallbackID)
         {
-            languageParents[languageID] = parentLanguageID;
+            languageFallbacks[languageID] = LanguageFallbackID;
         }
 
-        private string TryGetParentLanguageID(string languageID)
+        private string TryGetLanguageFallback(string languageID)
         {
-            string parent;
-            if (languageParents.TryGetValue(languageID, out parent))
-                return parent;
+            string fallback;
+            if (languageFallbacks.TryGetValue(languageID, out fallback))
+                return fallback;
 
             if (languageID == LocalText.InvariantLanguageID)
                 return null;
@@ -205,7 +205,7 @@ namespace Serenity.Localization
 
         /// <summary>
         ///   Gets all available text keys (that has a translation in language or any of its
-        ///   parent languages) and their local texts.</summary>
+        ///   language fallbacks) and their local texts.</summary>
         /// <param name="languageID">
         ///   Language ID (required).</param>
         /// <param name="pending">
@@ -253,7 +253,7 @@ namespace Serenity.Localization
                     currentID == LocalText.InvariantLanguageID)
                     break;
 
-                currentID = TryGetParentLanguageID(currentID) ?? LocalText.InvariantLanguageID;
+                currentID = TryGetLanguageFallback(currentID) ?? LocalText.InvariantLanguageID;
             }
 
             return texts;
