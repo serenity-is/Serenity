@@ -1,9 +1,11 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.PhantomJS;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading;
 
 namespace Serenity.Testing
 {
@@ -122,19 +124,41 @@ namespace Serenity.Testing
 
             ~IISProcessManager()
             {
-                Dispose();
+                Dispose(false);
             }
 
             public void Dispose()
             {
-                GC.SuppressFinalize(this);
+                Dispose(true);
+            }
+
+            public void Dispose(bool disposing)
+            {
+                if (disposing)
+                    GC.SuppressFinalize(this);
 
                 if (iisProcess != null && !iisProcess.HasExited)
                 {
-                    iisProcess.CloseMainWindow();
-                    if (!iisProcess.HasExited)
+                    try
                     {
-                        iisProcess.Kill();
+                        iisProcess.CloseMainWindow();
+
+                        Thread.Sleep(100);
+
+                        if (!iisProcess.HasExited)
+                        {
+                            try
+                            {
+                                iisProcess.Kill();
+                            }
+                            catch (Win32Exception)
+                            {
+                                // avoid access denied errors
+                            }
+                        }
+                    }
+                    finally
+                    {
                         iisProcess.Dispose();
                     }
                 }
