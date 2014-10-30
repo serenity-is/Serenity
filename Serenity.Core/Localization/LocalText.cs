@@ -19,7 +19,7 @@ namespace Serenity
         /// <summary>
         /// An empty local text instance like String.Empty
         /// </summary>
-        public static LocalText Empty;
+        public static readonly LocalText Empty;
 
         private string key;
 
