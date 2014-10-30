@@ -1,11 +1,8 @@
-﻿using System;
-using jQueryApi;
-using System.Html;
+﻿using jQueryApi;
+using System;
 using System.Collections.Generic;
+using System.Html;
 using System.Linq;
-using System.Reflection;
-using Serenity.ComponentModel;
-using System.ComponentModel;
 
 namespace Serenity
 {
@@ -105,14 +102,14 @@ namespace Serenity
                 .AddClass("category-title")
                 .Append(J("<a/>")
                     .AddClass("category-anchor")
-                    .Text(category)
+                    .Text(DetermineText(category, prefix => prefix + "Categories." + category))
                     .Attribute("name", options.IdPrefix + "Category" + categoryIndexes[category].ToString()))
                 .AppendTo(categoryDiv);
 
             return categoryDiv;
         }
 
-        private string DetermineText(string name, string text, string suffix)
+        private string DetermineText(string text, Func<string, string> getKey)
         {
             if (text != null &&
                 !text.StartsWith("`"))
@@ -127,7 +124,7 @@ namespace Serenity
 
             if (!options.LocalTextPrefix.IsEmptyOrNull())
             {
-                var local = Q.TryGetText(options.LocalTextPrefix + name + suffix);
+                var local = Q.TryGetText(getKey(options.LocalTextPrefix));
                 if (local != null)
                     return local;
             }
@@ -148,9 +145,9 @@ namespace Serenity
 
             string editorId = options.IdPrefix + item.Name;
 
-            string title = DetermineText(item.Name, item.Title, "");
-            string hint = DetermineText(item.Name, item.Hint, "Hint");
-            string placeHolder = DetermineText(item.Name, item.Placeholder, "Placeholder");
+            string title = DetermineText(item.Title, prefix => prefix + item.Name);
+            string hint = DetermineText(item.Hint, prefix => prefix + item.Name + "_Hint");
+            string placeHolder = DetermineText(item.Placeholder, prefix => prefix + item.Name + "_Placeholder");
 
             var label = J("<label/>")
                 .AddClass("caption")
@@ -224,19 +221,32 @@ namespace Serenity
             return editor;
         }
 
-        private JsDictionary<string, int?> GetCategoryOrder()
+        private JsDictionary<string, int?> GetCategoryOrder(List<PropertyItem> items)
         {
-            var split = (options.CategoryOrder.TrimToNull() ?? options.DefaultCategory ?? "").Split(";");
             int order = 0;
             var result = new JsDictionary<string, int?>();
 
-            foreach (var s in split)
+            var categoryOrder = options.CategoryOrder.TrimToNull();
+            if (categoryOrder != null)
             {
-                var x = s.TrimToNull();
-                if (x == null)
-                    continue;
+                var split = categoryOrder.Split(";");
+                foreach (var s in split)
+                {
+                    var x = s.TrimToNull();
+                    if (x == null)
+                        continue;
 
-                result[x] = order++;
+                    if (result[x] != null)
+                        continue;
+
+                    result[x] = order++;
+                }
+            }
+
+            foreach (var x in items)
+            {
+                if (result[x.Category] == null)
+                    result[x.Category] = order++;
             }
 
             return result;
@@ -253,25 +263,22 @@ namespace Serenity
             }
 
             var self = this;
-            JsDictionary<string, int?> categoryOrder = null;
+            var categoryOrder = GetCategoryOrder(items);
             
-            items.Sort((x, y) => {
+            items.Sort((x, y) => 
+            {
                 var c = 0;
                 
                 if (x.Category != y.Category)
                 {
-                    if (categoryOrder != null || options.CategoryOrder != null)
-                    {
-                        categoryOrder = categoryOrder ?? GetCategoryOrder();
-                        var c1 = categoryOrder[x.Category];
-                        var c2 = categoryOrder[y.Category];
-                        if (c1 != null && c2 != null)
-                            c = c1.Value - c2.Value;
-                        else if (c1 != null)
-                            c = -1;
-                        else if (c2 != null)
-                            c = 1;
-                    }
+                    var c1 = categoryOrder[x.Category];
+                    var c2 = categoryOrder[y.Category];
+                    if (c1 != null && c2 != null)
+                        c = c1.Value - c2.Value;
+                    else if (c1 != null)
+                        c = -1;
+                    else if (c2 != null)
+                        c = 1;
                 }
 
                 if (c == 0)
@@ -299,10 +306,10 @@ namespace Serenity
                             .AddClass("separator")
                             .Text("|")
                             .PrependTo(container);
-
+                    
                     J("<a/>")
                         .AddClass("category-link")
-                        .Text(item.Category)
+                        .Text(DetermineText(item.Category, prefix => prefix + "Categories." + item.Category))
                         .Attribute("tabindex", "-1")
                         .Attribute("href", "#" + options.IdPrefix + "Category" + index.ToString())
                         .Click(CategoryLinkClick)

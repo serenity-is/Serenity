@@ -71,7 +71,8 @@ namespace Serenity
                 {
                     IdPrefix = this.idPrefix,
                     Items = propertyItems,
-                    Mode = PropertyGridMode.Insert
+                    Mode = PropertyGridMode.Insert,
+                    LocalTextPrefix = "Forms." + GetFormKey() + "."
                 };
             });
         }

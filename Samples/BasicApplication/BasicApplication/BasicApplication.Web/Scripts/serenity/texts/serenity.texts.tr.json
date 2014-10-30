@@ -112,7 +112,23 @@
         "NoButton": "Hayır",
         "OkButton": "Tamam",
         "WarningTitle": "Uyarı",
-        "YesButton": "Evet"
+        "YesButton": "Evet",
+        "Northwind": {
+            "Customer": {
+                "Categories": {
+                    "General": "Genel",
+                    "Contact": "İlgili Kişi",
+                    "Address": "Adres"
+                }
+            },
+            "Product": {
+                "Categories": {
+                    "General": "Genel",
+                    "Pricing": "Fiyatlandırma",
+                    "Status": "Stok Durumu"
+                }
+            }
+        }
     },
     "Validation": {
         "CaptchaMismatch": "Doğru kod girilmelidir. Eğer karakterleri göremiyorsanız, resme tıklayarak yeni bir tane ürettirebilirsiniz.",

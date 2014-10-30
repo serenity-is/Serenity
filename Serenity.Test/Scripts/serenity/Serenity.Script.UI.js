@@ -1925,6 +1925,7 @@
 					$t1.idPrefix = this.idPrefix;
 					$t1.items = propertyItems;
 					$t1.mode = 0;
+					$t1.localTextPrefix = 'Forms.' + this.getFormKey() + '.';
 					return $t1;
 				}), null);
 			},
@@ -3664,6 +3665,7 @@
 					$t1.items = propertyItems;
 					$t1.mode = 0;
 					$t1.useCategories = false;
+					$t1.localTextPrefix = 'Forms.' + this.getFormKey() + '.';
 					return $t1;
 				}), null);
 			},
@@ -3906,6 +3908,9 @@
 			}
 			else if (categoryAttribute.length > 1) {
 				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla kategori belirlenmiş!', ss.getTypeName(type), pi.name));
+			}
+			else if (list.length > 0) {
+				pi.category = list[list.length - 1].category;
 			}
 			var cssClassAttr = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_ComponentModel_CssClassAttribute);
@@ -6752,10 +6757,12 @@
 		},
 		$createCategoryDiv: function(categoriesDiv, categoryIndexes, category) {
 			var categoryDiv = $('<div/>').addClass('category').appendTo(categoriesDiv);
-			$('<div/>').addClass('category-title').append($('<a/>').addClass('category-anchor').text(category).attr('name', this.options.idPrefix + 'Category' + categoryIndexes[category].toString())).appendTo(categoryDiv);
+			$('<div/>').addClass('category-title').append($('<a/>').addClass('category-anchor').text(this.$determineText(category, function(prefix) {
+				return prefix + 'Categories.' + category;
+			})).attr('name', this.options.idPrefix + 'Category' + categoryIndexes[category].toString())).appendTo(categoryDiv);
 			return categoryDiv;
 		},
-		$determineText: function(name, text, suffix) {
+		$determineText: function(text, getKey) {
 			if (ss.isValue(text) && !ss.startsWithString(text, '`')) {
 				var local = Q.tryGetText(text);
 				if (ss.isValue(local)) {
@@ -6766,7 +6773,7 @@
 				text = text.substr(1);
 			}
 			if (!Q.isEmptyOrNull(this.options.localTextPrefix)) {
-				var local1 = Q.tryGetText(this.options.localTextPrefix + name + suffix);
+				var local1 = Q.tryGetText(getKey(this.options.localTextPrefix));
 				if (ss.isValue(local1)) {
 					return local1;
 				}
@@ -6779,9 +6786,15 @@
 				fieldDiv.addClass(item.cssClass);
 			}
 			var editorId = this.options.idPrefix + item.name;
-			var title = this.$determineText(item.name, item.title, '');
-			var hint = this.$determineText(item.name, item.hint, 'Hint');
-			var placeHolder = this.$determineText(item.name, item.placeholder, 'Placeholder');
+			var title = this.$determineText(item.title, function(prefix) {
+				return prefix + item.name;
+			});
+			var hint = this.$determineText(item.hint, function(prefix1) {
+				return prefix1 + item.name + '_Hint';
+			});
+			var placeHolder = this.$determineText(item.placeholder, function(prefix2) {
+				return prefix2 + item.name + '_Placeholder';
+			});
 			var $t2 = $('<label/>').addClass('caption').attr('for', editorId);
 			var $t1 = hint;
 			if (ss.isNullOrUndefined($t1)) {
@@ -6830,21 +6843,29 @@
 			$('<div/>').addClass('clear').appendTo(fieldDiv);
 			return editor;
 		},
-		$getCategoryOrder: function() {
-			var $t1 = Q.trimToNull(this.options.categoryOrder);
-			if (ss.isNullOrUndefined($t1)) {
-				$t1 = ss.coalesce(this.options.defaultCategory, '');
-			}
-			var split = $t1.split(';');
+		$getCategoryOrder: function(items) {
 			var order = 0;
 			var result = {};
-			for (var $t2 = 0; $t2 < split.length; $t2++) {
-				var s = split[$t2];
-				var x = Q.trimToNull(s);
-				if (ss.isNullOrUndefined(x)) {
-					continue;
+			var categoryOrder = Q.trimToNull(this.options.categoryOrder);
+			if (ss.isValue(categoryOrder)) {
+				var split = categoryOrder.split(';');
+				for (var $t1 = 0; $t1 < split.length; $t1++) {
+					var s = split[$t1];
+					var x = Q.trimToNull(s);
+					if (ss.isNullOrUndefined(x)) {
+						continue;
+					}
+					if (ss.isValue(result[x])) {
+						continue;
+					}
+					result[x] = order++;
 				}
-				result[x] = order++;
+			}
+			for (var $t2 = 0; $t2 < items.length; $t2++) {
+				var x1 = items[$t2];
+				if (ss.isNullOrUndefined(result[x1.category])) {
+					result[x1.category] = order++;
+				}
 			}
 			return result;
 		},
@@ -6861,23 +6882,20 @@
 				itemIndex[x.name] = idx++;
 			}
 			var self = this;
-			var categoryOrder = null;
-			items.sort(ss.mkdel(this, function(x1, y) {
+			var categoryOrder = this.$getCategoryOrder(items);
+			items.sort(function(x1, y) {
 				var c = 0;
 				if (!ss.referenceEquals(x1.category, y.category)) {
-					if (ss.isValue(categoryOrder) || ss.isValue(this.options.categoryOrder)) {
-						categoryOrder = categoryOrder || this.$getCategoryOrder();
-						var c1 = categoryOrder[x1.category];
-						var c2 = categoryOrder[y.category];
-						if (ss.isValue(c1) && ss.isValue(c2)) {
-							c = ss.unbox(c1) - ss.unbox(c2);
-						}
-						else if (ss.isValue(c1)) {
-							c = -1;
-						}
-						else if (ss.isValue(c2)) {
-							c = 1;
-						}
+					var c1 = categoryOrder[x1.category];
+					var c2 = categoryOrder[y.category];
+					if (ss.isValue(c1) && ss.isValue(c2)) {
+						c = ss.unbox(c1) - ss.unbox(c2);
+					}
+					else if (ss.isValue(c1)) {
+						c = -1;
+					}
+					else if (ss.isValue(c2)) {
+						c = 1;
 					}
 				}
 				if (c === 0) {
@@ -6887,17 +6905,19 @@
 					c = ss.compare(itemIndex[x1.name], itemIndex[y.name]);
 				}
 				return c;
-			}));
+			});
 			var categoryIndexes = {};
 			for (var i = 0; i < items.length; i++) {
-				var item = items[i];
-				if (!ss.keyExists(categoryIndexes, item.category)) {
+				var item = { $: items[i] };
+				if (!ss.keyExists(categoryIndexes, item.$.category)) {
 					var index = ss.getKeyCount(categoryIndexes) + 1;
-					categoryIndexes[item.category] = index;
+					categoryIndexes[item.$.category] = index;
 					if (index > 1) {
 						$('<span/>').addClass('separator').text('|').prependTo(container);
 					}
-					$('<a/>').addClass('category-link').text(item.category).attr('tabindex', '-1').attr('href', '#' + this.options.idPrefix + 'Category' + index.toString()).click($Serenity_PropertyGrid.$categoryLinkClick).prependTo(container);
+					$('<a/>').addClass('category-link').text(this.$determineText(item.$.category, ss.mkdel({ item: item }, function(prefix) {
+						return prefix + 'Categories.' + this.item.$.category;
+					}))).attr('tabindex', '-1').attr('href', '#' + this.options.idPrefix + 'Category' + index.toString()).click($Serenity_PropertyGrid.$categoryLinkClick).prependTo(container);
 				}
 			}
 			$('<div/>').addClass('clear').appendTo(container);
