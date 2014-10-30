@@ -169,15 +169,15 @@
     <EmbeddedResource Include="SqlScript\DbSerenity.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\packages\Saltarelle.QUnit.1.12.1\qunit-1.12.0.css">
+    <Content Include="$(SolutionDir)packages\Saltarelle.QUnit.1.12.1\qunit-1.12.0.css">
       <Link>Scripts\qunit-1.12.0.css</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\packages\Saltarelle.QUnit.1.12.1\qunit-1.12.0.js">
+    <Content Include="$(SolutionDir)packages\Saltarelle.QUnit.1.12.1\qunit-1.12.0.js">
       <Link>Scripts\qunit-1.12.0.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\packages\PhantomJS.1.9.7\tools\phantomjs\phantomjs.exe">
+    <Content Include="$(SolutionDir)packages\PhantomJS.1.9.7\tools\phantomjs\phantomjs.exe">
       <Link>phantomjs.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
