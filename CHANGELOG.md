@@ -1,3 +1,12 @@
+## 1.3.5 (2014-10-30)
+
+Features:
+  - make form categories sorted by their item order in form definition (no need for CategoryOrder anymore)
+  - ability to localize form category titles (e.g. Forms.Northwind.Customer.Categories.General)
+  - [BREAKING CHANGE] LocalTextRegistry.SetLanguageParent is changed to SetLanguageFallback
+  - make LocalText.Empty read only
+
+
 ## 1.3.4 (2014-10-29)
 
 Bugfixes:
