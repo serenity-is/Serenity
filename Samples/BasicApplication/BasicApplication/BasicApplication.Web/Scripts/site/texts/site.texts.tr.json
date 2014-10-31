@@ -117,6 +117,22 @@
                 "FormTitle": "SERENITY BASİT UYGULAMA ÖRNEĞİNE HOŞGELDİNİZ",
                 "SignInButton": "Giriş"
             }
+        },
+        "Northwind": {
+            "Customer": {
+                "Categories": {
+                    "General": "Genel",
+                    "Contact": "İlgili Kişi",
+                    "Address": "Adres"
+                }
+            },
+            "Product": {
+                "Categories": {
+                    "General": "Genel",
+                    "Pricing": "Fiyatlandırma",
+                    "Status": "Stok Durumu"
+                }
+            }
         }
     },
     "Navigation": {
