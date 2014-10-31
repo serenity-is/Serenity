@@ -10,8 +10,15 @@ namespace Serenity.Localization
     using System.IO;
     using System.Reflection;
 
+    /// <summary>
+    /// Contains helper methods for registration of local texts in nested static classes and
+    /// hierarchical JSON files.
+    /// </summary>
     public static class NestedLocalTextRegistration
     {
+        /// <summary>
+        /// Adds translations from static nested local text classes marked with NestedLocalTextAttribute.
+        /// </summary>
         public static void Initialize()
         {
             var assemblies = ExtensibilityHelper.SelfAssemblies;
@@ -55,6 +62,12 @@ namespace Serenity.Localization
             }
         }
 
+        /// <summary>
+        /// Adds translation from a hierarchical local text dictionary parsed from JSON file.
+        /// </summary>
+        /// <param name="obj">Object parsed from local text JSON string</param>
+        /// <param name="prefix">Prefix to prepend before local text keys</param>
+        /// <param name="languageID">Language ID</param>
         public static void AddFromDictionary(IDictionary<string, JToken> obj, string prefix, string languageID)
         {
             if (obj == null)
@@ -76,7 +89,12 @@ namespace Serenity.Localization
             }
         }
 
-        public static void AddFromScripts(string path)
+        /// <summary>
+        /// Adds translations from JSON files at specified path. File names in this directory should be in format 
+        /// {anyprefix}.{languageID}.json where {languageID} is a language code like 'en', 'en-GB' etc.
+        /// </summary>
+        /// <param name="path">Path containing JSON files</param>
+        public static void AddFromJsonFiles(string path)
         {
             if (!Directory.Exists(path))
                 return;

@@ -74,8 +74,8 @@ namespace Serenity.Web
             NestedLocalTextRegistration.Initialize();
             EnumLocalTexts.Initialize(ExtensibilityHelper.SelfAssemblies);
             EntityLocalTexts.Initialize();
-            NestedLocalTextRegistration.AddFromScripts(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));
-            NestedLocalTextRegistration.AddFromScripts(HostingEnvironment.MapPath("~/Scripts/site/texts/"));
+            NestedLocalTextRegistration.AddFromJsonFiles(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));
+            NestedLocalTextRegistration.AddFromJsonFiles(HostingEnvironment.MapPath("~/Scripts/site/texts/"));
         }
 
         public static void InitializeDynamicScripts()

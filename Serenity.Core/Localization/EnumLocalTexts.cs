@@ -8,8 +8,18 @@ namespace Serenity.Localization
     using System.ComponentModel;
     using System.Reflection;
 
+    /// <summary>
+    /// Contains initialization method for adding local text translations defined by
+    /// Description attributes in enumeration classes.
+    /// </summary>
     public static class EnumLocalTexts
     {
+        /// <summary>
+        /// Adds local text translations defined implicitly by Description attributes in 
+        /// enumeration classes.
+        /// </summary>
+        /// <param name="assemblies">Assemblies to search for enumeration classes in</param>
+        /// <param name="languageID">Language ID texts will be added (default is invariant language)</param>
         public static void Initialize(IEnumerable<Assembly> assemblies,
             string languageID = LocalText.InvariantLanguageID)
         {
