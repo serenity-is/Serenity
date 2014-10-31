@@ -22,14 +22,9 @@ namespace Serenity.Localization
                     var attr = type.GetCustomAttribute<NestedLocalTextsAttribute>();
                     if (attr != null)
                     {
-                        Initialize(type);
+                        Initialize(type, attr.LanguageID ?? LocalText.InvariantLanguageID, attr.Prefix ?? "");
                     }
                 }
-        }
-
-        private static void Initialize(Type type, string languageID = LocalText.InvariantLanguageID)
-        {
-            Initialize(type, languageID, "");
         }
 
         private static void Initialize(Type type, string languageID, string prefix)

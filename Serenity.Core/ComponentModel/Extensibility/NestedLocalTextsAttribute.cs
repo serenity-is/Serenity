@@ -9,5 +9,8 @@ namespace Serenity.Extensibility
         public NestedLocalTextsAttribute()
         {
         }
+
+        public string LanguageID { get; set; }
+        public string Prefix { get; set; }
     }
 }
