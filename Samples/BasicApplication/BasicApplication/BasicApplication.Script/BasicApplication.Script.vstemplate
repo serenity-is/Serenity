@@ -15,6 +15,13 @@
   <TemplateContent>
     <Project TargetFileName="$projectname$.csproj" File="BasicApplication.Script.csproj" ReplaceParameters="true">
       <Folder Name="Administration" TargetFolderName="Administration">
+        <Folder Name="Language" TargetFolderName="Language">
+          <ProjectItem ReplaceParameters="true" TargetFileName="LanguageDialog.cs">LanguageDialog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="LanguageGrid.cs">LanguageGrid.cs</ProjectItem>
+        </Folder>
+        <Folder Name="Translation" TargetFolderName="Translation">
+          <ProjectItem ReplaceParameters="true" TargetFileName="TranslationGrid.cs">TranslationGrid.cs</ProjectItem>
+        </Folder>
         <Folder Name="User" TargetFolderName="User">
           <ProjectItem ReplaceParameters="true" TargetFileName="UserDialog.cs">UserDialog.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="UserGrid.cs">UserGrid.cs</ProjectItem>
@@ -25,12 +32,15 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="CascadedEditorHelper.cs">CascadedEditorHelper.cs</ProjectItem>
         </Folder>
         <Folder Name="Navigation" TargetFolderName="Navigation">
+          <ProjectItem ReplaceParameters="true" TargetFileName="LanguageSelection.cs">LanguageSelection.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="SidebarSearch.cs">SidebarSearch.cs</ProjectItem>
         </Folder>
       </Folder>
       <Folder Name="Imports" TargetFolderName="Imports">
         <Folder Name="FormContexts" TargetFolderName="FormContexts">
           <ProjectItem ReplaceParameters="true" TargetFileName="FormContexts.tt">FormContexts.tt</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.LanguageForm.cs">Administration.LanguageForm.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.TranslationForm.cs">Administration.TranslationForm.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserForm.cs">Administration.UserForm.cs</ProjectItem>
           <ProjectItem ReplaceParameters="false" TargetFileName="FormContexts.log">FormContexts.log</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginForm.cs">Membership.LoginForm.cs</ProjectItem>
@@ -51,6 +61,12 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="MultipleOutputHelper.ttinclude">MultipleOutputHelper.ttinclude</ProjectItem>
         <Folder Name="ServiceContracts" TargetFolderName="ServiceContracts">
           <ProjectItem ReplaceParameters="true" TargetFileName="ServiceContracts.tt">ServiceContracts.tt</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.LanguageRow.cs">Administration.LanguageRow.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.LanguageService.cs">Administration.LanguageService.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.TranslationItem.cs">Administration.TranslationItem.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.TranslationListRequest.cs">Administration.TranslationListRequest.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.TranslationService.cs">Administration.TranslationService.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Administration.TranslationUpdateRequest.cs">Administration.TranslationUpdateRequest.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserRow.cs">Administration.UserRow.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.UserService.cs">Administration.UserService.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="Membership.LoginRequest.cs">Membership.LoginRequest.cs</ProjectItem>
@@ -162,7 +178,7 @@
       <package id="Saltarelle.Linq" version="2.4.0" />
       <package id="Saltarelle.Runtime" version="2.6.0" />
       <package id="Saltarelle.Web" version="3.1.0" />
-      <package id="Serenity.Script" version="1.3.5" />
+      <package id="Serenity.Script" version="1.3.6" />
     </packages>
   </WizardData>
 </VSTemplate>
