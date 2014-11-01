@@ -32,7 +32,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Common\Helper\CascadedEditorHelper.cs" />
+    <Compile Include="Common\Navigation\LanguageSelection.cs" />
     <Compile Include="Common\Navigation\SidebarSearch.cs" />
+    <Compile Include="Imports\FormContexts\Administration.LanguageForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\FormContexts\Administration.TranslationForm.cs">
+      <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
     <Compile Include="Imports\FormContexts\Administration.UserForm.cs">
       <DependentUpon>FormContexts.tt</DependentUpon>
     </Compile>
@@ -77,6 +84,24 @@
     </Compile>
     <Compile Include="Imports\FormContexts\Northwind.TerritoryForm.cs">
       <DependentUpon>FormContexts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Administration.LanguageRow.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Administration.LanguageService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Administration.TranslationItem.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Administration.TranslationListRequest.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Administration.TranslationService.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Imports\ServiceContracts\Administration.TranslationUpdateRequest.cs">
+      <DependentUpon>ServiceContracts.tt</DependentUpon>
     </Compile>
     <Compile Include="Imports\ServiceContracts\Administration.UserRow.cs">
       <DependentUpon>ServiceContracts.tt</DependentUpon>
@@ -197,6 +222,9 @@
     <Compile Include="Northwind\CustomerDemographic\CustomerDemographicDialog.cs" />
     <Compile Include="Northwind\CustomerCustomerDemo\CustomerCustomerDemoGrid.cs" />
     <Compile Include="Northwind\CustomerCustomerDemo\CustomerCustomerDemoDialog.cs" />
+    <Compile Include="Administration\Language\LanguageGrid.cs" />
+    <Compile Include="Administration\Language\LanguageDialog.cs" />
+    <Compile Include="Administration\Translation\TranslationGrid.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Imports\FormContexts\FormContexts.log">

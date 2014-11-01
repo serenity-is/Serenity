@@ -752,6 +752,8 @@
     <Content Include="Modules\Northwind\Territory\TerritoryIndex.cshtml" />
     <Content Include="Modules\Northwind\CustomerDemographic\CustomerDemographicIndex.cshtml" />
     <Content Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoIndex.cshtml" />
+    <Content Include="Modules\Administration\Language\LanguageIndex.cshtml" />
+    <Content Include="Modules\Administration\Translation\TranslationIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -764,6 +766,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Administration\Language\LanguageLookup.cs" />
+    <Compile Include="Modules\Administration\Translation\TranslationUpdateRequest.cs" />
+    <Compile Include="Modules\Administration\Translation\TranslationListRequest.cs" />
+    <Compile Include="Modules\Administration\Translation\TranslationItem.cs" />
     <Compile Include="Modules\Common\Dashboard\DashboardPage.cs" />
     <Compile Include="Modules\Common\Helpers\SqlExceptionHelper.cs" />
     <Compile Include="Modules\Common\Imports\ScriptEditorTypes.cs">
@@ -863,6 +869,15 @@
     <Compile Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoRepository.cs" />
     <Compile Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoEndpoint.cs" />
     <Compile Include="Modules\Northwind\CustomerCustomerDemo\CustomerCustomerDemoPage.cs" />
+    <Compile Include="Modules\Administration\Language\LanguageRow.cs" />
+    <Compile Include="Modules\Administration\Language\LanguageColumns.cs" />
+    <Compile Include="Modules\Administration\Language\LanguageForm.cs" />
+    <Compile Include="Modules\Administration\Language\LanguageRepository.cs" />
+    <Compile Include="Modules\Administration\Language\LanguageEndpoint.cs" />
+    <Compile Include="Modules\Administration\Language\LanguagePage.cs" />
+    <Compile Include="Modules\Administration\Translation\TranslationRepository.cs" />
+    <Compile Include="Modules\Administration\Translation\TranslationEndpoint.cs" />
+    <Compile Include="Modules\Administration\Translation\TranslationPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
