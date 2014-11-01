@@ -1,3 +1,19 @@
+## 1.3.6 (2014-11-01)
+
+Features:
+  - basic application has a language dropdown and preferred language can be changed using it (no need to play with browser settings or web.config)
+  - basic application has an interface to localize all texts in any defined language (stores files in ~/scripts/site/texts/user.texts.{languageID}.json)
+  - added spanish translations for serenity and basic application sample (google translate)
+  - added optional LanguageID and Prefix properties to NestedLocalTextsAttribute.
+  - use simple sorted dictionary format for localization json files instead of hierarchical (easier to manage and merge)
+  - defined and used InitializedLocalText class for NestedLocalTextRegistration and EntityLocalTexts classes to avoid duplicate or invalid registrations when their Initialize methods called twice.
+  - translated filter panel texts to english
+  - [BREAKING CHANGE] moved NestedLocalTextRegistration.AddFromScripts To JsonLocalTextRegistration.AddFromJsonFiles
+  - [BREAKING CHANGE] ILocalTextRegistry.TryGet now takes a language ID parameter (was using CultureInfo.CurrentUICulture.Name before)
+  
+Bugfixes:
+  - Set enum key attribute for CustomFieldType enumeration
+
 ## 1.3.5 (2014-10-30)
 
 Features:
