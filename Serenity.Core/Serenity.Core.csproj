@@ -56,6 +56,8 @@
     <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />
     <Compile Include="Json\JsonLocalTextsHelper.cs" />
     <Compile Include="Json\JsonConfigHelper.cs" />
+    <Compile Include="Localization\JsonLocalTextRegistration.cs" />
+    <Compile Include="Localization\InitializedLocalText.cs" />
     <Compile Include="Munq\AlwaysNewLifetime.cs" />
     <Compile Include="Munq\Container.cs" />
     <Compile Include="Munq\Container.Registrar.cs" />

@@ -24,12 +24,22 @@ namespace Serenity.Localization
                 {
                     LocalText lt = field.Caption;
                     if (lt != null &&
-                        !lt.Key.IsEmptyOrNull() &&
-                        !lt.Key.StartsWith("Db."))
+                        !lt.Key.IsEmptyOrNull())
                     {
-                        var key = "Db." + prefix + "." + (field.PropertyName ?? field.Name);
-                        provider.Add(languageID, key, lt.Key);
-                        field.Caption = new LocalText(key);
+                        var initialized = lt as InitializedLocalText;
+                        if (initialized != null)
+                        {
+                            provider.Add(languageID, initialized.Key, initialized.InitialText);
+                        }
+                        else
+                        {
+                            if (!lt.Key.StartsWith("Db."))
+                            {
+                                var key = "Db." + prefix + "." + (field.PropertyName ?? field.Name);
+                                provider.Add(languageID, key, lt.Key);
+                                field.Caption = new InitializedLocalText(key, lt.Key);
+                            }
+                        }
                     }
                 }
 
