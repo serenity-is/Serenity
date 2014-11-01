@@ -1,166 +1,118 @@
-﻿{
-    "Db": {
-        "Administration": {
-            "User": {
-                "DisplayName": "Görünen İsim",
-                "Email": "E-posta",
-                "EntitySingular": "Kullanıcı",
-                "EntityPlural": "Kullanıcılar",
-                "Source": "Kaynak",
-                "Username": "Kullanıcı Adı",
-                "Password": "Şifre",
-                "PasswordConfirm": "Şifre Onay"
-            }
-        },
-        "Northwind": {
-            "Category": {
-                "CategoryName": "Kategori Adı",
-                "Description": "Açıklama",
-                "EntitySingular": "Kategori",
-                "EntityPlural": "Kategoriler",
-                "Picture": "Resim"
-            },
-            "Customer": {
-                "EntitySingular": "Müşteri",
-                "EntityPlural": "Müşteriler",
-                "CustomerID": "Müşteri Kodu",
-                "CompanyName": "Firma Adı",
-                "ContactName": "İlgili Kişi Adı",
-                "ContactTitle": "İlgili Kişi Unvanı",
-                "Address": "Adres",
-                "City": "Şehir",
-                "Region": "Bölge",
-                "PostalCode": "Posta Kodu",
-                "Country": "Ülke",
-                "Phone": "Telefon",
-                "Fax": "Faks"
-            },
-            "Employee": {
-                "EntitySingular": "Personel",
-                "EntityPlural": "Personeller",
-                "FirstName": "Adı",
-                "LastName": "Soyadı",
-                "FullName": "Adı Soyadı",
-                "Title": "Unvan",
-                "TitleOfCourtesy": "Nezaket Unvanı",
-                "BirthDate": "Doğum Tarihi",
-                "HireDate": "İşe Giriş Tarihi",
-                "Address": "Adres",
-                "City": "Şehir",
-                "Region": "Bölge",
-                "PostalCode": "Posta Kodu",
-                "Country": "Ülke",
-                "HomePhone": "Ev Telefonu",
-                "Extension": "Dahili",
-                "Photo": "Fotoğraf",
-                "PhotoPath": "Fotoğraf Yolu",
-                "ReportsToFullName": "Amiri"
-            },
-            "Product": {
-                "EntitySingular": "Ürün",
-                "EntityPlural": "Ürünler",
-                "ProductID": "Ürün ID",
-                "ProductName": "Ürün Adı",
-                "Discontinued": "Tedarik Edilemiyor",
-                "SupplierCompanyName": "Tedarikçi",
-                "CategoryName": "Kategori",
-                "QuantityPerUnit": "Birim Başına Miktar",
-                "UnitPrice": "Birim Fiyatı",
-                "UnitsInStock": "Stok Miktarı",
-                "UnitsOnOrder": "Sipariş Miktarı",
-                "ReorderLevel": "Azami Sipariş Seviyesi"
-            },
-            "Region": {
-                "EntitySingular": "Ana Bölge",
-                "EntityPlural": "Ana Bölgeler",
-                "RegionID": "Ana Bölge No",
-                "RegionDescription": "Ana Bölge Adı"
-            },
-            "Shipper": {
-                "EntitySingular": "Kargo Firması",
-                "EntityPlural": "Kargo Firmaları",
-                "CompanyName": "Firma Adı",
-                "Phone": "Telefon"
-            },
-            "Supplier": {
-                "EntitySingular": "Tedarikçi",
-                "EntityPlural": "Tedarikçiler",
-                "CompanyName": "Firma Adı",
-                "ContactName": "İlgili Adı",
-                "ContactTitle": "İlgili Unvanı",
-                "Address": "Adres",
-                "City": "Şehir",
-                "Region": "Bölge",
-                "PostalCode": "Posta Kodu",
-                "Country": "Ülke",
-                "Phone": "Telefon",
-                "Fax": "Faks",
-                "HomePage": "İnternet Adresi"
-            },
-            "Territory": {
-                "EntitySingular": "Alt Bölge",
-                "EntityPlural": "Alt Bölgeler",
-                "TerritoryID": "Alt Bölge No",
-                "TerritoryDescription": "Alt Bölge Adı",
-                "RegionDescription": "Ana Bölge Adı"
-            }
-        },
-        "Shared": {
-            "RecordId": "Kayıt No"
-        }
-    },
-    "Forms": {
-        "Membership": {
-            "Login": {
-                "UsernamePlaceholder": "varsayılan kullanıcı adı 'admin'",
-                "PasswordPlaceholder": "varsayılan şifre 'serenity'",
-                "FormTitle": "SERENITY BASİT UYGULAMA ÖRNEĞİNE HOŞGELDİNİZ",
-                "SignInButton": "Giriş"
-            }
-        },
-        "Northwind": {
-            "Customer": {
-                "Categories": {
-                    "General": "Genel",
-                    "Contact": "İlgili Kişi",
-                    "Address": "Adres"
-                }
-            },
-            "Product": {
-                "Categories": {
-                    "General": "Genel",
-                    "Pricing": "Fiyatlandırma",
-                    "Status": "Stok Durumu"
-                }
-            }
-        }
-    },
-    "Navigation": {
-        "Administration": "Yönetim",
-        "Administration/User Management": "Kullanıcı Yönetimi",
-        "Dashboard": "Ana Sayfa",
-        "Northwind": "Northwind",
-        "Northwind/Categories": "Kategoriler",
-        "Northwind/Customers": "Müşteriler",
-        "Northwind/Employees": "Personeller",
-        "Northwind/Orders": "Siparişler",
-        "Northwind/Products": "Ürünler",
-        "Northwind/Regions": "Ana Bölgeler",
-        "Northwind/Shippers": "Kargo Firmaları",
-        "Northwind/Suppliers": "Tedarikçiler",
-        "Northwind/Territories": "Alt Bölgeler",
-        "SiteTitle": "Serenity Örnek Sitesi",
-        "LogoutLink": "Çıkış yap"
-    },
-    "Site": {
-        "Dashboard": {
-            "WelcomeMessage": "Serenity BasicApplication ana sayfasına hoşgeldiniz. Soldaki navigasyondan diğer sayfaları inceleyebilirsiniz..."
-        },
-        "Validation": {
-            "DeleteForeignKeyError": "Kayıt silinemiyor. '{0}' tablosunda bu kayda bağlı veriler var!",
-            "SavePrimaryKeyError": "Kayıt yapılamıyor. Aynı {1} değerine sahip başka bir kayıt var!",
-            "NorthwindPhone": "Telefon numaraları '(503) 555-9831' formatında girilmelidir.",
-            "NorthwindPhoneMultiple": "Telefon numaraları '(503) 555-9831' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir."
-        }
-    }
+{
+  "Db.Administration.User.DisplayName": "Görünen İsim",
+  "Db.Administration.User.Email": "E-posta",
+  "Db.Administration.User.EntityPlural": "Kullanıcılar",
+  "Db.Administration.User.EntitySingular": "Kullanıcı",
+  "Db.Administration.User.Password": "Şifre",
+  "Db.Administration.User.PasswordConfirm": "Şifre Onay",
+  "Db.Administration.User.Source": "Kaynak",
+  "Db.Administration.User.Username": "Kullanıcı Adı",
+  "Db.Northwind.Category.CategoryName": "Kategori Adı",
+  "Db.Northwind.Category.Description": "Açıklama",
+  "Db.Northwind.Category.EntityPlural": "Kategoriler",
+  "Db.Northwind.Category.EntitySingular": "Kategori",
+  "Db.Northwind.Category.Picture": "Resim",
+  "Db.Northwind.Customer.Address": "Adres",
+  "Db.Northwind.Customer.City": "Şehir",
+  "Db.Northwind.Customer.CompanyName": "Firma Adı",
+  "Db.Northwind.Customer.ContactName": "İlgili Kişi Adı",
+  "Db.Northwind.Customer.ContactTitle": "İlgili Kişi Unvanı",
+  "Db.Northwind.Customer.Country": "Ülke",
+  "Db.Northwind.Customer.CustomerID": "Müşteri Kodu",
+  "Db.Northwind.Customer.EntityPlural": "Müşteriler",
+  "Db.Northwind.Customer.EntitySingular": "Müşteri",
+  "Db.Northwind.Customer.Fax": "Faks",
+  "Db.Northwind.Customer.Phone": "Telefon",
+  "Db.Northwind.Customer.PostalCode": "Posta Kodu",
+  "Db.Northwind.Customer.Region": "Bölge",
+  "Db.Northwind.Employee.Address": "Adres",
+  "Db.Northwind.Employee.BirthDate": "Doğum Tarihi",
+  "Db.Northwind.Employee.City": "Şehir",
+  "Db.Northwind.Employee.Country": "Ülke",
+  "Db.Northwind.Employee.EntityPlural": "Personeller",
+  "Db.Northwind.Employee.EntitySingular": "Personel",
+  "Db.Northwind.Employee.Extension": "Dahili",
+  "Db.Northwind.Employee.FirstName": "Adı",
+  "Db.Northwind.Employee.FullName": "Adı Soyadı",
+  "Db.Northwind.Employee.HireDate": "İşe Giriş Tarihi",
+  "Db.Northwind.Employee.HomePhone": "Ev Telefonu",
+  "Db.Northwind.Employee.LastName": "Soyadı",
+  "Db.Northwind.Employee.Photo": "Fotoğraf",
+  "Db.Northwind.Employee.PhotoPath": "Fotoğraf Yolu",
+  "Db.Northwind.Employee.PostalCode": "Posta Kodu",
+  "Db.Northwind.Employee.Region": "Bölge",
+  "Db.Northwind.Employee.ReportsToFullName": "Amiri",
+  "Db.Northwind.Employee.Title": "Unvan",
+  "Db.Northwind.Employee.TitleOfCourtesy": "Nezaket Unvanı",
+  "Db.Northwind.Product.CategoryName": "Kategori",
+  "Db.Northwind.Product.Discontinued": "Tedarik Edilemiyor",
+  "Db.Northwind.Product.EntityPlural": "Ürünler",
+  "Db.Northwind.Product.EntitySingular": "Ürün",
+  "Db.Northwind.Product.ProductID": "Ürün ID",
+  "Db.Northwind.Product.ProductName": "Ürün Adı",
+  "Db.Northwind.Product.QuantityPerUnit": "Birim Başına Miktar",
+  "Db.Northwind.Product.ReorderLevel": "Azami Sipariş Seviyesi",
+  "Db.Northwind.Product.SupplierCompanyName": "Tedarikçi",
+  "Db.Northwind.Product.UnitPrice": "Birim Fiyatı",
+  "Db.Northwind.Product.UnitsInStock": "Stok Miktarı",
+  "Db.Northwind.Product.UnitsOnOrder": "Sipariş Miktarı",
+  "Db.Northwind.Region.EntityPlural": "Ana Bölgeler",
+  "Db.Northwind.Region.EntitySingular": "Ana Bölge",
+  "Db.Northwind.Region.RegionDescription": "Ana Bölge Adı",
+  "Db.Northwind.Region.RegionID": "Ana Bölge No",
+  "Db.Northwind.Shipper.CompanyName": "Firma Adı",
+  "Db.Northwind.Shipper.EntityPlural": "Kargo Firmaları",
+  "Db.Northwind.Shipper.EntitySingular": "Kargo Firması",
+  "Db.Northwind.Shipper.Phone": "Telefon",
+  "Db.Northwind.Supplier.Address": "Adres",
+  "Db.Northwind.Supplier.City": "Şehir",
+  "Db.Northwind.Supplier.CompanyName": "Firma Adı",
+  "Db.Northwind.Supplier.ContactName": "İlgili Adı",
+  "Db.Northwind.Supplier.ContactTitle": "İlgili Unvanı",
+  "Db.Northwind.Supplier.Country": "Ülke",
+  "Db.Northwind.Supplier.EntityPlural": "Tedarikçiler",
+  "Db.Northwind.Supplier.EntitySingular": "Tedarikçi",
+  "Db.Northwind.Supplier.Fax": "Faks",
+  "Db.Northwind.Supplier.HomePage": "İnternet Adresi",
+  "Db.Northwind.Supplier.Phone": "Telefon",
+  "Db.Northwind.Supplier.PostalCode": "Posta Kodu",
+  "Db.Northwind.Supplier.Region": "Bölge",
+  "Db.Northwind.Territory.EntityPlural": "Alt Bölgeler",
+  "Db.Northwind.Territory.EntitySingular": "Alt Bölge",
+  "Db.Northwind.Territory.RegionDescription": "Ana Bölge Adı",
+  "Db.Northwind.Territory.TerritoryDescription": "Alt Bölge Adı",
+  "Db.Northwind.Territory.TerritoryID": "Alt Bölge No",
+  "Db.Shared.RecordId": "Kayıt No",
+  "Forms.Membership.Login.FormTitle": "SERENITY BASİT UYGULAMA ÖRNEĞİNE HOŞGELDİNİZ",
+  "Forms.Membership.Login.PasswordPlaceholder": "varsayılan şifre 'serenity'",
+  "Forms.Membership.Login.SignInButton": "Giriş",
+  "Forms.Membership.Login.UsernamePlaceholder": "varsayılan kullanıcı adı 'admin'",
+  "Forms.Northwind.Customer.Categories.Address": "Adres",
+  "Forms.Northwind.Customer.Categories.Contact": "İlgili Kişi",
+  "Forms.Northwind.Customer.Categories.General": "Genel",
+  "Forms.Northwind.Product.Categories.General": "Genel",
+  "Forms.Northwind.Product.Categories.Pricing": "Fiyatlandırma",
+  "Forms.Northwind.Product.Categories.Status": "Stok Durumu",
+  "Navigation.Administration": "Yönetim",
+  "Navigation.Administration/Languages": "Diller",
+  "Navigation.Administration/Translations": "Çeviriler",
+  "Navigation.Administration/User Management": "Kullanıcı Yönetimi",
+  "Navigation.Dashboard": "Ana Sayfa",
+  "Navigation.LogoutLink": "Çıkış yap",
+  "Navigation.Northwind": "Northwind",
+  "Navigation.Northwind/Categories": "Kategoriler",
+  "Navigation.Northwind/Customers": "Müşteriler",
+  "Navigation.Northwind/Employees": "Personeller",
+  "Navigation.Northwind/Orders": "Siparişler",
+  "Navigation.Northwind/Products": "Ürünler",
+  "Navigation.Northwind/Regions": "Ana Bölgeler",
+  "Navigation.Northwind/Shippers": "Kargo Firmaları",
+  "Navigation.Northwind/Suppliers": "Tedarikçiler",
+  "Navigation.Northwind/Territories": "Alt Bölgeler",
+  "Navigation.SiteTitle": "Serenity Örnek Sitesi",
+  "Site.Dashboard.WelcomeMessage": "Serenity BasicApplication ana sayfasına hoşgeldiniz. Soldaki navigasyondan diğer sayfaları inceleyebilirsiniz...",
+  "Validation.DeleteForeignKeyError": "Kayıt silinemiyor. '{0}' tablosunda bu kayda bağlı veriler var!",
+  "Validation.NorthwindPhone": "Telefon numaraları '(503) 555-9831' formatında girilmelidir.",
+  "Validation.NorthwindPhoneMultiple": "Telefon numaraları '(503) 555-9831' formatında ve birden fazlaysa virgülle ayrılarak girilmelidir.",
+  "Validation.SavePrimaryKeyError": "Kayıt yapılamıyor. Aynı {1} değerine sahip başka bir kayıt var!"
 }
