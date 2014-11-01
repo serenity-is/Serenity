@@ -12,9 +12,9 @@ namespace Serenity
                 return "";
 
             if (Q.IsTrue(ctx.Value))
-                return Q.HtmlEncode(Q.TryGetText(TrueText) ?? TrueText ?? Q.TryGetText("Forms.YesButton") ?? "Yes");
+                return Q.HtmlEncode(Q.TryGetText(TrueText) ?? TrueText ?? Q.TryGetText("Dialogs.YesButton") ?? "Yes");
 
-            return Q.HtmlEncode(Q.TryGetText(FalseText) ?? FalseText ?? Q.TryGetText("Forms.NoButton") ?? "No");
+            return Q.HtmlEncode(Q.TryGetText(FalseText) ?? FalseText ?? Q.TryGetText("Dialogs.NoButton") ?? "No");
         }
 
         [Option]
