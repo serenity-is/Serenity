@@ -4,6 +4,7 @@ namespace Serenity
     using Localization;
     using Serenity.Abstractions;
     using System;
+    using System.Globalization;
 
     /// <summary>
     /// Defines a localizable text resource. Contains a local text key and has implicit conversions to and 
@@ -88,7 +89,7 @@ namespace Serenity
         public static string TryGet(string key)
         {
             var provider = Dependency.TryResolve<ILocalTextRegistry>();
-            return provider == null ? null : provider.TryGet(key);
+            return provider == null ? null : provider.TryGet(CultureInfo.CurrentUICulture.Name, key);
         }
     }
 }

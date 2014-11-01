@@ -56,12 +56,11 @@ namespace Serenity.Localization
         /// Returns localized representation which corresponds to the local text key or the key itself if none 
         /// found in local text registry.
         /// </summary>
-        public string TryGet(string key)
+        public string TryGet(string languageID, string key)
         {
             var context = Dependency.TryResolve<ILocalTextContext>();
 
-            return TryGet(CultureInfo.CurrentUICulture.Name,
-                key, context != null && context.IsApprovalMode);
+            return TryGet(languageID, key, context != null && context.IsApprovalMode);
         }
 
         /// <summary>
@@ -257,6 +256,17 @@ namespace Serenity.Localization
             }
 
             return texts;
+        }
+
+        /// <summary>
+        /// Gets all text keys that is currently registered in any language
+        /// </summary>
+        public HashSet<string> GetAllTextKeys(bool pending)
+        {
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var k in (pending ? pendingTexts : approvedTexts).Keys)
+                result.Add(k.Item2);
+            return result;
         }
 
         private class ItemKeyComparer : IEqualityComparer<Tuple<string, string>>

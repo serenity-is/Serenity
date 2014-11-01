@@ -11,7 +11,7 @@ namespace Serenity.Abstractions
         /// </summary>
         /// <param name="key">Local text key (e.g. Enums.Month.June)</param>
         /// <returns></returns>
-        string TryGet(string key);
+        string TryGet(string languageID, string key);
         /// <summary>
         /// Adds a local text entry to the registry
         /// </summary>
