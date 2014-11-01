@@ -145,8 +145,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Security\WebSecurityHelper.cs" />
+    <Compile Include="Texts\Texts.Controls.EntityDialog.cs" />
+    <Compile Include="Texts\Texts.Controls.EntityGrid.cs" />
     <Compile Include="Texts\Texts.Controls.FilterPanel.cs" />
+    <Compile Include="Texts\Texts.Controls.Pager.cs" />
+    <Compile Include="Texts\Texts.Controls.PropertyGrid.cs" />
+    <Compile Include="Texts\Texts.Controls.QuickSearch.cs" />
     <Compile Include="Texts\Texts.cs" />
+    <Compile Include="Texts\Texts.Dialogs.cs" />
     <Compile Include="Texts\Texts.Validation.cs" />
     <Compile Include="Upload\ImageUploadEditorAttribute.cs" />
     <Compile Include="Upload\FileUploadEditorAttribute.cs" />

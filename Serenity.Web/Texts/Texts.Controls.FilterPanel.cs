@@ -2,7 +2,7 @@
 {
     internal static partial class Texts
     {
-        public static class Controls
+        public static partial class Controls
         {
             public static class FilterPanel
             {
