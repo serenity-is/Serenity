@@ -10,7 +10,7 @@ namespace Serenity
     public static partial class Q
     {
         [InlineCode("Q.serviceCall({options})")]
-        public static extern XmlHttpRequest ServiceCall(ServiceCallOptions options);
+        public static extern jQueryXmlHttpRequest ServiceCall(ServiceCallOptions options);
 
         [ScriptName("serviceCall"), IncludeGenericArguments(false)]
         public static jQueryXmlHttpRequest ServiceCall<TResponse>(ServiceCallOptions<TResponse> options)
@@ -112,10 +112,10 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        public static void ServiceRequest<TResponse>(string service, ServiceRequest request, Action<TResponse> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest ServiceRequest<TResponse>(string service, ServiceRequest request, Action<TResponse> onSuccess, ServiceCallOptions options = null)
             where TResponse: ServiceResponse
         {
-            ServiceCall(jQuery.ExtendObject(new ServiceCallOptions<TResponse>
+            return ServiceCall(jQuery.ExtendObject(new ServiceCallOptions<TResponse>
             {
                 Service = service,
                 Request = request,

@@ -104,7 +104,7 @@ namespace Serenity.CodeGeneration
 
                         hasAnyMethod = true;
 
-                        cw.Indented("public static void ");
+                        cw.Indented("public static jQueryXmlHttpRequest ");
                         sb.Append(method.Name);
                        
                         sb.Append("(");
@@ -118,7 +118,7 @@ namespace Serenity.CodeGeneration
 
                         cw.InBrace(delegate 
                         {
-                            cw.Indented("Q.ServiceRequest(\"");
+                            cw.Indented("return Q.ServiceRequest(\"");
 
                             string url = GetServiceUrl != null ? GetServiceUrl(type) : ns.Replace(".", "/");
                             url = UriHelper.Combine(url, UriHelper.Combine(className, method.Name));
@@ -139,6 +139,7 @@ namespace Serenity.CodeGeneration
                 sb.Clear();
             }
 
+            usedNamespaces.Add("jQueryApi");
             usedNamespaces.Add("Serenity");
             usedNamespaces.Add("System");
             usedNamespaces.Add("System.Collections");
