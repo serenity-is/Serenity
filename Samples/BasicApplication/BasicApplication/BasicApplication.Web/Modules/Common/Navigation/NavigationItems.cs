@@ -15,4 +15,6 @@ using Administration = BasicApplication.Administration.Pages;
 [assembly: NavigationLink(8800, "Northwind/Territories", typeof(Northwind.TerritoryController), icon: "icon-puzzle")]
 
 [assembly: NavigationMenu(9000, "Administration", icon: "icon-screen-desktop")]
-[assembly: NavigationLink(91000, "Administration/User Management", typeof(Administration.UserController), icon: "icon-users")]
+[assembly: NavigationLink(9100, "Administration/Languages", typeof(Administration.LanguageController), icon: "icon-bubbles")]
+[assembly: NavigationLink(9200, "Administration/Translations", typeof(Administration.TranslationController), icon: "icon-speech")]
+[assembly: NavigationLink(9900, "Administration/User Management", typeof(Administration.UserController), icon: "icon-users")]

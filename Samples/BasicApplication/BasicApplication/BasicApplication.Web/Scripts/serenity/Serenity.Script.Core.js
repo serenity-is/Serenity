@@ -443,7 +443,7 @@
 		return $.ajax(options);
 	};
 	$Q.serviceRequest = function(service, request, onSuccess, options) {
-		$Q.serviceCall($.extend({ service: service, request: request, onSuccess: onSuccess }, options));
+		return $Q.serviceCall($.extend({ service: service, request: request, onSuccess: onSuccess }, options));
 	};
 	$Q.trim = function(text) {
 		return ss.coalesce(text, '').replace(new RegExp('^\\s+|\\s+$', 'g'), '');
@@ -1610,7 +1610,7 @@
 				if (ss.isNullOrUndefined($t2)) {
 					var $t1 = this.get_trueText();
 					if (ss.isNullOrUndefined($t1)) {
-						$t1 = ss.coalesce($Q.tryGetText('Forms.YesButton'), 'Yes');
+						$t1 = ss.coalesce($Q.tryGetText('Dialogs.YesButton'), 'Yes');
 					}
 					$t2 = $t1;
 				}
@@ -1620,7 +1620,7 @@
 			if (ss.isNullOrUndefined($t4)) {
 				var $t3 = this.get_falseText();
 				if (ss.isNullOrUndefined($t3)) {
-					$t3 = ss.coalesce($Q.tryGetText('Forms.NoButton'), 'No');
+					$t3 = ss.coalesce($Q.tryGetText('Dialogs.NoButton'), 'No');
 				}
 				$t4 = $t3;
 			}

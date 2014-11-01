@@ -6,6 +6,7 @@ namespace BasicApplication.Navigation
     using Serenity.Navigation;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
     public partial class NavigationModel
     {
@@ -14,8 +15,7 @@ namespace BasicApplication.Navigation
         public NavigationModel()
         {
             Items = TwoLevelCache.GetLocalStoreOnly("LeftNavigationModel:NavigationItems:" + (Authorization.UserId ?? "-1"), TimeSpan.Zero,
-                UserRow.Fields.GenerationKey,
-                () => NavigationHelper.GetNavigationItems(System.Web.VirtualPathUtility.ToAbsolute));
+                UserRow.Fields.GenerationKey, () => NavigationHelper.GetNavigationItems(System.Web.VirtualPathUtility.ToAbsolute));
         }
     }
 }

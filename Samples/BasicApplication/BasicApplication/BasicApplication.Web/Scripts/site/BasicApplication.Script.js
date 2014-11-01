@@ -14,6 +14,87 @@
 	$BasicApplication_ScriptInitialization.__typeName = 'BasicApplication.ScriptInitialization';
 	global.BasicApplication.ScriptInitialization = $BasicApplication_ScriptInitialization;
 	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Administration.LanguageDialog
+	var $BasicApplication_Administration_LanguageDialog = function() {
+		ss.makeGenericType(Serenity.EntityDialog$1, [Object]).call(this);
+	};
+	$BasicApplication_Administration_LanguageDialog.__typeName = 'BasicApplication.Administration.LanguageDialog';
+	global.BasicApplication.Administration.LanguageDialog = $BasicApplication_Administration_LanguageDialog;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Administration.LanguageForm
+	var $BasicApplication_Administration_LanguageForm = function(idPrefix) {
+		Serenity.PrefixedContext.call(this, idPrefix);
+	};
+	$BasicApplication_Administration_LanguageForm.__typeName = 'BasicApplication.Administration.LanguageForm';
+	global.BasicApplication.Administration.LanguageForm = $BasicApplication_Administration_LanguageForm;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Administration.LanguageGrid
+	var $BasicApplication_Administration_LanguageGrid = function(container) {
+		ss.makeGenericType(Serenity.EntityGrid$1, [Object]).call(this, container);
+	};
+	$BasicApplication_Administration_LanguageGrid.__typeName = 'BasicApplication.Administration.LanguageGrid';
+	global.BasicApplication.Administration.LanguageGrid = $BasicApplication_Administration_LanguageGrid;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Administration.LanguageService
+	var $BasicApplication_Administration_LanguageService = function() {
+	};
+	$BasicApplication_Administration_LanguageService.__typeName = 'BasicApplication.Administration.LanguageService';
+	$BasicApplication_Administration_LanguageService.create = function(request, onSuccess, options) {
+		return Q.serviceRequest('Administration/Language/Create', request, onSuccess, options);
+	};
+	$BasicApplication_Administration_LanguageService.update = function(request, onSuccess, options) {
+		return Q.serviceRequest('Administration/Language/Update', request, onSuccess, options);
+	};
+	$BasicApplication_Administration_LanguageService.delete$1 = function(request, onSuccess, options) {
+		return Q.serviceRequest('Administration/Language/Delete', request, onSuccess, options);
+	};
+	$BasicApplication_Administration_LanguageService.retrieve = function(request, onSuccess, options) {
+		return Q.serviceRequest('Administration/Language/Retrieve', request, onSuccess, options);
+	};
+	$BasicApplication_Administration_LanguageService.list = function(request, onSuccess, options) {
+		return Q.serviceRequest('Administration/Language/List', request, onSuccess, options);
+	};
+	global.BasicApplication.Administration.LanguageService = $BasicApplication_Administration_LanguageService;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Administration.TranslationForm
+	var $BasicApplication_Administration_TranslationForm = function(idPrefix) {
+		Serenity.PrefixedContext.call(this, idPrefix);
+	};
+	$BasicApplication_Administration_TranslationForm.__typeName = 'BasicApplication.Administration.TranslationForm';
+	global.BasicApplication.Administration.TranslationForm = $BasicApplication_Administration_TranslationForm;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Administration.TranslationGrid
+	var $BasicApplication_Administration_TranslationGrid = function(container) {
+		this.$searchText = null;
+		this.$sourceLanguage = null;
+		this.$targetLanguage = null;
+		this.$targetLanguageKey = null;
+		this.$hasChanges = false;
+		ss.makeGenericType(Serenity.EntityGrid$1, [Object]).call(this, container);
+		this.element.on('keyup.' + this.uniqueName + ' change.' + this.uniqueName, 'input.custom-text', ss.mkdel(this, function(e) {
+			var value = Q.trimToNull($(e.target).val());
+			if (value === '') {
+				value = null;
+			}
+			this.view.getItemById($(e.target).data('key')).CustomText = value;
+			this.$hasChanges = true;
+		}));
+	};
+	$BasicApplication_Administration_TranslationGrid.__typeName = 'BasicApplication.Administration.TranslationGrid';
+	global.BasicApplication.Administration.TranslationGrid = $BasicApplication_Administration_TranslationGrid;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Administration.TranslationService
+	var $BasicApplication_Administration_TranslationService = function() {
+	};
+	$BasicApplication_Administration_TranslationService.__typeName = 'BasicApplication.Administration.TranslationService';
+	$BasicApplication_Administration_TranslationService.list = function(request, onSuccess, options) {
+		return Q.serviceRequest('Administration/Translation/List', request, onSuccess, options);
+	};
+	$BasicApplication_Administration_TranslationService.update = function(request, onSuccess, options) {
+		return Q.serviceRequest('Administration/Translation/Update', request, onSuccess, options);
+	};
+	global.BasicApplication.Administration.TranslationService = $BasicApplication_Administration_TranslationService;
+	////////////////////////////////////////////////////////////////////////////////
 	// BasicApplication.Administration.UserDialog
 	var $BasicApplication_Administration_UserDialog = function() {
 		this.$form = null;
@@ -54,22 +135,22 @@
 	};
 	$BasicApplication_Administration_UserService.__typeName = 'BasicApplication.Administration.UserService';
 	$BasicApplication_Administration_UserService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Administration/User/Create', request, onSuccess, options);
+		return Q.serviceRequest('Administration/User/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Administration_UserService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Administration/User/Update', request, onSuccess, options);
+		return Q.serviceRequest('Administration/User/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Administration_UserService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Administration/User/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Administration/User/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Administration_UserService.undelete = function(request, onSuccess, options) {
-		Q.serviceRequest('Administration/User/Undelete', request, onSuccess, options);
+		return Q.serviceRequest('Administration/User/Undelete', request, onSuccess, options);
 	};
 	$BasicApplication_Administration_UserService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Administration/User/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Administration/User/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Administration_UserService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Administration/User/List', request, onSuccess, options);
+		return Q.serviceRequest('Administration/User/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Administration.UserService = $BasicApplication_Administration_UserService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -136,6 +217,21 @@
 	$BasicApplication_Common_CascadedEditorHelper$2.__typeName = 'BasicApplication.Common.CascadedEditorHelper$2';
 	ss.initGenericClass($BasicApplication_Common_CascadedEditorHelper$2, $asm, 2);
 	global.BasicApplication.Common.CascadedEditorHelper$2 = $BasicApplication_Common_CascadedEditorHelper$2;
+	////////////////////////////////////////////////////////////////////////////////
+	// BasicApplication.Common.LanguageSelection
+	var $BasicApplication_Common_LanguageSelection = function(hidden, currentLanguage) {
+		this.$currentLanguage = null;
+		ss.makeGenericType(Serenity.LookupEditorBase$1, [Object]).call(this, hidden);
+		this.$currentLanguage = ss.coalesce(currentLanguage, 'en');
+		this.set_value('en');
+		var self = this;
+		Serenity.WX.changeSelect2(this, function(e) {
+			$.cookie('LanguagePreference', self.get_value(), { path: Q$Config.applicationPath });
+			window.location.reload(true);
+		});
+	};
+	$BasicApplication_Common_LanguageSelection.__typeName = 'BasicApplication.Common.LanguageSelection';
+	global.BasicApplication.Common.LanguageSelection = $BasicApplication_Common_LanguageSelection;
 	////////////////////////////////////////////////////////////////////////////////
 	// BasicApplication.Common.SidebarSearch
 	var $BasicApplication_Common_SidebarSearch = function(input, menuUL) {
@@ -217,19 +313,19 @@
 	};
 	$BasicApplication_Northwind_CategoryService.__typeName = 'BasicApplication.Northwind.CategoryService';
 	$BasicApplication_Northwind_CategoryService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Category/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Category/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CategoryService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Category/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Category/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CategoryService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Category/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Category/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CategoryService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Category/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Category/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CategoryService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Category/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Category/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.CategoryService = $BasicApplication_Northwind_CategoryService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -259,19 +355,19 @@
 	};
 	$BasicApplication_Northwind_CustomerCustomerDemoService.__typeName = 'BasicApplication.Northwind.CustomerCustomerDemoService';
 	$BasicApplication_Northwind_CustomerCustomerDemoService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerCustomerDemo/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerCustomerDemo/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerCustomerDemoService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerCustomerDemo/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerCustomerDemo/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerCustomerDemoService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerCustomerDemo/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerCustomerDemo/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerCustomerDemoService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerCustomerDemo/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerCustomerDemo/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerCustomerDemoService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerCustomerDemo/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerCustomerDemo/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.CustomerCustomerDemoService = $BasicApplication_Northwind_CustomerCustomerDemoService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -301,19 +397,19 @@
 	};
 	$BasicApplication_Northwind_CustomerDemographicService.__typeName = 'BasicApplication.Northwind.CustomerDemographicService';
 	$BasicApplication_Northwind_CustomerDemographicService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerDemographic/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerDemographic/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerDemographicService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerDemographic/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerDemographic/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerDemographicService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerDemographic/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerDemographic/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerDemographicService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerDemographic/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerDemographic/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerDemographicService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/CustomerDemographic/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/CustomerDemographic/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.CustomerDemographicService = $BasicApplication_Northwind_CustomerDemographicService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -344,19 +440,19 @@
 	};
 	$BasicApplication_Northwind_CustomerService.__typeName = 'BasicApplication.Northwind.CustomerService';
 	$BasicApplication_Northwind_CustomerService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Customer/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Customer/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Customer/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Customer/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Customer/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Customer/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Customer/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Customer/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_CustomerService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Customer/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Customer/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.CustomerService = $BasicApplication_Northwind_CustomerService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -386,19 +482,19 @@
 	};
 	$BasicApplication_Northwind_EmployeeService.__typeName = 'BasicApplication.Northwind.EmployeeService';
 	$BasicApplication_Northwind_EmployeeService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Employee/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Employee/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Employee/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Employee/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Employee/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Employee/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Employee/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Employee/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Employee/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Employee/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.EmployeeService = $BasicApplication_Northwind_EmployeeService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -428,19 +524,19 @@
 	};
 	$BasicApplication_Northwind_EmployeeTerritoryService.__typeName = 'BasicApplication.Northwind.EmployeeTerritoryService';
 	$BasicApplication_Northwind_EmployeeTerritoryService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/EmployeeTerritory/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/EmployeeTerritory/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeTerritoryService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/EmployeeTerritory/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/EmployeeTerritory/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeTerritoryService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/EmployeeTerritory/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/EmployeeTerritory/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeTerritoryService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/EmployeeTerritory/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/EmployeeTerritory/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_EmployeeTerritoryService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/EmployeeTerritory/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/EmployeeTerritory/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.EmployeeTerritoryService = $BasicApplication_Northwind_EmployeeTerritoryService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -470,19 +566,19 @@
 	};
 	$BasicApplication_Northwind_OrderDetailService.__typeName = 'BasicApplication.Northwind.OrderDetailService';
 	$BasicApplication_Northwind_OrderDetailService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/OrderDetail/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/OrderDetail/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderDetailService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/OrderDetail/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/OrderDetail/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderDetailService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/OrderDetail/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/OrderDetail/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderDetailService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/OrderDetail/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/OrderDetail/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderDetailService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/OrderDetail/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/OrderDetail/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.OrderDetailService = $BasicApplication_Northwind_OrderDetailService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -512,19 +608,19 @@
 	};
 	$BasicApplication_Northwind_OrderService.__typeName = 'BasicApplication.Northwind.OrderService';
 	$BasicApplication_Northwind_OrderService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Order/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Order/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Order/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Order/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Order/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Order/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Order/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Order/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_OrderService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Order/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Order/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.OrderService = $BasicApplication_Northwind_OrderService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -666,19 +762,19 @@
 	};
 	$BasicApplication_Northwind_ProductService.__typeName = 'BasicApplication.Northwind.ProductService';
 	$BasicApplication_Northwind_ProductService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Product/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Product/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ProductService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Product/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Product/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ProductService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Product/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Product/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ProductService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Product/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Product/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ProductService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Product/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Product/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.ProductService = $BasicApplication_Northwind_ProductService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -708,19 +804,19 @@
 	};
 	$BasicApplication_Northwind_RegionService.__typeName = 'BasicApplication.Northwind.RegionService';
 	$BasicApplication_Northwind_RegionService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Region/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Region/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_RegionService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Region/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Region/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_RegionService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Region/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Region/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_RegionService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Region/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Region/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_RegionService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Region/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Region/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.RegionService = $BasicApplication_Northwind_RegionService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -750,19 +846,19 @@
 	};
 	$BasicApplication_Northwind_ShipperService.__typeName = 'BasicApplication.Northwind.ShipperService';
 	$BasicApplication_Northwind_ShipperService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Shipper/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Shipper/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ShipperService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Shipper/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Shipper/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ShipperService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Shipper/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Shipper/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ShipperService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Shipper/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Shipper/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_ShipperService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Shipper/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Shipper/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.ShipperService = $BasicApplication_Northwind_ShipperService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -793,19 +889,19 @@
 	};
 	$BasicApplication_Northwind_SupplierService.__typeName = 'BasicApplication.Northwind.SupplierService';
 	$BasicApplication_Northwind_SupplierService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Supplier/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Supplier/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_SupplierService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Supplier/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Supplier/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_SupplierService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Supplier/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Supplier/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_SupplierService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Supplier/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Supplier/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_SupplierService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Supplier/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Supplier/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.SupplierService = $BasicApplication_Northwind_SupplierService;
 	////////////////////////////////////////////////////////////////////////////////
@@ -836,22 +932,202 @@
 	};
 	$BasicApplication_Northwind_TerritoryService.__typeName = 'BasicApplication.Northwind.TerritoryService';
 	$BasicApplication_Northwind_TerritoryService.create = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Territory/Create', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Territory/Create', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_TerritoryService.update = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Territory/Update', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Territory/Update', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_TerritoryService.delete$1 = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Territory/Delete', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Territory/Delete', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_TerritoryService.retrieve = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Territory/Retrieve', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Territory/Retrieve', request, onSuccess, options);
 	};
 	$BasicApplication_Northwind_TerritoryService.list = function(request, onSuccess, options) {
-		Q.serviceRequest('Northwind/Territory/List', request, onSuccess, options);
+		return Q.serviceRequest('Northwind/Territory/List', request, onSuccess, options);
 	};
 	global.BasicApplication.Northwind.TerritoryService = $BasicApplication_Northwind_TerritoryService;
 	ss.initClass($BasicApplication_ScriptInitialization, $asm, {});
+	ss.initClass($BasicApplication_Administration_LanguageDialog, $asm, {}, ss.makeGenericType(Serenity.EntityDialog$1, [Object]), [Serenity.IDialog, Serenity.IEditDialog, Serenity.IAsyncInit]);
+	ss.initClass($BasicApplication_Administration_LanguageForm, $asm, {
+		get_languageId: function() {
+			return this.byId(Serenity.StringEditor).call(this, 'LanguageId');
+		},
+		get_languageName: function() {
+			return this.byId(Serenity.StringEditor).call(this, 'LanguageName');
+		}
+	}, Serenity.PrefixedContext);
+	ss.initClass($BasicApplication_Administration_LanguageGrid, $asm, {}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid, Serenity.IAsyncInit]);
+	ss.initClass($BasicApplication_Administration_LanguageService, $asm, {});
+	ss.initClass($BasicApplication_Administration_TranslationForm, $asm, {
+		get_textKey: function() {
+			return this.byId(Serenity.StringEditor).call(this, 'TextKey');
+		},
+		get_languageId: function() {
+			return this.byId(Serenity.StringEditor).call(this, 'LanguageId');
+		},
+		get_translation: function() {
+			return this.byId(Serenity.StringEditor).call(this, 'Translation');
+		}
+	}, Serenity.PrefixedContext);
+	ss.initClass($BasicApplication_Administration_TranslationGrid, $asm, {
+		onClick: function(e, row, cell) {
+			ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.onClick.call(this, e, row, cell);
+			if (e.isDefaultPrevented()) {
+				return;
+			}
+			if ($(e.target).hasClass('source-text')) {
+				e.preventDefault();
+				var item = this.view.rows[row];
+				var done = ss.mkdel(this, function() {
+					item.CustomText = item.SourceText;
+					this.view.updateItem(item.Key, item);
+					this.$hasChanges = true;
+				});
+				if (Q.isTrimmedEmpty(item.CustomText) || ss.referenceEquals(Q.trimToEmpty(item.CustomText), Q.trimToEmpty(item.SourceText))) {
+					done();
+					return;
+				}
+				Q.confirm(Q.text('Db.Administration.Translation.OverrideConfirmation'), done);
+			}
+			if ($(e.target).hasClass('target-text')) {
+				e.preventDefault();
+				var item1 = this.view.rows[row];
+				var done1 = ss.mkdel(this, function() {
+					item1.CustomText = item1.TargetText;
+					this.view.updateItem(item1.Key, item1);
+					this.$hasChanges = true;
+				});
+				if (Q.isTrimmedEmpty(item1.CustomText) || ss.referenceEquals(Q.trimToEmpty(item1.CustomText), Q.trimToEmpty(item1.TargetText))) {
+					done1();
+					return;
+				}
+				Q.confirm(Q.text('Db.Administration.Translation.OverrideConfirmation'), done1);
+			}
+		},
+		getColumnsAsync: function() {
+			var columns = [];
+			columns.push({ field: 'Key', width: 300, sortable: false });
+			columns.push({
+				field: 'SourceText',
+				width: 300,
+				sortable: false,
+				format: function(ctx) {
+					return Q.outerHtml($('<a/>').addClass('source-text').text(ss.coalesce(ss.cast(ctx.value, String), '')));
+				}
+			});
+			columns.push({
+				field: 'CustomText',
+				width: 300,
+				sortable: false,
+				format: function(ctx1) {
+					return Q.outerHtml($('<input/>').addClass('custom-text').attr('value', ss.cast(ctx1.value, String)).attr('type', 'text').attr('data-key', ss.cast(ctx1.item.Key, String)));
+				}
+			});
+			columns.push({
+				field: 'TargetText',
+				width: 300,
+				sortable: false,
+				format: function(ctx2) {
+					return Q.outerHtml($('<a/>').addClass('target-text').text(ss.coalesce(ss.cast(ctx2.value, String), '')));
+				}
+			});
+			return RSVP.resolve(columns);
+		},
+		createToolbarExtensions: function() {
+			ss.makeGenericType(Serenity.EntityGrid$2, [Object, Object]).prototype.createToolbarExtensions.call(this);
+			var $t2 = ss.mkdel(this, function(e) {
+				e.appendTo(this.toolbar.get_element()).attr('placeholder', '--- ' + Q.text('Db.Administration.Translation.SourceLanguage') + ' ---');
+			});
+			var $t1 = Serenity.LookupEditorOptions.$ctor();
+			$t1.lookupKey = 'Administration.Language';
+			this.$sourceLanguage = Serenity.Widget.create(Serenity.LookupEditor).call(null, $t2, $t1, null);
+			Serenity.WX.changeSelect2(this.$sourceLanguage, ss.mkdel(this, function(e1) {
+				if (this.$hasChanges) {
+					this.saveChanges(this.$targetLanguageKey).then(ss.mkdel(this, this.refresh), null);
+				}
+				else {
+					this.refresh();
+				}
+			}));
+			var $t4 = ss.mkdel(this, function(e2) {
+				e2.appendTo(this.toolbar.get_element()).attr('placeholder', '--- ' + Q.text('Db.Administration.Translation.TargetLanguage') + ' ---');
+			});
+			var $t3 = Serenity.LookupEditorOptions.$ctor();
+			$t3.lookupKey = 'Administration.Language';
+			this.$targetLanguage = Serenity.Widget.create(Serenity.LookupEditor).call(null, $t4, $t3, null);
+			Serenity.WX.changeSelect2(this.$targetLanguage, ss.mkdel(this, function(e3) {
+				if (this.$hasChanges) {
+					this.saveChanges(this.$targetLanguageKey).then(ss.mkdel(this, this.refresh), null);
+				}
+				else {
+					this.refresh();
+				}
+			}));
+		},
+		saveChanges: function(language) {
+			var translations = {};
+			var $t1 = this.view.getItems();
+			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+				var item = $t1[$t2];
+				translations[item.Key] = item.CustomText;
+			}
+			return RSVP.resolve($BasicApplication_Administration_TranslationService.update({ TargetLanguageID: language, Translations: translations }, null, null)).then(ss.mkdel(this, function() {
+				this.$hasChanges = false;
+				Q.notifySuccess('User translations in "' + language + '" language are saved to "user.texts.' + language + '.json" ' + 'file under "~/script/site/texts/user/"');
+			}), null);
+		},
+		onViewSubmit: function() {
+			var request = this.view.params;
+			request.SourceLanguageID = this.$sourceLanguage.get_value();
+			this.$targetLanguageKey = ss.coalesce(this.$targetLanguage.get_value(), '');
+			request.TargetLanguageID = this.$targetLanguageKey;
+			this.$hasChanges = false;
+			return ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.onViewSubmit.call(this);
+		},
+		getButtons: function() {
+			var $t1 = [];
+			$t1.push({ title: 'Save Changes', onClick: ss.mkdel(this, function(e) {
+				this.saveChanges(this.$targetLanguageKey).then(ss.mkdel(this, this.refresh), null);
+			}), cssClass: 'apply-changes-button' });
+			return $t1;
+		},
+		createQuickSearchInput: function() {
+			Serenity.GridUtils.addQuickSearchInputCustom(this.toolbar.get_element(), ss.mkdel(this, function(field, searchText) {
+				this.$searchText = searchText;
+				this.view.setItems(this.view.getItems(), true);
+			}), null);
+		},
+		onViewFilter: function(item) {
+			if (!ss.makeGenericType(Serenity.DataGrid$2, [Object, Object]).prototype.onViewFilter.call(this, item)) {
+				return false;
+			}
+			if (Q.isEmptyOrNull(this.$searchText)) {
+				return true;
+			}
+			var searching = Select2.util.stripDiacritics(this.$searchText).toLowerCase();
+			if (Q.isEmptyOrNull(searching)) {
+				return true;
+			}
+			if (Select2.util.stripDiacritics(ss.coalesce(item.Key, '')).toLowerCase().indexOf(searching) >= 0) {
+				return true;
+			}
+			if (Select2.util.stripDiacritics(ss.coalesce(item.SourceText, '')).toLowerCase().indexOf(searching) >= 0) {
+				return true;
+			}
+			if (Select2.util.stripDiacritics(ss.coalesce(item.TargetText, '')).toLowerCase().indexOf(searching) >= 0) {
+				return true;
+			}
+			if (Select2.util.stripDiacritics(ss.coalesce(item.CustomText, '')).toLowerCase().indexOf(searching) >= 0) {
+				return true;
+			}
+			return false;
+		},
+		usePager: function() {
+			return false;
+		}
+	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid, Serenity.IAsyncInit]);
+	ss.initClass($BasicApplication_Administration_TranslationService, $asm, {});
 	ss.initClass($BasicApplication_Administration_UserDialog, $asm, {}, ss.makeGenericType(Serenity.EntityDialog$1, [Object]), [Serenity.IDialog, Serenity.IEditDialog]);
 	ss.initClass($BasicApplication_Administration_UserForm, $asm, {
 		get_username: function() {
@@ -885,6 +1161,40 @@
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid]);
 	ss.initClass($BasicApplication_Administration_UserService, $asm, {});
+	ss.initClass($BasicApplication_Common_LanguageSelection, $asm, {
+		getLookupAsync: function() {
+			return ss.makeGenericType(Serenity.LookupEditorBase$2, [Object, Object]).prototype.getLookupAsync.call(this).then(ss.mkdel(this, function(x) {
+				if (!Enumerable.from(x.get_items()).any(ss.mkdel(this, function(z) {
+					return ss.referenceEquals(z.LanguageId, this.$currentLanguage);
+				}))) {
+					var idx = this.$currentLanguage.lastIndexOf('-');
+					if (idx >= 0) {
+						this.$currentLanguage = this.$currentLanguage.substr(0, idx);
+						if (!Enumerable.from(x.get_items()).any(ss.mkdel(this, function(z1) {
+							return ss.referenceEquals(z1.LanguageId, this.$currentLanguage);
+						}))) {
+							this.$currentLanguage = 'en';
+						}
+					}
+					else {
+						this.$currentLanguage = 'en';
+					}
+				}
+				return x;
+			}), null);
+		},
+		updateItemsAsync: function() {
+			return ss.makeGenericType(Serenity.LookupEditorBase$2, [Object, Object]).prototype.updateItemsAsync.call(this).then(ss.mkdel(this, function() {
+				this.set_value(this.$currentLanguage);
+			}), null);
+		},
+		getLookupKey: function() {
+			return 'Administration.Language';
+		},
+		emptyItemText: function() {
+			return null;
+		}
+	}, ss.makeGenericType(Serenity.LookupEditorBase$1, [Object]), [Serenity.IStringValue, Serenity.IAsyncInit]);
 	ss.initClass($BasicApplication_Common_SidebarSearch, $asm, {
 		$updateMatchFlags: function(text) {
 			var liList = this.$menuUL.find('li').removeClass('non-match');
@@ -1326,9 +1636,6 @@
 	ss.initClass($BasicApplication_Northwind_ShipperForm, $asm, {
 		get_companyName: function() {
 			return this.byId(Serenity.StringEditor).call(this, 'CompanyName');
-		},
-		get_phone: function() {
-			return this.byId($BasicApplication_Northwind_PhoneEditor).call(this, 'Phone');
 		}
 	}, Serenity.PrefixedContext);
 	ss.initClass($BasicApplication_Northwind_ShipperGrid, $asm, {}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid, Serenity.IAsyncInit]);
@@ -1429,6 +1736,9 @@
 		}
 	}, ss.makeGenericType(Serenity.EntityGrid$1, [Object]), [Serenity.IDataGrid, Serenity.IAsyncInit]);
 	ss.initClass($BasicApplication_Northwind_TerritoryService, $asm, {});
+	ss.setMetadata($BasicApplication_Administration_LanguageDialog, { attr: [new Serenity.IdPropertyAttribute('Id'), new Serenity.NamePropertyAttribute('LanguageName'), new Serenity.FormKeyAttribute('Administration.Language'), new Serenity.LocalTextPrefixAttribute('Administration.Language'), new Serenity.ServiceAttribute('Administration/Language')] });
+	ss.setMetadata($BasicApplication_Administration_LanguageGrid, { attr: [new Serenity.ColumnsKeyAttribute('Administration.Language'), new Serenity.IdPropertyAttribute('Id'), new Serenity.NamePropertyAttribute('LanguageName'), new Serenity.DialogTypeAttribute($BasicApplication_Administration_LanguageDialog), new Serenity.LocalTextPrefixAttribute('Administration.Language'), new Serenity.ServiceAttribute('Administration/Language')] });
+	ss.setMetadata($BasicApplication_Administration_TranslationGrid, { attr: [new Serenity.ColumnsKeyAttribute('Administration.Translation'), new Serenity.IdPropertyAttribute('Key'), new Serenity.LocalTextPrefixAttribute('Administration.Translation'), new Serenity.ServiceAttribute('Administration/Translation')] });
 	ss.setMetadata($BasicApplication_Administration_UserDialog, { attr: [new Serenity.IdPropertyAttribute('UserId'), new Serenity.NamePropertyAttribute('Username'), new Serenity.IsActivePropertyAttribute('IsActive'), new Serenity.FormKeyAttribute('Administration.User'), new Serenity.LocalTextPrefixAttribute('Administration.User'), new Serenity.ServiceAttribute('Administration/User')] });
 	ss.setMetadata($BasicApplication_Administration_UserGrid, { attr: [new Serenity.IdPropertyAttribute('UserId'), new Serenity.NamePropertyAttribute('Username'), new Serenity.IsActivePropertyAttribute('IsActive'), new Serenity.DialogTypeAttribute($BasicApplication_Administration_UserDialog), new Serenity.LocalTextPrefixAttribute('Administration.User'), new Serenity.ServiceAttribute('Administration/User')] });
 	ss.setMetadata($BasicApplication_Membership_LoginPanel, { attr: [new Serenity.PanelAttribute(), new Serenity.FormKeyAttribute('Membership.Login')] });

@@ -8,7 +8,6 @@ namespace BasicApplication.Northwind
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
-    using BasicApplication;
 
     public partial class EmployeeTerritoryForm : PrefixedContext
     {

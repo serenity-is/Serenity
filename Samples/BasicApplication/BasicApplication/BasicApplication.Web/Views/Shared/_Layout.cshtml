@@ -57,6 +57,10 @@ else
                 </li>
             </ul>
 
+            <div class="pull-right" style="margin-top: 12px;">
+                <input id="LanguageSelect" type="hidden" />
+            </div>
+
             <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-search">
                     <div class="input-group custom-search-form">
@@ -91,6 +95,7 @@ else
     $().ready(function () {
         $('#side-menu').metisMenu();
         new BasicApplication.Common.SidebarSearch($('#SidebarSearch'), $('#side-menu')).init();
+        new BasicApplication.Common.LanguageSelection($('#LanguageSelect'), '@(System.Globalization.CultureInfo.CurrentUICulture.Name)');
         @RenderSection("PageInitScript", false);
 
         var doLayout = function () {

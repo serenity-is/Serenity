@@ -2,7 +2,9 @@
 namespace BasicApplication
 {
     using System;
+    using System.Globalization;
     using System.Linq;
+    using System.Threading;
     using System.Web.Mvc;
     using System.Web.Routing;
 
@@ -31,6 +33,19 @@ namespace BasicApplication
 
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
+            var cookie = Request.Cookies["LanguagePreference"];
+            if (cookie != null && !string.IsNullOrEmpty(cookie.Value))
+            {
+                try
+                {
+                    var culture = CultureInfo.GetCultureInfo(cookie.Value);
+                    Thread.CurrentThread.CurrentUICulture = culture;
+                }
+                catch (CultureNotFoundException)
+                {
+                    // ignore
+                }
+            }
         }
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)

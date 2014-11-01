@@ -1,5 +1,6 @@
 namespace BasicApplication.Northwind
 {
+    using jQueryApi;
     using Serenity;
     using System;
     using System.Collections;
@@ -7,29 +8,29 @@ namespace BasicApplication.Northwind
 
     public partial class ShipperService
     {
-        public static void Create(SaveRequest<ShipperRow> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Create(SaveRequest<ShipperRow> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)
         {
-            Q.ServiceRequest("Northwind/Shipper/Create", request, onSuccess, options);
+            return Q.ServiceRequest("Northwind/Shipper/Create", request, onSuccess, options);
         }
     
-        public static void Update(SaveRequest<ShipperRow> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Update(SaveRequest<ShipperRow> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)
         {
-            Q.ServiceRequest("Northwind/Shipper/Update", request, onSuccess, options);
+            return Q.ServiceRequest("Northwind/Shipper/Update", request, onSuccess, options);
         }
     
-        public static void Delete(DeleteRequest request, Action<DeleteResponse> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Delete(DeleteRequest request, Action<DeleteResponse> onSuccess, ServiceCallOptions options = null)
         {
-            Q.ServiceRequest("Northwind/Shipper/Delete", request, onSuccess, options);
+            return Q.ServiceRequest("Northwind/Shipper/Delete", request, onSuccess, options);
         }
     
-        public static void Retrieve(RetrieveRequest request, Action<RetrieveResponse<ShipperRow>> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Retrieve(RetrieveRequest request, Action<RetrieveResponse<ShipperRow>> onSuccess, ServiceCallOptions options = null)
         {
-            Q.ServiceRequest("Northwind/Shipper/Retrieve", request, onSuccess, options);
+            return Q.ServiceRequest("Northwind/Shipper/Retrieve", request, onSuccess, options);
         }
     
-        public static void List(ListRequest request, Action<ListResponse<ShipperRow>> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest List(ListRequest request, Action<ListResponse<ShipperRow>> onSuccess, ServiceCallOptions options = null)
         {
-            Q.ServiceRequest("Northwind/Shipper/List", request, onSuccess, options);
+            return Q.ServiceRequest("Northwind/Shipper/List", request, onSuccess, options);
         }
     }
     

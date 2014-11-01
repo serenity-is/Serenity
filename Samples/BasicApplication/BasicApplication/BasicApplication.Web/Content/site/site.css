@@ -1021,3 +1021,46 @@ a,
 .s-UserDialog .categories {
   height: 260px;
 }
+.s-LanguageDialog > .size {
+  min-width: 650px;
+  width: 650px;
+}
+.s-LanguageDialog .tab-pane {
+  height: auto;
+}
+.s-LanguageDialog .caption {
+  width: 150px;
+}
+.s-LanguageDialog .editor {
+  width: 400px;
+}
+.s-LanguageDialog input.editor[type=checkbox] {
+  width: auto;
+}
+.s-LanguageDialog .s-Form .editor.dateQ {
+  width: 383px;
+}
+.s-LanguageDialog .s-Form .editor.emailuser {
+  width: 170px;
+}
+.s-LanguageDialog .s-Form .editor.dateQ.s-DateTimeEditor {
+  width: 323px;
+}
+.s-LanguageDialog .s-Form .editor.s-DateTimeEditor.time {
+  width: 56px;
+  margin-left: 4px;
+}
+.s-LanguageDialog .s-Form .editor.has-inplace-button {
+  width: 378px;
+}
+.s-LanguageDialog .s-Form .emaildomain {
+  width: 215px;
+}
+.s-LanguageDialog .s-PropertyGrid .categories {
+  height: 260px;
+}
+.s-TranslationGrid input.custom-text {
+  width: 100%;
+  height: 23px;
+  padding: 0 3px;
+}
