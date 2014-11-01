@@ -1,7 +1,9 @@
-﻿using System.ComponentModel;
+﻿using Serenity.ComponentModel;
+using System.ComponentModel;
 
 namespace Serenity.Data
 {
+    [EnumKey("CustomFieldType")]
     public enum CustomFieldType
     {
         [Description("Metin (String)")]
