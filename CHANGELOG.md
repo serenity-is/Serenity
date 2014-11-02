@@ -82,7 +82,7 @@ Features:
   - allow criteria objects to be used on client side too (with some limitations to prevent SQL injections etc.)
   - list requests can now specify filtering through client side criteria
   - generate field names with entity classes in ServiceContracts.tt
-  - merge ServiceContracts.tt and ServiceEndpoints.tt (refer to BasicApplication sample to update your own ServiceContracts.tt file)
+  - merge ServiceContracts.tt and ServiceEndpoints.tt (refer to Serene sample to update your own ServiceContracts.tt file)
   - upgrade to Saltarelle Compiler 2.6.0
   - upgrade to jQuery UI 1.11.1, jQuery Validation 1.13, FontAwesome 4.2, Bootstrap 3.2
   
