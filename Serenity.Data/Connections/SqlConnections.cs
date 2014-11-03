@@ -8,7 +8,7 @@ namespace Serenity.Data
 {
     public static class SqlConnections
     {
-        private static Dictionary<string, Tuple<string, DbProviderFactory>> connections = new Dictionary<string, Tuple<string, DbProviderFactory>>();
+        private static Dictionary<string, ConnectionStringInfo> connections = new Dictionary<string, ConnectionStringInfo>();
         private static Dictionary<string, DbProviderFactory> factories = new Dictionary<string, DbProviderFactory>();
         
         public static DbProviderFactory GetFactory(string providerName)
@@ -24,19 +24,19 @@ namespace Serenity.Data
             return factory;
         }
 
-        public static Tuple<string, DbProviderFactory> GetConnectionString(string connectionKey)
+        public static ConnectionStringInfo GetConnectionString(string connectionKey)
         {
-            Tuple<string, DbProviderFactory> connection;
+            ConnectionStringInfo connection;
             if (!connections.TryGetValue(connectionKey, out connection))
             {
-                var newConnections = new Dictionary<string, Tuple<string, DbProviderFactory>>(connections);
+                var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
                 var connectionSetting = ConfigurationManager.ConnectionStrings[connectionKey];
                 if (connectionSetting == null)
                     throw new InvalidOperationException(String.Format("No connection string with key {0} in configuration file!", connectionKey));
 
                 var factory = GetFactory(connectionSetting.ProviderName);
 
-                connection = newConnections[connectionKey] = new Tuple<string, DbProviderFactory>(connectionSetting.ConnectionString, factory);
+                connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionSetting.ConnectionString, connectionSetting.ProviderName, factory);
                 connections = newConnections;
             }
 
@@ -69,8 +69,8 @@ namespace Serenity.Data
         public static IDbConnection NewByKey(string connectionKey)
         {
             var connectionSetting = GetConnectionString(connectionKey);
-            var connection = connectionSetting.Item2.CreateConnection();
-            connection.ConnectionString = connectionSetting.Item1;
+            var connection = connectionSetting.ProviderFactory.CreateConnection();
+            connection.ConnectionString = connectionSetting.ConnectionString;
 
             var profiler = Dependency.TryResolve<IConnectionProfiler>();
             if (profiler != null)
@@ -81,8 +81,8 @@ namespace Serenity.Data
 
         public static void SetConnection(string connectionKey, string connectionString, string providerName)
         {
-            var newConnections = new Dictionary<string, Tuple<string, DbProviderFactory>>(connections);
-            newConnections[connectionKey] = new Tuple<string, DbProviderFactory>(connectionString, GetFactory(providerName));
+            var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
+            newConnections[connectionKey] = new ConnectionStringInfo(connectionString, providerName, GetFactory(providerName));
             connections = newConnections;
         }
 
