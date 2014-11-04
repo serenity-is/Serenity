@@ -1,11 +1,7 @@
-﻿using jQueryApi;
-using Serenity.ComponentModel;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Html;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
+using jQueryApi;
 
 namespace Serenity
 {
@@ -749,9 +745,13 @@ namespace Serenity
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IsActivePropertyAttribute), true);
                 if (attributes.Length == 1)
+                {
                     isActiveFieldName = attributes[0].As<IsActivePropertyAttribute>().Value;
-
-                isActiveFieldName = String.Empty;
+                }
+                else
+                {
+                    isActiveFieldName = String.Empty;
+                }
             }
 
             return isActiveFieldName;

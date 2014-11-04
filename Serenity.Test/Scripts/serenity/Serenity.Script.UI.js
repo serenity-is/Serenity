@@ -984,7 +984,9 @@
 					if (attributes.length === 1) {
 						this.isActiveFieldName = attributes[0].get_value();
 					}
-					this.isActiveFieldName = '';
+					else {
+						this.isActiveFieldName = '';
+					}
 				}
 				return this.isActiveFieldName;
 			},
