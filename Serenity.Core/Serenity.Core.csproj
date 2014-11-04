@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B7CCA37B-2CC4-4F86-869A-43413ABC1ABB}</ProjectGuid>
+    <ProjectGuid>{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Serenity</RootNamespace>

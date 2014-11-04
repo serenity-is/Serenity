@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{985ADABF-FD82-40EF-B5AC-5C9515B7838F}</ProjectGuid>
+    <ProjectGuid>{49704C9A-30A2-43DE-AE3D-D13073BA50A4}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Serenity.CodeGenerator</RootNamespace>
