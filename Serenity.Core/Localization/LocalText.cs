@@ -88,6 +88,9 @@ namespace Serenity
         /// </summary>
         public static string TryGet(string key)
         {
+            if (string.IsNullOrEmpty(key))
+                return null;
+
             var provider = Dependency.TryResolve<ILocalTextRegistry>();
             return provider == null ? null : provider.TryGet(CultureInfo.CurrentUICulture.Name, key);
         }

@@ -93,6 +93,7 @@
     <Compile Include="Core\Caching\LocalCacheTests.cs" />
     <Compile Include="Core\AuthorizationTests.cs" />
     <Compile Include="Core\DependencyTests.cs" />
+    <Compile Include="Core\Localization\LocalTextTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterDeserializationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />
     <Compile Include="Data\FakeDisplayOrderRow.cs" />
@@ -104,7 +105,6 @@
     <Compile Include="Data\SerenityDbScript.cs" />
     <Compile Include="Data\DisplayOrderTests.cs" />
     <Compile Include="Data\DisplayOrderRow.cs" />
-    <Compile Include="IoC\IoCTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Selenium\ScriptTests.cs" />
     <Compile Include="Selenium\TcpUtility.cs" />
@@ -467,9 +467,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Core\Localization\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
