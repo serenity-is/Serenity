@@ -1064,4 +1064,6 @@ function showInFrame(code) {
     winPopup.document.body.innerHTML = code;
 }
 
-var btn = $.fn.button.noConflict(); $.fn.btn = btn;
+if ($.fn.button && $.fn.button.noConflict) {
+    var btn = $.fn.button.noConflict(); $.fn.btn = btn;
+}
