@@ -85,9 +85,8 @@ namespace Serenity.Web
             FormScriptRegistration.RegisterFormScripts();
             ColumnsScriptRegistration.RegisterColumnsScripts();
 
-            var templateRegistrar = new TemplateScriptRegistrar();
-            templateRegistrar.Initialize("~/Views/Templates", watchForChanges: true);
-            templateRegistrar.Initialize("~/Modules", watchForChanges: true);
+            new TemplateScriptRegistrar()
+                .Initialize(new[] { "~/Views/Templates", "~/Modules" }, watchForChanges: true);
 
             ScriptFileWatcher.WatchForChanges();
             CssFileWatcher.WatchForChanges();

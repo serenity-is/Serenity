@@ -138,7 +138,6 @@ namespace Serenity.Web
                     }
 
                     var bundle = new ConcatenatedScript(bundleParts);
-                    bundle.Minimize = settings.Minimize == true;
                     DynamicScriptManager.Register(bundleName, bundle);
                     bundleByKeyNew[bundleKey] = bundle;
                 }

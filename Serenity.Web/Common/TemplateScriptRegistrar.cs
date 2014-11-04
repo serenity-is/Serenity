@@ -13,7 +13,8 @@ namespace Serenity.Web
     public class TemplateScriptRegistrar
     {
         const string TemplateSuffix = ".Template.html";
-        
+
+        private ConcatenatedScript bundle;
         private Dictionary<string, TemplateScript> scriptByKey = new Dictionary<string, TemplateScript>(StringComparer.OrdinalIgnoreCase);
 
         private static string GetKey(string filename)
@@ -48,28 +49,41 @@ namespace Serenity.Web
             TemplateScript ts;
             if (scriptByKey.TryGetValue(key, out ts))
                 ts.Changed();
+
+            if (bundle != null)
+                ts.Changed();
         }
 
-        public void Initialize(string rootUrl, bool watchForChanges = true)
+        public void Initialize(string[] rootUrls, bool watchForChanges = true)
         {
-            var rootPath = HttpContext.Current.Server.MapPath(rootUrl);
+            var bundleList = new List<Func<string>>();
 
-            if (!Directory.Exists(rootPath))
-                return;
-
-            foreach (var file in Directory.EnumerateFiles(rootPath, "*.html", SearchOption.AllDirectories))
+            foreach (var rootUrl in rootUrls)
             {
-                var key = GetKey(file);
-                if (key == null)
+                var rootPath = HttpContext.Current.Server.MapPath(rootUrl);
+
+                if (!Directory.Exists(rootPath))
                     continue;
 
-                var path = rootUrl + UploadHelper.ToUrl(file.Substring(rootPath.Length));
+                foreach (var file in Directory.EnumerateFiles(rootPath, "*.html", SearchOption.AllDirectories))
+                {
+                    var key = GetKey(file);
+                    if (key == null)
+                        continue;
 
-                scriptByKey[key.ToLowerInvariant()] = new TemplateScript(key, path); // auto registers
+                    var path = rootUrl + UploadHelper.ToUrl(file.Substring(rootPath.Length));
+
+                    var script = new TemplateScript(key, path); // auto registers;
+                    scriptByKey[key.ToLowerInvariant()] = script;
+                    bundleList.Add(() => script.GetScript());
+                }
+
+                if (watchForChanges)
+                    WatchForChanges(rootUrl);
             }
 
-            if (watchForChanges)
-                WatchForChanges(rootUrl);
+            bundle = new ConcatenatedScript(bundleList);
+            DynamicScriptManager.Register("TemplateBundle", bundle);
         }
     }
 }

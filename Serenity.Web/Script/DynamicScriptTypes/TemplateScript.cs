@@ -47,7 +47,7 @@ namespace Serenity.Web
                 templateText = TemplateHelper.RenderViewToString(_template, null);
             } 
 
-            return "Q$ScriptData.set('Template." + _key + "', " + templateText.ToSingleQuoted() + ");\n"; 
+            return "Q$ScriptData.set('Template." + _key + "', " + templateText.ToSingleQuoted() + ");"; 
  	    }
 
         public void CheckRights()
