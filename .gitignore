@@ -16,11 +16,11 @@ TestResults/
 CodeGenerator/app.config
 Build/
 /Bin/
-Samples/BasicApplication/packages/
-Samples/BasicApplication/BasicApplication/BasicApplication.Web/bin
-Samples/BasicApplication/BasicApplication/BasicApplication.Web/App_Data/
-Samples/BasicApplication.VSIX/packages/
-Samples/BasicApplication/VSIX/packages/
-BasicApplication.Template.zip
+Samples/Serene/packages/
+Samples/Serene/Serene/Serene.Web/bin
+Samples/Serene/Serene/Serene.Web/App_Data/
+Samples/Serene.VSIX/packages/
+Samples/Serene/VSIX/packages/
+Serene.Template.zip
 Serenity.Test/WebRoot/serenity/Serenity*.js
 Serenity.Test/Scripts/serenity/Serenity*.js

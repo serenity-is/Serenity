@@ -9,19 +9,19 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 ## Quick Start
 
-The fastest way to get your hands dirty on Serenity is by using a sample application template from Visual Studio Gallery. 
+The fastest way to get your hands dirty on Serenity is by using a sample application template (Serene) from Visual Studio Gallery. 
 
-Just go to http://visualstudiogallery.msdn.microsoft.com/ and search for *Serenity Basic Application Sample*.
+Just go to http://visualstudiogallery.msdn.microsoft.com/ and search for *SERENE*.
 
-You can also install it directly from Visual Studio, by entering File -> New -> Project -> Online and searching for *Serenity*.
+You can also install it directly from Visual Studio, by entering File -> New -> Project -> Online and searching for *SERENE*.
 
-The default application sample has two projects (common for Serenity applications). One for server side (BasicApplication.Web) and another one for script side (BasicApplication.Script). The script project looks like a .NET project but it actually generates javascript code (using Saltarelle Compiler). 
+The default application sample has two projects (common for Serenity applications). One for server side (Serene.Web) and another one for script side (Serene.Script). The script project looks like a .NET project but it actually generates javascript code (using Saltarelle Compiler). 
 
 Web project is an ordinary MVC application. 
 
 Both projects have references to Serenity NuGet packages, so you can update them using package manager console any time you need.
 
-Basic Application Sample automatically creates its database in SQL local db, so just press F5 and you are ready to go.
+Serene automatically creates its database in SQL local db, so just press F5 and you are ready to go.
 
 When application launches use `admin` user and `serenity` password to login. You can create more users from *Administration / User Management* section.
 

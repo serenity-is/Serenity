@@ -49,6 +49,7 @@
     <Compile Include="Connections\DataReaderExtensions.cs" />
     <Compile Include="Connections\IConnectionProfiler.cs" />
     <Compile Include="Connections\IUnitOfWork.cs" />
+    <Compile Include="Connections\ConnectionStringInfo.cs" />
     <Compile Include="Connections\UnitOfWork.cs" />
     <Compile Include="Connections\WrappedTransaction.cs" />
     <Compile Include="Connections\WrappedConnection.cs" />
