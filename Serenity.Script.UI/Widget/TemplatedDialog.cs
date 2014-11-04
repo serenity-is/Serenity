@@ -29,25 +29,7 @@ namespace Serenity
             : base(div, opt)
         {
             isPanel = this.GetType().GetCustomAttributes(typeof(PanelAttribute), true).Length > 0;
-
-            if (!IsAsyncWidget())
-            {
-                #pragma warning disable 618
-                InitTemplatedDialog();
-                #pragma warning restore 618
-            }
-        }
-
-        protected override Promise InitializeAsync()
-        {
-            return base.InitializeAsync().Then(() =>
-            {
-                InitTemplatedDialog();
-            });
-        }
-
-        private void InitTemplatedDialog()
-        {
+            
             if (!isPanel)
                 InitDialog();
 

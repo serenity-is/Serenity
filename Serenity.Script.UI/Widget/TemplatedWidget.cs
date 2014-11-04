@@ -16,27 +16,10 @@ namespace Serenity
         {
             idPrefix = this.uniqueName + "_";
 
-            if (!IsAsyncWidget())
-            {
-                #pragma warning disable 618
-                string widgetMarkup = GetTemplate().Replace(new Regex("~_", "g"), idPrefix);
-                widgetMarkup = JsRender.Render(widgetMarkup);
-                #pragma warning restore 618
+            string widgetMarkup = GetTemplate().Replace(new Regex("~_", "g"), idPrefix);
+            widgetMarkup = JsRender.Render(widgetMarkup);
 
-                this.element.Html(widgetMarkup);
-            }
-        }
-
-        protected override Promise InitializeAsync()
-        {
-            return base.InitializeAsync()
-                .ThenAwait(new Func<Promise<string>>(GetTemplateAsync))
-                .Then(new Action<string>((string template) =>
-                {
-                    string widgetMarkup = template.Replace(new Regex("~_", "g"), idPrefix);
-                    widgetMarkup = JsRender.Render(widgetMarkup);
-                    this.element.Html(widgetMarkup);
-                }));
+            this.element.Html(widgetMarkup);
         }
 
         public jQueryObject ById(string id)
@@ -55,7 +38,6 @@ namespace Serenity
             return this.GetType().Name;
         }
 
-        [Obsolete("Prefer async version")]
         protected virtual string GetTemplate()
         {
             string templateName = this.GetTemplateName();
@@ -76,34 +58,6 @@ namespace Serenity
             }
 
             return template;
-        }
-
-        protected virtual Promise<string> GetTemplateAsync()
-        {
-            return Promise.Void.ThenAwait(() =>
-            {
-                string templateName = this.GetTemplateName();
-
-                var script = J("script#Template_" + templateName);
-                if (script.Length > 0)
-                {
-                    var template = script.GetHtml();
-                    return Promise.FromValue(template);
-                }
-                else
-                {
-                    return Q.GetTemplateAsync(templateName).ThenSelect(template =>
-                    {
-                        if (!Script.IsValue(template))
-                        {
-                            throw new Exception(String.Format("Can't locate template for widget '{0}' with name '{1}'!",
-                                this.GetType().Name, templateName));
-                        }
-
-                        return template;
-                    });
-                }
-            });
         }
     }
 

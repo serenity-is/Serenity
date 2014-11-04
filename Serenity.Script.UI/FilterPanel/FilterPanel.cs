@@ -1,12 +1,7 @@
 ﻿using jQueryApi;
-using Serenity.ComponentModel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Html;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -583,9 +578,9 @@ namespace Serenity
                 "<div style=\"clear: both\"></div>" +
             "</div>";
 
-        protected override Promise<string> GetTemplateAsync()
+        protected override string GetTemplate()
         {
-            return Promise.FromValue(PanelTemplate);
+            return PanelTemplate;
         }
 
         public void OnFilterChange()

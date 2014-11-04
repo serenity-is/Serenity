@@ -1451,7 +1451,7 @@
 		};
 		ss.registerGenericClassInstance($type, $Serenity_EntityDialog$2, [TEntity, TOptions], {
 			initializeAsync: function() {
-				return ss.makeGenericType($Serenity_TemplatedDialog$1, [TOptions]).prototype.initializeAsync.call(this).then(ss.mkdel(this, this.$initPropertyGridAsync), null).then(ss.mkdel(this, this.$initLocalizationGridAsync), null);
+				return $Serenity_Widget.prototype.initializeAsync.call(this).then(ss.mkdel(this, this.$initPropertyGridAsync), null).then(ss.mkdel(this, this.$initLocalizationGridAsync), null);
 			},
 			destroy: function() {
 				if (ss.isValue(this.propertyGrid)) {
@@ -3529,7 +3529,7 @@
 		};
 		ss.registerGenericClassInstance($type, $Serenity_PropertyDialog$2, [TEntity, TOptions], {
 			initializeAsync: function() {
-				return ss.makeGenericType($Serenity_TemplatedDialog$1, [TOptions]).prototype.initializeAsync.call(this).then(ss.mkdel(this, this.$initPropertyGridAsync), null).then(ss.mkdel(this, function() {
+				return $Serenity_Widget.prototype.initializeAsync.call(this).then(ss.mkdel(this, this.$initPropertyGridAsync), null).then(ss.mkdel(this, function() {
 					this.loadInitialEntity();
 				}), null);
 			},
@@ -4744,9 +4744,12 @@
 			this.toolbar = null;
 			ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).call(this, div, opt);
 			this.isPanel = ss.getAttributes(ss.getInstanceType(this), $Serenity_PanelAttribute, true).length > 0;
-			if (!this.isAsyncWidget()) {
-				this.$initTemplatedDialog();
+			if (!this.isPanel) {
+				this.initDialog();
 			}
+			this.initValidator();
+			this.initTabs();
+			this.initToolbar();
 		};
 		$type.$ctor1 = function(opt) {
 			$type.$ctor2.call(this, Q.newBodyDiv(), opt);
@@ -4789,19 +4792,6 @@
 			}
 		};
 		ss.registerGenericClassInstance($type, $Serenity_TemplatedDialog$1, [TOptions], {
-			initializeAsync: function() {
-				return ss.makeGenericType($Serenity_TemplatedWidget$1, [TOptions]).prototype.initializeAsync.call(this).then(ss.mkdel(this, function() {
-					this.$initTemplatedDialog();
-				}), null);
-			},
-			$initTemplatedDialog: function() {
-				if (!this.isPanel) {
-					this.initDialog();
-				}
-				this.initValidator();
-				this.initTabs();
-				this.initToolbar();
-			},
 			destroy: function() {
 				if (ss.isValue(this.tabs)) {
 					this.tabs.tabs('destroy');
@@ -4944,20 +4934,11 @@
 			this.idPrefix = null;
 			ss.makeGenericType($Serenity_Widget$1, [TOptions]).call(this, element, opt);
 			this.idPrefix = this.uniqueName + '_';
-			if (!this.isAsyncWidget()) {
-				var widgetMarkup = this.getTemplate().replace(new RegExp('~_', 'g'), this.idPrefix);
-				widgetMarkup = $Serenity_JsRender.render(widgetMarkup, null);
-				this.element.html(widgetMarkup);
-			}
+			var widgetMarkup = this.getTemplate().replace(new RegExp('~_', 'g'), this.idPrefix);
+			widgetMarkup = $Serenity_JsRender.render(widgetMarkup, null);
+			this.element.html(widgetMarkup);
 		};
 		ss.registerGenericClassInstance($type, $Serenity_TemplatedWidget$1, [TOptions], {
-			initializeAsync: function() {
-				return $Serenity_Widget.prototype.initializeAsync.call(this).then(ss.mkdel(this, this.getTemplateAsync), null).then(ss.mkdel(this, function(template) {
-					var widgetMarkup = template.replace(new RegExp('~_', 'g'), this.idPrefix);
-					widgetMarkup = $Serenity_JsRender.render(widgetMarkup, null);
-					this.element.html(widgetMarkup);
-				}), null);
-			},
 			byId$1: function(id) {
 				return $('#' + this.idPrefix + id);
 			},
@@ -4983,24 +4964,6 @@
 					}
 				}
 				return template;
-			},
-			getTemplateAsync: function() {
-				return RSVP.resolve().then(ss.mkdel(this, function() {
-					var templateName = this.getTemplateName();
-					var script = $('script#Template_' + templateName);
-					if (script.length > 0) {
-						var template = script.html();
-						return RSVP.resolve(template);
-					}
-					else {
-						return Q.getTemplateAsync(templateName).then(ss.mkdel(this, function(template1) {
-							if (!ss.isValue(template1)) {
-								throw new ss.Exception(ss.formatString("Can't locate template for widget '{0}' with name '{1}'!", ss.getTypeName(ss.getInstanceType(this)), templateName));
-							}
-							return template1;
-						}), null);
-					}
-				}), null);
 			}
 		}, function() {
 			return ss.makeGenericType($Serenity_Widget$1, [TOptions]);
@@ -6356,8 +6319,8 @@
 		get_currentFilter: function() {
 			return this.$currentFilter;
 		},
-		getTemplateAsync: function() {
-			return RSVP.resolve($Serenity_FilterPanel.panelTemplate);
+		getTemplate: function() {
+			return $Serenity_FilterPanel.panelTemplate;
 		},
 		onFilterChange: function() {
 			if (!ss.staticEquals(this.options.filterChange, null)) {
