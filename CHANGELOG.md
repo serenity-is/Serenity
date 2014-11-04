@@ -1,3 +1,10 @@
+## 1.3.7 (2014-11-04)
+
+Features:
+  - Basic Application Sample is now Serene in its own repository
+  - Serene uses FluentMigrator package to create and upgrade sample database
+  - SqlConnections.GetConnectionString returns ConnectionStringInfo object instead of Tuple
+
 ## 1.3.6 (2014-11-01)
 
 Features:
