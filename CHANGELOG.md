@@ -1,3 +1,8 @@
+## 1.3.8 (2014-11-04)
+Bugfixes:
+  - fix edit link problem when grid is not async and columns loaded from server side
+  - button noconflict fix
+
 ## 1.3.7 (2014-11-04)
 
 Features:
