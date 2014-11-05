@@ -22,5 +22,4 @@ Samples/Serene/Serene/Serene.Web/App_Data/
 Samples/Serene.VSIX/packages/
 Samples/Serene/VSIX/packages/
 Serene.Template.zip
-Serenity.Test/WebRoot/serenity/Serenity*.js
-Serenity.Test/Scripts/serenity/Serenity*.js
+serenity.Test/Scripts/serenity/Serenity*.js
