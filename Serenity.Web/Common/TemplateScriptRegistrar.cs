@@ -51,7 +51,7 @@ namespace Serenity.Web
                 ts.Changed();
 
             if (bundle != null)
-                ts.Changed();
+                bundle.Changed();
         }
 
         public void Initialize(string[] rootUrls, bool watchForChanges = true)
