@@ -1,5 +1,7 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Extensibility;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Serenity.Web
@@ -10,13 +12,17 @@ namespace Serenity.Web
         {
             var assemblies = ExtensibilityHelper.SelfAssemblies;
 
+            var scripts = new List<Func<string>>();
+
             foreach (var assembly in assemblies)
                 foreach (var type in assembly.GetTypes())
                 {
                     var attr = type.GetCustomAttribute<ColumnsScriptAttribute>();
                     if (attr != null)
-                        new ColumnsScript(attr.Key, type);
+                        scripts.Add(new ColumnsScript(attr.Key, type).GetScript);
                 }
+
+            DynamicScriptManager.Register("ColumnsBundle", new ConcatenatedScript(scripts));
         }
     }
 }
