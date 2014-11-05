@@ -58,6 +58,104 @@ namespace Serenity.Test
         [Fact]
         public void EnumLocalTexts_Initialize_SearchesOnlyGivenAssemblies()
         {
+            using (new MunqContext())
+            {
+                var registry = A.Fake<ILocalTextRegistry>();
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance(registry);
+
+                EnumLocalTexts.Initialize(new[] { typeof(LocalText).Assembly });
+
+                A.CallTo(() => registry.Add(A<string>._, A<string>.That.Contains("EnumWithoutKey"), A<string>._))
+                    .MustNotHaveHappened();
+            }
+        }
+
+        [Fact]
+        public void EnumLocalTexts_Initialize_UsesFullName_IfEnumKeyAttributeIsNotPresent()
+        {
+            using (new MunqContext())
+            {
+                var registry = A.Fake<ILocalTextRegistry>();
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance(registry);
+
+                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+
+                string expectedKey = "Enums." + typeof(EnumWithoutKey).FullName + "." + 
+                    EnumWithoutKey.WithDescriptionNoKey.GetName();
+
+                A.CallTo(() => registry.Add(A<string>._, expectedKey, "Description for WithDescriptionNoKey"))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+            }
+        }
+
+        [Fact]
+        public void EnumLocalTexts_Initialize_UsesKey_IfKeyAttributeIsPresent()
+        {
+            using (new MunqContext())
+            {
+                var registry = A.Fake<ILocalTextRegistry>();
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance(registry);
+
+                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+
+                string expectedKey = "Enums.My.CoolEnumKey." +
+                    EnumWithKey.WithDescriptionKey.GetName();
+
+                A.CallTo(() => registry.Add(A<string>._, expectedKey, "Description for WithDescriptionKey"))
+                    .MustHaveHappened(Repeated.Exactly.Once);
+            }
+        }
+
+        [Fact]
+        public void EnumLocalTexts_Initialize_SkipsEnumValuesWithoutDescriptionAttribute()
+        {
+            using (new MunqContext())
+            {
+                var registry = A.Fake<ILocalTextRegistry>();
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance(registry);
+
+                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+
+                string unexpectedKey1 = "Enums.My.CoolEnumKey." +
+                    EnumWithKey.NoDescriptionKey.GetName();
+
+                string unexpectedKey2 = "Enums." + typeof(EnumWithoutKey).FullName + "." +
+                    EnumWithoutKey.NoDescriptionNoKey.GetName();
+
+                A.CallTo(() => registry.Add(A<string>._, unexpectedKey1, A<string>._))
+                    .MustNotHaveHappened();
+
+                A.CallTo(() => registry.Add(A<string>._, unexpectedKey2, A<string>._))
+                    .MustNotHaveHappened();
+            }
+        }
+
+        [Fact]
+        public void EnumLocalTexts_Initialize_UsesInvariantLanguageId()
+        {
+            using (new MunqContext())
+            {
+                var registry = A.Fake<ILocalTextRegistry>();
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance(registry);
+
+                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+
+                A.CallTo(() => registry.Add("", A<string>._, A<string>._))
+                    .MustHaveHappened();
+
+                A.CallTo(() => registry.Add(A<string>.That.Not.IsEqualTo(""), A<string>._, A<string>._))
+                    .MustNotHaveHappened();
+            }
         }
     }
 }
