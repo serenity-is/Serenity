@@ -14,7 +14,7 @@ namespace @(Model.RootNamespace)@(dotModule)
 
     [ColumnsKey("@(moduleDot)@(Model.ClassName)"), IdProperty("@Model.Identity")@if (Model.NameField != null){<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
     [DialogType(typeof(@(Model.ClassName)Dialog)), LocalTextPrefix("@(moduleDot)@(Model.ClassName)"), Service("@(moduleSlash)@(Model.ClassName)")]
-    public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>, IAsyncInit
+    public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>
     {
         public @(Model.ClassName)Grid(jQueryObject container)
             : base(container)
