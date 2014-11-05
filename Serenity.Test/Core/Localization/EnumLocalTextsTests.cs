@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
-    public partial class EnumLocalTextsTests
+    public class EnumLocalTextsTests
     {
         [EnumKey("My.CoolEnumKey")]
         public enum EnumWithKey

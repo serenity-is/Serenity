@@ -94,6 +94,7 @@
     <Compile Include="Core\AuthorizationTests.cs" />
     <Compile Include="Core\DependencyTests.cs" />
     <Compile Include="Core\Localization\EnumLocalTextsTests.cs" />
+    <Compile Include="Core\Localization\InitializedLocalTextTests.cs" />
     <Compile Include="Core\Localization\LocalTextTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterDeserializationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
-    public partial class LocalTextTests
+    public class LocalTextTests
     {
         [Fact]
         public void LocalText_InvariantLanguageID_IsEmptyString()
