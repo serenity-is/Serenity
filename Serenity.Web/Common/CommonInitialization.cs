@@ -72,7 +72,7 @@ namespace Serenity.Web
                 registrar.RegisterInstance<ILocalTextRegistry>(new LocalTextRegistry());
 
             NestedLocalTextRegistration.Initialize();
-            EnumLocalTexts.Initialize(ExtensibilityHelper.SelfAssemblies);
+            EnumLocalTextRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
             EntityLocalTexts.Initialize();
             JsonLocalTextRegistration.AddFromFilesInFolder(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));
             JsonLocalTextRegistration.AddFromFilesInFolder(HostingEnvironment.MapPath("~/Scripts/site/texts/"));

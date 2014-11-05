@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
-    public class EnumLocalTextsTests
+    public class EnumLocalTextRegistrationTests
     {
         [EnumKey("My.CoolEnumKey")]
         public enum EnumWithKey
@@ -32,7 +32,7 @@ namespace Serenity.Test
             using (new MunqContext())
             {
                 var exception = Assert.Throws<KeyNotFoundException>(() => 
-                    EnumLocalTexts.Initialize(new[] { this.GetType().Assembly }));
+                    EnumLocalTextRegistration.Initialize(new[] { this.GetType().Assembly }));
 
                 Assert.Contains(typeof(ILocalTextRegistry).Name, exception.Message);
             }
@@ -48,7 +48,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance(registry);
 
-                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+                EnumLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry.Add(A<string>._, A<string>._, A<string>._))
                     .MustHaveHappened(Repeated.AtLeast.Twice);
@@ -65,7 +65,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance(registry);
 
-                EnumLocalTexts.Initialize(new[] { typeof(LocalText).Assembly });
+                EnumLocalTextRegistration.Initialize(new[] { typeof(LocalText).Assembly });
 
                 A.CallTo(() => registry.Add(A<string>._, A<string>.That.Contains("EnumWithoutKey"), A<string>._))
                     .MustNotHaveHappened();
@@ -82,7 +82,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance(registry);
 
-                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+                EnumLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 string expectedKey = "Enums." + typeof(EnumWithoutKey).FullName + "." + 
                     EnumWithoutKey.WithDescriptionNoKey.GetName();
@@ -102,7 +102,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance(registry);
 
-                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+                EnumLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 string expectedKey = "Enums.My.CoolEnumKey." +
                     EnumWithKey.WithDescriptionKey.GetName();
@@ -122,7 +122,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance(registry);
 
-                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+                EnumLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 string unexpectedKey1 = "Enums.My.CoolEnumKey." +
                     EnumWithKey.NoDescriptionKey.GetName();
@@ -148,7 +148,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance(registry);
 
-                EnumLocalTexts.Initialize(new[] { this.GetType().Assembly });
+                EnumLocalTextRegistration.Initialize(new[] { this.GetType().Assembly });
 
                 A.CallTo(() => registry.Add("", A<string>._, A<string>._))
                     .MustHaveHappened();

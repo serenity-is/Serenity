@@ -12,7 +12,7 @@ namespace Serenity.Localization
     /// Contains initialization method for adding local text translations defined by
     /// Description attributes in enumeration classes.
     /// </summary>
-    public static class EnumLocalTexts
+    public static class EnumLocalTextRegistration
     {
         /// <summary>
         /// Adds local text translations defined implicitly by Description attributes in 

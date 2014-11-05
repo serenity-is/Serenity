@@ -16,13 +16,16 @@ namespace Serenity.Localization
         /// <summary>
         /// Adds translation from a hierarchical local text dictionary parsed from JSON file.
         /// </summary>
-        /// <param name="obj">Object parsed from local text JSON string</param>
+        /// <param name="nested">Object parsed from local text JSON string</param>
         /// <param name="prefix">Prefix to prepend before local text keys</param>
         /// <param name="languageID">Language ID</param>
-        public static void AddFromNestedDictionary(IDictionary<string, JToken> obj, string prefix, string languageID)
+        public static void AddFromNestedDictionary(IDictionary<string, JToken> nested, string prefix, string languageID)
         {
+            if (nested == null)
+                throw new ArgumentNullException("nested");
+
             var target = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            ProcessNestedDictionary(obj, prefix, target);
+            ProcessNestedDictionary(nested, prefix, target);
 
             var registry = Dependency.Resolve<ILocalTextRegistry>();
             foreach (var pair in target)
@@ -32,15 +35,15 @@ namespace Serenity.Localization
         /// <summary>
         /// Converts translation from a hierarchical local text dictionary to a simple dictionary.
         /// </summary>
-        /// <param name="source">Object parsed from local text JSON string</param>
+        /// <param name="nested">Object parsed from local text JSON string</param>
         /// <param name="prefix">Prefix to prepend before local text keys</param>
         /// <param name="target">Target dictionary that will contain keys and translations</param>
-        public static void ProcessNestedDictionary(IDictionary<string, JToken> source, string prefix, Dictionary<string, string> target)
+        public static void ProcessNestedDictionary(IDictionary<string, JToken> nested, string prefix, Dictionary<string, string> target)
         {
-            if (source == null)
+            if (nested == null)
                 return;
 
-            foreach (var k in source)
+            foreach (var k in nested)
             {
                 var actual = prefix + k.Key;
                 var o = k.Value;
