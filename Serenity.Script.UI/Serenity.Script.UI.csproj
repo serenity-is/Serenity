@@ -52,7 +52,14 @@
     <Compile Include="Editor\URLEditor.cs" />
     <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
-    <Compile Include="FilterPanel\FilterPanel.FieldEditor.cs" />
+    <Compile Include="FilterPanel\FilterHandler\FilterHandlerTypeRegistry.cs" />
+    <Compile Include="FilterPanel\FilterHandler\StringFilterHandler.cs" />
+    <Compile Include="FilterPanel\FilterHandler\BaseFilterHandler.cs" />
+    <Compile Include="FilterPanel\FilterHandler\OperatorKeys.cs" />
+    <Compile Include="FilterPanel\FilterHandler\FilterOperator.cs" />
+    <Compile Include="FilterPanel\FilterHandler\IFilterHandler.cs" />
+    <Compile Include="FilterPanel\FilterPanel.OperatorSelect.cs" />
+    <Compile Include="FilterPanel\FilterPanel.FieldSelect.cs" />
     <Compile Include="FilterPanel\FilterWidgetBase.cs" />
     <Compile Include="FilterPanel\FilterLine.cs" />
     <Compile Include="FilterPanel\FilterDialog.cs" />

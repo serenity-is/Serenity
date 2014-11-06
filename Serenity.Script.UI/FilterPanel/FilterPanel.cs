@@ -54,6 +54,17 @@ namespace Serenity
                         return column.Title; 
                     }
                 }
+
+                public bool NotNull
+                {
+                    get { return false; }
+                }
+
+
+                public string HandlerType
+                {
+                    get { return "String"; }
+                }
             }
 
             public IFilterField FindField(string fieldName)
@@ -236,40 +247,78 @@ namespace Serenity
 
             bool isEmpty = (fieldName == null || fieldName == "");
 
-            jQueryObject opDiv = row.Children("div.o");
-            jQueryObject opSelect = opDiv.Children("select");
-
-            if (opSelect.Length == 0)
-                opSelect = J("<select/>").AppendTo(opDiv).Change(OnRowOperatorChange);
-            else
-                Q.ClearOptions(opSelect);
-
-            //RemoveFilterHandler(row);
-
-            PopulateOperatorList(opSelect);
-
+            RemoveFilterHandler(row);
+            PopulateOperatorList(row);
             RowOperatorChange(row);
             UpdateParens();
             UpdateButtons();
         }
 
-        private void PopulateOperatorList(jQueryObject select)
+        private void RemoveFilterHandler(jQueryObject row)
         {
-            jQueryObject row = select.Closest("div.filter-line");
-
-            /*IFilterHandler handler = GetFilterHandlerFor(row);
-            if (handler == null)
-                return;
-
-            List<string> operators = handler.GetOperators();
-
-            SelectElement sel = (SelectElement)select[0];
-
-            if (operators != null)
-                foreach (string op in operators)
-                    Q.AddOption(select, op, handler.OperatorTitle(op));*/
+            row.Data("FilterHandler", null);
+            row.Data("FilterHandlerField", null);
         }
 
+        private void PopulateOperatorList(jQueryObject row)
+        {
+            row.Children("div.o").Html("");
+
+            IFilterHandler handler = GetFilterHandlerFor(row);
+            if (handler == null)
+                return;
+            
+            var hidden = row.Children("div.o").Html("<input/>").Children().Attribute("type", "hidden").AddClass("op-select");
+
+            var operators = handler.GetOperators();
+
+            new OperatorSelect(hidden, operators).ChangeSelect2(OnRowOperatorChange);
+        }
+
+        private IFilterField GetFieldFor(jQueryObject row)
+        {
+            if (row.Length == 0)
+                return null;
+
+            var select = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
+            if (select.Value.IsEmptyOrNull())
+                return null;
+
+            return Source.FindField(select.Value);
+        }
+
+        private IFilterHandler GetFilterHandlerFor(jQueryObject row)
+        {
+            var field = GetFieldFor(row);
+            if (field == null)
+                return null;
+
+            IFilterHandler handler = (IFilterHandler)row.GetDataValue("FilterHandler");
+            string handlerField = row.GetDataValue("FilterHandlerField").As<string>();
+
+            if (handler != null)
+            {
+                if (handlerField != field.Name)
+                {
+                    row.Data("FilterHandler", null);
+                    handler = null;
+                }
+                else
+                {
+                    return handler;
+                }
+            }
+
+            var handlerType = FilterHandlerTypeRegistry.Get(field.HandlerType ?? "String");
+
+            jQueryObject editorDiv = row.Children("div.v");
+
+            handler = (IFilterHandler)Activator.CreateInstance(handlerType);
+            handler.Container = editorDiv;
+            handler.Field = field;
+
+            return handler;
+        }
 
         private void OnRowOperatorChange(jQueryEvent e)
         {
@@ -289,10 +338,10 @@ namespace Serenity
 
             editorDiv.Html("");
 
-            //IFilterHandler handler = null;//GetFilterHandlerFor(row);
+            IFilterHandler handler = GetFilterHandlerFor(row);
 
-            //if (handler == null)
-            //    return;
+            if (handler == null)
+                return;
 
             //string op = row.Children("div.o").Children("select").GetValue();
             //if (op == null || op == "")

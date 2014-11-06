@@ -32,7 +32,7 @@
                     public static LocalText @true = "yes";
                     public static LocalText @false = "no";
                     public static LocalText contains = "contains";
-                    public static LocalText startswith = "start with";
+                    public static LocalText startswith = "starts with";
                     public static LocalText eq = "equal";
                     public static LocalText ne = "not equal";
                     public static LocalText gt = "greater than";
