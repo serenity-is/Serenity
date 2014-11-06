@@ -10,10 +10,12 @@ namespace Serenity
     {
         public void Run()
         {
+            Document.Body.InnerHTML = "";
+            var div = Q.NewBodyDiv().AppendTo(Document.Body);
             Type t = Window.Instance.As<dynamic>().Marmara.Personel.PersonelIletisimGrid;
-            dynamic grid = Activator.CreateInstance(t, Q.NewBodyDiv());
+            dynamic grid = Activator.CreateInstance(t, Q.NewBodyDiv().Hide());
             var filterable = new FilterableColumns(grid.slickGrid.getColumns());
-            var panel = new FilterPanel(J(".page-content"));
+            var panel = new FilterPanel(div);
             panel.Source = filterable;
         }
 
@@ -162,7 +164,7 @@ namespace Serenity
 
             row.Children("a.delete").Attribute("title", Q.Text("Controls.FilterPanel.RemoveField")).Click(DeleteRowClick);
 
-            var fieldSel = new FieldSelect(row.Children("div.f").Children("input"), () => this.Source);
+            var fieldSel = new FieldSelect(row.Children("div.f").Children("input"), this.Source);
             fieldSel.ChangeSelect2(OnRowFieldChange);
 
             UpdateParens();
@@ -337,7 +339,7 @@ namespace Serenity
         }
 
         public const string PanelTemplate =
-            "<div id='~_Rows' class='rows'>" +
+            "<div id='~_Rows' class='filter-lines'>" +
             "</div>" +
             "<div id='~_Buttons' class='buttons'>" +
                 "<button id='~_AddButton' class='add'></button>" +
@@ -348,7 +350,7 @@ namespace Serenity
             "</div>";
 
         public const string RowTemplate =
-            "<div class='row'>" +
+            "<div class='filter-line'>" +
                 "<a class='delete'><span></span></a>" +
                 "<div class='l'>" +
                     "<a class='rightparen' href='#'>)</a>" +

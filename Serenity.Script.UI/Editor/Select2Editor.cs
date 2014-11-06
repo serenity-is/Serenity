@@ -17,7 +17,7 @@ namespace Serenity
     [Element("<input type=\"hidden\"/>")]
     public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, IStringValue
         where TOptions : class, new()
-        where TItem: class, new()
+        where TItem: class
     {
         protected List<Select2Item> items;
         protected int pageSize = 100;

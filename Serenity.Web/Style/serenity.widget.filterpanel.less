@@ -5,16 +5,16 @@
 }
 
 .s-FilterPanel {
-    margin-bottom: 2px;
+    padding: 8px;
 }
 
-.s-FilterPanel div.rows {
+.s-FilterPanel div.filter-lines {
     clear: both;
     margin: 0px 0px 4px 0px;
 }
 
-.s-FilterPanel div.row div.row {
-    vertical-align: top;
+.s-FilterPanel div.filter-line {
+    padding: 3px 0 3px 0;
 }
 
 .s-FilterPanel div.f, .s-FilterPanel div.l, .s-FilterPanel div.o, .s-FilterPanel div.v {
@@ -24,46 +24,51 @@
 }
 
 .s-FilterPanel div.l {
-    width: 43px !important;
+    width: 50px;
 }
 
 .s-FilterPanel div.l .andor {
-    width: 25px !important;
+    width: 32px !important;
     text-align: center;
     display: block;
     float: left;
-    line-height: 16px;
+    line-height: 20px;
     padding: 1px;
-    font-size: 10px;
+    margin-left: 1px;
+    font-size: 12px;
 }
 
 .s-FilterPanel div.l .leftparen, .s-FilterPanel div.l .rightparen {
-    line-height: 16px;
+    font-size: 20px;
+    line-height: 20px;
     width: 5px !important;
     text-align: center;
-    color: #d0d0d0;
+    opacity: 0.3;
+    color: #000;
     display: block;
     float: left;
     font-weight: bold;
-    padding: 1px;
+    text-decoration: none;
 }
 
 .s-FilterPanel div.l .active {
     color: #008040 !important;
+    opacity: 1;
 }
 
 .s-FilterPanel a.leftparen:hover, .s-FilterPanel a.rightparen:hover, .s-FilterPanel a.andor:hover {
-    border: 1px solid #ccc;
-    padding: 0px;
-    background-color: #fff;
+    opacity: 1;
     color: #000;
+    text-decoration: none;
 }
 
 .s-FilterPanel div.paren-start {
     margin-top: 6px;
+    border-top: 1px solid dashed;
 }
 
 .s-FilterPanel div.paren-end {
+    border-bottom: 1px solid dashed;
     margin-bottom: 6px;
 }
 
@@ -117,29 +122,15 @@
     float: left;
     width: 16px;
     height: 16px;
+    margin-top: 4px;
     background: url(images/delete.png) no-repeat center center;
-    padding: 1px;
-    margin-right: 2px;
-}
-
-.s-FilterPanel a.delete span {
-    display: block;
-    width: 14px;
-    height: 14px;
-    padding: 1px;
+    margin-right: 6px;
+    opacity: 0.7;
+    cursor: pointer;
 }
 
 .s-FilterPanel a.delete:hover {
-    border: 1px solid #ccc;
-    padding: 0px;
-}
-
-.s-FilterPanel a.delete:hover span {
-    border-left: 1px solid #fff;
-    border-top: 1px solid #fff;
-    border-right: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-    padding: 0px;
+    opacity: 1;
 }
 
 .s-FilterPanel button {

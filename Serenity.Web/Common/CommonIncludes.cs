@@ -39,7 +39,7 @@ namespace Serenity.Web
             "~/Content/bootstrap.css",
             "~/Content/colorbox/jquery.colorbox.css",
             "~/Content/slick.grid.css",
-            "~/Content/select2/select2.css",
+            "~/Content/css/select2.css",
             "~/Content/toastr.css",
             "~/Content/serenity/serenity.css",
         };
