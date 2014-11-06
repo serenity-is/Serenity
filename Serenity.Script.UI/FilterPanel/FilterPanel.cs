@@ -12,7 +12,7 @@ namespace Serenity
         {
             Document.Body.InnerHTML = "";
             var div = Q.NewBodyDiv().AppendTo(Document.Body);
-            Type t = Window.Instance.As<dynamic>().Marmara.Personel.PersonelIletisimGrid;
+            Type t = Window.Instance.As<dynamic>().Serene.Northwind.ProductGrid;
             dynamic grid = Activator.CreateInstance(t, Q.NewBodyDiv().Hide());
             var filterable = new FilterableColumns(grid.slickGrid.getColumns());
             var panel = new FilterPanel(div);
@@ -177,7 +177,7 @@ namespace Serenity
 
         private void OnRowFieldChange(jQueryEvent e)
         {
-            jQueryObject row = J(e.Target).Closest("div.row");
+            jQueryObject row = J(e.Target).Closest("div.filter-line");
             RowFieldChange(row);
             jQueryObject opSelect = row.Children("div.o").Children("select").Focus();
             try { opSelect.Focus(); }
@@ -186,7 +186,7 @@ namespace Serenity
 
         private void RowFieldChange(jQueryObject row)
         {
-            var select = row.Children("div.f").Children("input.field-select").GetWidget<FieldSelect>();
+            var select = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
             string fieldName = select.Value;
 
             bool isEmpty = (fieldName == null || fieldName == "");
@@ -210,7 +210,7 @@ namespace Serenity
 
         private void PopulateOperatorList(jQueryObject select)
         {
-            jQueryObject row = select.Closest("div.row");
+            jQueryObject row = select.Closest("div.filter-line");
 
             /*IFilterHandler handler = GetFilterHandlerFor(row);
             if (handler == null)
@@ -228,7 +228,7 @@ namespace Serenity
 
         private void OnRowOperatorChange(jQueryEvent e)
         {
-            jQueryObject row = J(e.Target).Closest("div.row");
+            jQueryObject row = J(e.Target).Closest("div.filter-line");
             RowOperatorChange(row);
             jQueryObject firstInput = row.Children("div.v").Find(":input:visible").First();
             try { firstInput.Focus(); }
@@ -259,7 +259,7 @@ namespace Serenity
         private void DeleteRowClick(jQueryEvent e)
         {
             e.PreventDefault();
-            jQueryObject row = J(e.Target).Closest("div.row");
+            jQueryObject row = J(e.Target).Closest("div.filter-line");
             row.Remove();
             if (this.rowsDiv.Children().Length == 0)
                 Search();
