@@ -19,7 +19,7 @@
                 public static LocalText InvalidNumber = "invalid number!";
                 public static LocalText Or = "or";
                 public static LocalText OrInParens = "(or)";
-                public static LocalText ResetButton = "clear filter";
+                public static LocalText ResetButton = "reset";
                 public static LocalText SearchButton = "apply filter";
                 public static LocalText ValueRequired = "value required!";
                 public static LocalText GroupBy = "--group--";

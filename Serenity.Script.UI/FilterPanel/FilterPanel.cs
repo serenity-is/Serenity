@@ -17,6 +17,8 @@ namespace Serenity
             var filterable = new FilterableColumns(grid.slickGrid.getColumns());
             var panel = new FilterPanel(div);
             panel.Source = filterable;
+            panel.ShowInitialLine = true;
+            panel.ShowSearchButton = false;
         }
 
         private class FilterableColumns : IFilterableSource
@@ -81,6 +83,37 @@ namespace Serenity
             UpdateButtons();
         }
 
+        private bool showInitialLine;
+
+        public bool ShowInitialLine
+        {
+            get { return showInitialLine; }
+            set
+            {
+                if (showInitialLine != value)
+                {
+                    showInitialLine = value;
+                    if (showInitialLine && rowsDiv.Children().Length == 0)
+                        AddEmptyRow(false);
+                }
+            }
+        }
+
+        private bool showSearchButton;
+
+        public bool ShowSearchButton
+        {
+            get { return showSearchButton; }
+            set
+            {
+                if (showSearchButton != value)
+                {
+                    showSearchButton = value;
+                    UpdateButtons();
+                }
+            }
+        }
+
         protected override string GetTemplate()
         {
             return PanelTemplate;
@@ -100,7 +133,7 @@ namespace Serenity
 
         private void AddButtonClick(jQueryEvent e)
         {
-            AddEmptyRow();
+            AddEmptyRow(true);
             e.PreventDefault();
         }
 
@@ -112,7 +145,9 @@ namespace Serenity
             Store.Items.Clear();
             Store.RaiseChanged();
             UpdateButtons();
-            //OnHeightChange();
+
+            if (ShowInitialLine)
+                AddEmptyRow(false);
         }
 
         private jQueryObject FindEmptyRow()
@@ -138,12 +173,19 @@ namespace Serenity
             return result;
         }
 
-        private jQueryObject AddEmptyRow()
+        private jQueryObject AddEmptyRow(bool popupField)
         {
             jQueryObject emptyRow = FindEmptyRow();
 
             if (emptyRow != null)
+            {
+                emptyRow.Find(".field-select").Select2("focus");
+
+                if (popupField)
+                    emptyRow.Find(".field-select").Select2("open");
+
                 return emptyRow;
+            }
 
             bool isLastRowOr = this.rowsDiv.Children().Last().Children("a.andor").HasClass("or");
 
@@ -170,7 +212,10 @@ namespace Serenity
             UpdateParens();
             UpdateButtons();
 
-            fieldSel.Element.Focus();
+            row.Find(".field-select").Select2("focus");
+
+            if (popupField)
+                row.Find(".field-select").Select2("open");
 
             return row;
         }
@@ -275,7 +320,7 @@ namespace Serenity
 
         private void UpdateButtons()
         {
-            this.ById("SearchButton").Toggle(rowsDiv.Children().Length >= 1);
+            this.ById("SearchButton").Toggle(rowsDiv.Children().Length >= 1 && showSearchButton);
             this.ById("ResetButton").Toggle(rowsDiv.Children().Length >= 1 ||
                 this.Store.Items.Count > 0);
         }
@@ -342,9 +387,9 @@ namespace Serenity
             "<div id='~_Rows' class='filter-lines'>" +
             "</div>" +
             "<div id='~_Buttons' class='buttons'>" +
-                "<button id='~_AddButton' class='add'></button>" +
-                "<button id='~_SearchButton' class='search'></button>" +
-                "<button id='~_ResetButton' class='reset'></button>" +
+                "<button id='~_AddButton' class='btn btn-primary add'></button>" +
+                "<button id='~_SearchButton' class='btn btn-success search'></button>" +
+                "<button id='~_ResetButton' class='btn btn-danger reset'></button>" +
             "</div>" +
             "<div style='clear: both'>" +
             "</div>";
