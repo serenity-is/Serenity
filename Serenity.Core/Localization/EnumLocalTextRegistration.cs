@@ -16,7 +16,11 @@ namespace Serenity.Localization
     {
         /// <summary>
         /// Adds local text translations defined implicitly by Description attributes in 
-        /// enumeration classes.
+        /// enumeration classes. Only enum values that has Description attribute are added as
+        /// local text. By default, enums are registered in format:
+        /// "Enums.{EnumerationTypeFullName}.{EnumValueName}". EnumerationTypeFullName, is
+        /// fullname of the enumeration type. This can be overridden by attaching a EnumKey
+        /// attribute.
         /// </summary>
         /// <param name="assemblies">Assemblies to search for enumeration classes in</param>
         /// <param name="languageID">Language ID texts will be added (default is invariant language)</param>

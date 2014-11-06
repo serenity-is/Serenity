@@ -139,7 +139,7 @@ namespace Serenity.Test
         }
 
         [Fact]
-        public void EnumLocalTexts_Initialize_UsesInvariantLanguageId()
+        public void EnumLocalTexts_Initialize_UsesInvariantLanguageIdByDefault()
         {
             using (new MunqContext())
             {
@@ -157,5 +157,26 @@ namespace Serenity.Test
                     .MustNotHaveHappened();
             }
         }
+
+        [Fact]
+        public void EnumLocalTexts_Initialize_UsesLanguageSpecified()
+        {
+            using (new MunqContext())
+            {
+                var registry = A.Fake<ILocalTextRegistry>();
+
+                Dependency.Resolve<IDependencyRegistrar>()
+                    .RegisterInstance(registry);
+
+                EnumLocalTextRegistration.Initialize(new[] { this.GetType().Assembly }, "es");
+
+                A.CallTo(() => registry.Add("es", A<string>._, A<string>._))
+                    .MustHaveHappened();
+
+                A.CallTo(() => registry.Add(A<string>.That.Not.IsEqualTo("es"), A<string>._, A<string>._))
+                    .MustNotHaveHappened();
+            }
+        }
+
     }
 }
