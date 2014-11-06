@@ -7,7 +7,12 @@ namespace Serenity.Localization
     using System.Reflection;
 
     /// <summary>
-    /// Contains helper methods for registration of local texts in nested static classes
+    /// Contains helper methods for registration of local texts in nested static classes.
+    /// Nested static contains LocalText objects with actual translations as keys. This class locates
+    /// them (with NestedLocalTextsAttribute at outermost class), determines keys by path from outermost
+    /// to nested class name, replaces existing LocalText instance with a InitializedLocalText instance
+    /// containing this generated key and initial translation, and registers this translation in 
+    /// ILocalTextRegistry provider.
     /// </summary>
     public static class NestedLocalTextRegistration
     {
