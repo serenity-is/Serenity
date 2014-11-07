@@ -1,4 +1,5 @@
 ﻿using jQueryApi;
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Html;
@@ -6,80 +7,6 @@ using System.Linq;
 
 namespace Serenity
 {
-    public class FilterPanelTest : ScriptContext
-    {
-        public void Run()
-        {
-            Document.Body.InnerHTML = "";
-            var div = Q.NewBodyDiv().AppendTo(Document.Body);
-            Type t = Window.Instance.As<dynamic>().Serene.Northwind.ProductGrid;
-            dynamic grid = Activator.CreateInstance(t, Q.NewBodyDiv().Hide());
-            var filterable = new FilterableColumns(grid.slickGrid.getColumns());
-            var panel = new FilterPanel(div);
-            panel.Source = filterable;
-            panel.ShowInitialLine = true;
-            panel.ShowSearchButton = false;
-        }
-
-        private class FilterableColumns : IFilterableSource
-        {
-            private SlickColumn[] columns;
-
-            public FilterableColumns(SlickColumn[] columns)
-            {
-                this.columns = columns;
-            }
-
-            private class MyFilterField : IFilterField
-            {
-                private SlickColumn column;
-
-                public MyFilterField(SlickColumn column)
-                {
-                    this.column = column;
-                }
-
-                public string Name
-                {
-                    get 
-                    { 
-                        return column.Field; 
-                    }
-                }
-
-                public string Title
-                {
-                    get 
-                    {
-                        return column.Title; 
-                    }
-                }
-
-                public bool NotNull
-                {
-                    get { return false; }
-                }
-
-
-                public string HandlerType
-                {
-                    get { return "String"; }
-                }
-            }
-
-            public IFilterField FindField(string fieldName)
-            {
-                var column = columns.FirstOrDefault(x => x.Field == fieldName);
-                return column == null ? null : new MyFilterField(column);
-            }
-
-            public IEnumerable<IFilterField> GetFields()
-            {
-                return columns.Select(x => (IFilterField)new MyFilterField(x));
-            }
-        }
-    }
-
     public partial class FilterPanel : FilterWidgetBase<object>
     {
         private jQueryObject rowsDiv;
@@ -110,7 +37,38 @@ namespace Serenity
             }
         }
 
-        private bool showSearchButton;
+        private bool showSearchButton = true;
+        private bool updateStoreOnReset = false;
+
+        protected override void FilterStoreChanged()
+        {
+            base.FilterStoreChanged();
+
+            UpdateRowsFromStore();
+        }
+
+        protected void UpdateRowsFromStore()
+        {
+            rowsDiv.Empty();
+
+            foreach (var item in Store.Items)
+            {
+                AddEmptyRow(false);
+                var row = rowsDiv.Children().Last();
+                var fieldSelect = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
+                fieldSelect.Value = item.Field.Name;
+                RowFieldChange(row);
+                var operatorSelect = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>();
+                operatorSelect.Value = item.Operator;
+                RowOperatorChange(row);
+                var filtering = GetFilteringFor(row);
+                if (filtering != null)
+                    filtering.LoadState(item.State);
+            }
+
+            if (ShowInitialLine && rowsDiv.Children().Length == 0)
+                AddEmptyRow(false);
+        }
 
         public bool ShowSearchButton
         {
@@ -121,6 +79,18 @@ namespace Serenity
                 {
                     showSearchButton = value;
                     UpdateButtons();
+                }
+            }
+        }
+
+        public bool UpdateStoreOnReset
+        {
+            get { return updateStoreOnReset; }
+            set
+            {
+                if (updateStoreOnReset != value)
+                {
+                    updateStoreOnReset = value;
                 }
             }
         }
@@ -140,6 +110,72 @@ namespace Serenity
         private void SearchButtonClick(jQueryEvent e)
         {
             e.PreventDefault();
+            Search();
+        }
+
+        public bool HasErrors
+        {
+            get
+            {
+                return this.rowsDiv.Children().Children("div.v").Children("span.error").Length > 0;
+            }
+        }
+
+        public void Search()
+        {
+            this.rowsDiv.Children().Children("div.v").Children("span.error").Remove();
+
+            var filterLines = new List<FilterLine>();
+            string errorText = null;
+            jQueryObject row = null;
+
+            for (int i = 0; i < rowsDiv.Children().Length; i++)
+            {
+                try
+                {
+                    row = rowsDiv.Children().Eq(i);
+
+                    var filtering = GetFilteringFor(row);
+                    if (filtering == null)
+                        continue;
+
+                    var field = GetFieldFor(row);
+                    var op = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>().Value;
+
+                    if (op == null || op.Length == 0)
+                        throw new Exception(Q.Text("Controls.FilterPanel.InvalidOperator"));
+
+                    FilterLine line = new FilterLine();
+                    line.Field = field;
+                    line.Operator = op;
+                    line.IsOr = row.Children("div.l").Children("a.andor").HasClass("or");
+                    line.LeftParen = row.Children("div.l").Children("a.leftparen").HasClass("active");
+                    line.RightParen = row.Children("div.l").Children("a.rightparen").HasClass("active");
+                    string displayText;
+                    line.Criteria = filtering.GetCriteria(op, out displayText);
+                    line.DisplayText = displayText;
+                    line.State = filtering.SaveState();
+
+                    filterLines.Add(line);
+                }
+                catch (Exception ex)
+                {
+                    errorText = ex.Message;
+                    break;
+                }
+            }
+
+            // if an error occured, display it, otherwise set current filters
+            if (errorText != null)
+            {
+                J("<span/>").AddClass("error").Text(errorText).AppendTo(row.Children("div.v"));
+                row.Children("div.v").Find("input:first").Focus();
+                return;
+            }
+
+            Store.Items.Clear();
+            Store.Items.AddRange(filterLines);
+            Store.RaiseChanged();
         }
 
         private void AddButtonClick(jQueryEvent e)
@@ -152,9 +188,16 @@ namespace Serenity
         {
             e.PreventDefault();
 
+            if (UpdateStoreOnReset)
+            {
+                if (Store.Items.Count > 0)
+                {
+                    Store.Items.Clear();
+                    Store.RaiseChanged();
+                }
+            }
+
             rowsDiv.Empty();
-            Store.Items.Clear();
-            Store.RaiseChanged();
             UpdateButtons();
 
             if (ShowInitialLine)
@@ -190,10 +233,10 @@ namespace Serenity
 
             if (emptyRow != null)
             {
-                emptyRow.Find(".field-select").Select2("focus");
+                emptyRow.Find("input.field-select").Select2("focus");
 
                 if (popupField)
-                    emptyRow.Find(".field-select").Select2("open");
+                    emptyRow.Find("input.field-select").Select2("open");
 
                 return emptyRow;
             }
@@ -217,16 +260,16 @@ namespace Serenity
 
             row.Children("a.delete").Attribute("title", Q.Text("Controls.FilterPanel.RemoveField")).Click(DeleteRowClick);
 
-            var fieldSel = new FieldSelect(row.Children("div.f").Children("input"), this.Source);
+            var fieldSel = new FieldSelect(row.Children("div.f").Children("input"), this.Store.Source);
             fieldSel.ChangeSelect2(OnRowFieldChange);
 
             UpdateParens();
             UpdateButtons();
 
-            row.Find(".field-select").Select2("focus");
+            row.Find("input.field-select").Select2("focus");
 
             if (popupField)
-                row.Find(".field-select").Select2("open");
+                row.Find("input.field-select").Select2("open");
 
             return row;
         }
@@ -235,9 +278,8 @@ namespace Serenity
         {
             jQueryObject row = J(e.Target).Closest("div.filter-line");
             RowFieldChange(row);
-            jQueryObject opSelect = row.Children("div.o").Children("select").Focus();
-            try { opSelect.Focus(); }
-            catch { }
+            jQueryObject opSelect = row.Children("div.o").Find("input.op-select");
+            opSelect.Select2("focus");
         }
 
         private void RowFieldChange(jQueryObject row)
@@ -247,30 +289,30 @@ namespace Serenity
 
             bool isEmpty = (fieldName == null || fieldName == "");
 
-            RemoveFilterHandler(row);
+            RemoveFiltering(row);
             PopulateOperatorList(row);
             RowOperatorChange(row);
             UpdateParens();
             UpdateButtons();
         }
 
-        private void RemoveFilterHandler(jQueryObject row)
+        private void RemoveFiltering(jQueryObject row)
         {
-            row.Data("FilterHandler", null);
-            row.Data("FilterHandlerField", null);
+            row.Data("Filtering", null);
+            row.Data("FilteringField", null);
         }
 
         private void PopulateOperatorList(jQueryObject row)
         {
             row.Children("div.o").Html("");
 
-            IFilterHandler handler = GetFilterHandlerFor(row);
-            if (handler == null)
+            IFiltering filtering = GetFilteringFor(row);
+            if (filtering == null)
                 return;
             
             var hidden = row.Children("div.o").Html("<input/>").Children().Attribute("type", "hidden").AddClass("op-select");
 
-            var operators = handler.GetOperators();
+            var operators = filtering.GetOperators();
 
             new OperatorSelect(hidden, operators).ChangeSelect2(OnRowOperatorChange);
         }
@@ -284,40 +326,40 @@ namespace Serenity
             if (select.Value.IsEmptyOrNull())
                 return null;
 
-            return Source.FindField(select.Value);
+            return this.Store.Source.FindField(select.Value);
         }
 
-        private IFilterHandler GetFilterHandlerFor(jQueryObject row)
+        private IFiltering GetFilteringFor(jQueryObject row)
         {
             var field = GetFieldFor(row);
             if (field == null)
                 return null;
 
-            IFilterHandler handler = (IFilterHandler)row.GetDataValue("FilterHandler");
-            string handlerField = row.GetDataValue("FilterHandlerField").As<string>();
+            IFiltering filtering = (IFiltering)row.GetDataValue("Filtering");
+            string filteringField = row.GetDataValue("FilteringField").As<string>();
 
-            if (handler != null)
+            if (filtering != null)
             {
-                if (handlerField != field.Name)
+                if (filteringField != field.Name)
                 {
-                    row.Data("FilterHandler", null);
-                    handler = null;
+                    row.Data("Filtering", null);
+                    filtering = null;
                 }
                 else
                 {
-                    return handler;
+                    return filtering;
                 }
             }
 
-            var handlerType = FilterHandlerTypeRegistry.Get(field.HandlerType ?? "String");
+            var filteringType = FilteringTypeRegistry.Get(field.FilteringType ?? "String");
 
             jQueryObject editorDiv = row.Children("div.v");
 
-            handler = (IFilterHandler)Activator.CreateInstance(handlerType);
-            handler.Container = editorDiv;
-            handler.Field = field;
+            filtering = (IFiltering)Activator.CreateInstance(filteringType);
+            filtering.Container = editorDiv;
+            filtering.Field = field;
 
-            return handler;
+            return filtering;
         }
 
         private void OnRowOperatorChange(jQueryEvent e)
@@ -338,16 +380,20 @@ namespace Serenity
 
             editorDiv.Html("");
 
-            IFilterHandler handler = GetFilterHandlerFor(row);
+            IFiltering filtering = GetFilteringFor(row);
 
-            if (handler == null)
+            if (filtering == null)
                 return;
 
-            //string op = row.Children("div.o").Children("select").GetValue();
-            //if (op == null || op == "")
-            //    return;
+            var operatorSelect = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>();
+            if (operatorSelect.Value.IsEmptyOrNull())
+                return;
 
-            //handler.CreateEditor(op);
+            var op = filtering.GetOperators().FirstOrDefault(x => x.Key == operatorSelect.Value);
+            if (op == null)
+                return;
+
+            filtering.CreateEditor(op);
         }
 
         private void DeleteRowClick(jQueryEvent e)
@@ -360,18 +406,12 @@ namespace Serenity
 
             UpdateParens();
             UpdateButtons();
-            //OnHeightChange();
-        }
-
-        private void Search()
-        {
         }
 
         private void UpdateButtons()
         {
             this.ById("SearchButton").Toggle(rowsDiv.Children().Length >= 1 && showSearchButton);
-            this.ById("ResetButton").Toggle(rowsDiv.Children().Length >= 1 ||
-                this.Store.Items.Count > 0);
+            this.ById("ResetButton").Toggle(rowsDiv.Children().Length >= 1);
         }
 
         private void AndOrClick(jQueryEvent e)

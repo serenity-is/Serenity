@@ -17,14 +17,15 @@ namespace Serenity
             emptySource = emptySource ?? new EmptyFilterableSource();
             
             this.source = emptySource;
-            this.store = new FilterStore();
+            this.store = new FilterStore(new EmptyFilterableSource());
+            this.store.Changed += OnFilterStoreChanged;
         }
 
         public override void Destroy()
         {
             if (store != null)
             {
-                store.Changed -= FilterStoreChanged;
+                store.Changed -= OnFilterStoreChanged;
                 store = null;
             }
 
@@ -33,14 +34,13 @@ namespace Serenity
             base.Destroy();
         }
 
-        protected virtual void FilterStoreChanged(object sender, EventArgs e)
+        private void OnFilterStoreChanged(object sender, EventArgs e)
         {
-
+            FilterStoreChanged();
         }
 
-        protected virtual void FilterSourceChanged()
+        protected virtual void FilterStoreChanged()
         {
-
         }
 
         public FilterStore Store
@@ -51,26 +51,11 @@ namespace Serenity
                 if (store != value)
                 {
                     if (this.store != null)
-                        this.store.Changed -= FilterStoreChanged;
+                        this.store.Changed -= OnFilterStoreChanged;
 
-                    store = value ?? new FilterStore();
-                    store.Changed += FilterStoreChanged;
-                }
-            }
-        }
-
-        public IFilterableSource Source
-        {
-            get 
-            { 
-                return source; 
-            }
-            set
-            {
-                if (source != value)
-                {
-                    source = value ?? emptySource;
-                    FilterSourceChanged();
+                    store = value ?? new FilterStore(new EmptyFilterableSource());
+                    store.Changed += OnFilterStoreChanged;
+                    FilterStoreChanged();
                 }
             }
         }

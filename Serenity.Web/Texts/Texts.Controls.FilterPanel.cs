@@ -26,6 +26,8 @@
                 public static LocalText ThenBy = "--then by--";
                 public static LocalText ApplyGroups = "apply grouping";
                 public static LocalText ClearGroups = "clear grouping";
+                public static LocalText DialogTitle = "Edit Filter";
+                public static LocalText FixErrorsMessage = "Please fix errors that are marked in red";
 
                 public static class OperatorNames
                 {

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Serenity
 {
-    public static class FilterHandlerTypeRegistry
+    public static class FilteringTypeRegistry
     {
         internal static JsDictionary<string, Type> knownTypes;
 
@@ -32,7 +32,7 @@ namespace Serenity
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (!typeof(IFilterHandler).IsAssignableFrom(type))
+                    if (!typeof(IFiltering).IsAssignableFrom(type))
                         continue;
 
                     if (type.IsGenericTypeDefinition)
@@ -63,7 +63,7 @@ namespace Serenity
 
         private static void SetTypeKeysWithoutFilterHandlerSuffix()
         {
-            const string suffix = "filterhandler";
+            const string suffix = "filtering";
 
             foreach (var k in knownTypes.Keys.ToArray())
             {

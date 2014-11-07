@@ -1,6 +1,10 @@
-﻿
+﻿using Serenity.Data;
+using System;
+using System.Runtime.CompilerServices;
+
 namespace Serenity
 {
+    [Imported, Serializable]
     public class FilterLine
     {
         public IFilterField Field { get; set; }
@@ -9,7 +13,8 @@ namespace Serenity
         public bool LeftParen { get; set; }
         public bool RightParen { get; set; }
         public string ValidationError { get; set; }
-        public object Value { get; set; }
+        public BaseCriteria Criteria { get; set; }
         public string DisplayText { get; set; }
+        public object State { get; set; }
     }
 }

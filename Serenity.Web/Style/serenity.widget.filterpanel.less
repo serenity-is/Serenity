@@ -1,4 +1,6 @@
-﻿.s-FilterBar {
+﻿@import "serenity.mixins.less";
+
+.s-FilterBar {
     height: 1.2em;
     padding: 0.1em;
     background-color: #ffc;
@@ -27,7 +29,7 @@
 
 .s-FilterPanel div.f, .s-FilterPanel div.l, .s-FilterPanel div.o, .s-FilterPanel div.v {
     padding-top: 1px;
-    padding-right: 3px;
+    padding-right: 4px;
     float: left;
 }
 
@@ -90,15 +92,14 @@
 }
 
 .s-FilterPanel div.v {
-    width: 600px;
+    width: 500px;
 }
 
 .s-FilterPanel div.v input {
-    width: 124px !important;
+    width: 150px !important;
     display: block;
     float: left;
-    padding: 0px 2px 0px 1px;
-    margin-top: 2px;
+    height: 26px;
 }
 
 .s-FilterPanel div.v select {
@@ -162,11 +163,13 @@
 }
 
 .s-FilterPanel div.v span.error {
-    background: transparent url(images/unchecked.gif) no-repeat scroll 0px 0px;
+    background: transparent url(images/unchecked.gif) no-repeat scroll 0px center;
     color: #EA5200;
-    padding-bottom: 2px;
-    padding-left: 16px;
-    margin-left: 2px;
+    padding-left: 17px;
+    margin-left: 4px;
+    float: left; 
+    height: 25px;
+    line-height: 25px;
 }
 
 .s-FilterPanel .groups {
@@ -220,4 +223,8 @@
     float: left;
     margin: 2px 0 0 0;
     padding: 1px 0 0 0;
+}
+
+.s-FilterDialog {
+    > .size { .widthAndMin(980px); .heightAndMin(450px); }
 }

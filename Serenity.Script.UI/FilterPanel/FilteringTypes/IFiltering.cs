@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Serenity
 {
-    public interface IFilterHandler
+    public interface IFiltering
     {
         IFilterField Field { get; set; }
         jQueryObject Container { get; set; }

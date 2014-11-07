@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    public static class OperatorKeys
+    public static class FilterOperators
     {
         /// <summary>true</summary>
         public const string IsTrue = "true";
@@ -33,5 +33,17 @@ namespace Serenity
         public const string IsNull = "isnull";
         /// <summary>is not null</summary>
         public const string IsNotNull = "isnotnull";
+
+        public static readonly JsDictionary<string, string> ToCriteriaOperator;
+
+        static FilterOperators()
+        {
+            ToCriteriaOperator = new JsDictionary<string, string>();
+            ToCriteriaOperator[FilterOperators.EQ] = "=";
+            ToCriteriaOperator[FilterOperators.GT] = ">";
+            ToCriteriaOperator[FilterOperators.GE] = ">=";
+            ToCriteriaOperator[FilterOperators.LT] = "<";
+            ToCriteriaOperator[FilterOperators.LE] = "<=";
+        }
     }
 }

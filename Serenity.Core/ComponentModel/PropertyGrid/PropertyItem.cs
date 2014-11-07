@@ -49,6 +49,7 @@ namespace Serenity.ComponentModel
         public Dictionary<string, object> FormatterParams { get; set; }
         [JsonProperty("displayFormat")]
         public string DisplayFormat { get; set; }
+
         [JsonProperty("alignment")]
         public string Alignment { get; set; }
         [JsonProperty("width")]
@@ -59,7 +60,7 @@ namespace Serenity.ComponentModel
         public int MaxWidth { get; set; }
         [JsonProperty("resizable")]
         public bool Resizable { get; set; }
-        
+       
         [JsonProperty("editLink")]
         public bool EditLink { get; set; }
         [JsonProperty("editLinkItemType")]
@@ -69,10 +70,16 @@ namespace Serenity.ComponentModel
         [JsonProperty("editLinkCssClass")]
         public string EditLinkCssClass { get; set; }
 
+        [JsonProperty("filteringType")]
+        public string FilteringType { get; set; }
+        [JsonProperty("filteringParams")]
+        public Dictionary<string, object> FilteringParams { get; set; }
+
         public PropertyItem()
         {
             EditorParams = new Dictionary<string, object>();
             FormatterParams = new Dictionary<string, object>();
+            FilteringParams = new Dictionary<string, object>();
         }
     }
 }

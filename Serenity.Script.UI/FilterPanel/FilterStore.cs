@@ -7,10 +7,21 @@ namespace Serenity
     {
         private EventHandler changed;
         private string displayText;
+        private IFilterableSource source;
 
-        public FilterStore()
+        public FilterStore(IFilterableSource source)
         {
             Items = new List<FilterLine>();
+
+            if (source == null)
+                throw new ArgumentNullException("source");
+
+            this.source = source;
+        }
+
+        public IFilterableSource Source
+        {
+            get { return source; }
         }
 
         public List<FilterLine> Items { get; private set; }

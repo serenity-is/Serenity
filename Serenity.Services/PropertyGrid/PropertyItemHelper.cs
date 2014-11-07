@@ -17,29 +17,8 @@ namespace Serenity.PropertyGrid
 
             var list = new List<PropertyItem>();
 
-            var basedOnRowAttr = type.GetCustomAttributes(typeof(BasedOnRowAttribute), false);
-            if (basedOnRowAttr.Length > 1)
-                throw new InvalidOperationException(String.Format("{0} için birden fazla örnek row belirlenmiş!", type.Name));
-
-            Row basedOnRow = null;
-
-            if (basedOnRowAttr.Length == 1)
-            {
-                var basedOnRowType = ((BasedOnRowAttribute)basedOnRowAttr[0]).RowType;
-                if (!basedOnRowType.IsSubclassOf(typeof(Row)))
-                    throw new InvalidOperationException(String.Format("BasedOnRow özelliği için bir Row belirtilmeli!", type.Name));
-
-                basedOnRow = (Row)Activator.CreateInstance(basedOnRowType);
-            }
-
-            ILocalizationRowHandler localizationRowHandler = null;
-            LocalizationRowAttribute localizationAttr = null;
-            if (basedOnRow != null)
-            {
-                localizationAttr = basedOnRow.GetType().GetCustomAttribute<LocalizationRowAttribute>(false);
-                if (localizationAttr != null)
-                    localizationRowHandler = Activator.CreateInstance(typeof(LocalizationRowHandler<>).MakeGenericType(basedOnRow.GetType())) as ILocalizationRowHandler;
-            }
+            var basedOnRow = GetBasedOnRow(type);
+            var localizationRowHandler = GetLocalizationRowHandler(basedOnRow);
 
             foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
             {
@@ -53,8 +32,13 @@ namespace Serenity.PropertyGrid
                 if (hiddenAttribute.Length > 0)
                     continue;
 
-                Type memberType = member.MemberType == MemberTypes.Property ? ((PropertyInfo)member).PropertyType : ((FieldInfo)member).FieldType;
+                var memberType = member.MemberType == MemberTypes.Property ? 
+                    ((PropertyInfo)member).PropertyType : 
+                    ((FieldInfo)member).FieldType;
 
+                var nullableType = Nullable.GetUnderlyingType(memberType);
+                var valueType = nullableType ?? memberType;
+                
                 pi.Name = member.Name;
 
                 Field basedOnField = null;
@@ -66,36 +50,8 @@ namespace Serenity.PropertyGrid
                         basedOnField = basedOnRow.FindFieldByPropertyName(member.Name);
                 }
 
-                Func<Type, object> getAttribute = delegate(Type attrType)
-                {
-                    var attr = member.GetCustomAttribute(attrType);
-
-                    if (attr == null && 
-                        basedOnField != null && 
-                        basedOnField.CustomAttributes != null)
-                    {
-                        foreach (var a in basedOnField.CustomAttributes)
-                            if (attrType.IsAssignableFrom(a.GetType()))
-                                return a;
-                    }
-
-                    return attr;
-                };
-
-                Func<Type, IEnumerable<object>> getAttributes = delegate(Type attrType)
-                {
-                    var attrList = new List<object>(member.GetCustomAttributes(attrType));
-
-                    if (basedOnField != null &&
-                        basedOnField.CustomAttributes != null)
-                    {
-                        foreach (var a in basedOnField.CustomAttributes)
-                            if (attrType.IsAssignableFrom(a.GetType()))
-                                attrList.Add(a);
-                    }
-
-                    return attrList;
-                };
+                Func<Type, Attribute> getAttribute = attrType => GetAttribute(member, basedOnField, attrType);
+                Func<Type, IEnumerable<Attribute>> getAttributes = attrType => GetAttributes(member, basedOnField, attrType);
 
                 var displayNameAttribute = (DisplayNameAttribute)member.GetCustomAttribute(typeof(DisplayNameAttribute), false);
                 if (displayNameAttribute != null)
@@ -149,7 +105,8 @@ namespace Serenity.PropertyGrid
                     {
                         Field textualField = null;
                         if (basedOnField.TextualField != null)
-                            textualField = basedOnField.Fields.FindFieldByPropertyName(basedOnField.TextualField) ?? basedOnField.Fields.FindField(basedOnField.TextualField);
+                            textualField = basedOnField.Fields.FindFieldByPropertyName(basedOnField.TextualField) ?? 
+                                basedOnField.Fields.FindField(basedOnField.TextualField);
 
                         if (textualField != null)
                         {
@@ -191,36 +148,13 @@ namespace Serenity.PropertyGrid
                 pi.Localizable = getAttribute(typeof(LocalizableAttribute)) != null ||
                     (basedOnField != null && localizationRowHandler != null && localizationRowHandler.IsLocalized(basedOnField));
 
-                Type nullableType = Nullable.GetUnderlyingType(memberType);
-                Type enumType = null;
-                if (memberType.IsEnum)
-                    enumType = memberType;
-                else if (nullableType != null && nullableType.IsEnum)
-                    enumType = nullableType;
-                else if (basedOnField != null && basedOnField is IEnumTypeField)
-                {
-                    enumType = (basedOnField as IEnumTypeField).EnumType;
-                    if (enumType != null && !enumType.IsEnum)
-                        enumType = null;
-                }
-
+                var enumType = GetEnumType(valueType, basedOnField);
+                
                 var editorTypeAttr = (EditorTypeAttribute)getAttribute(typeof(EditorTypeAttribute));
 
                 if (editorTypeAttr == null)
                 {
-                    if (enumType != null)
-                        pi.EditorType = "Select";
-                    else if (memberType == typeof(DateTime) || memberType == typeof(DateTime?))
-                        pi.EditorType = "Date";
-                    else if (memberType == typeof(Boolean))
-                        pi.EditorType = "Boolean";
-                    else if (memberType == typeof(Decimal) || memberType == typeof(Decimal?) ||
-                        memberType == typeof(Double) || memberType == typeof(Double?))
-                        pi.EditorType = "Decimal";
-                    else if (memberType == typeof(Int32) || memberType == typeof(Int32?))
-                        pi.EditorType = "Integer";
-                    else
-                        pi.EditorType = "String";
+                    pi.EditorType = AutoDetermineEditorType(valueType, enumType);
                 }
                 else
                 {
@@ -237,7 +171,7 @@ namespace Serenity.PropertyGrid
                         string text = EnumMapper.FormatEnum(enumType, val);
                         options.Add(new string[] { key, text });
                     }
-                    if (memberType == typeof(DayOfWeek)) // şimdilik tek bir özel durum
+                    if (valueType == typeof(DayOfWeek)) // şimdilik tek bir özel durum
                     {
                         options.Add(options[0]);
                         options.RemoveAt(0);
@@ -245,47 +179,7 @@ namespace Serenity.PropertyGrid
                     pi.EditorParams["items"] = options.ToArray();
                 }
 
-                var formatterTypeAttr = (FormatterTypeAttribute)getAttribute(typeof(FormatterTypeAttribute));
-                if (formatterTypeAttr == null)
-                {
-                    if (enumType != null)
-                    {
-                        pi.FormatterType = "Enum";
-                        var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
-                        var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
-                        pi.FormatterParams["enumKey"] = enumKey;
-                    }
-                    else if (memberType == typeof(DateTime) || memberType == typeof(DateTime?))
-                    {
-                        if (basedOnField != null && basedOnField is DateTimeField)
-                        {
-                            switch (((DateTimeField)basedOnField).DateTimeKind)
-                            {
-                                case DateTimeKind.Unspecified:
-                                    pi.FormatterType = "Date";
-                                    break;
-                                default:
-                                    pi.FormatterType = "DateTime";
-                                    break;
-                            }
-                        }
-                        else
-                            pi.FormatterType = "Date";
-                    }
-                    else if (memberType == typeof(Boolean))
-                        pi.FormatterType = "Checkbox";
-                    else if (memberType == typeof(Decimal) || memberType == typeof(Decimal?) ||
-                        memberType == typeof(Double) || memberType == typeof(Double?) ||
-                        memberType == typeof(Int32) || memberType == typeof(Int32?))
-                    {
-                        pi.FormatterType = "Number";
-                    }
-                }
-                else
-                {
-                    pi.FormatterType = formatterTypeAttr.FormatterType;
-                    formatterTypeAttr.SetParams(pi.FormatterParams);
-                }
+                HandleFormatter(valueType, enumType, basedOnField, pi);
 
                 if (basedOnField != null)
                 {
@@ -333,27 +227,166 @@ namespace Serenity.PropertyGrid
                     pi.EditorParams[key] = param.Value;
                 }
 
-                var displayFormatAttr = (DisplayFormatAttribute)getAttribute(typeof(DisplayFormatAttribute));
-                if (displayFormatAttr != null)
-                {
-                    pi.DisplayFormat = displayFormatAttr.Value;
-                    pi.FormatterParams["displayFormat"] = displayFormatAttr.Value;
-                }
-
-                foreach (FormatterOptionAttribute param in getAttributes(typeof(FormatterOptionAttribute)))
-                {
-                    var key = param.Key;
-                    if (key != null &&
-                        key.Length >= 1)
-                        key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
-
-                    pi.FormatterParams[key] = param.Value;
-                }
-
                 list.Add(pi);
             }
 
             return list;
+        }
+
+        private static Attribute GetAttribute(MemberInfo member, Field basedOnField, Type attrType)
+        {
+            var attr = member.GetCustomAttribute(attrType);
+
+            if (attr == null &&
+                basedOnField != null &&
+                basedOnField.CustomAttributes != null)
+            {
+                foreach (var a in basedOnField.CustomAttributes)
+                    if (attrType.IsAssignableFrom(a.GetType()))
+                        return (Attribute)a;
+            }
+
+            return attr;
+        }
+
+        private static IEnumerable<Attribute> GetAttributes(MemberInfo member, Field basedOnField, Type attrType)
+        {
+            var attrList = new List<Attribute>(member.GetCustomAttributes(attrType));
+
+            if (basedOnField != null &&
+                basedOnField.CustomAttributes != null)
+            {
+                foreach (var a in basedOnField.CustomAttributes)
+                    if (attrType.IsAssignableFrom(a.GetType()))
+                        attrList.Add((Attribute)a);
+            }
+
+            return attrList;
+        }
+
+        private static Row GetBasedOnRow(Type type)
+        {
+            var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
+            Row basedOnRow = null;
+
+            if (basedOnRowAttr != null)
+            {
+                var basedOnRowType = basedOnRowAttr.RowType;
+                if (!basedOnRowType.IsSubclassOf(typeof(Row)))
+                    throw new InvalidOperationException(String.Format("BasedOnRow özelliği için bir Row belirtilmeli!", type.Name));
+
+                basedOnRow = (Row)Activator.CreateInstance(basedOnRowType);
+            }
+
+            return basedOnRow;
+        }
+
+        private static ILocalizationRowHandler GetLocalizationRowHandler(Row basedOnRow)
+        {
+            LocalizationRowAttribute localizationAttr = null;
+            if (basedOnRow != null)
+            {
+                localizationAttr = basedOnRow.GetType().GetCustomAttribute<LocalizationRowAttribute>(false);
+                if (localizationAttr != null)
+                    return Activator.CreateInstance(typeof(LocalizationRowHandler<>)
+                        .MakeGenericType(basedOnRow.GetType())) as ILocalizationRowHandler;
+            }
+            return null;
+        }
+
+        private static Type GetEnumType(Type valueType, Field basedOnField)
+        {
+            Type enumType = null;
+            if (valueType.IsEnum)
+                enumType = valueType;
+            else if (basedOnField != null && basedOnField is IEnumTypeField)
+            {
+                enumType = (basedOnField as IEnumTypeField).EnumType;
+                if (enumType != null && !enumType.IsEnum)
+                    enumType = null;
+            }
+
+            return enumType;
+        }
+
+        private static string AutoDetermineEditorType(Type valueType, Type enumType)
+        {
+            if (enumType != null)
+                return "Select";
+            else if (valueType == typeof(String))
+                return "String";
+            else if (valueType == typeof(Int32))
+                return "Integer";
+            else if (valueType == typeof(DateTime))
+                return "Date";
+            else if (valueType == typeof(Boolean))
+                return "Boolean";
+            else if (valueType == typeof(Decimal) || valueType == typeof(Double))
+                return "Decimal";
+            else
+                return "String";
+        }
+
+        private static void HandleFormatter(Type valueType, Type enumType, Field basedOnField, PropertyItem pi)
+        {
+            var formatterTypeAttr = (FormatterTypeAttribute)GetAttribute(valueType, basedOnField, typeof(FormatterTypeAttribute));
+            if (formatterTypeAttr == null)
+            {
+                if (enumType != null)
+                {
+                    pi.FormatterType = "Enum";
+                    var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
+                    var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
+                    pi.FormatterParams["enumKey"] = enumKey;
+                }
+                else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?))
+                {
+                    if (basedOnField != null && basedOnField is DateTimeField)
+                    {
+                        switch (((DateTimeField)basedOnField).DateTimeKind)
+                        {
+                            case DateTimeKind.Unspecified:
+                                pi.FormatterType = "Date";
+                                break;
+                            default:
+                                pi.FormatterType = "DateTime";
+                                break;
+                        }
+                    }
+                    else
+                        pi.FormatterType = "Date";
+                }
+                else if (valueType == typeof(Boolean))
+                    pi.FormatterType = "Checkbox";
+                else if (valueType == typeof(Decimal) ||
+                    valueType == typeof(Double) || 
+                    valueType == typeof(Int32))
+                {
+                    pi.FormatterType = "Number";
+                }
+            }
+            else
+            {
+                pi.FormatterType = formatterTypeAttr.FormatterType;
+                formatterTypeAttr.SetParams(pi.FormatterParams);
+            }
+
+            var displayFormatAttr = (DisplayFormatAttribute)GetAttribute(valueType, basedOnField, typeof(DisplayFormatAttribute));
+            if (displayFormatAttr != null)
+            {
+                pi.DisplayFormat = displayFormatAttr.Value;
+                pi.FormatterParams["displayFormat"] = displayFormatAttr.Value;
+            }
+
+            foreach (FormatterOptionAttribute param in GetAttributes(valueType, basedOnField, typeof(FormatterOptionAttribute)))
+            {
+                var key = param.Key;
+                if (key != null &&
+                    key.Length >= 1)
+                    key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+
+                pi.FormatterParams[key] = param.Value;
+            }
         }
 
         public static int AutoWidth(Field field)

@@ -38,19 +38,23 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\CustomFilteringAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\FilteringOptionAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\ColumnsScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\EnumKeyAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\BasicFormatterTypes.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\AlignRightAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\AlignmentAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\AlignCenterAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\DisplayFormatAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\FormatterOptionAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\FormatterTypeAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\CustomFormatterAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\EditLinkAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Formatting\BasicFormatterTypes.cs" />
+    <Compile Include="ComponentModel\Columns\Alignment\AlignRightAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Alignment\AlignmentAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Alignment\AlignCenterAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Formatting\DisplayFormatAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Formatting\FormatterOptionAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Formatting\FormatterTypeAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Formatting\CustomFormatterAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\EditLinkAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\WidthAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\WidthAttribute.cs" />
     <Compile Include="Helpers\BinarySerialization.cs" />
     <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />
@@ -103,10 +107,10 @@
     <Compile Include="ComponentModel\Permission\UpdatePermissionAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\BasedOnRowAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\CssClassAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\CustomEditorAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\EditorOptionAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\EditorTypeAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\BasicEditorTypes.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\Editing\CustomEditorAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\Editing\EditorOptionAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\Editing\EditorTypeAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\Editing\BasicEditorTypes.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HiddenAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HintAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\MaxLengthAttribute.cs" />
@@ -169,6 +173,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
