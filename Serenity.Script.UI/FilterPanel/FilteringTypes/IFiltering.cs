@@ -6,10 +6,11 @@ namespace Serenity
 {
     public interface IFiltering
     {
-        IFilterField Field { get; set; }
+        PropertyItem Field { get; set; }
         jQueryObject Container { get; set; }
-        void CreateEditor(FilterOperator op);
-        BaseCriteria GetCriteria(FilterOperator op, out string displayText);
+        FilterOperator Operator { get; set; }
+        void CreateEditor();
+        BaseCriteria GetCriteria(out string displayText, ref string errorMessage);
         List<FilterOperator> GetOperators();
         void LoadState(object state);
         object SaveState();

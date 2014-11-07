@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Html;
 using System.Linq;
@@ -385,52 +386,57 @@ namespace Serenity
                     Script.IsUndefined(source[item.Name]))
                     source[item.Name] = item.DefaultValue;
 
-                var setEditValue = editor as ISetEditValue;
-                if (setEditValue != null)
-                    setEditValue.SetEditValue(source, item);
+                LoadEditorValue(editor, item, source);
+            }
+        }
 
-                var stringValue = editor as IStringValue;
-                if (stringValue != null)
+        public static void LoadEditorValue(Widget editor, PropertyItem item, dynamic source)
+        {
+            var setEditValue = editor as ISetEditValue;
+            if (setEditValue != null)
+                setEditValue.SetEditValue(source, item);
+
+            var stringValue = editor as IStringValue;
+            if (stringValue != null)
+            {
+                var value = source[item.Name];
+                if (value != null)
+                    value = value.toString();
+                stringValue.Value = value;
+            }
+            else
+            {
+                var booleanValue = editor as IBooleanValue;
+                if (booleanValue != null)
                 {
-                    var value = source[item.Name];
-                    if (value != null)
-                        value = value.toString();
-                    stringValue.Value = value;
+                    object value = source[item.Name];
+                    if (Script.TypeOf(value) == "number")
+                        booleanValue.Value = IdExtensions.IsPositiveId(value.As<Int64>());
+                    else
+                        booleanValue.Value = Q.IsTrue(value);
                 }
                 else
                 {
-                    var booleanValue = editor as IBooleanValue;
-                    if (booleanValue != null)
+                    var doubleValue = editor as IDoubleValue;
+                    if (doubleValue != null)
                     {
-                        object value = source[item.Name];
-                        if (Script.TypeOf(value) == "number")
-                            booleanValue.Value = IdExtensions.IsPositiveId(value.As<Int64>());
+                        var d = source[item.Name];
+                        if (d == null || (d is string && Q.IsTrimmedEmpty(d)))
+                            doubleValue.Value = null;
+                        else if (d is string)
+                            doubleValue.Value = Q.ParseDecimal(d);
+                        else if (d is Boolean)
+                            doubleValue.Value = (Boolean)d ? 1 : 0;
                         else
-                            booleanValue.Value = Q.IsTrue(value);
+                            doubleValue.Value = d;
                     }
-                    else
+                    else if (editor.Element.Is(":input"))
                     {
-                        var doubleValue = editor as IDoubleValue;
-                        if (doubleValue != null)
-                        {
-                            var d = source[item.Name];
-                            if (d == null || (d is string && Q.IsTrimmedEmpty(d)))
-                                doubleValue.Value = null;
-                            else if (d is string)
-                                doubleValue.Value = Q.ParseDecimal(d);
-                            else if (d is Boolean)
-                                doubleValue.Value = (Boolean)d ? 1 : 0;
-                            else
-                                doubleValue.Value = d;
-                        }
-                        else if (editor.Element.Is(":input"))
-                        {
-                            var v = source[item.Name];
-                            if (!Script.IsValue(v))
-                                editor.Element.Value("");
-                            else
-                                editor.Element.Value(((object)v).As<string>());
-                        }
+                        var v = source[item.Name];
+                        if (!Script.IsValue(v))
+                            editor.Element.Value("");
+                        else
+                            editor.Element.Value(((object)v).As<string>());
                     }
                 }
             }
@@ -446,33 +452,37 @@ namespace Serenity
                     !(Mode == PropertyGridMode.Update && item.Updatable == false))
                 {
                     var editor = editors[i];
+                    SaveEditorValue(editor, item, target);
+                }
+            }
+        }
 
-                    var getEditValue = editor as IGetEditValue;
-                    if (getEditValue != null)
-                        getEditValue.GetEditValue(item, target);
+        public static void SaveEditorValue(Widget editor, PropertyItem item, dynamic target)
+        {
+            var getEditValue = editor as IGetEditValue;
+            if (getEditValue != null)
+                getEditValue.GetEditValue(item, target);
+            else
+            {
+                var stringValue = editor as IStringValue;
+                if (stringValue != null)
+                    target[item.Name] = stringValue.Value;
+                else
+                {
+                    var booleanValue = editor as IBooleanValue;
+                    if (booleanValue != null)
+                        target[item.Name] = booleanValue.Value;
                     else
                     {
-                        var stringValue = editor as IStringValue;
-                        if (stringValue != null)
-                            target[item.Name] = stringValue.Value;
-                        else
+                        var doubleValue = editor as IDoubleValue;
+                        if (doubleValue != null)
                         {
-                            var booleanValue = editor as IBooleanValue;
-                            if (booleanValue != null)
-                                target[item.Name] = booleanValue.Value;
-                            else
-                            {
-                                var doubleValue = editor as IDoubleValue;
-                                if (doubleValue != null)
-                                {
-                                    var value = doubleValue.Value;
-                                    target[item.Name] = Double.IsNaN(value.As<double>()) ? null : value;
-                                }
-                                else if (editor.Element.Is(":input"))
-                                {
-                                    target[item.Name] = editor.Element.GetValue();
-                                }
-                            }
+                            var value = doubleValue.Value;
+                            target[item.Name] = Double.IsNaN(value.As<double>()) ? null : value;
+                        }
+                        else if (editor.Element.Is(":input"))
+                        {
+                            target[item.Name] = editor.Element.GetValue();
                         }
                     }
                 }

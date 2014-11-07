@@ -26,14 +26,6 @@ namespace Serenity.ComponentModel
         }
     }
 
-    public class CheckboxFilteringAttribute : CustomFilteringAttribute
-    {
-        public CheckboxFilteringAttribute()
-            : base("Checkbox")
-        {
-        }
-    }
-
     public class DateFilteringAttribute : CustomFilteringAttribute
     {
         public DateFilteringAttribute()
@@ -76,17 +68,44 @@ namespace Serenity.ComponentModel
         }
     }
 
-    public class NumberFilteringAttribute : CustomFilteringAttribute
+    public class IntegerFilteringAttribute : CustomFilteringAttribute
     {
-        public NumberFilteringAttribute()
-            : base("Number")
+        public IntegerFilteringAttribute()
+            : base("Integer")
         {
         }
+    }
 
-        public String DisplayFormat
+    public class DecimalFilteringAttribute : CustomFilteringAttribute
+    {
+        public DecimalFilteringAttribute()
+            : base("Decimal")
         {
-            get { return GetOption<String>("displayFormat"); }
-            set { SetOption("displayFormat", value); }
+        }
+    }
+
+    public partial class LookupFilteringAttribute : CustomFilteringAttribute
+    {
+        public LookupFilteringAttribute(string lookupKey)
+            : base("Lookup")
+        {
+            SetOption("lookupKey", lookupKey);
+        }
+
+        public LookupFilteringAttribute(Type lookupType)
+            : base("Lookup")
+        {
+            var attr = lookupType.GetCustomAttributes(typeof(LookupScriptAttribute), false);
+            if (attr.Length == 0)
+                throw new ArgumentOutOfRangeException("lookupType");
+
+            SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
+        }
+
+        public String IdField
+        {
+            get { return GetOption<String>("idField"); }
+            set { SetOption("idField", value); }
         }
     }
 }

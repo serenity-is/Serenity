@@ -8,13 +8,13 @@ namespace Serenity
 {
     public partial class FilterPanel : FilterWidgetBase<object>
     {
-        private class FieldSelect : Select2Editor<object, IFilterField>
+        private class FieldSelect : Select2Editor<object, PropertyItem>
         {
-            public FieldSelect(jQueryObject hidden, IFilterableSource source)
+            public FieldSelect(jQueryObject hidden, IEnumerable<PropertyItem> fields)
                 : base(hidden, null)
             {
-                foreach (var field in source.GetFields())
-                    AddItem(field.Name, field.Title ?? field.Name, field, false);
+                foreach (var field in fields)
+                    AddItem(field.Name, Q.TryGetText(field.Title) ?? field.Title ?? field.Name, field, false);
             }
 
             protected override string EmptyItemText()

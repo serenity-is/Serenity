@@ -56,14 +56,17 @@ namespace Serenity
                 AddEmptyRow(false);
                 var row = rowsDiv.Children().Last();
                 var fieldSelect = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
-                fieldSelect.Value = item.Field.Name;
+                fieldSelect.Value = item.Field;
                 RowFieldChange(row);
                 var operatorSelect = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>();
                 operatorSelect.Value = item.Operator;
                 RowOperatorChange(row);
                 var filtering = GetFilteringFor(row);
                 if (filtering != null)
+                {
+                    filtering.Operator = item.Operator;
                     filtering.LoadState(item.State);
+                }
             }
 
             if (ShowInitialLine && rowsDiv.Children().Length == 0)
@@ -131,38 +134,39 @@ namespace Serenity
 
             for (int i = 0; i < rowsDiv.Children().Length; i++)
             {
-                try
+                row = rowsDiv.Children().Eq(i);
+
+                var filtering = GetFilteringFor(row);
+                if (filtering == null)
+                    continue;
+
+                var field = GetFieldFor(row);
+                var op = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>().Value;
+
+                if (op == null || op.Length == 0)
+                    throw new ArgumentOutOfRangeException("operator", Q.Text("Controls.FilterPanel.InvalidOperator"));
+
+                FilterLine line = new FilterLine();
+                line.Field = field.Name;
+                line.Operator = op;
+                line.IsOr = row.Children("div.l").Children("a.andor").HasClass("or");
+                line.LeftParen = row.Children("div.l").Children("a.leftparen").HasClass("active");
+                line.RightParen = row.Children("div.l").Children("a.rightparen").HasClass("active");
+                string displayText;
+                string errorMessage = null;
+                filtering.Operator = op;
+                line.Criteria = filtering.GetCriteria(out displayText, ref errorMessage);
+
+                if (errorMessage != null)
                 {
-                    row = rowsDiv.Children().Eq(i);
-
-                    var filtering = GetFilteringFor(row);
-                    if (filtering == null)
-                        continue;
-
-                    var field = GetFieldFor(row);
-                    var op = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>().Value;
-
-                    if (op == null || op.Length == 0)
-                        throw new Exception(Q.Text("Controls.FilterPanel.InvalidOperator"));
-
-                    FilterLine line = new FilterLine();
-                    line.Field = field;
-                    line.Operator = op;
-                    line.IsOr = row.Children("div.l").Children("a.andor").HasClass("or");
-                    line.LeftParen = row.Children("div.l").Children("a.leftparen").HasClass("active");
-                    line.RightParen = row.Children("div.l").Children("a.rightparen").HasClass("active");
-                    string displayText;
-                    line.Criteria = filtering.GetCriteria(op, out displayText);
-                    line.DisplayText = displayText;
-                    line.State = filtering.SaveState();
-
-                    filterLines.Add(line);
-                }
-                catch (Exception ex)
-                {
-                    errorText = ex.Message;
+                    errorText = errorMessage;
                     break;
                 }
+
+                line.State = filtering.SaveState();
+                line.DisplayText = displayText;
+
+                filterLines.Add(line);
             }
 
             // if an error occured, display it, otherwise set current filters
@@ -260,7 +264,7 @@ namespace Serenity
 
             row.Children("a.delete").Attribute("title", Q.Text("Controls.FilterPanel.RemoveField")).Click(DeleteRowClick);
 
-            var fieldSel = new FieldSelect(row.Children("div.f").Children("input"), this.Store.Source);
+            var fieldSel = new FieldSelect(row.Children("div.f").Children("input"), this.Store.Fields);
             fieldSel.ChangeSelect2(OnRowFieldChange);
 
             UpdateParens();
@@ -284,6 +288,8 @@ namespace Serenity
 
         private void RowFieldChange(jQueryObject row)
         {
+            row.RemoveData("Filtering");
+
             var select = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
             string fieldName = select.Value;
 
@@ -317,7 +323,7 @@ namespace Serenity
             new OperatorSelect(hidden, operators).ChangeSelect2(OnRowOperatorChange);
         }
 
-        private IFilterField GetFieldFor(jQueryObject row)
+        private PropertyItem GetFieldFor(jQueryObject row)
         {
             if (row.Length == 0)
                 return null;
@@ -326,7 +332,7 @@ namespace Serenity
             if (select.Value.IsEmptyOrNull())
                 return null;
 
-            return this.Store.Source.FindField(select.Value);
+            return this.Store.FieldByName[select.Value];
         }
 
         private IFiltering GetFilteringFor(jQueryObject row)
@@ -336,20 +342,9 @@ namespace Serenity
                 return null;
 
             IFiltering filtering = (IFiltering)row.GetDataValue("Filtering");
-            string filteringField = row.GetDataValue("FilteringField").As<string>();
 
             if (filtering != null)
-            {
-                if (filteringField != field.Name)
-                {
-                    row.Data("Filtering", null);
-                    filtering = null;
-                }
-                else
-                {
-                    return filtering;
-                }
-            }
+                return filtering;
 
             var filteringType = FilteringTypeRegistry.Get(field.FilteringType ?? "String");
 
@@ -358,7 +353,8 @@ namespace Serenity
             filtering = (IFiltering)Activator.CreateInstance(filteringType);
             filtering.Container = editorDiv;
             filtering.Field = field;
-
+            row.Data("Filtering", filtering);
+            
             return filtering;
         }
 
@@ -393,7 +389,8 @@ namespace Serenity
             if (op == null)
                 return;
 
-            filtering.CreateEditor(op);
+            filtering.Operator = op;
+            filtering.CreateEditor();
         }
 
         private void DeleteRowClick(jQueryEvent e)

@@ -1,23 +1,18 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections.Generic;
 
 namespace Serenity
 {
     public abstract class FilterWidgetBase<TOptions> : TemplatedWidget<TOptions>
         where TOptions: class, new()
     {
-        private static IFilterableSource emptySource;
-
-        private IFilterableSource source;
         private FilterStore store;
 
         public FilterWidgetBase(jQueryObject div, TOptions opt)
             : base(div, opt)
         {
-            emptySource = emptySource ?? new EmptyFilterableSource();
-            
-            this.source = emptySource;
-            this.store = new FilterStore(new EmptyFilterableSource());
+            this.store = new FilterStore(new List<PropertyItem>());
             this.store.Changed += OnFilterStoreChanged;
         }
 
@@ -28,8 +23,6 @@ namespace Serenity
                 store.Changed -= OnFilterStoreChanged;
                 store = null;
             }
-
-            source = null;
 
             base.Destroy();
         }
@@ -53,7 +46,7 @@ namespace Serenity
                     if (this.store != null)
                         this.store.Changed -= OnFilterStoreChanged;
 
-                    store = value ?? new FilterStore(new EmptyFilterableSource());
+                    store = value ?? new FilterStore(new PropertyItem[0]);
                     store.Changed += OnFilterStoreChanged;
                     FilterStoreChanged();
                 }

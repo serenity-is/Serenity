@@ -7,8 +7,9 @@ namespace Serenity
 {
     public abstract class BaseFiltering : IFiltering
     {
-        public IFilterField Field { get; set; }
+        public PropertyItem Field { get; set; }
         public jQueryObject Container { get; set; }
+        public FilterOperator Operator { get; set; }
 
         public abstract List<FilterOperator> GetOperators();
 
@@ -22,14 +23,25 @@ namespace Serenity
             return list;
         }
 
-        protected virtual bool IsNullable()
+        protected List<FilterOperator> AppendComparisonOperators(List<FilterOperator> list)
         {
-            return !Field.NotNull;
+            list.Add(FilterOperators.EQ);
+            list.Add(FilterOperators.NE);
+            list.Add(FilterOperators.LT);
+            list.Add(FilterOperators.LE);
+            list.Add(FilterOperators.GT);
+            list.Add(FilterOperators.GE);
+            return list;
         }
 
-        public virtual void CreateEditor(FilterOperator op)
+        protected virtual bool IsNullable()
         {
-            switch (op.Key)
+            return !Field.Required;
+        }
+
+        public virtual void CreateEditor()
+        {
+            switch (Operator.Key)
             {
                 case FilterOperators.IsTrue:
                 case FilterOperators.IsFalse:
@@ -49,7 +61,7 @@ namespace Serenity
                     return;
             }
 
-            throw new Exception(String.Format("Filtering '{0}' has no editor for '{1}' operator", this.GetType().Name, op.Key));
+            throw new Exception(String.Format("Filtering '{0}' has no editor for '{1}' operator", this.GetType().Name, Operator.Key));
         }
 
         public virtual string OperatorFormat(FilterOperator op)
@@ -57,47 +69,57 @@ namespace Serenity
             return op.Format ?? Q.TryGetText("Controls.FilterPanel.OperatorFormats." + op.Key) ?? op.Key;
         }
 
+        protected virtual string GetTitle(PropertyItem field)
+        {
+            return Q.TryGetText(field.Title) ?? field.Title ?? field.Name;
+        }
+
         protected string DisplayText(FilterOperator op, params object[] values)
         {
             if (values.Length == 0)
-                return String.Format(OperatorFormat(op), Field.Title ?? Field.Name);
+                return String.Format(OperatorFormat(op), GetTitle(Field));
             else if (values.Length == 1)
-                return String.Format(OperatorFormat(op), Field.Title ?? Field.Name, values[0]);
+                return String.Format(OperatorFormat(op), GetTitle(Field), values[0]);
             else
-                return String.Format(OperatorFormat(op), Field.Title ?? Field.Name, values[0], values[1]);
+                return String.Format(OperatorFormat(op), GetTitle(Field), values[0], values[1]);
         }
 
-        public virtual BaseCriteria GetCriteria(FilterOperator op, out string displayText)
+        protected virtual string GetFieldName()
+        {
+            return Field.Name;
+        }
+
+        public virtual BaseCriteria GetCriteria(out string displayText, ref string errorMessage)
         {
             string text;
 
-            switch (op.Key)
+            switch (Operator.Key)
             {
                 case FilterOperators.IsTrue:
-                    displayText = DisplayText(op);
-                    return new Criteria(Field.Name) == new ValueCriteria(true);
+                    displayText = DisplayText(Operator);
+                    return new Criteria(GetFieldName()) == new ValueCriteria(true);
 
                 case FilterOperators.IsFalse:
-                    displayText = DisplayText(op);
-                    return new Criteria(Field.Name) == new ValueCriteria(false);
+                    displayText = DisplayText(Operator);
+                    return new Criteria(GetFieldName()) == new ValueCriteria(false);
 
                 case FilterOperators.IsNull:
-                    displayText = DisplayText(op);
-                    return new Criteria(Field.Name).IsNull();
+                    displayText = DisplayText(Operator);
+                    return new Criteria(GetFieldName()).IsNull();
 
                 case FilterOperators.IsNotNull:
-                    displayText = DisplayText(op);
-                    return new Criteria(Field.Name).IsNotNull();
+                    displayText = DisplayText(Operator);
+                    return new Criteria(GetFieldName()).IsNotNull();
 
                 case FilterOperators.Contains:
                     text = GetEditorText();
-                    displayText = DisplayText(op, text);
-                    return new Criteria(Field.Name).Contains(text);
+                    displayText = DisplayText(Operator, text);
+                    return new Criteria(GetFieldName()).Contains(text);
 
                 case FilterOperators.StartsWith:
                     text = GetEditorText();
-                    displayText = DisplayText(op, text);
-                    return new Criteria(Field.Name).StartsWith(text);
+                    displayText = DisplayText(Operator, text);
+                    return new Criteria(GetFieldName()).StartsWith(text);
 
                 case FilterOperators.EQ:
                 case FilterOperators.NE:
@@ -106,27 +128,38 @@ namespace Serenity
                 case FilterOperators.GT:
                 case FilterOperators.GE:
                     text = GetEditorText();
-                    displayText = DisplayText(op, text);
-                    return new BinaryCriteria(new Criteria(Field.Name), FilterOperators.ToCriteriaOperator[op.Key], 
+                    displayText = DisplayText(Operator, text);
+                    return new BinaryCriteria(new Criteria(GetFieldName()), FilterOperators.ToCriteriaOperator[Operator.Key], 
                         new ValueCriteria(GetEditorValue()));
             }
 
-            Q.Log(op);
-
             throw new Exception(String.Format("Filtering '{0}' has no handler for '{1}' operator",
-                this.GetType().Name, op));
+                this.GetType().Name, Operator.Key));
         }
 
-        public void LoadState(object state)
+        public virtual void LoadState(object state)
         {
             var input = Container.Find(":input").First();
             input.Value(state as string);
         }
 
-        public object SaveState()
+        public virtual object SaveState()
         {
-            var input = Container.Find(":input").First();
-            return input.GetValue();
+            switch (Operator.Key)
+            {
+                case FilterOperators.Contains:
+                case FilterOperators.StartsWith:
+                case FilterOperators.EQ:
+                case FilterOperators.NE:
+                case FilterOperators.LT:
+                case FilterOperators.LE:
+                case FilterOperators.GT:
+                case FilterOperators.GE:
+                    var input = Container.Find(":input").First();
+                    return input.GetValue();
+            }
+
+            return null;
         }
 
         protected virtual object GetEditorValue()

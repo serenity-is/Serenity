@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using System.Linq;
 
 namespace Serenity.PropertyGrid
 {
@@ -99,6 +100,9 @@ namespace Serenity.PropertyGrid
                 pi.EditLinkIdField = editLinkAttr != null ? editLinkAttr.IdField : null;
                 pi.EditLinkCssClass = editLinkAttr != null ? editLinkAttr.CssClass : null;
 
+                if (pi.EditLinkItemType != null && pi.EditLinkIdField == null)
+                    pi.EditLinkIdField = AutoDetermineIdField(basedOnField);
+
                 if (pi.Title == null)
                 {
                     if (basedOnField != null)
@@ -179,8 +183,6 @@ namespace Serenity.PropertyGrid
                     pi.EditorParams["items"] = options.ToArray();
                 }
 
-                HandleFormatter(valueType, enumType, basedOnField, pi);
-
                 if (basedOnField != null)
                 {
                     if (pi.EditorType == "Decimal" &&
@@ -226,6 +228,9 @@ namespace Serenity.PropertyGrid
                         
                     pi.EditorParams[key] = param.Value;
                 }
+
+                HandleFormatter(member, valueType, enumType, basedOnField, pi);
+                HandleFiltering(member, valueType, enumType, basedOnField, pi);
 
                 list.Add(pi);
             }
@@ -309,6 +314,17 @@ namespace Serenity.PropertyGrid
             return enumType;
         }
 
+        private static string AutoDetermineIdField(Field basedOnField)
+        {
+            if (basedOnField == null || basedOnField.Join == null)
+                return null;
+
+            var idField = basedOnField.Fields.FirstOrDefault(x => x.ForeignJoinAlias != null &&
+                x.ForeignJoinAlias.Name == basedOnField.Join.Name);
+
+            return idField.PropertyName ?? idField.Name;
+        }
+
         private static string AutoDetermineEditorType(Type valueType, Type enumType)
         {
             if (enumType != null)
@@ -327,9 +343,78 @@ namespace Serenity.PropertyGrid
                 return "String";
         }
 
-        private static void HandleFormatter(Type valueType, Type enumType, Field basedOnField, PropertyItem pi)
+        private static void HandleFiltering(MemberInfo member, Type valueType, Type enumType, Field basedOnField, PropertyItem pi)
         {
-            var formatterTypeAttr = (FormatterTypeAttribute)GetAttribute(valueType, basedOnField, typeof(FormatterTypeAttribute));
+            var filteringTypeAttr = (FilteringTypeAttribute)GetAttribute(member, basedOnField, typeof(FilteringTypeAttribute));
+            if (filteringTypeAttr == null)
+            {
+                if (enumType != null)
+                {
+                    pi.FilteringType = "Enum";
+                    var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
+                    var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
+                    pi.FilteringParams["enumKey"] = enumKey;
+                }
+                else if (valueType == typeof(DateTime))
+                {
+                    if (basedOnField != null && basedOnField is DateTimeField)
+                    {
+                        switch (((DateTimeField)basedOnField).DateTimeKind)
+                        {
+                            case DateTimeKind.Unspecified:
+                                pi.FilteringType = "Date";
+                                break;
+                            default:
+                                pi.FilteringType = "DateTime";
+                                break;
+                        }
+                    }
+                    else
+                        pi.FilteringType = "Date";
+                }
+                else if (valueType == typeof(Boolean))
+                    pi.FilteringType = "Boolean";
+                else if (valueType == typeof(Decimal) ||
+                    valueType == typeof(Double))
+                {
+                    pi.FilteringType = "Decimal";
+                }
+                else if (valueType == typeof(Int32) ||
+                    valueType == typeof(Int16) ||
+                    valueType == typeof(Int64))
+                {
+                    pi.FilteringType = "Integer";
+                }
+                else
+                    pi.FilteringType = "String";
+            }
+            else
+            {
+                pi.FilteringType = filteringTypeAttr.FilteringType;
+                pi.FilteringParams["idField"] = AutoDetermineIdField(basedOnField);
+                filteringTypeAttr.SetParams(pi.FilteringParams);
+            }
+
+            var displayFormatAttr = (DisplayFormatAttribute)GetAttribute(member, basedOnField, typeof(DisplayFormatAttribute));
+            if (displayFormatAttr != null)
+            {
+                pi.FilteringParams["displayFormat"] = displayFormatAttr.Value;
+            }
+
+            foreach (FilteringOptionAttribute param in GetAttributes(member, basedOnField, typeof(FilteringOptionAttribute)))
+            {
+                var key = param.Key;
+                if (key != null &&
+                    key.Length >= 1)
+                    key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+
+                pi.FilteringParams[key] = param.Value;
+            }
+        }
+
+        private static void HandleFormatter(MemberInfo member, Type valueType, Type enumType, Field basedOnField, PropertyItem pi)
+        {
+            var formatterTypeAttr = (FormatterTypeAttribute)GetAttribute(member, basedOnField, typeof(FormatterTypeAttribute));
             if (formatterTypeAttr == null)
             {
                 if (enumType != null)
@@ -371,14 +456,14 @@ namespace Serenity.PropertyGrid
                 formatterTypeAttr.SetParams(pi.FormatterParams);
             }
 
-            var displayFormatAttr = (DisplayFormatAttribute)GetAttribute(valueType, basedOnField, typeof(DisplayFormatAttribute));
+            var displayFormatAttr = (DisplayFormatAttribute)GetAttribute(member, basedOnField, typeof(DisplayFormatAttribute));
             if (displayFormatAttr != null)
             {
                 pi.DisplayFormat = displayFormatAttr.Value;
                 pi.FormatterParams["displayFormat"] = displayFormatAttr.Value;
             }
 
-            foreach (FormatterOptionAttribute param in GetAttributes(valueType, basedOnField, typeof(FormatterOptionAttribute)))
+            foreach (FormatterOptionAttribute param in GetAttributes(member, basedOnField, typeof(FormatterOptionAttribute)))
             {
                 var key = param.Key;
                 if (key != null &&
