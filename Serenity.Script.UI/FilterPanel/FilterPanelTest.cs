@@ -13,7 +13,7 @@ namespace Serenity
             var dialog = new FilterDialog();
             var panel = dialog.FilterPanel;
             panel.ShowInitialLine = true;
-            var store = new FilterStore(fields);
+            var store = new FilterStore(fields.Where(x => x.NotFilterable != true));
             panel.ShowSearchButton = true;
             panel.Store = store;
             dialog.DialogOpen();

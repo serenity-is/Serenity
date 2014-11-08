@@ -167,6 +167,11 @@ namespace Serenity.ComponentModel
 
             SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
         }
+
+        public string LookupKey
+        {
+            get { return GetOption<string>("lookupKey"); }
+        }
     }
 
     public partial class AsyncLookupEditorAttribute : CustomEditorAttribute
@@ -185,6 +190,11 @@ namespace Serenity.ComponentModel
                 throw new ArgumentOutOfRangeException("lookupType");
 
             SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
+        }
+
+        public string LookupKey
+        {
+            get { return GetOption<string>("lookupKey"); }
         }
     }
 

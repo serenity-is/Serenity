@@ -84,12 +84,12 @@ namespace Serenity
                 return String.Format(OperatorFormat(op), GetTitle(Field), values[0], values[1]);
         }
 
-        protected virtual string GetFieldName()
+        protected virtual string GetCriteriaField()
         {
             return Field.Name;
         }
 
-        public virtual BaseCriteria GetCriteria(out string displayText, ref string errorMessage)
+        public virtual BaseCriteria GetCriteria(out string displayText)
         {
             string text;
 
@@ -97,29 +97,29 @@ namespace Serenity
             {
                 case FilterOperators.IsTrue:
                     displayText = DisplayText(Operator);
-                    return new Criteria(GetFieldName()) == new ValueCriteria(true);
+                    return new Criteria(GetCriteriaField()) == new ValueCriteria(true);
 
                 case FilterOperators.IsFalse:
                     displayText = DisplayText(Operator);
-                    return new Criteria(GetFieldName()) == new ValueCriteria(false);
+                    return new Criteria(GetCriteriaField()) == new ValueCriteria(false);
 
                 case FilterOperators.IsNull:
                     displayText = DisplayText(Operator);
-                    return new Criteria(GetFieldName()).IsNull();
+                    return new Criteria(GetCriteriaField()).IsNull();
 
                 case FilterOperators.IsNotNull:
                     displayText = DisplayText(Operator);
-                    return new Criteria(GetFieldName()).IsNotNull();
+                    return new Criteria(GetCriteriaField()).IsNotNull();
 
                 case FilterOperators.Contains:
                     text = GetEditorText();
                     displayText = DisplayText(Operator, text);
-                    return new Criteria(GetFieldName()).Contains(text);
+                    return new Criteria(GetCriteriaField()).Contains(text);
 
                 case FilterOperators.StartsWith:
                     text = GetEditorText();
                     displayText = DisplayText(Operator, text);
-                    return new Criteria(GetFieldName()).StartsWith(text);
+                    return new Criteria(GetCriteriaField()).StartsWith(text);
 
                 case FilterOperators.EQ:
                 case FilterOperators.NE:
@@ -129,7 +129,7 @@ namespace Serenity
                 case FilterOperators.GE:
                     text = GetEditorText();
                     displayText = DisplayText(Operator, text);
-                    return new BinaryCriteria(new Criteria(GetFieldName()), FilterOperators.ToCriteriaOperator[Operator.Key], 
+                    return new BinaryCriteria(new Criteria(GetCriteriaField()), FilterOperators.ToCriteriaOperator[Operator.Key], 
                         new ValueCriteria(GetEditorValue()));
             }
 
@@ -162,6 +162,11 @@ namespace Serenity
             return null;
         }
 
+        protected ArgumentNullException ArgumentNull()
+        {
+            return new ArgumentNullException("value", Q.Text("Controls.FilterPanel.ValueRequired"));
+        }
+
         protected virtual object GetEditorValue()
         {
             var input = Container.Find(":input").First();
@@ -170,7 +175,7 @@ namespace Serenity
 
             string value = input.GetValue().Trim();
             if (value.Length == 0)
-                throw new Exception(Q.Text("Controls.FilterPanel.ValueRequired"));
+                throw ArgumentNull();
 
             return value;
         }

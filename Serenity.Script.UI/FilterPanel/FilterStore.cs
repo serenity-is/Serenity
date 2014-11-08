@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -33,8 +34,6 @@ namespace Serenity
         {
             displayText = null;
 
-            Q.Log(this.Items);
-
             if (changed != null)
                 changed(this, EventArgs.Empty);
         }
@@ -43,6 +42,58 @@ namespace Serenity
         {
             add { changed += value; }
             remove { changed -= value; }
+        }
+
+        public BaseCriteria ActiveCriteria
+        {
+            get
+            {
+                bool inParens = false;
+                BaseCriteria currentBlock = Criteria.Empty;
+                bool isBlockOr = false;
+                BaseCriteria activeCriteria = Criteria.Empty;
+
+                for (int i = 0; i < Items.Count; i++)
+                {
+                    var line = Items[i];
+
+                    if (inParens && (line.RightParen || line.LeftParen))
+                    {
+                        if (!currentBlock.IsEmpty)
+                        {
+                            if (isBlockOr)
+                                activeCriteria |= currentBlock;
+                            else
+                                activeCriteria &= currentBlock;
+
+                            currentBlock = Criteria.Empty;
+                        }
+
+                        inParens = false;
+                    }
+
+                    if (line.LeftParen)
+                    {
+                        isBlockOr = line.IsOr;
+                        inParens = true;
+                    }
+
+                    if (line.IsOr)
+                        currentBlock |= line.Criteria;
+                    else
+                        currentBlock &= line.Criteria;
+                }
+
+                if (!currentBlock.IsEmpty)
+                {
+                    if (isBlockOr)
+                        activeCriteria |= currentBlock;
+                    else
+                        activeCriteria &= currentBlock;
+                }
+
+                return activeCriteria;
+            }
         }
 
         public string DisplayText

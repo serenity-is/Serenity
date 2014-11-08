@@ -134,39 +134,39 @@ namespace Serenity
 
             for (int i = 0; i < rowsDiv.Children().Length; i++)
             {
-                row = rowsDiv.Children().Eq(i);
-
-                var filtering = GetFilteringFor(row);
-                if (filtering == null)
-                    continue;
-
-                var field = GetFieldFor(row);
-                var op = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>().Value;
-
-                if (op == null || op.Length == 0)
-                    throw new ArgumentOutOfRangeException("operator", Q.Text("Controls.FilterPanel.InvalidOperator"));
-
-                FilterLine line = new FilterLine();
-                line.Field = field.Name;
-                line.Operator = op;
-                line.IsOr = row.Children("div.l").Children("a.andor").HasClass("or");
-                line.LeftParen = row.Children("div.l").Children("a.leftparen").HasClass("active");
-                line.RightParen = row.Children("div.l").Children("a.rightparen").HasClass("active");
-                string displayText;
-                string errorMessage = null;
-                filtering.Operator = op;
-                line.Criteria = filtering.GetCriteria(out displayText, ref errorMessage);
-
-                if (errorMessage != null)
+                try
                 {
-                    errorText = errorMessage;
+                    row = rowsDiv.Children().Eq(i);
+
+                    var filtering = GetFilteringFor(row);
+                    if (filtering == null)
+                        continue;
+
+                    var field = GetFieldFor(row);
+                    var op = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>().Value;
+
+                    if (op == null || op.Length == 0)
+                        throw new ArgumentOutOfRangeException("operator", Q.Text("Controls.FilterPanel.InvalidOperator"));
+
+                    FilterLine line = new FilterLine();
+                    line.Field = field.Name;
+                    line.Operator = op;
+                    line.IsOr = row.Children("div.l").Children("a.andor").HasClass("or");
+                    line.LeftParen = row.Children("div.l").Children("a.leftparen").HasClass("active");
+                    line.RightParen = row.Children("div.l").Children("a.rightparen").HasClass("active");
+                    string displayText;
+                    filtering.Operator = op;
+                    line.Criteria = filtering.GetCriteria(out displayText);
+                    line.State = filtering.SaveState();
+                    line.DisplayText = displayText;
+
+                    filterLines.Add(line);
+                }
+                catch (ArgumentException ex)
+                {
+                    errorText = ex.Message;
                     break;
                 }
-
-                line.State = filtering.SaveState();
-                line.DisplayText = displayText;
-
-                filterLines.Add(line);
             }
 
             // if an error occured, display it, otherwise set current filters
@@ -351,6 +351,7 @@ namespace Serenity
             jQueryObject editorDiv = row.Children("div.v");
 
             filtering = (IFiltering)Activator.CreateInstance(filteringType);
+            ReflectionOptionsSetter.Set(filtering, field.FilteringParams);
             filtering.Container = editorDiv;
             filtering.Field = field;
             row.Data("Filtering", filtering);

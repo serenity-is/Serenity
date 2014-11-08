@@ -38,8 +38,10 @@ namespace Serenity
         public string EditLinkIdField { get; set; }
         public string EditLinkCssClass { get; set; }
 
-
         public string FilteringType { get; set; }
         public JsDictionary FilteringParams { get; set; }
+        public string FilteringIdField { get; set; }
+        public bool NotFilterable { get; set; }
+        public bool FilterOnly { get; set; }
     }
 }

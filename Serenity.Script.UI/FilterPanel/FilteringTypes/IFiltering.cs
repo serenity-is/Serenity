@@ -10,7 +10,7 @@ namespace Serenity
         jQueryObject Container { get; set; }
         FilterOperator Operator { get; set; }
         void CreateEditor();
-        BaseCriteria GetCriteria(out string displayText, ref string errorMessage);
+        BaseCriteria GetCriteria(out string displayText);
         List<FilterOperator> GetOperators();
         void LoadState(object state);
         object SaveState();

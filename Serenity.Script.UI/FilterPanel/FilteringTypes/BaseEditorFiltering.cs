@@ -9,11 +9,11 @@ namespace Serenity
     public abstract class BaseEditorFiltering<TEditor> : BaseFiltering
         where TEditor: Widget
     {
-        private Widget editor;
+        protected Widget editor;
 
-        protected bool IsComparison(string op)
+        protected virtual bool UseEditor()
         {
-            switch (op)
+            switch (Operator.Key)
             {
                 case FilterOperators.EQ:
                 case FilterOperators.NE:
@@ -29,7 +29,7 @@ namespace Serenity
 
         public override void CreateEditor()
         {
-            if (IsComparison(Operator.Key))
+            if (UseEditor())
             {
                 editor = Widget.CreateInside<TEditor>(Container, GetEditorOptions());
                 return;
@@ -43,16 +43,16 @@ namespace Serenity
             return false;
         }
 
-        protected override string GetFieldName()
+        protected override string GetCriteriaField()
         {
-            if (UseIdField() &&
-                Field.FilteringParams != null &&
-                Field.FilteringParams.ContainsKey("idField"))
+            if (UseEditor() &&
+                UseIdField() &&
+                !Field.FilteringIdField.IsEmptyOrNull())
             {
-                return Field.FilteringParams["idField"] as string;
+                return Field.FilteringIdField as string;
             }
 
-            return base.GetFieldName();
+            return base.GetCriteriaField();
         }
 
         protected virtual object GetEditorOptions()
@@ -62,7 +62,7 @@ namespace Serenity
 
         public override void LoadState(object state)
         {
-            if (IsComparison(Operator.Key))
+            if (UseEditor())
             {
                 if (state == null)
                     return;
@@ -76,7 +76,7 @@ namespace Serenity
 
         public override object SaveState()
         {
-            if (IsComparison(Operator.Key))
+            if (UseEditor())
             {
                 var target = new JsDictionary();
                 PropertyGrid.SaveEditorValue(editor, new PropertyItem { Name = "_" }, target);
@@ -88,22 +88,32 @@ namespace Serenity
 
         protected override object GetEditorValue()
         {
-            if (IsComparison(Operator.Key))
+            if (UseEditor())
             {
                 var target = new JsDictionary();
                 PropertyGrid.SaveEditorValue(editor, new PropertyItem { Name = "_" }, target);
+                var value = target["_"];
+                if (value == null || (value is string && ((string)value).Trim().Length == 0))
+                    throw ArgumentNull();
+
                 return target["_"];
             }
 
-            return base.SaveState();
+            return base.GetEditorValue();
         }
 
         protected override string GetEditorText()
         {
-            if (IsComparison(Operator.Key))
-                return Container.GetText();
+            if (UseEditor())
+            {
+                var input = Container.Find("input:visible").First();
+                if (input.Length > 0)
+                    return input.GetValue();
 
-            return GetEditorValue().ToString();
+                return Container.GetText().Trim();
+            }
+
+            return base.GetEditorText();
         }
     }
 }

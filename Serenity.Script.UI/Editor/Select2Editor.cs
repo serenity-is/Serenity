@@ -162,9 +162,7 @@ namespace Serenity
         {
             get
             {
-                var value = (Value ?? "").ToString();
-                var item = items.Filter(s => s.Id == value)[0];
-                return item != null ? item.Text : null;
+                return ((dynamic)element.Select2Get("data") ?? new object()).text;
             }
         }
     }

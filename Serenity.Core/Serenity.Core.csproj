@@ -39,9 +39,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\NotFilterableAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\CustomFilteringAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilteringOptionAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\FilterOnlyAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\ColumnsScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\EnumKeyAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Formatting\BasicFormatterTypes.cs" />

@@ -29,19 +29,19 @@ namespace Serenity.ComponentModel
         [JsonProperty("maxLength")]
         public int? MaxLength { get; set; }
         [JsonProperty("required")]
-        public bool Required { get; set; }
+        public bool? Required { get; set; }
         [JsonProperty("readOnly")]
-        public bool ReadOnly { get; set; }
+        public bool? ReadOnly { get; set; }
         [JsonProperty("insertable")]
-        public bool Insertable { get; set; }
+        public bool? Insertable { get; set; }
         [JsonProperty("updatable")]
-        public bool Updatable { get; set; }
+        public bool? Updatable { get; set; }
         [JsonProperty("oneWay")]
-        public bool OneWay { get; set; }
+        public bool? OneWay { get; set; }
         [JsonProperty("defaultValue")]
         public object DefaultValue { get; set; }
         [JsonProperty("localizable")]
-        public bool Localizable { get; set; }
+        public bool? Localizable { get; set; }
 
         [JsonProperty("formatterType")]
         public string FormatterType { get; set; }
@@ -53,16 +53,16 @@ namespace Serenity.ComponentModel
         [JsonProperty("alignment")]
         public string Alignment { get; set; }
         [JsonProperty("width")]
-        public int Width { get; set; }
+        public int? Width { get; set; }
         [JsonProperty("minWidth")]
-        public int MinWidth { get; set; }
+        public int? MinWidth { get; set; }
         [JsonProperty("maxWidth")]
-        public int MaxWidth { get; set; }
+        public int? MaxWidth { get; set; }
         [JsonProperty("resizable")]
-        public bool Resizable { get; set; }
+        public bool? Resizable { get; set; }
        
         [JsonProperty("editLink")]
-        public bool EditLink { get; set; }
+        public bool? EditLink { get; set; }
         [JsonProperty("editLinkItemType")]
         public string EditLinkItemType { get; set; }
         [JsonProperty("editLinkIdField")]
@@ -74,6 +74,12 @@ namespace Serenity.ComponentModel
         public string FilteringType { get; set; }
         [JsonProperty("filteringParams")]
         public Dictionary<string, object> FilteringParams { get; set; }
+        [JsonProperty("filteringIdField")]
+        public string FilteringIdField { get; set; }
+        [JsonProperty("filterOnly")]
+        public bool? FilterOnly { get; set; }
+        [JsonProperty("notFilterable")]
+        public bool? NotFilterable { get; set; }
 
         public PropertyItem()
         {

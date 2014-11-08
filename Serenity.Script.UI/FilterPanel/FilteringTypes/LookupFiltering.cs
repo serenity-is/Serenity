@@ -1,8 +1,4 @@
-﻿using jQueryApi;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Serenity
 {
@@ -20,9 +16,25 @@ namespace Serenity
                 });
         }
 
+        protected override bool UseEditor()
+        {
+            return Operator.Key == FilterOperators.EQ || 
+                Operator.Key == FilterOperators.NE;
+        }
+
         protected override bool UseIdField()
         {
-            return IsComparison(Operator.Key);
+            return UseEditor();
+        }
+
+        protected override string GetEditorText()
+        {
+            if (UseEditor())
+            {
+                return editor.As<LookupEditor>().Text;
+            }
+
+            return base.GetEditorText();
         }
     }
 }

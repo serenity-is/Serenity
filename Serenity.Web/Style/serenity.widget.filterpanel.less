@@ -92,11 +92,11 @@
 }
 
 .s-FilterPanel div.v {
-    width: 500px;
+    width: 520px;
 }
 
 .s-FilterPanel div.v input {
-    width: 150px !important;
+    width: 250px !important;
     display: block;
     float: left;
     height: 26px;
@@ -104,6 +104,12 @@
 
 .s-FilterPanel div.v select {
     max-width: 250px !important;
+    display: block;
+    float: left;
+}
+
+.s-FilterPanel div.v .select2-container {
+    width: 250px !important;
     display: block;
     float: left;
 }
@@ -227,4 +233,61 @@
 
 .s-FilterDialog {
     > .size { .widthAndMin(980px); .heightAndMin(450px); }
+}
+
+.s-FilterDisplayBar {
+    height: 26px;
+    line-height: 24px;
+    padding-left: 4px;
+    background-color: #f0f7ff;
+    border-top: 1px solid #c2dfff;
+    border-bottom: 1px solid #c2dfff;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+
+    .reset {
+        float: left;
+        display: block;
+        cursor: pointer;
+        opacity: 0.6;
+        width: 16px;
+        height: 16px;
+        margin-top: 4px;
+        margin-left: 4px;
+        margin-right: 4px;
+        background: url(images/delete2.png) no-repeat center center;
+    }
+
+    .reset:hover {
+        opacity: 1;
+    }
+
+    .edit {
+        float: right;
+        cursor: pointer;
+        font-weight: bold;
+        color: #187FD5;
+        margin-right: 8px;
+        margin-left: 8px;
+        position: relative;
+        display: block;
+        padding-left: 22px;
+        height: 24px;
+        line-height: 24px;
+        background: #f0f7ff url(images/funnel.png) no-repeat 4px center;
+    }
+
+    .cap {
+        font-weight: 600;
+        margin-right: 4px;
+    }
+
+    .txt {
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #CD1212;
+        font-weight: 600;
+    }
 }
