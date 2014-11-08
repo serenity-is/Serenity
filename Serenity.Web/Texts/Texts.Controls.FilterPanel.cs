@@ -30,7 +30,7 @@
                 public static LocalText EditFilter = "edit filter";
                 public static LocalText ResetFilterHint = "clear filter";
                 public static LocalText EffectiveFilter = "Etkin Filtre:";
-                public static LocalText EffectiveEmpty = "yok";
+                public static LocalText EffectiveEmpty = "none";
                 public static LocalText FixErrorsMessage = "Please fix errors that are marked in red";
 
                 public static class OperatorNames
