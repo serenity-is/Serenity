@@ -15,7 +15,7 @@
   "Controls.EntityGrid.IncludeDeletedToggle": "silinmiş kayıtları da göster",
   "Controls.EntityGrid.NewButton": "Yeni {0}",
   "Controls.EntityGrid.RefreshButton": "Yenile",
-  "Controls.FilterPanel.AddFilter": "filtre koşulu ekle",
+  "Controls.FilterPanel.AddFilter": "koşul ekle",
   "Controls.FilterPanel.All": "<tümü>",
   "Controls.FilterPanel.And": "ve",
   "Controls.FilterPanel.AndInParens": "(ve)",
