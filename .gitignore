@@ -23,3 +23,4 @@ Samples/Serene.VSIX/packages/
 Samples/Serene/VSIX/packages/
 Serene.Template.zip
 serenity.Test/Scripts/serenity/Serenity*.js
+Serenity.Test/Scripts/serenity/Serenity.Script.UI.js

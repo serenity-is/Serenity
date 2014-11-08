@@ -9,15 +9,17 @@ namespace Serenity
     {
         public static TWidget GetWidget<TWidget>(this jQueryObject element) where TWidget : Widget
         {
-            var widget = TryGetWidget<TWidget>(element);
-            if (widget == null)
-                throw new Exception(String.Format("Element has no widget of type '{0}'!", GetWidgetName(typeof(TWidget))));
-
-            return widget;
+            return (TWidget)GetWidget(element, typeof(TWidget));
         }
 
         public static object GetWidget(this jQueryObject element, Type widgetType)
         {
+            if (element == null)
+                throw new ArgumentNullException("element");
+
+            if (element.Length == 0)
+                throw new Exception(String.Format("Searching for widget of type '{0}' on a non-existent element!", GetWidgetName(widgetType)));
+
             var widget = TryGetWidget(element, widgetType);
             if (widget == null)
                 throw new Exception(String.Format("Element has no widget of type '{0}'!", GetWidgetName(widgetType)));

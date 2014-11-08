@@ -17,7 +17,7 @@ namespace Serenity
     [Element("<input type=\"hidden\"/>")]
     public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, IStringValue
         where TOptions : class, new()
-        where TItem: class, new()
+        where TItem: class
     {
         protected List<Select2Item> items;
         protected int pageSize = 100;
@@ -162,9 +162,7 @@ namespace Serenity
         {
             get
             {
-                var value = (Value ?? "").ToString();
-                var item = items.Filter(s => s.Id == value)[0];
-                return item != null ? item.Text : null;
+                return ((dynamic)element.Select2Get("data") ?? new object()).text;
             }
         }
     }

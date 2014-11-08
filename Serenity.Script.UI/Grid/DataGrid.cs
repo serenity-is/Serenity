@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using jQueryApi;
+using System.Linq;
 
 namespace Serenity
 {
@@ -15,6 +16,7 @@ namespace Serenity
     {
         protected jQueryObject titleDiv;
         protected Toolbar toolbar;
+        protected FilterDisplayBar filterBar;
         protected SlickRemoteView<TItem> view;
         protected jQueryObject slickContainer;
         protected SlickGrid slickGrid;
@@ -46,6 +48,9 @@ namespace Serenity
             this.view = CreateView();
 
             this.slickGrid = CreateSlickGrid();
+
+            if (EnableFiltering())
+                CreateFilterBar();
 
             if (UsePager())
                 CreatePager();
@@ -205,6 +210,13 @@ namespace Serenity
                 .ThenAwait(GetColumnsAsync)
                 .Then((columns) => {
                     columns = PostProcessColumns(columns);
+
+                    var self = this;
+                    if (this.filterBar != null)
+                    {
+                        filterBar.Store = new FilterStore(this.GetPropertyItems().Where(x => x.NotFilterable != true));
+                        filterBar.Store.Changed += (s, e) => self.Refresh();
+                    }
 
                     if (this.slickGrid != null)
                         this.slickGrid.SetColumns(columns);
@@ -407,6 +419,18 @@ namespace Serenity
                     include[column.Field] = true;
         }
 
+        protected virtual void SetCriteriaParameter()
+        {
+            view.Params.Criteria = null;
+
+            if (filterBar != null)
+            {
+                var criteria = filterBar.Store.ActiveCriteria;
+                if (!criteria.IsEmpty)
+                    ((ListRequest)view.Params).Criteria = criteria;
+            }
+        }
+
         protected virtual void SetIncludeColumnsParameter()
         {
             var include = new JsDictionary<string, bool>();
@@ -432,10 +456,11 @@ namespace Serenity
         {
             if (IsDisabled || !GetGridCanLoad())
             {
-                view.SetItems(new List<TItem>(), true);
+                //view.SetItems(new List<TItem>(), true);
                 return false;
             }
 
+            SetCriteriaParameter();
             SetIncludeColumnsParameter();
 
             return true;
@@ -467,9 +492,31 @@ namespace Serenity
             return false;
         }
 
+        protected virtual bool EnableFiltering()
+        {
+            var attr = this.GetType().GetCustomAttributes(typeof(FilterableAttribute), true);
+            return attr.Length > 0 && attr[0].As<FilterableAttribute>().Value;
+        }
+
         protected virtual bool PopulateWhenVisible()
         {
             return false;
+        }
+
+        protected virtual void CreateFilterBar()
+        {
+            var filterBarDiv = J("<div/>")
+                .AppendTo(this.element);
+
+            var self = this;
+
+            filterBar = new FilterDisplayBar(filterBarDiv);
+
+            if (!IsAsyncWidget())
+            {
+                filterBar.Store = new FilterStore(this.GetPropertyItems().Where(x => x.NotFilterable != true));
+                filterBar.Store.Changed += (s, e) => self.Refresh();
+            }
         }
 
         protected void CreatePager()
@@ -565,7 +612,7 @@ namespace Serenity
             return Promise.Void.ThenAwait(() => 
             {
                 var attr = this.GetType().GetCustomAttributes(typeof(ColumnsKeyAttribute), true);
-            
+
                 if (attr != null && attr.Length > 0)
                     return Q.GetColumnsAsync(attr[0].As<ColumnsKeyAttribute>().Value);
 
@@ -573,26 +620,19 @@ namespace Serenity
             });
         }
 
-        [Obsolete("Prefer async version")]
         protected virtual List<PropertyItem> GetPropertyItems()
         {
             var attr = this.GetType().GetCustomAttributes(typeof(ColumnsKeyAttribute), true);
 
             if (attr != null && attr.Length > 0)
-            {
-                #pragma warning disable 618
                 return Q.GetColumns(attr[0].As<ColumnsKeyAttribute>().Value);
-                #pragma warning restore 618
-            }
 
             return new List<PropertyItem>();
         }
 
         protected virtual List<SlickColumn> GetColumns()
         {
-            #pragma warning disable 618
-            var columnItems = GetPropertyItems();
-            #pragma warning restore 618
+            var columnItems = GetPropertyItems().Where(x => x.FilterOnly != true).ToList();
             return PropertyItemsToSlickColumns(columnItems);
         }
 
@@ -634,7 +674,7 @@ namespace Serenity
         {
             return GetPropertyItemsAsync().ThenSelect(propertyItems =>
             {
-                return PropertyItemsToSlickColumns(propertyItems);
+                return PropertyItemsToSlickColumns(propertyItems.Where(x => x.FilterOnly != true).ToList());
             });
         }
 

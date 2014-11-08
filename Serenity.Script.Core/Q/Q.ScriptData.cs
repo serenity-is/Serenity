@@ -35,7 +35,6 @@ namespace Serenity
                     .Unbind("scriptdatachange." + regClass);
             }
 
-            [Obsolete("Prefer asynchronous version")]
             private static void SyncLoadScript(string url)
             {
                 jQuery.Ajax(new jQueryAjaxOptions
@@ -67,7 +66,6 @@ namespace Serenity
                 });
             }
 
-            [Obsolete("Prefer asynchronous version")]
             private static void LoadScriptData(string name)
             {
                 if (!registered.ContainsKey(name))
@@ -75,9 +73,7 @@ namespace Serenity
 
                 name = name + ".js?" + registered[name];
 
-                #pragma warning disable 618
                 SyncLoadScript(Q.ResolveUrl("~/DynJS.axd/") + name);
-                #pragma warning restore 618
             }
 
             private static Promise LoadScriptDataAsync(string name)
@@ -93,15 +89,12 @@ namespace Serenity
                 });
             }
 
-            [Obsolete("Prefer asynchronous version")]
             public static object Ensure(string name)
             {
                 var data = loadedData[name];
 
-                #pragma warning disable 618
                 if (!Script.IsValue(data))
                     LoadScriptData(name);
-                #pragma warning restore 618
 
                 data = loadedData[name];
 
@@ -140,9 +133,7 @@ namespace Serenity
 
                 registered[name] = new JsDate().GetTime().ToString();
 
-                #pragma warning disable 618
                 LoadScriptData(name);
-                #pragma warning restore 618
 
                 var data = loadedData[name];
 
@@ -192,9 +183,7 @@ namespace Serenity
         [IncludeGenericArguments(false)]
         public static TData GetRemoteData<TData>(string key)
         {
-            #pragma warning disable 618
             return ScriptData.Ensure("RemoteData." + key).As<TData>();
-            #pragma warning restore 618
         }
 
         [IncludeGenericArguments(false)]
@@ -206,9 +195,7 @@ namespace Serenity
         [IncludeGenericArguments(false)]
         public static Lookup<TItem> GetLookup<TItem>(string key)
         {
-            #pragma warning disable 618
             return ScriptData.Ensure("Lookup." + key).As<Lookup<TItem>>();
-            #pragma warning restore 618
         }
 
         [IncludeGenericArguments(false)]
@@ -219,9 +206,7 @@ namespace Serenity
 
         public static void ReloadLookup(string key)
         {
-            #pragma warning disable 618
             ScriptData.Reload("Lookup." + key);
-            #pragma warning restore 618
         }
 
         public static Promise ReloadLookupAsync(string key)
@@ -230,12 +215,9 @@ namespace Serenity
         }
 
         [IncludeGenericArguments(false)]
-        [Obsolete("Prefer asynchronous version")]
         public static List<PropertyItem> GetColumns(string key)
         {
-            #pragma warning disable 618
             return ScriptData.Ensure("Columns." + key).As<List<PropertyItem>>();
-            #pragma warning restore 618
         }
 
         public static Promise<List<PropertyItem>> GetColumnsAsync(string key)
@@ -246,9 +228,7 @@ namespace Serenity
         [IncludeGenericArguments(false)]
         public static List<PropertyItem> GetForm(string key)
         {
-            #pragma warning disable 618
             return ScriptData.Ensure("Form." + key).As<List<PropertyItem>>();
-            #pragma warning restore 618
         }
 
         public static Promise<List<PropertyItem>> GetFormAsync(string key)
@@ -258,9 +238,7 @@ namespace Serenity
 
         public static string GetTemplate(string key)
         {
-            #pragma warning disable 618
             return ScriptData.Ensure("Template." + key).As<string>();
-            #pragma warning restore 618
         }
 
         public static Promise<string> GetTemplateAsync(string key)

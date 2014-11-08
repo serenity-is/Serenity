@@ -19,20 +19,26 @@
                 public static LocalText InvalidNumber = "invalid number!";
                 public static LocalText Or = "or";
                 public static LocalText OrInParens = "(or)";
-                public static LocalText ResetButton = "clear filter";
+                public static LocalText ResetButton = "reset";
                 public static LocalText SearchButton = "apply filter";
                 public static LocalText ValueRequired = "value required!";
                 public static LocalText GroupBy = "--group--";
                 public static LocalText ThenBy = "--then by--";
                 public static LocalText ApplyGroups = "apply grouping";
                 public static LocalText ClearGroups = "clear grouping";
+                public static LocalText DialogTitle = "Edit Filter";
+                public static LocalText EditFilter = "edit filter";
+                public static LocalText ResetFilterHint = "clear filter";
+                public static LocalText EffectiveFilter = "Etkin Filtre:";
+                public static LocalText EffectiveEmpty = "yok";
+                public static LocalText FixErrorsMessage = "Please fix errors that are marked in red";
 
                 public static class OperatorNames
                 {
                     public static LocalText @true = "yes";
                     public static LocalText @false = "no";
                     public static LocalText contains = "contains";
-                    public static LocalText startswith = "start with";
+                    public static LocalText startswith = "starts with";
                     public static LocalText eq = "equal";
                     public static LocalText ne = "not equal";
                     public static LocalText gt = "greater than";

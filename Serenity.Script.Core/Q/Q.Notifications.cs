@@ -1,4 +1,5 @@
 ﻿using System.Html;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -79,6 +80,11 @@ namespace Serenity
             }
 
             return options;
+        }
+
+        [InlineCode("window.console && window.console.log({message})")]
+        public static void Log(object message)
+        {
         }
 
     }
