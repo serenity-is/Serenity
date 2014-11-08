@@ -1,3 +1,16 @@
+## 1.4.0 (2014-11-08)
+
+Features:
+  - introduced FilterPanel widget, for advanced customizable filtering with grouping, and/or, lookup editors etc. Add [Filterable] attribute to your grid class to enable.
+  - TemplateBundle to send templates to client side on page load by including it as a script
+  - ColumnsBundle to send column metadata to client side on page load by including it as a script
+  - FormsBundle to send column metadata to client side on page load by including it as a script
+  - Widget templates no longer loaded asynchronously (it caused more problems than performance bonuses, use TemplateBundle if needed)
+  - LookupEditor is not async, use AsyncLookupEditor if required
+  - CodeGenerator doesn't produce Grid / Dialog as IAsyncInit by default
+  - added LocalText tests, and documentation
+  - updated Newtonsoft.JSON to 6.0.6, phantomJS to 1.9.7, select2 to 3.5.1
+
 ## 1.3.8 (2014-11-04)
 Bugfixes:
   - fix edit link problem when grid is not async and columns loaded from server side
