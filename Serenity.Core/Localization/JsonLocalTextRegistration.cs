@@ -41,7 +41,7 @@ namespace Serenity.Localization
         public static void ProcessNestedDictionary(IDictionary<string, JToken> nested, string prefix, Dictionary<string, string> target)
         {
             if (nested == null)
-                return;
+                throw new ArgumentNullException("nested");
 
             foreach (var k in nested)
             {
@@ -49,7 +49,7 @@ namespace Serenity.Localization
                 var o = k.Value;
                 if (o is IDictionary<string, JToken>)
                     ProcessNestedDictionary((IDictionary<string, JToken>)o, actual + ".", target);
-                else
+                else if (o != null && (!(o is JValue) || ((JValue)o).Value != null))
                 {
                     target[actual] = o.ToString();
                 }
@@ -63,6 +63,9 @@ namespace Serenity.Localization
         /// <param name="path">Path containing JSON files</param>
         public static void AddFromFilesInFolder(string path)
         {
+            if (path == null)
+                throw new ArgumentNullException("path");
+
             if (!Directory.Exists(path))
                 return;
 
