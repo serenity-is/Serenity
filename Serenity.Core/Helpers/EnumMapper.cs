@@ -100,6 +100,12 @@ namespace Serenity
             return FormatEnum(value.GetType(), value);
         }
 
+        public static string GetEnumTypeKey(Type enumType)
+        {
+            var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
+            return enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
+        }
+
         public static string FormatEnum(Type enumType, object value)
         {
             if (value == null)
@@ -109,10 +115,8 @@ namespace Serenity
                 enumType.IsEnum &&
                 System.Enum.GetName(enumType, value) != null)
             {
-                var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
-                var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
-
                 var enumName = System.Enum.GetName(enumType, value);
+                var enumKey = GetEnumTypeKey(enumType);
                 var key = "Enums." + enumKey + "." + enumName;
                 var text = LocalText.TryGet(key);
                 if (text == null)

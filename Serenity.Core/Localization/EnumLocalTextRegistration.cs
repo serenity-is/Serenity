@@ -35,8 +35,7 @@ namespace Serenity.Localization
                 {
                     if (type.IsEnum)
                     {
-                        var enumKeyAttr = type.GetCustomAttribute<EnumKeyAttribute>();
-                        var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : type.FullName;
+                        var enumKey = EnumMapper.GetEnumTypeKey(type);
 
                         foreach (var name in Enum.GetNames(type))
                         {

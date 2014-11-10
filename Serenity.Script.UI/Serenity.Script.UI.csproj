@@ -53,6 +53,9 @@
     <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
     <Compile Include="FilterPanel\FilteringTypes\BaseEditorFiltering.cs" />
+    <Compile Include="FilterPanel\FilteringTypes\EnumFiltering.cs" />
+    <Compile Include="FilterPanel\FilteringTypes\DateTimeFiltering.cs" />
+    <Compile Include="FilterPanel\FilteringTypes\DateFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\EditorFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\LookupFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\DecimalFiltering.cs" />
@@ -144,6 +147,7 @@
     <Compile Include="Reporting\ReportDesignPanel.cs" />
     <Compile Include="Reporting\ReportDialog.cs" />
     <Compile Include="Reporting\ReportPage.cs" />
+    <Compile Include="Editor\EnumEditor.cs" />
     <Compile Include="Widget\IAsyncInit.cs" />
     <Compile Include="Widget\ValidationExtensions.cs" />
     <Compile Include="Widget\DialogExtensions.cs" />

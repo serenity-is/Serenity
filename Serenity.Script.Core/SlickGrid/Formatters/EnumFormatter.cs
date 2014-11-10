@@ -23,7 +23,16 @@ namespace Serenity
             if (!Script.IsValue(value))
                 return "";
 
-            var name = System.Enum.ToString(enumType, value.As<System.Enum>());
+            string name;
+            try
+            {
+                name = System.Enum.ToString(enumType, value.As<System.Enum>());
+            }
+            catch (ArgumentException)
+            {
+                name = value.ToString();
+            }
+
             var enumKeyAttr = enumType.GetCustomAttributes(typeof(EnumKeyAttribute), false);
             var enumKey = enumKeyAttr.Length > 0 ? ((EnumKeyAttribute)enumKeyAttr[0]).Value : enumType.FullName;
 

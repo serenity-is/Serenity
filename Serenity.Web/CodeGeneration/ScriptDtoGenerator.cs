@@ -357,15 +357,10 @@ namespace Serenity.CodeGeneration
 
         private void GenerateEnum(Type enumType)
         {
-            var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
-            if (enumKeyAttr != null)
-            {
-                cw.Indented("[EnumKey(\"");
-                sb.Append(enumKeyAttr.Value);
-                sb.AppendLine("\"), PreserveMemberCase]");
-            }
-            else
-                cw.IndentedLine("[PreserveMemberCase]");
+            var enumKey = EnumMapper.GetEnumTypeKey(enumType);
+            cw.Indented("[EnumKey(\"");
+            sb.Append(enumKey);
+            sb.AppendLine("\"), PreserveMemberCase]");
 
             cw.Indented("public enum ");
             sb.AppendLine(enumType.Name);

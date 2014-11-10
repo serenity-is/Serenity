@@ -168,19 +168,7 @@ namespace Serenity.PropertyGrid
 
                 if (enumType != null)
                 {
-                    List<string[]> options = new List<string[]>();
-                    foreach (var val in Enum.GetValues(enumType))
-                    {
-                        string key = Convert.ToInt64(val).ToString();
-                        string text = EnumMapper.FormatEnum(enumType, val);
-                        options.Add(new string[] { key, text });
-                    }
-                    if (valueType == typeof(DayOfWeek)) // şimdilik tek bir özel durum
-                    {
-                        options.Add(options[0]);
-                        options.RemoveAt(0);
-                    }
-                    pi.EditorParams["items"] = options.ToArray();
+                    pi.EditorParams["enumKey"] = EnumMapper.GetEnumTypeKey(enumType);
                 }
 
                 if (basedOnField != null)
@@ -330,7 +318,7 @@ namespace Serenity.PropertyGrid
         private static string AutoDetermineEditorType(Type valueType, Type enumType)
         {
             if (enumType != null)
-                return "Select";
+                return "Enum";
             else if (valueType == typeof(String))
                 return "String";
             else if (valueType == typeof(Int32))
@@ -362,6 +350,19 @@ namespace Serenity.PropertyGrid
                 GetAttribute(null, field, typeof(AsyncLookupEditorAttribute)));
         }
 
+        private static HashSet<string> standardFilteringEditors = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Date",
+            "Serenity.Date",
+            "DateTime",
+            "Serenity.DateTime",
+            "Boolean",
+            "Serenity.Boolean",
+            "Decimal",
+            "Integer",
+            "Serenity.Integer"
+        };
+
         private static void HandleFiltering(MemberInfo member, Type valueType, Type enumType, Field basedOnField, PropertyItem pi)
         {
             var filterOnlyAttr = GetAttribute(member, basedOnField, typeof(FilterOnlyAttribute)) as FilterOnlyAttribute;
@@ -391,7 +392,7 @@ namespace Serenity.PropertyGrid
                     pi.FilteringIdField = idField;
                 }
 
-                if (editorAttr != null)
+                if (editorAttr != null && !standardFilteringEditors.Contains(editorAttr.EditorType))
                 {
                     pi.FilteringType = "Editor";
                     pi.FilteringParams["editorType"] = editorAttr.EditorType;
@@ -406,9 +407,7 @@ namespace Serenity.PropertyGrid
                 else if (enumType != null)
                 {
                     pi.FilteringType = "Enum";
-                    var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
-                    var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
-                    pi.FilteringParams["enumKey"] = enumKey;
+                    pi.FilteringParams["enumKey"] = EnumMapper.GetEnumTypeKey(enumType);
                 }
                 else if (valueType == typeof(DateTime))
                 {
@@ -496,9 +495,7 @@ namespace Serenity.PropertyGrid
                 if (enumType != null)
                 {
                     pi.FormatterType = "Enum";
-                    var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
-                    var enumKey = enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
-                    pi.FormatterParams["enumKey"] = enumKey;
+                    pi.FormatterParams["enumKey"] = EnumMapper.GetEnumTypeKey(enumType);
                 }
                 else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?))
                 {
@@ -618,7 +615,7 @@ namespace Serenity.PropertyGrid
             else
             {
                 if (enumType != null)
-                    pi.EditorType = "Select";
+                    pi.EditorType = "Enum";
                 else if (definition.FieldType == CustomFieldType.Date ||
                     definition.FieldType == CustomFieldType.DateTime)
                     pi.EditorType = "Date";
@@ -634,15 +631,7 @@ namespace Serenity.PropertyGrid
 
             if (enumType != null)
             {
-                List<string[]> options = new List<string[]>();
-                foreach (var val in Enum.GetValues(enumType))
-                {
-                    string key = Convert.ToInt64(val).ToString();
-                    string text = EnumMapper.FormatEnum(enumType, val);
-                    options.Add(new string[] { key, text });
-                }
-
-                pi.EditorParams["items"] = options.ToArray();
+                pi.EditorParams["enumKey"] = EnumMapper.GetEnumTypeKey(enumType);
             }
 
             if (basedOnField != null)

@@ -132,7 +132,7 @@ namespace Serenity.Data
         }
 
         [InlineCode("[{criteria1}, '=', {value}]")]
-        public static BaseCriteria operator ==(BaseCriteria criteria1, DateTime value)
+        public static BaseCriteria operator ==(BaseCriteria criteria1, JsDate value)
         {
             return null;
         }
@@ -180,7 +180,7 @@ namespace Serenity.Data
         }
 
         [InlineCode("[{criteria1}, '!=', {value}]")]
-        public static BaseCriteria operator !=(BaseCriteria criteria1, DateTime value)
+        public static BaseCriteria operator !=(BaseCriteria criteria1, JsDate value)
         {
             return null;
         }
@@ -228,7 +228,7 @@ namespace Serenity.Data
         }
 
         [InlineCode("[{criteria1}, '>', {value}]")]
-        public static BaseCriteria operator >(BaseCriteria criteria1, DateTime value)
+        public static BaseCriteria operator >(BaseCriteria criteria1, JsDate value)
         {
             return null;
         }
@@ -276,7 +276,7 @@ namespace Serenity.Data
         }
 
         [InlineCode("[{criteria1}, '>=', {value}]")]
-        public static BaseCriteria operator >=(BaseCriteria criteria1, DateTime value)
+        public static BaseCriteria operator >=(BaseCriteria criteria1, JsDate value)
         {
             return null;
         }
@@ -324,7 +324,7 @@ namespace Serenity.Data
         }
 
         [InlineCode("[{criteria1}, '<', {value}]")]
-        public static BaseCriteria operator <(BaseCriteria criteria1, DateTime value)
+        public static BaseCriteria operator <(BaseCriteria criteria1, JsDate value)
         {
             return null;
         }
@@ -372,7 +372,7 @@ namespace Serenity.Data
         }
 
         [InlineCode("[{criteria1}, '<=', {value}]")]
-        public static BaseCriteria operator <=(BaseCriteria criteria1, DateTime value)
+        public static BaseCriteria operator <=(BaseCriteria criteria1, JsDate value)
         {
             return null;
         }

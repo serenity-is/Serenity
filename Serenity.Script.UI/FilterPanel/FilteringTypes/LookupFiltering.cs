@@ -30,9 +30,7 @@ namespace Serenity
         protected override string GetEditorText()
         {
             if (UseEditor())
-            {
                 return editor.As<LookupEditor>().Text;
-            }
 
             return base.GetEditorText();
         }

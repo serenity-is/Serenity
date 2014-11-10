@@ -101,19 +101,5 @@ namespace Serenity
 
             return base.GetEditorValue();
         }
-
-        protected override string GetEditorText()
-        {
-            if (UseEditor())
-            {
-                var input = Container.Find("input:visible").First();
-                if (input.Length > 0)
-                    return input.GetValue();
-
-                return Container.GetText().Trim();
-            }
-
-            return base.GetEditorText();
-        }
     }
 }

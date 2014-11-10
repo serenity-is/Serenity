@@ -169,11 +169,21 @@ namespace Serenity
 
         protected virtual object GetEditorValue()
         {
-            var input = Container.Find(":input").First();
+            var input = Container.Find(":input")
+                .Not(".select2-focusser")
+                .First();
+
             if (input.Length != 1)
                 throw new Exception(String.Format("Couldn't find input in filter container for {0}", Field.Title ?? Field.Name));
 
-            string value = input.GetValue().Trim();
+            string value;
+            if (Script.IsValue(input.As<dynamic>().select2))
+                value = input.Select2Get("val") as string;
+            else
+                value = input.GetValue();
+            
+            value = (value ?? "").Trim();
+
             if (value.Length == 0)
                 throw ArgumentNull();
 
@@ -182,7 +192,20 @@ namespace Serenity
 
         protected virtual string GetEditorText()
         {
-            return GetEditorValue().ToString();
+            var input = Container.Find(":input")
+                .Not(".select2-focusser")
+                .First();
+
+            if (input.Length == 0)
+                return Container.GetText().Trim();
+
+            string value;
+            if (Script.IsValue(input.As<dynamic>().select2))
+                value = ((dynamic)input.Select2Get("data") ?? new object()).text;
+            else
+                value = input.GetValue();
+
+            return value;
         }
     }
 }
