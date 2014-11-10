@@ -950,8 +950,17 @@ else if (window.jQuery) {
 Q$Externals.jQueryDatepickerInitialization = function() {
   var order = Q$Culture.dateOrder;
   var s = Q$Culture.dateSeparator;
+  var culture = ($('html').attr('lang') || 'en').toLowerCase();
+  if (!$.datepicker.regional[culture]) {
+      culture = culture.split('-')[0];
+      if (!$.datepicker.regional[culture]) {
+          culture = 'en';
+      }
+  }
+  $.datepicker.setDefaults($.datepicker.regional['en']);
+  $.datepicker.setDefaults($.datepicker.regional[culture]);
+
   $.datepicker.setDefaults({
-    firstDay: 1,
     dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' : 
       (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' : 
                                       'dd' + s + 'mm' + s + 'yy')),
@@ -964,7 +973,7 @@ Q$Externals.jQueryDatepickerInitialization = function() {
   });
 };
 
-if (window.jQuery && window.jQuery.datepicker)
+if (window.jQuery && window.jQuery.datepicker && window.jQuery.datepicker.regional && window.jQuery.datepicker.regional.en)
     Q$Externals.jQueryDatepickerInitialization();
 else
     jQuery(function ($) {

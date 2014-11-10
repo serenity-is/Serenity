@@ -8,6 +8,7 @@ namespace Serenity.Web
             "~/Scripts/rsvp.js",
             "~/Scripts/jquery-{version}.js",
             "~/Scripts/jquery-ui-{version}.js",
+            "~/Scripts/jquery-ui-i18n.js",
             "~/Scripts/jquery.validate.js",
             "~/Scripts/jquery.blockUI.js",
             "~/Scripts/jquery.cookie.js",
