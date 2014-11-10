@@ -177,7 +177,7 @@ namespace Serenity
                 throw new Exception(String.Format("Couldn't find input in filter container for {0}", Field.Title ?? Field.Name));
 
             string value;
-            if (Script.IsValue(input.As<dynamic>().select2))
+            if (Script.IsValue(input.GetDataValue("select2")))
                 value = input.Select2Get("val") as string;
             else
                 value = input.GetValue();
@@ -200,7 +200,7 @@ namespace Serenity
                 return Container.GetText().Trim();
 
             string value;
-            if (Script.IsValue(input.As<dynamic>().select2))
+            if (Script.IsValue(input.GetDataValue("select2")))
                 value = ((dynamic)input.Select2Get("data") ?? new object()).text;
             else
                 value = input.GetValue();
