@@ -29,7 +29,7 @@
                 public static LocalText DialogTitle = "Edit Filter";
                 public static LocalText EditFilter = "edit filter";
                 public static LocalText ResetFilterHint = "clear filter";
-                public static LocalText EffectiveFilter = "Etkin Filtre:";
+                public static LocalText EffectiveFilter = "Active Filter:";
                 public static LocalText EffectiveEmpty = "none";
                 public static LocalText FixErrorsMessage = "Please fix errors that are marked in red";
 
