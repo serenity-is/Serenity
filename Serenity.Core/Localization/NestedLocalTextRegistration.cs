@@ -4,6 +4,7 @@ namespace Serenity.Localization
     using Extensibility;
     using Serenity.Abstractions;
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
 
     /// <summary>
@@ -19,9 +20,10 @@ namespace Serenity.Localization
         /// <summary>
         /// Adds translations from static nested local text classes marked with NestedLocalTextAttribute.
         /// </summary>
-        public static void Initialize()
+        public static void Initialize(IEnumerable<Assembly> assemblies)
         {
-            var assemblies = ExtensibilityHelper.SelfAssemblies;
+            if (assemblies == null)
+                throw new ArgumentNullException("assemblies");
 
             foreach (var assembly in assemblies)
                 foreach (var type in assembly.GetTypes())

@@ -27,6 +27,9 @@ namespace Serenity.Localization
         public static void Initialize(IEnumerable<Assembly> assemblies,
             string languageID = LocalText.InvariantLanguageID)
         {
+            if (assemblies == null)
+                throw new ArgumentNullException("assemblies");
+
             var provider = Dependency.Resolve<ILocalTextRegistry>();
 
             foreach (var assembly in assemblies)
