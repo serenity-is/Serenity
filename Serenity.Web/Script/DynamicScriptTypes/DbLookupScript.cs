@@ -81,10 +81,9 @@ namespace Serenity.Web
             _nonCached = nonCached;
 
             if (row != null)
-                GlobalGenerationKey = row.GetFields().GenerationKey;
+                GroupKey = row.GetFields().GenerationKey;
 
-            LocalExpiration = TimeSpan.Zero;
-            RemoteExpiration = TimeSpan.FromDays(1);
+            Expiration = TimeSpan.Zero;
 
             DynamicScriptManager.Register(this);
         }
@@ -180,8 +179,7 @@ namespace Serenity.Web
             remove { _scriptChanged -= value; }
         }
 
-        public string GlobalGenerationKey { get; set; }
-        public TimeSpan LocalExpiration { get; set; }
-        public TimeSpan RemoteExpiration { get; set; }
+        public string GroupKey { get; set; }
+        public TimeSpan Expiration { get; set; }
     }
 }

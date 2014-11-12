@@ -77,15 +77,21 @@ namespace Serenity.CodeGeneration
 
                         // belki burada daha sonra metod listesini de verebiliriz (ayrı bir namespace de?)
                         var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
-                        if (parameters.Length != 1)
+                        if (parameters.Length > 1)
                         {
                             // tek parametreli olmalı
                             continue;
                         }
 
-                        var paramType = parameters[0].ParameterType;
-                        if (paramType.IsPrimitive || !ScriptDtoGenerator.CanHandleType(paramType))
-                            continue;
+                        Type paramType;
+                        if (parameters.Length == 1)
+                        {
+                            paramType = parameters[0].ParameterType;
+                            if (paramType.IsPrimitive || !ScriptDtoGenerator.CanHandleType(paramType))
+                                continue;
+                        }
+                        else
+                            paramType = typeof(ServiceRequest);
 
                         var returnType = method.ReturnType;
 
@@ -97,6 +103,8 @@ namespace Serenity.CodeGeneration
                             responseType = returnType.GenericTypeArguments[0];
                         }
                         else if (typeof(ActionResult).IsAssignableFrom(returnType))
+                            continue;
+                        else if (returnType == typeof(void))
                             continue;
 
                         if (hasAnyMethod)
@@ -110,7 +118,7 @@ namespace Serenity.CodeGeneration
                         sb.Append("(");
                         ScriptDtoGenerator.HandleMemberType(sb, paramType, enqueueType: null);
                         sb.Append(' ');
-                        sb.Append(parameters[0].Name);
+                        sb.Append(parameters.Length == 0 ? "request" : parameters[0].Name);
                         sb.Append(", Action<");
                         ScriptDtoGenerator.HandleMemberType(sb, responseType, enqueueType: null);
                         sb.Append("> onSuccess, ServiceCallOptions options = null");

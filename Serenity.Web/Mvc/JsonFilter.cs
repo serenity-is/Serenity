@@ -17,6 +17,9 @@ namespace Serenity.Services
                 .GetParameters()
                 .Where(x => !x.ParameterType.IsInterface);
 
+            if (!prms.Any())
+                return;
+
             if (prms.Count() != 1)
             {
                 prms = prms.Where(x => x.ParameterName == "request");

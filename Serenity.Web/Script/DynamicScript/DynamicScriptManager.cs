@@ -44,7 +44,6 @@ namespace Serenity.Web
         public static void Register(string name, IDynamicScript script)
         {
             var item = new Item(name, script);
-            item.NonCached = script.NonCached;
             registeredScripts[name] = item;
         }
 
@@ -57,7 +56,7 @@ namespace Serenity.Web
                 if (key != RegisteredScripts._scriptName)
                 {
                     var value = s.Value as Item;
-                    result[key] = value.NonCached ? DateTime.Now.Ticks.ToString() : value.Content.Hash;
+                    result[key] = value.Content.Hash;
                 }
             }
             return result;

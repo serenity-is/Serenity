@@ -73,7 +73,7 @@ namespace Serenity.Web
                 this.Permission = readPermission.Permission.IsEmptyOrNull() ? null : readPermission.Permission;
             }
 
-            this.GlobalGenerationKey = row.GetFields().GenerationKey;
+            this.GroupKey = row.GetFields().GenerationKey;
 
             this.GetItems = delegate
             {

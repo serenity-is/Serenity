@@ -27,7 +27,8 @@ namespace Serenity.Web
             _scriptName = GetScriptName(package, languageId, isPending);
         }
 
-        public bool NonCached { get { return false; } }
+        public TimeSpan Expiration { get; set; }
+        public string GroupKey { get; set; }
 
         public static string GetScriptName(string package, string languageId, bool isPending)
         {

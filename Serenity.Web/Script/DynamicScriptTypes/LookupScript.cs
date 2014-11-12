@@ -14,8 +14,7 @@ namespace Serenity.Web
         public LookupScript()
         {
             lookupParams = new Dictionary<string, object>();
-            LocalExpiration = TimeSpan.Zero;
-            RemoteExpiration = TimeSpan.FromDays(1);
+            Expiration = TimeSpan.Zero;
         }
 
         public void Changed()
@@ -100,9 +99,8 @@ namespace Serenity.Web
             remove { scriptChanged -= value; }
         }
 
-        public string GlobalGenerationKey { get; set; }
-        public TimeSpan LocalExpiration { get; set; }
-        public TimeSpan RemoteExpiration { get; set; }
+        public string GroupKey { get; set; }
+        public TimeSpan Expiration { get; set; }
         public bool Authorize { get; set; }
         public string Permission { get; set; }
         public bool NonCached { get; set; }

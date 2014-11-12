@@ -19,7 +19,8 @@ namespace Serenity.Web
             _scriptName = GetScriptName(languageId);
         }
 
-        public bool NonCached { get { return false; } }
+        public TimeSpan Expiration { get; set; }
+        public string GroupKey { get; set; }
 
         public static string GetScriptName(int languageId)
         {

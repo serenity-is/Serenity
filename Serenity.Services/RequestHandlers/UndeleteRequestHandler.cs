@@ -126,7 +126,7 @@ namespace Serenity.Services
 
         protected virtual void ValidatePermissions()
         {
-            var attr = (OperationPermissionAttribute)typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(false) ??
+            var attr = (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(false) ??
                 typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false);
 
             if (attr != null)

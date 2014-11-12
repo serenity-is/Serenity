@@ -45,6 +45,7 @@
     <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilterOnlyAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\ColumnsScriptAttribute.cs" />
+    <Compile Include="ComponentModel\Extensibility\DataScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\EnumKeyAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Formatting\BasicFormatterTypes.cs" />
     <Compile Include="ComponentModel\Columns\Alignment\AlignRightAttribute.cs" />
@@ -55,10 +56,12 @@
     <Compile Include="ComponentModel\Columns\Formatting\FormatterTypeAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Formatting\CustomFormatterAttribute.cs" />
     <Compile Include="ComponentModel\Columns\EditLinkAttribute.cs" />
+    <Compile Include="ComponentModel\Extensibility\DataScript.cs" />
     <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
     <Compile Include="ComponentModel\Columns\WidthAttribute.cs" />
+    <Compile Include="Helpers\Check.cs" />
     <Compile Include="Helpers\BinarySerialization.cs" />
-    <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
+    <Compile Include="ComponentModel\Extensibility\DynamicScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />
     <Compile Include="Json\JsonLocalTextsHelper.cs" />
     <Compile Include="Json\JsonConfigHelper.cs" />
@@ -100,10 +103,10 @@
     <Compile Include="ComponentModel\Extensibility\FormScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\ScriptRegistrarAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\SelfAssemblyAttribute.cs" />
-    <Compile Include="ComponentModel\Permission\CreatePermissionAttribute.cs" />
+    <Compile Include="ComponentModel\Permission\InsertPermissionAtribute.cs" />
     <Compile Include="ComponentModel\Permission\DeletePermissionAttribute.cs" />
     <Compile Include="ComponentModel\Permission\ModifyPermissionAttribute.cs" />
-    <Compile Include="ComponentModel\Permission\OperationPermissionAttribute.cs" />
+    <Compile Include="ComponentModel\Permission\PermissionAttributeBase.cs" />
     <Compile Include="ComponentModel\Permission\ReadPermissionAttribute.cs" />
     <Compile Include="ComponentModel\Permission\RequiredPermissionAttribute.cs" />
     <Compile Include="ComponentModel\Permission\UpdatePermissionAttribute.cs" />

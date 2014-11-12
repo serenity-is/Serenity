@@ -31,8 +31,7 @@ namespace Serenity.Web
             _right = right;
             _nonCached = nonCached;
 
-            LocalExpiration = TimeSpan.Zero;
-            RemoteExpiration = TimeSpan.FromDays(1);
+            Expiration = TimeSpan.Zero;
 
             DynamicScriptManager.Register(this);
         }
@@ -68,8 +67,7 @@ namespace Serenity.Web
             remove { _scriptChanged -= value; }
         }
 
-        public string GlobalGenerationKey { get; set; }
-        public TimeSpan LocalExpiration { get; set; }
-        public TimeSpan RemoteExpiration { get; set; }
+        public string GroupKey { get; set; }
+        public TimeSpan Expiration { get; set; }
     }
 }

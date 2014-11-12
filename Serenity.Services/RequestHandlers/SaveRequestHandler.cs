@@ -528,7 +528,7 @@ namespace Serenity.Services
 
         protected virtual void ValidatePermissions()
         {
-            OperationPermissionAttribute attr = null;
+            PermissionAttributeBase attr = null;
             
             if (IsUpdate) 
             {

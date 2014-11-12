@@ -7,7 +7,8 @@ namespace Serenity.Web
         string GetScript();
         void CheckRights();
         void Changed();
-        bool NonCached { get; }
+        string GroupKey { get; }
+        TimeSpan Expiration { get; }
         event EventHandler ScriptChanged;
     }
 }

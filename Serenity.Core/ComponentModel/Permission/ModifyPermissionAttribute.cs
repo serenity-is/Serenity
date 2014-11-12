@@ -2,15 +2,20 @@
 
 namespace Serenity.Data
 {
-    public class ModifyPermissionAttribute : OperationPermissionAttribute
+    public class ModifyPermissionAttribute : PermissionAttributeBase
     {
         public ModifyPermissionAttribute(string permission)
             : base(permission)
         {
         }
 
-        public ModifyPermissionAttribute(object applicationId, string permission)
-            : this(applicationId.ToString() + ":" + permission)
+        public ModifyPermissionAttribute(object module, string permission)
+            : base(module, permission)
+        {
+        }
+
+        public ModifyPermissionAttribute(object module, object submodule, string permission)
+            : base(module, submodule, permission)
         {
         }
     }

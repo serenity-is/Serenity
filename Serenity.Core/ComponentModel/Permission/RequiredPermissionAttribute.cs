@@ -1,19 +1,23 @@
-﻿using System;
+﻿using Serenity.Data;
+using System;
 
 namespace Serenity.ComponentModel
 {
-    public class RequiredPermissionAttribute : Attribute
+    public class RequiredPermissionAttribute : PermissionAttributeBase
     {
         public RequiredPermissionAttribute(string permission)
-        {
-            this.Permission = permission;
-        }
-
-        public RequiredPermissionAttribute(object applicationId, string permission)
-            : this(applicationId.ToString() + ":" + permission)
+            : base(permission)
         {
         }
 
-        public string Permission { get; private set; }
+        public RequiredPermissionAttribute(object module, string permission)
+            : base(module, permission)
+        {
+        }
+
+        public RequiredPermissionAttribute(object module, object submodule, string permission)
+            : base(module, submodule, permission)
+        {
+        }
     }
 }

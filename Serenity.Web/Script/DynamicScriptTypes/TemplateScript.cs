@@ -23,7 +23,8 @@ namespace Serenity.Web
             DynamicScriptManager.Register(this);
         }
 
-        public bool NonCached { get { return false; } }
+        public TimeSpan Expiration { get; set; }
+        public string GroupKey { get; set; }
 
         public void Changed()
         {

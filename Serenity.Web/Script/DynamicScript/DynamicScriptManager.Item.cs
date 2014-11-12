@@ -13,7 +13,6 @@ namespace Serenity.Web
         {
             public string Name;
             public IDynamicScript Generator;
-            public bool NonCached;
 
             private Script content;
 
@@ -21,15 +20,20 @@ namespace Serenity.Web
             {
                 get
                 {
-                    var twoLevel = Generator as ITwoLevelCached;
-                    if (twoLevel == null || twoLevel.GlobalGenerationKey == null)
+                    if (Generator.GroupKey == null)
                         return content;
 
                     if (content.UncompressedBytes == null)
                         return content;
 
+                    if (content.Expiration < DateTime.Now)
+                    {
+                        this.Reset();
+                        return content;
+                    }
+
                     TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, TimeSpan.Zero,
-                        twoLevel.GlobalGenerationKey, () =>
+                        Generator.GroupKey, () =>
                         {
                             this.Reset();
                             return new object();
@@ -50,7 +54,7 @@ namespace Serenity.Web
                     UncompressedBytes = null,
                     CompressedBytes = null
                 };
-                NonCached = false;
+
                 generator.ScriptChanged += ScriptChanged;
             }
 
@@ -103,17 +107,18 @@ namespace Serenity.Web
                         Hash = GetMD5HashString(ub),
                         Time = DateTime.UtcNow,
                         CompressedBytes = cb,
-                        UncompressedBytes = ub
+                        UncompressedBytes = ub,
+                        Expiration = Generator.Expiration == TimeSpan.Zero ? DateTime.MaxValue :
+                            DateTime.Now.Add(Generator.Expiration)
                     };
 
                     this.content = script;
 
-                    var twoLevel = Generator as ITwoLevelCached;
-                    if (twoLevel == null || twoLevel.GlobalGenerationKey == null)
+                    if (Generator.GroupKey == null)
                         return script;
 
-                    TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, TimeSpan.Zero,
-                        twoLevel.GlobalGenerationKey, () =>
+                    TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, Generator.Expiration,
+                        Generator.GroupKey, () =>
                         {
                             return new object();
                         });
@@ -126,7 +131,7 @@ namespace Serenity.Web
             {
                 var currentScript = Content;
                 
-                if (currentScript.UncompressedBytes == null || NonCached)
+                if (currentScript.UncompressedBytes == null)
                     return GenerateContent();
 
                 return currentScript;

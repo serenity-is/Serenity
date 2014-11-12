@@ -80,6 +80,7 @@ namespace Serenity.Web
 
         public static void InitializeDynamicScripts()
         {
+            DynamicScriptRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
             LookupScriptRegistration.RegisterLookupScripts();
             RunStartupRegistrars<ScriptRegistrarAttribute>();
             FormScriptRegistration.RegisterFormScripts();

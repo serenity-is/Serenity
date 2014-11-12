@@ -43,10 +43,8 @@ namespace Serenity.Web
                 scriptChanged(this, new EventArgs());
         }
 
-        public bool NonCached
-        {
-            get { return false; }
-        }
+        public TimeSpan Expiration { get; set; }
+        public string GroupKey { get; set; }
 
         public event EventHandler ScriptChanged 
         {

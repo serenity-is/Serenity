@@ -31,7 +31,8 @@ namespace Serenity.Web
             return name;
         }
 
-        public bool NonCached { get { return false; } }
+        public TimeSpan Expiration { get; set; }
+        public string GroupKey { get; set; }
 
         public void Changed()
         {
