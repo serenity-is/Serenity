@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.IO;
 
 namespace Serenity
 {
@@ -63,10 +64,21 @@ namespace Serenity
         /// Converts object to its JSON representation
         /// </summary>
         /// <param name="value">Value to convert to JSON</param>
+        /// <param name="tabSize">Indentation (default 4)</param>
         /// <returns>Serialized JSON string</returns>
-        public static string StringifyIndented(object value)
+        public static string StringifyIndented(object value, int indentation = 4)
         {
-            return JsonConvert.SerializeObject(value, Formatting.Indented, JsonSettings.Strict);
+            using (var sw = new StringWriter())
+            using (var jw = new JsonTextWriter(sw))
+            {
+                jw.Formatting = Formatting.Indented;
+                jw.IndentChar = ' ';
+                jw.Indentation = indentation;
+
+                var serializer = JsonSerializer.Create(JsonSettings.Strict);
+                serializer.Serialize(jw, value);
+                return sw.ToString();
+            }
         }
 
         /// <summary>
