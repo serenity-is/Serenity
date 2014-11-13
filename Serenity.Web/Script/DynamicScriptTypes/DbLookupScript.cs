@@ -6,7 +6,7 @@ using System.Data;
 
 namespace Serenity.Web
 {
-    public class DbLookupScript<TItem> : INamedDynamicScript, ITwoLevelCached
+    public class DbLookupScript<TItem> : INamedDynamicScript
         where TItem: class, new()
     {
         private string _scriptName;
@@ -83,7 +83,7 @@ namespace Serenity.Web
             if (row != null)
                 GroupKey = row.GetFields().GenerationKey;
 
-            Expiration = TimeSpan.Zero;
+            Expiration = _nonCached ? TimeSpan.FromDays(-1) : TimeSpan.Zero;
 
             DynamicScriptManager.Register(this);
         }

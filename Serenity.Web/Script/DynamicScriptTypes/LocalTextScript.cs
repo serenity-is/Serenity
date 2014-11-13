@@ -10,49 +10,39 @@ using System.Text.RegularExpressions;
 
 namespace Serenity.Web
 {
-    public class LocalTextScript : INamedDynamicScript
+    public class LocalTextScript : DynamicScript, INamedDynamicScript
     {
-        private string _scriptName;
-        private string _package;
-        private string _languageId;
-        private bool _isPending;
-        private EventHandler _scriptChanged;
-        private static Dictionary<string, string[]> _packages;
+        private string scriptName;
+        private string package;
+        private string languageId;
+        private bool isPending;
+        private static Dictionary<string, string[]> packages;
 
         public LocalTextScript(string package, string languageId, bool isPending)
         {
-            _package = package;
-            _languageId = languageId;
-            _isPending = isPending;
-            _scriptName = GetScriptName(package, languageId, isPending);
+            this.package = package;
+            this.languageId = languageId;
+            this.isPending = isPending;
+            this.scriptName = GetScriptName(package, languageId, isPending);
         }
 
-        public TimeSpan Expiration { get; set; }
-        public string GroupKey { get; set; }
+        public string ScriptName { get { return scriptName; } }
 
         public static string GetScriptName(string package, string languageId, bool isPending)
         {
             return String.Format("LocalText.{0}.{1}.{2}", package, languageId, isPending ? "Pending" : "Public");
         }
 
-        public void Changed()
-        {
-            if (_scriptChanged != null)
-                _scriptChanged(this, new EventArgs());
-        }
-
-        public string ScriptName { get { return _scriptName; } }
-
         public static string GetLocalTextPackageScript(string package, string languageId, bool isPending)
         {
-            if (_packages == null)
+            if (packages == null)
             {
-                _packages = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(
+                packages = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(
                     ConfigurationManager.AppSettings["LocalTextPackages"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
             }
 
             string[] packageItems;
-            if (!_packages.TryGetValue(package, out packageItems) ||
+            if (!packages.TryGetValue(package, out packageItems) ||
                 packageItems.Length == 0)
                 return String.Empty;
 
@@ -168,19 +158,9 @@ namespace Serenity.Web
             return jwBuilder.ToString();
         }
 
-        public string GetScript()
+        public override string GetScript()
         {
-            return GetLocalTextPackageScript(_package, _languageId, _isPending);
- 	    }
-
-        public void CheckRights()
-        {
-        }
-
-        public event System.EventHandler ScriptChanged
-        {
-            add { _scriptChanged += value; }
-            remove { _scriptChanged -= value; }
+            return GetLocalTextPackageScript(package, languageId, isPending);
         }
     }
 }

@@ -179,7 +179,6 @@
     <Compile Include="Script\DynamicScript\DynamicScriptManager.Item.cs" />
     <Compile Include="Script\HtmlScriptExtensions.cs" />
     <Compile Include="Script\ContentHashCache.cs" />
-    <Compile Include="Script\DynamicScriptTypes\LocalInitScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\LocalTextScript.cs" />
     <Compile Include="Script\DynamicScriptTypes\DbLookupScript.cs" />
     <Compile Include="Script\PropertyEditor\PropertyItemsScript.cs" />

@@ -53,7 +53,7 @@ namespace Serenity.Web
             foreach (var s in registeredScripts)
             {
                 var key = (string)s.Key;
-                if (key != RegisteredScripts._scriptName)
+                if (key != "RegisteredScripts")
                 {
                     var value = s.Value as Item;
                     result[key] = value.Content.Hash;

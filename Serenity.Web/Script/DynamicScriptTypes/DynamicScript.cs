@@ -2,11 +2,11 @@
 
 namespace Serenity.Web
 {
-    public class DynamicScript : INamedDynamicScript, ITwoLevelCached
+    public abstract class DynamicScript : IDynamicScript
     {
         private EventHandler scriptChanged;
 
-        public DynamicScript()
+        protected DynamicScript()
         {
         }
 
@@ -16,34 +16,18 @@ namespace Serenity.Web
                 scriptChanged(this, new EventArgs());
         }
 
-        public virtual string GetScript()
+        public abstract string GetScript();
+
+        public virtual void CheckRights()
         {
-            Check.NotNull("GetData", "getData");
-
-            object data = GetData();
-
-            return String.Format("Q$ScriptData.set({0}, {1});",
-                (ScriptName).ToSingleQuoted(), data.ToJson());
-        }
-
-        public void CheckRights()
-        {
-            if (Permission == null)
+            if (Permission == null || Permission == "*")
                 return;
-
-            if (Permission == "?" || Permission == "")
-            {
-                Authorization.ValidateLoggedIn();
-                return;
-            }
-
-            if (Permission == "*")
-            {
-                Authorization.ValidatePermission(Permission);
-                return;
-            }
 
             Authorization.ValidateLoggedIn();
+
+            if (Permission == "?" || Permission == "")
+                return;
+            
             Authorization.ValidatePermission(Permission);
         }
 
@@ -56,7 +40,5 @@ namespace Serenity.Web
         public string GroupKey { get; set; }
         public TimeSpan Expiration { get; set; }
         public string Permission { get; set; }
-        public string ScriptName { get; set; }
-        public Func<object> GetData { get; set; }
     }
 }

@@ -1,64 +1,31 @@
 ﻿using System;
 using System.IO;
-using System.Web;
-using System.Text.RegularExpressions;
-using System.Web.Hosting;
 
 namespace Serenity.Web
 {
-    public class TemplateScript : INamedDynamicScript
+    public class TemplateScript : DynamicScript, INamedDynamicScript
     {
-        //private static readonly Regex _whiteSpaceRegex = new Regex("\\s{2,}", RegexOptions.Compiled);
+        private string key;
+        private Func<string> getTemplate;
 
-        private string _scriptName;
-        private string _template;
-        private string _key;
-        private EventHandler _scriptChanged;
-
-        public TemplateScript(string key, string template)
+        public TemplateScript(string key, Func<string> getTemplate)
         {
-            _template = template;
-            _key = key;
-            _scriptName = "Template." + key;
-            DynamicScriptManager.Register(this);
+            Check.NotNull(key, "key");
+            Check.NotNull(getTemplate, "getTemplate");
+
+            this.getTemplate = getTemplate;
+            this.key = key;
         }
 
-        public TimeSpan Expiration { get; set; }
-        public string GroupKey { get; set; }
+        public string ScriptName { get { return "Template." + key; } }
 
-        public void Changed()
+        public override string GetScript()
         {
-            if (_scriptChanged != null)
-                _scriptChanged(this, new EventArgs());
-        }
+            string templateText = getTemplate();
 
-        public string ScriptName { get { return _scriptName; } }
-
-        public string GetScript()
-        {
-            string templateText;
-            
-            if (_template.ToLowerInvariant().EndsWith(".html"))
-            {
-                using (var sr = new StreamReader(HostingEnvironment.MapPath(_template)))
-                    templateText = sr.ReadToEnd();
-            }
-            else
-            {
-                templateText = TemplateHelper.RenderViewToString(_template, null);
-            } 
-
-            return "Q$ScriptData.set('Template." + _key + "', " + templateText.ToSingleQuoted() + ");"; 
- 	    }
-
-        public void CheckRights()
-        {
-        }
-
-        public event System.EventHandler ScriptChanged
-        {
-            add { _scriptChanged += value; }
-            remove { _scriptChanged -= value; }
+            return String.Format("Q$ScriptData.set({0}, {1})", 
+                ("Template." + key).ToSingleQuoted(),
+                templateText.ToSingleQuoted()); 
         }
     }
 }

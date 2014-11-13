@@ -96,11 +96,11 @@ namespace Serenity
             return new List<DialogButton>
             {
                 new DialogButton {
-                    Text = "Tamam",
+                    Text = Q.Text("Dialogs.OkButton"),
                     Click = OkClick,
                 },
                 new DialogButton {
-                    Text = "İptal",
+                    Text = Q.Text("Dialogs.CancelButton"),
                     Click = CancelClick
                 }
             };

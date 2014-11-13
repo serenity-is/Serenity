@@ -20,7 +20,6 @@ namespace Serenity.Web
         {
             this.type = type;
             this.scriptName = scriptName;
-            DynamicScriptManager.Register(this);
         }
 
         protected static string CheckName(string name)

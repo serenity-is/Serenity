@@ -77,31 +77,12 @@ namespace Serenity.Web
                                 "It must be Result<T> or a regular class!",
                                 type.Name, method.Name));
 
-                        var dataScript = new DynamicScript();
-                        dataScript.ScriptName = attr.Key;
-                        dataScript.Expiration = TimeSpan.FromSeconds(attr.CacheDuration);
-                        dataScript.GroupKey = attr.CacheGroupKey;
-                        
-                        var serviceAuthorize = method.GetCustomAttribute<ServiceAuthorizeAttribute>() ??
-                            type.GetCustomAttribute<ServiceAuthorizeAttribute>();
-
-                        if (serviceAuthorize != null)
-                            dataScript.Permission = serviceAuthorize.Permission ?? "?";
-                        else
-                        {
-                            var authorize = method.GetCustomAttribute<AuthorizeAttribute>() ??
-                                type.GetCustomAttribute<AuthorizeAttribute>();
-
-                            if (authorize != null)
-                                dataScript.Permission = "?";
-                        }
-
-                        dataScript.GetData = delegate
+                        var dataScript = new DataScript(attr.Key, delegate()
                         {
                             var controller = Activator.CreateInstance(type);
 
                             object result;
-                            
+
                             object[] prm;
                             if (parameters.Length == 0)
                                 prm = null;
@@ -133,12 +114,29 @@ namespace Serenity.Web
                                 if (connection != null)
                                     connection.Dispose();
                             }
-                            
+
                             if (isResult)
                                 result = ((dynamic)result).Data;
 
                             return result;
-                        };
+                        });
+
+                        dataScript.Expiration = TimeSpan.FromSeconds(attr.CacheDuration);
+                        dataScript.GroupKey = attr.CacheGroupKey;
+                        
+                        var serviceAuthorize = method.GetCustomAttribute<ServiceAuthorizeAttribute>() ??
+                            type.GetCustomAttribute<ServiceAuthorizeAttribute>();
+
+                        if (serviceAuthorize != null)
+                            dataScript.Permission = serviceAuthorize.Permission ?? "?";
+                        else
+                        {
+                            var authorize = method.GetCustomAttribute<AuthorizeAttribute>() ??
+                                type.GetCustomAttribute<AuthorizeAttribute>();
+
+                            if (authorize != null)
+                                dataScript.Permission = "?";
+                        }
 
                         DynamicScriptManager.Register(dataScript.ScriptName, dataScript);
                     }

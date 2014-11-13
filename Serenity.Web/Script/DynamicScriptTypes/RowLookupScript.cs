@@ -40,6 +40,7 @@ namespace Serenity.Web
         }
 
         public RowLookupScript()
+            : base()
         {
             var row = new TRow();
 
@@ -68,34 +69,32 @@ namespace Serenity.Web
 
             var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>();
             if (readPermission != null)
-            {
-                this.Authorize = true;
                 this.Permission = readPermission.Permission.IsEmptyOrNull() ? null : readPermission.Permission;
-            }
 
             this.GroupKey = row.GetFields().GenerationKey;
+            this.getItems = GetItems;
+        }
 
-            this.GetItems = delegate
+        protected virtual List<TRow> GetItems()
+        {
+            var list = new List<TRow>();
+            var loader = new TRow();
+
+            var query = new SqlQuery()
+                .From(loader);
+
+            PrepareQuery(query);
+            ApplyOrder(query);
+
+            using (var connection = SqlConnections.NewByKey(RowRegistry.GetConnectionKey(loader)))
             {
-                var list = new List<TRow>();
-                var loader = new TRow();
-
-                var query = new SqlQuery()
-                    .From(loader);
-
-                PrepareQuery(query);
-                ApplyOrder(query);
-
-                using (var connection = SqlConnections.NewByKey(RowRegistry.GetConnectionKey(loader)))
+                query.ForEach(connection, delegate()
                 {
-                    query.ForEach(connection, delegate()
-                    {
-                        list.Add(loader.Clone());
-                    });
-                }
+                    list.Add(loader.Clone());
+                });
+            }
 
-                return list;
-            };
+            return list;
         }
     }
 }

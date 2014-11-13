@@ -6,26 +6,26 @@ using System.Data;
 
 namespace Serenity.Web
 {
-    public class LookupScript : INamedDynamicScript, ITwoLevelCached
+    public class LookupScript : DynamicScript, INamedDynamicScript
     {
-        private EventHandler scriptChanged;
         private Dictionary<string, object> lookupParams;
+        protected Func<IEnumerable> getItems;
 
-        public LookupScript()
+        protected LookupScript()
         {
             lookupParams = new Dictionary<string, object>();
-            Expiration = TimeSpan.Zero;
         }
 
-        public void Changed()
+        public LookupScript(Func<IEnumerable> getItems)
+            : this()
         {
-            if (scriptChanged != null)
-                scriptChanged(this, new EventArgs());
+            Check.NotNull(getItems, "getItems");
+            this.getItems = getItems;
         }
 
-        public string GetScript()
+        public override string GetScript()
         {
-            IEnumerable items = GetItems();
+            IEnumerable items = getItems();
 
             return String.Format("Q$ScriptData.set({0}, new Q$Lookup({1}, \n{2}\n));",
                 ("Lookup." + LookupKey).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
@@ -84,28 +84,7 @@ namespace Serenity.Web
             }
         }
 
-        public void CheckRights()
-        {
-            if (Authorize && !Authorization.IsLoggedIn)
-                throw new AccessViolationException(String.Format("{0} script'ine yalnızca giriş yapmış kullanıcılar tarafından erişilebilir!"));
-
-            if (Permission != null)
-                Authorization.ValidatePermission(Permission);
-        }
-
-        public event System.EventHandler ScriptChanged
-        {
-            add { scriptChanged += value; }
-            remove { scriptChanged -= value; }
-        }
-
-        public string GroupKey { get; set; }
-        public TimeSpan Expiration { get; set; }
-        public bool Authorize { get; set; }
-        public string Permission { get; set; }
-        public bool NonCached { get; set; }
         public string LookupKey { get; set; }
         public string ScriptName { get { return "Lookup." + LookupKey; } }
-        public Func<IEnumerable> GetItems { get; set; }
     }
 }

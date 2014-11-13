@@ -42,24 +42,7 @@ namespace Serenity.Web
                     script.LookupKey = attr.Key;
 
                     if (attr.Permission != null)
-                    {
-                        if (attr.Permission == "?" || attr.Permission == "")
-                        {
-                            script.Authorize = true;
-                            script.Permission = null;
-                        }
-                        else if (attr.Permission == "*")
-                        {
-                            script.Authorize = false;
-                            script.Permission = null;
-                        }
-                        else
-                        {
-                            script.Authorize = true;
-                            script.Permission = attr.Permission;
-                        }
-                    }
-
+                        script.Permission = attr.Permission;
 
                     DynamicScriptManager.Register(script.ScriptName, script);
                 }

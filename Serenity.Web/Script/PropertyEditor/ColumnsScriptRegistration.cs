@@ -19,7 +19,11 @@ namespace Serenity.Web
                 {
                     var attr = type.GetCustomAttribute<ColumnsScriptAttribute>();
                     if (attr != null)
-                        scripts.Add(new ColumnsScript(attr.Key, type).GetScript);
+                    {
+                        var script = new ColumnsScript(attr.Key, type);
+                        DynamicScriptManager.Register(script);
+                        scripts.Add(script.GetScript);
+                    }
                 }
 
             DynamicScriptManager.Register("ColumnsBundle", new ConcatenatedScript(scripts));

@@ -19,7 +19,11 @@ namespace Serenity.Web
                 {
                     var attr = type.GetCustomAttribute<FormScriptAttribute>();
                     if (attr != null)
-                        scripts.Add(new FormScript(attr.Key, type).GetScript);
+                    {
+                        var script = new FormScript(attr.Key, type);
+                        DynamicScriptManager.Register(script);
+                        scripts.Add(script.GetScript);
+                    }
                 }
 
             DynamicScriptManager.Register("FormBundle", new ConcatenatedScript(scripts));

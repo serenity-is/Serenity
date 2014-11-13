@@ -71,11 +71,10 @@ namespace Serenity.Web
                     if (key == null)
                         continue;
 
-                    var path = rootUrl + UploadHelper.ToUrl(file.Substring(rootPath.Length));
-
-                    var script = new TemplateScript(key, path); // auto registers;
+                    var script = new TemplateScript(key, () => File.ReadAllText(file));
+                    DynamicScriptManager.Register(script);
                     scriptByKey[key.ToLowerInvariant()] = script;
-                    bundleList.Add(() => script.GetScript());
+                    bundleList.Add(script.GetScript);
                 }
 
                 if (watchForChanges)

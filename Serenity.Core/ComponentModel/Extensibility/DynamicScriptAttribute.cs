@@ -3,7 +3,7 @@
 namespace Serenity.ComponentModel
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple=false)]
-    public class DynamicScriptAttribute : Attribute
+    public abstract class DynamicScriptAttribute : Attribute
     {
         public DynamicScriptAttribute(string key)
         {
