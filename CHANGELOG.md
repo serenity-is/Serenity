@@ -1,3 +1,17 @@
+## 1.4.1 (2014-11-13)
+
+Features:
+  - added Date and Enumeration filterings
+  - added jQuery UI datepicker localization
+  - JsonLocalTextRegistration and NestedLocalTextRegistration tests
+  - refactored dynamic scripts
+  - it is now possible to define a remote data script on a MVC action
+  - indentation option for Json.StringifyIndented
+  - added roles, role permissions, user permissions tables and interface to Serene sample application
+  
+Bugfixes:
+  - Filter panel effective filter text is English now
+
 ## 1.4.0 (2014-11-08)
 
 Features:
