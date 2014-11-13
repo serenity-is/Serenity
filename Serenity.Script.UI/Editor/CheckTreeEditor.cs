@@ -357,6 +357,40 @@ namespace Serenity
             return opt;
         }
 
+        protected virtual void SortItems()
+        {
+            if (!MoveSelectedUp())
+                return;
+
+            var oldIndexes = new JsDictionary<string, int>();
+            var list = this.view.GetItems();
+            int i = 0;
+            foreach (var x in list)
+                oldIndexes[x.Id] = i++;
+
+            list.Sort((x, y) =>
+            {
+                if (x.IsSelected && !y.IsSelected)
+                    return -1;
+
+                if (y.IsSelected && !x.IsSelected)
+                    return 1;
+
+                var c = Q.Externals.TurkishLocaleCompare(x.Text, y.Text);
+                if (c != 0)
+                    return c;
+
+                return oldIndexes[x.Id].CompareTo(oldIndexes[y.Id]);
+            });
+
+            view.SetItems(list, true);
+        }
+
+        protected virtual bool MoveSelectedUp()
+        {
+            return false;
+        }
+
         public List<string> Value
         {
             get
@@ -392,6 +426,7 @@ namespace Serenity
 
                     UpdateSelectAll();
                     UpdateFlags();
+                    SortItems();
                 }
                 finally
                 {
