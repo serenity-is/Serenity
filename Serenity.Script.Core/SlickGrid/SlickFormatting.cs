@@ -133,23 +133,23 @@ namespace Serenity
             return href;
         }
 
-        public static string ItemLinkText(string itemType, object id, object text, string extraClass)
+        public static string ItemLinkText(string itemType, object id, object text, string extraClass, bool encode)
         {
             return "<a" + (Script.IsValue(id) ? (" href=\"#" + itemType.Replace(".", "-") + "/" + id + "\"") : "") +
                 " data-item-type=\"" + itemType + "\"" +
                 " data-item-id=\"" + id + "\"" +
                 " class=\"s-EditLink s-" + itemType.Replace(".", "-") + "Link" + (extraClass.IsEmptyOrNull() ? "" : (" " + extraClass)) + "\">" +
-                Q.HtmlEncode(text ?? "") + "</a>";
+                (encode ? Q.HtmlEncode(text ?? "") : (text ?? "")) + "</a>";
         }
 
         public static SlickFormatter ItemLink(string itemType, string idField, 
-            Func<SlickFormatterContext, string> getText, Func<SlickFormatterContext, string> cssClass = null)
+            Func<SlickFormatterContext, string> getText, Func<SlickFormatterContext, string> cssClass = null, bool encode = false)
         {
             return delegate(SlickFormatterContext ctx)
             {
                 return ItemLinkText(itemType, ctx.Item[idField], 
                     getText == null ? ctx.Value : getText(ctx),
-                    cssClass == null ? "" : cssClass(ctx));
+                    cssClass == null ? "" : cssClass(ctx), encode);
             };
         }
     }

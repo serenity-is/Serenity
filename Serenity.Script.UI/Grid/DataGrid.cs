@@ -287,7 +287,6 @@ namespace Serenity
             });
 
             slickGrid.SetSortColumns(mapped);
-            Q.Log(mapped);
         }
 
         public List<TItem> Items
@@ -634,12 +633,12 @@ namespace Serenity
         }
 
         protected SlickFormatter ItemLink(string itemType = null, string idField = null,
-            Func<SlickFormatterContext, string> text = null, Func<SlickFormatterContext, string> cssClass = null)
+            Func<SlickFormatterContext, string> text = null, Func<SlickFormatterContext, string> cssClass = null, bool encode = true)
         {
             itemType = itemType ?? GetItemType();
             idField = idField ?? GetIdFieldName();
 
-            return SlickFormatting.ItemLink(itemType, idField, text, cssClass);
+            return SlickFormatting.ItemLink(itemType, idField, text, cssClass, encode);
         }
 
         protected virtual Promise<List<PropertyItem>> GetPropertyItemsAsync()
@@ -697,7 +696,8 @@ namespace Serenity
 
                                 return Q.HtmlEncode(ctx.Value);
                             },
-                            cssClass: ctx => css ?? "");
+                            cssClass: ctx => css ?? "",
+                            encode: false);
                     }
                 }
             }
