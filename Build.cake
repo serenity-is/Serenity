@@ -7,7 +7,7 @@ var nuspecParams = new Dictionary<string, string> {
   { "authors", "Volkan Ceylan" },
   { "owners", "Volkan Ceylan" },
   { "language", "en-US" },
-  { "iconUrl", "https://raw.github.com/volkanceylan/Serenity/master/Tools/Images/serenity-icon.png" },
+  { "iconUrl", "https://raw.github.com/volkanceylan/Serenity/master/Tools/Images/serenity-logo-128.png" },
   { "licenceUrl", "https://raw.github.com/volkanceylan/Serenity/master/LICENSE.md" },
   { "projectUrl", "http://github.com/volkanceylan/Serenity" },
   { "copyright", "Copyright (c) Volkan Ceylan" },
