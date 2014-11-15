@@ -70,16 +70,6 @@ namespace Serenity
         public SlickColumnFormatter Formatter { get; set; }
 
         /// <summary>
-        /// My extension to access source PropertyItem object if available
-        /// </summary>
-        public PropertyItem SourceItem { get; set; }
-
-        /// <summary>
-        /// My hack to allow formatters with single argument and intellisen
-        /// </summary>
-        public SlickFormatter Format { get; set; }
-
-        /// <summary>
         /// Accepts a string as a class name, applies that class to the cell for the column header. (default: null)
         /// </summary>
         public string HeaderCssClass { get; set; }
@@ -135,5 +125,20 @@ namespace Serenity
         /// Width of the column in pixels. (May often be overridden by things like minWidth, maxWidth, forceFitColumns, etc.) (default: null)
         /// </summary>
         public int Width { get; set; }
+
+        /// <summary>
+        /// Custom extension to allow formatters with single argument and intellisen
+        /// </summary>
+        public SlickFormatter Format { get; set; }
+
+        /// <summary>
+        /// Custom extension to access source PropertyItem object if available
+        /// </summary>
+        public PropertyItem SourceItem { get; set; }
+
+        /// <summary>
+        /// Custom extension to allow specifying initial sort orders (1, 2, 3 etc, negative number means descending sort)
+        /// </summary>
+        public int SortOrder { get; set; }
     }
 }

@@ -80,6 +80,10 @@ namespace Serenity.PropertyGrid
                 if (alignmentAttr != null)
                     pi.Alignment = alignmentAttr.Value;
 
+                var sortOrderAttr = (SortOrderAttribute)getAttribute(typeof(SortOrderAttribute));
+                if (sortOrderAttr != null && sortOrderAttr.SortOrder != 0)
+                    pi.SortOrder = sortOrderAttr.SortOrder;
+
                 if (getAttribute(typeof(OneWayAttribute)) != null)
                     pi.OneWay = true;
 

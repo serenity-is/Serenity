@@ -32,6 +32,7 @@ namespace Serenity
         public int MinWidth { get; set; }
         public int MaxWidth { get; set; }
         public bool Resizable { get; set; }
+        public int SortOrder { get; set; }
 
         public bool EditLink { get; set; }
         public string EditLinkItemType { get; set; }

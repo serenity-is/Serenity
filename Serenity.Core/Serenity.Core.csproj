@@ -57,6 +57,7 @@
     <Compile Include="ComponentModel\Columns\Formatting\CustomFormatterAttribute.cs" />
     <Compile Include="ComponentModel\Columns\EditLinkAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\SortOrderAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
     <Compile Include="ComponentModel\Columns\WidthAttribute.cs" />
     <Compile Include="Helpers\Check.cs" />

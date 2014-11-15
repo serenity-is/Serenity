@@ -60,6 +60,8 @@ namespace Serenity.ComponentModel
         public int? MaxWidth { get; set; }
         [JsonProperty("resizable")]
         public bool? Resizable { get; set; }
+        [JsonProperty("sortOrder")]
+        public int? SortOrder { get; set; }
        
         [JsonProperty("editLink")]
         public bool? EditLink { get; set; }

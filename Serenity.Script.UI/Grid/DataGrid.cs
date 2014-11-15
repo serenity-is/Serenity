@@ -221,6 +221,7 @@ namespace Serenity
                     if (this.slickGrid != null)
                         this.slickGrid.SetColumns(columns);
 
+                    SetInitialSortOrder();
                     InitialPopulate();
                 });
         }
@@ -254,12 +255,27 @@ namespace Serenity
                 EnableForHeaderCells = true
             }));
 
-            grid.SetSortColumns(GetDefaultSortBy().Map<SlickColumnSort>(s =>
+            this.slickGrid = grid;
+
+            if (!IsAsyncWidget())
+                SetInitialSortOrder();
+
+            return grid;
+        }
+
+        protected virtual void SetInitialSortOrder()
+        {
+            var sortBy = GetDefaultSortBy();
+
+            if (view != null)
+                view.SortBy = sortBy.ToArray();
+
+            var mapped = sortBy.Map<SlickColumnSort>(s =>
             {
                 var x = new SlickColumnSort();
-                if (s != null && s.ToLower().EndsWith(" DESC"))
+                if (s != null && s.ToLower().EndsWith(" desc"))
                 {
-                    x.ColumnId = s.Substr(0, s.Length - 5);
+                    x.ColumnId = s.Substr(0, s.Length - 5).TrimEnd();
                     x.SortAsc = false;
                 }
                 else
@@ -268,9 +284,10 @@ namespace Serenity
                     x.SortAsc = true;
                 }
                 return x;
-            }));
+            });
 
-            return grid;
+            slickGrid.SetSortColumns(mapped);
+            Q.Log(mapped);
         }
 
         public List<TItem> Items
@@ -484,6 +501,24 @@ namespace Serenity
 
         protected virtual List<string> GetDefaultSortBy()
         {
+            if (slickGrid != null && slickGrid.GetColumns().Count > 0)
+            {
+                var columns = slickGrid.GetColumns().Where(x => Script.IsValue(x.SortOrder) && x.SortOrder != 0).ToList();
+                if (columns.Count > 0)
+                {
+                    columns.Sort((x, y) => Math.Abs(x.SortOrder).CompareTo(Math.Abs(y.SortOrder)));
+
+                    var list = new List<string>();
+                    for (var i = 0; i < columns.Count; i++)
+                    {
+                        var col = columns[i];
+                        list.Add(col.Field + (col.SortOrder < 0 ? " DESC" : ""));
+                    }
+
+                    return list;
+                }
+            }
+
             return new List<string> { GetIdFieldName() };
         }
 
