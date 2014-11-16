@@ -34,8 +34,6 @@ namespace Serenity
 
         public static void InitFullHeightGridPage(jQueryObject gridDiv)
         {
-            J("html").CSS("overflow", "hidden");
-
             J("body")
                 .AddClass("full-height-page");
 
