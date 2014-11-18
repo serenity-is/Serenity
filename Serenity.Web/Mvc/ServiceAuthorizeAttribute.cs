@@ -54,6 +54,10 @@ namespace Serenity.Services
                     }
                 });
             }
+
+            filterContext.HttpContext.Response.Clear();
+            filterContext.HttpContext.Response.StatusCode = 400;
+            filterContext.HttpContext.Response.TrySkipIisCustomErrors = true;
         }
     }
 }
