@@ -167,7 +167,7 @@ namespace Serenity.Web
         public void CheckRights()
         {
             if (_authorize && !Authorization.IsLoggedIn)
-                throw new AccessViolationException(String.Format("{0} script'ine yalnızca giriş yapmış kullanıcılar tarafından erişilebilir!"));
+                throw new AccessViolationException(String.Format("{0} script'ine yalnızca giriş yapmış kullanıcılar tarafından erişilebilir!", ScriptName));
 
             if (_right != null)
                 Authorization.ValidatePermission(_right);
