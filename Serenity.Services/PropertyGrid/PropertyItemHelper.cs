@@ -316,7 +316,7 @@ namespace Serenity.PropertyGrid
             var idField = basedOnField.Fields.FirstOrDefault(x => x.ForeignJoinAlias != null &&
                 x.ForeignJoinAlias.Name == basedOnField.Join.Name);
 
-            return idField.PropertyName ?? idField.Name;
+            return idField == null ? null : (idField.PropertyName ?? idField.Name);
         }
 
         private static string AutoDetermineEditorType(Type valueType, Type enumType)
