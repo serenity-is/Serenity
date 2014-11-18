@@ -106,6 +106,25 @@ namespace Serenity.CodeGeneration
                         }
 
                         if (widgetTypeName == null)
+                        {
+                            var wn = editorType;
+                            if (!WidgetTypes.Contains(editorType))
+                                wn = editorType + "Editor";
+
+                            if (WidgetTypes.Contains(wn))
+                            {
+                                var idx = wn.LastIndexOf(".");
+                                if (idx >= 0)
+                                {
+                                    UsingNamespaces.Add(wn.Substring(0, idx));
+                                    widgetTypeName = wn.Substring(idx + 1);
+                                }
+                                else
+                                    widgetTypeName = wn;
+                            }
+                        }
+
+                        if (widgetTypeName == null)
                             continue;
 
                         if (widgetTypeName.StartsWith(ns + "."))
