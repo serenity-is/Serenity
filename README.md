@@ -29,10 +29,9 @@ The sample application includes old and famous Nortwind data along with services
 
 ## Documentation
 
+See [Serenity Guide](http://volkanceylan.github.io/SerenityGuide) for documentation.
 
-See [Serenity Guide](https://github.com/volkanceylan/SerenityGuide/blob/master/SUMMARY.md) for documentation.
-
-* [https://github.com/volkanceylan/SerenityGuide/blob/master/SUMMARY.md](https://github.com/volkanceylan/SerenityGuide/blob/master/SUMMARY.md)
+* [http://volkanceylan.github.io/SerenityGuide/index.html](http://volkanceylan.github.io/SerenityGuide)
 
 
 
