@@ -1,3 +1,17 @@
+## 1.4.2 (2014-11-19)
+
+Features:
+  - updated bootstrap to 3.3.0, jQuery.UI to 1.11.2, FakeItEasy to 1.25.0, toastr to 2.1.0
+  - allow specifying default sort order for datagrid columns on server / client side (SortOrder attribute, use negative values for descending sort)
+  - add theme selection option to Serene (only a light theme for now)
+
+Bugfixes:
+  - fix double html encoding with EditLinks (& was shown as &amp;).
+  - fix script form generator output when full editor namespace is used
+  - ServiceAuthorizeAttribute now returns 400 as HTML status code
+  - null reference exception when related id field for a foreign field can't be determined in PropertyItemHelper
+  - fix typo in authorization error message for DbLookupScript (it is gonna be obsolete, avoid using it)
+
 ## 1.4.1 (2014-11-13)
 
 Features:
