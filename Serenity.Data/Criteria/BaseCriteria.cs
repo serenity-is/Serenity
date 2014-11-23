@@ -2,6 +2,7 @@ namespace Serenity.Data
 {
     using Newtonsoft.Json;
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Text;
@@ -75,8 +76,15 @@ namespace Serenity.Data
                 return In((BaseCriteria)(object)values[0]);
             }
 
-            if ((values.Length == 1 &&
-                      values[0] is ISqlQuery))
+            if (values.Length == 1 &&
+                !(values[0] is string) &&
+                values[0] is IEnumerable)
+            {
+                return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values[0]));
+            }
+
+            if (values.Length == 1 &&
+                values[0] is ISqlQuery)
             {
                 return In((ISqlQuery)(object)values[0]);
             }
@@ -116,8 +124,15 @@ namespace Serenity.Data
                 return NotIn((BaseCriteria)(object)values[0]);
             }
 
-            if ((values.Length == 1 &&
-                      values[0] is ISqlQuery))
+            if (values.Length == 1 &&
+                !(values[0] is string) &&
+                values[0] is IEnumerable)
+            {
+                return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values[0]));
+            }
+
+            if (values.Length == 1 &&
+                values[0] is ISqlQuery)
             {
                 return NotIn((ISqlQuery)(object)values[0]);
             }
