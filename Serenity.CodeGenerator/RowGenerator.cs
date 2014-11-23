@@ -261,7 +261,7 @@ namespace Serenity.CodeGenerator
 
         public static string GenerateVariableName(string fieldName)
         {
-            return Inflector.Inflector.Pascalize(fieldName);
+            return Inflector.Inflector.Titleize(fieldName).Replace(" ", "");
 
             /*string[] strArray = fieldName.Trim().Split(new char[1] { '_' });
             string str1 = string.Empty;
