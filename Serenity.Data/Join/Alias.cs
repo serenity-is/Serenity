@@ -79,6 +79,16 @@ namespace Serenity.Data
             }
         }
 
+        public Criteria _(string field)
+        {
+            return new Criteria(this[field]);
+        }
+
+        public Criteria _(IField field)
+        {
+            return new Criteria(this[field]);
+        }
+
         public Alias WithNoLock()
         {
             if (String.IsNullOrEmpty(this.table))
