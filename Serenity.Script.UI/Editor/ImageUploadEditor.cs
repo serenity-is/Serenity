@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor, DisplayName("Resim Yükleme"), OptionsType(typeof(ImageUploadEditorOptions))]
+    [Editor, DisplayName("Image Upload"), OptionsType(typeof(ImageUploadEditorOptions))]
     [Element("<div/>")]
     public class ImageUploadEditor : Widget<ImageUploadEditorOptions>, IGetEditValue, ISetEditValue, IReadOnly
     {
@@ -62,6 +62,11 @@ namespace Serenity
             this.UpdateInterface();
         }
 
+        protected virtual string AddFileButtonText()
+        {
+            return Q.Text("Controls.ImageUpload.AddFileButton");
+        }
+
         protected virtual List<ToolButton> GetToolButtons()
         {
             var self = this;
@@ -70,14 +75,15 @@ namespace Serenity
             {
                 new ToolButton
                 {
-                    Title = "Dosya Seç",
+                    Title = AddFileButtonText(),
                     CssClass = "add-file-button",
                     OnClick = delegate {
                     }
                 },
                 new ToolButton
                 {
-                    Title = "Kaldır",
+                    Title = "",
+                    Hint = Q.Text("Controls.ImageUpload.DeleteButtonHint"),
                     CssClass = "delete-button",
                     OnClick = delegate
                     {
@@ -94,9 +100,9 @@ namespace Serenity
             bool displayOriginalName = !options.OriginalNameProperty.IsTrimmedEmpty();
 
             if (entity == null)
-                UploadHelper.PopulateFileSymbols(fileSymbols, null, displayOriginalName);
+                UploadHelper.PopulateFileSymbols(fileSymbols, null, displayOriginalName, options.UrlPrefix);
             else
-                UploadHelper.PopulateFileSymbols(fileSymbols, new List<UploadedFile> { entity }, displayOriginalName);
+                UploadHelper.PopulateFileSymbols(fileSymbols, new List<UploadedFile> { entity }, displayOriginalName, options.UrlPrefix);
         }
 
         protected virtual void UpdateInterface()
@@ -173,19 +179,21 @@ namespace Serenity
     [Serializable, Reflectable]
     public class ImageUploadEditorOptions
     {
-        [DisplayName("Minimum Genişlik")]
+        [DisplayName("Min Width")]
         public int MinWidth { get; set; }
-        [DisplayName("Maksimum Genişlik")]
+        [DisplayName("Min Width")]
         public int MaxWidth { get; set; }
-        [DisplayName("Minimum Yükseklik")]
+        [DisplayName("Max Height")]
         public int MinHeight { get; set; }
-        [DisplayName("Maksimum Yükseklik")]
+        [DisplayName("Max Height")]
         public int MaxHeight { get; set; }
-        [DisplayName("Minimum Boyut")]
+        [DisplayName("Min Size")]
         public int MinSize { get; set; }
-        [DisplayName("Maksimum Boyut")]
+        [DisplayName("Max Size")]
         public int MaxSize { get; set; }
-        [DisplayName("Orjinal Dosya Adı Alanı")]
+        [DisplayName("Original Name Property")]
         public string OriginalNameProperty { get; set; }
+        [DisplayName("UrlPrefix")]
+        public string UrlPrefix { get; set; }
     }
 }

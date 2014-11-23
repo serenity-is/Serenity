@@ -7,6 +7,7 @@ using System.Configuration;
 using System.IO;
 using System.Web;
 using Serenity.IO;
+using System.Web.Hosting;
 
 namespace Serenity.Web
 {
@@ -152,7 +153,19 @@ namespace Serenity.Web
         {
             get
             {
-                return UploadSettings.Current.Path;
+                var path = UploadSettings.Current.Path;
+                if (path.IsEmptyOrNull())
+                    throw new InvalidOperationException("Please make sure Path in appSettings\\UploadSettings is configured!");
+
+                string appData = @"~\App_Data\";
+                if (path.StartsWith(appData))
+                {
+                    path = Path.Combine(HostingEnvironment.MapPath(appData),
+                        path.Substring(appData.Length));
+                    UploadSettings.Current.Path = path;
+                }
+                
+                return path;
             }
         }
 
@@ -160,7 +173,13 @@ namespace Serenity.Web
         {
             get
             {
-                return Path.Combine(RootPath, @"Temporary\");
+                var path = Path.Combine(RootPath, @"Temporary\");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                    File.WriteAllText(Path.Combine(path, ".temporary"), "");
+                }
+                return path;
             }
         }
 

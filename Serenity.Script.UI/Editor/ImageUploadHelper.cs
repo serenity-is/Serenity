@@ -181,7 +181,8 @@ namespace Serenity
         public static void PopulateFileSymbols(
             jQueryObject container,
             List<UploadedFile> items,
-            bool displayOriginalName = false)
+            bool displayOriginalName = false,
+            string urlPrefix = null)
         {
             items = items ?? new List<UploadedFile>();
             container.Html("");
@@ -210,7 +211,11 @@ namespace Serenity
 
                 if (isImage)
                 {
-                    thumb.Attribute("href", DbFileUrl(item.Filename));
+                    string fileName = item.Filename;
+                    if (urlPrefix != null && fileName != null && !fileName.StartsWith("temporary/"))
+                        fileName = urlPrefix + fileName;
+
+                    thumb.Attribute("href", DbFileUrl(fileName));
                     thumb.Attribute("target", "_blank");
 
                     if (!originalName.IsEmptyOrNull())
