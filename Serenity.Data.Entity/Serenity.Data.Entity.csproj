@@ -55,6 +55,7 @@
     <Compile Include="CustomFields\ICustomFieldDefinition.cs" />
     <Compile Include="CustomFields\ICustomFieldListService.cs" />
     <Compile Include="CustomFields\SchemaChangeSource.cs" />
+    <Compile Include="Extensions\AliasedFields.cs" />
     <Compile Include="Extensions\EntitySqlQueryExtensions.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\EntityConnectionExtensions.cs" />

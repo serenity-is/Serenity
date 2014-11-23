@@ -64,7 +64,7 @@
             return this;
         }
 
-        public SqlQuery LeftJoin(string toTable, Alias alias, ICriteria onCriteria)
+        public SqlQuery LeftJoin(string toTable, IAlias alias, ICriteria onCriteria)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -79,7 +79,7 @@
             return this;
         }
 
-        public SqlQuery LeftJoin(Alias alias, ICriteria onCriteria)
+        public SqlQuery LeftJoin(IAlias alias, ICriteria onCriteria)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -94,7 +94,7 @@
             return this;
         }
 
-        public SqlQuery RightJoin(string toTable, Alias alias, ICriteria onCriteria)
+        public SqlQuery RightJoin(string toTable, IAlias alias, ICriteria onCriteria)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -109,7 +109,7 @@
             return this;
         }
 
-        public SqlQuery RightJoin(Alias alias, ICriteria onCriteria)
+        public SqlQuery RightJoin(IAlias alias, ICriteria onCriteria)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -124,7 +124,7 @@
             return this;
         }
 
-        public SqlQuery InnerJoin(Alias alias, ICriteria onCriteria)
+        public SqlQuery InnerJoin(IAlias alias, ICriteria onCriteria)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");

@@ -89,5 +89,24 @@ namespace Serenity.Data.Test
             Assert.True(aliases.Contains("Y"));
             Assert.True(aliases.Contains("y"));
         }
+
+        [Fact]
+        public void EnumerateAliasesDoesntEnumerateBracedAliases()
+        {
+            string singleAlias;
+            var aliases = JoinAliasLocator.LocateOptimized("x.y + [a].b + y.z + [a].[b].d", out singleAlias);
+            Assert.Equal(null, singleAlias);
+            Assert.Equal(2, aliases.Count);
+            Assert.True(aliases.Contains("x"));
+            Assert.True(aliases.Contains("y"));
+            Assert.Equal(2, aliases.Count);
+        }
+
+        [Fact]
+        public void ReplaceAliasesIgnoresBracedAliases()
+        {
+            var result = JoinAliasLocator.ReplaceAliases("x.y + [a].b + y.z + [a].[b].d", x => "_" + x);
+            Assert.Equal("_x.y + [a].b + _y.z + [a].[b].d", result);
+        }
     }
 }

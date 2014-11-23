@@ -86,7 +86,7 @@ namespace Serenity.Data
         ///   Join aliasý (T1 gibi kullanýlýr)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
-        public Criteria(Alias alias, IField field)
+        public Criteria(IAlias alias, IField field)
             : this(alias.Name, field.Name)
         {
         }
@@ -98,7 +98,7 @@ namespace Serenity.Data
         ///   Join aliasý (T1 gibi kullanýlýr)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
-        public Criteria(Alias alias, string field)
+        public Criteria(IAlias alias, string field)
             : this(alias.Name, field)
         {
         }

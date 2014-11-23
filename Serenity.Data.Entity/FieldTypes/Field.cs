@@ -9,7 +9,7 @@ namespace Serenity.Data
     {
         private string autoTextKey;
         internal LocalText caption;
-        private string expression;
+        internal string expression;
         private RowFieldsBase fields;
         internal FieldFlags flags;
         private string foreignTable;
@@ -17,7 +17,7 @@ namespace Serenity.Data
         internal int index;
         internal Join join;
         internal string joinAlias;
-        private readonly string name;
+        internal string name;
         internal string origin;
         internal string propertyName;
         internal HashSet<string> referencedAliases;
@@ -27,6 +27,7 @@ namespace Serenity.Data
         internal SelectLevel minSelectLevel;
         internal int naturalOrder;
         internal string textualField;
+        private Criteria criteria;
 
         protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
         {
@@ -337,6 +338,18 @@ namespace Serenity.Data
         {
             CheckUnassignedRead(row);
             return GetIsNull(row);
+        }
+
+        public Criteria _
+        {
+            get
+            {
+                if (!Object.ReferenceEquals(criteria, null))
+                    return criteria;
+
+                criteria = new Criteria(this);
+                return criteria;
+            }
         }
 
         //public string EditorType { get; set; }

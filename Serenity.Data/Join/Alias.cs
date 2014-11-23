@@ -4,7 +4,7 @@ namespace Serenity.Data
 {
     /// <summary>
     ///   Used to define aliases like (T0).</summary>
-    public class Alias
+    public class Alias : IAlias
     {
         public static readonly Alias T0 = new Alias(0);
         public static readonly Alias T1 = new Alias(1);
@@ -51,6 +51,11 @@ namespace Serenity.Data
         public string Name
         {
             get { return alias; }
+        }
+
+        public string NameDot
+        {
+            get { return aliasDot; }
         }
 
         public string Table

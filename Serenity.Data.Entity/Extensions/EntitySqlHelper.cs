@@ -358,8 +358,10 @@
            {
                if (info.IntoField as Field != null && info.IntoRowIndex != -1)
                {
-                   var row = into[info.IntoRowIndex];
-                   ((Field)info.IntoField).GetFromReader(reader, index, (Row)row);
+                   var row = (Row)into[info.IntoRowIndex];
+                   var field = ((Field)info.IntoField);
+                   if (field.Fields == row.fields)
+                       field.GetFromReader(reader, index, row);
                }
                else if (info.IntoRowIndex != -1)
                {

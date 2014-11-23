@@ -78,7 +78,7 @@
         /// <param name="table">Table</param>
         /// <param name="alias">Alias for the table</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery From(string table, Alias alias)
+        public SqlQuery From(string table, IAlias alias)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -103,7 +103,7 @@
         /// <param name="alias">Alias that contains table name and short name.</param>
         /// <returns>The query itself.</returns>
         /// <remarks>This overload requires that alias has a table name.</remarks>
-        public SqlQuery From(Alias alias)
+        public SqlQuery From(IAlias alias)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -121,7 +121,7 @@
         /// <param name="alias">Alias that contains the short name.</param>
         /// <returns>The query itself.</returns>
         /// <remarks>This overload requires that alias has a table name.</remarks>
-        public SqlQuery From(ISqlQuery subQuery, Alias alias)
+        public SqlQuery From(ISqlQuery subQuery, IAlias alias)
         {
             if (subQuery == null)
                 throw new ArgumentNullException("subQuery");
@@ -179,7 +179,7 @@
         /// <param name="alias">A table alias that will be prepended to the field name with "." between</param>
         /// <param name="fieldName">A field name of the aliased table.</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery GroupBy(Alias alias, string fieldName)
+        public SqlQuery GroupBy(IAlias alias, string fieldName)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -187,7 +187,7 @@
             if (string.IsNullOrEmpty(fieldName))
                 throw new ArgumentNullException("field");
 
-            return GroupBy(alias + fieldName);
+            return GroupBy(alias.NameDot + fieldName);
         }
 
         /// <summary>
@@ -240,7 +240,7 @@
         /// <param name="fieldName">A field name of the aliased table.</param>
         /// <param name="desc">True to add " DESC" keyword to the expression.</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery OrderBy(Alias alias, string fieldName, bool desc = false)
+        public SqlQuery OrderBy(IAlias alias, string fieldName, bool desc = false)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -248,7 +248,7 @@
             if (string.IsNullOrEmpty(fieldName))
                 throw new ArgumentNullException("field");
 
-            return OrderBy(alias + fieldName, desc);
+            return OrderBy(alias.NameDot + fieldName, desc);
         }
 
         /// <summary>
@@ -322,7 +322,7 @@
         /// <param name="fieldName">A field name of the aliased table.</param>
         /// <returns>The query itself.</returns>
         /// <remarks>No column name is used for the field or expression.</remarks>
-        public SqlQuery Select(Alias alias, string fieldName)
+        public SqlQuery Select(IAlias alias, string fieldName)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -330,7 +330,7 @@
             if (string.IsNullOrEmpty(fieldName))
                 throw new ArgumentNullException("fieldName");
 
-            string expression = alias + fieldName;
+            string expression = alias.NameDot + fieldName;
 
             columns.Add(new Column(expression, null, intoIndex, null));
 
@@ -368,7 +368,7 @@
         /// <param name="fieldName">A field name of the aliased table.</param>
         /// <param name="columnName">A column name</param>
         /// <returns>The query itself.</returns>
-        public SqlQuery Select(Alias alias, string fieldName, string columnName)
+        public SqlQuery Select(IAlias alias, string fieldName, string columnName)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -379,7 +379,7 @@
             if (string.IsNullOrEmpty(columnName))
                 throw new ArgumentNullException("columnName");
 
-            var expression = alias + fieldName;
+            var expression = alias.NameDot + fieldName;
 
             columns.Add(new Column(expression, columnName, intoIndex, null));
 

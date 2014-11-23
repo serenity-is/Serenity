@@ -60,7 +60,7 @@ namespace Serenity.Data
         /// <returns>The query itself.</returns>
         /// <remarks>No column name is set for the selected field.
         /// Also field is not set as a target, unlike field only overload, only field name is used.</remarks>
-        public static SqlQuery Select(this SqlQuery query, Alias alias, IField field)
+        public static SqlQuery Select(this SqlQuery query, IAlias alias, IField field)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -68,7 +68,7 @@ namespace Serenity.Data
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return query.Select(alias + field);
+            return query.Select(alias.NameDot + field);
         }
 
 
@@ -80,7 +80,7 @@ namespace Serenity.Data
         /// <param name="columnName">A column name</param>
         /// <returns>The query itself.</returns>
         /// <remarks>Field is not set as a target, unlike field only overload, only field name is used.</remarks>
-        public static SqlQuery Select(this SqlQuery query, Alias alias, IField field, string columnName)
+        public static SqlQuery Select(this SqlQuery query, IAlias alias, IField field, string columnName)
         {
             if (alias == null)
                 throw new ArgumentNullException("alias");
@@ -88,7 +88,7 @@ namespace Serenity.Data
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            return query.Select(alias + field, columnName);
+            return query.Select(alias.NameDot + field, columnName);
         }
 
         /// <summary>

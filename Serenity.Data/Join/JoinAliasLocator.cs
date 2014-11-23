@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Serenity.Data
 {
@@ -88,6 +89,61 @@ namespace Serenity.Data
             }
 
             return true;
+        }
+
+        public static string ReplaceAliases(string expression, Func<string, string> replace)
+        {
+            bool inQuote = false;
+            int startIdent = -1;
+            var sb = new StringBuilder();
+            for (var i = 0; i < expression.Length; i++)
+            {
+                var c = expression[i];
+                sb.Append(c);
+
+                if (inQuote)
+                {
+                    if (c == '\'')
+                    {
+                        inQuote = false;
+                    }
+                }
+                else
+                {
+                    if (c == '\'')
+                    {
+                        inQuote = true;
+                        startIdent = -1;
+                    }
+                    else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+                    {
+                        if (startIdent < 0)
+                            startIdent = i;
+                    }
+                    else if (c >= '0' && c <= '9')
+                    {
+                    }
+                    else if (c == '.')
+                    {
+                        if (startIdent >= 0 && startIdent < i)
+                        {
+                            var alias = expression.Substring(startIdent, i - startIdent);
+                            var replaced = replace(alias);
+                            if (alias != replaced)
+                            {
+                                sb.Length -= alias.Length + 1;
+                                sb.Append(replaced);
+                                sb.Append(".");
+                            }
+                        }
+                        startIdent = -1;
+                    }
+                    else
+                        startIdent = -1;
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }
