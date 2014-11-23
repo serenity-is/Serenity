@@ -65,6 +65,9 @@ namespace Serenity.Data
             if (field == null)
                 throw new ArgumentNullException("field");
 
+            if (columnName == null)
+                throw new ArgumentNullException("columnName");
+
             query.EnsureJoinOf(field);
             new SqlQuery.Column(query, field.Expression, columnName, field);
             return query;
