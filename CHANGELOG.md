@@ -1,3 +1,8 @@
+## 1.4.4 (2014-11-23)
+
+Features:
+  - Enabled image uploads and added sample to Products form in Serene
+
 ## 1.4.3 (2014-11-23)
 
 Features:
