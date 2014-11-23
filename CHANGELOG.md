@@ -1,3 +1,17 @@
+## 1.4.3 (2014-11-23)
+
+Features:
+  - new documentation site with indexs on left (generated with gitbook)
+  - introduce IAlias interface, that is implemented by Alias and RowFieldsBase
+  - add ability to replace t0 aliases with something else for RowFieldsBase objects by .As("x") method (only table fields)
+  - AliasName property in RowFieldsBase
+  - better naming for all capital and dashed field names in serenity code generator
+  - safety checks in GetFromReader method to ensure a field from another row is not used to load entity values
+  - sqlquery select with field can specify alternate column name
+  - criteria objects can be created from fields with _ shortcut (e.g. UserRow.Fields.UserId._ > 5 instead of new Criteria(UserRow.Fields.Personel.UserId) > 5)
+  - added better handling for Criteria.In and Criteria.NotIn when an IEnumerable or array is passed
+  - overload for Sql.Coalesce that uses parameters and supports criteria, field and query objects
+
 ## 1.4.2 (2014-11-19)
 
 Features:
