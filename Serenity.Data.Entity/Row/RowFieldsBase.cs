@@ -565,5 +565,10 @@ namespace Serenity.Data
         {
             get { return tableName; }
         }
+
+        public string AliasName
+        {
+            get { return alias; }
+        }
     }
 }
