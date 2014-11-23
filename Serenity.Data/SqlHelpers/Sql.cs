@@ -62,23 +62,57 @@ namespace Serenity.Data
 
         /// <summary>
         ///   Verilen alanı COALESCE(..) içerisine alır.</summary>
-        /// <param name="fields">
+        /// <param name="statements">
         ///   COALESCE(...) içerisine alınacak alan adları (zorunlu).</param>
         /// <returns>
         ///   "COALESCE(field)".</returns>
-        public static string Coalesce(params string[] fields)
+        public static string Coalesce(params string[] statements)
         {
-            if (fields == null || fields.Length == 0)
+            if (statements == null || statements.Length == 0)
                 throw new ArgumentNullException("fields");
 
             StringBuilder sb = new StringBuilder("COALESCE(");
-            sb.Append(fields[0]);
-            for (int i = 1; i < fields.Length; i++)
+            sb.Append(statements[0]);
+            for (int i = 1; i < statements.Length; i++)
             {
                 sb.Append(", ");
-                sb.Append(fields[i]);
+                sb.Append(statements[i]);
             }
             sb.Append(')');
+            return sb.ToString();
+        }
+
+        public static string Coalesce(this IQueryWithParams query, params object[] values)
+        {
+            if (values == null || values.Length == 0)
+                throw new ArgumentNullException("values");
+
+            StringBuilder sb = new StringBuilder("COALESCE(");
+
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(", ");
+
+                var value = values[i];
+                if (value is ICriteria)
+                    ((ICriteria)value).ToString(sb, query);
+                else if (value is IQueryWithParams)
+                    sb.Append(((IQueryWithParams) value).ToString());
+                else if (value is IField)
+                {
+                    sb.Append(((IField)value).Expression);
+                }
+                else
+                {
+                    var param = query.AutoParam();
+                    query.AddParam(param.Name, value);
+                    sb.Append(param.Name);
+                }
+            }
+
+            sb.Append(")");
+
             return sb.ToString();
         }
 
