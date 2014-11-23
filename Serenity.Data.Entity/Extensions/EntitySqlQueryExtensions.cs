@@ -53,6 +53,24 @@ namespace Serenity.Data
         }
 
         /// <summary>
+        /// Adds a field's expression to the SELECT statement with a given column name. 
+        /// If a join alias is referenced in the field expression, and the join is defined in 
+        /// field's entity class, it is automatically included in the query. 
+        /// The field is marked as a target at current index for future loading from a data reader.
+        /// </summary>
+        /// <param name="field">Field object</param>
+        /// <returns>The query itself.</returns>
+        public static SqlQuery Select(this SqlQuery query, IField field, string columnName)
+        {
+            if (field == null)
+                throw new ArgumentNullException("field");
+
+            query.EnsureJoinOf(field);
+            new SqlQuery.Column(query, field.Expression, columnName, field);
+            return query;
+        }
+
+        /// <summary>
         /// Adds a field of a given table alias to the SELECT statement.
         /// </summary>
         /// <param name="alias">A table alias that will be prepended to the field name with "." between</param>
@@ -87,6 +105,9 @@ namespace Serenity.Data
 
             if (field == null)
                 throw new ArgumentNullException("field");
+
+            if (columnName == null)
+                throw new ArgumentNullException("columnName");
 
             return query.Select(alias.NameDot + field, columnName);
         }
