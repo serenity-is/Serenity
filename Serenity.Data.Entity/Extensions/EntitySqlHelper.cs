@@ -358,14 +358,21 @@
            {
                if (info.IntoField as Field != null && info.IntoRowIndex != -1)
                {
-                   var row = (Row)into[info.IntoRowIndex];
-                   var field = ((Field)info.IntoField);
-                   if (field.Fields == row.fields)
+                   var row = into[info.IntoRowIndex] as Row;
+                   if (row == null)
+                       continue;
+                   var field = info.IntoField as Field;
+                   if (field == null)
+                       continue;
+                   if (field.Fields == row.fields ||
+                       field.Fields.GetType() == row.fields.GetType())
                        field.GetFromReader(reader, index, row);
                }
                else if (info.IntoRowIndex != -1)
                {
-                   var row = (Row)(into[info.IntoRowIndex]);
+                   var row = into[info.IntoRowIndex] as Row;
+                   if (row == null)
+                       continue;
                    var name = reader.GetName(index);
                    var field = row.FindField(name) ?? row.FindFieldByPropertyName(name);
                    if (field != null)
