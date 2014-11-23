@@ -11,6 +11,13 @@ namespace Serenity.Data
         public static TFields As<TFields>(this TFields fields, string alias)
             where TFields : RowFieldsBase, new()
         {
+            Check.NotNullOrEmpty(alias, "alias");
+            if ((alias == "t0" || alias == "T0") &&
+                (fields.alias == "t0" || fields.alias == "T0"))
+            {
+                return fields;
+            }
+
             return Get<TFields>(alias);
         }
 
