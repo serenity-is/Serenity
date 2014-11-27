@@ -25,14 +25,31 @@ namespace Serenity.Data
             var enumerable = value as IEnumerable;
             if (enumerable != null && !(value is string))
             {
+                var c = 0;
+                foreach (var k in enumerable)
+                    c++;
+
                 int i = 0;
                 sb.Append('(');
                 foreach (var k in enumerable)
                 {
-                    var param = query.AutoParam();
-                    query.AddParam(param.Name, k);
                     if (i++ > 0)
                         sb.Append(',');
+
+                    if (c > 10)
+                    {
+                        if (k is int ||
+                            k is short ||
+                            k is uint ||
+                            k is long ||
+                            k is byte)
+                        {
+                            sb.Append(k.ToString());
+                            continue;
+                        }
+                    }
+                    var param = query.AutoParam();
+                    query.AddParam(param.Name, k);
                     sb.Append(param.Name);
                 }
                 sb.Append(')');
