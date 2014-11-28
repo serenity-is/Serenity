@@ -1,4 +1,5 @@
 ﻿using Serenity.Data;
+using System;
 using System.Data;
 
 namespace Serenity.Services
@@ -17,7 +18,7 @@ namespace Serenity.Services
         public object GetFieldValue(string fieldName)
         {
             var field = row.FindFieldByPropertyName(fieldName) ?? row.FindField(fieldName);
-            if (field == null)
+            if (ReferenceEquals(null, field))
                 return null;
 
             return field.AsObject(row);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -83,25 +83,25 @@ namespace Serenity.Data
                 if (!logField.IsTableField())
                     continue;
 
-                if (info.captureLogInstance.ChangingUserIdField == logField ||
-                    info.captureLogInstance.ValidFromField == logField ||
-                    info.captureLogInstance.ValidUntilField == logField)
+                if (ReferenceEquals(info.captureLogInstance.ChangingUserIdField, logField) ||
+                    ReferenceEquals(info.captureLogInstance.ValidFromField, logField) ||
+                    ReferenceEquals(info.captureLogInstance.ValidUntilField, logField))
                     continue;
 
-                if (((IIdRow)info.captureLogInstance).IdField == logField)
+                if (ReferenceEquals(((IIdRow)info.captureLogInstance).IdField, logField))
                     continue;
 
-                if (((IIsActiveRow)info.logRowInstance).IsActiveField == logField)
+                if (ReferenceEquals(((IIsActiveRow)info.logRowInstance).IsActiveField, logField))
                     continue;
 
-                if (logField == info.mappedIdField)
+                if (ReferenceEquals(logField, info.mappedIdField))
                     yield return new Tuple<Field, Field>(logField, (Field)((IIdRow)info.rowInstance).IdField);
                 else
                 {
                     var name = logField.Name.Substring(info.logFieldPrefixLength);
                     name = ((Field)info.rowInstance.IdField).Name.Substring(0, info.rowFieldPrefixLength) + name;
                     var match = info.rowInstance.FindField(name);
-                    if (match == null)
+                    if (ReferenceEquals(null, match))
                         throw new InvalidOperationException(String.Format("Can't find match in the row for log table field {0}!", name));
 
                     yield return new Tuple<Field, Field>(logField, match);

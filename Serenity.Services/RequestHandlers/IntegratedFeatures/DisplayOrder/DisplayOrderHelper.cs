@@ -30,7 +30,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("connection");
             if (tableName == null || tableName.Length == 0)
                 throw new ArgumentNullException("tableName");
-            if (orderField == null)
+            if (ReferenceEquals(null, orderField))
                 throw new ArgumentNullException("orderField");
 
             using (IDataReader reader = SqlHelper.ExecuteReader(connection,
@@ -97,9 +97,9 @@ namespace Serenity.Data
                 throw new ArgumentNullException("connection");
             if (tableName == null || tableName.Length == 0)
                 throw new ArgumentNullException("tableName");
-            if (keyField == null)
+            if (ReferenceEquals(null, keyField))
                 throw new ArgumentNullException("keyField");
-            if (orderField == null)
+            if (ReferenceEquals(null, orderField))
                 throw new ArgumentNullException("orderField");
 
             // last assigned display order value
@@ -194,12 +194,11 @@ namespace Serenity.Data
             if (tableName.IsEmptyOrNull())
                 throw new ArgumentNullException("tableName");
 
-            if (keyField == null)
+            if (ReferenceEquals(null, keyField))
                 throw new ArgumentNullException("keyField");
 
-            if (orderField == null)
+            if (ReferenceEquals(null, orderField))
                 throw new ArgumentNullException("orderField");
-
 
             // StringBuilder that will contain query(s)
             StringBuilder queries = new StringBuilder();

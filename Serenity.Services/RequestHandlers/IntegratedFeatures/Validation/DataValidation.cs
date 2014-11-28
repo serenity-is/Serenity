@@ -25,7 +25,7 @@ namespace Serenity.Services
                 var field = fields[i];
 
                 var str = field as StringField;
-                if (str != null && row.IsAssigned(field))
+                if (!ReferenceEquals(null, str) && row.IsAssigned(field))
                 {
                     if ((field.Flags & FieldFlags.Trim) == FieldFlags.Trim)
                     {
@@ -58,7 +58,7 @@ namespace Serenity.Services
             if (!field.IsNull(row))
             {
                 var str = field as StringField;
-                if (str != null)
+                if (!ReferenceEquals(null, str))
                     TrimToNull(row, str);
             }
 

@@ -144,7 +144,7 @@
             }
 
             var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);
-            if (field == null ||
+            if (ReferenceEquals(null, field) ||
                 ((field.MinSelectLevel == SelectLevel.Never) && 
                     (field.CustomAttributes == null || 
                      !field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
@@ -305,7 +305,7 @@
                         continue;
 
                     var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
-                    if (field != null)
+                    if (!ReferenceEquals(null, field))
                     {
                         if (field.MinSelectLevel == SelectLevel.Never ||
                             field.Flags.HasFlag(FieldFlags.DenyFiltering))

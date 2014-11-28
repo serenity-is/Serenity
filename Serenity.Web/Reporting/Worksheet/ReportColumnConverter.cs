@@ -31,12 +31,12 @@ namespace Serenity.Reporting
             else
             {
                 var dtf = baseField as DateTimeField;
-                if (dtf != null &&
+                if (!ReferenceEquals(null, dtf) &&
                     dtf.DateTimeKind != DateTimeKind.Unspecified)
                 {
                     result.Format = "dd/MM/yyyy HH:mm";
                 }
-                else if (dtf != null ||
+                else if (!ReferenceEquals(null, dtf) ||
                          dataType == typeof (DateTime) ||
                          dataType == typeof (DateTime?))
                 {
@@ -44,7 +44,7 @@ namespace Serenity.Reporting
                 }
             }
 
-            if (baseField != null)
+            if (!ReferenceEquals(null, baseField))
             {
                 if (result.Title == null)
                     result.Title = baseField.Title;

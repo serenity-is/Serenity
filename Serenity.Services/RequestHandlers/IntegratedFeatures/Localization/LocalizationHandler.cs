@@ -1,4 +1,4 @@
-﻿using Serenity.Services;
+using Serenity.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -85,26 +85,26 @@ namespace Serenity.Data
             name = ((Field)info.localRowInterface.IdField).Name.Substring(0, info.localRowFieldPrefixLength) + name;
             var match = info.localRowInstance.FindField(name);
             
-            if (match == null)
+            if (ReferenceEquals(null, match))
                 return null;
 
             if (!match.IsTableField())
                 return null;
 
-            if (match == info.localRowInterface.IdField ||
-                match == info.localRowInterface.CultureIdField)
+            if (ReferenceEquals(match, info.localRowInterface.IdField) ||
+                ReferenceEquals(match, info.localRowInterface.CultureIdField))
                 return null;
 
             if (info.localRowInstance is IIsActiveRow && 
-                match == ((IIsActiveRow)info.localRowInstance).IsActiveField)
+                ReferenceEquals(match, ((IIsActiveRow)info.localRowInstance).IsActiveField))
                 return null;
 
             var logging = info.localRowInstance as ILoggingRow;
             if (logging != null && (
-                match == logging.InsertUserIdField ||
-                match == logging.UpdateUserIdField ||
-                match == logging.UpdateDateField ||
-                match == logging.InsertDateField))
+                ReferenceEquals(match, logging.InsertUserIdField) ||
+                ReferenceEquals(match, logging.UpdateUserIdField) ||
+                ReferenceEquals(match, logging.UpdateDateField) ||
+                ReferenceEquals(match, logging.InsertDateField)))
                 return null;
 
             return match;
@@ -112,7 +112,7 @@ namespace Serenity.Data
 
         public bool IsLocalized(Field field)
         {
-            return GetLocalizationMatch(field) != null;
+            return !ReferenceEquals(null, GetLocalizationMatch(field));
         }
 
         private Int64? GetOldLocalizationRowId(IDbConnection connection, Int64 recordId, Int32 cultureId)
@@ -177,7 +177,7 @@ namespace Serenity.Data
                     continue;
 
                 var match = GetLocalizationMatch(field);
-                if (match == null)
+                if (ReferenceEquals(null, match))
                     throw new ValidationError("CantLocalize", field.Name, String.Format("{0} alanı yerelleştirilemez!", field.Title));
 
                 var value = field.AsObject(row);
@@ -233,11 +233,11 @@ namespace Serenity.Data
 
             foreach (var field in row.GetFields())
             {
-                if (field == idField)
+                if (ReferenceEquals(field, idField))
                     continue;
 
                 var match = GetLocalizationMatch(field);
-                if (match != null)
+                if (!ReferenceEquals(null, match))
                 {
                     var value = match.AsObject(localRow);
                     field.AsObject(row, value);

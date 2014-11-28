@@ -1,4 +1,4 @@
-﻿using Serenity.Data;
+using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -75,10 +75,10 @@ namespace Serenity.Services
                 foreach (var field in this.Row.GetTableFields())
                 {
                     if (logRow != null &&
-                        (logRow.InsertDateField == field ||
-                         logRow.UpdateDateField == field ||
-                         logRow.InsertUserIdField == field ||
-                         logRow.UpdateUserIdField == field))
+                        (ReferenceEquals(logRow.InsertDateField, field) ||
+                         ReferenceEquals(logRow.UpdateDateField, field) ||
+                         ReferenceEquals(logRow.InsertUserIdField, field) ||
+                         ReferenceEquals(logRow.UpdateUserIdField, field)))
                     {
                         continue;
                     }
@@ -135,7 +135,7 @@ namespace Serenity.Services
             else if (IsCreate)
             {
                 var idField = Row.IdField as Field;
-                if (idField != null &&
+                if (!ReferenceEquals(null, idField) &&
                     idField.Flags.HasFlag(FieldFlags.AutoIncrement))
                 {
                     Response.EntityId = Connection.InsertAndGetID(Row);
@@ -144,7 +144,7 @@ namespace Serenity.Services
                 else
                 {
                     Connection.Insert(Row);
-                    if (idField != null)
+                    if (!ReferenceEquals(null, idField))
                         Response.EntityId = Row.IdField[Row];
                 }
 
@@ -427,7 +427,7 @@ namespace Serenity.Services
                 }
 
                 var stringField = field as StringField;
-                if (stringField != null &&
+                if (!ReferenceEquals(null, stringField) &&
                     Row.IsAssigned(field) &&
                     (field.Flags & FieldFlags.Trim) == FieldFlags.Trim)
                 {

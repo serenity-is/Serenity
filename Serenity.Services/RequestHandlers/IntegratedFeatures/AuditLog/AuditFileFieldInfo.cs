@@ -8,7 +8,7 @@ namespace Serenity.Services
     {
         public AuditFileFieldInfo(StringField filename, StringField originalName, Int32Field size)
         {
-            if (filename == null)
+            if (ReferenceEquals(null, filename))
                 throw new ArgumentNullException("filenameField");
 
             Filename = filename;

@@ -42,7 +42,7 @@ namespace Serenity.Data
             if (!Object.ReferenceEquals(null, criteria))
             {
                 var field = FindField(criteria.Expression);
-                if (field == null || !CanFilterField(field))
+                if (ReferenceEquals(null, field) || !CanFilterField(field))
                 {
                     throw new ValidationError("InvalidCriteriaField", criteria.Expression,
                         String.Format("'{0}' criteria field is not found!", criteria.Expression));

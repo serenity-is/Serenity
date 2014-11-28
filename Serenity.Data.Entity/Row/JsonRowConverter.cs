@@ -93,17 +93,17 @@ namespace Serenity.Data
                             throw new JsonSerializationException("Unexpected end when deserializing object.");
 
                         var field = row.FindField(fieldName);
-                        if (field == null)
+                        if (ReferenceEquals(null, field))
                             field = row.FindFieldByPropertyName(fieldName);
                         
-                        if (field == null &&
+                        if (ReferenceEquals(null, field) &&
                             serializer.MissingMemberHandling == MissingMemberHandling.Error)
                             throw new JsonSerializationException(String.Format("Could not find field '{0}' on row of type '{1}'", fieldName, objectType.Name));
 
                         while (reader.TokenType == JsonToken.Comment)
                             reader.Read();
 
-                        if (field == null)
+                        if (ReferenceEquals(null, field))
                             reader.Skip();
                         else
                             field.ValueFromJson(reader, row, serializer);

@@ -212,7 +212,7 @@ namespace Serenity.Data
                             }
                         }
 
-                        if (field == null)
+                        if (ReferenceEquals(null, field))
                         {
                             if (property == null)
                             {
@@ -471,7 +471,7 @@ namespace Serenity.Data
             if (isInitialized)
                 throw new InvalidOperationException("field collection can't be modified!");
 
-            if (item == null)
+            if (ReferenceEquals(null, item))
                 throw new ArgumentNullException("item");
 
             if (byName.ContainsKey(item.Name))
@@ -508,7 +508,7 @@ namespace Serenity.Data
             if (isInitialized)
                 throw new InvalidOperationException("field collection can't be modified!");
 
-            if (item == null)
+            if (ReferenceEquals(null, item))
                 throw new ArgumentNullException("item");
 
             if (byName.ContainsKey(item.Name))

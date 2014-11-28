@@ -20,7 +20,7 @@ namespace Serenity.Data
         ///   True if field seems to be an actual table field.</returns>
         public static bool IsTableField(this Field field)
         {
-            if (field == null)
+            if (ReferenceEquals(field, null))
                 throw new ArgumentNullException("meta");
 
             return (field.Flags & NonTableFieldFlags) == (FieldFlags)0;
@@ -68,7 +68,7 @@ namespace Serenity.Data
         public static void AutoTrim(this Field field, Row row)
         {
             var stringField = field as StringField;
-            if (stringField != null &&
+            if (!ReferenceEquals(null, stringField) &&
                 (field.Flags & FieldFlags.Trim) == FieldFlags.Trim)
             {
                 string value = stringField[row];

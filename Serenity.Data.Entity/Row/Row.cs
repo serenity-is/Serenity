@@ -203,7 +203,7 @@ namespace Serenity.Data
         private Field FindFieldEnsure(string fieldName)
         {
             var field = FindField(fieldName);
-            if (field == null)
+            if (ReferenceEquals(null, field))
                 throw new ArgumentOutOfRangeException("fieldName", String.Format(
                     "{0} has no field with name '{1}'.", this.GetType().Name, fieldName));
             return field;
@@ -214,7 +214,7 @@ namespace Serenity.Data
             get 
             {
                 var field = FindField(fieldName);
-                if (field == null)
+                if (ReferenceEquals(null, field))
                     return null;
                 return field.AsObject(this); 
             }

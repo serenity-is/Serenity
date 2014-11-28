@@ -25,7 +25,7 @@ namespace Serenity.Data
             {
                 FieldDescriptor descriptor = (FieldDescriptor)other;
 
-                return (descriptor._field == this._field);
+                return (ReferenceEquals(descriptor._field, this._field));
             }
             return false;
         }

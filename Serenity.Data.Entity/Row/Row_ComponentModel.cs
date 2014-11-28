@@ -27,7 +27,7 @@ namespace Serenity.Data
                 fields.propertyChangedEventArgs = args;
             }
 
-            if (field == null)
+            if (ReferenceEquals(null, field))
                 propertyChanged(this, fields.propertyChangedEventArgs[fields.Count]);
             else
                 propertyChanged(this, fields.propertyChangedEventArgs[field.Index]);

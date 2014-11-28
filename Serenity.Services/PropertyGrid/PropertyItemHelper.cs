@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
@@ -47,7 +47,7 @@ namespace Serenity.PropertyGrid
                 {
                     basedOnField = basedOnRow.FindField(member.Name);
 
-                    if (basedOnField == null)
+                    if (ReferenceEquals(null, basedOnField))
                         basedOnField = basedOnRow.FindFieldByPropertyName(member.Name);
                 }
 
@@ -94,7 +94,7 @@ namespace Serenity.PropertyGrid
                 pi.Resizable = resizableAttr == null || resizableAttr.Value;
 
                 var widthAttr = (WidthAttribute)getAttribute(typeof(WidthAttribute));
-                pi.Width = widthAttr == null ? (basedOnField != null ? AutoWidth(basedOnField) : 80)  : widthAttr.Value;
+                pi.Width = widthAttr == null ? (!ReferenceEquals(null, basedOnField) ? AutoWidth(basedOnField) : 80)  : widthAttr.Value;
                 pi.MinWidth = widthAttr == null ? 0 : widthAttr.Min;
                 pi.MaxWidth = widthAttr == null ? 0 : widthAttr.Max;
 
@@ -109,14 +109,14 @@ namespace Serenity.PropertyGrid
 
                 if (pi.Title == null)
                 {
-                    if (basedOnField != null)
+                    if (!ReferenceEquals(null, basedOnField))
                     {
                         Field textualField = null;
                         if (basedOnField.TextualField != null)
                             textualField = basedOnField.Fields.FindFieldByPropertyName(basedOnField.TextualField) ?? 
                                 basedOnField.Fields.FindField(basedOnField.TextualField);
 
-                        if (textualField != null)
+                        if (!ReferenceEquals(null, textualField))
                         {
                             pi.Title = !object.ReferenceEquals(null, textualField.Caption) ? 
                                 textualField.Caption.Key : textualField.Title;
@@ -134,13 +134,13 @@ namespace Serenity.PropertyGrid
                 var defaultValueAttribute = (DefaultValueAttribute)member.GetCustomAttribute(typeof(DefaultValueAttribute), false);
                 if (defaultValueAttribute != null)
                     pi.DefaultValue = defaultValueAttribute.Value;
-                else if (basedOnField != null && basedOnField.DefaultValue != null)
+                else if (!ReferenceEquals(null, basedOnField) && basedOnField.DefaultValue != null)
                     pi.DefaultValue = basedOnField.DefaultValue;
 
                 var insertableAttribute = member.GetCustomAttribute<InsertableAttribute>();
                 if (insertableAttribute != null)
                     pi.Insertable = insertableAttribute.Value;
-                else if (basedOnField != null)
+                else if (!ReferenceEquals(null, basedOnField))
                     pi.Insertable = (basedOnField.Flags & FieldFlags.Insertable) == FieldFlags.Insertable;
                 else
                     pi.Insertable = true;
@@ -148,13 +148,13 @@ namespace Serenity.PropertyGrid
                 var updatableAttribute = member.GetCustomAttribute<UpdatableAttribute>();
                 if (updatableAttribute != null)
                     pi.Updatable = updatableAttribute.Value;
-                else if (basedOnField != null)
+                else if (!ReferenceEquals(null, basedOnField))
                     pi.Updatable = (basedOnField.Flags & FieldFlags.Updatable) == FieldFlags.Updatable;
                 else
                     pi.Updatable = true;
 
                 pi.Localizable = getAttribute(typeof(LocalizableAttribute)) != null ||
-                    (basedOnField != null && localizationRowHandler != null && localizationRowHandler.IsLocalized(basedOnField));
+                    (!ReferenceEquals(null, basedOnField) && localizationRowHandler != null && localizationRowHandler.IsLocalized(basedOnField));
 
                 var enumType = GetEnumType(valueType, basedOnField);
                 
@@ -175,7 +175,7 @@ namespace Serenity.PropertyGrid
                     pi.EditorParams["enumKey"] = EnumMapper.GetEnumTypeKey(enumType);
                 }
 
-                if (basedOnField != null)
+                if (!ReferenceEquals(null, basedOnField))
                 {
                     if (pi.EditorType == "Decimal" &&
                         (basedOnField is DoubleField ||
@@ -235,7 +235,7 @@ namespace Serenity.PropertyGrid
             var attr = member == null ? null : member.GetCustomAttribute(attrType);
 
             if (attr == null &&
-                basedOnField != null &&
+                !ReferenceEquals(null, basedOnField) &&
                 basedOnField.CustomAttributes != null)
             {
                 foreach (var a in basedOnField.CustomAttributes)
@@ -252,7 +252,7 @@ namespace Serenity.PropertyGrid
             if (member != null)
                 attrList.AddRange(member.GetCustomAttributes(attrType));
 
-            if (basedOnField != null &&
+            if (!ReferenceEquals(null, basedOnField) &&
                 basedOnField.CustomAttributes != null)
             {
                 foreach (var a in basedOnField.CustomAttributes)
@@ -298,7 +298,7 @@ namespace Serenity.PropertyGrid
             Type enumType = null;
             if (valueType.IsEnum)
                 enumType = valueType;
-            else if (basedOnField != null && basedOnField is IEnumTypeField)
+            else if (!ReferenceEquals(null, basedOnField) && basedOnField is IEnumTypeField)
             {
                 enumType = (basedOnField as IEnumTypeField).EnumType;
                 if (enumType != null && !enumType.IsEnum)
@@ -310,13 +310,13 @@ namespace Serenity.PropertyGrid
 
         private static string AutoDetermineIdField(Field basedOnField)
         {
-            if (basedOnField == null || basedOnField.Join == null)
+            if (ReferenceEquals(null, basedOnField) || basedOnField.Join == null)
                 return null;
 
             var idField = basedOnField.Fields.FirstOrDefault(x => x.ForeignJoinAlias != null &&
                 x.ForeignJoinAlias.Name == basedOnField.Join.Name);
 
-            return idField == null ? null : (idField.PropertyName ?? idField.Name);
+            return ReferenceEquals(null, idField) ? null : (idField.PropertyName ?? idField.Name);
         }
 
         private static string AutoDetermineEditorType(Type valueType, Type enumType)
@@ -343,7 +343,7 @@ namespace Serenity.PropertyGrid
                 return null;
 
             var field = basedOnField.Fields.FindFieldByPropertyName(idField) ?? basedOnField.Fields.FindField(idField);
-            if (field == null)
+            if (ReferenceEquals(null, field))
                 return null;
 
             if (field.TextualField != basedOnField.PropertyName &&
@@ -415,7 +415,7 @@ namespace Serenity.PropertyGrid
                 }
                 else if (valueType == typeof(DateTime))
                 {
-                    if (basedOnField != null && basedOnField is DateTimeField)
+                    if (!ReferenceEquals(null, basedOnField) && basedOnField is DateTimeField)
                     {
                         switch (((DateTimeField)basedOnField).DateTimeKind)
                         {
@@ -503,7 +503,7 @@ namespace Serenity.PropertyGrid
                 }
                 else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?))
                 {
-                    if (basedOnField != null && basedOnField is DateTimeField)
+                    if (!ReferenceEquals(null, basedOnField) && basedOnField is DateTimeField)
                     {
                         switch (((DateTimeField)basedOnField).DateTimeKind)
                         {
@@ -595,17 +595,17 @@ namespace Serenity.PropertyGrid
         public static PropertyItem GetCustomFieldPropertyItem(ICustomFieldDefinition definition, Field basedOnField)
         {
             PropertyItem pi = new PropertyItem();
-            pi.Name = basedOnField != null ? (basedOnField.PropertyName ?? basedOnField.Name) : definition.Name;
+            pi.Name = !ReferenceEquals(null, basedOnField) ? (basedOnField.PropertyName ?? basedOnField.Name) : definition.Name;
             pi.Category = definition.Category.TrimToNull();
             pi.ReadOnly = false;
-            pi.Title = basedOnField != null ? basedOnField.Title : definition.Title;
+            pi.Title = !ReferenceEquals(null, basedOnField) ? basedOnField.Title : definition.Title;
             pi.DefaultValue = definition.DefaultValue;
-            pi.Insertable = basedOnField == null || ((basedOnField.Flags & FieldFlags.Insertable) == FieldFlags.Insertable);
-            pi.Updatable = basedOnField == null || ((basedOnField.Flags & FieldFlags.Updatable) == FieldFlags.Updatable);
+            pi.Insertable = ReferenceEquals(null, basedOnField) || ((basedOnField.Flags & FieldFlags.Insertable) == FieldFlags.Insertable);
+            pi.Updatable = ReferenceEquals(null, basedOnField) || ((basedOnField.Flags & FieldFlags.Updatable) == FieldFlags.Updatable);
             pi.Localizable = definition.IsLocalizable;
 
             Type enumType = null;
-            if (basedOnField != null && basedOnField is IEnumTypeField)
+            if (!ReferenceEquals(null, basedOnField) && basedOnField is IEnumTypeField)
             {
                 enumType = (basedOnField as IEnumTypeField).EnumType;
                 if (enumType != null && !enumType.IsEnum)
@@ -638,7 +638,7 @@ namespace Serenity.PropertyGrid
                 pi.EditorParams["enumKey"] = EnumMapper.GetEnumTypeKey(enumType);
             }
 
-            if (basedOnField != null)
+            if (!ReferenceEquals(null, basedOnField))
             {
                 if (basedOnField is StringField &&
                     basedOnField.Size > 0)

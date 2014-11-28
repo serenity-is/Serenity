@@ -181,7 +181,7 @@ namespace Serenity.Services
                                         p.Value is Int64)
                                     {
                                         var f = theRow.FindField(p.Key);
-                                        if (f != null &&
+                                        if (!ReferenceEquals(null, f) &&
                                             f.ForeignTable != null)
                                         {
                                             //EntityType foreignType;
@@ -230,7 +230,7 @@ namespace Serenity.Services
                             {
                                 var s = key.Substring(0, key.Length - 2);
                                 f = entity.FindField(s);
-                                if (f != null)
+                                if (!ReferenceEquals(null, f))
                                 {
                                     lookup[key] = f.Title;
                                     continue;
@@ -238,7 +238,7 @@ namespace Serenity.Services
                             }
 
                             f = entity.FindField(key);
-                            if (f != null)
+                            if (!ReferenceEquals(null, f))
                                 lookup[key] = f.Title;
                         }
                     }
@@ -378,7 +378,7 @@ namespace Serenity.Services
                     field.IndexCompare(oldRow, newRow) != 0)
                 {
                     var strField = field as StringField;
-                    if (strField == null ||
+                    if (ReferenceEquals(null, strField) ||
                         !strField[oldRow].IsTrimmedSame(strField[newRow]))
                     {
                         if (!field.IsNull(oldRow))

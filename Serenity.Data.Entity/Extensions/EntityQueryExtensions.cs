@@ -42,7 +42,7 @@ namespace Serenity.Data
                 throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
 
             foreach (var field in row.GetFields())
-                if (field != exclude && row.IsAssigned(field))
+                if (!ReferenceEquals(field, exclude) && row.IsAssigned(field))
                     self.Set((IField)field, field.AsObject(row));
 
             return self;

@@ -356,13 +356,13 @@
            int index = 0;
            foreach (var info in ext.Columns)
            {
-               if (info.IntoField as Field != null && info.IntoRowIndex != -1)
+               if (!ReferenceEquals(null, info.IntoField as Field) && info.IntoRowIndex != -1)
                {
                    var row = into[info.IntoRowIndex] as Row;
                    if (row == null)
                        continue;
                    var field = info.IntoField as Field;
-                   if (field == null)
+                   if (ReferenceEquals(null, field))
                        continue;
                    if (field.Fields == row.fields ||
                        field.Fields.GetType() == row.fields.GetType())
@@ -375,7 +375,7 @@
                        continue;
                    var name = reader.GetName(index);
                    var field = row.FindField(name) ?? row.FindFieldByPropertyName(name);
-                   if (field != null)
+                   if (!ReferenceEquals(null, field))
                    {
                        //info.IntoField = field;
                        field.GetFromReader(reader, index, row);
