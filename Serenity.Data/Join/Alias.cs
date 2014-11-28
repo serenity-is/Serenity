@@ -89,14 +89,6 @@ namespace Serenity.Data
             return new Criteria(this[field]);
         }
 
-        public Alias WithNoLock()
-        {
-            if (String.IsNullOrEmpty(this.table))
-                return new Alias(this.alias + " WITH(NOLOCK)");
-
-            return new Alias(this.table, this.alias + " WITH(NOLOCK)");
-        }
-
         public static string operator +(Alias alias, string fieldName)
         {
             return alias.aliasDot + fieldName;
