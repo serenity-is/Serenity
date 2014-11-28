@@ -17,9 +17,6 @@ namespace Serenity
         where TOptions : class, new()
     {
         protected bool isPanel;
-        protected bool isFlexify;
-        protected bool isResizable;
-        protected bool isMaximizable;
         protected jQueryValidator validator;
         protected TabsObject tabs;
         protected Toolbar toolbar;
@@ -28,9 +25,6 @@ namespace Serenity
             : base(div, opt)
         {
             isPanel = this.GetType().GetCustomAttributes(typeof(PanelAttribute), true).Length > 0;
-            isFlexify = this.GetType().GetCustomAttributes(typeof(FlexifyAttribute), true).Length > 0;
-            isResizable = this.GetType().GetCustomAttributes(typeof(ResizableAttribute), true).Length > 0;
-            isMaximizable = this.GetType().GetCustomAttributes(typeof(MaximizableAttribute), true).Length > 0;
             
             if (!isPanel)
                 InitDialog();
@@ -77,10 +71,13 @@ namespace Serenity
         {
             element.Dialog(GetDialogOptions());
 
-            if (isFlexify)
+            if (this.GetType().GetCustomAttributes(typeof(FlexifyAttribute), true).Length > 0)
+            {
+                element.DialogResizable();
                 element.DialogFlexify();
+            }
 
-            if (isMaximizable)
+            if (this.GetType().GetCustomAttributes(typeof(MaximizableAttribute), true).Length > 0)
                 element.DialogMaximizable();
 
             var self = this;
@@ -256,9 +253,9 @@ namespace Serenity
 
             opt.Width = 920;
             ApplyCssSizes(opt, dialogClass);
-            
+
             opt.AutoOpen = false;
-            opt.Resizable = isResizable || isFlexify;
+            opt.Resizable = this.GetType().GetCustomAttributes(typeof(ResizableAttribute), true).Length > 0;
             opt.Modal = true;
             opt.Position = new PositionOptions
             {
