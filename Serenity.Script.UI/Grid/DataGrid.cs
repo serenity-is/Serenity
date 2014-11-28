@@ -518,7 +518,7 @@ namespace Serenity
                 }
             }
 
-            return new List<string> { GetIdFieldName() };
+            return new List<string>();
         }
 
         protected virtual bool UsePager()
