@@ -11,6 +11,9 @@ namespace Serenity.Data
     public class Criteria : BaseCriteria
     {
         public static readonly BaseCriteria Empty = new Criteria();
+        public static readonly BaseCriteria False = new Criteria("0=1");
+        public static readonly BaseCriteria True = new Criteria("1=1");
+        
         private string expression;
 
         /// <summary>
