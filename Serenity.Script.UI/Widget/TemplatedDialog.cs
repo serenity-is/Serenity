@@ -73,8 +73,8 @@ namespace Serenity
 
             if (this.GetType().GetCustomAttributes(typeof(FlexifyAttribute), true).Length > 0)
             {
-                element.DialogResizable();
                 element.DialogFlexify();
+                element.DialogResizable();
             }
 
             if (this.GetType().GetCustomAttributes(typeof(MaximizableAttribute), true).Length > 0)
