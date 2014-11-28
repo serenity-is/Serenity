@@ -1,3 +1,14 @@
+## 1.4.5 (2014-11-28)
+
+Features:
+  - Fields can be used directly like criteria objects in queries e.g. p.Id == k.ProductId
+  - In criterias doesn't use parameters for longer than 10 numeric values
+  - ConstantCriteria object for values that shouldn't be converted to parameters in generated SQL
+  - WithNoLock moved to extensions class
+  - Flexify, Maximizable, Resizable attributes for dialog classes
+  - Default order for grids are now empty to let service side decide on the initial sort order
+  - [BREAKING CHANGE] Rename Field._ property to Field.Criteria as it felt unnatural.
+
 ## 1.4.4 (2014-11-23)
 
 Features:
