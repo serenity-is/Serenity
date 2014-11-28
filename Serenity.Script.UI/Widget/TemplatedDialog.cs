@@ -13,22 +13,6 @@ namespace Serenity
         void DialogOpen();
     }
 
-    public class PanelAttribute : Attribute
-    {
-    }
-
-    public class FlexifyAttribute : Attribute
-    {
-    }
-
-    public class ResizableAttribute : Attribute
-    {
-    }
-
-    public class MaximizableAttribute : Attribute
-    {
-    }
-
     public abstract class TemplatedDialog<TOptions> : TemplatedWidget<TOptions>, IDialog
         where TOptions : class, new()
     {
@@ -94,10 +78,7 @@ namespace Serenity
             element.Dialog(GetDialogOptions());
 
             if (isFlexify)
-            {
                 element.DialogFlexify();
-                element.Find(".categories").FlexHeightOnly();
-            }
 
             if (isMaximizable)
                 element.DialogMaximizable();

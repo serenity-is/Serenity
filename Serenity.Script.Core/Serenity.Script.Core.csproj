@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -41,10 +41,14 @@
     <Compile Include="Attribute\EditorAttribute.cs" />
     <Compile Include="Attribute\ElementAttribute.cs" />
     <Compile Include="Attribute\DialogTypeAttribute.cs" />
+    <Compile Include="Attribute\FlexifyAttribute.cs" />
     <Compile Include="Attribute\FormKeyAttribute.cs" />
     <Compile Include="Attribute\ItemNameAttribute.cs" />
     <Compile Include="Attribute\LocalTextPrefixAttribute.cs" />
+    <Compile Include="Attribute\MaximizableAttribute.cs" />
     <Compile Include="Attribute\OptionAttribute.cs" />
+    <Compile Include="Attribute\PanelAttribute.cs" />
+    <Compile Include="Attribute\ResizableAttribute.cs" />
     <Compile Include="Attribute\ServiceAttribute.cs" />
     <Compile Include="Attribute\EntityTypeAttribute.cs" />
     <Compile Include="Attribute\IdPropertyAttribute.cs" />

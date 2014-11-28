@@ -169,6 +169,8 @@ namespace Serenity
             #pragma warning restore 618
 
             propertyGrid = new PropertyGrid(pgDiv, pgOptions).Init();
+            if(isFlexify)
+                propertyGrid.Element.Children(".categories").FlexHeightOnly();
         }
 
         private Promise InitPropertyGridAsync()
@@ -183,6 +185,8 @@ namespace Serenity
                     .ThenAwait(pgOptions =>
                     {
                         propertyGrid = new PropertyGrid(pgDiv, pgOptions);
+                        if(isFlexify)
+                            propertyGrid.Element.Children(".categories").FlexHeightOnly();
                         return propertyGrid.Initialize();
                     });
             });
