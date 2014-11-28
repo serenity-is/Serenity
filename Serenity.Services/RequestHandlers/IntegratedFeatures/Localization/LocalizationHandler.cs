@@ -170,7 +170,7 @@ namespace Serenity.Data
 
             foreach (var field in row.GetFields())
             {
-                if (field == idField)
+                if (ReferenceEquals(field, idField))
                     continue;
 
                 if (!row.IsAssigned(field))
