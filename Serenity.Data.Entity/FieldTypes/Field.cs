@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Serenity.Data
 {
-    public abstract class Field : IFieldWithJoinInfo
+    public abstract partial class Field : IFieldWithJoinInfo
     {
         private string autoTextKey;
         internal LocalText caption;
@@ -340,7 +340,7 @@ namespace Serenity.Data
             return GetIsNull(row);
         }
 
-        public Criteria _
+        public Criteria Criteria
         {
             get
             {
@@ -351,17 +351,6 @@ namespace Serenity.Data
                 return criteria;
             }
         }
-
-        //public string EditorType { get; set; }
-        //public Dictionary<string, object> EditorOptions { get; set; }
-        //public string Hint { get; set; }
-        //public LocalText Category { get; set; }
-        //public int? MaxLength { get; set; }
-        //public bool? HideOnInsert { get; set; }
-        //public bool? HideOnUpdate { get; set; }
-        //public bool? Localizable { get; set; }
-        //public int? DisplayOrder { get; set; }
-        //public string DisplayFormat { get; set; }
 
         IDictionary<string, Join> IFieldWithJoinInfo.Joins
         {
