@@ -1,0 +1,24 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CompileSerenityLess" AfterTargets="AfterBuild">
+    <Exec Command="$(SolutionDir)serenity\tools\node\node.exe $(SolutionDir)serenity\tools\node\node_modules\less\bin\lessc $(SolutionDir)Serenity\Serenity.Web\Style\serenity.less &gt; $(ProjectDir)Content\serenity\serenity.css"></Exec>
+  </Target>
+  <Target Name="BeforeBuild">
+    <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Style\images\*.*">
+      <Output TaskParameter="Include" ItemName="SerenityImages" />
+    </CreateItem>
+    <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Includes\Scripts\serenity\texts\*.json">
+      <Output TaskParameter="Include" ItemName="SerenityTexts" />
+    </CreateItem>
+    <Copy SourceFiles="@(SerenityImages)" DestinationFolder="$(ProjectDir)Content\serenity\images" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(SerenityTexts)" DestinationFolder="$(ProjectDir)Scripts\serenity\texts" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="CopySerenityScripts" AfterTargets="CopyFilesToOutputDirectory">
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\mscorlib.js" DestinationFiles="$(ProjectDir)Scripts\Saltarelle\mscorlib.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\mscorlib.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\linq.js" DestinationFiles="$(ProjectDir)Scripts\Saltarelle\linq.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\linq.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\bin\$(ConfigurationName)\Serenity.Script.Core.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.Core.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\bin\$(ConfigurationName)\Serenity.Script.Core.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.Slick.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.Slick.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Test\bin\$(ConfigurationName)\Serenity.Script.Test.js" DestinationFiles="$(ProjectDir)Test\Serenity.Script.Test.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Test\bin\$(ConfigurationName)\Serenity.Script.Test.js')" />
+  </Target>
+</Project>

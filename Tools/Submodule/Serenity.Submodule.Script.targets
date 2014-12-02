@@ -1,0 +1,11 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CopySerenityScripts" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(WebProjectRoot)'!=''">
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\mscorlib.js" DestinationFiles="$(WebProjectRoot)Scripts\Saltarelle\mscorlib.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\mscorlib.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\linq.js" DestinationFiles="$(WebProjectRoot)Scripts\Saltarelle\linq.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\linq.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\bin\$(ConfigurationName)\Serenity.Script.Core.js" DestinationFiles="$(WebProjectRoot)Scripts\Serenity\Serenity.Script.Core.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\bin\$(ConfigurationName)\Serenity.Script.Core.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.js" DestinationFiles="$(WebProjectRoot)Scripts\Serenity\Serenity.Externals.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.Slick.js" DestinationFiles="$(WebProjectRoot)Scripts\Serenity\Serenity.Externals.Slick.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.Slick.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js" DestinationFiles="$(WebProjectRoot)Scripts\Serenity\Serenity.Script.UI.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Test\bin\$(ConfigurationName)\Serenity.Script.Test.js" DestinationFiles="$(WebProjectRoot)Test\Serenity.Script.Test.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Test\bin\$(ConfigurationName)\Serenity.Script.Test.js')" />
+  </Target>
+</Project>
