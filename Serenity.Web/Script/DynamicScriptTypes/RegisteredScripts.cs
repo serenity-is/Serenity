@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -7,6 +8,11 @@ namespace Serenity.Web
     public class RegisteredScripts : DynamicScript, INamedDynamicScript
     {
         public string ScriptName { get { return "RegisteredScripts"; } }
+
+        public RegisteredScripts()
+        {
+            Expiration = TimeSpan.FromDays(-1);
+        }
 
         public override string GetScript()
         {

@@ -20,9 +20,6 @@ namespace Serenity.Web
             {
                 get
                 {
-                    if (Generator.GroupKey == null)
-                        return content;
-
                     if (content.UncompressedBytes == null)
                         return content;
 
@@ -31,6 +28,9 @@ namespace Serenity.Web
                         this.Reset();
                         return content;
                     }
+
+                    if (Generator.GroupKey == null)
+                        return content;
 
                     TwoLevelCache.GetLocalStoreOnly("DynamicScriptCheck:" + this.Name, TimeSpan.Zero,
                         Generator.GroupKey, () =>
