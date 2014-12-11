@@ -127,5 +127,6 @@ namespace Serenity.Navigation
         public string Title { get; set; }
         public string IconClass { get; set; }
         public string Permission { get; set; }
+        public string Target { get; set; }
     }
 }

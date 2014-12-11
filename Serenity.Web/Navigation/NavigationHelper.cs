@@ -24,7 +24,8 @@
                 {
                     Title = menu.Title,
                     Url = (!string.IsNullOrEmpty(menu.Url) && resolveUrl != null) ? resolveUrl(menu.Url) : menu.Url,
-                    IconClass = menu.IconClass.TrimToNull()
+                    IconClass = menu.IconClass.TrimToNull(),
+                    Target = menu.Target.TrimToNull()
                 };
 
                 bool isAuthorizedSection = !menu.Url.IsEmptyOrNull() &&
@@ -45,6 +46,7 @@
                         Title = child.Title,
                         Url = (!string.IsNullOrEmpty(child.Url) && resolveUrl != null) ? resolveUrl(child.Url) : child.Url,
                         IconClass = child.IconClass.TrimToNull(),
+                        Target = child.Target.TrimToNull()
                     });
                 }
 
