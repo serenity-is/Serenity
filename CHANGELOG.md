@@ -1,3 +1,13 @@
+## 1.4.6 (2014-12-11)
+
+Features:
+  - allow specifying target for navigation links
+  - added false and true criteria constants
+  - build targets files for those who use serenity as a submodule
+
+Bugfixes:
+  - regression bug in 1.4.1 that causes cache invalidation to fail for lookups / dynamic scripts 
+
 ## 1.4.5 (2014-11-28)
 
 Features:
