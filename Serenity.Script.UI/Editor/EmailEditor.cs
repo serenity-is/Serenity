@@ -8,9 +8,11 @@ using System.Text.RegularExpressions;
 
 namespace Serenity
 {
+    using jQueryApi.UI;
+
     [Editor, DisplayName("E-posta")]
     [Element("<input type=\"text\"/>")]
-    public class EmailEditor : Widget<EmailEditorOptions>, IStringValue
+    public class EmailEditor : Widget<EmailEditorOptions>, IStringValue, IReadOnly
     {
         public EmailEditor(jQueryObject input, EmailEditorOptions opt)
             : base(input, opt)
@@ -156,6 +158,33 @@ namespace Serenity
                     }
                     else
                         element.Value(parts[0]);
+                }
+            }
+        }
+
+        public bool ReadOnly
+        {
+            get
+            {
+                var domain = element.NextAll(".emaildomain");
+                return element.GetAttribute("readonly") == null && (!options.ReadOnlyDomain || domain.GetAttribute("readonly") == null);
+            }
+            set
+            {
+                var domain = element.NextAll(".emaildomain");
+                if (value)
+                {
+                    element.Attribute("readonly", "readonly").AddClass("readonly");
+                    if (!options.ReadOnlyDomain)
+                        domain.Attribute("readonly", "readonly").AddClass("readonly");
+                }
+                else
+                {
+                    element.RemoveAttr("readonly").RemoveClass("readonly");
+                    if (!options.ReadOnlyDomain)
+                    {
+                        domain.RemoveAttr("readonly").RemoveClass("readonly");
+                    }
                 }
             }
         }
