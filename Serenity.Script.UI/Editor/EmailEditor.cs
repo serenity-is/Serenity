@@ -66,6 +66,13 @@ namespace Serenity
                 }
             });
 
+            if (!options.ReadOnlyDomain)
+            {
+                input.Change(e =>
+                {
+                    this.Value = input.GetValue();
+                });
+            }
         }
 
         [InlineCode("this.optional({element})")]
