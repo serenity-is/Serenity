@@ -39,6 +39,8 @@ namespace Serenity
         public bool EntitiesGreek { get; set; }
         [ScriptName("entities_additional")]
         public string EntitiesAdditional { get; set; }
+
+        public string FilebrowserBrowseUrl { get; set; }
     }
 
     [Imported, Serializable]
