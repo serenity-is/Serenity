@@ -174,7 +174,7 @@ namespace Serenity
             get
             {
                 var domain = element.NextAll(".emaildomain");
-                return element.GetAttribute("readonly") == null && (!options.ReadOnlyDomain || domain.GetAttribute("readonly") == null);
+                return !(element.GetAttribute("readonly") == null && (!options.ReadOnlyDomain || domain.GetAttribute("readonly") == null));
             }
             set
             {
