@@ -42,6 +42,8 @@ namespace Serenity.ComponentModel
         public object DefaultValue { get; set; }
         [JsonProperty("localizable")]
         public bool? Localizable { get; set; }
+        [JsonProperty("visible")]
+        public bool? Visible { get; set; }
 
         [JsonProperty("formatterType")]
         public string FormatterType { get; set; }

@@ -666,7 +666,7 @@ namespace Serenity
 
         protected virtual List<SlickColumn> GetColumns()
         {
-            var columnItems = GetPropertyItems().Where(x => x.FilterOnly != true).ToList();
+            var columnItems = GetPropertyItems().Where(x => x.FilterOnly != true && x.Visible != false).ToList();
             return PropertyItemsToSlickColumns(columnItems);
         }
 
@@ -709,7 +709,7 @@ namespace Serenity
         {
             return GetPropertyItemsAsync().ThenSelect(propertyItems =>
             {
-                return PropertyItemsToSlickColumns(propertyItems.Where(x => x.FilterOnly != true).ToList());
+                return PropertyItemsToSlickColumns(propertyItems.Where(x => x.FilterOnly != true && x.Visible != false).ToList());
             });
         }
 

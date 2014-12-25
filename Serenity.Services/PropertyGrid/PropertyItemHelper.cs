@@ -156,6 +156,10 @@ namespace Serenity.PropertyGrid
                 pi.Localizable = getAttribute(typeof(LocalizableAttribute)) != null ||
                     (!ReferenceEquals(null, basedOnField) && localizationRowHandler != null && localizationRowHandler.IsLocalized(basedOnField));
 
+                var visibleAttribute = (VisibleAttribute)getAttribute(typeof(VisibleAttribute));
+                if (visibleAttribute != null && visibleAttribute.Value == false)
+                    pi.Visible = false;
+
                 var enumType = GetEnumType(valueType, basedOnField);
                 
                 var editorTypeAttr = (EditorTypeAttribute)getAttribute(typeof(EditorTypeAttribute));

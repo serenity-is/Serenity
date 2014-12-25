@@ -23,6 +23,7 @@ namespace Serenity
         public bool OneWay { get; set; }
         public object DefaultValue { get; set; }
         public bool Localizable { get; set; }
+        public bool? Visible { get; set; }
 
         public string FormatterType { get; set; }
         public JsDictionary FormatterParams { get; set; }
