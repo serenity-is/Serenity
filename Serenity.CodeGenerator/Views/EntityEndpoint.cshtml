@@ -12,7 +12,7 @@ namespace @(Model.RootNamespace)@(dotModule).Endpoints
     using MyRow = Entities.@(Model.RowClassName);
 
     [RoutePrefix("Services/@(modulePrefix)@(Model.ClassName)"), Route("{action}")]
-    [ConnectionKey("@Model.Schema"), ServiceAuthorize("@(Model.Permission)")]
+    [ConnectionKey("@Model.ConnectionKey"), ServiceAuthorize("@(Model.Permission)")]
     public class @(Model.ClassName)Controller : ServiceEndpoint
     {
         [HttpPost]

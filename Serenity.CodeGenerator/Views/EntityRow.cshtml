@@ -2,6 +2,7 @@
 @functions { public dynamic Model { get; set; } }@{
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+    var schemaDot = Model.Schema == null ? "" : (Model.Schema + ".");
      
     Func<string, string, string> jf = (x, y) =>
     {
@@ -22,7 +23,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     using System.ComponentModel;
     using System.IO;
 
-    [ConnectionKey("@Model.Schema"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), TwoLevelCached]
+    [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), TwoLevelCached]
     [ReadPermission("@Model.Permission")]
     [ModifyPermission("@Model.Permission")]
     [JsonConverter(typeof(JsonRowConverter))]
@@ -44,8 +45,8 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     if (!String.IsNullOrEmpty(x.Flags)) {
         attrs.Add(x.Flags);
     }       
-    if (!String.IsNullOrEmpty(x.ForeignTable)) {
-        attrs.Add("ForeignKey(\"" + x.ForeignTable + "\", \"" + x.ForeignField + "\")");
+    if (!String.IsNullOrEmpty(x.PKTable)) {
+        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? "" : (x.PKSchema + ".")) + x.PKTable + "\", \"" + x.PKColumn + "\")");
         attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
     }
     if (Model.NameField == x.Ident) {
@@ -94,16 +95,14 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
         {@foreach (var x in Model.Fields) {
 <text>
             public readonly @(x.Type)Field @(x.Ident);</text>}
-@foreach (var x in Model.Joins) {
+@foreach (var x in Model.Joins) {<text>
+</text>foreach (var y in x.Fields) {
 <text>
-@foreach (var y in x.Fields) {
-<text>
-            public readonly @(y.Type)Field @(jf(x.Name, y.Ident));</text>}</text>
-}
+            public readonly @(y.Type)Field @(jf(x.Name, y.Ident));</text>}}
 
 
             public RowFields()
-                : base("@Model.Tablename"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
+                : base("@(schemaDot)@Model.Tablename"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
             {
                 LocalTextPrefix = "@(moduleDot)@(Model.ClassName)";
             }

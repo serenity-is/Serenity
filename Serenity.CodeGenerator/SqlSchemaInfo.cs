@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 
 namespace Serenity.CodeGenerator
 {
@@ -135,7 +136,7 @@ namespace Serenity.CodeGenerator
             return list;
         }
 
-        public static List<ForeignKeyInfo> GetTableSingleFieldForeignKeys(IDbConnection connection, string tableName)
+        public static List<ForeignKeyInfo> GetTableSingleFieldForeignKeys(IDbConnection connection, string schema, string tableName)
         {
             var inf = InformationSchema(connection);
             List<ForeignKeyInfo> foreignKeyInfos = new List<ForeignKeyInfo>();
@@ -152,10 +153,10 @@ namespace Serenity.CodeGenerator
                         {
                             ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
 
-                            foreignKeyInfo.SourceTable = tableName;
-                            foreignKeyInfo.SourceColumn = reader.GetString(3);
-                            foreignKeyInfo.ForeignTable = reader.GetString(2);
-                            foreignKeyInfo.ForeignColumn = reader.GetString(4);
+                            foreignKeyInfo.FKTable = tableName;
+                            foreignKeyInfo.FKColumn = reader.GetString(3);
+                            foreignKeyInfo.PKTable = reader.GetString(2);
+                            foreignKeyInfo.PKColumn = reader.GetString(4);
 
                             foreignKeyInfos.Add(foreignKeyInfo);
                         }
@@ -170,50 +171,49 @@ namespace Serenity.CodeGenerator
 
             try
             {
-                // çift (ya da daha çok) alanlı constraint ler yapımıza uymuyor
-                // bu yüzden constraint adına göre sıralı liste alıyoruz
-                // tarama sırasında tek bir constraint'te birden fazla
-                // alan bulduysak bu constraint hiç yokmuş gibi davranacağız
-                using (var reader = SqlHelper.ExecuteReader(connection, (String.Format(
-                    "SELECT CCU.CONSTRAINT_NAME SRC_CONSTRAINT, CCU.COLUMN_NAME SRC_COL, " +
-                    "KCU.TABLE_NAME FOREIGN_TABLE, KCU.COLUMN_NAME FOREIGN_COL " +
-                    "FROM " + inf + "CONSTRAINT_COLUMN_USAGE CCU, " +
-                    inf + "REFERENTIAL_CONSTRAINTS RC, " +
-                    inf + "KEY_COLUMN_USAGE KCU " +
-                    "WHERE CCU.TABLE_NAME = {0} AND " +
-                    "CCU.CONSTRAINT_NAME = RC.CONSTRAINT_NAME AND " +
-                    "KCU.CONSTRAINT_NAME = RC.UNIQUE_CONSTRAINT_NAME " +
-                    "ORDER BY CCU.CONSTRAINT_NAME", tableName.ToSql()))))
+                var c = new Alias(inf + "REFERENTIAL_CONSTRAINTS", "c");
+                var fk = new Alias(inf + "CONSTRAINT_COLUMN_USAGE", "fk");
+                var pk = new Alias(inf + "KEY_COLUMN_USAGE", "pk");
+
+                var list = connection.Query<ForeignKeyInfo>(new SqlQuery()
+                    .From(c)
+                    .From(fk)
+                    .From(pk)
+                    .Where(
+                        fk._("TABLE_SCHEMA") == schema &
+                        fk._("TABLE_NAME") == tableName &
+                        fk._("CONSTRAINT_SCHEMA") == c._("CONSTRAINT_SCHEMA") &
+                        fk._("CONSTRAINT_NAME") == c._("CONSTRAINT_NAME") &
+                        pk._("CONSTRAINT_SCHEMA") == c._("UNIQUE_CONSTRAINT_SCHEMA") &
+                        pk._("CONSTRAINT_NAME") == c._("UNIQUE_CONSTRAINT_NAME"))
+                    .Select(fk["CONSTRAINT_NAME"], "FKName")
+                    .Select(fk["TABLE_SCHEMA"], "FKSchema")
+                    .Select(fk["TABLE_NAME"], "FKTable")
+                    .Select(fk["COLUMN_NAME"], "FKColumn")
+                    .Select(pk["TABLE_SCHEMA"], "PKSchema")
+                    .Select(pk["TABLE_NAME"], "PKTable")
+                    .Select(pk["COLUMN_NAME"], "PKColumn")
+                    .OrderBy(fk["CONSTRAINT_NAME"]));
+                    
+                foreach (var foreignKeyInfo in list)
                 {
-                    string priorConstraint = "";
+                    string priorName = "";
                     bool priorDeleted = false;
 
-                    while (reader.Read())
+                    // eğer bir önceki ile aynıysa bunu listeye ekleme ve öncekini de sil
+                    if (priorName == foreignKeyInfo.FKName)
                     {
-                        ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
-
-                        foreignKeyInfo.SourceConstraint = reader.GetString(0);
-
-                        // eğer bir önceki ile aynıysa bunu listeye ekleme ve öncekini de sil
-                        if (priorConstraint == foreignKeyInfo.SourceConstraint)
+                        if (!priorDeleted)
                         {
-                            if (!priorDeleted)
-                            {
-                                foreignKeyInfos.RemoveAt(foreignKeyInfos.Count - 1);
-                                priorDeleted = true;
-                            }
-                            continue;
+                            foreignKeyInfos.RemoveAt(foreignKeyInfos.Count - 1);
+                            priorDeleted = true;
                         }
-
-                        foreignKeyInfo.SourceTable = tableName;
-                        foreignKeyInfo.SourceColumn = reader.GetString(1);
-                        foreignKeyInfo.ForeignTable = reader.GetString(2);
-                        foreignKeyInfo.ForeignColumn = reader.GetString(3);
-
-                        foreignKeyInfos.Add(foreignKeyInfo);
-                        priorDeleted = false;
-                        priorConstraint = foreignKeyInfo.SourceConstraint;
+                        continue;
                     }
+
+                    foreignKeyInfos.Add(foreignKeyInfo);
+                    priorDeleted = false;
+                    priorName = foreignKeyInfo.FKName;
                 }
             }
             catch (Exception)
@@ -229,7 +229,7 @@ namespace Serenity.CodeGenerator
         {
             var inf = InformationSchema(connection);
             List<FieldInfo> fieldInfos = new List<FieldInfo>();
-            List<ForeignKeyInfo> foreignKeys = GetTableSingleFieldForeignKeys(connection, tableName);
+            List<ForeignKeyInfo> foreignKeys = GetTableSingleFieldForeignKeys(connection, schema, tableName);
             List<string> primaryFields = GetTablePrimaryFields(connection, schema, tableName);
             List<string> identityFields = GetTableIdentityFields(connection, schema, tableName);
 
@@ -296,12 +296,13 @@ namespace Serenity.CodeGenerator
             foreach (FieldInfo fieldInfo in fieldInfos)
             {
                 ForeignKeyInfo foreignKey = foreignKeys.Find(
-                    delegate(ForeignKeyInfo d) { return d.SourceColumn == fieldInfo.FieldName; });
+                    delegate(ForeignKeyInfo d) { return d.FKColumn == fieldInfo.FieldName; });
 
                 if (foreignKey != null)
                 {
-                    fieldInfo.ForeignTable = foreignKey.ForeignTable;
-                    fieldInfo.ForeignField = foreignKey.ForeignColumn;
+                    fieldInfo.PKSchema = foreignKey.PKSchema;
+                    fieldInfo.PKTable = foreignKey.PKTable;
+                    fieldInfo.PKColumn = foreignKey.PKColumn;
                 }
             }
 
@@ -316,18 +317,21 @@ namespace Serenity.CodeGenerator
             public bool IsPrimaryKey;
             public bool IsIdentity;
             public bool IsNullable;
-            public string ForeignTable;
-            public string ForeignField;
+            public string PKSchema;
+            public string PKTable;
+            public string PKColumn;
             public string DataType;
         }
 
         public class ForeignKeyInfo
         {
-            public string SourceTable;
-            public string SourceConstraint;
-            public string SourceColumn;
-            public string ForeignTable;
-            public string ForeignColumn;
+            public string FKName;
+            public string FKSchema;
+            public string FKTable;
+            public string FKColumn;
+            public string PKSchema;
+            public string PKTable;
+            public string PKColumn;
         }
 
         const string SqlBit = "bit";

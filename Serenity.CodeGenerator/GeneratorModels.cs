@@ -8,11 +8,12 @@ namespace Serenity.CodeGenerator
     public class EntityCodeGenerationModel
     {
         public string Module { get; set; }
-        public string Schema { get; set; }
+        public string ConnectionKey { get; set; }
         public string Permission { get; set; }
         public string RootNamespace { get; set; }
         public string ClassName { get; set; }
         public string RowClassName { get; set; }
+        public string Schema { get; set; }
         public string Tablename { get; set; }
         public string Identity { get; set; }
         public string IsActiveField { get; set; }
@@ -35,8 +36,9 @@ namespace Serenity.CodeGenerator
         public string Name { get; set; }
         public string Title { get; set; }
         public string Flags { get; set; }
-        public string ForeignTable { get; set; }
-        public string ForeignField { get; set; }
+        public string PKSchema { get; set; }
+        public string PKTable { get; set; }
+        public string PKColumn { get; set; }
         public string ForeignJoinAlias { get; set; }
         public bool IsValueType { get; set; }
         public int? Size { get; set; }

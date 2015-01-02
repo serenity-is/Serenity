@@ -241,7 +241,7 @@ namespace Serenity.CodeGenerator
         {
             CreateNewSiteWebFile(Templates.Render(new Views.EntityEndpoint(), new
             {
-                Schema = model.Schema,
+                ConnectionKey = model.ConnectionKey,
                 RootNamespace = model.RootNamespace,
                 ClassName = model.ClassName,
                 RowClassName = model.RowClassName,
@@ -255,7 +255,7 @@ namespace Serenity.CodeGenerator
         {
             CreateNewSiteWebFile(Templates.Render(new Views.EntityPageController(), new 
             {
-                Schema = model.Schema,
+                ConnectionKey = model.ConnectionKey,
                 RootNamespace = model.RootNamespace,
                 ClassName = model.ClassName,
                 RowClassName = model.RowClassName,
@@ -269,7 +269,7 @@ namespace Serenity.CodeGenerator
         {
             CreateNewSiteWebFile(Templates.Render(new Views.EntityPageIndex(), new
             {
-                Schema = model.Schema,
+                ConnectionKey = model.ConnectionKey,
                 RootNamespace = model.RootNamespace,
                 ClassName = model.ClassName,
                 RowClassName = model.RowClassName,

@@ -10,10 +10,10 @@ namespace Serenity.CodeGenerator
 {
     public class RowGenerator
     {
-        public static string Generate(IDbConnection connection, string tableSchema, string table, string module, string schema, string entityClass, string permission,
+        public static string Generate(IDbConnection connection, string tableSchema, string table, string module, string connectionKey, string entityClass, string permission,
             GeneratorConfig config)
         {
-            var model = GenerateModel(connection, tableSchema, table, module, schema, entityClass, permission, config);
+            var model = GenerateModel(connection, tableSchema, table, module, connectionKey, entityClass, permission, config);
             return Templates.Render(new Views.EntityRow(), model);
         }
 
@@ -43,12 +43,13 @@ namespace Serenity.CodeGenerator
         }
 
         public static EntityCodeGenerationModel GenerateModel(IDbConnection connection, string tableSchema, string table,
-            string module, string schema, string entityClass, string permission, GeneratorConfig config)
+            string module, string connectionKey, string entityClass, string permission, GeneratorConfig config)
         {
             var model = new EntityCodeGenerationModel();
             model.Module = module;
+            model.Schema = tableSchema;
             model.Permission = permission;
-            model.Schema = schema;
+            model.ConnectionKey = connectionKey;
             model.RootNamespace = config.RootNamespace;
             var className = entityClass ?? ClassNameFromTableName(table);
             model.ClassName = className;
@@ -59,7 +60,7 @@ namespace Serenity.CodeGenerator
             model.Instance = true;
 
             var fields = SqlSchemaInfo.GetTableFieldInfos(connection, tableSchema, table);
-            var foreigns = SqlSchemaInfo.GetTableSingleFieldForeignKeys(connection, table);
+            var foreigns = SqlSchemaInfo.GetTableSingleFieldForeignKeys(connection, tableSchema, table);
 
             var prefix = DeterminePrefixLength(fields, x => x.FieldName);
 
@@ -180,13 +181,14 @@ namespace Serenity.CodeGenerator
                 if (f.Name == className && fieldType == "String")
                     model.NameField = f.Name;
 
-                var foreign = foreigns.Find((k) => k.SourceColumn.Equals(field.FieldName, StringComparison.InvariantCultureIgnoreCase));
+                var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.InvariantCultureIgnoreCase));
                 if (foreign != null)
                 {
-                    f.ForeignTable = foreign.ForeignTable;
-                    f.ForeignField = foreign.ForeignColumn;
+                    f.PKSchema = foreign.PKSchema;
+                    f.PKTable = foreign.PKTable;
+                    f.PKColumn = foreign.PKColumn;
 
-                    var frgfld = SqlSchemaInfo.GetTableFieldInfos(connection, tableSchema, foreign.ForeignTable);
+                    var frgfld = SqlSchemaInfo.GetTableFieldInfos(connection, foreign.PKSchema, foreign.PKTable);
                     int frgPrefix = RowGenerator.DeterminePrefixLength(frgfld, z => z.FieldName);
                     var j = new EntityCodeJoin();
                     j.Fields = new List<EntityCodeField>();
@@ -203,7 +205,7 @@ namespace Serenity.CodeGenerator
 
                     foreach (var frg in frgfld)
                     {
-                        if (frg.FieldName.Equals(foreign.ForeignColumn, StringComparison.InvariantCultureIgnoreCase))
+                        if (frg.FieldName.Equals(foreign.PKColumn, StringComparison.InvariantCultureIgnoreCase))
                             continue;
 
                         var kType = SqlSchemaInfo.SqlTypeNameToFieldType(frg.DataType);

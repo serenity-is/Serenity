@@ -327,7 +327,7 @@ namespace Serenity.CodeGenerator
                         connection.Open();
 
                         foreach (var t in SqlSchemaInfo.GetTableNames(connection))
-                            _tables.Add(((t.Item1 != null && t.Item1 != "dbo") ? (t.Item1 + ".") : "") + t.Item2);
+                            _tables.Add(((t.Item1 != null) ? (t.Item1 + ".") : "") + t.Item2);
                     }
                 }
                 catch (Exception ex)
