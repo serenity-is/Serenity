@@ -54,7 +54,7 @@ namespace Serenity
             var opt = base.GetEditorOptions();
 
             if (UseEditor() && EditorType == Field.EditorType)
-                opt = jQuery.Extend(opt, Field.FilteringParams);
+                opt = jQuery.Extend(opt, Field.EditorParams);
 
             return opt;
         }
