@@ -55,12 +55,21 @@ namespace Serenity
             {
                 AddEmptyRow(false);
                 var row = rowsDiv.Children().Last();
+
+                var divl = row.Children("div.l");
+                divl.Children(".leftparen").ToggleClass("active", Q.IsTrue(item.LeftParen));
+                divl.Children(".rightparen").ToggleClass("active", Q.IsTrue(item.RightParen));
+                divl.Children(".andor").ToggleClass("or", Q.IsTrue(item.IsOr))
+                    .Text(Q.Text(Q.IsTrue(item.IsOr) ? "Controls.FilterPanel.Or" : "Controls.FilterPanel.And"));
+
                 var fieldSelect = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
                 fieldSelect.Value = item.Field;
                 RowFieldChange(row);
+
                 var operatorSelect = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>();
                 operatorSelect.Value = item.Operator;
                 RowOperatorChange(row);
+
                 var filtering = GetFilteringFor(row);
                 if (filtering != null)
                 {
@@ -71,6 +80,8 @@ namespace Serenity
 
             if (ShowInitialLine && rowsDiv.Children().Length == 0)
                 AddEmptyRow(false);
+
+            UpdateParens();
         }
 
         public bool ShowSearchButton
