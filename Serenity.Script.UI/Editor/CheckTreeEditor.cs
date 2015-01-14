@@ -329,6 +329,9 @@ namespace Serenity
                         var cls = "check-box";
                         var item = (TItem)ctx.Item;
 
+                        if (item.HideCheckBox)
+                            return GetItemText(ctx);
+
                         bool threeState = IsThreeStateHierarchy();
                         if (item.IsSelected)
                         {
@@ -509,7 +512,7 @@ namespace Serenity
     public class CheckTreeItem
     {
         public bool IsSelected { get; set; }
-
+        public bool HideCheckBox { get; set; }
         public bool IsAllDescendantsSelected { get; set; }
         public string Id { get; set; }
         public string Text { get; set; }
