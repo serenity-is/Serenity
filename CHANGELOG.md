@@ -1,3 +1,19 @@
+## 1.4.7 (2015-01-16)
+
+Features:
+  - EmailEditor better copy paste
+  - added FileBrowserBrowseUrl for CKEditorOptions
+  - added Visible and Invisible attributes for columns
+  - TryGetWidget and GetWidget works with non-widget types (e.g. interface or base class)
+  - include schema name in generated table names and foreign keys
+  - hidecheckbox option for CheckListBox items
+
+Bugfixes:
+  - Readonly implementation for EmailEditor
+  - DateTime editor CSS width fixed
+  - fix editor filtering options
+  - fix filter panel restore problem with parenthesis, and/or
+
 ## 1.4.6 (2014-12-11)
 
 Features:
