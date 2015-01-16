@@ -72,20 +72,9 @@ namespace Serenity
 
         [IncludeGenericArguments(false)] // saltarelle bug ı var, değiştirme
         public static void Change<TWidget>(this TWidget widget, jQueryEventHandler handler)
-            where TWidget: Widget
+            where TWidget : Widget
         {
-            if (widget.Element.GetDataValue("select2") != null)
-            {
-                widget.Element.Bind2("change." + widget.UniqueName, (e, x) =>
-                {
-                    if (e.HasOriginalEvent() || Q.IsFalse(x))
-                    {
-                        handler(e);
-                    }
-                });
-            }
-            else
-                widget.Element.Bind("change." + widget.UniqueName, handler);
+            widget.Element.Bind("change." + widget.UniqueName, handler);
         }
 
         [IncludeGenericArguments(false)] // saltarelle bug ı var, değiştirme
