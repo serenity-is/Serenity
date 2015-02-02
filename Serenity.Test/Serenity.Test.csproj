@@ -165,7 +165,9 @@
     <None Include="fonts\glyphicons-halflings-regular.ttf" />
     <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="packages.config" />
-    <None Include="Scripts\jquery-2.1.3.min.map" />
+    <None Include="Scripts\jquery-2.1.3.min.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SqlScript\DbSerenity.sql" />
@@ -299,11 +301,21 @@
     <Content Include="phantomjs-license.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\jquery-2.1.3.intellisense.js" />
-    <Content Include="Scripts\jquery-2.1.3.js" />
-    <Content Include="Scripts\jquery-2.1.3.min.js" />
+    <Content Include="Scripts\bootstrap.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\bootstrap.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\jquery-2.1.3.intellisense.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\jquery-2.1.3.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\jquery-2.1.3.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\jquery-ui-1.11.2.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -331,7 +343,9 @@
     <Content Include="Scripts\jquery.validate.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\npm.js" />
+    <Content Include="Scripts\npm.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_az.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
