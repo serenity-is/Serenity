@@ -12,15 +12,18 @@ namespace Serenity
             this.Element.Find(".edit").Text(Q.Text("Controls.FilterPanel.EditFilter"));
             this.Element.Find(".reset").Attribute("title", Q.Text("Controls.FilterPanel.ResetFilterHint"));
 
-            this.Element.Find(".edit").Add(".txt").Click((s, e) =>
+            jQueryEventHandler openFilterDialog = delegate(jQueryEvent e)
             {
                 e.PreventDefault();
                 var dialog = new FilterDialog();
                 dialog.FilterPanel.Store = this.Store;
                 dialog.DialogOpen();
-            });
+            };
 
-            this.Element.Find(".reset").Click((s, e) =>
+            this.Element.Find(".edit").Click(openFilterDialog);
+            this.Element.Add(".txt").Click(openFilterDialog);
+
+            this.Element.Find(".reset").Click(e =>
             {
                 e.PreventDefault();
                 this.Store.Items.Clear();
