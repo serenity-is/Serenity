@@ -21,7 +21,7 @@ namespace Serenity
             };
 
             this.Element.Find(".edit").Click(openFilterDialog);
-            this.Element.Add(".txt").Click(openFilterDialog);
+            this.Element.Find(".txt").Click(openFilterDialog);
 
             this.Element.Find(".reset").Click(e =>
             {
