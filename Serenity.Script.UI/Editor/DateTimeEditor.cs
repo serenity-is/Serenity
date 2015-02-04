@@ -104,16 +104,5 @@ namespace Serenity
                 }
             }
         }
-
-        public static dynamic DefaultAutoNumericOptions()
-        {
-            return new
-            {
-                aDec = Q.Culture.DecimalSeparator,
-                altDec = Q.Culture.DecimalSeparator == "." ? "," : ".",
-                aSep = Q.Culture.DecimalSeparator == "." ? "," : ".",
-                aPad = true
-            };
-        }
     }
 }

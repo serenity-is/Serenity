@@ -30,6 +30,39 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class TimeEditorAttribute : CustomEditorAttribute
+    {
+        public TimeEditorAttribute()
+            : base("Time")
+        {
+        }
+
+        public Boolean NoEmptyOption
+        {
+            get { return GetOption<Boolean>("noEmptyOption"); }
+            set { SetOption("noEmptyOption", value); }
+        }
+
+        public Int32 StartHour
+        {
+            get { return GetOption<Int32>("startHour"); }
+            set { SetOption("startHour", value); }
+        }
+
+        public Int32 EndHour
+        {
+            get { return GetOption<Int32>("endHour"); }
+            set { SetOption("endHour", value); }
+        }
+
+        public Int32 InvervalMinutes
+        {
+            get { return GetOption<Int32>("invervalMinutes"); }
+            set { SetOption("invervalMinutes", value); }
+        }
+
+    }
+
     public partial class DateYearEditorAttribute : CustomEditorAttribute
     {
         public DateYearEditorAttribute()
