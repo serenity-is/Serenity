@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using System.Web.Mvc;
 
 namespace Serenity.Web
@@ -12,11 +13,16 @@ namespace Serenity.Web
 
         public PageAuthorizeAttribute(object permission)
         {
-            this.Permission = permission.ToString();
+            this.Permission = permission == null ? null : permission.ToString();
         }
 
-        public PageAuthorizeAttribute(object applicationId, object permission)
-            : this(applicationId.ToString() + ":" + permission.ToString())
+        public PageAuthorizeAttribute(object module, object permission)
+            : this(module.ToString() + ":" + permission)
+        {
+        }
+
+        public PageAuthorizeAttribute(object module, object submodule, object permission)
+            : this(module.ToString() + ":" + submodule + ":" + permission)
         {
         }
 

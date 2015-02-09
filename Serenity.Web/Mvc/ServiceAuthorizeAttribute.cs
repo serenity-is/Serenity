@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using System.Web.Mvc;
 
 namespace Serenity.Services
@@ -12,11 +13,16 @@ namespace Serenity.Services
         public ServiceAuthorizeAttribute(object permission)
             : this()
         {
-            this.Permission = permission.ToString();
+            this.Permission = permission == null ? null : permission.ToString();
         }
 
-        public ServiceAuthorizeAttribute(object applicationId, object permission)
-            : this(applicationId.ToString() + ":" + permission.ToString())
+        public ServiceAuthorizeAttribute(object module, object permission)
+            : this(module.ToString() + ":" + permission)
+        {
+        }
+
+        public ServiceAuthorizeAttribute(object module, object submodule, object permission)
+            : this(module.ToString() + ":" + submodule + ":" + permission)
         {
         }
 

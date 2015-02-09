@@ -4,17 +4,17 @@ namespace Serenity.Data
 {
     public class ModifyPermissionAttribute : PermissionAttributeBase
     {
-        public ModifyPermissionAttribute(string permission)
+        public ModifyPermissionAttribute(object permission)
             : base(permission)
         {
         }
 
-        public ModifyPermissionAttribute(object module, string permission)
+        public ModifyPermissionAttribute(object module, object permission)
             : base(module, permission)
         {
         }
 
-        public ModifyPermissionAttribute(object module, object submodule, string permission)
+        public ModifyPermissionAttribute(object module, object submodule, object permission)
             : base(module, submodule, permission)
         {
         }
