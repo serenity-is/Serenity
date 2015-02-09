@@ -1,3 +1,13 @@
+## 1.4.8 (2015-02-09)
+
+Features:
+  - allow object values in Permission attributes instead of string to be able to use Enums, Integers.
+  - added TimeEditor
+  - updated Newtonsoft.Json to 6.0.8, jQuery to 2.1.3, FakeItEasy to 1.25.1
+
+Bugfixes:
+  - filter panel dialog was showing multiple times sometimes
+
 ## 1.4.7 (2015-01-16)
 
 Features:
