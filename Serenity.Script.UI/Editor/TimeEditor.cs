@@ -26,8 +26,6 @@ namespace Serenity
                 Q.AddOption(input, h.ToString(), h < 10 ? "0" + h : h.ToString());
 
             minutes = J("<select/>").AddClass("editor s-TimeEditor minute").InsertAfter(input);
-            if (!options.NoEmptyOption)
-                Q.AddOption(minutes, "", "--");
             for (var m = 0; m <= 59; m += (options.InvervalMinutes ?? 5))
                 Q.AddOption(minutes, m.ToString(), m < 10 ? "0" + m : m.ToString());
         }
@@ -54,7 +52,7 @@ namespace Serenity
                     else
                     {
                         element.Value("");
-                        minutes.Value("");
+                        minutes.Value("0");
                     }
                 }
                 else

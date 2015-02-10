@@ -89,4 +89,18 @@ namespace Serenity.ComponentModel
             set { SetOption("displayFormat", value); }
         }
     }
+
+    public class MinuteFormatterAttribute : CustomFormatterAttribute
+    {
+        public MinuteFormatterAttribute()
+            : base("Serenity.MinuteFormatter")
+        {
+        }
+
+        public String DisplayFormat
+        {
+            get { return GetOption<String>("displayFormat"); }
+            set { SetOption("displayFormat", value); }
+        }
+    }
 }

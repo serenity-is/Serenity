@@ -82,6 +82,7 @@
     <Compile Include="SlickGrid\Formatters\BooleanFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\EnumFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\EnumTypeRegistry.cs" />
+    <Compile Include="SlickGrid\Formatters\MinuteFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\NumberFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\DateTimeFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\ISlickFormatter.cs" />
@@ -141,7 +142,8 @@
     </Copy>
     <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.Slick.js" DestinationFolder="$(OutDir)">
     </Copy>
-    <Copy SourceFiles="$(OutDir)Serenity.Script.Core.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\Scripts\serenity\"></Copy>
+    <Copy SourceFiles="$(OutDir)Serenity.Script.Core.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\Scripts\serenity\">
+    </Copy>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.Core.js -o $(OutDir)Serenity.Script.Core.min.js --comments --mangle">
     </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Externals.js -o $(OutDir)Serenity.Externals.min.js --comments --mangle">
