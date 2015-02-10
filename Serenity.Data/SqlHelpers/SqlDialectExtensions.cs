@@ -59,6 +59,14 @@ namespace Serenity.Data
             return dialect.HasFlag(SqlDialect.Firebird);
         }
 
+        public static string OffsetFormat(this SqlDialect dialect)
+        {
+            if (dialect.HasFlag(SqlDialect.Sqlite))
+                return " OFFSET {0}";
+
+            return " OFFSET {0} ROWS";
+        }
+
         public static string OffsetFetchFormat(this SqlDialect dialect)
         {
             if (dialect.HasFlag(SqlDialect.Sqlite))

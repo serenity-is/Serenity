@@ -27,9 +27,9 @@ namespace Serenity.Data
             string extraWhere = null;
 
             bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword();
-            bool useFetchNext = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch();
-            bool useRowNumber = skip > 0 && !useSkipKeyword && !useFetchNext && dialect.CanUseRowNumber();
-            bool useSecondQuery = skip > 0 && !useSkipKeyword && !useFetchNext && !useRowNumber;
+            bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch();
+            bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && dialect.CanUseRowNumber();
+            bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
 
             // atlanması istenen kayıt var mı?
             if (useRowNumber || useSecondQuery)
@@ -193,7 +193,7 @@ namespace Serenity.Data
             }
 
             // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (take != 0 && (!useFetchNext) && (useRowNumber || !dialect.UseTakeAtEnd()))
+            if (take != 0 && (!useOffset) && (useRowNumber || !dialect.UseTakeAtEnd()))
             {
                 sb.Append(dialect.TakeKeyword());
                 sb.Append(' ');
@@ -271,7 +271,7 @@ namespace Serenity.Data
                 sb.Append(skip);
             }
 
-            if (take != 0 && (!useFetchNext) && !useRowNumber && dialect.UseTakeAtEnd())
+            if (take != 0 && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd())
             {
                 sb.Append(' ');
                 sb.Append(dialect.TakeKeyword());
@@ -279,8 +279,13 @@ namespace Serenity.Data
                 sb.Append(take);
             }
 
-            if (useFetchNext)
-                sb.Append(String.Format(dialect.OffsetFetchFormat(), skip, take));
+            if (useOffset)
+            {
+                if (take == 0)
+                    sb.Append(String.Format(dialect.OffsetFormat(), skip, take));
+                else
+                    sb.Append(String.Format(dialect.OffsetFetchFormat(), skip, take));
+            }
 
             if (!string.IsNullOrEmpty(forXml))
             {
