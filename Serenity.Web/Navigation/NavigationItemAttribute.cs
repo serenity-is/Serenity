@@ -12,7 +12,7 @@ namespace Serenity.Navigation
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public abstract class NavigationItemAttribute : Attribute
     {
-        protected NavigationItemAttribute(int order, string path, string url, string permission, string icon)
+        protected NavigationItemAttribute(int order, string path, string url, object permission, string icon)
         {
             var idx = (path ?? "").IndexOf("/");
             if (idx >= 0)
@@ -24,7 +24,7 @@ namespace Serenity.Navigation
                 this.Title = path;
 
             this.Order = order;
-            this.Permission = permission;
+            this.Permission = permission == null ? null : permission.ToString();
             this.IconClass = icon;
             this.Url = url;
         }
