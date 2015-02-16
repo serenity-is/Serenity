@@ -60,6 +60,15 @@ namespace Serenity.Testing
                 SetupOverride(over);
         }
 
+        public void ExpireOverrides()
+        {
+            lock (syncLock)
+            {
+                foreach (var over in overrides)
+                    attachedHashes.Remove(over.DbAlias);
+            }
+        }
+
         private void SetupOverride(DbOverride over)
         {
             lock (syncLock)
