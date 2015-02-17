@@ -66,6 +66,12 @@ namespace Serenity.Testing
             {
                 foreach (var over in overrides)
                     attachedHashes.Remove(over.DbAlias);
+
+                if (scope != null)
+                {
+                    scope.Dispose();
+                    scope = null;
+                }
             }
         }
 
