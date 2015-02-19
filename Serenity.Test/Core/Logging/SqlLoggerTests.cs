@@ -54,10 +54,11 @@ namespace Serenity.Test.Logging
                     Log.Info("Hello2", new Exception("SomeException2"), this.GetType());
                     Log.Warn("Hello3", new Exception("SomeException3"), this.GetType());
 
-                    Thread.Sleep(50);
-
                     using (var connection = SqlConnections.NewByKey("Serenity"))
                     {
+                        connection.Open();
+                        connection.Close();
+                        Thread.Sleep(500);
                         var items = connection.List<SystemLogRow>(q => q.SelectTableFields().OrderBy(fld.ID, desc: true).Take(3));
 
                         Assert.Equal(3, items.Count);
