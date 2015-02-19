@@ -137,6 +137,7 @@
     <Compile Include="SqlHelpers\SqlSettings.cs" />
     <Compile Include="Utility\AppSettingsJsonConfigRepository.cs" />
     <Compile Include="Utility\DeltaLister.cs" />
+    <Compile Include="Utility\SqlLogger.cs" />
     <Compile Include="Validation\ICustomValidator.cs" />
     <Compile Include="Validation\ValidationContext.cs" />
   </ItemGroup>

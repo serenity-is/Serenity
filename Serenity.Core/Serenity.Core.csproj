@@ -70,6 +70,8 @@
     <Compile Include="Json\JsonConfigHelper.cs" />
     <Compile Include="Localization\JsonLocalTextRegistration.cs" />
     <Compile Include="Localization\InitializedLocalText.cs" />
+    <Compile Include="Logging\FileLogger.cs" />
+    <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Munq\AlwaysNewLifetime.cs" />
     <Compile Include="Munq\Container.cs" />
     <Compile Include="Munq\Container.Registrar.cs" />
@@ -136,7 +138,7 @@
     <Compile Include="Helpers\EnumMapper.cs" />
     <Compile Include="Helpers\CollectionExtensions.cs" />
     <Compile Include="Helpers\ExtensibilityHelper.cs" />
-    <Compile Include="Helpers\Log.cs" />
+    <Compile Include="Logging\Log.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Helpers\UriHelper.cs" />
     <Compile Include="Interface\ExceptionLog.cs" />
@@ -146,7 +148,7 @@
     <Compile Include="Interface\SettingScopeAttribute.cs" />
     <Compile Include="Interface\SettingKeyAttribute.cs" />
     <Compile Include="Interface\IExceptionLogger.cs" />
-    <Compile Include="Interface\LoggingLevel.cs" />
+    <Compile Include="Logging\LoggingLevel.cs" />
     <Compile Include="Configuration\IConfigurationRepository.cs" />
     <Compile Include="Interface\ValidationError.cs" />
     <Compile Include="IO\DeleteType.cs" />

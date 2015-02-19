@@ -366,12 +366,12 @@
        {
            using (IDbCommand command = NewCommand(connection, commandText, param))
            {
-               if (Log.DebugLevel)
+               if (Log.IsDebugEnabled)
                    LogCommand("ExecuteNonQuery", command);
 
                var result = ExecuteNonQuery(command);
 
-               if (Log.DebugLevel)
+               if (Log.IsDebugEnabled)
                    Log.Debug("END - ExecuteNonQuery");
 
                return result;
@@ -390,12 +390,12 @@
        {
            using (IDbCommand command = NewCommand(connection, commandText))
            {
-               if (Log.DebugLevel)
+               if (Log.IsDebugEnabled)
                    LogCommand("ExecuteNonQuery", command);
 
                var result = ExecuteNonQuery(command);
 
-               if (Log.DebugLevel)
+               if (Log.IsDebugEnabled)
                    Log.Debug("END - ExecuteNonQuery");
 
                return result;
@@ -425,12 +425,12 @@
                {
                    try
                    {
-                       if (Log.DebugLevel)
+                       if (Log.IsDebugEnabled)
                            LogCommand("ExecuteScalar", command);
 
                        var result = command.ExecuteScalar();
 
-                       if (Log.DebugLevel)
+                       if (Log.IsDebugEnabled)
                            Log.Debug("END - ExecuteScalar");
 
                        return result;
@@ -559,12 +559,12 @@
                    IDbCommand command = NewCommand(connection, commandText, param);
                    try
                    {
-                       if (Log.DebugLevel)
+                       if (Log.IsDebugEnabled)
                            LogCommand("ExecuteReader", command);
 
                        var result = command.ExecuteReader();
 
-                       if (Log.DebugLevel)
+                       if (Log.IsDebugEnabled)
                            Log.Debug("END - ExecuteReader");
 
                        return result;

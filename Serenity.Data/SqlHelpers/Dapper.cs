@@ -872,7 +872,7 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
             {
                 cmd = SetupCommand(cnn, transaction, sql, info.ParamReader, param, commandTimeout, commandType);
 
-                if (Log.DebugLevel)
+                if (Log.IsDebugEnabled)
                     SqlHelper.LogCommand("Dapper.QueryInternal", cmd);
 
                 cnn.EnsureOpen();

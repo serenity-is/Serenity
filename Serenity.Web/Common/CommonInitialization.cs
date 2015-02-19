@@ -3,9 +3,7 @@ using Serenity.Caching;
 using Serenity.Configuration;
 using Serenity.Extensibility;
 using Serenity.Localization;
-using System;
-using System.Collections.Generic;
-using System.IO;
+using Serenity.Logging;
 using System.Linq;
 using System.Reflection;
 using System.Web.Compilation;
@@ -21,6 +19,7 @@ namespace Serenity.Web
             InitializeSelfAssemblies();
             InitializeCaching();
             InitializeConfigurationSystem();
+            InitializeLogging();
             InitializeLocalTexts();
             InitializeDynamicScripts();
         }
@@ -32,6 +31,14 @@ namespace Serenity.Web
                 var container = new MunqContainer();
                 Dependency.SetResolver(container);
             }
+        }
+
+        public static void InitializeLogging()
+        {
+            var registrar = Dependency.Resolve<IDependencyRegistrar>();
+
+            if (Dependency.TryResolve<ILogger>() == null)
+                registrar.RegisterInstance<ILogger>(new FileLogger());
         }
 
         public static void InitializeSelfAssemblies()

@@ -101,6 +101,9 @@
     <Compile Include="Core\Localization\EnumLocalTextRegistrationTests.cs" />
     <Compile Include="Core\Localization\InitializedLocalTextTests.cs" />
     <Compile Include="Core\Localization\LocalTextTests.cs" />
+    <Compile Include="Core\Logging\SqlLoggerTests.cs" />
+    <Compile Include="Core\Logging\LoggingTests.cs" />
+    <Compile Include="Core\Logging\SqlLoggerTests.SystemLogRow.cs" />
     <Compile Include="Data\JsonCriteriaConverterDeserializationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />
     <Compile Include="Data\FakeDisplayOrderRow.cs" />

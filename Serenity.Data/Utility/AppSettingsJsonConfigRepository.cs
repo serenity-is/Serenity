@@ -21,7 +21,7 @@ namespace Serenity.Configuration
             {
                 var keyAttr = settingType.GetCustomAttribute<SettingKeyAttribute>();
                 var key = keyAttr == null ? settingType.Name : keyAttr.Value;
-                return JSON.Parse(ConfigurationManager.AppSettings[key].TrimToNull() ?? "{}", settingType);
+                return JSON.ParseTolerant(ConfigurationManager.AppSettings[key].TrimToNull() ?? "{}", settingType);
             });
         }
     }
