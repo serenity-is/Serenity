@@ -50,17 +50,36 @@ namespace Serenity.Test.Logging
                     registrar.RegisterInstance<ILogger>(new SqlLogger());
 
                     Log.MinimumLevel = LoggingLevel.Debug;
-                    Log.Debug("Hello", new Exception("SomeMessage"), this.GetType());
+                    Log.Debug("Hello1", new Exception("SomeException1"), this.GetType());
+                    Log.Info("Hello2", new Exception("SomeException2"), this.GetType());
+                    Log.Warn("Hello3", new Exception("SomeException3"), this.GetType());
 
                     Thread.Sleep(50);
 
                     using (var connection = SqlConnections.NewByKey("Serenity"))
                     {
-                        var item = connection.First<SystemLogRow>(q => q.SelectTableFields().OrderBy(fld.ID, desc: true).Take(1));
+                        var items = connection.List<SystemLogRow>(q => q.SelectTableFields().OrderBy(fld.ID, desc: true).Take(3));
 
-                        Assert.Equal("Hello", item.LogMessage);
-                        Assert.Contains("SomeMessage", item.Exception);
+                        Assert.Equal(3, items.Count);
+
+                        var item = items[2];
+                        Assert.Equal("Hello1", item.LogMessage);
+                        Assert.Contains("SomeException1", item.Exception);
                         Assert.Equal("Debug", item.LogLevel);
+                        Assert.Equal(this.GetType().FullName, item.SourceType);
+                        Assert.True(DateTime.Now.Subtract(item.EventDate.Value).TotalSeconds < 60);
+
+                        item = items[1];
+                        Assert.Equal("Hello2", item.LogMessage);
+                        Assert.Contains("SomeException2", item.Exception);
+                        Assert.Equal("Info", item.LogLevel);
+                        Assert.Equal(this.GetType().FullName, item.SourceType);
+                        Assert.True(DateTime.Now.Subtract(item.EventDate.Value).TotalSeconds < 60);
+
+                        item = items[0];
+                        Assert.Equal("Hello3", item.LogMessage);
+                        Assert.Contains("SomeException3", item.Exception);
+                        Assert.Equal("Warn", item.LogLevel);
                         Assert.Equal(this.GetType().FullName, item.SourceType);
                         Assert.True(DateTime.Now.Subtract(item.EventDate.Value).TotalSeconds < 60);
                     }

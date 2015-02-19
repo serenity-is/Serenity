@@ -9,15 +9,74 @@ using System.Threading;
 
 namespace Serenity.Logging
 {
-    public class SqlLogger : ILogger
+    public class SqlLogger : ILogger, IDisposable
     {
         private object sync = new object();
+        private Queue<DynamicParameters> queue = new Queue<DynamicParameters>();
+        private AutoResetEvent signal = new AutoResetEvent(false);
 
         public SqlLogger()
         {
             var settings = Config.TryGet<LogSettings>() ?? new LogSettings();
             ConnectionKey = settings.ConnectionKey;
             InsertCommand = settings.InsertCommand;
+            new Thread(Worker).Start();
+        }
+
+        ~SqlLogger()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            lock (sync)
+            {
+                queue = null;
+            }
+
+            if (disposing)
+                GC.SuppressFinalize(this);
+        }
+
+        private void Worker()
+        {
+            while (queue != null)
+            {
+                signal.WaitOne();
+
+                if (queue == null)
+                    break;
+
+                while (true)
+                try
+                {
+                    DynamicParameters parameters;
+                    lock (sync)
+                    {
+                        if (queue == null || queue.Count == 0)
+                            break;
+
+                        parameters = queue.Dequeue();
+                    }
+
+                    using (var connection = SqlConnections.NewByKey(ConnectionKey))
+                    {
+                        connection.Execute(InsertCommand, parameters);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var internalLogger = Dependency.TryResolve<ILogger>("Internal");
+                    if (internalLogger != null)
+                        internalLogger.Write(LoggingLevel.Fatal, null, ex, this.GetType());
+                }
+            }
         }
 
         public string ConnectionKey { get; set; }
@@ -45,22 +104,10 @@ namespace Serenity.Logging
                 { "@thread", Thread.CurrentThread.ManagedThreadId }
             });
 
-            ThreadPool.QueueUserWorkItem(w =>
-            {
-                try
-                {
-                    using (var connection = SqlConnections.NewByKey(connectionKey))
-                    {
-                        connection.Execute(insertCommand, parameters);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    var internalLogger = Dependency.TryResolve<ILogger>("Internal");
-                    if (internalLogger != null)
-                        internalLogger.Write(LoggingLevel.Fatal, null, ex, this.GetType());
-                }
-            });
+            lock (sync)
+                queue.Enqueue(parameters);
+
+            signal.Set();
         }
     }
 }
