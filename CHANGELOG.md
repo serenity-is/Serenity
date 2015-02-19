@@ -1,3 +1,15 @@
+## 1.4.9 (2015-02-19)
+
+Features:
+  - abstracted logging functions, added SqlLogger class to Serenity.Data
+  - ability to expire cached databased and end transaction scope in database tests if data is modified in another thread / application
+  - updated Newtonsoft.Json to 6.0.8, jQuery to 2.1.3, FakeItEasy to 1.25.1
+  - use 32 bit Node instead of 64 for those who need to work on 32 bit windows
+  - added TimeFormatter
+
+Bugfixes:
+  - fix problem with SQL 2012 dialect when skip > 0 and take = 0
+  
 ## 1.4.8 (2015-02-09)
 
 Features:
