@@ -9,12 +9,12 @@ namespace Serenity.CodeGeneration
 {
     public class ScriptFormGenerator
     {
-        public ScriptFormGenerator(Assembly assembly)
+        public ScriptFormGenerator(params Assembly[] assemblies)
         {
-            if (assembly == null)
+            if (assemblies == null || assemblies.Length == 0)
                 throw new ArgumentNullException("assembly");
 
-            this.Assembly = assembly;
+            this.Assemblies = assemblies;
 
             WidgetTypes = new HashSet<string>();
 
@@ -35,7 +35,7 @@ namespace Serenity.CodeGeneration
             };
         }
 
-        public Assembly Assembly { get; private set; }
+        public Assembly[] Assemblies { get; private set; }
         public Func<Type, string> GetTypeName { get; set; }
         public Func<Type, string> GetNamespace { get; set; }
         public HashSet<string> UsingNamespaces { get; private set; }
@@ -64,7 +64,8 @@ namespace Serenity.CodeGeneration
             var sb = new StringBuilder();
             var cw = new Serenity.Reflection.CodeWriter(sb, 4);
 
-            foreach (var type in this.Assembly.GetTypes())
+            foreach (var assembly in Assemblies)
+            foreach (var type in assembly.GetTypes())
             {
                 if (type.GetCustomAttribute(typeof(Serenity.ComponentModel.FormScriptAttribute)) == null)
                     continue;

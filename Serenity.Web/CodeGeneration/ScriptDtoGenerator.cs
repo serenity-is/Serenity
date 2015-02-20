@@ -20,7 +20,7 @@ namespace Serenity.CodeGeneration
         private HashSet<Type> visited;
         private Queue<Type> generateQueue;
 
-        public ScriptDtoGenerator(Assembly assembly)
+        public ScriptDtoGenerator(params Assembly[] assemblies)
         {
             UsingNamespaces = new HashSet<string>
             {
@@ -37,13 +37,13 @@ namespace Serenity.CodeGeneration
             {
             };
 
-            if (assembly == null)
+            if (assemblies == null || assemblies.Length == 0)
                 throw new ArgumentNullException("assembly");
 
-            this.Assembly = assembly;
+            this.Assemblies = assemblies;
         }
 
-        public Assembly Assembly { get; private set; }
+        public Assembly[] Assemblies { get; private set; }
         public HashSet<string> UsingNamespaces { get; private set; }
         public HashSet<string> RootNamespaces { get; private set; }
 
@@ -73,7 +73,8 @@ namespace Serenity.CodeGeneration
             this.generateQueue = new Queue<Type>();
             this.visited = new HashSet<Type>();
 
-            foreach (var fromType in this.Assembly.GetTypes())
+            foreach (var assembly in this.Assemblies)
+            foreach (var fromType in assembly.GetTypes())
             {
                 if (fromType.IsAbstract)
                     continue;
@@ -90,7 +91,7 @@ namespace Serenity.CodeGeneration
             {
                 var type = generateQueue.Dequeue();
 
-                if (type.Assembly != this.Assembly)
+                if (!this.Assemblies.Contains(type.Assembly))
                     continue;
 
                 GenerateCodeFor(type);

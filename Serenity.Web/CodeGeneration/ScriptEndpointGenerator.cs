@@ -11,20 +11,20 @@ namespace Serenity.CodeGeneration
 {
     public class ScriptEndpointGenerator
     {
-        public Assembly Assembly { get; private set; }
+        public Assembly[] Assemblies { get; private set; }
         public Func<Type, bool> IsEndpoint { get; set; }
         public Func<Type, string> GetNamespace { get; set; }
         public Func<Type, string> GetServiceUrl { get; set; }
         public HashSet<string> RootNamespaces { get; private set; }
 
-        public ScriptEndpointGenerator(Assembly assembly)
+        public ScriptEndpointGenerator(params Assembly[] assemblies)
         {
-            if (assembly == null)
-                throw new ArgumentNullException("assembly");
+            if (assemblies == null || assemblies.Length == 0)
+                throw new ArgumentNullException("assemblies");
 
             RootNamespaces = new HashSet<string> { };
 
-            this.Assembly = assembly;
+            this.Assemblies = assemblies;
         }
 
         public SortedDictionary<string, string> GenerateCode()
@@ -42,7 +42,8 @@ namespace Serenity.CodeGeneration
                 return className;
             };
 
-            foreach (var type in this.Assembly.GetTypes())
+            foreach (var assembly in this.Assemblies)
+            foreach (var type in assembly.GetTypes())
             {
                 if (!type.IsSubclassOf(typeof(Controller)))
                     continue;
