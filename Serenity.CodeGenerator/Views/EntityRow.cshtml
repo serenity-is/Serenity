@@ -30,11 +30,12 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
     {@foreach (var x in Model.Fields) {
     var attrs = new List<string>();
-    if (x.Ident != x.Name) {
+    attrs.Add("DisplayName(\"" + x.Title + "\")");
+
+    if (x.Ident != x.Name)
+    {
         attrs.Add("Column(\"" + x.Name + "\")");
     }
-
-    attrs.Add("DisplayName(\"" + x.Title + "\")");
 
     if ((x.Size ?? 0) != 0) {
         attrs.Add("Size(" + x.Size + ")");
