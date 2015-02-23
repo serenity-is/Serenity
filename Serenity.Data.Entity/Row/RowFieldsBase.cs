@@ -15,6 +15,7 @@ namespace Serenity.Data
         internal Dictionary<string, Field> byName;
         internal Dictionary<string, Field> byPropertyName;
         internal Field[] primaryKeys;
+        internal Tuple<Field, bool>[] sortOrders;
         internal bool isInitialized;
         internal string fieldPrefix;
         internal Dictionary<string, Join> joins;
@@ -463,6 +464,34 @@ namespace Serenity.Data
                 }
 
                 return primaryKeys;
+            }
+        }
+
+        public Tuple<Field, bool>[] SortOrders
+        {
+            get
+            {
+                if (sortOrders == null)
+                {
+                    var list = new List<Tuple<Field, int>>();
+                    foreach (var field in this)
+                    {
+                        if (field.CustomAttributes == null)
+                            continue;
+
+                        var sortAttr = field.CustomAttributes
+                            .OfType<SortOrderAttribute>().FirstOrDefault();
+
+                        if (sortAttr != null)
+                            list.Add(new Tuple<Field, int>(field, sortAttr.SortOrder));
+                    }
+
+                    sortOrders = list.OrderBy(x => Math.Abs(x.Item2))
+                        .Select(x => new Tuple<Field, bool>(x.Item1, x.Item2 < 0 ? true : false))
+                        .ToArray();
+                }
+
+                return sortOrders;
             }
         }
 

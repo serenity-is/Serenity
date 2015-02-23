@@ -21,6 +21,10 @@
 
         protected virtual SortBy[] GetNativeSort()
         {
+            var sortOrders = Row.GetFields().SortOrders;
+            if (!sortOrders.IsEmptyOrNull())
+                return sortOrders.Select(x => new SortBy(x.Item1.PropertyName ?? x.Item1.Name, x.Item2)).ToArray();
+
             var nameRow = Row as INameRow;
             if (nameRow != null)
                 return new SortBy[] { new SortBy(nameRow.NameField.Name, false) };
