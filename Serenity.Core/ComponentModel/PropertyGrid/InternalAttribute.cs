@@ -2,7 +2,7 @@
 
 namespace Serenity.ComponentModel
 {
-    public class HiddenAttribute : Attribute
+    public class InternalAttribute : Attribute
     {
     }
 }

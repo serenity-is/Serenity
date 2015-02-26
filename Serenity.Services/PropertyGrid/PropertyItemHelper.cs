@@ -29,7 +29,7 @@ namespace Serenity.PropertyGrid
                     member.MemberType != MemberTypes.Field)
                     continue;
 
-                var hiddenAttribute = member.GetCustomAttributes(typeof(HiddenAttribute), false);
+                var hiddenAttribute = member.GetCustomAttributes(typeof(InternalAttribute), false);
                 if (hiddenAttribute.Length > 0)
                     continue;
 

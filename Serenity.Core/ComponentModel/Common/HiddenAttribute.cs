@@ -2,9 +2,9 @@
 
 namespace Serenity.ComponentModel
 {
-    public class InvisibleAttribute : VisibleAttribute
+    public class HiddenAttribute : VisibleAttribute
     {
-        public InvisibleAttribute()
+        public HiddenAttribute()
             : base(false)
         {
         }

@@ -44,7 +44,7 @@
     <Compile Include="ComponentModel\Columns\Filtering\FilteringOptionAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilterOnlyAttribute.cs" />
-    <Compile Include="ComponentModel\Common\InvisibleAttribute.cs" />
+    <Compile Include="ComponentModel\Common\HiddenAttribute.cs" />
     <Compile Include="ComponentModel\Common\VisibleAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\ColumnsScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\DataScriptAttribute.cs" />
@@ -121,7 +121,7 @@
     <Compile Include="ComponentModel\PropertyGrid\Editing\EditorOptionAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Editing\EditorTypeAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Editing\BasicEditorTypes.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\HiddenAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\InternalAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HintAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\MaxLengthAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\OneWayAttribute.cs" />

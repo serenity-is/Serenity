@@ -82,7 +82,7 @@ namespace Serenity.Logging
         public string ConnectionKey { get; set; }
         public string InsertCommand { get; set; }
 
-        [SettingScope("Application"), SettingKey("Logging"), Hidden]
+        [SettingScope("Application"), SettingKey("Logging"), Internal]
         private class LogSettings
         {
             public string ConnectionKey { get; set; }
