@@ -85,7 +85,7 @@ namespace Serenity.Reporting
                     propertyInfo == null)
                     continue;
 
-                if (member.GetCustomAttribute<InternalAttribute>() != null)
+                if (member.GetCustomAttribute<IgnoreAttribute>() != null)
                     continue;
 
                 Field baseField;

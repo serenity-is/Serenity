@@ -66,7 +66,7 @@ namespace Serenity.Logging
             return Base32.Encode(eightBytes);
         }
 
-        [SettingScope("Application"), SettingKey("Logging"), Internal]
+        [SettingScope("Application"), SettingKey("Logging"), Ignore]
         private class LogSettings
         {
             public string File { get; set; }

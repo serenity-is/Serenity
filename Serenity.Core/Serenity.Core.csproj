@@ -121,7 +121,7 @@
     <Compile Include="ComponentModel\PropertyGrid\Editing\EditorOptionAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Editing\EditorTypeAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Editing\BasicEditorTypes.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\InternalAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\IgnoreAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HintAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\MaxLengthAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\OneWayAttribute.cs" />
