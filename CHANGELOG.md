@@ -1,3 +1,14 @@
+## 1.4.10 (2015-02-27)
+
+Features:
+  - ListRequestHandler uses SortOrder attributes on row for GetNativeSort if available, name field otherwise
+  - ScriptDtoGenerator, ScriptEndPointGenerator, ScriptFormGenerator constructors accepts multiple assemblies
+  - Column attribute is listed after DisplayName attribute by code generator to prevent user errors
+  - [BREAKING CHANGE] Renamed HiddenAttribute to IgnoreAttribute and InvisibleAttribute to HiddenAttribute to prevent confusion
+
+Bugfixes:
+  - unable to deserialize enumeration fields due to Enum.IsDefined type incompability error
+
 ## 1.4.9 (2015-02-19)
 
 Features:
