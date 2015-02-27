@@ -56,7 +56,8 @@ namespace Serenity.Data
         {
             if (enumType.IsEnum)
             {
-                if (!Enum.IsDefined(enumType, v))
+                var val = Enum.Parse(enumType, v.ToString());
+                if (!Enum.IsDefined(enumType, val))
                     throw new InvalidCastException(String.Format("{0} geçerli bir {1} değeri değil!", v, enumType.Name));
 
                 return v;
@@ -72,7 +73,8 @@ namespace Serenity.Data
                 Int64 v;
                 if (Int64.TryParse(s, out v))
                 {
-                    if (!Enum.IsDefined(enumType, v))
+                    var val = Enum.Parse(enumType, s);
+                    if (!Enum.IsDefined(enumType, val))
                         throw new InvalidCastException(String.Format("{0} geçerli bir {1} değeri değil!", v, enumType.Name));
 
                     return v;
