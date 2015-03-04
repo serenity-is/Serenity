@@ -47,7 +47,8 @@ namespace Serenity.Test.Logging
                 using (var context = NewDbTestContext())
                 {
                     context.ExpireOverrides();
-                    registrar.RegisterInstance<ILogger>(new SqlLogger());
+                    var logger = new SqlLogger();
+                    registrar.RegisterInstance<ILogger>(logger);
 
                     Log.MinimumLevel = LoggingLevel.Debug;
                     Log.Debug("Hello1", new Exception("SomeException1"), this.GetType());
@@ -56,9 +57,7 @@ namespace Serenity.Test.Logging
 
                     using (var connection = SqlConnections.NewByKey("Serenity"))
                     {
-                        connection.Open();
-                        connection.Close();
-                        Thread.Sleep(500);
+                        logger.Flush();
                         var items = connection.List<SystemLogRow>(q => q.SelectTableFields().OrderBy(fld.ID, desc: true).Take(3));
 
                         Assert.Equal(3, items.Count);

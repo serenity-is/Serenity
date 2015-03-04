@@ -44,6 +44,19 @@ namespace Serenity.Logging
                 GC.SuppressFinalize(this);
         }
 
+        public void Flush()
+        {
+            while (true)
+            {
+                lock (sync)
+                {
+                    if (queue == null || queue.Count == 0)
+                        return;
+                }
+                Thread.Sleep(1);
+            }
+        }
+
         private void Worker()
         {
             while (queue != null)
