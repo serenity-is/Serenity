@@ -12,6 +12,7 @@ namespace Serenity.Logging
     public class SqlLogger : ILogger, IDisposable
     {
         private object sync = new object();
+        private int inProgress;
         private Queue<DynamicParameters> queue = new Queue<DynamicParameters>();
         private AutoResetEvent signal = new AutoResetEvent(false);
 
@@ -50,7 +51,7 @@ namespace Serenity.Logging
             {
                 lock (sync)
                 {
-                    if (queue == null || queue.Count == 0)
+                    if (inProgress == 0 && (queue == null || queue.Count == 0))
                         return;
                 }
                 Thread.Sleep(1);
@@ -76,11 +77,19 @@ namespace Serenity.Logging
                             break;
 
                         parameters = queue.Dequeue();
+                        inProgress++;
                     }
 
-                    using (var connection = SqlConnections.NewByKey(ConnectionKey))
+                    try
                     {
-                        connection.Execute(InsertCommand, parameters);
+                        using (var connection = SqlConnections.NewByKey(ConnectionKey))
+                        {
+                            connection.Execute(InsertCommand, parameters);
+                        }
+                    }
+                    finally
+                    {
+                        inProgress--;
                     }
                 }
                 catch (Exception ex)
