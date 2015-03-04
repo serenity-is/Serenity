@@ -58,7 +58,7 @@ namespace Serenity
         {
             key = this.configuration.KeyPrefix + key;
             using (var cache = this.cacheManager.GetClient())
-                return cache.Increment(key, 1);
+                return cache.Increment(key, amount);
         }
 
         /// <summary>
