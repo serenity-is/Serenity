@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Core", "Serenity.Core\Serenity.Core.csproj", "{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}"
 EndProject
@@ -34,6 +34,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Web", "Serenity.Web\Serenity.Web.csproj", "{8632943D-2A88-4C83-8451-69D62F059EFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.CodeGenerator", "Serenity.CodeGenerator\Serenity.CodeGenerator.csproj", "{49704C9A-30A2-43DE-AE3D-D13073BA50A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Caching.RedisSE", "Serenity.Caching.RedisSE\Serenity.Caching.RedisSE.csproj", "{BAE7261E-8799-45F8-A61A-4477E7353A32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +125,12 @@ Global
 		{49704C9A-30A2-43DE-AE3D-D13073BA50A4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{49704C9A-30A2-43DE-AE3D-D13073BA50A4}.Release|x86.ActiveCfg = Release|x86
 		{49704C9A-30A2-43DE-AE3D-D13073BA50A4}.Release|x86.Build.0 = Release|x86
+		{BAE7261E-8799-45F8-A61A-4477E7353A32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE7261E-8799-45F8-A61A-4477E7353A32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAE7261E-8799-45F8-A61A-4477E7353A32}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BAE7261E-8799-45F8-A61A-4477E7353A32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAE7261E-8799-45F8-A61A-4477E7353A32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAE7261E-8799-45F8-A61A-4477E7353A32}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
