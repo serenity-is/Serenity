@@ -16,11 +16,22 @@ namespace Serenity
         {
             return options.LookupKey ?? base.GetLookupKey();
         }
+
+        protected override Select2Options GetSelect2Options()
+        {
+            var opt = base.GetSelect2Options();
+
+            if (options.MinimumResultsForSearch != null)
+                opt.MinimumResultsForSearch = options.MinimumResultsForSearch.Value;
+
+            return opt;
+        }
     }
 
     [Serializable, Reflectable]
     public class LookupEditorOptions
     {
         public string LookupKey { get; set; }
+        public int? MinimumResultsForSearch { get; set; }
     }
 }
