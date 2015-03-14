@@ -56,7 +56,6 @@ namespace Serenity
             return new Select2Options
             {
                 Data = items,
-                MinimumResultsForSearch = 10,
                 PlaceHolder = !emptyItemText.IsEmptyOrNull() ? emptyItemText : null,
                 AllowClear = emptyItemText != null,
                 Query = delegate(Select2QueryOptions query)
