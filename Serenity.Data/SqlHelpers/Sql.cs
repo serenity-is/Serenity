@@ -340,6 +340,8 @@ namespace Serenity.Data
                         ((ICriteria)value).ToString(sb, query);
                     else if (value is IQueryWithParams)
                         sb.Append(((IQueryWithParams) value).ToString());
+                    else if (value is IField)
+                        sb.Append(((IField) value).Expression);
                     else
                     {
                         var param = query.AutoParam();
@@ -356,6 +358,8 @@ namespace Serenity.Data
                         ((ICriteria)elseValue).ToString(sb, query);
                     else if (elseValue is IQueryWithParams)
                         sb.Append(((IQueryWithParams)elseValue).ToString());
+                    else if (elseValue is IField)
+                        sb.Append(((IField)elseValue).Expression);
                     else
                     {
                         var param = query.AutoParam();
