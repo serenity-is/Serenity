@@ -53,6 +53,7 @@
     <Compile Include="DbManager.cs" />
     <Compile Include="DbScript.cs" />
     <Compile Include="DbSettings.cs" />
+    <Compile Include="DbOverride.cs" />
     <Compile Include="ImpersonationContext.cs" />
     <Compile Include="MunqContext.cs" />
     <Compile Include="DbTestContext.cs" />

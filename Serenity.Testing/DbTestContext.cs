@@ -6,61 +6,6 @@ using System.Reflection;
 
 namespace Serenity.Testing
 {
-    public class DbOverride
-    {
-        private static class Cached<TDbScript>
-        {
-            public static string Script;
-        }
-
-        public DbOverride(string connectionKey, string dbAlias, string script)
-        {
-            this.ConnectionKey = connectionKey;
-            this.DbAlias = dbAlias;
-            this.Script = script;
-            this.ScriptHash = DbManager.GetHash(script ?? "");
-        }
-
-        public static DbOverride New<TDbScript>(string connectionKey = null, string dbAlias = null, bool cacheScript = true)
-            where TDbScript : DbScript, new()
-        {
-            if (connectionKey == null)
-            {
-                var connectionKeyAttr = typeof(TDbScript).GetCustomAttribute<ConnectionKeyAttribute>();
-                if (connectionKeyAttr == null || string.IsNullOrEmpty(connectionKeyAttr.Value))
-                    throw new ArgumentNullException("connectionKey");
-
-                connectionKey = connectionKeyAttr.Value;
-            }
-
-            if (dbAlias == null)
-            {
-                var dbAliasAttr = typeof(DbScript).GetCustomAttribute<DatabaseAliasAttribute>();
-                if (dbAliasAttr == null)
-                {
-                    dbAlias = connectionKey;
-                }
-                else
-                {
-                    dbAlias = dbAliasAttr.Value;
-                }
-            }
-
-            string script;
-            if (cacheScript)
-                script = Cached<TDbScript>.Script = Cached<TDbScript>.Script ?? new TDbScript().ToString();
-            else
-                script = new TDbScript().ToString();
-
-            return new DbOverride(connectionKey, dbAlias, script);
-        }
-
-        public string DbAlias { get; private set; }
-        public string Script { get; private set; }
-        public string ScriptHash { get; private set; }
-        public string ConnectionKey { get; private set; }
-    }
-
     public class DbTestContext : IDisposable
     {
         private static object syncLock = new object();
@@ -195,6 +140,75 @@ namespace Serenity.Testing
             catch
             {
             }
+        }
+    }
+
+    public class DbTestContext<TDbScript> : DbTestContext
+        where TDbScript : DbScript, new()
+    {
+        public DbTestContext()
+            : base(DbOverride.New<TDbScript>())
+        {
+        }
+    }
+
+    public class DbTestContext<TDbScript1, TDbScript2> : DbTestContext
+        where TDbScript1 : DbScript, new()
+        where TDbScript2 : DbScript, new()
+    {
+        public DbTestContext()
+            : base(
+                DbOverride.New<TDbScript1>(),
+                DbOverride.New<TDbScript2>())
+        {
+        }
+    }
+
+    public class DbTestContext<TDbScript1, TDbScript2, TDbScript3> : DbTestContext
+        where TDbScript1 : DbScript, new()
+        where TDbScript2 : DbScript, new()
+        where TDbScript3 : DbScript, new()
+    {
+        public DbTestContext()
+            : base(
+                DbOverride.New<TDbScript1>(),
+                DbOverride.New<TDbScript2>(),
+                DbOverride.New<TDbScript3>())
+        {
+        }
+    }
+
+    public class DbTestContext<TDbScript1, TDbScript2, TDbScript3, TDbScript4> : DbTestContext
+        where TDbScript1 : DbScript, new()
+        where TDbScript2 : DbScript, new()
+        where TDbScript3 : DbScript, new()
+        where TDbScript4 : DbScript, new()
+    {
+        public DbTestContext()
+            : base(
+                DbOverride.New<TDbScript1>(),
+                DbOverride.New<TDbScript2>(),
+                DbOverride.New<TDbScript3>(),
+                DbOverride.New<TDbScript4>())
+        {
+        }
+    }
+
+    public class DbTestContext<TDbScript1, TDbScript2, TDbScript3, TDbScript4, TDbScript5> : DbTestContext
+        where TDbScript1 : DbScript, new()
+        where TDbScript2 : DbScript, new()
+        where TDbScript3 : DbScript, new()
+        where TDbScript4 : DbScript, new()
+        where TDbScript5 : DbScript, new()
+    {
+        public DbTestContext()
+            : base(
+                DbOverride.New<TDbScript1>(),
+                DbOverride.New<TDbScript2>(),
+                DbOverride.New<TDbScript3>(),
+                DbOverride.New<TDbScript4>(),
+                DbOverride.New<TDbScript5>())
+        {
         }
     }
 }
