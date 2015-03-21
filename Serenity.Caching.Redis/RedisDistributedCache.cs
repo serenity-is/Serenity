@@ -1,133 +1,76 @@
-﻿using System;
-using System.Configuration;
-using ServiceStack.CacheAccess;
-using ServiceStack.Redis;
-using Serenity.Data;
-using Newtonsoft.Json;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
+using StackExchange.Redis;
+using System;
 
-namespace Serenity
+namespace Serenity.Caching
 {
-    /// <summary>
-    /// Redis distributed cache implementation.
-    /// </summary>
-    public class RedisDistributedCache : IDistributedCache, IDisposable
+    public class RedisDistributedCache : IDistributedCache
     {
-        /// <summary>
-        /// The cache manager that pools Redis connections
-        /// </summary>
-        private PooledRedisClientManager cacheManager;
+        ConnectionMultiplexer redis;
+        IDatabase cache;
+        string keyPrefix;
 
-        /// <summary>
-        /// The configuration read from application settings
-        /// </summary>
-        private Configuration configuration;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RedisDistributedCache"/> class.
-        /// </summary>
-        /// <exception cref="System.InvalidOperationException">Lutfen uygulama icin AppSettings -> DistributedCache -> 
-        /// ServerAddress ayarini yapiniz!</exception>
-        public RedisDistributedCache()
+        public RedisDistributedCache(int database = 0)
         {
-            this.configuration = JsonConvert.DeserializeObject<Configuration>(ConfigurationManager.AppSettings["DistributedCache"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
-
-            if (this.configuration.ServerAddress.IsTrimmedEmpty())
-                throw new InvalidOperationException(
-                    "Lutfen uygulama icin AppSettings -> DistributedCache -> ServerAddress ayarini yapiniz!");
-
-            this.cacheManager = new PooledRedisClientManager(this.configuration.ServerAddress);
+            var config = Config.Get<Configuration>();
+            keyPrefix = keyPrefix ?? "";
+            redis = ConnectionMultiplexer.Connect(config.Connection);
+            cache = redis.GetDatabase(config.Database);
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            if (this.cacheManager != null)
-                this.cacheManager.Dispose();
-        }
-
-        /// <summary>
-        /// Cache'teki belirtilen anahtara sahip değeri arttırır ve arttırılmış değeri döner.
-        /// Eğer cache'te yoksa değer 1 e set edilir.
-        /// </summary>
-        /// <param name="key">Anahtar.</param>
-        /// <param name="amount">Artım miktarı.</param>
-        /// <returns>Arttırılmış değer, ya da yoksa 1</returns>
-        public long Increment(string key, int amount = 1)
-        {
-            key = this.configuration.KeyPrefix + key;
-            using (var cache = this.cacheManager.GetClient())
-                return cache.Increment(key, amount);
-        }
-
-        /// <summary>
-        /// Cache ten belirtilen anahtara sahip değeri okur. Eğer cache te
-        /// değer yok ya da expire olduysa default(T) değerini döndürür. 
-        /// </summary>
-        /// <typeparam name="TValue">Değerin tipi</typeparam>
-        /// <param name="key">Anahtar.</param>
-        /// <remarks>Okunan değer belirtilen TValue tipinde değilse
-        /// bir exception üretebilir.</remarks>
         public TValue Get<TValue>(string key)
         {
-            key = this.configuration.KeyPrefix + key;
-            using (var cache = this.cacheManager.GetClient())
-                return cache.Get<TValue>(key);
+            var value = cache.StringGet(key);
+
+            if (value.IsNull)
+                return default(TValue);
+
+            return Deserialize<TValue>(value);
         }
 
-        /// <summary>
-        /// Anahtarı verilen değeri cache e yazar.
-        /// </summary>
-        /// <typeparam name="TValue">Değer tipi.</typeparam>
-        /// <param name="key">Anahtar</param>
-        /// <param name="value">Değer.</param>
+        public long Increment(string key, int amount = 1)
+        {
+            key = this.keyPrefix + key;
+            return cache.StringIncrement(key, amount);
+        }
+
+        public void Set<TValue>(string key, TValue value, TimeSpan expiration)
+        {
+            key = this.keyPrefix + key;
+
+            if (ReferenceEquals(value, null))
+                cache.StringSet(key, (string)null);
+
+            cache.StringSet(key, Serialize(value), expiration);
+        }
+
         public void Set<TValue>(string key, TValue value)
         {
-            key = this.configuration.KeyPrefix + key;
-            using (var cache = this.cacheManager.GetClient())
-                cache.Set(key, value);
+            key = this.keyPrefix + key;
+
+            if (ReferenceEquals(value, null))
+                cache.StringSet(key, (string)null);
+
+            cache.StringSet(key, Serialize(value));
         }
 
-        /// <summary>
-        /// Anahtarı verilen değeri, belli bir tarihte expire olmak
-        /// üzere cache e yazar.
-        /// </summary>
-        /// <typeparam name="TValue">Değer tipi.</typeparam>
-        /// <param name="key">Anahtar.</param>
-        /// <param name="value">Değer.</param>
-        /// <param name="expiresAt">Değerin expire olacağı tarih.</param>
-        public void Set<TValue>(string key, TValue value, DateTime expiresAt)
+
+        private TValue Deserialize<TValue>(string value)
         {
-            key = this.configuration.KeyPrefix + key;
-            using (var cache = this.cacheManager.GetClient())
-                cache.Set(key, value, expiresAt);
+            return JSON.Parse<TValue>(value);
         }
 
-        /// <summary>
-        /// Configuration settings
-        /// </summary>
+        private string Serialize<TValue>(TValue value)
+        {
+            return JSON.Stringify(value);
+        }
+
+        [SettingKey("DistributedCache"), SettingScope("Application"), Ignore]
         private class Configuration
         {
-            /// <summary>
-            /// Gets or sets the Redis server address.
-            /// </summary>
-            /// <value>
-            /// The server address.
-            /// </value>
-            public string ServerAddress { get; set; }
-
-            /// <summary>
-            /// Gets or sets the key prefix for values stored in cache.
-            /// </summary>
-            /// <value>
-            /// The key prefix.
-            /// </value>
-            /// <remarks>
-            /// The key prefix should be unique per database (or applications using same set of data).
-            /// Otherwise, if a group of applications use the same Redis server, they may override
-            /// their distinct data by using the same keys.
-            /// </remarks>
+            public string Connection { get; set; }
+            public int Database { get; set; }
             public string KeyPrefix { get; set; }
         }
     }

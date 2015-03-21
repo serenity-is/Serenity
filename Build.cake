@@ -105,6 +105,7 @@ Task("NuGet")
     nuspecParams["configuration"] = configuration;
     nuspecParams["jsonNetVersion"] = getPackageVersion("Serenity.Core", "Newtonsoft.Json");
     nuspecParams["couchbaseNetClientVersion"] = getPackageVersion("Serenity.Caching.Couchbase", "CouchbaseNetClient");
+    nuspecParams["stackExchangeRedisVersion"] = getPackageVersion("Serenity.Caching.Redis", "StackExchange.Redis");
     nuspecParams["microsoftAspNetMvcVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.Mvc");
     nuspecParams["microsoftAspNetRazorVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.Razor");
     nuspecParams["microsoftAspNetWebPagesVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.WebPages");
@@ -150,6 +151,7 @@ Task("NuGet")
     
     myPack("Serenity.Core", null);
     myPack("Serenity.Caching.Couchbase", null);
+    myPack("Serenity.Caching.Redis", null);
     myPack("Serenity.Data", null);
     myPack("Serenity.Data.Entity", null);
     myPack("Serenity.Services", null);
