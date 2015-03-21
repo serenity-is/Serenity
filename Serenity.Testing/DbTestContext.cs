@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Transactions;
+using System.Reflection;
 
 namespace Serenity.Testing
 {
@@ -20,11 +21,33 @@ namespace Serenity.Testing
             this.ScriptHash = DbManager.GetHash(script ?? "");
         }
 
-        public static DbOverride New<TDbScript>(string connectionKey, string dbAlias, bool cached = true)
+        public static DbOverride New<TDbScript>(string connectionKey = null, string dbAlias = null, bool cacheScript = true)
             where TDbScript : DbScript, new()
         {
+            if (connectionKey == null)
+            {
+                var connectionKeyAttr = typeof(TDbScript).GetCustomAttribute<ConnectionKeyAttribute>();
+                if (connectionKeyAttr == null || string.IsNullOrEmpty(connectionKeyAttr.Value))
+                    throw new ArgumentNullException("connectionKey");
+
+                connectionKey = connectionKeyAttr.Value;
+            }
+
+            if (dbAlias == null)
+            {
+                var dbAliasAttr = typeof(DbScript).GetCustomAttribute<DatabaseAliasAttribute>();
+                if (dbAliasAttr == null)
+                {
+                    dbAlias = connectionKey;
+                }
+                else
+                {
+                    dbAlias = dbAliasAttr.Value;
+                }
+            }
+
             string script;
-            if (cached)
+            if (cacheScript)
                 script = Cached<TDbScript>.Script = Cached<TDbScript>.Script ?? new TDbScript().ToString();
             else
                 script = new TDbScript().ToString();
