@@ -153,6 +153,12 @@ namespace Serenity.Data
             return null;
         }
 
+        public static int Count<TRow>(this IDbConnection connection)
+            where TRow : Row, new()
+        {
+            return connection.Count<TRow>((Criteria)null);
+        }
+
         public static int Count<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()
         {
@@ -185,6 +191,11 @@ namespace Serenity.Data
                     .Exists(connection);
         }
 
+        public static List<TRow> List<TRow>(this IDbConnection connection)
+            where TRow : Row, new()
+        {
+            return connection.List<TRow>((Criteria)null);
+        }
 
         public static List<TRow> List<TRow>(this IDbConnection connection, ICriteria where)
             where TRow : Row, new()

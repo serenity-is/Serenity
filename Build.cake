@@ -166,6 +166,9 @@ Task("NuGet")
     {
         foreach (var package in nugetPackages)
             File.Copy(package, @"C:\Sandbox\MyNugetFeed\" + System.IO.Path.GetFileName(package), true);
+            
+        foreach (var package in Directory.GetFiles(System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), @"nuget\cache"), "Seren*.nupkg"))
+            File.Delete(package);
     }
 });
 
