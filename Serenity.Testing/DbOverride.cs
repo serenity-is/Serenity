@@ -35,7 +35,7 @@ namespace Serenity.Testing
 
             if (dbAlias == null)
             {
-                var dbAliasAttr = typeof(DbScript).GetCustomAttribute<DatabaseAliasAttribute>();
+                var dbAliasAttr = typeof(TDbScript).GetCustomAttribute<DatabaseAliasAttribute>();
                 if (dbAliasAttr == null)
                 {
                     dbAlias = connectionKey;
