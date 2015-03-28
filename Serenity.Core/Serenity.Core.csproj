@@ -38,6 +38,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authorization\ImpersonatingAuthenticationService.cs" />
+    <Compile Include="Authorization\IRequestContext.cs" />
+    <Compile Include="Authorization\ITransientGrantor.cs" />
+    <Compile Include="Authorization\IImpersonator.cs" />
+    <Compile Include="Authorization\TransientGrantingPermissionService.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\NotFilterableAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\CustomFilteringAttribute.cs" />

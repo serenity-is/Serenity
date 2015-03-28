@@ -9,7 +9,7 @@ namespace Serenity.Web
     /// <summary>
     /// Adds impersonation support to any IAuthorizationService implementation
     /// </summary>
-    public class ImpersonatingAuthorizationService : IAuthorizationService
+    public class ImpersonatingAuthorizationService : IAuthorizationService, IImpersonator
     {
         private IAuthorizationService authorizationService;
         private ThreadLocal<Stack<string>> impersonationStack = new ThreadLocal<Stack<string>>();
@@ -24,12 +24,14 @@ namespace Serenity.Web
         private Stack<string> GetImpersonationStack(bool createIfNull)
         {
             Stack<string> stack;
-                
-            if (HttpContext.Current != null)
+
+            var requestItems = Dependency.Resolve<IRequestContext>().Items;
+
+            if (requestItems != null)
             {
-                stack = HttpContext.Current.Items["ImpersonationStack"] as Stack<string>;
+                stack = requestItems["ImpersonationStack"] as Stack<string>;
                 if (stack == null && createIfNull)
-                    HttpContext.Current.Items["ImpersonationStack"] = stack = new Stack<string>();
+                    requestItems["ImpersonationStack"] = stack = new Stack<string>();
             }
             else
             {

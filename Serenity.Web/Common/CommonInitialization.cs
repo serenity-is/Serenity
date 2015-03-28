@@ -22,6 +22,7 @@ namespace Serenity.Web
             InitializeLogging();
             InitializeLocalTexts();
             InitializeDynamicScripts();
+            InitializeRequestContext();
         }
 
         public static void InitializeServiceLocator()
@@ -61,6 +62,14 @@ namespace Serenity.Web
 
             if (Dependency.TryResolve<IDistributedCache>() == null)
                 registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());
+        }
+
+        public static void InitializeRequestContext()
+        {
+            var registrar = Dependency.Resolve<IDependencyRegistrar>();
+
+            if (Dependency.TryResolve<IRequestContext>() == null)
+                registrar.RegisterInstance<IRequestContext>(new RequestContext());
         }
 
         public static void InitializeConfigurationSystem()
