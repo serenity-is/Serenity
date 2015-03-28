@@ -1,3 +1,15 @@
+## 1.4.11 (2015-03-28)
+
+Features:
+  - add flush support to SqlLogger
+  - add Redis caching library using StackExchange.Redis
+  - sql case now supports field objects in when or value
+  - minimumresultforsearch option for select2 is now zero by default
+  - generic dbtestcontext objects
+  - connection key and database alias for dbscript can be specified with attributes
+  - connection count and list extensions without any criteria or query parameter
+  - impersonating authorization service and transient granting permission service
+
 ## 1.4.10 (2015-02-27)
 
 Features:
