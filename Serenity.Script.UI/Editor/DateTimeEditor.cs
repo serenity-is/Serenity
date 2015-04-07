@@ -24,28 +24,21 @@ namespace Serenity
                 .AddClass("editor s-DateTimeEditor time")
                 .InsertAfter(input.Next(".ui-datepicker-trigger"));
 
-            foreach (var t in GetTimeOptions(fromHour: options.StartHour, toHour: options.EndHour, stepMins: options.IntervalMinutes ?? 30))
+            foreach (var t in GetTimeOptions(fromHour: options.StartHour ?? 0, 
+                toHour: options.EndHour ?? 23, 
+                stepMins: options.IntervalMinutes ?? 30))
                 Q.AddOption(time, t, t);
         }
 
-        private static List<string> GetTimeOptions(int? fromHour = null, int? fromMin = null,
-            int? toHour = 23, int? toMin = 59, int stepMins = 30)
+        private static List<string> GetTimeOptions(int fromHour = 0, int fromMin = 0,
+            int toHour = 23, int toMin = 59, int stepMins = 30)
         {
             var list = new List<string>();
 
-            fromHour = fromHour ?? 0;
-
-            if (toHour == null)
-                toHour = 0;
-            else if (toHour >= 23)
+            if (toHour >= 23)
                 toHour = 23;
 
-            if (fromMin == null)
-                fromMin = 0;
-
-            if (toMin == null)
-                toMin = 0;
-            else if (toMin >= 60)
+            if (toMin >= 60)
                 toMin = 59;
 
             var hour = fromHour;
