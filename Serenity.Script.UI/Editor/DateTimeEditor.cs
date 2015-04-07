@@ -10,12 +10,12 @@ namespace Serenity
 {
     [Editor, DisplayName("Tarih/Zaman")]
     [Element("<input type=\"text\"/>")]
-    public class DateTimeEditor : Widget, IStringValue
+    public class DateTimeEditor : Widget<DateTimeEditorOptions>, IStringValue
     {
         private jQueryObject time;
 
-        public DateTimeEditor(jQueryObject input)
-            : base(input)
+        public DateTimeEditor(jQueryObject input, DateTimeEditorOptions opt)
+            : base(input, opt)
         {
             input.AddClass("dateQ s-DateTimeEditor")
                 .DatePicker(new DatePickerOptions { ShowOn = "button" });
@@ -24,7 +24,7 @@ namespace Serenity
                 .AddClass("editor s-DateTimeEditor time")
                 .InsertAfter(input.Next(".ui-datepicker-trigger"));
 
-            foreach (var t in GetTimeOptions())
+            foreach (var t in GetTimeOptions(fromHour: options.StartHour, toHour: options.EndHour, stepMins: options.IntervalMinutes ?? 30))
                 Q.AddOption(time, t, t);
         }
 
@@ -104,5 +104,13 @@ namespace Serenity
                 }
             }
         }
+    }
+
+    [Imported, Serializable]
+    public class DateTimeEditorOptions
+    {
+        public int? StartHour { get; set; }
+        public int? EndHour { get; set; }
+        public int? IntervalMinutes { get; set; }
     }
 }

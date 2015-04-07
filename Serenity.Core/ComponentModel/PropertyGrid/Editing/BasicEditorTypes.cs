@@ -28,6 +28,24 @@ namespace Serenity.ComponentModel
             : base("DateTime")
         {
         }
+
+        public Int32 StartHour
+        {
+            get { return GetOption<Int32>("startHour"); }
+            set { SetOption("startHour", value); }
+        }
+
+        public Int32 EndHour
+        {
+            get { return GetOption<Int32>("endHour"); }
+            set { SetOption("endHour", value); }
+        }
+
+        public Int32 IntervalMinutes
+        {
+            get { return GetOption<Int32>("intervalMinutes"); }
+            set { SetOption("intervalMinutes", value); }
+        }
     }
 
     public partial class TimeEditorAttribute : CustomEditorAttribute
@@ -55,10 +73,10 @@ namespace Serenity.ComponentModel
             set { SetOption("endHour", value); }
         }
 
-        public Int32 InvervalMinutes
+        public Int32 IntervalMinutes
         {
-            get { return GetOption<Int32>("invervalMinutes"); }
-            set { SetOption("invervalMinutes", value); }
+            get { return GetOption<Int32>("intervalMinutes"); }
+            set { SetOption("intervalMinutes", value); }
         }
 
     }

@@ -26,7 +26,7 @@ namespace Serenity
                 Q.AddOption(input, h.ToString(), h < 10 ? "0" + h : h.ToString());
 
             minutes = J("<select/>").AddClass("editor s-TimeEditor minute").InsertAfter(input);
-            for (var m = 0; m <= 59; m += (options.InvervalMinutes ?? 5))
+            for (var m = 0; m <= 59; m += (options.IntervalMinutes ?? 5))
                 Q.AddOption(minutes, m.ToString(), m < 10 ? "0" + m : m.ToString());
         }
 
@@ -70,6 +70,6 @@ namespace Serenity
         public bool NoEmptyOption { get; set; }
         public int? StartHour { get; set; }
         public int? EndHour { get; set; }
-        public int? InvervalMinutes { get; set; }
+        public int? IntervalMinutes { get; set; }
     }
 }
