@@ -1,3 +1,8 @@
+## 1.4.12 (2015-04-06)
+
+Features:
+  - add interval support to datetimeeditor
+
 ## 1.4.11 (2015-03-28)
 
 Features:
