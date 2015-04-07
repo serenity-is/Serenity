@@ -1,3 +1,8 @@
+## 1.4.13 (2015-04-07)
+
+Features:
+  - fix datetimeditor time list when tohour is not specified
+
 ## 1.4.12 (2015-04-06)
 
 Features:
