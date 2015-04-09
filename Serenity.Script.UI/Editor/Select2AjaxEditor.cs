@@ -110,7 +110,7 @@ namespace Serenity
                     {
                         ContainsText = query.Term.TrimToNull(),
                         Skip = (query.Page - 1) * pageSize,
-                        Take = pageSize
+                        Take = pageSize + 1
                     };
 
                     if (queryTimeout != 0)
@@ -122,13 +122,13 @@ namespace Serenity
                         {
                             query.Callback(new Select2Result
                             {
-                                Results = response.Entities.Select(x => new Select2Item
+                                Results = response.Entities.Take(pageSize).Select(x => new Select2Item
                                 {
                                     Id = GetItemKey(x),
                                     Text = GetItemText(x),
                                     Source = x
                                 }).ToList(),
-                                More = response.TotalCount >= query.Page * pageSize
+                                More = response.Entities.Count >= pageSize
                             });
                         });
                     }, GetTypeDelay());
