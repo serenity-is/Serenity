@@ -62,9 +62,16 @@ namespace Serenity.CodeGeneration
                 sb.Append(className);
                 sb.AppendLine("Service");
 
-                bool hasAnyMethod = false;
+                var methods = new List<string>();
+                string serviceUrl = GetServiceUrl != null ? GetServiceUrl(type) : ns.Replace(".", "/");
+                serviceUrl = UriHelper.Combine(serviceUrl, className);
                 cw.InBrace(delegate 
                 {
+                    cw.Indented("[InlineConstant] public const string BaseUrl = \"");
+                    sb.Append(serviceUrl);
+                    sb.AppendLine("\";");
+                    sb.AppendLine();
+
                     foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
                     {
                         if (method.GetCustomAttribute<NonActionAttribute>() != null)
@@ -108,10 +115,10 @@ namespace Serenity.CodeGeneration
                         else if (returnType == typeof(void))
                             continue;
 
-                        if (hasAnyMethod)
+                        if (methods.Count > 0)
                             sb.AppendLine();
 
-                        hasAnyMethod = true;
+                        methods.Add(method.Name);
 
                         cw.Indented("public static jQueryXmlHttpRequest ");
                         sb.Append(method.Name);
@@ -127,19 +134,33 @@ namespace Serenity.CodeGeneration
 
                         cw.InBrace(delegate 
                         {
-                            cw.Indented("return Q.ServiceRequest(\"");
+                            cw.Indented("return Q.ServiceRequest(");
 
-                            string url = GetServiceUrl != null ? GetServiceUrl(type) : ns.Replace(".", "/");
-                            url = UriHelper.Combine(url, UriHelper.Combine(className, method.Name));
+                            sb.Append("Methods.");
+                            sb.Append(method.Name);
 
-                            sb.Append(url);
-
-                            sb.AppendLine("\", request, onSuccess, options);");
+                            sb.AppendLine(", request, onSuccess, options);");
                         });
                     }
+
+                    sb.AppendLine();
+                    cw.IndentedLine("[Imported, PreserveMemberCase]");
+                    cw.IndentedLine("public static class Methods");
+                    cw.InBrace(delegate
+                    {
+                        foreach (var method in methods)
+                        {
+                            cw.Indented("[InlineConstant] public const string ");
+                            sb.Append(method);
+                            sb.Append(" = \"");
+                            sb.Append(UriHelper.Combine(serviceUrl, method));
+                            sb.AppendLine("\";");
+                        }
+                    });
+
                 });
 
-                if (hasAnyMethod)
+                if (methods.Count > 0)
                 {
                     endpointCodes.Add(type, sb.ToString());
                     //usedNamespaces.Add(ns);
@@ -153,6 +174,7 @@ namespace Serenity.CodeGeneration
             usedNamespaces.Add("System");
             usedNamespaces.Add("System.Collections");
             usedNamespaces.Add("System.Collections.Generic");
+            usedNamespaces.Add("System.Runtime.CompilerServices");
 
             var ordered = endpointCodes.Keys.OrderBy(x => GetNamespace != null ? GetNamespace(x) : x.Namespace).ThenBy(x => x.Name);
             var byNameSpace = ordered.ToLookup(x => GetNamespace != null ? GetNamespace(x) : x.Namespace);
