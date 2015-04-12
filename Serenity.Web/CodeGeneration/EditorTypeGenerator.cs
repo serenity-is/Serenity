@@ -82,12 +82,15 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine(" : CustomEditorAttribute");
                 cw.InBrace(delegate
                 {
+                    cw.Indented("public const string Key = \"");
+                    sb.Append(key);
+                    sb.AppendLine("\";");
+                    sb.AppendLine();
+
                     cw.Indented("public ");
                     sb.Append(type);
                     sb.AppendLine("()");
-                    cw.Indented("    : base(\"");
-                    sb.Append(key);
-                    sb.AppendLine("\")");
+                    cw.IndentedLine("    : base(Key)");
                     cw.IndentedLine("{");
                     cw.IndentedLine("}");
                     var opt = editorInfo.Options.Keys.ToList();
