@@ -388,7 +388,61 @@ namespace Serenity.CodeGeneration
 
         private void GenerateRowMembers(Type rowType)
         {
+            bool anyMetadata = false;
+
             Row row = (Row)rowType.GetInstance();
+
+            var idRow = row as IIdRow;
+            if (idRow != null)
+            {
+                cw.Indented("[InlineConstant] public const string IdProperty = \"");
+                var field = ((Field)idRow.IdField);
+                sb.Append(field.PropertyName ?? field.Name);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
+            var isActiveRow = row as IIsActiveRow;
+            if (isActiveRow != null)
+            {
+                cw.Indented("[InlineConstant] public const string IsActiveProperty = \"");
+                var field = (isActiveRow.IsActiveField);
+                sb.Append(field.PropertyName ?? field.Name);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
+            var nameRow = row as INameRow;
+            if (nameRow != null)
+            {
+                cw.Indented("[InlineConstant] public const string NameProperty = \"");
+                var field = (nameRow.NameField);
+                sb.Append(field.PropertyName ?? field.Name);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
+            var localTextPrefix = row.GetFields().LocalTextPrefix;
+            if (!string.IsNullOrEmpty(localTextPrefix))
+            {
+                cw.Indented("[InlineConstant] public const string LocalTextPrefix = \"");
+                sb.Append(localTextPrefix);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
+            var attr = rowType.GetCustomAttribute<LookupScriptAttribute>();
+            if (attr != null)
+            {
+                cw.Indented("[InlineConstant] public const string LookupKey = \"");
+                sb.Append(attr.Key);
+                sb.AppendLine("\";");
+                anyMetadata = true;
+            }
+
+
+            if (anyMetadata)
+                sb.AppendLine();
 
             foreach (var field in row.GetFields())
             {
