@@ -82,6 +82,7 @@
     </Compile>
     <Compile Include="CodeGeneration\DtoActionResult.cs" />
     <Compile Include="CodeGeneration\DtoGenerator.cs" />
+    <Compile Include="CodeGeneration\FormatterTypeGenerator.cs" />
     <Compile Include="CodeGeneration\EditorTypeGenerator.cs" />
     <Compile Include="CodeGeneration\GeneratorUtils.cs" />
     <Compile Include="CodeGeneration\ScriptDtoGenerator.cs" />
