@@ -49,6 +49,14 @@ namespace Serenity
             }
         }
 
+        public bool IsValid
+        {
+            get
+            {
+                return !Double.IsNaN(Value.As<double>());
+            }
+        }
+
         public static dynamic DefaultAutoNumericOptions()
         {
             return new

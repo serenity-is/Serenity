@@ -1,4 +1,5 @@
 ﻿using jQueryApi;
+using System;
 using System.Html;
 using System.Runtime.CompilerServices;
 
@@ -38,6 +39,16 @@ namespace Serenity
         public static jQueryObject JQuery(this Element input)
         {
             return null;
+        }
+
+        public static bool IsNaN(this double? value)
+        {
+            return Double.IsNaN(value.As<double>());
+        }
+
+        public static bool IsNaN(this double value)
+        {
+            return Double.IsNaN(value);
         }
     }
 }
