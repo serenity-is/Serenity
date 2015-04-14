@@ -46,6 +46,42 @@ namespace Serenity
             }
         }
 
+        public JsDate ValueAsJsDate
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Value))
+                    return null;
+
+                return Q.ParseISODateTime(this.Value);
+            }
+            set
+            {
+                if (value == null)
+                    this.Value = null;
+
+                this.Value = Q.FormatDate(value, "dd/MM/yyy");
+            }
+        }
+
+        public DateTime? ValueAsDateTime
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Value))
+                    return null;
+
+                return (DateTime)Q.ParseISODateTime(this.Value);
+            }
+            set
+            {
+                if (value == null)
+                    this.Value = null;
+
+                this.Value = Q.FormatDate((JsDate)value.Value, "dd/MM/yyy");
+            }
+        }
+
         public static dynamic DefaultAutoNumericOptions()
         {
             return new
