@@ -18,7 +18,9 @@ namespace Serenity
                 throw new ArgumentNullException("source");
 
             this.Fields = fields.ToList();
-            this.Fields.Sort((x, y) => ((x.Title ?? x.Name).CompareTo(y.Title ?? y.Name)));
+            this.Fields.Sort((x, y) => Q.Externals.TurkishLocaleCompare(
+                Q.TryGetText(x.Title) ?? x.Title ?? x.Name, 
+                Q.TryGetText(y.Title) ?? y.Title ?? y.Name));
         
             this.FieldByName = new JsDictionary<string,PropertyItem>();
 
