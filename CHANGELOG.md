@@ -1,3 +1,18 @@
+## 1.4.14 (2015-04-14)
+
+Features:
+  - paging optimization for select2 ajax editor (no need to get total record count)
+  - ability to generate formatter types server side, just like editor types
+  - define key constant for imported editor and formatter types
+  - define baseurl and method urls for service endpoint and method imports
+  - isnan extension for double and double?
+  - isvalid property for decimal editor
+  - date / datetimeeditor ValueAsDate property
+  - phone editor auto formatting, extension support
+  - filter panel validation messages are hint only now
+  - scriptdtogenerator creates reference to row lookup data and id, name, local text prefix  properties
+
+
 ## 1.4.13 (2015-04-07)
 
 Features:
