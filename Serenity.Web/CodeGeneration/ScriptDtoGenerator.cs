@@ -19,6 +19,7 @@ namespace Serenity.CodeGeneration
         private CodeWriter cw;
         private HashSet<Type> visited;
         private Queue<Type> generateQueue;
+        private List<Type> lookupScripts;
 
         public ScriptDtoGenerator(params Assembly[] assemblies)
         {
@@ -72,6 +73,7 @@ namespace Serenity.CodeGeneration
             this.cw = new CodeWriter(sb, 4);
             this.generateQueue = new Queue<Type>();
             this.visited = new HashSet<Type>();
+            this.lookupScripts = new List<Type>();
 
             foreach (var assembly in this.Assemblies)
             foreach (var fromType in assembly.GetTypes())
@@ -84,6 +86,11 @@ namespace Serenity.CodeGeneration
                     fromType.IsSubclassOf(typeof(Row)) ||
                     fromType.GetCustomAttribute<ScriptIncludeAttribute>() != null)
                     EnqueueType(fromType);
+                else
+                {
+                    if (fromType.GetCustomAttribute<LookupScriptAttribute>() != null)
+                        lookupScripts.Add(fromType);
+                }
             }
 
             Dictionary<Type, string> generatedCode = new Dictionary<Type, string>();
@@ -432,14 +439,32 @@ namespace Serenity.CodeGeneration
             }
 
             var attr = rowType.GetCustomAttribute<LookupScriptAttribute>();
+            if (attr == null)
+            {
+                var script = lookupScripts.FirstOrDefault(x => 
+                    x.BaseType != null && 
+                    x.BaseType.IsGenericType &&
+                    x.BaseType.GetGenericArguments().Any(z => z == rowType));
+
+                if (script != null)
+                    attr = script.GetCustomAttribute<LookupScriptAttribute>();
+            }
+
             if (attr != null)
             {
                 cw.Indented("[InlineConstant] public const string LookupKey = \"");
                 sb.Append(attr.Key);
                 sb.AppendLine("\";");
+
+                sb.AppendLine();
+                cw.Indented("public static Lookup<");
+                sb.Append(MakeFriendlyName(rowType));
+                sb.Append("> Lookup { [InlineCode(\"Q.getLookup('");
+                sb.Append(attr.Key);
+                sb.AppendLine("')\")] get { return null; } }");
+
                 anyMetadata = true;
             }
-
 
             if (anyMetadata)
                 sb.AppendLine();
