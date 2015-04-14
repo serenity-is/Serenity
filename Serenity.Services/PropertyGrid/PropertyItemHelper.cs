@@ -341,23 +341,6 @@ namespace Serenity.PropertyGrid
                 return "String";
         }
 
-        private static CustomEditorAttribute FindLookupAttribute(Field basedOnField, string idField)
-        {
-            if (idField == null)
-                return null;
-
-            var field = basedOnField.Fields.FindFieldByPropertyName(idField) ?? basedOnField.Fields.FindField(idField);
-            if (ReferenceEquals(null, field))
-                return null;
-
-            if (field.TextualField != basedOnField.PropertyName &&
-                field.TextualField != basedOnField.Name)
-                return null;
-
-            return (CustomEditorAttribute)(GetAttribute(null, field, typeof(LookupEditorAttribute)) ??
-                GetAttribute(null, field, typeof(AsyncLookupEditorAttribute)));
-        }
-
         private static HashSet<string> standardFilteringEditors = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "Date",
@@ -385,32 +368,49 @@ namespace Serenity.PropertyGrid
             if (pi.NotFilterable == true)
                 return;
 
-            var filteringTypeAttr = (FilteringTypeAttribute)GetAttribute(member, basedOnField, typeof(FilteringTypeAttribute));
+            string idFieldName = AutoDetermineIdField(basedOnField);
+            Field idField = null;
+            if (idFieldName != null)
+            {
+                idField = basedOnField.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField.Fields.FindField(idFieldName);
+                if (Object.ReferenceEquals(idField, null) ||
+                    (idField.TextualField != basedOnField.PropertyName &&
+                     idField.TextualField != basedOnField.Name))
+                {
+                    idField = null;
+                    idFieldName = null;
+                }
+            }
+
+            var filteringTypeAttr = (FilteringTypeAttribute)GetAttribute(member, basedOnField, typeof(FilteringTypeAttribute)) ??
+                (FilteringTypeAttribute)GetAttribute(null, idField, typeof(FilteringTypeAttribute));
+
             if (filteringTypeAttr == null)
             {
-                string idField = AutoDetermineIdField(basedOnField);
-                CustomEditorAttribute lookupEditorAttr = null;
-                var editorAttr = (EditorTypeAttribute)GetAttribute(member, basedOnField, typeof(EditorTypeAttribute));
-                if (editorAttr == null)
-                    lookupEditorAttr = FindLookupAttribute(basedOnField, idField);
+                var editorAttr = (EditorTypeAttribute)GetAttribute(member, basedOnField, typeof(EditorTypeAttribute)) ??
+                    (EditorTypeAttribute)GetAttribute(null, idField, typeof(EditorTypeAttribute));
 
-                if (idField != null)
+                if (idFieldName != null)
                 {
-                    pi.FilteringParams["idField"] = idField;
-                    pi.FilteringIdField = idField;
+                    pi.FilteringParams["idField"] = idFieldName;
+                    pi.FilteringIdField = idFieldName;
                 }
 
                 if (editorAttr != null && !standardFilteringEditors.Contains(editorAttr.EditorType))
                 {
-                    pi.FilteringType = "Editor";
-                    pi.FilteringParams["editorType"] = editorAttr.EditorType;
-                    pi.FilteringParams["useLike"] = valueType == typeof(String);
-                }
-                else if (lookupEditorAttr != null)
-                {
-                    var async = lookupEditorAttr as AsyncLookupEditorAttribute;
-                    pi.FilteringType = async != null ? "AsyncLookup" : "Lookup";
-                    pi.FilteringParams["lookupKey"] = async != null ? async.LookupKey : ((LookupEditorAttribute)lookupEditorAttr).LookupKey;
+                    if (editorAttr is LookupEditorAttribute ||
+                        editorAttr is AsyncLookupEditorAttribute)
+                    {
+                        var async = editorAttr as AsyncLookupEditorAttribute;
+                        pi.FilteringType = async != null ? "AsyncLookup" : "Lookup";
+                        pi.FilteringParams["lookupKey"] = async != null ? async.LookupKey : ((LookupEditorAttribute)editorAttr).LookupKey;
+                    }
+                    else
+                    {
+                        pi.FilteringType = "Editor";
+                        pi.FilteringParams["editorType"] = editorAttr.EditorType;
+                        pi.FilteringParams["useLike"] = valueType == typeof(String);
+                    }
                 }
                 else if (enumType != null)
                 {
@@ -459,7 +459,9 @@ namespace Serenity.PropertyGrid
                 {
                     if (!pi.FilteringParams.ContainsKey("editorType"))
                     {
-                        var editorAttr = (EditorTypeAttribute)GetAttribute(member, basedOnField, typeof(EditorTypeAttribute));
+                        var editorAttr = (EditorTypeAttribute)GetAttribute(member, basedOnField, typeof(EditorTypeAttribute)) ??
+                            (EditorTypeAttribute)GetAttribute(member, idField, typeof(EditorTypeAttribute));
+
                         if (editorAttr != null)
                             pi.FilteringParams["editorType"] = editorAttr.EditorType;
                     }
@@ -471,11 +473,11 @@ namespace Serenity.PropertyGrid
                     }
                 }
 
-                object idField;
-                if (pi.FilteringParams.TryGetValue("idField", out idField) && idField is string)
-                    pi.FilteringIdField = (idField as string).TrimToNull();
+                object idFieldObj;
+                if (pi.FilteringParams.TryGetValue("idField", out idFieldObj) && idFieldObj is string)
+                    pi.FilteringIdField = (idFieldObj as string).TrimToNull();
                 else
-                    pi.FilteringIdField = AutoDetermineIdField(basedOnField);
+                    pi.FilteringIdField = idFieldName;
             }
 
             var displayFormatAttr = (DisplayFormatAttribute)GetAttribute(member, basedOnField, typeof(DisplayFormatAttribute));
@@ -484,7 +486,9 @@ namespace Serenity.PropertyGrid
                 pi.FilteringParams["displayFormat"] = displayFormatAttr.Value;
             }
 
-            foreach (FilteringOptionAttribute param in GetAttributes(member, basedOnField, typeof(FilteringOptionAttribute)))
+            foreach (FilteringOptionAttribute param in 
+                GetAttributes(null, idField, typeof(FilteringOptionAttribute)).Concat(
+                GetAttributes(member, basedOnField, typeof(FilteringOptionAttribute))))
             {
                 var key = param.Key;
                 if (key != null &&
