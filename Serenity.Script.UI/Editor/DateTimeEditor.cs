@@ -64,7 +64,7 @@ namespace Serenity
             return list;
         }
 
-        public String Value
+        public string ISOStringValue
         {
             get
             {
@@ -98,39 +98,33 @@ namespace Serenity
             }
         }
 
-        public JsDate ValueAsJsDate
+        public JsDate Value
         {
             get
             {
-                if (string.IsNullOrEmpty(Value))
+                if (string.IsNullOrEmpty(ISOStringValue))
                     return null;
 
-                return Q.ParseISODateTime(this.Value);
+                return Q.ParseISODateTime(this.ISOStringValue);
             }
             set
             {
                 if (value == null)
                     this.Value = null;
 
-                this.Value = Q.FormatDate(value, "dd/MM/yyy");
+                this.ISOStringValue = Q.FormatDate(value, "yyyy-MM-ddTHH:mm:ss");
             }
         }
 
-        public DateTime? ValueAsDateTime
+        string IStringValue.Value
         {
             get
             {
-                if (string.IsNullOrEmpty(Value))
-                    return null;
-
-                return (DateTime)Q.ParseISODateTime(this.Value);
+                return ISOStringValue;
             }
             set
             {
-                if (value == null)
-                    this.Value = null;
-
-                this.Value = Q.FormatDate((JsDate)value.Value, "dd/MM/yyy");
+                ISOStringValue = value;
             }
         }
     }
