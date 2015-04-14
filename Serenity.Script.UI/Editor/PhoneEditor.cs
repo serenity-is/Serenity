@@ -23,7 +23,7 @@ namespace Serenity
                 if (value == null)
                     return null;
 
-                return Validate(value, options.Multiple, options.Internal, options.Mobile);
+                return Validate(value);
             });
 
             string hint = options.Internal ? 
@@ -53,6 +53,46 @@ namespace Serenity
                     FormatValue();
                 }
             });
+
+            input.Bind("keyup", delegate(jQueryEvent e)
+            {
+                if (options.Internal)
+                    return;
+
+                var val = (input.GetValue() ?? "");
+                if (val.Length > 0 && ((dynamic)input[0]).selectionEnd == val.Length &&
+                    ((e.Which >= 48 && e.Which <= 57) || (e.Which >= 96 && e.Which <= 105)) &&
+                    val[val.Length - 1] >= '0' && val[val.Length - 1] <= '9' && !val.StartsWith("+") && val.IndexOf('/') < 0)
+                {
+                    if (Validate(val) == null)
+                        FormatValue();
+                    else
+                    {
+                        for (var i = 1; i <= 7; i++)
+                        {
+                            val += "9";
+                            if (Validate(val) == null)
+                            {
+                                this.Value = val;
+                                FormatValue();
+                                val = this.Value;
+                                for (var j = 1; j <= i; j++)
+                                {
+                                    val = val.Trim();
+                                    val = val.Substr(0, val.Length - 1);
+                                }
+                                this.Value = val;
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        public string Validate(string value)
+        {
+            return Validate(value, options.Multiple, options.Internal, options.Mobile, options.AllowInternational, options.AllowExtension);
         }
 
         public void FormatValue()
@@ -64,37 +104,57 @@ namespace Serenity
         {
             var value = this.element.GetValue();
 
-            if (!options.Multiple &&
-                !options.Internal &&
+            Func<string, string> formatter = null;
+
+            Func<string, string> myFormatter = s =>
+            {
+                if (string.IsNullOrEmpty(s) || options.Internal)
+                    return formatter(s);
+
+                s = (s ?? "").Trim();
+
+                if (s.StartsWith("+"))
+                    return s;
+
+                if (s.IndexOf('/') > 0)
+                {
+                    var p = s.Split(new char[] { '/' });
+                    if (p.Length != 2)
+                        return s;
+
+                    if (p[0].Length < 5)
+                        return s;
+
+                    int x;
+                    if (!int.TryParse(p[1], out x))
+                        return s;
+
+                    return p[0] + " / " + x.ToString();
+                }
+
+                return formatter(s);
+            };
+
+            if (!options.Internal &&
                 !options.Mobile)
             {
-                return FormatPhoneTurkey(value);
+                formatter = FormatPhoneTurkey;
             }
-            else if (options.Multiple &&
-                !options.Mobile &&
-                !options.Internal)
+            else if (options.Mobile)
             {
-                return FormatPhoneTurkeyMulti(value);
+                formatter = FormatMobileTurkey;
             }
-            else if (options.Mobile &&
-                !options.Multiple)
+            else if (options.Internal)
             {
-                return FormatMobileTurkey(value);
+                formatter = FormatPhoneInternal;
             }
-            else if (options.Mobile &&
-                options.Multiple)
+
+            if (formatter != null)
             {
-                return FormatMobileTurkeyMulti(value);
-            }
-            else if (options.Internal &&
-                !options.Multiple)
-            {
-                return FormatPhoneInternal(value);
-            }
-            else if (options.Internal &&
-                options.Multiple)
-            {
-                return FormatPhoneInternalMulti(value);
+                if (options.Multiple)
+                    return FormatMulti(value, myFormatter);
+                else
+                    return myFormatter(value);
             }
 
             return value;
@@ -200,7 +260,7 @@ namespace Serenity
 
         #region @@@SharedValidationCodeBlock@@@
 
-        private static string Validate(string phone, bool isMultiple, bool isInternal, bool isMobile)
+        private static string Validate(string phone, bool isMultiple, bool isInternal, bool isMobile, bool allowInternational, bool allowExtension)
         {
             Func<string, bool> validateFunc;
 
@@ -211,7 +271,50 @@ namespace Serenity
             else
                 validateFunc = IsValidPhoneTurkey;
 
-            bool valid = isMultiple ? IsValidMulti(phone, validateFunc) : validateFunc(phone);
+            Func<string, bool> myValidateFunc = s =>
+            {
+                if (!validateFunc(s))
+                {
+                    if (isInternal)
+                        return false;
+
+                    s = (s ?? "").Trim();
+
+                    if (s.StartsWith("+"))
+                    {
+                        if (allowInternational &&
+                            s.Length > 7)
+                        {
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                    if (allowExtension &&
+                        s.IndexOf('/') > 0)
+                    {
+                        var p = s.Split(new char[] { '/' });
+                        if (p.Length != 2)
+                            return false;
+
+                        if (p[0].Length < 5 || !validateFunc(p[0]))
+                            return false;
+
+                        int x;
+                        if (!int.TryParse(p[1].Trim(), out x))
+                            return false;
+
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return true;
+            };
+
+            bool valid = isMultiple ? IsValidMulti(phone, myValidateFunc) : myValidateFunc(phone);
 
             if (valid)
                 return null;
@@ -349,5 +452,9 @@ namespace Serenity
         public bool Internal { get; set; }
         [DisplayName("Cep Telefonu")]
         public bool Mobile { get; set; }
+        [DisplayName("Dahili Girişine İzin Ver")]
+        public bool AllowExtension { get; set; }
+        [DisplayName("Uluslararası Telefon Girişine İzin Ver")]
+        public bool AllowInternational { get; set; }
     }
 }

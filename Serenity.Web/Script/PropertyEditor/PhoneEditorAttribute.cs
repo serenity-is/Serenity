@@ -28,6 +28,17 @@ namespace Serenity.ComponentModel
             set { SetOption("multiple", value); }
         }
 
+        public Boolean AllowInternational
+        {
+            get { return GetOption<Boolean>("allowInternational"); }
+            set { SetOption("allowInternational", value); }
+        }
+
+        public Boolean AllowExtension
+        {
+            get { return GetOption<Boolean>("allowExtension"); }
+            set { SetOption("allowExtension", value); }
+        }
 
         public string Validate(IValidationContext context)
         {
@@ -35,12 +46,12 @@ namespace Serenity.ComponentModel
                 return null;
 
             var value = context.Value.ToString();
-            return Validate(value, this.Multiple, this.Internal, this.Mobile);
+            return Validate(value, this.Multiple, this.Internal, this.Mobile, this.AllowInternational, this.AllowExtension);
         }
 
         #region @@@SharedValidationCodeBlock@@@
 
-        private static string Validate(string phone, bool isMultiple, bool isInternal, bool isMobile)
+        private static string Validate(string phone, bool isMultiple, bool isInternal, bool isMobile, bool allowInternational, bool allowExtension)
         {
             Func<string, bool> validateFunc;
 
@@ -51,7 +62,50 @@ namespace Serenity.ComponentModel
             else
                 validateFunc = IsValidPhoneTurkey;
 
-            bool valid = isMultiple ? IsValidMulti(phone, validateFunc) : validateFunc(phone);
+            Func<string, bool> myValidateFunc = s =>
+            {
+                if (!validateFunc(s))
+                {
+                    if (isInternal)
+                        return false;
+
+                    s = (s ?? "").Trim();
+
+                    if (s.StartsWith("+"))
+                    {
+                        if (allowInternational &&
+                            s.Length > 7)
+                        {
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                    if (allowExtension &&
+                        s.IndexOf('/') > 0)
+                    {
+                        var p = s.Split(new char[] { '/' });
+                        if (p.Length != 2)
+                            return false;
+
+                        if (p[0].Length < 5 || !validateFunc(p[0]))
+                            return false;
+
+                        int x;
+                        if (!int.TryParse(p[1].Trim(), out x))
+                            return false;
+
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return true;
+            };
+
+            bool valid = isMultiple ? IsValidMulti(phone, myValidateFunc) : myValidateFunc(phone);
 
             if (valid)
                 return null;
