@@ -183,7 +183,7 @@ namespace Serenity
             // if an error occured, display it, otherwise set current filters
             if (errorText != null)
             {
-                J("<span/>").AddClass("error").Text(errorText).AppendTo(row.Children("div.v"));
+                J("<span/>").AddClass("error").Attribute("title", errorText).AppendTo(row.Children("div.v"));
                 row.Children("div.v").Find("input:first").Focus();
                 return;
             }
