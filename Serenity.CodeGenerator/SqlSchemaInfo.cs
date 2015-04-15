@@ -128,10 +128,14 @@ namespace Serenity.CodeGenerator
             var list = new List<string>();
 
             var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            var dict = new Dictionary<string, int>();
             foreach (DataRow row in columns.Rows)
             {
-                list.Add((string)row["COLUMN_NAME"]);
+                var col = (string)row["COLUMN_NAME"];
+                dict[col] = (int)row["ORDINAL_POSITION"];
+                list.Add(col);
             }
+            list.Sort((x, y) => dict[x].CompareTo(dict[y]));
 
             return list;
         }
@@ -234,6 +238,8 @@ namespace Serenity.CodeGenerator
             List<string> identityFields = GetTableIdentityFields(connection, schema, tableName);
 
             var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            var order = new Dictionary<string, int>();
+
             foreach (DataRow row in columns.Rows)
             {
 
@@ -244,7 +250,9 @@ namespace Serenity.CodeGenerator
                 .ForEach(connection, delegate(IDataReader reader)*/
                 {
                     FieldInfo fieldInfo = new FieldInfo();
-                    fieldInfo.FieldName = row["COLUMN_NAME"] as string;
+                    fieldInfo.FieldName = (string)row["COLUMN_NAME"];
+                    order[fieldInfo.FieldName] = (int)row["ORDINAL_POSITION"];
+
                     fieldInfo.IsPrimaryKey =
                         primaryFields.IndexOf(fieldInfo.FieldName) >= 0;
                     fieldInfo.IsIdentity =
@@ -290,6 +298,8 @@ namespace Serenity.CodeGenerator
                     fieldInfos.Add(fieldInfo);
                 }
             }
+
+            fieldInfos.Sort((x, y) => order[x.FieldName].CompareTo(order[y.FieldName]));
 
             // şimdi ForeignKey tespiti yap, bunu önceki döngüde yapamayız reader'lar çakışır
 
