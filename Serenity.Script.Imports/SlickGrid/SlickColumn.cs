@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -130,6 +131,11 @@ namespace Serenity
         /// Custom extension to allow formatters with single argument and intellisen
         /// </summary>
         public SlickFormatter Format { get; set; }
+
+        /// <summary>
+        /// Custom extension to allow columns to specify used columns in formatting, so that they can be loaded from server side
+        /// </summary>
+        public List<string> ReferencedFields { get; set; }
 
         /// <summary>
         /// Custom extension to access source PropertyItem object if available

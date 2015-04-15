@@ -48,6 +48,11 @@ namespace Serenity
                 if (item.FormatterParams != null)
                     ReflectionOptionsSetter.Set(formatter, item.FormatterParams);
 
+                var initializer = formatter as IInitializeColumn;
+
+                if (initializer != null)
+                    initializer.InitializeColumn(result);
+
                 result.Format = formatter.Format;
             }
 

@@ -82,6 +82,7 @@
     <Compile Include="SlickGrid\Formatters\BooleanFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\EnumFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\EnumTypeRegistry.cs" />
+    <Compile Include="SlickGrid\Formatters\IInitializeColumn.cs" />
     <Compile Include="SlickGrid\Formatters\MinuteFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\NumberFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\DateTimeFormatter.cs" />

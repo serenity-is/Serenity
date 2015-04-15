@@ -431,8 +431,16 @@ namespace Serenity
         protected virtual void GetIncludeColumns(JsDictionary<string, bool> include)
         {
             foreach (var column in slickGrid.GetColumns())
+            {
                 if (column.Field != null)
                     include[column.Field] = true;
+
+                if (column.ReferencedFields != null)
+                {
+                    foreach (var x in column.ReferencedFields)
+                        include[x] = true;
+                }
+            }
         }
 
         protected virtual void SetCriteriaParameter()
@@ -698,6 +706,12 @@ namespace Serenity
                             },
                             cssClass: ctx => css ?? "",
                             encode: false);
+
+                        if (!string.IsNullOrEmpty(item.EditLinkIdField))
+                        {
+                            column.ReferencedFields = column.ReferencedFields ?? new List<string>();
+                            column.ReferencedFields.Add(item.EditLinkIdField);
+                        }
                     }
                 }
             }
