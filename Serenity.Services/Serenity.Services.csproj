@@ -92,6 +92,7 @@
     <Compile Include="Models\UpdateLocalizationRequest.cs" />
     <Compile Include="RequestHandlers\Helpers\ServiceQueryHelper.cs" />
     <Compile Include="RequestHandlers\Behaviours\ISaveRequestHandler.cs" />
+    <Compile Include="RequestHandlers\TreeOrdering.cs" />
     <Compile Include="RequestHandlers\ListRequestHandler.cs" />
     <Compile Include="RequestHandlers\RetrieveRequestHandler.cs" />
     <Compile Include="RequestHandlers\CriteriaFieldExpressionReplacer.cs" />
