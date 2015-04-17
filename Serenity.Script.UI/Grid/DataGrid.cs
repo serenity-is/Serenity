@@ -380,6 +380,8 @@ namespace Serenity
                 return;
 
             var target = J(e.Target);
+            if (!target.HasClass("s-EditLink"))
+                target = target.Closest("a");
             if (target.HasClass("s-EditLink"))
             {
                 e.PreventDefault();
