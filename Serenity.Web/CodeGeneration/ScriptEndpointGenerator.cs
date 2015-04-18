@@ -14,6 +14,9 @@ namespace Serenity.CodeGeneration
         public Assembly[] Assemblies { get; private set; }
         public Func<Type, bool> IsEndpoint { get; set; }
         public Func<Type, string> GetNamespace { get; set; }
+        /// <summary>
+        /// Don't set this anymore, prefer route attributes
+        /// </summary>
         public Func<Type, string> GetServiceUrl { get; set; }
         public HashSet<string> RootNamespaces { get; private set; }
 
@@ -35,7 +38,8 @@ namespace Serenity.CodeGeneration
             var cw = new CodeWriter(sb, 4);
             var result = new SortedDictionary<string, string>();
 
-            Func<Type, string> getClassName = (t) => {
+            Func<Type, string> getClassName = (t) =>
+            {
                 string className = t.Name;
                 if (className.EndsWith("Controller"))
                     className = className.Substring(0, className.Length - 10);
@@ -43,131 +47,141 @@ namespace Serenity.CodeGeneration
             };
 
             foreach (var assembly in this.Assemblies)
-            foreach (var type in assembly.GetTypes())
-            {
-                if (!type.IsSubclassOf(typeof(Controller)))
-                    continue;
-
-                if (type.IsAbstract)
-                    continue;
-
-                if (this.IsEndpoint != null && !this.IsEndpoint(type))
-                    continue;
-
-                var className = getClassName(type);
-
-                string ns = GetNamespace != null ? GetNamespace(type) : type.Namespace;
-
-                cw.Indented("public partial class ");
-                sb.Append(className);
-                sb.AppendLine("Service");
-
-                var methods = new List<string>();
-                string serviceUrl = GetServiceUrl != null ? GetServiceUrl(type) : ns.Replace(".", "/");
-                serviceUrl = UriHelper.Combine(serviceUrl, className);
-                cw.InBrace(delegate 
+                foreach (var type in assembly.GetTypes())
                 {
-                    cw.Indented("[InlineConstant] public const string BaseUrl = \"");
-                    sb.Append(serviceUrl);
-                    sb.AppendLine("\";");
-                    sb.AppendLine();
+                    if (!type.IsSubclassOf(typeof(Controller)))
+                        continue;
 
-                    foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
+                    if (type.IsAbstract)
+                        continue;
+
+                    if (this.IsEndpoint != null && !this.IsEndpoint(type))
+                        continue;
+
+                    var className = getClassName(type);
+
+                    cw.Indented("public partial class ");
+                    sb.Append(className);
+                    sb.AppendLine("Service");
+
+                    var methods = new List<string>();
+
+                    string serviceUrl;
+                    if (GetServiceUrl != null)
                     {
-                        if (method.GetCustomAttribute<NonActionAttribute>() != null)
-                            continue;
-
-                        if (typeof(Controller).IsSubclassOf(method.DeclaringType))
-                            continue;
-
-                        if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
-                            continue;
-
-                        // belki burada daha sonra metod listesini de verebiliriz (ayrı bir namespace de?)
-                        var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
-                        if (parameters.Length > 1)
-                        {
-                            // tek parametreli olmalı
-                            continue;
-                        }
-
-                        Type paramType;
-                        if (parameters.Length == 1)
-                        {
-                            paramType = parameters[0].ParameterType;
-                            if (paramType.IsPrimitive || !ScriptDtoGenerator.CanHandleType(paramType))
-                                continue;
-                        }
-                        else
-                            paramType = typeof(ServiceRequest);
-
-                        var returnType = method.ReturnType;
-
-                        Type responseType = returnType;
-                        if (returnType != null &&
-                            returnType.IsGenericType &&
-                            returnType.GetGenericTypeDefinition() == typeof(Result<>))
-                        {
-                            responseType = returnType.GenericTypeArguments[0];
-                        }
-                        else if (typeof(ActionResult).IsAssignableFrom(returnType))
-                            continue;
-                        else if (returnType == typeof(void))
-                            continue;
-
-                        if (methods.Count > 0)
-                            sb.AppendLine();
-
-                        methods.Add(method.Name);
-
-                        cw.Indented("public static jQueryXmlHttpRequest ");
-                        sb.Append(method.Name);
-                       
-                        sb.Append("(");
-                        ScriptDtoGenerator.HandleMemberType(sb, paramType, enqueueType: null);
-                        sb.Append(' ');
-                        sb.Append(parameters.Length == 0 ? "request" : parameters[0].Name);
-                        sb.Append(", Action<");
-                        ScriptDtoGenerator.HandleMemberType(sb, responseType, enqueueType: null);
-                        sb.Append("> onSuccess, ServiceCallOptions options = null");
-                        sb.AppendLine(")");
-
-                        cw.InBrace(delegate 
-                        {
-                            cw.Indented("return Q.ServiceRequest(");
-
-                            sb.Append("Methods.");
-                            sb.Append(method.Name);
-
-                            sb.AppendLine(", request, onSuccess, options);");
-                        });
+                        serviceUrl = GetServiceUrl(type);
+                        serviceUrl = UriHelper.Combine(serviceUrl, className);
+                    }
+                    else
+                    {
+                        serviceUrl = GetServiceUrlFromRoute(type);
+                        if (serviceUrl == null)
+                            serviceUrl = GetNamespace != null ? GetNamespace(type).Replace(".", "/") : "???";
                     }
 
-                    sb.AppendLine();
-                    cw.IndentedLine("[Imported, PreserveMemberCase]");
-                    cw.IndentedLine("public static class Methods");
                     cw.InBrace(delegate
                     {
-                        foreach (var method in methods)
+                        cw.Indented("[InlineConstant] public const string BaseUrl = \"");
+                        sb.Append(serviceUrl);
+                        sb.AppendLine("\";");
+                        sb.AppendLine();
+
+                        foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
                         {
-                            cw.Indented("[InlineConstant] public const string ");
-                            sb.Append(method);
-                            sb.Append(" = \"");
-                            sb.Append(UriHelper.Combine(serviceUrl, method));
-                            sb.AppendLine("\";");
+                            if (method.GetCustomAttribute<NonActionAttribute>() != null)
+                                continue;
+
+                            if (typeof(Controller).IsSubclassOf(method.DeclaringType))
+                                continue;
+
+                            if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
+                                continue;
+
+                            // belki burada daha sonra metod listesini de verebiliriz (ayrı bir namespace de?)
+                            var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
+                            if (parameters.Length > 1)
+                            {
+                                // tek parametreli olmalı
+                                continue;
+                            }
+
+                            Type paramType;
+                            if (parameters.Length == 1)
+                            {
+                                paramType = parameters[0].ParameterType;
+                                if (paramType.IsPrimitive || !ScriptDtoGenerator.CanHandleType(paramType))
+                                    continue;
+                            }
+                            else
+                                paramType = typeof(ServiceRequest);
+
+                            var returnType = method.ReturnType;
+
+                            Type responseType = returnType;
+                            if (returnType != null &&
+                                returnType.IsGenericType &&
+                                returnType.GetGenericTypeDefinition() == typeof(Result<>))
+                            {
+                                responseType = returnType.GenericTypeArguments[0];
+                            }
+                            else if (typeof(ActionResult).IsAssignableFrom(returnType))
+                                continue;
+                            else if (returnType == typeof(void))
+                                continue;
+
+                            if (methods.Count > 0)
+                                sb.AppendLine();
+
+                            methods.Add(method.Name);
+
+                            cw.Indented("public static jQueryXmlHttpRequest ");
+                            sb.Append(method.Name);
+
+                            sb.Append("(");
+                            ScriptDtoGenerator.HandleMemberType(sb, paramType, enqueueType: null);
+                            sb.Append(' ');
+                            sb.Append(parameters.Length == 0 ? "request" : parameters[0].Name);
+                            sb.Append(", Action<");
+                            ScriptDtoGenerator.HandleMemberType(sb, responseType, enqueueType: null);
+                            sb.Append("> onSuccess, ServiceCallOptions options = null");
+                            sb.AppendLine(")");
+
+                            cw.InBrace(delegate
+                            {
+                                cw.Indented("return Q.ServiceRequest(");
+
+                                sb.Append("Methods.");
+                                sb.Append(method.Name);
+
+                                sb.AppendLine(", request, onSuccess, options);");
+                            });
                         }
+
+                        sb.AppendLine();
+                        cw.IndentedLine("[Imported, PreserveMemberCase]");
+                        cw.IndentedLine("public static class Methods");
+                        cw.InBrace(delegate
+                        {
+                            foreach (var method in methods)
+                            {
+                                cw.Indented("[InlineConstant] public const string ");
+                                sb.Append(method);
+                                sb.Append(" = \"");
+                                sb.Append(UriHelper.Combine(serviceUrl, method));
+                                sb.AppendLine("\";");
+                            }
+                        });
+
                     });
 
-                });
+                    if (methods.Count > 0)
+                    {
+                        endpointCodes.Add(type, sb.ToString());
+                        //usedNamespaces.Add(ns);
+                    }
 
-                if (methods.Count > 0)
-                {
-                    endpointCodes.Add(type, sb.ToString());
-                    //usedNamespaces.Add(ns);
+                    sb.Clear();
                 }
-
-                sb.Clear();
-            }
 
             usedNamespaces.Add("jQueryApi");
             usedNamespaces.Add("Serenity");
@@ -222,6 +236,43 @@ namespace Serenity.CodeGeneration
             }
 
             return result;
+        }
+
+        private string GetServiceUrlFromRoute(Type controller)
+        {
+            var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            string url = route.Template ?? "";
+
+            if (!url.StartsWith("~/"))
+            {
+                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
+                if (routePrefix != null)
+                    url = UriHelper.Combine(routePrefix.Prefix, url);
+            }
+
+            if (!url.StartsWith("~/") && !url.StartsWith("/"))
+                url = "~/" + url;
+
+            while (true)
+            {
+                var idx1 = url.IndexOf('{');
+                if (idx1 <= 0)
+                    break;
+
+                var idx2 = url.IndexOf("}", idx1 + 1);
+                if (idx2 <= 0)
+                    break;
+
+                url = url.Substring(0, idx1) + url.Substring(idx2 + 1);
+            }
+
+            if (url.StartsWith("~/Services/", StringComparison.OrdinalIgnoreCase))
+                url = url.Substring("~/Services/".Length);
+
+            if (url.Length > 1 && url.EndsWith("/"))
+                url = url.Substring(0, url.Length - 1);
+
+            return url;
         }
     }
 }
