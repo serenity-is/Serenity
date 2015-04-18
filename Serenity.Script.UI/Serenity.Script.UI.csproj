@@ -78,6 +78,7 @@
     <Compile Include="FilterPanel\FilterStore.cs" />
     <Compile Include="FilterPanel\FilterableAttribute.cs" />
     <Compile Include="FilterPanel\FilterDisplayBar.cs" />
+    <Compile Include="Grid\IDataGrid.cs" />
     <Compile Include="Grid\ReflectionOptionsSetter.cs" />
     <Compile Include="Grid\PropertyItemSlickConverter.cs" />
     <Compile Include="Grid\FormatterTypeRegistry.cs" />

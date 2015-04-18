@@ -6,10 +6,6 @@ using System.Linq;
 
 namespace Serenity
 {
-    public interface IDataGrid
-    {
-    }
-
     public abstract class DataGrid<TItem, TOptions> : Widget<TOptions>, IDataGrid
         where TItem : class, new()
         where TOptions : class, new()
@@ -865,6 +861,26 @@ namespace Serenity
 
         public SlickRemoteView<TItem> View { get { return view; } }
         public SlickGrid SlickGrid { get { return slickGrid; } }
+
+        jQueryObject IDataGrid.GetElement()
+        {
+            return this.element;
+        }
+
+        SlickGrid IDataGrid.GetGrid()
+        {
+            return this.slickGrid;
+        }
+
+        SlickRemoteView IDataGrid.GetView()
+        {
+            return this.view;
+        }
+
+        FilterStore IDataGrid.GetFilterStore()
+        {
+            return this.filterBar == null ? null : this.filterBar.Store;
+        }
     }
 
     public abstract class DataGrid<TItem> : DataGrid<TItem, object>
