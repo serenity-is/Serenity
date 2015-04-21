@@ -39,7 +39,7 @@ WriteLiteral("\r\n");
                                                    
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
-    var schemaDot = Model.Schema == null ? "" : (Model.Schema + ".");
+    var schemaDot = Model.Schema == null ? "" : ("[" + Model.Schema + "].");
      
     Func<string, string, string> jf = (x, y) =>
     {
@@ -199,7 +199,7 @@ WriteLiteral(", IIdRow");
         attrs.Add(x.Flags);
     }       
     if (!String.IsNullOrEmpty(x.PKTable)) {
-        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? "" : (x.PKSchema + ".")) + x.PKTable + "\", \"" + x.PKColumn + "\")");
+        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? "" : ("[" + x.PKSchema + "].")) + x.PKTable + "\", \"" + x.PKColumn + "\")");
         attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
     }
     if (Model.NameField == x.Ident) {
