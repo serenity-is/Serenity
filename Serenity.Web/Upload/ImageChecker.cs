@@ -151,7 +151,6 @@ namespace Serenity.Web
                         return ImageCheckResult.SizeMismatch;
                     else
                         return ImageCheckResult.WidthMismatch;
-
                 }
                 else
                     return ImageCheckResult.WidthTooLow;
