@@ -65,7 +65,7 @@ namespace Serenity
 
         public static bool CheckImageConstraints(UploadResponse file, ImageUploadEditorOptions opt)
         {
-            if (!file.IsImage)
+            if (!file.IsImage && !opt.AllowNonImage)
             {
                 Q.Alert("Yüklemeye çalıştığınız dosya bir resim değil!");
                 return false;
@@ -82,6 +82,9 @@ namespace Serenity
                 Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} boyutunda olabilir!", opt.MaxSize));
                 return false;
             }
+
+            if (!file.IsImage)
+                return true;
 
             if (opt.MinWidth > 0 && file.Width < opt.MinWidth)
             {

@@ -196,5 +196,7 @@ namespace Serenity
         public string OriginalNameProperty { get; set; }
         [DisplayName("UrlPrefix")]
         public string UrlPrefix { get; set; }
+        [DisplayName("Allow Non Image Files")]
+        public bool AllowNonImage { get; set; }
     }
 }

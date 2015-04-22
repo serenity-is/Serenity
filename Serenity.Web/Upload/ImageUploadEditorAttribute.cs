@@ -13,10 +13,10 @@ namespace Serenity.ComponentModel
     {
         public ImageUploadEditorAttribute(string originalNameProperty = null,
             int minBytes = 0, int maxBytes = 0, int minWidth = 0, int maxWidth = 0, int minHeight = 0, int maxHeight = 0, 
-            bool allowFlash = false, int scaleWidth = 0, int scaleHeight = 0, bool scaleSmaller = true, 
+            bool allowFlash = false, bool allowNonImage = false, bool jsonEncodeValue = false, bool allowMultiple = false, int scaleWidth = 0, int scaleHeight = 0, bool scaleSmaller = true, 
             ImageScaleMode scaleMode = ImageScaleMode.CropSourceImage, string thumbSizes = null, 
             ImageScaleMode thumbMode = ImageScaleMode.CropSourceImage, int thumbQuality = 0)
-            : base("ImageUpload")
+            : base(allowMultiple ? "MultipleImageUpload" : "ImageUpload")
         {
             OriginalNameProperty = originalNameProperty;
             MinBytes = minBytes;
@@ -32,6 +32,8 @@ namespace Serenity.ComponentModel
             ThumbSizes = thumbSizes;
             ThumbMode = thumbMode;
             ThumbQuality = ThumbQuality;
+            AllowNonImage = allowNonImage;
+            JsonEncodeValue = jsonEncodeValue;
         }
 
         public override void SetParams(IDictionary<string, object> editorParams)
@@ -43,6 +45,8 @@ namespace Serenity.ComponentModel
             editorParams["maxWidth"] = MaxWidth;
             editorParams["minHeight"] = MinHeight;
             editorParams["maxHeight"] = MaxHeight;
+            editorParams["allowNonImage"] = AllowNonImage;
+            editorParams["jsonEncodeValue"] = JsonEncodeValue;
         }
 
         public ImageUploadEditorAttribute()
@@ -86,6 +90,18 @@ namespace Serenity.ComponentModel
             set { SetOption("minWidth", value); }
         }
 
+        public bool AllowNonImage
+        {
+            get { return GetOption<bool>("allowNonImage"); }
+            set { SetOption("allowNonImage", value); }
+        }
+
+        public bool JsonEncodeValue
+        {
+            get { return GetOption<bool>("jsonEncodeValue"); }
+            set { SetOption("jsonEncodeValue", value); }
+        }
+
         public String OriginalNameProperty
         {
             get { return GetOption<String>("originalNameProperty"); }
@@ -101,6 +117,7 @@ namespace Serenity.ComponentModel
         public string ThumbSizes { get; private set; }
         public ImageScaleMode ThumbMode { get; private set; }
         public int ThumbQuality { get; private set; }
+        public bool AllowMultiple { get; private set; }
 
         public void CheckUploadedImageAndCreateThumbs(ref string temporaryFile, 
             params ImageCheckResult[] supportedFormats)
