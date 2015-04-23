@@ -110,7 +110,7 @@ namespace Serenity
             set
             {
                 if (value == null)
-                    this.ValueAsDate = null;
+                    this.Value = null;
 
                 this.Value = Q.FormatDate(value, "yyyy-MM-ddTHH:mm");
             }
