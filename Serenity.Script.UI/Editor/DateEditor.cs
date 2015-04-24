@@ -24,6 +24,27 @@ namespace Serenity
             });
 
             input.Bind("keyup." + this.uniqueName, DateInputKeyup);
+
+            input.Bind("change." + this.uniqueName, DateInputChange);
+        }
+
+        public static void DateInputChange(jQueryEvent e)
+        {
+            if (Q.Culture.DateOrder != "dmy")
+                return;
+
+            var input = J(e.Target);
+            if (!input.Is(":input"))
+                return;
+
+            var val = (input.GetValue() ?? "");
+            int x;
+            if (val.Length >= 6 && Int32.TryParse(val, out x))
+            {
+                input.Value(val.Substr(0, 2) + Q.Culture.DateSeparator + 
+                    val.Substr(2, 2) + Q.Culture.DateSeparator + 
+                    val.Substr(4));
+            }
         }
 
         public static void DateInputKeyup(jQueryEvent e)
