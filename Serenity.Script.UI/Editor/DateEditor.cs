@@ -22,6 +22,133 @@ namespace Serenity
                     return !input.HasClass("readonly");
                 })
             });
+
+            input.Bind("keyup." + this.uniqueName, DateInputKeyup);
+        }
+
+        public static void DateInputKeyup(jQueryEvent e)
+        {
+            if (Q.Culture.DateOrder != "dmy")
+                return;
+
+            var input = J(e.Target);
+            if (!input.Is(":input"))
+                return;
+
+            var val = (input.GetValue() ?? "");
+
+            if (val.Length == 0 || ((dynamic)input[0]).selectionEnd != val.Length)
+                return;
+
+            if (e.Which == 47 || e.Which == 111) // slash key
+            {
+                if (val.Length >= 2 &&
+                    val[val.Length - 1].ToString() == Q.Culture.DateSeparator &&
+                    val[val.Length - 2].ToString() == Q.Culture.DateSeparator)
+                {
+                    input.Value(val.Substr(0, val.Length - 1));
+                    return;
+                }
+
+                if (val[val.Length - 1].ToString() != Q.Culture.DateSeparator)
+                    return;
+
+                switch (val.Length)
+                {
+                    case 2:
+                        if (IsNumeric(val[0]))
+                        {
+                            val = "0" + val;
+                            break;
+                        }
+                        else
+                            return;
+                    case 4:
+                        if (IsNumeric(val[0]) && IsNumeric(val[2]) && val[1].ToString() == Q.Culture.DateSeparator)
+                        {
+                            val = "0" + val[0].ToString() + Q.Culture.DateSeparator + "0" + val[2].ToString() + Q.Culture.DateSeparator;
+                            break;
+                        }
+                        else
+                            return;
+                    case 5:
+                        if (IsNumeric(val[0]) && IsNumeric(val[2]) && IsNumeric(val[3]) &&
+                            val[1].ToString() == Q.Culture.DateSeparator)
+                        {
+                            val = "0" + val;
+                            break;
+                        }
+                        else if (IsNumeric(val[0]) && IsNumeric(val[1]) && IsNumeric(val[3]) &&
+                            val[2].ToString() == Q.Culture.DateSeparator)
+                        {
+                            val = val[0].ToString() + val[1].ToString() + Q.Culture.DateSeparator + "0" + val[3].ToString() + Q.Culture.DateSeparator;
+                            break;
+                        }
+                        else
+                            break;
+                    default: 
+                        return;
+                }
+
+                input.Value(val);
+            }
+
+            if (val.Length < 6 && ((e.Which >= 48 && e.Which <= 57) || (e.Which >= 96 && e.Which <= 105)) &&
+                IsNumeric(val[val.Length - 1]))
+            {
+                switch (val.Length)
+                {
+                    case 1:
+                        if (val[0] <= '3')
+                            return;
+                        val = "0" + val;
+                        break;
+                    case 2:
+                        if (!IsNumeric(val[0]))
+                            return;
+                        break;
+                    case 3:
+                        if (!IsNumeric(val[0]) || 
+                            val[1].ToString() != Q.Culture.DateSeparator ||
+                            val[2] <= '1')
+                            return;
+
+                        val = "0" + val[0].ToString() + Q.Culture.DateSeparator + "0" + val[2].ToString();
+                        break;
+                    case 4:
+                        if (val[1].ToString() == Q.Culture.DateSeparator)
+                        {
+                            if (!IsNumeric(val[0]) || !IsNumeric(val[2]))
+                                return;
+
+                            val = "0" + val;
+                            break;
+                        }
+                        else if (val[2].ToString() == Q.Culture.DateSeparator)
+                        {
+                            if (!IsNumeric(val[0]) || !IsNumeric(val[1]) || val[3] <= '1')
+                                return;
+                            val = val[0].ToString() + val[1].ToString() + Q.Culture.DateSeparator + "0" + val[3].ToString();
+                            break;
+                        }
+                        else
+                            return;
+                    case 5:
+                        if (val[2].ToString() != Q.Culture.DateSeparator ||
+                            !IsNumeric(val[0]) || !IsNumeric(val[1]) || !IsNumeric(val[3]))
+                            return;
+                        break;
+                    default:
+                        return;
+                }
+
+                input.Value(val + Q.Culture.DateSeparator);
+            }
+        }
+
+        private static bool IsNumeric(char c)
+        {
+            return c >= '0' && c <= '9';
         }
 
         public String Value
