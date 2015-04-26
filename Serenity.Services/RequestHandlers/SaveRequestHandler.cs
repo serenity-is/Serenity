@@ -520,8 +520,9 @@ namespace Serenity.Services
                 if (attr != null && !attr.CheckBeforeSave)
                     continue;
 
-                ValidateUniqueConstraint(Criteria.Empty, 
-                    new Field[] { field }, attr == null ? (string)null : attr.ErrorMessage);
+                ValidateUniqueConstraint(new Field[] { field }, 
+                    attr == null ? (string)null : attr.ErrorMessage, 
+                    Criteria.Empty);
             }
 
             foreach (var attr in typeof(TRow).GetCustomAttributes<UniqueConstraintAttribute>())
@@ -529,7 +530,7 @@ namespace Serenity.Services
                 if (!attr.CheckBeforeSave)
                     continue;
 
-                ValidateUniqueConstraint(Criteria.Empty, attr.Fields.Select(x =>
+                ValidateUniqueConstraint(attr.Fields.Select(x =>
                 {
                     var field = Row.FindFieldByPropertyName(x) ?? Row.FindField(x);
                     if (ReferenceEquals(null, field))
@@ -539,12 +540,12 @@ namespace Serenity.Services
                                 x, typeof(TRow).FullName));
                     }
                     return field;
-                }), attr.ErrorMessage);
+                }), attr.ErrorMessage, Criteria.Empty);
             }
         }
 
-        protected virtual void ValidateUniqueConstraint(BaseCriteria groupCriteria, 
-            IEnumerable<Field> fields, string errorMessage)
+        protected virtual void ValidateUniqueConstraint(IEnumerable<Field> fields, 
+            string errorMessage = null, BaseCriteria groupCriteria = null)
         {
             if (IsUpdate && !fields.Any(x => x.IndexCompare(Old, Row) != 0))
                 return;
