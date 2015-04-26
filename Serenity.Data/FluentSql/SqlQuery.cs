@@ -5,7 +5,6 @@
     using System.Diagnostics;
     using System.Text;
 
-    [DebuggerDisplay("{DebugText}")]
     public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName, ISqlQueryExtensible
     {
         private Dictionary<string, string> aliases;

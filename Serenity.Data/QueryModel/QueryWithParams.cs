@@ -1,8 +1,10 @@
 ﻿namespace Serenity.Data
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
+    [DebuggerDisplay("{DebugText}")]
     public class QueryWithParams : IQueryWithParams
     {
         protected SqlDialect dialect;
@@ -105,6 +107,14 @@
         SqlDialect IQueryWithParams.Dialect
         {
             get { return dialect; }
+        }
+
+        public string DebugText
+        {
+            get
+            {
+                return SqlDebugDumper.Dump(ToString(), this.Params);
+            }
         }
     }
 }

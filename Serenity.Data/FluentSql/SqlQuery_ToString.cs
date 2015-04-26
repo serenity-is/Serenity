@@ -411,13 +411,5 @@ namespace Serenity.Data
                 }
             }
         }
-
-        public string DebugText
-        {
-            get
-            {
-                return SqlDebugDumper.Dump(ToString(), this.Params);
-            }
-        }
     }
 }
