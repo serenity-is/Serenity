@@ -1,4 +1,5 @@
 using Serenity.Data;
+using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -477,6 +478,8 @@ namespace Serenity.Services
 
             ValidateFieldValues();
 
+            ValidateUniqueConstraints();
+
             foreach (var behaviour in this.behaviours)
                 behaviour.OnValidateRequest(this);
         }
@@ -503,6 +506,68 @@ namespace Serenity.Services
                     if (error != null)
                         throw new ValidationError("CustomValidationError", field.PropertyName ?? field.Name, error);
                 }
+            }
+        }
+
+        protected virtual void ValidateUniqueConstraints()
+        {
+            foreach (var field in Row.GetTableFields())
+            {
+                if (!field.Flags.HasFlag(FieldFlags.Unique))
+                    continue;
+
+                var attr = field.CustomAttributes.OfType<UniqueAttribute>().FirstOrDefault();
+                if (attr != null && !attr.CheckBeforeSave)
+                    continue;
+
+                ValidateUniqueConstraint(Criteria.Empty, 
+                    new Field[] { field }, attr == null ? (string)null : attr.ErrorMessage);
+            }
+
+            foreach (var attr in typeof(TRow).GetCustomAttributes<UniqueConstraintAttribute>())
+            {
+                if (!attr.CheckBeforeSave)
+                    continue;
+
+                ValidateUniqueConstraint(Criteria.Empty, attr.Fields.Select(x =>
+                {
+                    var field = Row.FindFieldByPropertyName(x) ?? Row.FindField(x);
+                    if (ReferenceEquals(null, field))
+                    {
+                        throw new InvalidOperationException(String.Format(
+                            "Can't find field '{0}' of unique constraint in row type '{1}'",
+                                x, typeof(TRow).FullName));
+                    }
+                    return field;
+                }), attr.ErrorMessage);
+            }
+        }
+
+        protected virtual void ValidateUniqueConstraint(BaseCriteria groupCriteria, 
+            IEnumerable<Field> fields, string errorMessage)
+        {
+            if (IsUpdate && !fields.Any(x => x.IndexCompare(Old, Row) != 0))
+                return;
+
+            var criteria = groupCriteria ?? Criteria.Empty;
+                   
+            foreach (var field in fields)
+                if (field.IsNull(Row))
+                    criteria &= field.IsNull();
+                else
+                    criteria &= field == new ValueCriteria(field.AsObject(Row));
+
+            if (IsUpdate)
+                criteria &= (Field)Row.IdField != Row.IdField[Old].Value;
+
+            if (Connection.Exists<TRow>(criteria))
+            {
+                throw new ValidationError("UniqueViolation", 
+                    String.Join(", ", fields.Select(x => x.PropertyName ?? x.Name)),
+                    String.Format(!string.IsNullOrEmpty(errorMessage) ? 
+                        (LocalText.TryGet(errorMessage) ?? errorMessage) :
+                            LocalText.Get("Validation.UniqueViolation"),
+                        String.Join(", ", fields.Select(x => x.Title))));
             }
         }
 

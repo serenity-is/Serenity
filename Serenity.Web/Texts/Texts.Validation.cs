@@ -25,6 +25,7 @@
             public static LocalText UsernameExists = "This username is already used. Please choose another.";
             public static LocalText Xss = "Invalid value! (don't use '&lt;' and '&amp;')";
             public static LocalText InvalidFormMessage = "Please validate empty or invalid inputs (marked with red) before submitting the form.";
+            public static LocalText UniqueConstraint = "Another record with the same '{0}' value(s) exists!";
         }
     }
 }

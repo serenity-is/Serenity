@@ -113,6 +113,7 @@
     "Validation.PasswordConfirm": "Girilen şifreler birbirini tutmuyor.",
     "Validation.Range": "Lütfen {0} ile {1} arasında bir değer giriniz.",
     "Validation.Required": "Bu alan zorunludur.",
+    "Validation.UniqueViolation": "Aynı '{0}' değerine sahip başka bir kayıt mevcut!",
     "Validation.Url": "Lütfen geçerli bir URL giriniz (http://www.site.com formatında).",
     "Validation.Username": "Bu geçerli bir kullanıcı adı değil.",
     "Validation.UsernameExists": "Bu kullanıcı adı müsait değil. Lütfen başka bir ad seçiniz.",

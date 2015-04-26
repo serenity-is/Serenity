@@ -61,6 +61,9 @@ namespace Serenity.Data
         ///   DenyFiltering.</summary>
         DenyFiltering = 2048,
         /// <summary>
+        ///   Unique.</summary>
+        Unique = 4096,
+        /// <summary>
         ///   Yeni bir <see cref="Field"/> üretirken alan özellikleri belirtilmediðinde
         ///   kullanýlacak öndeðer özellikler. Eklenebilir, güncellenebilir, NULL yapýlabilir,
         ///   boþ string'ler NULL'a çevrilir.</summary>
