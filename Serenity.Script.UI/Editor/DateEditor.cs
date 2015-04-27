@@ -67,6 +67,14 @@ namespace Serenity
                     val.Substr(2, 2) + Q.Culture.DateSeparator + 
                     val.Substr(4));
             }
+
+            val = input.GetValue() ?? "";
+
+            if (val.Length >= 5 && Q.ParseDate(val).As<dynamic>() != false)
+            {
+                var d = Q.ParseDate(val);
+                input.Value(Q.FormatDate(d));
+            }
         }
 
         public static void DateInputKeyup(jQueryEvent e)
