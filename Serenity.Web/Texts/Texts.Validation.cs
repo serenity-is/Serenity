@@ -26,6 +26,8 @@
             public static LocalText Xss = "Invalid value! (don't use '&lt;' and '&amp;')";
             public static LocalText InvalidFormMessage = "Please validate empty or invalid inputs (marked with red) before submitting the form.";
             public static LocalText UniqueConstraint = "Another record with the same '{0}' value(s) exists!";
+            public static LocalText MinDate = "Please enter a date after '{0}'.";
+            public static LocalText MaxDate = "Please enter a date before '{0}'.";
         }
     }
 }

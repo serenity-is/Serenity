@@ -20,6 +20,9 @@ namespace Serenity
             input.AddClass("dateQ s-DateTimeEditor")
                 .DatePicker(new DatePickerOptions { ShowOn = "button" });
 
+            input.Bind("keyup." + this.uniqueName, DateEditor.DateInputKeyup);
+            input.Bind("change." + this.uniqueName, DateEditor.DateInputChange);
+
             time = J("<select/>")
                 .AddClass("editor s-DateTimeEditor time")
                 .InsertAfter(input.Next(".ui-datepicker-trigger"));
@@ -28,6 +31,26 @@ namespace Serenity
                 toHour: options.EndHour ?? 23, 
                 stepMins: options.IntervalMinutes ?? 30))
                 Q.AddOption(time, t, t);
+
+
+            input.AddValidationRule(this.uniqueName, e =>
+            {
+                var value = this.Value;
+                if (string.IsNullOrEmpty(value))
+                    return null;
+
+                if (!string.IsNullOrEmpty(MinValue) &&
+                    String.Compare(value, MinValue) < 0)
+                    return String.Format(Q.Text("Validation.MinDate"),
+                        Q.FormatDate(Q.ParseISODateTime(MinValue)));
+
+                if (!string.IsNullOrEmpty(MaxValue) &&
+                    String.Compare(value, MaxValue) >= 0)
+                    return String.Format(Q.Text("Validation.MaxDate"),
+                        Q.FormatDate(Q.ParseISODateTime(MaxValue)));
+
+                return null;
+            });
         }
 
         private static List<string> GetTimeOptions(int fromHour = 0, int fromMin = 0,
@@ -113,6 +136,46 @@ namespace Serenity
                     this.Value = null;
 
                 this.Value = Q.FormatDate(value, "yyyy-MM-ddTHH:mm");
+            }
+        }
+
+        [Option]
+        public string MinValue { get; set; }
+        [Option]
+        public string MaxValue { get; set; }
+
+        public JsDate MinDate
+        {
+            get { return Q.ParseISODateTime(MinValue); }
+            set { MinValue = Q.FormatDate(value, "yyyy-MM-ddTHH:mm:ss"); }
+        }
+
+        public JsDate MaxDate
+        {
+            get { return Q.ParseISODateTime(MaxValue); }
+            set { MaxValue = Q.FormatDate(value, "yyyy-MM-ddTHH:mm:ss"); }
+        }
+
+        [Option]
+        public bool SqlMinMax
+        {
+            get
+            {
+                return MinValue == "1753-01-01" &&
+                    MaxValue == "9999-12-31";
+            }
+            set
+            {
+                if (value)
+                {
+                    MinValue = "1753-01-01";
+                    MaxValue = "9999-12-31";
+                }
+                else
+                {
+                    MinValue = null;
+                    MaxValue = null;
+                }
             }
         }
     }
