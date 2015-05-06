@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data
+namespace Serenity.Data
 {
     using System;
     using System.Collections.Generic;
@@ -353,46 +353,44 @@
        {
            var ext = (ISqlQueryExtensible)query;
 
-           int index = 0;
+           int index = -1;
            foreach (var info in ext.Columns)
            {
-               if (!ReferenceEquals(null, info.IntoField as Field) && info.IntoRowIndex != -1)
+               index++;
+
+               if (info.IntoRowIndex < 0 || info.IntoRowIndex >= into.Count)
+                   continue;
+
+               var row = into[info.IntoRowIndex] as Row;
+               if (row == null)
+                   continue;
+
+               var field = info.IntoField as Field;
+
+               if (!ReferenceEquals(null, field) &&
+                   (field.Fields == row.fields ||
+                    field.Fields.GetType() == row.fields.GetType()))
                {
-                   var row = into[info.IntoRowIndex] as Row;
-                   if (row == null)
-                       continue;
-                   var field = info.IntoField as Field;
-                   if (ReferenceEquals(null, field))
-                       continue;
-                   if (field.Fields == row.fields ||
-                       field.Fields.GetType() == row.fields.GetType())
-                       field.GetFromReader(reader, index, row);
-               }
-               else if (info.IntoRowIndex != -1)
-               {
-                   var row = into[info.IntoRowIndex] as Row;
-                   if (row == null)
-                       continue;
-                   var name = reader.GetName(index);
-                   var field = row.FindField(name) ?? row.FindFieldByPropertyName(name);
-                   if (!ReferenceEquals(null, field))
-                   {
-                       //info.IntoField = field;
-                       field.GetFromReader(reader, index, row);
-                   }
-                   else
-                   {
-                       if (reader.IsDBNull(index))
-                           row.SetDictionaryData(name, null);
-                       else
-                       {
-                           var value = reader.GetValue(index);
-                           row.SetDictionaryData(name, value);
-                       }
-                   }
+                   field.GetFromReader(reader, index, row);
+                   continue;
                }
 
-               index++;
+               var name = reader.GetName(index);
+               field = row.FindField(name) ?? row.FindFieldByPropertyName(name);
+
+               if (!ReferenceEquals(null, field))
+               {
+                   field.GetFromReader(reader, index, row);
+                   continue;
+               }
+
+               if (reader.IsDBNull(index))
+                   row.SetDictionaryData(name, null);
+               else
+               {
+                   var value = reader.GetValue(index);
+                   row.SetDictionaryData(name, value);
+               }
            }
        }
    }
