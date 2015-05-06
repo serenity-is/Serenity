@@ -18,6 +18,11 @@ namespace Serenity
         public string Service { get; set; }
 
         /// <summary>
+        /// Gets or sets service URL
+        /// </summary>
+        public string Url { get; set; }
+
+        /// <summary>
         /// Gets or sets target
         /// </summary>
         public string Target { get; set; }
