@@ -337,5 +337,22 @@ namespace Serenity
 
             return empty ?? "";
         }
+
+        /// <summary>
+        /// Joins two strings conditionally, by putting separator between if both are non empty
+        /// </summary>
+        public static string Join(string a, string separator, string b)
+        {
+            if (a.IsNullOrEmpty() && b.IsNullOrEmpty())
+                return "";
+            
+            if (a.IsNullOrEmpty())
+                return b ?? "";
+            
+            if (b.IsNullOrEmpty())
+                return a ?? "";
+
+            return a + separator + b;
+        }
     }
 }
