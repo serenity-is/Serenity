@@ -75,6 +75,7 @@
     <Compile Include="Join\AliasExtensions.cs" />
     <Compile Include="Join\IAlias.cs" />
     <Compile Include="Mapping\AutoIncrementAttribute.cs" />
+    <Compile Include="Mapping\DateTimeKindAttribute.cs" />
     <Compile Include="Mapping\UniqueAttribute.cs" />
     <Compile Include="Mapping\UniqueConstraintAttribute.cs" />
     <Compile Include="Mapping\ColumnAttribute.cs" />

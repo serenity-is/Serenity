@@ -180,6 +180,7 @@ namespace Serenity.Data
                         LeftJoinAttribute foreignJoin = null;
                         DefaultValueAttribute defaultValue = null;
                         TextualFieldAttribute textualField = null;
+                        DateTimeKindAttribute dateTimeKind = null;
 
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
@@ -196,6 +197,7 @@ namespace Serenity.Data
                             foreignJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
                             defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
                             textualField = property.GetCustomAttribute<TextualFieldAttribute>(false);
+                            dateTimeKind = property.GetCustomAttribute<DateTimeKindAttribute>(false);
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                             var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
@@ -297,6 +299,11 @@ namespace Serenity.Data
                         if (textualField != null)
                         {
                             field.textualField = textualField.Value;
+                        }
+
+                        if (dateTimeKind != null && field is DateTimeField)
+                        {
+                            ((DateTimeField)field).DateTimeKind = dateTimeKind.Value;
                         }
 
                         if (property != null)
