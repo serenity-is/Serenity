@@ -80,5 +80,29 @@ namespace Serenity
         {
             return null;
         }
+
+        [ScriptAlias("Q$Externals.deepClone"), ExpandParams, IncludeGenericArguments(false)]
+        public static T DeepClone<T>(T source)
+        {
+            return default(T);
+        }
+
+        [ScriptAlias("Q$Externals.deepClone"), IncludeGenericArguments(false)]
+        public static T DeepExtend<T>(T target, T merge)
+        {
+            return default(T);
+        }
+
+        [ScriptAlias("Q$Externals.deepClone"), IncludeGenericArguments(false)]
+        public static T DeepExtend<T>(T target, T merge1, T merge2)
+        {
+            return default(T);
+        }
+
+        [ScriptAlias("Q$Externals.deepClone"), IncludeGenericArguments(false)]
+        public static T DeepExtend<T>(T target, T merge1, T merge2, T merge3)
+        {
+            return default(T);
+        }    
     }
 }
