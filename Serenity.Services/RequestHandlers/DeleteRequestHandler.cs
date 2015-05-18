@@ -121,9 +121,9 @@ namespace Serenity.Services
                 {
                     if (new SqlUpdate(Row.Table)
                             .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, deleteLogRow.DeleteDateField.DateTimeKind))
-                            .Set(deleteLogRow.DeleteUserIdField, Authorization.UserId.TryParseID())
+                            .Set((Field)deleteLogRow.DeleteUserIdField, Authorization.UserId.TryParseID())
                             .WhereEqual(idField, id)
-                            .Where(new Criteria(deleteLogRow.DeleteUserIdField).IsNull())
+                            .Where(new Criteria((Field)deleteLogRow.DeleteUserIdField).IsNull())
                             .Execute(Connection) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id);
                 }
