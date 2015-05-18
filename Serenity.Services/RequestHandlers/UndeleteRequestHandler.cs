@@ -166,7 +166,7 @@ namespace Serenity.Services
 
             Row = new TRow();
 
-            var isActiveRow = Row as IIsActiveRow;
+            var isActiveRow = Row as IIsActiveDeletedRow;
 
             if (isActiveRow == null)
                 throw new NotImplementedException();

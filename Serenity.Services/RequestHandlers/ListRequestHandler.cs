@@ -271,7 +271,7 @@
         {
             if (!Request.IncludeDeleted)
             {
-                var isActiveRow = Row as IIsActiveRow;
+                var isActiveRow = Row as IIsActiveDeletedRow;
                 if (isActiveRow != null)
                     query.Where(new Criteria(isActiveRow.IsActiveField) >= 0);
             }

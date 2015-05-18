@@ -11,8 +11,6 @@ namespace Serenity.Services
         where TDeleteRequest: DeleteRequest
         where TDeleteResponse : DeleteResponse, new()
     {
-        protected bool ShouldActuallyDelete { get; set; }
-
         protected IUnitOfWork UnitOfWork;
         protected TRow Row;
         protected TDeleteResponse Response;
@@ -95,12 +93,11 @@ namespace Serenity.Services
 
         protected virtual void ExecuteDelete()
         {
-            var isActiveRow = Row as IIsActiveRow;
+            var isDeletedRow = Row as IIsActiveDeletedRow;
             var idField = (Field)Row.IdField;
             var id = Request.EntityId.Value;
 
-            if (ShouldActuallyDelete ||
-                isActiveRow == null)
+            if (isDeletedRow == null)
             {
                 if (new SqlDelete(Row.Table)
                         .WhereEqual(idField, id)
@@ -110,9 +107,9 @@ namespace Serenity.Services
             else
             {
                 if (new SqlUpdate(Row.Table)
-                        .Set(isActiveRow.IsActiveField, -1)
+                        .Set(isDeletedRow.IsActiveField, -1)
                         .WhereEqual(idField, id)
-                        .Where(new Criteria(isActiveRow.IsActiveField) >= 0)
+                        .Where(new Criteria(isDeletedRow.IsActiveField) >= 0)
                         .Execute(Connection) != 1)
                     throw DataValidation.EntityNotFoundError(Row, id);
             }
@@ -203,11 +200,10 @@ namespace Serenity.Services
 
             ValidateRequest();
 
-            var isActiveRow = Row as IIsActiveRow;
+            var isDeletedRow = Row as IIsActiveDeletedRow;
 
-            if (isActiveRow != null &&
-                !ShouldActuallyDelete &&
-                isActiveRow.IsActiveField[Row] < 0)
+            if (isDeletedRow != null &&
+                isDeletedRow.IsActiveField[Row] < 0)
                 Response.WasAlreadyDeleted = true;
             else
             {

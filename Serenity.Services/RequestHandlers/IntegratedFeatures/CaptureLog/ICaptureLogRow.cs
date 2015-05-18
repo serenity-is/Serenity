@@ -1,7 +1,7 @@
 ﻿
 namespace Serenity.Data
 {
-    public interface ICaptureLogRow : IIsActiveRow
+    public interface ICaptureLogRow : IIsActiveDeletedRow
     {
         IIdField ChangingUserIdField { get; }
         DateTimeField ValidFromField { get; }
