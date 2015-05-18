@@ -271,9 +271,15 @@
         {
             if (!Request.IncludeDeleted)
             {
-                var isActiveRow = Row as IIsActiveDeletedRow;
-                if (isActiveRow != null)
-                    query.Where(new Criteria(isActiveRow.IsActiveField) >= 0);
+                var isDeletedRow = Row as IIsActiveDeletedRow;
+                if (isDeletedRow != null)
+                    query.Where(new Criteria(isDeletedRow.IsActiveField) >= 0);
+                else
+                {
+                    var deleteLogRow = Row as IDeleteLogRow;
+                    if (deleteLogRow != null)
+                        query.Where(new Criteria((Field)deleteLogRow.DeleteUserIdField).IsNull());
+                }
             }
         }
 

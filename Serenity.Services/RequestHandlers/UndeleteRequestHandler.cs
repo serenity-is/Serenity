@@ -166,9 +166,10 @@ namespace Serenity.Services
 
             Row = new TRow();
 
-            var isActiveRow = Row as IIsActiveDeletedRow;
+            var isDeletedRow = Row as IIsActiveDeletedRow;
+            var deleteLogRow = Row as IDeleteLogRow;
 
-            if (isActiveRow == null)
+            if (isDeletedRow == null && deleteLogRow == null)
                 throw new NotImplementedException();
 
             var idField = (Field)Row.IdField;
@@ -177,18 +178,32 @@ namespace Serenity.Services
 
             ValidateRequest();
 
-            if (isActiveRow.IsActiveField[Row] > 0)
+            if ((isDeletedRow != null && isDeletedRow.IsActiveField[Row] > 0) ||
+                (deleteLogRow != null && deleteLogRow.DeleteUserIdField[Row] == null))
                 Response.WasNotDeleted = true;
             else
             {
                 OnBeforeUndelete();
 
-                if (new SqlUpdate(Row.Table)
-                        .Set(isActiveRow.IsActiveField, 1)
-                        .WhereEqual(idField, request.EntityId.Value)
-                        .WhereEqual(isActiveRow.IsActiveField, -1)
-                        .Execute(Connection) != 1)
-                    throw DataValidation.EntityNotFoundError(Row, request.EntityId.Value);
+                if (isDeletedRow != null)
+                {
+                    if (new SqlUpdate(Row.Table)
+                            .Set(isDeletedRow.IsActiveField, 1)
+                            .WhereEqual(idField, request.EntityId.Value)
+                            .WhereEqual(isDeletedRow.IsActiveField, -1)
+                            .Execute(Connection) != 1)
+                        throw DataValidation.EntityNotFoundError(Row, request.EntityId.Value);
+                }
+                else
+                {
+                    if (new SqlUpdate(Row.Table)
+                            .Set((Field)deleteLogRow.DeleteUserIdField, null)
+                            .Set(deleteLogRow.DeleteDateField, null)
+                            .WhereEqual(idField, request.EntityId.Value)
+                            .Where(((Field)deleteLogRow.DeleteUserIdField).IsNotNull())
+                            .Execute(Connection) != 1)
+                        throw DataValidation.EntityNotFoundError(Row, request.EntityId.Value);
+                }
 
                 InvalidateCacheOnCommit();
 

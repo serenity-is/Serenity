@@ -12,6 +12,12 @@
         DateTimeField InsertDateField { get; }
     }
 
+    public interface IDeleteLogRow
+    {
+        IIdField DeleteUserIdField { get; }
+        DateTimeField DeleteDateField { get; }
+    }
+
     public interface ILoggingRow : IUpdateLogRow, IInsertLogRow
     {
     }

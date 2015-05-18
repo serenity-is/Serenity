@@ -3,6 +3,7 @@ using Serenity.Data;
 using Serenity.Services;
 using System;
 using System.Reflection;
+using System.Globalization;
 
 namespace Serenity.Services
 {
@@ -94,10 +95,11 @@ namespace Serenity.Services
         protected virtual void ExecuteDelete()
         {
             var isDeletedRow = Row as IIsActiveDeletedRow;
+            var deleteLogRow = Row as IDeleteLogRow;
             var idField = (Field)Row.IdField;
             var id = Request.EntityId.Value;
 
-            if (isDeletedRow == null)
+            if (isDeletedRow == null && deleteLogRow == null)
             {
                 if (new SqlDelete(Row.Table)
                         .WhereEqual(idField, id)
@@ -106,12 +108,25 @@ namespace Serenity.Services
             }
             else
             {
-                if (new SqlUpdate(Row.Table)
-                        .Set(isDeletedRow.IsActiveField, -1)
-                        .WhereEqual(idField, id)
-                        .Where(new Criteria(isDeletedRow.IsActiveField) >= 0)
-                        .Execute(Connection) != 1)
-                    throw DataValidation.EntityNotFoundError(Row, id);
+                if (isDeletedRow != null)
+                {
+                    if (new SqlUpdate(Row.Table)
+                            .Set(isDeletedRow.IsActiveField, -1)
+                            .WhereEqual(idField, id)
+                            .Where(new Criteria(isDeletedRow.IsActiveField) >= 0)
+                            .Execute(Connection) != 1)
+                        throw DataValidation.EntityNotFoundError(Row, id);
+                }
+                else //if (deleteLogRow != null)
+                {
+                    if (new SqlUpdate(Row.Table)
+                            .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, deleteLogRow.DeleteDateField.DateTimeKind))
+                            .Set(deleteLogRow.DeleteUserIdField, Authorization.UserId.TryParseID())
+                            .WhereEqual(idField, id)
+                            .Where(new Criteria(deleteLogRow.DeleteUserIdField).IsNull())
+                            .Execute(Connection) != 1)
+                        throw DataValidation.EntityNotFoundError(Row, id);
+                }
             }
 
             InvalidateCacheOnCommit();
@@ -201,9 +216,12 @@ namespace Serenity.Services
             ValidateRequest();
 
             var isDeletedRow = Row as IIsActiveDeletedRow;
+            var deleteLogRow = Row as IDeleteLogRow;
 
-            if (isDeletedRow != null &&
-                isDeletedRow.IsActiveField[Row] < 0)
+            if ((isDeletedRow != null &&
+                 isDeletedRow.IsActiveField[Row] < 0) ||
+                (deleteLogRow != null &&
+                 deleteLogRow.DeleteUserIdField[Row] != null))
                 Response.WasAlreadyDeleted = true;
             else
             {
