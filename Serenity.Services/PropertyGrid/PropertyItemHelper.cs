@@ -204,7 +204,7 @@ namespace Serenity.PropertyGrid
                         pi.Required = true;
                 }
 
-                var reqAttr = member.GetAttribute<RequiredAttribute>(true);
+                var reqAttr = (RequiredAttribute)getAttribute(typeof(RequiredAttribute));
                 if (reqAttr != null && (pi.Required != null || reqAttr.IsRequired))
                     pi.Required = reqAttr.IsRequired;
 
