@@ -106,14 +106,9 @@ namespace Serenity
                 LoadLocalization();
         }
 
-        private static IEnumerable<Tuple<int, string>> GetLanguages()
+        protected virtual IEnumerable<Tuple<string, string>> GetLanguages()
         {
-            return new List<Tuple<int, string>>
-            {
-                new Tuple<int, string>("".As<int>(), "Türkçe"),
-                new Tuple<int, string>(1033, "English"),
-                new Tuple<int, string>(3082, "Espanol")
-            };
+            return new List<Tuple<string, string>>{};
         }
 
         private void LoadLocalization()
@@ -125,7 +120,7 @@ namespace Serenity
             opt.Request = new RetrieveLocalizationRequest
             {
                 EntityId = this.EntityId.Value,
-                CultureId = Int32.Parse(localizationSelect.GetValue(), 10)
+                CultureId = localizationSelect.GetValue()
             };
             
             opt.OnSuccess = response => 
@@ -176,7 +171,7 @@ namespace Serenity
 
             opt.Request = new UpdateLocalizationRequest<TEntity> 
             {
-                CultureId = Int32.Parse(localizationSelect.GetValue(), 10),
+                CultureId = localizationSelect.GetValue(),
                 Entity = entity
             };
 

@@ -7,6 +7,6 @@ namespace Serenity
     public class UpdateLocalizationRequest<TEntity> : SaveRequest<TEntity>
         where TEntity : new()
     {
-        public Int32 CultureId { get; set; }
+        public string CultureId { get; set; }
     }
 }
