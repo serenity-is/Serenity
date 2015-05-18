@@ -4,6 +4,6 @@ namespace Serenity.Data
 {
     public interface ILocalizationRow : IIdRow
     {
-        Int32Field CultureIdField { get; }
+        Field CultureIdField { get; }
     }
 }

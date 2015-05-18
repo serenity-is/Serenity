@@ -6,6 +6,6 @@ namespace Serenity.Services
 {
     public class RetrieveLocalizationRequest : RetrieveRequest
     {
-        public Int32? CultureId { get; set; }
+        public object CultureId { get; set; }
     }
 }

@@ -115,7 +115,7 @@ namespace Serenity.Data
             return !ReferenceEquals(null, GetLocalizationMatch(field));
         }
 
-        private Int64? GetOldLocalizationRowId(IDbConnection connection, Int64 recordId, Int32 cultureId)
+        private Int64? GetOldLocalizationRowId(IDbConnection connection, Int64 recordId, object cultureId)
         {
             var info = EnsureInfo();
 
@@ -131,7 +131,7 @@ namespace Serenity.Data
             return null;
         }
 
-        public void Update<TLocalRow>(IUnitOfWork uow, TRow row, Int32 cultureId)
+        public void Update<TLocalRow>(IUnitOfWork uow, TRow row, object cultureId)
             where TLocalRow: Row, IIdRow, new()
         {
             Update(uow, row, cultureId,
@@ -147,7 +147,7 @@ namespace Serenity.Data
                     }, SaveRequestType.Update));
         }
         
-        public void Update(IUnitOfWork uow, TRow row, Int32 cultureId,
+        public void Update(IUnitOfWork uow, TRow row, object cultureId,
             Action<Row> create, Action<Row> update)
         {
             var info = EnsureInfo();
@@ -165,7 +165,7 @@ namespace Serenity.Data
             if (oldId == null)
             {
                 info.mappedIdField[localRow] = recordId;
-                info.localRowInterface.CultureIdField[localRow] = cultureId;
+                info.localRowInterface.CultureIdField.AsObject(localRow, cultureId);
             }
 
             foreach (var field in row.GetFields())
@@ -190,7 +190,7 @@ namespace Serenity.Data
                 update(localRow);
         }
 
-        private Row GetOldLocalizationRow(IDbConnection connection, Int64 recordId, Int32 cultureId)
+        private Row GetOldLocalizationRow(IDbConnection connection, Int64 recordId, object cultureId)
         {
             var info = EnsureInfo();
 
@@ -223,7 +223,7 @@ namespace Serenity.Data
             var recordId = request.EntityId.Value;
             var idField = ((IIdRow)row).IdField;
 
-            var localRow = GetOldLocalizationRow(connection, recordId, request.CultureId.Value);
+            var localRow = GetOldLocalizationRow(connection, recordId, request.CultureId);
 
             var response = new RetrieveResponse<TRow>();
             response.Entity = row;
