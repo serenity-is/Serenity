@@ -113,8 +113,27 @@ namespace Serenity
         /// </summary>
         protected virtual void AddCssClass()
         {
-            this.element.AddClass("s-" + this.GetType().Name + " " +
-                "s-" + this.GetType().FullName.Replace(".", "-"));
+            this.element.AddClass(GetCssClass());
+        }
+
+        protected virtual string GetCssClass()
+        {
+            var klass = "s-" + this.GetType().Name;
+            var fullClass = this.GetType().FullName.Replace(".", "-");
+            
+            foreach (var k in Q.Config.RootNamespaces)
+                if (fullClass.StartsWith(k + "-"))
+                {
+                    fullClass = fullClass.Substr(k.Length + 1);
+                    break;
+                }
+
+            fullClass = "s-" + fullClass;
+
+            if (klass == fullClass)
+                return klass;
+
+            return klass + " " + fullClass;
         }
 
         /// <summary>

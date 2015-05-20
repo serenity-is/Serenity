@@ -248,7 +248,7 @@ namespace Serenity
         {
             DialogOptions opt = new DialogOptions();
 
-            var dialogClass = "s-Dialog " + "s-" + this.GetType().Name;
+            var dialogClass = "s-Dialog " + GetCssClass();
             opt.DialogClass = dialogClass;
 
             opt.Width = 920;
