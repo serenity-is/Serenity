@@ -28,6 +28,7 @@ namespace Serenity
             deleteButton = toolbar.FindButton("delete-button");
             undeleteButton = toolbar.FindButton("undo-delete-button");
             cloneButton = toolbar.FindButton("clone-button");
+            localizationButton = toolbar.FindButton("localization-button");
         }
 
         protected virtual void ShowSaveSuccessMessage(ServiceResponse response)
@@ -66,7 +67,7 @@ namespace Serenity
                 {
                     if (self.IsLocalizationMode)
                     {
-                        self.SaveLocalization();
+                        self.SaveLocalization(null);
                         return;
                     }
 
@@ -116,6 +117,16 @@ namespace Serenity
                                 });
                             });
                         }
+                    }
+                });
+
+                list.Add(new ToolButton
+                {
+                    Title = Texts.Controls.EntityDialog.LocalizationButton,
+                    CssClass = "localization-button",
+                    OnClick = delegate
+                    {
+                        this.LocalizationButtonClick();
                     }
                 });
 
@@ -190,8 +201,8 @@ namespace Serenity
             if (localizationGrid != null)
                 localizationGrid.Element.Toggle(isLocalizationMode);
 
-            if (localizationSelect != null)
-                localizationSelect.Toggle(IsEditMode && !IsCloneMode);
+            if (localizationButton != null)
+                localizationButton.Toggle(localizationGrid != null && IsEditMode && !IsCloneMode);
 
             if (tabs != null)
                 tabs.SetDisabled("Log", IsNewOrDeleted);

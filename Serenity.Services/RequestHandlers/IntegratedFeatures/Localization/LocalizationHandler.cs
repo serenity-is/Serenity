@@ -206,42 +206,67 @@ namespace Serenity.Data
             return null;
         }
 
-        public RetrieveResponse<TRow> Retrieve(IDbConnection connection, RetrieveLocalizationRequest request)
+        private List<Row> GetOldLocalizationRows(IDbConnection connection, Int64 recordId)
+        {
+            var info = EnsureInfo();
+
+            var row = info.localRowInstance.CreateNew();
+            return new SqlQuery()
+                    .From(row)
+                    .SelectTableFields()
+                    .WhereEqual((Field)info.mappedIdField, recordId)
+                    .List(connection, row);
+        }
+
+        public RetrieveLocalizationResponse<TRow> Retrieve(IDbConnection connection, RetrieveLocalizationRequest request)
         {
             request.CheckNotNull();
 
             if (request.EntityId == null)
                 throw new ArgumentNullException("entityId");
 
-            if (request.CultureId == null)
-                throw new ArgumentNullException("cultureId");
-
-            var row = new TRow();
-            row.TrackAssignments = true;
-            row.IdField[row] = request.EntityId.Value;
-
             var recordId = request.EntityId.Value;
-            var idField = ((IIdRow)row).IdField;
 
-            var localRow = GetOldLocalizationRow(connection, recordId, request.CultureId);
+            var localRows = GetOldLocalizationRows(connection, request.EntityId.Value);
 
-            var response = new RetrieveResponse<TRow>();
-            response.Entity = row;
+            var response = new RetrieveLocalizationResponse<TRow>();
+            response.Entities = new Dictionary<string, TRow>();
 
-            if (localRow == null)
+            if (localRows.IsEmptyOrNull())
                 return response;
 
-            foreach (var field in row.GetFields())
+            TRow row = new TRow();
+            var idField = ((IIdRow)row).IdField;
+            var fields = new TRow().GetFields();
+            var matches = new Field[fields.Count];
+            for (var i = 0; i < fields.Count; i++)
             {
+                var field = fields[i];
                 if (ReferenceEquals(field, idField))
                     continue;
 
-                var match = GetLocalizationMatch(field);
-                if (!ReferenceEquals(null, match))
+                matches[i] = GetLocalizationMatch(field);
+            }
+
+            foreach (var localRow in localRows)
+            {
+                row = new TRow();
+                row.TrackAssignments = true;
+                row.IdField[row] = recordId;
+                
+                for (var i = 0; i < fields.Count; i++)
                 {
-                    var value = match.AsObject(localRow);
-                    field.AsObject(row, value);
+                    var match = matches[i];
+                    if (!ReferenceEquals(null, match))
+                    {
+                        var field = fields[i];
+                        var value = match.AsObject(localRow);
+                        field.AsObject(row, value);
+                    }
                 }
+
+                var culture = ((ILocalizationRow)localRow).CultureIdField.AsObject(localRow);
+                response.Entities[culture == null ? "" : culture.ToString()] = row;
             }
 
             return response;
