@@ -182,6 +182,8 @@ namespace Serenity
                         copy[language + "$" + key] = entity[key];
                 }
 
+                self.localizationGrid.Load(copy);
+
                 self.localizationGrid.EnumerateItems((item, widget) =>
                 {
                     if (item.Name.IndexOf("$") < 0 && widget.Element.Is(":input"))
@@ -200,8 +202,7 @@ namespace Serenity
                                 .Attribute("placeholder", hint);
                     }
                 });
-
-                self.localizationGrid.Load(copy);
+                
                 localizationLastEntity = new JsDictionary<string, object>(); ;
                 self.localizationGrid.Save(localizationLastEntity);
             };
