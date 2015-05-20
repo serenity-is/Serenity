@@ -147,8 +147,8 @@ namespace Serenity
 
             return new ToolButton
             {
-                Title = noText ? null : Texts.Controls.EntityGrid.RefreshButton,
-                Hint = noText ? Texts.Controls.EntityGrid.RefreshButton : null,
+                Title = noText ? null : Texts.Controls.EntityGrid.RefreshButton.Get(),
+                Hint = noText ? Texts.Controls.EntityGrid.RefreshButton.Get() : null,
                 CssClass = "refresh-button",
                 OnClick = delegate
                 {
