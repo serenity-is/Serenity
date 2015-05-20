@@ -141,13 +141,14 @@ namespace Serenity
             return buttons;
         }
 
-        protected ToolButton NewRefreshButton()
+        protected ToolButton NewRefreshButton(bool noText = false)
         {
             var self = this;
 
             return new ToolButton
             {
-                Title = Texts.Controls.EntityGrid.RefreshButton,
+                Title = noText ? null : Texts.Controls.EntityGrid.RefreshButton,
+                Hint = noText ? Texts.Controls.EntityGrid.RefreshButton : null,
                 CssClass = "refresh-button",
                 OnClick = delegate
                 {
