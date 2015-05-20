@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Serenity.Reflection;
+using Serenity.ComponentModel;
 
 namespace Serenity.CodeGeneration
 {
@@ -67,7 +68,8 @@ namespace Serenity.CodeGeneration
             foreach (var assembly in Assemblies)
             foreach (var type in assembly.GetTypes())
             {
-                if (type.GetCustomAttribute(typeof(Serenity.ComponentModel.FormScriptAttribute)) == null)
+                var formScriptAttribute = (FormScriptAttribute)type.GetCustomAttribute(typeof(FormScriptAttribute));
+                if (formScriptAttribute == null)
                     continue;
 
                 var ns = DoGetNamespace(type);
@@ -78,6 +80,11 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine(" : PrefixedContext");
                 cw.InBrace(delegate
                 {
+                    cw.Indented("[InlineConstant] public const string FormKey = \"");
+                    sb.Append(formScriptAttribute.Key);
+                    sb.AppendLine("\";");
+                    sb.AppendLine();
+                    
                     cw.Indented("public ");
                     sb.Append(DoGetTypeName(type));
                     sb.AppendLine("(string idPrefix) : base(idPrefix) {}");
