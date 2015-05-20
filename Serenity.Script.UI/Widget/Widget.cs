@@ -113,7 +113,8 @@ namespace Serenity
         /// </summary>
         protected virtual void AddCssClass()
         {
-            this.element.AddClass("s-" + this.GetType().Name);
+            this.element.AddClass("s-" + this.GetType().Name + " " +
+                "s-" + this.GetType().FullName.Replace(".", "-"));
         }
 
         /// <summary>
