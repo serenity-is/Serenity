@@ -149,6 +149,9 @@ namespace Serenity
 
         private void LoadLocalization()
         {
+            if (localizationLastValue == null && IsNew)
+                localizationLastValue = new JsDictionary<string, object>();
+
             if (localizationLastValue != null)
             {
                 localizationGrid.Load(localizationLastValue);
