@@ -65,12 +65,6 @@ namespace Serenity
                 CssClass = "apply-changes-button",
                 OnClick = delegate
                 {
-                    if (self.IsLocalizationMode)
-                    {
-                        self.SaveLocalization(null);
-                        return;
-                    }
-
                     self.Save(delegate(ServiceResponse response)
                     {
                         if (self.IsEditMode)
@@ -190,7 +184,7 @@ namespace Serenity
             }
 
             if (applyChangesButton != null)
-                applyChangesButton.Toggle(isLocalizationMode || !isDeleted);
+                applyChangesButton.Toggle(!isLocalizationMode && !isDeleted);
 
             if (cloneButton != null)
                 cloneButton.Toggle(false);
@@ -202,7 +196,7 @@ namespace Serenity
                 localizationGrid.Element.Toggle(isLocalizationMode);
 
             if (localizationButton != null)
-                localizationButton.Toggle(localizationGrid != null && IsEditMode && !IsCloneMode);
+                localizationButton.Toggle(localizationGrid != null);
 
             if (tabs != null)
                 tabs.SetDisabled("Log", IsNewOrDeleted);

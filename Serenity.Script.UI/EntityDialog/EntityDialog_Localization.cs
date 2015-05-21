@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Serenity
@@ -12,7 +13,8 @@ namespace Serenity
     {
         protected PropertyGrid localizationGrid;
         protected jQueryObject localizationButton;
-        protected JsDictionary<string, object> localizationLastEntity;
+        protected JsDictionary<string, object> localizationLastValue;
+        protected JsDictionary<string, object> localizationPendingValue;
 
         private void InitLocalizationGrid()
         {
@@ -101,8 +103,6 @@ namespace Serenity
             get 
             {
                 return
-                    IsEditMode && 
-                    !IsCloneMode &&
                     localizationButton != null &&
                     localizationButton.HasClass("pressed");
             }
@@ -115,33 +115,22 @@ namespace Serenity
                 if (!IsLocalizationMode)
                     return false;
 
-                var newEntity = new JsDictionary<string, object>();
-                localizationGrid.Save(newEntity);
+                var newValue = GetLocalizationGridValue();
 
-                return Q.ToJSON(localizationLastEntity) != Q.ToJSON(newEntity);
+                return Q.ToJSON(localizationLastValue) != Q.ToJSON(newValue);
             }
         }
 
         private void LocalizationButtonClick()
         {
+            if (IsLocalizationMode && !ValidateForm())
+                return;
+
             if (IsLocalizationChanged)
             {
-                Q.Confirm(Texts.Controls.EntityDialog.LocalizationConfirmation, () =>
-                {
-                    SaveLocalization(() =>
-                    {
-                        localizationButton.ToggleClass("pressed");
-                        UpdateInterface();
-                    });
-                }, new ConfirmOptions
-                {
-                    OnCancel = () => 
-                    {
-                        localizationButton.ToggleClass("pressed");
-                        UpdateInterface();
-                    }
-                });
-
+                var newValue = GetLocalizationGridValue();
+                localizationLastValue = newValue;
+                localizationPendingValue = newValue;
                 return;
             }
 
@@ -160,6 +149,13 @@ namespace Serenity
 
         private void LoadLocalization()
         {
+            if (localizationLastValue != null)
+            {
+                localizationGrid.Load(localizationLastValue);
+                SetLocalizationGridCurrentValues();
+                return;
+            }
+
             var self = this;
             var opt = new ServiceCallOptions<RetrieveLocalizationResponse<TEntity>>();
             opt.Service = this.GetService() + "/RetrieveLocalization";
@@ -171,7 +167,6 @@ namespace Serenity
             
             opt.OnSuccess = response => 
             {
-                var valueByName = new JsDictionary<string, string>();
                 var copy = jQuery.ExtendObject(new TEntity(), self.Entity).As<JsDictionary<string, object>>();
                 
                 foreach (var language in response.Entities.Keys)
@@ -183,58 +178,61 @@ namespace Serenity
                 }
 
                 self.localizationGrid.Load(copy);
+                SetLocalizationGridCurrentValues();
 
-                self.localizationGrid.EnumerateItems((item, widget) =>
-                {
-                    if (item.Name.IndexOf("$") < 0 && widget.Element.Is(":input"))
-                        valueByName[item.Name] = widget.Element.GetValue();
-                });
-
-                self.localizationGrid.EnumerateItems((item, widget) =>
-                {
-                    var idx = item.Name.IndexOf("$");
-                    if (idx >= 0 && (widget.Element.Is(":input")))
-                    {
-                        var hint = valueByName[item.Name.Substr(idx + 1)];
-                        if (hint != null && hint.Length > 0)
-                            widget.Element
-                                .Attribute("title", hint)
-                                .Attribute("placeholder", hint);
-                    }
-                });
-                
-                localizationLastEntity = new JsDictionary<string, object>(); ;
-                self.localizationGrid.Save(localizationLastEntity);
+                localizationPendingValue = null;
+                localizationLastValue = GetLocalizationGridValue();
             };
 
             Q.ServiceCall(opt);
         }
 
-        private void SaveLocalization(Action callback)
+        private void SetLocalizationGridCurrentValues()
         {
-            if (!ValidateForm())
-                return;
+            var valueByName = new JsDictionary<string, string>();
 
-            var opt = new ServiceCallOptions();
-            opt.Service = this.GetService() + "/UpdateLocalization";
-            opt.OnSuccess = delegate(ServiceResponse response)
+            this.localizationGrid.EnumerateItems((item, widget) =>
             {
-                localizationLastEntity = new JsDictionary<string, object>();
-                localizationGrid.Save(localizationLastEntity);
+                if (item.Name.IndexOf("$") < 0 && widget.Element.Is(":input"))
+                {
+                    valueByName[item.Name] = this.ById(item.Name).GetValue();
+                    widget.Element.Value(valueByName[item.Name]);
+                }
+            });
 
-                if (callback != null)
-                    callback();
-            };
+            this.localizationGrid.EnumerateItems((item, widget) =>
+            {
+                var idx = item.Name.IndexOf("$");
+                if (idx >= 0 && (widget.Element.Is(":input")))
+                {
+                    var hint = valueByName[item.Name.Substr(idx + 1)];
+                    if (hint != null && hint.Length > 0)
+                        widget.Element
+                            .Attribute("title", hint)
+                            .Attribute("placeholder", hint);
+                }
+            });
 
-            var data = new TEntity().As<JsDictionary<string, object>>();
-            this.localizationGrid.Save(data);
+        }
+
+        private JsDictionary<string, object> GetLocalizationGridValue()
+        {
+            var value = new JsDictionary<string, object>();
+            localizationGrid.Save(value);
+            foreach (var k in value.Keys)
+                if (k.IndexOf('$') < 0)
+                    value.Remove(k);
+            return value;
+        }
+
+        private JsDictionary<string, TEntity> GetPendingLocalizations()
+        {
+            if (localizationPendingValue == null)
+                return null;
+
+            var result = new JsDictionary<string, TEntity>();
 
             string idField = GetEntityIdField();
-
-            var request = new UpdateLocalizationRequest<TEntity>
-            {
-                Entities = new JsDictionary<string, TEntity>()
-            };
 
             foreach (var pair in GetLanguages())
             {
@@ -246,18 +244,16 @@ namespace Serenity
 
                 var prefix = language + "$";
 
-                foreach (var k in data.Keys)
+                foreach (var k in localizationPendingValue.Keys)
                 {
                     if (k.StartsWith(prefix))
-                        entity[k.Substr(prefix.Length)] = data[k];
+                        entity[k.Substr(prefix.Length)] = localizationPendingValue[k];
                 }
 
-                request.Entities[language] = entity.As<TEntity>();
+                result[language] = entity.As<TEntity>();
             }
 
-            opt.Request = request;
-
-            Q.ServiceCall(opt);
+            return result;
         }
     }
 }

@@ -86,6 +86,8 @@ namespace Serenity
 
         protected virtual void BeforeLoadEntity(TEntity entity)
         {
+            localizationPendingValue = null;
+            localizationLastValue = null;
         }
 
         protected virtual void AfterLoadEntity()

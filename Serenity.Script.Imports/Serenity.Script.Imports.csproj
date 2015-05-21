@@ -52,6 +52,7 @@
     <Compile Include="Services\PostToUrlOptions.cs" />
     <Compile Include="Services\RequestResponse\RetrieveLocalizationResponse.cs" />
     <Compile Include="Services\RequestResponse\RetrieveLocalizationRequest.cs" />
+    <Compile Include="Services\RequestResponse\SaveWithLocalizationRequest.cs" />
     <Compile Include="Services\RequestResponse\UpdateLocalizationRequest.cs" />
     <Compile Include="Services\RequestResponse\SaveRequestWithAttachment.cs" />
     <Compile Include="Services\RequestResponse\SaveRequest.cs" />
