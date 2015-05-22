@@ -102,7 +102,8 @@ namespace Serenity
         public static void EnsurePermission(string permission)
         {
             if (!Authorization.HasPermission(permission))
-                FormsAuthentication.RedirectToLoginPage();
+                FormsAuthentication.RedirectToLoginPage(
+                    Authorization.IsLoggedIn ? "denied=1" :null);
         }
     }
 }
