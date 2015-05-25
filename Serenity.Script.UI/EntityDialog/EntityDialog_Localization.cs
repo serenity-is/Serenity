@@ -108,7 +108,7 @@ namespace Serenity
             }
         }
 
-        private bool IsLocalizationChanged
+        private bool IsLocalizationModeAndChanged
         {
             get
             {
@@ -126,16 +126,14 @@ namespace Serenity
             if (IsLocalizationMode && !ValidateForm())
                 return;
 
-            if (IsLocalizationChanged)
+            if (IsLocalizationModeAndChanged)
             {
                 var newValue = GetLocalizationGridValue();
                 localizationLastValue = newValue;
                 localizationPendingValue = newValue;
-                return;
             }
 
             localizationButton.ToggleClass("pressed");
-
             UpdateInterface();
 
             if (IsLocalizationMode)
@@ -150,7 +148,12 @@ namespace Serenity
         private void LoadLocalization()
         {
             if (localizationLastValue == null && IsNew)
-                localizationLastValue = new JsDictionary<string, object>();
+            {
+                localizationGrid.Load(new JsDictionary<string, object>());
+                SetLocalizationGridCurrentValues();
+                localizationLastValue = GetLocalizationGridValue();
+                return;
+            }
 
             if (localizationLastValue != null)
             {
