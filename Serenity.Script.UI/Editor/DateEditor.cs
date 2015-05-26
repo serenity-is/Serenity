@@ -91,6 +91,12 @@ namespace Serenity
             if (val.Length == 0 || ((dynamic)input[0]).selectionEnd != val.Length)
                 return;
 
+            if (val.Contains(Q.Culture.DateSeparator + Q.Culture.DateSeparator))
+            {
+                input.Value(val.Replace(Q.Culture.DateSeparator + Q.Culture.DateSeparator, Q.Culture.DateSeparator));
+                return;
+            }
+
             if (e.Which == 47 || e.Which == 111) // slash key
             {
                 if (val.Length >= 2 &&
