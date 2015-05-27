@@ -21,6 +21,7 @@ namespace Serenity
                 public static LocalText ApplyChangesButton = "Apply Changes";
                 public static LocalText DeleteButton = "Delete";
                 public static LocalText LocalizationButton = "Localization";
+                public static LocalText LocalizationBack = "Back to Form";
                 public static LocalText LocalizationConfirmation = "Save changes to translations?";
                 public static LocalText NewRecordTitle = "New {0}";
                 public static LocalText EditRecordTitle = "Edit {0}{1}";

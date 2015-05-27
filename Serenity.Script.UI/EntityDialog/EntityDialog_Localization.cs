@@ -98,7 +98,7 @@ namespace Serenity
             var self = this;
         }
 
-        private bool IsLocalizationMode
+        protected bool IsLocalizationMode
         {
             get 
             {

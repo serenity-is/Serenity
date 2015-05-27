@@ -169,25 +169,8 @@ namespace Serenity
             bool isDeleted = IsDeleted;
             bool isLocalizationMode = IsLocalizationMode;
 
-            if (deleteButton != null)
-                deleteButton.Toggle(!isLocalizationMode && IsEditMode && !isDeleted);
-
-            if (undeleteButton != null)
-                undeleteButton.Toggle(!isLocalizationMode && IsEditMode && isDeleted);
-
-            if (saveAndCloseButton != null)
-            {
-                saveAndCloseButton.Toggle(!isLocalizationMode && !isDeleted);
-
-                saveAndCloseButton.Find(".button-inner").Text(
-                    IsNew ? Texts.Controls.EntityDialog.SaveButton : Texts.Controls.EntityDialog.UpdateButton);
-            }
-
-            if (applyChangesButton != null)
-                applyChangesButton.Toggle(!isLocalizationMode && !isDeleted);
-
-            if (cloneButton != null)
-                cloneButton.Toggle(false);
+            if (tabs != null)
+                tabs.SetDisabled("Log", IsNewOrDeleted);
 
             if (propertyGrid != null)
                 propertyGrid.Element.Toggle(!isLocalizationMode);
@@ -196,10 +179,48 @@ namespace Serenity
                 localizationGrid.Element.Toggle(isLocalizationMode);
 
             if (localizationButton != null)
+            {
                 localizationButton.Toggle(localizationGrid != null);
 
-            if (tabs != null)
-                tabs.SetDisabled("Log", IsNewOrDeleted);
+                localizationButton.Find(".button-inner").Text(IsLocalizationMode ? 
+                    Texts.Controls.EntityDialog.LocalizationBack : 
+                    Texts.Controls.EntityDialog.LocalizationButton);
+            }
+
+            if (isLocalizationMode)
+            {
+                if (this.toolbar != null)
+                    this.toolbar.FindButton("tool-button").Not(".localization-hidden")
+                        .AddClass(".localization-hidden").Hide();
+
+                if (localizationButton != null)
+                    localizationButton.Show();
+
+                return;
+            }
+
+            this.toolbar.FindButton("localization-hidden")
+                .RemoveClass("localization-hidden").Show();
+
+            if (deleteButton != null)
+                deleteButton.Toggle(IsEditMode && !isDeleted);
+
+            if (undeleteButton != null)
+                undeleteButton.Toggle(IsEditMode && isDeleted);
+
+            if (saveAndCloseButton != null)
+            {
+                saveAndCloseButton.Toggle(!isDeleted);
+
+                saveAndCloseButton.Find(".button-inner").Text(
+                    IsNew ? Texts.Controls.EntityDialog.SaveButton : Texts.Controls.EntityDialog.UpdateButton);
+            }
+
+            if (applyChangesButton != null)
+                applyChangesButton.Toggle(!isDeleted);
+
+            if (cloneButton != null)
+                cloneButton.Toggle(false);
         }
     }
 }

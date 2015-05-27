@@ -6,6 +6,7 @@
     "Controls.EntityDialog.DeleteButton": "Sil",
     "Controls.EntityDialog.DeleteConfirmation": "Kaydı silmek istiyor musunuz?",
     "Controls.EntityDialog.EditRecordTitle": "{0} Düzenleme{1}",
+    "Controls.EntityDialog.LocalizationBack": "Forma Dön",
     "Controls.EntityDialog.LocalizationButton": "Çeviriler",
     "Controls.EntityDialog.LocalizationConfirmation": "Çevirilerde yaptığınız değişiklikler kaydedilsin mi?",
     "Controls.EntityDialog.NewRecordTitle": "Yeni {0}",
