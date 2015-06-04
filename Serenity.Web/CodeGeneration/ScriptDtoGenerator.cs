@@ -58,7 +58,7 @@ namespace Serenity.CodeGeneration
             return true;
         }
 
-        private string GetNamespace(Type type)
+        private static string GetNamespace(Type type)
         {
             var ns = type.Namespace;
             if (ns.EndsWith(".Entities"))
@@ -121,7 +121,7 @@ namespace Serenity.CodeGeneration
             {
                 Action<Type> outputType = delegate(Type type)
                 {
-                    var filename = ns.Key + "." + MakeFriendlyName(type) + ".cs";
+                    var filename = ns.Key + "." + type.Name + ".cs";
 
                     foreach (var rn in RootNamespaces)
                     {
@@ -232,12 +232,13 @@ namespace Serenity.CodeGeneration
             return result;
         }
 
-        private void HandleMemberType(Type memberType)
+        private void HandleMemberType(Type memberType, string codeNamespace, HashSet<string> usingNamespaces)
         {
-            HandleMemberType(sb, memberType, t => EnqueueType(t));
+            HandleMemberType(sb, memberType, codeNamespace, usingNamespaces, t => EnqueueType(t));
         }
 
-        public static void HandleMemberType(StringBuilder code, Type memberType, Action<Type> enqueueType = null)
+        public static void HandleMemberType(StringBuilder code, Type memberType, string codeNamespace, HashSet<string> usingNamespaces, 
+            Action<Type> enqueueType = null)
         {
             if (memberType == typeof(DateTime?) || memberType == typeof(DateTime))
             {
@@ -263,7 +264,7 @@ namespace Serenity.CodeGeneration
 
             if (nullableType != null)
             {
-                HandleMemberType(code, nullableType, enqueueType);
+                HandleMemberType(code, nullableType, codeNamespace, usingNamespaces, enqueueType);
                 code.Append("?");
                 return;
             }
@@ -290,7 +291,7 @@ namespace Serenity.CodeGeneration
             if (memberType.IsArray)
             {
                 code.Append("List<");
-                HandleMemberType(code, memberType.GetElementType(), enqueueType);
+                HandleMemberType(code, memberType.GetElementType(), codeNamespace, usingNamespaces, enqueueType);
                 code.Append(">");
                 return;
             }
@@ -299,7 +300,7 @@ namespace Serenity.CodeGeneration
                 (memberType.GetGenericTypeDefinition() == typeof(List<>) || memberType.GetGenericTypeDefinition() == typeof(HashSet<>)))
             {
                 code.Append("List<");
-                HandleMemberType(code, memberType.GenericTypeArguments[0], enqueueType);
+                HandleMemberType(code, memberType.GenericTypeArguments[0], codeNamespace, usingNamespaces, enqueueType);
                 code.Append(">");
                 return;
             }
@@ -308,9 +309,9 @@ namespace Serenity.CodeGeneration
                 memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 code.Append("JsDictionary<");
-                HandleMemberType(code, memberType.GenericTypeArguments[0], enqueueType);
+                HandleMemberType(code, memberType.GenericTypeArguments[0], codeNamespace, usingNamespaces, enqueueType);
                 code.Append(",");
-                HandleMemberType(code, memberType.GenericTypeArguments[1], enqueueType);
+                HandleMemberType(code, memberType.GenericTypeArguments[1], codeNamespace, usingNamespaces, enqueueType);
                 code.Append(">");
                 return;
             }
@@ -318,7 +319,7 @@ namespace Serenity.CodeGeneration
             if (enqueueType != null)
                 enqueueType(memberType);
 
-            code.Append(MakeFriendlyName(memberType));
+            code.Append(MakeFriendlyName(memberType, codeNamespace, usingNamespaces));
         }
 
         public static bool CanHandleType(Type memberType)
@@ -335,7 +336,7 @@ namespace Serenity.CodeGeneration
             return true;
         }
 
-        public static string MakeFriendlyName(Type type)
+        public static string MakeFriendlyName(Type type, string codeNamespace, HashSet<string> usingNamespaces)
         {
             if (type.IsGenericType)
             {
@@ -351,7 +352,7 @@ namespace Serenity.CodeGeneration
 
                 foreach (var argument in type.GetGenericArguments())
                 {
-                    var arg = MakeFriendlyName(argument);
+                    var arg = MakeFriendlyName(argument, codeNamespace, usingNamespaces);
                     sb.Append(arg);
                 }
 
@@ -360,7 +361,20 @@ namespace Serenity.CodeGeneration
                 return sb.ToString();
             }
 
-            return type.Name;
+            // compability with older code generators that doesn't take namespaces into account
+            if (usingNamespaces == null && codeNamespace == null)
+                return type.Name;
+
+            var ns = GetNamespace(type);
+
+            if (ns == "Serenity" ||
+                ns.StartsWith("Serenity.") ||
+                (usingNamespaces != null && usingNamespaces.Contains(ns)) ||
+                (codeNamespace != null && (ns == codeNamespace)) ||
+                (codeNamespace != null && codeNamespace.StartsWith((ns + "."))))
+                return type.Name;
+
+            return type.FullName;
         }
 
         private void GenerateEnum(Type enumType)
@@ -396,6 +410,7 @@ namespace Serenity.CodeGeneration
         private void GenerateRowMembers(Type rowType)
         {
             bool anyMetadata = false;
+            var codeNamespace = GetNamespace(rowType);
 
             Row row = (Row)rowType.GetInstance();
 
@@ -458,7 +473,7 @@ namespace Serenity.CodeGeneration
 
                 sb.AppendLine();
                 cw.Indented("public static Lookup<");
-                sb.Append(MakeFriendlyName(rowType));
+                sb.Append(MakeFriendlyName(rowType, null, null));
                 sb.Append("> Lookup { [InlineCode(\"Q.getLookup('");
                 sb.Append(attr.Key);
                 sb.AppendLine("')\")] get { return null; } }");
@@ -476,13 +491,13 @@ namespace Serenity.CodeGeneration
                 var enumField = field as IEnumTypeField;
                 if (enumField != null && enumField.EnumType != null)
                 {
-                    HandleMemberType(enumField.EnumType);
+                    HandleMemberType(enumField.EnumType, codeNamespace, UsingNamespaces);
                     sb.Append('?');
                 }
                 else
                 {
                     var dataType = field.ValueType;
-                    HandleMemberType(dataType);
+                    HandleMemberType(dataType, codeNamespace, UsingNamespaces);
                 }
 
                 sb.Append(" ");
@@ -550,13 +565,15 @@ namespace Serenity.CodeGeneration
 
             cw.IndentedLine("[Imported, Serializable, PreserveMemberCase]");
             cw.Indented("public partial class ");
-            sb.Append(MakeFriendlyName(type));
+            var codeNamespace = GetNamespace(type);
+
+            sb.Append(MakeFriendlyName(type, null, null));
 
             var parentClass = GetParentClass(type);
             if (parentClass != null)
             {
                 sb.Append(" : ");
-                sb.Append(MakeFriendlyName(parentClass));
+                sb.Append(MakeFriendlyName(parentClass, GetNamespace(type), UsingNamespaces));
             }
 
             sb.AppendLine();
@@ -597,7 +614,7 @@ namespace Serenity.CodeGeneration
 
                         cw.Indented("public ");
 
-                        HandleMemberType(memberType);
+                        HandleMemberType(memberType, codeNamespace, UsingNamespaces);
 
                         sb.Append(" ");
                         sb.Append(memberName);

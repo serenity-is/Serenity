@@ -138,11 +138,11 @@ namespace Serenity.CodeGeneration
                             sb.Append(method.Name);
 
                             sb.Append("(");
-                            ScriptDtoGenerator.HandleMemberType(sb, paramType, enqueueType: null);
+                            ScriptDtoGenerator.HandleMemberType(sb, paramType, null, null, enqueueType: null);
                             sb.Append(' ');
                             sb.Append(parameters.Length == 0 ? "request" : parameters[0].Name);
                             sb.Append(", Action<");
-                            ScriptDtoGenerator.HandleMemberType(sb, responseType, enqueueType: null);
+                            ScriptDtoGenerator.HandleMemberType(sb, responseType, null, null, enqueueType: null);
                             sb.Append("> onSuccess, ServiceCallOptions options = null");
                             sb.AppendLine(")");
 
