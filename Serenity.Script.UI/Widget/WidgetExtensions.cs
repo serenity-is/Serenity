@@ -44,6 +44,9 @@ namespace Serenity
             }
 
             var data = element.GetData();
+            if (data == null)
+                return null;
+
             foreach (string key in data.Keys)
             {
                 widget = data[key] as TWidget;
