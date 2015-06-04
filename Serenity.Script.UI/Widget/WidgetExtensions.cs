@@ -13,7 +13,8 @@ namespace Serenity
                 throw new ArgumentNullException("element");
 
             if (element.Length == 0)
-                throw new Exception(String.Format("Searching for widget of type '{0}' on a non-existent element!", typeof(TWidget).FullName));
+                throw new Exception(String.Format("Searching for widget of type '{0}' on a non-existent element! ({1})", 
+                    typeof(TWidget).FullName, element.Selector));
 
             var widget = TryGetWidget<TWidget>(element);
             if (widget == null)
