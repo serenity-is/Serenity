@@ -99,7 +99,11 @@ namespace Serenity
         public void LoadByIdAndOpenDialog(long entityId)
         {
             var self = this;
-            LoadById(entityId, response => Window.SetTimeout(() => { if (!isPanel) self.element.Dialog().Open(); }, 0));
+            LoadById(entityId, response => Window.SetTimeout(() => { if (!isPanel) self.element.Dialog().Open(); }, 0), () =>
+            {
+                if (!isPanel && !self.Element.Is(":visible"))
+                    self.Element.Remove();
+            });
         }
 
         protected virtual void OnLoadingData(RetrieveResponse<TEntity> data)
@@ -124,7 +128,7 @@ namespace Serenity
             LoadById(this.EntityId.Value, null);
         }
 
-        public void LoadById(long id, Action<RetrieveResponse<TEntity>> callback)
+        public void LoadById(long id, Action<RetrieveResponse<TEntity>> callback, Action fail = null)
         {
             var baseOptions = new ServiceCallOptions<RetrieveResponse<TEntity>>();
             baseOptions.Service = this.GetService() + "/Retrieve";
@@ -150,12 +154,14 @@ namespace Serenity
             var thisOptions = GetLoadByIdOptions(id, callback);
             var finalOptions = jQuery.ExtendObject(baseOptions, thisOptions);
 
-            LoadByIdHandler(finalOptions, callback);
+            LoadByIdHandler(finalOptions, callback, fail);
         }
 
-        protected void LoadByIdHandler(ServiceCallOptions<RetrieveResponse<TEntity>> options, Action<RetrieveResponse<TEntity>> callback)
+        protected void LoadByIdHandler(ServiceCallOptions<RetrieveResponse<TEntity>> options, Action<RetrieveResponse<TEntity>> callback, Action fail)
         {
-            Q.ServiceCall(options);
+            var request = Q.ServiceCall(options);
+            if (fail != null)
+                request.Fail(fail);
         }
     }
 }
