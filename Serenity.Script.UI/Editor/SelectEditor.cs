@@ -24,7 +24,10 @@ namespace Serenity
 
         protected override string EmptyItemText()
         {
-            return options.EmptyOptionText;
+            if (!string.IsNullOrEmpty(options.EmptyOptionText))
+                return options.EmptyOptionText;
+
+            return base.EmptyItemText();
         }
 
         protected virtual void UpdateItems()
@@ -52,7 +55,6 @@ namespace Serenity
     {
         public SelectEditorOptions()
         {
-            EmptyOptionText = "--seçiniz--";
             Items = new List<object>();
         }
 
