@@ -396,14 +396,27 @@ function EventHelper() {
                 success: function (response) {
                     loading = false;
                     if (response.Error)
-                        Q.notifyError(response.Error.Message || response.Error.Code, 'error');
+                        Q.notifyError(response.Error.Message || response.Error.Code);
                     else
                         addData(response);
                     onDataLoaded.notify(this);
                 },
-                error: function (info) {
+                error: function (xhr, status, ev) {
                     loading = false;
-                    errorMessage = info.errormsg;
+
+                    if ((xhr.getResponseHeader("content-type") || '').toLowerCase().indexOf("application/json") >= 0)
+                    {
+                        var json = $.parseJSON(xhr.responseText);
+                        if (json != null && json.Error != null)
+                        {
+                            Q.notifyError(json.Error.Message || json.Error.Code);
+                            onPagingInfoChanged.notify(getPagingInfo());
+                            onDataLoaded.notify(this);
+                            return;
+                        }
+                    }
+
+                    errorMessage = xhr.errormsg;
                     onPagingInfoChanged.notify(getPagingInfo());
                     onDataLoaded.notify(this);
                 },
