@@ -43,7 +43,7 @@ namespace Serenity
 
         private static ToastrOptions GetToastrOptions()
         {
-            var dialog = J(Window.Document.Body).Children(".ui-dialog").Last();
+            var dialog = J(Window.Document.Body).Children(".ui-dialog:visible").Last();
             var toastrDiv = J("#toast-container");
 
             var options = new ToastrOptions
