@@ -66,11 +66,6 @@ namespace Serenity
 
             return years;
         }
-
-        protected override string EmptyItemText()
-        {
-            return options.EmptyOptionText;
-        }
     }
 
     [Serializable, Reflectable]
