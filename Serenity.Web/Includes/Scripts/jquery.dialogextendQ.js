@@ -70,29 +70,7 @@
         "margin-top": "-10px",
         "height": "18px"
       });
-      titlebar.find(".ui-dialog-titlebar-close").hide();
-      //titlebar.find(".ui-dialog-titlebar-close").css({
-      //  "position": "relative",
-      //  "float": "right",
-      //  "top": "auto",
-      //  "right": "auto",
-      //  "margin": 0
-        //}).find(".ui-icon").removeClass("ui-icon-closethick").addClass(this.options.icons.close).end().appendTo(buttonPane).end();
-        buttonPane.append('<a class="ui-dialog-titlebar-closex ui-corner-all ui-state-default" href="#"><span class="ui-icon ' +
-            this.options.icons.close + '">Pencereyi Kapat</span></a>').find('.ui-dialog-titlebar-closex').attr("role", "button").attr('title', 'Pencereyi Kapat')
-      .click(function (e) {
-          e.preventDefault();
-          return _this.element.dialog('close');
-      })
-      .mouseover(function () {
-          return $(this).addClass("ui-state-hover");
-      }).mouseout(function () {
-          return $(this).removeClass("ui-state-hover");
-      }).focus(function () {
-          return $(this).addClass("ui-state-focus");
-      }).blur(function () {
-          return $(this).removeClass("ui-state-focus");
-      })
+      titlebar.addClass("has-maximize-restore");
 
         buttonPane.append('<a class="ui-dialog-titlebar-restore ui-corner-all ui-state-default" href="#"><span class="ui-icon ' + this.options.icons.restore + '">Önceki Boyutuna Dön</span></a>')
             .find('.ui-dialog-titlebar-restore').attr("role", "button").attr('title', 'Önceki Boyutuna Dön').mouseover(function () {
