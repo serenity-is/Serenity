@@ -68,6 +68,14 @@ namespace Serenity
                 this.field = options.Fields[0];
                 UpdateInputPlaceHolder();
             }
+
+            this.element.Bind("execute-search." + this.uniqueName, e =>
+            {
+                if (Q.IsTrue(this.timer))
+                    Window.ClearTimeout(this.timer);
+
+                SearchNow(Q.Trim(this.element.GetValue() ?? ""));
+            });
         }
 
         private void UpdateInputPlaceHolder()
@@ -104,14 +112,18 @@ namespace Serenity
             var self = this;
             this.timer = Window.SetTimeout(delegate
             {
-                if (self.options.OnSearch != null)
-                    self.options.OnSearch(field != null && !field.Name.IsEmptyOrNull() ? field.Name : null, value);
-
-                self.element.RemoveClass(self.options.LoadingParentClass ?? "");
-
+                self.SearchNow(value);
             }, this.options.TypeDelay);
 
             this.lastValue = value;
+        }
+
+        private void SearchNow(string value)
+        {
+            if (this.options.OnSearch != null)
+                this.options.OnSearch(field != null && !field.Name.IsEmptyOrNull() ? field.Name : null, value);
+
+            this.element.RemoveClass(this.options.LoadingParentClass ?? "");
         }
     }
 
