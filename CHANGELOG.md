@@ -1,3 +1,46 @@
+## 1.5.0 (2015-06-21)
+
+Features:
+  - better filter handling detection for textual fields that are connected to an ID field
+  - sort filter fields by localized title
+  - provide column formatters ability to initialize themselves and related column if required, and set referenced columns
+  - added TreeOrdering helper
+  - use closest anchor for edit link if target doesn't have the class (fixes problem when a anchor has inner elements)
+  - use ServiceEndpoint base url from route attributes if GetServiceUrl is not specified for ScriptEndpointGenerator
+  - add members to IDataGrid interface to access grid, view, element and filter store objects
+  - put database schema name in brackets for generated code
+  - date input automatic formatting for DMY cultures.
+  - date editor two digit year parsing
+  - debug text for SqlUpdate, SqlInsert, and SqlDelete like SqlSelect already had.
+  - single / multiple field unique validation on save handler level with UniqueConstraint and Unique attributes.
+  - date time editor minvalue and maxvalue is set by default according to SQL server rules
+  - add url option for PostToServiceOptions
+  - better handling for non-row fields in GetFromReader. their values can be read from DictionaryData.
+  - StringHelper.Join method to put separator between two strings if only both is non empty or null.
+  - DateTimeKind attribute to set date type on datetime fields.
+  - Checkbox readonly background in forms
+  - q.deepclone / q.deepextend methods that doesn't merge arrays (unlike jquery extend)
+  - get required attribute from row first if available
+  - allow non-integer CultureId fields for localization rows
+  - introduce IIsActiveDeletedRow. IIsActiveRow doesn't have deleted state (-1) now
+  - IDeleteLogRow for row types that store deleting user id and date.
+  - refresh button no text (hint only) option
+  - generate form key in form scripts
+  - add css class with full type name to widgets too (solves problem when two modules has same widget type)
+  - allow editing multiple localization in one screen
+  - allow editing localizations before inserting row
+  - redirect to login page with denied flag, so login page can know difference between unauthenticated and permission denied requests
+  - show last jQuery selector in error console log if can't find widget on element in GetWidget
+  - dispose dialog if LoadByIdAndOpenDialog fails
+  - use jquery ui dialogs own close button, as dialogExtend one was causing problems in tests and mobile.
+  - execute-search trigger for quick search input (to avoid delays in tests)
+  
+Bugfixes:
+  - code generator preserves source table field order as it was before
+  - select editor empty option text fix
+  - make sure toastr is shown only on visible dialogs
+  - fix error handling for grid data source
+
 ## 1.4.14 (2015-04-14)
 
 Features:
