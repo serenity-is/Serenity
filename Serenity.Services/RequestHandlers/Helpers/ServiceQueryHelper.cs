@@ -26,7 +26,11 @@ namespace Serenity.Services
                     {
                         var field = ((Row)ext.FirstIntoRow).FindFieldByPropertyName(sort);
                         if (!ReferenceEquals(null, field))
+                        {
                             expr = ((IGetExpressionByName)query).GetExpression(field.Name);
+                            if (expr == null)
+                                expr = field.Expression;
+                        }
                     }
                 }
 
