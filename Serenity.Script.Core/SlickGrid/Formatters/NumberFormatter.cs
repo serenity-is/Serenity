@@ -18,12 +18,16 @@ namespace Serenity
         {
             format = format ?? "";
 
-            if (!Script.IsValue(value) ||
-                Double.IsNaN(value.As<double>()))
+            if (!Script.IsValue(value))
                 return "";
 
             if (Script.TypeOf(value) == "number")
+            {
+                if (Double.IsNaN(value.As<double>()))
+                    return "";
+
                 return Q.HtmlEncode(Q.FormatNumber(value.As<double>(), format));
+            }
 
             var dbl = Q.ParseDecimal(value.ToString());
             if (dbl == null)
