@@ -40,6 +40,7 @@ namespace Serenity
         {
             ToCriteriaOperator = new JsDictionary<string, string>();
             ToCriteriaOperator[FilterOperators.EQ] = "=";
+            ToCriteriaOperator[FilterOperators.NE] = "!=";
             ToCriteriaOperator[FilterOperators.GT] = ">";
             ToCriteriaOperator[FilterOperators.GE] = ">=";
             ToCriteriaOperator[FilterOperators.LT] = "<";
