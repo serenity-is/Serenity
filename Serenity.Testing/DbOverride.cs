@@ -11,6 +11,7 @@ namespace Serenity.Testing
         private static class Cached<TDbScript>
         {
             public static string Script;
+            public static string ScriptHash;
         }
 
         public DbOverride(string connectionKey, string dbAlias, string script)
@@ -19,6 +20,14 @@ namespace Serenity.Testing
             this.DbAlias = dbAlias;
             this.Script = script;
             this.ScriptHash = DbManager.GetHash(script ?? "");
+        }
+
+        private DbOverride(string connectionKey, string dbAlias, string script, string scriptHash)
+        {
+            this.ConnectionKey = connectionKey;
+            this.DbAlias = dbAlias;
+            this.Script = script;
+            this.ScriptHash = scriptHash;
         }
 
         public static DbOverride New<TDbScript>(string connectionKey = null, string dbAlias = null, bool cacheScript = true)
@@ -46,13 +55,22 @@ namespace Serenity.Testing
                 }
             }
 
-            string script;
             if (cacheScript)
-                script = Cached<TDbScript>.Script = Cached<TDbScript>.Script ?? new TDbScript().ToString();
-            else
-                script = new TDbScript().ToString();
+            {
+                if (Cached<TDbScript>.Script == null)
+                {
+                    var script = new TDbScript().ToString();
+                    Cached<TDbScript>.Script = script ?? "";
+                    Cached<TDbScript>.ScriptHash = DbManager.GetHash(script ?? "");
+                }
 
-            return new DbOverride(connectionKey, dbAlias, script);
+                return new DbOverride(connectionKey, dbAlias, Cached<TDbScript>.Script, Cached<TDbScript>.ScriptHash);
+            }
+            else
+            {
+                var script = new TDbScript().ToString();
+                return new DbOverride(connectionKey, dbAlias, script);
+            }
         }
 
         public string DbAlias { get; private set; }
