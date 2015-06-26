@@ -85,7 +85,7 @@ namespace Serenity.Testing
 
                 attachedHashes.Remove(over.DbAlias);
                 DbManager.DetachDb(over.DbAlias);
-                var mdfFilePath = DbManager.CreateDatabaseFilesForScript(over.Script);
+                var mdfFilePath = DbManager.CreateDatabaseFilesForScript(over.Script, over.ScriptHash);
                 try
                 {
                     DbManager.AttachDb(over.DbAlias, mdfFilePath);

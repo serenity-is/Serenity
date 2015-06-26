@@ -180,7 +180,11 @@ namespace Serenity.Testing
         public static string CreateDatabaseFilesForScript(string script)
         {
             var hash = GetHash(script);
+            return CreateDatabaseFilesForScript(script, hash);
+        }
 
+        internal static string CreateDatabaseFilesForScript(string script, string hash)
+        {
             var cachedPath = Path.Combine(DbSettings.Current.RootPath,
                 "cache_" + hash + ".mdf");
 
