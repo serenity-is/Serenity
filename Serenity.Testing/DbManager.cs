@@ -29,6 +29,13 @@ namespace Serenity.Testing
             File.Copy(sourcePath, targetPath);
             File.Copy(Path.ChangeExtension(sourcePath, ".ldf"), Path.ChangeExtension(targetPath, ".ldf"));
         }
+
+        private static void WriteDb(string targetPath, byte[] mdf, byte[] ldf)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+            File.WriteAllBytes(targetPath, mdf);
+            File.WriteAllBytes(Path.ChangeExtension(targetPath, ".ldf"), ldf);
+        }
         
         public static void DeleteDb(string path)
         {
@@ -183,10 +190,31 @@ namespace Serenity.Testing
             return CreateDatabaseFilesForScript(script, hash);
         }
 
+        private static object fileCacheLock = new object();
+        private static Dictionary<string, Tuple<byte[], byte[]>> fileCache = new Dictionary<string, Tuple<byte[], byte[]>>();
+
         internal static string CreateDatabaseFilesForScript(string script, string hash)
         {
             var cachedPath = Path.Combine(DbSettings.Current.RootPath,
                 "cache_" + hash + ".mdf");
+
+            Tuple<byte[], byte[]> data;
+            lock (fileCacheLock)
+            {
+                if (!fileCache.TryGetValue(cachedPath, out data))
+                    data = null;
+            }
+
+            Func<string> writeDb = delegate() {
+                var rnd = TemporaryFileHelper.RandomFileCode();
+                var instancePath = Path.Combine(DbSettings.Current.RootPath,
+                    "test_" + rnd + ".mdf");
+                WriteDb(instancePath, data.Item1, data.Item2);
+                return instancePath;
+            };
+
+            if (data != null)
+                return writeDb();
 
             if (!File.Exists(cachedPath))
             {
@@ -205,13 +233,13 @@ namespace Serenity.Testing
             if (!File.Exists(cachedPath))
                 throw new InvalidOperationException("Test için cache veritabanı oluşturulamadı!");
 
-            var rnd = TemporaryFileHelper.RandomFileCode();
-            var instancePath = Path.Combine(DbSettings.Current.RootPath,
-                "test_" + rnd + ".mdf");
+            data = new Tuple<byte[], byte[]>(
+                File.ReadAllBytes(cachedPath), File.ReadAllBytes(Path.ChangeExtension(cachedPath, ".ldf")));
 
-            CopyDb(cachedPath, instancePath);
+            lock (fileCacheLock)
+                fileCache[cachedPath] = data;
 
-            return instancePath;
+            return writeDb();
         }
     }
 }
