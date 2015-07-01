@@ -16,7 +16,7 @@ namespace Serenity
 
         public static string Format(object value, string format)
         {
-            format = format ?? "";
+            format = format ?? "#,##0.##";
 
             if (!Script.IsValue(value))
                 return "";
