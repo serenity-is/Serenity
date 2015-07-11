@@ -8,10 +8,11 @@
 
     public class NavigationHelper
     {
-        public static List<NavigationItem> GetNavigationItems(Func<string, string> resolveUrl = null)
+        public static List<NavigationItem> GetNavigationItems(Func<string, string> resolveUrl = null,
+            Func<NavigationItemAttribute, bool> filter = null)
         {
             var result = new List<NavigationItem>();
-            var menuItems = GetNavigationItemAttributes();
+            var menuItems = GetNavigationItemAttributes(filter);
             var remaining = new HashSet<string>();
             foreach (var item in menuItems)
                 remaining.Add(item.Key);
@@ -70,7 +71,8 @@
             return result;
         }
 
-        private static ILookup<string, NavigationItemAttribute> GetNavigationItemAttributes()
+        private static ILookup<string, NavigationItemAttribute> GetNavigationItemAttributes(
+            Func<NavigationItemAttribute, bool> filter)
         {
             return LocalCache.Get("NavigationHelper:NavigationItems", TimeSpan.Zero, () =>
             {
@@ -80,7 +82,8 @@
                 {
                     foreach (NavigationItemAttribute attr in assembly.GetCustomAttributes(typeof(NavigationItemAttribute), false))
                     {
-                        list.Add(attr);
+                        if (filter == null || filter(attr))
+                            list.Add(attr);
                     }
                 }
 
