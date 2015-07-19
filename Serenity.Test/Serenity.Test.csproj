@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(SolutionDir)packages\xunit.runner.visualstudio.2.0.0\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\..\packages\xunit.runner.visualstudio.2.0.0\build\net20\xunit.runner.visualstudio.props')" />
   <PropertyGroup>
@@ -378,8 +378,8 @@
     <Content Include="Scripts\Select2-locales\select2_locale_lv.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_mk.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ms.js" />
-    <Content Include="Scripts\Select2-locales\select2_locale_nb.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_nl.js" />
+    <Content Include="Scripts\Select2-locales\select2_locale_no.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_pl.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_pt-BR.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_pt-PT.js" />
