@@ -53,5 +53,13 @@ namespace Serenity
             return Format(typeof(TEnum), value.Value);
         }
 
+        public static string GetName<TEnum>(TEnum? value)
+            where TEnum : struct
+        {
+            if (!Script.IsValue(value))
+                return "";
+
+            return Enum.ToString(typeof(TEnum), value.Value.As<Enum>());
+        }
     }
 }
