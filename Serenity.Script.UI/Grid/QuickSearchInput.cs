@@ -132,7 +132,7 @@ namespace Serenity
     {
         public QuickSearchInputOptions()
         {
-            TypeDelay = 250;
+            TypeDelay = 500;
             LoadingParentClass = "s-QuickSearchLoading";
             FilteredParentClass = "s-QuickSearchFiltered";
         }

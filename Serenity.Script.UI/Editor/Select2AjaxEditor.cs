@@ -47,6 +47,7 @@ namespace Serenity
         {
             var options = new ServiceCallOptions<ListResponse<TItem>>
             {
+                BlockUI = false,
                 Service = GetService() + "/List",
                 Request = request,
                 OnSuccess = response =>
@@ -67,6 +68,7 @@ namespace Serenity
         {
             var options = new ServiceCallOptions<RetrieveResponse<TItem>>
             {
+                BlockUI = false,
                 Service = GetService() + "/Retrieve",
                 Request = new RetrieveRequest
                 {
@@ -91,7 +93,7 @@ namespace Serenity
 
         protected virtual int GetTypeDelay()
         {
-            return 250;
+            return 500;
         }
 
         protected virtual Select2Options GetSelect2Options()
