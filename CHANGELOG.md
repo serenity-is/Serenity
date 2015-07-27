@@ -1,3 +1,22 @@
+## 1.5.1 (2015-07-27)
+
+Features:
+  - allow ordering by row fields even if field is not used in query of ListRequestHandler.
+  - cache db script hash in dboverrides for even more performance in database tests
+  - faster database copying in database tests
+  - number formatter default format is "0.##."
+  - form generator handles different namespaces better than before
+  - allow filtering of navigation items in NavigationHelper
+  - downgrade select2 3.5.2 to 3.5.1 as 3.5.2 had problems with jQuery validate plugin
+  - quicksearchinput type delay default is now 500 ms (instead of 250 ms)
+  - no ui blocking for select2ajaxeditor
+  - make sure MultipleImageUploadEditor works properly
+  
+
+Bugfixes:
+  - number formatter shows empty string for non-numeric values.
+  - filter panel's not equal operator wasn't encoded properly
+
 ## 1.5.0 (2015-06-21)
 
 Features:
