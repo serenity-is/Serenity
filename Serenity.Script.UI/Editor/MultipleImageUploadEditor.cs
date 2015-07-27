@@ -87,6 +87,17 @@ namespace Serenity
         protected virtual void Populate()
         {
             UploadHelper.PopulateFileSymbols(fileSymbols, entities, true, options.UrlPrefix);
+            fileSymbols.Children().Each((i, e) =>
+            {
+                var x = i;
+                J("<a class='delete'></a>").AppendTo(J(e).Children(".filename"))
+                    .Click(ev =>
+                {
+                    ev.PreventDefault();
+                    this.entities.RemoveAt(x);
+                    Populate();
+                });
+            });
         }
 
         protected virtual void UpdateInterface()
@@ -140,13 +151,24 @@ namespace Serenity
 
         void ISetEditValue.SetEditValue(dynamic source, PropertyItem property)
         {
-            if (JsonEncodeValue)
+            var val = source[property.Name];
+            if (val is string)
             {
                 var json = (source[property.Name] as string).TrimToNull() ?? "[]";
-                this.Value = jQuery.ParseJson(json).As<List<UploadedFile>>();
+                if (json.StartsWith("[") && json.EndsWith("]"))
+                    this.Value = jQuery.ParseJson(json).As<List<UploadedFile>>();
+                else
+                    this.Value = new List<UploadedFile>
+                    {
+                        new UploadedFile 
+                        {
+                            Filename = json,
+                            OriginalName = "UnknownFile"
+                        }
+                    };
             }
             else
-                this.Value = source[property.Name];
+                this.Value = (List<UploadedFile>)val;
         }
 
         [Option]

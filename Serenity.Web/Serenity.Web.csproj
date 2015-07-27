@@ -159,6 +159,7 @@
     <Compile Include="Texts\Texts.cs" />
     <Compile Include="Texts\Texts.Dialogs.cs" />
     <Compile Include="Texts\Texts.Validation.cs" />
+    <Compile Include="Upload\EmbeddedMultiFileUploadBehaviourAttribute.cs" />
     <Compile Include="Upload\EmbeddedFileUploadBehaviourAttribute.cs" />
     <Compile Include="Upload\ImageUploadEditorAttribute.cs" />
     <Compile Include="Upload\FileUploadEditorAttribute.cs" />

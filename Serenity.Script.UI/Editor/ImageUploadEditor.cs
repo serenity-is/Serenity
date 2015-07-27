@@ -170,7 +170,7 @@ namespace Serenity
         }
     }
 
-    [Imported, Serializable]
+    [Imported, Serializable, PreserveMemberCase]
     public class UploadedFile
     {
         public string Filename { get; set; }

@@ -26,7 +26,7 @@
 .file-item {
     border: 1px solid #ccc;
     padding: 1px;
-    width: 128px;
+    width: 132px;
 
     .deleted {
         text-decoration: overline;
@@ -70,7 +70,7 @@
         border-width: 1px;
         border-style: none solid solid solid;
         border-color: #ccc;
-        padding: 3px;
+        padding: 6px 6px 8px 6px;
         overflow-y: auto;
         background-color: #fff;
         min-height: 116px;
@@ -87,6 +87,23 @@
 
 .s-MultipleImageUploadEditor li {
     float: left;
+    margin-right: 6px;
+
+    .delete {
+        display: block;
+        position: relative;
+        top: -16px;
+        right: 0px;
+        width: 16px;
+        height: 16px;
+        background: url(images/cross-script.png) no-repeat center center;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+
+    .delete:hover {
+        opacity: 1;
+    }
 }
 
 .s-ImageUploadEditor.hide-original-name ul {
