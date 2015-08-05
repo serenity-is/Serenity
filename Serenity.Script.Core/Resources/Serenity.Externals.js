@@ -780,7 +780,7 @@ Q$Externals.jQueryValidationInitialization = function () {
         }
 
         $(this.currentForm)
-            .validateDelegate(":text, :password, :file, select, textarea", "focusin", delegate);
+            .on(":text, :password, :file, select, textarea", "focusin.validate", delegate);
     }
 
     $.validator.prototype.oldfocusInvalid = $.validator.prototype.focusInvalid;
@@ -788,13 +788,6 @@ Q$Externals.jQueryValidationInitialization = function () {
         if (this.settings.abortHandler)
             this.settings.abortHandler(this);
         this.oldfocusInvalid.call(this);
-
-        if ($.fn.qtip) {
-            var lbl = $('label.error', this.currentForm).not('.checked').eq(0);
-            if (lbl.length) {
-                lbl.qtip('show');
-            }
-        }
     }
 
     $.validator.prototype.oldstopRequest = $.validator.prototype.focusInvalid;
@@ -837,66 +830,8 @@ Q$Externals.validatorAbortHandler = function (validator) {
     }
 }
 
-Q$Externals.validateAddTip = function(error) {
-    if ($.fn.qtip) {    
-        error.qtip({
-            style: {
-                classes: 'ui-tooltip-red',
-                widget: false
-            }
-        });
-    }
-}
-    
-Q$Externals.validateDelTip = function(error) {
-    if ($.fn.qtip && error.data('qtip')) {
-        error.qtip('destroy').attr('title', '');
-    }
-}
-
-Q$Externals.validateShowLabel = function(element, message) {
-    var label = this.errorsFor( element );
-    if ( label.length ) {
-        // refresh error/success class
-        label.removeClass().addClass( this.settings.errorClass );
-        
-        // check if we have a generated label, replace the message then
-        if (label.attr("generated"))
-            label.attr('title', message);
-                
-        Q$Externals.validateAddTip(label);
-    } else {
-        // create label
-        label = $("<" + this.settings.errorElement + "/>")
-            .attr({"for":  this.idOrName(element), generated: true})
-            .addClass(this.settings.errorClass)
-            .attr('title', message || '');
-                
-        if ( this.settings.wrapper ) {
-            // make sure the element is visible, even in IE
-            // actually showing the wrapped element is handled elsewhere
-            label = label.hide().show().wrap("<" + this.settings.wrapper + "/>").parent();
-        }
-        if ( !this.labelContainer.append(label).length )
-            this.settings.errorPlacement
-                ? this.settings.errorPlacement(label, $(element) )
-                : label.insertAfter(element);
-                    
-        Q$Externals.validateAddTip(label);
-    }
-    if ( !message && this.settings.success ) {
-        typeof this.settings.success == "string"
-            ? label.addClass( this.settings.success )
-            : this.settings.success( label );
-        label.attr('title', '');                    
-                    
-    }
-    this.toShow = this.toShow.add(label);
-}, 
 
 Q$Externals.validateOptions = function(options) {
-    $.validator.prototype.showLabel = Q$Externals.validateShowLabel;
-                
     return $.extend({
         ignore: ":hidden",
         meta: 'v',
@@ -933,7 +868,6 @@ Q$Externals.validateOptions = function(options) {
         },          
         success: function(label) {
             label.addClass('checked');
-            Q$Externals.validateDelTip(label);             
         }
     }, options);
 } 

@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Serenity.Test.Logging
 {
+    [Collection("AvoidParallel")]
     public partial class SqlLoggerTests
     {
         private DbTestContext NewDbTestContext()

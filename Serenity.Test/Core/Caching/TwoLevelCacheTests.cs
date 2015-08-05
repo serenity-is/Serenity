@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+    [Collection("AvoidParallel")]
     public partial class TwoLevelCacheTests
     {
         [Fact]

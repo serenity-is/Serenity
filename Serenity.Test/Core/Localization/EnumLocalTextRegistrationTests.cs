@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+    [Collection("AvoidParallel")]
     public class EnumLocalTextRegistrationTests
     {
         [EnumKey("My.CoolEnumKey")]

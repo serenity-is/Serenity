@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+    [Collection("AvoidParallel")]
     public partial class ConfigTests
     {
         private class ApplicationSettings
@@ -39,7 +40,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Server", A.Fake<IConfigurationRepository>());
 
-                Assert.DoesNotThrow(() => Config.Get(typeof(ServerSettings)));
+                Config.Get(typeof(ServerSettings));
 
                 var exception = Assert.Throws<KeyNotFoundException>(() => Config.Get(typeof(ApplicationSettings)));
                 Assert.Contains(typeof(IConfigurationRepository).Name, exception.Message);
@@ -58,7 +59,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Server", repository);
 
-                Assert.DoesNotThrow(() => Config.Get(typeof(ServerSettings)));
+                Config.Get(typeof(ServerSettings));
 
                 A.CallTo(() => repository.Load(typeof(ServerSettings)))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -80,7 +81,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Application", repository);
 
-                Assert.DoesNotThrow(() => Config.Get(typeof(ApplicationSettings)));
+                Config.Get(typeof(ApplicationSettings));
 
                 A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -112,7 +113,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Server", repository);
 
-                Assert.DoesNotThrow(() => Config.Get<ServerSettings>());
+                Config.Get<ServerSettings>();
 
                 var exception = Assert.Throws<KeyNotFoundException>(() => Config.Get<ApplicationSettings>());
                 Assert.Contains(typeof(IConfigurationRepository).Name, exception.Message);
@@ -131,7 +132,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Server", repository);
 
-                Assert.DoesNotThrow(() => Config.Get<ServerSettings>());
+                Config.Get<ServerSettings>();
 
                 A.CallTo(() => repository.Load(typeof(ServerSettings)))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -153,7 +154,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Application", repository);
 
-                Assert.DoesNotThrow(() => Config.Get<ApplicationSettings>());
+                Config.Get<ApplicationSettings>();
 
                 A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -197,7 +198,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Server", repository);
 
-                Assert.DoesNotThrow(() => Config.TryGet(typeof(ServerSettings)));
+                Config.TryGet(typeof(ServerSettings));
 
                 A.CallTo(() => repository.Load(typeof(ServerSettings)))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -219,7 +220,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Application", repository);
 
-                Assert.DoesNotThrow(() => Config.TryGet(typeof(ApplicationSettings)));
+                Config.TryGet(typeof(ApplicationSettings));
 
                 A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -268,7 +269,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Server", repository);
 
-                Assert.DoesNotThrow(() => Config.Get(typeof(ServerSettings)));
+                Config.Get(typeof(ServerSettings));
 
                 A.CallTo(() => repository.Load(typeof(ServerSettings)))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -290,7 +291,7 @@ namespace Serenity.Test
                 Dependency.Resolve<IDependencyRegistrar>()
                     .RegisterInstance<IConfigurationRepository>("Application", repository);
 
-                Assert.DoesNotThrow(() => Config.Get<ApplicationSettings>());
+                Config.Get<ApplicationSettings>();
 
                 A.CallTo(() => repository.Load(typeof(ApplicationSettings)))
                     .MustHaveHappened(Repeated.Exactly.Once);

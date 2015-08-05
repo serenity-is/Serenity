@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Serenity.Data.Test
 {
+    [Collection("AvoidParallel")]
     public partial class SqlConnectionExtensionsTests
     {
         private DisplayOrderRow.RowFields fld = DisplayOrderRow.Fields;

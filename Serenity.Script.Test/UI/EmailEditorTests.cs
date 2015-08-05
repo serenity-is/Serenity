@@ -107,7 +107,7 @@ namespace Serenity.Test
                         Assert.IsTrue(jq.validator.methods.emailuser.call(validator, "some.user", user.Value("some.user")[0]), title + "2");
 
                         domain.Value("");
-                        Assert.IsTrue(jq.validator.methods.emailuser.call(validator, " ", user.Value(" ")[0]), title + "3");
+                        Assert.IsFalse(jq.validator.methods.emailuser.call(validator, " ", user.Value(" ")[0]), title + "3");
 
                         domain.Value(onlyAscii ? "ascii.domain.co.uk" : "unıcõde.domaîn.co.uk");
 

@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+    [Collection("AvoidParallel")]
     public class DependencyTests
     {
         [Fact]

@@ -8,6 +8,7 @@ using System.Linq;
 
 namespace Serenity.Test.Data
 {
+    [Collection("AvoidParallel")]
     public partial class DisplayOrderTests
     {
         private DisplayOrderRow.RowFields fld = DisplayOrderRow.Fields;

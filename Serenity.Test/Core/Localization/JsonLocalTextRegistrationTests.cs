@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+    [Collection("AvoidParallel")]
     public class JsonLocalTextRegistrationTests
     {
         [Fact]
@@ -204,7 +205,7 @@ namespace Serenity.Test
         [Fact]
         public void JsonLocalTextRegistration_AddFromFilesInFolder_Ignores_IfDirectoryDoesntExist()
         {
-            Assert.DoesNotThrow(() => JsonLocalTextRegistration.AddFromFilesInFolder(@"c:\s_o_m_e_f_o_l_d_e_r"));
+            JsonLocalTextRegistration.AddFromFilesInFolder(@"c:\s_o_m_e_f_o_l_d_e_r");
         }
 
         private string CreateTempFolder()

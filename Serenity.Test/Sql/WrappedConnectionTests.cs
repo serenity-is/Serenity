@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Serenity.Data.Test
 {
+    [Collection("AvoidParallel")]
     public partial class WrappedConnectionTests
     {
         private DisplayOrderRow.RowFields fld = DisplayOrderRow.Fields;

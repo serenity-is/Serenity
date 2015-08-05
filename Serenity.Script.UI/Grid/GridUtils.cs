@@ -109,6 +109,17 @@ namespace Serenity
             });
         }
 
+        public static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string> onSearch,
+            List<QuickSearchField> fields = null)
+        {
+            AddQuickSearchInputCustom(container, (x, y, z) => 
+            {
+                onSearch(x, y);
+                z(true);
+            });
+        }
+
+
         public static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string, Action<bool>> onSearch,
             List<QuickSearchField> fields = null)
         {

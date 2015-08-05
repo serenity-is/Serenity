@@ -173,7 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
-      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.6.2\tools\Assemblies\mscorlib.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\Saltarelle.Runtime.2.7.0\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="Saltarelle.jQuery, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a4048e8fcc593f14, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -201,7 +201,8 @@
       <Name>Serenity.Script.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(ProjectDir)..\tools\Saltarelle\Saltarelle.Compiler.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\Saltarelle.Compiler.targets')" />
   <Target Name="CopyAndMinimize" AfterTargets="BuildScript">
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.UI.js -o $(OutDir)Serenity.Script.UI.min.js --comments --mangle">
     </Exec>

@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+    [Collection("AvoidParallel")]
     public class LocalTextTests
     {
         [Fact]
@@ -33,8 +34,8 @@ namespace Serenity.Test
         [Fact]
         public void LocalText_Constructor_AcceptsNullAndEmptyString()
         {
-            Assert.DoesNotThrow(() => new LocalText(null));
-            Assert.DoesNotThrow(() => new LocalText(String.Empty));
+            new LocalText(null);
+            new LocalText(String.Empty);
         }
 
         [Fact]
@@ -100,9 +101,7 @@ namespace Serenity.Test
         {
             using (new MunqContext())
             {
-                Assert.DoesNotThrow(() => {
-                    string actual = new LocalText("Dummy");
-                });
+                new LocalText("Dummy");
             }
         }
 
@@ -249,10 +248,7 @@ namespace Serenity.Test
         {
             using (new MunqContext())
             {
-                Assert.DoesNotThrow(() =>
-                {
-                    new LocalText("Dummy").ToString();
-                });
+                new LocalText("Dummy").ToString();
             }
         }
 
@@ -391,10 +387,7 @@ namespace Serenity.Test
         {
             using (new MunqContext())
             {
-                Assert.DoesNotThrow(() =>
-                {
-                    LocalText.Get("Dummy");
-                });
+                LocalText.Get("Dummy");
             }
         }
 
@@ -533,10 +526,7 @@ namespace Serenity.Test
         {
             using (new MunqContext())
             {
-                Assert.DoesNotThrow(() =>
-                {
-                    LocalText.TryGet("Dummy");
-                });
+                LocalText.TryGet("Dummy");
             }
         }
 

@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+    [Collection("AvoidParallel")]
     public class ScriptTests : SeleniumTestBase
     {
         protected override string GetWebPath()
