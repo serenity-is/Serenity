@@ -156,8 +156,8 @@ namespace Serenity
 
             string itemGenerationKey = cacheKey + GenerationSuffix;
 
-            var localCache = Dependency.Resolve<ILocalCache>();
-            var distributedCache = Dependency.Resolve<IDistributedCache>();
+            var localCache = LocalCache.Provider;
+            var distributedCache = DistributedCache.Provider;
 
             // retrieves distributed cache group generation number lazily
             Func<ulong> getGroupGenerationValue = delegate()
@@ -325,7 +325,7 @@ namespace Serenity
         /// <param name="groupKey">Group key</param>
         public static void ExpireGroupItems(string groupKey)
         {
-            Dependency.Resolve<ILocalCache>().Remove(groupKey);
+            LocalCache.Provider.Remove(groupKey);
             DistributedCache.Set<object>(groupKey, null);
         }
 
@@ -337,8 +337,8 @@ namespace Serenity
         {
             string itemGenerationKey = cacheKey + GenerationSuffix;
 
-            var localCache = Dependency.Resolve<ILocalCache>();
-            var distributedCache = Dependency.Resolve<IDistributedCache>();
+            var localCache = LocalCache.Provider;
+            var distributedCache = DistributedCache.Provider;
 
             localCache.Remove(cacheKey);
             localCache.Remove(itemGenerationKey);

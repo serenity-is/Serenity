@@ -10,6 +10,19 @@ namespace Serenity
     public static class LocalCache
     {
         /// <summary>
+        /// Use to skip Dependency.Resolve calls only when performance is critical
+        /// </summary>
+        public static ILocalCache StaticProvider;
+
+        public static ILocalCache Provider
+        {
+            get
+            {
+                return StaticProvider ?? Dependency.Resolve<ILocalCache>();
+            }
+        }
+
+        /// <summary>
         /// Adds a value to cache with a given key
         /// </summary>
         /// <param name="key">key</param>
@@ -17,7 +30,7 @@ namespace Serenity
         /// <param name="expiration">Expire time (Use TimeSpan.Zero to hold value with no expiration)</param>
         public static void Add(string key, object value, TimeSpan expiration)
         {
-            Dependency.Resolve<ILocalCache>().Add(key, value, expiration);
+            Provider.Add(key, value, expiration);
         }
 
         /// <summary>
@@ -32,7 +45,7 @@ namespace Serenity
         public static TItem Get<TItem>(string cacheKey, TimeSpan expiration, Func<TItem> loader)
             where TItem : class
         {
-            var cachedObj = Dependency.Resolve<ILocalCache>().Get<object>(cacheKey);
+            var cachedObj = Provider.Get<object>(cacheKey);
             
             if (cachedObj == DBNull.Value)
             {
@@ -58,7 +71,7 @@ namespace Serenity
         public static TItem TryGet<TItem>(string cacheKey)
             where TItem : class
         {
-            return Dependency.Resolve<ILocalCache>().Get<object>(cacheKey) as TItem;
+            return Provider.Get<object>(cacheKey) as TItem;
         }
 
         /// <summary>
@@ -67,7 +80,7 @@ namespace Serenity
         /// <param name="cacheKey">Key</param>
         public static object Remove(string cacheKey)
         {
-            return Dependency.Resolve<ILocalCache>().Remove(cacheKey);
+            return Provider.Remove(cacheKey);
         }
 
         /// <summary>
@@ -75,7 +88,7 @@ namespace Serenity
         /// </summary>
         public static void RemoveAll()
         {
-            Dependency.Resolve<ILocalCache>().RemoveAll();
+            Provider.RemoveAll();
         }
     }
 }
