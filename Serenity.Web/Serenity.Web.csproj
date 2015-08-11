@@ -481,6 +481,7 @@
     <None Include="Style\images\xml.png" />
     <None Include="Style\images\zones-stack.png" />
     <None Include="Style\images\zoom.png" />
+    <None Include="Style\serenity.grid.quickfiltersbar.less" />
     <None Include="Style\serenity.widget.fileupload.less" />
     <None Include="Style\serenity.override.uibutton.less" />
     <None Include="Style\serenity.override.uidialog.less" />

@@ -13,6 +13,7 @@ namespace Serenity
         protected jQueryObject titleDiv;
         protected Toolbar toolbar;
         protected FilterDisplayBar filterBar;
+        protected jQueryObject quickFiltersDiv;
         protected SlickRemoteView<TItem> view;
         protected jQueryObject slickContainer;
         protected SlickGrid slickGrid;
@@ -20,6 +21,7 @@ namespace Serenity
         protected string isActiveFieldName;
         protected string localTextPrefix;
         private bool isDisabled;
+        protected event Action submitHandlers;
 
         public DataGrid(jQueryObject container, TOptions opt = null)
             : base(container, opt)
@@ -104,6 +106,8 @@ namespace Serenity
 
         public override void Destroy()
         {
+            this.submitHandlers = null;
+
             if (this.toolbar != null)
             {
                 this.toolbar.Destroy();
@@ -477,13 +481,11 @@ namespace Serenity
         protected virtual bool OnViewSubmit()
         {
             if (IsDisabled || !GetGridCanLoad())
-            {
-                //view.SetItems(new List<TItem>(), true);
                 return false;
-            }
 
             SetCriteriaParameter();
             SetIncludeColumnsParameter();
+            InvokeSubmitHandlers();
 
             return true;
         }
@@ -855,6 +857,81 @@ namespace Serenity
         }
 
         protected virtual void SubDialogDataChange()
+        {
+            this.Refresh();
+        }
+
+        public void AddFilterSeparator()
+        {
+            if (quickFiltersDiv != null)
+                quickFiltersDiv.Append(J("<hr/>"));
+        }
+
+        public TWidget AddEqualityFilter<TWidget>(string field, string title, object options = null, Action<ListRequest, TWidget> handler = null,
+            Action<jQueryObject> element = null, Action<TWidget> init = null)
+            where TWidget: Widget
+        {
+            if (quickFiltersDiv == null)
+            {
+                J("<div/>").AddClass("clear").AppendTo(toolbar.Element);
+                quickFiltersDiv = J("<div/>").AddClass("quick-filters-bar").AppendTo(toolbar.Element);
+            }
+
+            var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
+                .AppendTo(quickFiltersDiv)
+                .Children().Text(title ?? "")
+                .Parent();
+
+            var widget = Widget.Create<TWidget>(
+                element: e =>
+                {
+                    if (!field.IsEmptyOrNull())
+                        e.Attribute("id", this.UniqueName + "_QuickFilter_" + field);
+                    e.AppendTo(quickFilter);
+                    if (element != null)
+                        element(e);
+                },
+                options: options,
+                init: init);
+
+            submitHandlers += () =>
+            {
+                var request = (ListRequest)view.Params;
+                request.EqualityFilter = request.EqualityFilter ?? new JsDictionary<string, object>();
+
+                var obj = new JsDictionary<string, object>();
+                PropertyGrid.SaveEditorValue(widget, new PropertyItem
+                {
+                    Name = "$$value$$",
+                }, obj);
+                var value = obj["$$value$$"];
+
+                bool active = Script.IsValue(value) && !string.IsNullOrEmpty(value.ToString());
+                quickFilter.ToggleClass("quick-filter-active", active);
+
+                if (handler != null)
+                    handler(request, widget);
+                else
+                {
+                    request.EqualityFilter[field] = value;
+                }
+            };
+
+            widget.Change(e =>
+            {
+                this.QuickFilterChange(e);
+            });
+
+            return widget;
+        }
+
+        protected virtual void InvokeSubmitHandlers()
+        {
+            if (submitHandlers != null)
+                submitHandlers();
+        }
+
+        protected virtual void QuickFilterChange(jQueryEvent e)
         {
             this.Refresh();
         }
