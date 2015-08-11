@@ -887,6 +887,7 @@ namespace Serenity
                 {
                     if (!field.IsEmptyOrNull())
                         e.Attribute("id", this.UniqueName + "_QuickFilter_" + field);
+                    e.Attribute("placeholder", " ");
                     e.AppendTo(quickFilter);
                     if (element != null)
                         element(e);
