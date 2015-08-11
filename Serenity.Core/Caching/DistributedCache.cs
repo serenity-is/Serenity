@@ -7,6 +7,16 @@
     /// Provides shortcuts to currently configured IDistributedCache provider.</summary>
     public static class DistributedCache
     {
+        public static IDistributedCache StaticProvider;
+
+        public static IDistributedCache Provider
+        {
+            get
+            {
+                return StaticProvider ?? Dependency.Resolve<IDistributedCache>();
+            }
+        }
+
         /// <summary>
         /// Increments value with specified key and returns the new value.
         /// If value doesn't exist, its new value will be 1.
@@ -16,7 +26,7 @@
         /// <returns>Increased amount, or 1 if it didn't exist before</returns>
         public static long Increment(string key, int amount = 1)
         {
-            return Dependency.Resolve<IDistributedCache>().Increment(key, amount);
+            return Provider.Increment(key, amount);
         }
 
         /// <summary>
@@ -28,7 +38,7 @@
         /// <remarks>It may raise an exception if the value is not of type TValue.</remarks>
         public static TValue Get<TValue>(string key)
         {
-            return Dependency.Resolve<IDistributedCache>().Get<TValue>(key);
+            return Provider.Get<TValue>(key);
         }
 
         /// <summary>
@@ -39,7 +49,7 @@
         /// <param name="value">Value</param>
         public static void Set<TValue>(string key, TValue value)
         {
-            Dependency.Resolve<IDistributedCache>().Set(key, value);
+            Provider.Set(key, value);
         }
 
         /// <summary>
@@ -52,7 +62,7 @@
         /// <param name="expiresAt">The time the cached item will be expired on.</param>
         public static void Set<TValue>(string key, TValue value, TimeSpan expiration)
         {
-            Dependency.Resolve<IDistributedCache>().Set(key, value, expiration);
+            Provider.Set(key, value, expiration);
         }
     }
 }

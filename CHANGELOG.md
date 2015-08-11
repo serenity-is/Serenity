@@ -1,3 +1,6 @@
+## 1.5.2 (2015-07-27)
+  - support specifying a static ILocalCache and IDistributedCache provider where cache performance is critical (only use in non unit test environment)
+
 ## 1.5.1 (2015-07-27)
 
 Features:
