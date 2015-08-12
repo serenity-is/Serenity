@@ -18,6 +18,11 @@ namespace Serenity
             return Q.Externals.ToId(value);
         }
 
+        public static Int32? ToInt32(this object value)
+        {
+            return Q.Externals.ToId(value).As<Int32?>();
+        }
+
         public static bool IsPositiveId(Int64 id)
         {
             if (!Script.IsValue(id))

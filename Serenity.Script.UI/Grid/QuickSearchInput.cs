@@ -103,9 +103,6 @@ namespace Serenity
 
             fieldChanged = false;
 
-            this.element.Parent().ToggleClass(this.options.FilteredParentClass ?? "", Q.IsTrue(value.Length > 0));
-            this.element.AddClass(this.options.LoadingParentClass ?? "");
-
             if (Q.IsTrue(this.timer))
                 Window.ClearTimeout(this.timer);
             
@@ -120,10 +117,26 @@ namespace Serenity
 
         private void SearchNow(string value)
         {
-            if (this.options.OnSearch != null)
-                this.options.OnSearch(field != null && !field.Name.IsEmptyOrNull() ? field.Name : null, value);
+            this.element.Parent().ToggleClass(this.options.FilteredParentClass ?? "", Q.IsTrue(value.Length > 0));
+            this.element.Parent().AddClass(this.options.LoadingParentClass ?? "")
+                .AddClass(this.options.LoadingParentClass ?? "");
 
-            this.element.RemoveClass(this.options.LoadingParentClass ?? "");
+            Action<bool> done = delegate(bool results)
+            {
+                this.element.RemoveClass(this.options.LoadingParentClass ?? "")
+                    .Parent().RemoveClass(this.options.LoadingParentClass ?? "");
+
+                if (!results)
+                {
+                    this.element.Closest(".s-QuickSearchBar").Find(".quick-search-icon i").As<dynamic>()
+                        .effect("shake", new { distance = 2 });
+                }
+            };
+
+            if (this.options.OnSearch != null)
+                this.options.OnSearch(field != null && !field.Name.IsEmptyOrNull() ? field.Name : null, value, done);
+            else
+                done(true);
         }
     }
 
@@ -140,7 +153,7 @@ namespace Serenity
         public int TypeDelay { get; set; }
         public string LoadingParentClass { get; set; }
         public string FilteredParentClass { get; set; }
-        public Action<string, string> OnSearch { get; set; }
+        public Action<string, string, Action<bool>> OnSearch { get; set; }
         public List<QuickSearchField> Fields { get; set; }
     }
 

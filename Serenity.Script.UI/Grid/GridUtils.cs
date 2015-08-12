@@ -88,16 +88,28 @@ namespace Serenity
                 return true;
             };
 
-            AddQuickSearchInputCustom(toolDiv, delegate(string field, string query)
+            Action<bool> lastDoneEvent = null;
+
+            AddQuickSearchInputCustom(toolDiv, delegate(string field, string query, Action<bool> done)
             {
                 searchText = query;
                 searchField = field;
                 view.SeekToPage = 1;
                 view.Populate();
+                lastDoneEvent = done;
             }, fields);
+
+            view.OnRowsChanged.Subscribe((e, ui) =>
+            {
+                if (lastDoneEvent != null)
+                {
+                    lastDoneEvent(view.Rows.Count > 0);
+                    lastDoneEvent = null;
+                }
+            });
         }
 
-        public static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string> onSearch,
+        public static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string, Action<bool>> onSearch,
             List<QuickSearchField> fields = null)
         {
             var input = jQuery.FromHtml("<div><input type=\"text\"/></div>")

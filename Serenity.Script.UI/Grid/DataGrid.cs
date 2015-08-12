@@ -867,7 +867,7 @@ namespace Serenity
                 quickFiltersDiv.Append(J("<hr/>"));
         }
 
-        public TWidget AddEqualityFilter<TWidget>(string field, string title, object options = null, Action<ListRequest, TWidget> handler = null,
+        public TWidget AddEqualityFilter<TWidget>(string field, string title, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
             Action<jQueryObject> element = null, Action<TWidget> init = null)
             where TWidget: Widget
         {
@@ -908,13 +908,31 @@ namespace Serenity
                 var value = obj["$$value$$"];
 
                 bool active = Script.IsValue(value) && !string.IsNullOrEmpty(value.ToString());
-                quickFilter.ToggleClass("quick-filter-active", active);
 
                 if (handler != null)
-                    handler(request, widget);
+                {
+                    var args = new QuickFilterArgs<TWidget>
+                    {
+                        Field = field,
+                        Request = request,
+                        EqualityFilter = request.EqualityFilter,
+                        Value = value,
+                        Active = active,
+                        Handled = true
+                    };
+
+                    handler(args);
+
+                    quickFilter.ToggleClass("quick-filter-active", args.Active);
+
+                    if (!args.Handled)
+                        request.EqualityFilter[field] = value;
+                }
                 else
                 {
                     request.EqualityFilter[field] = value;
+                    quickFilter.ToggleClass("quick-filter-active", active);
+
                 }
             };
 
