@@ -120,6 +120,7 @@ namespace Serenity
         public SlickRemoteViewProcessCallback<dynamic> OnProcessData;
         public RemoteViewEvent OnRowCountChanged;
         public RemoteViewEvent OnRowsChanged;
+        public RemoteViewEvent OnDataLoaded;
 
         [ScriptName("seekToPage")]
         public Int32? SeekToPage;

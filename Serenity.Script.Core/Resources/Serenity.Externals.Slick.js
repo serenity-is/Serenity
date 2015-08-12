@@ -598,7 +598,7 @@ function EventHelper() {
             "onRowCountChanged": onRowCountChanged,
             "onRowsChanged": onRowsChanged,
             "onPagingInfoChanged": onPagingInfoChanged,
-            "onDataLoaded": onDataLoading,
+            "onDataLoaded": onDataLoaded,
             "onDataLoading": onDataLoading
         };
         

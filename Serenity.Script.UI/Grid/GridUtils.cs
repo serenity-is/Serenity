@@ -95,11 +95,11 @@ namespace Serenity
                 searchText = query;
                 searchField = field;
                 view.SeekToPage = 1;
-                view.Populate();
                 lastDoneEvent = done;
+                view.Populate();
             }, fields);
 
-            view.OnRowsChanged.Subscribe((e, ui) =>
+            view.OnDataLoaded.Subscribe((e, ui) =>
             {
                 if (lastDoneEvent != null)
                 {
