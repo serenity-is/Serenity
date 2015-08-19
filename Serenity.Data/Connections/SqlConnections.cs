@@ -79,6 +79,15 @@ namespace Serenity.Data
             return new WrappedConnection(connection);
         }
 
+        public static IDbConnection NewFor<TClass>()
+        {
+            var attr = typeof(TClass).GetAttribute<ConnectionKeyAttribute>();
+            if (attr == null)
+                throw new ArgumentOutOfRangeException("Type has no ConnectionKey attribute!", typeof(TClass).FullName);
+
+            return NewByKey(attr.Value);
+        }
+
         public static void SetConnection(string connectionKey, string connectionString, string providerName)
         {
             var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
