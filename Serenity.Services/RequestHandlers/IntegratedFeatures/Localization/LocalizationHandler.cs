@@ -144,11 +144,15 @@ namespace Serenity.Data
                     new SaveRequest<TLocalRow>
                     {
                         Entity = (TLocalRow)r
-                    }, SaveRequestType.Update));
+                    }, SaveRequestType.Update),
+                (id) => new DeleteRequestHandler<TLocalRow>().Process(uow, new DeleteRequest
+                    {
+                        EntityId = id
+                    }));
         }
         
         public void Update(IUnitOfWork uow, TRow row, object cultureId,
-            Action<Row> create, Action<Row> update)
+            Action<Row> create, Action<Row> update, Action<Int64> delete)
         {
             var info = EnsureInfo();
 
@@ -168,6 +172,8 @@ namespace Serenity.Data
                 info.localRowInterface.CultureIdField.AsObject(localRow, cultureId);
             }
 
+            bool anyNonEmpty = false;
+
             foreach (var field in row.GetFields())
             {
                 if (ReferenceEquals(field, idField))
@@ -182,12 +188,26 @@ namespace Serenity.Data
 
                 var value = field.AsObject(row);
                 match.AsObject(localRow, value);
+
+                if (value != null &&
+                    (!(value is string) || !(value as string).IsTrimmedEmpty()))
+                {
+                    anyNonEmpty = true;
+                }
             }
 
             if (oldId == null)
-                create(localRow);
+            {
+                if (anyNonEmpty)
+                    create(localRow);
+            }
             else
-                update(localRow);
+            {
+                if (anyNonEmpty)
+                    update(localRow);
+                else
+                    delete(oldId.Value);
+            }
         }
 
         private Row GetOldLocalizationRow(IDbConnection connection, Int64 recordId, object cultureId)
