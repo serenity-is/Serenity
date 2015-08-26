@@ -1,6 +1,7 @@
 ﻿using Serenity.Services;
 using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace Serenity.Data
 {
@@ -98,5 +99,9 @@ namespace Serenity.Data
             return field;
         }
 
+        public static IDbConnection NewConnection(RowFieldsBase fields)
+        {
+            return SqlConnections.NewByKey(fields.connectionKey);
+        }
     }
 }
