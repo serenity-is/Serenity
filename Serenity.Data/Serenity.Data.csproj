@@ -73,7 +73,9 @@
     <Compile Include="FluentSql\SqlQuery_Join.cs" />
     <Compile Include="FluentSql\SqlQuery_ToString.cs" />
     <Compile Include="Join\AliasExtensions.cs" />
+    <Compile Include="Join\DatabaseRefenceReplacer.cs" />
     <Compile Include="Join\IAlias.cs" />
+    <Compile Include="Join\BracketLocator.cs" />
     <Compile Include="Mapping\AutoIncrementAttribute.cs" />
     <Compile Include="Mapping\DateTimeKindAttribute.cs" />
     <Compile Include="Mapping\UniqueAttribute.cs" />

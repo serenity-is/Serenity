@@ -120,6 +120,8 @@
     <Compile Include="Selenium\ScriptTests.cs" />
     <Compile Include="Selenium\TcpUtility.cs" />
     <Compile Include="Selenium\SeleniumTestBase.cs" />
+    <Compile Include="Sql\DatabaseReferenceReplacer.cs" />
+    <Compile Include="Sql\BracketLocatorTests.cs" />
     <Compile Include="Sql\WrappedConnectionTests.cs" />
     <Compile Include="Sql\SqlConnectionExtensionsTests.cs" />
     <Compile Include="Sql\JoinAliasLocatorTests.cs" />
