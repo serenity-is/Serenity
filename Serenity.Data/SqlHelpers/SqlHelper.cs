@@ -221,7 +221,7 @@
                throw new ArgumentNullException("connection");
 
            IDbCommand command = connection.CreateCommand();
-           command.CommandText = commandText;
+           command.CommandText = DatabaseBracketReferences.Replace(commandText);
            return command;
        }
 

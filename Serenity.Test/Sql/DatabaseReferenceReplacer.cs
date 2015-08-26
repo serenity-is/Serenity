@@ -10,7 +10,7 @@ namespace Serenity.Data.Test
             SqlConnections.SetConnection("Dummy1", 
                 "Data Source=server1; Initial Catalog=catalog1",
                 "System.Data.SqlClient");
-            var result = DatabaseReferenceReplacer.Replace("[abc].[dbo].[Table]");
+            var result = DatabaseBracketReferences.Replace("[abc].[dbo].[Table]");
             Assert.Equal(result, "[abc].[dbo].[Table]");
         }
 
@@ -20,7 +20,7 @@ namespace Serenity.Data.Test
             SqlConnections.SetConnection("Dummy1",
                 "Data Source=server1; Initial Catalog=catalog1",
                 "System.Data.SqlClient");
-            var result = DatabaseReferenceReplacer.Replace("[Dummy1^].[dbo].[Table]");
+            var result = DatabaseBracketReferences.Replace("[Dummy1^].[dbo].[Table]");
             Assert.Equal(result, "[catalog1].[dbo].[Table]");
         }
 
@@ -30,7 +30,7 @@ namespace Serenity.Data.Test
             SqlConnections.SetConnection("Dummy1",
                 "Data Source=server1; Initial Catalog=catalog1",
                 "System.Data.SqlClient");
-            var result = DatabaseReferenceReplacer.Replace("[^].[dbo].[Table]");
+            var result = DatabaseBracketReferences.Replace("[^].[dbo].[Table]");
             Assert.Equal(result, "[^].[dbo].[Table]");
         }
 
@@ -40,7 +40,7 @@ namespace Serenity.Data.Test
             SqlConnections.SetConnection("Nevermind",
                 "Data Source=server1; Initial Catalog=catalog1",
                 "System.Data.SqlClient");
-            var result = DatabaseReferenceReplacer.Replace("[InvalidConnectionKey^AlternateDB].[dbo].[Table]");
+            var result = DatabaseBracketReferences.Replace("[InvalidConnectionKey^AlternateDB].[dbo].[Table]");
             Assert.Equal(result, "[AlternateDB].[dbo].[Table]");
         }
 
@@ -50,7 +50,7 @@ namespace Serenity.Data.Test
             SqlConnections.SetConnection("MyDB",
                 "Data Source=server1; Initial Catalog=MyMy",
                 "System.Data.SqlClient");
-            var result = DatabaseReferenceReplacer.Replace(
+            var result = DatabaseBracketReferences.Replace(
                 "SELECT A, B, C FROM [MyDB^X].dbo.[Table] WHERE x > '[MyDB^X]'");
             Assert.Equal("SELECT A, B, C FROM [MyMy].dbo.[Table] WHERE x > '[MyDB^X]'", 
                 result);

@@ -4,16 +4,16 @@ using System.Text;
 
 namespace Serenity.Data
 {
-    public class DatabaseReferenceReplacer
+    public class DatabaseBracketReferences
     {
         public static string Replace(string expression)
         {
             if (expression == null || expression.IndexOf('^') < 0)
                 return expression;
 
-            return BracketLocator.ReplaceBracketContents(expression, '!', contents =>
+            return BracketLocator.ReplaceBracketContents(expression, '^', contents =>
             {
-                var idx = contents.IndexOf('!');
+                var idx = contents.IndexOf('^');
                 if (idx < 0)
                     return contents;
 

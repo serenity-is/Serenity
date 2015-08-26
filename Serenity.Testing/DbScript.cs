@@ -34,7 +34,7 @@ namespace Serenity.Testing
             string statementText;
             using (var command = new SqlCommand())
             {
-                command.CommandText = commandText;
+                command.CommandText = DatabaseBracketReferences.Replace(commandText);
 
                 if (parameters != null)
                     foreach (var p in parameters)
