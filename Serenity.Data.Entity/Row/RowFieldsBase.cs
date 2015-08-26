@@ -27,6 +27,9 @@ namespace Serenity.Data
         internal string connectionKey;
         internal string generationKey;
         internal object initializeLock;
+        internal string database;
+        internal string schema;
+        internal string tableOnly;
         internal string tableName;
         internal string alias;
         internal string aliasDot;
@@ -44,6 +47,7 @@ namespace Serenity.Data
 
             DetermineRowType();
             DetermineTableName();
+            DetermineDatabaseAndSchema();
             DetermineConnectionKey();
             DetermineLocalTextPrefix();
         }
@@ -96,6 +100,36 @@ namespace Serenity.Data
                 name = name.Substring(0, name.Length - 3);
 
             tableName = name;
+        }
+
+        public static string ParseDatabaseAndSchema(string tableName, 
+            out string database, out string schema)
+        {
+            database = null;
+            schema = null;
+
+            if (tableName == null)
+                return null;
+
+            var idx1 = tableName.IndexOf('.');
+            if (idx1 < 0)
+                return tableName;
+
+            var idx2 = tableName.IndexOf('.', idx1 + 1);
+            if (idx2 < 0)
+            {
+                schema = tableName.Substring(0, idx1);
+                return tableName.Substring(idx1 + 1);
+            }
+
+            database = tableName.Substring(0, idx1);
+            schema = tableName.Substring(idx1 + 1, idx2 - idx1 - 1);
+            return tableName.Substring(idx2 + 1);
+        }
+
+        private void DetermineDatabaseAndSchema()
+        {
+            this.tableOnly = ParseDatabaseAndSchema(this.tableName, out this.database, out this.schema);
         }
 
         private void DetermineConnectionKey()
@@ -427,6 +461,21 @@ namespace Serenity.Data
             get { return tableName; }
         }
 
+        public string Database
+        {
+            get { return database; }
+        }
+
+        public string Schema
+        {
+            get { return schema; }
+        }
+
+        public string TableOnly
+        {
+            get { return tableOnly; }
+        }
+
         public string FieldPrefix
         {
             get { return fieldPrefix ?? ""; }
@@ -437,11 +486,6 @@ namespace Serenity.Data
         {
             get { return localTextPrefix ?? TableName; }
             set { localTextPrefix = value; }
-        }
-
-        public string Schema
-        {
-            get { return connectionKey; }
         }
 
         public string GenerationKey
