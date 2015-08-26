@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Serenity.Data
 {
-    public class DatabaseBracketReferences
+    public class DatabaseCaretReferences
     {
         public static string Replace(string expression)
         {

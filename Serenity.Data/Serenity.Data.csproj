@@ -73,7 +73,7 @@
     <Compile Include="FluentSql\SqlQuery_Join.cs" />
     <Compile Include="FluentSql\SqlQuery_ToString.cs" />
     <Compile Include="Join\AliasExtensions.cs" />
-    <Compile Include="Join\DatabaseBracketReferences.cs" />
+    <Compile Include="Join\DatabaseCaretReferences.cs" />
     <Compile Include="Join\IAlias.cs" />
     <Compile Include="Join\BracketLocator.cs" />
     <Compile Include="Mapping\AutoIncrementAttribute.cs" />
