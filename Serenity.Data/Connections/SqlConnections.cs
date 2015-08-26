@@ -24,7 +24,7 @@ namespace Serenity.Data
             return factory;
         }
 
-        public static ConnectionStringInfo GetConnectionString(string connectionKey)
+        public static ConnectionStringInfo TryGetConnectionString(string connectionKey)
         {
             ConnectionStringInfo connection;
             if (!connections.TryGetValue(connectionKey, out connection))
@@ -32,13 +32,31 @@ namespace Serenity.Data
                 var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
                 var connectionSetting = ConfigurationManager.ConnectionStrings[connectionKey];
                 if (connectionSetting == null)
-                    throw new InvalidOperationException(String.Format("No connection string with key {0} in configuration file!", connectionKey));
+                    return null;
 
                 var factory = GetFactory(connectionSetting.ProviderName);
 
                 connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionSetting.ConnectionString, connectionSetting.ProviderName, factory);
                 connections = newConnections;
             }
+
+            return connection;
+        }
+
+        public static string GetDatabaseName(string connectionKey)
+        {
+            var connection = TryGetConnectionString(connectionKey);
+            if (connection != null)
+                return connection.DatabaseName;
+
+            return null;
+        }
+
+        public static ConnectionStringInfo GetConnectionString(string connectionKey)
+        {
+            var connection = TryGetConnectionString(connectionKey);
+            if (connection == null)
+                throw new InvalidOperationException(String.Format("No connection string with key {0} in configuration file!", connectionKey));
 
             return connection;
         }
