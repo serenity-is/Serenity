@@ -1,4 +1,19 @@
+## 1.5.3 (2015-09-14)
+
+Features:
+  - updated nuget packages
+  - visual studio 2015 support
+  - if all localized fields are null, delete localization row
+  - introduced quick filters bar
+  - quick search input no result animation
+  - sqlconnections.newfor
+  - dictionary get default extension
+  - ability to get database name from connection string
+  - bracket database reference replacer that replaces [DB^] style references with catalog names before sql execution
+
 ## 1.5.2 (2015-07-27)
+
+Features:
   - support specifying a static ILocalCache and IDistributedCache provider where cache performance is critical (only use in non unit test environment)
 
 ## 1.5.1 (2015-07-27)
