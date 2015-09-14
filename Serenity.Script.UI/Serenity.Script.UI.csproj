@@ -201,8 +201,7 @@
       <Name>Serenity.Script.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" Condition="!Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\Saltarelle.Compiler.targets')" />
-  <Import Project="$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\Saltarelle.Compiler.targets" Condition="Exists('$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\Saltarelle.Compiler.targets')" />
+  <Import Project="$(ProjectDir)..\tools\Saltarelle\Saltarelle.Compiler.targets" />
   <Target Name="CopyAndMinimize" AfterTargets="BuildScript">
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.UI.js -o $(OutDir)Serenity.Script.UI.min.js --comments --mangle">
     </Exec>

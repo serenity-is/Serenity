@@ -20,7 +20,7 @@ var nugetPackages = new List<string>();
 Func<string, System.Xml.XmlDocument> loadXml = path => 
 {
     var xml = new System.Xml.XmlDocument();
-    xml.LoadXml(File.ReadAllText(path));
+    xml.LoadXml(System.IO.File.ReadAllText(path));
     return xml;
 };
 
@@ -81,7 +81,7 @@ Task("Unit-Tests")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    XUnit("./Serenity.Test*/**/bin/" + configuration + "/*.Test.dll");
+    XUnit2("./Serenity.Test*/**/bin/" + configuration + "/*.Test.dll");
 });
 
 Task("Copy-Files")
@@ -119,7 +119,7 @@ Task("NuGet")
     nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value;
 
     Action<string, string> myPack = (s, id) => {
-        var nuspec = File.ReadAllText("./" + s + "/" + (id ?? s) + ".nuspec");
+        var nuspec = System.IO.File.ReadAllText("./" + s + "/" + (id ?? s) + ".nuspec");
       
         nuspec = nuspec.Replace("${version}", serenityVersion);
         nuspec = nuspec.Replace("${id}", (id ?? s));
@@ -128,17 +128,17 @@ Task("NuGet")
             nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
           
         var assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
-        if (!File.Exists(assembly))
+        if (!System.IO.File.Exists(assembly))
             assembly = "./" + s + "/bin/" + configuration + "/" + s + ".exe";
           
-        if (File.Exists(assembly)) 
+        if (System.IO.File.Exists(assembly)) 
         {
             var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly);
             nuspec = nuspec.Replace("${title}", vi.FileDescription);
             nuspec = nuspec.Replace("${description}", vi.Comments);
         }
       
-        File.WriteAllText("./Bin/Temp/" + s + ".temp.nuspec", nuspec);
+        System.IO.File.WriteAllText("./Bin/Temp/" + s + ".temp.nuspec", nuspec);
        
         NuGetPack("./Bin/Temp/" + s + ".temp.nuspec", new NuGetPackSettings {
             BasePath = "./" + s + "/bin/" + configuration,
@@ -165,10 +165,12 @@ Task("NuGet")
     if (System.IO.Directory.Exists(@"C:\Sandbox\MyNugetFeed")) 
     {
         foreach (var package in nugetPackages)
-            File.Copy(package, @"C:\Sandbox\MyNugetFeed\" + System.IO.Path.GetFileName(package), true);
+            System.IO.File.Copy(package, @"C:\Sandbox\MyNugetFeed\" + System.IO.Path.GetFileName(package), true);
             
-        foreach (var package in Directory.GetFiles(System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), @"nuget\cache"), "Seren*.nupkg"))
-            File.Delete(package);
+        foreach (var package in System.IO.Directory.GetFiles(
+			System.IO.Path.Combine(System.Environment.GetFolderPath(
+				System.Environment.SpecialFolder.LocalApplicationData), @"nuget\cache"), "Seren*.nupkg"))
+            System.IO.File.Delete(package);
     }
 });
 
