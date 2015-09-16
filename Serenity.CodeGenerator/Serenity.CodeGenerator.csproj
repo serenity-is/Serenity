@@ -167,6 +167,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptGrid.cshtml</DependentUpon>
     </Compile>
+    <None Include="Views\razorgenerator.directives" />
     <Page Include="AddConnectionStringWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
