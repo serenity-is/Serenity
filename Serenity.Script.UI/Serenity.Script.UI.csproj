@@ -69,7 +69,6 @@
     <Compile Include="FilterPanel\FilterOperators.cs" />
     <Compile Include="FilterPanel\FilterOperator.cs" />
     <Compile Include="FilterPanel\FilteringTypes\IFiltering.cs" />
-    <Compile Include="FilterPanel\FilterPanelTest.cs" />
     <Compile Include="FilterPanel\FilterPanel.OperatorSelect.cs" />
     <Compile Include="FilterPanel\FilterPanel.FieldSelect.cs" />
     <Compile Include="FilterPanel\FilterWidgetBase.cs" />
