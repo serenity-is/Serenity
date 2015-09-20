@@ -3,6 +3,9 @@ Serenity Application Platform
 
 [![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)
 
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Serenity.Core.svg?label=NuGet%20Downloads)](http://www.nuget.org/packages/Serenity.Core/) [![Latest NuGet Package Version](https://img.shields.io/nuget/v/Serenity.Core.svg?label=Latest%20NuGet%20Package)](http://www.nuget.org/packages/Serenity.Core/)
+
+
 ## What is Serenity Platform
 
 Serenity is a Javascript / .NET application platform which has been built on open source technologies. 
