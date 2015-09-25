@@ -1,3 +1,9 @@
+## 1.5.5 (2015-09-25)
+
+Features:
+  - generate script code form enum members in form / column definitions, even if they are not used in any row 
+  - add integrated inplace item add / edit ability to LookupEditor  
+
 ## 1.5.4 (2015-09-24)
 
 Features:
