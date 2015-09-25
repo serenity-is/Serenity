@@ -14,7 +14,7 @@ namespace Serenity
         private static List<object> editorTypeList;
 
         public EditorTypeEditor(jQueryObject select)
-            : base(select, new SelectEditorOptions { EmptyOptionText = "--seçiniz--" })
+            : base(select, new SelectEditorOptions { EmptyOptionText = Texts.Controls.SelectEditor.EmptyItemText })
         {
         }
 

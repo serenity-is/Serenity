@@ -49,7 +49,7 @@ namespace Serenity
 
         public static void AddEmptyOption(jQueryObject select)
         {
-            AddOption(select, "", "--seçiniz--");
+            AddOption(select, "", Texts.Controls.SelectEditor.EmptyItemText);
         }
 
         public static void AddOption(jQueryObject select, string key, string text)

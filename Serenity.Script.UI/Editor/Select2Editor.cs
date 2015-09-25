@@ -48,7 +48,7 @@ namespace Serenity
 
         protected virtual string EmptyItemText()
         {
-            return element.GetAttribute("placeholder") ?? "--seçiniz--";
+            return element.GetAttribute("placeholder") ?? Texts.Controls.SelectEditor.EmptyItemText;
         }
 
         protected virtual Select2Options GetSelect2Options()
