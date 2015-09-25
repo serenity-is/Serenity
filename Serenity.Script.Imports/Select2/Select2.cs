@@ -104,6 +104,7 @@ namespace Serenity
         public Func<string, int, string> FormatInputTooShort { get; set; }
         public Func<string, string> FormatSelectionTooBig { get; set; }
         public Func<string, object> CreateSearchChoice { get; set; }
+        public string CreateSearchChoicePosition { get; set; }
         public Action<jQueryObject, Action<object>> InitSelection { get; set; }
         public Func<string, dynamic[], Func<object, object>, dynamic, string> Tokenizer { get; set; }
         public string[] TokenSeparators { get; set; }

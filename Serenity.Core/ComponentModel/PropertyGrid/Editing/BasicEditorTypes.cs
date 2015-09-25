@@ -223,6 +223,18 @@ namespace Serenity.ComponentModel
         {
             get { return GetOption<string>("lookupKey"); }
         }
+
+        public bool InplaceAdd
+        {
+            get { return GetOption<bool>("inplaceAdd"); }
+            set { SetOption("inplaceAdd", value); }
+        }
+
+        public string DialogType
+        {
+            get { return GetOption<string>("dialogType"); }
+            set { SetOption("dialogType", value); }
+        }
     }
 
     public partial class AsyncLookupEditorAttribute : CustomEditorAttribute

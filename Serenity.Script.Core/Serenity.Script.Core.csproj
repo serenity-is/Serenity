@@ -92,6 +92,7 @@
     <Compile Include="SlickGrid\LazyLoadHelper.cs" />
     <Compile Include="SlickGrid\SlickColumnHelper.cs" />
     <Compile Include="SlickGrid\SlickFormatting.cs" />
+    <Compile Include="Texts\Texts.Controls.SelectEditor.cs" />
     <Compile Include="Texts\Texts.Controls.PropertyGrid.cs" />
     <Compile Include="Texts\Texts.Controls.QuickSearch.cs" />
     <Compile Include="Texts\Texts.Controls.Pager.cs" />

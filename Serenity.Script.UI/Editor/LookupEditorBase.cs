@@ -1,9 +1,7 @@
-﻿using System.Html;
-using jQueryApi;
+﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+using System.Html;
 
 namespace Serenity
 {
@@ -138,6 +136,60 @@ namespace Serenity
                         Source = item,
                         Disabled = disabled
                     });
+                }
+            });
+        }
+
+        protected virtual string GetDialogTypeKey()
+        {
+            return GetLookupKey();
+        }
+
+        protected virtual void CreateEditDialog(Action<IEditDialog> callback)
+        {
+            var dialogTypeKey = GetDialogTypeKey();
+            var dialogType = DialogTypeRegistry.Get(dialogTypeKey);
+            Widget.CreateOfType(dialogType, options: new { }, init: dlg => callback((IEditDialog)dlg));
+        }
+
+        protected virtual void InitNewEntity(TItem entity)
+        {
+            if (OnInitNewEntity != null)
+                OnInitNewEntity(entity);
+        }
+
+        public Action<TItem> OnInitNewEntity { get; set; }
+
+        protected override void InplaceCreateClick(jQueryEvent e)
+        {
+            var self = this;
+            CreateEditDialog(dialog =>
+            { 
+                (dialog as Widget).BindToDataChange(this, (x, dci) =>
+                {
+                    Q.ReloadLookup(GetLookupKey());
+                    self.UpdateItems();
+                    self.Value = null;
+
+                    if ((dci.Type == "create" || dci.Type == "update") && dci.EntityId != null)
+                    {
+                        self.Value = dci.EntityId.Value.ToString();
+                    }
+                });
+
+                if (this.Value.IsEmptyOrNull())
+                {
+                    var entity = new TItem();
+                    entity.As<JsDictionary<string, object>>()[GetLookup().TextField] = lastCreateTerm.TrimToEmpty();
+
+                    if (OnInitNewEntity != null)
+                        OnInitNewEntity(entity);
+
+                    dialog.Load(entity, () => dialog.DialogOpen(), null);
+                }
+                else
+                {
+                    dialog.Load(this.Value.ConvertToId().Value, () => dialog.DialogOpen(), null);
                 }
             });
         }
