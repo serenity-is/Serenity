@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Serenity.ComponentModel;
 using Serenity.Data;
+using Serenity.Reflection;
 using Serenity.Services;
 using System;
 using System.Collections;
@@ -9,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Serenity.Reflection;
 
 namespace Serenity.CodeGeneration
 {
@@ -58,6 +58,29 @@ namespace Serenity.CodeGeneration
             return true;
         }
 
+        private void EnqueueTypeMembers(Type type)
+        {
+            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
+            {
+                var pi = member as PropertyInfo;
+                var fi = member as FieldInfo;
+
+                if (pi == null && fi == null)
+                    continue;
+
+                var memberType = pi != null ? pi.PropertyType : fi.FieldType;
+                if (memberType == null)
+                    continue;
+
+                var nullableType = Nullable.GetUnderlyingType(memberType);
+                if (nullableType != null)
+                    memberType = nullableType;
+
+                if (memberType.IsEnum)
+                    EnqueueType(memberType);
+            }
+        }
+
         private static string GetNamespace(Type type)
         {
             var ns = type.Namespace;
@@ -85,11 +108,22 @@ namespace Serenity.CodeGeneration
                     fromType.IsSubclassOf(typeof(ServiceResponse)) ||
                     fromType.IsSubclassOf(typeof(Row)) ||
                     fromType.GetCustomAttribute<ScriptIncludeAttribute>() != null)
-                    EnqueueType(fromType);
-                else
                 {
-                    if (fromType.GetCustomAttribute<LookupScriptAttribute>() != null)
-                        lookupScripts.Add(fromType);
+                    EnqueueType(fromType);
+                    continue;
+                }
+
+                if (fromType.GetCustomAttribute<FormScriptAttribute>() != null ||
+                    fromType.GetCustomAttributes<ColumnsScriptAttribute>() != null)
+                {
+                    EnqueueTypeMembers(fromType);
+                    continue;
+                }
+
+                if (fromType.GetCustomAttribute<LookupScriptAttribute>() != null)
+                {
+                    lookupScripts.Add(fromType);
+                    continue;
                 }
             }
 
