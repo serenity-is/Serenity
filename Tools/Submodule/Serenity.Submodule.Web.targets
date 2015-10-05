@@ -19,6 +19,5 @@
     <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.js')" />
     <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.Slick.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Core\Resources\Serenity.Externals.Slick.js')" />
     <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.Test\bin\$(ConfigurationName)\Serenity.Script.Test.js" DestinationFiles="$(ProjectDir)Test\Serenity.Script.Test.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.Test\bin\$(ConfigurationName)\Serenity.Script.Test.js')" />
   </Target>
 </Project>
