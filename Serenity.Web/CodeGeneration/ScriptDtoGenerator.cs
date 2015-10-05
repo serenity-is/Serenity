@@ -114,7 +114,7 @@ namespace Serenity.CodeGeneration
                 }
 
                 if (fromType.GetCustomAttribute<FormScriptAttribute>() != null ||
-                    fromType.GetCustomAttributes<ColumnsScriptAttribute>() != null)
+                    fromType.GetCustomAttribute<ColumnsScriptAttribute>() != null)
                 {
                     EnqueueTypeMembers(fromType);
                     continue;
