@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Serenity.Data
 {
     /// <summary>
-    ///   SQL sorgusundaki bir JOIN ifadesine kar��l�k gelir (INNER, OUTER, CROSS vs.)</summary>
+    ///   SQL sorgusundaki bir JOIN ifadesine karşılık gelir (INNER, OUTER, CROSS vs.)</summary>
     public abstract class Join : Alias
     {
         private IDictionary<string, Join> joins;
@@ -49,7 +49,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Left outer join'in "ON(...)" k�sm�nda yaz�lan ifadeyi verir.</summary>
+        ///   Left outer join'in "ON(...)" kısmında yazılan ifadeyi verir.</summary>
         public ICriteria OnCriteria
         {
             get
@@ -59,7 +59,7 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Left outer join'in "ON(...)" k�sm�nda yaz�lan ifadedeki alias lar�n listesini verir.</summary>
+        ///   Left outer join'in "ON(...)" kısmında yazılan ifadedeki alias ların listesini verir.</summary>
         public HashSet<string> ReferencedAliases
         {
             get

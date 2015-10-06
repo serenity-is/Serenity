@@ -1,4 +1,4 @@
-namespace Serenity.Data
+﻿namespace Serenity.Data
 {
     using System;
     using System.Collections;

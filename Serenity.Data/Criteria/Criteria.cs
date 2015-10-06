@@ -1,4 +1,4 @@
-namespace Serenity.Data
+ï»¿namespace Serenity.Data
 {
     using System;
     using System.Collections.Generic;
@@ -47,12 +47,12 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Belirtilen tablo alias'ı ve alan adını aralarına nokta koyarak içeren yeni bir 
-        ///   kriter oluşturur.</summary>
+        ///   Belirtilen tablo alias'Ä± ve alan adÄ±nÄ± aralarÄ±na nokta koyarak iÃ§eren yeni bir 
+        ///   kriter oluÅŸturur.</summary>
         /// <param name="alias">
-        ///   Tablo alias'ı. Null ya da boş olursa önemsenmez.</param>
+        ///   Tablo alias'Ä±. Null ya da boÅŸ olursa Ã¶nemsenmez.</param>
         /// <param name="field">
-        ///   Alan adı (zorunlu).</param>
+        ///   Alan adÄ± (zorunlu).</param>
         public Criteria(string alias, string field)
         {
             if (String.IsNullOrEmpty(field))
@@ -64,13 +64,13 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Belirtilen numerik tablo alias'ı (başına T konarak) ve alan adını aralarına 
-        ///   nokta koyarak içeren yeni bir kriter oluşturur.</summary>
+        ///   Belirtilen numerik tablo alias'Ä± (baÅŸÄ±na T konarak) ve alan adÄ±nÄ± aralarÄ±na 
+        ///   nokta koyarak iÃ§eren yeni bir kriter oluÅŸturur.</summary>
         /// <param name="joinNumber">
-        ///   Join numarası (T1 gibi kullanılır). Değer sıfırdan küçükse alan adı tek başına
-        ///   kullanılır.</param>
+        ///   Join numarasÄ± (T1 gibi kullanÄ±lÄ±r). DeÄŸer sÄ±fÄ±rdan kÃ¼Ã§Ã¼kse alan adÄ± tek baÅŸÄ±na
+        ///   kullanÄ±lÄ±r.</param>
         /// <param name="field">
-        ///   Alan adı (zorunlu).</param>
+        ///   Alan adÄ± (zorunlu).</param>
         public Criteria(int joinNumber, string field)
         {
             if (String.IsNullOrEmpty(field))
@@ -83,10 +83,10 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Belirtilen numerik tablo alias'ı (başına T konarak) ve alanın adını aralarına 
-        ///   nokta koyarak içeren yeni bir kriter oluşturur.</summary>
+        ///   Belirtilen numerik tablo alias'Ä± (baÅŸÄ±na T konarak) ve alanÄ±n adÄ±nÄ± aralarÄ±na 
+        ///   nokta koyarak iÃ§eren yeni bir kriter oluÅŸturur.</summary>
         /// <param name="alias">
-        ///   Join aliası (T1 gibi kullanılır)</param>
+        ///   Join aliasÄ± (T1 gibi kullanÄ±lÄ±r)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
         public Criteria(IAlias alias, IField field)
@@ -95,10 +95,10 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Belirtilen numerik tablo alias'ı (başına T konarak) ve alanın adını aralarına 
-        ///   nokta koyarak içeren yeni bir kriter oluşturur.</summary>
+        ///   Belirtilen numerik tablo alias'Ä± (baÅŸÄ±na T konarak) ve alanÄ±n adÄ±nÄ± aralarÄ±na 
+        ///   nokta koyarak iÃ§eren yeni bir kriter oluÅŸturur.</summary>
         /// <param name="alias">
-        ///   Join aliası (T1 gibi kullanılır)</param>
+        ///   Join aliasÄ± (T1 gibi kullanÄ±lÄ±r)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
         public Criteria(IAlias alias, string field)
@@ -107,10 +107,10 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Belirtilen numerik tablo alias'ı (başına T konarak) ve alanın adını aralarına 
-        ///   nokta koyarak içeren yeni bir kriter oluşturur.</summary>
+        ///   Belirtilen numerik tablo alias'Ä± (baÅŸÄ±na T konarak) ve alanÄ±n adÄ±nÄ± aralarÄ±na 
+        ///   nokta koyarak iÃ§eren yeni bir kriter oluÅŸturur.</summary>
         /// <param name="joinNumber">
-        ///   Join numarası (T1 gibi kullanılır)</param>
+        ///   Join numarasÄ± (T1 gibi kullanÄ±lÄ±r)</param>
         /// <param name="field">
         ///   Alan nesnesi (zorunlu).</param>
         public Criteria(int joinNumber, IField field)
@@ -119,10 +119,10 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Belirtilen join ve meta alanın adını aralarına nokta koyarak içeren yeni bir 
-        ///   kriter oluşturur.</summary>
+        ///   Belirtilen join ve meta alanÄ±n adÄ±nÄ± aralarÄ±na nokta koyarak iÃ§eren yeni bir 
+        ///   kriter oluÅŸturur.</summary>
         /// <param name="join">
-        ///   Tablo alias bilgisini içeren LeftJoin nesnesi (zorunlu).</param>
+        ///   Tablo alias bilgisini iÃ§eren LeftJoin nesnesi (zorunlu).</param>
         /// <param name="field">
         ///   Field alan (zorunlu).</param>
         public Criteria(string join, IField field)
@@ -131,8 +131,8 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Belirtilen SqlQuery i içeren yeni bir 
-        ///   kriter oluşturur.</summary>
+        ///   Belirtilen SqlQuery i iÃ§eren yeni bir 
+        ///   kriter oluÅŸturur.</summary>
         /// <param name="query">
         ///   Query nesnesi (genellikle sub query).</param>
         public Criteria(ISqlQuery query)
@@ -142,13 +142,13 @@ namespace Serenity.Data
 
 
         /// <summary>
-        ///   Verilen alan adını köşeli parantez içine alarak yeni bir kriter oluşturur.
-        ///   SQL'de boşluk içeren ya da keyword olan alan adlarının kullanılabilmesi 
-        ///   için gerekebilir.</summary>
+        ///   Verilen alan adÄ±nÄ± kÃ¶ÅŸeli parantez iÃ§ine alarak yeni bir kriter oluÅŸturur.
+        ///   SQL'de boÅŸluk iÃ§eren ya da keyword olan alan adlarÄ±nÄ±n kullanÄ±labilmesi 
+        ///   iÃ§in gerekebilir.</summary>
         /// <param name="fieldName">
-        ///   Köşeli parantez içine alınıp kriterye çevrilecek alan adı (zorunlu).</param>
+        ///   KÃ¶ÅŸeli parantez iÃ§ine alÄ±nÄ±p kriterye Ã§evrilecek alan adÄ± (zorunlu).</param>
         /// <returns>
-        ///   Alan adını köşeli parantez içinde içeren yeni bir kriter.</returns>
+        ///   Alan adÄ±nÄ± kÃ¶ÅŸeli parantez iÃ§inde iÃ§eren yeni bir kriter.</returns>
         public static Criteria Bracket(string fieldName)
         {
             if (String.IsNullOrEmpty(fieldName))

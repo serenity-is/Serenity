@@ -1,36 +1,36 @@
-using System;
+ï»¿using System;
 
 namespace Serenity.Data
 {
 
     /// <summary>
-    ///   Bir alanın temel özelliklerini belirleyen flag'lar</summary>
+    ///   Bir alanÄ±n temel Ã¶zelliklerini belirleyen flag'lar</summary>
     /// <remarks>
-    ///   Bilgi amaçlı olarak kullanıldığı gibi, PagerPanel gibi bazı nesneler tarafından dinamik 
-    ///   INSERT, UPDATE sorgularının üretilmesinde de kullanılır. Örneğin Insertable olmayan alanlar 
-    ///   değerleri alınsa da INSERT sorgusuna dahil edilmez. ConvertEmptyStringToNull ise
-    ///   INSERT, UPDATE esnasında grid ya da details view den gelen string alan değerlerinin SQL 
-    ///   parametrelerine çevrilirken, eğer değer boşsa NULL yapılıp yapılmayacağını belirler.</remarks>
+    ///   Bilgi amaÃ§lÄ± olarak kullanÄ±ldÄ±ÄŸÄ± gibi, PagerPanel gibi bazÄ± nesneler tarafÄ±ndan dinamik 
+    ///   INSERT, UPDATE sorgularÄ±nÄ±n Ã¼retilmesinde de kullanÄ±lÄ±r. Ã–rneÄŸin Insertable olmayan alanlar 
+    ///   deÄŸerleri alÄ±nsa da INSERT sorgusuna dahil edilmez. ConvertEmptyStringToNull ise
+    ///   INSERT, UPDATE esnasÄ±nda grid ya da details view den gelen string alan deÄŸerlerinin SQL 
+    ///   parametrelerine Ã§evrilirken, eÄŸer deÄŸer boÅŸsa NULL yapÄ±lÄ±p yapÄ±lmayacaÄŸÄ±nÄ± belirler.</remarks>
     [Flags]
     public enum FieldFlags
     {
         /// <summary>
-        ///   Hiçbir flag set edilmemiş.</summary>
+        ///   HiÃ§bir flag set edilmemiÅŸ.</summary>
         None = 0,
         /// <summary>
-        ///   Hiçbir flag set edilmemiş.</summary>
+        ///   HiÃ§bir flag set edilmemiÅŸ.</summary>
         Internal = 0,
         /// <summary>
-        ///   INSERT esnasında değer verilebilir mi? Diğer tablolardan gelen alanlar ve 
-        ///   identity gibi alanların bu flag'i olmamalı.</summary>
+        ///   INSERT esnasÄ±nda deÄŸer verilebilir mi? DiÄŸer tablolardan gelen alanlar ve 
+        ///   identity gibi alanlarÄ±n bu flag'i olmamalÄ±.</summary>
         Insertable = 1,
         /// <summary>
-        ///   UPDATE esnasında güncellenebilir mi? Diğer tablolardan gelen alanlar ve identity 
-        ///   gibi alanların bu flag'i olmamalı.</summary>
+        ///   UPDATE esnasÄ±nda gÃ¼ncellenebilir mi? DiÄŸer tablolardan gelen alanlar ve identity 
+        ///   gibi alanlarÄ±n bu flag'i olmamalÄ±.</summary>
         Updatable = 2,
         /// <summary>
-        ///   NULL olabilir mi. Gridview ve Detailsview'de validator'ların Required özelliklerinin
-        ///   belirlenmesi için.</summary>
+        ///   NULL olabilir mi. Gridview ve Detailsview'de validator'larÄ±n Required Ã¶zelliklerinin
+        ///   belirlenmesi iÃ§in.</summary>
         NotNull = 4,
         /// <summary>
         ///   Alan anahtar saha ya da sahalardan biri.</summary>
@@ -39,10 +39,10 @@ namespace Serenity.Data
         ///   Otomatik artan integer saha.</summary>
         AutoIncrement = 16,
         /// <summary>
-        ///   LEFT OUTER JOIN ile diğer tablolardan gelen alanların bu flag'i set edilmeli.</summary> 
+        ///   LEFT OUTER JOIN ile diÄŸer tablolardan gelen alanlarÄ±n bu flag'i set edilmeli.</summary> 
         Foreign = 32,
         /// <summary>
-        ///   Hesaplanan alan, Foreign varsa diğer tablolardan da gelen alanların karışımı olabilir.</summary>
+        ///   Hesaplanan alan, Foreign varsa diÄŸer tablolardan da gelen alanlarÄ±n karÄ±ÅŸÄ±mÄ± olabilir.</summary>
         Calculated = 64,
         /// <summary>
         ///   Just reflects another field value (e.g. negative/absolute of it), so doesn't have client and server side storage of its own,
@@ -64,15 +64,15 @@ namespace Serenity.Data
         ///   Unique.</summary>
         Unique = 4096,
         /// <summary>
-        ///   Yeni bir <see cref="Field"/> üretirken alan özellikleri belirtilmediğinde
-        ///   kullanılacak öndeğer özellikler. Eklenebilir, güncellenebilir, NULL yapılabilir,
-        ///   boş string'ler NULL'a çevrilir.</summary>
+        ///   Yeni bir <see cref="Field"/> Ã¼retirken alan Ã¶zellikleri belirtilmediÄŸinde
+        ///   kullanÄ±lacak Ã¶ndeÄŸer Ã¶zellikler. Eklenebilir, gÃ¼ncellenebilir, NULL yapÄ±labilir,
+        ///   boÅŸ string'ler NULL'a Ã§evrilir.</summary>
         Default = Insertable | Updatable | Trim,
         /// <summary>
-        ///   Default'tan farkı zorunlu alan olması.</summary>
+        ///   Default'tan farkÄ± zorunlu alan olmasÄ±.</summary>
         Required = Default | NotNull,
         /// <summary>
-        ///   Otomatik artan anahtar ID alanları için kullanılacak flag seti.</summary>
+        ///   Otomatik artan anahtar ID alanlarÄ± iÃ§in kullanÄ±lacak flag seti.</summary>
         Identity = PrimaryKey | AutoIncrement | NotNull
     }
 }

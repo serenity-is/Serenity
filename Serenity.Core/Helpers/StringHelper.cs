@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Globalization;
 using System.Text;
@@ -274,7 +274,7 @@ namespace Serenity
             s = s.Replace("/", "_");
             s = s.Replace(":", "_");
             s = s.Replace("&", "_");
-            s = s.Replace("ý", "i");
+            s = s.Replace("Ä±", "i");
             return s.TrimToEmpty();
         }
 
@@ -288,7 +288,7 @@ namespace Serenity
                 Char c = normalizedString[i];
                 if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
                 {
-                    if (c == 'ý')
+                    if (c == 'Ä±')
                         c = 'i';
 
                     stringBuilder.Append(c);

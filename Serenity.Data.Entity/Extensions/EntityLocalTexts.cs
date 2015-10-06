@@ -1,4 +1,4 @@
-
+﻿
 namespace Serenity.Localization
 {
     using Localization;

@@ -1,4 +1,4 @@
-namespace Serenity.Localization
+﻿namespace Serenity.Localization
 {
     /// <summary>
     /// Local text context abstraction for sites that support a pending approval mode.

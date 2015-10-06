@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using System;

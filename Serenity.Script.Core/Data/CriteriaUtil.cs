@@ -1,4 +1,4 @@
-namespace Serenity
+﻿namespace Serenity
 {
     using Serenity.Data;
     using System;

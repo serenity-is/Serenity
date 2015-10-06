@@ -1,4 +1,4 @@
-namespace Serenity.Abstractions
+﻿namespace Serenity.Abstractions
 {
     /// <summary>
     /// Abstraction for local text registry which stores translations for local text keys. 
