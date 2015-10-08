@@ -87,6 +87,7 @@
     <Compile Include="Grid\DataGrid.cs" />
     <Compile Include="Grid\PopupToolButton.cs" />
     <Compile Include="Grid\PopupMenuButton.cs" />
+    <Compile Include="Misc\GoogleMap.cs" />
     <Compile Include="PropertyDialog\PropertyDialog.cs" />
     <Compile Include="Editor\BooleanEditor.cs" />
     <Compile Include="Editor\EditorTypeEditor.cs" />
