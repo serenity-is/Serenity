@@ -1,3 +1,11 @@
+## 1.5.6 (2015-10-08)
+
+Features:
+  - imported google maps using Script# import library at https://gmapsharp.codeplex.com/
+  
+Bugfixes:
+  - fix typo in ScriptDtoGenerator that resolves lookup script reference generation for outside-row lookup scripts
+
 ## 1.5.5 (2015-09-25)
 
 Features:
