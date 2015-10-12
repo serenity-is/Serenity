@@ -673,8 +673,20 @@ Q$Externals.toId = function(id) {
     return parseInt(id, 10);
 }
 
+var oldShowLabel;
+
+Q$Externals.validateShowLabel = function (element, message) {
+    oldShowLabel.call(this, element, message);
+    this.errorsFor(element).each(function (i, e) {
+        $(e).attr('title', $(e).text());
+    });
+}
+
 Q$Externals.jQueryValidationInitialization = function () {
     Serenity.CustomValidation.registerValidationMethods();
+
+    oldShowLabel = $.validator.prototype.showLabel;
+    $.validator.prototype.showLabel = Q$Externals.validateShowLabel;
 
     jQuery.validator.addMethod("xss", function (value, element) {
         if (value.length == 0)
@@ -830,8 +842,8 @@ Q$Externals.validatorAbortHandler = function (validator) {
     }
 }
 
+Q$Externals.validateOptions = function (options) {
 
-Q$Externals.validateOptions = function(options) {
     return $.extend({
         ignore: ":hidden",
         meta: 'v',
