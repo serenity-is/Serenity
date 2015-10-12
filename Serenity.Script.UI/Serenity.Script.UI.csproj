@@ -152,6 +152,7 @@
     <Compile Include="Reporting\ReportDialog.cs" />
     <Compile Include="Reporting\ReportPage.cs" />
     <Compile Include="Editor\EnumEditor.cs" />
+    <Compile Include="Widget\CascadedWidgetLink.cs" />
     <Compile Include="Widget\IAsyncInit.cs" />
     <Compile Include="Widget\ValidationExtensions.cs" />
     <Compile Include="Widget\DialogExtensions.cs" />
