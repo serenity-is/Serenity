@@ -25,10 +25,13 @@ namespace Serenity.Data
             if (reader == null)
                 throw new ArgumentNullException("reader");
 
-            if (reader.IsDBNull(index))
+            var value = reader.GetValue(index);
+            if (value is DBNull)
                 _setValue(row, null);
+            else if (value is Decimal)
+                _setValue(row, (decimal)value);
             else
-                _setValue(row, reader.GetDecimal(index));
+                _setValue(row, Convert.ToDecimal(value, CultureInfo.InvariantCulture));
 
             if (row.tracking)
                 row.FieldAssignedValue(this);
