@@ -867,7 +867,32 @@ namespace Serenity
                 quickFiltersDiv.Append(J("<hr/>"));
         }
 
-        public TWidget AddEqualityFilter<TWidget>(string field, string title, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
+        protected string DetermineText(string text, Func<string, string> getKey)
+        {
+            if (text != null &&
+                !text.StartsWith("`"))
+            {
+                var local = Q.TryGetText(text);
+                if (local != null)
+                    return local;
+            }
+
+            if (text != null && text.StartsWith("`"))
+                text = text.Substr(1);
+
+            var localTextPrefix = GetLocalTextPrefix();
+
+            if (!localTextPrefix.IsEmptyOrNull())
+            {
+                var local = Q.TryGetText(getKey(localTextPrefix));
+                if (local != null)
+                    return local;
+            }
+
+            return text;
+        }
+
+        public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
             Action<jQueryObject> element = null, Action<TWidget> init = null)
             where TWidget: Widget
         {
@@ -876,10 +901,10 @@ namespace Serenity
                 J("<div/>").AddClass("clear").AppendTo(toolbar.Element);
                 quickFiltersDiv = J("<div/>").AddClass("quick-filters-bar").AppendTo(toolbar.Element);
             }
-
+           
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)
-                .Children().Text(title ?? "")
+                .Children().Text(DetermineText(title ?? field, pre => pre + field) ?? "")
                 .Parent();
 
             var widget = Widget.Create<TWidget>(
