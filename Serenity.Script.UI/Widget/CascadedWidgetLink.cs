@@ -11,6 +11,7 @@
         public CascadedWidgetLink(Widget widget, Action<TParent> parentChange)
         {
             this.widget = widget;
+            this.parentChange = parentChange;
             Bind();
             this.widget.Element.Bind("remove." + widget.UniqueName + "cwh", (e) => {
                 Unbind();
