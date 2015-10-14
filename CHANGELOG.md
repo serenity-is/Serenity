@@ -1,3 +1,17 @@
+## 1.5.7 (2015-10-14)
+
+Features:
+  - CascadedWidgetLink to make it easier to implement cascaded select editors
+  - determine quick filter title using local texts automatically
+  - decimal field better conversion handling
+  - sample for order and detail (in-memory) editing and updating within a unit of work (transaction) [Serene]
+  - provide tabbed interface to edit orders in customer dialog [Serene]
+  - country / city cascaded editors and filtering sample [Serene]
+  - better Sql LocalDB error handling [Serene]
+  
+Bugfixes:
+  - fix validation message hint not showing after recent jquery.validate update
+
 ## 1.5.6 (2015-10-08)
 
 Features:
