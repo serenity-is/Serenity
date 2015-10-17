@@ -36,7 +36,7 @@ namespace Serenity
 
         protected virtual bool IsNullable()
         {
-            return !Field.Required;
+            return Field.Required != true;
         }
 
         public virtual void CreateEditor()

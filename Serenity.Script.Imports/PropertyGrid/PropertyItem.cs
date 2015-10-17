@@ -16,13 +16,13 @@ namespace Serenity
         public string Category { get; set; }
         public string CssClass { get; set; }
         public int? MaxLength { get; set; }
-        public bool Required { get; set; }
+        public bool? Required { get; set; }
         public bool? Insertable { get; set; }
         public bool? Updatable { get; set; }
-        public bool ReadOnly { get; set; }
-        public bool OneWay { get; set; }
+        public bool? ReadOnly { get; set; }
+        public bool? OneWay { get; set; }
         public object DefaultValue { get; set; }
-        public bool Localizable { get; set; }
+        public bool? Localizable { get; set; }
         public bool? Visible { get; set; }
 
         public string FormatterType { get; set; }
@@ -30,12 +30,12 @@ namespace Serenity
         public string DisplayFormat { get; set; }
         public string Alignment { get; set; }
         public int Width { get; set; }
-        public int MinWidth { get; set; }
-        public int MaxWidth { get; set; }
-        public bool Resizable { get; set; }
-        public int SortOrder { get; set; }
+        public int? MinWidth { get; set; }
+        public int? MaxWidth { get; set; }
+        public bool? Resizable { get; set; }
+        public int? SortOrder { get; set; }
 
-        public bool EditLink { get; set; }
+        public bool? EditLink { get; set; }
         public string EditLinkItemType { get; set; }
         public string EditLinkIdField { get; set; }
         public string EditLinkCssClass { get; set; }
@@ -43,7 +43,7 @@ namespace Serenity
         public string FilteringType { get; set; }
         public JsDictionary FilteringParams { get; set; }
         public string FilteringIdField { get; set; }
-        public bool NotFilterable { get; set; }
-        public bool FilterOnly { get; set; }
+        public bool? NotFilterable { get; set; }
+        public bool? FilterOnly { get; set; }
     }
 }

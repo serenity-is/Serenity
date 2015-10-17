@@ -157,7 +157,7 @@ namespace Serenity
                 .Html(title ?? "")
                 .AppendTo(fieldDiv);
 
-            if (item.Required)
+            if (item.Required == true)
                 J("<sup>*</sup>")
                     .Attribute("title", Texts.Controls.PropertyGrid.RequiredHint)
                     .PrependTo(label);
@@ -447,7 +447,7 @@ namespace Serenity
             for (var i = 0; i < editors.Count; i++)
             {
                 var item = items[i];
-                if (!item.OneWay &&
+                if (item.OneWay != true &&
                     !(Mode == PropertyGridMode.Insert && item.Insertable == false) &&
                     !(Mode == PropertyGridMode.Update && item.Updatable == false))
                 {
@@ -496,12 +496,12 @@ namespace Serenity
                 var item = items[i];
                 var editor = editors[i];
 
-                bool readOnly = item.ReadOnly ||
+                bool readOnly = item.ReadOnly == true ||
                     (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
                     (Mode == PropertyGridMode.Update && item.Updatable == false);
 
                 SetReadOnly(editor, readOnly);
-                SetRequired(editor, !readOnly && item.Required && 
+                SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
                     (item.EditorType != "Boolean"));
             }
         }

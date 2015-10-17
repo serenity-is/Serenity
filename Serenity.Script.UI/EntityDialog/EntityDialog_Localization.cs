@@ -49,7 +49,7 @@ namespace Serenity
             var pgDiv = this.ById("PropertyGrid");
             var anyLocalizable = false;
             foreach (var item in pgOptions.Items)
-                if (item.Localizable)
+                if (item.Localizable == true)
                     anyLocalizable = true;
 
             if (!anyLocalizable)
@@ -64,7 +64,7 @@ namespace Serenity
             var items = new List<PropertyItem>();
             foreach (var item in pgOptions.Items)
             {
-                if (item.Localizable)
+                if (item.Localizable == true)
                 {
                     var copy = jQuery.ExtendObject(new PropertyItem(), item);
                     copy.OneWay = true;

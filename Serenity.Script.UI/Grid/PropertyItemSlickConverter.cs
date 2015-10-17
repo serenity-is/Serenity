@@ -26,7 +26,7 @@ namespace Serenity
             result.Field = item.Name;
             result.Title = Q.TryGetText(item.Title) ?? item.Title;
             result.CssClass = item.CssClass;
-            result.SortOrder = item.SortOrder;
+            result.SortOrder = item.SortOrder ?? 0;
             
             if (Script.IsValue(item.Alignment) && item.Alignment.Length > 0)
             {
@@ -37,9 +37,9 @@ namespace Serenity
             }
 
             result.Width = Script.IsValue(item.Width) ? item.Width : 80;
-            result.MinWidth = (!Script.IsValue(item.MinWidth) || item.MinWidth == 0) ? 30 : item.MinWidth;
-            result.MaxWidth = (!Script.IsValue(item.MaxWidth) || item.MaxWidth == 0) ? null : (int?)item.MaxWidth;
-            result.Resizable = !Script.IsValue(item.Resizable) || item.Resizable;
+            result.MinWidth = item.MinWidth ?? 30;
+            result.MaxWidth = (item.MaxWidth == null || item.MaxWidth == 0) ? null : item.MaxWidth;
+            result.Resizable = item.Resizable == null || item.Resizable.Value;
 
             if (Script.IsValue(item.FormatterType) && item.FormatterType.Length > 0)
             {

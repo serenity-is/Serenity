@@ -689,7 +689,7 @@ namespace Serenity
                     var item = propertyItems[i];
                     var column = columns[i];
 
-                    if (item.EditLink)
+                    if (item.EditLink == true)
                     {
                         var oldFormat = column.Format;
                         var css = Script.IsValue(item.EditLinkCssClass) ? item.EditLinkCssClass : null;

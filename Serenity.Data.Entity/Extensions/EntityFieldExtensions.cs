@@ -103,5 +103,38 @@ namespace Serenity.Data
         {
             return SqlConnections.NewByKey(fields.connectionKey);
         }
+
+        public static TAttribute GetAttribute<TAttribute>(this Field field)
+            where TAttribute: Attribute
+        {
+            if (Object.ReferenceEquals(null, field))
+                return null;
+
+            if (field.CustomAttributes != null)
+            {
+                foreach (var a in field.CustomAttributes)
+                    if (typeof(TAttribute).IsAssignableFrom(a.GetType()))
+                        return (TAttribute)a;
+            }
+
+            return null;
+        }
+
+
+        public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this Field field)
+            where TAttribute : Attribute
+        {
+            if (Object.ReferenceEquals(null, field))
+                yield break;
+
+            if (field.CustomAttributes != null)
+            {
+                foreach (var a in field.CustomAttributes)
+                    if (typeof(TAttribute).IsAssignableFrom(a.GetType()))
+                        yield return (TAttribute)a;
+            }
+
+            yield break;
+        }
     }
 }
