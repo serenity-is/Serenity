@@ -5,15 +5,15 @@ namespace Serenity.PropertyGrid
 {
     public partial class BasicPropertyProcessor : PropertyProcessor
     {
-        private void SetUpdatable(IPropertySource source, PropertyItem item)
+        private void SetInsertable(IPropertySource source, PropertyItem item)
         {
-            if (source.Member != null)
+            if (source.Property != null)
             {
-                var attr = source.Member.GetAttribute<UpdatableAttribute>(false);
+                var attr = source.Property.GetAttribute<InsertableAttribute>(false);
                 if (attr != null)
                 {
                     if (!attr.Value)
-                        item.Updatable = false;
+                        item.Insertable = false;
 
                     return;
                 }
@@ -21,8 +21,8 @@ namespace Serenity.PropertyGrid
 
             if (!ReferenceEquals(null, source.BasedOnField))
             {
-                if ((source.BasedOnField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
-                    item.Updatable = false;
+                if ((source.BasedOnField.Flags & FieldFlags.Insertable) != FieldFlags.Insertable)
+                    item.Insertable = false;
             }
         }
     }

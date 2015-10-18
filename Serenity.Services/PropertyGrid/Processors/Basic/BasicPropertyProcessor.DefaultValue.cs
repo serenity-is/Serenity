@@ -7,9 +7,9 @@ namespace Serenity.PropertyGrid
     {
         private void SetDefaultValue(IPropertySource source, PropertyItem item)
         {
-            if (source.Member != null)
+            if (source.Property != null)
             {
-                var attr = source.Member.GetAttribute<DefaultValueAttribute>(false);
+                var attr = source.Property.GetAttribute<DefaultValueAttribute>(false);
                 if (attr != null)
                 {
                     item.DefaultValue = attr.Value;

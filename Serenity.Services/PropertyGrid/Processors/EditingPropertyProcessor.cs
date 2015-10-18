@@ -4,9 +4,9 @@ using System;
 
 namespace Serenity.PropertyGrid
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    public partial class EditingPropertyProcessor : PropertyProcessor
     {
-        private void SetEditing(IPropertySource source, PropertyItem item)
+        public override void Process(IPropertySource source, PropertyItem item)
         {
             var editorTypeAttr = source.GetAttribute<EditorTypeAttribute>();
 
@@ -27,9 +27,9 @@ namespace Serenity.PropertyGrid
             {
                 if (item.EditorType == "Decimal" &&
                     (source.BasedOnField is DoubleField ||
-                     source.BasedOnField is DecimalField) &&
-                     source.BasedOnField.Size > 0 &&
-                     source.BasedOnField.Scale < source.BasedOnField.Size)
+                        source.BasedOnField is DecimalField) &&
+                        source.BasedOnField.Size > 0 &&
+                        source.BasedOnField.Scale < source.BasedOnField.Size)
                 {
                     string minVal = new String('0', source.BasedOnField.Size - source.BasedOnField.Scale);
                     if (source.BasedOnField.Scale > 0)
@@ -79,6 +79,11 @@ namespace Serenity.PropertyGrid
                 return "Decimal";
             else
                 return "String";
+        }
+
+        public override int Priority
+        {
+            get { return 20; }
         }
     }
 }

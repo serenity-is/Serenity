@@ -5,11 +5,6 @@ namespace Serenity.PropertyGrid
 {
     public partial class BasicPropertyProcessor : PropertyProcessor
     {
-        public override void Initialize()
-        {
-            InitLocalizable();
-        }
-
         public override void Process(IPropertySource source, PropertyItem item)
         {
             SetAlignment(source, item);
@@ -17,9 +12,10 @@ namespace Serenity.PropertyGrid
             SetCssClass(source, item);
             SetDefaultValue(source, item);
             SetEditLink(source, item);
+            SetFiltering(source, item);
+            SetFormatting(source, item);
             SetHint(source, item);
             SetInsertable(source, item);
-            SetLocalizable(source, item);
             SetOneWay(source, item);
             SetPlaceholder(source, item);
             SetReadOnly(source, item);
@@ -30,10 +26,11 @@ namespace Serenity.PropertyGrid
             SetUpdatable(source, item);
             SetVisible(source, item);
             SetWidth(source, item);
+        }
 
-            SetEditing(source, item);
-            SetFormatting(source, item);
-            SetFiltering(source, item);
+        public override int Priority
+        {
+            get { return 10; }
         }
     }
 }

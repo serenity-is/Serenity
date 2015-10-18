@@ -3,10 +3,6 @@ using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
-using System.Linq;
-using Serenity.Extensibility;
 
 namespace Serenity.PropertyGrid
 {

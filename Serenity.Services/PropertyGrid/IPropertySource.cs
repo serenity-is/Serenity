@@ -11,7 +11,7 @@ namespace Serenity.PropertyGrid
 {
     public interface IPropertySource
     {
-        MemberInfo Member { get; }
+        PropertyInfo Property { get; }
         Field BasedOnField { get; }
         TAttr GetAttribute<TAttr>() where TAttr : Attribute;
         IEnumerable<TAttr> GetAttributes<TAttr>() where TAttr : Attribute;

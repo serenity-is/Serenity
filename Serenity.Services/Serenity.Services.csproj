@@ -49,29 +49,31 @@
     <Compile Include="Models\RetrieveLocalizationResponse.cs" />
     <Compile Include="Models\SaveRequestWithLocalizations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Alignment.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.DefaultValue.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.CssClass.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Formatting.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Filtering.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Editing.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Hint.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.EditLink.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Required.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Visible.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Updatable.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Insertable.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Localizable.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Resizable.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.ReadOnly.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.OneWay.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.SortOrder.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Placeholder.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Category.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Width.cs" />
-    <Compile Include="PropertyGrid\Processors\BasicPropertyProcessor.Title.cs" />
-    <Compile Include="PropertyGrid\PropertyItemHelper.MemberPropertySource.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Alignment.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.DefaultValue.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.CssClass.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Formatting.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Filtering.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Editing.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Hint.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.EditLink.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Required.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Visible.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Updatable.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Insertable.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Localizable.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Resizable.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.ReadOnly.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.OneWay.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.SortOrder.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Placeholder.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Category.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Width.cs" />
+    <Compile Include="PropertyGrid\Processors\Basic\BasicPropertyProcessor.Title.cs" />
+    <Compile Include="PropertyGrid\Processors\EditingPropertyProcessor.cs" />
+    <Compile Include="PropertyGrid\Processors\LocalizablePropertyProcessor.cs" />
+    <Compile Include="PropertyGrid\PropertyInfoSource.cs" />
     <Compile Include="PropertyGrid\PropertyItemHelper.CustomField.cs" />
     <Compile Include="PropertyGrid\PropertyProcessor.cs" />
     <Compile Include="PropertyGrid\IPropertySource.cs" />
@@ -146,6 +148,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

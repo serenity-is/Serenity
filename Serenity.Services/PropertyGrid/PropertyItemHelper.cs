@@ -29,21 +29,25 @@ namespace Serenity.PropertyGrid
                 processor.Initialize();
             }
 
-            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .OrderBy(x => x.MetadataToken))
             {
-                if (SkipMember(member))
+                if (property.GetCustomAttribute<IgnoreAttribute>(false) != null)
                     continue;
 
-                var source = new MemberPropertySource(member, basedOnRow);
+                var source = new PropertyInfoSource(property, basedOnRow);
 
                 PropertyItem pi = new PropertyItem();
-                pi.Name = member.Name;
+                pi.Name = property.Name;
 
                 foreach (var processor in processors)
                     processor.Process(source, pi);
 
                 list.Add(pi);
             }
+
+            foreach (var processor in processors)
+                processor.PostProcess();
 
             return list;
         }
@@ -61,18 +65,6 @@ namespace Serenity.PropertyGrid
                         type.FullName, typeof(Row).FullName));
 
             return (Row)Activator.CreateInstance(basedOnRowType);
-        }
-
-        private static bool SkipMember(MemberInfo member)
-        {
-            if (member.MemberType != MemberTypes.Property &&
-                member.MemberType != MemberTypes.Field)
-                return true;
-
-            if (member.GetCustomAttribute<IgnoreAttribute>(false) != null)
-                return true;
-
-            return false;
         }
 
         private static Type[] processorTypes;

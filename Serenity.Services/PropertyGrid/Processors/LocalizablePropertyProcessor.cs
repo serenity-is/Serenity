@@ -6,11 +6,23 @@ using System.Reflection;
 
 namespace Serenity.PropertyGrid
 {
-    public partial class BasicPropertyProcessor : PropertyProcessor
+    public partial class LocalizablePropertyProcessor : PropertyProcessor
     {
         private ILocalizationRowHandler localizationRowHandler;
 
-        private void SetLocalizable(IPropertySource source, PropertyItem item)
+        public override void Initialize()
+        {
+            if (BasedOnRow == null)
+                return;
+
+            var attr = BasedOnRow.GetType().GetCustomAttribute<LocalizationRowAttribute>(false);
+
+            if (attr != null)
+                localizationRowHandler = Activator.CreateInstance(typeof(LocalizationRowHandler<>)
+                    .MakeGenericType(BasedOnRow.GetType())) as ILocalizationRowHandler;
+        }
+
+        public override void Process(IPropertySource source, PropertyItem item)
         {
             var attr = source.GetAttribute<LocalizableAttribute>();
             if (attr != null)
@@ -27,17 +39,9 @@ namespace Serenity.PropertyGrid
             }
         }
 
-        private void InitLocalizable()
+        public override int Priority
         {
-            if (BasedOnRow == null)
-                return;
-
-            var attr = BasedOnRow.GetType().GetCustomAttribute<LocalizationRowAttribute>(false);
-
-            if (attr != null)
-                localizationRowHandler = Activator.CreateInstance(typeof(LocalizationRowHandler<>)
-                    .MakeGenericType(BasedOnRow.GetType())) as ILocalizationRowHandler;
+            get { return 15; }
         }
-
     }
 }
