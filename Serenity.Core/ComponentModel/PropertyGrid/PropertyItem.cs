@@ -85,6 +85,21 @@ namespace Serenity.ComponentModel
         [JsonProperty("notFilterable")]
         public bool? NotFilterable { get; set; }
 
+        public bool ShouldSerializeEditorParams()
+        {
+            return EditorParams != null && EditorParams.Count > 0;
+        }
+
+        public bool ShouldSerializeFormatterParams()
+        {
+            return EditorParams != null && FormatterParams.Count > 0;
+        }
+
+        public bool ShouldSerializeFilteringParams()
+        {
+            return FilteringParams != null && FilteringParams.Count > 0;
+        }
+
         public PropertyItem()
         {
             EditorParams = new Dictionary<string, object>();

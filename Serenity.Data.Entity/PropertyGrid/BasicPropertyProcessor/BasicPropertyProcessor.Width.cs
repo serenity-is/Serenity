@@ -14,8 +14,11 @@ namespace Serenity.PropertyGrid
             var widthAttr = source.GetAttribute<WidthAttribute>();
             var basedOnField = source.BasedOnField;
             item.Width = widthAttr == null ? (!ReferenceEquals(null, basedOnField) ? AutoWidth(basedOnField) : 80) : widthAttr.Value;
-            item.MinWidth = widthAttr == null ? 0 : widthAttr.Min;
-            item.MaxWidth = widthAttr == null ? 0 : widthAttr.Max;
+            if (widthAttr != null && (widthAttr.Min != 0))
+                item.MinWidth = widthAttr.Min;
+
+            if (widthAttr != null && (widthAttr.Max != 0))
+                item.MaxWidth = widthAttr.Max;
         }
 
         private static int AutoWidth(Field field)
