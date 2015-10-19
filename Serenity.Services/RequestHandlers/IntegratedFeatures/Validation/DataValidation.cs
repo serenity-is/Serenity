@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Serenity.Data;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using Serenity.Data;
 
 namespace Serenity.Services
 {
@@ -155,89 +155,84 @@ namespace Serenity.Services
             return RequiredError(field.Name, field.Title);
         }
 
-        public static ValidationError RequiredError(string name, string title)
+        public static ValidationError RequiredError(string name, string title = null)
         {
-            return new ValidationError("Required", name, "{0} alanı için değer girilmeli!", title);
-        }
-
-        public static ValidationError RequiredError(string name)
-        {
-            return new ValidationError("Required", name, "{0} alanı için değer girilmeli!", name);
+            return new ValidationError("Required", name, Texts.Validation.FieldInvalidValue, title ?? name);
         }
 
         public static ValidationError InvalidIdError(Row row, IIdField field)
         {
             var fld = (Field)field;
-            return new ValidationError("InvalidId", fld.Name, "Geçersiz {0} değeri: {1}", fld.Title, field[row].Value);
+            return new ValidationError("InvalidId", fld.Name, Texts.Validation.FieldInvalidValue, fld.Title, field[row].Value);
         }
 
         public static ValidationError InvalidIdError(Field field, Int64 value)
         {
             var fld = (Field)field;
-            return new ValidationError("InvalidId", field.Name, "Geçersiz {0} değeri: {1}", field.Title, value);
+            return new ValidationError("InvalidId", field.Name, Texts.Validation.FieldInvalidValue, field.Title, value);
         }
 
         public static ValidationError InvalidDateRangeError(Row row, DateTimeField start, DateTimeField finish)
         {
-            return new ValidationError("InvalidDateRange", start.Name + "," + finish.Name, "{0} için girilen tarih {1}'den önce olamaz!", start.Title, finish.Title);
+            return new ValidationError("InvalidDateRange", start.Name + "," + finish.Name, Texts.Validation.FieldInvalidDateRange, start.Title, finish.Title);
         }
 
         public static ValidationError ReadOnlyError(Row row, Field field)
         {
-            return new ValidationError("ReadOnly", field.Name, "{0} alanı salt okunur!", field.Title);
+            return new ValidationError("ReadOnly", field.Name, Texts.Validation.FieldIsReadOnly, field.Title);
         }
 
         public static ValidationError InvalidValueError(Field field, object value)
         {
-            return new ValidationError("InvalidValue", field.Name, "{0}, {1} alanı için geçerli bir değer değil!",
+            return new ValidationError("InvalidValue", field.Name, Texts.Validation.FieldInvalidValue,
                 Convert.ToString(value, CultureInfo.CurrentCulture), field.Title);
         }
 
         public static ValidationError InvalidValueError(Row row, Field field)
         {
-            return new ValidationError("InvalidValue", field.Name, "{0}, {1} alanı için geçerli bir değer değil!",
+            return new ValidationError("InvalidValue", field.Name, Texts.Validation.FieldInvalidValue,
                 Convert.ToString(field.AsObject(row), CultureInfo.CurrentCulture), field.Title);
         }
 
         public static ValidationError EntityNotFoundError(Row row, Int64 id)
         {
-            return new ValidationError("EntityNotFound", null, "İstenen kayıt bulunamadı. Kayıt silinmiş ya da erişim hakkınız yok!",
+            return new ValidationError("EntityNotFound", null, Texts.Validation.EntityNotFound,
                 Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));
         }
 
         public static ValidationError EntityReadAccessError(Row row, Int64 id)
         {
-            return new ValidationError("EntityReadAccessError", null, "{0} numaralı {1} kaydını görmeye hakkınız yok!",
+            return new ValidationError("EntityReadAccessError", null, Texts.Validation.EntityReadAccessViolation,
                 Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));
         }
 
         public static ValidationError EntityWriteAccessError(Row row, Int64 id)
         {
-            return new ValidationError("EntityWriteAccessError", null, "{0} numaralı {1} kaydı üzerinde değişiklik hakkınız yok!",
+            return new ValidationError("EntityWriteAccessError", null, Texts.Validation.EntityWriteAccessViolation,
                 Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));
         }
 
         public static ValidationError RelatedRecordExist(string foreignTable)
         {
-            return new ValidationError("RelatedRecordExist", null, "Bu kayıt silinmeden önce, kendisine bağlı olan {0} kayıtları silinmelidir!",
+            return new ValidationError("RelatedRecordExist", null, Texts.Validation.EntityForeignKeyViolation,
                 GetEntitySingular(foreignTable));
         }
 
         public static ValidationError ParentRecordDeleted(string foreignTable)
         {
-            return new ValidationError("ParentRecordDeleted", null, "Bu kayıtla ilgili işlem yapılmadan önce, kendisinin bağlı olduğu {0} kaydı geri alınmalıdır!",
+            return new ValidationError("ParentRecordDeleted", null, Texts.Validation.EntityHasDeletedParent,
                 GetEntitySingular(foreignTable));
         }
 
         public static ValidationError RecordNotActive(Row row)
         {
-            return new ValidationError("RecordNotActive", null, "Silinmiş bir {0} kaydı üzerinde işlem yapılamaz!",
+            return new ValidationError("RecordNotActive", null, Texts.Validation.EntityIsNotActive,
                 GetEntitySingular(row.Table));
         }
 
         public static ValidationError UnexpectedError()
         {
-            return new ValidationError("UnexpectedError", null, "Beklenmeyen bir hata oluştu!");
+            return new ValidationError("UnexpectedError", null, Texts.Validation.UnexpectedError);
         }
 
         public static string GetEntitySingular(string table)
@@ -247,18 +242,18 @@ namespace Serenity.Services
 
         public static ValidationError ArgumentNull(string argument)
         {
-            return new ValidationError("ArgumentNull", argument, "{0} istek parametresi boş girilmiş!", argument);
+            return new ValidationError("ArgumentNull", argument, Texts.Validation.ArgumentIsNull, argument);
         }
 
         public static ValidationError ArgumentOutOfRange(string argument)
         {
-            return new ValidationError("ArgumentOutOfRange", argument, "{0} istek parametresi izin verilen aralıkta değil!", argument);
+            return new ValidationError("ArgumentOutOfRange", argument, Texts.Validation.ArgumentOutOfRange, argument);
         }
 
         public static void CheckNotNull(this ServiceRequest request)
         {
             if (request == null)
-                throw new ValidationError("İstek boş!");
+                throw new ValidationError(Texts.Validation.RequestIsNull);
         }
     }
 }

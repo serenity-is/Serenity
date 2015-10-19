@@ -540,7 +540,7 @@ namespace Serenity
             var hasSupItem = gridField.Find("sup").GetItems().Any();
             if (isRequired && !hasSupItem){
                 J("<sup>*</sup>")
-                    .Attribute("title", "Bu alan zorunludur")
+                    .Attribute("title", Texts.Controls.PropertyGrid.RequiredHint)
                     .PrependTo(gridField.Find(".caption")[0]);
             }
             else if (!isRequired && hasSupItem){

@@ -55,6 +55,7 @@
     <Compile Include="RequestHandlers\Behaviours\ValidateParentAttribute.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\DisplayOrder\DisplayOrderFilterHelper.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\DisplayOrder\DisplayOrderHelper.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\Validation\Texts.Validation.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\Validation\DataValidation.cs" />
     <Compile Include="RequestHandlers\Helpers\PrefixHelper.cs" />
     <Compile Include="RequestHandlers\Behaviours\SaveRequestBehaviourAttribute.cs" />
