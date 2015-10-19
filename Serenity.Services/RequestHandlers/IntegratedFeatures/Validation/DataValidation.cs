@@ -157,7 +157,7 @@ namespace Serenity.Services
 
         public static ValidationError RequiredError(string name, string title = null)
         {
-            return new ValidationError("Required", name, Texts.Validation.FieldInvalidValue, title ?? name);
+            return new ValidationError("Required", name, Texts.Validation.FieldIsRequired, title ?? name);
         }
 
         public static ValidationError InvalidIdError(Row row, IIdField field)
