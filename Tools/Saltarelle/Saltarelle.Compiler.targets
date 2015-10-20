@@ -1,7 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 
-	<UsingTask AssemblyFile="$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\SCTask.dll" TaskName="SCTask"/>
+	<UsingTask AssemblyFile="..\..\..\packages\Saltarelle.Compiler.2.7.0\tools\SCTask.dll" TaskName="SCTask"/>
 
 	<ItemGroup>
 		<IntermediateScript Include="$(IntermediateOutputPath)$(TargetName).js" Condition="'@(IntermediateScript)'==''"/>
