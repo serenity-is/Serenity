@@ -190,14 +190,6 @@
     <EmbeddedResource Include="SqlScript\DbSerenity.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="$(SolutionDir)packages\Saltarelle.QUnit.1.12.1\qunit-1.12.0.css">
-      <Link>Scripts\qunit-1.12.0.css</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(SolutionDir)packages\Saltarelle.QUnit.1.12.1\qunit-1.12.0.js">
-      <Link>Scripts\qunit-1.12.0.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="$(SolutionDir)packages\PhantomJS.2.0.0\tools\phantomjs\phantomjs.exe">
       <Link>phantomjs.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -356,6 +348,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\qunit-1.12.0.css" />
+    <Content Include="Scripts\qunit-1.12.0.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_az.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
