@@ -1,3 +1,13 @@
+## 1.5.8 (2015-10-20)
+
+  - PropertyItemHelper is now extensible
+  - 30% compacter property item scripts
+  - localize server side validation texts in DataValidation
+
+Bugfixes:
+  - fix client side Select2 validation error by downgrading to 3.5.1
+  - fix qunit.js not found sometimes while running tests
+
 ## 1.5.7 (2015-10-14)
 
 Features:
@@ -8,7 +18,7 @@ Features:
   - provide tabbed interface to edit orders in customer dialog [Serene]
   - country / city cascaded editors and filtering sample [Serene]
   - better Sql LocalDB error handling [Serene]
-  
+
 Bugfixes:
   - fix validation message hint not showing after recent jquery.validate update
 
@@ -16,14 +26,14 @@ Bugfixes:
 
 Features:
   - imported google maps using Script# import library at https://gmapsharp.codeplex.com/
-  
+
 Bugfixes:
   - fix typo in ScriptDtoGenerator that resolves lookup script reference generation for outside-row lookup scripts
 
 ## 1.5.5 (2015-09-25)
 
 Features:
-  - generate script code form enum members in form / column definitions, even if they are not used in any row 
+  - generate script code form enum members in form / column definitions, even if they are not used in any row
   - add integrated inplace item add / edit ability to LookupEditor  
 
 ## 1.5.4 (2015-09-24)
@@ -33,7 +43,7 @@ Features:
   - updated razor generator
   - textarea font size changed to make it consistent with other editors in Serene
   - disable browser link feature in Visual Studio for Serene
-  
+
 ## 1.5.3 (2015-09-14)
 
 Features:
@@ -65,7 +75,7 @@ Features:
   - quicksearchinput type delay default is now 500 ms (instead of 250 ms)
   - no ui blocking for select2ajaxeditor
   - make sure MultipleImageUploadEditor works properly
-  
+
 
 Bugfixes:
   - number formatter shows empty string for non-numeric values.
@@ -107,7 +117,7 @@ Features:
   - dispose dialog if LoadByIdAndOpenDialog fails
   - use jquery ui dialogs own close button, as dialogExtend one was causing problems in tests and mobile.
   - execute-search trigger for quick search input (to avoid delays in tests)
-  
+
 Bugfixes:
   - code generator preserves source table field order as it was before
   - select editor empty option text fix
@@ -173,7 +183,7 @@ Features:
 
 Bugfixes:
   - fix problem with SQL 2012 dialect when skip > 0 and take = 0
-  
+
 ## 1.4.8 (2015-02-09)
 
 Features:
@@ -208,7 +218,7 @@ Features:
   - build targets files for those who use serenity as a submodule
 
 Bugfixes:
-  - regression bug in 1.4.1 that causes cache invalidation to fail for lookups / dynamic scripts 
+  - regression bug in 1.4.1 that causes cache invalidation to fail for lookups / dynamic scripts
 
 ## 1.4.5 (2014-11-28)
 
@@ -264,7 +274,7 @@ Features:
   - it is now possible to define a remote data script on a MVC action
   - indentation option for Json.StringifyIndented
   - added roles, role permissions, user permissions tables and interface to Serene sample application
-  
+
 Bugfixes:
   - Filter panel effective filter text is English now
 
@@ -305,7 +315,7 @@ Features:
   - translated filter panel texts to english
   - [BREAKING CHANGE] moved NestedLocalTextRegistration.AddFromScripts To JsonLocalTextRegistration.AddFromJsonFiles
   - [BREAKING CHANGE] ILocalTextRegistry.TryGet now takes a language ID parameter (was using CultureInfo.CurrentUICulture.Name before)
-  
+
 Bugfixes:
   - Set enum key attribute for CustomFieldType enumeration
 
@@ -330,8 +340,8 @@ Bugfixes:
 Bugfixes:
 
   - fix default location of select2.js in CommonIncludes
- 
- 
+
+
 ## 1.3.2 (2014-10-28)
 
 Features:
@@ -372,7 +382,7 @@ Features:
   - new EnumKey attribute for enum types so same enum names in different namespaces doesn't get mixed
   - async versions versions of Q.GetLookup, Q.GetForm etc.
   - include promise library for async operations (make sure your LayoutHead.cshtml contains ~/Scripts/rsvp.js before jQuery)
-  - widgets that do async initialization. TemplatedWidget, EntityDialog, DataGrid etc. supports this new system. 
+  - widgets that do async initialization. TemplatedWidget, EntityDialog, DataGrid etc. supports this new system.
     to provide backward compability, this feature is only enabled by adding IAsyncInit interface to a widget class.
   - allow criteria objects to be used on client side too (with some limitations to prevent SQL injections etc.)
   - list requests can now specify filtering through client side criteria
@@ -380,7 +390,7 @@ Features:
   - merge ServiceContracts.tt and ServiceEndpoints.tt (refer to Serene sample to update your own ServiceContracts.tt file)
   - upgrade to Saltarelle Compiler 2.6.0
   - upgrade to jQuery UI 1.11.1, jQuery Validation 1.13, FontAwesome 4.2, Bootstrap 3.2
-  
+
 Bugfixes:
   - enum editors use integer keys instead of string keys
   - fix slick grid column sort indicators in firefox
