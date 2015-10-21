@@ -1,3 +1,9 @@
+## 1.5.9 (2015-10-21)
+
+Bugfixes:
+  - FormContext.tt was failing after recent PropertyItemHelper changes
+  - fix typo in serenity.texts.tr.json
+  
 ## 1.5.8 (2015-10-20)
 
   - PropertyItemHelper is now extensible
