@@ -162,7 +162,7 @@ namespace Serenity
                     .Attribute("title", Texts.Controls.PropertyGrid.RequiredHint)
                     .PrependTo(label);
 
-            var editorType = EditorTypeRegistry.Get(item.EditorType);
+            var editorType = EditorTypeRegistry.Get(item.EditorType ?? "String");
             var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
             string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
 

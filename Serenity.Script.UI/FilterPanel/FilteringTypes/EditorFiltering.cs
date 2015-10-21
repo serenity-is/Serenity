@@ -53,7 +53,7 @@ namespace Serenity
         {
             var opt = base.GetEditorOptions();
 
-            if (UseEditor() && EditorType == Field.EditorType)
+            if (UseEditor() && EditorType == (Field.EditorType ?? "String"))
                 opt = jQuery.Extend(opt, Field.EditorParams);
 
             return opt;

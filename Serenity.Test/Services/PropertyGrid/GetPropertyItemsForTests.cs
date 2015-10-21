@@ -49,10 +49,7 @@ namespace Serenity.Test.PropertyGrid
             var actual = PropertyItemHelper.GetPropertyItemsFor(typeof(ClassWithOneSimpleProperty));
             var expected = new PropertyItem[]
             {
-                new PropertyItem
-                {
-                    Name = "Property"
-                }
+                new PropertyItem { Name = "Property", Title = "Property", Width = 80 }
             };
 
             Assert.Equal(JSON.StringifyIndented(expected), JSON.StringifyIndented(actual));
@@ -74,9 +71,9 @@ namespace Serenity.Test.PropertyGrid
 
             var expected = new PropertyItem[]
             {
-                new PropertyItem { Name = "Property3" },
-                new PropertyItem { Name = "Property1" },
-                new PropertyItem { Name = "Property2" },
+                new PropertyItem { Name = "Property3", Title = "Property3", Width = 80 },
+                new PropertyItem { Name = "Property1", Title = "Property1", Width = 80 },
+                new PropertyItem { Name = "Property2", Title = "Property2", Width = 80 }
             };
 
             Assert.Equal(JSON.StringifyIndented(expected), JSON.StringifyIndented(actual));

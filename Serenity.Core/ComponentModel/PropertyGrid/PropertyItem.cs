@@ -85,6 +85,16 @@ namespace Serenity.ComponentModel
         [JsonProperty("notFilterable")]
         public bool? NotFilterable { get; set; }
 
+        public bool ShouldSerializeEditorType()
+        {
+            return EditorType != null && EditorType != "String";
+        }
+
+        public bool ShouldSerializeFilteringType()
+        {
+            return FilteringType != null && FilteringType != "String";
+        }
+
         public bool ShouldSerializeEditorParams()
         {
             return EditorParams != null && EditorParams.Count > 0;
