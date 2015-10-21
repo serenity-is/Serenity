@@ -88,7 +88,6 @@
     <Compile Include="CodeGeneration\ScriptDtoGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptEndpointGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
-    <Compile Include="Common\AssemblySorter.cs" />
     <Compile Include="Common\RequestContext.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
     <Compile Include="Mvc\EndpointExtensions.cs" />

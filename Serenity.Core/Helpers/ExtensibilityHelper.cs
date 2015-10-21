@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Serenity.Extensibility
@@ -10,7 +12,13 @@ namespace Serenity.Extensibility
 
         public static Assembly[] SelfAssemblies
         {
-            get { return selfAssemblies; }
+            get
+            {
+                if (selfAssemblies == null)
+                    selfAssemblies = DetermineSelfAssemblies();
+
+                return selfAssemblies;
+            }
             set 
             {
                 if (value == null)
@@ -18,11 +26,6 @@ namespace Serenity.Extensibility
 
                 selfAssemblies = value; 
             }
-        }
-
-        static ExtensibilityHelper()
-        {
-            selfAssemblies = new Assembly[] { typeof(ExtensibilityHelper).Assembly };
         }
 
         public static IEnumerable<Type> GetTypesWithInterface(Type intf, Assembly[] assemblies = null)
@@ -34,6 +37,46 @@ namespace Serenity.Extensibility
                         intf.IsAssignableFrom(type))
                         yield return type;
             }
+        }
+
+        private static bool ReferencesSerenity(Assembly assembly)
+        { 
+            return assembly.FullName.Contains("Serenity") ||
+                assembly.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity"));
+        }
+
+        private static void EnumerateDirectory(Dictionary<string, Assembly> assemblies, string path)
+        {
+            foreach (var filename in Directory.GetFiles(path, "*.dll"))
+            try
+            {
+                if (assemblies.ContainsKey(Path.GetFileNameWithoutExtension(Path.GetFileName(filename))))
+                    continue;
+
+                var asm = Assembly.LoadFrom(filename);
+                var name = asm.GetName().Name;
+                if (!assemblies.ContainsKey(name) && ReferencesSerenity(asm))
+                    assemblies.Add(name, asm);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private static Assembly[] DetermineSelfAssemblies()
+        {
+            var assemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var name = asm.GetName().Name;
+                if (!assemblies.ContainsKey(name) && ReferencesSerenity(asm))
+                    assemblies.Add(name, asm);
+            }
+
+            var asmPath = Path.GetDirectoryName(typeof(ExtensibilityHelper).Assembly.Location);
+            EnumerateDirectory(assemblies, asmPath);
+
+            return Reflection.AssemblySorter.Sort(assemblies.Values).ToArray();
         }
 
         public static void RunClassConstructor(Type type)

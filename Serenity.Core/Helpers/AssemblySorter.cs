@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Serenity.Web
+namespace Serenity.Reflection
 {
-    internal class AssemblySorter
+    public class AssemblySorter
     {
         private class AssemblyItem
         {

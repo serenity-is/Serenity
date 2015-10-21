@@ -50,7 +50,7 @@ namespace Serenity.Web
                     x.FullName.Contains("Serenity") ||
                     x.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity")));
 
-            ExtensibilityHelper.SelfAssemblies = AssemblySorter.Sort(selfAssemblies).ToArray();
+            ExtensibilityHelper.SelfAssemblies = Reflection.AssemblySorter.Sort(selfAssemblies).ToArray();
         }
 
         public static void InitializeCaching()

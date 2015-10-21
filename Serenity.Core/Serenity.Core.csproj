@@ -67,6 +67,7 @@
     <Compile Include="ComponentModel\PropertyGrid\SortOrderAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
     <Compile Include="ComponentModel\Columns\WidthAttribute.cs" />
+    <Compile Include="Helpers\AssemblySorter.cs" />
     <Compile Include="Helpers\Check.cs" />
     <Compile Include="Helpers\BinarySerialization.cs" />
     <Compile Include="ComponentModel\Extensibility\DynamicScriptAttribute.cs" />
