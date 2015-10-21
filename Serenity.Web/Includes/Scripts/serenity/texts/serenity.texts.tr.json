@@ -134,7 +134,7 @@
     "Validation.MinLength": "Lütfen en az {0} karakter giriniz.",
     "Validation.PasswordConfirm": "Girilen şifreler birbirini tutmuyor.",
     "Validation.Range": "Lütfen {0} ile {1} arasında bir değer giriniz.",
-    "Validation.RequestIsNull": "Request is empty!""
+    "Validation.RequestIsNull": "İstek içeriği boş!",
     "Validation.Required": "Bu alan zorunludur.",
     "Validation.UnexpectedError": "Beklenmeyen bir hata oluştu!",
     "Validation.UniqueViolation": "Aynı '{0}' değerine sahip başka bir kayıt mevcut!",
