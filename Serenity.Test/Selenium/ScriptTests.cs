@@ -19,17 +19,11 @@ namespace Serenity.Test
             return AppDomain.CurrentDomain.BaseDirectory;
         }
 
-        private Dictionary<string, object> ExecuteQunitTests()
+        private Dictionary<string, object> GetQunitTestResults()
         {
-            Browser.Manage().Timeouts().SetScriptTimeout(new TimeSpan(0, 1, 0));
-
-            Thread.Sleep(2000);
-
             return ((OpenQA.Selenium.IJavaScriptExecutor)Browser).ExecuteScript(
             (
-                "var callback = arguments[arguments.length - 1];" +
-                "QUnit.done(callback); " +
-                "QUnit.start();"
+                "return window.global_test_results"
             )) as Dictionary<string, object>;
         }
 
@@ -39,11 +33,22 @@ namespace Serenity.Test
             GoToUrl("~/ScriptTests.html?noautostart=1");
             try
             {
-                var qunitResults = ExecuteQunitTests();
+                Dictionary<string, object> qunitResults = null;
+                int tries = 0;
+                while (tries++ < 100 && qunitResults == null)
+                {
+                    Thread.Sleep(100);
+                    qunitResults = GetQunitTestResults();
+                }
+
+                Assert.True(qunitResults != null, "Couldn't read QUNIT results!");
+
                 int failed = -1;
                 if (qunitResults.ContainsKey("failed"))
                     failed = Convert.ToInt32(qunitResults["failed"]);
-                Assert.True(failed == 0, String.Format("{0} tests failed!", failed));
+
+                Assert.True(failed == 0, String.Format("{0} tests failed! Results: {1}", failed,
+                    JSON.Stringify(qunitResults)));
             }
             catch (Exception)
             {
