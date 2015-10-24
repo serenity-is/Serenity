@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading;
 using Xunit;
 
 namespace Serenity.Test
@@ -22,7 +23,9 @@ namespace Serenity.Test
         {
             Browser.Manage().Timeouts().SetScriptTimeout(new TimeSpan(0, 1, 0));
 
-            return ((OpenQA.Selenium.IJavaScriptExecutor)Browser).ExecuteAsyncScript(
+            Thread.Sleep(2000);
+
+            return ((OpenQA.Selenium.IJavaScriptExecutor)Browser).ExecuteScript(
             (
                 "var callback = arguments[arguments.length - 1];" +
                 "QUnit.done(callback); " +
