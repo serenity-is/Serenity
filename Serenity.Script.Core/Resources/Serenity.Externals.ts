@@ -1,13 +1,13 @@
-﻿var Q$Externals;
-(function (Q$Externals) {
-    function zeroPad(n, digits) {
+﻿module Q$Externals {
+
+    export function zeroPad(n: number, digits: number): string {
         var s = n.toString();
         while (s.length < digits)
             s = "0" + digits;
         return s;
     }
-    Q$Externals.zeroPad = zeroPad;
-    function formatDayHourAndMin(n) {
+
+    export function formatDayHourAndMin(n: number): string {
         if (n === 0)
             return '0';
         else if (!n)
@@ -24,10 +24,9 @@
             txt += mins;
         }
         return txt;
-    }
-    Q$Externals.formatDayHourAndMin = formatDayHourAndMin;
-    ;
-    function formatISODateTimeUTC(d) {
+    };
+
+    export function formatISODateTimeUTC(d: Date): string {
         if (d == null)
             return "";
         var zeropad = function (num) { return ((num < 10) ? '0' : '') + num; };
@@ -41,14 +40,14 @@
             zeropad(d.getUTCMilliseconds()));
         str += ":" + zeropad(secs) + "Z";
         return str;
-    }
-    Q$Externals.formatISODateTimeUTC = formatISODateTimeUTC;
-    ;
-    function formatNumber(n, fmt, dec, grp) {
+    };
+
+    export function formatNumber(n: number, fmt: string, dec?: string, grp?: string): string {
         var neg = '-';
         if (isNaN(n)) {
             return null;
         }
+
         var r = "";
         if (fmt.indexOf(".") > -1) {
             var dp = dec;
@@ -80,6 +79,7 @@
         }
         else
             n = Math.round(n);
+
         var ones = Math.floor(n);
         if (n < 0)
             ones = Math.ceil(n);
@@ -88,6 +88,7 @@
             of = fmt;
         else
             of = fmt.substring(0, fmt.indexOf("."));
+
         var op = "";
         if (!(ones == 0 && of.substr(of.length - 1) == '#')) {
             // find how many digits are in the group
@@ -104,6 +105,7 @@
                     gc = 0;
                 }
             }
+
             // account for any pre-data padding
             if (of.length > op.length) {
                 var padStart = of.indexOf('0');
@@ -122,19 +124,22 @@
                 }
             }
         }
+
         if (!op && of.indexOf('0', of.length - 1) !== -1)
             op = '0';
+
         r = op + r;
         if (n < 0)
             r = neg + r;
+
         if (r.lastIndexOf(dec) == r.length - 1) {
             r = r.substring(0, r.length - 1);
         }
+
         return r;
-    }
-    Q$Externals.formatNumber = formatNumber;
-    ;
-    function roundNumber(n, dec) {
+    };
+
+    function roundNumber(n: number, dec?: number): number {
         var power = Math.pow(10, dec || 0);
         var value = (Math.round(n * power) / power).toString();
         // ensure the decimal places are there
@@ -153,11 +158,12 @@
             }
         }
         return parseFloat(value);
-    }
-    ;
+    };
+
     var isoRegexp = /(\d{4,})(?:-(\d{1,2})(?:-(\d{1,2})(?:[T ](\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:\.(\d+))?)?(?:(Z)|([+-])(\d{1,2})(?::(\d{1,2}))?)?)?)?)?/;
+    
     // -- PARSING ---
-    function parseInteger(s) {
+    function parseInteger(s: string): number {
         s = Q.trim(s.toString());
         var ts = Q$Culture.get_groupSeperator();
         if (s && s.length && s.indexOf(ts) > 0) {
@@ -166,9 +172,9 @@
         if (!(/^[-\+]?\d+$/.test(s)))
             return NaN;
         return parseInt(s, 10);
-    }
-    ;
-    function parseDate(s, dateOrder) {
+    };
+
+    export function parseDate(s: string, dateOrder?: string): any {
         if (!s || !s.length)
             return null;
         var dateVal;
@@ -177,6 +183,7 @@
         dArray = splitDateString(s);
         if (!dArray)
             return false;
+
         if (dArray.length == 3) {
             dateOrder = dateOrder || Q$Culture.dateOrder;
             switch (dateOrder) {
@@ -197,8 +204,10 @@
                     y = parseInt(dArray[2], 10);
                     break;
             }
+
             if (isNaN(d) || isNaN(m) || isNaN(y) || d < 1 || d > 31 || m < 0 || m > 11 || y > 9999 || y < 0)
                 return false;
+
             if (y < 100) {
                 var fullYear = new Date().getFullYear();
                 var shortYearCutoff = (fullYear % 100) + 10;
@@ -224,22 +233,23 @@
             }
         }
         return dateVal;
-    }
-    Q$Externals.parseDate = parseDate;
-    ;
-    function parseDecimal(s) {
+    };
+
+    export function parseDecimal(s: string): number {
         s = Q.trim(s.toString());
         var ts = Q$Culture.get_groupSeperator();
+
         if (s && s.length && s.indexOf(ts) > 0) {
             s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');
         }
+
         if (!(new RegExp("^\\s*([-\\+])?(\\d*)\\" + Q$Culture.decimalSeparator + "?(\\d*)\\s*$").test(s)))
             return NaN;
+
         return parseFloat(s.toString().replace(Q$Culture.decimalSeparator, '.'));
-    }
-    Q$Externals.parseDecimal = parseDecimal;
-    ;
-    function splitDateString(s) {
+    };
+
+    export function splitDateString(s: string): string[] {
         s = Q.trim(s);
         if (!s.length)
             return;
@@ -253,45 +263,54 @@
             return s.split("\\");
         else
             return [s];
-    }
-    Q$Externals.splitDateString = splitDateString;
-    ;
-    function parseISODateTime(s) {
+    };
+
+    export function parseISODateTime(s: string): Date {
         if (!s || !s.length)
             return null;
+
         var timestamp = Date.parse(s);
         if (!isNaN(timestamp) && typeof timestamp == "Date")
-            return timestamp;
+            return <Date><any>timestamp;
+
         s = s + "";
         if (typeof (s) != "string" || s.length === 0) {
             return null;
         }
+
         var res = s.match(isoRegexp);
         if (typeof (res) == "undefined" || res === null) {
             return null;
         }
+
         var year, month, day, hour, min, sec, msec;
         year = parseInt(res[1], 10);
+
         if (typeof (res[2]) == "undefined" || res[2] === '') {
             return new Date(year);
         }
+
         month = parseInt(res[2], 10) - 1;
         day = parseInt(res[3], 10);
         if (typeof (res[4]) == "undefined" || res[4] === '') {
             return new Date(year, month, day);
         }
+
         hour = parseInt(res[4], 10);
         min = parseInt(res[5], 10);
         sec = (typeof (res[6]) != "undefined" && res[6] !== '') ? parseInt(res[6], 10) : 0;
+
         if (typeof (res[7]) != "undefined" && res[7] !== '') {
             msec = Math.round(1000.0 * parseFloat("0." + res[7]));
         }
         else {
             msec = 0;
         }
+
         if ((typeof (res[8]) == "undefined" || res[8] === '') && (typeof (res[9]) == "undefined" || res[9] === '')) {
             return new Date(year, month, day, hour, min, sec, msec);
         }
+
         var ofs;
         if (typeof (res[9]) != "undefined" && res[9] !== '') {
             ofs = parseInt(res[10], 10) * 3600000;
@@ -306,10 +325,9 @@
             ofs = 0;
         }
         return new Date(Date.UTC(year, month, day, hour, min, sec, msec) - ofs);
-    }
-    Q$Externals.parseISODateTime = parseISODateTime;
-    ;
-    function parseHourAndMin(value) {
+    };
+
+    export function parseHourAndMin(value: string) {
         var v = Q.trim(value);
         if (v.length < 4 || v.length > 5)
             return NaN;
@@ -327,10 +345,9 @@
         if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59)
             return NaN;
         return h * 60 + m;
-    }
-    Q$Externals.parseHourAndMin = parseHourAndMin;
-    ;
-    function parseDayHourAndMin(s) {
+    };
+
+    export function parseDayHourAndMin(s: string): number {
         var days;
         var v = Q.trim(s);
         if (!v)
@@ -351,10 +368,9 @@
                 return NaN;
             return days * 24 * 60 + hm;
         }
-    }
-    Q$Externals.parseDayHourAndMin = parseDayHourAndMin;
-    ;
-    function parseQueryString(s) {
+    };
+
+    export function parseQueryString(s: string): {} {
         var qs;
         if (arguments.length == 0)
             qs = location.search.substring(1, location.search.length);
@@ -368,11 +384,11 @@
             result[name] = (pair.length >= 2 ? decodeURIComponent(pair[1]) : name);
         }
         return result;
-    }
-    Q$Externals.parseQueryString = parseQueryString;
-    ;
-    var turkishOrder;
-    function turkishLocaleCompare(a, b) {
+    };
+
+    var turkishOrder: {};
+
+    export function turkishLocaleCompare(a: string, b: string): number {
         var alphabet = "AaBbCcÇçFfGgĞğHhIıİiJjKkLlMmNnOoÖöPpRrSsŞşTtUuÜüVvYyZz";
         a = a || "";
         b = b || "";
@@ -397,20 +413,36 @@
             return c;
         }
         return a.localeCompare(b);
-    }
-    Q$Externals.turkishLocaleCompare = turkishLocaleCompare;
-    ;
-    function turkishLocaleToUpper(a) {
+    };
+
+    export function turkishLocaleToUpper(a: string): string {
         if (!a)
             return a;
         return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
+    };
+
+    export interface CommonDialogOptions extends JQueryUI.DialogOptions {
+        onOpen?: () => void;
+        onClose?: () => void;
+        htmlEncode?: boolean;
     }
-    Q$Externals.turkishLocaleToUpper = turkishLocaleToUpper;
-    ;
+
+    export interface AlertDialogOptions extends CommonDialogOptions {
+        okButton?: string;
+    }
+
+    export interface ConfirmDialogOptions extends CommonDialogOptions {
+        yesButton?: string;
+        noButton?: string;
+        cancelButton?: string;
+        onCancel?: () => void;
+        onNo?: () => void;
+    }
+
     // --- DIALOGS ---
-    function alertDialog(message, options) {
+    export function alertDialog(message: string, options: AlertDialogOptions) {
         var dialog;
-        options = $.extend({
+        options = <AlertDialogOptions>$.extend({
             htmlEncode: true,
             okButton: Q.text('Dialogs.OkButton'),
             title: Q.text('Dialogs.AlertTitle'),
@@ -433,6 +465,7 @@
                     options.onClose();
             }
         }, options);
+
         if (options.htmlEncode)
             message = Q.htmlEncode(message);
         if (!options.buttons) {
@@ -451,10 +484,9 @@
             .html(message)
             .parent()
             .dialog('open');
-    }
-    Q$Externals.alertDialog = alertDialog;
-    ;
-    function confirmDialog(message, onYes, options) {
+    };
+
+    export function confirmDialog(message: string, onYes: () => void, options: ConfirmDialogOptions): void {
         var dialog;
         options = $.extend({
             htmlEncode: true,
@@ -519,24 +551,27 @@
             .html(message)
             .parent()
             .dialog('open');
+    };
+
+    export interface IFrameDialogOptions {
+        html?: string;
     }
-    Q$Externals.confirmDialog = confirmDialog;
-    ;
-    function iframeDialog(options) {
+
+    export function iframeDialog(options: IFrameDialogOptions) {
         var doc;
         var e = $('<div><iframe></iframe></div>');
-        var settings = $.extend({
+        var settings: IFrameDialogOptions = $.extend(<JQueryUI.DialogOptions>{
             autoOpen: true,
             modal: true,
             width: '60%',
             height: '400',
             title: Q.text('Dialogs.AlertTitle'),
             open: function () {
-                doc = (e.find('iframe').css({
+                doc = (<HTMLIFrameElement>(e.find('iframe').css({
                     border: 'none',
                     width: '100%',
                     height: '100%'
-                })[0]).contentDocument;
+                })[0])).contentDocument;
                 doc.open();
                 doc.write(settings.html);
                 doc.close();
@@ -549,12 +584,11 @@
             }
         }, options);
         e.dialog(settings);
-    }
-    Q$Externals.iframeDialog = iframeDialog;
-    ;
+    };
+
     // -- AJAX HELPERS --
-    function setupAjaxIndicator() {
-        var loadingIndicator = null;
+    export function setupAjaxIndicator(): void {
+        var loadingIndicator: JQuery = null;
         var loadingTimer = 0;
         $(document).ajaxStart(function () {
             window.clearTimeout(loadingTimer);
@@ -569,10 +603,9 @@
             }
             window.clearTimeout(loadingTimer);
         });
-    }
-    Q$Externals.setupAjaxIndicator = setupAjaxIndicator;
-    ;
-    function toId(id) {
+    };
+
+    export function toId(id: any): any {
         if (id == null)
             return null;
         if (typeof id == "number")
@@ -583,20 +616,21 @@
         if (id.length >= 15)
             return id;
         return parseInt(id, 10);
-    }
-    Q$Externals.toId = toId;
-    ;
-    var oldShowLabel;
-    function validateShowLabel(element, message) {
+    };
+
+    var oldShowLabel: (HtmlElement, message) => void;
+
+    function validateShowLabel(element: HTMLElement, message: string) {
         oldShowLabel.call(this, element, message);
         this.errorsFor(element).each(function (i, e) {
             $(e).attr('title', $(e).text());
         });
-    }
-    ;
+    };
+
     function jQueryValidationInitialization() {
+
         Serenity.CustomValidation.registerValidationMethods();
-        var p = $.validator;
+        var p: any = $.validator;
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
         jQuery.validator.addMethod("xss", function (value, element) {
@@ -661,7 +695,9 @@
         $.validator.addMethod("anyvalue", function (value, element) {
             return true;
         });
-        var d = $.validator.defaults;
+
+        var d = (<any>$.validator).defaults;
+
         d.ignoreTitle = true;
         d.onchange = function (element) {
             this.element(element);
@@ -720,17 +756,16 @@
                 url: Q.text("Validation.Url")
             });
         });
-    }
-    ;
-    function validatorAbortHandler(validator) {
+    };
+
+    export function validatorAbortHandler(validator) {
         validator.settings.abortHandler = null;
         validator.settings.submitHandler = function () {
             return false;
         };
-    }
-    Q$Externals.validatorAbortHandler = validatorAbortHandler;
-    ;
-    function validateOptions(options) {
+    };
+
+    export function validateOptions(options) {
         return $.extend({
             ignore: ":hidden",
             meta: 'v',
@@ -767,9 +802,8 @@
                 label.addClass('checked');
             }
         }, options);
-    }
-    Q$Externals.validateOptions = validateOptions;
-    ;
+    };
+
     if (window['jQuery'] && window['jQuery']['validator'])
         jQueryValidationInitialization();
     else if (window['jQuery']) {
@@ -778,7 +812,8 @@
                 jQueryValidationInitialization();
         });
     }
-    function jQueryDatepickerInitialization() {
+
+    function jQueryDatepickerInitialization(): void {
         var order = Q$Culture.dateOrder;
         var s = Q$Culture.dateSeparator;
         var culture = ($('html').attr('lang') || 'en').toLowerCase();
@@ -801,8 +836,8 @@
             changeMonth: true,
             changeYear: true
         });
-    }
-    ;
+    };
+
     if (window['jQuery'] && window['jQuery']['datepicker'] && window['jQuery']['datepicker']['regional'] && window['jQuery']['datepicker']['regional']['en'])
         jQueryDatepickerInitialization();
     else
@@ -810,15 +845,16 @@
             if ($.datepicker)
                 jQueryDatepickerInitialization();
         });
-    function jQuerySelect2Initialization() {
+
+    function jQuerySelect2Initialization(): void {
         $.ui.dialog.prototype._allowInteraction = function (event) {
             if ($(event.target).closest(".ui-dialog").length) {
                 return true;
             }
             return !!$(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, #support-modal").length;
         };
-    }
-    ;
+    };
+
     if (window['jQuery'] && window['jQuery']['ui'])
         jQuerySelect2Initialization();
     else
@@ -826,7 +862,21 @@
             if (window['jQuery']['ui'])
                 jQuerySelect2Initialization();
         });
-    function postToService(options) {
+
+    export interface PostToServiceOptions {
+        url?: string;
+        service?: string;
+        target?: string;
+        request: any;
+    }
+
+    export interface PostToUrlOptions {
+        url?: string;
+        target?: string;
+        params: any;
+    }
+
+    export function postToService(options: PostToServiceOptions) {
         var form = $('<form/>')
             .attr('method', 'POST')
             .attr('action', options.url ? (Q.resolveUrl(options.url)) : Q.resolveUrl('~/services/' + options.service))
@@ -841,10 +891,9 @@
             .appendTo(div);
         form.submit();
         window.setTimeout(function () { form.remove(); }, 0);
-    }
-    Q$Externals.postToService = postToService;
-    ;
-    function postToUrl(options) {
+    };
+
+    export function postToUrl(options: PostToUrlOptions) {
         var form = $('<form/>')
             .attr('method', 'POST')
             .attr('action', Q.resolveUrl(options.url))
@@ -863,15 +912,14 @@
             .appendTo(div);
         form.submit();
         window.setTimeout(function () { form.remove(); }, 0);
-    }
-    Q$Externals.postToUrl = postToUrl;
-    ;
+    };
+
     function ssExceptionInitialization() {
         ss.Exception.prototype.toString = function () {
             return this.get_message();
         };
-    }
-    ;
+    };
+
     if (ss && ss.Exception)
         ssExceptionInitialization();
     else
@@ -879,7 +927,8 @@
             if (ss && ss.Exception)
                 ssExceptionInitialization();
         });
-    function showInFrame(code) {
+
+    export function showInFrame(code) {
         var height = screen.availHeight - 60;
         var width = screen.availWidth - 10;
         var x = (screen.availWidth - width) / 2 - 5;
@@ -892,13 +941,14 @@
             ", scrollbars=1, resizable=yes, left=" + x + ", top=" + y);
         winPopup.document.body.innerHTML = code;
     }
-    Q$Externals.showInFrame = showInFrame;
+
     if ($.fn.button && $.fn.button.noConflict) {
         var btn = $.fn.button.noConflict();
         $.fn.btn = btn;
     }
+
     // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
-    function deepClone(arg1, arg2) {
+    export function deepClone(arg1: any, arg2: any) {
         var options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
         // Handle case when target is a string or something (possible in deep copy)
         if (typeof target !== "object" && !$.isFunction(target)) {
@@ -946,7 +996,5 @@
         }
         // Return the modified object
         return target;
-    }
-    Q$Externals.deepClone = deepClone;
-    ;
-})(Q$Externals || (Q$Externals = {}));
+    };
+}

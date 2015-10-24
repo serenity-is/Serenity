@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -138,7 +139,20 @@
     <None Include="Resources\linq.js" />
     <None Include="Resources\mscorlib.js" />
   </ItemGroup>
+  <PropertyGroup>
+    <TypeScriptCharset>utf-8</TypeScriptCharset>
+    <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+  </PropertyGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Resources\Serenity.Core.d.ts" />
+    <TypeScriptCompile Include="Resources\Serenity.Externals.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+  </ItemGroup>
   <Import Project="..\tools\Saltarelle\Saltarelle.Compiler.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" />
   <Target Name="MinimizeScripts" AfterTargets="BuildScript">
     <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.js" DestinationFolder="$(OutDir)">
     </Copy>

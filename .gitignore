@@ -25,3 +25,4 @@ Serene.Template.zip
 serenity.Test/Scripts/serenity/Serenity*.js
 Serenity.Test/Scripts/serenity/Serenity.Script.UI.js
 packages/repositories.config
+Serenity.Script.Core/Resources/Serenity.*.map
