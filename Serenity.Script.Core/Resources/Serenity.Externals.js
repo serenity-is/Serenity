@@ -950,3 +950,4 @@
     Q$Externals.deepClone = deepClone;
     ;
 })(Q$Externals || (Q$Externals = {}));
+//# sourceMappingURL=Serenity.Externals.js.map

@@ -150,9 +150,9 @@ ss.compare = function ss$compare(a, b) {
 	if (!ss.isValue(a))
 		throw new ss_NullReferenceException('Object is null');
 	else if (typeof(a) === 'number' || typeof(a) === 'string' || typeof(a) === 'boolean')
-		return a < b ? -1 : (a > b ? 1 : 0);
+		return ss.isValue(b) ? (a < b ? -1 : (a > b ? 1 : 0)) : 1;
 	else if (ss.isDate(a))
-		return ss.compare(a.valueOf(), b.valueOf());
+		return ss.isValue(b) ? ss.compare(a.valueOf(), b.valueOf()) : 1;
 	else
 		return a.compareTo(b);
 };
@@ -303,7 +303,7 @@ ss.__genericCache = {};
 ss._makeGenericTypeName = function ss$_makeGenericTypeName(genericType, typeArguments) {
 	var result = genericType.__typeName;
 	for (var i = 0; i < typeArguments.length; i++)
-		result += (i === 0 ? '[' : ',') + '[' + ss.getTypeQName(typeArguments[i]) + ']';
+		result += (i === 0 ? '[' : ',') + '[' + ss.getTypeFullName(typeArguments[i]) + ']';
 	result += ']';
 	return result;
 };
@@ -1073,6 +1073,11 @@ ss.netSplit = function ss$netSplit(s, strings, limit, options) {
 };
 
 ss.compareStrings = function ss$compareStrings(s1, s2, ignoreCase) {
+	if (!ss.isValue(s1))
+		return ss.isValue(s2) ? -1 : 0;
+	if (!ss.isValue(s2))
+		return 1;
+
 	if (ignoreCase) {
 		if (s1) {
 			s1 = s1.toUpperCase();
@@ -1684,6 +1689,35 @@ ss.repeat = function ss$repeat(value, count) {
 	return result;
 };
 
+ss.arrayFill = function ss$arrayFill(dst, val, index, count) {
+	if (index < 0 || count < 0 || (index + count) > dst.length)
+		throw new ss_ArgumentException();
+	if (Array.prototype.fill) {
+		dst.fill(val, index, index + count);
+	}
+	else {
+		while (--count >= 0)
+			dst[index + count] = val;
+	}
+};
+
+ss.arrayCopy = function ss$arrayCopy(src, spos, dst, dpos, len) {
+	if (spos < 0 || dpos < 0 || len < 0)
+		throw new ss_ArgumentOutOfRangeException();
+
+	if (len > (src.length - spos) || len > (dst.length - dpos))
+		throw new ss_ArgumentException();
+
+	if (spos < dpos && src === dst) {
+		while (--len >= 0)
+			dst[dpos + len] = src[spos + len];
+	}
+	else {
+		for (var i = 0; i < len; i++)
+			dst[dpos + i] = src[spos + i];
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Date Extensions
 
@@ -2089,6 +2123,9 @@ ss._mkdel = function ss$_mkdel(targets) {
 ss.mkdel = function ss$mkdel(object, method) {
 	if (!object) {
 		return method;
+	}
+	if (typeof method === 'string') {
+		method = object[method];
 	}
 	return ss._mkdel([object, method]);
 };
@@ -2550,7 +2587,7 @@ ss_Nullable$1.bor = function Nullable$bor(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a | b : null;
 };
 
-ss_Nullable$1.xor = function Nullable$xor(a, b) {
+ss_Nullable$1.bxor = function Nullable$xor(a, b) {
 	return ss.isValue(a) && ss.isValue(b) ? a ^ b : null;
 };
 
@@ -2584,6 +2621,10 @@ ss_Nullable$1.or = function Nullable$or(a, b) {
 		return null;
 };
 
+ss_Nullable$1.xor = function Nullable$xor(a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? !!(a ^ b) : null;
+};
+
 ss_Nullable$1.not = function Nullable$not(a) {
 	return ss.isValue(a) ? !a : null;
 };
@@ -2600,12 +2641,26 @@ ss_Nullable$1.cpl = function Nullable$cpl(a) {
 	return ss.isValue(a) ? ~a : null;
 };
 
-ss_Nullable$1.lift = function Nullable$lift() {
-	for (var i = 0; i < arguments.length; i++) {
-		if (!ss.isValue(arguments[i]))
-			return null;
-	}
-	return arguments[0].apply(null, Array.prototype.slice.call(arguments, 1));
+ss_Nullable$1.lift1 = function Nullable$lift1(f, o) {
+	return ss.isValue(o) ? f(o) : null;
+};
+
+ss_Nullable$1.lift2 = function Nullable$lift2(f, a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? f(a, b) : null;
+};
+
+ss_Nullable$1.liftcmp = function Nullable$liftcmp(f, a, b) {
+	return ss.isValue(a) && ss.isValue(b) ? f(a, b) : false;
+};
+
+ss_Nullable$1.lifteq = function Nullable$lifteq(f, a, b) {
+	var va = ss.isValue(a), vb = ss.isValue(b);
+	return (!va && !vb) || (va && vb && f(a, b));
+};
+
+ss_Nullable$1.liftne = function Nullable$liftne(f, a, b) {
+	var va = ss.isValue(a), vb = ss.isValue(b);
+	return (va !== vb) || (va && f(a, b));
 };
 
 ///////////////////////////////////////////////////////////////////////////////
