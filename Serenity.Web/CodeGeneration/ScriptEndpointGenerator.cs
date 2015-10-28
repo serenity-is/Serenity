@@ -60,6 +60,7 @@ namespace Serenity.CodeGeneration
 
                     var className = getClassName(type);
 
+                    cw.IndentedLine("[Imported, PreserveMemberCase]");
                     cw.Indented("public partial class ");
                     sb.Append(className);
                     sb.AppendLine("Service");
@@ -134,13 +135,19 @@ namespace Serenity.CodeGeneration
 
                             methods.Add(method.Name);
 
+                            var parameterName = parameters.Length == 0 ? "request" : parameters[0].Name;
+                            cw.Indented("[InlineCode(\"Q.serviceRequest(\'");
+                            sb.Append(UriHelper.Combine(serviceUrl, method.Name));
+                            sb.Append("\', {");
+                            sb.Append(parameterName);
+                            sb.AppendLine("}, {onSuccess}, {options})\")]");
                             cw.Indented("public static jQueryXmlHttpRequest ");
                             sb.Append(method.Name);
 
                             sb.Append("(");
                             ScriptDtoGenerator.HandleMemberType(sb, paramType, null, null, enqueueType: null);
                             sb.Append(' ');
-                            sb.Append(parameters.Length == 0 ? "request" : parameters[0].Name);
+                            sb.Append(parameterName);
                             sb.Append(", Action<");
                             ScriptDtoGenerator.HandleMemberType(sb, responseType, null, null, enqueueType: null);
                             sb.Append("> onSuccess, ServiceCallOptions options = null");
@@ -148,12 +155,7 @@ namespace Serenity.CodeGeneration
 
                             cw.InBrace(delegate
                             {
-                                cw.Indented("return Q.ServiceRequest(");
-
-                                sb.Append("Methods.");
-                                sb.Append(method.Name);
-
-                                sb.AppendLine(", request, onSuccess, options);");
+                                cw.IndentedLine("return null;");
                             });
                         }
 
