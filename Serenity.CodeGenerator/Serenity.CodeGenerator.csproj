@@ -110,6 +110,8 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CodeFileHelper.cs" />
+    <Compile Include="ProjectFileHelper.cs" />
     <Compile Include="GeneratorConfig.cs" />
     <Compile Include="StringInflector.cs" />
     <Compile Include="EntityCodeGenerator.cs" />
@@ -119,6 +121,16 @@
     <Compile Include="Templates.cs" />
     <Compile Include="Views\EntityColumns.generated.cs">
       <DependentUpon>EntityColumns.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Views\EntityScriptForm.generated.cs">
+      <DependentUpon>EntityScriptForm.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Views\EntityScriptService.generated.cs">
+      <DependentUpon>EntityScriptService.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
@@ -152,6 +164,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityRepository.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EntityScriptRow.generated.cs">
+      <DependentUpon>EntityScriptRow.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Views\EntityRow.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -167,6 +184,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptGrid.cshtml</DependentUpon>
     </Compile>
+    <None Include="Views\EntityScriptForm.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptForm.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptService.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptService.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptRow.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptRow.generated.cs</LastGenOutput>
+    </None>
     <None Include="Views\razorgenerator.directives" />
     <Page Include="AddConnectionStringWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

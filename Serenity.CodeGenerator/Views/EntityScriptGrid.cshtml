@@ -12,19 +12,13 @@ namespace @(Model.RootNamespace)@(dotModule)
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
-    [ColumnsKey("@(moduleDot)@(Model.ClassName)"), IdProperty("@Model.Identity")@if (Model.NameField != null){<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
-    [DialogType(typeof(@(Model.ClassName)Dialog)), LocalTextPrefix("@(moduleDot)@(Model.ClassName)"), Service("@(moduleSlash)@(Model.ClassName)")]
+    [ColumnsKey("@(moduleDot)@(Model.ClassName)")@if (Model.Identity != null){<text>, IdProperty(@(Model.RowClassName).IdProperty)</text>}@if (Model.NameField != null){<text>, NameProperty(@(Model.RowClassName).NameProperty)</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty(@(Model.RowClassName).IsActiveProperty)</text>}]
+    [DialogType(typeof(@(Model.ClassName)Dialog)), LocalTextPrefix(@(Model.RowClassName).LocalTextPrefix), Service(@(Model.ClassName)Service.BaseUrl)]
     public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>
     {
         public @(Model.ClassName)Grid(jQueryObject container)
             : base(container)
         {
         }
-    }
-
-    // Please remove this partial class or the first line below, after you run ScriptContexts.tt
-    [Imported, Serializable, PreserveMemberCase] 
-    public partial class @(Model.ClassName)Row
-    {
     }
 }

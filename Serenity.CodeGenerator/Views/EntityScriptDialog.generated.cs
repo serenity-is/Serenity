@@ -33,6 +33,7 @@ WriteLiteral("\r\n");
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
     var moduleSlash = Model.Module == null ? "" : (Model.Module + "/");
+    var secondComma = Model.Identity != null ? ", " : "";
 
 
 WriteLiteral("namespace ");
@@ -43,36 +44,45 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral("\r\n{\r\n    using jQueryApi;\r\n    using Serenity;\r\n    using System.Collections.Gene" +
-"ric;\r\n\r\n    [IdProperty(\"");
+
+                                            WriteLiteral("\r\n{\r\n    using jQueryApi;\r\n    using Serenity;\r\n    using System.Collections.Gene" +
+"ric;\r\n\r\n    [");
+
+      if (Model.Identity != null){
+WriteLiteral("IdProperty(");
 
 
-            Write(Model.Identity);
+                                               Write(Model.RowClassName);
+
+WriteLiteral(".IdProperty)");
 
 
-                                WriteLiteral("\")");
+                                                                                           }
 
-                                   if (Model.NameField != null) {
-WriteLiteral(", NameProperty(\"");
+                                                                                             if (Model.NameField != null){
 
+                                                                                                                            Write(secondComma);
 
-                                                                                  Write(Model.NameField);
-
-WriteLiteral("\")");
+WriteLiteral("NameProperty(");
 
 
-                                                                                                                }
+                                                                                                                                                       Write(Model.RowClassName);
 
-                                                                                                                  if (Model.IsActiveField != null) {
-WriteLiteral(", IsActiveProperty(\"");
-
-
-                                                                                                                                                                          Write(Model.IsActiveField);
-
-WriteLiteral("\")");
+WriteLiteral(".NameProperty)");
 
 
-                                                                                                                                                                                                             }
+                                                                                                                                                                                                     }
+
+                                                                                                                                                                                                       if (Model.IsActiveField != null) {
+WriteLiteral(", IsActiveProperty(");
+
+
+                                                                                                                                                                                                                                                              Write(Model.RowClassName);
+
+WriteLiteral(".IsActiveProperty)");
+
+
+                                                                                                                                                                                                                                                                                                                }
 WriteLiteral("]\r\n    [FormKey(\"");
 
 
@@ -81,23 +91,17 @@ WriteLiteral("]\r\n    [FormKey(\"");
 
                       Write(Model.ClassName);
 
-WriteLiteral("\"), LocalTextPrefix(\"");
+WriteLiteral("\"), LocalTextPrefix(");
 
 
-                                                             Write(moduleDot);
+                                                            Write(Model.RowClassName);
+
+WriteLiteral(".LocalTextPrefix), Service(");
 
 
-                                                                         Write(Model.ClassName);
+                                                                                                            Write(Model.ClassName);
 
-WriteLiteral("\"), Service(\"");
-
-
-                                                                                                        Write(moduleSlash);
-
-
-                                                                                                                      Write(Model.ClassName);
-
-WriteLiteral("\")]\r\n    public class ");
+WriteLiteral("Service.BaseUrl)]\r\n    public class ");
 
 
              Write(Model.ClassName);
@@ -107,7 +111,22 @@ WriteLiteral("Dialog : EntityDialog<");
 
                                                      Write(Model.RowClassName);
 
-WriteLiteral(">\r\n    {\r\n    }\r\n}");
+WriteLiteral(">\r\n    {\r\n        protected ");
+
+
+              Write(Model.ClassName);
+
+WriteLiteral("Form form;\r\n\r\n        public ");
+
+
+           Write(Model.ClassName);
+
+WriteLiteral("Dialog()\r\n        {\r\n            form = new ");
+
+
+                   Write(Model.ClassName);
+
+WriteLiteral("Form(this.IdPrefix);\r\n        }\r\n    }\r\n}");
 
 
         }

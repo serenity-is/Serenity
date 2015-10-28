@@ -3,6 +3,7 @@
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
     var moduleSlash = Model.Module == null ? "" : (Model.Module + "/");
+    var secondComma = Model.Identity != null ? ", " : "";
 }
 namespace @(Model.RootNamespace)@(dotModule)
 {
@@ -10,9 +11,15 @@ namespace @(Model.RootNamespace)@(dotModule)
     using Serenity;
     using System.Collections.Generic;
 
-    [IdProperty("@Model.Identity")@if (Model.NameField != null) {<text>, NameProperty("@Model.NameField")</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty("@(Model.IsActiveField)")</text>}]
-    [FormKey("@(moduleDot)@(Model.ClassName)"), LocalTextPrefix("@(moduleDot)@(Model.ClassName)"), Service("@(moduleSlash)@(Model.ClassName)")]
+    [@if (Model.Identity != null){<text>IdProperty(@(Model.RowClassName).IdProperty)</text>}@if (Model.NameField != null){<text>@(secondComma)NameProperty(@(Model.RowClassName).NameProperty)</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty(@(Model.RowClassName).IsActiveProperty)</text>}]
+    [FormKey("@(moduleDot)@(Model.ClassName)"), LocalTextPrefix(@(Model.RowClassName).LocalTextPrefix), Service(@(Model.ClassName)Service.BaseUrl)]
     public class @(Model.ClassName)Dialog : EntityDialog<@(Model.RowClassName)>
     {
+        protected @(Model.ClassName)Form form;
+
+        public @(Model.ClassName)Dialog()
+        {
+            form = new @(Model.ClassName)Form(this.IdPrefix);
+        }
     }
 }

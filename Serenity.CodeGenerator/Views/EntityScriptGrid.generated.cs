@@ -53,57 +53,57 @@ WriteLiteral("\r\n{\r\n    using jQueryApi;\r\n    using Serenity;\r\n    using 
 
                          Write(Model.ClassName);
 
-WriteLiteral("\"), IdProperty(\"");
+
+                                               WriteLiteral("\")");
+
+                                                  if (Model.Identity != null){
+WriteLiteral(", IdProperty(");
 
 
-                                                          Write(Model.Identity);
+                                                                                             Write(Model.RowClassName);
+
+WriteLiteral(".IdProperty)");
 
 
-                                                                              WriteLiteral("\")");
+                                                                                                                                         }
 
-                                                                                 if (Model.NameField != null){
-WriteLiteral(", NameProperty(\"");
-
-
-                                                                                                                               Write(Model.NameField);
-
-WriteLiteral("\")");
+                                                                                                                                           if (Model.NameField != null){
+WriteLiteral(", NameProperty(");
 
 
-                                                                                                                                                             }
+                                                                                                                                                                                         Write(Model.RowClassName);
 
-                                                                                                                                                               if (Model.IsActiveField != null) {
-WriteLiteral(", IsActiveProperty(\"");
-
-
-                                                                                                                                                                                                                       Write(Model.IsActiveField);
-
-WriteLiteral("\")");
+WriteLiteral(".NameProperty)");
 
 
-                                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                       }
+
+                                                                                                                                                                                                                                         if (Model.IsActiveField != null) {
+WriteLiteral(", IsActiveProperty(");
+
+
+                                                                                                                                                                                                                                                                                                Write(Model.RowClassName);
+
+WriteLiteral(".IsActiveProperty)");
+
+
+                                                                                                                                                                                                                                                                                                                                                  }
 WriteLiteral("]\r\n    [DialogType(typeof(");
 
 
                    Write(Model.ClassName);
 
-WriteLiteral("Dialog)), LocalTextPrefix(\"");
+WriteLiteral("Dialog)), LocalTextPrefix(");
 
 
-                                                                Write(moduleDot);
+                                                               Write(Model.RowClassName);
+
+WriteLiteral(".LocalTextPrefix), Service(");
 
 
-                                                                            Write(Model.ClassName);
+                                                                                                               Write(Model.ClassName);
 
-WriteLiteral("\"), Service(\"");
-
-
-                                                                                                           Write(moduleSlash);
-
-
-                                                                                                                         Write(Model.ClassName);
-
-WriteLiteral("\")]\r\n    public class ");
+WriteLiteral("Service.BaseUrl)]\r\n    public class ");
 
 
              Write(Model.ClassName);
@@ -118,20 +118,8 @@ WriteLiteral(">\r\n    {\r\n        public ");
 
            Write(Model.ClassName);
 
-WriteLiteral(@"Grid(jQueryObject container)
-            : base(container)
-        {
-        }
-    }
-
-    // Please remove this partial class or the first line below, after you run ScriptContexts.tt
-    [Imported, Serializable, PreserveMemberCase] 
-    public partial class ");
-
-
-                     Write(Model.ClassName);
-
-WriteLiteral("Row\r\n    {\r\n    }\r\n}");
+WriteLiteral("Grid(jQueryObject container)\r\n            : base(container)\r\n        {\r\n        }" +
+"\r\n    }\r\n}");
 
 
         }

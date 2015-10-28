@@ -25,7 +25,6 @@ namespace Serenity.CodeGenerator
         public List<EntityCodeJoin> Joins;
         public bool Instance { get; set; }
         public string NameField { get; set; }
-        public string TextPrefix { get; set; }
         public string FieldPrefix { get; set; }
     }
 
