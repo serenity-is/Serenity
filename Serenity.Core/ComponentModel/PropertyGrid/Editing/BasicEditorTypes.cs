@@ -212,9 +212,17 @@ namespace Serenity.ComponentModel
         public LookupEditorAttribute(Type lookupType)
             : base("Lookup")
         {
+            if (lookupType == null)
+                throw new ArgumentNullException("lookupType");
+
             var attr = lookupType.GetCustomAttributes(typeof(LookupScriptAttribute), false);
             if (attr.Length == 0)
-                throw new ArgumentOutOfRangeException("lookupType");
+            {
+                throw new ArgumentException(String.Format(
+                    "'{0}' type doesn't have a [LookupScript] attribute, so it can't " + 
+                    "be used with a LookupEditor!", 
+                    lookupType.FullName), "lookupType");
+            }
 
             SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
         }
@@ -248,9 +256,17 @@ namespace Serenity.ComponentModel
         public AsyncLookupEditorAttribute(Type lookupType)
             : base("AsyncLookup")
         {
+            if (lookupType == null)
+                throw new ArgumentNullException("lookupType");
+
             var attr = lookupType.GetCustomAttributes(typeof(LookupScriptAttribute), false);
             if (attr.Length == 0)
-                throw new ArgumentOutOfRangeException("lookupType");
+            {
+                throw new ArgumentException(String.Format(
+                    "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
+                    "be used with a AsyncLookupEditor!",
+                    lookupType.FullName), "lookupType");
+            }
 
             SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
         }
