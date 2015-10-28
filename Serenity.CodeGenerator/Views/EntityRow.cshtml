@@ -53,6 +53,9 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     if (Model.NameField == x.Ident) {
         attrs.Add("QuickSearch");
     }
+    if (x.TextualField != null) {
+        attrs.Add("TextualField(\"" + x.TextualField + "\")");
+    }
     var attrString = String.Join(", ", attrs.ToArray());
 <text>
 @if (!String.IsNullOrEmpty(attrString)) {

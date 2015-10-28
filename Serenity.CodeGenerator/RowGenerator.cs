@@ -34,7 +34,15 @@ namespace Serenity.CodeGenerator
             return str2.Length + 1;
         }
 
-        public static string JF(string join, string field)
+        public static string JI(string join, string field)
+        {
+            if (field.ToLowerInvariant() == join.ToLowerInvariant())
+                return field;
+            else
+                return join + field;
+        }
+
+        public static string JU(string join, string field)
         {
             if (join.ToLowerInvariant() == field.ToLowerInvariant())
                 return field;
@@ -209,17 +217,21 @@ namespace Serenity.CodeGenerator
                             continue;
 
                         var kType = SqlSchemaInfo.SqlTypeNameToFieldType(frg.DataType);
+
                         var k = new EntityCodeField()
                         {
                             Type = kType,
                             Ident = GenerateVariableName(frg.FieldName.Substring(frgPrefix)),
-                            Title = Inflector.Inflector.Titleize(JF(j.Name, frg.FieldName.Substring(frgPrefix))),
+                            Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName.Substring(frgPrefix))),
                             Name = frg.FieldName,
                             Flags = flags,
                             IsValueType = kType != "String" && kType != "Stream",
                             Size = frg.Size == 0 ? (Int32?)null : frg.Size,
                             Scale = frg.Scale
                         };
+
+                        if (f.TextualField == null && kType == "String")
+                            f.TextualField = JI(j.Name, k.Ident);
 
                         j.Fields.Add(k);
                     }

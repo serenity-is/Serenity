@@ -42,6 +42,7 @@ namespace Serenity.CodeGenerator
         public bool IsValueType { get; set; }
         public int? Size { get; set; }
         public int Scale { get; set; }
+        public string TextualField { get; set; }
     }
 
     public class EntityCodeJoin

@@ -133,6 +133,9 @@ WriteLiteral(", IIdRow");
     if (Model.NameField == x.Ident) {
         attrs.Add("QuickSearch");
     }
+    if (x.TextualField != null) {
+        attrs.Add("TextualField(\"" + x.TextualField + "\")");
+    }
     var attrString = String.Join(", ", attrs.ToArray());
 
 WriteLiteral("\r\n");
