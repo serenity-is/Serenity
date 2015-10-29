@@ -86,9 +86,9 @@ namespace Serenity
         {
             var options = new ToastrOptions
             {
-                TimeOut = 20000,
-                ShowDuration = 2250,
-                HideDuration = 2200,
+                TimeOut = 3000,
+                ShowDuration = 250,
+                HideDuration = 500,
                 ExtendedTimeOut = 500,
                 PositionClass = "toast-top-full-width",
             };
