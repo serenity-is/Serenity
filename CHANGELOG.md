@@ -1,3 +1,13 @@
+## 1.6.0 (2015-19-20)
+
+Features:
+  - when a toast shown inside a dialog, then dialog closed right away, toast is moved to next dialog or body instead of getting lost
+  - a compacter imported format for service endpoints in client side
+  - code generator now produces code that is compatible (same location/contents) with T4 templates, so no need to remove that partial leftover class from XGrid.cs
+  - code generator sets TextualField attribute for foreign keys
+  - code generator also generates script side service and form objects
+  - better error message if a row type is used with a LookupEditorAttribute, but it doesn't have a LookupScript
+
 ## 1.5.9 (2015-10-21)
 
 Bugfixes:
