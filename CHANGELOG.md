@@ -1,4 +1,4 @@
-## 1.6.0 (2015-19-20)
+## 1.6.0 (2015-10-29)
 
 Features:
   - when a toast shown inside a dialog, then dialog closed right away, toast is moved to next dialog or body instead of getting lost
