@@ -1,3 +1,9 @@
+## 1.6.1 (2015-10-29)
+
+Features:
+  - code generator will remove ID suffix when generating DisplayName attribute for foreign key fields.
+  - [BREAKING CHANGE] title for foreign ID fields are no longer determined by their TextualField. you may have to edit ID fields DisplayName attributes if you did depend on this feature. it was generally causing confusion when a developer changes ID field display name but it is not reflected in the form.
+
 ## 1.6.0 (2015-10-29)
 
 Features:
