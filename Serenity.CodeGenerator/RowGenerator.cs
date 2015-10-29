@@ -192,6 +192,9 @@ namespace Serenity.CodeGenerator
                 var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.InvariantCultureIgnoreCase));
                 if (foreign != null)
                 {
+                    if (f.Title.EndsWith(" Id") && f.Title.Length > 3)
+                        f.Title = f.Title.SafeSubstring(0, f.Title.Length - 3);
+
                     f.PKSchema = foreign.PKSchema;
                     f.PKTable = foreign.PKTable;
                     f.PKColumn = foreign.PKColumn;
