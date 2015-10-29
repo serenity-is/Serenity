@@ -24,21 +24,8 @@ namespace Serenity.PropertyGrid
 
                 if (!ReferenceEquals(null, basedOnField))
                 {
-                    Field textualField = null;
-                    if (basedOnField.TextualField != null)
-                        textualField = basedOnField.Fields.FindFieldByPropertyName(basedOnField.TextualField) ??
-                            basedOnField.Fields.FindField(basedOnField.TextualField);
-
-                    if (!ReferenceEquals(null, textualField))
-                    {
-                        item.Title = !object.ReferenceEquals(null, textualField.Caption) ?
-                            textualField.Caption.Key : textualField.Title;
-                    }
-                    else
-                    {
-                        item.Title = !object.ReferenceEquals(null, basedOnField.Caption) ?
-                            basedOnField.Caption.Key : basedOnField.Title;
-                    }
+                    item.Title = !object.ReferenceEquals(null, basedOnField.Caption) ?
+                        basedOnField.Caption.Key : basedOnField.Title;
                 }
                 else
                     item.Title = item.Name;
