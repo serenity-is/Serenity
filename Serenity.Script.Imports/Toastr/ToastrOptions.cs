@@ -10,6 +10,7 @@ namespace Serenity
     public class ToastrOptions
     {
         public object Target { get; set; }
+        public string ContainerId { get; set; }
         public string PositionClass { get; set; }
         public int TimeOut { get; set; }
         public int ShowDuration { get; set; }

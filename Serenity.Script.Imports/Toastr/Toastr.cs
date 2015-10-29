@@ -1,4 +1,5 @@
-﻿using System;
+﻿using jQueryApi;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -79,6 +80,17 @@ namespace Serenity
         /// </summary>
         public static void Clear()
         {
+        }
+
+        /// <summary>
+        /// Gets container for toastr
+        /// </summary>
+        /// <param name="options">Options</param>
+        /// <param name="create">Create if not exists</param>
+        /// <returns>Current container or emtpy array if none</returns>
+        public static jQueryObject GetContainer(ToastrOptions options, bool create)
+        {
+            return null;
         }
 
         /// <summary>

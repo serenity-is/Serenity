@@ -1,4 +1,5 @@
-﻿using System.Html;
+﻿using System.Collections.Generic;
+using System.Html;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -41,43 +42,58 @@ namespace Serenity
             Toastr.Error(message, "", GetToastrOptions());
         }
 
-        private static ToastrOptions GetToastrOptions()
+        public static void PositionToastContainer(bool create)
         {
+            if (Window.Instance.As<dynamic>().toastr == null)
+                return;
+
             var dialog = J(Window.Document.Body).Children(".ui-dialog:visible").Last();
-            var toastrDiv = J("#toast-container");
+            var container = Toastr.GetContainer(null, create);
 
-            var options = new ToastrOptions
-            {
-                TimeOut = 3000,
-                ShowDuration = 250,
-                HideDuration = 500,
-                ExtendedTimeOut = 500
-            };
-
+            if (container.Length == 0)
+                return;
 
             if (dialog.Length > 0)
             {
-                if (!toastrDiv.HasClass("dialog-toast") &&
-                    toastrDiv.Length > 0)
+                var position = dialog.Position();
+                container.AddClass("positioned-toast toast-top-full-width");
+                container.CSS(new
                 {
-                    toastrDiv.Remove();
-                }
-
-                options.Target = dialog;
-                options.PositionClass = "toast-top-full-width dialog-toast";
+                    position = "absolute",
+                    top = (position.Top + 28) + "px",
+                    left = (position.Left + 6) + "px",
+                    width = (dialog.GetWidth() - 12) + "px"
+                }.As<JsDictionary<string, object>>());
             }
             else
             {
-                toastrDiv.RemoveClass("dialog-toast");
-
-                if (toastrDiv.HasClass("dialog-toast") &&
-                    toastrDiv.Length > 0)
+                container.AddClass("toast-top-full-width");
+                if (container.HasClass("positioned-toast"))
                 {
-                    toastrDiv.Remove();
+                    container.RemoveClass("positioned-toast");
+                    container.CSS(new
+                    {
+                        position = "",
+                        top = "",
+                        left = "",
+                        width = ""
+                    }.As<JsDictionary<string, object>>());
                 }
-
-                options.PositionClass = "toast-top-full-width";
             }
+        }
+
+        private static ToastrOptions GetToastrOptions()
+        {
+            var options = new ToastrOptions
+            {
+                TimeOut = 20000,
+                ShowDuration = 2250,
+                HideDuration = 2200,
+                ExtendedTimeOut = 500,
+                PositionClass = "toast-top-full-width",
+            };
+
+            PositionToastContainer(true);
 
             return options;
         }

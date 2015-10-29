@@ -183,6 +183,7 @@ namespace Serenity
                 var element = self.element;
                 self.Destroy();
                 element.Remove();
+                Q.PositionToastContainer(false);
             }, 0);
         }
 
