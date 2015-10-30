@@ -19,7 +19,7 @@ See [Serenity Developer Guide](https://volkanceylan.gitbooks.io/serenity-guide) 
 
 * [https://volkanceylan.gitbooks.io/serenity-guide](https://volkanceylan.gitbooks.io/serenity-guide)
 
-> Türkçe dökümantasyon için *[şu kılavuz](https://www.gitbook.com/star/book/ademc/serenity-gelistirici-dokumani)* incelenebilir. Katkıları için Adem beye teşekkür ederiz.
+> Türkçe dökümantasyon için *[şu kılavuz](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)* incelenebilir. Katkıları için Adem beye teşekkür ederiz.
 
 ## Quick Start
 
