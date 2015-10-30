@@ -30,11 +30,22 @@ namespace Serenity.Test
         [Fact]
         public void ScriptTestsPasses()
         {
-            GoToUrl("~/ScriptTests.html?noautostart=1");
+            int tries = 0;
+            while (tries++ < 100 && true)
+            {
+                GoToUrl("~/ScriptTests.html");
+                if (Browser.Title == "Serenity Tests")
+                    break;
+                Thread.Sleep(100);
+                tries++;
+            }
             try
             {
+                Assert.True(Browser.Title == "Serenity Tests",
+                    "Couldn't load test page. Probably IIS express launch error!");
+
                 Dictionary<string, object> qunitResults = null;
-                int tries = 0;
+                tries = 0;
                 while (tries++ < 100 && qunitResults == null)
                 {
                     Thread.Sleep(100);
