@@ -27,8 +27,6 @@ The easiest and fastest way to get your hands dirty on Serenity is by using a sa
 
 You can also install it directly from Visual Studio, by entering File -> New -> Project -> Online and searching for *SERENE*.
 
-The default application sample has two projects (common for Serenity applications). One for server side (Serene.Web) and another one for script side (Serene.Script). The script project looks like a .NET project but it actually generates javascript code (using Saltarelle Compiler). 
-
 Please read documentation at https://volkanceylan.gitbooks.io/serenity-guide for step-by-step tutorials.
 
 ## Support / Spread the Word
