@@ -33,7 +33,7 @@ Please read documentation at https://volkanceylan.gitbooks.io/serenity-guide for
 
 ## Support / Spread the Word
 
-You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open an issue here with relevant links. You can also ask a question in [Stack Overflow](www.stackoverflow.com) with [Serenity] tag.
+You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open an issue here with relevant links. You can also ask a question at [Stack Overflow](www.stackoverflow.com) with [Serenity] tag.
 
 If you are using Serenity in any open source / commercial projects let me know, so i can add it to the list of references.
 
