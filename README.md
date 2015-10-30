@@ -15,9 +15,7 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 ## Documentation
 
-See [Serenity Developer Guide](https://volkanceylan.gitbooks.io/serenity-guide) for documentation.
-
-* [https://volkanceylan.gitbooks.io/serenity-guide](https://volkanceylan.gitbooks.io/serenity-guide)
+See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenity-guide) at https://www.gitbook.com/book/volkanceylan/serenity-guide for documentation.
 
 > Türkçe dökümantasyon için *[şu kılavuz](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)* incelenebilir. Katkıları için Adem beye teşekkür ederiz.
 
