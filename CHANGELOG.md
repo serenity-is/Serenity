@@ -1,3 +1,9 @@
+## 1.6.2 (2015-10-31)
+
+Features:
+  - code generator determines root namespace and script/web project locations at first run for Serene projects
+  - added a welcome page to Serene template
+
 ## 1.6.1 (2015-10-29)
 
 Features:
