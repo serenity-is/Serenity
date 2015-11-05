@@ -12,8 +12,8 @@ namespace Serenity.ComponentModel
             MaxBytes = maxBytes;
         }
 
-        public FileUploadEditorAttribute(int minBytes = 0, int maxBytes = 0)
-            : base("FileUpload")
+        public FileUploadEditorAttribute(int minBytes = 0, int maxBytes = 0, bool allowMultiple = false)
+            : base(allowMultiple ? "MultipleImageUpload" : "ImageUpload")
         {
         }
 
@@ -21,6 +21,7 @@ namespace Serenity.ComponentModel
         {
             base.SetParams(editorParams);
 
+            editorParams["allowNonImage"] = true;
             editorParams["MinBytes"] = MinBytes;
             editorParams["MaxBytes"] = MaxBytes;
         }
