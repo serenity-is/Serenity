@@ -29,39 +29,38 @@ namespace Serenity.Services
 
                 TRow row = new TRow();
 
-                var registry = Dependency.TryResolve<IImplicitBehaviorRegistry>();
-                if (registry != null)
+                var registry = Dependency.TryResolve<IImplicitBehaviorRegistry>() ??
+                    DefaultImplicitBehaviorRegistry.Instance;
+
+                foreach (var behaviorType in registry.GetTypes())
                 {
-                    foreach (var behaviorType in registry.GetTypes())
+                    var saveBehavior = Activator.CreateInstance(behaviorType) as ISaveBehavior;
+                    if (saveBehavior == null)
+                        continue;
+
+                    var implicitBehavior = saveBehavior as IImplicitBehavior;
+                    if (implicitBehavior == null)
+                        continue;
+
+                    var fieldBehavior = saveBehavior as IFieldBehavior;
+                    if (fieldBehavior == null)
                     {
-                        var saveBehavior = Activator.CreateInstance(behaviorType) as ISaveBehavior;
-                        if (saveBehavior == null)
-                            continue;
+                        if (implicitBehavior.ActivateFor(row))
+                            list.Add(saveBehavior);
 
-                        var implicitBehavior = saveBehavior as IImplicitBehavior;
-                        if (implicitBehavior == null)
-                            continue;
+                        continue;
+                    }
 
-                        var fieldBehavior = saveBehavior as IFieldBehavior;
-                        if (fieldBehavior == null)
+                    foreach (var field in row.GetFields())
+                    {
+                        fieldBehavior.Target = field;
+                        if (implicitBehavior.ActivateFor(row))
                         {
-                            if (implicitBehavior.ActivateFor(row))
-                                list.Add(saveBehavior);
+                            list.Add(saveBehavior);
 
-                            continue;
-                        }
-
-                        foreach (var field in row.GetFields())
-                        {
-                            fieldBehavior.Target = field;
-                            if (implicitBehavior.ActivateFor(row))
-                            {
-                                list.Add(saveBehavior);
-
-                                saveBehavior = Activator.CreateInstance(behaviorType) as ISaveBehavior;
-                                implicitBehavior = saveBehavior as IImplicitBehavior;
-                                fieldBehavior = saveBehavior as IFieldBehavior;
-                            }
+                            saveBehavior = Activator.CreateInstance(behaviorType) as ISaveBehavior;
+                            implicitBehavior = saveBehavior as IImplicitBehavior;
+                            fieldBehavior = saveBehavior as IFieldBehavior;
                         }
                     }
                 }

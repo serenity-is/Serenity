@@ -4,6 +4,7 @@ using Serenity.Configuration;
 using Serenity.Extensibility;
 using Serenity.Localization;
 using Serenity.Logging;
+using Serenity.Services;
 using System.Linq;
 using System.Reflection;
 using System.Web.Compilation;
@@ -23,6 +24,7 @@ namespace Serenity.Web
             InitializeLocalTexts();
             InitializeDynamicScripts();
             InitializeRequestContext();
+            InitializeRequestBehaviors();
         }
 
         public static void InitializeServiceLocator()
@@ -70,6 +72,14 @@ namespace Serenity.Web
 
             if (Dependency.TryResolve<IRequestContext>() == null)
                 registrar.RegisterInstance<IRequestContext>(new RequestContext());
+        }
+
+        public static void InitializeRequestBehaviors()
+        {
+            var registrar = Dependency.Resolve<IDependencyRegistrar>();
+
+            if (Dependency.TryResolve<IImplicitBehaviorRegistry>() == null)
+                registrar.RegisterInstance<IImplicitBehaviorRegistry>(DefaultImplicitBehaviorRegistry.Instance);
         }
 
         public static void InitializeConfigurationSystem()

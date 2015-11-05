@@ -6,7 +6,13 @@ namespace Serenity.Services
 {
     public class DefaultImplicitBehaviorRegistry : IImplicitBehaviorRegistry
     {
+        public static readonly DefaultImplicitBehaviorRegistry Instance = new DefaultImplicitBehaviorRegistry();
+
         private static IEnumerable<Type> types;
+
+        protected DefaultImplicitBehaviorRegistry()
+        {
+        }
 
         public virtual IEnumerable<Type> GetTypes()
         {
