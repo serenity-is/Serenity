@@ -18,25 +18,38 @@ namespace Serenity.Services
         private static bool loggingInitialized;
         protected static CaptureLogHandler<TRow> captureLogHandler;
         protected static bool hasAuditLogAttribute;
-        protected IEnumerable<SaveRequestBehaviourAttribute> behaviours;
+        protected static IEnumerable<ISaveBehavior> staticSaveFilters;
+        protected IEnumerable<ISaveBehavior> saveFilters;
 
         public SaveRequestHandler()
         {
-            this.behaviours = this.GetType().GetCustomAttributes<SaveRequestBehaviourAttribute>();
+            this.StateBag = new Dictionary<string, object>();
+            this.saveFilters = GetSaveFilters();
+        }
+
+        protected virtual IEnumerable<ISaveBehavior> GetSaveFilters()
+        {
+            if (staticSaveFilters == null)
+            {
+                staticSaveFilters = RowSaveBehaviors<TRow>.Default.Concat(
+                    this.GetType().GetCustomAttributes().OfType<ISaveBehavior>()).ToList();
+            }
+
+            return staticSaveFilters;
         }
 
         protected virtual void AfterSave()
         {
             HandleDisplayOrder(afterSave: true);
 
-            foreach (var behaviour in this.behaviours)
-                behaviour.OnAfterSave(this);
+            foreach (var filter in saveFilters)
+                filter.OnAfterSave(this);
         }
 
         protected virtual void BeforeSave()
         {
-            foreach (var behaviour in this.behaviours)
-                behaviour.OnBeforeSave(this);
+            foreach (var filter in saveFilters)
+                filter.OnBeforeSave(this);
         }
 
         protected virtual void ClearNonTableAssignments()
@@ -287,8 +300,8 @@ namespace Serenity.Services
 
         protected virtual void OnReturn()
         {
-            foreach (var behaviour in this.behaviours)
-                behaviour.OnReturn(this);
+            foreach (var filter in this.saveFilters)
+                filter.OnReturn(this);
         }
 
         protected virtual SqlQuery PrepareQuery()
@@ -382,7 +395,7 @@ namespace Serenity.Services
 
             SetInternalLogFields();
 
-            foreach (var behaviour in this.behaviours)
+            foreach (var behaviour in this.saveFilters)
                 behaviour.OnSetInternalFields(this);
         }
 
@@ -480,8 +493,8 @@ namespace Serenity.Services
 
             ValidateUniqueConstraints();
 
-            foreach (var behaviour in this.behaviours)
-                behaviour.OnValidateRequest(this);
+            foreach (var filter in this.saveFilters)
+                filter.OnValidateRequest(this);
         }
 
         protected virtual void ValidateFieldValues()
@@ -650,6 +663,8 @@ namespace Serenity.Services
         Row ISaveRequestHandler.Old { get { return this.Old; } }
 
         Row ISaveRequestHandler.Row { get { return this.Row; } }
+
+        public IDictionary<string, object> StateBag { get; private set; }
     }
 
     public class SaveRequestHandler<TRow> : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>

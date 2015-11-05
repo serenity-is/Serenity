@@ -5,12 +5,11 @@ using System.IO;
 
 namespace Serenity.Services
 {
-    public class EmbeddedFileUploadBehaviourAttribute : SaveRequestBehaviourAttribute
+    public class EmbeddedFileUploadBehaviourAttribute : SaveRequestBehaviorAttribute
     {
         private string fileNameField;
         private bool copyFileToHistory;
         private string subFolder;
-        private FilesToDelete filesToDelete;
         private string fileNameFormat;
         private bool storeSubFolderInDB;
 
@@ -33,8 +32,9 @@ namespace Serenity.Services
 
         public override void OnBeforeSave(ISaveRequestHandler handler)
         {
-            filesToDelete = new FilesToDelete();
+            var filesToDelete = new FilesToDelete();
             UploadHelper.RegisterFilesToDelete(handler.UnitOfWork, filesToDelete);
+            handler.StateBag[this.GetType().FullName + "_FilesToDelete"] = filesToDelete;
 
             var filename = (StringField)(handler.Row.FindField(this.fileNameField) ?? handler.Row.FindFieldByPropertyName(fileNameField));
             var oldFilename = handler.Old == null ? null : filename[handler.Old];
@@ -76,12 +76,12 @@ namespace Serenity.Services
 
             if (handler.Old != null)
             {
-                var copyResult = CopyTemporaryFile(handler);
+                var copyResult = CopyTemporaryFile(handler, filesToDelete);
                 filename[handler.Row] = copyResult.DbFileName;
             }
         }
 
-        private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler)
+        private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler, FilesToDelete filesToDelete)
         {
             var filename = (StringField)(handler.Row.FindField(this.fileNameField) ?? handler.Row.FindFieldByPropertyName(fileNameField));
             var newFilename = filename[handler.Row] = filename[handler.Row].TrimToNull();
@@ -103,7 +103,8 @@ namespace Serenity.Services
             if (newFilename == null)
                 return;
 
-            var copyResult = CopyTemporaryFile(handler);
+            var filesToDelete = handler.StateBag[this.GetType().FullName + "_FilesToDelete"] as FilesToDelete;
+            var copyResult = CopyTemporaryFile(handler, filesToDelete);
 
             new SqlUpdate(handler.Row.Table)
                 .Set(filename, copyResult.DbFileName)

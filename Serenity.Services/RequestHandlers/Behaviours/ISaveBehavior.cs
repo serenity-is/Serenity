@@ -1,45 +1,34 @@
-﻿using System;
-
-namespace Serenity.Services
+﻿namespace Serenity.Services
 {
     /// <summary>
-    /// Base type for explicitly activated save behavior attributes
+    /// A save behavior that can be used as a mixin within a SaveRequestHandler lifecycle
     /// </summary>
-    public abstract class SaveRequestBehaviorAttribute : Attribute, ISaveBehavior
+    /// <remarks>
+    /// A save behavior instance is always cached and reused across requests, so make 
+    /// sure you don't store anything in private variables, and its operation 
+    /// is thread-safe. If you need to pass some state between events, 
+    /// use handler's StateBag.
+    /// </remarks>
+    public interface ISaveBehavior
     {
         /// <summary>Called when save request is validated</summary>
         /// <param name="handler">Calling save request handler</param>
-        public virtual void OnValidateRequest(ISaveRequestHandler handler)
-        {
-        }
+        void OnValidateRequest(ISaveRequestHandler handler);
 
         /// <summary>Called when internal fields in row is being set</summary>
         /// <param name="handler">Calling save request handler</param>
-        public virtual void OnSetInternalFields(ISaveRequestHandler handler)
-        {
-        }
+        void OnSetInternalFields(ISaveRequestHandler handler);
 
         /// <summary>Called just before row is inserted to / updated in database</summary>
         /// <param name="handler">Calling save request handler</param>
-        public virtual void OnBeforeSave(ISaveRequestHandler handler)
-        {
-        }
+        void OnBeforeSave(ISaveRequestHandler handler);
 
         /// <summary>Called after row is inserted to / updated in database</summary>
         /// <param name="handler">Calling save request handler</param>
-        public virtual void OnAfterSave(ISaveRequestHandler handler)
-        {
-        }
+        void OnAfterSave(ISaveRequestHandler handler);
 
         /// <summary>Called before handler is returning the result</summary>
         /// <param name="handler">Calling save request handler</param>
-        public virtual void OnReturn(ISaveRequestHandler handler)
-        {
-        }
-    }
-
-    [Obsolete("Use SaveRequestBehaviorAttribute")]
-    public abstract class SaveRequestBehaviourAttribute : SaveRequestBehaviorAttribute
-    {
+        void OnReturn(ISaveRequestHandler handler);
     }
 }

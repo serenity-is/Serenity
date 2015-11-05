@@ -3,7 +3,7 @@ using System;
 
 namespace Serenity.Services
 {
-    public class ValidateParentAttribute : SaveRequestBehaviourAttribute
+    public class ValidateParentAttribute : SaveRequestBehaviorAttribute
     {
         public override void OnValidateRequest(ISaveRequestHandler handler)
         {

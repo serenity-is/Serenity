@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Serenity.Services
 {
-    public class EmbeddedMultiFileUploadBehaviourAttribute : SaveRequestBehaviourAttribute
+    public class EmbeddedMultiFileUploadBehaviourAttribute : SaveRequestBehaviorAttribute
     {
         private class UploadedFile
         {
@@ -17,7 +17,6 @@ namespace Serenity.Services
         private string filesField;
         private bool copyFilesToHistory;
         private string subFolder;
-        private FilesToDelete filesToDelete;
         private string fileNameFormat;
         private bool storeSubFolderInDB;
 
@@ -73,8 +72,9 @@ namespace Serenity.Services
             var oldFileList = ParseAndValidate(oldFilesJSON, "oldFiles");
             var newFileList = ParseAndValidate(newFilesJSON, "newFiles");
 
-            filesToDelete = new FilesToDelete();
+            var filesToDelete = new FilesToDelete();
             UploadHelper.RegisterFilesToDelete(handler.UnitOfWork, filesToDelete);
+            handler.StateBag[this.GetType().FullName + "_FilesToDelete"] = filesToDelete;
 
             foreach (var file in oldFileList)
             {
@@ -102,11 +102,11 @@ namespace Serenity.Services
             }
 
             if (handler.Old != null)
-                field[handler.Row] = CopyTemporaryFiles(handler, oldFileList, newFileList);
+                field[handler.Row] = CopyTemporaryFiles(handler, oldFileList, newFileList, filesToDelete);
         }
 
         private string CopyTemporaryFiles(ISaveRequestHandler handler, 
-            UploadedFile[] oldFileList, UploadedFile[] newFileList)
+            UploadedFile[] oldFileList, UploadedFile[] newFileList, FilesToDelete filesToDelete)
         {
             foreach (var file in newFileList)
             {
@@ -143,7 +143,8 @@ namespace Serenity.Services
             if (newFileList.IsEmptyOrNull())
                 return;
 
-            var copyResult = CopyTemporaryFiles(handler, new UploadedFile[0], newFileList);
+            var filesToDelete = handler.StateBag[this.GetType().FullName + "_FilesToDelete"] as FilesToDelete;
+            var copyResult = CopyTemporaryFiles(handler, new UploadedFile[0], newFileList, filesToDelete);
 
             new SqlUpdate(handler.Row.Table)
                 .Set(field, copyResult)
