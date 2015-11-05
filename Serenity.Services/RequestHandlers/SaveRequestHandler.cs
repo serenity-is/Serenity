@@ -1,5 +1,4 @@
 ﻿using Serenity.Data;
-using Serenity.Data.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,7 +14,7 @@ namespace Serenity.Services
         where TSaveRequest : SaveRequest<TRow>, new()
     {
         private bool displayOrderFix;
-        protected static IEnumerable<ISaveBehavior> staticSaveBehaviors;
+        protected static IEnumerable<ISaveBehavior> cachedSaveBehaviors;
         protected IEnumerable<ISaveBehavior> saveBehaviors;
 
         public SaveRequestHandler()
@@ -26,13 +25,13 @@ namespace Serenity.Services
 
         protected virtual IEnumerable<ISaveBehavior> GetSaveBehaviors()
         {
-            if (staticSaveBehaviors == null)
+            if (cachedSaveBehaviors == null)
             {
-                staticSaveBehaviors = RowSaveBehaviors<TRow>.Default.Concat(
+                cachedSaveBehaviors = RowSaveBehaviors<TRow>.Default.Concat(
                     this.GetType().GetCustomAttributes().OfType<ISaveBehavior>()).ToList();
             }
 
-            return staticSaveBehaviors;
+            return cachedSaveBehaviors;
         }
 
         protected virtual void AfterSave()
