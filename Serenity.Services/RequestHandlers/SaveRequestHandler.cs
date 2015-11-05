@@ -15,8 +15,6 @@ namespace Serenity.Services
         where TSaveRequest : SaveRequest<TRow>, new()
     {
         private bool displayOrderFix;
-        private static bool loggingInitialized;
-        protected static bool hasAuditLogAttribute;
         protected static IEnumerable<ISaveBehavior> staticSaveBehaviors;
         protected IEnumerable<ISaveBehavior> saveBehaviors;
 
@@ -62,41 +60,8 @@ namespace Serenity.Services
 
         protected virtual void PerformAuditing()
         {
-            if (!loggingInitialized)
-            {
-                hasAuditLogAttribute = typeof(TRow).GetCustomAttribute<AuditLogAttribute>(false) != null;
-
-                loggingInitialized = true;
-            }
-
-            if (hasAuditLogAttribute)
-                DoGenericAudit();
-
             foreach (var behavior in saveBehaviors)
                 behavior.OnAudit(this);
-        }
-
-        protected virtual void DoGenericAudit()
-        {
-            var auditFields = new HashSet<Field>();
-            GetEditableFields(auditFields);
-
-            var auditRequest = GetAuditRequest(auditFields);
-
-            if (IsUpdate)
-            {
-                Row audit = null;
-                if (auditRequest != null)
-                    audit = AuditLogService.PrepareAuditUpdate(RowRegistry.GetConnectionKey(Row), auditRequest);
-
-                if (audit != null)
-                    Connection.Insert(audit);
-            }
-            else if (IsCreate)
-            {
-                if (auditRequest != null)
-                    AuditLogService.AuditInsert(Connection, RowRegistry.GetConnectionKey(Row), auditRequest);
-            }
         }
 
         protected virtual void ExecuteSave()
@@ -127,29 +92,6 @@ namespace Serenity.Services
 
                 InvalidateCacheOnCommit();
             }
-        }
-
-        protected virtual AuditSaveRequest GetAuditRequest(HashSet<Field> auditFields)
-        {
-            Field[] array = new Field[auditFields.Count];
-            auditFields.CopyTo(array);
-
-            var auditRequest = new AuditSaveRequest(Row.Table, (IIdRow)Old, (IIdRow)Row, array);
-
-            var parentIdRow = Row as IParentIdRow;
-            if (parentIdRow != null)
-            {
-                var parentIdField = (Field)parentIdRow.ParentIdField;
-
-                if (!parentIdField.ForeignTable.IsTrimmedEmpty())
-                {
-                    auditRequest.ParentTypeId = parentIdField.ForeignTable;
-                    auditRequest.OldParentId = Old == null ? null : parentIdRow.ParentIdField[Old];
-                    auditRequest.NewParentId = parentIdRow.ParentIdField[Row];
-                }
-            }
-
-            return auditRequest;
         }
 
         protected virtual BaseCriteria GetDisplayOrderFilter()
