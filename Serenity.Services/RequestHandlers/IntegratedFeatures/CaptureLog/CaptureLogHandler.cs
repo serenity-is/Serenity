@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Serenity.Data
@@ -10,10 +9,16 @@ namespace Serenity.Data
         public static readonly DateTime ValidUntil = new DateTime(9999, 1, 1);
     }
 
-    public class CaptureLogHandler<TRow>
-        where TRow: Row, IIdRow, new()
+    public interface ICaptureLogHandler
     {
-        private static string schemaName;
+        void LogSave(IUnitOfWork uow, Row row, Int64 userId);
+        void LogDelete(IUnitOfWork uow, Row old, Int64 userId);
+    }
+
+    public class CaptureLogHandler<TRow> : ICaptureLogHandler
+        where TRow: Row, IIdRow, new() 
+    {
+        private static string logConnectionKey;
         private static StaticInfo info;
 
         private class StaticInfo
@@ -28,9 +33,9 @@ namespace Serenity.Data
 
         static CaptureLogHandler()
         {
-            SchemaChangeSource.Observers += (schema, table) =>
+            SchemaChangeSource.Observers += (connectionKey, table) =>
             {
-                if (schema == schemaName)
+                if (connectionKey == logConnectionKey)
                     info = null;
             };
         }
@@ -45,27 +50,27 @@ namespace Serenity.Data
             if (logTableAttr == null || logTableAttr.LogTable.IsTrimmedEmpty())
                 throw new InvalidOperationException(String.Format("{0} row type has no capture log table attribute defined!", typeof(TRow).Name));
 
-            schemaName = RowRegistry.GetConnectionKey(typeof(TRow));
-            var instance = RowRegistry.GetConnectionRow(schemaName, logTableAttr.LogTable);
-            if (instance == null)
-                throw new InvalidOperationException(String.Format("Can't locate {0} capture log table in schema {1} for {2} row type!",
-                    logTableAttr.LogTable, schemaName, typeof(TRow).Name));
+            logConnectionKey = logTableAttr.LogConnectionKey ?? RowRegistry.GetConnectionKey(typeof(TRow));
+            var logRowInstance = RowRegistry.GetConnectionRow(logConnectionKey, logTableAttr.LogTable);
+            if (logRowInstance == null)
+                throw new InvalidOperationException(String.Format("Can't locate {0} capture log table in connection {1} for {2} row type!",
+                    logTableAttr.LogTable, logConnectionKey, typeof(TRow).Name));
 
-            var captureLogRow = instance as ICaptureLogRow;
+            var captureLogRow = logRowInstance as ICaptureLogRow;
             if (captureLogRow == null)
                 throw new InvalidOperationException(String.Format("Capture log table {0} doesn't implement ICaptureLogRow interface!",
-                    logTableAttr.LogTable, schemaName, typeof(TRow).Name));
+                    logTableAttr.LogTable, logConnectionKey, typeof(TRow).Name));
 
             if (!(captureLogRow is IIsActiveRow))
                 throw new InvalidOperationException(String.Format("Capture log table {0} doesn't implement IIsActiveRow interface!",
-                    logTableAttr.LogTable, schemaName, typeof(TRow).Name));
+                    logTableAttr.LogTable, logConnectionKey, typeof(TRow).Name));
 
             newInfo = new StaticInfo();
-            newInfo.logRowInstance = instance;
+            newInfo.logRowInstance = logRowInstance;
             newInfo.captureLogInstance = captureLogRow;
             newInfo.rowInstance = new TRow();
             newInfo.rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(newInfo.rowInstance.EnumerateTableFields(), x => x.Name);
-            newInfo.logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(instance.EnumerateTableFields(), x => x.Name);
+            newInfo.logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRowInstance.EnumerateTableFields(), x => x.Name);
             newInfo.mappedIdField = ((Row)captureLogRow).FindField(logTableAttr.MappedIdField) as IIdField;
             if (newInfo.mappedIdField == null)
                 throw new InvalidOperationException(String.Format("Can't locate capture log table mapped ID field for {0}!",
@@ -139,6 +144,16 @@ namespace Serenity.Data
                 throw new InvalidOperationException(String.Format("Capture log has more than one active instance for ID {0}?!", info.mappedIdField[logRow]));
 
             uow.Connection.Insert(logRow);
+        }
+
+        void ICaptureLogHandler.LogSave(IUnitOfWork uow, Row row, long userId)
+        {
+            Log(uow, (TRow)row, userId, isDelete: false);
+        }
+
+        void ICaptureLogHandler.LogDelete(IUnitOfWork uow, Row old, long userId)
+        {
+            Log(uow, (TRow)old, userId, isDelete: true);
         }
     }
 }

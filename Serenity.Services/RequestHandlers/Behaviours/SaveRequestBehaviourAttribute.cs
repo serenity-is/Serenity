@@ -31,6 +31,12 @@ namespace Serenity.Services
         {
         }
 
+        /// <summary>Called after row is inserted to / updated and auditing should be performed</summary>
+        /// <param name="handler">Calling save request handler</param>
+        public virtual void OnAudit(ISaveRequestHandler handler)
+        {
+        }
+
         /// <summary>Called before handler is returning the result</summary>
         /// <param name="handler">Calling save request handler</param>
         public virtual void OnReturn(ISaveRequestHandler handler)

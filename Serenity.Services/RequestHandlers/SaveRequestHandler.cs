@@ -16,7 +16,6 @@ namespace Serenity.Services
     {
         private bool displayOrderFix;
         private static bool loggingInitialized;
-        protected static CaptureLogHandler<TRow> captureLogHandler;
         protected static bool hasAuditLogAttribute;
         protected static IEnumerable<ISaveBehavior> staticSaveBehaviors;
         protected IEnumerable<ISaveBehavior> saveBehaviors;
@@ -65,52 +64,16 @@ namespace Serenity.Services
         {
             if (!loggingInitialized)
             {
-                var logTableAttr = typeof(TRow).GetCustomAttribute<CaptureLogAttribute>();
-                if (logTableAttr != null)
-                    captureLogHandler = new CaptureLogHandler<TRow>();
-
                 hasAuditLogAttribute = typeof(TRow).GetCustomAttribute<AuditLogAttribute>(false) != null;
 
                 loggingInitialized = true;
             }
 
-            if (captureLogHandler != null)
-                DoCaptureLog();
-            else if (hasAuditLogAttribute)
+            if (hasAuditLogAttribute)
                 DoGenericAudit();
-        }
 
-        protected virtual void DoCaptureLog()
-        {
-            if (IsUpdate)
-            {
-                var logRow = Row as ILoggingRow;
-                bool anyChanged = false;
-                foreach (var field in this.Row.GetTableFields())
-                {
-                    if (logRow != null &&
-                        (ReferenceEquals(logRow.InsertDateField, field) ||
-                         ReferenceEquals(logRow.UpdateDateField, field) ||
-                         ReferenceEquals(logRow.InsertUserIdField, field) ||
-                         ReferenceEquals(logRow.UpdateUserIdField, field)))
-                    {
-                        continue;
-                    }
-
-                    if (field.IndexCompare(Old, Row) != 0)
-                    {
-                        anyChanged = true;
-                        break;
-                    }
-                }
-
-                if (anyChanged)
-                    captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.TryParseID().Value, isDelete: false);
-            }
-            else if (IsCreate)
-            {
-                captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.TryParseID().Value, isDelete: false);
-            }
+            foreach (var behavior in saveBehaviors)
+                behavior.OnAudit(this);
         }
 
         protected virtual void DoGenericAudit()

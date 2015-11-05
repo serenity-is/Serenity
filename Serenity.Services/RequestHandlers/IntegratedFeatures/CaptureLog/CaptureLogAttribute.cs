@@ -10,7 +10,9 @@ namespace Serenity.Data
             this.MappedIdField = mappedIdField;
         }
 
+        public string LogConnectionKey { get; private set; }
         public string LogTable { get; private set; }
         public string MappedIdField { get; private set; }
+        
     }
 }

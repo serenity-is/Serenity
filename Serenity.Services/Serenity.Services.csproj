@@ -54,6 +54,8 @@
     <Compile Include="RequestHandlers\Behaviours\IImplicitBehaviorRegistry.cs" />
     <Compile Include="RequestHandlers\Behaviours\IFieldBehavior.cs" />
     <Compile Include="RequestHandlers\Behaviours\ISaveBehavior.cs" />
+    <Compile Include="RequestHandlers\Behaviours\BaseSaveBehavior.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\CaptureLogSaveBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\Localization\LocalizablePropertyProcessor.cs" />
     <Compile Include="RequestHandlers\DeleteRequestHandler.cs" />
     <Compile Include="RequestHandlers\Helpers\BatchGenerationUpdater.cs" />

@@ -27,6 +27,10 @@
         /// <param name="handler">Calling save request handler</param>
         void OnAfterSave(ISaveRequestHandler handler);
 
+        /// <summary>Called after row is inserted to / updated and auditing should be performed</summary>
+        /// <param name="handler">Calling save request handler</param>
+        void OnAudit(ISaveRequestHandler handler);
+
         /// <summary>Called before handler is returning the result</summary>
         /// <param name="handler">Calling save request handler</param>
         void OnReturn(ISaveRequestHandler handler);
