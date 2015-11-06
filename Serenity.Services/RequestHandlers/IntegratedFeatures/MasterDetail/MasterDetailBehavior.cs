@@ -16,6 +16,7 @@ namespace Serenity.Services
         private Type rowType;
         private Type rowListType;
         private Type listHandlerType;
+        private Type deleteHandlerType;
 
         public bool ActivateFor(Row row)
         {
@@ -37,8 +38,44 @@ namespace Serenity.Services
                 return false;
 
             listHandlerType = typeof(ListRequestHandler<>).MakeGenericType(rowType);
+            deleteHandlerType = typeof(DeleteRequestHandler<>).MakeGenericType(rowType);
 
             return true;
+        }
+
+        public override void OnBeforeDelete(IDeleteRequestHandler handler)
+        {
+            if (ReferenceEquals(null, Target) ||
+                (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+                return;
+
+            var idField = (handler.Row as IIdRow).IdField;
+
+            var row = (Row)Activator.CreateInstance(rowType);
+            var foreignKeyField = row.FindFieldByPropertyName(attr.ForeignKey) ??
+                row.FindField(attr.ForeignKey);
+
+            if (ReferenceEquals(foreignKeyField, null))
+                throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." + 
+                    "This field is specified for a master detail relation in field '{2}' of row type '{3}'.",
+                    attr.ForeignKey, row.GetType().FullName,
+                    Target.PropertyName ?? Target.Name, handler.Row.GetType().FullName));
+
+            var rowIdField = (row as IIdRow).IdField;
+
+            var deleteHandler = (IDeleteRequestProcessor)Activator.CreateInstance(deleteHandlerType);
+            var deleteList = new List<Int64>();
+            new SqlQuery()
+                    .From(row)
+                    .Select((Field)rowIdField)
+                    .Where(foreignKeyField == idField[handler.Row].Value)
+                    .ForEach(handler.Connection, () =>
+            {
+                deleteList.Add(rowIdField[row].Value);
+            });
+
+            foreach (var id in deleteList)
+                deleteHandler.Process(handler.UnitOfWork, new DeleteRequest { EntityId = id });
         }
 
         public void OnReturn(IRetrieveRequestHandler handler)

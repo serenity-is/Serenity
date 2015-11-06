@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Serenity.Services
 {
-    public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestHandler
+    public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestHandler, IDeleteRequestProcessor
         where TRow : Row, IIdRow, new()
         where TDeleteRequest: DeleteRequest
         where TDeleteResponse : DeleteResponse, new()
@@ -217,6 +217,11 @@ namespace Serenity.Services
             return Response;
         }
 
+        DeleteResponse IDeleteRequestProcessor.Process(IUnitOfWork uow, DeleteRequest request)
+        {
+            return Process(uow, (TDeleteRequest)request);
+        }
+
         public IUnitOfWork UnitOfWork { get; protected set; }  
         DeleteRequest IDeleteRequestHandler.Request { get { return this.Request; } }
         DeleteResponse IDeleteRequestHandler.Response { get { return this.Response; } }
@@ -227,5 +232,10 @@ namespace Serenity.Services
     public class DeleteRequestHandler<TRow> : DeleteRequestHandler<TRow, DeleteRequest, DeleteResponse>
         where TRow : Row, IIdRow, new()
     {
+    }
+
+    public interface IDeleteRequestProcessor
+    {
+        DeleteResponse Process(IUnitOfWork uow, DeleteRequest request);
     }
 }
