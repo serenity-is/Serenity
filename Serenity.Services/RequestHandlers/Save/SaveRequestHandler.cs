@@ -227,6 +227,8 @@ namespace Serenity.Services
         public TSaveResponse Process(IUnitOfWork unitOfWork, TSaveRequest request,
             SaveRequestType requestType = SaveRequestType.Auto)
         {
+            StateBag.Clear();
+
             if (unitOfWork == null)
                 throw new ArgumentNullException("unitOfWork");
 

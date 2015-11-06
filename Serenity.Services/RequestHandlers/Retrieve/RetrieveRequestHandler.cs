@@ -36,10 +36,9 @@
             return cachedBehaviors;
         }
 
-        protected virtual bool AllowSelectField(Field field)
+        protected virtual bool CanSelectField(Field field)
         {
-            if (field.MinSelectLevel == SelectLevel.Never ||
-                (field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
+            if ((field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
                 return false;
 
             return true;
@@ -48,6 +47,9 @@
         protected virtual bool ShouldSelectField(Field field)
         {
             var mode = field.MinSelectLevel;
+
+            if (field.MinSelectLevel == SelectLevel.Never)
+                return false;
 
             if (mode == SelectLevel.Always)
                 return true;
@@ -102,7 +104,7 @@
         {
             foreach (var field in Row.GetFields())
             {
-                if (AllowSelectField(field) && ShouldSelectField(field))
+                if (CanSelectField(field) && ShouldSelectField(field))
                     SelectField(query, field);
             }
         }
@@ -178,6 +180,8 @@
 
         public TRetrieveResponse Process(IDbConnection connection, TRetrieveRequest request)
         {
+            StateBag.Clear();
+
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
@@ -214,6 +218,7 @@
         public SqlQuery Query { get; private set; }
         RetrieveRequest IRetrieveRequestHandler.Request { get { return this.Request; } }
         IRetrieveResponse IRetrieveRequestHandler.Response { get { return this.Response; } }
+        bool IRetrieveRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
         public IDictionary<string, object> StateBag { get; private set; }
     }
 

@@ -170,6 +170,8 @@ namespace Serenity.Services
 
         public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)
         {
+            StateBag.Clear();
+
             if (unitOfWork == null)
                 throw new ArgumentNullException("unitOfWork");
 

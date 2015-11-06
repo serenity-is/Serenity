@@ -56,6 +56,7 @@
     <Compile Include="RequestHandlers\Delete\BaseDeleteBehavior.cs" />
     <Compile Include="RequestHandlers\Delete\IDeleteBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\ICaptureLogHandler.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\MasterDetail\MasterDetailBehavior.cs" />
     <Compile Include="RequestHandlers\List\BaseListBehavior.cs" />
     <Compile Include="RequestHandlers\List\IListBehavior.cs" />
     <Compile Include="RequestHandlers\List\IListRequestHandler.cs" />

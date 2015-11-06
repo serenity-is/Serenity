@@ -9,7 +9,7 @@
     using System.Linq;
     using System.Reflection;
 
-    public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestHandler
+    public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestHandler, IListRequestProcessor
         where TRow: Row, new()
         where TListRequest: ListRequest
         where TListResponse: ListResponse<TRow>, new()
@@ -430,6 +430,8 @@
 
         public TListResponse Process(IDbConnection connection, TListRequest request)
         {
+            StateBag.Clear();
+
             if (connection == null)
                 throw new ArgumentNullException("connection");
 
@@ -476,6 +478,11 @@
             return Response;
         }
 
+        IListResponse IListRequestProcessor.Process(IDbConnection connection, ListRequest request)
+        {
+            return Process(connection, (TListRequest)request);
+        }
+
         public IDbConnection Connection { get; private set; }
         Row IListRequestHandler.Row { get { return this.Row; } }
         public SqlQuery Query { get; private set; }
@@ -493,5 +500,10 @@
         where TRow : Row, new()
         where TListRequest: ListRequest
     {
+    }
+
+    public interface IListRequestProcessor
+    {
+        IListResponse Process(IDbConnection connection, ListRequest request);
     }
 }
