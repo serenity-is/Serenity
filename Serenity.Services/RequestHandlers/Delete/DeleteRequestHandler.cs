@@ -1,58 +1,49 @@
-﻿using System.Data;
-using Serenity.Data;
-using Serenity.Services;
+﻿using Serenity.Data;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Reflection;
-using System.Globalization;
 
 namespace Serenity.Services
 {
-    public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse>
+    public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> : IDeleteRequestHandler
         where TRow : Row, IIdRow, new()
         where TDeleteRequest: DeleteRequest
         where TDeleteResponse : DeleteResponse, new()
     {
-        protected IUnitOfWork UnitOfWork;
         protected TRow Row;
         protected TDeleteResponse Response;
         protected TDeleteRequest Request;
-        private static bool loggingInitialized;
-        protected static CaptureLogHandler<TRow> captureLogHandler;
-        protected static bool hasAuditLogAttribute;
+        protected static IEnumerable<IDeleteBehavior> cachedBehaviors;
+        protected IEnumerable<IDeleteBehavior> behaviors;
 
-        protected IDbConnection Connection
+        public DeleteRequestHandler()
+        {
+            this.StateBag = new Dictionary<string, object>();
+            this.behaviors = GetBehaviors();
+        }
+
+        protected virtual IEnumerable<IDeleteBehavior> GetBehaviors()
+        {
+            if (cachedBehaviors == null)
+            {
+                cachedBehaviors = RowDeleteBehaviors<TRow>.Default.Concat(
+                    this.GetType().GetCustomAttributes().OfType<IDeleteBehavior>()).ToList();
+            }
+
+            return cachedBehaviors;
+        }
+
+        public IDbConnection Connection
         {
             get { return UnitOfWork.Connection; }
         }
 
-        protected virtual AuditDeleteRequest GetAuditRequest()
-        {
-            //EntityType entityType;
-            //if (SiteSchema.Instance.TableToType.TryGetValue(Row.Table, out entityType))
-            {
-                var auditRequest = new AuditDeleteRequest(Row.Table, Row.IdField[Row].Value);
-
-                var parentIdRow = Row as IParentIdRow;
-                if (parentIdRow != null)
-                {
-                    var parentIdField = (Field)parentIdRow.ParentIdField;
-                    //EntityType parentEntityType;
-                    if (!parentIdField.ForeignTable.IsNullOrEmpty())
-                        //SiteSchema.Instance.TableToType.TryGetValue(parentIdField.ForeignTable, out parentEntityType))
-                    {
-                        auditRequest.ParentTypeId = parentIdField.ForeignTable;
-                        auditRequest.ParentId = parentIdRow.ParentIdField[Row];
-                    }
-                }
-
-                return auditRequest;
-            }
-
-            //return null;
-        }
-
         protected virtual void OnBeforeDelete()
         {
+            foreach (var behavior in behaviors)
+                behavior.OnBeforeDelete(this);
         }
 
         protected virtual BaseCriteria GetDisplayOrderFilter()
@@ -68,15 +59,23 @@ namespace Serenity.Services
                 var filter = GetDisplayOrderFilter();
                 DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter, -1, 1, false);
             }
+
+            foreach (var behavior in behaviors)
+                behavior.OnAfterDelete(this);
         }
 
         protected virtual void ValidateRequest()
         {
+            foreach (var behavior in behaviors)
+                behavior.OnValidateRequest(this);
         }
 
         protected virtual void PrepareQuery(SqlQuery query)
         {
             query.SelectTableFields();
+
+            foreach (var behavior in behaviors)
+                behavior.OnPrepareQuery(this, query);
         }
 
         protected virtual void LoadEntity()
@@ -143,39 +142,16 @@ namespace Serenity.Services
             }
         }
 
-        protected virtual void DoGenericAudit()
-        {
-            var auditRequest = GetAuditRequest();
-            if (auditRequest != null)
-                AuditLogService.AuditDelete(Connection, RowRegistry.GetConnectionKey(Row), auditRequest);
-        }
-
-        protected virtual void DoCaptureLog()
-        {
-            captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.TryParseID().Value, isDelete: true);
-        }
-
         protected virtual void DoAudit()
         {
-            if (!loggingInitialized)
-            {
-                var logTableAttr = typeof(TRow).GetCustomAttribute<CaptureLogAttribute>();
-                if (logTableAttr != null)
-                    captureLogHandler = new CaptureLogHandler<TRow>();
-
-                hasAuditLogAttribute = typeof(TRow).GetCustomAttribute<AuditLogAttribute>(false) != null;
-
-                loggingInitialized = true;
-            }
-
-            if (captureLogHandler != null)
-                DoCaptureLog();
-            else if (hasAuditLogAttribute)
-                DoGenericAudit();
+            foreach (var behavior in behaviors)
+                behavior.OnAudit(this);
         }
 
         protected virtual void OnReturn()
         {
+            foreach (var behavior in behaviors)
+                behavior.OnReturn(this);
         }
 
         protected virtual void ValidatePermissions()
@@ -238,6 +214,12 @@ namespace Serenity.Services
 
             return Response;
         }
+
+        public IUnitOfWork UnitOfWork { get; protected set; }  
+        DeleteRequest IDeleteRequestHandler.Request { get { return this.Request; } }
+        DeleteResponse IDeleteRequestHandler.Response { get { return this.Response; } }
+        Row IDeleteRequestHandler.Row { get { return this.Row; } }
+        public IDictionary<string, object> StateBag { get; private set; }
     }
 
     public class DeleteRequestHandler<TRow> : DeleteRequestHandler<TRow, DeleteRequest, DeleteResponse>

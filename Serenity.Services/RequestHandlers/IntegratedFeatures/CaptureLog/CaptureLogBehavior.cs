@@ -4,27 +4,35 @@ using System.Reflection;
 
 namespace Serenity.Services
 {
-    public class CaptureLogSaveBehavior : BaseSaveBehavior, IImplicitBehavior
+    public class CaptureLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior
     {
         private ICaptureLogHandler captureLogHandler;
 
         public bool ActivateFor(Row row)
         {
-            return row.GetType().GetCustomAttribute<CaptureLogAttribute>() != null;
+            if (row.GetType().GetCustomAttribute<CaptureLogAttribute>() == null)
+                return false;
+
+            captureLogHandler = (ICaptureLogHandler)Activator.CreateInstance(
+                typeof(CaptureLogHandler<>).MakeGenericType(row.GetType()));
+
+            return true;
+        }
+
+        public override void OnAudit(IDeleteRequestHandler handler)
+        {
+            if (handler.Row == null || captureLogHandler == null)
+                return;
+
+            captureLogHandler.LogDelete(handler.UnitOfWork, handler.Row, Authorization.UserId.TryParseID().Value);
         }
 
         public override void OnAudit(ISaveRequestHandler handler)
         {
-            if (captureLogHandler == null)
-            {
-                captureLogHandler = (ICaptureLogHandler)Activator.CreateInstance(
-                    typeof(CaptureLogHandler<>).MakeGenericType(handler.Row.GetType()));
-            }
-
-            if (handler.Row == null)
+            if (handler.Row == null || captureLogHandler == null)
                 return;
 
-            if (handler.Old == null)
+            if (handler.IsCreate)
             {
                 captureLogHandler.LogSave(handler.UnitOfWork, handler.Row, 
                     Authorization.UserId.TryParseID().Value);

@@ -14,37 +14,37 @@ namespace Serenity.Services
         where TSaveRequest : SaveRequest<TRow>, new()
     {
         private bool displayOrderFix;
-        protected static IEnumerable<ISaveBehavior> cachedSaveBehaviors;
-        protected IEnumerable<ISaveBehavior> saveBehaviors;
+        protected static IEnumerable<ISaveBehavior> cachedBehaviors;
+        protected IEnumerable<ISaveBehavior> behaviors;
 
         public SaveRequestHandler()
         {
             this.StateBag = new Dictionary<string, object>();
-            this.saveBehaviors = GetSaveBehaviors();
+            this.behaviors = GetBehaviors();
         }
 
-        protected virtual IEnumerable<ISaveBehavior> GetSaveBehaviors()
+        protected virtual IEnumerable<ISaveBehavior> GetBehaviors()
         {
-            if (cachedSaveBehaviors == null)
+            if (cachedBehaviors == null)
             {
-                cachedSaveBehaviors = RowSaveBehaviors<TRow>.Default.Concat(
+                cachedBehaviors = RowSaveBehaviors<TRow>.Default.Concat(
                     this.GetType().GetCustomAttributes().OfType<ISaveBehavior>()).ToList();
             }
 
-            return cachedSaveBehaviors;
+            return cachedBehaviors;
         }
 
         protected virtual void AfterSave()
         {
             HandleDisplayOrder(afterSave: true);
 
-            foreach (var behavior in saveBehaviors)
+            foreach (var behavior in behaviors)
                 behavior.OnAfterSave(this);
         }
 
         protected virtual void BeforeSave()
         {
-            foreach (var behavior in saveBehaviors)
+            foreach (var behavior in behaviors)
                 behavior.OnBeforeSave(this);
         }
 
@@ -59,7 +59,7 @@ namespace Serenity.Services
 
         protected virtual void PerformAuditing()
         {
-            foreach (var behavior in saveBehaviors)
+            foreach (var behavior in behaviors)
                 behavior.OnAudit(this);
         }
 
@@ -204,7 +204,7 @@ namespace Serenity.Services
 
         protected virtual void OnReturn()
         {
-            foreach (var behavior in this.saveBehaviors)
+            foreach (var behavior in this.behaviors)
                 behavior.OnReturn(this);
         }
 
@@ -213,10 +213,15 @@ namespace Serenity.Services
             var idField = (Field)(Row.IdField);
             var id = Row.IdField[Row].Value;
 
-            return new SqlQuery()
+            var query = new SqlQuery()
                 .From(Old)
                 .SelectTableFields()
                 .WhereEqual(idField, id);
+
+            foreach (var behavior in behaviors)
+                behavior.OnPrepareQuery(this, query);
+
+            return query;
         }
 
         public TSaveResponse Process(IUnitOfWork unitOfWork, TSaveRequest request,
@@ -299,7 +304,7 @@ namespace Serenity.Services
 
             SetInternalLogFields();
 
-            foreach (var behaviour in this.saveBehaviors)
+            foreach (var behaviour in this.behaviors)
                 behaviour.OnSetInternalFields(this);
         }
 
@@ -395,7 +400,7 @@ namespace Serenity.Services
 
             ValidateFieldValues();
 
-            foreach (var behavior in this.saveBehaviors)
+            foreach (var behavior in this.behaviors)
                 behavior.OnValidateRequest(this);
         }
 
@@ -479,7 +484,7 @@ namespace Serenity.Services
             }
         }
 
-        protected IDbConnection Connection { get { return UnitOfWork.Connection; } }
+        public IDbConnection Connection { get { return UnitOfWork.Connection; } }
 
         public IUnitOfWork UnitOfWork { get; protected set; }       
 

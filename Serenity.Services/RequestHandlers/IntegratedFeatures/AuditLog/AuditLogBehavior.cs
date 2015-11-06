@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Serenity.Services
 {
-    public class AuditLogSaveBehavior : BaseSaveBehavior, IImplicitBehavior
+    public class AuditLogBehavior : BaseSaveDeleteBehavior, IImplicitBehavior
     {
         private string connectionKey;
 
@@ -13,12 +13,39 @@ namespace Serenity.Services
             return row.GetType().GetCustomAttribute<AuditLogAttribute>() != null;
         }
 
-        protected AuditSaveRequest GetAuditRequest(ISaveRequestHandler handler)
+        protected AuditDeleteRequest GetAuditDeleteRequest(IDeleteRequestHandler handler)
         {
-            bool isCreate = handler.Old == null;
+            var idField = ((IIdRow)handler.Row).IdField;
 
+            var auditRequest = new AuditDeleteRequest(handler.Row.Table, idField[handler.Row].Value);
+
+            var parentIdRow = handler.Row as IParentIdRow;
+            if (parentIdRow != null)
+            {
+                var parentIdField = (Field)parentIdRow.ParentIdField;
+                //EntityType parentEntityType;
+                if (!parentIdField.ForeignTable.IsNullOrEmpty())
+                    //SiteSchema.Instance.TableToType.TryGetValue(parentIdField.ForeignTable, out parentEntityType))
+                {
+                    auditRequest.ParentTypeId = parentIdField.ForeignTable;
+                    auditRequest.ParentId = parentIdRow.ParentIdField[handler.Row];
+                }
+            }
+
+            return auditRequest;
+        }
+
+        public override void OnAudit(IDeleteRequestHandler handler)
+        {
+            var auditRequest = GetAuditDeleteRequest(handler);
+            if (auditRequest != null)
+                AuditLogService.AuditDelete(handler.UnitOfWork.Connection, RowRegistry.GetConnectionKey(handler.Row), auditRequest);
+        }
+
+        protected AuditSaveRequest GetAuditSaveRequest(ISaveRequestHandler handler)
+        {
             var auditFields = new HashSet<Field>();
-            var flag = isCreate ? FieldFlags.Insertable : FieldFlags.Updatable;
+            var flag = handler.IsCreate ? FieldFlags.Insertable : FieldFlags.Updatable;
             foreach (var field in handler.Row.GetFields())
                 if (field.Flags.HasFlag(flag))
                     auditFields.Add(field);
@@ -36,7 +63,7 @@ namespace Serenity.Services
                 if (!parentIdField.ForeignTable.IsTrimmedEmpty())
                 {
                     auditRequest.ParentTypeId = parentIdField.ForeignTable;
-                    auditRequest.OldParentId = handler.Old == null ? null : parentIdRow.ParentIdField[handler.Old];
+                    auditRequest.OldParentId = handler.IsCreate ? null : parentIdRow.ParentIdField[handler.Old];
                     auditRequest.NewParentId = parentIdRow.ParentIdField[handler.Row];
                 }
             }
@@ -44,18 +71,17 @@ namespace Serenity.Services
             return auditRequest;
         }
 
-
         public override void OnAudit(ISaveRequestHandler handler)
         {
             if (handler.Row == null)
                 return;
 
-            var auditRequest = GetAuditRequest(handler);
+            var auditRequest = GetAuditSaveRequest(handler);
 
             if (connectionKey == null)
                 connectionKey = RowRegistry.GetConnectionKey(handler.Row);
 
-            if (handler.Old == null)
+            if (handler.IsCreate)
             {
                 if (auditRequest != null)
                     AuditLogService.AuditInsert(handler.UnitOfWork.Connection, connectionKey, auditRequest);

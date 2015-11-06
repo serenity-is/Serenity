@@ -9,15 +9,34 @@
     using System.Linq;
     using System.Reflection;
 
-    public class ListRequestHandler<TRow, TListRequest, TListResponse>
+    public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestHandler
         where TRow: Row, new()
         where TListRequest: ListRequest
         where TListResponse: ListResponse<TRow>, new()
     {
-        protected IDbConnection Connection;
         protected TRow Row;
         protected TListRequest Request;
         protected TListResponse Response;
+
+        protected static IEnumerable<IListBehavior> cachedBehaviors;
+        protected IEnumerable<IListBehavior> behaviors;
+
+        public ListRequestHandler()
+        {
+            this.StateBag = new Dictionary<string, object>();
+            this.behaviors = GetBehaviors();
+        }
+
+        protected virtual IEnumerable<IListBehavior> GetBehaviors()
+        {
+            if (cachedBehaviors == null)
+            {
+                cachedBehaviors = RowListBehaviors<TRow>.Default.Concat(
+                    this.GetType().GetCustomAttributes().OfType<IListBehavior>()).ToList();
+            }
+
+            return cachedBehaviors;
+        }
 
         protected virtual SortBy[] GetNativeSort()
         {
@@ -32,14 +51,19 @@
             return null;
         }
 
+        protected virtual bool AllowSelectField(Field field)
+        {
+            if (field.MinSelectLevel == SelectLevel.Never ||
+                (field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
+                return false;
+
+            return true;
+        }
+
         protected virtual bool ShouldSelectField(Field field)
         {
             var mode = field.MinSelectLevel;
             
-            if (mode == SelectLevel.Never ||
-                (field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
-                return false;
-
             if (mode == SelectLevel.Always)
                 return true;
 
@@ -106,7 +130,7 @@
         {
             foreach (var field in Row.GetFields())
             {
-                if (ShouldSelectField(field))
+                if (AllowSelectField(field) && ShouldSelectField(field))
                     SelectField(query, field);
             }
         }
@@ -114,6 +138,9 @@
         protected virtual void PrepareQuery(SqlQuery query)
         {
             SelectFields(query);
+
+            foreach (var behavior in behaviors)
+                behavior.OnPrepareQuery(this, query);
         }
 
         protected virtual void ApplyKeyOrder(SqlQuery query)
@@ -256,10 +283,20 @@
 
         protected virtual void OnBeforeExecuteQuery()
         {
+            foreach (var behavior in behaviors)
+                behavior.OnBeforeExecuteQuery(this);
         }
 
         protected virtual void OnAfterExecuteQuery()
         {
+            foreach (var behavior in behaviors)
+                behavior.OnAfterExecuteQuery(this);
+        }
+
+        protected virtual void OnReturn()
+        {
+            foreach (var behavior in behaviors)
+                behavior.OnReturn(this);
         }
 
         protected virtual TRow ProcessEntity(TRow row)
@@ -340,6 +377,9 @@
             ApplyEqualityFilter(query);
             ApplyCriteria(query);
             ApplyIncludeDeletedFilter(query);
+
+            foreach (var behavior in behaviors)
+                behavior.OnApplyFilters(this, query);
         }
 
         protected virtual void ValidatePermissions()
@@ -352,6 +392,14 @@
                 else
                     Authorization.ValidatePermission(readAttr.Permission);
             }
+        }
+
+        protected virtual void ValidateRequest()
+        {
+            ValidatePermissions();
+
+            foreach (var behavior in behaviors)
+                behavior.OnValidateRequest(this);
         }
 
         protected virtual SqlQuery CreateQuery()
@@ -387,7 +435,7 @@
 
             Connection = connection;
             Request = request;
-            ValidatePermissions();
+            ValidateRequest();
 
             Response = new TListResponse();
             Response.Entities = new List<TRow>();
@@ -395,6 +443,7 @@
             Row = new TRow();
 
             var query = CreateQuery();
+            this.Query = query;
 
             PrepareQuery(query);
 
@@ -422,8 +471,17 @@
 
             OnAfterExecuteQuery();
 
+            OnReturn();
+
             return Response;
         }
+
+        public IDbConnection Connection { get; private set; }
+        Row IListRequestHandler.Row { get { return this.Row; } }
+        public SqlQuery Query { get; private set; }
+        ListRequest IListRequestHandler.Request { get { return this.Request; } }
+        IListResponse IListRequestHandler.Response { get { return this.Response; } }
+        public IDictionary<string, object> StateBag { get; private set; }
     }
 
     public class ListRequestHandler<TRow> : ListRequestHandler<TRow, ListRequest, ListResponse<TRow>>

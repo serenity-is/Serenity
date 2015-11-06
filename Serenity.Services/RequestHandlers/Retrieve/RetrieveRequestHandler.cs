@@ -1,29 +1,53 @@
 ﻿namespace Serenity.Services
 {
-    using System;
-    using System.Data;
     using Serenity.Data;
-    using Serenity.Services;
+    using System;
     using System.Collections.Generic;
+    using System.Data;
+    using System.Linq;
     using System.Reflection;
 
-    public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse>
+    public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestHandler
         where TRow: Row, new()
         where TRetrieveRequest: RetrieveRequest
         where TRetrieveResponse: RetrieveResponse<TRow>, new()
     {
-        protected IDbConnection Connection;
         protected TRow Row;
         protected TRetrieveResponse Response;
         protected TRetrieveRequest Request;
 
+        protected static IEnumerable<IRetrieveBehavior> cachedBehaviors;
+        protected IEnumerable<IRetrieveBehavior> behaviors;
+
+        public RetrieveRequestHandler()
+        {
+            this.StateBag = new Dictionary<string, object>();
+            this.behaviors = GetBehaviors();
+        }
+
+        protected virtual IEnumerable<IRetrieveBehavior> GetBehaviors()
+        {
+            if (cachedBehaviors == null)
+            {
+                cachedBehaviors = RowRetrieveBehaviors<TRow>.Default.Concat(
+                    this.GetType().GetCustomAttributes().OfType<IRetrieveBehavior>()).ToList();
+            }
+
+            return cachedBehaviors;
+        }
+
+        protected virtual bool AllowSelectField(Field field)
+        {
+            if (field.MinSelectLevel == SelectLevel.Never ||
+                (field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
+                return false;
+
+            return true;
+        }
+
         protected virtual bool ShouldSelectField(Field field)
         {
             var mode = field.MinSelectLevel;
-
-            if (mode == SelectLevel.Never ||
-                (field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
-                return false;
 
             if (mode == SelectLevel.Always)
                 return true;
@@ -78,18 +102,35 @@
         {
             foreach (var field in Row.GetFields())
             {
-                if (ShouldSelectField(field))
+                if (AllowSelectField(field) && ShouldSelectField(field))
                     SelectField(query, field);
             }
         }
 
         protected virtual void OnReturn()
         {
+            foreach (var behavior in behaviors)
+                behavior.OnReturn(this);
         }
 
         protected virtual void PrepareQuery(SqlQuery query)
         {
             SelectFields(query);
+
+            foreach (var behavior in behaviors)
+                behavior.OnPrepareQuery(this, query);
+        }
+
+        protected virtual void OnBeforeExecuteQuery()
+        {
+            foreach (var behavior in behaviors)
+                behavior.OnBeforeExecuteQuery(this);
+        }
+
+        protected virtual void OnAfterExecuteQuery()
+        {
+            foreach (var behavior in behaviors)
+                behavior.OnAfterExecuteQuery(this);
         }
 
         protected bool IsIncluded(Field field)
@@ -117,6 +158,14 @@
             }
         }
 
+        protected virtual void ValidateRequest()
+        {
+            ValidatePermissions();
+
+            foreach (var behavior in behaviors)
+                behavior.OnValidateRequest(this);
+        }
+
         protected virtual SqlQuery CreateQuery()
         {
             var query = new SqlQuery()
@@ -138,23 +187,34 @@
 
             Connection = connection;
             Request = request;
-            ValidatePermissions();
+            ValidateRequest();
 
             Response = new TRetrieveResponse();
             Row = new TRow();
+           
+            this.Query = CreateQuery();
 
-            var query = CreateQuery();
+            PrepareQuery(Query);
 
-            PrepareQuery(query);
+            OnBeforeExecuteQuery();
 
-            if (query.GetFirst(Connection))
+            if (Query.GetFirst(Connection))
                 Response.Entity = Row;
             else
                 throw DataValidation.EntityNotFoundError(Row, request.EntityId.Value);
 
+            OnAfterExecuteQuery();
+
             OnReturn();
             return Response;
         }
+
+        public IDbConnection Connection { get; private set; }
+        Row IRetrieveRequestHandler.Row { get { return this.Row; } }
+        public SqlQuery Query { get; private set; }
+        RetrieveRequest IRetrieveRequestHandler.Request { get { return this.Request; } }
+        IRetrieveResponse IRetrieveRequestHandler.Response { get { return this.Response; } }
+        public IDictionary<string, object> StateBag { get; private set; }
     }
 
     public class RetrieveRequestHandler<TRow> : RetrieveRequestHandler<TRow, RetrieveRequest, RetrieveResponse<TRow>>

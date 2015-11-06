@@ -1,4 +1,6 @@
-﻿namespace Serenity.Services
+﻿using Serenity.Data;
+
+namespace Serenity.Services
 {
     /// <summary>
     /// A save behavior that can be used as a mixin within a SaveRequestHandler lifecycle
@@ -11,6 +13,10 @@
     /// </remarks>
     public interface ISaveBehavior
     {
+        /// <summary>Called when query to load old entity is built</summary>
+        /// <param name="handler">Calling save request handler</param>
+        void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query);
+
         /// <summary>Called when save request is validated</summary>
         /// <param name="handler">Calling save request handler</param>
         void OnValidateRequest(ISaveRequestHandler handler);

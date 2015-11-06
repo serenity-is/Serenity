@@ -9,12 +9,6 @@ namespace Serenity.Data
         public static readonly DateTime ValidUntil = new DateTime(9999, 1, 1);
     }
 
-    public interface ICaptureLogHandler
-    {
-        void LogSave(IUnitOfWork uow, Row row, Int64 userId);
-        void LogDelete(IUnitOfWork uow, Row old, Int64 userId);
-    }
-
     public class CaptureLogHandler<TRow> : ICaptureLogHandler
         where TRow: Row, IIdRow, new() 
     {

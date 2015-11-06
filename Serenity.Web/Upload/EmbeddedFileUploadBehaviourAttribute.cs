@@ -37,7 +37,7 @@ namespace Serenity.Services
             handler.StateBag[this.GetType().FullName + "_FilesToDelete"] = filesToDelete;
 
             var filename = (StringField)(handler.Row.FindField(this.fileNameField) ?? handler.Row.FindFieldByPropertyName(fileNameField));
-            var oldFilename = handler.Old == null ? null : filename[handler.Old];
+            var oldFilename = handler.IsCreate ? null : filename[handler.Old];
             var newFilename = filename[handler.Row] = filename[handler.Row].TrimToNull();
 
             if (oldFilename.IsTrimmedSame(newFilename))
@@ -74,7 +74,7 @@ namespace Serenity.Services
             if (!newFilename.ToLowerInvariant().StartsWith("temporary/"))
                 throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
 
-            if (handler.Old != null)
+            if (handler.IsUpdate)
             {
                 var copyResult = CopyTemporaryFile(handler, filesToDelete);
                 filename[handler.Row] = copyResult.DbFileName;
@@ -96,7 +96,7 @@ namespace Serenity.Services
         {
             var filename = (StringField)(handler.Row.FindField(this.fileNameField) ?? handler.Row.FindFieldByPropertyName(fileNameField));
 
-            if (handler.Old != null)
+            if (handler.IsUpdate)
                 return;
 
             var newFilename = filename[handler.Row] = filename[handler.Row].TrimToNull();

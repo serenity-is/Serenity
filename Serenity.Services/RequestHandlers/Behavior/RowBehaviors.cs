@@ -6,26 +6,27 @@ using System.Reflection;
 namespace Serenity.Services
 {
     /// <summary>
-    /// Stores a static, cached list of behaviors that are implicitly or explicitly activated
-    /// for a row type (TRow).
+    /// Base class that stores a static, cached list of TBehavior behaviors that are 
+    /// implicitly or explicitly activated for a row type (TRow).
     /// </summary>
     /// <typeparam name="TRow">Type of row</typeparam>
-    public class RowSaveBehaviors<TRow>
+    public abstract class RowBehaviors<TRow, TBehavior>
+        where TBehavior: class
         where TRow: Row, new()
     {
-        static IEnumerable<ISaveBehavior> behaviors;
+        static IEnumerable<TBehavior> behaviors;
 
         /// <summary>
         /// Cached list of behaviors for TRow type.
         /// </summary>
-        public static IEnumerable<ISaveBehavior> Default
+        public static IEnumerable<TBehavior> Default
         {
             get
             {
                 if (behaviors != null)
                     return behaviors;
 
-                var list = new List<ISaveBehavior>();
+                var list = new List<TBehavior>();
 
                 TRow row = new TRow();
 
@@ -34,19 +35,19 @@ namespace Serenity.Services
 
                 foreach (var behaviorType in registry.GetTypes())
                 {
-                    var saveBehavior = Activator.CreateInstance(behaviorType) as ISaveBehavior;
-                    if (saveBehavior == null)
+                    var behavior = Activator.CreateInstance(behaviorType) as TBehavior;
+                    if (behavior == null)
                         continue;
 
-                    var implicitBehavior = saveBehavior as IImplicitBehavior;
+                    var implicitBehavior = behavior as IImplicitBehavior;
                     if (implicitBehavior == null)
                         continue;
 
-                    var fieldBehavior = saveBehavior as IFieldBehavior;
+                    var fieldBehavior = behavior as IFieldBehavior;
                     if (fieldBehavior == null)
                     {
                         if (implicitBehavior.ActivateFor(row))
-                            list.Add(saveBehavior);
+                            list.Add(behavior);
 
                         continue;
                     }
@@ -56,22 +57,22 @@ namespace Serenity.Services
                         fieldBehavior.Target = field;
                         if (implicitBehavior.ActivateFor(row))
                         {
-                            list.Add(saveBehavior);
+                            list.Add(behavior);
 
-                            saveBehavior = Activator.CreateInstance(behaviorType) as ISaveBehavior;
-                            implicitBehavior = saveBehavior as IImplicitBehavior;
-                            fieldBehavior = saveBehavior as IFieldBehavior;
+                            behavior = Activator.CreateInstance(behaviorType) as TBehavior;
+                            implicitBehavior = behavior as IImplicitBehavior;
+                            fieldBehavior = behavior as IFieldBehavior;
                         }
                     }
                 }
 
                 foreach (var attr in row.GetType().GetCustomAttributes())
                 {
-                    var saveBehavior = attr as ISaveBehavior;
-                    if (saveBehavior == null)
+                    var behavior = attr as TBehavior;
+                    if (behavior == null)
                         continue;
 
-                    list.Add(saveBehavior);
+                    list.Add(behavior);
                 }
 
                 foreach (var field in row.GetFields())
@@ -81,16 +82,16 @@ namespace Serenity.Services
 
                     foreach (var attr in field.CustomAttributes)
                     {
-                        var saveBehavior = attr as ISaveBehavior;
-                        if (saveBehavior == null)
+                        var behavior = attr as TBehavior;
+                        if (behavior == null)
                             continue;
 
-                        var fieldBehavior = saveBehavior as IFieldBehavior;
+                        var fieldBehavior = behavior as IFieldBehavior;
                         if (fieldBehavior == null)
                             continue;
 
                         fieldBehavior.Target = field;
-                        list.Add(saveBehavior);
+                        list.Add(behavior);
                     }
                 }
 

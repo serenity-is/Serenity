@@ -7,6 +7,10 @@ namespace Serenity.Services
 {
     public abstract class BaseSaveBehavior : ISaveBehavior
     {
+        public virtual void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)
+        {
+        }
+
         public virtual void OnAfterSave(ISaveRequestHandler handler)
         {
         }

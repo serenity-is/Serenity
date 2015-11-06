@@ -60,7 +60,7 @@ namespace Serenity.Services
             if (!handler.Row.IsAssigned(field))
                 return;
 
-            var oldFilesJSON = (handler.Old == null ? null : field[handler.Old]).TrimToNull();
+            var oldFilesJSON = (handler.IsCreate ? null : field[handler.Old]).TrimToNull();
             var newFilesJSON = field[handler.Row] = field[handler.Row].TrimToNull();
 
             if (oldFilesJSON.IsTrimmedSame(newFilesJSON))
@@ -101,7 +101,7 @@ namespace Serenity.Services
                 return;
             }
 
-            if (handler.Old != null)
+            if (handler.IsUpdate)
                 field[handler.Row] = CopyTemporaryFiles(handler, oldFileList, newFileList, filesToDelete);
         }
 
@@ -130,7 +130,7 @@ namespace Serenity.Services
 
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
-            if (handler.Old != null)
+            if (handler.IsUpdate)
                 return;
 
             var field = (StringField)(handler.Row.FindField(this.filesField) ?? handler.Row.FindFieldByPropertyName(filesField));

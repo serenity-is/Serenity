@@ -39,7 +39,7 @@ namespace Serenity.Services
         internal static void ValidateUniqueConstraint(ISaveRequestHandler handler, IEnumerable<Field> fields,
             string errorMessage = null, BaseCriteria groupCriteria = null)
         {
-            if (handler.Old != null && !fields.Any(x => x.IndexCompare(handler.Old, handler.Row) != 0))
+            if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old, handler.Row) != 0))
                 return;
 
             var criteria = groupCriteria ?? Criteria.Empty;
@@ -52,7 +52,7 @@ namespace Serenity.Services
 
             var idField = ((IIdRow)handler.Row).IdField;
 
-            if (handler.Old != null)
+            if (handler.IsUpdate)
                 criteria &= (Field)idField != idField[handler.Old].Value;
 
             var row = handler.Row.CreateNew();
