@@ -72,7 +72,7 @@
     <Compile Include="FieldTypes\DateTimeField.cs" />
     <Compile Include="FieldTypes\DecimalField.cs" />
     <Compile Include="FieldTypes\DoubleField.cs" />
-    <Compile Include="FieldTypes\ForeignRowSetField.cs" />
+    <Compile Include="FieldTypes\RowListField.cs" />
     <Compile Include="FieldTypes\GenericClassField.cs" />
     <Compile Include="FieldTypes\GenericField.cs" />
     <Compile Include="FieldTypes\GenericValueField.cs" />
