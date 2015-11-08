@@ -7,6 +7,11 @@ namespace Serenity.Reflection
     {
         public static Func<object> DelegateForConstructor(Type type)
         {
+            return DelegateForConstructor<object>(type);
+        }
+
+        public static Func<TReturn> DelegateForConstructor<TReturn>(Type type)
+        {
             var ctor = type.GetConstructor(Type.EmptyTypes);
 
             if (ctor == null)
@@ -21,7 +26,7 @@ namespace Serenity.Reflection
             il.Emit(OpCodes.Ldloc_0);
             il.Emit(OpCodes.Ret);
 
-            return (Func<object>)dm.CreateDelegate(typeof(Func<object>));
+            return (Func<TReturn>)dm.CreateDelegate(typeof(Func<TReturn>));
         }
     }
 }
