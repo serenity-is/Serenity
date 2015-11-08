@@ -176,6 +176,7 @@
     <Compile Include="Reflection\CodeWriter.cs" />
     <Compile Include="Reflection\ILGeneration.cs" />
     <Compile Include="Reflection\InstanceCreator.cs" />
+    <Compile Include="Reflection\FastReflection.cs" />
     <Compile Include="Reflection\ObjectAccessor.cs" />
     <Compile Include="Reflection\ReflectionExtensions.cs" />
     <Compile Include="Reflection\TypeAccessor.cs" />
