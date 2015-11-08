@@ -7,6 +7,8 @@ namespace Serenity.Data.Mapping
     {
         public MasterDetailRelationAttribute(string foreignKey)
         {
+            Check.NotNullOrEmpty(foreignKey, "MasterDetailRelation.ForeignKey");
+
             this.ForeignKey = foreignKey;
         }
 
