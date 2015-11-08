@@ -1,6 +1,7 @@
 ﻿using Serenity;
 using Serenity.Data;
 using Serenity.Data.Mapping;
+using Serenity.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,9 +15,10 @@ namespace Serenity.Services
 
         private MasterDetailRelationAttribute attr;
         private Type rowType;
-        private Type rowListType;
-        private Type listHandlerType;
-        private Type deleteHandlerType;
+        private Func<IList> rowListFactory;
+        private Func<Row> rowFactory;
+        private Func<IListRequestProcessor> listHandlerFactory;
+        private Func<IDeleteRequestProcessor> deleteHandlerFactory;
 
         public bool ActivateFor(Row row)
         {
@@ -24,21 +26,36 @@ namespace Serenity.Services
                 return false;
 
             attr = Target.GetAttribute<MasterDetailRelationAttribute>();
-            if (attr == null || string.IsNullOrEmpty(attr.ForeignKey))
+            if (attr == null)
                 return false;
 
-            rowListType = Target.ValueType;
+            var rowListType = Target.ValueType;
             if (!rowListType.IsGenericType ||
                 rowListType.GetGenericTypeDefinition() != typeof(List<>))
-                return false;
+            {
+                throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
+                    "but its property type is not a generic List (e.g. List<Row>)!",
+                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+            }
 
             rowType = rowListType.GetGenericArguments()[0];
             if (rowType.IsAbstract ||
                 !typeof(Row).IsAssignableFrom(rowType))
-                return false;
+            {
+                throw new ArgumentException(String.Format(
+                    "Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
+                    "but its property type is not a generic list of rows (e.g. List<Row>)!",
+                        Target.PropertyName ?? Target.Name, row.GetType().FullName));
+            }
 
-            listHandlerType = typeof(ListRequestHandler<>).MakeGenericType(rowType);
-            deleteHandlerType = typeof(DeleteRequestHandler<>).MakeGenericType(rowType);
+            rowListFactory = FastReflection.DelegateForConstructor<IList>(rowListType);
+            rowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
+
+            listHandlerFactory = FastReflection.DelegateForConstructor<IListRequestProcessor>(
+                typeof(ListRequestHandler<>).MakeGenericType(rowType));
+
+            deleteHandlerFactory = FastReflection.DelegateForConstructor<IDeleteRequestProcessor>(
+                typeof(DeleteRequestHandler<>).MakeGenericType(rowType));
 
             return true;
         }
@@ -51,7 +68,7 @@ namespace Serenity.Services
 
             var idField = (handler.Row as IIdRow).IdField;
 
-            var row = (Row)Activator.CreateInstance(rowType);
+            var row = rowFactory();
             var foreignKeyField = row.FindFieldByPropertyName(attr.ForeignKey) ??
                 row.FindField(attr.ForeignKey);
 
@@ -63,7 +80,7 @@ namespace Serenity.Services
 
             var rowIdField = (row as IIdRow).IdField;
 
-            var deleteHandler = (IDeleteRequestProcessor)Activator.CreateInstance(deleteHandlerType);
+            var deleteHandler = deleteHandlerFactory();
             var deleteList = new List<Int64>();
             new SqlQuery()
                     .From(row)
@@ -86,7 +103,7 @@ namespace Serenity.Services
 
             var idField = (handler.Row as IIdRow).IdField;
 
-            var listHandler = (IListRequestProcessor)Activator.CreateInstance(listHandlerType);
+            var listHandler = listHandlerFactory();
 
             var listRequest = new ListRequest
             {
@@ -99,7 +116,7 @@ namespace Serenity.Services
 
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
 
-            var list = (IList)Activator.CreateInstance(rowListType);
+            var list = rowListFactory();
             foreach (var item in response.Entities)
                 list.Add(item);
 
