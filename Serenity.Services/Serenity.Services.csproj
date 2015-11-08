@@ -57,7 +57,7 @@
     <Compile Include="RequestHandlers\Delete\IDeleteBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\ICaptureLogHandler.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\MasterDetail\MasterDetailRelationBehavior.cs" />
-    <Compile Include="RequestHandlers\IntegratedFeatures\UpdateInsertLog\UpdateInsertLogBehavior.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\InsertUpdateLog\InsertUpdateLogBehavior.cs" />
     <Compile Include="RequestHandlers\List\BaseListBehavior.cs" />
     <Compile Include="RequestHandlers\List\IListBehavior.cs" />
     <Compile Include="RequestHandlers\List\IListRequestHandler.cs" />
