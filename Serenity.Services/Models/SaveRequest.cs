@@ -6,7 +6,7 @@ namespace Serenity.Services
 {
     public interface ISaveRequest
     {
-        object Entity { get; }
+        object Entity { get; set; }
     }
 
     public class SaveRequest<TEntity> : ServiceRequest, ISaveRequest
@@ -16,6 +16,7 @@ namespace Serenity.Services
         object ISaveRequest.Entity
         {
             get { return this.Entity; }
+            set { this.Entity = (TEntity)value; }
         }
     }
 }
