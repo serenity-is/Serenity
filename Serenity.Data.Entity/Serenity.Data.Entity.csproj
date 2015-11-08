@@ -63,6 +63,7 @@
     <Compile Include="Extensions\EntityFieldExtensions.cs" />
     <Compile Include="Extensions\EntitySqlHelper.cs" />
     <Compile Include="Extensions\EntityLocalTexts.cs" />
+    <Compile Include="FieldTypes\SingleField.cs" />
     <Compile Include="FieldTypes\Field.CriteriaOperators.cs" />
     <Compile Include="FieldTypes\Field.cs" />
     <Compile Include="Extensions\FieldDescriptor.cs" />
