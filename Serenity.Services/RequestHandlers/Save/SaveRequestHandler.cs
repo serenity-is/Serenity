@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Serenity.Services
 {
-    public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestHandler
+    public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> : ISaveRequestHandler, ISaveRequestProcessor
         where TRow : Row, IIdRow, new()
         where TSaveResponse : SaveResponse, new()
         where TSaveRequest : SaveRequest<TRow>, new()
@@ -304,27 +304,8 @@ namespace Serenity.Services
                 SetDefaultValues();
             }
 
-            SetInternalLogFields();
-
             foreach (var behaviour in this.behaviors)
                 behaviour.OnSetInternalFields(this);
-        }
-
-        protected virtual void SetInternalLogFields()
-        {
-            var updateLogRow = Row as IUpdateLogRow;
-            var insertLogRow = Row as IInsertLogRow;
-
-            if (updateLogRow != null && (IsUpdate || insertLogRow == null))
-            {
-                updateLogRow.UpdateDateField[Row] = DateTimeField.ToDateTimeKind(DateTime.Now, updateLogRow.UpdateDateField.DateTimeKind);
-                updateLogRow.UpdateUserIdField[Row] = Authorization.UserId.TryParseID();
-            }
-            else if (insertLogRow != null && IsCreate)
-            {
-                insertLogRow.InsertDateField[Row] = DateTimeField.ToDateTimeKind(DateTime.Now, insertLogRow.InsertDateField.DateTimeKind);
-                insertLogRow.InsertUserIdField[Row] = Authorization.UserId.TryParseID();
-            }
         }
 
         protected virtual void SetTrimToEmptyFields()
@@ -486,6 +467,11 @@ namespace Serenity.Services
             }
         }
 
+        SaveResponse ISaveRequestProcessor.Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type)
+        {
+            return Process(uow, (TSaveRequest)request, type);
+        }
+
         public IDbConnection Connection { get { return UnitOfWork.Connection; } }
 
         public IUnitOfWork UnitOfWork { get; protected set; }       
@@ -516,5 +502,10 @@ namespace Serenity.Services
     public class SaveRequestHandler<TRow> : SaveRequestHandler<TRow, SaveRequest<TRow>, SaveResponse>
         where TRow : Row, IIdRow, new()
     {
+    }
+
+    public interface ISaveRequestProcessor
+    {
+        SaveResponse Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type);
     }
 }
