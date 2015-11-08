@@ -10,8 +10,10 @@ namespace Serenity.Data.Mapping
             Check.NotNullOrEmpty(foreignKey, "MasterDetailRelation.ForeignKey");
 
             this.ForeignKey = foreignKey;
+            this.CheckChangesOnUpdate = true;
         }
 
         public string ForeignKey { get; private set; }
+        public bool CheckChangesOnUpdate { get; set; }
     }
 }
