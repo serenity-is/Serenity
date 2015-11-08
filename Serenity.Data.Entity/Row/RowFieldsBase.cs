@@ -315,7 +315,27 @@ namespace Serenity.Data
 
                         if (expression != null)
                         {
+                            bool wasForeign = (field.Flags & (FieldFlags.Foreign | FieldFlags.Calculated)) != 0;
+
                             field.Expression = expression.Value;
+
+                            var newFlags = field.Flags;
+                            if (!wasForeign && (newFlags & (FieldFlags.Foreign | FieldFlags.Calculated)) != 0)
+                            {
+                                if ((addFlags & FieldFlags.Updatable) != FieldFlags.Updatable &
+                                    (newFlags & FieldFlags.Updatable) == FieldFlags.Updatable)
+                                {
+                                    newFlags -= FieldFlags.Updatable;
+                                }
+
+                                if ((addFlags & FieldFlags.Insertable) != FieldFlags.Insertable &
+                                    (newFlags & FieldFlags.Insertable) == FieldFlags.Insertable)
+                                {
+                                    newFlags -= FieldFlags.Insertable;
+                                }
+
+                                field.Flags = newFlags;
+                            }
                         }
 
                         if (foreignKey != null)
