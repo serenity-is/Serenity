@@ -42,6 +42,7 @@ namespace Serenity.PropertyGrid
                     return 55;
                 case FieldType.Int32:
                     return 65;
+                case FieldType.Single:
                 case FieldType.Double:
                 case FieldType.Decimal:
                     return 85;

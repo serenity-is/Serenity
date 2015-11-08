@@ -8,6 +8,7 @@
         Int64,
         Boolean,
         Decimal,
+        Single,
         Double,
         DateTime,
         Time,

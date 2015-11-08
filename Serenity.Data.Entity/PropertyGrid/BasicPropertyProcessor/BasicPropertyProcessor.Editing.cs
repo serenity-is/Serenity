@@ -75,7 +75,7 @@ namespace Serenity.PropertyGrid
                 return "Date";
             else if (valueType == typeof(Boolean))
                 return "Boolean";
-            else if (valueType == typeof(Decimal) || valueType == typeof(Double))
+            else if (valueType == typeof(Decimal) || valueType == typeof(Double) || valueType == typeof(Single))
                 return "Decimal";
             else
                 return "String";

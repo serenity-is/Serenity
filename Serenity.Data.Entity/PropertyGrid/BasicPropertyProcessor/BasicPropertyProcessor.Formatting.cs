@@ -41,6 +41,7 @@ namespace Serenity.PropertyGrid
                     item.FormatterType = "Checkbox";
                 else if (valueType == typeof(Decimal) ||
                     valueType == typeof(Double) ||
+                    valueType == typeof(Single) ||
                     valueType == typeof(Int32))
                 {
                     item.FormatterType = "Number";

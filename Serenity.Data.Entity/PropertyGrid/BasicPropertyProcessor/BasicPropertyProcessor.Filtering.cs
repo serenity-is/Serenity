@@ -95,7 +95,8 @@ namespace Serenity.PropertyGrid
                 else if (valueType == typeof(Boolean))
                     item.FilteringType = "Boolean";
                 else if (valueType == typeof(Decimal) ||
-                    valueType == typeof(Double))
+                    valueType == typeof(Double) ||
+                    valueType == typeof(Single))
                 {
                     item.FilteringType = "Decimal";
                 }
