@@ -1,3 +1,12 @@
+## 1.6.3 (2015-11-09)
+
+Features:
+  - implement behavior (mixin) functionality for service request handlers (list/retrieve/save/delete)
+  - extract capturelog, auditlog, insert/update log, unique constraint checks as behaviors
+  - MasterDetailRelationAttribute and MasterDetailRelationRelationBehavior 
+  - if a field is auto created and has a foreign / calculated expression, it shouldn't be updatable / insertable by default
+  - SingleField field type
+
 ## 1.6.2 (2015-10-31)
 
 Features:
