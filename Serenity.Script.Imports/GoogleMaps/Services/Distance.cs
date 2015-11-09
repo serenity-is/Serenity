@@ -1,4 +1,4 @@
-// Distance.cs
+﻿// Distance.cs
 //
 
 using System;

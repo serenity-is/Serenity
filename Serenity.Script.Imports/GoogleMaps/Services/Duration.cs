@@ -1,4 +1,4 @@
-// Duration.cs
+﻿// Duration.cs
 //
 
 using System;

@@ -1,4 +1,4 @@
-// DistanceMatrixElementStatus.cs
+﻿// DistanceMatrixElementStatus.cs
 //
 
 using System;

@@ -1,4 +1,4 @@
-// DistanceMatrixResponseRow.cs
+﻿// DistanceMatrixResponseRow.cs
 //
 
 using System;
