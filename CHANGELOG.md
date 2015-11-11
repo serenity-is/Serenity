@@ -6,6 +6,11 @@ Features:
   - MasterDetailRelationAttribute and MasterDetailRelationRelationBehavior 
   - if a field is auto created and has a foreign / calculated expression, it shouldn't be updatable / insertable by default
   - SingleField field type
+  - ability to revoke a permission which is granted to roles from users [SERENE]
+  - use tree mode for permission editing and display effective permission [SERENE]
+
+Bugfixes:
+  - order tab in customer dialog was showing all orders in new customer mode [SERENE]
 
 ## 1.6.2 (2015-10-31)
 
