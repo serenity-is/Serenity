@@ -3,7 +3,7 @@ using System;
 
 namespace Serenity.ComponentModel
 {
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class, AllowMultiple = true)]
     public class RegisterPermissionKeyAttribute : PermissionAttributeBase
     {
         public RegisterPermissionKeyAttribute(object permission)
