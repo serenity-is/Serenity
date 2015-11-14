@@ -3,6 +3,7 @@
 Features:
   - date range quick filtering
   - ability to register a permission key with RegisterPermissionKeyAttribute to be shown in permissions dialog [SERENE]
+  - use a better datepicker trigger image
 
 ## 1.6.3 (2015-11-09)
 
