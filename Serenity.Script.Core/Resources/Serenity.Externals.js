@@ -794,7 +794,7 @@
             dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
                 (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                     'dd' + s + 'mm' + s + 'yy')),
-            buttonImage: Q.resolveUrl('~/content/serenity/images/datepicker.gif'),
+            buttonImage: Q.resolveUrl('~/content/serenity/images/datepicker.png'),
             buttonImageOnly: true,
             showOn: 'both',
             showButtonPanel: true,
