@@ -144,17 +144,6 @@ namespace Serenity
             base.OnDialogOpen();
         }
 
-        protected override string GetTemplateName()
-        {
-            var templateName = base.GetTemplateName();
-            
-            if (!Q.CanLoadScriptData("Template." + templateName) &&
-                Q.CanLoadScriptData("Template.PropertyDialog"))
-                return "PropertyDialog";
-
-            return templateName;
-        }
-
         protected PropertyGrid propertyGrid;
 
         [Obsolete("Prefer async version")]

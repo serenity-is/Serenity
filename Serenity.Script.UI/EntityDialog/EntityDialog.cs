@@ -104,17 +104,6 @@ namespace Serenity
                 element.Dialog().Title = GetEntityTitle();
         }
 
-        protected override string GetTemplateName()
-        {
-            var templateName = base.GetTemplateName();
-            
-            if (!Q.CanLoadScriptData("Template." + templateName) &&
-                Q.CanLoadScriptData("Template.EntityDialog"))
-                return "EntityDialog";
-
-            return templateName;
-        }
-
         protected bool IsCloneMode
         {
             get { return EntityId != null && IdExtensions.IsNegativeId(EntityId.Value); }

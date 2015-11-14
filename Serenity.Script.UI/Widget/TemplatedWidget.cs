@@ -10,6 +10,7 @@ namespace Serenity
         where TOptions: class, new()
     {
         protected string idPrefix;
+        private static string templateName;
 
         protected TemplatedWidget(jQueryObject element, TOptions opt = null)
             : base(element, opt)
@@ -35,7 +36,48 @@ namespace Serenity
 
         protected virtual string GetTemplateName()
         {
-            return this.GetType().Name;
+            if (templateName != null)
+                return templateName;
+
+            var type = this.GetType();
+
+            while (type != null && type != typeof(Widget))
+            {
+                var fullName = type.FullName.Replace(".", "_");
+
+                var dollar = fullName.IndexOf("$");
+                if (dollar >= 0)
+                    fullName = fullName.Substr(0, dollar);
+
+                foreach (var k in Q.Config.RootNamespaces)
+                    if (fullName.StartsWith(k + "_"))
+                    {
+                        fullName = fullName.Substr(k.Length + 1);
+                        break;
+                    }
+
+                if (Q.CanLoadScriptData("Template." + fullName) ||
+                    J("script#Template_" + fullName).Length > 0)
+                {
+                    templateName = fullName;
+                    return templateName;
+                }
+
+                var name = type.Name;
+
+                if (Q.CanLoadScriptData("Template." + name) ||
+                    J("script#Template_" + name).Length > 0)
+                {
+                    templateName = name;
+                    return templateName;
+                }
+
+                type = type.BaseType;
+            }
+
+            templateName = this.GetType().Name;
+
+            return templateName;
         }
 
         protected virtual string GetTemplate()
@@ -45,17 +87,15 @@ namespace Serenity
             
             var script = J("script#Template_" + templateName);
             if (script.Length > 0)
-                template = script.GetHtml();
-            else
-            {
-                #pragma warning disable 618
-                template = Q.GetTemplate(templateName);
-                #pragma warning restore 618
+                return script.GetHtml();
 
-                if (!Script.IsValue(template))
-                    throw new Exception(String.Format(
-                        "Can't locate template for widget '{0}' with name '{1}'!", this.GetType().Name, templateName));
-            }
+            #pragma warning disable 618
+            template = Q.GetTemplate(templateName);
+            #pragma warning restore 618
+
+            if (!Script.IsValue(template))
+                throw new Exception(String.Format(
+                    "Can't locate template for widget '{0}' with name '{1}'!", this.GetType().Name, templateName));
 
             return template;
         }
