@@ -1,3 +1,9 @@
+## 1.6.4 (2015-11-14)
+
+Features:
+  - date range quick filtering
+  - ability to register a permission key with RegisterPermissionKeyAttribute to be shown in permissions dialog [SERENE]
+
 ## 1.6.3 (2015-11-09)
 
 Features:
