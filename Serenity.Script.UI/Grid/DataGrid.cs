@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using jQueryApi;
 using System.Linq;
+using Serenity.Data;
 
 namespace Serenity
 {
@@ -943,6 +944,7 @@ namespace Serenity
                         EqualityFilter = request.EqualityFilter,
                         Value = value,
                         Active = active,
+                        Widget = widget,
                         Handled = true
                     };
 
@@ -967,6 +969,34 @@ namespace Serenity
             });
 
             return widget;
+        }
+
+        public DateEditor AddDateRangeFilter(string field, string title = null)
+        {
+            DateEditor end = null;
+
+            return AddEqualityFilter<DateEditor>(field,
+                element: e1 =>
+                {
+                    end = Widget.Create<DateEditor>(element: e2 => e2.InsertAfter(e1));
+                    end.Element.Change(x => e1.TriggerHandler("change"));
+                    J("<span/>").AddClass("range-separator").Text("-").InsertAfter(e1);
+                },
+                handler: args =>
+                {
+                    args.Active =
+                        !string.IsNullOrEmpty(args.Widget.Value) ||
+                        !string.IsNullOrEmpty(end.Value);
+
+                    if (ReferenceEquals(null, args.Request.Criteria))
+                        args.Request.Criteria = Criteria.Empty;
+
+                    if (!string.IsNullOrEmpty(args.Widget.Value))
+                        args.Request.Criteria &= new Criteria(args.Field) >= args.Widget.Value;
+
+                    if (!string.IsNullOrEmpty(end.Value))
+                        args.Request.Criteria &= new Criteria(args.Field) <= end.Value;
+                });
         }
 
         protected virtual void InvokeSubmitHandlers()
