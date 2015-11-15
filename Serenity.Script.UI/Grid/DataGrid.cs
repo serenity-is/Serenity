@@ -993,9 +993,6 @@ namespace Serenity
                         !string.IsNullOrEmpty(args.Widget.Value) ||
                         !string.IsNullOrEmpty(end.Value);
 
-                    if (ReferenceEquals(null, args.Request.Criteria))
-                        args.Request.Criteria = Criteria.Empty;
-
                     if (!string.IsNullOrEmpty(args.Widget.Value))
                         args.Request.Criteria &= new Criteria(args.Field) >= args.Widget.Value;
 
