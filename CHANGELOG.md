@@ -1,3 +1,11 @@
+## 1.6.5 (2015-11-15)
+
+Features:
+  - don't raise on criteria join (and, or, xor) if one of criteria is null, assume empty
+  - SetEquality extension for list request
+  - SetEquality helper in DataGrid
+  
+
 ## 1.6.4 (2015-11-14)
 
 Features:
