@@ -448,7 +448,7 @@ namespace Serenity
 
         protected virtual void SetCriteriaParameter()
         {
-            view.Params.Criteria = null;
+            Script.Delete(view.Params, "Criteria");
 
             if (filterBar != null)
             {
@@ -456,6 +456,11 @@ namespace Serenity
                 if (!criteria.IsEmpty)
                     ((ListRequest)view.Params).Criteria = criteria;
             }
+        }
+
+        public void SetEquality(string field, object value)
+        {
+            ((ListRequest)view.Params).SetEquality(field, value);
         }
 
         protected virtual void SetIncludeColumnsParameter()
