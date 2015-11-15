@@ -1,3 +1,10 @@
+## 1.6.6 (2015-11-15)
+
+Features:
+  - converted file and image upload to behaviors that can be used in a row field
+  - ability to generate multiple thumb sizes
+  - better symbol for binary files in upload editors
+  
 ## 1.6.5 (2015-11-15)
 
 Features:
