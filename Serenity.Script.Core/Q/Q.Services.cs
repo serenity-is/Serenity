@@ -4,6 +4,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using jQueryApi;
 using System.Collections.Generic;
+using Serenity.Data;
 
 namespace Serenity
 {
@@ -121,6 +122,14 @@ namespace Serenity
                 Request = request,
                 OnSuccess = onSuccess
             }, options.As<ServiceCallOptions<TResponse>>()));
+        }
+
+        public static void SetEquality(this ListRequest request, string field, object value)
+        {
+            if (request.EqualityFilter == null)
+                request.EqualityFilter = new JsDictionary<string, object>();
+
+            request.EqualityFilter[field] = value;
         }
     }
 }
