@@ -5,6 +5,7 @@ using System.IO;
 
 namespace Serenity.Services
 {
+    [Obsolete("Use Image/FileUploadEditorAttribute in row image/file field and remove this attribute from your handler")]
     public class EmbeddedFileUploadBehaviourAttribute : SaveRequestBehaviorAttribute
     {
         private string fileNameField;

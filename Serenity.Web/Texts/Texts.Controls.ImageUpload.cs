@@ -12,6 +12,8 @@ namespace Serenity.Web
             {
                 public static LocalText AddFileButton = "Select File";
                 public static LocalText DeleteButtonHint = "Remove";
+                public static LocalText UploadFileTooSmall = "Uploaded file must be at least {0}";
+                public static LocalText UploadFileTooBig = "Uploaded file must be smallar than {0}";
             }
         }
     }

@@ -65,6 +65,11 @@
     <Compile Include="ComponentModel\Columns\EditLinkAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
     <Compile Include="ComponentModel\Permission\RegisterPermissionKeyAttribute.cs" />
+    <Compile Include="ComponentModel\Upload\FileUploadEditorAttribute.cs" />
+    <Compile Include="ComponentModel\Upload\ImageScaleMode.cs" />
+    <Compile Include="ComponentModel\Upload\ImageUploadEditorAttribute.cs" />
+    <Compile Include="ComponentModel\Upload\MultipleFileUploadEditorAttribute.cs" />
+    <Compile Include="ComponentModel\Upload\MultipleImageUploadEditorAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\SortOrderAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
     <Compile Include="ComponentModel\Columns\WidthAttribute.cs" />
