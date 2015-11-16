@@ -1,3 +1,8 @@
+## 1.6.7 (2015-11-16)
+
+Bugfixes:
+-  fix critical regression bug in TemplatedWidget.GetTemplateName method, please update if you rare using 1.6.4, 1.6.5 or 1.6.6!
+
 ## 1.6.6 (2015-11-15)
 
 Features:

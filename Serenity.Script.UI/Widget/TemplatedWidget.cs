@@ -1,6 +1,7 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace Serenity
         where TOptions: class, new()
     {
         protected string idPrefix;
-        private static string templateName;
+        private static JsDictionary<string, string> templateNames = new JsDictionary<string, string>();
 
         protected TemplatedWidget(jQueryObject element, TOptions opt = null)
             : base(element, opt)
@@ -36,48 +37,56 @@ namespace Serenity
 
         protected virtual string GetTemplateName()
         {
-            if (templateName != null)
-                return templateName;
+            Func<string, string> noGeneric = s =>
+            {
+                var dollar = s.IndexOf("$");
+                if (dollar >= 0)
+                    return s.Substr(0, dollar);
+
+                return s;
+            };
+
+            var fullName = this.GetType().FullName;
+
+            var cachedName = templateNames[fullName];
+            if (cachedName != null)
+                return cachedName;
 
             var type = this.GetType();
 
             while (type != null && type != typeof(Widget))
             {
-                var fullName = type.FullName.Replace(".", "_");
-
-                var dollar = fullName.IndexOf("$");
-                if (dollar >= 0)
-                    fullName = fullName.Substr(0, dollar);
+                var name = noGeneric(type.FullName.Replace(".", "_"));
 
                 foreach (var k in Q.Config.RootNamespaces)
-                    if (fullName.StartsWith(k + "_"))
+                    if (name.StartsWith(k + "_"))
                     {
-                        fullName = fullName.Substr(k.Length + 1);
+                        name = name.Substr(k.Length + 1);
                         break;
                     }
-
-                if (Q.CanLoadScriptData("Template." + fullName) ||
-                    J("script#Template_" + fullName).Length > 0)
-                {
-                    templateName = fullName;
-                    return templateName;
-                }
-
-                var name = type.Name;
 
                 if (Q.CanLoadScriptData("Template." + name) ||
                     J("script#Template_" + name).Length > 0)
                 {
-                    templateName = name;
-                    return templateName;
+                    templateNames[fullName] = name;
+                    return name;
+                }
+
+                name = noGeneric(type.Name);
+
+                if (Q.CanLoadScriptData("Template." + name) ||
+                    J("script#Template_" + name).Length > 0)
+                {
+                    templateNames[fullName] = name;
+                    return name;
                 }
 
                 type = type.BaseType;
             }
 
-            templateName = this.GetType().Name;
+            templateNames[fullName] = cachedName = noGeneric(this.GetType().Name);
 
-            return templateName;
+            return cachedName;
         }
 
         protected virtual string GetTemplate()
