@@ -1,3 +1,8 @@
+## 1.6.8 (2015-11-16)
+
+Features:
+- added grid row selection mixin
+
 ## 1.6.7 (2015-11-16)
 
 Bugfixes:
