@@ -112,6 +112,9 @@ namespace Serenity
         [ScriptName("rowsPerPage")]
         public Int32? RowsPerPage;
 
+        [ScriptName("idField")]
+        public string IdField;
+
         [IntrinsicProperty]
         public string[] SortBy { get; set; }
 

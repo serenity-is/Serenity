@@ -617,6 +617,7 @@ function EventHelper() {
         intf.method = options.method || 'POST';
         intf.errormsg = intf.errormsg || Q.text("Controls.Pager.DefaultLoadError");
         intf.sortBy = options.sortBy || [];
+        intf.idField = idField;
 
         if (options.url && options.autoLoad) {
             populate();
