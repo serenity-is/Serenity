@@ -597,6 +597,7 @@
     function jQueryValidationInitialization() {
         Serenity.CustomValidation.registerValidationMethods();
         var p = $.validator;
+        p = p.prototype;
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
         jQuery.validator.addMethod("xss", function (value, element) {

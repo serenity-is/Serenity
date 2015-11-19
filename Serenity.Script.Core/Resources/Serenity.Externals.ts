@@ -631,8 +631,10 @@
 
         Serenity.CustomValidation.registerValidationMethods();
         var p: any = $.validator;
+        p = p.prototype;
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
+
         jQuery.validator.addMethod("xss", function (value, element) {
             if (value.length == 0)
                 return true;
@@ -656,27 +658,34 @@
                 startIndex = pos + 1;
             }
         });
+
         $.validator.addMethod("dateQ", function (value, element) {
             return this.optional(element) || Q$Externals.parseDate(value) != false;
         });
+
         $.validator.addMethod("hourAndMin", function (value, element) {
             return this.optional(element) || !isNaN(parseHourAndMin(value));
         });
+
         $.validator.addMethod("dayHourAndMin", function (value, element) {
             return this.optional(element) || !isNaN(parseDayHourAndMin(value));
         });
+
         $.validator.addMethod("decimalQ", function (value, element) {
             return this.optional(element) || !isNaN(parseDecimal(value));
         });
+
         $.validator.addMethod("integerQ", function (value, element) {
             return this.optional(element) || !isNaN(parseInteger(value));
         });
+
         var oldEmail = $.validator.methods['email'];
         $.validator.addMethod("email", function (value, element) {
             if (!Q$Config.emailAllowOnlyAscii)
                 return oldEmail.call(this, value, element);
             return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
         });
+
         $.validator.addMethod("emailMultiple", function (value, element) {
             var result = this.optional(element);
             if (result)
@@ -692,6 +701,7 @@
             }
             return result;
         });
+
         $.validator.addMethod("anyvalue", function (value, element) {
             return true;
         });
