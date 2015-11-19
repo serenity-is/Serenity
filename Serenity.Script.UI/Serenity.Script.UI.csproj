@@ -89,6 +89,7 @@
     <Compile Include="Grid\PopupToolButton.cs" />
     <Compile Include="Grid\PopupMenuButton.cs" />
     <Compile Include="Misc\GoogleMap.cs" />
+    <Compile Include="PropertyDialog\PropertyPanel.cs" />
     <Compile Include="PropertyDialog\PropertyDialog.cs" />
     <Compile Include="Editor\BooleanEditor.cs" />
     <Compile Include="Editor\EditorTypeEditor.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Editor\EnumEditor.cs" />
     <Compile Include="Widget\CascadedWidgetLink.cs" />
     <Compile Include="Widget\IAsyncInit.cs" />
+    <Compile Include="Widget\TemplatedPanel.cs" />
     <Compile Include="Widget\ValidationExtensions.cs" />
     <Compile Include="Widget\DialogExtensions.cs" />
     <Compile Include="Widget\Flexify.cs">
