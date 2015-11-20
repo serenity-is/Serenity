@@ -1,12 +1,23 @@
+## 1.7.0 (2015-11-20)
+
+Features:
+  - added PropertyPanel and TemplatedPanel similar to PropertyDialog and TemplatedDialog (no need to use Panel attribute)
+  
+Bugfixes:
+  - fix validator hints not showing after typescript conversion
+
+
 ## 1.6.8 (2015-11-16)
 
 Features:
-- added grid row selection mixin
+  - added grid row selection mixin
+
 
 ## 1.6.7 (2015-11-16)
 
 Bugfixes:
--  fix critical regression bug in TemplatedWidget.GetTemplateName method, please update if you rare using 1.6.4, 1.6.5 or 1.6.6!
+  - fix critical regression bug in TemplatedWidget.GetTemplateName method, please update if you rare using 1.6.4, 1.6.5 or 1.6.6!
+
 
 ## 1.6.6 (2015-11-15)
 
@@ -14,6 +25,7 @@ Features:
   - converted file and image upload to behaviors that can be used in a row field
   - ability to generate multiple thumb sizes
   - better symbol for binary files in upload editors
+
   
 ## 1.6.5 (2015-11-15)
 
@@ -30,6 +42,7 @@ Features:
   - ability to register a permission key with RegisterPermissionKeyAttribute to be shown in permissions dialog [SERENE]
   - use a better datepicker trigger image
 
+
 ## 1.6.3 (2015-11-09)
 
 Features:
@@ -44,17 +57,20 @@ Features:
 Bugfixes:
   - order tab in customer dialog was showing all orders in new customer mode [SERENE]
 
+
 ## 1.6.2 (2015-10-31)
 
 Features:
   - code generator determines root namespace and script/web project locations at first run for Serene projects
   - added a welcome page to Serene template
 
+
 ## 1.6.1 (2015-10-29)
 
 Features:
   - code generator will remove ID suffix when generating DisplayName attribute for foreign key fields.
   - [BREAKING CHANGE] title for foreign ID fields are no longer determined by their TextualField. you may have to edit ID fields DisplayName attributes if you did depend on this feature. it was generally causing confusion when a developer changes ID field display name but it is not reflected in the form.
+
 
 ## 1.6.0 (2015-10-29)
 
@@ -66,11 +82,13 @@ Features:
   - code generator also generates script side service and form objects
   - better error message if a row type is used with a LookupEditorAttribute, but it doesn't have a LookupScript
 
+
 ## 1.5.9 (2015-10-21)
 
 Bugfixes:
   - FormContext.tt was failing after recent PropertyItemHelper changes
   - fix typo in serenity.texts.tr.json
+
   
 ## 1.5.8 (2015-10-20)
 
@@ -81,6 +99,7 @@ Bugfixes:
 Bugfixes:
   - fix client side Select2 validation error by downgrading to 3.5.1
   - fix qunit.js not found sometimes while running tests
+
 
 ## 1.5.7 (2015-10-14)
 
@@ -96,6 +115,7 @@ Features:
 Bugfixes:
   - fix validation message hint not showing after recent jquery.validate update
 
+
 ## 1.5.6 (2015-10-08)
 
 Features:
@@ -104,11 +124,13 @@ Features:
 Bugfixes:
   - fix typo in ScriptDtoGenerator that resolves lookup script reference generation for outside-row lookup scripts
 
+
 ## 1.5.5 (2015-09-25)
 
 Features:
   - generate script code form enum members in form / column definitions, even if they are not used in any row
   - add integrated inplace item add / edit ability to LookupEditor  
+
 
 ## 1.5.4 (2015-09-24)
 
@@ -117,6 +139,7 @@ Features:
   - updated razor generator
   - textarea font size changed to make it consistent with other editors in Serene
   - disable browser link feature in Visual Studio for Serene
+
 
 ## 1.5.3 (2015-09-14)
 
