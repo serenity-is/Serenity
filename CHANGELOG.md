@@ -2,6 +2,8 @@
 
 Features:
   - added PropertyPanel and TemplatedPanel similar to PropertyDialog and TemplatedDialog (no need to use Panel attribute)
+  - change password page [Serene]
+  - forgot password and reset password page [Serene]
   
 Bugfixes:
   - fix validator hints not showing after typescript conversion
