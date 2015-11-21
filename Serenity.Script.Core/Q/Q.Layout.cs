@@ -37,14 +37,26 @@ namespace Serenity
             J("body")
                 .AddClass("full-height-page");
 
+            gridDiv.AddClass("responsive-height");
+
             jQueryEventHandler layout = delegate 
             {
-                if (gridDiv.Parent().HasClass("page-content"))
+                bool inPageContent = gridDiv.Parent().HasClass("page-content") ||
+                    gridDiv.Parent().Is("section.content");
+
+                if (inPageContent)
+                {
                     gridDiv.CSS("height", "1px")
                         .CSS("overflow", "hidden");
-
+                }
+                
                 Q.LayoutFillHeight(gridDiv);
+
+                if (inPageContent)
+                    gridDiv.CSS("overflow", "");
+
                 gridDiv.TriggerHandler("layout");
+
             };
 
             if (J("body").HasClass("has-layout-event"))

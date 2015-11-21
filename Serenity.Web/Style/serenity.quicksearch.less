@@ -1,0 +1,72 @@
+﻿@import (reference) "bootstrap/mixins.less";
+@import (reference) "bootstrap/variables.less";
+@import (reference) "serenity.variables.less";
+
+.s-QuickSearchBar {
+    margin: 2px 2px 0 0;
+    float: left;
+    border-right: 1px solid #aaa;
+    border-radius: 0 4px 4px 0;
+    background-clip: padding-box;
+
+    .quick-search-icon {
+        display: inline-block;
+        float: left;
+        padding: 0 0 0 8px;
+        border-radius: 5px 0 0 5px;
+        background: @grid-title-color;
+        height: 28px;
+        width: 36px;
+
+        i {
+            display: inline-block;
+            width: 22px;
+            height: 28px;
+            background: url(images/sprites.png) no-repeat -214px -90px;
+        }
+    }
+
+    .s-QuickSearchInput {
+        line-height: 23px;
+        height: 28px;
+        padding: 0 2px 0 4px;
+        border-radius: 0 4px 4px 0;
+        background-clip: padding-box;
+        border: 1px solid #aaa;
+        border-style: solid none solid none;
+        box-shadow: none;
+        float: left;
+
+        &:focus {
+            outline: none;
+        }
+    }
+}
+
+.s-QuickSearchLoading, .s-QuickSearchLoading input {
+    cursor: wait;
+}
+
+.s-QuickSearchLoading span i {
+    background: #fff url(images/quick-search-loading.gif) no-repeat center center;
+}
+
+
+.has-quick-search-fields {
+    border-right: none;
+}
+
+a.quick-search-field {
+    padding: 0 13px 0 3px;
+    background: #fff url(images/down.gif) no-repeat right 5px;
+    float: right;
+    font-size: 11px;
+    height: 21px;
+    line-height: 18px;
+    cursor: pointer;
+    margin-right: 1px;
+    color: #0090d9;
+    border: 1px solid #aaa;
+    border-radius: 0 4px 4px 0;
+    border-style: solid solid solid none;
+}

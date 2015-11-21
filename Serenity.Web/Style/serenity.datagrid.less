@@ -1,0 +1,41 @@
+﻿@import (reference) "bootstrap/mixins.less";
+@import (reference) "bootstrap/variables.less";
+@import (reference) "serenity.variables.less";
+
+.grid-title {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 6px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #e7e7e7;
+    color: @grid-title-color;
+}
+
+.s-Dialog .s-DataGrid {
+    border: 1px solid #ccc;
+}
+
+.s-DataGrid input[type=checkbox] {
+    box-shadow: none;
+}
+
+.s-ApplyTreeOrdering { float: right; margin: 3px 4px 0 2px; width: 18px; height: 18px; padding: 1px; }
+.s-ApplyTreeOrdering.hover { padding: 0px; border: 1px solid #aaa; }
+.s-ApplyTreeOrdering a { width: 18px; height: 18px; display: block; background: transparent url(images/node-select-all.png) no-repeat center center; opacity: 0.7; }
+.s-ApplyTreeOrdering.active { padding: 0px; border: 1px solid #aaa; } 
+.s-ApplyTreeOrdering.active a { opacity: 1; background-color: #fe7; }
+
+.s-IncludeDeleted { float: right; margin: 3px 4px 0 2px; width: 18px; height: 18px; padding: 1px; }
+.s-IncludeDeleted.hover { padding: 0px; border: 1px solid #aaa; }
+.s-IncludeDeleted a { width: 18px; height: 18px; display: block; background: transparent url(images/eraser-plus.png) no-repeat center center; opacity: 0.7; }
+.s-IncludeDeleted.active { padding: 0px; border: 1px solid #aaa; } 
+.s-IncludeDeleted.active a { opacity: 1; background-color: #fe7; }
+
+.delete-item {
+    background: url(images/delete.png) no-repeat center center;
+    display: block;
+    float: right;
+    width: 16px;
+    height: 16px;
+    padding: 1px;
+}

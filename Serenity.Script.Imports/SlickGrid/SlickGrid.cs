@@ -162,6 +162,10 @@ namespace Serenity
             return null;
         }
 
+        public void SetOptions(SlickGridOptions options)
+        {
+        }
+
         /// <summary>
         /// Returns an array of row indices corresponding to the currently selected rows.
         /// </summary>

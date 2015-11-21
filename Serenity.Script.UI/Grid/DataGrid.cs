@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using jQueryApi;
 using System.Linq;
 using Serenity.Data;
+using System.Html;
 
 namespace Serenity
 {
@@ -23,6 +24,12 @@ namespace Serenity
         protected string localTextPrefix;
         private bool isDisabled;
         protected event Action submitHandlers;
+
+        static DataGrid()
+        {
+            DefaultRowHeight = 27;
+            DefaultHeaderHeight = 30;
+        }
 
         public DataGrid(jQueryObject container, TOptions opt = null)
             : base(container, opt)
@@ -75,6 +82,26 @@ namespace Serenity
                 return;
 
             Q.LayoutFillHeight(this.slickContainer);
+
+            if (this.element.HasClass("responsive-height"))
+            {
+
+                if (this.slickGrid != null && this.slickGrid.GetOptions().AutoHeight)
+                {
+                    this.slickContainer.Children(".slick-viewport").CSS("height", "");
+                    this.slickGrid.SetOptions(new SlickGridOptions { AutoHeight = false });
+                }
+
+                if (this.slickGrid != null &&
+                    (this.slickContainer.GetHeight() < 200 ||
+                     (J(Window.Instance).GetWidth() < 768)))
+                {
+                    this.element.CSS("height", "");
+                    this.slickContainer.CSS("height", "")
+                        .Children(".slick-viewport").CSS("height", "");
+                    this.slickGrid.SetOptions(new SlickGridOptions { AutoHeight = true });
+                }
+            }
 
             if (this.slickGrid != null)
                 this.slickGrid.ResizeCanvas();
@@ -588,6 +615,8 @@ namespace Serenity
 
             if (!UsePager())
                 opt.RowsPerPage = 0;
+            else if (element.HasClass("responsive-height"))
+                opt.RowsPerPage = J(Window.Instance).GetWidth() < 768 ? 20 : 100;
             else
                 opt.RowsPerPage = 100;
 
@@ -739,8 +768,8 @@ namespace Serenity
             opt.MultiSelect = false;
             opt.MultiColumnSort = true;
             opt.EnableCellNavigation = false;
-            opt.HeaderRowHeight = 30;
-            opt.RowHeight = 27;
+            opt.HeaderRowHeight = DefaultHeaderHeight;
+            opt.RowHeight = DefaultRowHeight;
             return opt;
         }
 
@@ -1011,6 +1040,9 @@ namespace Serenity
         {
             this.Refresh();
         }
+
+        public static int DefaultRowHeight { get; set; }
+        public static int DefaultHeaderHeight { get; set; }
 
         public SlickRemoteView<TItem> View { get { return view; } }
         public SlickGrid SlickGrid { get { return slickGrid; } }

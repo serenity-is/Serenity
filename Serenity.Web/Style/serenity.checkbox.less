@@ -1,0 +1,49 @@
+﻿@import "serenity.mixins.less";
+
+.check-box {
+    background-image: url(images/checkbox-states.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin: 2px 3px 0 0;
+    cursor: pointer;
+}
+
+.s-Form .check-box.readonly {
+    background-image: url(images/checkbox-states.png);
+    opacity: 0.8;
+}
+
+.check-box.disabled {
+    background-position: -60px 0px;
+}
+
+.check-box.checked {
+    background-position: -15px 0px;
+}
+
+.check-box.checked.disabled {
+    background-position: -75px 0px;
+}
+
+.check-box.partial {
+    background-position: -30px 0px;
+}
+
+.check-box.partial.disabled {
+    background-position: -90px 0px;
+}
+
+.check-box.indeterminate {
+    background-position: -45px 0px;
+}
+
+.check-box.indeterminate.disabled {
+    background-position: -105px 0px;
+}
+
+.check-box.readonly {
+    cursor: default;
+}
