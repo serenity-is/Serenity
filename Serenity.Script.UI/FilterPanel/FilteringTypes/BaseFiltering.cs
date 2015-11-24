@@ -167,6 +167,14 @@ namespace Serenity
             return new ArgumentNullException("value", Q.Text("Controls.FilterPanel.ValueRequired"));
         }
 
+        protected virtual object ValidateEditorValue(string value)
+        {
+            if (value.Length == 0)
+                throw ArgumentNull();
+
+            return value;
+        }
+
         protected virtual object GetEditorValue()
         {
             var input = Container.Find(":input")
@@ -181,13 +189,10 @@ namespace Serenity
                 value = input.Select2Get("val") as string;
             else
                 value = input.GetValue();
-            
+
             value = (value ?? "").Trim();
 
-            if (value.Length == 0)
-                throw ArgumentNull();
-
-            return value;
+            return ValidateEditorValue(value);
         }
 
         protected virtual string GetEditorText()

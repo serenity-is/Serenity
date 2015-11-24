@@ -18,5 +18,13 @@ namespace Serenity
                 FilterOperators.BW
             });
         }
+
+        protected override object ValidateEditorValue(string value)
+        {
+            if (value.Length == 0)
+                return value;
+
+            return base.ValidateEditorValue(value);
+        }
     }
 }
