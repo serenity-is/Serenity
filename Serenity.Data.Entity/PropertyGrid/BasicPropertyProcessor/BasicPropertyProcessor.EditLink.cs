@@ -33,11 +33,23 @@ namespace Serenity.PropertyGrid
 
         private static string AutoDetermineIdField(Field basedOnField)
         {
-            if (ReferenceEquals(null, basedOnField) || basedOnField.Join == null)
+            if (ReferenceEquals(null, basedOnField))
                 return null;
 
-            var idField = basedOnField.Fields.FirstOrDefault(x => x.ForeignJoinAlias != null &&
-                x.ForeignJoinAlias.Name == basedOnField.Join.Name);
+            Field idField;
+
+            if (basedOnField.Join == null && (basedOnField.ReferencedAliases == null || basedOnField.ReferencedAliases.Count > 1))
+            {
+                idField = basedOnField.Fields.FirstOrDefault(x => x.ForeignJoinAlias != null &&
+                    (x.TextualField == basedOnField.PropertyName ||
+                     x.TextualField == basedOnField.Name));
+            }
+            else
+            {
+                var joinName = basedOnField.Join != null ? basedOnField.Join.Name : basedOnField.ReferencedAliases.Single();
+                idField = basedOnField.Fields.FirstOrDefault(x => x.ForeignJoinAlias != null &&
+                    x.ForeignJoinAlias.Name == joinName);
+            }
 
             return ReferenceEquals(null, idField) ? null : (idField.PropertyName ?? idField.Name);
         }

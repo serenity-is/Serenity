@@ -24,17 +24,29 @@ namespace Serenity.PropertyGrid
 
             var basedOnField = source.BasedOnField;
 
-            string idFieldName = AutoDetermineIdField(basedOnField);
-            Field idField = null;
-            if (idFieldName != null)
+            Field idField;
+            string idFieldName;
+            var filteringIdField = source.GetAttribute<FilteringIdFieldAttribute>();
+            if (filteringIdField != null)
             {
+                idFieldName = filteringIdField.Value;
                 idField = basedOnField.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField.Fields.FindField(idFieldName);
-                if (Object.ReferenceEquals(idField, null) ||
-                    (idField.TextualField != basedOnField.PropertyName &&
-                     idField.TextualField != basedOnField.Name))
+            }
+            else
+            {
+                idFieldName = AutoDetermineIdField(basedOnField);
+
+                idField = null;
+                if (idFieldName != null)
                 {
-                    idField = null;
-                    idFieldName = null;
+                    idField = basedOnField.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField.Fields.FindField(idFieldName);
+                    if (Object.ReferenceEquals(idField, null) ||
+                        (idField.TextualField != basedOnField.PropertyName &&
+                         idField.TextualField != basedOnField.Name))
+                    {
+                        idField = null;
+                        idFieldName = null;
+                    }
                 }
             }
 
@@ -151,6 +163,9 @@ namespace Serenity.PropertyGrid
                 if (key != null &&
                     key.Length >= 1)
                     key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+
+                if (key == "idField")
+                    item.FilteringIdField = (param.Value as string) ?? item.FilteringIdField;
 
                 item.FilteringParams[key] = param.Value;
             }
