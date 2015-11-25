@@ -11,7 +11,7 @@ namespace Serenity
         public Toolbar(jQueryObject div, ToolbarOptions options)
             : base(div, options)
         {
-            this.element.AddClass("s-Toolbar")
+            this.element.AddClass("s-Toolbar clearfix")
                 .Html("<div class=\"tool-buttons\"><div class=\"buttons-outer\"><div class=\"buttons-inner\"></div></div></div>");
 
             var container = J("div.buttons-inner", this.element);
