@@ -92,7 +92,7 @@ namespace Serenity.CodeGeneration
 
                     foreach (var item in Serenity.PropertyGrid.PropertyItemHelper.GetPropertyItemsFor(type))
                     {
-                        var editorType = item.EditorType;
+                        var editorType = item.EditorType ?? "String";
                         string widgetTypeName = null;
                         foreach (var rootNamespace in RootNamespaces)
                         {

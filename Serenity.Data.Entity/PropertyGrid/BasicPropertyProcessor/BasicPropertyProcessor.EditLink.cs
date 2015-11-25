@@ -38,7 +38,10 @@ namespace Serenity.PropertyGrid
 
             Field idField;
 
-            if (basedOnField.Join == null && (basedOnField.ReferencedAliases == null || basedOnField.ReferencedAliases.Count > 1))
+            if (basedOnField.Join == null && (basedOnField.ReferencedAliases == null || basedOnField.ReferencedAliases.Count != 1))
+                return null;
+
+            if (basedOnField.Join == null)
             {
                 idField = basedOnField.Fields.FirstOrDefault(x => x.ForeignJoinAlias != null &&
                     (x.TextualField == basedOnField.PropertyName ||
