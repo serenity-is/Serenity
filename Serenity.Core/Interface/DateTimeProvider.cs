@@ -17,7 +17,7 @@ namespace Serenity.Abstractions
         {
             get
             {
-                return StaticProvider ?? Dependency.Resolve<IDateTimeProvider>() ?? instance;
+                return StaticProvider ?? Dependency.TryResolve<IDateTimeProvider>() ?? instance;
             }
         }
 
