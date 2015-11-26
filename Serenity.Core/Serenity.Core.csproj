@@ -79,6 +79,8 @@
     <Compile Include="Helpers\BinarySerialization.cs" />
     <Compile Include="ComponentModel\Extensibility\DynamicScriptAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />
+    <Compile Include="Interface\DateTimeProvider.cs" />
+    <Compile Include="Interface\IDateTimeProvider.cs" />
     <Compile Include="Json\JsonLocalTextsHelper.cs" />
     <Compile Include="Json\JsonConfigHelper.cs" />
     <Compile Include="Localization\JsonLocalTextRegistration.cs" />

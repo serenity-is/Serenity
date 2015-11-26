@@ -65,9 +65,11 @@ namespace Serenity.Caching
                 if (!this.dictionary.TryGetValue(key, out value))
                     return default(TValue);
 
+                var now = DateTimeProvider.Current.Now;
+
                 DateTime expires;
                 if (this.expiration.TryGetValue(key, out expires) &&
-                    expires <= DateTime.Now)
+                    expires <= now)
                 {
                     this.dictionary.Remove(key);
                     this.expiration.Remove(key);
@@ -105,7 +107,7 @@ namespace Serenity.Caching
             lock (this.sync)
             {
                 this.dictionary[key] = value;
-                this.expiration[key] = DateTime.Now.Add(expiration);
+                this.expiration[key] = DateTimeProvider.Now.Add(expiration);
             }
         }
 

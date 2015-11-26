@@ -1,4 +1,7 @@
-﻿using Serenity.Caching;
+﻿using FakeItEasy;
+using Serenity.Abstractions;
+using Serenity.Caching;
+using Serenity.Testing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,52 +134,72 @@ namespace Serenity.Test
         [Fact]
         public void DistributedCacheEmulator_SetWithExpiration_WorksProperly()
         {
-            var cache = new DistributedCacheEmulator();
+            using (new MunqContext())
+            {
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
-            cache.Set("SomeInt", 13579, TimeSpan.FromMilliseconds(100));
-            var actualInt = cache.Get<int>("SomeInt");
-            Assert.Equal(13579, actualInt);
-            var until = DateTime.Now.AddMilliseconds(10);
-            while (DateTime.Now < until);
+                DateTimeProvider.StaticProvider = null;
+                DateTime now = DateTime.Now;
+                var dateTime = A.Fake<IDateTimeProvider>();
+                A.CallTo(() => dateTime.Now).ReturnsLazily(() => now);
 
-            var notExpiredInt = cache.Get<int>("SomeInt");
-            Assert.Equal(13579, notExpiredInt);
+                registrar.RegisterInstance(dateTime);
+                var cache = new DistributedCacheEmulator();
 
-            until = DateTime.Now.AddMilliseconds(200);
-            while (DateTime.Now < until);
+                cache.Set("SomeInt", 13579, TimeSpan.FromSeconds(5));
+                var actualInt = cache.Get<int>("SomeInt");
+                Assert.Equal(13579, actualInt);
+                now = now.AddSeconds(1);
 
-            var expiredInt = cache.Get<int>("SomeInt");
-            Assert.Equal(0, expiredInt);
+                var notExpiredInt = cache.Get<int>("SomeInt");
+                Assert.Equal(13579, notExpiredInt);
+
+                now = now.AddSeconds(6);
+
+                var expiredInt = cache.Get<int>("SomeInt");
+                Assert.Equal(0, expiredInt);
+            }
         }
 
         [Fact]
         public void DistributedCacheEmulator_SetWithExpiration_WorksMultiThreaded()
         {
-            var cache = new DistributedCacheEmulator();
-
-            var threads = new int[100];
-            for (var i = 0; i < threads.Length; i++)
-                threads[i] = i;
-
-            Parallel.ForEach(threads, x =>
+            using (new MunqContext())
             {
-                cache.Set("MultiThreadedValue" + x, x * 7, TimeSpan.FromMilliseconds(100));
-            });
+                DateTimeProvider.StaticProvider = null;
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
-            Thread.Sleep(1);
+                DateTime now = DateTime.Now;
+                var dateTime = A.Fake<IDateTimeProvider>();
+                A.CallTo(() => dateTime.Now).ReturnsLazily(() => now);
 
-            for (var i = 0; i < threads.Length; i++)
-            {
-                var actual = cache.Get<int>("MultiThreadedValue" + threads[i]);
-                Assert.Equal(threads[i] * 7, actual);
-            }
+                registrar.RegisterInstance(dateTime);
+                var cache = new DistributedCacheEmulator();
 
-            Thread.Sleep(110);
+                var threads = new int[100];
+                for (var i = 0; i < threads.Length; i++)
+                    threads[i] = i;
 
-            for (var i = 0; i < threads.Length; i++)
-            {
-                var actual = cache.Get<int>("MultiThreadedValue" + threads[i]);
-                Assert.Equal(0, actual);
+                Parallel.ForEach(threads, x =>
+                {
+                    cache.Set("MultiThreadedValue" + x, x * 7, TimeSpan.FromSeconds(5));
+                });
+
+                now = now.AddSeconds(1);
+
+                for (var i = 0; i < threads.Length; i++)
+                {
+                    var actual = cache.Get<int>("MultiThreadedValue" + threads[i]);
+                    Assert.Equal(threads[i] * 7, actual);
+                }
+
+                now = now.AddSeconds(6);
+
+                for (var i = 0; i < threads.Length; i++)
+                {
+                    var actual = cache.Get<int>("MultiThreadedValue" + threads[i]);
+                    Assert.Equal(0, actual);
+                }
             }
         }
     }
