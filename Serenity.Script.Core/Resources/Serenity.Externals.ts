@@ -1,4 +1,4 @@
-﻿module Q$Externals {
+﻿module Q {
 
     export function zeroPad(n: number, digits: number): string {
         var s = n.toString();
@@ -47,6 +47,9 @@
         if (isNaN(n)) {
             return null;
         }
+
+        dec = dec || Q$Culture.decimalSeparator;
+        grp = grp || Q$Culture.get_groupSeperator();
 
         var r = "";
         if (fmt.indexOf(".") > -1) {
@@ -236,7 +239,13 @@
     };
 
     export function parseDecimal(s: string): number {
+        if (s == null)
+            return null;
+
         s = Q.trim(s.toString());
+        if (s.length == 0)
+            return null;
+
         var ts = Q$Culture.get_groupSeperator();
 
         if (s && s.length && s.indexOf(ts) > 0) {
@@ -427,11 +436,11 @@
         htmlEncode?: boolean;
     }
 
-    export interface AlertDialogOptions extends CommonDialogOptions {
+    export interface AlertOptions extends CommonDialogOptions {
         okButton?: string;
     }
 
-    export interface ConfirmDialogOptions extends CommonDialogOptions {
+    export interface ConfirmOptions extends CommonDialogOptions {
         yesButton?: string;
         noButton?: string;
         cancelButton?: string;
@@ -440,9 +449,9 @@
     }
 
     // --- DIALOGS ---
-    export function alertDialog(message: string, options: AlertDialogOptions) {
+    export function alert(message: string, options?: AlertOptions) {
         var dialog;
-        options = <AlertDialogOptions>$.extend({
+        options = <AlertOptions>$.extend({
             htmlEncode: true,
             okButton: Q.text('Dialogs.OkButton'),
             title: Q.text('Dialogs.AlertTitle'),
@@ -486,7 +495,7 @@
             .dialog('open');
     };
 
-    export function confirmDialog(message: string, onYes: () => void, options: ConfirmDialogOptions): void {
+    export function confirm(message: string, onYes: () => void, options?: ConfirmOptions): void {
         var dialog;
         options = $.extend({
             htmlEncode: true,
@@ -513,7 +522,7 @@
                     options.onCancel();
             },
             overlay: {
-                opacity: 0.7,
+                opacity: 0.77,
                 background: "black"
             }
         }, options);
@@ -553,6 +562,24 @@
             .dialog('open');
     };
 
+    export function warning(message: string, options?: AlertOptions) {
+        alert(message, <AlertOptions>$.extend(
+        {
+            title: Q.text("Dialogs.WarningTitle"),
+            dialogClass: "s-MessageDialog s-WarningDialog"
+        }, options));
+    }
+
+    export function information(message: string, onOk: () => void, options?: ConfirmOptions) {
+        confirm(message, onOk, <ConfirmOptions>$.extend(
+        {
+            title: Q.text("Dialogs.InformationTitle"),
+            dialogClass: "s-MessageDialog s-InformationDialog",
+            yesButton: Q.text("Dialogs.OkButton"),
+            noButton: null,
+        }, options));
+    }
+
     export interface IFrameDialogOptions {
         html?: string;
     }
@@ -586,25 +613,6 @@
         e.dialog(settings);
     };
 
-    // -- AJAX HELPERS --
-    export function setupAjaxIndicator(): void {
-        var loadingIndicator: JQuery = null;
-        var loadingTimer = 0;
-        $(document).ajaxStart(function () {
-            window.clearTimeout(loadingTimer);
-            loadingTimer = window.setTimeout(function () {
-                if (!loadingIndicator)
-                    loadingIndicator = $('<div/>').addClass('s-AjaxIndicator').appendTo(document.body);
-            }, 2000);
-        }).ajaxStop(function () {
-            if (loadingIndicator) {
-                loadingIndicator.remove();
-                loadingIndicator = null;
-            }
-            window.clearTimeout(loadingTimer);
-        });
-    };
-
     export function toId(id: any): any {
         if (id == null)
             return null;
@@ -623,6 +631,10 @@
     function validateShowLabel(element: HTMLElement, message: string) {
         oldShowLabel.call(this, element, message);
         this.errorsFor(element).each(function (i, e) {
+
+            if ($(element).hasClass('error'))
+                $(e).removeClass('checked');
+
             $(e).attr('title', $(e).text());
         });
     };
@@ -660,7 +672,7 @@
         });
 
         $.validator.addMethod("dateQ", function (value, element) {
-            return this.optional(element) || Q$Externals.parseDate(value) != false;
+            return this.optional(element) || parseDate(value) != false;
         });
 
         $.validator.addMethod("hourAndMin", function (value, element) {
@@ -995,7 +1007,7 @@
                                 clone = src && $.isPlainObject(src) ? src : {};
                             }
                             // Never move original objects, clone them
-                            target[name] = Q$Externals.deepClone(clone, copy);
+                            target[name] = deepClone(clone, copy);
                         }
                         else if (copy !== undefined) {
                             target[name] = copy;

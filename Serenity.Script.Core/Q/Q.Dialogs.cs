@@ -10,7 +10,7 @@ namespace Serenity
         /// Shows a custom alert dialog
         /// </summary>
         /// <param name="message">Message</param>
-        [AlternateSignature]
+        [InlineCode("Q.alert({message})")]
         public static void Alert(string message)
         {
         }
@@ -20,9 +20,9 @@ namespace Serenity
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="options">Options</param>
+        [InlineCode("Q.alert({message}, {options})")]
         public static void Alert(string message, AlertOptions options)
         {
-            Q.Externals.AlertDialog(message, options);
         }
 
         /// <summary>
@@ -30,20 +30,16 @@ namespace Serenity
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="options">Options</param>
+        [InlineCode("Q.warning({message}, {options})")]
         public static void Warning(string message, AlertOptions options)
         {
-            Q.Externals.AlertDialog(message, jQuery.ExtendObject(new AlertOptions
-            {
-                Title = Texts.Dialogs.WarningTitle,
-                DialogClass = "s-MessageDialog s-WarningDialog"
-            }, options));
         }
 
         /// <summary>
         /// Shows a custom confirmation dialog
         /// </summary>
         /// <param name="message">Message</param>
-        [AlternateSignature]
+        [InlineCode("Q.confirm({message}, {onYes})")]
         public static void Confirm(string message, Action onYes)
         {
         }
@@ -53,19 +49,18 @@ namespace Serenity
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="options">Options</param>
+        [InlineCode("Q.confirm({message}, {onYes}, {options})")]
         public static void Confirm(string message, Action onYes, ConfirmOptions options)
         {
-            Q.Externals.ConfirmDialog(message, onYes, options);
         }
 
         /// <summary>
         /// Shows a custom information dialog
         /// </summary>
         /// <param name="message">Message</param>
-        [AlternateSignature]
+        [InlineCode("Q.information({message})")]
         public static void Information(string message)
         {
-            Information(message, null, null);
         }
 
         /// <summary>
@@ -73,15 +68,9 @@ namespace Serenity
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="options">Options</param>
+        [InlineCode("Q.information({message}, {onOk}, {options})")]
         public static void Information(string message, Action onOk, ConfirmOptions options)
         {
-            Q.Externals.ConfirmDialog(message, onOk, jQuery.ExtendObject(new ConfirmOptions
-            {
-                Title = Texts.Dialogs.InformationTitle,
-                YesButton = Texts.Dialogs.OkButton,
-                NoButton = null,
-                DialogClass = "s-MessageDialog s-InformationDialog"
-            }, options));
         }
     }
 }

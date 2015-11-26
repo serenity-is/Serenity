@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Serenity
@@ -76,14 +77,22 @@ namespace Serenity
                 });
         }
 
-        public static JsDate ParseDate(string value)
+        [InlineCode("Q.formatISODateTimeUTC({date})")]
+        public static string FormatISODateTimeUTC(JsDate date)
         {
-            return Q.Externals.ParseDate(value);
+            return null;
         }
 
+        [InlineCode("Q.parseDate({value})")]
+        public static JsDate ParseDate(string value)
+        {
+            return null;
+        }
+
+        [InlineCode("Q.parseISODateTime({value})")]
         public static JsDate ParseISODateTime(string value)
         {
-            return Q.Externals.ParseISODateTime(value);
+            return null;
         }
     }
 }

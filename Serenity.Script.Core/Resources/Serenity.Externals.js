@@ -1,12 +1,12 @@
-﻿var Q$Externals;
-(function (Q$Externals) {
+﻿var Q;
+(function (Q) {
     function zeroPad(n, digits) {
         var s = n.toString();
         while (s.length < digits)
             s = "0" + digits;
         return s;
     }
-    Q$Externals.zeroPad = zeroPad;
+    Q.zeroPad = zeroPad;
     function formatDayHourAndMin(n) {
         if (n === 0)
             return '0';
@@ -25,7 +25,7 @@
         }
         return txt;
     }
-    Q$Externals.formatDayHourAndMin = formatDayHourAndMin;
+    Q.formatDayHourAndMin = formatDayHourAndMin;
     ;
     function formatISODateTimeUTC(d) {
         if (d == null)
@@ -42,13 +42,15 @@
         str += ":" + zeropad(secs) + "Z";
         return str;
     }
-    Q$Externals.formatISODateTimeUTC = formatISODateTimeUTC;
+    Q.formatISODateTimeUTC = formatISODateTimeUTC;
     ;
     function formatNumber(n, fmt, dec, grp) {
         var neg = '-';
         if (isNaN(n)) {
             return null;
         }
+        dec = dec || Q$Culture.decimalSeparator;
+        grp = grp || Q$Culture.get_groupSeperator();
         var r = "";
         if (fmt.indexOf(".") > -1) {
             var dp = dec;
@@ -132,7 +134,7 @@
         }
         return r;
     }
-    Q$Externals.formatNumber = formatNumber;
+    Q.formatNumber = formatNumber;
     ;
     function roundNumber(n, dec) {
         var power = Math.pow(10, dec || 0);
@@ -225,10 +227,14 @@
         }
         return dateVal;
     }
-    Q$Externals.parseDate = parseDate;
+    Q.parseDate = parseDate;
     ;
     function parseDecimal(s) {
+        if (s == null)
+            return null;
         s = Q.trim(s.toString());
+        if (s.length == 0)
+            return null;
         var ts = Q$Culture.get_groupSeperator();
         if (s && s.length && s.indexOf(ts) > 0) {
             s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');
@@ -237,7 +243,7 @@
             return NaN;
         return parseFloat(s.toString().replace(Q$Culture.decimalSeparator, '.'));
     }
-    Q$Externals.parseDecimal = parseDecimal;
+    Q.parseDecimal = parseDecimal;
     ;
     function splitDateString(s) {
         s = Q.trim(s);
@@ -254,7 +260,7 @@
         else
             return [s];
     }
-    Q$Externals.splitDateString = splitDateString;
+    Q.splitDateString = splitDateString;
     ;
     function parseISODateTime(s) {
         if (!s || !s.length)
@@ -307,7 +313,7 @@
         }
         return new Date(Date.UTC(year, month, day, hour, min, sec, msec) - ofs);
     }
-    Q$Externals.parseISODateTime = parseISODateTime;
+    Q.parseISODateTime = parseISODateTime;
     ;
     function parseHourAndMin(value) {
         var v = Q.trim(value);
@@ -328,7 +334,7 @@
             return NaN;
         return h * 60 + m;
     }
-    Q$Externals.parseHourAndMin = parseHourAndMin;
+    Q.parseHourAndMin = parseHourAndMin;
     ;
     function parseDayHourAndMin(s) {
         var days;
@@ -352,7 +358,7 @@
             return days * 24 * 60 + hm;
         }
     }
-    Q$Externals.parseDayHourAndMin = parseDayHourAndMin;
+    Q.parseDayHourAndMin = parseDayHourAndMin;
     ;
     function parseQueryString(s) {
         var qs;
@@ -369,7 +375,7 @@
         }
         return result;
     }
-    Q$Externals.parseQueryString = parseQueryString;
+    Q.parseQueryString = parseQueryString;
     ;
     var turkishOrder;
     function turkishLocaleCompare(a, b) {
@@ -398,17 +404,17 @@
         }
         return a.localeCompare(b);
     }
-    Q$Externals.turkishLocaleCompare = turkishLocaleCompare;
+    Q.turkishLocaleCompare = turkishLocaleCompare;
     ;
     function turkishLocaleToUpper(a) {
         if (!a)
             return a;
         return a.replace(/i/g, 'İ').replace(/ı/g, 'I').toUpperCase();
     }
-    Q$Externals.turkishLocaleToUpper = turkishLocaleToUpper;
+    Q.turkishLocaleToUpper = turkishLocaleToUpper;
     ;
     // --- DIALOGS ---
-    function alertDialog(message, options) {
+    function alert(message, options) {
         var dialog;
         options = $.extend({
             htmlEncode: true,
@@ -452,9 +458,9 @@
             .parent()
             .dialog('open');
     }
-    Q$Externals.alertDialog = alertDialog;
+    Q.alert = alert;
     ;
-    function confirmDialog(message, onYes, options) {
+    function confirm(message, onYes, options) {
         var dialog;
         options = $.extend({
             htmlEncode: true,
@@ -481,7 +487,7 @@
                     options.onCancel();
             },
             overlay: {
-                opacity: 0.7,
+                opacity: 0.77,
                 background: "black"
             }
         }, options);
@@ -520,8 +526,24 @@
             .parent()
             .dialog('open');
     }
-    Q$Externals.confirmDialog = confirmDialog;
+    Q.confirm = confirm;
     ;
+    function warning(message, options) {
+        alert(message, $.extend({
+            title: Q.text("Dialogs.WarningTitle"),
+            dialogClass: "s-MessageDialog s-WarningDialog"
+        }, options));
+    }
+    Q.warning = warning;
+    function information(message, onOk, options) {
+        confirm(message, onOk, $.extend({
+            title: Q.text("Dialogs.InformationTitle"),
+            dialogClass: "s-MessageDialog s-InformationDialog",
+            yesButton: Q.text("Dialogs.OkButton"),
+            noButton: null,
+        }, options));
+    }
+    Q.information = information;
     function iframeDialog(options) {
         var doc;
         var e = $('<div><iframe></iframe></div>');
@@ -550,27 +572,7 @@
         }, options);
         e.dialog(settings);
     }
-    Q$Externals.iframeDialog = iframeDialog;
-    ;
-    // -- AJAX HELPERS --
-    function setupAjaxIndicator() {
-        var loadingIndicator = null;
-        var loadingTimer = 0;
-        $(document).ajaxStart(function () {
-            window.clearTimeout(loadingTimer);
-            loadingTimer = window.setTimeout(function () {
-                if (!loadingIndicator)
-                    loadingIndicator = $('<div/>').addClass('s-AjaxIndicator').appendTo(document.body);
-            }, 2000);
-        }).ajaxStop(function () {
-            if (loadingIndicator) {
-                loadingIndicator.remove();
-                loadingIndicator = null;
-            }
-            window.clearTimeout(loadingTimer);
-        });
-    }
-    Q$Externals.setupAjaxIndicator = setupAjaxIndicator;
+    Q.iframeDialog = iframeDialog;
     ;
     function toId(id) {
         if (id == null)
@@ -584,12 +586,14 @@
             return id;
         return parseInt(id, 10);
     }
-    Q$Externals.toId = toId;
+    Q.toId = toId;
     ;
     var oldShowLabel;
     function validateShowLabel(element, message) {
         oldShowLabel.call(this, element, message);
         this.errorsFor(element).each(function (i, e) {
+            if ($(element).hasClass('error'))
+                $(e).removeClass('checked');
             $(e).attr('title', $(e).text());
         });
     }
@@ -624,7 +628,7 @@
             }
         });
         $.validator.addMethod("dateQ", function (value, element) {
-            return this.optional(element) || Q$Externals.parseDate(value) != false;
+            return this.optional(element) || parseDate(value) != false;
         });
         $.validator.addMethod("hourAndMin", function (value, element) {
             return this.optional(element) || !isNaN(parseHourAndMin(value));
@@ -729,7 +733,7 @@
             return false;
         };
     }
-    Q$Externals.validatorAbortHandler = validatorAbortHandler;
+    Q.validatorAbortHandler = validatorAbortHandler;
     ;
     function validateOptions(options) {
         return $.extend({
@@ -769,7 +773,7 @@
             }
         }, options);
     }
-    Q$Externals.validateOptions = validateOptions;
+    Q.validateOptions = validateOptions;
     ;
     if (window['jQuery'] && window['jQuery']['validator'])
         jQueryValidationInitialization();
@@ -843,7 +847,7 @@
         form.submit();
         window.setTimeout(function () { form.remove(); }, 0);
     }
-    Q$Externals.postToService = postToService;
+    Q.postToService = postToService;
     ;
     function postToUrl(options) {
         var form = $('<form/>')
@@ -865,7 +869,7 @@
         form.submit();
         window.setTimeout(function () { form.remove(); }, 0);
     }
-    Q$Externals.postToUrl = postToUrl;
+    Q.postToUrl = postToUrl;
     ;
     function ssExceptionInitialization() {
         ss.Exception.prototype.toString = function () {
@@ -893,7 +897,7 @@
             ", scrollbars=1, resizable=yes, left=" + x + ", top=" + y);
         winPopup.document.body.innerHTML = code;
     }
-    Q$Externals.showInFrame = showInFrame;
+    Q.showInFrame = showInFrame;
     if ($.fn.button && $.fn.button.noConflict) {
         var btn = $.fn.button.noConflict();
         $.fn.btn = btn;
@@ -936,7 +940,7 @@
                                 clone = src && $.isPlainObject(src) ? src : {};
                             }
                             // Never move original objects, clone them
-                            target[name] = Q$Externals.deepClone(clone, copy);
+                            target[name] = deepClone(clone, copy);
                         }
                         else if (copy !== undefined) {
                             target[name] = copy;
@@ -948,7 +952,7 @@
         // Return the modified object
         return target;
     }
-    Q$Externals.deepClone = deepClone;
+    Q.deepClone = deepClone;
     ;
-})(Q$Externals || (Q$Externals = {}));
+})(Q || (Q = {}));
 //# sourceMappingURL=Serenity.Externals.js.map

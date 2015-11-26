@@ -131,5 +131,16 @@ namespace Serenity
 
             request.EqualityFilter[field] = value;
         }
+
+        [InlineCode("Q.postToService({options})")]
+        public static void PostToService(PostToServiceOptions options)
+        {
+        }
+
+        [InlineCode("Q.postToUrl({options})")]
+        public static void PostToUrl(PostToUrlOptions options)
+        {
+        }
+
     }
 }

@@ -12,7 +12,7 @@ namespace Serenity
         /// <summary>
         /// Contains external functions in Site.Script.Externals.js
         /// </summary>
-        [Imported, IgnoreNamespace, ScriptName("Q$Externals")]
+        [Imported, IgnoreNamespace, ScriptName("Q")]
         public static class Externals
         {
             /// <summary>
@@ -20,6 +20,7 @@ namespace Serenity
             /// </summary>
             /// <param name="message">Message</param>
             /// <param name="options">Alert options</param>
+            [ScriptName("alert")]
             public static void AlertDialog(string message, AlertOptions options)
             {
             }
@@ -29,6 +30,7 @@ namespace Serenity
             /// </summary>
             /// <param name="message">Message</param>
             /// <param name="options">Confirm options</param>
+            [ScriptName("confirm")]
             public static void ConfirmDialog(string message, Action onYes, ConfirmOptions options)
             {
             }

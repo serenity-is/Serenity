@@ -1,10 +1,10 @@
-﻿interface Q {
-    formatDate(date: Date, format?: string): string;
-    htmlEncode(s: any): string;
-    resolveUrl(url: string): string;
-    text(s: string): string;
-    trim(s: string): string;
-    notifyError(msg: string): void;
+﻿declare module Q {
+    function formatDate(date: Date, format?: string): string;
+    function htmlEncode(s: any): string;
+    function resolveUrl(url: string): string;
+    function text(s: string): string;
+    function trim(s: string): string;
+    function notifyError(msg: string): void;
 }
 
 interface Q$Culture {
@@ -30,7 +30,6 @@ declare namespace Serenity {
     }
 }
 
-declare var Q: Q;
 declare var Q$Config: Q$Config;
 declare var Q$Culture: Q$Culture;
 declare var Serenity: Serenity

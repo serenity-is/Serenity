@@ -1,4 +1,4 @@
-﻿declare module Q$Externals {
+﻿declare module Q {
     function zeroPad(n: number, digits: number): string;
     function formatDayHourAndMin(n: number): string;
     function formatISODateTimeUTC(d: Date): string;
@@ -17,23 +17,24 @@
         onClose?: () => void;
         htmlEncode?: boolean;
     }
-    interface AlertDialogOptions extends CommonDialogOptions {
+    interface AlertOptions extends CommonDialogOptions {
         okButton?: string;
     }
-    interface ConfirmDialogOptions extends CommonDialogOptions {
+    interface ConfirmOptions extends CommonDialogOptions {
         yesButton?: string;
         noButton?: string;
         cancelButton?: string;
         onCancel?: () => void;
         onNo?: () => void;
     }
-    function alertDialog(message: string, options: AlertDialogOptions): void;
-    function confirmDialog(message: string, onYes: () => void, options: ConfirmDialogOptions): void;
+    function alert(message: string, options?: AlertOptions): void;
+    function confirm(message: string, onYes: () => void, options?: ConfirmOptions): void;
+    function warning(message: string, options?: AlertOptions): void;
+    function information(message: string, onOk: () => void, options?: ConfirmOptions): void;
     interface IFrameDialogOptions {
         html?: string;
     }
     function iframeDialog(options: IFrameDialogOptions): void;
-    function setupAjaxIndicator(): void;
     function toId(id: any): any;
     function validatorAbortHandler(validator: any): void;
     function validateOptions(options: any): any;

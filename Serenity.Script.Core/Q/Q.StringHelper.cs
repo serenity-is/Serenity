@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Serenity
@@ -104,6 +105,12 @@ namespace Serenity
         public static string ToSingleLine(this string str)
         {
             return str.TrimToEmpty().Replace("\r\n", " ").Replace("\n", " ").Trim();
+        }
+
+        [InlineCode("Select2.util.stripDiacritics({input})")]
+        public static string StripDiacritics(string input)
+        {
+            return null;
         }
     }
 }
