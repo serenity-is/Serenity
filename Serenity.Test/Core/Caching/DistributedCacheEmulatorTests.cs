@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+    [Collection("AvoidParallel")]
     public partial class DistributedCacheEmulatorTests
     {
         [Fact]
@@ -132,16 +133,17 @@ namespace Serenity.Test
         {
             var cache = new DistributedCacheEmulator();
 
-            cache.Set("SomeInt", 13579, TimeSpan.FromMilliseconds(200));
+            cache.Set("SomeInt", 13579, TimeSpan.FromMilliseconds(100));
             var actualInt = cache.Get<int>("SomeInt");
             Assert.Equal(13579, actualInt);
-
-            Thread.Sleep(50);
+            var until = DateTime.Now.AddMilliseconds(10);
+            while (DateTime.Now < until);
 
             var notExpiredInt = cache.Get<int>("SomeInt");
             Assert.Equal(13579, notExpiredInt);
 
-            Thread.Sleep(350);
+            until = DateTime.Now.AddMilliseconds(200);
+            while (DateTime.Now < until);
 
             var expiredInt = cache.Get<int>("SomeInt");
             Assert.Equal(0, expiredInt);

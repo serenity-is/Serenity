@@ -11,7 +11,7 @@ namespace Serenity.Test
         {
             var div = Q.NewBodyDiv();
             var form = J("<form/>").AppendTo(div).As<jQueryValidationObject>();
-            form.Validate(Q.Externals.ValidateOptions(Q.Externals.ValidateOptions(new jQueryValidatorOptions())));
+            form.Validate(Q.Externals.ValidateOptions(new jQueryValidatorOptions()));
             return form;
         }
 
