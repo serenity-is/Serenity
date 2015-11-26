@@ -132,16 +132,16 @@ namespace Serenity.Test
         {
             var cache = new DistributedCacheEmulator();
 
-            cache.Set("SomeInt", 13579, TimeSpan.FromMilliseconds(100));
+            cache.Set("SomeInt", 13579, TimeSpan.FromMilliseconds(200));
             var actualInt = cache.Get<int>("SomeInt");
             Assert.Equal(13579, actualInt);
 
-            Thread.Sleep(1);
+            Thread.Sleep(50);
 
             var notExpiredInt = cache.Get<int>("SomeInt");
             Assert.Equal(13579, notExpiredInt);
 
-            Thread.Sleep(110);
+            Thread.Sleep(350);
 
             var expiredInt = cache.Get<int>("SomeInt");
             Assert.Equal(0, expiredInt);
