@@ -18,9 +18,12 @@
             foreach (var item in menuItems)
                 remaining.Add(item.Key);
 
-            Action<NavigationItemAttribute> processMenu = menu =>
+            Action<List<NavigationItem>, NavigationItemAttribute> processMenu = null;
+            processMenu = (parent, menu) =>
             {
-                remaining.Remove(menu.Title.TrimToNull());
+                var path = (menu.Category.IsEmptyOrNull() ? "" : (menu.Category + "/"));
+                path += (menu.Title.TrimToNull() ?? "");
+                remaining.Remove(path);
 
                 var section = new NavigationItem
                 {
@@ -33,40 +36,24 @@
                 bool isAuthorizedSection = !menu.Url.IsEmptyOrNull() &&
                     (menu.Permission.IsEmptyOrNull() || Authorization.HasPermission(menu.Permission));
 
-                var children = menuItems[menu.Title.TrimToNull() ?? "???"];
+                var children = menuItems[path];
                 foreach (var child in children)
-                {
-                    if (child.Url.IsEmptyOrNull())
-                        continue;
-
-                    if (child.Permission != null &&
-                        !Authorization.HasPermission(child.Permission))
-                        continue;
-
-                    section.Children.Add(new NavigationItem
-                    {
-                        Title = child.Title,
-                        Url = (!string.IsNullOrEmpty(child.Url) && resolveUrl != null) ? resolveUrl(child.Url) : child.Url,
-                        IconClass = child.IconClass.TrimToNull(),
-                        Target = child.Target.TrimToNull()
-                    });
-                }
+                    processMenu(section.Children, child);
 
                 if (section.Children.Count > 0 || isAuthorizedSection)
-                {
-                    result.Add(section);
-                }
+                    parent.Add(section);
             };
 
-            foreach (var menu in menuItems[null])
-                processMenu(menu);
+            remaining.Remove("");
+            foreach (var menu in menuItems[""])
+                processMenu(result, menu);
 
             while (remaining.Count > 0)
             {
                 var first = remaining.First();
                 remaining.Remove(first);
                 var menu = new NavigationMenuAttribute(Int32.MaxValue, first);
-                processMenu(menu);
+                processMenu(result, menu);
             }
 
             return result;
@@ -88,9 +75,9 @@
                     }
                 }
 
-                return list.OrderBy(x => x.Category)
+                return list.OrderBy(x => (x.Category.TrimToNull() ?? ""))
                     .ThenBy(x => x.Order)
-                    .ToLookup(x => x.Category.TrimToNull());
+                    .ToLookup(x => (x.Category.TrimToNull() ?? ""));
             });
         }
     }

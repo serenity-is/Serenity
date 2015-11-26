@@ -14,7 +14,7 @@ namespace Serenity.Navigation
     {
         protected NavigationItemAttribute(int order, string path, string url, object permission, string icon)
         {
-            var idx = (path ?? "").IndexOf("/");
+            var idx = (path ?? "").LastIndexOf("/");
             if (idx >= 0)
             {
                 this.Category = path.Substring(0, idx);
