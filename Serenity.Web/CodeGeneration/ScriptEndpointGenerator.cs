@@ -19,6 +19,7 @@ namespace Serenity.CodeGeneration
         /// </summary>
         public Func<Type, string> GetServiceUrl { get; set; }
         public HashSet<string> RootNamespaces { get; private set; }
+        public HashSet<string> UsingNamespaces { get; private set; }
 
         public ScriptEndpointGenerator(params Assembly[] assemblies)
         {
@@ -26,14 +27,30 @@ namespace Serenity.CodeGeneration
                 throw new ArgumentNullException("assemblies");
 
             RootNamespaces = new HashSet<string> { };
+            UsingNamespaces = new HashSet<string>
+            {
+                "jQueryApi",
+                "Serenity",
+                "System",
+                "System.Collections",
+                "System.Collections.Generic",
+                "System.Runtime.CompilerServices"
+            };
 
             this.Assemblies = assemblies;
+        }
+
+        private string DoGetNamespace(Type type)
+        {
+            if (GetNamespace != null)
+                return GetNamespace(type);
+
+            return type.Namespace;
         }
 
         public SortedDictionary<string, string> GenerateCode()
         {
             var endpointCodes = new Dictionary<Type, string>();
-            var usedNamespaces = new HashSet<string>();
             var sb = new StringBuilder();
             var cw = new CodeWriter(sb, 4);
             var result = new SortedDictionary<string, string>();
@@ -77,7 +94,7 @@ namespace Serenity.CodeGeneration
                     {
                         serviceUrl = GetServiceUrlFromRoute(type);
                         if (serviceUrl == null)
-                            serviceUrl = GetNamespace != null ? GetNamespace(type).Replace(".", "/") : "???";
+                            serviceUrl = DoGetNamespace(type).Replace(".", "/");
                     }
 
                     cw.InBrace(delegate
@@ -145,11 +162,21 @@ namespace Serenity.CodeGeneration
                             sb.Append(method.Name);
 
                             sb.Append("(");
-                            ScriptDtoGenerator.HandleMemberType(sb, paramType, null, null, enqueueType: null);
+
+                            ScriptDtoGenerator.HandleMemberType(sb, paramType, 
+                                codeNamespace: DoGetNamespace(type), 
+                                usingNamespaces: UsingNamespaces, 
+                                enqueueType: null);
+
                             sb.Append(' ');
                             sb.Append(parameterName);
                             sb.Append(", Action<");
-                            ScriptDtoGenerator.HandleMemberType(sb, responseType, null, null, enqueueType: null);
+
+                            ScriptDtoGenerator.HandleMemberType(sb, responseType,
+                                codeNamespace: DoGetNamespace(type),
+                                usingNamespaces: UsingNamespaces,
+                                enqueueType: null);
+
                             sb.Append("> onSuccess, ServiceCallOptions options = null");
                             sb.AppendLine(")");
 
@@ -177,23 +204,13 @@ namespace Serenity.CodeGeneration
                     });
 
                     if (methods.Count > 0)
-                    {
                         endpointCodes.Add(type, sb.ToString());
-                        //usedNamespaces.Add(ns);
-                    }
 
                     sb.Clear();
                 }
 
-            usedNamespaces.Add("jQueryApi");
-            usedNamespaces.Add("Serenity");
-            usedNamespaces.Add("System");
-            usedNamespaces.Add("System.Collections");
-            usedNamespaces.Add("System.Collections.Generic");
-            usedNamespaces.Add("System.Runtime.CompilerServices");
-
-            var ordered = endpointCodes.Keys.OrderBy(x => GetNamespace != null ? GetNamespace(x) : x.Namespace).ThenBy(x => x.Name);
-            var byNameSpace = ordered.ToLookup(x => GetNamespace != null ? GetNamespace(x) : x.Namespace);
+            var ordered = endpointCodes.Keys.OrderBy(DoGetNamespace).ThenBy(x => x.Name);
+            var byNameSpace = ordered.ToLookup(DoGetNamespace);
 
             sb.Clear();
 
@@ -219,7 +236,7 @@ namespace Serenity.CodeGeneration
 
                     cw.InBrace(delegate
                     {
-                        foreach (var nsStr in usedNamespaces)
+                        foreach (var nsStr in UsingNamespaces.ToArray().OrderBy(x => x))
                         {
                             cw.Indented("using ");
                             sb.Append(nsStr);
