@@ -88,7 +88,7 @@ namespace Serenity
 
                 if (this.slickGrid != null && this.slickGrid.GetOptions().AutoHeight)
                 {
-                    this.slickContainer.Children(".slick-viewport").CSS("height", "");
+                    this.slickContainer.Children(".slick-viewport").CSS("height", "auto");
                     this.slickGrid.SetOptions(new SlickGridOptions { AutoHeight = false });
                 }
 
@@ -96,9 +96,9 @@ namespace Serenity
                     (this.slickContainer.GetHeight() < 200 ||
                      (J(Window.Instance).GetWidth() < 768)))
                 {
-                    this.element.CSS("height", "");
-                    this.slickContainer.CSS("height", "")
-                        .Children(".slick-viewport").CSS("height", "");
+                    this.element.CSS("height", "auto");
+                    this.slickContainer.CSS("height", "auto")
+                        .Children(".slick-viewport").CSS("height", "auto");
                     this.slickGrid.SetOptions(new SlickGridOptions { AutoHeight = true });
                 }
             }
