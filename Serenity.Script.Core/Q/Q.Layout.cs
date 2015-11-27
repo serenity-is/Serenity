@@ -20,7 +20,10 @@ namespace Serenity
                     });
 
             h = element.Parent().GetHeight() - h;
-            h = h - (element.GetOuterHeight(true) - element.GetHeight());
+
+            if (element.GetCSS("box-sizing") != "border-box")
+                h = h - (element.GetOuterHeight(true) - element.GetHeight());
+
             return h;
         }
 
