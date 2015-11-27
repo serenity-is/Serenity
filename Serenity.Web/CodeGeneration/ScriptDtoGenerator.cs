@@ -408,6 +408,13 @@ namespace Serenity.CodeGeneration
                 (codeNamespace != null && codeNamespace.StartsWith((ns + "."))))
                 return type.Name;
 
+            if (codeNamespace != null)
+            {
+                var idx = codeNamespace.IndexOf('.');
+                if (idx >= 0 && type.FullName.StartsWith(codeNamespace.Substring(0, idx + 1)))
+                    return type.FullName.Substring(idx + 1);
+            }
+
             return type.FullName;
         }
 
