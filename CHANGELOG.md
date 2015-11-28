@@ -1,3 +1,20 @@
+## 1.8.0 (2015-11-28)
+
+Features:
+  - allow comparison against empty value with StringFiltering, you can search for empty strings (not null) in filter dialog now
+  - better handling of FilteringIdField determination for textual fields with complex expressions
+  - [BREAKING CHANGE] cleanup serenity less files, less dependency on jQuery UI css (aristo.css), might cause minor problems, see upgrade info in Serenity guide
+  - Q$Externals methods are moved under Q but Q$Externals is still an alias to Q, so no breaking changes expected
+  - multi level navigation support (up to 10 levels)
+  - use shorter namespace for types from other modules for T4 generated code
+  - handle type namespaces properly if T4 generated service endpoint uses types from other modules / namespaces
+  - integrate free AdminLTE theme [Serene]
+  - add AdminLTE sample pages [Serene]
+  - develop a MVC.tt file to generate strongly typed view locations (similar but much simpler than T4MVC)
+  
+Bugfixes:
+  - IDateTimeProvider to fix Appveyor tests failing sometimes on time related tests
+
 ## 1.7.0 (2015-11-20)
 
 Features:
