@@ -50,7 +50,9 @@
             if (having != null)
                 clone.having = new StringBuilder(having.ToString());
 
-            if (this.Params != null)
+            if (parent != null)
+                clone.parent = this.parent;
+            else if (this.Params != null)
                 foreach (var pair in this.Params)
                     clone.AddParam(pair.Key, pair.Value);
 
