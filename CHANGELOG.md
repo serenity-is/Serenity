@@ -1,3 +1,8 @@
+## 1.8.2 (2015-11-28)
+  - it is now much easier to create cascaded editors using new CascadeFrom (editor ID), CascadeField (matching field) and CascadeValue (matching value) properties. Just set CascadeFrom and/or CascadeField properties.
+  - lookup editors can also be filtered using new FilterField and FilterValue properties, without need to define a new editor type.
+  - made permission and other user information like username available from client side, optionally [Serene]
+  
 ## 1.8.1 (2015-11-28)
 
 Features:
