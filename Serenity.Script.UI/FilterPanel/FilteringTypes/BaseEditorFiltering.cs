@@ -67,7 +67,7 @@ namespace Serenity
                 if (state == null)
                     return;
 
-                PropertyGrid.LoadEditorValue(editor, new PropertyItem { Name = "_" }, state);
+                EditorUtils.SetValue(editor, state);
                 return;
             }
 
@@ -77,11 +77,7 @@ namespace Serenity
         public override object SaveState()
         {
             if (UseEditor())
-            {
-                var target = new JsDictionary();
-                PropertyGrid.SaveEditorValue(editor, new PropertyItem { Name = "_" }, target);
-                return target;
-            }
+                return EditorUtils.GetValue(editor);
 
             return base.SaveState();
         }
@@ -90,13 +86,11 @@ namespace Serenity
         {
             if (UseEditor())
             {
-                var target = new JsDictionary();
-                PropertyGrid.SaveEditorValue(editor, new PropertyItem { Name = "_" }, target);
-                var value = target["_"];
+                var value = EditorUtils.GetValue(editor);
                 if (value == null || (value is string && ((string)value).Trim().Length == 0))
                     throw ArgumentNull();
 
-                return target["_"];
+                return value;
             }
 
             return base.GetEditorValue();

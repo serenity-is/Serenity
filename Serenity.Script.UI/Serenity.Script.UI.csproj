@@ -130,6 +130,7 @@
     <Compile Include="PropertyGrid\Attributes\ReadOnlyAttribute.cs" />
     <Compile Include="PropertyGrid\CustomValidation.cs" />
     <Compile Include="PropertyGrid\EditorTypeRegistry.cs" />
+    <Compile Include="Widget\EditorUtils.cs" />
     <Compile Include="PropertyGrid\ReflectionUtils.cs" />
     <Compile Include="PropertyGrid\PublicEditorTypes.cs" />
     <Compile Include="PropertyGrid\Attributes\HiddenAttribute.cs" />

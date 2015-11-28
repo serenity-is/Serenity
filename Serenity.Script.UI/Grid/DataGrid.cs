@@ -960,13 +960,7 @@ namespace Serenity
                 var request = (ListRequest)view.Params;
                 request.EqualityFilter = request.EqualityFilter ?? new JsDictionary<string, object>();
 
-                var obj = new JsDictionary<string, object>();
-                PropertyGrid.SaveEditorValue(widget, new PropertyItem
-                {
-                    Name = "$$value$$",
-                }, obj);
-                var value = obj["$$value$$"];
-
+                var value = EditorUtils.GetValue(widget);
                 bool active = Script.IsValue(value) && !string.IsNullOrEmpty(value.ToString());
 
                 if (handler != null)
