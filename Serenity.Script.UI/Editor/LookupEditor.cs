@@ -10,31 +10,6 @@ namespace Serenity
         public LookupEditor(jQueryObject hidden, LookupEditorOptions opt)
             : base(hidden, opt)
         {
-            if (options.InplaceAdd)
-                AddInplaceCreate(Texts.Controls.SelectEditor.InplaceAdd);
-        }
-
-        protected override string GetLookupKey()
-        {
-            return options.LookupKey ?? base.GetLookupKey();
-        }
-
-        protected override string GetDialogTypeKey()
-        {
-            return options.DialogType ?? base.GetDialogTypeKey();
-        }
-
-        protected override Select2Options GetSelect2Options()
-        {
-            var opt = base.GetSelect2Options();
-
-            if (options.MinimumResultsForSearch != null)
-                opt.MinimumResultsForSearch = options.MinimumResultsForSearch.Value;
-
-            if (options.InplaceAdd)
-                opt.CreateSearchChoice = GetCreateSearchChoice();
-
-            return opt;
         }
     }
 
@@ -45,5 +20,28 @@ namespace Serenity
         public int? MinimumResultsForSearch { get; set; }
         public bool InplaceAdd { get; set; }
         public string DialogType { get; set; }
+        /// <summary>
+        /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country
+        /// </summary>
+        public string CascadeFrom { get; set; }
+        /// <summary>
+        /// Cascade filtering field (items will be filtered on this key, e.g. CountryID).
+        /// If null, CascadeFrom is used as cascade field name too.
+        /// </summary>
+        public string CascadeField { get; set; }
+        /// <summary>
+        /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
+        /// If null or empty, and CascadeField/CascadeFrom is set, all items are filtered
+        /// </summary>
+        public object CascadeValue { get; set; }
+        /// <summary>
+        /// Optional filtering field (items will be filtered on this key, e.g. GroupID)
+        /// </summary>
+        public string FilterField { get; set; }
+        /// <summary>
+        /// Optional filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
+        /// If null or empty, and CascadeField is set, all items are filtered
+        /// </summary>
+        public object FilterValue { get; set; }
     }
 }
