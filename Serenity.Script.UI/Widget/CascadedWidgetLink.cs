@@ -20,10 +20,10 @@
             });
         }
 
-        public void Bind()
+        public TParent Bind()
         {
             if (parentID.IsEmptyOrNull())
-                return;
+                return null;
 
             var parent = Q.FindElementWithRelativeId(widget.Element, parentID).TryGetWidget<TParent>();
             if (parent != null)
@@ -32,17 +32,26 @@
                 {
                     parentChange(parent);
                 });
+
+                return parent;
+            }
+            else
+            {
+                Q.NotifyError("Can't find cascaded parent element with ID: " + parentID + "!");
+                return null;
             }
         }
 
-        public void Unbind()
+        public TParent Unbind()
         {
             if (parentID.IsEmptyOrNull())
-                return;
+                return null;
 
             var parent = Q.FindElementWithRelativeId(widget.Element, parentID).TryGetWidget<TParent>();
             if (parent != null)
                 parent.Element.Unbind("." + widget.UniqueName);
+
+            return parent;
         }
 
         private string parentID;
