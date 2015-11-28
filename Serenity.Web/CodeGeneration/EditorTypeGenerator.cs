@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Serenity.Reflection;
+using Serenity.ComponentModel;
+using System.Reflection;
 
 namespace Serenity.CodeGeneration
 {
@@ -44,6 +46,12 @@ namespace Serenity.CodeGeneration
         public Dictionary<string, EditorTypeInfo> EditorTypes { get; private set; }
         public HashSet<string> RootNamespaces { get; private set; }
 
+        private static readonly string[] lookupEditorBaseOptions =
+            typeof(LookupEditorBaseAttribute)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .Select(x => x.Name)
+                .ToArray();
+
         private string DoGetTypeName(string typeName)
         {
             if (GetTypeName != null)
@@ -79,7 +87,18 @@ namespace Serenity.CodeGeneration
                 cw.Indented("public partial class ");
                 var type = DoGetTypeName(key);
                 sb.Append(type);
-                sb.AppendLine(" : CustomEditorAttribute");
+
+                // yes it's ugly, but backward compatible
+                if (editorInfo.Options.Count >= lookupEditorBaseOptions.Length &&
+                    lookupEditorBaseOptions.All(x => editorInfo.Options.ContainsKey(x)))
+                {
+                    sb.AppendLine(" : LookupEditorBaseAttribute");
+                    foreach (var x in lookupEditorBaseOptions)
+                        editorInfo.Options.Remove(x);
+                }
+                else
+                    sb.AppendLine(" : CustomEditorAttribute");
+
                 cw.InBrace(delegate
                 {
                     cw.Indented("public const string Key = \"");

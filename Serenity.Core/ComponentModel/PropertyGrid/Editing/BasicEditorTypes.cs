@@ -1,8 +1,4 @@
-﻿using Serenity;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
 
 namespace Serenity.ComponentModel
 {
@@ -201,7 +197,92 @@ namespace Serenity.ComponentModel
         }
     }
 
-    public partial class LookupEditorAttribute : CustomEditorAttribute
+    public abstract class LookupEditorBaseAttribute : CustomEditorAttribute
+    {
+        protected LookupEditorBaseAttribute(string editorType)
+            : base(editorType)
+        {
+        }
+
+        /// <summary>
+        /// Lookup key, e.g. Northwind.CustomerCity
+        /// </summary>
+        public string LookupKey
+        {
+            get { return GetOption<string>("lookupKey"); }
+            set { SetOption("lookupKey", value); }
+        }
+
+        /// <summary>
+        /// Enable inplace add / edit functionality
+        /// </summary>
+        public bool InplaceAdd
+        {
+            get { return GetOption<bool>("inplaceAdd"); }
+            set { SetOption("inplaceAdd", value); }
+        }
+
+        public string DialogType
+        {
+            get { return GetOption<string>("dialogType"); }
+            set { SetOption("dialogType", value); }
+        }
+
+        /// <summary>
+        /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country
+        /// </summary>
+        public string CascadeFrom
+        {
+            get { return GetOption<string>("cascadeFrom"); }
+            set { SetOption("cascadeFrom", value); }
+        }
+
+        /// <summary>
+        /// Cascade filtering field (items will be filtered on this key, e.g. CountryID)
+        /// </summary>
+        public object CascadeField
+        {
+            get { return GetOption<string>("cascadeField"); }
+            set { SetOption("cascadeField", value); }
+        }
+
+        /// <summary>
+        /// Cascade filtering value, usually set by CascadeFrom editor, e.g. the integer value of CountryID
+        /// If null or empty, and CascadeField is set, all items are filtered
+        /// </summary>
+        public object CascadeValue
+        {
+            get { return GetOption<string>("cascadeValue"); }
+            set { SetOption("cascadeValue", value); }
+        }
+
+        /// <summary>
+        /// Optional filtering field (items will be filtered on this key, e.g. GroupID)
+        /// </summary>
+        public object FilterField
+        {
+            get { return GetOption<string>("filterField"); }
+            set { SetOption("filterField", value); }
+        }
+
+        /// <summary>
+        /// Optional filtering value, e.g. the integer value of GroupID. If null or empty string no filtering occurs.
+        /// </summary>
+        public object FilterValue
+        {
+            get { return GetOption<string>("filterValue"); }
+            set { SetOption("filterValue", value); }
+        }
+
+        /// <summary>
+        /// The minimum number of results that must be initially (after opening the dropdown for the first time) populated in order to keep the search field. 
+        /// This is useful for cases where local data is used with just a few results, in which case the search box is not very useful and wastes screen space.
+        /// The option can be set to a negative value to permanently hide the search field.
+        /// </summary>
+        public int MinimumResultsForSearch { get; set; }
+    }
+
+    public partial class LookupEditorAttribute : LookupEditorBaseAttribute
     {
         public LookupEditorAttribute(string lookupKey)
             : base("Lookup")
@@ -225,23 +306,6 @@ namespace Serenity.ComponentModel
             }
 
             SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
-        }
-
-        public string LookupKey
-        {
-            get { return GetOption<string>("lookupKey"); }
-        }
-
-        public bool InplaceAdd
-        {
-            get { return GetOption<bool>("inplaceAdd"); }
-            set { SetOption("inplaceAdd", value); }
-        }
-
-        public string DialogType
-        {
-            get { return GetOption<string>("dialogType"); }
-            set { SetOption("dialogType", value); }
         }
     }
 
