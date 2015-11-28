@@ -11,17 +11,13 @@
 }
 
 .pace .pace-progress {
-  background: #29d;
+  background: #fff;
   position: fixed;
   z-index: 2000;
   top: 0;
-  left: 0;
+  right: 100%;
+  width: 100%;
   height: 2px;
-
-  -webkit-transition: width 1s;
-  -moz-transition: width 1s;
-  -o-transition: width 1s;
-  transition: width 1s;
 }
 
 .pace .pace-progress-inner {
@@ -30,7 +26,7 @@
   right: 0px;
   width: 100px;
   height: 100%;
-  box-shadow: 0 0 10px #29d, 0 0 5px #29d;
+  box-shadow: 0 0 10px #fff, 0 0 5px #fff;
   opacity: 1.0;
   -webkit-transform: rotate(3deg) translate(0px, -4px);
   -moz-transform: rotate(3deg) translate(0px, -4px);
@@ -44,18 +40,27 @@
   position: fixed;
   z-index: 2000;
   top: 15px;
-  right: 15px;
+  right: 50%;
   width: 14px;
   height: 14px;
   border: solid 2px transparent;
-  border-top-color: #29d;
-  border-left-color: #29d;
+  border-top-color: #fff;
+  border-left-color: #fff;
   border-radius: 10px;
   -webkit-animation: pace-spinner 400ms linear infinite;
   -moz-animation: pace-spinner 400ms linear infinite;
   -ms-animation: pace-spinner 400ms linear infinite;
   -o-animation: pace-spinner 400ms linear infinite;
   animation: pace-spinner 400ms linear infinite;
+}
+
+@media (max-width: 767px) {
+	.pace .pace-activity {
+	  top: 15px;
+	  right: 15px;
+	  width: 14px;
+	  height: 14px;
+	}
 }
 
 @-webkit-keyframes pace-spinner {

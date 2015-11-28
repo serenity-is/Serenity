@@ -1,3 +1,8 @@
+## 1.8.1 (2015-11-28)
+
+Features:
+  - update slimscroll, pace and simple line icons
+
 ## 1.8.0 (2015-11-28)
 
 Features:
