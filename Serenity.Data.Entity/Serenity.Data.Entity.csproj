@@ -49,7 +49,6 @@
     <Compile Include="Contracts\IEntityWithJoins.cs" />
     <Compile Include="Contracts\IFieldWithJoinInfo.cs" />
     <Compile Include="Contracts\IIsActiveDeletedRow.cs" />
-    <Compile Include="Extensions\AliasWithFields.cs" />
     <Compile Include="CustomFields\CustomFieldCache.cs" />
     <Compile Include="CustomFields\CustomFieldExtensions.cs" />
     <Compile Include="CustomFields\CustomFieldType.cs" />

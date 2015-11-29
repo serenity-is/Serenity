@@ -185,10 +185,10 @@
             }
         }
 
-        public void EnsureJoinsInExpression(string expression)
+        public SqlQuery EnsureJoinsInExpression(string expression)
         {
             if (string.IsNullOrEmpty(expression))
-                return;
+                return this;
 
             string referencedJoin;
             var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out referencedJoin);
@@ -199,6 +199,8 @@
             if (referencedJoins != null)
                 foreach (var alias in referencedJoins)
                     EnsureJoin(alias);
+
+            return this;
         }
 
         public SqlQuery EnsureJoin(Join join)
