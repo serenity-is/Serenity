@@ -20,8 +20,6 @@
         private int skip;
         private int take;
         private StringBuilder where;
-
-        private Action<SqlQuery, string> ensureJoinsInExpression;
         private int intoIndex = -1;
         private List<object> into = new List<object>();
 
@@ -171,8 +169,7 @@
             else
                 groupBy.Append(", ").Append(expression);
 
-            if (ensureJoinsInExpression != null)
-                ensureJoinsInExpression(this, expression);
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
@@ -231,8 +228,7 @@
 
             orderBy.Add(expression);
 
-            if (ensureJoinsInExpression != null)
-                ensureJoinsInExpression(this, expression);
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
@@ -294,8 +290,7 @@
             else
                 orderBy.Add(expression);
 
-            if (ensureJoinsInExpression != null)
-                ensureJoinsInExpression(this, expression);
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
@@ -313,8 +308,7 @@
 
             columns.Add(new Column(expression, null, intoIndex, null));
 
-            if (ensureJoinsInExpression != null)
-                ensureJoinsInExpression(this, expression);
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
@@ -338,8 +332,8 @@
 
             columns.Add(new Column(expression, null, intoIndex, null));
 
-            if (ensureJoinsInExpression != null)
-                ensureJoinsInExpression(this, expression);
+            EnsureJoinsInExpression(expression);
+
             return this;
         }
 
@@ -359,8 +353,7 @@
 
             columns.Add(new Column(expression, columnName, intoIndex, null));
 
-            if (ensureJoinsInExpression != null)
-                ensureJoinsInExpression(this, expression);
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
@@ -387,8 +380,7 @@
 
             columns.Add(new Column(expression, columnName, intoIndex, null));
 
-            if (ensureJoinsInExpression != null)
-                ensureJoinsInExpression(this, expression);
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
@@ -515,8 +507,7 @@
             else
                 where.Append(SqlKeywords.And).Append(expression);
 
-            if (ensureJoinsInExpression != null)
-                ensureJoinsInExpression(this, expression);
+            EnsureJoinsInExpression(expression);
 
             return this;
         }
@@ -618,12 +609,6 @@
         {
             return this.columns.FindIndex(
                 delegate(Column s) { return s.IntoField == field; });
-        }
-
-        Action<SqlQuery, string> ISqlQueryExtensible.EnsureJoinsInExpression
-        {
-            get { return ensureJoinsInExpression; }
-            set { ensureJoinsInExpression = value; }
         }
 
         void ISqlQueryExtensible.IntoRowSelection(object row)

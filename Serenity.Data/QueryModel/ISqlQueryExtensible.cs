@@ -5,7 +5,6 @@ namespace Serenity.Data
 {
     public interface ISqlQueryExtensible
     {
-        Action<SqlQuery, string> EnsureJoinsInExpression { get; set; }
         IList<object> IntoRows { get; }
         void IntoRowSelection(object into);
         object FirstIntoRow { get; }

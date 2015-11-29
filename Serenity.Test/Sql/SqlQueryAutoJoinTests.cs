@@ -234,5 +234,131 @@ namespace Serenity.Test.Data
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
+
+        [Fact]
+        public void DoesAutomaticJoinWithWhereDistrict()
+        {
+            var fld = ViewRow.Fields;
+
+            var query = new SqlQuery()
+                    .From(fld)
+                    .Select("1")
+                    .Where(fld.District.Contains("x"));
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT 1 " +
+                    "FROM ViewTable T0 " +
+                    "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " + 
+                    "WHERE d.Name LIKE N'%x%'"),
+                TestSqlHelper.Normalize(
+                    query.DebugText));
+        }
+
+        [Fact]
+        public void DoesAutomaticJoinWithWhereCountry()
+        {
+            var fld = ViewRow.Fields;
+
+            var query = new SqlQuery()
+                    .From(fld)
+                    .Select("1")
+                    .Where(fld.Country.Contains("x"));
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT 1 " +
+                    "FROM ViewTable T0 " +
+                    "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
+                    "LEFT JOIN Cities c ON (c.CityID = d.CityID) " +
+                    "LEFT JOIN Countries o ON (o.CountryID = c.CountryID) " +
+                    "WHERE o.Name LIKE N'%x%'"),
+                TestSqlHelper.Normalize(
+                    query.DebugText));
+        }
+
+        [Fact]
+        public void DoesAutomaticJoinWithOrderByDistrict()
+        {
+            var fld = ViewRow.Fields;
+
+            var query = new SqlQuery()
+                    .From(fld)
+                    .Select("1")
+                    .OrderBy(fld.District);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT 1 " +
+                    "FROM ViewTable T0 " +
+                    "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
+                    "ORDER BY d.Name"),
+                TestSqlHelper.Normalize(
+                    query.DebugText));
+        }
+
+        [Fact]
+        public void DoesAutomaticJoinWithOrderByCountry()
+        {
+            var fld = ViewRow.Fields;
+
+            var query = new SqlQuery()
+                    .From(fld)
+                    .Select("1")
+                    .OrderBy(fld.Country);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT 1 " +
+                    "FROM ViewTable T0 " +
+                    "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
+                    "LEFT JOIN Cities c ON (c.CityID = d.CityID) " +
+                    "LEFT JOIN Countries o ON (o.CountryID = c.CountryID) " +
+                    "ORDER BY o.Name"),
+                TestSqlHelper.Normalize(
+                    query.DebugText));
+        }
+
+        [Fact]
+        public void DoesAutomaticJoinWithGroupByDistrict()
+        {
+            var fld = ViewRow.Fields;
+
+            var query = new SqlQuery()
+                    .From(fld)
+                    .Select("1")
+                    .GroupBy(fld.District);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT 1 " +
+                    "FROM ViewTable T0 " +
+                    "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
+                    "GROUP BY d.Name"),
+                TestSqlHelper.Normalize(
+                    query.DebugText));
+        }
+
+        [Fact]
+        public void DoesAutomaticJoinWithGroupByCountry()
+        {
+            var fld = ViewRow.Fields;
+
+            var query = new SqlQuery()
+                    .From(fld)
+                    .Select("1")
+                    .GroupBy(fld.Country);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT 1 " +
+                    "FROM ViewTable T0 " +
+                    "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
+                    "LEFT JOIN Cities c ON (c.CityID = d.CityID) " +
+                    "LEFT JOIN Countries o ON (o.CountryID = c.CountryID) " +
+                    "GROUP BY o.Name"),
+                TestSqlHelper.Normalize(
+                    query.DebugText));
+        }
     }
 }
