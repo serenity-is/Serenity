@@ -438,11 +438,11 @@ namespace Serenity.Services
             
             if (IsUpdate) 
             {
-                typeof(TRow).GetCustomAttribute<UpdatePermissionAttribute>(false);
+                attr = typeof(TRow).GetCustomAttribute<UpdatePermissionAttribute>(false);
             }
             else if (IsCreate)
             {
-                typeof(TRow).GetCustomAttribute<InsertPermissionAttribute>(false);
+                attr = typeof(TRow).GetCustomAttribute<InsertPermissionAttribute>(false);
             }
 
             attr = attr ?? typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false);
