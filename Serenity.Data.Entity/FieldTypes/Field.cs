@@ -173,7 +173,7 @@ namespace Serenity.Data
                                 enumerator.MoveNext();
                                 var theJoin = enumerator.Current;
 
-                                if (theJoin.ToLowerInvariant() == "t0")
+                                if (theJoin == "t0" || theJoin == "T0")
                                     flags = (FieldFlags)(flags ^ FieldFlags.Foreign) | FieldFlags.Calculated;
                                 else
                                 {

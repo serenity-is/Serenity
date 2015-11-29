@@ -44,7 +44,7 @@
             string existingExpression;
 
             if (!string.IsNullOrEmpty(join.Name) &&
-                aliases != null && aliases.TryGetValue(join.Name, out existingExpression))
+                aliasExpressions != null && aliasExpressions.TryGetValue(join.Name, out existingExpression))
             {
                 if (expression == existingExpression)
                     return this;
@@ -59,7 +59,13 @@
             JoinToString(join, from, modifySelf: true);
 
             if (!string.IsNullOrEmpty(join.Name))
-                ((ISqlQueryExtensible)this).Aliases[join.Name] = expression;
+            {
+                AliasExpressions[join.Name] = expression;
+
+                var haveJoins = join as IHaveJoins;
+                if (haveJoins != null)
+                    AliasWithJoins[join.Name] = haveJoins;
+            }
 
             return this;
         }
@@ -76,6 +82,10 @@
 
             Join(join);
 
+            var haveJoins = alias as IHaveJoins;
+            if (haveJoins != null)
+                AliasWithJoins[alias.Name] = haveJoins;
+
             return this;
         }
 
@@ -90,6 +100,10 @@
             var join = new LeftJoin(alias.Table, alias.Name, onCriteria);
 
             Join(join);
+
+            var haveJoins = alias as IHaveJoins;
+            if (haveJoins != null)
+                AliasWithJoins[alias.Name] = haveJoins;
 
             return this;
         }
@@ -106,6 +120,10 @@
 
             Join(join);
 
+            var haveJoins = alias as IHaveJoins;
+            if (haveJoins != null)
+                AliasWithJoins[alias.Name] = haveJoins;
+
             return this;
         }
 
@@ -120,6 +138,10 @@
             var join = new RightJoin(alias.Table, alias.Name, onCriteria);
 
             Join(join);
+
+            var haveJoins = alias as IHaveJoins;
+            if (haveJoins != null)
+                AliasWithJoins[alias.Name] = haveJoins;
 
             return this;
         }
@@ -136,7 +158,73 @@
 
             Join(join);
 
+            var haveJoins = alias as IHaveJoins;
+            if (haveJoins != null)
+                AliasWithJoins[alias.Name] = haveJoins;
+
             return this;
+        }
+
+        void EnsureJoin(string joinAlias)
+        {
+            Join join;
+            if (aliasWithJoins == null)
+                return;
+
+            foreach (var haveJoin in aliasWithJoins)
+            {
+                var alias = haveJoin.Value as IAlias;
+                if (alias != null && haveJoin.Key == alias.Name)
+                {
+                    if (haveJoin.Value.Joins.TryGetValue(joinAlias, out join))
+                    {
+                        EnsureJoin(join);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void EnsureJoinsInExpression(string expression)
+        {
+            if (string.IsNullOrEmpty(expression))
+                return;
+
+            string referencedJoin;
+            var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out referencedJoin);
+
+            if (referencedJoin != null)
+                EnsureJoin(referencedJoin);
+
+            if (referencedJoins != null)
+                foreach (var alias in referencedJoins)
+                    EnsureJoin(alias);
+        }
+
+        public SqlQuery EnsureJoin(Join join)
+        {
+            if (join == null)
+                throw new ArgumentNullException("join");
+
+            var ext = (ISqlQueryExtensible)this;
+
+            var joinAlias = join.Name;
+            if (aliasExpressions != null && aliasExpressions.ContainsKey(joinAlias))
+                return this;
+
+            if (join.Joins != null &&
+                join.ReferencedAliases != null)
+                foreach (var alias in join.ReferencedAliases)
+                {
+                    if (String.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) == 0)
+                        continue;
+
+                    Join other;
+                    if (join.Joins.TryGetValue(alias, out other))
+                        EnsureJoin(other);
+                }
+
+            return Join(join);
         }
     }
 }

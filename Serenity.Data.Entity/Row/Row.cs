@@ -315,7 +315,7 @@ namespace Serenity.Data
             set { dictionaryData = value; }
         }
 
-        IDictionary<string, Join> IEntityWithJoins.Joins
+        IDictionary<string, Join> IHaveJoins.Joins
         {
             get { return fields.Joins; }
         }

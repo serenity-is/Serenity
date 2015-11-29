@@ -114,6 +114,7 @@
     <Compile Include="Core\Logging\SqlLoggerTests.cs" />
     <Compile Include="Core\Logging\LoggingTests.cs" />
     <Compile Include="Core\Logging\SqlLoggerTests.SystemLogRow.cs" />
+    <Compile Include="Data\ViewRow.cs" />
     <Compile Include="Data\JsonCriteriaConverterDeserializationTests.cs" />
     <Compile Include="Data\JsonCriteriaConverterSerializationTests.cs" />
     <Compile Include="Data\FakeDisplayOrderRow.cs" />
@@ -132,6 +133,8 @@
     <Compile Include="Services\PropertyGrid\GetPropertyItemsForTests.cs" />
     <Compile Include="Sql\DatabaseReferenceReplacer.cs" />
     <Compile Include="Sql\BracketLocatorTests.cs" />
+    <Compile Include="Sql\AliasedFieldsTests.cs" />
+    <Compile Include="Sql\SqlQueryAutoJoinTests.cs" />
     <Compile Include="Sql\WrappedConnectionTests.cs" />
     <Compile Include="Sql\SqlConnectionExtensionsTests.cs" />
     <Compile Include="Sql\JoinAliasLocatorTests.cs" />

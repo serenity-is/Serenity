@@ -16,7 +16,7 @@ namespace Serenity.Data
 
         public override string GetKeyword()
         {
-            return "Outer APPLY";
+            return "OUTER APPLY";
         }
      }
 }

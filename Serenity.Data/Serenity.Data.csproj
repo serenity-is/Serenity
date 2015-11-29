@@ -110,6 +110,7 @@
     <Compile Include="QueryExtensions\QueryWithParamsExtensions.cs" />
     <Compile Include="QueryExtensions\SetFieldByStatementExtensions.cs" />
     <Compile Include="QueryModel\IField.cs" />
+    <Compile Include="QueryModel\IHaveJoins.cs" />
     <Compile Include="QueryModel\ISqlQueryExtensible.cs" />
     <Compile Include="QueryModel\QueryWithParams.cs" />
     <Compile Include="SqlHelpers\Dapper.cs" />

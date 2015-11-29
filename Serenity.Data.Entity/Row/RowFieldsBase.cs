@@ -10,7 +10,7 @@ using System.Reflection.Emit;
 
 namespace Serenity.Data
 {
-    public partial class RowFieldsBase : Collection<Field>, IAlias
+    public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
         internal Dictionary<string, Field> byName;
         internal Dictionary<string, Field> byPropertyName;
@@ -37,8 +37,8 @@ namespace Serenity.Data
         protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
             this.tableName = tableName;
-            this.alias = "t0";
-            this.aliasDot = "t0.";
+            this.alias = "T0";
+            this.aliasDot = "T0.";
             this.fieldPrefix = fieldPrefix;
             this.byName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);
             this.byPropertyName = new Dictionary<string, Field>(StringComparer.OrdinalIgnoreCase);

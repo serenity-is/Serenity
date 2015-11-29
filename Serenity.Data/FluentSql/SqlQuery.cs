@@ -7,7 +7,8 @@
 
     public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName, ISqlQueryExtensible
     {
-        private Dictionary<string, string> aliases;
+        private Dictionary<string, string> aliasExpressions;
+        private Dictionary<string, IHaveJoins> aliasWithJoins;
         private List<Column> columns;
         private bool countRecords;
         private bool distinct;
@@ -82,8 +83,8 @@
             if (alias == null)
                 throw new ArgumentNullException("alias");
 
-            if (aliases != null &&
-                aliases.ContainsKey(alias.Name))
+            if (aliasExpressions != null &&
+                aliasExpressions.ContainsKey(alias.Name))
                 throw new ArgumentOutOfRangeException("{0} alias is used more than once in the query!");
 
             From(table);
@@ -91,7 +92,11 @@
             from.Append(' ');
             from.Append(alias.Name);
 
-            ((ISqlQueryExtensible)this).Aliases.Add(alias.Name, table + " " + alias.Name);
+            AliasExpressions.Add(alias.Name, table + " " + alias.Name);
+
+            var haveJoins = alias as IHaveJoins;
+            if (haveJoins != null)
+                AliasWithJoins[alias.Name] = haveJoins;
 
             return this;
         }
@@ -587,14 +592,25 @@
             get { return into; }
         }
 
-        IDictionary<string, string> ISqlQueryExtensible.Aliases 
+        private IDictionary<string, IHaveJoins> AliasWithJoins
         {
             get
             {
-                if (aliases == null)
-                    aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                if (aliasWithJoins == null)
+                    aliasWithJoins = new Dictionary<string, IHaveJoins>(StringComparer.OrdinalIgnoreCase);
 
-                return aliases;
+                return aliasWithJoins;
+            }
+        }
+
+        private IDictionary<string, string> AliasExpressions
+        {
+            get
+            {
+                if (aliasExpressions == null)
+                    aliasExpressions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                return aliasExpressions;
             }
         }
 

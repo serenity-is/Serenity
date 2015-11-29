@@ -162,14 +162,6 @@ namespace Serenity.Data
             return SelectTableFields(query, (Row)ext.FirstIntoRow, exclude);
         }
 
-        public static SqlQuery EnsureAllForeignJoins(this SqlQuery query, Row row)
-        {
-            foreach (var field in row.GetFields())
-                if ((field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign)
-                    query.EnsureJoinOf(field);
-            return query;
-        }
-
         /// <summary>
         ///   Sets a field value with a parameter.</summary>
         /// <param field="field">

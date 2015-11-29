@@ -12,14 +12,24 @@ namespace Serenity.Data
         /// </summary>
         /// <param name="row">Row object.</param>
         /// <returns>The query itself.</returns>
-        public static SqlQuery From(this SqlQuery query, IEntity row)
+        public static SqlQuery From(this SqlQuery query, IEntity entity)
         {
-            if (row == null)
+            if (entity == null)
                 throw new ArgumentNullException("row");
 
-            query.From(row.Table, Alias.T0).Into(row);
-
-            return query;
+            var row = entity as Row;
+            if (row != null)
+                query.From(row.GetFields());
+            else
+            {
+                var alias = entity as IAlias;
+                if (alias != null && (alias.Name == "t0" || alias.Name == "T0") && alias.Table == entity.Table)
+                    query.From(alias);
+                else
+                    query.From(entity.Table, Alias.T0);
+            }
+            
+            return query.Into(entity);
         }
 
         public static SqlQuery Into(this SqlQuery query, IEntity into)
@@ -27,12 +37,8 @@ namespace Serenity.Data
             var ext = (ISqlQueryExtensible)query;
             ext.IntoRowSelection(into);
 
-            if (ext.FirstIntoRow == into)
-                ext.EnsureJoinsInExpression = EnsureJoinsInExpression;
-
             return query;
         }
-
 
         /// <summary>
         /// Adds a field's expression to the SELECT statement with its own column name. 
@@ -47,7 +53,7 @@ namespace Serenity.Data
             if (field == null)
                 throw new ArgumentNullException("field");
 
-            query.EnsureJoinOf(field);
+            query.EnsureJoinsInExpression(field.Expression);
             new SqlQuery.Column(query, field.Expression, field.Name, field);
             return query;
         }
@@ -68,7 +74,7 @@ namespace Serenity.Data
             if (columnName == null)
                 throw new ArgumentNullException("columnName");
 
-            query.EnsureJoinOf(field);
+            query.EnsureJoinsInExpression(field.Expression);
             new SqlQuery.Column(query, field.Expression, columnName, field);
             return query;
         }
@@ -191,85 +197,6 @@ namespace Serenity.Data
                 GroupBy(query, f);
 
             return query;
-        }
-
-        public static SqlQuery EnsureJoin(this SqlQuery query, Join join)
-        {
-            if (join == null)
-                throw new ArgumentNullException("join");
-
-            var ext = (ISqlQueryExtensible)query;
-
-            var joinAlias = join.Name;
-            var aliases = ext.Aliases;
-            if (aliases.ContainsKey(joinAlias))
-                return query;
-
-            if (join.Joins != null &&
-                join.ReferencedAliases != null)
-                foreach (var alias in join.ReferencedAliases)
-                {
-                    if (String.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) == 0)
-                        continue;
-
-                    Join other;
-                    if (join.Joins.TryGetValue(alias, out other))
-                        EnsureJoin(query, other);
-                }
-
-            query.Join(join);
-
-            return query;
-        }
-
-        public static SqlQuery EnsureJoinOf(this SqlQuery query, IField field)
-        {
-            if (field == null)
-                throw new ArgumentNullException("field");
-
-            var joinField = field as IFieldWithJoinInfo;
-            if (joinField == null)
-                return query;
-
-            if (joinField.ReferencedAliases == null)
-                return query;
-
-            foreach (var alias in joinField.ReferencedAliases)
-            {
-                Join join;
-                if (joinField.Joins.TryGetValue(alias, out join))
-                    EnsureJoin(query, join);
-            }
-
-            return query;
-        }
-
-        static void EnsureJoinsInExpression(SqlQuery query, string expression)
-        {
-            if (string.IsNullOrEmpty(expression))
-                return;
-
-            var ext = (ISqlQueryExtensible)query;
-
-            var intoRow = ext.FirstIntoRow as IEntityWithJoins;
-            if (intoRow == null)
-                return;
-
-            string referencedJoin;
-            Join join;
-            var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out referencedJoin);
-            if (referencedJoin != null)
-            {
-                if (intoRow.Joins.TryGetValue(referencedJoin, out join))
-                    EnsureJoin(query, join);
-            }
-
-            if (referencedJoins != null)
-                foreach (var alias in referencedJoins)
-                {
-                    if (intoRow.Joins.TryGetValue(alias, out join))
-                        EnsureJoin(query, join);
-                }
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Serenity.Test.Data
                 set { Fields.Name[this] = value; }
             }
 
-            [Expression("(T0.Name + T0.Surname)")]
+            [Expression("(T0.Name + ' ' + T0.Surname)")]
             public String FullName
             {
                 get { return Fields.FullName[this]; }
