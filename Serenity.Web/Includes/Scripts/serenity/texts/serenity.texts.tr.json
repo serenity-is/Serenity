@@ -137,6 +137,7 @@
     "Validation.RequestIsNull": "İstek içeriği boş!",
     "Validation.Required": "Bu alan zorunludur.",
     "Validation.UnexpectedError": "Beklenmeyen bir hata oluştu!",
+    "Validation.UniqueConstraint": "Aynı '{0}' değerine sahip başka bir kayıt mevcut!",
     "Validation.UniqueViolation": "Aynı '{0}' değerine sahip başka bir kayıt mevcut!",
     "Validation.Url": "Lütfen geçerli bir URL giriniz (http://www.site.com formatında).",
     "Validation.Username": "Bu geçerli bir kullanıcı adı değil.",
