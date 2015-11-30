@@ -111,6 +111,14 @@
     <Compile Include="Navigation\NavigationLinkAttribute.cs" />
     <Compile Include="Navigation\NavigationItemAttribute.cs" />
     <Compile Include="Reporting\BaseReport.cs" />
+    <Compile Include="Reporting\Model\GenerateCsvRequest.cs" />
+    <Compile Include="Reporting\Model\GenerateExcelFileRequest.cs" />
+    <Compile Include="Reporting\Worksheet\CellDecoratorAttribute.cs" />
+    <Compile Include="Reporting\Worksheet\BaseCellDecorator.cs" />
+    <Compile Include="Reporting\Worksheet\ICellDecorator.cs" />
+    <Compile Include="Reporting\Worksheet\EnumDecorator.cs" />
+    <Compile Include="Reporting\Tools\CommandLineTools.cs" />
+    <Compile Include="Reporting\Tools\HtmlToPdfConverter.cs" />
     <Compile Include="Reporting\ICustomFileName.cs" />
     <Compile Include="Reporting\IDataOnlyReport.cs" />
     <Compile Include="Reporting\IReport.cs" />
