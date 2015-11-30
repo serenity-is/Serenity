@@ -1,3 +1,16 @@
+## 1.8.3 (2015-11-30)
+Features:
+  - auto join with aliased fields and their view fields 
+  - cloned query has same parent as source query, so they share params 
+  - undo fields with expressions be read only by default (was causing problems with backwards compability)
+  - remove alias with fields as noone uses or should use it anymore  
+  - set ui-front to z-index 1100 instead of overriding z-index of AdminLTE divs [Serene]
+
+Bugfixes:
+  - fix required attribute in form not overriding one defined in row
+  - fix update / insert permission attributes ignored, if specified explicitly along with modify permission
+  - fix error 505 and login page links [Serene]
+
 ## 1.8.2 (2015-11-28)
   - it is now much easier to create cascaded editors using new CascadeFrom (editor ID), CascadeField (matching field) and CascadeValue (matching value) properties. Just set CascadeFrom and/or CascadeField properties.
   - lookup editors can also be filtered using new FilterField and FilterValue properties, without need to define a new editor type.
