@@ -1,3 +1,6 @@
+## 1.8.4 (2015-12-01)
+  - added excel export samples to product, customer and order grids [Serene]
+  
 ## 1.8.3 (2015-11-30)
 Features:
   - auto join with aliased fields and their view fields 
