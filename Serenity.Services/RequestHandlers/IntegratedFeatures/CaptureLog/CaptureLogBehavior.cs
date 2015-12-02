@@ -24,7 +24,16 @@ namespace Serenity.Services
             if (handler.Row == null || captureLogHandler == null)
                 return;
 
-            captureLogHandler.LogDelete(handler.UnitOfWork, handler.Row, Authorization.UserId.TryParseID().Value);
+            Row newRow = null;
+
+            // if row is not actually deleted, but set to deleted by a flag, log it as if it is an update operation
+            if (handler.Row is IIsActiveDeletedRow)
+            {
+                newRow = handler.Row.Clone();
+                ((IIsActiveDeletedRow)newRow).IsActiveField[newRow] = -1;
+            }
+
+            captureLogHandler.Log(handler.UnitOfWork, handler.Row, newRow, Authorization.UserId);
         }
 
         public override void OnAudit(ISaveRequestHandler handler)
@@ -34,8 +43,8 @@ namespace Serenity.Services
 
             if (handler.IsCreate)
             {
-                captureLogHandler.LogSave(handler.UnitOfWork, handler.Row, 
-                    Authorization.UserId.TryParseID().Value);
+                captureLogHandler.Log(handler.UnitOfWork, 
+                    null, handler.Row, Authorization.UserId);
 
                 return;
             }
@@ -66,7 +75,8 @@ namespace Serenity.Services
             }
 
             if (anyChanged)
-                captureLogHandler.LogSave(handler.UnitOfWork, handler.Row, Authorization.UserId.TryParseID().Value);
+                captureLogHandler.Log(handler.UnitOfWork, 
+                    handler.Old, handler.Row, Authorization.UserId);
         }
     }
 }

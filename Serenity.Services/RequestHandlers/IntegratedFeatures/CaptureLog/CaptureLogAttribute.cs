@@ -4,15 +4,12 @@ namespace Serenity.Data
 {
     public class CaptureLogAttribute : Attribute
     {
-        public CaptureLogAttribute(string logTable, string mappedIdField)
+        public CaptureLogAttribute(Type logRow)
         {
-            this.LogTable = logTable;
-            this.MappedIdField = mappedIdField;
+            this.LogRow = logRow;
         }
 
-        public string LogConnectionKey { get; private set; }
-        public string LogTable { get; private set; }
+        public Type LogRow { get; private set; }
         public string MappedIdField { get; private set; }
-        
     }
 }

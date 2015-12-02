@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Reflection;
 
 namespace Serenity.Data
@@ -44,20 +43,17 @@ namespace Serenity.Data
                 return newInfo;
 
             var localAttr = typeof(TRow).GetCustomAttribute<LocalizationRowAttribute>(false);
-            if (localAttr == null || localAttr.LocalizationTable.IsTrimmedEmpty())
-                throw new InvalidOperationException(String.Format("{0} row type has no localization attribute defined!", typeof(TRow).Name));
+            if (localAttr == null || localAttr.LocalizationRow == null)
+                throw new InvalidOperationException(String.Format("{0} row type has no localization row type defined!", typeof(TRow).Name));
 
-            schemaName = RowRegistry.GetConnectionKey(typeof(TRow));
-            var localInstance = RowRegistry.GetConnectionRow(schemaName, localAttr.LocalizationTable);
-            if (localInstance == null)
-                throw new InvalidOperationException(String.Format("Can't locate {0} localization table in schema {1} for {2} row type!",
-                    localAttr.LocalizationTable, schemaName, typeof(TRow).Name));
+            var localInstance = (Row)Activator.CreateInstance(localAttr.LocalizationRow);
 
             var localRow = localInstance as ILocalizationRow;
             if (localRow == null)
                 throw new InvalidOperationException(String.Format("Localization table {0} doesn't implement ILocalizationRow interface!",
-                    localAttr.LocalizationTable, schemaName, typeof(TRow).Name));
+                    localAttr.LocalizationRow.GetType().FullName, schemaName, typeof(TRow).Name));
 
+            schemaName = RowRegistry.GetConnectionKey(localInstance);
 
             newInfo = new StaticInfo();
             newInfo.localRowInterface = localRow;

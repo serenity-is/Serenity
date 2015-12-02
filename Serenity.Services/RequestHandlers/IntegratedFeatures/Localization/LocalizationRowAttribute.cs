@@ -4,13 +4,12 @@ namespace Serenity.Data
 {
     public class LocalizationRowAttribute : Attribute
     {
-        public LocalizationRowAttribute(string localizationTable, string mappedIdField)
+        public LocalizationRowAttribute(Type localizationRow)
         {
-            this.LocalizationTable = localizationTable;
-            this.MappedIdField = mappedIdField;
+            this.LocalizationRow = localizationRow;
         }
 
-        public string LocalizationTable { get; private set; }
+        public Type LocalizationRow { get; private set; }
         public string MappedIdField { get; private set; }
     }
 }

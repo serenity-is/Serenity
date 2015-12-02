@@ -79,8 +79,9 @@ namespace Serenity.Services
 
         protected virtual void DoCaptureLog()
         {
-            ((IIsActiveRow)Row).IsActiveField[Row] = 1;
-            captureLogHandler.Log(this.UnitOfWork, this.Row, Authorization.UserId.TryParseID().Value, isDelete: false);
+            var newRow = Row.Clone();
+            ((IIsActiveRow)newRow).IsActiveField[newRow] = 1;
+            captureLogHandler.Log(this.UnitOfWork, this.Row, newRow, Authorization.UserId);
         }
 
         protected virtual void DoAudit()
