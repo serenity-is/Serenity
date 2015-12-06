@@ -1,11 +1,15 @@
-﻿namespace Serenity.Services
+﻿using Serenity.Extensibility;
+
+namespace Serenity.Services
 {
+    [NestedLocalTexts]
     internal static partial class Texts
     {
         public static class Validation
         {
             public static LocalText ArgumentIsNull = "Argument {0} is null!";
             public static LocalText ArgumentOutOfRange = "Argument {0} is out of range!";
+            public static LocalText Recaptcha = "Please validate that you are not a robot!";
             public static LocalText EntityForeignKeyViolation = "You must first delete related {0} records before deleting this one!";
             public static LocalText EntityHasDeletedParent = "Before operating on this record, its parent must be undeleted!";
             public static LocalText EntityIsNotActive = "Can't operate on a deleted {0} record!";

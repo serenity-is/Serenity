@@ -412,4 +412,26 @@ namespace Serenity.ComponentModel
         {
         }
     }
+
+    [SettingKey("Recaptcha"), SettingScope("Application")]
+    public class RecaptchaSettings
+    {
+        public string SiteKey { get; set; }
+        public string SecretKey { get; set; }
+    }
+
+    public partial class Recaptcha : CustomEditorAttribute
+    {
+        public Recaptcha()
+            : base("Recaptcha")
+        {
+            SiteKey = Config.Get<RecaptchaSettings>().SiteKey;
+        }
+
+        public String SiteKey
+        {
+            get { return GetOption<String>("siteKey"); }
+            set { SetOption("siteKey", value); }
+        }
+    }
 }
