@@ -155,6 +155,7 @@
     <Compile Include="Script\DynamicScriptTypes\DataScript.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Security\RecaptchaValidation.cs" />
     <Compile Include="Security\WebSecurityHelper.cs" />
     <Compile Include="Texts\Texts.Controls.ImageUpload.cs" />
     <Compile Include="Texts\Texts.Controls.EntityDialog.cs" />
