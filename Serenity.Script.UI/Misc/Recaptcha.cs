@@ -21,8 +21,7 @@ namespace Serenity
                 J("script#RecaptchaInclude").Length == 0)
             {
                 var src = "https://www.google.com/recaptcha/api.js";
-                if (options.Language != null)
-                    src += "?hl=" + options.Language;
+                src += "?hl=" + (options.Language ?? J("html").GetAttribute("lang") ?? "");
 
                 J("<script/>").Attribute("id", "RecaptchaInclude").Attribute("src", src)
                     .AppendTo(Document.Body);
