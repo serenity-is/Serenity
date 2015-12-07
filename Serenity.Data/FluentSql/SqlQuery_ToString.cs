@@ -19,16 +19,16 @@ namespace Serenity.Data
             if (this.parent != null)
                 sb.Append("(");
 
-            if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword())
+            if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword)
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
 
             // ek filtremiz şimdilik yok
             string extraWhere = null;
 
-            bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword();
-            bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch();
-            bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && dialect.CanUseRowNumber();
+            bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
+            bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch;
+            bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && dialect.CanUseRowNumber;
             bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
 
             // atlanması istenen kayıt var mı?
@@ -109,7 +109,7 @@ namespace Serenity.Data
                     if (distinct)
                         sb.Append(SqlKeywords.Distinct);
 
-                    sb.Append(dialect.TakeKeyword());
+                    sb.Append(dialect.TakeKeyword);
                     sb.Append(' ');
                     // Atlanacak kayıt sayısı kadar
                     sb.Append(skip);
@@ -193,9 +193,9 @@ namespace Serenity.Data
             }
 
             // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (take != 0 && (!useOffset) && (useRowNumber || !dialect.UseTakeAtEnd()))
+            if (take != 0 && (!useOffset) && (useRowNumber || !dialect.UseTakeAtEnd))
             {
-                sb.Append(dialect.TakeKeyword());
+                sb.Append(dialect.TakeKeyword);
                 sb.Append(' ');
                 sb.Append(useRowNumber ? (skip + take) : take);
                 sb.Append(' ');
@@ -203,7 +203,7 @@ namespace Serenity.Data
 
             if (useSkipKeyword)
             {
-                sb.Append(dialect.SkipKeyword());
+                sb.Append(dialect.SkipKeyword);
                 sb.Append(' ');
                 sb.Append(skip);
             }
@@ -271,10 +271,10 @@ namespace Serenity.Data
                 sb.Append(skip);
             }
 
-            if (take != 0 && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd())
+            if (take != 0 && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd)
             {
                 sb.Append(' ');
-                sb.Append(dialect.TakeKeyword());
+                sb.Append(dialect.TakeKeyword);
                 sb.Append(' ');
                 sb.Append(take);
             }
@@ -282,9 +282,9 @@ namespace Serenity.Data
             if (useOffset)
             {
                 if (take == 0)
-                    sb.Append(String.Format(dialect.OffsetFormat(), skip, take));
+                    sb.Append(String.Format(dialect.OffsetFormat, skip, take));
                 else
-                    sb.Append(String.Format(dialect.OffsetFetchFormat(), skip, take));
+                    sb.Append(String.Format(dialect.OffsetFetchFormat, skip, take));
             }
 
             if (!string.IsNullOrEmpty(forXml))
@@ -295,7 +295,7 @@ namespace Serenity.Data
 
             if (countRecords)
             {
-                if (!dialect.MultipleResultsets())
+                if (!dialect.MultipleResultsets)
                     sb.Append("\n---\n"); // temporary fix till we find a better solution for firebird
                 else
                     sb.Append(";\n");

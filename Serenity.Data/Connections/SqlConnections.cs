@@ -36,7 +36,8 @@ namespace Serenity.Data
 
                 var factory = GetFactory(connectionSetting.ProviderName);
 
-                connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionSetting.ConnectionString, connectionSetting.ProviderName, factory);
+                connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, connectionSetting.ConnectionString, 
+                    connectionSetting.ProviderName, factory);
                 connections = newConnections;
             }
 
@@ -73,11 +74,13 @@ namespace Serenity.Data
             var connection = factory.CreateConnection();
             connection.ConnectionString = connectionString;
 
+            var dialect = ConnectionStringInfo.GetDialectByProviderName(providerName) ?? SqlSettings.DefaultDialect;
+
             var profiler = Dependency.TryResolve<IConnectionProfiler>();
             if (profiler != null)
-                return new WrappedConnection(profiler.Profile(connection));
+                return new WrappedConnection(profiler.Profile(connection), dialect);
 
-            return new WrappedConnection(connection);
+            return new WrappedConnection(connection, dialect);
         }
 
         /// <summary>
@@ -92,9 +95,9 @@ namespace Serenity.Data
 
             var profiler = Dependency.TryResolve<IConnectionProfiler>();
             if (profiler != null)
-                return new WrappedConnection(profiler.Profile(connection));
+                return new WrappedConnection(profiler.Profile(connection), connectionSetting.Dialect);
 
-            return new WrappedConnection(connection);
+            return new WrappedConnection(connection, connectionSetting.Dialect);
         }
 
         public static IDbConnection NewFor<TClass>()
@@ -109,7 +112,7 @@ namespace Serenity.Data
         public static void SetConnection(string connectionKey, string connectionString, string providerName)
         {
             var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
-            newConnections[connectionKey] = new ConnectionStringInfo(connectionString, providerName, GetFactory(providerName));
+            newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, connectionString, providerName, GetFactory(providerName));
             connections = newConnections;
         }
 
@@ -131,6 +134,15 @@ namespace Serenity.Data
                 return wrapped.CurrentTransaction.ActualTransaction;
 
             return null;
+        }
+
+        public static ISqlDialect GetDialect(this IDbConnection connection)
+        {
+            var wrapped = connection as WrappedConnection;
+            if (wrapped == null)
+                return SqlSettings.DefaultDialect;
+
+            return wrapped.Dialect ?? SqlSettings.DefaultDialect;
         }
     }
 }

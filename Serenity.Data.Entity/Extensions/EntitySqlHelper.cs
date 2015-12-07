@@ -226,7 +226,7 @@
        {
            int count = 0;
 
-           if (query.Dialect().MultipleResultsets())
+           if (connection.GetDialect().MultipleResultsets)
            {
                using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
                {
@@ -283,7 +283,7 @@
        {
            int count = 0;
 
-           if (query.Dialect().MultipleResultsets())
+           if (connection.GetDialect().MultipleResultsets)
            {
                using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
                {

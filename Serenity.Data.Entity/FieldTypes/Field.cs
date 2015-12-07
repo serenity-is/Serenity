@@ -32,7 +32,7 @@ namespace Serenity.Data
         protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
         {
             this.name = name;
-            expression = "T0." + name;
+            expression = "T0." + SqlSyntax.AutoBracket(name);
             this.size = size;
             this.flags = flags;
             this.type = type;
@@ -154,11 +154,16 @@ namespace Serenity.Data
 
                     if (value != null)
                     {
-                        if (String.Compare(expression, "T0." + name, StringComparison.OrdinalIgnoreCase) == 0)
+                        if (expression != null && 
+                            expression.StartsWith("T0.", StringComparison.OrdinalIgnoreCase) &&
+                            SqlSyntax.IsValidQuotedIdentifier(expression.Substring(3)))
                         {
-                            flags ^= FieldFlags.Calculated;
-                            flags ^= FieldFlags.Foreign;
-                            expression = "T0." + name;
+                            if (flags.HasFlag(FieldFlags.Calculated))
+                                flags -= FieldFlags.Calculated;
+
+                            if (flags.HasFlag(FieldFlags.Foreign))
+                                flags -= FieldFlags.Foreign;
+
                             return;
                         }
 
@@ -182,7 +187,7 @@ namespace Serenity.Data
                                     var split = expression.Split('.');
                                     if (split.Length == 2 &&
                                         split[0] == theJoin &&
-                                        SqlSyntax.IsValidIdentifier(split[1]))
+                                        SqlSyntax.IsValidQuotedIdentifier(split[1]))
                                     {
                                         joinAlias = theJoin;
                                         origin = split[1];
@@ -198,8 +203,12 @@ namespace Serenity.Data
                     else
                     {
                         expression = "T0." + name;
-                        flags ^= FieldFlags.Calculated;
-                        flags ^= FieldFlags.Foreign;
+
+                        if (flags.HasFlag(FieldFlags.Calculated))
+                            flags -= FieldFlags.Calculated;
+
+                        if (flags.HasFlag(FieldFlags.Foreign))
+                            flags -= FieldFlags.Foreign;
                     }
                 }
             }

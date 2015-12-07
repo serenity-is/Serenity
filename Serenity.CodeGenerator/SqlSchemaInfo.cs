@@ -9,8 +9,6 @@ namespace Serenity.CodeGenerator
 {
     public class SqlSchemaInfo
     {
-        public static SqlDialect Dialect { get; set; } 
-
         public static string InformationSchema(IDbConnection connection)
         {
             return "INFORMATION_SCHEMA.";
@@ -145,7 +143,7 @@ namespace Serenity.CodeGenerator
             var inf = InformationSchema(connection);
             List<ForeignKeyInfo> foreignKeyInfos = new List<ForeignKeyInfo>();
 
-            if (Dialect.HasFlag(SqlDialect.Sqlite))
+            if (connection.GetDialect() is SqliteDialect)
             {
                 try
                 {

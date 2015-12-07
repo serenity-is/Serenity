@@ -113,6 +113,13 @@
     <Compile Include="QueryModel\IHaveJoins.cs" />
     <Compile Include="QueryModel\ISqlQueryExtensible.cs" />
     <Compile Include="QueryModel\QueryWithParams.cs" />
+    <Compile Include="Dialects\ISqlDialect.cs" />
+    <Compile Include="Dialects\PostgresDialect.cs" />
+    <Compile Include="Dialects\SqliteDialect.cs" />
+    <Compile Include="Dialects\FirebirdDialect.cs" />
+    <Compile Include="Dialects\SqlServer2012Dialect.cs" />
+    <Compile Include="Dialects\SqlServer2005Dialect.cs" />
+    <Compile Include="Dialects\SqlServer2000Dialect.cs" />
     <Compile Include="SqlHelpers\Dapper.cs" />
     <Compile Include="SqlHelpers\Sql.cs" />
     <Compile Include="FluentSql\SqlDelete.cs" />
@@ -122,7 +129,6 @@
     <Compile Include="SqlHelpers\SqlCommandDumper.cs" />
     <Compile Include="SqlHelpers\SqlConversions.cs" />
     <Compile Include="SqlHelpers\SqlDebugDumper.cs" />
-    <Compile Include="SqlHelpers\SqlDialectExtensions.cs" />
     <Compile Include="Join\Alias.cs" />
     <Compile Include="Join\T0ReferenceRemover.cs" />
     <Compile Include="QueryModel\ICriteria.cs" />
@@ -142,7 +148,6 @@
     <Compile Include="QueryModel\Parameter.cs" />
     <Compile Include="SqlHelpers\SqlHelper.cs" />
     <Compile Include="SqlHelpers\SqlSyntax.cs" />
-    <Compile Include="SqlHelpers\SqlDialect.cs" />
     <Compile Include="SqlHelpers\SqlSettings.cs" />
     <Compile Include="Utility\AppSettingsJsonConfigRepository.cs" />
     <Compile Include="Utility\DeltaLister.cs" />

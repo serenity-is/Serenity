@@ -955,8 +955,11 @@ namespace Serenity
                 options: options,
                 init: init);
 
-            submitHandlers += () =>
+            Action submitHandler = () =>
             {
+                if (quickFilter.HasClass("ignore"))
+                    return;
+
                 var request = (ListRequest)view.Params;
                 request.EqualityFilter = request.EqualityFilter ?? new JsDictionary<string, object>();
 
@@ -994,6 +997,12 @@ namespace Serenity
             widget.Change(e =>
             {
                 this.QuickFilterChange(e);
+            });
+
+            submitHandlers += submitHandler;
+            widget.Element.Bind("remove." + this.uniqueName, x =>
+            {
+                submitHandlers -= submitHandler;
             });
 
             return widget;

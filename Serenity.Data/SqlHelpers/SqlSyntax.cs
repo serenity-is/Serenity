@@ -84,5 +84,77 @@ namespace Serenity.Data
 
             return true;
         }
+
+        public static bool IsValidQuotedIdentifier(string s)
+        {
+            if (!IsQuoted(s))
+                return IsValidIdentifier(s);
+
+            if (s[1] == ' ' || s[s.Length - 2] == ' ')
+                return false;
+
+            Char c;
+            for (var i = 2; i <= s.Length - 2; i++)
+            {
+                c = s[i];
+                if (c != ' ' &&
+                    c != '_' &&
+                    !Char.IsLetterOrDigit(c))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool IsQuoted(string s)
+        {
+            if (string.IsNullOrEmpty(s) || s.Length < 3)
+                return false;
+
+            if ((s[0] == '[' &&
+                 s[s.Length - 1] == ']') ||
+                (s[0] == '"' &&
+                 s[s.Length - 1] == '"') ||
+                (s[0] == '`' &&
+                 s[s.Length - 1] == '`'))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static string AutoBracket(string s)
+        {
+            if (!SqlSettings.AutoBracket)
+                return s;
+
+            if (string.IsNullOrEmpty(s))
+                return s;
+
+            if (IsQuoted(s))
+                return s;
+
+            return '[' + s + ']';
+        }
+
+        public static string AutoBracketValid(string s)
+        {
+            if (!SqlSettings.AutoBracket)
+                return s;
+
+            if (!IsValidIdentifier(s))
+                return s;
+
+            return '[' + s + ']';
+        }
+
+        public static string Unquote(string s)
+        {
+            if (!IsQuoted(s))
+                return s;
+
+            return s.Substring(1, s.Length - 2);
+        }
     }
 }

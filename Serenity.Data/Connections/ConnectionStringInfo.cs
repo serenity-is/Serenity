@@ -1,14 +1,33 @@
-﻿
+﻿using Serenity.ComponentModel;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
+
 namespace Serenity.Data
 {
     public class ConnectionStringInfo
     {
-        private string databaseName;
-
-        public ConnectionStringInfo(string connectionString, string providerName, DbProviderFactory providerFactory)
+        private static readonly string[] databaseNameKeys = new string[]
         {
+            "Initial Catalog",
+            "Database"
+        };
+
+        private static readonly Dictionary<string, ISqlDialect> dialectByProviderName = 
+            new Dictionary<string, ISqlDialect>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "System.Data.SqlClient", SqlServer2012Dialect.Instance },
+                { "Npgsql", new PostgresDialect() },
+                { "FirebirdSql.Data.FirebirdClient", FirebirdDialect.Instance },
+                { "System.Data.SQLite", new SqliteDialect() }
+            };
+
+        private string databaseName;
+        private ISqlDialect dialect;
+
+        public ConnectionStringInfo(string connectionKey, string connectionString, string providerName, DbProviderFactory providerFactory)
+        {
+            this.ConnectionKey = connectionKey;
             this.ConnectionString = connectionString;
             this.ProviderName = providerName;
             this.ProviderFactory = providerFactory;
@@ -22,13 +41,61 @@ namespace Serenity.Data
                 {
                     var csb = new DbConnectionStringBuilder();
                     csb.ConnectionString = ConnectionString;
-                    databaseName = csb["Initial Catalog"] as string ?? csb["Database"] as string ?? "";
+
+                    foreach (var s in databaseNameKeys)
+                        if (csb.ContainsKey(s))
+                        {
+                            databaseName = csb[s] as string ?? "";
+                            return databaseName;
+                        }
+
+                    databaseName = "";
+                    return databaseName;
                 }
 
                 return databaseName == "" ? null : databaseName;
             }
         }
 
+        public ISqlDialect Dialect
+        {
+            get
+            {
+                if (dialect != null)
+                    return dialect;
+
+                var connectionSettings = Config.TryGet<ConnectionSettings>();
+
+                ConnectionSetting setting;
+                if (connectionSettings != null && 
+                    connectionSettings.TryGetValue(ConnectionKey, out setting) &&
+                    !setting.Dialect.IsEmptyOrNull())
+                {
+                    var dialectType = Type.GetType("Serenity.Data." + setting.Dialect);
+                    if (dialectType == null)
+                        throw new ArgumentException(String.Format("Dialect type {0} specified for connection key {1} is not found!",
+                            setting.Dialect, ConnectionKey));
+                }
+
+                return (this.dialect = GetDialectByProviderName(ProviderName) ?? SqlSettings.DefaultDialect);
+            }
+            set
+            {
+                dialect = value;
+            }
+        }
+
+        public static ISqlDialect GetDialectByProviderName(string providerName)
+        {
+            ISqlDialect dialect;
+
+            if (dialectByProviderName.TryGetValue(providerName, out dialect))
+                return dialect;
+
+            return null;
+        }
+
+        public string ConnectionKey { get; private set; }
         public string ConnectionString { get; private set; }
         public string ProviderName { get; private set; }
         public DbProviderFactory ProviderFactory { get; private set; }
@@ -37,5 +104,16 @@ namespace Serenity.Data
         public string Item1 { get { return ConnectionString; } }
         [Obsolete("Use ProviderName")]
         public string Item2 { get { return ProviderName; } }
+
+        [SettingScope("Application"), SettingKey("ConnectionSettings")]
+        private class ConnectionSettings : Dictionary<string, ConnectionSetting>
+        {
+
+        }
+
+        private class ConnectionSetting
+        {
+            public string Dialect { get; set; }
+        }
     }
 }

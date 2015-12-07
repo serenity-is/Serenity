@@ -29,19 +29,24 @@ namespace Serenity.Test.Logging
                 var fakeConfig = A.Fake<IConfigurationRepository>();
                 A.CallTo(() => fakeConfig.Load(null))
                     .WithAnyArguments()
-                    .ReturnsLazily((Type t) => 
-                        JSON.ParseTolerant(JSON.Stringify(new
-                        {
-                            Level = "Debug",
-                            ConnectionKey = "Serenity",
-                            InsertCommand = new SqlInsert(fld.TableName)
-                                .SetTo(fld.EventDate, "@date")
-                                .SetTo(fld.LogLevel, "@level")
-                                .SetTo(fld.LogMessage, "@message")
-                                .SetTo(fld.Exception, "@exception")
-                                .SetTo(fld.SourceType, "@source")
-                                .ToString()
-                        }), t));
+                    .ReturnsLazily((Type t) =>
+                    {
+                        if (t.Name == "LogSettings")
+                            return JSON.ParseTolerant(JSON.Stringify(new
+                            {
+                                Level = "Debug",
+                                ConnectionKey = "Serenity",
+                                InsertCommand = new SqlInsert(fld.TableName)
+                                    .SetTo(fld.EventDate, "@date")
+                                    .SetTo(fld.LogLevel, "@level")
+                                    .SetTo(fld.LogMessage, "@message")
+                                    .SetTo(fld.Exception, "@exception")
+                                    .SetTo(fld.SourceType, "@source")
+                                    .ToString()
+                            }), t);
+
+                        return Activator.CreateInstance(t);
+                    });
 
                 registrar.RegisterInstance<IConfigurationRepository>("Application", fakeConfig);
 

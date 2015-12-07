@@ -203,7 +203,7 @@ namespace Serenity.Data
             // StringBuilder that will contain query(s)
             StringBuilder queries = new StringBuilder();
 
-            if (SqlSettings.CurrentDialect.NeedsExecuteBlockStatement())
+            if (connection.GetDialect().NeedsExecuteBlockStatement)
             {
                 queries.AppendLine("EXECUTE BLOCK AS");
                 queries.AppendLine("BEGIN");
@@ -334,7 +334,7 @@ namespace Serenity.Data
 
             if (queries.Length > 0 && updateCount > 0)
             {
-                if (SqlSettings.CurrentDialect.NeedsExecuteBlockStatement())
+                if (connection.GetDialect().NeedsExecuteBlockStatement)
                     queries.AppendLine("END;");
 
                 SqlHelper.ExecuteNonQuery(connection, queries.ToString());

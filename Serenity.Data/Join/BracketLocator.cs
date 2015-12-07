@@ -60,5 +60,40 @@ namespace Serenity.Data
 
             return sb.ToString();
         }
+
+        public static string ReplaceBrackets(string expression, char openQuote, char closeQuote)
+        {
+            if (expression == null)
+                return null;
+
+            bool inQuote = false;
+            var sb = new StringBuilder(expression.Length);
+            for (var i = 0; i < expression.Length; i++)
+            {
+                var c = expression[i];
+
+                if (inQuote)
+                {
+                    if (c == '\'')
+                        inQuote = false;
+                }
+                else if (c == '\'')
+                {
+                    inQuote = true;
+                }
+                else if (c == '[')
+                {
+                    c = openQuote;
+                }
+                else if (c == ']')
+                {
+                    c = closeQuote;
+                }
+
+                sb.Append(c);
+            }
+
+            return sb.ToString();
+        }
     }
 }

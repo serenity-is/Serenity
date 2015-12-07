@@ -42,7 +42,7 @@ namespace Serenity.Testing
             return sb.ToString().Trim();
         }
 
-        public static string GenerateInsertStatements(IDataReader reader, string table)
+        public static string GenerateInsertStatements(IDataReader reader, string table, ISqlDialect dialect = null)
         {
             StringBuilder sbAll = new StringBuilder();
 
@@ -75,15 +75,15 @@ namespace Serenity.Testing
                         value == DBNull.Value)
                         sb.Append("NULL");
                     else if (value is DateTime)
-                        sb.Append(((DateTime)value).ToSql());
+                        sb.Append(((DateTime)value).ToSql(dialect));
                     else if (value is Int32 || value is Int16 || value is Boolean || value is Int64)
                         sb.Append(Serenity.Invariants.ToInvariant(Convert.ToInt64(value)));
                     else if (value is Double || value is Decimal || value is float)
                         sb.Append(Serenity.Invariants.ToInvariant(Convert.ToDecimal(value)));
                     else if (value is String)
-                        sb.Append(((string)value).ToSql());
+                        sb.Append(((string)value).ToSql(dialect));
                     else
-                        sb.Append(value.ToString().ToSql());
+                        sb.Append(value.ToString().ToSql(dialect));
                 }
 
                 sb.Append(");");
@@ -113,7 +113,7 @@ namespace Serenity.Testing
             }
 
             using (var reader = SqlHelper.ExecuteReader(connection, query))
-                return GenerateInsertStatements(reader, table);
+                return GenerateInsertStatements(reader, table, connection.GetDialect());
         }
     }
 }

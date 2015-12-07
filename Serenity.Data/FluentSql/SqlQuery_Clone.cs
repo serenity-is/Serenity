@@ -19,6 +19,7 @@
             var clone = new SqlQuery();
 
             clone.dialect = dialect;
+            clone.dialectOverridden = dialectOverridden;
             clone.skip = skip;
             clone.take = take;
             clone.countRecords = countRecords;

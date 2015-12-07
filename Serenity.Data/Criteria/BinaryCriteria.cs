@@ -31,7 +31,7 @@
                 this.op == CriteriaOperator.NotLike)
             {
                 var valueCriteria = this.right as ValueCriteria;
-                if (query.Dialect.IsCaseSensitive() &&
+                if (query.Dialect.IsLikeCaseSensitive &&
                     !ReferenceEquals(null, valueCriteria) &&
                     valueCriteria.Value is string)
                 {

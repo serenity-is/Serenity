@@ -167,13 +167,13 @@
                 throw new ArgumentOutOfRangeException("nameValuePairs");
 
             StringBuilder sb = new StringBuilder("INSERT INTO ", 64 + nameValuePairs.Count * 16);
-            sb.Append(tableName);
+            sb.Append(SqlSyntax.AutoBracketValid(tableName));
             sb.Append(" (");
             for (int i = 0; i < nameValuePairs.Count; i += 2)
             {
                 if (i > 0)
                     sb.Append(", ");
-                sb.Append(nameValuePairs[i]);
+                sb.Append(SqlSyntax.AutoBracket(nameValuePairs[i]));
             }
             sb.Append(") VALUES (");
             for (int i = 1; i < nameValuePairs.Count; i += 2)

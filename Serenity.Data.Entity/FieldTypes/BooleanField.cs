@@ -29,7 +29,7 @@ namespace Serenity.Data
             if (reader.IsDBNull(index))
                 _setValue(row, null);
             else
-                _setValue(row, reader.GetBoolean(index));
+                _setValue(row, Convert.ToBoolean(reader.GetValue(index)));
 
             if (row.tracking)
                 row.FieldAssignedValue(this);

@@ -9,7 +9,7 @@ namespace Serenity.Data
 {
     public class SqlDebugDumper
     {
-        public static string Dump(string sql, IDictionary<string, object> parameters)
+        public static string Dump(string sql, IDictionary<string, object> parameters, ISqlDialect dialect = null)
         {
             if (parameters == null)
                 return sql;
@@ -26,22 +26,22 @@ namespace Serenity.Data
 
             var sb = new StringBuilder(sql);
             foreach (var pair in param)
-                sb.Replace(pair.Key, DumpParameterValue(pair.Value));
+                sb.Replace(pair.Key, DumpParameterValue(pair.Value, dialect));
 
             return sb.ToString();
         }
 
-        private static string DumpParameterValue(object value)
+        private static string DumpParameterValue(object value, ISqlDialect dialect = null)
         {
             if (value == null || value == DBNull.Value)
                 return "NULL";
 
             var str = value as string;
             if (str != null)
-                return str.ToSql();
+                return str.ToSql(dialect);
 
             if (value is char || value is char[])
-                return value.ToString().ToSql();
+                return value.ToString().ToSql(dialect);
 
             if (value is bool)
                 return ((bool)value) ? "1" : "0";
@@ -50,9 +50,9 @@ namespace Serenity.Data
             {
                 var date = (DateTime)value;
                 if (date.Date == date)
-                    return date.ToSqlDate();
+                    return date.ToSqlDate(dialect);
                 else
-                    return ((DateTime)value).ToSql();
+                    return ((DateTime)value).ToSql(dialect);
             }
 
             if (value is DateTimeOffset)

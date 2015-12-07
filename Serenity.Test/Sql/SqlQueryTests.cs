@@ -520,7 +520,7 @@ namespace Serenity.Test.Data
         public void SkipThrowsExceptionIfNoOrderByForSql2000Dialect()
         {
             var query = new SqlQuery()
-                .Dialect(SqlDialect.MsSql2000)
+                .Dialect(SqlServer2000Dialect.Instance)
                 .Select("c")
                 .From("t")
                 .Skip(10);
@@ -535,7 +535,7 @@ namespace Serenity.Test.Data
         public void SkipUsesWorkAroundWithOneOrderByForSql2000Dialect()
         {
             var query = new SqlQuery()
-                .Dialect(SqlDialect.MsSql2000)
+                .Dialect(SqlServer2000Dialect.Instance)
                 .Select("c")
                 .From("t")
                 .OrderBy("x")
@@ -554,7 +554,7 @@ namespace Serenity.Test.Data
         public void SkipUsesWorkAroundWithTwoOrderByForSql2000Dialect()
         {
             var query = new SqlQuery()
-                .Dialect(SqlDialect.MsSql2000)
+                .Dialect(SqlServer2000Dialect.Instance)
                 .Select("c")
                 .From("t")
                 .Where("c > 2")
@@ -581,7 +581,7 @@ namespace Serenity.Test.Data
         public void SkipUsesRowNumberForSql2005Dialect()
         {
             var query = new SqlQuery()
-                .Dialect(SqlDialect.MsSql2005)
+                .Dialect(SqlServer2005Dialect.Instance)
                 .Select("c")
                 .From("t")
                 .OrderBy("x")
@@ -766,7 +766,7 @@ namespace Serenity.Test.Data
         public void TakeUsesCorrectSyntaxForSqliteDialect()
         {
             var query = new SqlQuery()
-                .Dialect(SqlDialect.Sqlite)
+                .Dialect(SqliteDialect.Instance)
                 .Select("c")
                 .From("t")
                 .Take(10);

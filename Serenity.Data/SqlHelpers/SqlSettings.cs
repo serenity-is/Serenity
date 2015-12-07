@@ -4,6 +4,8 @@ namespace Serenity.Data
 {
     public static class SqlSettings
     {
-        public static SqlDialect CurrentDialect = SqlDialect.MsSql2000;
+        public static bool AutoBracket { get; set; }
+
+        public static ISqlDialect DefaultDialect = new SqlServer2012Dialect();
     }
 }

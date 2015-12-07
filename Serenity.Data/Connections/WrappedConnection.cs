@@ -6,15 +6,22 @@ namespace Serenity.Data
     {
         private IDbConnection actualConnection;
         private WrappedTransaction currentTransaction;
+        private ISqlDialect dialect;
 
-        public WrappedConnection(IDbConnection actualConnection)
+        public WrappedConnection(IDbConnection actualConnection, ISqlDialect dialect)
         {
             this.actualConnection = actualConnection;
+            this.dialect = dialect;
         }
 
         public IDbConnection ActualConnection
         {
             get { return actualConnection; }
+        }
+        public ISqlDialect Dialect
+        {
+            get { return dialect; }
+            set { dialect = value; }
         }
 
         public WrappedTransaction CurrentTransaction

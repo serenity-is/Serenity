@@ -64,7 +64,7 @@
             if (from.Length > 0)
                 from.Append(", ");
 
-            from.Append(table);
+            from.Append(SqlSyntax.AutoBracketValid(table));
 
             return this;
         }
@@ -540,22 +540,33 @@
         /// <summary>
         /// Gets the dialect (SQL server type / version) for query.
         /// </summary>
-        public SqlDialect Dialect()
+        public ISqlDialect Dialect()
         {
             return this.dialect;
+        }
+
+        public bool IsDialectOverridden
+        {
+            get
+            {
+                return this.dialectOverridden;
+            }
         }
 
         /// <summary>
         /// Sets the dialect (SQL server type / version) for query.
         /// </summary>
         /// <remarks>TODO: SqlDialect system should be improved.</remarks>
-        public SqlQuery Dialect(SqlDialect dialect)
+        public SqlQuery Dialect(ISqlDialect dialect)
         {
+            if (dialect == null)
+                throw new ArgumentNullException("dialect");
+
             this.dialect = dialect;
+            this.dialectOverridden = true;
 
             return this;
         }
-
 
         /// <summary>
         /// Gets/sets the flag to get the total record count when paging is used by SKIP/TAKE. 

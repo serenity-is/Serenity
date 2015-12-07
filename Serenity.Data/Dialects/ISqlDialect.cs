@@ -1,0 +1,27 @@
+﻿namespace Serenity.Data
+{
+    public interface ISqlDialect
+    {
+        bool CanUseOffsetFetch { get; }
+        bool CanUseRowNumber { get; }
+        bool CanUseSkipKeyword { get; }
+        char CloseQuote { get; }
+        string ConcatOperator { get; }
+        string DateFormat { get; }
+        string DateTimeFormat { get; }
+        bool IsLikeCaseSensitive { get; }
+        bool MultipleResultsets { get; }
+        bool NeedsExecuteBlockStatement { get; }
+        string OffsetFormat { get; }
+        string OffsetFetchFormat { get; }
+        char OpenQuote { get; }
+        string QuoteUnicodeString(string s);
+        string ScopeIdentityExpression { get; }
+        string SkipKeyword { get; }
+        string TakeKeyword { get; }
+        string TimeFormat { get; }
+        bool UseReturningIdentity { get; }
+        bool UseScopeIdentity { get; }
+        bool UseTakeAtEnd { get; }
+    }
+}

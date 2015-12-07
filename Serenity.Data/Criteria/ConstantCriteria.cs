@@ -28,13 +28,13 @@
         {
         }
 
-        public ConstantCriteria(string value)
-            : base(value.ToSql())
+        public ConstantCriteria(string value, ISqlDialect dialect = null)
+            : base(value.ToSql(dialect))
         {
         }
 
-        public ConstantCriteria(IEnumerable<string> values)
-            : base(String.Join(",", values.Select(x => x.ToSql())))
+        public ConstantCriteria(IEnumerable<string> values, ISqlDialect dialect = null)
+            : base(String.Join(",", values.Select(x => x.ToSql(dialect))))
         {
         }
     }

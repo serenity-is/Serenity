@@ -31,9 +31,10 @@ namespace Serenity.Data
                 _setValue(row, null);
             else
             {
-                long available = reader.GetBytes(index, (long)0, null, 0, 0);
+                long available = reader.GetBytes(index, (long)0, null, 0, 0);                  
                 byte[] a = new byte[available];
-                reader.GetBytes(index, (long)0, a, 0, a.Length);
+                if (a.Length > 0)
+                    reader.GetBytes(index, (long)0, a, 0, a.Length);
                 _setValue(row, new MemoryStream(a));
             }
 

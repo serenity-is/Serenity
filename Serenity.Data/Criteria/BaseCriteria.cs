@@ -526,9 +526,9 @@
                 get { return null; }
             }
 
-            public SqlDialect Dialect
+            public ISqlDialect Dialect
             {
-                get { return SqlSettings.CurrentDialect; }
+                get { return SqlSettings.DefaultDialect; }
             }
         }
 
@@ -554,9 +554,9 @@
                 get { return null; }
             }
 
-            public SqlDialect Dialect
+            public ISqlDialect Dialect
             {
-                get { return SqlSettings.CurrentDialect; }
+                get { return SqlSettings.DefaultDialect; }
             }
         }
     }

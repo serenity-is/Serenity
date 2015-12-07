@@ -19,7 +19,16 @@ namespace Serenity.Data
 
             var row = entity as Row;
             if (row != null)
-                query.From(row.GetFields());
+            {
+                var fields = row.GetFields();
+                query.From(fields);
+                if (!query.IsDialectOverridden && !string.IsNullOrEmpty(fields.connectionKey))
+                {
+                    var cs = SqlConnections.TryGetConnectionString(fields.connectionKey);
+                    if (cs != null)
+                        query.Dialect(cs.Dialect);
+                }
+            }
             else
             {
                 var alias = entity as IAlias;

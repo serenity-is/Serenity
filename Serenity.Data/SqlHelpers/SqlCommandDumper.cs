@@ -195,7 +195,7 @@ namespace Serenity.Data
                     }
                     else if (value is DateTime)
                     {
-                        sbCommandText.Append(((DateTime)value).ToSql());
+                        sbCommandText.Append(((DateTime)value).ToSql(SqlServer2012Dialect.Instance));
                     }
                     else if (value is DateTimeOffset)
                     {

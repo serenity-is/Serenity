@@ -102,7 +102,7 @@
                 throw new ArgumentNullException(tableName);
 
             StringBuilder sb = new StringBuilder("DELETE FROM ", 24 + where.Length);
-            sb.Append(tableName);
+            sb.Append(SqlSyntax.AutoBracketValid(tableName));
 
             if (!String.IsNullOrEmpty(where))
             {

@@ -191,7 +191,7 @@
             if (index == 0)
             {
                 string rest = expression.Substring(3);
-                if (SqlSyntax.IsValidIdentifier(rest))
+                if (SqlSyntax.IsValidQuotedIdentifier(rest))
                     return rest;
             }
 
@@ -281,13 +281,13 @@
 
             StringBuilder sb = new StringBuilder("UPDATE ", 64 + where.Length +
                 nameValuePairs.Count * 16);
-            sb.Append(tableName);
+            sb.Append(SqlSyntax.AutoBracketValid(tableName));
             sb.Append(" SET ");
             for (int i = 0; i < nameValuePairs.Count - 1; i += 2)
             {
                 if (i > 0)
                     sb.Append(", ");
-                sb.Append(nameValuePairs[i]);
+                sb.Append(SqlSyntax.AutoBracket(nameValuePairs[i]));
                 sb.Append(" = ");
                 sb.Append(nameValuePairs[i + 1]);
             }

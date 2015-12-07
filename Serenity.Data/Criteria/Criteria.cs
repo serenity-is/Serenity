@@ -60,7 +60,7 @@
 
             if (String.IsNullOrEmpty(alias))
                 throw new ArgumentNullException("alias");
-            this.expression = alias + "." + field;
+            this.expression = alias + "." + SqlSyntax.AutoBracketValid(field);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@
             if (joinNumber < 0)
                 throw new ArgumentOutOfRangeException("joinNumber");
 
-            this.expression = joinNumber.TableAliasDot() + field;
+            this.expression = joinNumber.TableAliasDot() + SqlSyntax.AutoBracketValid(field);
         }
 
         /// <summary>

@@ -7,14 +7,15 @@
     [DebuggerDisplay("{DebugText}")]
     public class QueryWithParams : IQueryWithParams
     {
-        protected SqlDialect dialect;
+        protected ISqlDialect dialect;
+        protected bool dialectOverridden;
         protected QueryWithParams parent;
         private Dictionary parameters;
         private int nextAutoParam;
 
         public QueryWithParams()
         {
-            dialect = SqlSettings.CurrentDialect;
+            dialect = SqlSettings.DefaultDialect;
         }
 
         protected void CloneParams(QueryWithParams target)
@@ -104,7 +105,7 @@
             return subQuery;
         }
 
-        SqlDialect IQueryWithParams.Dialect
+        ISqlDialect IQueryWithParams.Dialect
         {
             get { return dialect; }
         }
@@ -113,7 +114,7 @@
         {
             get
             {
-                return SqlDebugDumper.Dump(ToString(), this.Params);
+                return SqlDebugDumper.Dump(ToString(), this.Params, dialect);
             }
         }
     }

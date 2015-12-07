@@ -405,6 +405,7 @@
         protected virtual SqlQuery CreateQuery()
         {
             return new SqlQuery()
+                .Dialect(Connection.GetDialect())
                 .From(Row);
         }
 
