@@ -425,7 +425,9 @@ namespace Serenity.ComponentModel
         public Recaptcha()
             : base("Recaptcha")
         {
-            SiteKey = Config.Get<RecaptchaSettings>().SiteKey;
+            var settings = Config.TryGet<RecaptchaSettings>();
+            if (settings != null)
+                SiteKey = settings.SiteKey;
         }
 
         public String SiteKey
