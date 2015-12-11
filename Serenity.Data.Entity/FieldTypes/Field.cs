@@ -366,6 +366,11 @@ namespace Serenity.Data
             get { return Fields.Joins; }
         }
 
+        public string ColumnAlias
+        {
+            get { return propertyName ?? name; }
+        }
+
         public override string ToString()
         {
             return this.Expression;

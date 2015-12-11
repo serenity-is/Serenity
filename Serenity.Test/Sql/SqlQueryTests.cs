@@ -13,6 +13,7 @@ namespace Serenity.Test.Data
         {
             public string Name { get; set; }
             public string Expression { get; set; }
+            public string ColumnAlias { get; set; }
         }
 
         private class MyEntity : IEntity

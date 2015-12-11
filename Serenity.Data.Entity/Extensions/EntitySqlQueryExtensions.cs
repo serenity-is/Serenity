@@ -63,7 +63,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("field");
 
             query.EnsureJoinsInExpression(field.Expression);
-            new SqlQuery.Column(query, field.Expression, field.Name, field);
+            new SqlQuery.Column(query, field.Expression, field.ColumnAlias, field);
             return query;
         }
 
@@ -166,7 +166,7 @@ namespace Serenity.Data
             if (intoField == null)
                 throw new ArgumentNullException("alias");
 
-            new SqlQuery.Column(query, expression, intoField.Name, intoField);
+            new SqlQuery.Column(query, expression, intoField.ColumnAlias, intoField);
             return query;
         }
 
