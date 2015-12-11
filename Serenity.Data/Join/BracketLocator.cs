@@ -83,6 +83,23 @@ namespace Serenity.Data
                 }
                 else if (c == '[')
                 {
+                    if (i >= expression.Length - 2)
+                    {
+                        sb.Append(expression.Substring(i));
+                        break;
+                    }
+
+                    if (expression[i + 2] == ']' &&
+                        expression[i + 1] >= '0' &&
+                        expression[i + 1] <= '9')
+                    {
+                        sb.Append('[');
+                        sb.Append(expression[i + 1]);
+                        sb.Append(']');
+                        i += 2;
+                        continue;
+                    }
+
                     c = openQuote;
                 }
                 else if (c == ']')
