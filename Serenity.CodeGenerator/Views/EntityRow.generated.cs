@@ -127,7 +127,7 @@ WriteLiteral(", IIdRow");
         attrs.Add(x.Flags);
     }       
     if (!String.IsNullOrEmpty(x.PKTable)) {
-        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? "" : ("[" + x.PKSchema + "].")) + x.PKTable + "\", \"" + x.PKColumn + "\")");
+        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]") + "\", \"" + x.PKColumn + "\")"));
         attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
     }
     if (Model.NameField == x.Ident) {
@@ -191,7 +191,7 @@ WriteLiteral("\r\n        [DisplayName(\"");
 WriteLiteral("\"), Expression(\"");
 
 
-                                          Write("j" + x.Name + "." + y.Name);
+                                          Write("j" + x.Name + ".[" + y.Name + "]");
 
 WriteLiteral("\")]\r\n        public ");
 

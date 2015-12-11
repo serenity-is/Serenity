@@ -88,9 +88,21 @@ namespace Serenity.CodeGenerator
 
         public static List<string> GetTableIdentityFields(IDbConnection connection, string schema, string tableName)
         {
+            var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             List<string> identityFields = new List<string>();
 
-            var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
+            if (connection.GetDialect() is PostgresDialect)
+            {
+                foreach (DataRow row in columns.Rows)
+                {
+                    var defaultValue = row["column_default"] as string;
+                    if (defaultValue != null && defaultValue.IndexOf("nextval(") > 0)
+                        identityFields.Add((string)row["COLUMN_NAME"]);
+                }
+
+                return identityFields;
+            }
+
             if (columns.Columns.Contains("AUTOINCREMENT"))
                 foreach (DataRow row in columns.Rows)
                 {
@@ -166,6 +178,70 @@ namespace Serenity.CodeGenerator
                 }
                 catch (Exception)
                 {
+                }
+
+                return foreignKeyInfos;
+            }
+
+            if (connection.GetDialect() is PostgresDialect)
+            {
+                try
+                {
+                    var list = connection.Query(
+                        @"SELECT * FROM (
+                            SELECT
+                                o.conname AS constraint_name,
+                                (SELECT nspname FROM pg_namespace WHERE oid=m.relnamespace) AS source_schema,
+                                m.relname AS source_table,
+                                (SELECT a.attname FROM pg_attribute a WHERE a.attrelid = m.oid AND a.attnum = o.conkey[1] AND a.attisdropped = false) AS source_column,
+                                (SELECT nspname FROM pg_namespace WHERE oid=f.relnamespace) AS target_schema,
+                                f.relname AS target_table,
+                                (SELECT a.attname FROM pg_attribute a WHERE a.attrelid = f.oid AND a.attnum = o.confkey[1] AND a.attisdropped = false) AS target_column
+                            FROM
+                                pg_constraint o LEFT JOIN pg_class c ON c.oid = o.conrelid
+                                LEFT JOIN pg_class f ON f.oid = o.confrelid LEFT JOIN pg_class m ON m.oid = o.conrelid
+                            WHERE
+                                o.contype = 'f' AND o.conrelid IN (SELECT oid FROM pg_class c WHERE c.relkind = 'r')) x
+                        WHERE source_schema = @sh AND source_table = @tb
+                        ORDER BY constraint_name", new { sh = schema, tb = tableName }).ToList();
+
+
+                    foreach (var fk in list)
+                    {
+                        string priorName = "";
+                        bool priorDeleted = false;
+
+                        // eğer bir önceki ile aynıysa bunu listeye ekleme ve öncekini de sil
+                        var fkName = fk.constraint_name as string;
+                        if (priorName == fkName)
+                        {
+                            if (!priorDeleted)
+                            {
+                                foreignKeyInfos.RemoveAt(foreignKeyInfos.Count - 1);
+                                priorDeleted = true;
+                            }
+                            continue;
+                        }
+
+                        var foreignKeyInfo = new ForeignKeyInfo
+                        {
+                            FKName = fkName,
+                            FKSchema = fk.source_schema,
+                            FKTable = fk.source_table,
+                            FKColumn = fk.source_column,
+                            PKSchema = fk.target_schema,
+                            PKTable = fk.target_table,
+                            PKColumn = fk.target_column
+                        };
+
+                        foreignKeyInfos.Add(foreignKeyInfo);
+                        priorDeleted = false;
+                        priorName = foreignKeyInfo.FKName;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.Log();
                 }
 
                 return foreignKeyInfos;

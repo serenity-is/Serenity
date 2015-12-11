@@ -47,7 +47,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
         attrs.Add(x.Flags);
     }       
     if (!String.IsNullOrEmpty(x.PKTable)) {
-        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? "" : ("[" + x.PKSchema + "].")) + x.PKTable + "\", \"" + x.PKColumn + "\")");
+        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]") + "\", \"" + x.PKColumn + "\")"));
         attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
     }
     if (Model.NameField == x.Ident) {
@@ -68,7 +68,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 </text>}
 @foreach (var x in Model.Joins){foreach (var y in x.Fields){
 <text>
-        [DisplayName("@y.Title"), Expression("@("j" + x.Name + "." + y.Name)")]
+        [DisplayName("@y.Title"), Expression("@("j" + x.Name + ".[" + y.Name + "]")")]
         public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident))
         {
             get { return Fields.@(jf(x.Name, y.Ident))[this]; }
