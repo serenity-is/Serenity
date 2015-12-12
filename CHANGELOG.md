@@ -1,3 +1,15 @@
+## 1.8.5 (2015-12-12)
+
+Features:
+  - [BREAKING CHANGE] changed enum based dialect support with interface based dialect system. remove SqlSettings.CurrentDialect line from SiteInitialization or replace it with SqlSettings.DefaultDialect = SqlServer2012Dialect.Instance.
+  - new PostgreSQL dialect and code generator support.
+  - serene and northwind sample now works with PostgreSQL out of the box. see how to guide.   
+  - automatic bracket with dialect specific identifier quote replacement
+  - [BREAKING CHANGE] fields are selected with their property name if available, for better compability with Dapper. shouldn't cause a problem if you didn't depend on prior funtionality where field name was used.
+  - made capture log handler also log old rows, this resolves possible misidentified update attribution to a user, in case a record is changed directly from database before.
+  - added Google Recaptcha widget and helpers
+  - removed sqlite package from code generator. if you need sqlite or another provider support, register it in sergen.config.
+
 ## 1.8.4 (2015-12-01)
   - added excel export samples to product, customer and order grids [Serene]
   
