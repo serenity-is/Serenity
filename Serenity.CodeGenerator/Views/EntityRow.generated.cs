@@ -299,15 +299,12 @@ WriteLiteral(";");
 WriteLiteral("\r\n\r\n            public RowFields()\r\n                : base(\"");
 
 
-                    Write(schemaDot);
-
-
-                               Write(Model.Tablename);
+                    Write(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]");
 
 WriteLiteral("\"");
 
 
-                                                 Write(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\""));
+                                                                                                                   Write(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\""));
 
 WriteLiteral(")\r\n            {\r\n                LocalTextPrefix = \"");
 

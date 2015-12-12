@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -21,6 +23,12 @@ namespace Serenity.CodeGenerator
         public MainWindow()
         {
             InitializeComponent();
+
+            var loadProviderDLLs = (ConfigurationManager.AppSettings["LoadProviderDLLs"] ?? "")
+                .Split(new char[] { ',', ';' });
+
+            foreach (var dll in loadProviderDLLs)
+                Assembly.LoadFrom(dll);
 
             _connections = new BindingList<GeneratorConfig.Connection>();
             _tables = new BindingList<string>();

@@ -314,63 +314,77 @@ namespace Serenity.CodeGenerator
             var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             var order = new Dictionary<string, int>();
 
+            var ordinal = "ORDINAL_POSITION";
+            var columnName = "COLUMN_NAME";
+            var isNullable = "IS_NULLABLE";
+            var charMax = "CHARACTER_MAXIMUM_LENGTH";
+            var numPrec = "NUMERIC_PRECISION";
+            var numScale = "NUMERIC_SCALE";
+            var dataType = "DATA_TYPE";
+            if (!columns.Columns.Contains(ordinal) &&
+                columns.Columns.Contains(ordinal.ToLowerInvariant()))
+            {
+                ordinal = ordinal.ToLowerInvariant();
+                columnName = columnName.ToLowerInvariant();
+                dataType = dataType.ToLowerInvariant();
+                isNullable = isNullable.ToLowerInvariant();
+                charMax = charMax.ToLowerInvariant();
+                numPrec = numPrec.ToLowerInvariant();
+                numScale = numScale.ToLowerInvariant();
+            }
+
             foreach (DataRow row in columns.Rows)
             {
+                FieldInfo fieldInfo = new FieldInfo();
+                fieldInfo.FieldName = (string)row[columnName];
+                    
+                order[fieldInfo.FieldName] = (int)row[ordinal];
 
-            /*new SqlQuery().Select("COLUMN_NAME, DATA_TYPE, IS_NULLABLE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE")
-                .From(inf + "COLUMNS")
-                .Where(new Criteria("TABLE_NAME") == tableName)
-                .OrderBy("ORDINAL_POSITION")
-                .ForEach(connection, delegate(IDataReader reader)*/
+                fieldInfo.IsPrimaryKey =
+                    primaryFields.IndexOf(fieldInfo.FieldName) >= 0;
+                fieldInfo.IsIdentity =
+                    identityFields.IndexOf(fieldInfo.FieldName) >= 0;
+                fieldInfo.IsNullable = (row[isNullable] as string == "YES") || (row[isNullable] as Boolean? == true);
+                fieldInfo.DataType = row[dataType] as string;
+                fieldInfo.Size = 0;
+
+                if (fieldInfo.DataType != SqlInt &&
+                    fieldInfo.DataType != SqlInteger &&
+                    fieldInfo.DataType != SqlReal &&
+                    fieldInfo.DataType != SqlFloat &&
+                    fieldInfo.DataType != SqlTinyInt &&
+                    fieldInfo.DataType != SqlSmallInt &&
+                    fieldInfo.DataType != SqlBigInt &&
+                    fieldInfo.DataType != SqlInt8 &&
+                    fieldInfo.DataType != SqlInt4)
                 {
-                    FieldInfo fieldInfo = new FieldInfo();
-                    fieldInfo.FieldName = (string)row["COLUMN_NAME"];
-                    order[fieldInfo.FieldName] = (int)row["ORDINAL_POSITION"];
-
-                    fieldInfo.IsPrimaryKey =
-                        primaryFields.IndexOf(fieldInfo.FieldName) >= 0;
-                    fieldInfo.IsIdentity =
-                        identityFields.IndexOf(fieldInfo.FieldName) >= 0;
-                    fieldInfo.IsNullable = (row["IS_NULLABLE"] as string == "YES") || (row["IS_NULLABLE"] as Boolean? == true);
-                    fieldInfo.DataType = row["DATA_TYPE"] as string;
-                    fieldInfo.Size = 0;
-
-                    if (fieldInfo.DataType != SqlInt &&
-                        fieldInfo.DataType != SqlInteger &&
-                        fieldInfo.DataType != SqlReal &&
-                        fieldInfo.DataType != SqlFloat &&
-                        fieldInfo.DataType != SqlTinyInt &&
-                        fieldInfo.DataType != SqlSmallInt &&
-                        fieldInfo.DataType != SqlBigInt)
+                    var size = row[charMax] as Int32?;
+                    if (size != null)
                     {
-                        var size = row["CHARACTER_MAXIMUM_LENGTH"] as Int32?;
-                        if (size != null)
-                        {
-                            fieldInfo.Size = size.Value;
-                            if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
-                                fieldInfo.Size = 0;
-                        }
-
-                        var prec = row["NUMERIC_PRECISION"] as Int32?;
-
-                        if (prec != null)
-                        {
-                            fieldInfo.Size = Convert.ToInt32(prec.Value);
-                            if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
-                                fieldInfo.Size = 0;
-                        }
-
-                        var scale = row["NUMERIC_SCALE"] as Int32?;
-                        if (scale != null)
-                        {
-                            fieldInfo.Scale = Convert.ToInt32(scale.Value);
-                            if (fieldInfo.Scale < 0 || fieldInfo.Scale >= 1000000000)
-                                fieldInfo.Scale = 0;
-                        }
+                        fieldInfo.Size = size.Value;
+                        if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
+                            fieldInfo.Size = 0;
                     }
 
-                    fieldInfos.Add(fieldInfo);
+                    var prec = row[numPrec] as Int32?;
+
+                    if (prec != null)
+                    {
+                        fieldInfo.Size = Convert.ToInt32(prec.Value);
+                        if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
+                            fieldInfo.Size = 0;
+                    }
+
+                    var scale = row[numScale] as Int32?;
+                    if (scale != null)
+                    {
+                        fieldInfo.Scale = Convert.ToInt32(scale.Value);
+                        if (fieldInfo.Scale < 0 || fieldInfo.Scale >= 1000000000)
+                            fieldInfo.Scale = 0;
+                    }
                 }
+
+                fieldInfos.Add(fieldInfo);
             }
 
             fieldInfos.Sort((x, y) => order[x.FieldName].CompareTo(order[y.FieldName]));
@@ -440,14 +454,16 @@ namespace Serenity.CodeGenerator
         const string SqlVarBinary = "varbinary";
         const string SqlTinyInt = "tinyint";
         const string SqlTimestamp = "timestamp";
+        const string SqlInt8 = "int8";
+        const string SqlInt4 = "int4";
 
         public static string SqlTypeNameToFieldType(string sqlTypeName)
         {
             if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlNChar || sqlTypeName == SqlVarChar || sqlTypeName == SqlChar)
                 return "String";
-            else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger)
+            else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger || sqlTypeName == SqlInt4)
                 return "Int32";
-            else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp)
+            else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp || sqlTypeName == SqlInt8)
                 return "Int64";
             else if (sqlTypeName == SqlMoney || sqlTypeName == SqlDecimal || sqlTypeName == SqlNumeric)
                 return "Decimal";

@@ -106,7 +106,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 
 
             public RowFields()
-                : base("@(schemaDot)@Model.Tablename"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
+                : base("@(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]")"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
             {
                 LocalTextPrefix = "@(moduleDot)@(Model.ClassName)";
             }
