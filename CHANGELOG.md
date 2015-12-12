@@ -1,3 +1,8 @@
+## 1.8.6 (2015-12-12)
+
+Bugfixes:
+  - fix assembly load error causing sergen.exe fail to launch
+  
 ## 1.8.5 (2015-12-12)
 
 Features:
@@ -11,9 +16,12 @@ Features:
   - removed sqlite package from code generator. if you need sqlite or another provider support, register it in sergen.config.
 
 ## 1.8.4 (2015-12-01)
+
+Features:
   - added excel export samples to product, customer and order grids [Serene]
   
 ## 1.8.3 (2015-11-30)
+
 Features:
   - auto join with aliased fields and their view fields 
   - cloned query has same parent as source query, so they share params 
