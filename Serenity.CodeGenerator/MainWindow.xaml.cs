@@ -25,10 +25,17 @@ namespace Serenity.CodeGenerator
             InitializeComponent();
 
             var loadProviderDLLs = (ConfigurationManager.AppSettings["LoadProviderDLLs"] ?? "")
-                .Split(new char[] { ',', ';' });
+                .Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var dll in loadProviderDLLs)
-                Assembly.LoadFrom(dll);
+                try
+                {
+                    Assembly.LoadFrom(dll);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Can't load: " + dll + "\n" + ex.ToString());
+                }
 
             _connections = new BindingList<GeneratorConfig.Connection>();
             _tables = new BindingList<string>();
