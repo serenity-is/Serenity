@@ -1,3 +1,8 @@
+## 1.8.7 (2015-12-12)
+
+Features:
+  - add ISqlDialect.QuoteIdentifier method and always quote column aliases with it as they might be reserved words
+  
 ## 1.8.6 (2015-12-12)
 
 Bugfixes:
