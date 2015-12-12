@@ -15,6 +15,7 @@
         string OffsetFormat { get; }
         string OffsetFetchFormat { get; }
         char OpenQuote { get; }
+        string QuoteIdentifier(string s);
         string QuoteUnicodeString(string s);
         string ScopeIdentityExpression { get; }
         string SkipKeyword { get; }

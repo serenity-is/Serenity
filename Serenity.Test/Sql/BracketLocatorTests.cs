@@ -74,57 +74,57 @@ namespace Serenity.Data.Test
         [Fact]
         public void ReplaceBrackets_IgnoresEmptyBrackets()
         {
-            Assert.Equal("[]", BracketLocator.ReplaceBrackets("[]", '"', '"'));
-            Assert.Equal("xyz []", BracketLocator.ReplaceBrackets("xyz []", '"', '"'));
-            Assert.Equal("[] abc", BracketLocator.ReplaceBrackets("[] abc", '"', '"'));
-            Assert.Equal("u [] w [] []", BracketLocator.ReplaceBrackets("u [] w [] []", '"', '"'));
+            Assert.Equal("[]", BracketLocator.ReplaceBrackets("[]", PostgresDialect.Instance));
+            Assert.Equal("xyz []", BracketLocator.ReplaceBrackets("xyz []", PostgresDialect.Instance));
+            Assert.Equal("[] abc", BracketLocator.ReplaceBrackets("[] abc", PostgresDialect.Instance));
+            Assert.Equal("u [] w [] []", BracketLocator.ReplaceBrackets("u [] w [] []", PostgresDialect.Instance));
         }
 
         [Fact]
         public void ReplaceBrackets_IgnoresBracketsPrecededWithLettersOrNumbers()
         {
-            Assert.Equal("a[b]", BracketLocator.ReplaceBrackets("a[b]", '"', '"'));
-            Assert.Equal("xyz b[e]", BracketLocator.ReplaceBrackets("xyz b[e]", '"', '"'));
-            Assert.Equal("0[f] abc", BracketLocator.ReplaceBrackets("0[f] abc", '"', '"'));
-            Assert.Equal("u k[x] w 9[j] _[r]", BracketLocator.ReplaceBrackets("u k[x] w 9[j] _[r]", '"', '"'));
+            Assert.Equal("a[b]", BracketLocator.ReplaceBrackets("a[b]", PostgresDialect.Instance));
+            Assert.Equal("xyz b[e]", BracketLocator.ReplaceBrackets("xyz b[e]", PostgresDialect.Instance));
+            Assert.Equal("0[f] abc", BracketLocator.ReplaceBrackets("0[f] abc", PostgresDialect.Instance));
+            Assert.Equal("u k[x] w 9[j] _[r]", BracketLocator.ReplaceBrackets("u k[x] w 9[j] _[r]", PostgresDialect.Instance));
         }
 
         [Fact]
         public void ReplaceBrackets_IgnoresBracketsFollowedWithLettersOrNumbers()
         {
-            Assert.Equal("[b]a", BracketLocator.ReplaceBrackets("[b]a", '"', '"'));
-            Assert.Equal("xyz [e]b", BracketLocator.ReplaceBrackets("xyz [e]b", '"', '"'));
-            Assert.Equal("[f]0 abc", BracketLocator.ReplaceBrackets("[f]0 abc", '"', '"'));
-            Assert.Equal("u [x]k w [j]9 [r]_", BracketLocator.ReplaceBrackets("u [x]k w [j]9 [r]_", '"', '"'));
+            Assert.Equal("[b]a", BracketLocator.ReplaceBrackets("[b]a", PostgresDialect.Instance));
+            Assert.Equal("xyz [e]b", BracketLocator.ReplaceBrackets("xyz [e]b", PostgresDialect.Instance));
+            Assert.Equal("[f]0 abc", BracketLocator.ReplaceBrackets("[f]0 abc", PostgresDialect.Instance));
+            Assert.Equal("u [x]k w [j]9 [r]_", BracketLocator.ReplaceBrackets("u [x]k w [j]9 [r]_", PostgresDialect.Instance));
         }
 
         [Fact]
         public void ReplaceBrackets_IgnoresBracketsInStrings()
         {
-            Assert.Equal("'[b]'", BracketLocator.ReplaceBrackets("'[b]'", '"', '"'));
-            Assert.Equal("'sfg [c] ab [x]'", BracketLocator.ReplaceBrackets("'sfg [c] ab [x]'", '"', '"'));
+            Assert.Equal("'[b]'", BracketLocator.ReplaceBrackets("'[b]'", PostgresDialect.Instance));
+            Assert.Equal("'sfg [c] ab [x]'", BracketLocator.ReplaceBrackets("'sfg [c] ab [x]'", PostgresDialect.Instance));
         }
 
         [Fact]
         public void ReplaceBrackets_IgnoresBracketsWithNumericContents()
         {
-            Assert.Equal("[0]", BracketLocator.ReplaceBrackets("[0]", '"', '"'));
-            Assert.Equal("[77][89]", BracketLocator.ReplaceBrackets("[77][89]", '"', '"'));
+            Assert.Equal("[0]", BracketLocator.ReplaceBrackets("[0]", PostgresDialect.Instance));
+            Assert.Equal("[77][89]", BracketLocator.ReplaceBrackets("[77][89]", PostgresDialect.Instance));
         }
 
         [Fact]
         public void ReplaceBrackets_ReplacesSimpleIdentifiers()
         {
-            Assert.Equal("\"a\"", BracketLocator.ReplaceBrackets("[a]", '"', '"'));
-            Assert.Equal("x.`y` z.d", BracketLocator.ReplaceBrackets("x.[y] z.d", '`', '`'));
+            Assert.Equal("\"a\"", BracketLocator.ReplaceBrackets("[a]", PostgresDialect.Instance));
+            Assert.Equal("x.\"y\" z.d", BracketLocator.ReplaceBrackets("x.[y] z.d", PostgresDialect.Instance));
         }
 
         [Fact]
         public void ReplaceBrackets_ReplacesIdentifiersWithSpaces()
         {
-            Assert.Equal("\"Order Details\"", BracketLocator.ReplaceBrackets("[Order Details]", '"', '"'));
-            Assert.Equal("SELECT c.`Some Field` from Customers c", 
-                BracketLocator.ReplaceBrackets("SELECT c.[Some Field] from Customers c", '`', '`'));
+            Assert.Equal("\"Order Details\"", BracketLocator.ReplaceBrackets("[Order Details]", PostgresDialect.Instance));
+            Assert.Equal("SELECT c.\"Some Field\" from Customers c", 
+                BracketLocator.ReplaceBrackets("SELECT c.[Some Field] from Customers c", PostgresDialect.Instance));
         }
     }
 }

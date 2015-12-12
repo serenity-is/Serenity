@@ -61,7 +61,7 @@ namespace Serenity.Data
             return sb.ToString();
         }
 
-        public static string ReplaceBrackets(string expression, char openQuote, char closeQuote)
+        public static string ReplaceBrackets(string expression, ISqlDialect dialect)
         {
             if (expression == null)
                 return null;
@@ -121,9 +121,7 @@ namespace Serenity.Data
                         continue;
                     }
 
-                    sb.Append(openQuote);
-                    sb.Append(sub);
-                    sb.Append(closeQuote);
+                    sb.Append(dialect.QuoteIdentifier(sub));
                     i = end;
                     continue;
                 }

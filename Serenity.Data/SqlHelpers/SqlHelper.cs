@@ -227,8 +227,7 @@
             var dialect = connection.GetDialect();
             var openBracket = dialect.OpenQuote;
             if (openBracket != '[')
-                commandText = BracketLocator.ReplaceBrackets(commandText, 
-                    openBracket, dialect.CloseQuote);
+                commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
 
             command.CommandText = commandText;
             return command;

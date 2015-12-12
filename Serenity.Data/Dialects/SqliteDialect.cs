@@ -110,6 +110,17 @@ namespace Serenity.Data
             }
         }
 
+        public string QuoteIdentifier(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return s;
+
+            if (s.StartsWith("[") && s.EndsWith("]"))
+                return s;
+
+            return '[' + s + ']';
+        }
+
         public string QuoteUnicodeString(string s)
         {
             if (s.IndexOf('\'') >= 0)

@@ -17,7 +17,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT c.Name AS CountryName"),
+                    "SELECT c.Name AS [CountryName]"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
@@ -33,7 +33,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT c.Name AS CountryName FROM ComplexTable T0 " +
+                    "SELECT c.Name AS [CountryName] FROM ComplexTable T0 " +
                     "LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
@@ -50,7 +50,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT c.Name AS CountryName FROM ComplexTable T0 " +
+                    "SELECT c.Name AS [CountryName] FROM ComplexTable T0 " +
                     "LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
@@ -67,7 +67,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT x_c.Name AS CountryName FROM ComplexTable x " +
+                    "SELECT x_c.Name AS [CountryName] FROM ComplexTable x " +
                     "LEFT JOIN TheCountryTable x_c ON (x_c.TheCountryID = x.CountryID)"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
@@ -88,8 +88,8 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT " + 
-                        "x_c.Name AS CountryNameX, " +
-                        "y_c.Name AS CountryNameY " +
+                        "x_c.Name AS [CountryNameX], " +
+                        "y_c.Name AS [CountryNameY] " +
                     "FROM ComplexTable x " +
                     "LEFT JOIN ComplexTable y ON (y.ComplexID = x.ComplexID) " +
                     "LEFT JOIN TheCountryTable x_c ON (x_c.TheCountryID = x.CountryID) " +
@@ -110,7 +110,7 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT " +
-                        "o.Name AS Country " +
+                        "o.Name AS [Country] " +
                     "FROM ViewTable T0 " +
                     "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
                     "LEFT JOIN Cities c ON (c.CityID = d.CityID) " +
@@ -131,7 +131,7 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT " +
-                        "c.Name AS City " +
+                        "c.Name AS [City] " +
                     "FROM ViewTable T0 " +
                     "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
                     "LEFT JOIN Cities c ON (c.CityID = d.CityID) "),
@@ -151,7 +151,7 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT " +
-                        "d.Name AS District " +
+                        "d.Name AS [District] " +
                     "FROM ViewTable T0 " +
                     "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) "),
                 TestSqlHelper.Normalize(
@@ -174,9 +174,9 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT " +
-                        "o.Name AS Country, " +
-                        "c.Name AS City, " +
-                        "d.Name AS District " +
+                        "o.Name AS [Country], " +
+                        "c.Name AS [City], " +
+                        "d.Name AS [District] " +
                     "FROM ViewTable T0 " +
                     "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
                     "LEFT JOIN Cities c ON (c.CityID = d.CityID) " +
@@ -199,9 +199,9 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT " +
-                        "d.Name AS District, " +
-                        "c.Name AS City, " +
-                        "o.Name AS Country " +
+                        "d.Name AS [District], " +
+                        "c.Name AS [City], " +
+                        "o.Name AS [Country] " +
                     "FROM ViewTable T0 " +
                     "LEFT JOIN Districts d ON (d.DistrictID = T0.DistrictID) " +
                     "LEFT JOIN Cities c ON (c.CityID = d.CityID) " +
@@ -224,9 +224,9 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT " +
-                        "vw_d.Name AS District, " +
-                        "vw_c.Name AS City, " +
-                        "vw_o.Name AS Country " +
+                        "vw_d.Name AS [District], " +
+                        "vw_c.Name AS [City], " +
+                        "vw_o.Name AS [Country] " +
                     "FROM ViewTable vw " +
                     "LEFT JOIN Districts vw_d ON (vw_d.DistrictID = vw.DistrictID) " +
                     "LEFT JOIN Cities vw_c ON (vw_c.CityID = vw_d.CityID) " +

@@ -792,7 +792,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT c.Name AS CountryName FROM ComplexTable T0 LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)"),
+                    "SELECT c.Name AS [CountryName] FROM ComplexTable T0 LEFT JOIN TheCountryTable c ON (c.TheCountryID = T0.CountryID)"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
 

@@ -233,14 +233,15 @@ namespace Serenity.Data
                     selCount.Append(s.Expression);
 
                 // alana bir alias atanmışsa bunu yaz
-                if (s.ColumnName != null)
+                if (!string.IsNullOrEmpty(s.ColumnName))
                 {
                     sb.Append(SqlKeywords.As);
-                    sb.Append(s.ColumnName);
+                    var quoted = dialect.QuoteIdentifier(s.ColumnName);
+                    sb.Append(quoted);
                     if (distinct)
                     {
                         selCount.Append(SqlKeywords.As);
-                        selCount.Append(s.ColumnName);
+                        selCount.Append(quoted);
                     }
                 }
             }
