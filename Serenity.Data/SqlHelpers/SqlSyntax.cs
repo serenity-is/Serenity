@@ -126,7 +126,7 @@ namespace Serenity.Data
 
         public static string AutoBracket(string s)
         {
-            if (!SqlSettings.AutoBracket)
+            if (!SqlSettings.AutoQuotedIdentifiers)
                 return s;
 
             if (string.IsNullOrEmpty(s))
@@ -140,7 +140,7 @@ namespace Serenity.Data
 
         public static string AutoBracketValid(string s)
         {
-            if (!SqlSettings.AutoBracket)
+            if (!SqlSettings.AutoQuotedIdentifiers)
                 return s;
 
             if (!IsValidIdentifier(s))

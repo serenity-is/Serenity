@@ -76,38 +76,61 @@ namespace Serenity.Data
                 {
                     if (c == '\'')
                         inQuote = false;
+
+                    sb.Append(c);
                 }
                 else if (c == '\'')
                 {
                     inQuote = true;
+                    sb.Append(c);
                 }
                 else if (c == '[')
                 {
-                    if (i >= expression.Length - 2)
+                    if (i > 0 &&
+                        (Char.IsLetterOrDigit(expression[i - 1]) ||
+                         expression[i - 1] == '_'))
                     {
-                        sb.Append(expression.Substring(i));
-                        break;
-                    }
-
-                    if (expression[i + 2] == ']' &&
-                        expression[i + 1] >= '0' &&
-                        expression[i + 1] <= '9')
-                    {
-                        sb.Append('[');
-                        sb.Append(expression[i + 1]);
-                        sb.Append(']');
-                        i += 2;
+                        // might be an array indexer expression like a[5]
+                        sb.Append(c);
                         continue;
                     }
 
-                    c = openQuote;
-                }
-                else if (c == ']')
-                {
-                    c = closeQuote;
-                }
+                    var end = expression.IndexOf(']', i + 1);
+                    if (end < 0)
+                    {
+                        sb.Append(c);
+                        continue;
+                    }
 
-                sb.Append(c);
+                    if (end < expression.Length - 1 &&
+                        (expression[end + 1] == '_' ||
+                         Char.IsLetterOrDigit(expression[end + 1])))
+                    {
+                        sb.Append(c);
+                        continue;
+                    }
+
+                    long l;
+                    var sub = expression.SafeSubstring(i + 1, end - i - 1);
+                    if (sub.Length == 0 ||
+                        sub.IndexOf('\'') >= 0 ||
+                        sub.IndexOf('[') >= 0 ||
+                        Int64.TryParse(sub, out l))
+                    {
+                        sb.Append(c);
+                        continue;
+                    }
+
+                    sb.Append(openQuote);
+                    sb.Append(sub);
+                    sb.Append(closeQuote);
+                    i = end;
+                    continue;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
             }
 
             return sb.ToString();
