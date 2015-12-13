@@ -149,7 +149,7 @@ namespace Serenity.Data
         {
             get
             {
-                return "TOP";
+                return "FIRST";
             }
         }
 
@@ -181,7 +181,7 @@ namespace Serenity.Data
         {
             get
             {
-                return true;
+                return false;
             }
         }
     }
