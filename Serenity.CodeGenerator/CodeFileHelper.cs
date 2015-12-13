@@ -128,8 +128,16 @@ namespace Serenity.CodeGenerator
             if (Kdiff3Path.IsNullOrEmpty() ||
                 !File.Exists(Kdiff3Path))
             {
-                throw new InvalidOperationException(String.Format("KDiff3, verilen '{0}' konumunda bulunamadı!",
-                    Kdiff3Path ?? ""));
+                if (Kdiff3Path.IsNullOrEmpty())
+                    throw new Exception(
+                        "Couldn't locate KDiff3 utility which is required to merge changes. " +
+                        "Please install it, or if it is not installed to default location, " + 
+                        "set its path in CodeGenerator.config file!");
+
+                throw new Exception(String.Format(
+                    "Couldn't locate KDiff3 utility at '{0}' which is required to merge changes. " +
+                    "Please install it, or if it is not installed to default location, " +
+                    "set its path in CodeGenerator.config file!", Kdiff3Path));
             }
 
             Process.Start(Kdiff3Path, "--auto " + file + " " + generated + " -o " + file);
