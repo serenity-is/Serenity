@@ -31,7 +31,7 @@ namespace Serenity.Test
         public void ScriptTestsPasses()
         {
             int tries = 0;
-            while (tries++ < 100 && true)
+            while (tries++ < 3000 && true)
             {
                 GoToUrl("~/ScriptTests.html");
                 if (Browser.Title == "Serenity Tests")
@@ -46,7 +46,7 @@ namespace Serenity.Test
 
                 Dictionary<string, object> qunitResults = null;
                 tries = 0;
-                while (tries++ < 100 && qunitResults == null)
+                while (tries++ < 3000 && qunitResults == null)
                 {
                     Thread.Sleep(100);
                     qunitResults = GetQunitTestResults();
