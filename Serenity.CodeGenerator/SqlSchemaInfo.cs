@@ -44,6 +44,27 @@ namespace Serenity.CodeGenerator
             var inf = InformationSchema(connection);
             List<string> primaryFields = new List<string>();
 
+            if (connection.GetDialect() is FirebirdDialect)
+            {
+                var query = @"
+select
+cast(RC.RDB$RELATION_NAME as varchar(31)) as TABLE_NAME,
+cast(ISGMT.RDB$FIELD_NAME as varchar(31)) as COLUMN_NAME,
+CAST((ISGMT.RDB$FIELD_POSITION + 1) as SMALLINT) as KEY_SEQ,
+cast(RC.RDB$CONSTRAINT_NAME as varchar(31)) as PK_NAME
+from
+RDB$RELATION_CONSTRAINTS RC
+INNER JOIN RDB$INDEX_SEGMENTS ISGMT ON RC.RDB$INDEX_NAME = ISGMT.RDB$INDEX_NAME
+where CAST(RC.RDB$RELATION_NAME AS VARCHAR(40)) = '{0}' and
+RC.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY'
+order by 3";
+
+                foreach (var k in connection.Query(String.Format(query, tableName)))
+                {
+                    primaryFields.Add(k.COLUMN_NAME);
+                }
+            }
+
             var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             foreach (DataRow row in columns.Rows)
             {
@@ -90,6 +111,11 @@ namespace Serenity.CodeGenerator
         {
             var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
             List<string> identityFields = new List<string>();
+
+            if (connection.GetDialect() is FirebirdDialect)
+            {
+                return new List<string>();
+            }
 
             if (connection.GetDialect() is PostgresDialect)
             {
@@ -171,6 +197,59 @@ namespace Serenity.CodeGenerator
                             foreignKeyInfo.FKColumn = reader.GetString(3);
                             foreignKeyInfo.PKTable = reader.GetString(2);
                             foreignKeyInfo.PKColumn = reader.GetString(4);
+
+                            foreignKeyInfos.Add(foreignKeyInfo);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
+                return foreignKeyInfos;
+            }
+
+            if (connection.GetDialect() is FirebirdDialect)
+            {
+                var query = @"
+select 
+ PK.RDB$RELATION_NAME as PKTABLE_NAME
+,ISP.RDB$FIELD_NAME as PKCOLUMN_NAME
+,FK.RDB$RELATION_NAME as FKTABLE_NAME
+,ISF.RDB$FIELD_NAME as FKCOLUMN_NAME
+,(ISP.RDB$FIELD_POSITION + 1) as KEY_SEQ
+,RC.RDB$UPDATE_RULE as UPDATE_RULE
+,RC.RDB$DELETE_RULE as DELETE_RULE
+,PK.RDB$CONSTRAINT_NAME as PK_NAME
+,FK.RDB$CONSTRAINT_NAME as FK_NAME
+from
+ RDB$RELATION_CONSTRAINTS PK
+,RDB$RELATION_CONSTRAINTS FK
+,RDB$REF_CONSTRAINTS RC
+,RDB$INDEX_SEGMENTS ISP
+,RDB$INDEX_SEGMENTS ISF
+WHERE FK.RDB$RELATION_NAME = '{0}' and 
+ FK.RDB$CONSTRAINT_NAME = RC.RDB$CONSTRAINT_NAME 
+and PK.RDB$CONSTRAINT_NAME = RC.RDB$CONST_NAME_UQ 
+and ISP.RDB$INDEX_NAME = PK.RDB$INDEX_NAME 
+and ISF.RDB$INDEX_NAME = FK.RDB$INDEX_NAME 
+and ISP.RDB$FIELD_POSITION = ISF.RDB$FIELD_POSITION 
+order by 1, 5";
+
+                try
+                {
+                    using (var reader =
+                        SqlHelper.ExecuteReader(connection,
+                        (String.Format(query, tableName))))
+                    {
+                        while (reader.Read())
+                        {
+                            ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
+
+                            foreignKeyInfo.FKTable = tableName;
+                            foreignKeyInfo.FKColumn = reader.GetString(3);
+                            foreignKeyInfo.PKTable = reader.GetString(0);
+                            foreignKeyInfo.PKColumn = reader.GetString(1);
 
                             foreignKeyInfos.Add(foreignKeyInfo);
                         }
@@ -333,12 +412,20 @@ namespace Serenity.CodeGenerator
                 numScale = numScale.ToLowerInvariant();
             }
 
+            if (!columns.Columns.Contains(dataType) &&
+                columns.Columns.Contains("COLUMN_DATA_TYPE"))
+                dataType = "COLUMN_DATA_TYPE";
+
+            if (!columns.Columns.Contains(charMax) &&
+                columns.Columns.Contains("CHARACTER_OCTET_LENGTH"))
+                charMax = "CHARACTER_OCTET_LENGTH";
+
             foreach (DataRow row in columns.Rows)
             {
                 FieldInfo fieldInfo = new FieldInfo();
                 fieldInfo.FieldName = (string)row[columnName];
                     
-                order[fieldInfo.FieldName] = (int)row[ordinal];
+                order[fieldInfo.FieldName] = Convert.ToInt32(row[ordinal]);
 
                 fieldInfo.IsPrimaryKey =
                     primaryFields.IndexOf(fieldInfo.FieldName) >= 0;
