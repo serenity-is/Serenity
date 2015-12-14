@@ -28,11 +28,10 @@ namespace Serenity.Web
 
         private static string GetFileSHA1(string filePath)
         {
-            using (FileStream fs = File.OpenRead(filePath))
-            using (BufferedStream bs = new BufferedStream(fs, 1200000))
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000))
             using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
             {
-                byte[] hash = md5.ComputeHash(bs);
+                byte[] hash = md5.ComputeHash(fs);
                 return HttpServerUtility.UrlTokenEncode(hash);
             }
         }
