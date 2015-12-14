@@ -78,6 +78,8 @@ namespace Serenity.Data
                     if (dialectType == null)
                         throw new ArgumentException(String.Format("Dialect type {0} specified for connection key {1} is not found!",
                             setting.Dialect, ConnectionKey));
+
+                    return (this.dialect = (ISqlDialect)Activator.CreateInstance(dialectType));
                 }
 
                 return (this.dialect = GetDialectByProviderName(ProviderName) ?? SqlSettings.DefaultDialect);
