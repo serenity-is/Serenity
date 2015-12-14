@@ -1,3 +1,13 @@
+## 1.8.8 (2015-12-14)
+
+Features:
+  - better error message when Kdiff3 couldn't be located by sergen.exe.
+  - use a large buffer for hashing
+  - ability to set per connection dialect with an application setting (ConnectionSettings key)
+
+Bugfixes:
+  - fix firebird dialect FIRST keyword naming and positioning
+
 ## 1.8.7 (2015-12-12)
 
 Features:
