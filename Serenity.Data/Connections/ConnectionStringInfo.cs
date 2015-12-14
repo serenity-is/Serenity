@@ -71,7 +71,10 @@ namespace Serenity.Data
                     connectionSettings.TryGetValue(ConnectionKey, out setting) &&
                     !setting.Dialect.IsEmptyOrNull())
                 {
-                    var dialectType = Type.GetType("Serenity.Data." + setting.Dialect);
+                    var dialectType = Type.GetType("Serenity.Data." + setting.Dialect + "Dialect") ??
+                        Type.GetType("Serenity.Data." + setting.Dialect) ??
+                        Type.GetType(setting.Dialect);
+
                     if (dialectType == null)
                         throw new ArgumentException(String.Format("Dialect type {0} specified for connection key {1} is not found!",
                             setting.Dialect, ConnectionKey));
