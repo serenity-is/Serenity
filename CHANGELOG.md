@@ -4,6 +4,8 @@ Features:
   - better error message when Kdiff3 couldn't be located by sergen.exe.
   - use a large buffer for hashing
   - ability to set per connection dialect with an application setting (ConnectionSettings key)
+  - show a warning explaining why migrations are skipped, and how to enable them [Serene]
+  - include site.css in web project to avoid errors on publish [Serene]
 
 Bugfixes:
   - fix firebird dialect FIRST keyword naming and positioning
