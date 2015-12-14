@@ -247,9 +247,9 @@ order by 1, 5";
                             ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
 
                             foreignKeyInfo.FKTable = tableName;
-                            foreignKeyInfo.FKColumn = reader.GetString(3);
-                            foreignKeyInfo.PKTable = reader.GetString(0);
-                            foreignKeyInfo.PKColumn = reader.GetString(1);
+                            foreignKeyInfo.FKColumn = reader.GetString(3).TrimEnd();
+                            foreignKeyInfo.PKTable = reader.GetString(0).TrimEnd();
+                            foreignKeyInfo.PKColumn = reader.GetString(1).TrimEnd();
 
                             foreignKeyInfos.Add(foreignKeyInfo);
                         }
@@ -520,6 +520,7 @@ order by 1, 5";
         }
 
         const string SqlBit = "bit";
+        const string SqlDate = "date";
         const string SqlDateTime = "datetime";
         const string SqlSmallDateTime = "smalldatetime";
         const string SqlDecimal = "decimal";
@@ -528,10 +529,12 @@ order by 1, 5";
         const string SqlInt = "int";
         const string SqlInteger = "integer";
         const string SqlDouble = "double";
+        const string SqlDoublePrecision = "double precision";
         const string SqlMoney = "money";
         const string SqlNChar = "nchar";
         const string SqlNVarChar = "nvarchar";
         const string SqlNText = "ntext";
+        const string SqlBlobSubType1 = "blob sub_type 1";
         const string SqlReal = "real";
         const string SqlFloat = "float";
         const string SqlSmallInt = "smallint";
@@ -546,7 +549,8 @@ order by 1, 5";
 
         public static string SqlTypeNameToFieldType(string sqlTypeName)
         {
-            if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlNChar || sqlTypeName == SqlVarChar || sqlTypeName == SqlChar)
+            if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlNChar || 
+                sqlTypeName == SqlVarChar || sqlTypeName == SqlChar || sqlTypeName == SqlBlobSubType1)
                 return "String";
             else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger || sqlTypeName == SqlInt4)
                 return "Int32";
@@ -554,7 +558,7 @@ order by 1, 5";
                 return "Int64";
             else if (sqlTypeName == SqlMoney || sqlTypeName == SqlDecimal || sqlTypeName == SqlNumeric)
                 return "Decimal";
-            else if (sqlTypeName == SqlDateTime)
+            else if (sqlTypeName == SqlDateTime || sqlTypeName == SqlDate)
                 return "DateTime";
             else if (sqlTypeName == SqlSmallDateTime)
                 return "DateTime";
@@ -562,7 +566,7 @@ order by 1, 5";
                 return "Boolean";
             else if (sqlTypeName == SqlReal)
                 return "Single";
-            else if (sqlTypeName == SqlFloat || sqlTypeName == SqlDouble)
+            else if (sqlTypeName == SqlFloat || sqlTypeName == SqlDouble || sqlTypeName == SqlDoublePrecision)
                 return "Double";
             else if (sqlTypeName == SqlSmallInt || sqlTypeName == SqlTinyInt)
                 return "Int16";
