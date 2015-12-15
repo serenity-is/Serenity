@@ -1,3 +1,12 @@
+## 1.8.9 (2015-12-15)
+
+Features:
+  - sergen can generate code for firebird databases (no schema support yet)
+  
+Bugfixes:
+  - when table schema is null generated row code has syntax error for foreign keys, regression bug from 1.8.5
+  - sort indicator in grids was showing wrong direction
+
 ## 1.8.8 (2015-12-14)
 
 Features:
