@@ -2,6 +2,7 @@
 
 Features:
   - sergen can generate code for firebird databases (no schema support yet)
+  - made top row of numbers in dashboard populate from database (cached), made more info buttons go to relevant pages [Serene]
   
 Bugfixes:
   - when table schema is null generated row code has syntax error for foreign keys, regression bug from 1.8.5
