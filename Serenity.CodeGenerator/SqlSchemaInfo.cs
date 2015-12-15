@@ -61,7 +61,7 @@ order by 3";
 
                 foreach (var k in connection.Query(String.Format(query, tableName)))
                 {
-                    primaryFields.Add(k.COLUMN_NAME);
+                    primaryFields.Add(((string)k.COLUMN_NAME).TrimEnd());
                 }
             }
 
