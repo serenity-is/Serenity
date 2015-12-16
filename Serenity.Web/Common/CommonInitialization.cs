@@ -102,6 +102,7 @@ namespace Serenity.Web
             EntityLocalTexts.Initialize();
             JsonLocalTextRegistration.AddFromFilesInFolder(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));
             JsonLocalTextRegistration.AddFromFilesInFolder(HostingEnvironment.MapPath("~/Scripts/site/texts/"));
+            JsonLocalTextRegistration.AddFromFilesInFolder(HostingEnvironment.MapPath("~/App_Data/texts/"));
         }
 
         public static void InitializeDynamicScripts()
