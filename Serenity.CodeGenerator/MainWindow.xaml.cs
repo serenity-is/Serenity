@@ -334,7 +334,7 @@ namespace Serenity.CodeGenerator
                 if (tableOnly.IndexOf('.') >= 0)
                     tableOnly = tableOnly.Substring(tableOnly.IndexOf('.') + 1);
 
-                EntitySingular = table == null ? Inflector.Inflector.Pascalize(tableOnly).Replace(" ", "") : table.Identifier;
+                EntitySingular = table == null ? Inflector.Inflector.Titleize(tableOnly).Replace(" ", "") : table.Identifier;
 
                 Permission = table == null ? "Administration" : table.PermissionKey;
                 ConnectionKey = table != null ? table.ConnectionKey : (connection != null ? connection.Key : "");
