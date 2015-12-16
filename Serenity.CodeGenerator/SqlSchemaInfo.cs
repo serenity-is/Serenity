@@ -63,6 +63,8 @@ order by 3";
                 {
                     primaryFields.Add(((string)k.COLUMN_NAME).TrimEnd());
                 }
+
+                return primaryFields;
             }
 
             var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
