@@ -3,6 +3,7 @@
 Features:
   - use titleize to set default table indentifier in sergen
   - int16 (short) types sets maximum value to 32767 properly
+  - user translations are saved under ~/App_Data/texts instead of ~/scripts/site/texts to avoid permission errors [Serene]
 
 Bugfixes:
   - clone mode should handled by dialog itself as some records might have negative IDs.
