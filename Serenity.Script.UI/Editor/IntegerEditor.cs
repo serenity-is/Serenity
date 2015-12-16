@@ -1,5 +1,4 @@
 ﻿using jQueryApi;
-using Serenity.ComponentModel;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -66,9 +65,7 @@ namespace Serenity
             MaxValue = 2147483647;
         }
 
-        [DisplayName("Min Değer")]
         public Int64 MinValue { get; set; }
-        [DisplayName("Max Değer")]
         public Int64 MaxValue { get; set; }
     }
 }

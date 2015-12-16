@@ -1,6 +1,7 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
+using System.Collections.Generic;
 
 namespace Serenity.PropertyGrid
 {
@@ -12,7 +13,7 @@ namespace Serenity.PropertyGrid
 
             if (editorTypeAttr == null)
             {
-                item.EditorType = AutoDetermineEditorType(source.ValueType, source.EnumType);
+                item.EditorType = AutoDetermineEditorType(source.ValueType, source.EnumType, item.EditorParams);
             }
             else
             {
@@ -63,14 +64,19 @@ namespace Serenity.PropertyGrid
             }
         }
 
-        private static string AutoDetermineEditorType(Type valueType, Type enumType)
+        private static string AutoDetermineEditorType(Type valueType, Type enumType, IDictionary<string, object> editorParams)
         {
             if (enumType != null)
                 return "Enum";
             else if (valueType == typeof(string))
                 return "String";
-            else if (valueType == typeof(Int32) || valueType == typeof(Int16))
+            else if (valueType == typeof(Int32))
                 return "Integer";
+            else if (valueType == typeof(Int16))
+            {
+                editorParams["maxValue"] = Int16.MaxValue;
+                return "Integer";
+            }
             else if (valueType == typeof(DateTime))
                 return "Date";
             else if (valueType == typeof(Boolean))
