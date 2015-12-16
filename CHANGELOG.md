@@ -1,3 +1,14 @@
+## 1.8.10 (2015-12-16)
+
+Features:
+  - use titleize to set default table indentifier in sergen
+  - int16 (short) types sets maximum value to 32767 properly
+
+Bugfixes:
+  - clone mode should handled by dialog itself as some records might have negative IDs.
+  - fix error with firebird primary keys in sergen
+  - set column size properly for firebird string columns in sergen
+
 ## 1.8.9 (2015-12-15)
 
 Features:
