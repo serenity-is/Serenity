@@ -1,4 +1,4 @@
-## 1.8.10 (2015-12-16)
+## 1.8.11 (2015-12-16)
 
 Features:
   - use titleize to set default table indentifier in sergen
