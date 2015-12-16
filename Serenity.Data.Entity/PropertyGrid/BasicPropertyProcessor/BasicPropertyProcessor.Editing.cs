@@ -69,7 +69,7 @@ namespace Serenity.PropertyGrid
                 return "Enum";
             else if (valueType == typeof(string))
                 return "String";
-            else if (valueType == typeof(Int32))
+            else if (valueType == typeof(Int32) || valueType == typeof(Int16))
                 return "Integer";
             else if (valueType == typeof(DateTime))
                 return "Date";
