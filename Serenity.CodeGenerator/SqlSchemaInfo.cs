@@ -419,8 +419,8 @@ order by 1, 5";
                 dataType = "COLUMN_DATA_TYPE";
 
             if (!columns.Columns.Contains(charMax) &&
-                columns.Columns.Contains("CHARACTER_OCTET_LENGTH"))
-                charMax = "CHARACTER_OCTET_LENGTH";
+                columns.Columns.Contains("COLUMN_SIZE"))
+                charMax = "COLUMN_SIZE";
 
             foreach (DataRow row in columns.Rows)
             {
@@ -457,7 +457,7 @@ order by 1, 5";
 
                     var prec = row[numPrec] as Int32?;
 
-                    if (prec != null)
+                    if (prec != null && (SqlTypeNameToFieldType(fieldInfo.DataType) != "String"))
                     {
                         fieldInfo.Size = Convert.ToInt32(prec.Value);
                         if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
