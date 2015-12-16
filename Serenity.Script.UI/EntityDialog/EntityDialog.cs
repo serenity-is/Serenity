@@ -104,14 +104,14 @@ namespace Serenity
                 element.Dialog().Title = GetEntityTitle();
         }
 
-        protected bool IsCloneMode
+        protected virtual bool IsCloneMode
         {
-            get { return EntityId != null && IdExtensions.IsNegativeId(EntityId.Value); }
+            get { return false; }
         }
 
         protected bool IsEditMode
         {
-            get { return EntityId != null && IdExtensions.IsPositiveId(EntityId.Value); }
+            get { return EntityId != null && !IsCloneMode; }
         }
 
         protected bool IsDeleted
