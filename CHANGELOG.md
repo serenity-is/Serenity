@@ -1,3 +1,9 @@
+## 1.8.12 (2015-12-17)
+
+Features:
+  - added Throttler class, to throttle logins, logging etc.
+  - added LDAP / Active Directory authentication samples [Serene]
+
 ## 1.8.11 (2015-12-16)
 
 Features:
