@@ -180,7 +180,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptGrid.cshtml</DependentUpon>
     </Compile>
-    <None Include="App.config" />
     <None Include="Views\EntityScriptForm.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityScriptForm.generated.cs</LastGenOutput>
