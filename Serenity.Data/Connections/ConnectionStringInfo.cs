@@ -17,9 +17,10 @@ namespace Serenity.Data
             new Dictionary<string, ISqlDialect>(StringComparer.OrdinalIgnoreCase)
             {
                 { "System.Data.SqlClient", SqlServer2012Dialect.Instance },
-                { "Npgsql", new PostgresDialect() },
                 { "FirebirdSql.Data.FirebirdClient", FirebirdDialect.Instance },
-                { "System.Data.SQLite", new SqliteDialect() }
+                { "Npgsql", PostgresDialect.Instance },
+                { "MySql.Data.MySqlClient", MySqlDialect.Instance },
+                { "System.Data.SQLite", SqliteDialect.Instance }
             };
 
         private string databaseName;

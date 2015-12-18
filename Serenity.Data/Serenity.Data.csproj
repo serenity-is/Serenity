@@ -66,6 +66,7 @@
     <Compile Include="Criteria\ParamCriteria.cs" />
     <Compile Include="Criteria\UnaryCriteria.cs" />
     <Compile Include="Criteria\ValueCriteria.cs" />
+    <Compile Include="Dialects\MySqlDialect.cs" />
     <Compile Include="FluentSql\MethodChainingExtensions.cs" />
     <Compile Include="FluentSql\SqlQuery.cs" />
     <Compile Include="FluentSql\SqlQuery_Clone.cs" />
