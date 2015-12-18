@@ -68,21 +68,27 @@ order by 3";
             }
 
             var columns = ((DbConnection)((WrappedConnection)connection).ActualConnection).GetSchema("Columns", new string[] { null, schema, tableName, null });
-            foreach (DataRow row in columns.Rows)
+            if (columns.Columns.Contains("PRIMARY_KEY"))
             {
-                try
+                foreach (DataRow row in columns.Rows)
                 {
-                    var isPrimaryKey = row["PRIMARY_KEY"] as Boolean?;
-                    if (isPrimaryKey == true)
-                        primaryFields.Add((string)row["COLUMN_NAME"]);
-                }
-                catch (Exception)
-                {
+                    try
+                    {
+                        var isPrimaryKey = row["PRIMARY_KEY"] as Boolean?;
+                        if (isPrimaryKey == true)
+                            primaryFields.Add((string)row["COLUMN_NAME"]);
+                    }
+                    catch (Exception)
+                    {
 
+                    }
                 }
+
+                return primaryFields;
             }
 
-            if (primaryFields.Count == 0)
+            if (connection.GetDialect() is MySqlDialect ||
+                connection.GetDialect().GetType().Name.StartsWith("SqlServer"))
             {
                 var query = new SqlQuery().Select(
                         "KCU.COLUMN_NAME")
@@ -131,14 +137,32 @@ order by 3";
                 return identityFields;
             }
 
+            if (connection.GetDialect() is MySqlDialect)
+            {
+                foreach (DataRow row in columns.Rows)
+                {
+                    var isIdentity = (row["EXTRA"] as string) == "auto_increment";
+                    if (isIdentity == true)
+                        identityFields.Add((string)row["COLUMN_NAME"]);
+                }
+
+                return identityFields;
+            }
+
             if (columns.Columns.Contains("AUTOINCREMENT"))
+            {
                 foreach (DataRow row in columns.Rows)
                 {
                     var isIdentity = row["AUTOINCREMENT"] as Boolean?;
                     if (isIdentity == true)
                         identityFields.Add((string)row["COLUMN_NAME"]);
                 }
-            else
+
+                return identityFields;
+            }
+
+
+            if (connection.GetDialect().GetType().Name.StartsWith("SqlServer"))
             {
                 new SqlQuery().Select(
                     "C.NAME")
@@ -150,7 +174,7 @@ order by 3";
                     new Criteria("C.STATUS & 128") == 128 &
                     new Criteria("T.NAME") == tableName &
                     new Criteria("T.XTYPE") == "U")
-                .ForEach(connection, delegate(IDataReader reader)
+                .ForEach(connection, delegate (IDataReader reader)
                 {
                     identityFields.Add(reader.GetString(0));
                 });
@@ -158,7 +182,6 @@ order by 3";
 
             return identityFields;
         }
-
 
         public static List<string> GetTableFieldNames(IDbConnection connection, string schema, string tableName)
         {
@@ -328,7 +351,35 @@ order by 1, 5";
                 return foreignKeyInfos;
             }
 
-            try
+            if (connection.GetDialect() is MySqlDialect)
+            {
+                using (var reader =
+                    SqlHelper.ExecuteReader(connection,
+                    (String.Format(@"
+                        SELECT k.COLUMN_NAME, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME
+                        FROM information_schema.TABLE_CONSTRAINTS i
+                        LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                        WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                        AND i.TABLE_SCHEMA = '{0}'
+                        AND i.TABLE_NAME = '{1}'"
+                    , schema, tableName))))
+                {
+                    while (reader.Read())
+                    {
+                        ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
+
+                        foreignKeyInfo.FKTable = tableName;
+                        foreignKeyInfo.FKColumn = reader.GetString(0);
+                        foreignKeyInfo.PKTable = reader.GetString(1);
+                        foreignKeyInfo.PKColumn = reader.GetString(2);
+                        foreignKeyInfos.Add(foreignKeyInfo);
+                    }
+                }
+
+                return foreignKeyInfos;
+            }
+
+            if (connection.GetDialect().GetType().Name.StartsWith("SqlServer"))
             {
                 var c = new Alias(inf + "REFERENTIAL_CONSTRAINTS", "c");
                 var fk = new Alias(inf + "CONSTRAINT_COLUMN_USAGE", "fk");
@@ -374,10 +425,6 @@ order by 1, 5";
                     priorDeleted = false;
                     priorName = foreignKeyInfo.FKName;
                 }
-            }
-            catch (Exception)
-            {
-
             }
 
             return foreignKeyInfos;
@@ -447,30 +494,24 @@ order by 1, 5";
                     fieldInfo.DataType != SqlInt8 &&
                     fieldInfo.DataType != SqlInt4)
                 {
-                    var size = row[charMax] as Int32?;
-                    if (size != null)
-                    {
-                        fieldInfo.Size = size.Value;
-                        if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
-                            fieldInfo.Size = 0;
-                    }
+                    var val = row[charMax];
+                    var size = (val == null || val == DBNull.Value) ? (Int64?)null : Convert.ToInt64(val);
+                    if (size != null && size > 0 && size <= 1000000000)
+                        fieldInfo.Size = (int)size.Value;
 
-                    var prec = row[numPrec] as Int32?;
+                    val = row[numPrec];
+                    var prec = (val == null || val == DBNull.Value) ? (Int64?)null : Convert.ToInt64(val);
 
-                    if (prec != null && (SqlTypeNameToFieldType(fieldInfo.DataType) != "String"))
+                    if (prec != null && (SqlTypeNameToFieldType(fieldInfo.DataType) != "String") &&
+                        prec >= 0 && prec < 1000000000)
                     {
                         fieldInfo.Size = Convert.ToInt32(prec.Value);
-                        if (fieldInfo.Size < 0 || fieldInfo.Size >= 1000000000)
-                            fieldInfo.Size = 0;
                     }
 
-                    var scale = row[numScale] as Int32?;
-                    if (scale != null)
-                    {
+                    val = row[numScale];
+                    var scale = (val == null || val == DBNull.Value) ? (Int64?)null : Convert.ToInt64(val);
+                    if (scale != null && scale >= 0 && scale < 1000000000)
                         fieldInfo.Scale = Convert.ToInt32(scale.Value);
-                        if (fieldInfo.Scale < 0 || fieldInfo.Scale >= 1000000000)
-                            fieldInfo.Scale = 0;
-                    }
                 }
 
                 fieldInfos.Add(fieldInfo);

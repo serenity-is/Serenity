@@ -5,6 +5,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Serenity.Data;
 
 namespace Serenity.CodeGenerator
 {
@@ -55,7 +56,12 @@ namespace Serenity.CodeGenerator
         {
             var model = new EntityCodeGenerationModel();
             model.Module = module;
-            model.Schema = tableSchema;
+
+            if (connection.GetDialect() is MySqlDialect)
+                model.Schema = null;
+            else
+                model.Schema = tableSchema;
+
             model.Permission = permission;
             model.ConnectionKey = connectionKey;
             model.RootNamespace = config.RootNamespace;
