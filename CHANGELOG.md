@@ -1,3 +1,10 @@
+## 1.8.13 (2015-12-18)
+
+Features:
+  - added MySql dialect
+  - code generator works with MySql
+  - sample template supports MySql [Serene]
+
 ## 1.8.12 (2015-12-17)
 
 Features:
