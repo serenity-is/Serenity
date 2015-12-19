@@ -48,6 +48,7 @@ namespace Serenity
                 {
                     Title = Texts.Controls.EntityDialog.SaveButton,
                     CssClass = "save-and-close-button",
+                    Hotkey = "alt+s",
                     OnClick = delegate
                     {
                         self.Save(delegate(ServiceResponse response)
@@ -63,6 +64,7 @@ namespace Serenity
                 Title = isPanel ? Texts.Controls.EntityDialog.SaveButton : LocalText.Empty,
                 Hint = isPanel ? Texts.Controls.EntityDialog.SaveButton : Texts.Controls.EntityDialog.ApplyChangesButton,
                 CssClass = "apply-changes-button",
+                Hotkey = "alt+a",
                 OnClick = delegate
                 {
                     self.Save(delegate(ServiceResponse response)
@@ -83,6 +85,7 @@ namespace Serenity
                 {
                     Title = Texts.Controls.EntityDialog.DeleteButton,
                     CssClass = "delete-button",
+                    Hotkey = "alt+x",
                     OnClick = delegate
                     {
                         Q.Confirm(Texts.Controls.EntityDialog.DeleteConfirmation, delegate

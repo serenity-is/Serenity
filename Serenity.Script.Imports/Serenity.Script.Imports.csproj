@@ -172,6 +172,7 @@
     <Compile Include="GoogleMaps\_Customs\StreetViewPanorama.cs" />
     <Compile Include="GoogleMaps\_Customs\StreetViewPanoramaOptions.cs" />
     <Compile Include="GoogleMaps\_Customs\StreetViewService.cs" />
+    <Compile Include="Mousetrap\Mousetrap.cs" />
     <Compile Include="Promise\Promise.cs" />
     <Compile Include="Select2\Select2.cs" />
     <Compile Include="Dialogs\AlertOptions.cs" />

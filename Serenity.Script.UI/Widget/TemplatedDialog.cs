@@ -98,9 +98,14 @@ namespace Serenity
             if (toolbarDiv.Length == 0)
                 return;
 
+            var hotkeyContext = this.Element.Closest(".ui-dialog");
+            if (hotkeyContext.Length == 0)
+                hotkeyContext = this.element;
+
             var opt = new ToolbarOptions
             {
-                Buttons = GetToolbarButtons()
+                Buttons = GetToolbarButtons(),
+                HotkeyContext = hotkeyContext[0]
             };
 
             toolbar = new Toolbar(toolbarDiv, opt);

@@ -627,9 +627,11 @@ namespace Serenity
         {
             var toolbarDiv = J("<div class=\"grid-toolbar\"></div>")
                 .AppendTo(this.Element);
+
             toolbar = new Toolbar(toolbarDiv, new ToolbarOptions
             {
-                Buttons = buttons
+                Buttons = buttons,
+                HotkeyContext = this.element[0]
             });
         }
 

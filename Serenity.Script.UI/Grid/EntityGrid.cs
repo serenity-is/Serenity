@@ -131,6 +131,7 @@ namespace Serenity
             {
                 Title = GetAddButtonCaption(),
                 CssClass = "add-button",
+                Hotkey = "alt+n",
                 OnClick = delegate {
                     self.AddButtonClick();
                 }

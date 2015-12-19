@@ -1,6 +1,7 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
+using System.Html;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
@@ -55,6 +56,18 @@ namespace Serenity
                 btn.AddClass("no-text");
             else
                 btn.Find("span").Html(text);
+
+            if (!string.IsNullOrEmpty(b.Hotkey) &&
+                Script.IsValue(Window.Instance.As<dynamic>().Mousetrap))
+            {
+                Mousetrap.Wrap(options.HotkeyContext ?? Window.Document.DocumentElement).Bind(b.Hotkey, (e, action) =>
+                {
+                    if (btn.Is(":visible"))
+                        btn.TriggerHandler("click");
+
+                    return (b.HotkeyAllowDefault);
+                });
+            }
         }
 
         public override void Destroy()
@@ -78,6 +91,7 @@ namespace Serenity
     public class ToolbarOptions
     {
         public List<ToolButton> Buttons;
+        public Element HotkeyContext;
     }
 
     [Imported, Serializable]
@@ -88,5 +102,7 @@ namespace Serenity
         public string CssClass { get; set; }
         public jQueryEventHandler OnClick { get; set; }
         public bool? HtmlEncode { get; set; }
+        public string Hotkey { get; set; }
+        public bool HotkeyAllowDefault { get; set; }
     }
 }
