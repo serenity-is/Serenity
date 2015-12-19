@@ -1,3 +1,10 @@
+## 1.8.14 (2015-12-19)
+
+Features:
+  - add mousetrap import
+  - tool buttons can have hotkeys
+  - if mousetrap is included, entity dialogs has alt+s (save), alt+a (apply changes), alt+x (delete) shortcuts when form tab is active.
+
 ## 1.8.13 (2015-12-18)
 
 Features:
