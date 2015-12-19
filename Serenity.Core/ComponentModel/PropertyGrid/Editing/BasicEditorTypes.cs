@@ -104,9 +104,9 @@ namespace Serenity.ComponentModel
         {
         }
 
-        public Int32? Decimals
+        public Int32 Decimals
         {
-            get { return GetOption<Int32?>("decimals"); }
+            get { return GetOption<Int32>("decimals"); }
             set { SetOption("decimals", value); }
         }
 
@@ -122,9 +122,9 @@ namespace Serenity.ComponentModel
             set { SetOption("minValue", value); }
         }
 
-        public Boolean? PadDecimals
+        public Boolean PadDecimals
         {
-            get { return GetOption<Boolean?>("padDecimals"); }
+            get { return GetOption<Boolean>("padDecimals"); }
             set { SetOption("padDecimals", value); }
         }
     }
@@ -144,15 +144,15 @@ namespace Serenity.ComponentModel
         {
         }
 
-        public Int32? Cols
+        public Int32 Cols
         {
-            get { return GetOption<Int32?>("cols"); }
+            get { return GetOption<Int32>("cols"); }
             set { SetOption("cols", value); }
         }
 
-        public Int32? Rows
+        public Int32 Rows
         {
-            get { return GetOption<Int32?>("rows"); }
+            get { return GetOption<Int32>("rows"); }
             set { SetOption("rows", value); }
         }
     }
@@ -164,15 +164,15 @@ namespace Serenity.ComponentModel
         {
         }
 
-        public Int32? Cols
+        public Int32 Cols
         {
-            get { return GetOption<Int32?>("cols"); }
+            get { return GetOption<Int32>("cols"); }
             set { SetOption("cols", value); }
         }
 
-        public Int32? Rows
+        public Int32 Rows
         {
-            get { return GetOption<Int32?>("rows"); }
+            get { return GetOption<Int32>("rows"); }
             set { SetOption("rows", value); }
         }
     }
