@@ -61,7 +61,7 @@ namespace Serenity.Data
             newInfo.rowInstance = new TRow();
             newInfo.rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(newInfo.rowInstance.EnumerateTableFields(), x => x.Name);
             newInfo.localRowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(localInstance.EnumerateTableFields(), x => x.Name);
-            newInfo.mappedIdField = (IIdField)((Row)localInstance).FindField(localAttr.MappedIdField);
+            newInfo.mappedIdField = (IIdField)((Row)localInstance).FindField(localAttr.MappedIdField ?? ((Field)new TRow().IdField).Name);
             if (newInfo.mappedIdField == null)
                 throw new InvalidOperationException(String.Format("Can't locate localization table mapped ID field for {0}!",
                     localInstance.Table));
