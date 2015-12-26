@@ -144,6 +144,9 @@ namespace Serenity
 
         public void DialogOpen()
         {
+            if (isPanel)
+                return;
+
             element.Dialog().Open();
         }
 
@@ -275,7 +278,16 @@ namespace Serenity
 
         public void DialogClose()
         {
+            if (isPanel)
+                return;
+
             this.element.Dialog().Close();
+        }
+
+        public string DialogTitle
+        {
+            get { if (isPanel) return null; return element.Dialog().Option("title") as string; }
+            set { if (isPanel) return; element.Dialog().Option("title", value); }
         }
 
         protected virtual void InitTabs()
