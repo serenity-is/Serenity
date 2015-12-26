@@ -1,3 +1,13 @@
+## 1.8.15 (2015-12-26)
+
+Features:
+  - add DialogTitle property to set dialog title explicitly
+  - add notes editor, notes behavior and tab to Customer dialog [Serene]
+
+Bugfixes:
+  - fix quick search css when there is a fields dropdown
+  - MappedIdField should be set if it is different than id field name in localized row
+
 ## 1.8.14 (2015-12-19)
 
 Features:
