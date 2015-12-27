@@ -6,7 +6,6 @@ namespace Serenity.Data
     using System;
     using System.ComponentModel;
 
-    [JsonConverter(typeof(JsonRowConverter))]
     public class TestRow : Row, IIdRow
     {
         protected Int32? _TestId;

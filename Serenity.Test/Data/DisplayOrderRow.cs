@@ -7,7 +7,6 @@ namespace Serenity.Test.Data
     using R = DisplayOrderRow;
 
     ///   Entity class for a "DisplayOrders" table</summary>
-    [JsonConverter(typeof(JsonRowConverter))]
     public sealed class DisplayOrderRow : Row, IIdRow, IIsActiveRow, IDisplayOrderRow
     {
         /// <summary>Table name</summary>

@@ -26,7 +26,6 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), TwoLevelCached]
     [ReadPermission("@Model.Permission")]
     [ModifyPermission("@Model.Permission")]
-    [JsonConverter(typeof(JsonRowConverter))]
     public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
     {@foreach (var x in Model.Fields) {
     var attrs = new List<string>();

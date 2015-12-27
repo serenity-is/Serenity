@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Serenity.Data
 {
+    [JsonConverter(typeof(JsonRowConverter))]
     public abstract partial class Row : IEntityWithJoins, ISupportAttached, 
         INotifyPropertyChanged, IEditableObject, IDataErrorInfo
     {

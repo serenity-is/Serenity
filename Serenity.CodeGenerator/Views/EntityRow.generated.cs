@@ -87,7 +87,7 @@ WriteLiteral("\")]\r\n    [ModifyPermission(\"");
 
                   Write(Model.Permission);
 
-WriteLiteral("\")]\r\n    [JsonConverter(typeof(JsonRowConverter))]\r\n    public sealed class ");
+WriteLiteral("\")]\r\n    public sealed class ");
 
 
                    Write(Model.RowClassName);

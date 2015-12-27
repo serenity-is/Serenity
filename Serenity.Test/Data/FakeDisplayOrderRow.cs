@@ -7,7 +7,6 @@ namespace Serenity.Test.Data
     using R = FakeDisplayOrderRow;
 
     ///   Entity class for a "DisplayOrders" table with fake ID field (Group ID instead of ID)</summary>
-    [JsonConverter(typeof(JsonRowConverter))]
     public sealed class FakeDisplayOrderRow : Row, IIdRow, IIsActiveRow, IDisplayOrderRow
     {
         /// <summary>Table name</summary>
