@@ -386,7 +386,7 @@ namespace Serenity.CodeGenerator
                         Module, ConnectionKey, EntitySingular, Permission, config);
                     new EntityCodeGenerator(rowModel, config).Run();
 
-                    MessageBox.Show("Code files for the selected table is generated!");
+                    MessageBox.Show("Code files for the selected table is generated. Please REBUILD SOLUTION before running application, otherwise you may have script errors!");
 
                     GenerateCodeButton.IsEnabled = false;
                 }
