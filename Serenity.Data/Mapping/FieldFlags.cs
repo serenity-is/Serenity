@@ -3,76 +3,55 @@
 namespace Serenity.Data
 {
 
-    /// <summary>
-    ///   Bir alanın temel özelliklerini belirleyen flag'lar</summary>
-    /// <remarks>
-    ///   Bilgi amaçlı olarak kullanıldığı gibi, PagerPanel gibi bazı nesneler tarafından dinamik 
-    ///   INSERT, UPDATE sorgularının üretilmesinde de kullanılır. Örneğin Insertable olmayan alanlar 
-    ///   değerleri alınsa da INSERT sorgusuna dahil edilmez. ConvertEmptyStringToNull ise
-    ///   INSERT, UPDATE esnasında grid ya da details view den gelen string alan değerlerinin SQL 
-    ///   parametrelerine çevrilirken, eğer değer boşsa NULL yapılıp yapılmayacağını belirler.</remarks>
+    /// <summary>Flags that determine basic properties of a field</summary>
     [Flags]
     public enum FieldFlags
     {
-        /// <summary>
-        ///   Hiçbir flag set edilmemiş.</summary>
+        /// <summary>No flags set.</summary>
         None = 0,
-        /// <summary>
-        ///   Hiçbir flag set edilmemiş.</summary>
+        /// <summary>Internal fields are equal to no flags set.</summary>
         Internal = 0,
-        /// <summary>
-        ///   INSERT esnasında değer verilebilir mi? Diğer tablolardan gelen alanlar ve 
-        ///   identity gibi alanların bu flag'i olmamalı.</summary>
+        /// <summary>Can a value be set on INSERT? Server side calculated 
+        /// fields (like identity) shouldn't have this flag.</summary>
         Insertable = 1,
-        /// <summary>
-        ///   UPDATE esnasında güncellenebilir mi? Diğer tablolardan gelen alanlar ve identity 
-        ///   gibi alanların bu flag'i olmamalı.</summary>
+        /// <summary>Can it be set on UPDATE? Server side calculated 
+        /// fields (like identity) shouldn't have this flag.</summary>
         Updatable = 2,
-        /// <summary>
-        ///   NULL olabilir mi. Gridview ve Detailsview'de validator'ların Required özelliklerinin
-        ///   belirlenmesi için.</summary>
+        /// <summary>Can it have a null or empty value?</summary>
         NotNull = 4,
-        /// <summary>
-        ///   Alan anahtar saha ya da sahalardan biri.</summary>
+        /// <summary>Field is a member of primary key.</summary>
         PrimaryKey = 8,
-        /// <summary>
-        ///   Otomatik artan integer saha.</summary>
+        /// <summary>Auto incrementing field.</summary>
         AutoIncrement = 16,
-        /// <summary>
-        ///   LEFT OUTER JOIN ile diğer tablolardan gelen alanların bu flag'i set edilmeli.</summary> 
+        /// <summary>It is a field originating from another table 
+        /// through a join. e.g. view field.</summary> 
         Foreign = 32,
-        /// <summary>
-        ///   Hesaplanan alan, Foreign varsa diğer tablolardan da gelen alanların karışımı olabilir.</summary>
+        /// <summary>Calculated field.</summary>
         Calculated = 64,
-        /// <summary>
-        ///   Just reflects another field value (e.g. negative/absolute of it), so doesn't have client and server side storage of its own,
-        ///   and setting it just sets another field.</summary>
+        /// <summary>Just reflects another field value (e.g. negative/absolute 
+        /// version of it), so doesn't have client and server side storage of 
+        /// its own, and setting it just sets another field.</summary>
         Reflective = 128,
         /// <summary>
-        ///   Field which is just a container to use in client side code (might also be client side calculated / reflective).</summary>
+        /// Field which is just a container to use in client side code (might 
+        /// also be client side calculated / reflective).</summary>
         ClientSide = 256,
-        /// <summary>
-        ///   Trim.</summary>
+        /// <summary>Should be trimmed (empty string as null) before 
+        /// setting its value.</summary>
         Trim = 512,
-        /// <summary>
-        ///   TrimToEmpty.</summary>
+        /// <summary>Should be trimmed to (null to empty string) before 
+        /// setting its value.</summary>
         TrimToEmpty = 512 + 1024,
-        /// <summary>
-        ///   DenyFiltering.</summary>
+        /// <summary>Deny filtering on this field.</summary>
         DenyFiltering = 2048,
-        /// <summary>
-        ///   Unique.</summary>
+        /// <summary>Values should be unique.</summary>
         Unique = 4096,
-        /// <summary>
-        ///   Yeni bir <see cref="Field"/> üretirken alan özellikleri belirtilmediğinde
-        ///   kullanılacak öndeğer özellikler. Eklenebilir, güncellenebilir, NULL yapılabilir,
-        ///   boş string'ler NULL'a çevrilir.</summary>
+        /// <summary>These are default flags unless specified otherwise. 
+        /// Insertable, updatable and nullable and trimmed (to null).
         Default = Insertable | Updatable | Trim,
-        /// <summary>
-        ///   Default'tan farkı zorunlu alan olması.</summary>
+        /// <summary>Default flags with NotNull included.</summary>
         Required = Default | NotNull,
-        /// <summary>
-        ///   Otomatik artan anahtar ID alanları için kullanılacak flag seti.</summary>
+        /// <summary>An identity primary key field with auto incrementing value.</summary>
         Identity = PrimaryKey | AutoIncrement | NotNull
     }
 }
