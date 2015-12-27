@@ -102,7 +102,7 @@
     <Compile Include="Mapping\ScaleAttribute.cs" />
     <Compile Include="Mapping\SearchType.cs" />
     <Compile Include="Mapping\SelectLevel.cs" />
-    <Compile Include="Mapping\SetFlagsAttribute.cs" />
+    <Compile Include="Mapping\SetFieldFlagsAttribute.cs" />
     <Compile Include="Mapping\SizeAttribute.cs" />
     <Compile Include="Mapping\TableNameAttribute.cs" />
     <Compile Include="Mapping\TwoLevelCachedAttribute.cs" />
