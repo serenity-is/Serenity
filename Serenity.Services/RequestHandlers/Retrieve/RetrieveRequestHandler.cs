@@ -171,6 +171,7 @@
         protected virtual SqlQuery CreateQuery()
         {
             var query = new SqlQuery()
+                .Dialect(Connection.GetDialect())
                 .From(Row);
 
             query.WhereEqual((Field)(((IIdRow)Row).IdField), Request.EntityId.Value);

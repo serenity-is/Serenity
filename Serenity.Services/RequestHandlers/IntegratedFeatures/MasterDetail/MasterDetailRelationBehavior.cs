@@ -241,6 +241,7 @@ namespace Serenity.Services
                 // no need to call list request handler
 
                 new SqlQuery()
+                        .Dialect(handler.Connection.GetDialect())
                         .From(row)
                         .Select((Field)rowIdField)
                         .Where(foreignKeyField == idField[handler.Row].Value)
@@ -282,6 +283,7 @@ namespace Serenity.Services
             var deleteHandler = deleteHandlerFactory();
             var deleteList = new List<Int64>();
             new SqlQuery()
+                    .Dialect(handler.Connection.GetDialect())
                     .From(row)
                     .Select((Field)rowIdField)
                     .Where(foreignKeyField == idField[handler.Row].Value)

@@ -61,7 +61,7 @@ namespace Serenity.Services
 
         public static void CheckParentNotDeleted(IDbConnection connection, string tableName, Action<SqlQuery> filter)
         {
-            var query = new SqlQuery().Select("1").From(tableName, Alias.T0);
+            var query = new SqlQuery().Dialect(connection.GetDialect()).Select("1").From(tableName, Alias.T0);
             filter(query);
             if (query.Take(1).Exists(connection))
                 throw DataValidation.ParentRecordDeleted(tableName);
@@ -113,7 +113,9 @@ namespace Serenity.Services
             var row = newRow.CreateNew();
             var newId = ((IIdRow)newRow).IdField[newRow];
 
-            var query = new SqlQuery().From(row).Select((Field)(((IIdRow)newRow).IdField));
+            var query = new SqlQuery()
+                .Dialect(connection.GetDialect())
+                .From(row).Select((Field)(((IIdRow)newRow).IdField));
             foreach (var field in indexFields)
                 query.WhereEqual(field, field.AsObject(newRow));
 

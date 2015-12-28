@@ -66,7 +66,7 @@
 
             if (dialect.UseScopeIdentity)
             {
-                var scopeIdentityExpression = ((IQueryWithParams)query).Dialect.ScopeIdentityExpression;
+                var scopeIdentityExpression = dialect.ScopeIdentityExpression;
 
                 queryText += ";\nSELECT " + scopeIdentityExpression + " AS IDCOLUMNVALUE";
 

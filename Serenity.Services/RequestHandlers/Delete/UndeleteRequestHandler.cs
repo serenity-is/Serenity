@@ -112,7 +112,9 @@ namespace Serenity.Services
         {
             var idField = (Field)Row.IdField;
 
-            var query = new SqlQuery().From(Row)
+            var query = new SqlQuery()
+                .Dialect(Connection.GetDialect())
+                .From(Row)
                 .WhereEqual(idField, Request.EntityId.Value);
 
             PrepareQuery(query);

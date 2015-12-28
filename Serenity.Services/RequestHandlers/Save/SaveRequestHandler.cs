@@ -214,6 +214,7 @@ namespace Serenity.Services
             var id = Row.IdField[Row].Value;
 
             var query = new SqlQuery()
+                .Dialect(Connection.GetDialect())
                 .From(Old)
                 .SelectTableFields()
                 .WhereEqual(idField, id);

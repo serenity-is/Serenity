@@ -56,7 +56,9 @@ namespace Serenity.Services
                 criteria &= (Field)idField != idField[handler.Old].Value;
 
             var row = handler.Row.CreateNew();
-            if (new SqlQuery().From(row)
+            if (new SqlQuery()
+                    .Dialect(handler.Connection.GetDialect())
+                    .From(row)
                     .Select("1")
                     .Where(criteria)
                     .Exists(handler.UnitOfWork.Connection))
