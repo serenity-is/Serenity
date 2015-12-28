@@ -38,6 +38,8 @@ namespace Serenity.PropertyGrid
                     return 40;
                 case FieldType.DateTime:
                     return 85;
+                case FieldType.Time:
+                    return 70;
                 case FieldType.Int16:
                     return 55;
                 case FieldType.Int32:

@@ -19,7 +19,8 @@ namespace Serenity.Reflection
                 type == typeof(Double) ||
                 type == typeof(Decimal) ||
                 type == typeof(DateTime) ||
-                type == typeof(Boolean))
+                type == typeof(Boolean) ||
+                type == typeof(TimeSpan))
                 return true;
 
             return false;

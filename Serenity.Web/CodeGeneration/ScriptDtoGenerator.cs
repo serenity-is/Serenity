@@ -274,7 +274,7 @@ namespace Serenity.CodeGeneration
         public static void HandleMemberType(StringBuilder code, Type memberType, string codeNamespace, HashSet<string> usingNamespaces, 
             Action<Type> enqueueType = null)
         {
-            if (memberType == typeof(DateTime?) || memberType == typeof(DateTime))
+            if (memberType == typeof(DateTime?) || memberType == typeof(DateTime) || memberType == typeof(TimeSpan) || memberType == typeof(TimeSpan?))
             {
                 code.Append("String"); // şu an için string, JSON tarafında ISO string formatında tarihler gidiyor, 
                 // ama bunu daha sonra JSON.parse, JSON.stringify'ı değiştirip düzelteceğiz.

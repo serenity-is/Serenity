@@ -586,6 +586,7 @@ order by 1, 5";
         const string SqlUniqueIdentifier = "uniqueidentifier";
         const string SqlVarBinary = "varbinary";
         const string SqlTinyInt = "tinyint";
+        const string SqlTime = "time";
         const string SqlTimestamp = "timestamp";
         const string SqlInt8 = "int8";
         const string SqlInt4 = "int4";
@@ -601,10 +602,10 @@ order by 1, 5";
                 return "Int64";
             else if (sqlTypeName == SqlMoney || sqlTypeName == SqlDecimal || sqlTypeName == SqlNumeric)
                 return "Decimal";
-            else if (sqlTypeName == SqlDateTime || sqlTypeName == SqlDate)
+            else if (sqlTypeName == SqlDateTime || sqlTypeName == SqlDate || sqlTypeName == SqlSmallDateTime)
                 return "DateTime";
-            else if (sqlTypeName == SqlSmallDateTime)
-                return "DateTime";
+            else if (sqlTypeName == SqlTime)
+                return "TimeSpan";
             else if (sqlTypeName == SqlBit)
                 return "Boolean";
             else if (sqlTypeName == SqlReal)
