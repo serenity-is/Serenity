@@ -4,5 +4,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Serenity")]
 [assembly: AssemblyProduct("Serenity Platform")]
 [assembly: AssemblyCopyright("Copyright © Volkan Ceylan")]
-[assembly: AssemblyVersion("1.8.16")]
-[assembly: AssemblyFileVersion("1.8.16")]
+[assembly: AssemblyVersion("1.8.17")]
+[assembly: AssemblyFileVersion("1.8.17")]

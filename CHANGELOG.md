@@ -1,3 +1,8 @@
+## 1.8.17 (2015-12-28)
+
+Bugfixes:
+  - fix identity insert problem with mysql and use connection dialect in more places to avoid such errors
+
 ## 1.8.16 (2015-12-28)
   
 Features:
