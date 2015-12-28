@@ -1,3 +1,10 @@
+## 1.8.16 (2015-12-28)
+  
+Features:
+  - moved JsonRowConverter attribute to base Row class, so no need to specify it in every row subclass
+  - added warning to rebuild solution after generating code in sergen
+  - added TimeSpan field type matching Sql Server time data type
+  
 ## 1.8.15 (2015-12-26)
 
 Features:
