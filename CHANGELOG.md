@@ -1,3 +1,9 @@
+## 1.8.18 (2015-12-31)
+
+Bugfixes:
+  - fix file upload control look after theme change
+  - change Notes permission to Northwind:General from Administration [Serene]
+
 ## 1.8.17 (2015-12-28)
 
 Bugfixes:
