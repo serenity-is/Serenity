@@ -1,5 +1,8 @@
 ## 1.8.18 (2015-12-31)
 
+Features:
+  - added sign up sample [Serene]
+
 Bugfixes:
   - fix file upload control look after theme change
   - change Notes permission to Northwind:General from Administration [Serene]
