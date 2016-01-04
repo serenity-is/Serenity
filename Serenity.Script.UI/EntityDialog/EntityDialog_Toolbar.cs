@@ -70,9 +70,9 @@ namespace Serenity
                     self.Save(delegate(ServiceResponse response)
                     {
                         if (self.IsEditMode)
-                            self.LoadById(self.EntityId.As<long>(), null);
+                            self.LoadById(response.As<SaveResponse>().EntityId ?? self.EntityId.As<long>(), null);
                         else
-                            self.LoadById(((object)(response.As<dynamic>().EntityId)).As<long>(), null);
+                            self.LoadById(response.As<SaveResponse>().EntityId.Value, null);
 
                         ShowSaveSuccessMessage(response);
                     });

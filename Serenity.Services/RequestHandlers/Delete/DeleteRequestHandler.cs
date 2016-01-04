@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -81,16 +82,17 @@ namespace Serenity.Services
         protected virtual void LoadEntity()
         {
             var idField = (Field)Row.IdField;
+            var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             var query = new SqlQuery()
                 .Dialect(Connection.GetDialect())
                 .From(Row)
-                .WhereEqual(idField, Request.EntityId.Value);
+                .WhereEqual(idField, id);
 
             PrepareQuery(query);
 
             if (!query.GetFirst(Connection))
-                throw DataValidation.EntityNotFoundError(Row, Request.EntityId.Value);
+                throw DataValidation.EntityNotFoundError(Row, Request.EntityId);
         }
 
         protected virtual void ExecuteDelete()
@@ -98,7 +100,7 @@ namespace Serenity.Services
             var isDeletedRow = Row as IIsActiveDeletedRow;
             var deleteLogRow = Row as IDeleteLogRow;
             var idField = (Field)Row.IdField;
-            var id = Request.EntityId.Value;
+            var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             if (isDeletedRow == null && deleteLogRow == null)
             {
@@ -201,7 +203,7 @@ namespace Serenity.Services
             if ((isDeletedRow != null &&
                  isDeletedRow.IsActiveField[Row] < 0) ||
                 (deleteLogRow != null &&
-                 deleteLogRow.DeleteUserIdField[Row] != null))
+                 !((Field)deleteLogRow.DeleteUserIdField).IsNull(Row)))
                 Response.WasAlreadyDeleted = true;
             else
             {

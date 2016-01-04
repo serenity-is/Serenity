@@ -5,6 +5,6 @@ namespace Serenity.Services
 {
     public class SaveResponse : ServiceResponse
     {
-        public Int64? EntityId;
+        public object EntityId;
     }
 }

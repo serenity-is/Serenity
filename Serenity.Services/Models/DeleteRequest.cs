@@ -4,6 +4,6 @@ namespace Serenity.Services
 {
     public class DeleteRequest : ServiceRequest
     {
-        public Int64? EntityId;
+        public object EntityId;
     }
 }

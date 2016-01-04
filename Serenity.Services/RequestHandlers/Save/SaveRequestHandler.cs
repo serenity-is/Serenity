@@ -69,7 +69,21 @@ namespace Serenity.Services
             {
                 if (Row.IsAnyFieldAssigned)
                 {
+                    var idField = (Field)Row.IdField;
+                    if (idField.IndexCompare(Old, Row) != 0)
+                    {
+                        var update = new SqlUpdate(Row.Table);
+                        update.Set(Row);
+                        update.Where(idField == new ValueCriteria(idField.AsObject(Old)));
+                        update.Execute(Connection, ExpectedRows.One);
+                    }
+                    else
+                    {
+                        Connection.UpdateById(Row);
+                    }
+
                     Connection.UpdateById(Row);
+                    Response.EntityId = idField.AsObject(Row);
                     InvalidateCacheOnCommit();
                 }
             }
@@ -79,14 +93,15 @@ namespace Serenity.Services
                 if (!ReferenceEquals(null, idField) &&
                     idField.Flags.HasFlag(FieldFlags.AutoIncrement))
                 {
-                    Response.EntityId = Connection.InsertAndGetID(Row);
-                    Row.IdField[Row] = Response.EntityId;
+                    var entityId = Connection.InsertAndGetID(Row);
+                    Response.EntityId = entityId;
+                    Row.IdField[Row] = entityId;
                 }
                 else
                 {
                     Connection.Insert(Row);
                     if (!ReferenceEquals(null, idField))
-                        Response.EntityId = Row.IdField[Row];
+                        Response.EntityId = ((Field)idField).AsObject(Row);
                 }
 
                 InvalidateCacheOnCommit();
@@ -195,11 +210,15 @@ namespace Serenity.Services
 
         protected virtual void LoadOldEntity()
         {
-            var idField = (Field)(Row.IdField);
-            var id = Row.IdField[Row].Value;
-
             if (!PrepareQuery().GetFirst(Connection))
+            {
+                var idField = (Field)(Row.IdField);
+                var id = Request.EntityId != null ?
+                    idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
+                    : idField.AsObject(Row);
+
                 throw DataValidation.EntityNotFoundError(Row, id);
+            }
         }
 
         protected virtual void OnReturn()
@@ -211,7 +230,9 @@ namespace Serenity.Services
         protected virtual SqlQuery PrepareQuery()
         {
             var idField = (Field)(Row.IdField);
-            var id = Row.IdField[Row].Value;
+            var id = Request.EntityId != null ?
+                idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
+                : idField.AsObject(Row);
 
             var query = new SqlQuery()
                 .Dialect(Connection.GetDialect())
@@ -244,7 +265,7 @@ namespace Serenity.Services
 
             if (requestType == SaveRequestType.Auto)
             {
-                if (Row.IdField[Row] == null)
+                if (((Field)Row.IdField).IsNull(Row))
                     requestType = SaveRequestType.Create;
                 else
                     requestType = SaveRequestType.Update;
@@ -430,7 +451,9 @@ namespace Serenity.Services
         {
             var idField = (Field)(Row.IdField);
             Row.ValidateRequired(idField);
-            Row.ClearAssignment(idField);
+
+            if ((idField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+                Row.ClearAssignment(idField);
         }
 
         protected virtual void ValidatePermissions()

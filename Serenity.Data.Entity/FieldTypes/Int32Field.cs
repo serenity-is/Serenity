@@ -146,5 +146,10 @@ namespace Serenity.Data
                     row.FieldAssignedValue(this);
             }
         }
+
+        bool IIdField.IsIntegerType
+        {
+            get { return true; }
+        }
     }
 }

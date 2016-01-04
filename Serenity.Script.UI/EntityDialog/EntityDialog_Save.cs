@@ -54,7 +54,7 @@ namespace Serenity
             if (this.IsEditMode)
             {
                 string idField = GetEntityIdField();
-                if (idField != null)
+                if (idField != null && !Script.IsValue(entity.As<JsDictionary>()[idField]))
                     entity.As<JsDictionary>()[idField] = this.EntityId;
             }
 
@@ -67,6 +67,14 @@ namespace Serenity
 
             SaveRequest<TEntity> req = new SaveRequest<TEntity>();
             req.Entity = entity;
+
+            if (this.IsEditMode)
+            {
+                string idField = GetEntityIdField();
+                if (idField != null)
+                    req.EntityId = this.EntityId;
+            }
+
             if (localizationPendingValue != null)
                 req.As<SaveWithLocalizationRequest<TEntity>>().Localizations = GetPendingLocalizations();
 

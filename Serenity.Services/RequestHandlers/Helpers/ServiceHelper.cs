@@ -111,22 +111,18 @@ namespace Serenity.Services
             }
 
             var row = newRow.CreateNew();
-            var newId = ((IIdRow)newRow).IdField[newRow];
+            var idField = (Field)(((IIdRow)newRow).IdField);
 
             var query = new SqlQuery()
                 .Dialect(connection.GetDialect())
-                .From(row).Select((Field)(((IIdRow)newRow).IdField));
+                .From(row).Select(idField);
             foreach (var field in indexFields)
                 query.WhereEqual(field, field.AsObject(newRow));
 
             if (!query.GetFirst(connection))
                 return false;
 
-            var id = ((IIdRow)row).IdField[row];
-            if (id != null && id == newId)
-                return false;
-
-            return true;
+            return idField.IndexCompare(row, newRow) != 0;
         }
 
         public static void HandleUniqueKodException(IDbConnection connection,

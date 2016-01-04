@@ -13,7 +13,7 @@ namespace Serenity.Services
 
     public class RetrieveRequest : ServiceRequest, IIncludeExcludeColumns
     {
-        public Int64? EntityId { get; set; }
+        public object EntityId { get; set; }
         public RetrieveColumnSelection ColumnSelection { get; set; }
         [JsonConverter(typeof(JsonStringHashSetConverter))]
         public HashSet<string> IncludeColumns { get; set; }

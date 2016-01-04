@@ -163,7 +163,7 @@ namespace Serenity.Services
         public static ValidationError InvalidIdError(Row row, IIdField field)
         {
             var fld = (Field)field;
-            return new ValidationError("InvalidId", fld.Name, Texts.Validation.FieldInvalidValue, fld.Title, field[row].Value);
+            return new ValidationError("InvalidId", fld.Name, Texts.Validation.FieldInvalidValue, fld.Title, ((Field)field).AsObject(row));
         }
 
         public static ValidationError InvalidIdError(Field field, Int64 value)
@@ -194,13 +194,13 @@ namespace Serenity.Services
                 Convert.ToString(field.AsObject(row), CultureInfo.CurrentCulture), field.Title);
         }
 
-        public static ValidationError EntityNotFoundError(Row row, Int64 id)
+        public static ValidationError EntityNotFoundError(Row row, object id)
         {
             return new ValidationError("EntityNotFound", null, Texts.Validation.EntityNotFound,
                 Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));
         }
 
-        public static ValidationError EntityReadAccessError(Row row, Int64 id)
+        public static ValidationError EntityReadAccessError(Row row, object id)
         {
             return new ValidationError("EntityReadAccessError", null, Texts.Validation.EntityReadAccessViolation,
                 Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table));

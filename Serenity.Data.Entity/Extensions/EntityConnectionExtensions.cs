@@ -7,7 +7,7 @@ namespace Serenity.Data
 {
     public static class EntityConnectionExtensions
     {
-        public static TRow ById<TRow>(this IDbConnection connection, Int64 id)
+        public static TRow ById<TRow>(this IDbConnection connection, object id)
             where TRow: Row, IIdRow, new()
         {
             var row = TryById<TRow>(connection, id);
@@ -17,20 +17,20 @@ namespace Serenity.Data
             return row;
         }
 
-        public static TRow TryById<TRow>(this IDbConnection connection, Int64 id)
+        public static TRow TryById<TRow>(this IDbConnection connection, object id)
             where TRow: Row, IIdRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             if (new SqlQuery().From(row)
                     .SelectTableFields()
-                    .Where(new Criteria((IField)row.IdField) == id)
+                    .Where(new Criteria((IField)row.IdField) == new ValueCriteria(id))
                     .GetSingle(connection))
                 return row;
 
             return null;
         }
 
-        public static TRow ById<TRow>(this IDbConnection connection, Int64 id, Action<SqlQuery> editQuery)
+        public static TRow ById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
             where TRow : Row, IIdRow, new()
         {
             var row = TryById<TRow>(connection, id, editQuery);
@@ -40,12 +40,12 @@ namespace Serenity.Data
             return row;
         }
 
-        public static TRow TryById<TRow>(this IDbConnection connection, Int64 id, Action<SqlQuery> editQuery)
+        public static TRow TryById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
             where TRow: Row, IIdRow, new()
         {
             var row = new TRow() { TrackWithChecks = true };
             var query = new SqlQuery().From(row)
-                .Where(new Criteria((IField)row.IdField) == id);
+                .Where(new Criteria((IField)row.IdField) == new ValueCriteria(id));
 
             editQuery(query);
 
@@ -170,14 +170,14 @@ namespace Serenity.Data
                     .Where(where)));
         }
 
-        public static bool ExistsById<TRow>(this IDbConnection connection, Int64 id)
+        public static bool ExistsById<TRow>(this IDbConnection connection, object id)
             where TRow : Row, IIdRow, new()
         {
             var row = new TRow();
             return new SqlQuery()
                     .From(row)
                     .Select("1")
-                    .Where(new Criteria((IField)row.IdField) == id)
+                    .Where(new Criteria((IField)row.IdField) == new ValueCriteria(id))
                     .Exists(connection);
         }
 
@@ -243,12 +243,12 @@ namespace Serenity.Data
                 .Execute(connection, expectedRows);
         }
 
-        public static int DeleteById<TRow>(this IDbConnection connection, Int64 id, ExpectedRows expectedRows = ExpectedRows.One)
+        public static int DeleteById<TRow>(this IDbConnection connection, object id, ExpectedRows expectedRows = ExpectedRows.One)
             where TRow: Row, IIdRow, new()
         {
             var row = new TRow();
             return new SqlDelete(row.Table)
-                .Where(new Criteria((Field)row.IdField) == id)
+                .Where((Field)row.IdField == new ValueCriteria(id))
                 .Execute(connection, expectedRows);
         }
 
@@ -280,7 +280,8 @@ namespace Serenity.Data
             var update = new SqlUpdate(row.Table);
 
             update.Set((Row)row, (Field)(row.IdField));
-            update.Where(new Criteria((Field)row.IdField) == row.IdField[(Row)row].Value);
+            var idField = (Field)row.IdField;
+            update.Where(idField == new ValueCriteria(idField.AsObject((Row)row)));
 
             return update;
         }

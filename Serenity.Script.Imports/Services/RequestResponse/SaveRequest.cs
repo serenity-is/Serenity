@@ -7,6 +7,7 @@ namespace Serenity
     public class SaveRequest<TEntity> : ServiceRequest
         where TEntity : new()
     {
+        public object EntityId { get; set; }
         public TEntity Entity { get; set; }
     }
 }

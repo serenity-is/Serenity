@@ -10,7 +10,9 @@ namespace Serenity.Services
 
         public bool ActivateFor(Row row)
         {
-            return row.GetType().GetCustomAttribute<AuditLogAttribute>() != null;
+            return row.GetType().GetCustomAttribute<AuditLogAttribute>() != null &&
+                row is IIdRow &&
+                ((IIdRow)row).IdField.IsIntegerType;
         }
 
         protected AuditDeleteRequest GetAuditDeleteRequest(IDeleteRequestHandler handler)

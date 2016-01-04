@@ -241,9 +241,9 @@ namespace Serenity.Data
             if (request.EntityId == null)
                 throw new ArgumentNullException("entityId");
 
-            var recordId = request.EntityId.Value;
+            var recordId = Convert.ToInt64(request.EntityId);
 
-            var localRows = GetOldLocalizationRows(connection, request.EntityId.Value);
+            var localRows = GetOldLocalizationRows(connection, recordId);
 
             var response = new RetrieveLocalizationResponse<TRow>();
             response.Entities = new Dictionary<string, TRow>();

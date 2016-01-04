@@ -623,7 +623,10 @@
             return null;
         if (id.length >= 15)
             return id;
-        return parseInt(id, 10);
+        var v = parseInt(id, 10);
+        if (isNaN(v))
+            return id;
+        return v;
     };
 
     var oldShowLabel: (HtmlElement, message) => void;

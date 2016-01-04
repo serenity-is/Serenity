@@ -11,6 +11,7 @@ namespace Serenity.Services
 
     public class SaveRequest<TEntity> : ServiceRequest, ISaveRequest
     {
+        public object EntityId { get; set; }
         public TEntity Entity { get; set; }
 
         object ISaveRequest.Entity

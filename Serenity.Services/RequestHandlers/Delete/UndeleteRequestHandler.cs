@@ -1,6 +1,7 @@
 ﻿using Serenity.Data;
 using System;
 using System.Data;
+using System.Globalization;
 using System.Reflection;
 
 namespace Serenity.Services
@@ -92,7 +93,8 @@ namespace Serenity.Services
                 if (logTableAttr != null)
                     captureLogHandler = new CaptureLogHandler<TRow>();
 
-                hasAuditLogAttribute = typeof(TRow).GetCustomAttribute<AuditLogAttribute>(false) != null;
+                hasAuditLogAttribute = Row.IdField.IsIntegerType &&
+                    typeof(TRow).GetCustomAttribute<AuditLogAttribute>(false) != null;
 
                 loggingInitialized = true;
             }
@@ -111,16 +113,17 @@ namespace Serenity.Services
         protected virtual void LoadEntity()
         {
             var idField = (Field)Row.IdField;
+            var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             var query = new SqlQuery()
                 .Dialect(Connection.GetDialect())
                 .From(Row)
-                .WhereEqual(idField, Request.EntityId.Value);
+                .WhereEqual(idField, id);
 
             PrepareQuery(query);
 
             if (!query.GetFirst(Connection))
-                throw DataValidation.EntityNotFoundError(Row, Request.EntityId.Value);
+                throw DataValidation.EntityNotFoundError(Row, id);
         }
 
         protected virtual void OnReturn()
@@ -176,13 +179,14 @@ namespace Serenity.Services
                 throw new NotImplementedException();
 
             var idField = (Field)Row.IdField;
+            var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
             LoadEntity();
 
             ValidateRequest();
 
             if ((isDeletedRow != null && isDeletedRow.IsActiveField[Row] > 0) ||
-                (deleteLogRow != null && deleteLogRow.DeleteUserIdField[Row] == null))
+                (deleteLogRow != null && ((Field)deleteLogRow.DeleteUserIdField).IsNull(Row)))
                 Response.WasNotDeleted = true;
             else
             {
@@ -192,20 +196,20 @@ namespace Serenity.Services
                 {
                     if (new SqlUpdate(Row.Table)
                             .Set(isDeletedRow.IsActiveField, 1)
-                            .WhereEqual(idField, request.EntityId.Value)
+                            .WhereEqual(idField, id)
                             .WhereEqual(isDeletedRow.IsActiveField, -1)
                             .Execute(Connection) != 1)
-                        throw DataValidation.EntityNotFoundError(Row, request.EntityId.Value);
+                        throw DataValidation.EntityNotFoundError(Row, id);
                 }
                 else
                 {
                     if (new SqlUpdate(Row.Table)
                             .Set((Field)deleteLogRow.DeleteUserIdField, null)
                             .Set(deleteLogRow.DeleteDateField, null)
-                            .WhereEqual(idField, request.EntityId.Value)
+                            .WhereEqual(idField, id)
                             .Where(((Field)deleteLogRow.DeleteUserIdField).IsNotNull())
                             .Execute(Connection) != 1)
-                        throw DataValidation.EntityNotFoundError(Row, request.EntityId.Value);
+                        throw DataValidation.EntityNotFoundError(Row, id);
                 }
 
                 InvalidateCacheOnCommit();

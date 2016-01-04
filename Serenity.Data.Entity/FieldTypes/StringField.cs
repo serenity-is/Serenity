@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace Serenity.Data
 {
-    public class StringField : GenericClassField<String>
+    public class StringField : GenericClassField<String>, IIdField
     {
         public StringField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
             Func<Row, String> getValue = null, Action<Row, String> setValue = null)
@@ -85,6 +85,27 @@ namespace Serenity.Data
 
             if (row.tracking)
                 row.FieldAssignedValue(this);
+        }
+
+        bool IIdField.IsIntegerType
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        long? IIdField.this[Row row]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
 
@@ -174,7 +175,10 @@
                 .Dialect(Connection.GetDialect())
                 .From(Row);
 
-            query.WhereEqual((Field)(((IIdRow)Row).IdField), Request.EntityId.Value);
+            var idField = (Field)(((IIdRow)Row).IdField);
+            var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+
+            query.WhereEqual(idField, id);
 
             return query;
         }
@@ -206,7 +210,7 @@
             if (Query.GetFirst(Connection))
                 Response.Entity = Row;
             else
-                throw DataValidation.EntityNotFoundError(Row, request.EntityId.Value);
+                throw DataValidation.EntityNotFoundError(Row, request.EntityId);
 
             OnAfterExecuteQuery();
 

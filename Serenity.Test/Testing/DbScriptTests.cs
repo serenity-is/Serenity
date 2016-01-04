@@ -63,7 +63,7 @@ namespace Serenity.Test.Testing
 
             Assert.Equal(TestSqlHelper.Normalize(
                 "DECLARE @p1 NVARCHAR(4) = 'Test';" +
-                "DECLARE @p2 BIGINT = 1;" +
+                "DECLARE @p2 INT = 1;" +
                 "UPDATE Tests SET Description = @p1 WHERE TestId = @p2"),
                 TestSqlHelper.Normalize(script.ToString()));
         }

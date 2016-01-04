@@ -50,10 +50,10 @@ namespace Serenity.Services
                 else
                     criteria &= field == new ValueCriteria(field.AsObject(handler.Row));
 
-            var idField = ((IIdRow)handler.Row).IdField;
+            var idField = (Field)((IIdRow)handler.Row).IdField;
 
             if (handler.IsUpdate)
-                criteria &= (Field)idField != idField[handler.Old].Value;
+                criteria &= (Field)idField != new ValueCriteria(idField.AsObject(handler.Old));
 
             var row = handler.Row.CreateNew();
             if (new SqlQuery()
