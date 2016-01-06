@@ -89,6 +89,7 @@
     <Compile Include="CodeGeneration\ScriptEndpointGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />
+    <Compile Include="Common\ScriptCulture.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
     <Compile Include="Mvc\EndpointExtensions.cs" />
     <Compile Include="Mvc\ExcelContentResult.cs" />
