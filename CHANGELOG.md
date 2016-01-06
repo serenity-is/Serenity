@@ -1,3 +1,12 @@
+## 1.8.19 (2015-01-06)
+
+Features:
+  - ability to set script side culture settings (date format etc.) using server side culture through script element with id #ScriptCulture.
+  - support for tables with string/guid id columns (limited)
+  
+Bugfixes:  
+  - set back check tree editor min-height to 150px
+
 ## 1.8.18 (2015-12-31)
 
 Features:
