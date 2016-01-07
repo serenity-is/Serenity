@@ -25,8 +25,8 @@ namespace Serenity.CodeGenerator
             {
                 var tableType = row["TABLE_TYPE"] as string;
                 
-                if (tableType != null && tableType.ToLowerInvariant() == "view")
-                    continue;
+                //if (tableType != null && tableType.ToLowerInvariant() == "view")
+                //    continue;
 
                 var schema = row["TABLE_SCHEMA"] as string;
                 var tableName = row["TABLE_NAME"] as string;
