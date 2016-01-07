@@ -1,3 +1,8 @@
+## 1.8.20 (2015-01-07)
+
+Features:
+  - list views in code generator along with tables. it can't determine id field, so you should manually set it in code.
+
 ## 1.8.19 (2015-01-06)
 
 Features:
