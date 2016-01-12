@@ -186,6 +186,12 @@ namespace Serenity.Services
                         result = checker.CheckStream(fs, true, out image);
                     }
 
+                    if (result == ImageCheckResult.InvalidImage &&
+                        attr.AllowNonImage)
+                    {
+                        return;
+                    }
+
                     if (result > ImageCheckResult.UnsupportedFormat || 
                         (supportedFormats != null && Array.IndexOf(supportedFormats, result) < 0))
                     {

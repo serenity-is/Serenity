@@ -212,18 +212,17 @@ namespace Serenity
 
                 string originalName = item.OriginalName ?? "";
 
+                string fileName = item.Filename;
+                if (urlPrefix != null && fileName != null && !fileName.StartsWith("temporary/"))
+                    fileName = urlPrefix + fileName;
+
+                thumb.Attribute("href", DbFileUrl(fileName));
+                thumb.Attribute("target", "_blank");
+                if (!originalName.IsEmptyOrNull())
+                    thumb.Attribute("title", (originalName));
+
                 if (isImage)
                 {
-                    string fileName = item.Filename;
-                    if (urlPrefix != null && fileName != null && !fileName.StartsWith("temporary/"))
-                        fileName = urlPrefix + fileName;
-
-                    thumb.Attribute("href", DbFileUrl(fileName));
-                    thumb.Attribute("target", "_blank");
-
-                    if (!originalName.IsEmptyOrNull())
-                        thumb.Attribute("title", (originalName));
-
                     thumb.CSS("backgroundImage", "url(" + DbFileUrl(ThumbFileName(item.Filename)) + ")");
                     ColorBox(thumb, new object());
                 }
