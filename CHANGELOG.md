@@ -1,4 +1,13 @@
-## 1.8.21 (2015-01-07)
+## 1.8.22 (2015-01-12)
+
+Features:
+  - safety check to ensure that once a connection is opened, it won't auto open again
+  - allow viewing / downloading non-image files in ImageUploadEditor 
+
+Bugfixes:
+  - FileUploadEditor didn't allow non-image files
+
+## 1.8.21 (2015-01-12)
 
 Bugfixes:
   - rename await to awai in mscorlib.js from saltarelle, as it is a future reserved word for ES6, and creates problems with Edge
