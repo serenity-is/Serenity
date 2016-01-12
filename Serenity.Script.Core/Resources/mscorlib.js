@@ -3758,14 +3758,14 @@ ss.initClass(ss_Task, ss, {
 	isFaulted: function Task$isFaulted() {
 		return this.status === 7;
 	},
-	_getResult: function Task$_getResult(await) {
+	_getResult: function Task$_getResult(awai) {
 		switch (this.status) {
 			case 5:
 				return this._result;
 			case 6:
 				throw new ss_InvalidOperationException('Task was cancelled.');
 			case 7:
-				throw await ? this.exception.innerExceptions[0] : this.exception;
+				throw awai ? this.exception.innerExceptions[0] : this.exception;
 			default:
 				throw new ss_InvalidOperationException('Task is not yet completed.');
 		}
