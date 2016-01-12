@@ -1,3 +1,8 @@
+## 1.8.21 (2015-01-07)
+
+Bugfixes:
+  - rename await to awai in mscorlib.js from saltarelle, as it is a future reserved word for ES6, and creates problems with Edge
+  
 ## 1.8.20 (2015-01-07)
 
 Features:
