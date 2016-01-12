@@ -5,6 +5,7 @@ namespace Serenity.Data
     public class WrappedConnection : IDbConnection
     {
         private IDbConnection actualConnection;
+        private bool openedOnce;
         private WrappedTransaction currentTransaction;
         private ISqlDialect dialect;
 
@@ -14,10 +15,16 @@ namespace Serenity.Data
             this.dialect = dialect;
         }
 
+        public bool OpenedOnce
+        {
+            get { return openedOnce; }
+        }
+
         public IDbConnection ActualConnection
         {
             get { return actualConnection; }
         }
+
         public ISqlDialect Dialect
         {
             get { return dialect; }
@@ -83,7 +90,16 @@ namespace Serenity.Data
             var command = actualConnection.CreateCommand();
             try
             {
-                command.Transaction = this.currentTransaction != null ? this.currentTransaction.ActualTransaction : null;
+                var transaction = this.currentTransaction != null ? this.currentTransaction.ActualTransaction : null;
+                if (transaction != null && transaction.Connection == null)
+                    throw new System.Exception("Active transaction for connection is in invalid state! " + 
+                        "Connection was probably closed unexpectedly!");
+
+                command.Transaction = transaction;
+
+                if (command.Transaction != transaction)
+                    throw new System.Exception("Can't set transaction for command! " +
+                        "Connection was probably closed unexpectedly!");
             }
             catch
             {
@@ -102,6 +118,7 @@ namespace Serenity.Data
         public void Open()
         {
             actualConnection.Open();
+            openedOnce = true;
         }
 
         public ConnectionState State

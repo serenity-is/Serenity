@@ -314,6 +314,11 @@
 
             if (ex != null && ex.Number == 10054)
             {
+                var wrapped = connection as WrappedConnection;
+                if (wrapped != null &&
+                    (wrapped.OpenedOnce || wrapped.CurrentTransaction != null))
+                        return false;
+
                 System.Data.SqlClient.SqlConnection.ClearAllPools();
                 connection.Close();
                 connection.Open();

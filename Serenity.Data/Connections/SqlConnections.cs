@@ -122,7 +122,13 @@ namespace Serenity.Data
                 throw new ArgumentNullException("connection");
 
             if (connection.State != ConnectionState.Open)
+            {
+                var wrapped = connection as WrappedConnection;
+                if (wrapped != null && wrapped.OpenedOnce)
+                    throw new InvalidOperationException("Can't auto open a closed connection that was previously open!");
+
                 connection.Open();
+            }
 
             return connection;
         }
