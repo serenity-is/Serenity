@@ -5,9 +5,9 @@ namespace Serenity.Reporting
 {
     public abstract class BaseReport : IReport, IReportWithAdditionalData
     {
-        public abstract IEnumerable GetData();
+        public abstract object GetData();
 
-        public virtual IDictionary<string, IEnumerable> GetAdditionalData()
+        public virtual IDictionary<string, object> GetAdditionalData()
         {
             return null;
         }

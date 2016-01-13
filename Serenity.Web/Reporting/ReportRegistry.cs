@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Serenity.Abstractions;
+using Serenity.ComponentModel;
+using Serenity.Extensibility;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
-using Serenity.ComponentModel;
-using Serenity.Extensibility;
-using Serenity.Abstractions;
 
 namespace Serenity.Reporting
 {
@@ -13,9 +13,9 @@ namespace Serenity.Reporting
         private static Dictionary<string, Report> reportByKey;
         private static Dictionary<string, List<Report>> reportsByCategory;
 
-        private static string GetReportKey(Type type)
+        public static string GetReportKey(Type type)
         {
-            var attr = type.GetCustomAttribute<RegisterReportAttribute>(false);
+            var attr = type.GetCustomAttribute<ReportAttribute>(false);
             if (attr == null || attr.ReportKey.IsNullOrEmpty())
                 return type.FullName;
 
@@ -57,7 +57,7 @@ namespace Serenity.Reporting
             foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
                 foreach (var type in assembly.GetTypes())
                 {
-                    var attr = type.GetCustomAttribute<RegisterReportAttribute>(false);
+                    var attr = type.GetCustomAttribute<ReportAttribute>(false);
                     if (attr != null)
                     {
                         var report = new Report(type);
@@ -139,7 +139,7 @@ namespace Serenity.Reporting
         public class Report
         {
             public Type Type { get; private set; }
-            public string Key { get; private set; }           
+            public string Key { get; private set; }
             public string Permission { get; private set; }
             public string Title { get; private set; }
             public Category Category { get; private set; }

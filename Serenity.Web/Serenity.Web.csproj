@@ -113,8 +113,11 @@
     <Compile Include="Navigation\NavigationLinkAttribute.cs" />
     <Compile Include="Navigation\NavigationItemAttribute.cs" />
     <Compile Include="Reporting\BaseReport.cs" />
+    <Compile Include="Reporting\ICustomizeHtmlToPdf.cs" />
     <Compile Include="Reporting\Model\GenerateCsvRequest.cs" />
     <Compile Include="Reporting\Model\GenerateExcelFileRequest.cs" />
+    <Compile Include="Reporting\ReportDesignAttribute.cs" />
+    <Compile Include="Reporting\Tools\IHtmlToPdfConverter.cs" />
     <Compile Include="Reporting\Worksheet\CellDecoratorAttribute.cs" />
     <Compile Include="Reporting\Worksheet\BaseCellDecorator.cs" />
     <Compile Include="Reporting\Worksheet\ICellDecorator.cs" />
@@ -125,10 +128,7 @@
     <Compile Include="Reporting\IDataOnlyReport.cs" />
     <Compile Include="Reporting\IReport.cs" />
     <Compile Include="Reporting\IReportWithAdditionalData.cs" />
-    <Compile Include="Reporting\RegisterReportAttribute.cs" />
-    <Compile Include="Reporting\ReportDesignItem.cs" />
-    <Compile Include="Reporting\ReportDesignListRequest.cs" />
-    <Compile Include="Reporting\ReportExecuteRequest.cs" />
+    <Compile Include="Reporting\ReportAttribute.cs" />
     <Compile Include="Reporting\ReportExportType.cs" />
     <Compile Include="Reporting\ReportRegistry.cs" />
     <Compile Include="Reporting\ReportRetrieveRequest.cs" />

@@ -2,9 +2,9 @@
 
 namespace Serenity.Reporting
 {
-    public class RegisterReportAttribute : Attribute
+    public class ReportAttribute : Attribute
     {
-        public RegisterReportAttribute(string reportKey = null)
+        public ReportAttribute(string reportKey = null)
         {
             this.ReportKey = reportKey;
         }

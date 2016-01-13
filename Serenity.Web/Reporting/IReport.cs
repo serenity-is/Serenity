@@ -5,6 +5,6 @@ namespace Serenity.Reporting
 {
     public interface IReport
     {
-        IEnumerable GetData();
+        object GetData();
     }
 }

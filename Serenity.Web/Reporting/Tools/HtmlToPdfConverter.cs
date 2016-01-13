@@ -6,30 +6,27 @@ namespace Serenity.Reporting
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Web.Hosting;
 
-    public class HtmlToPdfConverter
-    {
-        public string Url { get; set; }
-        public List<string> AdditionalUrls { get; set; }
-        public Dictionary<string, string> Cookies { get; set; }
-
-        public int TimeoutSeconds { get; set; }
-        public bool UsePrintMediaType { get; set; }
-        public string UtilityExePath { get; set; }
-
+    public class HtmlToPdfConverter : IHtmlToPdfOptions
+    {       
         public HtmlToPdfConverter()
         {
             AdditionalUrls = new List<string>();
             Cookies = new Dictionary<string, string>();
+            CustomArgs = new List<string>();
+            FooterHeaderReplace = new Dictionary<string, string>();
             TimeoutSeconds = 300;
             UsePrintMediaType = true;
+            PrintBackground = true;
+            PageSize = "A4";
         }
 
         public byte[] Execute()
         {
-            var exePath = UtilityExePath ?? HostingEnvironment.MapPath("~/Reports/Utility/wkhtmltopdf.exe");
+            var exePath = UtilityExePath ?? HostingEnvironment.MapPath("~/App_Data/Reporting/wkhtmltopdf.exe");
             if (!File.Exists(exePath))
                 throw new InvalidOperationException(String.Format("Can't find wkhtmltopdf.exe which is required for PDF generation at location: '{0}'!", exePath));
 
@@ -38,10 +35,71 @@ namespace Serenity.Reporting
 
             var args = new List<string>();
 
+            args.Add(!SmartShrinking ? "--disable-smart-shrinking" : "--enable-smart-shrinking");
+
+            if (!string.IsNullOrEmpty(PageSize))
+            {
+                args.Add("--page-size");
+                args.Add(PageSize);
+            }
+
+            if (MarginLeft != null)
+            {
+                args.Add("--margin-left");
+                args.Add(MarginLeft);
+            }
+
+            if (MarginTop != null)
+            {
+                args.Add("--margin-top");
+                args.Add(MarginTop);
+            }
+
+            if (MarginRight != null)
+            {
+                args.Add("--margin-right");
+                args.Add(MarginRight);
+            }
+
+            if (MarginBottom != null)
+            {
+                args.Add("--margin-bottom");
+                args.Add(MarginBottom);
+            }
+
+            if (Dpi != null)
+            {
+                args.Add("--dpi");
+                args.Add(Dpi.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (Zoom != null)
+            {
+                args.Add("--zoom");
+                args.Add(Zoom);
+            }
+
             if (UsePrintMediaType)
                 args.Add("--print-media-type");
             else
                 args.Add("--no-print-media-type");
+
+            if (PrintBackground)
+                args.Add("--background");
+            else
+                args.Add("--no-background");
+
+            if (FooterHtmlUrl != null)
+            {
+                args.Add("--footer-html");
+                args.Add(FooterHtmlUrl);
+            }
+
+            if (Landscape)
+            {
+                args.Add("--orientation");
+                args.Add("Landscape");
+            }
 
             foreach (var cookie in Cookies)
             {
@@ -50,9 +108,19 @@ namespace Serenity.Reporting
                 args.Add(cookie.Value);
             }
 
+            foreach (var replace in FooterHeaderReplace)
+            {
+                args.Add("--replace");
+                args.Add(replace.Key);
+                args.Add(replace.Value);
+            }
+
             args.Add(this.Url);
             foreach (var additional in AdditionalUrls)
                 args.Add(additional);
+
+            foreach (var arg in CustomArgs)
+                args.Add(arg);
 
             var tempFile = Path.GetTempFileName();
             try
@@ -89,6 +157,38 @@ namespace Serenity.Reporting
             finally
             {
                 TemporaryFileHelper.TryDelete(tempFile);
+            }
+        }
+
+        public string Url { get; set; }
+        public List<string> AdditionalUrls { get; set; }
+        public Dictionary<string, string> Cookies { get; set; }
+        public int TimeoutSeconds { get; set; }
+        public bool UsePrintMediaType { get; set; }
+        public bool PrintBackground { get; set; }
+        public string UtilityExePath { get; set; }
+        public string PageSize { get; set; }
+        public bool SmartShrinking { get; set; }
+        public int? Dpi { get; set; }
+        public bool Landscape { get; set; }
+        public string Zoom { get; set; }
+        public string MarginLeft { get; set; }
+        public string MarginRight { get; set; }
+        public string MarginBottom { get; set; }
+        public string MarginTop { get; set; }
+        public string FooterHtmlUrl { get; set; }
+
+        public Dictionary<string, string> FooterHeaderReplace { get; private set; }
+        public List<string> CustomArgs { get; private set; }
+
+        public string MarginsAll
+        {
+            set
+            {
+                MarginLeft = value;
+                MarginTop = value;
+                MarginRight = value;
+                MarginBottom = value;
             }
         }
     }

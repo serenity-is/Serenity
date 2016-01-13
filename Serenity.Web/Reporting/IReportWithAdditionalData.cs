@@ -5,6 +5,6 @@ namespace Serenity.Reporting
 {
     public interface IReportWithAdditionalData
     {
-        IDictionary<string, IEnumerable> GetAdditionalData();
+        IDictionary<string, object> GetAdditionalData();
     }
 }
