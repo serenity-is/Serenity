@@ -16,5 +16,7 @@ namespace Serenity
         public int ShowDuration { get; set; }
         public int HideDuration { get; set; }
         public int ExtendedTimeOut { get; set; }
+        public bool ProgressBar { get; set; }
+        public bool CloseButton { get; set; }
     }
 }
