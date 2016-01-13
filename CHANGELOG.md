@@ -1,3 +1,11 @@
+## 1.8.23 (2015-01-13)
+
+Features:
+  - add missing toastr options
+
+Bugfixes:
+  - check only transaction is not null for dbcommand after assigning
+
 ## 1.8.22 (2015-01-12)
 
 Features:
