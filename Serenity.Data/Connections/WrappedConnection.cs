@@ -97,7 +97,7 @@ namespace Serenity.Data
 
                 command.Transaction = transaction;
 
-                if (command.Transaction != transaction)
+                if (transaction != null && command.Transaction == null)
                     throw new System.Exception("Can't set transaction for command! " +
                         "Connection was probably closed unexpectedly!");
             }
