@@ -81,7 +81,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="RazorGenerator.Templating, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\RazorGenerator.Templating.2.3.9\lib\portable-Profile328\RazorGenerator.Templating.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\RazorGenerator.Templating.2.3.11\lib\portable-Profile328\RazorGenerator.Templating.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -239,9 +240,6 @@
       <SubType>Designer</SubType>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="SampleTemplate.cshtml">
-      <Generator>RazorGenerator</Generator>
-    </None>
     <None Include="Views\EntityColumns.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityColumns.generated.cs</LastGenOutput>
