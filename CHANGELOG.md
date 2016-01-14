@@ -1,4 +1,9 @@
-## 1.8.23 (2015-01-13)
+## 1.9.0 (2016-01-14)
+
+Features:
+  - updated jquery to 2.2.0, xunit to 2.1.0, RazorGenerator.Templating to 2.3.11, Selenium.WebDriver to 2.48.2, StackExchange.Redis to 1.0.488, Newtonsoft.Json to 8.0.2
+
+## 1.8.23 (2016-01-13)
 
 Features:
   - add missing toastr options
@@ -6,7 +11,7 @@ Features:
 Bugfixes:
   - check only transaction is not null for dbcommand after assigning
 
-## 1.8.22 (2015-01-12)
+## 1.8.22 (2016-01-12)
 
 Features:
   - safety check to ensure that once a connection is opened, it won't auto open again
@@ -15,17 +20,17 @@ Features:
 Bugfixes:
   - FileUploadEditor didn't allow non-image files
 
-## 1.8.21 (2015-01-12)
+## 1.8.21 (2016-01-12)
 
 Bugfixes:
   - rename await to awai in mscorlib.js from saltarelle, as it is a future reserved word for ES6, and creates problems with Edge
   
-## 1.8.20 (2015-01-07)
+## 1.8.20 (2016-01-07)
 
 Features:
   - list views in code generator along with tables. it can't determine id field, so you should manually set it in code.
 
-## 1.8.19 (2015-01-06)
+## 1.8.19 (2016-01-06)
 
 Features:
   - ability to set script side culture settings (date format etc.) using server side culture through script element with id #ScriptCulture.
