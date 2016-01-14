@@ -181,7 +181,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Content\bootstrap-theme.css.map" />
+    <None Include="Content\bootstrap-theme.min.css.map" />
     <None Include="Content\bootstrap.css.map" />
+    <None Include="Content\bootstrap.min.css.map" />
     <None Include="Content\toastr.less" />
     <None Include="Content\toastr.scss" />
     <None Include="fonts\glyphicons-halflings-regular.eot" />
