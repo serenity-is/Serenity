@@ -1,5 +1,13 @@
 @IF EXIST "%~dp0\node.exe" (
-  "%~dp0\node.exe"  "%~dp0\less\bin\lessc" %*
+  @IF EXIST "%~dp0\less\lib\lessc" (
+    "%~dp0\node.exe"  "%~dp0\less\lib\lessc" %*
+  ) ELSE (
+    "%~dp0\node.exe" "%~dp0\less\bin\lessc" %*
+  )
 ) ELSE (
-  node  "%~dp0\less\bin\lessc" %*
+  @IF EXIST "%~dp0\less\lib\lessc" (
+    node  "%~dp0\less\lib\lessc" %*
+  ) ELSE (
+    node  "%~dp0\less\bin\lessc" %*
+  )
 )
