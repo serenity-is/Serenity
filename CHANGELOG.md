@@ -1,3 +1,8 @@
+## 1.9.1 (2016-01-15)
+
+Features:
+  - use lessc from lib folder if available, as bin folder might be ignored in tfs/git
+
 ## 1.9.0 (2016-01-14)
 
 Features:
