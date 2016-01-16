@@ -6,7 +6,7 @@
             : base("MultipleImageUpload")
         {
             AllowNonImage = true;
-            JsonEncodeValue = true;.
+            JsonEncodeValue = true;
         }
     }
 }
