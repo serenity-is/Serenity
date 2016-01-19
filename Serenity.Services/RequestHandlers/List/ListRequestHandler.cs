@@ -186,6 +186,89 @@
             return new Field[] { field };
         }
 
+        protected virtual void AddFieldContainsCriteria(Field field, string containsText, long? id, 
+            SearchType searchType, bool numericOnly, ref BaseCriteria criteria, ref bool orFalse)
+        {
+            if (numericOnly == true && (id == null))
+            {
+                orFalse = true;
+                return;
+            }
+
+            switch (searchType)
+            {
+                case SearchType.Contains:
+                    criteria |= new Criteria(field).Contains(containsText);
+                    break;
+
+                case SearchType.StartsWith:
+                    criteria |= new Criteria(field).StartsWith(containsText);
+                    break;
+
+                case SearchType.Equals:
+                    if (field is Int32Field)
+                    {
+                        if (id == null || id < Int32.MinValue || id > Int32.MaxValue)
+                        {
+                            orFalse = true;
+                            return;
+                        }
+
+                        criteria |= new Criteria(field) == (int)id;
+                    }
+                    else if (field is Int16Field)
+                    {
+                        if (id == null || id < Int16.MinValue || id > Int16.MaxValue)
+                        {
+                            orFalse = true;
+                            return;
+                        }
+
+                        criteria |= new Criteria(field) == (Int16)id;
+                    }
+                    else if (field is Int64Field)
+                    {
+                        if (id == null || id < Int64.MinValue || id > Int64.MaxValue)
+                        {
+                            orFalse = true;
+                            return;
+                        }
+
+                        criteria |= new Criteria(field) == id.Value;
+                    }
+                    else
+                    {
+                        criteria |= new Criteria(field) == containsText;
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("searchType");
+            }
+        }
+
+        protected virtual void ApplyFieldContainsText(Field field, string containsText, long? id,
+            ref BaseCriteria criteria, ref bool orFalse)
+        {
+            var attr = field.CustomAttributes == null ? null : field.CustomAttributes.OfType<QuickSearchAttribute>().FirstOrDefault();
+            var searchType = attr == null ? SearchType.Auto : attr.SearchType;
+            var numericOnly = attr == null ? null : attr.NumericOnly;
+
+            if (numericOnly == null)
+                numericOnly = field is Int32Field || field is Int16Field || field is Int64Field;
+
+            if (searchType == SearchType.Auto)
+            {
+                if (field is Int32Field || field is Int16Field || field is Int64Field)
+                    searchType = SearchType.Equals;
+                else
+                    searchType = SearchType.Contains;
+            }
+
+            AddFieldContainsCriteria(field, containsText, id, searchType, numericOnly ?? false,
+                ref criteria, ref orFalse);
+        }
+
         protected virtual void ApplyContainsText(SqlQuery query, string containsText)
         {
             query.ApplyContainsText(containsText, (text, id) =>
@@ -199,79 +282,7 @@
                 bool orFalse = false;
 
                 foreach (var field in fields)
-                {
-                    var attr = field.CustomAttributes == null ? null : field.CustomAttributes.OfType<QuickSearchAttribute>().FirstOrDefault();
-                    var searchType = attr == null ? SearchType.Auto : attr.SearchType;
-                    var numericOnly = attr == null ? null : attr.NumericOnly;
-
-                    if (numericOnly == null)
-                        numericOnly = field is Int32Field || field is Int16Field || field is Int64Field;
-
-                    if (searchType == SearchType.Auto)
-                    {
-                        if (field is Int32Field || field is Int16Field || field is Int64Field)
-                            searchType = SearchType.Equals;
-                        else
-                            searchType = SearchType.Contains;
-                    }
-
-                    if (numericOnly == true && (id == null))
-                    {
-                        orFalse = true;
-                        continue;
-                    }
-
-                    switch (searchType)
-                    {
-                        case SearchType.Contains:
-                            criteria |= new Criteria(field).Contains(containsText);
-                            break;
-
-                        case SearchType.StartsWith:
-                            criteria |= new Criteria(field).StartsWith(containsText);
-                            break;
-
-                        case SearchType.Equals:
-                            if (field is Int32Field)
-                            {
-                                if (id == null || id < Int32.MinValue || id > Int32.MaxValue)
-                                {
-                                    orFalse = true;
-                                    continue;
-                                }
-
-                                criteria |= new Criteria(field) == (int)id;
-                            }
-                            else if (field is Int16Field)
-                            {
-                                if (id == null || id < Int16.MinValue || id > Int16.MaxValue)
-                                {
-                                    orFalse = true;
-                                    continue;
-                                }
-
-                                criteria |= new Criteria(field) == (Int16)id;
-                            }
-                            else if (field is Int64Field)
-                            {
-                                if (id == null || id < Int64.MinValue || id > Int64.MaxValue)
-                                {
-                                    orFalse = true;
-                                    continue;
-                                }
-
-                                criteria |= new Criteria(field) == id.Value;
-                            }
-                            else
-                            {
-                                criteria |= new Criteria(field) == containsText;
-                            }
-                            break;
-
-                        default:
-                            throw new ArgumentOutOfRangeException("searchType");
-                    }
-                }
+                    ApplyFieldContainsText(field, containsText, id, ref criteria, ref orFalse);
 
                 if (orFalse && criteria.IsEmpty)
                     criteria |= new Criteria("1 = 0");
