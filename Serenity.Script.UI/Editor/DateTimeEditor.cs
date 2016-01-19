@@ -10,7 +10,7 @@ namespace Serenity
 {
     [Editor, DisplayName("Tarih/Zaman")]
     [Element("<input type=\"text\"/>")]
-    public class DateTimeEditor : Widget<DateTimeEditorOptions>, IStringValue
+    public class DateTimeEditor : Widget<DateTimeEditorOptions>, IStringValue, IReadOnly
     {
         private jQueryObject time;
 
@@ -18,7 +18,14 @@ namespace Serenity
             : base(input, opt)
         {
             input.AddClass("dateQ s-DateTimeEditor")
-                .DatePicker(new DatePickerOptions { ShowOn = "button" });
+                .DatePicker(new DatePickerOptions
+                {
+                    ShowOn = "button",
+                    BeforeShow = new Func<bool>(delegate
+                    {
+                        return !input.HasClass("readonly");
+                    })
+                });
 
             input.Bind("keyup." + this.uniqueName, DateEditor.DateInputKeyup);
             input.Bind("change." + this.uniqueName, DateEditor.DateInputChange);
@@ -175,6 +182,32 @@ namespace Serenity
                 {
                     MinValue = null;
                     MaxValue = null;
+                }
+            }
+        }
+
+        public bool ReadOnly
+        {
+            get
+            {
+                return this.element.HasClass("readonly");
+            }
+            set
+            {
+                if (value != ReadOnly)
+                {
+                    if (value)
+                    {
+                        this.element.AddClass("readonly").Attribute("readonly", "readonly");
+                        this.element.NextAll(".ui-datepicker-trigger").CSS("opacity", "0.1");
+                    }
+                    else
+                    {
+                        this.element.RemoveClass("readonly").RemoveAttr("readonly");
+                        this.element.NextAll(".ui-datepicker-trigger").CSS("opacity", "1");
+                    }
+
+                    EditorUtils.SetReadOnly(time, value);
                 }
             }
         }
