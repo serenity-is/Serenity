@@ -103,4 +103,12 @@ namespace Serenity.ComponentModel
             set { SetOption("displayFormat", value); }
         }
     }
+
+    public class UrlFormatterAttribute : CustomFormatterAttribute
+    {
+        public UrlFormatterAttribute()
+            : base("Url")
+        {
+        }
+    }
 }
