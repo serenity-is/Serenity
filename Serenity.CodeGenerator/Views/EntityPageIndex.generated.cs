@@ -32,15 +32,15 @@ WriteLiteral("\r\n");
                                                    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
 
 
-WriteLiteral("@{\r\n    ViewBag.Title = Serenity.LocalText.Get(\"Db");
+WriteLiteral("@{\r\n    ViewData[\"Title\"] = Serenity.LocalText.Get(\"Db");
 
 
-                                          Write(dotModule);
+                                              Write(dotModule);
 
 WriteLiteral(".");
 
 
-                                                       Write(Model.ClassName);
+                                                           Write(Model.ClassName);
 
 WriteLiteral(".EntityPlural\");\r\n}\r\n\r\n<div id=\"GridDiv\"></div>\r\n\r\n<script type=\"text/javascript\"" +
 ">\r\n    jQuery(function () {\r\n        new ");

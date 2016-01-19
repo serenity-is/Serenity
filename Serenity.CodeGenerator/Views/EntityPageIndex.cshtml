@@ -1,7 +1,7 @@
 ﻿@* Generator: Template *@
 @functions { public dynamic Model { get; set; } }@{var dotModule = Model.Module == null ? "" : ("." + Model.Module);}
 @@{
-    ViewBag.Title = Serenity.LocalText.Get("Db@(dotModule).@(Model.ClassName).EntityPlural");
+    ViewData["Title"] = Serenity.LocalText.Get("Db@(dotModule).@(Model.ClassName).EntityPlural");
 }
 
 <div id="GridDiv"></div>
