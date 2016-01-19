@@ -1,3 +1,17 @@
+## 1.9.2 (2016-01-19)
+
+Features:
+  - update script package versions in nuspec
+  - set JsonEncodeValue to true by default for MultipleFileUploadEditor
+  - added UrlFormatter
+  - use ViewData to avoid hidden RuntimeBinderExceptions.
+  - update typescript defs
+  - divide ListRequestHandler.ApplyContainsText into submethods to make it easier to override per field logic
+ 
+Bugfixes:
+  - fix DateTimeEditor readonly state
+  - fix DateTimeEditor width in form styles
+
 ## 1.9.1 (2016-01-15)
 
 Features:
