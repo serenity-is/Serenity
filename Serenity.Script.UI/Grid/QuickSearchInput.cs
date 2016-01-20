@@ -138,6 +138,21 @@ namespace Serenity
             else
                 done(true);
         }
+
+        public QuickSearchField Field
+        {
+            get { return field; }
+            set
+            {
+                if (this.field != value)
+                {
+                    fieldChanged = true;
+                    this.field = value;
+                    UpdateInputPlaceHolder();
+                    CheckIfValueChanged();
+                }
+            }
+        }
     }
 
     [Serializable, Reflectable]
