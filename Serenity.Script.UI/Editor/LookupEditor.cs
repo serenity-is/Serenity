@@ -43,5 +43,13 @@ namespace Serenity
         /// If null or empty, and CascadeField is set, all items are filtered
         /// </summary>
         public object FilterValue { get; set; }
+        /// <summary>
+        /// Allow multiple selection
+        /// </summary>
+        public bool Multiple { get; set; }
+        /// <summary>
+        /// In multiple mode, use a comma separated string, instead of an array when serializing value
+        /// </summary>
+        public bool Delimited { get; set; }
     }
 }

@@ -116,7 +116,7 @@ namespace Serenity
                 object idValue = item[lookup.IdField];
                 string id = idValue == null ? "" : idValue.ToString();
 
-                this.items.Add(new Select2Item
+                AddItem(new Select2Item
                 {
                     Id = id,
                     Text = text,
@@ -141,7 +141,7 @@ namespace Serenity
                     object idValue = item[lookup.IdField];
                     string id = idValue == null ? "" : idValue.ToString();
 
-                    this.items.Add(new Select2Item
+                    AddItem(new Select2Item
                     {
                         Id = id,
                         Text = text,
@@ -273,6 +273,9 @@ namespace Serenity
 
             if (options.InplaceAdd)
                 opt.CreateSearchChoice = GetCreateSearchChoice();
+
+            if (options.Multiple)
+                opt.Multiple = true;
 
             return opt;
         }

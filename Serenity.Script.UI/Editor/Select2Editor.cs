@@ -1,8 +1,8 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -16,11 +16,13 @@ namespace Serenity
     }
 
     [Element("<input type=\"hidden\"/>")]
-    public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, IStringValue
+    public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, ISetEditValue, IGetEditValue, IStringValue
         where TOptions : class, new()
         where TItem: class
     {
+        private bool multiple;
         protected List<Select2Item> items;
+        protected JsDictionary<string, Select2Item> itemById;
         protected int pageSize = 100;
         protected string lastCreateTerm;
 
@@ -28,12 +30,15 @@ namespace Serenity
             : base(hidden, opt)
         {
             items = new List<Select2Item>();
+            itemById = new JsDictionary<string, Select2Item>();
 
             var emptyItemText = EmptyItemText();
             if (emptyItemText != null)
                 hidden.Attribute("placeholder", emptyItemText);
 
-            hidden.Select2(GetSelect2Options());
+            var select2Options = GetSelect2Options();
+            multiple = Q.IsTrue(select2Options.Multiple);
+            hidden.Select2(select2Options);
             
             hidden.Attribute("type", "text"); // jquery validate to work
             hidden.Bind2("change." + this.uniqueName, (e, x) =>
@@ -86,30 +91,49 @@ namespace Serenity
                 InitSelection = delegate(jQueryObject element, Action<object> callback)
                 {
                     var val = element.GetValue();
-                    Select2Item item = null;
-                    for (var i = 0; i < this.items.Count; i++)
+
+                    if (multiple)
                     {
-                        var x = items[i];
-                        if (x.Id == val)
+                        var list = new List<object>();
+                        foreach (var z in val.Split(","))
                         {
-                            item = x;
-                            break;
+                            var item = itemById[z];
+                            if (item != null)
+                                list.Add(item);
                         }
+
+                        callback(list);
+                        return;
                     }
 
-                    callback(item);
+                    callback(itemById[val]);
                 }
             };
+        }
+
+        public bool Delimited
+        {
+            get
+            {
+                return Q.IsTrue(options.As<dynamic>().delimited);
+            }
         }
 
         protected void ClearItems()
         {
             this.items.Clear();
+            this.itemById = new JsDictionary<string, Select2Item>();
+        }
+
+        protected void AddItem(Select2Item item)
+        {
+            this.items.Add(item);
+            this.itemById[item.Id] = item;
         }
 
         protected void AddItem(string key, string text, TItem source = null, bool disabled = false)
         {
-            this.items.Add(new Select2Item
+            AddItem(new Select2Item
             {
                 Id = key,
                 Text = text,
@@ -194,6 +218,23 @@ namespace Serenity
             };
         }
 
+        public void SetEditValue(dynamic source, PropertyItem property)
+        {
+            var val = source[property.Name];
+            if (Q.IsArray(val))
+                Values = val;
+            else
+                Value = val;
+        }
+
+        public void GetEditValue(PropertyItem property, dynamic target)
+        {
+            if ((!multiple || Delimited))
+                target[property.Name] = Value;
+            else
+                target[property.Name] = Values;
+        }
+
         protected jQueryObject Select2Container
         {
             get { return this.element.PrevAll(".select2-container"); }
@@ -204,16 +245,67 @@ namespace Serenity
             get { return this.items; }
         }
 
+        public JsDictionary<string, Select2Item> ItemByKey
+        {
+            get { return this.itemById;}
+        }
+
         public string Value
         {
             get
             {
-                return this.element.Select2Get("val") as string;
+                var val = this.element.Select2Get("val");
+
+                if (val != null && Q.IsArray(val))
+                    return ((string[])val).Join(",");
+
+                return val as string;
             }
             set
             {
                 if (value != Value)
-                    this.element.Select2("val", value).TriggerHandler("change", new object[] { true });
+                {
+                    object val = value;
+
+                    if (!string.IsNullOrEmpty(value) && multiple)
+                    {
+                        val = value.Split(',')
+                            .Select(x => x.TrimToNull())
+                            .Where(x => x != null)
+                            .ToArray();
+                    }
+
+                    this.element.Select2("val", val).TriggerHandler("change", new object[] { true });
+                }
+            }
+        }
+
+        public string[] Values
+        {
+            get
+            {
+                var val = this.element.Select2Get("val");
+                if (val == null)
+                    return new string[0];
+
+                if (Q.IsArray(val))
+                    return ((string[])val);
+
+                var str = val as string;
+                if (string.IsNullOrEmpty(str))
+                    return new string[0];
+
+                return new string[] { str };
+            }
+            set
+            {
+                if (value == null || value.Length == 0)
+                {
+                    Value = null;
+                    return;
+                }
+
+                Value = string.Join(",", value);
             }
         }
 

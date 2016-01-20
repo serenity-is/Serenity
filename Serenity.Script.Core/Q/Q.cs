@@ -71,6 +71,17 @@ namespace Serenity
             return false;
         }
 
+        /// <summary>
+        /// Returns true if obj is an array
+        /// </summary>
+        /// <param name="obj">Object to be checked</param>
+        /// <returns>True if obj is an array</returns>
+        [InlineCode("ss.isArray({obj})")]
+        public static bool IsArray(object obj)
+        {
+            return false;
+        }
+
         [InlineCode("$({p})")]
         private static jQueryObject J(object p)
         {
