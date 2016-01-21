@@ -1,3 +1,10 @@
+## 1.9.3 (2016-01-21)
+
+Features:
+  - add multiple selection option to LookupEditor
+  - LinkingSetRelationAttribute and related behavior to store multiple selection items in linking table
+  - make selected quick search field info public in QuickSearchInput
+
 ## 1.9.2 (2016-01-19)
 
 Features:
