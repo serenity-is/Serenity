@@ -5,11 +5,13 @@ using Serenity.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Serenity.Services
 {
-    public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IRetrieveBehavior, IFieldBehavior
+    public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior, 
+        IImplicitBehavior, IRetrieveBehavior, IFieldBehavior
     {
         public Field Target { get; set; }
 
@@ -32,6 +34,14 @@ namespace Serenity.Services
             if (attr == null)
                 return false;
 
+            if (!(row is IIdRow))
+            {
+                throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
+                    "but it doesn't implement IIdRow!",
+                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+            }
+
+
             var listType = Target.ValueType;
             if (!listType.IsGenericType ||
                 listType.GetGenericTypeDefinition() != typeof(List<>))
@@ -47,10 +57,18 @@ namespace Serenity.Services
             {
                 throw new ArgumentException(String.Format(
                     "Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
-                    "but its row type is not valid!",
+                    "but specified row type is not valid row class!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
             }
-            
+
+            if (!typeof(IIdRow).IsAssignableFrom(rowType))
+            {
+                throw new ArgumentException(String.Format(
+                    "Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
+                    "but specified row type doesn't implement IIdRow!",
+                        Target.PropertyName ?? Target.Name, row.GetType().FullName));
+            }
+
             listFactory = FastReflection.DelegateForConstructor<IList>(listType);
             rowFactory = FastReflection.DelegateForConstructor<Row>(rowType);
 
@@ -100,7 +118,7 @@ namespace Serenity.Services
                 !handler.ShouldSelectField(Target))
                 return;
 
-            var idField = (handler.Row as IIdRow).IdField;
+            var idField = (Field)((handler.Row as IIdRow).IdField);
 
             var listHandler = listHandlerFactory();
 
@@ -113,7 +131,7 @@ namespace Serenity.Services
                 },
                 EqualityFilter = new Dictionary<string, object>
                 {
-                    { thisKeyField.PropertyName ?? thisKeyField.Name, idField[handler.Row] }
+                    { thisKeyField.PropertyName ?? thisKeyField.Name, idField.AsObject(handler.Row) }
                 }
             };
 
@@ -126,12 +144,12 @@ namespace Serenity.Services
             Target.AsObject(handler.Row, list);
         }
 
-        private void SaveDetail(IUnitOfWork uow, Row detail, Int64 masterId, Int64? detailId)
+        private void SaveDetail(IUnitOfWork uow, object masterId, object detailId, object itemKey)
         {
-            detail = detail.Clone();
-
-            ((IIdRow)detail).IdField[detail] = detailId;
-            ((IIdField)thisKeyField)[detail] = masterId;
+            var detail = rowFactory();
+            ((Field)(((IIdRow)detail).IdField)).AsObject(detail, detailId);
+            thisKeyField.AsObject(detail, masterId);
+            itemKeyField.AsObject(detail, itemKeyField.ConvertValue(itemKey, CultureInfo.InvariantCulture));
 
             var saveHandler = saveHandlerFactory();
             var saveRequest = saveRequestFactory();
@@ -139,11 +157,150 @@ namespace Serenity.Services
             saveHandler.Process(uow, saveRequest, detailId == null ? SaveRequestType.Create : SaveRequestType.Update);
         }
 
-        private void DeleteDetail(IUnitOfWork uow, Int64 detailId)
+        private void DeleteDetail(IUnitOfWork uow, object detailId)
         {
             var deleteHandler = deleteHandlerFactory();
             var deleteRequest = new DeleteRequest { EntityId = detailId };
             deleteHandler.Process(uow, deleteRequest);
+        }
+
+        private void DetailListSave(IUnitOfWork uow, object masterId, IList<Row> oldRows, 
+            IList<object> newItemKeys)
+        {
+            if (oldRows.Count == 0)
+            {
+                foreach (object itemKey in newItemKeys)
+                    SaveDetail(uow, masterId, null, itemKey);
+
+                return;
+            }
+
+            var row = rowFactory();
+            var rowIdField = (Field)((row as IIdRow).IdField);
+
+            newItemKeys = newItemKeys.Where(x => x != null).Distinct().ToList();
+
+            if (newItemKeys.Count == 0)
+            {
+                foreach (Row entity in oldRows)
+                    DeleteDetail(uow, rowIdField.AsObject(entity));
+
+                return;
+            }
+
+            var oldByItemKey = new Dictionary<string, Row>(oldRows.Count);
+            foreach (Row item in oldRows)
+            {
+                var itemKey = itemKeyField.AsObject(item);
+                if (itemKey != null)
+                    oldByItemKey[itemKey.ToString()] = item;
+            }
+
+            if (attr.PreserveOrder)
+            {
+                if (!newItemKeys.Take(oldRows.Count).SequenceEqual(
+                        oldRows.Select(x => itemKeyField.AsObject(x))) &&
+                    newItemKeys.Any(x => !oldByItemKey.ContainsKey(x.ToString())))
+                {
+                    foreach (Row item in oldRows)
+                    {
+                        var id = rowIdField.AsObject(item);
+                        DeleteDetail(uow, id);
+                    }
+
+                    oldRows = new List<Row>();
+                    oldByItemKey = new Dictionary<string, Row>();
+                }
+            }
+
+            var newByItemKey = new HashSet<string>();
+            foreach (object item in newItemKeys)
+            {
+                if (item != null)
+                    newByItemKey.Add(item.ToString());
+            }
+
+            foreach (Row item in oldRows)
+            {
+                var itemKey = itemKeyField.AsObject(item);
+                var id = rowIdField.AsObject(item);
+                if (itemKey == null || !newByItemKey.Contains(itemKey.ToString()))
+                    DeleteDetail(uow, id);
+            }
+
+            foreach (object itemKey in newItemKeys)
+            {
+                if (oldByItemKey.ContainsKey(itemKey.ToString()))
+                    continue;
+
+                SaveDetail(uow, masterId, null, itemKey);
+            }
+        }
+
+        public override void OnAfterSave(ISaveRequestHandler handler)
+        {
+            var newList = Target.AsObject(handler.Row) as IList;
+            if (newList == null)
+                return;
+
+            var idField = (Field)((handler.Row as IIdRow).IdField);
+            var masterId = idField.AsObject(handler.Row);
+
+            if (handler.IsCreate)
+            {
+                foreach (object itemKey in newList)
+                    if (itemKey != null)
+                        SaveDetail(handler.UnitOfWork, masterId, null, itemKey);
+
+                return;
+            }
+
+            var oldRows = new List<Row>();
+
+            var row = rowFactory();
+            var rowIdField = (Field)((row as IIdRow).IdField);
+
+            new SqlQuery()
+                    .Dialect(handler.Connection.GetDialect())
+                    .From(row)
+                    .Select(rowIdField)
+                    .Select(itemKeyField)
+                    .OrderBy(rowIdField)
+                    .WhereEqual(thisKeyField, masterId)
+                    .ForEach(handler.Connection, () =>
+                    {
+                        oldRows.Add(row.Clone());
+                    });
+
+            DetailListSave(handler.UnitOfWork, masterId, oldRows,
+                newList.Cast<object>().ToList());
+        }
+
+        public override void OnBeforeDelete(IDeleteRequestHandler handler)
+        {
+            if (ReferenceEquals(null, Target) ||
+                (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+                return;
+
+            var idField = (Field)((handler.Row as IIdRow).IdField);
+            var masterId = idField.AsObject(handler.Row);
+            var row = rowFactory();
+            var rowIdField = (Field)((row as IIdRow).IdField);
+
+            var deleteHandler = deleteHandlerFactory();
+            var deleteList = new List<object>();
+            new SqlQuery()
+                    .Dialect(handler.Connection.GetDialect())
+                    .From(row)
+                    .Select(rowIdField)
+                    .WhereEqual(thisKeyField, masterId)
+                    .ForEach(handler.Connection, () =>
+                    {
+                        deleteList.Add(rowIdField.AsObject(row));
+                    });
+
+            foreach (var id in deleteList)
+                DeleteDetail(handler.UnitOfWork, id);
         }
     }
 }

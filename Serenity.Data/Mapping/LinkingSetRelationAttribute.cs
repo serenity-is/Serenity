@@ -18,11 +18,13 @@ namespace Serenity.Data.Mapping
             Check.NotNullOrEmpty(itemKey, "LinkingSetRelationAttribute.ItemKey");
 
             this.RowType = rowType;
+            this.ThisKey = thisKey;
+            this.ItemKey = itemKey;
         }
 
-        public Type RowType { get; set; }
-        public string ThisKey { get; set; }
-        public string ItemKey { get; set; }
+        public Type RowType { get; private set; }
+        public string ThisKey { get; private set; }
+        public string ItemKey { get; private set; }
         public bool PreserveOrder { get; set; }
     }
 }
