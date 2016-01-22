@@ -1,3 +1,8 @@
+## 1.9.4 (2016-01-22)
+
+Bugfixes:
+  - fix cast error with Select2 editor when value is not string
+  
 ## 1.9.3 (2016-01-21)
 
 Features:
