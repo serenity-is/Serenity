@@ -24,6 +24,6 @@
     <file src="Serenity.Core.dll" target="tools" />
     <file src="Serenity.Data.dll" target="tools" />
     <file src="Serenity.Data.Entity.dll" target="tools" />
-    <file src="..\..\Includes\tools\**\*.*" target="content\tools" />
+    <file src="..\..\Includes\tools\**\*" target="content\tools" />
   </files>
 </package>
