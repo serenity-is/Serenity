@@ -1,3 +1,8 @@
+## 1.9.5 (2016-01-22)
+
+Bugfixes:
+  - fix nuspec to include extensionless lessc compiler file
+
 ## 1.9.4 (2016-01-22)
 
 Bugfixes:
