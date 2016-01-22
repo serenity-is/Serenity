@@ -220,11 +220,11 @@ namespace Serenity
 
         public void SetEditValue(dynamic source, PropertyItem property)
         {
-            var val = source[property.Name];
+            object val = source[property.Name];
             if (Q.IsArray(val))
-                Values = val;
+                Values = val.As<string[]>();
             else
-                Value = val;
+                Value = val == null ? null : val.ToString();
         }
 
         public void GetEditValue(PropertyItem property, dynamic target)
