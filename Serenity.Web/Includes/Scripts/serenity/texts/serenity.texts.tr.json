@@ -74,6 +74,8 @@
     "Controls.FilterPanel.ValueRequired": "alan için değer girilmeli!",
     "Controls.ImageUpload.AddFileButton": "Dosya Seç",
     "Controls.ImageUpload.DeleteButtonHint": "Kaldır",
+    "Controls.ImageUpload.UploadFileTooBig": "Yüklenen dosya en fazla {0} olabilir!",
+    "Controls.ImageUpload.UploadFileTooSmall": "Yüklenen dosya en az {0} olmalıdır!",
     "Controls.Pager.DefaultLoadError": "Kayıtlar alınırken hata oluştu!",
     "Controls.Pager.LoadingStatus": "Veri alınıyor, lütfen bekleyiniz...",
     "Controls.Pager.NoRowStatus": "Kayıt yok",
