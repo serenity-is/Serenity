@@ -17,6 +17,7 @@ namespace Serenity.Services
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private UploadHelper uploadHelper;
+        private StringField originalNameField;
 
         public bool ActivateFor(Row row)
         {
@@ -36,6 +37,22 @@ namespace Serenity.Services
                 throw new ArgumentException(String.Format(
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
+
+            if (!attr.OriginalNameProperty.IsEmptyOrNull())
+            {
+                var originalNameField = row.FindFieldByPropertyName(attr.OriginalNameProperty) ??
+                    row.FindField(attr.OriginalNameProperty);
+
+                if (ReferenceEquals(null, originalNameField))
+                    throw new ArgumentException(String.Format(
+                        "Field '{0}' on row type '{1}' has a UploadEditor attribute but " +
+                        "a field with OriginalNameProperty '{2} is not found!'",
+                            Target.PropertyName ?? Target.Name, 
+                            row.GetType().FullName,
+                            attr.OriginalNameProperty));
+
+                this.originalNameField = (StringField)originalNameField;
+            }
 
             var format = attr.FilenameFormat;
 
@@ -96,11 +113,23 @@ namespace Serenity.Services
                     return;
 
                 filename[handler.Row] = null;
+
+                if (!ReferenceEquals(null, originalNameField))
+                    originalNameField[handler.Row] = null;
+
                 return;
             }
 
             if (!newFilename.ToLowerInvariant().StartsWith("temporary/"))
                 throw new InvalidOperationException("For security reasons, only temporary files can be used in uploads!");
+
+            if (!ReferenceEquals(null, originalNameField))
+            {
+                var originalName = File.ReadAllText(Path.ChangeExtension(
+                    UploadHelper.DbFilePath(newFilename), ".orig")).TrimToNull();
+
+                originalNameField[handler.Row] = originalName;
+            }
 
             if (handler.IsUpdate)
             {
