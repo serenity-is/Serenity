@@ -1,3 +1,8 @@
+## 1.9.7 (2016-01-28)
+
+Bugfixes:
+  - make OriginalNameProperty in single file upload editors work again
+
 ## 1.9.6 (2016-01-27)
 
 Features:
