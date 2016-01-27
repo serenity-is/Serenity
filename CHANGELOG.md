@@ -1,3 +1,11 @@
+## 1.9.6 (2016-01-27)
+
+Features:
+  - added german translations (thanks to Toni Riegler)
+  - add now button to DateTimeEditor
+  - change default step minutes to 5 from 30 in DateTimeEditor
+  - pressing space sets value to now in DateTimeEditor and DateEditor
+  
 ## 1.9.5 (2016-01-22)
 
 Bugfixes:
