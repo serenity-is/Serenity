@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor, DisplayName("Tarih/Zaman")]
+    [Editor, DisplayName("Date/Time")]
     [Element("<input type=\"text\"/>")]
     public class DateTimeEditor : Widget<DateTimeEditorOptions>, IStringValue, IReadOnly
     {
@@ -27,7 +27,12 @@ namespace Serenity
                     })
                 });
 
-            input.Bind("keyup." + this.uniqueName, DateEditor.DateInputKeyup);
+            input.Bind("keyup." + this.uniqueName, e => {
+                if (e.Which == 32 && !ReadOnly)
+                    this.ValueAsDate = JsDate.Now;
+                else
+                    DateEditor.DateInputKeyup(e);
+            });
             input.Bind("change." + this.uniqueName, DateEditor.DateInputChange);
 
             time = J("<select/>")
@@ -36,9 +41,8 @@ namespace Serenity
 
             foreach (var t in GetTimeOptions(fromHour: options.StartHour ?? 0, 
                 toHour: options.EndHour ?? 23, 
-                stepMins: options.IntervalMinutes ?? 30))
+                stepMins: options.IntervalMinutes ?? 5))
                 Q.AddOption(time, t, t);
-
 
             input.AddValidationRule(this.uniqueName, e =>
             {
@@ -58,6 +62,17 @@ namespace Serenity
 
                 return null;
             });
+
+            J("<div class='inplace-button inplace-now'><b></b></div>")
+                .Attribute("title", "set to now")
+                .InsertAfter(time)
+                .Click(e =>
+                {
+                    if (this.Element.HasClass("readonly"))
+                        return;
+
+                    this.ValueAsDate = JsDate.Now;
+                });
         }
 
         private static List<string> GetTimeOptions(int fromHour = 0, int fromMin = 0,
@@ -114,18 +129,30 @@ namespace Serenity
                     this.element.Value("");
                     this.time.Value("00:00");
                 }
-                else if (value == "Today")
+                else if (value.ToLower() == "today")
                 {
                     this.element.Value(Q.FormatDate(JsDate.Today));
                     this.time.Value("00:00");
                 }
                 else
                 {
-                    var val = Q.Externals.ParseISODateTime(value);
+                    var val = value.ToLower() == "now" ? JsDate.Now : (Q.Externals.ParseISODateTime(value));
+                    val = RoundToMinutes(val, options.IntervalMinutes ?? 5);
                     this.element.Value(Q.FormatDate(val));
                     this.time.Value(Q.FormatDate(val, "HH:mm"));
                 }
             }
+        }
+
+        public static JsDate RoundToMinutes(JsDate date, int minutesStep)
+        {
+            date = new JsDate(date.GetTime());
+
+            var m = (int)(Math.Round((double)date.GetMinutes() / minutesStep) * minutesStep);
+            date.SetMinutes(m);
+            date.SetSeconds(0);
+            date.SetMilliseconds(0);
+            return date;
         }
 
         public JsDate ValueAsDate

@@ -24,7 +24,12 @@ namespace Serenity
                 })
             });
 
-            input.Bind("keyup." + this.uniqueName, DateInputKeyup);
+            input.Bind("keyup." + this.uniqueName, e => {
+                if (e.Which == 32 && !ReadOnly)
+                    this.ValueAsDate = JsDate.Now;
+                else
+                    DateInputKeyup(e);
+            });
 
             input.Bind("change." + this.uniqueName, DateInputChange);
 
@@ -84,6 +89,9 @@ namespace Serenity
 
             var input = J(e.Target);
             if (!input.Is(":input"))
+                return;
+
+            if (input.Is(":readonly") || input.Is(":disabled"))
                 return;
 
             var val = (input.GetValue() ?? "");
@@ -223,7 +231,7 @@ namespace Serenity
             {
                 if (value == null)
                     this.element.Value("");
-                else if (value == "Today")
+                else if (value.ToLower() == "today" || value.ToLower() == "now")
                     this.element.Value(Q.FormatDate(JsDate.Today));
                 else
                     this.element.Value(Q.FormatDate(Q.Externals.ParseISODateTime(value)));
