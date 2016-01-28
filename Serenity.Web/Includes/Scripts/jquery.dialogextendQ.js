@@ -73,7 +73,9 @@
       titlebar.addClass("has-maximize-restore");
 
         buttonPane.append('<a class="ui-dialog-titlebar-restore ui-corner-all ui-state-default" href="#"><span class="ui-icon ' + this.options.icons.restore + '">Önceki Boyutuna Dön</span></a>')
-            .find('.ui-dialog-titlebar-restore').attr("role", "button").attr('title', 'Önceki Boyutuna Dön').mouseover(function () {
+            .find('.ui-dialog-titlebar-restore').attr("role", "button")
+            .attr('title', Q.text('Dialogs.RestoreHint'))
+        .mouseover(function () {
         return $(this).addClass("ui-state-hover");
       }).mouseout(function() {
         return $(this).removeClass("ui-state-hover");
@@ -122,7 +124,9 @@
       }).end();
 
       if (name == 'maximize')
-          buttonPane.find('a.ui-dialog-titlebar-maximize').attr('title', 'Ekranı Kapla').find('span').text('Ekranı Kapla');
+          buttonPane.find('a.ui-dialog-titlebar-maximize')
+              .attr('title', Q.text('Dialogs.MaximizeHint'))
+              .find('span').text(Q.text('Dialogs.MaximizeHint'));
 
       return result;
     },
