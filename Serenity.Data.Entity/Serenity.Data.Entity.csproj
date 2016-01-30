@@ -93,6 +93,8 @@
     <Compile Include="Contracts\INameRow.cs" />
     <Compile Include="Contracts\IParentIdRow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.HideOnUpdate.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.HideOnInsert.cs" />
     <Compile Include="PropertyGrid\IPropertyProcessor.cs" />
     <Compile Include="PropertyGrid\IPropertySource.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Alignment.cs" />

@@ -34,8 +34,12 @@ namespace Serenity.ComponentModel
         public bool? ReadOnly { get; set; }
         [JsonProperty("insertable")]
         public bool? Insertable { get; set; }
+        [JsonProperty("hideOnInsert")]
+        public bool? HideOnInsert { get; set; }
         [JsonProperty("updatable")]
         public bool? Updatable { get; set; }
+        [JsonProperty("hideOnUpdate")]
+        public bool? HideOnUpdate { get; set; }
         [JsonProperty("oneWay")]
         public bool? OneWay { get; set; }
         [JsonProperty("defaultValue")]

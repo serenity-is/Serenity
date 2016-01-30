@@ -73,7 +73,7 @@ namespace Serenity
                 editors[i] = editor;
             }
 
-            UpdateReadOnly();
+            UpdateInterface();
         }
 
         public override void Destroy()
@@ -366,7 +366,7 @@ namespace Serenity
                 if (options.Mode != value)
                 {
                     options.Mode = value;
-                    UpdateReadOnly();
+                    UpdateInterface();
                 }
             }
         }
@@ -413,20 +413,35 @@ namespace Serenity
             EditorUtils.SaveValue(editor, item, target);
         }
 
-        private void UpdateReadOnly()
+        private void UpdateInterface()
         {
             for (var i = 0; i < editors.Count; i++)
             {
                 var item = items[i];
                 var editor = editors[i];
 
-                bool readOnly = item.ReadOnly == true ||
-                    (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
-                    (Mode == PropertyGridMode.Update && item.Updatable == false);
+                if (item.ReadOnly == true ||
+                    item.Insertable == false ||
+                    item.Updatable == false)
+                { 
+                    bool readOnly = item.ReadOnly == true ||
+                        (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
+                        (Mode == PropertyGridMode.Update && item.Updatable == false);
 
-                EditorUtils.SetReadOnly(editor, readOnly);
-                EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
-                    (item.EditorType != "Boolean"));
+                    EditorUtils.SetReadOnly(editor, readOnly);
+                    EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
+                        (item.EditorType != "Boolean"));
+                }
+
+                if (item.HideOnInsert == true ||
+                    item.HideOnUpdate == true)
+                { 
+                    bool hidden = 
+                        (Mode == PropertyGridMode.Insert && item.HideOnInsert == true) ||
+                        (Mode == PropertyGridMode.Update && item.HideOnUpdate == true);
+
+                    editor.GetGridField().Toggle(!hidden);
+                }
             }
         }
 

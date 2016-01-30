@@ -15,6 +15,8 @@ namespace Serenity.PropertyGrid
             SetEditing(source, item);
             SetFiltering(source, item);
             SetFormatting(source, item);
+            SetHideOnInsert(source, item);
+            SetHideOnUpdate(source, item);
             SetHint(source, item);
             SetInsertable(source, item);
             SetOneWay(source, item);
