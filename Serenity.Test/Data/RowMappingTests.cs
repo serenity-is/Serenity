@@ -152,7 +152,7 @@ namespace Serenity.Test.Data
 
             var join = ComplexRow.Fields.Joins["c"];
             Assert.Equal(
-                TestSqlHelper.Normalize("c.TheCountryID = T0.CountryID"),
+                TestSqlHelper.Normalize("(c.TheCountryID = T0.CountryID)"),
                 TestSqlHelper.Normalize(join.OnCriteria.ToStringIgnoreParams()));
 
             Assert.Equal("TheCountryTable", join.Table);

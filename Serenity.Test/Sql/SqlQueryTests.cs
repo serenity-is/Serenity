@@ -739,7 +739,7 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT ParentColumn FROM ParentTable WHERE " +
-                        "(SELECT TOP 1 SubColumn FROM SubTable) >= @p1"),
+                        "((SELECT TOP 1 SubColumn FROM SubTable) >= @p1)"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
@@ -758,7 +758,7 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT ParentColumn FROM ParentTable WHERE " +
-                        "(SELECT TOP 1 SubColumn FROM SubTable) >= @p1"),
+                        "((SELECT TOP 1 SubColumn FROM SubTable) >= @p1)"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }

@@ -76,10 +76,20 @@ namespace Serenity.Data
             result.joins.Clear();
             foreach (var join in oldJoins)
             {
+                BaseCriteria onCriteria;
+                var bc = join.Value.OnCriteria as BinaryCriteria;
+                if (!ReferenceEquals(null, bc))
+                    onCriteria = new BinaryCriteria(
+                        new Criteria(mapExpression(bc.LeftOperand.ToString())),
+                        bc.Operator,
+                        new Criteria(mapExpression(bc.RightOperand.ToString())));
+                else
+                    onCriteria = new Criteria(mapExpression(join.Value.OnCriteria.ToString()));
+
                 new ReplacedJoin(result.Joins, 
                     mapExpression(join.Value.Table), 
                     mapAlias(join.Value.Name),
-                    new Criteria(mapExpression(join.Value.OnCriteria.ToString())), 
+                    onCriteria, 
                     join.Value.GetKeyword());
             }
 

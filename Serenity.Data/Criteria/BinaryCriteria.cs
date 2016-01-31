@@ -50,9 +50,11 @@
             }
             else
             {
+                sb.Append('(');
                 this.left.ToString(sb, query);
                 sb.Append(opText[(int)this.op - (int)CriteriaOperator.AND]);
                 this.right.ToString(sb, query);
+                sb.Append(')');
             }
         }
 

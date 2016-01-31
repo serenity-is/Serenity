@@ -22,14 +22,17 @@
             if (!ReferenceEquals(null, join.OnCriteria) &&
                 !join.OnCriteria.IsEmpty)
             {
-                sb.Append(" ON (");
+                sb.Append(" ON ");
+                if (!(join.OnCriteria is BinaryCriteria))
+                    sb.Append('(');
                 
                 if (modifySelf)
                     sb.Append(join.OnCriteria.ToString(this));
                 else
                     sb.Append(join.OnCriteria.ToStringIgnoreParams());
 
-                sb.Append(')');
+                if (!(join.OnCriteria is BinaryCriteria))
+                    sb.Append(')');
             }
         }
 
