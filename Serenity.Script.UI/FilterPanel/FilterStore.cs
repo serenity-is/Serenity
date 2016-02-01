@@ -64,9 +64,9 @@ namespace Serenity
                         if (!currentBlock.IsEmpty)
                         {
                             if (isBlockOr)
-                                activeCriteria |= currentBlock;
+                                activeCriteria |= ~(currentBlock);
                             else
-                                activeCriteria &= currentBlock;
+                                activeCriteria &= ~(currentBlock);
 
                             currentBlock = Criteria.Empty;
                         }
@@ -89,9 +89,9 @@ namespace Serenity
                 if (!currentBlock.IsEmpty)
                 {
                     if (isBlockOr)
-                        activeCriteria |= currentBlock;
+                        activeCriteria |= ~(currentBlock);
                     else
-                        activeCriteria &= currentBlock;
+                        activeCriteria &= ~(currentBlock);
                 }
 
                 return activeCriteria;

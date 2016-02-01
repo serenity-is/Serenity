@@ -347,7 +347,7 @@
 
             var criteria = ReplaceFieldExpressions(Request.Criteria);
 
-            query.Where(criteria);
+            query.Where(~(criteria));
         }
 
         protected virtual void ApplyEqualityFilter(SqlQuery query)
