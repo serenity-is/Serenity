@@ -428,10 +428,12 @@ namespace Serenity
                 EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
                     (item.EditorType != "Boolean"));
 
-                if (item.HideOnInsert == true ||
+                if (item.Visible == false ||
+                    item.HideOnInsert == true ||
                     item.HideOnUpdate == true)
-                { 
+                {
                     bool hidden = 
+                        item.Visible == false ||
                         (Mode == PropertyGridMode.Insert && item.HideOnInsert == true) ||
                         (Mode == PropertyGridMode.Update && item.HideOnUpdate == true);
 
