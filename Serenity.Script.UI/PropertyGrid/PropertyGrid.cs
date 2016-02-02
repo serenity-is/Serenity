@@ -420,18 +420,13 @@ namespace Serenity
                 var item = items[i];
                 var editor = editors[i];
 
-                if (item.ReadOnly == true ||
-                    item.Insertable == false ||
-                    item.Updatable == false)
-                { 
-                    bool readOnly = item.ReadOnly == true ||
-                        (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
-                        (Mode == PropertyGridMode.Update && item.Updatable == false);
+                bool readOnly = item.ReadOnly == true ||
+                    (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
+                    (Mode == PropertyGridMode.Update && item.Updatable == false);
 
-                    EditorUtils.SetReadOnly(editor, readOnly);
-                    EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
-                        (item.EditorType != "Boolean"));
-                }
+                EditorUtils.SetReadOnly(editor, readOnly);
+                EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
+                    (item.EditorType != "Boolean"));
 
                 if (item.HideOnInsert == true ||
                     item.HideOnUpdate == true)
@@ -470,6 +465,7 @@ namespace Serenity
         [Obsolete("Use EditorUtils.SetRequired")]
         public static void SetRequired(Widget widget, bool isRequired)
         {
+            EditorUtils.SetRequired(widget, isRequired);
         }
 
         [Obsolete("Use EditorUtils.SetReadOnly")]
