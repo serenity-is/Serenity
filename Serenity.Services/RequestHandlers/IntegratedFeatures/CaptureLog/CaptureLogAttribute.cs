@@ -10,6 +10,6 @@ namespace Serenity.Data
         }
 
         public Type LogRow { get; private set; }
-        public string MappedIdField { get; private set; }
+        public string MappedIdField { get; set; }
     }
 }
