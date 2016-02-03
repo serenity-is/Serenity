@@ -84,7 +84,12 @@ namespace Serenity.Data
                         bc.Operator,
                         new Criteria(mapExpression(bc.RightOperand.ToString())));
                 else
-                    onCriteria = new Criteria(mapExpression(join.Value.OnCriteria.ToString()));
+                {
+                    if (ReferenceEquals(null, join.Value.OnCriteria))
+                        onCriteria = null;
+                    else
+                        onCriteria = new Criteria(mapExpression(join.Value.OnCriteria.ToString()));
+                }
 
                 new ReplacedJoin(result.Joins, 
                     mapExpression(join.Value.Table), 
