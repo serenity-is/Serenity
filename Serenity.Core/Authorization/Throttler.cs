@@ -33,7 +33,7 @@ namespace Serenity
             }
             else
             {
-                if (hit.Counter++ > this.Limit)
+                if (hit.Counter++ >= this.Limit)
                     return false;
             }
 
