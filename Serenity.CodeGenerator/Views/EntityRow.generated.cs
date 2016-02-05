@@ -259,20 +259,20 @@ WriteLiteral("()\r\n            : base(Fields)\r\n        {\r\n        }\r\n\r\n
 
           foreach (var x in Model.Fields) {
 
-WriteLiteral("\r\n            public readonly ");
+WriteLiteral("\r\n            public ");
 
 
-                        Write(x.Type);
+               Write(x.Type);
 
 WriteLiteral("Field ");
 
 
-                                       Write(x.Ident);
+                              Write(x.Ident);
 
 WriteLiteral(";");
 
 
-                                                             }
+                                                    }
 
 
  foreach (var x in Model.Joins) {
@@ -281,20 +281,20 @@ WriteLiteral("\r\n");
 
        foreach (var y in x.Fields) {
 
-WriteLiteral("\r\n            public readonly ");
+WriteLiteral("\r\n            public ");
 
 
-                        Write(y.Type);
+               Write(y.Type);
 
 WriteLiteral("Field ");
 
 
-                                       Write(jf(x.Name, y.Ident));
+                              Write(jf(x.Name, y.Ident));
 
 WriteLiteral(";");
 
 
-                                                                         }}
+                                                                }}
 
 WriteLiteral("\r\n\r\n            public RowFields()\r\n                : base(\"");
 

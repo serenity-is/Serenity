@@ -97,11 +97,11 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
         public class RowFields : @(Model.FieldsBaseClass)
         {@foreach (var x in Model.Fields) {
 <text>
-            public readonly @(x.Type)Field @(x.Ident);</text>}
+            public @(x.Type)Field @(x.Ident);</text>}
 @foreach (var x in Model.Joins) {<text>
 </text>foreach (var y in x.Fields) {
 <text>
-            public readonly @(y.Type)Field @(jf(x.Name, y.Ident));</text>}}
+            public @(y.Type)Field @(jf(x.Name, y.Ident));</text>}}
 
 
             public RowFields()

@@ -15,13 +15,13 @@ namespace Serenity.Test.Data
         public class RowFields : RowFieldsBase
         {
             /// <summary>ID field</summary>
-            public readonly Int32Field ID;
+            public Int32Field ID;
             /// <summary>GroupID field</summary>
-            public readonly Int32Field GroupID;
+            public Int32Field GroupID;
             /// <summary>DisplayOrder field</summary>
-            public readonly Int32Field DisplayOrder;
+            public Int32Field DisplayOrder;
             /// <summary>IsActive field</summary>
-            public readonly Int16Field IsActive;
+            public Int16Field IsActive;
 
             public RowFields()
                 : base(R.TableName, "")

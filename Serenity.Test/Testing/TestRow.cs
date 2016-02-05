@@ -62,11 +62,11 @@ namespace Serenity.Data
         {
             public RowFields() : base("Tests") { }
 
-            public readonly Int32Field TestId;
-            public readonly StringField Name;
-            public readonly Int32Field SomeId;
-            public readonly StringField Description;
-            public readonly Int32Field DisplayOrder;
+            public Int32Field TestId;
+            public StringField Name;
+            public Int32Field SomeId;
+            public StringField Description;
+            public Int32Field DisplayOrder;
         }
 
         public static readonly RowFields Fields = new RowFields();
