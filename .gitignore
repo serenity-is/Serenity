@@ -27,3 +27,6 @@ Serenity.Test/Scripts/serenity/Serenity.Script.UI.js
 packages/repositories.config
 Serenity.Script.Core/Resources/Serenity.*.map
 Serenity.CodeGenerator/App.config
+*.crunchsolution.cache
+*.ncrunchproject
+*.ncrunchsolution
