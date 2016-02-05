@@ -7,12 +7,11 @@ namespace Serenity.Services
     public class RowValidationContext : IValidationContext
     {
         private Row row;
-        private IDbConnection connection;
 
         public RowValidationContext(IDbConnection connection, Row row)
         {
             this.row = row;
-            this.connection = connection;
+            this.Connection = connection;
         }
 
         public object GetFieldValue(string fieldName)

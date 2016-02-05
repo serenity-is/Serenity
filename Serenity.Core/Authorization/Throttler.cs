@@ -29,11 +29,11 @@ namespace Serenity
             if (hit == null)
             {
                 hit = new HitInfo { Counter = 1 };
-                LocalCache.Add(this.CacheKey, hit, this.Duration);
+                Dependency.Resolve<ILocalCache>().Add(this.CacheKey, hit, this.Duration);
             }
             else
             {
-                if (hit.Counter++ > this.Limit)
+                if (hit.Counter++ >= this.Limit)
                     return false;
             }
 
