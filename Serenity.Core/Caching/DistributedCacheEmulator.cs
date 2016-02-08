@@ -38,8 +38,8 @@ namespace Serenity.Caching
                 object value;
                 if (!this.dictionary.TryGetValue(key, out value))
                 {
-                    this.dictionary[key] = 1L;
-                    return 1L;
+                    this.dictionary[key] = (long)amount;
+                    return (long)amount;
                 }
                 else
                 {

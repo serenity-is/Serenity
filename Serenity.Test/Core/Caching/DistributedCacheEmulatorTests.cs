@@ -19,10 +19,10 @@ namespace Serenity.Test
         {
             var cache = new DistributedCacheEmulator();
             var actual = cache.Increment("NotExistingValue", 7);
-            Assert.Equal(1, actual);
+            Assert.Equal(7, actual);
 
             var inCache = cache.Get<long>("NotExistingValue");
-            Assert.Equal(1, inCache);
+            Assert.Equal(7, inCache);
         }
 
         [Fact]
