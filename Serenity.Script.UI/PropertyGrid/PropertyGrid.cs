@@ -199,7 +199,7 @@ namespace Serenity
 
             editor.Initialize();
 
-            if (editor is BooleanEditor)
+            if (editor is BooleanEditor && (item.EditorParams == null || !Q.IsTrue(item.EditorParams["labelFor"])))
                 label.RemoveAttr("for");
 
             if (Script.IsValue(item.MaxLength))
