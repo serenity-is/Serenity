@@ -127,10 +127,9 @@ namespace Serenity
             set 
             {
                 var instance = GetEditorInstance();
+                this.element.Value(value);
                 if (instanceReady && instance != null)
                     instance.SetData(value);
-                else
-                    this.element.Value(value); 
             }
         }
 
