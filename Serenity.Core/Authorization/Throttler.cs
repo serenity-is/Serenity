@@ -25,7 +25,7 @@ namespace Serenity
 
         public bool Check()
         {
-            var hit = Dependency.Resolve<ILocalCache>().Get<object>(this.CacheKey) as HitInfo;
+            var hit = LocalCache.TryGet<HitInfo>(this.CacheKey);
             if (hit == null)
             {
                 hit = new HitInfo { Counter = 1 };
@@ -42,7 +42,7 @@ namespace Serenity
 
         public void Reset()
         {
-            Dependency.Resolve<ILocalCache>().Remove(CacheKey);
+            LocalCache.Remove(CacheKey);
         }
     }
 }
