@@ -1,3 +1,21 @@
+## 1.9.8 (2016-02-09)
+
+Features:
+   - localize restore and maximize buttons 
+   - replace Node in sergen with 32 bit version
+   - use Visible attribute also for forms
+   - add HideOnlnsert and HideOnUpdate attributes that controls field visibility in forms based on edit mode 
+   - binary criteria puts paranthesis always so no longer need ~ operator in most cases 
+   - labelFor option for checkbox editor to make them checkable by clicking on label optionally
+   - removed readonly from field declarations as some users report problems with asp.net medium trust hosting
+   - added comments to PermissionKeys class as most users had confusion with it [Serene]
+ 
+ Bugfixes:
+   - fix required validation error with HtmlContentEditor when editing an existing record
+   - fix connection assignment in RowValidationContext (unused property)
+   - error when oncriteria is null for outer apply and Fields.As("x") used
+   - script side HasPermission method should return true for "admin" user for any permission [Serene]
+
 ## 1.9.7 (2016-01-28)
 
 Bugfixes:
