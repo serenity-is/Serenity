@@ -10,7 +10,7 @@ Features:
    - removed readonly from field declarations as some users report problems with asp.net medium trust hosting
    - added comments to PermissionKeys class as most users had confusion with it [Serene]
  
- Bugfixes:
+Bugfixes:
    - fix required validation error with HtmlContentEditor when editing an existing record
    - fix connection assignment in RowValidationContext (unused property)
    - error when oncriteria is null for outer apply and Fields.As("x") used
