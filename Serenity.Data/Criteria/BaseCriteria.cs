@@ -206,6 +206,11 @@
             return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
         }
 
+        public static BaseCriteria operator ==(BaseCriteria criteria1, Enum value)
+        {
+            return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
+        }
+
         public static BaseCriteria operator !=(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, criteria2);
@@ -247,6 +252,11 @@
         }
 
         public static BaseCriteria operator !=(BaseCriteria criteria1, Guid value)
+        {
+            return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
+        }
+
+        public static BaseCriteria operator !=(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
         }
@@ -296,6 +306,11 @@
             return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
         }
 
+        public static BaseCriteria operator >(BaseCriteria criteria1, Enum value)
+        {
+            return new BinaryCriteria(criteria1, CriteriaOperator.GT, new ValueCriteria(value));
+        }
+
         public static BaseCriteria operator >=(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, criteria2);
@@ -337,6 +352,11 @@
         }
 
         public static BaseCriteria operator >=(BaseCriteria criteria1, Guid value)
+        {
+            return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
+        }
+
+        public static BaseCriteria operator >=(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.GE, new ValueCriteria(value));
         }
@@ -386,6 +406,11 @@
             return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
         }
 
+        public static BaseCriteria operator <(BaseCriteria criteria1, Enum value)
+        {
+            return new BinaryCriteria(criteria1, CriteriaOperator.LT, new ValueCriteria(value));
+        }
+
         public static BaseCriteria operator <=(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, criteria2);
@@ -427,6 +452,11 @@
         }
 
         public static BaseCriteria operator <=(BaseCriteria criteria1, Guid value)
+        {
+            return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
+        }
+
+        public static BaseCriteria operator <=(BaseCriteria criteria1, Enum value)
         {
             return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
         }
