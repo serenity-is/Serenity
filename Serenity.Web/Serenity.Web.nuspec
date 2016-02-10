@@ -23,7 +23,6 @@
       <dependency id="Serenity.Data" version="${version}" />
       <dependency id="Serenity.Data.Entity" version="${version}" />
       <dependency id="Serenity.Services" version="${version}" />
-      <dependency id="FontAwesome" version="4.4.0" />
       <dependency id="jQuery" version="2.2.0" />
       <dependency id="jquery.event.drag" version="2.2.0" />
       <dependency id="jQuery.UI.Combined" version="1.11.4" />

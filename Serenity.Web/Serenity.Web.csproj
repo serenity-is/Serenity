@@ -205,9 +205,22 @@
     <Compile Include="Mvc\Throttling.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Includes\Fonts\fontawesome-webfont.eot" />
+    <None Include="Includes\Fonts\fontawesome-webfont.ttf" />
+    <None Include="Includes\Fonts\fontawesome-webfont.woff" />
+    <None Include="Includes\Fonts\fontawesome-webfont.woff2" />
+    <None Include="Includes\Fonts\FontAwesome.otf" />
+    <None Include="Includes\Fonts\glyphicons-halflings-regular.eot" />
+    <None Include="Includes\Fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="Includes\Fonts\glyphicons-halflings-regular.woff" />
+    <None Include="Includes\Fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="Includes\Fonts\ionicons.eot" />
+    <None Include="Includes\Fonts\ionicons.ttf" />
+    <None Include="Includes\Fonts\ionicons.woff" />
     <None Include="Includes\Fonts\Simple-Line-Icons.eot" />
     <None Include="Includes\Fonts\Simple-Line-Icons.ttf" />
     <None Include="Includes\Fonts\Simple-Line-Icons.woff" />
+    <None Include="Includes\Fonts\Simple-Line-Icons.woff2" />
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.es.json" />
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.de.json" />
@@ -578,10 +591,17 @@
     <Content Include="Includes\Content\colorbox\images\loading.gif" />
     <Content Include="Includes\Content\colorbox\images\loading_background.png" />
     <Content Include="Includes\Content\colorbox\jquery.colorbox.css" />
+    <Content Include="Includes\Content\font-awesome.css" />
+    <Content Include="Includes\Content\font-awesome.min.css" />
     <Content Include="Includes\Content\glyphicons.css" />
+    <Content Include="Includes\Content\ionicons.css" />
+    <Content Include="Includes\Content\ionicons.min.css" />
     <Content Include="Includes\Content\jquery.fileupload.css" />
     <Content Include="Includes\Content\pace.css" />
     <Content Include="Includes\Content\simple-line-icons.css" />
+    <Content Include="Includes\Fonts\fontawesome-webfont.svg" />
+    <Content Include="Includes\Fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Includes\Fonts\ionicons.svg" />
     <Content Include="Includes\Fonts\Simple-Line-Icons.dev.svg" />
     <Content Include="Includes\Fonts\Simple-Line-Icons.svg" />
     <Content Include="Includes\Scripts\jlayout.border.js" />

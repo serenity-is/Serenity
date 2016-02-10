@@ -1,3 +1,9 @@
+## 1.9.9 (2016-02-09)
+
+Features:
+  - replaced FontAwesome package with embedded v4.5.0 version, please uninstall FontAwesome package from Serene
+  - included ionicons to Serenity.Web
+
 ## 1.9.8 (2016-02-09)
 
 Features:
