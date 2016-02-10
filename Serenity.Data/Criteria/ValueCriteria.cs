@@ -1,5 +1,6 @@
 ﻿namespace Serenity.Data
 {
+    using System;
     using System.Collections;
     using System.Text;
 
@@ -38,28 +39,51 @@
 
                     if (c > 10)
                     {
-                        if (k is int ||
-                            k is short ||
-                            k is uint ||
-                            k is long ||
-                            k is byte)
+                        if (IsIntegerType(k))
                         {
                             sb.Append(k.ToString());
                             continue;
                         }
+                        else if (k is Enum)
+                        {
+                            sb.Append(Convert.ToInt64(k).ToString());
+                            continue;
+                        }
                     }
-                    var param = query.AutoParam();
-                    query.AddParam(param.Name, k);
-                    sb.Append(param.Name);
+                    sb.Append(AddParam(query, k).Name);
                 }
                 sb.Append(')');
             }
             else
             {
-                var param = query.AutoParam();
-                query.AddParam(param.Name, this.value);
-                sb.Append(param.Name);
+                sb.Append(AddParam(query, this.value).Name);
             }
+        }
+
+        private bool IsIntegerType(object k)
+        {
+            if (k == null)
+                return false;
+
+            if (k is int || k is long)
+                return true;
+
+            if (!k.GetType().IsPrimitive)
+                return false;
+
+            return k is Byte ||
+                   k is SByte ||
+                   k is Int16 ||
+                   k is UInt16 ||
+                   k is UInt32 ||
+                   k is UInt64;
+        }
+
+        private Parameter AddParam(IQueryWithParams query, object value)
+        {
+            var param = query.AutoParam();
+            query.AddParam(param.Name, value);
+            return param;
         }
     }
 }
