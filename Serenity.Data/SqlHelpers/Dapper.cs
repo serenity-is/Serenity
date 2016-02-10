@@ -434,7 +434,7 @@ namespace Serenity.Data
         }
 
         internal const string LinqBinary = "System.Data.Linq.Binary";
-        internal static DbType LookupDbType(Type type, string name)
+        public static DbType LookupDbType(Type type, string name)
         {
             DbType dbType;
             var nullUnderlyingType = Nullable.GetUnderlyingType(type);

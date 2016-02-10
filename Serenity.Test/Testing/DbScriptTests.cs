@@ -46,7 +46,7 @@ namespace Serenity.Test.Testing
 
             Assert.Equal(TestSqlHelper.Normalize(
                 "DECLARE @p1 INT = 1;" + 
-                "DECLARE @p2 NVARCHAR(4) = 'Test';" + 
+                "DECLARE @p2 NVARCHAR(4000) = 'Test';" + 
                 "INSERT INTO Tests (TestId, Description) VALUES (@p1, @p2)"), 
                 TestSqlHelper.Normalize(script.ToString()));
         }
@@ -62,7 +62,7 @@ namespace Serenity.Test.Testing
             }.ToSqlUpdateById());
 
             Assert.Equal(TestSqlHelper.Normalize(
-                "DECLARE @p1 NVARCHAR(4) = 'Test';" +
+                "DECLARE @p1 NVARCHAR(4000) = 'Test';" +
                 "DECLARE @p2 INT = 1;" +
                 "UPDATE Tests SET Description = @p1 WHERE (TestId = @p2)"),
                 TestSqlHelper.Normalize(script.ToString()));

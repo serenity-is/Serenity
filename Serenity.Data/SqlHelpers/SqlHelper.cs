@@ -264,6 +264,39 @@
             }
         }
 
+        public static object FixParamType(object value)
+        {
+            if (value == null)
+                return DBNull.Value;
+
+            if (value is Stream)
+            {
+                if (value is MemoryStream)
+                    return ((MemoryStream)value).ToArray();
+                else
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        ((Stream)value).CopyTo(ms);
+                        return value = ms.ToArray();
+                    }
+                }
+            }
+
+            if (value is Enum)
+            {
+                var underlyingType = Enum.GetUnderlyingType(value.GetType());
+                if (underlyingType == typeof(Int32))
+                    return (int)value;
+                else if (underlyingType == typeof(Int16))
+                    return (Int16)value;
+                else
+                    return Convert.ChangeType(value, underlyingType);
+            }
+
+            return value;
+        }
+
         /// <summary>
         ///   <see cref="DbCommand"/> nesnesine belirtilen isim ve değere sahip yeni bir parametre ekler.</summary>
         /// <param name="command">
@@ -278,22 +311,16 @@
         {
             DbParameter param = command.CreateParameter();
 
-            if (value != null &&
-                value is Stream)
-            {
-                if (value is MemoryStream)
-                    value = ((MemoryStream)value).ToArray();
-                else
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        ((Stream)value).CopyTo(ms);
-                        value = ms.ToArray();
-                    }
-                }
-            }
+            value = FixParamType(value);
+            param.Value = value;
 
-            param.Value = value ?? DBNull.Value;
+            var str = value as string;
+            if (str != null && str.Length < 4000)
+                param.Size = 4000;
+
+            if (value != null)
+                param.DbType = SqlMapper.LookupDbType(value.GetType(), name);
+
             param.ParameterName = name;
             command.Parameters.Add(param);
             return param;
