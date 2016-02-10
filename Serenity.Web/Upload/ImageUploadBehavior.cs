@@ -246,7 +246,7 @@ namespace Serenity.Services
                             temporaryFile = baseFile + ".jpg";
                             fs.Close();
                             scaledImage.Save(Path.Combine(basePath, temporaryFile), System.Drawing.Imaging.ImageFormat.Jpeg);
-                            temporaryFile = "temporaryFile/" + temporaryFile;
+                            temporaryFile = "temporary/" + temporaryFile;
                         }
                     }
 
