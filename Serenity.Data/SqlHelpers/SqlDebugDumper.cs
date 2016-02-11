@@ -28,7 +28,14 @@ namespace Serenity.Data
             foreach (var pair in param)
                 sb.Replace(pair.Key, DumpParameterValue(pair.Value, dialect));
 
-            return sb.ToString();
+            var text = DatabaseCaretReferences.Replace(sb.ToString());
+
+            dialect = dialect ?? SqlSettings.DefaultDialect;
+            var openBracket = dialect.OpenQuote;
+            if (openBracket != '[')
+                text = BracketLocator.ReplaceBrackets(text, dialect);
+
+            return text;
         }
 
         private static string DumpParameterValue(object value, ISqlDialect dialect = null)
