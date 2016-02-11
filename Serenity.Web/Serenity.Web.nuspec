@@ -51,8 +51,6 @@
     <file src="..\..\Style\images\*.png" target="content/Content/serenity/images" />
     <file src="..\..\Style\images\*.gif" target="content/Content/serenity/images" />
     <file src="..\..\Style\images\*.jpg" target="content/Content/serenity/images" />   
-    <file src="..\..\..\..\packages\Saltarelle.Runtime.${saltarelleRuntimeVersion}\mscorlib.js" target="content/Scripts/saltarelle" />
-    <file src="..\..\..\..\packages\Saltarelle.Runtime.${saltarelleRuntimeVersion}\mscorlib.min.js" target="content/Scripts/saltarelle" />
     <file src="..\..\..\..\packages\Saltarelle.Linq.${saltarelleLinqVersion}\linq.js" target="content/Scripts/saltarelle" />
     <file src="..\..\..\..\packages\Saltarelle.Linq.${saltarelleLinqVersion}\linq.min.js" target="content/Scripts/saltarelle" />
     <file src="..\..\..\Serenity.Script.Core\bin\${configuration}\Serenity.Externals.js" target="content/Scripts/serenity" />
