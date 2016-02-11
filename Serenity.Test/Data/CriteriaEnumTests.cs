@@ -7,7 +7,7 @@ namespace Serenity.Test.Data
 {
     public class CriteriaEnumTests
     {
-        private enum MyEnum : Int32
+        private enum MyEnum : int
         {
             Value1 = 1,
             Value2 = 2

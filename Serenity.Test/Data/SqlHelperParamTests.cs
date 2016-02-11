@@ -9,13 +9,13 @@ namespace Serenity.Test.Data
 {
     public class SqlHelperParamTests
     {
-        private enum MyEnum32 : Int32
+        private enum MyEnum32 : int
         {
             Value1 = 1,
             Value2 = 2
         }
 
-        private enum MyEnum64 : Int64
+        private enum MyEnum64 : long
         {
             Value1 = 1,
             Value2 = 2
