@@ -318,7 +318,7 @@
             if (str != null && str.Length < 4000)
                 param.Size = 4000;
 
-            if (value != null)
+            if (value != null && value != DBNull.Value)
                 param.DbType = SqlMapper.LookupDbType(value.GetType(), name);
 
             param.ParameterName = name;
