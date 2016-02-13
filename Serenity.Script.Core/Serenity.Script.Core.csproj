@@ -79,6 +79,7 @@
     <Compile Include="Q\Q.Text.cs" />
     <Compile Include="Q\Q.UrlUtils.cs" />
     <Compile Include="ScriptContext.cs" />
+    <Compile Include="SlickGrid\Formatters\FileDownloadFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\UrlFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\CheckboxFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\BooleanFormatter.cs" />

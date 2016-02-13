@@ -76,6 +76,26 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public class FileDownloadFormatterAttribute : CustomFormatterAttribute
+    {
+        public FileDownloadFormatterAttribute()
+            : base("FileDownload")
+        {
+        }
+
+        public String DisplayFormat
+        {
+            get { return GetOption<String>("displayFormat"); }
+            set { SetOption("displayFormat", value); }
+        }
+
+        public String OriginalNameProperty
+        {
+            get { return GetOption<String>("originalNameProperty"); }
+            set { SetOption("originalNameProperty", value); }
+        }
+    }
+
     public class NumberFormatterAttribute : CustomFormatterAttribute
     {
         public NumberFormatterAttribute()
