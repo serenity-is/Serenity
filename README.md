@@ -1,11 +1,9 @@
 Serenity Application Platform
 =============================
 
-[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)
+<img src="https://github.com/volkanceylan/Serenity/blob/master/Tools/Images/serenity-logo-128.png" />
 
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Serenity.Script.svg?label=NuGet%20Downloads)](http://www.nuget.org/packages/Serenity.Script/) [![Latest NuGet Package Version](https://img.shields.io/nuget/v/Serenity.Script.svg?label=Latest%20NuGet%20Package)](http://www.nuget.org/packages/Serenity.Script/)
-
-[![Join the chat at https://gitter.im/volkanceylan/Serenity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/volkanceylan/Serenity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)   [![NuGet Downloads](https://img.shields.io/nuget/dt/Serenity.Script.svg?label=NuGet%20Downloads)](http://www.nuget.org/packages/Serenity.Script/)   [![NuGet Version](https://img.shields.io/nuget/v/Serenity.Script.svg?label=Latest%20NuGet%20Package)](http://www.nuget.org/packages/Serenity.Script/)   [![Join the chat at https://gitter.im/volkanceylan/Serenity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/volkanceylan/Serenity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## What is Serenity Platform
 
