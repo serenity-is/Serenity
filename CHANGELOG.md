@@ -1,3 +1,18 @@
+## 1.9.10 (2016-02-10)
+
+Features:
+  - criteria has operator overloads for enums, so no longer need cast to int
+  - use nvarchar(4000) for parameter size, if string is shorter than 4000 (idea from dapper) for better query optimization
+  - replace bracket references in query.DebugText
+  - use embedded mscorlib in Serenity.Web, as one in saltarelle nuget package has compability problem with Edge browser
+  - updated ckeditor package to include all languages available
+  - use html lang attribute to determine ckeditor language
+  - added FileDownloadFormatter to display download link for files uploaded with File/ImageUploadEditor (single only)
+  - Serenity has a brand new logo!
+  
+Bugfixes:
+  - argument out of range error when signed up users try to login [Serene]
+  
 ## 1.9.9 (2016-02-09)
 
 Features:
