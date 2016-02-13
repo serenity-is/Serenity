@@ -82,6 +82,12 @@ namespace Serenity
         public static Action<CKEditorConfig> EditorConfig;
 
         public static CKEditorConfig Config;
+
+        [InlineCode("(!!CKEDITOR.lang.languages[{language}])")]
+        public static bool HasLanguage(string language)
+        {
+            return false;
+        }
     }
 
     /// <summary>

@@ -59,6 +59,22 @@ namespace Serenity
             x.Editor.SetData(this.element.GetValue());
         }
 
+        protected virtual string GetLanguage()
+        {
+            var lang = J("html").GetAttribute("lang").TrimToNull() ?? "en";
+
+            if (CKEditor.HasLanguage(lang))
+                return lang;
+
+            if (lang.IndexOf('-') >= 0)
+                lang = lang.Split('-')[0];
+
+            if (CKEditor.HasLanguage(lang))
+                return lang;
+
+            return "en";
+        }
+
         protected virtual CKEditorConfig GetConfig()
         {
             var self = this;
@@ -66,7 +82,7 @@ namespace Serenity
             return new CKEditorConfig
             {
                 CustomConfig = "",
-                Language = "tr",
+                Language = GetLanguage(),
                 BodyClass = "s-HtmlContentBody",
                 On = new CKEditorEvents
                 {
