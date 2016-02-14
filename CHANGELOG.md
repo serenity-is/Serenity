@@ -1,3 +1,8 @@
+## 1.9.11 (2016-02-14)
+
+Bugfixes:
+  - mscorlib.js wasn't included in nuget for 1.9.10 somehow
+
 ## 1.9.10 (2016-02-10)
 
 Features:
