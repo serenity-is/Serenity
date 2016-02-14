@@ -7,6 +7,7 @@ using Serenity.Testing;
 
 namespace Serenity.Test.Data
 {
+    [Collection("AvoidParallel")]
     public class SqlHelperParamTests
     {
         private enum MyEnum32 : int

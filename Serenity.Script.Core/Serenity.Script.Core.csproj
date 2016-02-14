@@ -153,6 +153,9 @@
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\mscorlib.min.js" />
+  </ItemGroup>
   <Import Project="..\tools\Saltarelle\Saltarelle.Compiler.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" />
   <Target Name="MinimizeScripts" AfterTargets="BuildScript">
