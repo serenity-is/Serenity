@@ -113,17 +113,34 @@ namespace Serenity.Services
             {
                 if (isDeletedRow != null)
                 {
-                    if (new SqlUpdate(Row.Table)
-                            .Set(isDeletedRow.IsActiveField, -1)
-                            .WhereEqual(idField, id)
-                            .Where(new Criteria(isDeletedRow.IsActiveField) >= 0)
-                            .Execute(Connection) != 1)
+                    var updateLogRow = Row as IUpdateLogRow;
+
+                    var update = new SqlUpdate(Row.Table)
+                        .Set(isDeletedRow.IsActiveField, -1)
+                        .WhereEqual(idField, id)
+                        .Where(new Criteria(isDeletedRow.IsActiveField) >= 0);
+
+                    if (deleteLogRow != null)
+                    {
+                        update.Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
+                                        deleteLogRow.DeleteDateField.DateTimeKind))
+                              .Set((Field)deleteLogRow.DeleteUserIdField, Authorization.UserId.TryParseID());
+                    }
+                    else if (updateLogRow != null)
+                    {
+                        update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
+                                        updateLogRow.UpdateDateField.DateTimeKind))
+                              .Set((Field)updateLogRow.UpdateUserIdField, Authorization.UserId.TryParseID());
+                    }
+
+                    if (update.Execute(Connection) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id);
                 }
                 else //if (deleteLogRow != null)
                 {
                     if (new SqlUpdate(Row.Table)
-                            .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, deleteLogRow.DeleteDateField.DateTimeKind))
+                            .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now, 
+                                        deleteLogRow.DeleteDateField.DateTimeKind))
                             .Set((Field)deleteLogRow.DeleteUserIdField, Authorization.UserId.TryParseID())
                             .WhereEqual(idField, id)
                             .Where(new Criteria((Field)deleteLogRow.DeleteUserIdField).IsNull())
