@@ -4,6 +4,7 @@ Features:
   - delete auditing also works for IActiveDeletedRow.
   - for delete auditing IUpdateLogRow is used if IDeleteLogRow is not available
   - data localization samples for product and category dialogs [Serene]
+  - pending changes (close without save) confirmation sample for customer dialog [Serene]
 
 Bugfixes:
   - mscorlib.js wasn't included in nuget for 1.9.10 somehow
