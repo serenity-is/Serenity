@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Serenity.Services
 {
-    public class MultipleImageUploadBehavior : BaseSaveBehavior, IImplicitBehavior, IFieldBehavior
+    public class MultipleImageUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
     {
         public Field Target { get; set; }
 
@@ -102,7 +102,24 @@ namespace Serenity.Services
                 if (newFileList.Any(x => String.Compare(x.Filename.Trim(), filename, StringComparison.OrdinalIgnoreCase) == 0))
                     continue;
 
-                var actualOldFile = (attr.SubFolder.IsEmptyOrNull() ? "" : (attr.SubFolder + "/")) + filename;
+                DeleteOldFile(filesToDelete, filename);
+            }
+
+            if (newFileList.IsEmptyOrNull())
+            {
+                field[handler.Row] = null;
+                return;
+            }
+
+            if (handler.IsUpdate)
+                field[handler.Row] = CopyTemporaryFiles(handler, oldFileList, newFileList, filesToDelete);
+        }
+
+        private void DeleteOldFile(FilesToDelete filesToDelete, string oldFilename)
+        {
+            if (!oldFilename.IsEmptyOrNull())
+            {
+                var actualOldFile = (attr.SubFolder.IsEmptyOrNull() ? "" : (attr.SubFolder + "/")) + oldFilename;
                 filesToDelete.RegisterOldFile(actualOldFile);
 
                 if (attr.CopyToHistory)
@@ -114,15 +131,23 @@ namespace Serenity.Services
                         UploadHelper.CopyFileAndRelated(UploadHelper.DbFilePath(oldFilePath), UploadHelper.DbFilePath(historyFile), overwrite: true);
                 }
             }
+        }
 
-            if (newFileList.IsEmptyOrNull())
-            {
-                field[handler.Row] = null;
+        public override void OnAfterDelete(IDeleteRequestHandler handler)
+        {
+            if (handler.Row is IIsActiveDeletedRow ||
+                handler.Row is IDeleteLogRow)
                 return;
-            }
 
-            if (handler.IsUpdate)
-                field[handler.Row] = CopyTemporaryFiles(handler, oldFileList, newFileList, filesToDelete);
+            var field = (StringField)Target;
+            var oldFilesJSON = field[handler.Row].TrimToNull();
+            var oldFileList = ParseAndValidate(oldFilesJSON, "oldFiles");
+
+            var filesToDelete = new FilesToDelete();
+            UploadHelper.RegisterFilesToDelete(handler.UnitOfWork, filesToDelete);
+
+            foreach (var file in oldFileList)
+                DeleteOldFile(filesToDelete, file.Filename);
         }
 
         private string CopyTemporaryFiles(ISaveRequestHandler handler,

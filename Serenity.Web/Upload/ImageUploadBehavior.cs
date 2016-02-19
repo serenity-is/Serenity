@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Serenity.Services
 {
-    public class ImageUploadBehavior : BaseSaveBehavior, IImplicitBehavior, IFieldBehavior
+    public class ImageUploadBehavior : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
     {
         public Field Target { get; set; }
 
@@ -92,20 +92,7 @@ namespace Serenity.Services
                 return;
             }
 
-            if (!oldFilename.IsEmptyOrNull())
-            {
-                var actualOldFile = (attr.SubFolder.IsEmptyOrNull() ? "" : (attr.SubFolder + "/")) + oldFilename;
-                filesToDelete.RegisterOldFile(actualOldFile);
-
-                if (attr.CopyToHistory)
-                {
-                    var oldFilePath = UploadHelper.ToPath(actualOldFile);
-                    string date = DateTime.UtcNow.ToString("yyyyMM", Invariants.DateTimeFormat);
-                    string historyFile = "history/" + date + "/" + Path.GetFileName(oldFilePath);
-                    if (File.Exists(UploadHelper.DbFilePath(oldFilePath)))
-                        UploadHelper.CopyFileAndRelated(UploadHelper.DbFilePath(oldFilePath), UploadHelper.DbFilePath(historyFile), overwrite: true);
-                }
-            }
+            DeleteOldFile(filesToDelete, oldFilename);
 
             if (newFilename == null)
             {
@@ -136,6 +123,38 @@ namespace Serenity.Services
                 var copyResult = CopyTemporaryFile(handler, filesToDelete);
                 filename[handler.Row] = copyResult.DbFileName;
             }
+        }
+
+        private void DeleteOldFile(FilesToDelete filesToDelete, string oldFilename)
+        {
+            if (!oldFilename.IsEmptyOrNull())
+            {
+                var actualOldFile = (attr.SubFolder.IsEmptyOrNull() ? "" : (attr.SubFolder + "/")) + oldFilename;
+                filesToDelete.RegisterOldFile(actualOldFile);
+
+                if (attr.CopyToHistory)
+                {
+                    var oldFilePath = UploadHelper.ToPath(actualOldFile);
+                    string date = DateTime.UtcNow.ToString("yyyyMM", Invariants.DateTimeFormat);
+                    string historyFile = "history/" + date + "/" + Path.GetFileName(oldFilePath);
+                    if (File.Exists(UploadHelper.DbFilePath(oldFilePath)))
+                        UploadHelper.CopyFileAndRelated(UploadHelper.DbFilePath(oldFilePath), UploadHelper.DbFilePath(historyFile), overwrite: true);
+                }
+            }
+        }
+
+        public override void OnAfterDelete(IDeleteRequestHandler handler)
+        {
+            if (handler.Row is IIsActiveDeletedRow ||
+                handler.Row is IDeleteLogRow)
+                return;
+
+            var filename = (StringField)(Target);
+            var oldFilename = filename[handler.Row];
+            var filesToDelete = new FilesToDelete();
+            UploadHelper.RegisterFilesToDelete(handler.UnitOfWork, filesToDelete);
+
+            DeleteOldFile(filesToDelete, oldFilename);
         }
 
         private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler, FilesToDelete filesToDelete)
