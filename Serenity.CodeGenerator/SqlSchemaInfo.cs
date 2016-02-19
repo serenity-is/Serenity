@@ -565,6 +565,7 @@ order by 1, 5";
         const string SqlBit = "bit";
         const string SqlDate = "date";
         const string SqlDateTime = "datetime";
+        const string SqlDateTime2 = "datetime2";
         const string SqlSmallDateTime = "smalldatetime";
         const string SqlDecimal = "decimal";
         const string SqlNumeric = "numeric";
@@ -602,7 +603,7 @@ order by 1, 5";
                 return "Int64";
             else if (sqlTypeName == SqlMoney || sqlTypeName == SqlDecimal || sqlTypeName == SqlNumeric)
                 return "Decimal";
-            else if (sqlTypeName == SqlDateTime || sqlTypeName == SqlDate || sqlTypeName == SqlSmallDateTime)
+            else if (sqlTypeName == SqlDateTime || sqlTypeName == SqlDateTime2 || sqlTypeName == SqlDate || sqlTypeName == SqlSmallDateTime)
                 return "DateTime";
             else if (sqlTypeName == SqlTime)
                 return "TimeSpan";
