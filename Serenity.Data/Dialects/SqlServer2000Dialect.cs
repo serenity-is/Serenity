@@ -161,6 +161,14 @@ namespace Serenity.Data
             }
         }
 
+        public virtual bool UseDateTime2
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public bool UseReturningIdentity
         {
             get

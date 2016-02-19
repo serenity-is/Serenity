@@ -21,6 +21,7 @@
         string SkipKeyword { get; }
         string TakeKeyword { get; }
         string TimeFormat { get; }
+        bool UseDateTime2 { get; }
         bool UseReturningIdentity { get; }
         bool UseScopeIdentity { get; }
         bool UseTakeAtEnd { get; }

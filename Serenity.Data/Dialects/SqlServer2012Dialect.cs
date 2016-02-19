@@ -1,7 +1,7 @@
 ﻿
 namespace Serenity.Data
 {
-    public class SqlServer2012Dialect : SqlServer2005Dialect
+    public class SqlServer2012Dialect : SqlServer2008Dialect
     {
         public static new readonly ISqlDialect Instance = new SqlServer2012Dialect();
 
