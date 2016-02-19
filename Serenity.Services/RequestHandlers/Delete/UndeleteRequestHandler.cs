@@ -192,25 +192,26 @@ namespace Serenity.Services
             {
                 OnBeforeUndelete();
 
+                var update = new SqlUpdate(Row.Table)
+                    .WhereEqual(idField, id);
+
                 if (isDeletedRow != null)
                 {
-                    if (new SqlUpdate(Row.Table)
-                            .Set(isDeletedRow.IsActiveField, 1)
-                            .WhereEqual(idField, id)
-                            .WhereEqual(isDeletedRow.IsActiveField, -1)
-                            .Execute(Connection) != 1)
-                        throw DataValidation.EntityNotFoundError(Row, id);
+                    update.Set(isDeletedRow.IsActiveField, 1)
+                        .WhereEqual(isDeletedRow.IsActiveField, -1);
                 }
-                else
+
+                if (deleteLogRow != null)
                 {
-                    if (new SqlUpdate(Row.Table)
-                            .Set((Field)deleteLogRow.DeleteUserIdField, null)
-                            .Set(deleteLogRow.DeleteDateField, null)
-                            .WhereEqual(idField, id)
-                            .Where(((Field)deleteLogRow.DeleteUserIdField).IsNotNull())
-                            .Execute(Connection) != 1)
-                        throw DataValidation.EntityNotFoundError(Row, id);
+                    update.Set((Field)deleteLogRow.DeleteUserIdField, null)
+                        .Set(deleteLogRow.DeleteDateField, null);
+
+                    if (isDeletedRow == null)
+                        update.Where(((Field)deleteLogRow.DeleteUserIdField).IsNotNull());
                 }
+
+                if (update.Execute(Connection) != 1)
+                    throw DataValidation.EntityNotFoundError(Row, id);
 
                 InvalidateCacheOnCommit();
 
