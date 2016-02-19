@@ -1,3 +1,11 @@
+## 1.9.13 (2016-02-19)
+
+Features:
+  - [BREAKING CHANGE] IReport.GetData() returns object instead of IEnumerable. Just replace IEnumerable with object.
+  - more options for HtmlToPdfConverter
+  - wkhtmltopdf based reporting system (requires wkhtmltopdf.exe under ~/App_Data/Reporting directory)
+  - order details (invoice) sample in order dialog [Serene]
+
 ## 1.9.12 (2016-02-19)
 
 Features:
