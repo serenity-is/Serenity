@@ -1,3 +1,13 @@
+## 1.9.12 (2016-02-19)
+
+Features:
+  - datetime2 support
+  - minvalue, maxvalue and sqlminmax options in date/datetime editors
+  - deletedby and deletedate fields are cleaned on undelete
+  
+Bugfixes:
+  - uploaded files should be deleted when record is deleted and row is not IIsActiveDeletedRow or IDeleteLogRow 
+
 ## 1.9.11 (2016-02-14)
 
 Features:
