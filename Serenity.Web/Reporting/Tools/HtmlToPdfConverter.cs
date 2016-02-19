@@ -28,7 +28,11 @@ namespace Serenity.Reporting
         {
             var exePath = UtilityExePath ?? HostingEnvironment.MapPath("~/App_Data/Reporting/wkhtmltopdf.exe");
             if (!File.Exists(exePath))
-                throw new InvalidOperationException(String.Format("Can't find wkhtmltopdf.exe which is required for PDF generation at location: '{0}'!", exePath));
+            {
+                throw new InvalidOperationException(String.Format("Can't find wkhtmltopdf.exe which is required for PDF generation.\n" +
+                    "Please download a stable version from http://wkhtmltopdf.org/downloads.html\n and place it under directory '{0}'.", 
+                    Path.GetDirectoryName(exePath)));
+            }
 
             if (String.IsNullOrEmpty(this.Url))
                 throw new ArgumentNullException("url");
