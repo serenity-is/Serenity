@@ -63,6 +63,8 @@ namespace Serenity
                 return null;
             });
 
+            SqlMinMax = true;
+
             J("<div class='inplace-button inplace-now'><b></b></div>")
                 .Attribute("title", "set to now")
                 .InsertAfter(time)

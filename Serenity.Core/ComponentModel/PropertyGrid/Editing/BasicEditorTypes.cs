@@ -16,6 +16,24 @@ namespace Serenity.ComponentModel
             : base("Date")
         {
         }
+
+        public DateTime MinValue
+        {
+            get { return GetOption<DateTime>("minValue"); }
+            set { SetOption("minValue", value); }
+        }
+
+        public DateTime MaxValue
+        {
+            get { return GetOption<DateTime>("maxValue"); }
+            set { SetOption("maxValue", value); }
+        }
+
+        public bool SqlMinMax
+        {
+            get { return GetOption<bool?>("sqlMinMax") ?? true; }
+            set { SetOption("sqlMinMax", value); }
+        }
     }
 
     public partial class DateTimeEditorAttribute : CustomEditorAttribute
@@ -23,6 +41,24 @@ namespace Serenity.ComponentModel
         public DateTimeEditorAttribute()
             : base("DateTime")
         {
+        }
+
+        public DateTime MinValue
+        {
+            get { return GetOption<DateTime>("minValue"); }
+            set { SetOption("minValue", value); }
+        }
+
+        public DateTime MaxValue
+        {
+            get { return GetOption<DateTime>("maxValue"); }
+            set { SetOption("maxValue", value); }
+        }
+
+        public bool SqlMinMax
+        {
+            get { return GetOption<bool?>("sqlMinMax") ?? true; }
+            set { SetOption("sqlMinMax", value); }
         }
 
         public Int32 StartHour

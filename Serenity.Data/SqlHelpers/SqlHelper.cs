@@ -269,6 +269,8 @@
             if (value == null)
                 return DBNull.Value;
 
+            if (value is DateTime)
+
             if (value is Stream)
             {
                 if (value is MemoryStream)
@@ -319,7 +321,13 @@
                 param.Size = 4000;
 
             if (value != null && value != DBNull.Value)
+            {
                 param.DbType = SqlMapper.LookupDbType(value.GetType(), name);
+
+                if (param.DbType == DbType.DateTime &&
+                    command.Connection.GetDialect().UseDateTime2)
+                    param.DbType = DbType.DateTime2;
+            }
 
             param.ParameterName = name;
             command.Parameters.Add(param);
