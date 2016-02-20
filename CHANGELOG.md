@@ -1,7 +1,7 @@
 ## 1.9.13 (2016-02-19)
 
 Features:
-  - [BREAKING CHANGE] IReport.GetData() returns object instead of IEnumerable. Just replace "public IEnumerable GetData()" with "public object GetData()" in DynamicDataReport.cs.
+  - [BREAKING CHANGE] IReport.GetData() returns object instead of IEnumerable. Replace "public IEnumerable GetData()" with "public object GetData()" in DynamicDataReport.cs. Also use cast to (IEnumerable) in ReportRepository.cs or copy latest source from Serene.
   - more options for HtmlToPdfConverter
   - wkhtmltopdf based reporting system (requires wkhtmltopdf.exe under ~/App_Data/Reporting directory)
   - order details (invoice) sample in order dialog [Serene]
