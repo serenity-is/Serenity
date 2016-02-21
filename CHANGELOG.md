@@ -5,6 +5,7 @@ Features:
   - more options for HtmlToPdfConverter
   - wkhtmltopdf based reporting system (requires wkhtmltopdf.exe under ~/App_Data/Reporting directory)
   - order details (invoice) sample in order dialog [Serene]
+  - cancellable bulk action sample [Serene]
 
 ## 1.9.12 (2016-02-19)
 
