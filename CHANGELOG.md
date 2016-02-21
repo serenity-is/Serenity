@@ -6,6 +6,7 @@ Features:
   - wkhtmltopdf based reporting system (requires wkhtmltopdf.exe under ~/App_Data/Reporting directory)
   - order details (invoice) sample in order dialog [Serene]
   - cancellable bulk action sample [Serene]
+  - working with view without ID sample [Serene]
 
 ## 1.9.12 (2016-02-19)
 
