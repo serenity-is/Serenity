@@ -7,6 +7,7 @@ Features:
   - order details (invoice) sample in order dialog [Serene]
   - cancellable bulk action sample [Serene]
   - working with view without ID sample [Serene]
+  - multi column resizable dialog (form) sample [Serene]
 
 ## 1.9.12 (2016-02-19)
 
