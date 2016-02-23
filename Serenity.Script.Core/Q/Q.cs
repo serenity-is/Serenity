@@ -23,6 +23,11 @@ namespace Serenity
                 }));
 
             window["Q$Externals"] = window.Q;
+
+            jQuery.OnDocumentReady(() =>
+            {
+                J(Document.Body).AddClass(Q.IsMobileDevice() ? "mobile-device" : "desktop-device");
+            });
         }
 
         /// <summary>

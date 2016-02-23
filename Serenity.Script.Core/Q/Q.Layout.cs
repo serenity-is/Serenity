@@ -121,5 +121,11 @@ namespace Serenity
             element.CSS("height", "100%");
             TriggerLayoutOnShow(element);
         }
+
+        public static bool IsMobileDevice()
+        {
+            return Window.MatchMedia("only screen and (max-width: 760px)").Matches ||
+                Navigator.UserAgent.IndexOf("Mobi") >= 0;
+        }
     }
 }

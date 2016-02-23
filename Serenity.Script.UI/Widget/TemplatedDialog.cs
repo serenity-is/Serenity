@@ -17,6 +17,7 @@ namespace Serenity
         where TOptions : class, new()
     {
         protected bool isPanel;
+        protected bool responsive;
         protected jQueryValidator validator;
         protected TabsObject tabs;
         protected Toolbar toolbar;
@@ -71,7 +72,22 @@ namespace Serenity
         {
             element.Dialog(GetDialogOptions());
 
-            if (this.GetType().GetCustomAttributes(typeof(FlexifyAttribute), true).Length > 0)
+            responsive = this.GetType().GetCustomAttributes(
+                typeof(ResponsiveAttribute), true).Length > 0;
+
+            if (responsive)
+            {
+                element.DialogResizable();
+
+                jQuery.Window.Resize(e => {
+                    if (this.Element.Is(":visible"))
+                        HandleResponsive();
+                });
+
+                this.Element.Closest(".ui-dialog").AddClass("flex-layout");
+            }
+            else if (this.GetType().GetCustomAttributes(
+                typeof(FlexifyAttribute), true).Length > 0)
             {
                 element.DialogFlexify();
                 element.DialogResizable();
@@ -83,11 +99,19 @@ namespace Serenity
             var self = this;
             element.Bind("dialogopen." + this.uniqueName, delegate
             {
+                J(Document.Body).AddClass("modal-dialog-open");
+
+                if (responsive)
+                    HandleResponsive();
+
                 self.OnDialogOpen();
             });
 
             element.Bind("dialogclose." + this.uniqueName, delegate
             {
+                J(Document.Body).ToggleClass("modal-dialog-open", 
+                    jQuery.Select(".ui-dialog:visible").Length > 0);
+
                 self.OnDialogClose();
             });
         }
@@ -300,6 +324,74 @@ namespace Serenity
         }
 
         public string IdPrefix { get { return idPrefix; } }
+
+        protected void HandleResponsive()
+        {
+            var dlg = this.Element.Dialog();
+            var uiDialog = this.Element.Closest(".ui-dialog");
+
+            if (J(Document.Body).HasClass("mobile-device"))
+            {
+                var data = this.Element.GetDataValue("responsiveData") as ResponsiveData;
+                if (data == null)
+                {
+                    data = new ResponsiveData();
+                    data.draggable = dlg.Draggable;
+                    data.resizable = dlg.Resizable;
+                    var pos = uiDialog.Position();
+                    data.left = pos.Left;
+                    data.top = pos.Top;
+                    data.width = uiDialog.GetWidth();
+                    data.height = uiDialog.GetHeight();
+                    this.Element.Data("responsiveData", data);
+
+                    dlg.Draggable = false;
+                    dlg.Resizable = false;
+                }
+
+                uiDialog.AddClass("mobile-layout");
+                uiDialog.CSS(new
+                {
+                    left = "0px",
+                    top = "0px",
+                    width = jQuery.Window.GetWidth() + "px",
+                    height = jQuery.Window.GetHeight() + "px",
+                }.As<JsDictionary<string, object>>());
+
+                J(Document.Body).ScrollTop(0);
+                Q.LayoutFillHeight(this.Element);
+            }
+            else
+            {
+                var data = this.Element.GetDataValue("responsiveData") as ResponsiveData;
+                if (data != null)
+                {
+                    dlg.Draggable = data.draggable;
+                    dlg.Resizable = data.resizable;
+                    this.Element.Closest(".ui-dialog").CSS(new
+                    {
+                        left = "0px",
+                        top = "0px",
+                        width = data.width + "px",
+                        height = data.height + "px"
+
+                    }.As<JsDictionary<string, object>>());
+
+                    uiDialog.RemoveClass("mobile-layout");
+                    this.element.RemoveData("responsiveData");
+                }
+            }
+        }
+
+        private class ResponsiveData
+        {
+            public bool draggable;
+            public bool resizable;
+            public int width;
+            public int height;
+            public int left;
+            public int top;
+        }
     }
 
     public abstract class TemplatedDialog : TemplatedDialog<object>

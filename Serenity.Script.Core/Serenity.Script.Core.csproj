@@ -42,6 +42,7 @@
     <Compile Include="Attribute\EditorAttribute.cs" />
     <Compile Include="Attribute\ElementAttribute.cs" />
     <Compile Include="Attribute\DialogTypeAttribute.cs" />
+    <Compile Include="Attribute\ResponsiveAttribute.cs" />
     <Compile Include="Attribute\FlexifyAttribute.cs" />
     <Compile Include="Attribute\FormKeyAttribute.cs" />
     <Compile Include="Attribute\ItemNameAttribute.cs" />
