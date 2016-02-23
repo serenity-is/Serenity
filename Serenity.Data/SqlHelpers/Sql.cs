@@ -249,10 +249,17 @@ namespace Serenity.Data
             return cb.ToString(query);
         }
 
+        /// <summary>
+        /// Builds a CASE statement.
+        /// </summary>
+        /// <param name="condition">Optional condition. For example for statement "CASE Field1 WHEN 1 THEN 2 END", condition would be "Field1"</param>
+        /// <param name="whenThenPairs">Pairs of WHEN/THEN statements like ["A = 1", "'Result1'", "A = 2", "'Result2'"] for a case
+        /// statement like CASE WHEN A = 1 THEN 'Result1' WHEN A = 2 THEN 'Result2' END.</param>
+        /// <param name="elseStatement">Optional ELSE statement</param>
+        /// <returns></returns>
         public static string Case(string condition, string[] whenThenPairs, string elseStatement)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("CASE ");
+            StringBuilder sb = new StringBuilder("CASE ");
             sb.Append(condition);
 
             if (whenThenPairs.Length == 0 ||
