@@ -1,3 +1,8 @@
+## 1.9.14 (2016-02-24)
+
+Features:
+  - responsive flex box based dialog feature (experimental)
+
 ## 1.9.13 (2016-02-19)
 
 Features:
