@@ -215,6 +215,8 @@ namespace Serenity.CodeGenerator
                     f.ForeignJoinAlias = j.Name;
                     j.SourceField = f.Ident;
 
+                    frgfld.RemoveAll(y => removeForeignFields.Contains(y.FieldName));
+
                     if (frgfld.Find(y => y.FieldName.Substring(frgPrefix) == "SonGuncelleyenID") != null)
                     {
                         //frgfld.RemoveAll(y => LoggingBaseFields.Contains(y.FieldName.Substring(frgPrefix)));
