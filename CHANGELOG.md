@@ -1,3 +1,12 @@
+## 1.9.15 (2016-12-24)
+
+Features:
+  - better responsive handling when window resized
+
+Bugfixes
+  - toId returns partial value thanks to parseInt for invalid values like '3.5.4'
+  - code generator doesn't remove foreign fields determined in config file on row generation
+
 ## 1.9.14 (2016-02-24)
 
 Features:
