@@ -1,4 +1,9 @@
-## 1.9.15 (2016-12-24)
+## 1.9.16 (2016-02-24)
+
+Features:
+  - fine tune flex styles for multi column ability
+
+## 1.9.15 (2016-02-24)
 
 Features:
   - better responsive handling when window resized
