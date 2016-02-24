@@ -2,6 +2,7 @@
 
 Features:
   - fine tune flex styles for multi column ability
+  - multi column responsive dialog sample [Serene]
 
 ## 1.9.15 (2016-02-24)
 
