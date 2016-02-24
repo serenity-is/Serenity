@@ -122,10 +122,19 @@ namespace Serenity
             TriggerLayoutOnShow(element);
         }
 
-        public static bool IsMobileDevice()
+        public static void SetMobileDeviceMode()
         {
-            return Window.MatchMedia("only screen and (max-width: 760px)").Matches ||
-                Navigator.UserAgent.IndexOf("Mobi") >= 0;
+            var isMobile = Navigator.UserAgent.IndexOf("Mobi") >= 0 ||
+                Window.MatchMedia("(max-width: 767px)").Matches;
+
+            var body = J(Document.Body);
+            if (body.HasClass("mobile-device"))
+            {
+                if (!isMobile)
+                    body.RemoveClass("mobile-device");
+            }
+            else if (isMobile)
+                body.AddClass("mobile-device");
         }
     }
 }

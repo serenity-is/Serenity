@@ -65,6 +65,8 @@ namespace Serenity
             if (!isPanel)
                 element.Dialog().Destroy();
 
+            jQuery.Window.Unbind("." + this.uniqueName);
+
             base.Destroy();
         }
 
@@ -79,8 +81,8 @@ namespace Serenity
             {
                 element.DialogResizable();
 
-                jQuery.Window.Resize(e => {
-                    if (this.Element.Is(":visible"))
+                jQuery.Window.Bind("resize." + this.uniqueName, e => {
+                    if (this.Element != null && this.Element.Is(":visible"))
                         HandleResponsive();
                 });
 
@@ -343,6 +345,7 @@ namespace Serenity
                     data.top = pos.Top;
                     data.width = uiDialog.GetWidth();
                     data.height = uiDialog.GetHeight();
+                    data.contentHeight = this.Element.GetHeight();
                     this.Element.Data("responsiveData", data);
 
                     dlg.Draggable = false;
@@ -374,8 +377,9 @@ namespace Serenity
                         top = "0px",
                         width = data.width + "px",
                         height = data.height + "px"
-
                     }.As<JsDictionary<string, object>>());
+
+                    this.element.Height(data.contentHeight);
 
                     uiDialog.RemoveClass("mobile-layout");
                     this.element.RemoveData("responsiveData");
@@ -391,6 +395,7 @@ namespace Serenity
             public int height;
             public int left;
             public int top;
+            public int contentHeight;
         }
     }
 

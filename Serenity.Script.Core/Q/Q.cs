@@ -26,7 +26,8 @@ namespace Serenity
 
             jQuery.OnDocumentReady(() =>
             {
-                J(Document.Body).AddClass(Q.IsMobileDevice() ? "mobile-device" : "desktop-device");
+                SetMobileDeviceMode();
+                Window.OnResize += e => SetMobileDeviceMode();
             });
         }
 
