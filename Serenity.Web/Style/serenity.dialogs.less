@@ -96,18 +96,21 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
 }
 
 .flex-layout {
-    .field { .display(flex); .flex-wrap(nowrap); .align-items(flex-start); }
-    .editor { .flex(1, 100, auto); min-width: 0; }
+    .category { .display(flex); .flex-wrap(wrap); .flex-direction(row); }
+    .field { .display(flex); .flex-wrap(nowrap); .align-items(flex-start); .flex(0, 1, 100%); min-width: 0; }
+    .editor { .flex(1, 1, 80%); min-width: 0; }
     input.editor[type=checkbox] { .flex(0, 0, auto); }
     .s-Form .editor { float: initial; }
     .editor { float: initial; }
     .s-Form .caption { float: initial; .flex(0, 0, auto); }
-    .s-Form .vx { float: initial; }
+    .s-Form .vx { float: initial; .flex(0, 0, auto); }
+    .category-links { .flex(0, 1, 100%); }
+    .category-title { .flex(0, 1, 100%); }
 
     @media (max-width: 760px) {
         .field { .flex-wrap(wrap); }
         .select2-container { .flex(1); }
-        .s-Form .caption { .flex(0, 1, 100%); width: auto; text-align: left; padding-top: 0px; padding-bottom: 2px; }
+        .s-Form .caption { .flex(0, 0, 100%); width: auto; text-align: left; padding-top: 0px; padding-bottom: 2px; }
         .category-title { margin: 12px 10px 8px 0; }
         .s-PropertyGrid .category-title { padding: 3px 0; }
     }
@@ -128,10 +131,6 @@ body.mobile-device.modal-dialog-open {
         .display(flex);
         .flex-direction(column);
         .flex-grow(1);
-    }
-
-    .category-links {
-        .flex-shrink(0);
     }
 
     .s-PropertyGrid .categories {
