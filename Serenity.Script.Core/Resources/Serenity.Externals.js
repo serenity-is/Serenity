@@ -582,7 +582,7 @@
         id = $.trim(id);
         if (id == null || !id.length)
             return null;
-        if (id.length >= 15)
+        if (id.length >= 15 || !(/^\d+$/.test(id)))
             return id;
         var v = parseInt(id, 10);
         if (isNaN(v))
@@ -958,4 +958,3 @@
     Q.deepClone = deepClone;
     ;
 })(Q || (Q = {}));
-//# sourceMappingURL=Serenity.Externals.js.map
