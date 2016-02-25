@@ -3,6 +3,8 @@
 Features:
   - fine tune flex styles for multi column ability
   - multi column responsive dialog sample [Serene]
+  - language and theme selection cookies has 365 days expiration [Serene]
+  - added cloneable dialog sample [Serene]
 
 ## 1.9.15 (2016-02-24)
 
