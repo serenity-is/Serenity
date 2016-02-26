@@ -106,6 +106,8 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
     .s-Form .vx { float: initial; .flex(0, 0, auto); }
     .category-links { .flex(0, 0, auto); }
     .category-title { .flex(0, 1, 100%); }
+    .s-DateTimeEditor.dateQ { .flex(1, 1, 50%); }
+    .s-DateTimeEditor.time { .flex(0, 0, auto); margin-left: 4px; }
 
     @media (max-width: 760px) {
         .field { .flex-wrap(wrap); }
@@ -126,11 +128,17 @@ body.mobile-device.modal-dialog-open {
     .s-DialogContent, 
     .s-Form, 
     form,
-    .fieldset, 
+    .fieldset,
+    .tab-pane,
+    .tab-pane > .s-DataGrid,
     .s-PropertyGrid {
         .display(flex);
         .flex-direction(column);
-        .flex-grow(1);
+        .flex(1, 1, 50%);
+    }
+
+    .grid-container {
+        .flex(1, 1, 50%);
     }
 
     .s-PropertyGrid .categories {
