@@ -28,10 +28,18 @@ namespace Serenity.CodeGenerator.Views
 WriteLiteral("\r\n");
 
 
-WriteLiteral("\r\n\r\n.s-");
+
+                                                   
+    var moduleDash = Model.Module == null ? "" : (Model.Module + "-");
 
 
-Write(Model.ClassName);
+WriteLiteral("\r\n.s-");
+
+
+Write(moduleDash);
+
+
+            Write(Model.ClassName);
 
 WriteLiteral("Dialog {\r\n    > .size { .widthAndMin(650px); }\r\n    .dialog-styles(");
 
