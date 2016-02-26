@@ -1031,7 +1031,11 @@ namespace Serenity
                         args.Request.Criteria &= new Criteria(args.Field) >= args.Widget.Value;
 
                     if (!string.IsNullOrEmpty(end.Value))
-                        args.Request.Criteria &= new Criteria(args.Field) <= end.Value;
+                    {
+                        var next = new JsDate(end.ValueAsDate.ValueOf());
+                        next.SetDate(next.GetDate() + 1);
+                        args.Request.Criteria &= new Criteria(args.Field) < Q.FormatDate(next, "yyyy-MM-dd");
+                    }
                 });
         }
 
