@@ -38,7 +38,7 @@ namespace Serenity.Testing
 
                 if (parameters != null)
                     foreach (var p in parameters)
-                        SqlHelper.AddParamWithValue(command, p.Key, p.Value);
+                        SqlHelper.AddParamWithValue(command, command.Connection, p.Key, p.Value);
 
                 statementText = SqlCommandDumper.GetCommandText(command);
             }

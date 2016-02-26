@@ -32,19 +32,23 @@ namespace Serenity.Test.Data
         [Fact]
         public void SqlHelper_AddParamWithValue_HandlesEnumsCorrectly()
         {
-            var param32 = new SqlCommand()
-                .AddParamWithValue("@name", MyEnum32.Value2);
+            using (var dbContext = NewDbTestContext())
+            using (var connection = SqlConnections.NewByKey("Serenity"))
+            {
+                var param32 = new SqlCommand()
+                .AddParamWithValue(connection, "@name", MyEnum32.Value2);
 
-            Assert.Equal(System.Data.DbType.Int32, param32.DbType);
-            Assert.IsType(typeof(Int32), param32.Value);
-            Assert.Equal((int)MyEnum32.Value2, param32.Value);
+                Assert.Equal(System.Data.DbType.Int32, param32.DbType);
+                Assert.IsType(typeof(Int32), param32.Value);
+                Assert.Equal((int)MyEnum32.Value2, param32.Value);
 
-            var param64 = new SqlCommand()
-                .AddParamWithValue("@name", MyEnum64.Value2);
+                var param64 = new SqlCommand()
+                    .AddParamWithValue(connection, "@name", MyEnum64.Value2);
 
-            Assert.Equal(System.Data.DbType.Int64, param64.DbType);
-            Assert.IsType(typeof(Int64), param64.Value);
-            Assert.Equal((long)MyEnum64.Value2, param64.Value);
+                Assert.Equal(System.Data.DbType.Int64, param64.DbType);
+                Assert.IsType(typeof(Int64), param64.Value);
+                Assert.Equal((long)MyEnum64.Value2, param64.Value);
+            }
         }
 
         [Fact]
