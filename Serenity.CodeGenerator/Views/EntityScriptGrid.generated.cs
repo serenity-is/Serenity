@@ -77,17 +77,6 @@ WriteLiteral(".NameProperty)");
 
 
                                                                                                                                                                                                                                        }
-
-                                                                                                                                                                                                                                         if (Model.IsActiveField != null) {
-WriteLiteral(", IsActiveProperty(");
-
-
-                                                                                                                                                                                                                                                                                                Write(Model.RowClassName);
-
-WriteLiteral(".IsActiveProperty)");
-
-
-                                                                                                                                                                                                                                                                                                                                                  }
 WriteLiteral("]\r\n    [DialogType(typeof(");
 
 

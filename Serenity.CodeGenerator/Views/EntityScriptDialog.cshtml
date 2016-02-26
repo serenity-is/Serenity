@@ -11,7 +11,7 @@ namespace @(Model.RootNamespace)@(dotModule)
     using Serenity;
     using System.Collections.Generic;
 
-    [@if (Model.Identity != null){<text>IdProperty(@(Model.RowClassName).IdProperty)</text>}@if (Model.NameField != null){<text>@(secondComma)NameProperty(@(Model.RowClassName).NameProperty)</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty(@(Model.RowClassName).IsActiveProperty)</text>}]
+    [@if (Model.Identity != null){<text>IdProperty(@(Model.RowClassName).IdProperty)</text>}@if (Model.NameField != null){<text>@(secondComma)NameProperty(@(Model.RowClassName).NameProperty)</text>}]
     [FormKey("@(moduleDot)@(Model.ClassName)"), LocalTextPrefix(@(Model.RowClassName).LocalTextPrefix), Service(@(Model.ClassName)Service.BaseUrl)]
     public class @(Model.ClassName)Dialog : EntityDialog<@(Model.RowClassName)>
     {

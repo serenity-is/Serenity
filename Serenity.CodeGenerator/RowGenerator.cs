@@ -260,19 +260,6 @@ namespace Serenity.CodeGenerator
                     model.NameField = fld.Ident;
             }
 
-            if (model.IsActiveField == null)
-            {
-                var fld = model.Fields.FirstOrDefault(
-                    z => (z.Type == "Boolean" || z.Type == "Int16" || z.Type == "Int32") && (z.Ident == "Aktif" || z.Ident == "IsActive"));
-
-                if (fld == null)
-                    fld = model.RowBaseFields.FirstOrDefault(
-                        z => (z.Type == "Boolean" || z.Type == "Int16" || z.Type == "Int32") && (z.Ident == "Aktif" || z.Ident == "IsActive"));
-
-                if (fld != null)
-                    model.IsActiveField = fld.Ident;
-            }
-
             return model;
         }
 

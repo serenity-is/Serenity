@@ -29,13 +29,6 @@ namespace @(Model.RootNamespace)@(dotModule).Repositories
             return new MyDeleteHandler().Process(uow, request);
         }
 
-@if (Model.IsActiveField != null) {
-<text>        public UndeleteResponse Undelete(IUnitOfWork uow, UndeleteRequest request)
-        {
-            return new MyUndeleteHandler().Process(uow, request);
-        }
-</text>
-}
         public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
         {
             return new MyRetrieveHandler().Process(connection, request);
@@ -48,9 +41,6 @@ namespace @(Model.RootNamespace)@(dotModule).Repositories
 
         private class MySaveHandler : SaveRequestHandler<MyRow> { }
         private class MyDeleteHandler : DeleteRequestHandler<MyRow> { }
-@if (Model.IsActiveField != null) {<text>
-        private class MyUndeleteHandler : UndeleteRequestHandler<MyRow> { }
-</text>}
         private class MyRetrieveHandler : RetrieveRequestHandler<MyRow> { }
         private class MyListHandler : ListRequestHandler<MyRow> { }
     }

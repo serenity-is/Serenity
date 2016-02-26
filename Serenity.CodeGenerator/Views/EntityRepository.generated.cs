@@ -70,21 +70,7 @@ WriteLiteral(@"Repository
             return new MyDeleteHandler().Process(uow, request);
         }
 
-");
-
-
- if (Model.IsActiveField != null) {
-
-WriteLiteral("        public UndeleteResponse Undelete(IUnitOfWork uow, UndeleteRequest request" +
-")\r\n        {\r\n            return new MyUndeleteHandler().Process(uow, request);\r" +
-"\n        }\r\n");
-
-WriteLiteral("\r\n");
-
-
-}
-
-WriteLiteral(@"        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
+        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
         {
             return new MyRetrieveHandler().Process(connection, request);
         }
@@ -96,17 +82,10 @@ WriteLiteral(@"        public RetrieveResponse<MyRow> Retrieve(IDbConnection con
 
         private class MySaveHandler : SaveRequestHandler<MyRow> { }
         private class MyDeleteHandler : DeleteRequestHandler<MyRow> { }
-");
-
-
- if (Model.IsActiveField != null) {
-WriteLiteral("\r\n        private class MyUndeleteHandler : UndeleteRequestHandler<MyRow> { }\r\n");
-
-
-       }
-
-WriteLiteral("        private class MyRetrieveHandler : RetrieveRequestHandler<MyRow> { }\r\n    " +
-"    private class MyListHandler : ListRequestHandler<MyRow> { }\r\n    }\r\n}");
+        private class MyRetrieveHandler : RetrieveRequestHandler<MyRow> { }
+        private class MyListHandler : ListRequestHandler<MyRow> { }
+    }
+}");
 
 
         }

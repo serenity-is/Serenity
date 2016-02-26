@@ -31,8 +31,7 @@ namespace @(Model.RootNamespace)@(dotModule)
     public partial class @Model.RowClassName
     {@if (Model.Identity != null) {<text>
         [InlineConstant] public const string IdProperty = "@(Model.Identity)";</text>}@if (Model.NameField != null) {<text>
-        [InlineConstant] public const string NameProperty = "@(Model.NameField)";</text>}@if (Model.IsActiveField != null) {<text>
-        [InlineConstant] public const string IsActiveProperty = "@(Model.IsActiveField)";</text>}
+        [InlineConstant] public const string NameProperty = "@(Model.NameField)";</text>}
 
         [InlineConstant] public const string LocalTextPrefix = "@moduleDot@Model.ClassName";
 @foreach (var x in Model.Fields) {

@@ -16,7 +16,6 @@ namespace Serenity.CodeGenerator
         public string Schema { get; set; }
         public string Tablename { get; set; }
         public string Identity { get; set; }
-        public string IsActiveField { get; set; }
         public string RowBaseClass { get; set; }
         public List<EntityCodeField> RowBaseFields { get; set; }
         public string FieldsBaseClass { get; set; }

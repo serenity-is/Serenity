@@ -35,14 +35,6 @@ namespace @(Model.RootNamespace)@(dotModule)
             return null;
         }
 
-@if (Model.IsActiveField != null) {
-<text>        [InlineCode("Q.serviceRequest('@(modulePrefix)@(Model.ClassName)/Undelete', {request}, {onSuccess}, {options})")]
-        public static jQueryXmlHttpRequest Undelete(UndeleteRequest request, Action<UndeleteResponse> onSuccess, ServiceCallOptions options = null)
-        {
-            return null;
-        }
-</text>
-}
         [InlineCode("Q.serviceRequest('@(modulePrefix)@(Model.ClassName)/Retrieve', {request}, {onSuccess}, {options})")]
         public static jQueryXmlHttpRequest Retrieve(RetrieveRequest request, Action<RetrieveResponse<@(Model.RowClassName)>> onSuccess, ServiceCallOptions options = null)
         {
@@ -61,11 +53,6 @@ namespace @(Model.RootNamespace)@(dotModule)
             [InlineConstant] public const string Create = "@(modulePrefix)@(Model.ClassName)/Create";
             [InlineConstant] public const string Update = "@(modulePrefix)@(Model.ClassName)/Update";
             [InlineConstant] public const string Delete = "@(modulePrefix)@(Model.ClassName)/Delete";
-@if (Model.IsActiveField != null) {
-<text>
-            [InlineConstant] public const string Undelete = "@(modulePrefix)@(Model.ClassName)/Undelete";
-</text>
-}
             [InlineConstant] public const string Retrieve = "@(modulePrefix)@(Model.ClassName)/Retrieve";
             [InlineConstant] public const string List = "@(modulePrefix)@(Model.ClassName)/List";
         }

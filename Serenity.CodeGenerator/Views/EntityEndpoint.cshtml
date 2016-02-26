@@ -33,14 +33,6 @@ namespace @(Model.RootNamespace)@(dotModule).Endpoints
             return new MyRepository().Delete(uow, request);
         }
 
-@if (Model.IsActiveField != null) {
-<text>        [HttpPost]
-        public UndeleteResponse Undelete(IUnitOfWork uow, UndeleteRequest request)
-        {
-            return new MyRepository().Undelete(uow, request);
-        }
-</text>
-}
         public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
         {
             return new MyRepository().Retrieve(connection, request);

@@ -95,21 +95,7 @@ WriteLiteral(@"Controller : ServiceEndpoint
             return new MyRepository().Delete(uow, request);
         }
 
-");
-
-
- if (Model.IsActiveField != null) {
-
-WriteLiteral("        [HttpPost]\r\n        public UndeleteResponse Undelete(IUnitOfWork uow, Und" +
-"eleteRequest request)\r\n        {\r\n            return new MyRepository().Undelete" +
-"(uow, request);\r\n        }\r\n");
-
-WriteLiteral("\r\n");
-
-
-}
-
-WriteLiteral(@"        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
+        public RetrieveResponse<MyRow> Retrieve(IDbConnection connection, RetrieveRequest request)
         {
             return new MyRepository().Retrieve(connection, request);
         }

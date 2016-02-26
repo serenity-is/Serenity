@@ -97,17 +97,6 @@ WriteLiteral("\";");
 
                                                                                         }
 
-                                                                                          if (Model.IsActiveField != null) {
-WriteLiteral("\r\n        [InlineConstant] public const string IsActiveProperty = \"");
-
-
-                                                             Write(Model.IsActiveField);
-
-WriteLiteral("\";");
-
-
-                                                                                                }
-
 WriteLiteral("\r\n        [InlineConstant] public const string LocalTextPrefix = \"");
 
 

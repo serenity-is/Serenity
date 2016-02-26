@@ -165,8 +165,7 @@ namespace Serenity.CodeGenerator
                 ClassName = model.ClassName,
                 RowClassName = model.RowClassName,
                 Module = model.Module,
-                Permission = model.Permission,
-                IsActiveField = model.IsActiveField
+                Permission = model.Permission
             }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Repository.cs"))));
         }
 
@@ -179,8 +178,7 @@ namespace Serenity.CodeGenerator
                 ClassName = model.ClassName,
                 RowClassName = model.RowClassName,
                 Module = model.Module,
-                Permission = model.Permission,
-                IsActiveField = model.IsActiveField
+                Permission = model.Permission
             }), Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Endpoint.cs"))));
         }
 

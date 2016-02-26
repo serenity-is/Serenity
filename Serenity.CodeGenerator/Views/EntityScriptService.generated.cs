@@ -98,33 +98,13 @@ WriteLiteral("> request, Action<SaveResponse> onSuccess, ServiceCallOptions opti
 
                                                   Write(Model.ClassName);
 
-WriteLiteral("/Delete\', {request}, {onSuccess}, {options})\")]\r\n        public static jQueryXmlH" +
-"ttpRequest Delete(DeleteRequest request, Action<DeleteResponse> onSuccess, Servi" +
-"ceCallOptions options = null)\r\n        {\r\n            return null;\r\n        }\r\n\r" +
-"\n");
+WriteLiteral(@"/Delete', {request}, {onSuccess}, {options})"")]
+        public static jQueryXmlHttpRequest Delete(DeleteRequest request, Action<DeleteResponse> onSuccess, ServiceCallOptions options = null)
+        {
+            return null;
+        }
 
-
- if (Model.IsActiveField != null) {
-
-WriteLiteral("        [InlineCode(\"Q.serviceRequest(\'");
-
-
-                                         Write(modulePrefix);
-
-
-                                                        Write(Model.ClassName);
-
-WriteLiteral("/Undelete\', {request}, {onSuccess}, {options})\")]\r\n        public static jQueryXm" +
-"lHttpRequest Undelete(UndeleteRequest request, Action<UndeleteResponse> onSucces" +
-"s, ServiceCallOptions options = null)\r\n        {\r\n            return null;\r\n    " +
-"    }\r\n");
-
-WriteLiteral("\r\n");
-
-
-}
-
-WriteLiteral("        [InlineCode(\"Q.serviceRequest(\'");
+        [InlineCode(""Q.serviceRequest('");
 
 
                                    Write(modulePrefix);
@@ -180,27 +160,7 @@ WriteLiteral("/Update\";\r\n            [InlineConstant] public const string Del
 
                                                                       Write(Model.ClassName);
 
-WriteLiteral("/Delete\";\r\n");
-
-
- if (Model.IsActiveField != null) {
-
-WriteLiteral("\r\n            [InlineConstant] public const string Undelete = \"");
-
-
-                                                         Write(modulePrefix);
-
-
-                                                                        Write(Model.ClassName);
-
-WriteLiteral("/Undelete\";\r\n");
-
-WriteLiteral("\r\n");
-
-
-}
-
-WriteLiteral("            [InlineConstant] public const string Retrieve = \"");
+WriteLiteral("/Delete\";\r\n            [InlineConstant] public const string Retrieve = \"");
 
 
                                                          Write(modulePrefix);

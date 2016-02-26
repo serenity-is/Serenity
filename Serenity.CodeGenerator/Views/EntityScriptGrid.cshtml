@@ -12,7 +12,7 @@ namespace @(Model.RootNamespace)@(dotModule)
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
-    [ColumnsKey("@(moduleDot)@(Model.ClassName)")@if (Model.Identity != null){<text>, IdProperty(@(Model.RowClassName).IdProperty)</text>}@if (Model.NameField != null){<text>, NameProperty(@(Model.RowClassName).NameProperty)</text>}@if (Model.IsActiveField != null) {<text>, IsActiveProperty(@(Model.RowClassName).IsActiveProperty)</text>}]
+    [ColumnsKey("@(moduleDot)@(Model.ClassName)")@if (Model.Identity != null){<text>, IdProperty(@(Model.RowClassName).IdProperty)</text>}@if (Model.NameField != null){<text>, NameProperty(@(Model.RowClassName).NameProperty)</text>}]
     [DialogType(typeof(@(Model.ClassName)Dialog)), LocalTextPrefix(@(Model.RowClassName).LocalTextPrefix), Service(@(Model.ClassName)Service.BaseUrl)]
     public class @(Model.ClassName)Grid : EntityGrid<@(Model.RowClassName)>
     {
