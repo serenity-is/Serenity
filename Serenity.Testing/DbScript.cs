@@ -37,8 +37,12 @@ namespace Serenity.Testing
                 command.CommandText = DatabaseCaretReferences.Replace(commandText);
 
                 if (parameters != null)
+                {
+                    var dialect = command.Connection.GetDialect();
+
                     foreach (var p in parameters)
-                        SqlHelper.AddParamWithValue(command, command.Connection, p.Key, p.Value);
+                        SqlHelper.AddParamWithValue(command, p.Key, p.Value, dialect);
+                }
 
                 statementText = SqlCommandDumper.GetCommandText(command);
             }
