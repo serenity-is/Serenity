@@ -29,6 +29,15 @@ namespace Serenity
                 SetMobileDeviceMode();
                 Window.OnResize += e => SetMobileDeviceMode();
             });
+
+            DefaultNotifyOptions = new ToastrOptions
+            {
+                TimeOut = 3000,
+                ShowDuration = 250,
+                HideDuration = 500,
+                ExtendedTimeOut = 500,
+                PositionClass = "toast-top-full-width",
+            };
         }
 
         /// <summary>
