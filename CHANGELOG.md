@@ -1,3 +1,17 @@
+## 1.9.17 (2016-02-27)
+
+Features:
+  - added DefaultNotifyOptions to set default toastr options for Q.Notify methods
+  - Q.Notify methods now gets optional title and toastr options parameters
+  - use "Module-" prefix for generated dialog css if available
+  - better handling for DataGrid.AddDateRangeFilter for date/time fields.
+  - sergen no longer tries to determine IsActive field or IsActiveProperty. you may still add related interfaces to row manually.
+  - more flex box tuning for grids in dialog tabs and date/time editor
+  - lookup editor filter by multiple values sample [Serene]
+  
+Bugfixes
+  - fixed dialect issue with DateTime2 and AddParamWithValue (thanks @brettbeard)
+
 ## 1.9.16 (2016-02-24)
 
 Features:
