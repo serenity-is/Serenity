@@ -47,6 +47,18 @@ namespace Serenity.Reporting
                 args.Add(PageSize);
             }
 
+            if (!string.IsNullOrEmpty(PageWidth))
+            {
+                args.Add("--page-width");
+                args.Add(PageWidth);
+            }
+
+            if (!string.IsNullOrEmpty(PageHeight))
+            {
+                args.Add("--page-height");
+                args.Add(PageHeight);
+            }
+
             if (MarginLeft != null)
             {
                 args.Add("--margin-left");
@@ -171,7 +183,9 @@ namespace Serenity.Reporting
         public bool UsePrintMediaType { get; set; }
         public bool PrintBackground { get; set; }
         public string UtilityExePath { get; set; }
+        public string PageHeight { get; set; }
         public string PageSize { get; set; }
+        public string PageWidth { get; set; }
         public bool SmartShrinking { get; set; }
         public int? Dpi { get; set; }
         public bool Landscape { get; set; }
