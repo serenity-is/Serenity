@@ -117,7 +117,7 @@
     <Compile Include="Reporting\Model\GenerateCsvRequest.cs" />
     <Compile Include="Reporting\Model\GenerateExcelFileRequest.cs" />
     <Compile Include="Reporting\ReportDesignAttribute.cs" />
-    <Compile Include="Reporting\Tools\IHtmlToPdfConverter.cs" />
+    <Compile Include="Reporting\IHtmlToPdfOptions.cs" />
     <Compile Include="Reporting\Worksheet\CellDecoratorAttribute.cs" />
     <Compile Include="Reporting\Worksheet\BaseCellDecorator.cs" />
     <Compile Include="Reporting\Worksheet\ICellDecorator.cs" />
