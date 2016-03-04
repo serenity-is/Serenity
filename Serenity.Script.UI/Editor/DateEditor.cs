@@ -91,7 +91,7 @@ namespace Serenity
             if (!input.Is(":input"))
                 return;
 
-            if (input.Is(":readonly") || input.Is(":disabled"))
+            if (input.Is("[readonly]") || input.Is(":disabled"))
                 return;
 
             var val = (input.GetValue() ?? "");
