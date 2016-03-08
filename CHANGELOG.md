@@ -1,3 +1,14 @@
+## 1.9.18 (2016-03-08)
+
+Features:
+  - added PageWidth and PageHeight options to HtmlToPdfConvertOptions and add comments to all options
+  - added grid filtered by criteria sample [Serene]
+ 
+Bugfixes:
+  - readonly selector was invalid in DateEditor, leading to script error while typing
+  - can't set min value to negative for DecimalEditor when field has Size attribute
+  - Permission keys used with only PageAuthorize attribute wasn't shown in permission dialog [Serene]
+
 ## 1.9.17 (2016-02-27)
 
 Features:
