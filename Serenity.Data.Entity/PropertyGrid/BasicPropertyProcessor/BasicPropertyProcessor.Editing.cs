@@ -28,9 +28,11 @@ namespace Serenity.PropertyGrid
             {
                 if (item.EditorType == "Decimal" &&
                     (source.BasedOnField is DoubleField ||
-                        source.BasedOnField is DecimalField) &&
-                        source.BasedOnField.Size > 0 &&
-                        source.BasedOnField.Scale < source.BasedOnField.Size)
+                     source.BasedOnField is DecimalField) &&
+                    source.BasedOnField.Size > 0 &&
+                    source.BasedOnField.Scale < source.BasedOnField.Size &&
+                    !item.EditorParams.ContainsKey("minValue") &&
+                    !item.EditorParams.ContainsKey("maxValue"))
                 {
                     string minVal = new String('0', source.BasedOnField.Size - source.BasedOnField.Scale);
                     if (source.BasedOnField.Scale > 0)
