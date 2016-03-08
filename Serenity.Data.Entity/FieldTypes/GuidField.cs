@@ -60,6 +60,23 @@ namespace Serenity.Data
                 row.FieldAssignedValue(this);
         }
 
+        public override object ConvertValue(object source, IFormatProvider provider)
+        {
+            if (source == null)
+                return null;
+
+            if (source is Guid)
+                return (Guid)source;
+
+            if (source is string)
+                return new Guid(source as string);
+
+            if (source is byte[])
+                return new Guid(source as byte[]);
+
+            return Convert.ChangeType(source, typeof(Guid), provider);
+        }
+
         bool IIdField.IsIntegerType
         {
             get
