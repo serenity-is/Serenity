@@ -578,6 +578,7 @@ order by 1, 5";
         const string SqlNChar = "nchar";
         const string SqlNVarChar = "nvarchar";
         const string SqlNText = "ntext";
+        const string SqlText = "text";
         const string SqlBlobSubType1 = "blob sub_type 1";
         const string SqlReal = "real";
         const string SqlFloat = "float";
@@ -594,7 +595,7 @@ order by 1, 5";
 
         public static string SqlTypeNameToFieldType(string sqlTypeName)
         {
-            if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlNChar || 
+            if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlText || sqlTypeName == SqlNChar || 
                 sqlTypeName == SqlVarChar || sqlTypeName == SqlChar || sqlTypeName == SqlBlobSubType1)
                 return "String";
             else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger || sqlTypeName == SqlInt4)
