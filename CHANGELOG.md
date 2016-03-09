@@ -3,6 +3,7 @@
 Features:
   - added PageWidth and PageHeight options to HtmlToPdfConvertOptions and add comments to all options
   - added grid filtered by criteria sample [Serene]
+  - added default values in new entity dialog sample [Serene]
  
 Bugfixes:
   - readonly selector was invalid in DateEditor, leading to script error while typing
