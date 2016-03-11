@@ -87,7 +87,8 @@ namespace Serenity.Services
             var filename = (StringField)(handler.Row.FindField(this.fileNameField) ?? handler.Row.FindFieldByPropertyName(fileNameField));
             var newFilename = filename[handler.Row] = filename[handler.Row].TrimToNull();
             var uploadHelper = new UploadHelper((subFolder.IsEmptyOrNull() ? "" : (subFolder + "/")) + fileNameFormat);
-            var copyResult = uploadHelper.CopyTemporaryFile(newFilename, ((IIdRow)handler.Row).IdField[handler.Row].Value, filesToDelete);
+            var idField = (Field)(((IIdRow)handler.Row).IdField);
+            var copyResult = uploadHelper.CopyTemporaryFile(newFilename, idField.AsObject(handler.Row), filesToDelete);
             if (subFolder != null && !this.storeSubFolderInDB)
                 copyResult.DbFileName = copyResult.DbFileName.Substring(subFolder.Length + 1);
             return copyResult;
@@ -106,10 +107,11 @@ namespace Serenity.Services
 
             var filesToDelete = handler.StateBag[this.GetType().FullName + "_FilesToDelete"] as FilesToDelete;
             var copyResult = CopyTemporaryFile(handler, filesToDelete);
+            var idField = (Field)(((IIdRow)handler.Row).IdField);
 
             new SqlUpdate(handler.Row.Table)
                 .Set(filename, copyResult.DbFileName)
-                .WhereEqual((Field)((IIdRow)handler.Row).IdField, ((IIdRow)handler.Row).IdField[handler.Row].Value)
+                .Where(idField == new ValueCriteria(idField.AsObject(handler.Row)))
                 .Execute(handler.UnitOfWork.Connection);
         }
     }

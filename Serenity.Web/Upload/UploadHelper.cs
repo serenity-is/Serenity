@@ -55,19 +55,19 @@ namespace Serenity.Web
             return Path.Combine(RootPath, ToPath(dbFileName));
         }
 
-        public string FormatDbFileName(Int64 entityId, string extension)
+        public string FormatDbFileName(object entityId, string extension)
         {
             return FormatDbFileName(dbFileFormat, entityId, extension);
         }
 
-        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, Int64 entityId, FilesToDelete filesToDelete)
+        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId, FilesToDelete filesToDelete)
         {
             var result = CopyTemporaryFile(dbTemporaryFile, entityId);
             filesToDelete.Register(result);
             return result;
         }
 
-        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, Int64 entityId)
+        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId)
         {
             string temporaryFilePath = DbFilePath(dbTemporaryFile);
             string dbFileName = ToUrl(FormatDbFileName(entityId, Path.GetExtension(dbTemporaryFile)));
@@ -215,9 +215,31 @@ namespace Serenity.Web
             return RootUrl + ToUrl(fileName);
         }
 
-        public static string FormatDbFileName(string format, Int64 identity, string extension)
+        public static string FormatDbFileName(string format, object identity, string extension)
         {
-            return String.Format(format, identity, identity / 1000, TemporaryFileHelper.RandomFileCode()) + extension;
+            long l;
+            object groupKey;
+            string s;
+            if (identity == null)
+                groupKey = "_";
+            else if (identity is Guid)
+            {
+                s = ((Guid)identity).ToString("N");
+                identity = s;
+                groupKey = s.Substring(0, 2);
+            }
+            else
+            {
+                s = identity.ToString();
+                if (long.TryParse(s, out l))
+                    groupKey = l / 1000;
+                else if (s.Length == 0)
+                    groupKey = "_";
+                else
+                    groupKey = s.SafeSubstring(0, 2);
+            }
+
+            return String.Format(format, identity, groupKey, TemporaryFileHelper.RandomFileCode()) + extension;
         }
 
         public static void DeleteFileAndRelated(string dbFileName, DeleteType deleteType)

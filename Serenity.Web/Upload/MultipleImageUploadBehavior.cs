@@ -164,7 +164,8 @@ namespace Serenity.Services
 
                 ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, ref filename);
 
-                var copyResult = uploadHelper.CopyTemporaryFile(filename, ((IIdRow)handler.Row).IdField[handler.Row].Value, filesToDelete);
+                var idField = (Field)(((IIdRow)handler.Row).IdField);
+                var copyResult = uploadHelper.CopyTemporaryFile(filename, idField.AsObject(handler.Row), filesToDelete);
                 if (!attr.SubFolder.IsEmptyOrNull())
                     copyResult.DbFileName = copyResult.DbFileName.Substring(attr.SubFolder.Length + 1);
 
@@ -191,10 +192,11 @@ namespace Serenity.Services
 
             var filesToDelete = handler.StateBag[this.GetType().FullName + "_" + Target.Name + "_FilesToDelete"] as FilesToDelete;
             var copyResult = CopyTemporaryFiles(handler, new UploadedFile[0], newFileList, filesToDelete);
+            var idField = (Field)(((IIdRow)handler.Row).IdField);
 
             new SqlUpdate(handler.Row.Table)
                 .Set(field, copyResult)
-                .WhereEqual((Field)((IIdRow)handler.Row).IdField, ((IIdRow)handler.Row).IdField[handler.Row].Value)
+                .Where(idField == new ValueCriteria(idField.AsObject(handler.Row)))
                 .Execute(handler.UnitOfWork.Connection);
         }
     }
