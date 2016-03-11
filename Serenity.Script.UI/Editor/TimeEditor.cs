@@ -34,8 +34,8 @@ namespace Serenity
         {
             get
             {
-                var hour = element.GetValue().ConvertToId();
-                var minute = minutes.GetValue().ConvertToId();
+                var hour = element.GetValue().ToInt32();
+                var minute = minutes.GetValue().ToInt32();
                 if (hour == null || minute == null)
                     return null;
                 return hour.Value * 60 + minute.Value;

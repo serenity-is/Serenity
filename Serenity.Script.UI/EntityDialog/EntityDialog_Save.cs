@@ -110,7 +110,7 @@ namespace Serenity
     public class DataChangeInfo
     {
         public string Type { get; set; }
-        public Int64? EntityId { get; set; }
+        public object EntityId { get; set; }
         public object Entity { get; set; }
     }
 }

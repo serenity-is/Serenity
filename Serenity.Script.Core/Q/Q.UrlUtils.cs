@@ -30,7 +30,7 @@ namespace Serenity
         {
             AutoOpenByQuery(key, delegate(string value)
             {
-                var id = value.ConvertToId();
+                var id = value.ToInt64();
                 if (id == null || Double.IsNaN(id.As<double>()))
                     return;
 

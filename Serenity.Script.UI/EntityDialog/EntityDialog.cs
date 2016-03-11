@@ -16,7 +16,7 @@ namespace Serenity
         where TOptions: class, new()
     {
         private TEntity entity;
-        private Int64? entityId;
+        private object entityId;
         
         protected EntityDialog()
             : this(Q.NewBodyDiv(), null)
@@ -75,7 +75,7 @@ namespace Serenity
             set { entity = value ?? new TEntity(); }
         }
 
-        protected internal Nullable<Int64> EntityId
+        protected internal object EntityId
         {
             get { return entityId; }
             set { entityId = value; }

@@ -1,9 +1,7 @@
 ﻿using jQueryApi;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 
 namespace Serenity
 {
@@ -59,9 +57,6 @@ namespace Serenity
             /// <summary>
             /// Converts a numeric or string value to its ID representation (integer or string for large numbers)
             /// </summary>
-            /// <remarks>
-            /// https://code.google.com/p/jquery-numberformatter/
-            /// </remarks>
             public static Int64? ToId(object value)
             {
                 return null;

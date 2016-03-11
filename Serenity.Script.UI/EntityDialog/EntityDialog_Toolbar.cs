@@ -70,9 +70,9 @@ namespace Serenity
                     self.Save(delegate(ServiceResponse response)
                     {
                         if (self.IsEditMode)
-                            self.LoadById(response.As<SaveResponse>().EntityId ?? self.EntityId.As<long>(), null);
+                            self.LoadById(response.As<SaveResponse>().EntityId ?? self.EntityId, null);
                         else
-                            self.LoadById(response.As<SaveResponse>().EntityId.Value, null);
+                            self.LoadById(response.As<SaveResponse>().EntityId, null);
 
                         ShowSaveSuccessMessage(response);
                     });
@@ -110,7 +110,7 @@ namespace Serenity
                             {
                                 self.Undelete(delegate
                                 {
-                                    self.LoadById(self.EntityId.As<long>(), null);
+                                    self.LoadById(self.EntityId, null);
                                 });
                             });
                         }

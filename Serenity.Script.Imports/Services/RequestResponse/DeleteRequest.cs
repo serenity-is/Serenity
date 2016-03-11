@@ -6,6 +6,6 @@ namespace Serenity
     [Imported, Serializable, PreserveMemberCase]
     public class DeleteRequest : ServiceRequest
     {
-        public Int64 EntityId { get; set; }
+        public object EntityId { get; set; }
     }
 }

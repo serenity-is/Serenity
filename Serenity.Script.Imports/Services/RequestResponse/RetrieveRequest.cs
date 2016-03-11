@@ -7,7 +7,7 @@ namespace Serenity
     [Imported, Serializable, PreserveMemberCase]
     public class RetrieveRequest : ServiceRequest
     {
-        public Int64 EntityId { get; set; }
+        public object EntityId { get; set; }
         public RetrieveColumnSelection ColumnSelection { get; set; }
         public List<string> IncludeColumns { get; set; }
         public List<string> ExcludeColumns { get; set; }

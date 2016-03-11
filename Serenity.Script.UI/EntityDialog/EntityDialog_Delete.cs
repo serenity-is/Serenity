@@ -24,7 +24,7 @@ namespace Serenity
             baseOptions.Service = this.GetService() + "/Delete";
 
             var request = new DeleteRequest();
-            request.EntityId = EntityId.As<long>();
+            request.EntityId = EntityId;
             baseOptions.Request = request;
 
             baseOptions.OnSuccess = response =>

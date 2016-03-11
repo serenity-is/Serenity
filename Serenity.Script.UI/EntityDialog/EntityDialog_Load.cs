@@ -25,7 +25,7 @@ namespace Serenity
                 if (scriptType == "string" || scriptType == "number")
                 {
                     var self = this;
-                    var entityId = entityOrId.As<long>();
+                    var entityId = entityOrId;
                     LoadById(entityId, response => Window.SetTimeout(done, 0));
                     return;
                 }
@@ -73,7 +73,7 @@ namespace Serenity
         {
             string idField = GetEntityIdField();
             if (idField != null)
-                this.EntityId = (long?)(entity.As<JsDictionary>()[idField]).ConvertToId();
+                this.EntityId = entity.As<JsDictionary>()[idField];
 
             this.Entity = entity;
 
@@ -110,13 +110,13 @@ namespace Serenity
         {
         }
 
-        protected virtual ServiceCallOptions<RetrieveResponse<TEntity>> GetLoadByIdOptions(long id,
+        protected virtual ServiceCallOptions<RetrieveResponse<TEntity>> GetLoadByIdOptions(object id,
             Action<RetrieveResponse<TEntity>> callback)
         {
             return new ServiceCallOptions<RetrieveResponse<TEntity>>();
         }
 
-        protected virtual RetrieveRequest GetLoadByIdRequest(long id)
+        protected virtual RetrieveRequest GetLoadByIdRequest(object id)
         {
             RetrieveRequest request = new RetrieveRequest();
             request.EntityId = id;
@@ -125,10 +125,10 @@ namespace Serenity
 
         public void ReloadById()
         {
-            LoadById(this.EntityId.Value, null);
+            LoadById(this.EntityId, null);
         }
 
-        public void LoadById(long id, Action<RetrieveResponse<TEntity>> callback, Action fail = null)
+        public void LoadById(object id, Action<RetrieveResponse<TEntity>> callback, Action fail = null)
         {
             var baseOptions = new ServiceCallOptions<RetrieveResponse<TEntity>>();
             baseOptions.Service = this.GetService() + "/Retrieve";

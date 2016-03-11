@@ -168,7 +168,7 @@ namespace Serenity
             opt.BlockUI = true;
             opt.Request = new RetrieveLocalizationRequest
             {
-                EntityId = this.EntityId.Value
+                EntityId = this.EntityId
             };
             
             opt.OnSuccess = response => 

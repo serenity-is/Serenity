@@ -188,7 +188,7 @@ namespace Serenity
 
                     if ((dci.Type == "create" || dci.Type == "update") && dci.EntityId != null)
                     {
-                        self.Value = dci.EntityId.Value.ToString();
+                        self.Value = dci.EntityId.ToString();
                     }
                 });
 
@@ -204,7 +204,7 @@ namespace Serenity
                 }
                 else
                 {
-                    dialog.Load(this.Value.ConvertToId().Value, () => dialog.DialogOpen(), null);
+                    dialog.Load(this.Value, () => dialog.DialogOpen(), null);
                 }
             });
         }
