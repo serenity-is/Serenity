@@ -1,3 +1,12 @@
+## 1.9.19 (2016-03-11)
+
+Features:
+  - added mapping for sql text field to StringField in sergen.
+  - upload editors and upload behaviors should now work on tables with string/guid ID columns.
+
+Bugfixes:
+  - convert.changetype doesn't work with guids, so tables with Guid ID columns had problems.
+
 ## 1.9.18 (2016-03-08)
 
 Features:
