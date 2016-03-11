@@ -199,6 +199,8 @@ namespace Serenity.Data
                             else
                                 flags = flags | FieldFlags.Calculated | FieldFlags.Foreign;
                         }
+                        else if (!SqlSyntax.IsValidQuotedIdentifier(value))
+                            flags = flags | FieldFlags.Calculated;
                     }
                     else
                     {
