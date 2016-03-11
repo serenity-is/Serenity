@@ -52,6 +52,34 @@ namespace Serenity.Test.Data
                 set { Fields.CountryName[this] = value; }
             }
 
+            [DisplayName("Concat Expression"), Expression("CONCAT('A', 'B')")]
+            public String ConcatExpression
+            {
+                get { return Fields.ConcatExpression[this]; }
+                set { Fields.ConcatExpression[this] = value; }
+            }
+
+            [DisplayName("Basic Expression"), Expression("SomeField")]
+            public String BasicExpression
+            {
+                get { return Fields.BasicExpression[this]; }
+                set { Fields.BasicExpression[this] = value; }
+            }
+
+            [DisplayName("Quoted Expression"), Expression("[SomeField]")]
+            public String QuotedExpression
+            {
+                get { return Fields.QuotedExpression[this]; }
+                set { Fields.QuotedExpression[this] = value; }
+            }
+
+            [DisplayName("Alias Dot Quoted Expression"), Expression("t0.[ThatField]")]
+            public String AliasDotQuotedExpression
+            {
+                get { return Fields.AliasDotQuotedExpression[this]; }
+                set { Fields.AliasDotQuotedExpression[this] = value; }
+            }
+
             public class RowFields : RowFieldsBase
             {
                 public Int32Field ID;
@@ -60,6 +88,10 @@ namespace Serenity.Test.Data
                 public Int32Field CountryID;
                 public StringField CountryName;
                 public StringField FullName;
+                public StringField ConcatExpression;
+                public StringField BasicExpression;
+                public StringField QuotedExpression;
+                public StringField AliasDotQuotedExpression;
 
                 public RowFields()
                 {

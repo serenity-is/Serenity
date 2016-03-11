@@ -166,6 +166,14 @@ namespace Serenity.Test.Data
             Assert.True(ComplexRow.Fields.CountryName.Flags.HasFlag(FieldFlags.Foreign));
         }
 
+
+        [Fact]
+        public void ExpressionAttributeSetsCalculatedFlagForExpressionsWithoutAliases()
+        {
+            Assert.True(ComplexRow.Fields.ConcatExpression.Flags.HasFlag(FieldFlags.Calculated));
+            Assert.False(ComplexRow.Fields.ConcatExpression.Flags.HasFlag(FieldFlags.Foreign));
+        }
+
         [Fact]
         public void ExpressionAttributeDoesntSetForeignFlagIfContainsOnlyT0()
         {
@@ -177,6 +185,27 @@ namespace Serenity.Test.Data
         {
             Assert.False(ComplexRow.Fields.Name.Flags.HasFlag(FieldFlags.Calculated));
             Assert.False(ComplexRow.Fields.CountryName.Flags.HasFlag(FieldFlags.Calculated));
+        }
+
+        [Fact]
+        public void ExpressionAttributeDoesntSetCalculatedFlagForBasicExpressions()
+        {
+            Assert.False(ComplexRow.Fields.BasicExpression.Flags.HasFlag(FieldFlags.Calculated));
+            Assert.False(ComplexRow.Fields.BasicExpression.Flags.HasFlag(FieldFlags.Foreign));
+        }
+
+        [Fact]
+        public void ExpressionAttributeDoesntSetCalculatedFlagForQuotedExpressions()
+        {
+            Assert.False(ComplexRow.Fields.QuotedExpression.Flags.HasFlag(FieldFlags.Calculated));
+            Assert.False(ComplexRow.Fields.QuotedExpression.Flags.HasFlag(FieldFlags.Foreign));
+        }
+
+        [Fact]
+        public void ExpressionAttributeDoesntSetCalculatedFlagForAliasDotQuotedExpressions()
+        {
+            Assert.False(ComplexRow.Fields.AliasDotQuotedExpression.Flags.HasFlag(FieldFlags.Calculated));
+            Assert.False(ComplexRow.Fields.AliasDotQuotedExpression.Flags.HasFlag(FieldFlags.Foreign));
         }
 
         [Fact]
