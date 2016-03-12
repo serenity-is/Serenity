@@ -140,6 +140,21 @@ namespace Serenity
         public bool FullWidthRows { get; set; }
 
         /// <summary>
+        /// Frozen columns (experimental). Default -1.
+        /// </summary>
+        public int FrozenColumn { get; set; }
+
+        /// <summary>
+        /// Frozen rows (experimental). Default -1.
+        /// </summary>
+        public int FrozenRow { get; set; }
+
+        /// <summary>
+        /// Frozen rows at bottom (experimental)
+        /// </summary>
+        public bool FrozenBottom { get; set; }
+
+        /// <summary>
         /// (default: 25)
         /// </summary>
         public int HeaderRowHeight { get; set; }
@@ -173,6 +188,11 @@ namespace Serenity
         /// (default: false)
         /// </summary>
         public bool ShowHeaderRow { get; set; }
+
+        /// <summary>
+        /// (default: false)
+        /// </summary>
+        public bool ShowFooterRow { get; set; }
 
         /// <summary>
         /// If true, the column being resized will change its width as the mouse is dragging the resize handle. If false, the column will resize after mouse drag ends. (default: false)

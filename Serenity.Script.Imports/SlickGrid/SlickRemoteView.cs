@@ -1,6 +1,5 @@
 ﻿using jQueryApi;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -22,10 +21,55 @@ namespace Serenity
         public int SeekToPage { get; set; }
         public SlickEvent OnProcessData { get; set; }
         public string Method { get; set; }
+        public Func<object, int, dynamic> GetItemMetadata { get; set; }
         [ScriptName("errormsg")]
         public string ErrorMsg { get; set; }
     }
 
+    [Imported, Serializable]
+    public class SlickSummaryOptions
+    {
+        public List<SlickAggregator> Aggregators { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class SlickGroupInfo<TItem>
+    {
+        public TypeOption<string, Func<TItem, object>> Getter { get; set; }
+        public Func<SlickGroup<TItem>, string> Formatter { get; set; }
+        public List<SlickAggregator> Aggregators { get; set; }
+        public bool AggregateCollapsed { get; set; }
+        public bool LazyTotalsCalculation { get; set; }
+    }
+
+    [Imported, ScriptNamespace("Slick"), ScriptName("Group"), IncludeGenericArguments(false), Serializable]
+    public class SlickGroup<TItem>
+    {
+        [ScriptName("__group")]
+        public bool IsGroup { get; }
+        public int Level { get; }
+        public int Count { get; }
+        public object Value { get; }
+        public string Title { get; }
+        public bool Collapsed { get; }
+        public object Totals { get; }
+        public TItem[] Rows { get; }
+        public SlickGroup<TItem> Groups { get; }
+        public string GroupingKey { get; }
+    }
+
+    [Imported, ScriptNamespace("Slick"), ScriptName("GroupTotals"), Serializable]
+    public class SlickGroupTotals<TItem>
+    {
+        [ScriptName("__groupTotals")]
+        public bool IsGroupTotals { get; }
+        public SlickGroup<TItem> Group { get; }
+        public bool Initialized { get; }
+        public JsDictionary<string, object> Sum { get; }
+        public JsDictionary<string, object> Avg { get; }
+        public JsDictionary<string, object> Min { get; }
+        public JsDictionary<string, object> Max { get; }
+    }
 
     public delegate bool CancellableViewCallback<TEntity>(SlickRemoteView<TEntity> view);
     public delegate bool SlickRemoteViewAjaxCallback<TEntity>(SlickRemoteView<TEntity> view, jQueryAjaxOptions options);
@@ -103,6 +147,15 @@ namespace Serenity
             return null;
         }
 
+        public void SetGrouping(List<SlickGroupInfo<dynamic>> groupInfo)
+        {
+        }
+
+        public List<SlickGroupInfo<dynamic>> GetGrouping()
+        {
+            return null;
+        }
+
         [IntrinsicProperty]
         public dynamic Params { get { return null; } }
 
@@ -121,9 +174,10 @@ namespace Serenity
         public CancellableViewCallback<dynamic> OnSubmit;
         public SlickRemoteViewAjaxCallback<dynamic> OnAjaxCall;
         public SlickRemoteViewProcessCallback<dynamic> OnProcessData;
-        public RemoteViewEvent OnRowCountChanged;
-        public RemoteViewEvent OnRowsChanged;
-        public RemoteViewEvent OnDataLoaded;
+        public SlickEvent OnRowCountChanged;
+        public SlickEvent OnRowsChanged;
+        public SlickEvent OnDataChanged;
+        public SlickEvent OnDataLoaded;
 
         [ScriptName("seekToPage")]
         public Int32? SeekToPage;
@@ -177,6 +231,18 @@ namespace Serenity
             return default(TEntity);
         }
 
+        public void SetGrouping(List<SlickGroupInfo<TEntity>> groupInfo)
+        {
+        }
+
+        public void SetSummaryOptions(SlickSummaryOptions options)
+        {
+        }
+
+        public void Refresh()
+        {
+        }
+
         [IntrinsicProperty]
         public new List<TEntity> Rows { get { return null; } }
 
@@ -185,18 +251,39 @@ namespace Serenity
         public new SlickRemoteViewProcessCallback<TEntity> OnProcessData;
     }
 
-    [Imported, IncludeGenericArguments(false)]
-    public class RemoteViewEvent
+    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Aggregator")]
+    public abstract class SlickAggregator
     {
-        public void Subscribe(Action<jQueryEvent, dynamic> handler)
+    }
+
+    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Avg")]
+    public class SlickAvg : SlickAggregator
+    {
+        public SlickAvg(string field)
         {
         }
+    }
 
-        public void Unsubscribe(Action<jQueryEvent, dynamic> handler)
+    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Sum")]
+    public class SlickSum : SlickAggregator
+    {
+        public SlickSum(string field)
         {
         }
+    }
 
-        public void Clear()
+    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Min")]
+    public class SlickMin : SlickAggregator
+    {
+        public SlickMin(string field)
+        {
+        }
+    }
+
+    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Max")]
+    public class SlickMax : SlickAggregator
+    {
+        public SlickMax(string field)
         {
         }
     }

@@ -27,6 +27,11 @@ namespace Serenity
         public void Unsubscribe(Action<jQueryEvent, dynamic> handler)
         {
         }
+
+        public void Clear()
+        {
+
+        }
     }
 
     [Imported, Serializable]
@@ -752,6 +757,18 @@ namespace Serenity
         public SlickEvent OnCellCssStylesChanged { get; private set; }
     }
 
+    [Imported, ScriptNamespace("Slick.Data"), ScriptName("GroupItemMetadataProvider")]
+    public class SlickGroupItemMetadataProvider
+    {
+        public SlickGroupItemMetadataProvider()
+        {
+        }
+
+        public SlickGroupItemMetadataProvider(object options)
+        {
+        }
+    }
+
     [Imported, ScriptNamespace("Slick"), ScriptName("RowSelectionModel")]
     public class SlickRowSelectionModel
     {
@@ -775,6 +792,4 @@ namespace Serenity
     {
         public Boolean CancelEditOnDrag { get; set; }
     }
-
-
 }

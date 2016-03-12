@@ -146,5 +146,7 @@ namespace Serenity
         /// Custom extension to allow specifying initial sort orders (1, 2, 3 etc, negative number means descending sort)
         /// </summary>
         public int SortOrder { get; set; }
+
+        public Func<SlickGroupTotals<dynamic>, SlickColumn, string> GroupTotalsFormatter { get; set; }
     }
 }

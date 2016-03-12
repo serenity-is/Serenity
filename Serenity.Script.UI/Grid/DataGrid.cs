@@ -5,6 +5,7 @@ using jQueryApi;
 using System.Linq;
 using Serenity.Data;
 using System.Html;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -162,13 +163,9 @@ namespace Serenity
 
             if (this.view != null)
             {
-                this.view.OnRowsChanged.Clear();
-                this.view.OnRowCountChanged.Clear();
+                this.view.OnDataChanged.Clear();
                 this.view.OnSubmit = null;
                 this.view.SetFilter(null);
-                dynamic viewRows = this.view.Rows;
-                if (viewRows != null)
-                    viewRows.getItemMetadata = null;
                 this.view = null;
             }
 
@@ -268,15 +265,7 @@ namespace Serenity
             }
 
             var slickOptions = GetSlickOptions();
-            var self = this;
-            dynamic viewRows = view.Rows;
-            viewRows.getItemMetadata = new Func<int, dynamic>(delegate(int index)
-            {
-                var item = self.view.Rows[index];
-                return self.GetItemMetadata(item, index);
-            });
-
-            var grid = new SlickGrid(slickContainer, data: viewRows, columns: slickColumns, options: slickOptions);
+            var grid = new SlickGrid(slickContainer, data: view.As<List<dynamic>>(), columns: slickColumns, options: slickOptions);
 
             grid.RegisterPlugin(new SlickAutoTooltips(new SlickAutoTooltipsOptions
             {
@@ -284,6 +273,7 @@ namespace Serenity
             }));
 
             this.slickGrid = grid;
+            this.Rows = this.slickGrid.As<GridRows<TItem>>();
 
             if (!IsAsyncWidget())
                 SetInitialSortOrder();
@@ -317,6 +307,18 @@ namespace Serenity
             slickGrid.SetSortColumns(mapped);
         }
 
+        [System.Runtime.CompilerServices.IntrinsicProperty]
+        public GridRows<TItem> Rows
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Be careful with this as it contains all source items.
+        /// If grid is grouped, or showing filtered items, 
+        /// use Rows to access data item for a given row index
+        /// </summary>
         public List<TItem> Items
         {
             get
@@ -328,7 +330,6 @@ namespace Serenity
                 view.SetItems(value, true);
             }
         }
-
 
         private Action<jQueryEvent, dynamic> slickGridOnSort;
         private Action<jQueryEvent, dynamic> slickGridOnClick;
@@ -418,31 +419,15 @@ namespace Serenity
             }
         }
 
-        private void ViewRowCountChanged(jQueryEvent e, dynamic d)
+        private void ViewDataChanged(jQueryEvent e, dynamic rows)
         {
-            this.slickGrid.UpdateRowCount();
-            this.slickGrid.Render();
-        }
-
-        private void ViewRowsChanged(jQueryEvent e, dynamic rows)
-        {
-            if (rows == null)
-            {
-                this.slickGrid.Invalidate();
-                MarkupReady();
-            }
-            else
-            {
-                this.slickGrid.Invalidate();
-                this.slickGrid.Render();
-            }
+            MarkupReady();
         }
 
         protected void BindToViewEvents()
         {
             var self = this;
-            this.view.OnRowCountChanged.Subscribe((e, d) => self.ViewRowCountChanged(e, d));
-            this.view.OnRowsChanged.Subscribe((e, d) => self.ViewRowsChanged(e, d));
+            this.view.OnDataChanged.Subscribe((e, d) => self.ViewDataChanged(e, d));
             this.view.OnSubmit = (view) => self.OnViewSubmit();
             this.view.SetFilter((item, view) => self.OnViewFilter(item));
             this.view.OnProcessData = ((response, view) => self.OnViewProcessData(response));
@@ -619,6 +604,8 @@ namespace Serenity
                 opt.RowsPerPage = J(Window.Instance).GetWidth() < 768 ? 20 : 100;
             else
                 opt.RowsPerPage = 100;
+
+            opt.GetItemMetadata = (item, index) => this.GetItemMetadata(item.As<TItem>(), index);
 
             return opt;
         }
@@ -1085,4 +1072,29 @@ namespace Serenity
         {
         }
    }
+
+    public class GridRows<TItem>
+    {
+        private GridRows()
+        {
+        }
+
+        public TItem this[int row]
+        {
+            [InlineCode("{this}.getDataItem({row})")]
+            get
+            {
+                return default(TItem);
+            }
+        }
+
+        public int Count
+        {
+            [InlineCode("{this}.getDataLength()")]
+            get
+            {
+                return 0;
+            }
+        }
+    }
 }

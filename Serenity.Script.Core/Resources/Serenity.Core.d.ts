@@ -24,6 +24,12 @@ interface Serenity {
     CustomValidation: Serenity.CustomValidation;
 }
 
+interface ListRequest {
+    Skip?: number;
+    Take?: number;
+    Sort?: string[];
+}
+
 declare namespace Serenity {
     interface CustomValidation {
         registerValidationMethods(): void;

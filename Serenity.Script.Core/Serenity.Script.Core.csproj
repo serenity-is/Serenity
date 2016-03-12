@@ -135,8 +135,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Serenity.Externals.js" />
-    <None Include="Resources\Serenity.Externals.Slick.js" />
+    <TypeScriptCompile Include="Resources\Serenity.Externals.Slick.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\linq.js" />
@@ -158,7 +157,7 @@
     <Content Include="Resources\mscorlib.min.js" />
   </ItemGroup>
   <Import Project="..\tools\Saltarelle\Saltarelle.Compiler.targets" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets"  Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Target Name="MinimizeScripts" AfterTargets="BuildScript">
     <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.js" DestinationFolder="$(OutDir)">
     </Copy>

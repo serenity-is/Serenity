@@ -23,6 +23,7 @@ namespace Serenity.Web
             "~/Scripts/toastr.js",
             "~/Scripts/SlickGrid/slick.core.js",
             "~/Scripts/SlickGrid/slick.grid.js",
+            "~/Scripts/SlickGrid/slick.groupitemmetadataprovider.js",
             "~/Scripts/SlickGrid/Plugins/slick.autotooltips.js",
             "~/Scripts/SlickGrid/Plugins/slick.headerbuttons.js",
             "~/Scripts/bootstrap.js",
