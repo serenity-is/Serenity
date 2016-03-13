@@ -46,29 +46,29 @@ namespace Serenity
     public class SlickGroup<TItem>
     {
         [ScriptName("__group")]
-        public bool IsGroup { get; }
-        public int Level { get; }
-        public int Count { get; }
-        public object Value { get; }
-        public string Title { get; }
-        public bool Collapsed { get; }
-        public object Totals { get; }
-        public TItem[] Rows { get; }
-        public SlickGroup<TItem> Groups { get; }
-        public string GroupingKey { get; }
+        public bool IsGroup { get { return false; } }
+        public int Level { get { return 0; } }
+        public int Count { get { return 0; } }
+        public object Value { get { return null; } }
+        public string Title { get { return null; } }
+        public bool Collapsed { get { return false; } }
+        public object Totals { get { return null; } }
+        public TItem[] Rows { get { return null; } }
+        public SlickGroup<TItem> Groups { get { return null; } }
+        public string GroupingKey { get { return null; } }
     }
 
     [Imported, ScriptNamespace("Slick"), ScriptName("GroupTotals"), Serializable]
     public class SlickGroupTotals<TItem>
     {
         [ScriptName("__groupTotals")]
-        public bool IsGroupTotals { get; }
-        public SlickGroup<TItem> Group { get; }
-        public bool Initialized { get; }
-        public JsDictionary<string, object> Sum { get; }
-        public JsDictionary<string, object> Avg { get; }
-        public JsDictionary<string, object> Min { get; }
-        public JsDictionary<string, object> Max { get; }
+        public bool IsGroupTotals { get { return false; } }
+        public SlickGroup<TItem> Group { get { return null; } }
+        public bool Initialized { get { return false; } }
+        public JsDictionary<string, object> Sum { get { return null; } }
+        public JsDictionary<string, object> Avg { get { return null; } }
+        public JsDictionary<string, object> Min { get { return null; } }
+        public JsDictionary<string, object> Max { get { return null; } }
     }
 
     public delegate bool CancellableViewCallback<TEntity>(SlickRemoteView<TEntity> view);
