@@ -177,7 +177,7 @@ namespace Serenity
             if (target.HasClass("check-box"))
             {
                 bool checkedOrPartial = target.HasClass("checked") || target.HasClass("partial");
-                var item = view.Rows[row];
+                var item = Rows[row];
                 var anyChanged = item.IsSelected != (!checkedOrPartial);
                 view.BeginUpdate();
                 try
