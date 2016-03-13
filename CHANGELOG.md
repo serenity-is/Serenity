@@ -1,3 +1,8 @@
+## 1.9.21 (2016-03-14)
+
+Bugfixes:
+  - resolved problems with SlickGrid affecting permission dialogs after recent merges with 6pac and x-slickgrid
+
 ## 1.9.20 (2016-03-13)
 
 Features:
