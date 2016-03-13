@@ -280,11 +280,14 @@ namespace Serenity
 
         private bool AllItemsSelected()
         {
-            foreach (var row in view.Rows)
+            for (var i = 0; i < Rows.Count; i++)
+            {
+                var row = Rows[i];
                 if (!row.IsSelected)
                     return false;
+            }
 
-            return view.Rows.Count > 0;
+            return Rows.Count > 0;
         }
 
         protected bool AllDescendantsSelected(TItem item)

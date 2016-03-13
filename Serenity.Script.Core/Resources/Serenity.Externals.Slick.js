@@ -483,6 +483,9 @@ var Slick;
                     updateIdxById(idx);
                     refresh();
                 }
+                function getRows() {
+                    return rows;
+                }
                 function getLength() {
                     return rows.length;
                 }
@@ -1112,13 +1115,12 @@ var Slick;
                     }
                 }
                 intf = {
-                    // properties
-                    "rows": rows,
                     // methods
                     "beginUpdate": beginUpdate,
                     "endUpdate": endUpdate,
                     "setPagingOptions": setPagingOptions,
                     "getPagingInfo": getPagingInfo,
+                    "getRows": getRows,
                     "getItems": getItems,
                     "setItems": setItems,
                     "setFilter": setFilter,

@@ -45,8 +45,7 @@ namespace Serenity
     [Imported, ScriptNamespace("Slick"), ScriptName("Group"), IncludeGenericArguments(false), Serializable]
     public class SlickGroup<TItem>
     {
-        [ScriptName("__group")]
-        public bool IsGroup { get { return false; } }
+        public bool IsGroup { [InlineCode("!!{this}.__group")] get { return false; } }
         public int Level { get { return 0; } }
         public int Count { get { return 0; } }
         public object Value { get { return null; } }
@@ -159,8 +158,11 @@ namespace Serenity
         [IntrinsicProperty]
         public dynamic Params { get { return null; } }
 
-        [IntrinsicProperty]
-        public List<dynamic> Rows { get { return null; } }
+        [IntrinsicProperty, Obsolete("Use GetItem and GetLength")]
+        public List<dynamic> Rows { [InlineCode("{this}.getRows()")] get { return null; } }
+
+        public dynamic GetItem(int row) { return null; }
+        public int GetLength() { return 0; }
 
         [ScriptName("rowsPerPage")]
         public Int32? RowsPerPage;
@@ -243,8 +245,13 @@ namespace Serenity
         {
         }
 
-        [IntrinsicProperty]
-        public new List<TEntity> Rows { get { return null; } }
+        public new TEntity GetItem(int row)
+        {
+            return default(TEntity);
+        }
+
+        [IntrinsicProperty, Obsolete("Use GetItem and GetLength")]
+        public new List<TEntity> Rows { [InlineCode("{this}.getRows()")] get { return null; } }
 
         public new CancellableViewCallback<TEntity> OnSubmit;
         public new SlickRemoteViewAjaxCallback<TEntity> OnAjaxCall;

@@ -103,7 +103,7 @@ namespace Serenity
             {
                 if (lastDoneEvent != null)
                 {
-                    lastDoneEvent(view.Rows.Count > 0);
+                    lastDoneEvent(view.GetLength() > 0);
                     lastDoneEvent = null;
                 }
             });
@@ -188,9 +188,9 @@ namespace Serenity
                     order = 1;
                 else
                 {
-                    if (insertBefore >= grid.View.Rows.Count)
+                    if (insertBefore >= grid.Rows.Count)
                     {
-                        order = getDisplayOrder((TItem)grid.View.Rows[grid.View.Rows.Count - 1]) ?? 0;
+                        order = getDisplayOrder((TItem)grid.Rows[grid.Rows.Count - 1]) ?? 0;
                         if (order == 0)
                             order = insertBefore + 1;
                         else
@@ -198,7 +198,7 @@ namespace Serenity
                     }
                     else
                     {
-                        order = getDisplayOrder((TItem)grid.View.Rows[insertBefore]) ?? 0;
+                        order = getDisplayOrder((TItem)grid.Rows[insertBefore]) ?? 0;
                         if (order == 0)
                             order = insertBefore + 1;
                     }
@@ -213,7 +213,7 @@ namespace Serenity
                     Q.ServiceCall(new ServiceCallOptions
                     {
                         Service = service,
-                        Request = getUpdateRequest(getId(grid.View.Rows[rows[i]]), order++),
+                        Request = getUpdateRequest(getId(grid.Rows[rows[i]]), order++),
                         OnSuccess = delegate(ServiceResponse response)
                         {
                             i++;

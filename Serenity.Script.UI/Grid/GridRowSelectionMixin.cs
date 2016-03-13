@@ -21,7 +21,7 @@ namespace Serenity
                 {
                     e.PreventDefault();
 
-                    var item = grid.GetView().Rows[p.row];
+                    var item = grid.GetView().GetItem(p.row);
                     var id = item[idField].toString();
 
                     if (include.ContainsKey(id))
@@ -29,7 +29,7 @@ namespace Serenity
                     else
                         include[id] = true;
 
-                    for (var i = 0; i < grid.GetView().Rows.Count; i++)
+                    for (var i = 0; i < grid.GetView().GetLength(); i++)
                         grid.GetGrid().UpdateRow(i);
 
                     UpdateSelectAll();

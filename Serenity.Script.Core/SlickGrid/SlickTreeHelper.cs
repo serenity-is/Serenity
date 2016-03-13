@@ -103,7 +103,7 @@ namespace Serenity
             if (target.HasClass("s-TreeCollapse") ||
                 target.HasClass("s-TreeExpand"))
             {
-                dynamic item = view.Rows[row];
+                dynamic item = view.GetItem(row);
                 if (item != null)
                 {
                     if (Q.IsFalse(item._collapsed))

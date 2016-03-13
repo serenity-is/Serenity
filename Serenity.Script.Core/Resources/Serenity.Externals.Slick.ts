@@ -563,6 +563,10 @@ namespace Slick.Data {
                 refresh();
             }
 
+            function getRows() {
+                return rows;
+            }
+
             function getLength() {
                 return rows.length;
             }
@@ -1308,13 +1312,12 @@ namespace Slick.Data {
             }
 
             intf = {
-                // properties
-                "rows": rows,  // note: neither the array or the data in it should be modified directly
                 // methods
                 "beginUpdate": beginUpdate,
                 "endUpdate": endUpdate,
                 "setPagingOptions": setPagingOptions,
                 "getPagingInfo": getPagingInfo,
+                "getRows": getRows,
                 "getItems": getItems,
                 "setItems": setItems,
                 "setFilter": setFilter,
