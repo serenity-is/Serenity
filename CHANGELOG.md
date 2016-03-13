@@ -1,3 +1,17 @@
+## 1.9.20 (2016-03-13)
+
+Features:
+  - rewrote slick remote view in typescript
+  - port extra features from x-slickgrid fork (https://github.com/ddomingues/X-SlickGrid)
+  - [BREAKING CHANGE] EntityDialog.EntityId is now of type object (instead of long). As Serenity already supports non integer ID values server side, this was required. If you have code depending on EntityId being a long in dialog, you may use ToInt32() or ToInt64() extensions.
+  - more tests for expression attribute mapping
+  - experimental grouping and summaries feature (works client side only, no server support so don't use with paging)
+  - experimental frozen columns and rows feature
+  - grouping and summaries in grid sample [Serene]
+  
+Bugfixes:
+  - if a field has an expression like CONCAT('a', 'b') it should also have Calculated flag
+
 ## 1.9.19 (2016-03-11)
 
 Features:
