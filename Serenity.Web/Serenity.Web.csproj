@@ -224,6 +224,7 @@
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.es.json" />
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.de.json" />
+    <None Include="Includes\Scripts\SlickGrid\README.md" />
     <None Include="Includes\web.config.transform" />
     <None Include="packages.config" />
     <None Include="Style\images\accessright.png" />
@@ -641,6 +642,31 @@
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.tr.json" />
     <Content Include="Includes\Scripts\rsvp.js" />
     <Content Include="Includes\Scripts\rsvp.min.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Controls\slick.columnpicker.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Controls\slick.pager.js" />
+    <Content Include="Includes\Scripts\SlickGrid\MIT-LICENSE.txt" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.autotooltips.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.autotooltips.min.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.cellcopymanager.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.cellrangedecorator.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.cellrangeselector.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.cellselectionmodel.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.checkboxselectcolumn.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.headerbuttons.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.headermenu.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.rowmovemanager.js" />
+    <Content Include="Includes\Scripts\SlickGrid\Plugins\slick.rowselectionmodel.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.core.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.core.min.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.dataview.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.editors.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.formatters.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.grid.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.grid.min.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.remotemodel-yahoo.js" />
+    <Content Include="Includes\Scripts\SlickGrid\slick.remotemodel.js" />
     <Content Include="Style\images\32px.png" />
     <Content Include="Style\images\accordion-down.png" />
     <Content Include="Style\images\accordion-left.png" />
@@ -677,6 +703,12 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="CompileSiteLess" AfterTargets="AfterBuild">
     <Exec Command="$(ProjectDir)..\tools\node\lessc.cmd $(ProjectDir)style\serenity.less &gt; $(OutDir)serenity.css">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\SlickGrid\slick.core.js -o $(ProjectDir)Includes\Scripts\SlickGrid\slick.core.min.js --comments --mangle">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\SlickGrid\slick.grid.js -o $(ProjectDir)Includes\Scripts\SlickGrid\slick.grid.min.js --comments --mangle">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.js -o $(ProjectDir)Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js --comments --mangle">
     </Exec>
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
