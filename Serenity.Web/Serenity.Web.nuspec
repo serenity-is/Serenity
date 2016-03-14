@@ -29,7 +29,6 @@
       <dependency id="jQuery.Validation" version="1.14.0" />
       <dependency id="bootstrap" version="3.3.6" />
       <dependency id="toastr" version="2.1.1" />
-      <dependency id="SlickGrid" version="2.2.20140120" />
       <dependency id="Select2.js" version="3.5.1" />
     </dependencies>
   </metadata>
