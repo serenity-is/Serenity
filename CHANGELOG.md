@@ -1,7 +1,7 @@
-## 1.9.21 (2016-03-14)
+## 1.9.22 (2016-03-14)
 
 Bugfixes:
-  - included SlickGrid scripts in serenity.web nuget package and removed dependency to SlickGrid package as these scripts are now customized   
+  - included SlickGrid scripts in serenity.web nuget package and removed dependency to SlickGrid package as these scripts are now customized. 
 
 ## 1.9.21 (2016-03-14)
 
