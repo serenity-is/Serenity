@@ -269,6 +269,102 @@
       <Link>Scripts\rsvp.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Controls\slick.columnpicker.js">
+      <Link>Scripts\SlickGrid\controls\slick.columnpicker.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Controls\slick.pager.js">
+      <Link>Scripts\SlickGrid\controls\slick.pager.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.autotooltips.js">
+      <Link>Scripts\SlickGrid\plugins\slick.autotooltips.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.autotooltips.min.js">
+      <Link>Scripts\SlickGrid\plugins\slick.autotooltips.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.cellcopymanager.js">
+      <Link>Scripts\SlickGrid\plugins\slick.cellcopymanager.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.cellrangedecorator.js">
+      <Link>Scripts\SlickGrid\plugins\slick.cellrangedecorator.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.cellrangeselector.js">
+      <Link>Scripts\SlickGrid\plugins\slick.cellrangeselector.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.cellselectionmodel.js">
+      <Link>Scripts\SlickGrid\plugins\slick.cellselectionmodel.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.checkboxselectcolumn.js">
+      <Link>Scripts\SlickGrid\plugins\slick.checkboxselectcolumn.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.headerbuttons.js">
+      <Link>Scripts\SlickGrid\plugins\slick.headerbuttons.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.headermenu.js">
+      <Link>Scripts\SlickGrid\plugins\slick.headermenu.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.rowmovemanager.js">
+      <Link>Scripts\SlickGrid\plugins\slick.rowmovemanager.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.rowselectionmodel.js">
+      <Link>Scripts\SlickGrid\plugins\slick.rowselectionmodel.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.core.js">
+      <Link>Scripts\SlickGrid\slick.core.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.core.min.js">
+      <Link>Scripts\SlickGrid\slick.core.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.dataview.js">
+      <Link>Scripts\SlickGrid\slick.dataview.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.editors.js">
+      <Link>Scripts\SlickGrid\slick.editors.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.formatters.js">
+      <Link>Scripts\SlickGrid\slick.formatters.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.grid.js">
+      <Link>Scripts\SlickGrid\slick.grid.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.grid.min.js">
+      <Link>Scripts\SlickGrid\slick.grid.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.js">
+      <Link>Scripts\SlickGrid\slick.groupitemmetadataprovider.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js">
+      <Link>Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.remotemodel-yahoo.js">
+      <Link>Scripts\SlickGrid\slick.remotemodel-yahoo.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.remotemodel.js">
+      <Link>Scripts\SlickGrid\slick.remotemodel.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -423,63 +519,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\select2.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Controls\slick.columnpicker.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Controls\slick.pager.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.autotooltips.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.cellcopymanager.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.cellrangedecorator.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.cellrangeselector.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.cellselectionmodel.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.checkboxselectcolumn.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.headerbuttons.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.headermenu.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.rowmovemanager.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\Plugins\slick.rowselectionmodel.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\slick.core.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\slick.dataview.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\slick.editors.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\slick.formatters.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\slick.grid.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\slick.groupitemmetadataprovider.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\SlickGrid\slick.remotemodel.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\serenity\Serenity.Script.Core.js">
