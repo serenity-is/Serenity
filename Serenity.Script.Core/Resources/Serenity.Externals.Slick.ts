@@ -606,7 +606,7 @@ namespace Slick.Data {
                     return options.groupItemMetadataProvider.getTotalsRowMetadata(item);
                 }
 
-                return (options.getItemMetadata && intf.getItemMetadata(item, i)) || null;
+                return (options.getItemMetadata && options.getItemMetadata(item, i)) || null;
             }
 
             function expandCollapseAllGroups(level, collapse) {
