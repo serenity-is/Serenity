@@ -36,16 +36,9 @@
     <file src="${id}.dll" target="lib/${framework}" />
     <file src="${id}.pdb" target="lib/${framework}" />
     <file src="..\..\Includes\web.config.transform" target="content\web.config.transform" />
-    <file src="..\..\Includes\Content\**\*.css" target="content\Content" />
-    <file src="..\..\Includes\Content\**\*.png" target="content\Content" />
-    <file src="..\..\Includes\Content\**\*.gif" target="content\Content" />
-    <file src="..\..\Includes\Content\**\*.jpg" target="content\Content" />
-    <file src="..\..\Includes\Fonts\**\*.eot" target="content\fonts" />
-    <file src="..\..\Includes\Fonts\**\*.svg" target="content\fonts" />
-    <file src="..\..\Includes\Fonts\**\*.ttf" target="content\fonts" />
-    <file src="..\..\Includes\Fonts\**\*.woff" target="content\fonts" />
-    <file src="..\..\Includes\Scripts\**\*.js" target="content\Scripts" />
-    <file src="..\..\Includes\Scripts\**\*.json" target="content\Scripts" />
+    <file src="..\..\Includes\Content\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content\Content" />
+    <file src="..\..\Includes\Fonts\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content\fonts" />
+    <file src="..\..\Includes\Scripts\**\*" exclude="**\*.bak;**\*.log;**\*.orig"  target="content\Scripts" />
     <file src="serenity.css" target="content/Content/serenity" />
     <file src="..\..\Style\images\*.png" target="content/Content/serenity/images" />
     <file src="..\..\Style\images\*.gif" target="content/Content/serenity/images" />
