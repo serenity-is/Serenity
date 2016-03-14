@@ -1,3 +1,14 @@
+## 1.9.24 (2016-03-14)
+
+Bugfixes:
+  - include slickgrid css and images under content folder
+
+## 1.9.23 (2016-03-14)
+
+Bugfixes:
+  - slick.grid.css wasn't included in nuget file
+  - getItemMetadata and getItemCssClass didn't work properly after update
+
 ## 1.9.22 (2016-03-14)
 
 Bugfixes:
