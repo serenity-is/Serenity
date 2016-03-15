@@ -33,7 +33,7 @@ namespace Serenity
 
         protected virtual void ShowSaveSuccessMessage(ServiceResponse response)
         {
-            Q.NotifySuccess(Texts.Controls.EntityDialog.SaveSuccessMessage);
+            Q.NotifySuccess(Q.Text("Controls.EntityDialog.SaveSuccessMessage"));
         }
 
         protected override List<ToolButton> GetToolbarButtons()
@@ -46,7 +46,7 @@ namespace Serenity
             {
                 list.Add(new ToolButton
                 {
-                    Title = Texts.Controls.EntityDialog.SaveButton,
+                    Title = Q.Text("Controls.EntityDialog.SaveButton"),
                     CssClass = "save-and-close-button",
                     Hotkey = "alt+s",
                     OnClick = delegate
@@ -61,8 +61,8 @@ namespace Serenity
 
             list.Add(new ToolButton
             {
-                Title = isPanel ? Texts.Controls.EntityDialog.SaveButton : LocalText.Empty,
-                Hint = isPanel ? Texts.Controls.EntityDialog.SaveButton : Texts.Controls.EntityDialog.ApplyChangesButton,
+                Title = isPanel ? Q.Text("Controls.EntityDialog.SaveButton") : "",
+                Hint = isPanel ? Q.Text("Controls.EntityDialog.SaveButton") : Q.Text("Controls.EntityDialog.ApplyChangesButton"),
                 CssClass = "apply-changes-button",
                 Hotkey = "alt+a",
                 OnClick = delegate
@@ -83,12 +83,12 @@ namespace Serenity
             {
                 list.Add(new ToolButton
                 {
-                    Title = Texts.Controls.EntityDialog.DeleteButton,
+                    Title = Q.Text("Controls.EntityDialog.DeleteButton"),
                     CssClass = "delete-button",
                     Hotkey = "alt+x",
                     OnClick = delegate
                     {
-                        Q.Confirm(Texts.Controls.EntityDialog.DeleteConfirmation, delegate
+                        Q.Confirm(Q.Text("Controls.EntityDialog.DeleteConfirmation"), delegate
                         {
                             self.DoDelete(delegate
                             {
@@ -100,13 +100,13 @@ namespace Serenity
 
                 list.Add(new ToolButton
                 {
-                    Title = Texts.Controls.EntityDialog.UndeleteButton,
+                    Title = Q.Text("Controls.EntityDialog.UndeleteButton"),
                     CssClass = "undo-delete-button",
                     OnClick = delegate
                     {
                         if (self.IsDeleted)
                         {
-                            Q.Confirm(Texts.Controls.EntityDialog.UndeleteConfirmation, delegate()
+                            Q.Confirm(Q.Text("Controls.EntityDialog.UndeleteConfirmation"), delegate()
                             {
                                 self.Undelete(delegate
                                 {
@@ -119,7 +119,7 @@ namespace Serenity
 
                 list.Add(new ToolButton
                 {
-                    Title = Texts.Controls.EntityDialog.LocalizationButton,
+                    Title = Q.Text("Controls.EntityDialog.LocalizationButton"),
                     CssClass = "localization-button",
                     OnClick = delegate
                     {
@@ -129,7 +129,7 @@ namespace Serenity
 
                 list.Add(new ToolButton
                 {
-                    Title = Texts.Controls.EntityDialog.CloneButton,
+                    Title = Q.Text("Controls.EntityDialog.CloneButton"),
                     CssClass = "clone-button",
                     OnClick = delegate
                     {
@@ -186,8 +186,8 @@ namespace Serenity
                 localizationButton.Toggle(localizationGrid != null);
 
                 localizationButton.Find(".button-inner").Text(IsLocalizationMode ? 
-                    Texts.Controls.EntityDialog.LocalizationBack : 
-                    Texts.Controls.EntityDialog.LocalizationButton);
+                    Q.Text("Controls.EntityDialog.LocalizationBack") : 
+                    Q.Text("Controls.EntityDialog.LocalizationButton"));
             }
 
             if (isLocalizationMode)
@@ -216,7 +216,7 @@ namespace Serenity
                 saveAndCloseButton.Toggle(!isDeleted);
 
                 saveAndCloseButton.Find(".button-inner").Text(
-                    IsNew ? Texts.Controls.EntityDialog.SaveButton : Texts.Controls.EntityDialog.UpdateButton);
+                    Q.Text(IsNew ? "Controls.EntityDialog.SaveButton" : "Controls.EntityDialog.UpdateButton"));
             }
 
             if (applyChangesButton != null)

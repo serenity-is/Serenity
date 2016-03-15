@@ -164,6 +164,7 @@
     <Compile Include="Texts\Texts.Controls.EntityGrid.cs" />
     <Compile Include="Texts\Texts.Controls.FilterPanel.cs" />
     <Compile Include="Texts\Texts.Controls.Pager.cs" />
+    <Compile Include="Texts\Texts.Controls.SelectEditor.cs" />
     <Compile Include="Texts\Texts.Controls.PropertyGrid.cs" />
     <Compile Include="Texts\Texts.Controls.QuickSearch.cs" />
     <Compile Include="Texts\Texts.cs" />

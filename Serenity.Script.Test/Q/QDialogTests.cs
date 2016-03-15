@@ -37,10 +37,10 @@ namespace Serenity.Test
             Assert.IsTrue(dlg.Find(":contains('Test ABCDEFGHJKL'):visible").Length > 0,
                 "Check that message is displayed");
 
-            var yesButton = jQuery.Select(".ui-dialog-buttonset button:contains('" + Texts.Dialogs.YesButton.Get() + "')");
+            var yesButton = jQuery.Select(".ui-dialog-buttonset button:contains('" + Q.Text("Dialogs.YesButton") + "')");
             Assert.IsTrue(yesButton.Length == 1, "Check that dialog has Yes button");
 
-            var noButton = jQuery.Select(".ui-dialog-buttonset button:contains('" + Texts.Dialogs.NoButton.Get() + "')");
+            var noButton = jQuery.Select(".ui-dialog-buttonset button:contains('" + Q.Text("Dialogs.NoButton") + "')");
             Assert.IsTrue(noButton.Length == 1, "Check that dialog has No button");
 
             jQuery.Select(".ui-dialog-titlebar-close:visible").Click();
@@ -58,7 +58,7 @@ namespace Serenity.Test
 
             Q.Confirm("Test", delegate { confirmed = true; });
 
-            jQuery.Select(".ui-dialog-buttonset button:contains('" + Texts.Dialogs.YesButton.Get() + "')").Click();
+            jQuery.Select(".ui-dialog-buttonset button:contains('" + Q.Text("Dialogs.YesButton") + "')").Click();
 
             Assert.IsTrue(confirmed, "Ensure yes button click called success delegate");
         }
@@ -70,7 +70,7 @@ namespace Serenity.Test
 
             Q.Confirm("Test", delegate { confirmed = true; });
 
-            jQuery.Select(".ui-dialog-buttonset button:contains('" + Texts.Dialogs.NoButton.Get() + "')").Click();
+            jQuery.Select(".ui-dialog-buttonset button:contains('" + Q.Text("Dialogs.NoButton") + "')").Click();
 
             Assert.IsFalse(confirmed, "Ensure no button click didn't call success delegate");
         }

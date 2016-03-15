@@ -1222,7 +1222,7 @@ namespace Slick.Data {
                 if (!intf.seekToPage)
                     intf.seekToPage = 1;
 
-                var request: ListRequest = {};
+                var request: Serenity.ListRequest = {};
 
                 var skip = (intf.seekToPage - 1) * intf.rowsPerPage;
                 if (skip)

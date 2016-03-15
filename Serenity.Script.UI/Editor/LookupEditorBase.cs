@@ -30,7 +30,7 @@ namespace Serenity
             }
 
             if (options.InplaceAdd)
-                AddInplaceCreate(Texts.Controls.SelectEditor.InplaceAdd);
+                AddInplaceCreate(Q.Text("Controls.SelectEditor.InplaceAdd"));
         }
 
         protected override Promise InitializeAsync()

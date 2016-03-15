@@ -27,7 +27,7 @@ namespace Serenity.Web
         {
             IEnumerable items = getItems();
 
-            return String.Format("Q$ScriptData.set({0}, new Q$Lookup({1}, \n{2}\n));",
+            return String.Format("Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));",
                 ("Lookup." + LookupKey).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
         }
 

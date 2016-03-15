@@ -170,7 +170,7 @@ namespace Serenity
         public static jQueryObject ElementFor(Type editorType)
         {
             var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
-            string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
+            string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Value : "<input/>";
             return jQuery.FromHtml(elementHtml);
         }
 

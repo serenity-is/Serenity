@@ -223,6 +223,10 @@
       <Link>Scripts\saltarelle\mscorlib.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Serenity.Script.Core\Resources\Serenity.CoreLib.js">
+      <Link>Scripts\serenity\Serenity.CoreLib.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Serenity.Script.Core\Resources\Serenity.Externals.js">
       <Link>Scripts\serenity\Serenity.Externals.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

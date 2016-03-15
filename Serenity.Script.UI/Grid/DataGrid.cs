@@ -186,9 +186,9 @@ namespace Serenity
 
             if (Script.TypeOf(value) == "number")
             {
-                if (IdExtensions.IsNegativeId(value.As<Int64>()))
+                if (value.As<double>() < 0)
                     return "deleted";
-                else if (value.As<Int32>() == 0)
+                else if (value.As<double>() == 0)
                     return "inactive";
             }
             else if (Script.TypeOf(value) == "boolean")

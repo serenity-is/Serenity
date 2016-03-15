@@ -119,7 +119,7 @@ namespace Serenity
 
         protected override string GetAddButtonCaption()
         {
-            return String.Format(Texts.Controls.EntityGrid.NewButton, GetEntitySingular());
+            return String.Format(Q.Text("Controls.EntityGrid.NewButton"), GetEntitySingular());
         }
 
         protected override List<ToolButton> GetButtons()
@@ -148,8 +148,8 @@ namespace Serenity
 
             return new ToolButton
             {
-                Title = noText ? null : Texts.Controls.EntityGrid.RefreshButton.Get(),
-                Hint = noText ? Texts.Controls.EntityGrid.RefreshButton.Get() : null,
+                Title = noText ? null : Q.Text("Controls.EntityGrid.RefreshButton"),
+                Hint = noText ? Q.Text("Controls.EntityGrid.RefreshButton") : null,
                 CssClass = "refresh-button",
                 OnClick = delegate
                 {

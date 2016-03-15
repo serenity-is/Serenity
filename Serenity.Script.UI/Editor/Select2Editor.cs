@@ -53,7 +53,7 @@ namespace Serenity
 
         protected virtual string EmptyItemText()
         {
-            return element.GetAttribute("placeholder") ?? Texts.Controls.SelectEditor.EmptyItemText;
+            return element.GetAttribute("placeholder") ?? Q.Text("Controls.SelectEditor.EmptyItemText");
         }
 
         protected virtual Select2Options GetSelect2Options()
@@ -146,8 +146,8 @@ namespace Serenity
         {
             var self = this;
 
-            addTitle = addTitle ?? Texts.Controls.SelectEditor.InplaceAdd;
-            editTitle = editTitle ?? Texts.Controls.SelectEditor.InplaceEdit;
+            addTitle = addTitle ?? Q.Text("Controls.SelectEditor.InplaceAdd");
+            editTitle = editTitle ?? Q.Text("Controls.SelectEditor.InplaceEdit");
 
             var inplaceButton = J("<a><b/></a>").AddClass("inplace-button inplace-create")
                 .Attribute("title", addTitle)
@@ -206,14 +206,14 @@ namespace Serenity
                     return new Select2Item
                     {
                         Id = Int32.MinValue.ToString(),
-                        Text = Texts.Controls.SelectEditor.NoResultsClickToDefine
+                        Text = Q.Text("Controls.SelectEditor.NoResultsClickToDefine")
                     };
                 }
 
                 return new Select2Item
                 {
                     Id = Int32.MinValue.ToString(),
-                    Text = Texts.Controls.SelectEditor.ClickToDefine
+                    Text = Q.Text("Controls.SelectEditor.ClickToDefine")
                 };
             };
         }

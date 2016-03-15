@@ -89,11 +89,11 @@ namespace Serenity
         protected virtual string GetEntityTitle()
         {
             if (!(this.IsEditMode))
-                return String.Format(Texts.Controls.EntityDialog.NewRecordTitle, GetEntitySingular());
+                return String.Format(Q.Text("Controls.EntityDialog.NewRecordTitle"), GetEntitySingular());
             else
             {
                 string title = (GetEntityNameFieldValue() ?? "");
-                return String.Format(Texts.Controls.EntityDialog.EditRecordTitle, GetEntitySingular(),
+                return String.Format(Q.Text("Controls.EntityDialog.EditRecordTitle"), GetEntitySingular(),
                     (title.IsEmptyOrNull() ? "" : " (" + title + ")"));
             }
         }
@@ -125,7 +125,7 @@ namespace Serenity
                 if (value == null)
                     return false;
 
-                return IdExtensions.IsNegativeId(value.Value);
+                return value < 0;
             }
         }
 
@@ -147,5 +147,15 @@ namespace Serenity
             : base(null)
         {
         }
+    }
+}
+
+namespace TypeScript.Serenity_
+{
+    using System.Runtime.CompilerServices;
+
+    [ScriptName("EntityDialog"), ScriptNamespace("Serenity")]
+    public class __EntityDialog : Serenity.EntityDialog<object, object>
+    {
     }
 }

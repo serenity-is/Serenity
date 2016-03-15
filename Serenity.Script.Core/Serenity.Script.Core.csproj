@@ -37,73 +37,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Attribute\ColumnsKeyAttribute.cs" />
-    <Compile Include="Attribute\EnumKeyAttribute.cs" />
-    <Compile Include="Attribute\EditorAttribute.cs" />
-    <Compile Include="Attribute\ElementAttribute.cs" />
-    <Compile Include="Attribute\DialogTypeAttribute.cs" />
-    <Compile Include="Attribute\ResponsiveAttribute.cs" />
-    <Compile Include="Attribute\FlexifyAttribute.cs" />
-    <Compile Include="Attribute\FormKeyAttribute.cs" />
-    <Compile Include="Attribute\ItemNameAttribute.cs" />
-    <Compile Include="Attribute\LocalTextPrefixAttribute.cs" />
-    <Compile Include="Attribute\MaximizableAttribute.cs" />
-    <Compile Include="Attribute\OptionAttribute.cs" />
-    <Compile Include="Attribute\PanelAttribute.cs" />
-    <Compile Include="Attribute\ResizableAttribute.cs" />
-    <Compile Include="Attribute\ServiceAttribute.cs" />
-    <Compile Include="Attribute\EntityTypeAttribute.cs" />
-    <Compile Include="Attribute\IdPropertyAttribute.cs" />
-    <Compile Include="Attribute\IsActivePropertyAttribute.cs" />
-    <Compile Include="Attribute\NamePropertyAttribute.cs" />
-    <Compile Include="Data\CriteriaUtil.cs" />
-    <Compile Include="Extensions\IdExtensions.cs" />
-    <Compile Include="Extensions\TabsExtensions.cs" />
-    <Compile Include="LocalText.cs" />
-    <Compile Include="Lookup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Q\Q.BlockUI.cs" />
-    <Compile Include="Q\Q.Config.cs" />
-    <Compile Include="Q\Q.cs" />
-    <Compile Include="Q\Q.Culture.cs" />
-    <Compile Include="Q\Q.Date.cs" />
-    <Compile Include="Q\Q.Dialogs.cs" />
-    <Compile Include="Q\Q.ErrorHandling.cs" />
-    <Compile Include="Q\Q.Externals.cs" />
-    <Compile Include="Q\Q.HtmlUtils.cs" />
-    <Compile Include="Q\Q.Layout.cs" />
-    <Compile Include="Q\Q.Notifications.cs" />
-    <Compile Include="Q\Q.Number.cs" />
-    <Compile Include="Q\Q.ScriptData.cs" />
-    <Compile Include="Q\Q.Services.cs" />
-    <Compile Include="Q\Q.StringHelper.cs" />
-    <Compile Include="Q\Q.Text.cs" />
-    <Compile Include="Q\Q.UrlUtils.cs" />
-    <Compile Include="ScriptContext.cs" />
-    <Compile Include="SlickGrid\Formatters\FileDownloadFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\UrlFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\CheckboxFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\BooleanFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\EnumFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\EnumTypeRegistry.cs" />
-    <Compile Include="SlickGrid\Formatters\IInitializeColumn.cs" />
-    <Compile Include="SlickGrid\Formatters\MinuteFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\NumberFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\DateTimeFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\ISlickFormatter.cs" />
-    <Compile Include="SlickGrid\Formatters\DateFormatter.cs" />
-    <Compile Include="SlickGrid\SlickTreeHelper.cs" />
-    <Compile Include="SlickGrid\LazyLoadHelper.cs" />
-    <Compile Include="SlickGrid\SlickColumnHelper.cs" />
-    <Compile Include="SlickGrid\SlickFormatting.cs" />
-    <Compile Include="Texts\Texts.Controls.SelectEditor.cs" />
-    <Compile Include="Texts\Texts.Controls.PropertyGrid.cs" />
-    <Compile Include="Texts\Texts.Controls.QuickSearch.cs" />
-    <Compile Include="Texts\Texts.Controls.Pager.cs" />
-    <Compile Include="Texts\Texts.Controls.EntityGrid.cs" />
-    <Compile Include="Texts\Texts.cs" />
-    <Compile Include="Texts\Texts.Controls.EntityDialog.cs" />
-    <Compile Include="Texts\Texts.Dialogs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -136,6 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Resources\Serenity.Externals.Slick.ts" />
+    <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\linq.js" />
@@ -145,10 +81,13 @@
     <TypeScriptCharset>utf-8</TypeScriptCharset>
     <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
     <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
+    <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
   </PropertyGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Resources\Serenity.Core.d.ts" />
+    <TypeScriptCompile Include="Resources\Serenity.CoreLib.ts" />
     <TypeScriptCompile Include="Resources\Serenity.Externals.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
@@ -156,6 +95,10 @@
   <ItemGroup>
     <Content Include="Resources\mscorlib.min.js" />
   </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\tools\Saltarelle\Saltarelle.Compiler.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Target Name="MinimizeScripts" AfterTargets="BuildScript">

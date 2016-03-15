@@ -1,5 +1,4 @@
-﻿// PAGER -----
-(function ($) {
+﻿(function ($) {
     $.widget("ui.slickPager", {
         options: {
             view: null,
@@ -316,11 +315,6 @@ var Slick;
                     updateIdxById();
                     refresh();
                 }
-                /***
-                 * Provides a workaround for the extremely slow sorting in IE.
-                 * Does a [lexicographic] sort on a give column by temporarily overriding Object.prototype.toString
-                 * to return the value of that field and then doing a native Array.sort().
-                 */
                 function fastSort(field, ascending) {
                     sortAsc = ascending;
                     fastSortField = field;
@@ -329,8 +323,6 @@ var Slick;
                     Object.prototype.toString = (typeof field === "function") ? field : function () {
                         return this[field];
                     };
-                    // an extra reversal for descending sort keeps the sort stable
-                    // (assuming a stable native sort implementation, which isn't true in some cases)
                     if (ascending === false) {
                         items.reverse();
                     }
@@ -401,7 +393,6 @@ var Slick;
                         var gi = groupingInfos[i] = $.extend(true, {}, groupingInfoDefaults, groupingInfos[i]);
                         gi.aggregators = gi.aggregators || summaryOptions.aggregators || [];
                         gi.getterIsAFn = typeof gi.getter === "function";
-                        // pre-compile accumulator loops
                         gi.compiledAccumulators = [];
                         var idx = gi.aggregators.length;
                         while (idx--) {
@@ -491,7 +482,6 @@ var Slick;
                 }
                 function getItem(i) {
                     var item = rows[i];
-                    // if this is a group row, make sure totals are calculated and update the title
                     if (item && item.__group && item.totals && !item.totals.initialized) {
                         var gi = groupingInfos[item.level];
                         if (!gi.displayTotalsRow) {
@@ -509,11 +499,9 @@ var Slick;
                     if (item === undefined) {
                         return null;
                     }
-                    // overrides for grouping rows
                     if (item.__group) {
                         return options.groupItemMetadataProvider.getGroupRowMetadata(item);
                     }
-                    // overrides for totals rows
                     if (item.__groupTotals) {
                         return options.groupItemMetadataProvider.getTotalsRowMetadata(item);
                     }
@@ -532,15 +520,9 @@ var Slick;
                     }
                     refresh();
                 }
-                /**
-                 * @param level {Number} Optional level to collapse.  If not specified, applies to all levels.
-                 */
                 function collapseAllGroups(level) {
                     expandCollapseAllGroups(level, true);
                 }
-                /**
-                 * @param level {Number} Optional level to expand.  If not specified, applies to all levels.
-                 */
                 function expandAllGroups(level) {
                     expandCollapseAllGroups(level, false);
                 }
@@ -558,22 +540,10 @@ var Slick;
                     toggledGroupsByLevel[opts.level][opts.groupingKey] = groupingInfos[opts.level].collapsed ^ collapse;
                     refresh();
                 }
-                /**
-                 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-                 *     variable argument list of grouping values denoting a unique path to the row.  For
-                 *     example, calling collapseGroup('high', '10%') will collapse the '10%' subgroup of
-                 *     the 'high' group.
-                 */
                 function collapseGroup(varArgs) {
                     var args = Array.prototype.slice.call(arguments);
                     expandCollapseGroup(args, true);
                 }
-                /**
-                 * @param varArgs Either a Slick.Group's "groupingKey" property, or a
-                 *     variable argument list of grouping values denoting a unique path to the row.  For
-                 *     example, calling expandGroup('high', '10%') will expand the '10%' subgroup of
-                 *     the 'high' group.
-                 */
                 function expandGroup(varArgs) {
                     var args = Array.prototype.slice.call(arguments);
                     expandCollapseGroup(args, false);
@@ -626,7 +596,6 @@ var Slick;
                     var isLeafLevel = (group.level == groupingInfos.length);
                     var agg, idx = gi.aggregators.length;
                     if (!isLeafLevel && gi.aggregateChildGroups) {
-                        // make sure all the subgroups are calculated
                         var i = group.groups.length;
                         while (i--) {
                             if (!group.groups[i].totals.initialized) {
@@ -667,7 +636,6 @@ var Slick;
                         if (g.collapsed && !gi.aggregateCollapsed) {
                             continue;
                         }
-                        // Do a depth-first aggregation so that parent group aggregators can access subgroup totals.
                         if (g.groups) {
                             addTotals(g.groups, level + 1);
                         }
@@ -720,10 +688,7 @@ var Slick;
                         .replace(/return false\s*([;}]|$)/gi, "{ continue _coreloop; }$1")
                         .replace(/return true\s*([;}]|$)/gi, "{ _retval[_idx++] = $item$; continue _coreloop; }$1")
                         .replace(/return ([^;}]+?)\s*([;}]|$)/gi, "{ if ($1) { _retval[_idx++] = $item$; }; continue _coreloop; }$2");
-                    // This preserves the function template code after JS compression,
-                    // so that replace() commands still work as expected.
                     var tpl = [
-                        //"function(_items, _args) { ",
                         "var _retval = [], _idx = 0; ",
                         "var $item$, $args$ = _args; ",
                         "_coreloop: ",
@@ -746,10 +711,7 @@ var Slick;
                         .replace(/return false\s*([;}]|$)/gi, "{ continue _coreloop; }$1")
                         .replace(/return true\s*([;}]|$)/gi, "{ _cache[_i] = true;_retval[_idx++] = $item$; continue _coreloop; }$1")
                         .replace(/return ([^;}]+?)\s*([;}]|$)/gi, "{ if ((_cache[_i] = $1)) { _retval[_idx++] = $item$; }; continue _coreloop; }$2");
-                    // This preserves the function template code after JS compression,
-                    // so that replace() commands still work as expected.
                     var tpl = [
-                        //"function(_items, _args, _cache) { ",
                         "var _retval = [], _idx = 0; ",
                         "var $item$, $args$ = _args; ",
                         "_coreloop: ",
@@ -808,12 +770,8 @@ var Slick;
                         }
                     }
                     else {
-                        // special case:  if not filtering and not paging, the resulting
-                        // rows collection needs to be a copy so that changes due to sort
-                        // can be caught
                         filteredItems = items.concat();
                     }
-                    // get the current page
                     return { totalRows: filteredItems.length, rows: filteredItems };
                 }
                 function getRowDiffs(rows, newRows) {
@@ -836,9 +794,6 @@ var Slick;
                                 item.__group !== r.__group ||
                                 item.__group && !item.equals(r))
                                 || (eitherIsNonData &&
-                                    // no good way to compare totals since they are arbitrary DTOs
-                                    // deep object comparison is pretty expensive
-                                    // always considering them 'dirty' seems easier for the time being
                                     (item.__groupTotals || r.__groupTotals))
                                 || item[idProperty] != r[idProperty]
                                 || (updated && updated[item[idProperty]])) {
@@ -876,7 +831,7 @@ var Slick;
                     }
                     var countBefore = rows.length;
                     var totalRowsBefore = totalRows;
-                    var diff = recalc(items); // pass as direct refs to avoid closure perf hit
+                    var diff = recalc(items);
                     updated = null;
                     prevRefreshHints = refreshHints;
                     refreshHints = {};
@@ -890,25 +845,6 @@ var Slick;
                         onRowsChanged.notify({ rows: diff, dataView: self }, null, self);
                     }
                 }
-                /***
-                 * Wires the grid and the DataView together to keep row selection tied to item ids.
-                 * This is useful since, without it, the grid only knows about rows, so if the items
-                 * move around, the same rows stay selected instead of the selection moving along
-                 * with the items.
-                 *
-                 * NOTE:  This doesn't work with cell selection model.
-                 *
-                 * @param grid {Slick.Grid} The grid to sync selection with.
-                 * @param preserveHidden {Boolean} Whether to keep selected items that go out of the
-                 *     view due to them getting filtered out.
-                 * @param preserveHiddenOnSelectionChange {Boolean} Whether to keep selected items
-                 *     that are currently out of the view (see preserveHidden) as selected when selection
-                 *     changes.
-                 * @return {Slick.Event} An event that notifies when an internal list of selected row ids
-                 *     changes.  This is useful since, in combination with the above two options, it allows
-                 *     access to the full list selected row ids, and not just the ones visible to the grid.
-                 * @method syncGridSelection
-                 */
                 function syncGridSelection(grid, preserveHidden, preserveHiddenOnSelectionChange) {
                     var self = this;
                     var inHandler;
@@ -945,9 +881,7 @@ var Slick;
                             setSelectedRowIds(newSelectedRowIds);
                         }
                         else {
-                            // keep the ones that are hidden
                             var existing = $.grep(selectedRowIds, function (id) { return self.getRowById(id) === undefined; });
-                            // add the newly selected ones
                             setSelectedRowIds(existing.concat(newSelectedRowIds));
                         }
                     });
@@ -958,8 +892,6 @@ var Slick;
                 function syncGridCellCssStyles(grid, key) {
                     var hashById;
                     var inHandler;
-                    // since this method can be called after the cell styles have been set,
-                    // get the existing ones right away
                     storeCellCssStyles(grid.getCellCssStyles(key));
                     function storeCellCssStyles(hash) {
                         hashById = {};
@@ -1035,7 +967,6 @@ var Slick;
                     onDataLoading.notify(this);
                     if (!intf.url)
                         return false;
-                    // set loading event
                     if (!intf.seekToPage)
                         intf.seekToPage = 1;
                     var request = {};
@@ -1115,7 +1046,6 @@ var Slick;
                     }
                 }
                 intf = {
-                    // methods
                     "beginUpdate": beginUpdate,
                     "endUpdate": endUpdate,
                     "setPagingOptions": setPagingOptions,
