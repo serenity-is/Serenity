@@ -18,7 +18,7 @@
         {
             get { return false; }
         }
-
+        
         public BaseCriteria IsNull()
         {
             return new UnaryCriteria(CriteriaOperator.IsNull, this);
@@ -493,7 +493,17 @@
                 return new UnaryCriteria(CriteriaOperator.Paren, criteria);
             return criteria;
         }
-
+        
+        public static bool operator true(BaseCriteria statement)
+        {
+            return true;
+        }
+        
+        public static bool operator false(BaseCriteria statement)
+        {
+            return false;
+        }
+        
         /// <summary>
         /// Must override this or will get operator overload warning.
         /// </summary>
