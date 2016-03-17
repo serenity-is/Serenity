@@ -496,7 +496,7 @@
         
         public static bool operator true(BaseCriteria statement)
         {
-            return true;
+            return false;
         }
         
         public static bool operator false(BaseCriteria statement)
