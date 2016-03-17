@@ -138,5 +138,60 @@ namespace Serenity.Test.Data
             Assert.IsType(typeof(MyEnum), value.Value);
             Assert.Equal(MyEnum.Value1, value.Value);
         }
+        
+        [Fact]
+        public void BaseCriteria_ShortCircuitAnd()
+        {
+            var left = new Criteria("x");
+            var actual = left == MyEnum.Value1;
+
+            Assert.NotNull(actual);
+            Assert.IsType(typeof(BinaryCriteria), actual);
+
+            var binary = actual as BinaryCriteria;
+
+            Assert.Equal(CriteriaOperator.EQ, binary.Operator);
+            Assert.Equal(binary.LeftOperand, left);
+            Assert.IsType(typeof(ValueCriteria), binary.RightOperand);
+
+            var value = binary.RightOperand as ValueCriteria;
+
+            Assert.IsType(typeof(MyEnum), value.Value);
+            Assert.Equal(MyEnum.Value1, value.Value);
+            var test1 = (MyEnum)value.Value == MyEnum.Value1 && (MyEnum)value.Value == MyEnum.Value1 && (MyEnum)value.Value == MyEnum.Value1;
+            Assert.True(test1);
+            var test2 = (MyEnum)value.Value == MyEnum.Value1 && (MyEnum)value.Value != MyEnum.Value1 && (MyEnum)value.Value == MyEnum.Value1;
+            Assert.False(test2);
+        }
+
+        [Fact]
+        public void BaseCriteria_ShortCircuitOr()
+        {
+            var left = new Criteria("x");
+            var actual = left == MyEnum.Value1;
+
+            Assert.NotNull(actual);
+            Assert.IsType(typeof(BinaryCriteria), actual);
+
+            var binary = actual as BinaryCriteria;
+
+            Assert.Equal(CriteriaOperator.EQ, binary.Operator);
+            Assert.Equal(binary.LeftOperand, left);
+            Assert.IsType(typeof(ValueCriteria), binary.RightOperand);
+
+            var value = binary.RightOperand as ValueCriteria;
+
+            Assert.IsType(typeof(MyEnum), value.Value);
+            Assert.Equal(MyEnum.Value1, value.Value);
+            var test = left != MyEnum.Value1 || left == MyEnum.Value1;
+            Assert.NotNull(test);
+
+            var test1 = (MyEnum)value.Value == MyEnum.Value1 || (MyEnum)value.Value != MyEnum.Value1 || (MyEnum)value.Value == MyEnum.Value1;
+            Assert.True(test1);
+            var test2 = (MyEnum)value.Value != MyEnum.Value1 || (MyEnum)value.Value != MyEnum.Value1 || (MyEnum)value.Value != MyEnum.Value1;
+            Assert.False(test2);
+            var test3 = (MyEnum)value.Value == MyEnum.Value1 || (MyEnum)value.Value == MyEnum.Value1 || (MyEnum)value.Value == MyEnum.Value1;
+            Assert.True(test3);
+        }
     }
 }
