@@ -158,7 +158,7 @@ namespace Serenity
         [IntrinsicProperty]
         public dynamic Params { get { return null; } }
 
-        [IntrinsicProperty, Obsolete("Use GetItem and GetLength")]
+        [Obsolete("Use GetItem and GetLength")]
         public List<dynamic> Rows { [InlineCode("{this}.getRows()")] get { return null; } }
 
         public dynamic GetItem(int row) { return null; }
@@ -250,7 +250,7 @@ namespace Serenity
             return default(TEntity);
         }
 
-        [IntrinsicProperty, Obsolete("Use GetItem and GetLength")]
+        [Obsolete("Use GetItem and GetLength")]
         public new List<TEntity> Rows { [InlineCode("{this}.getRows()")] get { return null; } }
 
         public new CancellableViewCallback<TEntity> OnSubmit;
