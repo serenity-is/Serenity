@@ -493,17 +493,26 @@
                 return new UnaryCriteria(CriteriaOperator.Paren, criteria);
             return criteria;
         }
-        
-        public static bool operator true(BaseCriteria statement)
-        {
-            return false;
-        }
-        
+
+        /// <summary>
+        /// Must return FALSE from this for short circuit OR (||) to return 
+        /// a new binary criteria merging left and right operands in any case
+        /// </summary>
         public static bool operator false(BaseCriteria statement)
         {
             return false;
         }
-        
+
+        /// <summary>
+        /// Must ALSO return FALSE from this for short circuit AND (&&) to return 
+        /// a new binary criteria merging left and right operands in any case
+        /// https://msdn.microsoft.com/en-us/library/aa691312
+        /// </summary>
+        public static bool operator true(BaseCriteria statement)
+        {
+            return false;
+        }
+
         /// <summary>
         /// Must override this or will get operator overload warning.
         /// </summary>

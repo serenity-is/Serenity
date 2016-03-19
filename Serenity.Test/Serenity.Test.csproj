@@ -126,6 +126,8 @@
     <Compile Include="Core\Logging\SqlLoggerTests.cs" />
     <Compile Include="Core\Logging\LoggingTests.cs" />
     <Compile Include="Core\Logging\SqlLoggerTests.SystemLogRow.cs" />
+    <Compile Include="Data\CriteriaAndOrTests.cs" />
+    <Compile Include="Data\CriteriaShortCircuitTests.cs" />
     <Compile Include="Data\SqlHelperParamTests.cs" />
     <Compile Include="Data\CriteriaEnumTests.cs" />
     <Compile Include="Data\ViewRow.cs" />
