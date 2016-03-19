@@ -1,3 +1,13 @@
+## 1.9.25 (2016-03-19)
+
+Features:
+  - short circuit AND (&&) and OR (||) operator overloads can now be used while building criteria objects (thanks @wldkrd1)
+  - select2 version in nuget package is forced to be 3.5.1 as some users updated it to 4+ by mistake and had errors
+
+Bugfixes:
+  - because of [InstrinsicProperty] attribute on SlickRemoteView.Row property, Saltarelle was ignoring [InlineCode] attribute on get method
+  - forgot to add grouping and summaries sample to navigation [Serene]
+
 ## 1.9.24 (2016-03-14)
 
 Bugfixes:
