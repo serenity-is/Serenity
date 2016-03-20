@@ -108,6 +108,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests_Declaration.cs" />
+    <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests_InterfaceDialogFormatter.cs" />
     <Compile Include="Core\Config\AppSettingsJsonConfigRepositoryTests.cs" />
     <Compile Include="Core\Caching\DistributedCacheEmulatorTests.cs" />
     <Compile Include="Core\Caching\DistributedCacheTests.cs" />
@@ -160,6 +162,7 @@
     <Compile Include="Testing\TestSqlHelperTests.cs" />
     <Compile Include="Testing\TestRow.cs" />
     <Compile Include="Testing\DbScriptTests.cs" />
+    <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests.cs" />
     <Compile Include="Web\NavigationItemTests.cs" />
   </ItemGroup>
   <ItemGroup>

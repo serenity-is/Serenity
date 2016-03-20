@@ -81,6 +81,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CodeGeneration\TypeScriptParser.cs" />
     <Compile Include="CodeGeneration\Lexer.cs" />
     <Compile Include="CodeGeneration\DtoActionResult.cs" />
     <Compile Include="CodeGeneration\DtoGenerator.cs" />
