@@ -1116,7 +1116,7 @@ var Slick;
                 return intf;
             }
             return RemoteView;
-        })();
+        }());
         Data.RemoteView = RemoteView;
     })(Data = Slick.Data || (Slick.Data = {}));
 })(Slick || (Slick = {}));

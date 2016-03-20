@@ -1167,16 +1167,16 @@
                 scan(root[k], fullName + '.' + k, depth + 1);
             }
         }
-        for (var _i = 0; _i < namespaces.length; _i++) {
-            var nsRoot = namespaces[_i];
+        for (var _i = 0, namespaces_1 = namespaces; _i < namespaces_1.length; _i++) {
+            var nsRoot = namespaces_1[_i];
             if (nsRoot == null || !nsRoot.length) {
                 continue;
             }
             if (nsRoot.indexOf('.') >= 0) {
                 var g = global;
                 var parts = nsRoot.split('.');
-                for (var _a = 0; _a < parts.length; _a++) {
-                    var p = parts[_a];
+                for (var _a = 0, parts_1 = parts; _a < parts_1.length; _a++) {
+                    var p = parts_1[_a];
                     if (!p.length)
                         continue;
                     g = g[p];
@@ -1255,8 +1255,8 @@
             this.items = [];
             this.itemById = {};
             if (value) {
-                for (var _i = 0; _i < value.length; _i++) {
-                    var k = value[_i];
+                for (var _i = 0, value_1 = value; _i < value_1.length; _i++) {
+                    var k = value_1[_i];
                     this.items.push(k);
                 }
             }
@@ -1290,7 +1290,7 @@
             return this.items;
         };
         return Lookup;
-    })();
+    }());
     Q.Lookup = Lookup;
     var LT = (function () {
         function LT(key) {
@@ -1359,7 +1359,7 @@
             }
         };
         return LT;
-    })();
+    }());
     Q.LT = LT;
     var ScriptData;
     (function (ScriptData) {
@@ -1528,41 +1528,41 @@ var Serenity;
             this.value = value;
         }
         return ColumnsKeyAttribute;
-    })();
+    }());
     Serenity.ColumnsKeyAttribute = ColumnsKeyAttribute;
     var DialogTypeAttribute = (function () {
         function DialogTypeAttribute(value) {
             this.value = value;
         }
         return DialogTypeAttribute;
-    })();
+    }());
     Serenity.DialogTypeAttribute = DialogTypeAttribute;
     var EditorAttribute = (function () {
         function EditorAttribute() {
         }
         return EditorAttribute;
-    })();
+    }());
     Serenity.EditorAttribute = EditorAttribute;
     var ElementAttribute = (function () {
         function ElementAttribute(value) {
             this.value = value;
         }
         return ElementAttribute;
-    })();
+    }());
     Serenity.ElementAttribute = ElementAttribute;
     var EntityTypeAttribute = (function () {
         function EntityTypeAttribute(value) {
             this.value = value;
         }
         return EntityTypeAttribute;
-    })();
+    }());
     Serenity.EntityTypeAttribute = EntityTypeAttribute;
     var EnumKeyAttribute = (function () {
         function EnumKeyAttribute(value) {
             this.value = value;
         }
         return EnumKeyAttribute;
-    })();
+    }());
     Serenity.EnumKeyAttribute = EnumKeyAttribute;
     var FlexifyAttribute = (function () {
         function FlexifyAttribute(value) {
@@ -1570,42 +1570,42 @@ var Serenity;
             this.value = value;
         }
         return FlexifyAttribute;
-    })();
+    }());
     Serenity.FlexifyAttribute = FlexifyAttribute;
     var FormKeyAttribute = (function () {
         function FormKeyAttribute(value) {
             this.value = value;
         }
         return FormKeyAttribute;
-    })();
+    }());
     Serenity.FormKeyAttribute = FormKeyAttribute;
     var IdPropertyAttribute = (function () {
         function IdPropertyAttribute(value) {
             this.value = value;
         }
         return IdPropertyAttribute;
-    })();
+    }());
     Serenity.IdPropertyAttribute = IdPropertyAttribute;
     var IsActivePropertyAttribute = (function () {
         function IsActivePropertyAttribute(value) {
             this.value = value;
         }
         return IsActivePropertyAttribute;
-    })();
+    }());
     Serenity.IsActivePropertyAttribute = IsActivePropertyAttribute;
     var ItemNameAttribute = (function () {
         function ItemNameAttribute(value) {
             this.value = value;
         }
         return ItemNameAttribute;
-    })();
+    }());
     Serenity.ItemNameAttribute = ItemNameAttribute;
     var LocalTextPrefixAttribute = (function () {
         function LocalTextPrefixAttribute(value) {
             this.value = value;
         }
         return LocalTextPrefixAttribute;
-    })();
+    }());
     Serenity.LocalTextPrefixAttribute = LocalTextPrefixAttribute;
     var MaximizableAttribute = (function () {
         function MaximizableAttribute(value) {
@@ -1613,27 +1613,27 @@ var Serenity;
             this.value = value;
         }
         return MaximizableAttribute;
-    })();
+    }());
     Serenity.MaximizableAttribute = MaximizableAttribute;
     var NamePropertyAttribute = (function () {
         function NamePropertyAttribute(value) {
             this.value = value;
         }
         return NamePropertyAttribute;
-    })();
+    }());
     Serenity.NamePropertyAttribute = NamePropertyAttribute;
     var OptionAttribute = (function () {
         function OptionAttribute() {
         }
         return OptionAttribute;
-    })();
+    }());
     Serenity.OptionAttribute = OptionAttribute;
     var OptionsTypeAttribute = (function () {
         function OptionsTypeAttribute(value) {
             this.value = value;
         }
         return OptionsTypeAttribute;
-    })();
+    }());
     Serenity.OptionsTypeAttribute = OptionsTypeAttribute;
     var PanelAttribute = (function () {
         function PanelAttribute(value) {
@@ -1641,7 +1641,7 @@ var Serenity;
             this.value = value;
         }
         return PanelAttribute;
-    })();
+    }());
     Serenity.PanelAttribute = PanelAttribute;
     var ResizableAttribute = (function () {
         function ResizableAttribute(value) {
@@ -1649,7 +1649,7 @@ var Serenity;
             this.value = value;
         }
         return ResizableAttribute;
-    })();
+    }());
     Serenity.ResizableAttribute = ResizableAttribute;
     var ResponsiveAttribute = (function () {
         function ResponsiveAttribute(value) {
@@ -1657,14 +1657,14 @@ var Serenity;
             this.value = value;
         }
         return ResponsiveAttribute;
-    })();
+    }());
     Serenity.ResponsiveAttribute = ResponsiveAttribute;
     var ServiceAttribute = (function () {
         function ServiceAttribute(value) {
             this.value = value;
         }
         return ServiceAttribute;
-    })();
+    }());
     Serenity.ServiceAttribute = ServiceAttribute;
     var Criteria;
     (function (Criteria) {
