@@ -108,6 +108,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests_Lookup.cs" />
     <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests_Declaration.cs" />
     <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests_InterfaceDialogFormatter.cs" />
     <Compile Include="Core\Config\AppSettingsJsonConfigRepositoryTests.cs" />

@@ -14,6 +14,7 @@ namespace Serenity.CodeGeneration
             CompareInfo = CultureInfo.InvariantCulture.CompareInfo,
             DecimalSeparator = ".",
             Options = LexerOptions.StringEscaping,
+            IdentChars = new char[] { '$' },
             StringQuotes = new char[] { '\"', '\'' },
             CommentBegin = "/*",
             CommentEnd = "*/"
@@ -322,7 +323,7 @@ namespace Serenity.CodeGeneration
             return key;
         }
 
-        public string ParseTypeDefinition()
+        public string ParseGenericIdentifier()
         {
             string key = "";
             do
@@ -427,13 +428,13 @@ namespace Serenity.CodeGeneration
                     modifiers.Contains("declare")
             });
 
+            modifiers.Clear();
             braceStack.Push("{namespace");
             return true;
         }
 
         private void Dump()
         {
-
         }
 
         private bool ParseType()
@@ -446,7 +447,7 @@ namespace Serenity.CodeGeneration
             if (type != TokenType.Identifier)
                 return false;
 
-            var className = ParseTypeDefinition();
+            var className = ParseGenericIdentifier();
             if (className == null)
                 return false;
 
@@ -458,10 +459,12 @@ namespace Serenity.CodeGeneration
                 IsInterface = isInterface,
                 Extends = "",
                 Implements = "",
+                Members = new List<MemberInfo>(),
                 IsDeclaration = namespaceStack.Peek().IsDeclaration ||
                     modifiers.Contains("declare")
             });
 
+            modifiers.Clear();
             SkipWhitespace();
 
             if (Is(TokenType.Identifier, "extends"))
@@ -494,7 +497,8 @@ namespace Serenity.CodeGeneration
             if (!Is(TokenType.Char, "{"))
                 return false;
 
-            braceStack.Push("{class");
+            modifiers.Clear();
+            braceStack.Push("{type");
 
             return true;
         }
@@ -533,46 +537,323 @@ namespace Serenity.CodeGeneration
             return true;
         }
 
+        private string ParseExpression(Func<bool> terminate)
+        {
+            var startBraceLevel = BraceStack.Count;
+
+            string expression = null;
+
+            do
+            {
+                if (type == TokenType.End || (startBraceLevel == BraceStack.Count && terminate()))
+                    return expression;
+
+                if (type == TokenType.Char && !ParseChar())
+                    return null;
+
+                if (type == TokenType.WhiteSpace ||
+                    type == TokenType.EndOfLine)
+                {
+                    if (expression != null && !expression.EndsWith(" "))
+                        expression += " ";
+                }
+                else
+                {
+                    string import;
+                    if (string.IsNullOrEmpty(text) ||
+                        !namespaceStack.Peek().Imports.TryGetValue(text, out import) ||
+                        prior == null ||
+                         (prior.Type == TokenType.Char &&
+                          prior.Text == "."))
+                    {
+                        import = text;
+                    }
+
+                    if (expression == null)
+                        expression = import;
+                    else
+                        expression += import;
+                }
+
+            } while (Next());
+
+            return expression;
+        }
+
+        private string ParseTypeExpressionAndDefault(out string initialValue,
+            Func<bool> terminator)
+        {
+            initialValue = "";
+
+            var memberType = ParseExpression(() =>
+            {
+                if (Is(TokenType.Char, "=") ||
+                    terminator())
+                    return true;
+
+                return false;
+            });
+
+            if (memberType == null)
+                return null;
+
+            if (Is(TokenType.Char, "="))
+            {
+                SkipWhitespace();
+
+                initialValue = ParseExpression(terminator);
+
+                if (initialValue == null)
+                    return null;
+            }
+
+            if (terminator())
+                return memberType;
+
+            return null;
+        }
+
+        private bool ParseTypeMember()
+        {
+            var identifier = ParseGenericIdentifier();
+            if (identifier == null)
+                return false;
+
+            if (IsWhitespace())
+                SkipWhitespace();
+
+            var member = new MemberInfo
+            {
+                Modifiers = new List<string>(modifiers),
+                Arguments = new List<ArgumentInfo>(),
+                Name = identifier,
+                IsFunction = false,
+                Decorators = new List<DecoratorInfo>(),
+                Type = ""
+            };
+
+            modifiers.Clear();
+            typeStack.Peek().Members.Add(member);
+
+            if (Is(TokenType.Char, "?"))
+            {
+                member.IsOptional = true;
+                SkipWhitespace();
+            }
+
+            if (Is(TokenType.Char, ":"))
+            {
+                SkipWhitespace();
+
+                string defaultValue;
+                member.Type = ParseTypeExpressionAndDefault(out defaultValue, () =>
+                    Is(TokenType.Char, ";") || type == TokenType.EndOfLine);
+
+                if (member.Type == null)
+                    return false;
+
+                member.InitialValue = defaultValue ?? "";
+            }
+            else if (Is(TokenType.Char, "("))
+            {
+                member.IsFunction = true;
+
+                while (true)
+                {
+                    SkipWhitespace();
+
+                    if (type == TokenType.Char &&
+                        text == ")")
+                        break;
+
+                    if (type != TokenType.Identifier)
+                        return false;
+
+                    var argument = new ArgumentInfo()
+                    {
+                        Name = text,
+                        Modifier = "",
+                        Decorators = new List<DecoratorInfo>(),
+                        InitialValue = "",
+                        Type = ""
+                    };
+
+                    member.Arguments.Add(argument);
+
+                    if (text == "private" ||
+                        text == "public" ||
+                        text == "protected")
+                    {
+                        argument.Modifier = text;
+
+                        SkipWhitespace();
+                        if (type != TokenType.Identifier)
+                            return false;
+
+                        argument.Name = text;
+                    }
+
+                    SkipWhitespace();
+
+                    if (Is(TokenType.Char, "?"))
+                    {
+                        argument.IsOptional = true;
+                        SkipWhitespace();
+                    }
+
+                    if (Is(TokenType.Char, ":"))
+                    {
+                        SkipWhitespace();
+
+                        string defaultValue;
+                        argument.Type = ParseTypeExpressionAndDefault(out defaultValue, () =>
+                            Is(TokenType.Char, ",") ||
+                            Is(TokenType.Char, ")"));
+
+                        if (argument.Type == null)
+                            return false;
+                    }
+                    else if (Is(TokenType.Char, "="))
+                    {
+                        argument.InitialValue = ParseExpression(() =>
+                            Is(TokenType.Char, ",") ||
+                            Is(TokenType.Char, ")"));
+
+                        if (argument.InitialValue == null)
+                            return false;
+                    }
+
+                    if (IsWhitespace())
+                        SkipWhitespace();
+
+                    if (Is(TokenType.Char, ","))
+                        continue;
+
+                    if (!Is(TokenType.Char, ")"))
+                        return false;
+
+                    break;
+                }
+
+                SkipWhitespace();
+
+                if (Is(TokenType.Char, ":"))
+                {
+                    SkipWhitespace();
+
+                    member.Type = ParseExpression(() =>
+                        Is(TokenType.Char, ";") ||
+                        Is(TokenType.Char, "{"));
+
+                    if (member.Type == null)
+                        return false;
+                }
+
+                if (IsWhitespace())
+                    SkipWhitespace();
+
+                if (Is(TokenType.Char, "{"))
+                {
+                    braceStack.Push("{");
+                    return true;
+                }
+                else if (Is(TokenType.Char, ";"))
+                {
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else if (Is(TokenType.Char, "="))
+            {
+                SkipWhitespace();
+
+                member.InitialValue = ParseExpression(() =>
+                    Is(TokenType.Char, ";") ||
+                    type == TokenType.EndOfLine);
+
+                if (member.InitialValue == null)
+                    return false;
+            }
+            else
+                return true;
+
+            return true;
+        }
+
+        private bool ParseFunction()
+        {
+            return true;
+        }
+
+        private bool ParseVar()
+        {
+            return true;
+        }
+
         private bool ParseIdentifier()
         {
+            bool rootOrNamespace = braceStack.Count == 0 ||
+                braceStack.Peek() == "{namespace";
+
+            bool typeBrace = braceStack.Count > 0 &&
+                braceStack.Peek() == "{type";
+
             bool afterSpace = (prior == null || (prior.Type == TokenType.WhiteSpace ||
                 prior.Type == TokenType.EndOfLine));
 
             switch (text)
             {
                 case "namespace":
-                    if (afterSpace)
+                    if (rootOrNamespace)
                         return ParseNamespace();
-
-                    return true;
-
-                case "export":
-                    if (afterSpace)
-                        modifiers.Push(text);
-
-                    return true;
-
-                case "declare":
-                    if (afterSpace)
-                        modifiers.Push(text);
-
-                    return true;
-
-                case "import":
-                    if (afterSpace)
-                        return ParseImport();
-
-                    return true;
+                    else if (typeBrace)
+                        return false;
+                    else
+                        return true;
 
                 case "class":
                 case "interface":
-                    if (afterSpace)
+                    if (rootOrNamespace)
                         return ParseType();
                     else
-                        return true;
-            }
+                        return !typeBrace;
 
-            return true;
+                case "import":
+                    if (rootOrNamespace)
+                        return ParseImport();
+                    else
+                        return !typeBrace;
+
+                case "declare":
+                case "export":
+                case "private":
+                case "protected":
+                case "public":
+                case "static":
+                    if (rootOrNamespace || typeBrace)
+                        modifiers.Push(text);
+                    return true;
+
+                case "function":
+                    if (rootOrNamespace)
+                        return ParseFunction();
+                    else
+                        return !typeBrace;
+
+                case "let":
+                case "var":
+                    if (rootOrNamespace)
+                        return ParseVar();
+                    else
+                        return !typeBrace;
+
+                default:
+                    if (typeBrace)
+                        return ParseTypeMember();
+
+                    return true;
+            }
         }
 
         private bool Parse()
@@ -614,7 +895,7 @@ namespace Serenity.CodeGeneration
 
                         namespaceStack.Pop();
                     }
-                    else if (s == "{class")
+                    else if (s == "{type")
                     {
                         if (typeStack.Count == 0)
                             return false;
@@ -659,24 +940,34 @@ namespace Serenity.CodeGeneration
                 case "[":
                     braceStack.Push("[");
                     return true;
+
+                case ";":
+                    modifiers.Clear();
+                    return true;
             }
 
             return true;
         }
 
-        public class FieldInfo : MemberInfo
-        {
-        }
-
-        public class FunctionInfo : MemberInfo
-        {
-        }
-
         public class MemberInfo
+        {
+            public bool IsFunction;
+            public string Name;
+            public string Type;
+            public string InitialValue;
+            public bool IsOptional;
+            public List<string> Modifiers;
+            public List<DecoratorInfo> Decorators;
+            public List<ArgumentInfo> Arguments;
+        }
+
+        public class ArgumentInfo
         {
             public string Name;
             public string Type;
-            public List<string> Modifiers;
+            public string InitialValue;
+            public bool IsOptional;
+            public string Modifier;
             public List<DecoratorInfo> Decorators;
         }
 
@@ -715,6 +1006,7 @@ namespace Serenity.CodeGeneration
             public bool IsDeclaration;
             public string Name;
             public Dictionary<string, string> Imports;
+            public List<MemberInfo> Members;
         }
     }
 }

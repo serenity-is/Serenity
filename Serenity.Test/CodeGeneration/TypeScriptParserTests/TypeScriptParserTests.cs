@@ -42,7 +42,9 @@ class EntityDialog<TEntity>
 }");
 
             Assert.Equal(1, types.Count);
-            Assert.Equal("EntityDialog<TEntity>", types[0].Name);
+            var t0 = types[0];
+            Assert.Equal("EntityDialog<TEntity>", t0.Name);
+            Assert.Equal(2, t0.Members.Count);
         }
 
         [Fact]
