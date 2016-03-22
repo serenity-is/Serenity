@@ -130,5 +130,17 @@ namespace Serenity.ComponentModel
             : base("Url")
         {
         }
+        
+        public String DisplayProperty
+        {
+            get { return GetOption<String>("displayColumn"); }
+            set { SetOption("displayColumn", value); }
+        }
+
+        public String UrlProperty
+        {
+            get { return GetOption<String>("urlProperty"); }
+            set { SetOption("urlProperty", value); }
+        }
     }
 }
