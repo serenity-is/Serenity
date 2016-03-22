@@ -1,93 +1,142 @@
-﻿using Serenity.Web;
-using System;
+﻿using MsieJavaScriptEngine;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Web.Mvc;
 using Xunit;
 
 namespace Serenity.CodeGeneration.Test
 {
     public partial class TypeScriptParserTests
     {
-        [Fact]
-        public void ParserDoesntFailOnEmptyFile()
+        private MsieJsEngine SetupJsEngine()
         {
-            var parser = new TypeScriptParser();
-            Token reportedToken = null;
-            parser.ReportToken += (token) =>
+            var jsEngine = new MsieJsEngine();
+            try
             {
-                reportedToken = token;
-            };
-            parser.Parse("");
-            Assert.Equal(TokenType.End, reportedToken.Type);
+                using (var sr = new StreamReader(
+                    typeof(TypeScriptParserTests).Assembly.GetManifestResourceStream(
+                        "Serenity.Test.CodeGeneration.TypeScriptParserTests.typescriptServices.js")))
+                {
+                    jsEngine.Evaluate(sr.ReadToEnd());
+                }
+
+                using (var sr = new StreamReader(
+                    typeof(DtoGenerator).Assembly.GetManifestResourceStream(
+                        "Serenity.Web.Scripts.tsservices.Serenity.CodeGeneration.js")))
+                {
+                    jsEngine.Evaluate(sr.ReadToEnd());
+                }
+
+                return jsEngine;
+            }
+            catch
+            {
+                jsEngine.Dispose();
+                throw;
+            }
         }
 
+
+        public const string Input_FormatterOnly = @"
+namespace Serene.Northwind {
+    export class MyBoldFormatter implements Slick.Formatter
+    {
+        format(ctx: Slick.FormatterContext): string {
+            return ""<b>"" + Q.htmlEncode(ctx.value) + ""</b>"";
+        }
+    }
+}";
+
         [Fact]
-        public void CanParseGenericClass()
+        public void CanParseFormatterType()
         {
-            var parser = new TypeScriptParser();
-            var types = new List<TypeScriptParser.TypeInfo>();
-
-            parser.ReportType += (type) =>
+            using (var jsEngine = SetupJsEngine())
             {
-                types.Add(type);
-            };
+                jsEngine.SetVariableValue("sourceText", Input_FormatterOnly);
+                var json = jsEngine.Evaluate<string>(
+                    "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
+                var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
+                Assert.NotNull(formatterTypes);
+                Assert.Equal(1, formatterTypes.Count);
+                var k = "Serene.Northwind.MyBoldFormatter";
+                Assert.True(formatterTypes.ContainsKey(k));
+                Assert.NotNull(formatterTypes[k].Options);
+                Assert.Equal(0, formatterTypes[k].Options.Count);
+            }
+        }
 
-            parser.Parse(@"
-class EntityDialog<TEntity>
+        public const string Input_FormatterOnlyWithImport = @"
+namespace Serene.Northwind {
+    import S = Slick;
+
+    export class MyBoldFormatter implements S.Formatter
+    {
+        format(ctx: Slick.FormatterContext): string {
+            return ""<b>"" + Q.htmlEncode(ctx.value) + ""</b>"";
+        }
+    }
+}";
+
+        [Fact]
+        public void CanParseFormatterTypeWithImport()
+        {
+            using (var jsEngine = SetupJsEngine())
+            {
+                jsEngine.SetVariableValue("sourceText", Input_FormatterOnly);
+                var json = jsEngine.Evaluate<string>(
+                    "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
+                var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
+                Assert.NotNull(formatterTypes);
+                Assert.Equal(1, formatterTypes.Count);
+                var k = "Serene.Northwind.MyBoldFormatter";
+                Assert.True(formatterTypes.ContainsKey(k));
+                Assert.NotNull(formatterTypes[k].Options);
+                Assert.Equal(0, formatterTypes[k].Options.Count);
+            }
+        }
+
+        public const string Input_InterfaceDialogFormatter = @"
+interface CustomerRow {
+    ID: number;
+    CustomerID: string;
+}
+
+namespace Serene.Northwind {
+    import D = Serenity.Decorators;
+    import S = Slick;
+
+    @D.formKey(""Northwind.Customer"") @D.idProperty(""ID"") @D.nameProperty(""CustomerID"") 
+    @D.service(""Northwind/Customer"") @D.flexify() @D.maximizable()
+    export class MyCustomerDialog extends Serenity.EntityDialog<CustomerRow> {
+    }
+
+    export class MyBoldFormatter implements S.Formatter
+    {
+        format(ctx: Slick.FormatterContext): string {
+            return ""<b>"" + Q.htmlEncode(ctx.value) + ""</b>"";
+        }
+    }
+}
+
+namespace XYZ
 {
-    dialogOpen(): void;
-    loadByIdAndOpenDialog(id: any): void;
-}");
-
-            Assert.Equal(1, types.Count);
-            var t0 = types[0];
-            Assert.Equal("EntityDialog<TEntity>", t0.Name);
-            Assert.Equal(2, t0.Members.Count);
-        }
+}";
 
         [Fact]
-        public void CanParseGenericClassWithExtendsConstraint()
+        public void CanParseFormatterAmongOtherClasses()
         {
-            var parser = new TypeScriptParser();
-            var types = new List<TypeScriptParser.TypeInfo>();
-
-            parser.ReportType += (type) =>
+            using (var jsEngine = SetupJsEngine())
             {
-                types.Add(type);
-            };
-
-            parser.Parse(@"
-interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
-    request?: any;
-}");
-
-            Assert.Equal(1, types.Count);
-            Assert.Equal("ServiceOptions<TResponse extends ServiceResponse>", types[0].Name);
-        }
-
-        public void ParserTest()
-        {
-            var parser = new TypeScriptParser();
-            var types = new List<TypeScriptParser.TypeInfo>();
-
-            StringBuilder sb = new StringBuilder();
-
-            parser.ReportToken += (token) =>
-            {
-                if (token.Type != TokenType.WhiteSpace &&
-                   token.Type != TokenType.EndOfLine)
-                    sb.AppendLine(JSON.StringifyIndented(token)); ;
-            };
-
-            parser.ReportType += (type) =>
-            {
-                types.Add(type);
-            };
-
-            parser.Parse(File.ReadAllText(@"P:\Sandbox\Serene\Serenity\Serenity.Script.Core\Resources\Serenity.CoreLib.ts"));
-            throw new Exception(JSON.StringifyIndented(types) + sb.ToString());
+                jsEngine.SetVariableValue("sourceText", Input_InterfaceDialogFormatter);
+                var json = jsEngine.Evaluate<string>(
+                    "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
+                var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
+                Assert.NotNull(formatterTypes);
+                Assert.Equal(1, formatterTypes.Count);
+                var k = "Serene.Northwind.MyBoldFormatter";
+                Assert.True(formatterTypes.ContainsKey(k));
+                Assert.NotNull(formatterTypes[k].Options);
+                Assert.Equal(0, formatterTypes[k].Options.Count);
+            }
         }
     }
 }
