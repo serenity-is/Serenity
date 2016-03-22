@@ -681,6 +681,8 @@
     <Content Include="Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js" />
     <Content Include="Includes\Scripts\SlickGrid\slick.remotemodel-yahoo.js" />
     <Content Include="Includes\Scripts\SlickGrid\slick.remotemodel.js" />
+    <None Include="Scripts\tsservices\typescriptServices.js" />
+    <EmbeddedResource Include="Scripts\tsservices\Serenity.CodeGeneration.js" />
     <Content Include="Style\images\32px.png" />
     <Content Include="Style\images\accordion-down.png" />
     <Content Include="Style\images\accordion-left.png" />
@@ -724,6 +726,8 @@
     <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.ts" />
     <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.ts" />
     <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.Slick.ts" />
+    <TypeScriptCompile Include="Scripts\tsservices\typescriptServices.d.ts" />
+    <TypeScriptCompile Include="Scripts\tsservices\Serenity.CodeGeneration.ts" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

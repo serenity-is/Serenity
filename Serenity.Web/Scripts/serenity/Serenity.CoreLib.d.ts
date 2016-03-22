@@ -119,9 +119,21 @@ declare namespace Q {
     function warning(message: string, options?: S.AlertOptions): void;
     function iframeDialog(options: S.IFrameDialogOptions): void;
     function toId(id: any): any;
+    /**
+     * Uses jQuery BlockUI plugin to block access to whole page (default) or
+     * a part of it, by using a transparent overlay covering the whole area.
+     * @param options Parameters for the BlockUI plugin
+     * @remarks If options are not specified, this function blocks
+     * whole page with a transparent overlay. Default z-order of the overlay
+     * div is 2000, so a higher z-order shouldn't be used in page.
+     */
     function blockUI(options: JQBlockUIOptions): void;
     function blockUndo(): void;
     function formatDate(date: Date, format?: string): string;
+    /**
+     * Html encodes a string
+     * @param s String to be HTML encoded
+     */
     function htmlEncode(s: any): string;
     function newBodyDiv(): JQuery;
     function addOption(select: JQuery, key: string, text: string): void;

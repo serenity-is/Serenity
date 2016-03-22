@@ -185,6 +185,14 @@
         $.blockUI(opt);
         blockUICount++;
     }
+    /**
+     * Uses jQuery BlockUI plugin to block access to whole page (default) or
+     * a part of it, by using a transparent overlay covering the whole area.
+     * @param options Parameters for the BlockUI plugin
+     * @remarks If options are not specified, this function blocks
+     * whole page with a transparent overlay. Default z-order of the overlay
+     * div is 2000, so a higher z-order shouldn't be used in page.
+     */
     function blockUI(options) {
         options = $.extend({
             baseZ: 2000,
@@ -260,6 +268,10 @@
         }
         return a;
     }
+    /**
+     * Html encodes a string
+     * @param s String to be HTML encoded
+     */
     function htmlEncode(s) {
         var text = (s == null ? '' : s.toString());
         if ((new RegExp('[><&]', 'g')).test(text)) {
@@ -753,6 +765,7 @@
             of = fmt.substring(0, fmt.indexOf("."));
         var op = "";
         if (!(ones == 0 && of.substr(of.length - 1) == '#')) {
+            // find how many digits are in the group
             var oneText = new String(Math.abs(ones));
             var gl = 9999;
             if (of.lastIndexOf(",") != -1)
@@ -766,13 +779,16 @@
                     gc = 0;
                 }
             }
+            // account for any pre-data padding
             if (of.length > op.length) {
                 var padStart = of.indexOf('0');
                 if (padStart != -1) {
                     var padLen = of.length - padStart;
+                    // pad to left with 0's or group char
                     var pos = of.length - op.length - 1;
                     while (op.length < padLen) {
                         var pc = of.charAt(pos);
+                        // replace with real group char if needed
                         if (pc == ',')
                             pc = grp;
                         op = pc + op;
@@ -795,6 +811,7 @@
     function roundNumber(n, dec) {
         var power = Math.pow(10, dec || 0);
         var value = (Math.round(n * power) / power).toString();
+        // ensure the decimal places are there
         if (dec > 0) {
             var dp = value.indexOf(".");
             if (dp == -1) {
@@ -1099,8 +1116,10 @@
         var btn = $.fn.button.noConflict();
         $.fn.btn = btn;
     }
+    // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
     function deepClone(arg1, arg2) {
         var options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
+        // Handle case when target is a string or something (possible in deep copy)
         if (typeof target !== "object" && !$.isFunction(target)) {
             target = {};
         }
@@ -1109,17 +1128,22 @@
             i = 0;
         }
         for (; i < length; i++) {
+            // Only deal with non-null/undefined values
             if ((options = arguments[i]) !== null) {
+                // Special operations for arrays
                 if ($.isArray(options)) {
                     target = $.extend(true, [], options);
                 }
                 else {
+                    // Extend the base object
                     for (name in options) {
                         src = target[name];
                         copy = options[name];
+                        // Prevent never-ending loop
                         if (target === copy) {
                             continue;
                         }
+                        // Recurse if we're merging plain objects or arrays
                         if (copy && ($.isPlainObject(copy) ||
                             (copyIsArray = $.isArray(copy)))) {
                             if (copyIsArray) {
@@ -1129,6 +1153,7 @@
                             else {
                                 clone = src && $.isPlainObject(src) ? src : {};
                             }
+                            // Never move original objects, clone them
                             target[name] = deepClone(clone, copy);
                         }
                         else if (copy !== undefined) {
@@ -1138,6 +1163,7 @@
                 }
             }
         }
+        // Return the modified object
         return target;
     }
     Q.deepClone = deepClone;
@@ -1481,7 +1507,9 @@
                 log((e.get_stack && e.get_stack()) || e.stack);
             });
         }
+        // fake assembly for typescript apps
         ss.initAssembly({}, 'App', {});
+        // for backward compability, avoid!
         global.Q$Externals = Q;
         global.Q$Config = Q.Config;
         global.Q$Culture = Q.Culture;
@@ -1490,6 +1518,7 @@
         global.Q$LT = Q.LT;
         function initializeTypes() {
             enumerateTypes(global, Q.Config.rootNamespaces, function (obj, fullName) {
+                // probably Saltaralle class
                 if (obj.__typeName)
                     return;
                 if (!obj.__interfaces &&
@@ -1977,4 +2006,3 @@ var Serenity;
         LazyLoadHelper.executeEverytimeWhenShown = executeEverytimeWhenShown;
     })(LazyLoadHelper = Serenity.LazyLoadHelper || (Serenity.LazyLoadHelper = {}));
 })(Serenity || (Serenity = {}));
-//# sourceMappingURL=Serenity.CoreLib.js.map
