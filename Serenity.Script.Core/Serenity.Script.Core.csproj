@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -46,75 +45,12 @@
     <Reference Include="mscorlib">
       <HintPath>..\..\packages\Saltarelle.Runtime.2.7.0\tools\Assemblies\mscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="Saltarelle.jQuery, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a4048e8fcc593f14, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Saltarelle.jQuery.1.10.1\lib\Saltarelle.jQuery.dll</HintPath>
-    </Reference>
-    <Reference Include="Saltarelle.jQuery.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a4048e8fcc593f14, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Saltarelle.jQuery.UI.1.10.1\lib\Saltarelle.jQuery.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Saltarelle.Linq">
-      <HintPath>..\..\packages\Saltarelle.Linq.2.4.0\lib\Saltarelle.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="Saltarelle.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a4048e8fcc593f14, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Saltarelle.Web.3.1.0\lib\Saltarelle.Web.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Serenity.Script.Imports\Serenity.Script.Imports.csproj">
-      <Project>{1e32ed5b-d96e-41d9-b532-577005b0ddb0}</Project>
-      <Name>Serenity.Script.Imports</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="Resources\Serenity.Externals.Slick.ts" />
-    <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\linq.js" />
-    <None Include="Resources\mscorlib.js" />
-  </ItemGroup>
-  <PropertyGroup>
-    <TypeScriptCharset>utf-8</TypeScriptCharset>
-    <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
-    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
-    <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
-    <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
-  </PropertyGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="Resources\Serenity.CoreLib.ts" />
-    <TypeScriptCompile Include="Resources\Serenity.Externals.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\mscorlib.min.js" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup />
-  <Import Project="..\tools\Saltarelle\Saltarelle.Compiler.targets" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
-  <Target Name="MinimizeScripts" AfterTargets="BuildScript">
-    <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.js" DestinationFolder="$(OutDir)">
-    </Copy>
-    <Copy SourceFiles="$(ProjectDir)Resources\Serenity.Externals.Slick.js" DestinationFolder="$(OutDir)">
-    </Copy>
-    <Copy SourceFiles="$(OutDir)Serenity.Script.Core.js" DestinationFolder="$(ProjectDir)..\Serenity.Test\Scripts\serenity\">
-    </Copy>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Script.Core.js -o $(OutDir)Serenity.Script.Core.min.js --comments --mangle">
-    </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Externals.js -o $(OutDir)Serenity.Externals.min.js --comments --mangle">
-    </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(OutDir)Serenity.Externals.Slick.js -o $(OutDir)Serenity.Externals.Slick.min.js --comments --mangle">
-    </Exec>
-  </Target>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

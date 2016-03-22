@@ -219,23 +219,23 @@
       <Link>phantomjs.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Serenity.Script.Core\Resources\linq.js">
+    <Content Include="..\Serenity.Web\Includes\Scripts\Saltarelle\linq.js">
       <Link>Scripts\saltarelle\linq.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Serenity.Script.Core\Resources\mscorlib.js">
+    <Content Include="..\Serenity.Web\Includes\Scripts\Saltarelle\mscorlib.js">
       <Link>Scripts\saltarelle\mscorlib.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Serenity.Script.Core\Resources\Serenity.CoreLib.js">
+    <Content Include="..\Serenity.Web\Scripts\Serenity\Serenity.CoreLib.js">
       <Link>Scripts\serenity\Serenity.CoreLib.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Serenity.Script.Core\Resources\Serenity.Externals.js">
+    <Content Include="..\Serenity.Web\Scripts\Serenity\Serenity.Externals.js">
       <Link>Scripts\serenity\Serenity.Externals.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Serenity.Script.Core\Resources\Serenity.Externals.Slick.js">
+    <Content Include="..\Serenity.Web\Scripts\Serenity\Serenity.Externals.Slick.js">
       <Link>Scripts\serenity\Serenity.Externals.Slick.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
