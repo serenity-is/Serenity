@@ -1,12 +1,21 @@
-﻿namespace Serenity.CodeGeneration {
+﻿declare namespace ts {
+    interface Node {
+        $imports?: Serenity.CodeGeneration.Imports;
+    }
+}
 
-    export interface FormatterOptionInfo {
+namespace Serenity.CodeGeneration {
+    export type Imports = { [key: string]: string };
+
+    export interface OptionInfo {
         Name: string;
         Type: string;
     }
 
+    export type OptionInfos = { [key: string]: OptionInfo };
+    
     export interface FormatterTypeInfo {
-        Options: { [key: string]: FormatterOptionInfo };
+        Options: OptionInfos;
     }
 
     export type FormatterTypes = { [key: string]: FormatterTypeInfo };
@@ -80,7 +89,7 @@
         return copy;
     }
 
-    function isFormatter(node: ts.ClassDeclaration, imports: { [key: string]: string }): boolean {
+    function isFormatter(node: ts.ClassDeclaration): boolean {
         for (let heritage of node.heritageClauses) {
             if (heritage.token == ts.SyntaxKind.ImplementsKeyword &&
                 heritage.types != null) {
@@ -91,8 +100,8 @@
                         var expression = type.expression.getText();
 
                         var parts = expression.split(".");
-                        if (parts.length > 1) {
-                            var resolved = imports[parts[0]];
+                        if (parts.length > 1 && node.$imports) {
+                            var resolved = node.$imports[parts[0]];
                             if (resolved) {
                                 parts[0] = resolved;
                                 expression = parts.join(".");
@@ -120,40 +129,156 @@
         return any(node.modifiers, x => x.kind == ts.SyntaxKind.ExportKeyword);
     }
 
+    function isPrivateOrProtected(node: ts.Node): boolean {
+        return !any(node.modifiers, x => x.kind == ts.SyntaxKind.PrivateKeyword ||
+            x.kind == ts.SyntaxKind.ProtectedKeyword);
+    }
+
+    function isInterfaceOption(node: ts.TypeElement): boolean {
+        return false;
+    }
+
+    function isClassOption(node: ts.TypeElement): boolean {
+        return false;
+    }
+
+    function isOptionDecorator(decorator: ts.Decorator): boolean {
+        if (decorator.expression == null)
+            return false;
+
+        let pae: ts.PropertyAccessExpression = null;
+        if (decorator.expression.kind == ts.SyntaxKind.CallExpression) {
+            let ce = decorator.expression as ts.CallExpression;
+
+            if (ce.expression != null &&
+                ce.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+                pae = ce.expression as ts.PropertyAccessExpression;
+            }
+        }
+        else if (decorator.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+            pae = decorator.expression as ts.PropertyAccessExpression;
+        }
+
+        if (!pae)
+            return;
+
+        let expression = pae.getText();
+        var parts = expression.split(".");
+        if (parts.length > 1 && pae.$imports) {
+            var resolved = pae.$imports[parts[0]];
+            if (resolved) {
+                parts[0] = resolved;
+                expression = parts.join(".");
+            }
+        }
+
+        return expression == "Serenity.Decorators.option";
+    }
+
+    function getOptions(sourceFile: ts.SourceFile, node: ts.Node): OptionInfos {
+        let result : OptionInfos = {};
+
+        function scanOptions(node: ts.Node, isOptions: boolean): void {
+            let isInterface = node.kind == ts.SyntaxKind.InterfaceDeclaration;
+            let isClass = node.kind == ts.SyntaxKind.ClassDeclaration;
+
+            if (isInterface) {
+                for (let member of (node as ts.InterfaceDeclaration).members) {
+
+                    let name = member.name.getText();
+
+                    if (result[name])
+                        continue;
+
+                    if (!isOptions && !any(member.decorators, isOptionDecorator))
+                        continue;
+
+                    result[name] = {
+                        Name: name,
+                        Type: "System.Object"
+                    };
+                }
+            }
+            else if (isClass) {
+                for (let member of (node as ts.ClassDeclaration).members) {
+
+                    let name = member.name.getText();
+
+                    if (result[name])
+                        continue;
+
+                    if (!isOptions && !any(member.decorators, isOptionDecorator))
+                        continue;
+
+                    result[name] = {
+                        Name: name,
+                        Type: "System.Object"
+                    };
+                }
+            }
+            else
+                return;
+        }
+
+        scanOptions(node, false);
+        return result;
+    }
+
+    function setImports(sourceFile: ts.SourceFile) {
+        function visitNode(node: ts.Node) {
+            node.$imports = node.parent ? node.parent.$imports : {};
+
+            switch (node.kind) {
+                case ts.SyntaxKind.ImportEqualsDeclaration:
+                    var ied = <ts.ImportEqualsDeclaration>node;
+                    node.$imports[ied.name.getText()] = ied.moduleReference.getText();
+                    break;
+
+                case ts.SyntaxKind.ClassDeclaration:
+                    node.$imports = cloneDictionary(node.$imports);
+                    break;
+
+                case ts.SyntaxKind.ModuleDeclaration:
+                    node.$imports = cloneDictionary(node.$imports);
+                    break;
+
+                case ts.SyntaxKind.InterfaceDeclaration:
+                    node.$imports = cloneDictionary(node.$imports);
+                    break;
+            }
+
+            ts.forEachChild(node, child => visitNode(child));
+        }
+
+        visitNode(sourceFile);
+    }
+
     function extractFormatterTypes(sourceFile: ts.SourceFile): FormatterTypes {
 
         var result: FormatterTypes = {};
 
-        function visitNode(node: ts.Node, imports: { [key: string]: string }) {
+        function visitNode(node: ts.Node) {
             switch (node.kind) {
-                case ts.SyntaxKind.ImportEqualsDeclaration:
-                    var ied = <ts.ImportEqualsDeclaration>node;
-                    imports[ied.name.getText()] = ied.moduleReference.getText();
-                    break;
-
                 case ts.SyntaxKind.ClassDeclaration:
-                    imports = cloneDictionary(imports);
-
                     let klass = node as ts.ClassDeclaration;
 
                     if (!isUnderAmbientNamespace(node) &&
                         hasExportModifier(node) &&
-                        isFormatter(klass, imports))
+                        isFormatter(klass))
                     {
                         var name = prependNamespace(klass.name.getText(), klass);
                         result[name] = {
-                            Options: {
-                            }
-                        };
+                            Options: getOptions(sourceFile, node)
+                        }
                     }
 
                     break;
             }
 
-            ts.forEachChild(node, child => visitNode(child, imports));
+            ts.forEachChild(node, child => visitNode(child));
         }
 
-        visitNode(sourceFile, {});
+        visitNode(sourceFile);
 
         return result;
     }
@@ -188,12 +313,16 @@
                 }
 
                 return value;
+
             }, "    ");
     }
 
     function parseSourceFile(sourceText: string): ts.SourceFile {
-        return ts.createSourceFile("dummy.ts", sourceText,
+        var sourceFile = ts.createSourceFile("dummy.ts", sourceText,
             ts.ScriptTarget.ES5, /*setParentNodes */ true);
+
+        setImports(sourceFile);
+        return sourceFile;
     }
 
     export function parseFormatterTypes(sourceText: string): FormatterTypes {

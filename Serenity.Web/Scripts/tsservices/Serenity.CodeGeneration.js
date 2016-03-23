@@ -59,7 +59,7 @@
             }
             return copy;
         }
-        function isFormatter(node, imports) {
+        function isFormatter(node) {
             for (var _i = 0, _a = node.heritageClauses; _i < _a.length; _i++) {
                 var heritage = _a[_i];
                 if (heritage.token == ts.SyntaxKind.ImplementsKeyword &&
@@ -70,8 +70,8 @@
                             !type.typeArguments.length) {
                             var expression = type.expression.getText();
                             var parts = expression.split(".");
-                            if (parts.length > 1) {
-                                var resolved = imports[parts[0]];
+                            if (parts.length > 1 && node.$imports) {
+                                var resolved = node.$imports[parts[0]];
                                 if (resolved) {
                                     parts[0] = resolved;
                                     expression = parts.join(".");
@@ -95,30 +95,123 @@
         function hasExportModifier(node) {
             return any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.ExportKeyword; });
         }
-        function extractFormatterTypes(sourceFile) {
+        function isPrivateOrProtected(node) {
+            return !any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.PrivateKeyword ||
+                x.kind == ts.SyntaxKind.ProtectedKeyword; });
+        }
+        function isInterfaceOption(node) {
+            return false;
+        }
+        function isClassOption(node) {
+            return false;
+        }
+        function isOptionDecorator(decorator) {
+            if (decorator.expression == null)
+                return false;
+            var pae = null;
+            if (decorator.expression.kind == ts.SyntaxKind.CallExpression) {
+                var ce = decorator.expression;
+                if (ce.expression != null &&
+                    ce.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+                    pae = ce.expression;
+                }
+            }
+            else if (decorator.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+                pae = decorator.expression;
+            }
+            if (!pae)
+                return;
+            var expression = pae.getText();
+            var parts = expression.split(".");
+            if (parts.length > 1 && pae.$imports) {
+                var resolved = pae.$imports[parts[0]];
+                if (resolved) {
+                    parts[0] = resolved;
+                    expression = parts.join(".");
+                }
+            }
+            return expression == "Serenity.Decorators.option";
+        }
+        function getOptions(sourceFile, node) {
             var result = {};
-            function visitNode(node, imports) {
+            function scanOptions(node, isOptions) {
+                var isInterface = node.kind == ts.SyntaxKind.InterfaceDeclaration;
+                var isClass = node.kind == ts.SyntaxKind.ClassDeclaration;
+                if (isInterface) {
+                    for (var _i = 0, _a = node.members; _i < _a.length; _i++) {
+                        var member = _a[_i];
+                        var name_1 = member.name.getText();
+                        if (result[name_1])
+                            continue;
+                        if (!isOptions && !any(member.decorators, isOptionDecorator))
+                            continue;
+                        result[name_1] = {
+                            Name: name_1,
+                            Type: "System.Object"
+                        };
+                    }
+                }
+                else if (isClass) {
+                    for (var _b = 0, _c = node.members; _b < _c.length; _b++) {
+                        var member = _c[_b];
+                        var name_2 = member.name.getText();
+                        if (result[name_2])
+                            continue;
+                        if (!isOptions && !any(member.decorators, isOptionDecorator))
+                            continue;
+                        result[name_2] = {
+                            Name: name_2,
+                            Type: "System.Object"
+                        };
+                    }
+                }
+                else
+                    return;
+            }
+            scanOptions(node, false);
+            return result;
+        }
+        function setImports(sourceFile) {
+            function visitNode(node) {
+                node.$imports = node.parent ? node.parent.$imports : {};
                 switch (node.kind) {
                     case ts.SyntaxKind.ImportEqualsDeclaration:
                         var ied = node;
-                        imports[ied.name.getText()] = ied.moduleReference.getText();
+                        node.$imports[ied.name.getText()] = ied.moduleReference.getText();
                         break;
                     case ts.SyntaxKind.ClassDeclaration:
-                        imports = cloneDictionary(imports);
+                        node.$imports = cloneDictionary(node.$imports);
+                        break;
+                    case ts.SyntaxKind.ModuleDeclaration:
+                        node.$imports = cloneDictionary(node.$imports);
+                        break;
+                    case ts.SyntaxKind.InterfaceDeclaration:
+                        node.$imports = cloneDictionary(node.$imports);
+                        break;
+                }
+                ts.forEachChild(node, function (child) { return visitNode(child); });
+            }
+            visitNode(sourceFile);
+        }
+        function extractFormatterTypes(sourceFile) {
+            var result = {};
+            function visitNode(node) {
+                switch (node.kind) {
+                    case ts.SyntaxKind.ClassDeclaration:
                         var klass = node;
                         if (!isUnderAmbientNamespace(node) &&
                             hasExportModifier(node) &&
-                            isFormatter(klass, imports)) {
+                            isFormatter(klass)) {
                             var name = prependNamespace(klass.name.getText(), klass);
                             result[name] = {
-                                Options: {}
+                                Options: getOptions(sourceFile, node)
                             };
                         }
                         break;
                 }
-                ts.forEachChild(node, function (child) { return visitNode(child, imports); });
+                ts.forEachChild(node, function (child) { return visitNode(child); });
             }
-            visitNode(sourceFile, {});
+            visitNode(sourceFile);
             return result;
         }
         function stringifyNode(node) {
@@ -150,7 +243,9 @@
         }
         CodeGeneration.stringifyNode = stringifyNode;
         function parseSourceFile(sourceText) {
-            return ts.createSourceFile("dummy.ts", sourceText, ts.ScriptTarget.ES5, /*setParentNodes */ true);
+            var sourceFile = ts.createSourceFile("dummy.ts", sourceText, ts.ScriptTarget.ES5, /*setParentNodes */ true);
+            setImports(sourceFile);
+            return sourceFile;
         }
         function parseFormatterTypes(sourceText) {
             return extractFormatterTypes(parseSourceFile(sourceText));

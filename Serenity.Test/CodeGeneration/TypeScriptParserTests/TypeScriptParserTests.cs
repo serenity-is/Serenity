@@ -245,13 +245,24 @@ namespace Serenity.CodeGeneration.Test
                 jsEngine.SetVariableValue("sourceText", @"
                     import S = Slick;
                     namespace Z {
+                        import D = Serenity.Decorators;
                         export class MyBoldFormatter implements S.Formatter
                         {
                             format(ctx: Slick.FormatterContext): string {
                                 return ""<b>"" + Q.htmlEncode(ctx.value) + ""</b>"";
                             }
-                        }}
-                ");
+
+                            @D.option()
+                            test: int;
+
+                            @D.zzz
+                            abc: int;
+
+                            @D.option()
+                            set_test(value: int) {
+                            }
+                        }
+                    }");
 
                 var json = jsEngine.Evaluate<string>(
                     "Serenity.CodeGeneration.parseSourceToJson(sourceText)");
