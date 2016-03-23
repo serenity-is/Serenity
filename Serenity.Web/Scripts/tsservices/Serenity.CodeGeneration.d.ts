@@ -11,5 +11,7 @@
     type FormatterTypes = {
         [key: string]: FormatterTypeInfo;
     };
+    function stringifyNode(node: any): string;
     function parseFormatterTypes(sourceText: string): FormatterTypes;
+    function parseSourceToJson(sourceText: string): string;
 }

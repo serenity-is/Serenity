@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Serenity.CodeGeneration.Test
 {
-    public partial class BasicTsParserTests
+    public partial class ManualTsParserTests
     {
         [Fact]
         public void ParserDoesntFailOnEmptyFile()

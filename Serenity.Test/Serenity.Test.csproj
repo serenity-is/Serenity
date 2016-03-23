@@ -112,7 +112,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Web\BasicTsParserTests.cs" />
+    <Compile Include="Web\ManualTsParserTests.cs" />
     <Compile Include="Core\Config\AppSettingsJsonConfigRepositoryTests.cs" />
     <Compile Include="Core\Caching\DistributedCacheEmulatorTests.cs" />
     <Compile Include="Core\Caching\DistributedCacheTests.cs" />
