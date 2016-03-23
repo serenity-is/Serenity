@@ -68,15 +68,7 @@
                         var type = _c[_b];
                         if (type.typeArguments == null ||
                             !type.typeArguments.length) {
-                            var expression = type.expression.getText();
-                            var parts = expression.split(".");
-                            if (parts.length > 1 && node.$imports) {
-                                var resolved = node.$imports[parts[0]];
-                                if (resolved) {
-                                    parts[0] = resolved;
-                                    expression = parts.join(".");
-                                }
-                            }
+                            var expression = getExpandedExpression(type);
                             if (expression == "Slick.Formatter") {
                                 return true;
                             }
@@ -105,6 +97,20 @@
         function isClassOption(node) {
             return false;
         }
+        function getExpandedExpression(node) {
+            if (!node)
+                return "";
+            var expression = node.getText();
+            var parts = expression.split(".");
+            if (parts.length > 1 && node.$imports) {
+                var resolved = node.$imports[parts[0]];
+                if (resolved) {
+                    parts[0] = resolved;
+                    expression = parts.join(".");
+                }
+            }
+            return expression;
+        }
         function isOptionDecorator(decorator) {
             if (decorator.expression == null)
                 return false;
@@ -121,15 +127,7 @@
             }
             if (!pae)
                 return;
-            var expression = pae.getText();
-            var parts = expression.split(".");
-            if (parts.length > 1 && pae.$imports) {
-                var resolved = pae.$imports[parts[0]];
-                if (resolved) {
-                    parts[0] = resolved;
-                    expression = parts.join(".");
-                }
-            }
+            var expression = getExpandedExpression(pae);
             return expression == "Serenity.Decorators.option";
         }
         function getOptions(sourceFile, node) {
@@ -154,14 +152,23 @@
                 else if (isClass) {
                     for (var _b = 0, _c = node.members; _b < _c.length; _b++) {
                         var member = _c[_b];
+                        if (member.kind != ts.SyntaxKind.MethodDeclaration &&
+                            member.kind != ts.SyntaxKind.PropertyDeclaration)
+                            continue;
                         var name_2 = member.name.getText();
                         if (result[name_2])
                             continue;
                         if (!isOptions && !any(member.decorators, isOptionDecorator))
                             continue;
+                        var typeName = "";
+                        if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
+                            var pd = member;
+                            if (pd.type)
+                                typeName = pd.type.getText();
+                        }
                         result[name_2] = {
                             Name: name_2,
-                            Type: "System.Object"
+                            Type: typeName
                         };
                     }
                 }

@@ -97,17 +97,7 @@ namespace Serenity.CodeGeneration {
                 for (let type of heritage.types) {
                     if (type.typeArguments == null ||
                         !type.typeArguments.length) {
-                        var expression = type.expression.getText();
-
-                        var parts = expression.split(".");
-                        if (parts.length > 1 && node.$imports) {
-                            var resolved = node.$imports[parts[0]];
-                            if (resolved) {
-                                parts[0] = resolved;
-                                expression = parts.join(".");
-                            }
-                        }
-
+                        let expression = getExpandedExpression(type);
                         if (expression == "Slick.Formatter") {
                             return true;
                         }
@@ -142,6 +132,23 @@ namespace Serenity.CodeGeneration {
         return false;
     }
 
+    function getExpandedExpression(node: ts.Node) {
+        if (!node)
+            return "";
+
+        let expression = node.getText();
+        let parts = expression.split(".");
+        if (parts.length > 1 && node.$imports) {
+            var resolved = node.$imports[parts[0]];
+            if (resolved) {
+                parts[0] = resolved;
+                expression = parts.join(".");
+            }
+        }
+
+        return expression;
+    }
+
     function isOptionDecorator(decorator: ts.Decorator): boolean {
         if (decorator.expression == null)
             return false;
@@ -162,16 +169,7 @@ namespace Serenity.CodeGeneration {
         if (!pae)
             return;
 
-        let expression = pae.getText();
-        var parts = expression.split(".");
-        if (parts.length > 1 && pae.$imports) {
-            var resolved = pae.$imports[parts[0]];
-            if (resolved) {
-                parts[0] = resolved;
-                expression = parts.join(".");
-            }
-        }
-
+        let expression = getExpandedExpression(pae);
         return expression == "Serenity.Decorators.option";
     }
 
@@ -202,17 +200,27 @@ namespace Serenity.CodeGeneration {
             else if (isClass) {
                 for (let member of (node as ts.ClassDeclaration).members) {
 
-                    let name = member.name.getText();
+                    if (member.kind != ts.SyntaxKind.MethodDeclaration &&
+                        member.kind != ts.SyntaxKind.PropertyDeclaration)
+                        continue;
 
+                    let name = member.name.getText();
                     if (result[name])
                         continue;
 
                     if (!isOptions && !any(member.decorators, isOptionDecorator))
                         continue;
 
+                    let typeName: string = "";
+                    if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
+                        let pd = (member as ts.PropertyDeclaration);
+                        if (pd.type)
+                            typeName = pd.type.getText();
+                    }
+
                     result[name] = {
                         Name: name,
-                        Type: "System.Object"
+                        Type: typeName
                     };
                 }
             }
