@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Serenity.Reflection;
 
 namespace Serenity.CodeGeneration
 {
@@ -63,6 +62,34 @@ namespace Serenity.CodeGeneration
             return result;
         }
 
+        internal static string GetOptionTypeName(string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName))
+                return "object";
+
+            switch (typeName) {
+                case "number": return "double";
+                case "string": return "string";
+                case "Date": return "DateTime";
+                case "boolean": return "bool";
+            }
+
+            var nullablePrefix = "System.Nullable`1";
+            bool nullable = typeName.StartsWith(nullablePrefix);
+            if (nullable)
+                typeName = typeName.Substring(nullablePrefix.Length + 1, 
+                    typeName.Length - nullablePrefix.Length - 2);
+
+            var systemType = Type.GetType(typeName);
+            if (systemType == null)
+                return "object";
+
+            if (typeName.StartsWith("System."))
+                return typeName.Substring(7);
+
+            return typeName;
+        }
+
         public string GenerateCode()
         {
             var codeByType = new Dictionary<string, string>();
@@ -73,7 +100,7 @@ namespace Serenity.CodeGeneration
             {
                 var ns = DoGetNamespace(key);
 
-                var editorInfo = FormatterTypes[key];
+                var formatterInfo = FormatterTypes[key];
 
                 sb.Clear();
                 cw.Indented("public partial class ");
@@ -94,29 +121,17 @@ namespace Serenity.CodeGeneration
                     cw.IndentedLine("{");
                     cw.IndentedLine("}"); 
                     
-                    var opt = editorInfo.Options.Keys.ToList();
+                    var opt = formatterInfo.Options.Keys.ToList();
                     opt.Sort();
 
                     foreach (var item in opt)
                     {
-                        var option = editorInfo.Options[item];
-                        var typeName = option.Type;
-                        var nullablePrefix = "System.Nullable`1";
-                        bool nullable = option.Type.StartsWith(nullablePrefix);
-                        if (nullable)
-                            typeName = typeName.Substring(nullablePrefix.Length + 1, typeName.Length - nullablePrefix.Length - 2);
-
-                        var systemType = Type.GetType(typeName);
-                        if (systemType == null)
-                            typeName = "object";
-                        else if (typeName.StartsWith("System."))
-                            typeName = typeName.Substring(7);
+                        var option = formatterInfo.Options[item];
+                        var typeName = GetOptionTypeName(option.Type);
 
                         sb.AppendLine();
                         cw.Indented("public ");
                         sb.Append(typeName);
-                        //if (nullable) //Attribute name argument nullable problem
-                        //    sb.Append("?");
                         sb.Append(" ");
                         sb.AppendLine(item);
                         cw.InBrace(() =>
@@ -126,8 +141,6 @@ namespace Serenity.CodeGeneration
                                 propName = "id";
                             cw.Indented("get { return GetOption<");
                             sb.Append(typeName);
-                            //if (nullable) //Attribute name argument nullable problem
-                            //    sb.Append("?");
                             sb.Append(">(\"");
                             sb.Append(propName);
                             sb.AppendLine("\"); }");

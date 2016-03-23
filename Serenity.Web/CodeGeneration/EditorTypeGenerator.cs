@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Serenity.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Serenity.Reflection;
-using Serenity.ComponentModel;
 using System.Reflection;
+using System.Text;
 
 namespace Serenity.CodeGeneration
 {
@@ -118,23 +117,11 @@ namespace Serenity.CodeGeneration
                     foreach (var item in opt)
                     {
                         var option = editorInfo.Options[item];
-                        var typeName = option.Type;
-                        var nullablePrefix = "System.Nullable`1";
-                        bool nullable = option.Type.StartsWith(nullablePrefix);
-                        if (nullable)
-                            typeName = typeName.Substring(nullablePrefix.Length + 1, typeName.Length - nullablePrefix.Length - 2);
-
-                        var systemType = Type.GetType(typeName);
-                        if (systemType == null)
-                            typeName = "object";
-                        else if (typeName.StartsWith("System."))
-                            typeName = typeName.Substring(7);
+                        var typeName = FormatterTypeGenerator.GetOptionTypeName(option.Type);
 
                         sb.AppendLine();
                         cw.Indented("public ");
                         sb.Append(typeName);
-                        //if (nullable) //Attribute name argument nullable problem
-                        //    sb.Append("?");
                         sb.Append(" ");
                         sb.AppendLine(item);
                         cw.InBrace(() =>
@@ -144,8 +131,6 @@ namespace Serenity.CodeGeneration
                                 propName = "id";
                             cw.Indented("get { return GetOption<");
                             sb.Append(typeName);
-                            //if (nullable) //Attribute name argument nullable problem
-                            //    sb.Append("?");
                             sb.Append(">(\"");
                             sb.Append(propName);
                             sb.AppendLine("\"); }");
