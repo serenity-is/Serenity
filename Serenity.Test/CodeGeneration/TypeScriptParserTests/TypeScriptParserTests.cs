@@ -317,16 +317,7 @@ namespace Serenity.CodeGeneration.Test
                             }
                         }
                     }");
-
-                var json = jsEngine.Evaluate<string>(
-                    "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
-                var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
-                Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
-                var k = "Serene.Northwind.MyBoldFormatter";
-                Assert.True(formatterTypes.ContainsKey(k));
-                Assert.NotNull(formatterTypes[k].Options);
-                Assert.Equal(0, formatterTypes[k].Options.Count);
+                
             }
         }
 
@@ -404,6 +395,47 @@ namespace Serenity.CodeGeneration.Test
                 var json = jsEngine.Evaluate<string>(
                     "Serenity.CodeGeneration.parseSourceToJson(sourceText)");
                 throw new System.Exception(json);
+            }
+        }
+
+        [Fact]
+        public void CanParseFormatterOptionInBaseClasses()
+        {
+            using (var jsEngine = SetupJsEngine())
+            {
+                jsEngine.SetVariableValue("sourceText", @"
+                    namespace Serene.Northwind {
+                        import D = Serenity.Decorators;
+                        
+                        class MyBaseDecorator {
+                            @D.option()
+                            baseOption: number;
+                        }
+
+                        export class MyDerivedDecorator extends MyBaseDecorator implements Slick.Formatter {
+                            format(ctx: Slick.FormatterContext): string {
+                                return "" < b > "" + Q.htmlEncode(ctx.value) + "" </ b > "";
+                            }
+                           
+                            @D.option()
+                            derivedOption: string;
+                        }
+                    }");
+
+                var json = jsEngine.Evaluate<string>(
+                    "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
+                var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
+                Assert.NotNull(formatterTypes);
+                Assert.Equal(2, formatterTypes.Count);
+                var k = "Serene.Northwind.MyBoldFormatter";
+                Assert.True(formatterTypes.ContainsKey(k));
+                var ft = formatterTypes[k];
+                Assert.NotNull(ft.Options);
+                Assert.Equal(1, ft.Options.Count);
+                Assert.True(ft.Options.ContainsKey("someOption"));
+                var o1 = ft.Options["someOption"];
+                Assert.Equal("someOption", o1.Name);
+                Assert.Equal("string", o1.Type);
             }
         }
     }

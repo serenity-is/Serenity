@@ -1,22 +1,8 @@
 ﻿declare namespace Serenity {
-    interface PostToServiceOptions {
-        url?: string;
-        service?: string;
-        target?: string;
-        request: any;
-    }
-    interface PostToUrlOptions {
-        url?: string;
-        target?: string;
-        params: any;
-    }
     interface CommonDialogOptions extends JQueryUI.DialogOptions {
         onOpen?: () => void;
         onClose?: () => void;
         htmlEncode?: boolean;
-    }
-    interface AlertOptions extends CommonDialogOptions {
-        okButton?: string;
     }
     interface ConfirmOptions extends CommonDialogOptions {
         yesButton?: string;
@@ -36,8 +22,16 @@
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
     }
-    namespace CustomValidation {
-        function registerValidationMethods(): void;
+    interface PostToServiceOptions {
+        url?: string;
+        service?: string;
+        target?: string;
+        request: any;
+    }
+    interface PostToUrlOptions {
+        url?: string;
+        target?: string;
+        params: any;
     }
     interface ServiceError {
     }
@@ -54,6 +48,9 @@
     }
     interface IFrameDialogOptions {
         html?: string;
+    }
+    namespace CustomValidation {
+        function registerValidationMethods(): void;
     }
 }
 interface JQueryStatic {

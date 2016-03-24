@@ -43,7 +43,7 @@ namespace Serenity.Test.Data
             Assert.Equal(0, BasicRow.Fields.AString.Size);
             Assert.Equal(0, BasicRow.Fields.AString.Scale);
             Assert.Equal(null, BasicRow.Fields.AString.DefaultValue);
-            Assert.Equal(SelectLevel.Default, BasicRow.Fields.AString.MinSelectLevel);
+            Assert.Equal(SelectLevel.Auto, BasicRow.Fields.AString.MinSelectLevel);
             Assert.Equal(null, BasicRow.Fields.AString.ForeignTable);
             Assert.Equal(null, BasicRow.Fields.AString.ForeignField);
             Assert.Equal(null, BasicRow.Fields.AString.Join);
@@ -66,7 +66,7 @@ namespace Serenity.Test.Data
             Assert.Equal(0, BasicRow.Fields.AInt32.Size);
             Assert.Equal(0, BasicRow.Fields.AInt32.Scale);
             Assert.Equal(null, BasicRow.Fields.AInt32.DefaultValue);
-            Assert.Equal(SelectLevel.Default, BasicRow.Fields.AInt32.MinSelectLevel);
+            Assert.Equal(SelectLevel.Auto, BasicRow.Fields.AInt32.MinSelectLevel);
             Assert.Equal(null, BasicRow.Fields.AInt32.ForeignTable);
             Assert.Equal(null, BasicRow.Fields.AInt32.ForeignField);
             Assert.Equal(null, BasicRow.Fields.AInt32.Join);
