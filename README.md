@@ -3,7 +3,7 @@ Serenity Application Platform
 
 <img src="https://github.com/volkanceylan/Serenity/blob/master/Tools/Images/serenity-logo-128.png" />
 
-[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)   [![NuGet](https://img.shields.io/nuget/dt/Serenity.Script.svg?label=nuget)](http://www.nuget.org/packages/Serenity.Script/)   [![Version](https://img.shields.io/nuget/v/Serenity.Script.svg?label=version)](http://www.nuget.org/packages/Serenity.Script/)   [![Join the chat at https://gitter.im/volkanceylan/Serenity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/volkanceylan/Serenity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Script.svg?label=version)](http://www.nuget.org/packages/Serenity.Script/)   [![Join the chat at https://gitter.im/volkanceylan/Serenity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/volkanceylan/Serenity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## What is Serenity Platform
 
@@ -27,7 +27,7 @@ Please read documentation at https://volkanceylan.gitbooks.io/serenity-guide for
 
 ## Support / Spread the Word
 
-You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open an issue here with relevant links. You can also ask a question at [Stack Overflow](http://www.stackoverflow.com) with [Serenity] tag.
+You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open an issue here with relevant links.
 
 If you are using Serenity in any open source / commercial projects let me know, so i can add it to the list of references.
 
