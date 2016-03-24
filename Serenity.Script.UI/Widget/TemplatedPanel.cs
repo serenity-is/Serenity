@@ -2,10 +2,12 @@
 using jQueryApi.UI.Widgets;
 using System.Collections.Generic;
 using System.Html;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
     [Element("<div/>")]
+    [IncludeGenericArguments(false), ScriptName("TemplatedPanel")]
     public abstract class TemplatedPanel<TOptions> : TemplatedWidget<TOptions>
         where TOptions : class, new()
     {
@@ -14,17 +16,12 @@ namespace Serenity
         protected TabsObject tabs;
         protected Toolbar toolbar;
 
-        protected TemplatedPanel(jQueryObject div, TOptions opt)
+        protected TemplatedPanel(jQueryObject div, TOptions opt = null)
             : base(div, opt)
         {
             InitValidator();
             InitTabs();
             InitToolbar();
-        }
-
-        protected TemplatedPanel(jQueryObject div)
-            : this(div, null)
-        {
         }
 
         public override void Destroy()
@@ -112,6 +109,7 @@ namespace Serenity
         public string IdPrefix { get { return idPrefix; } }
     }
 
+    [Imported, ScriptName("TemplatedPanel")]
     public abstract class TemplatedPanel : TemplatedPanel<object>
     {
         public TemplatedPanel(jQueryObject container)

@@ -21,18 +21,8 @@ namespace Serenity
         private TEntity entity;
         private Int64? entityId;
 
-        protected PropertyDialog()
-            : this(Q.NewBodyDiv(), null)
-        {
-        }
-
-        protected PropertyDialog(TOptions opt)
-            : this(Q.NewBodyDiv(), opt)
-        {
-        }
-
-        protected PropertyDialog(jQueryObject div, TOptions opt)
-            : base(div, opt)
+        protected PropertyDialog(TOptions opt = null)
+            : base(opt)
         {
             if (!IsAsyncWidget())
             {

@@ -30,7 +30,7 @@ namespace Serenity
                     return;
                 }
 
-                var entity = entityOrId.As<TEntity>() ?? new TEntity();
+                var entity = entityOrId.As<TEntity>() ?? new object().As<TEntity>();
                 LoadResponse(new RetrieveResponse<TEntity> { Entity = entity });
                 done();
             };
@@ -73,7 +73,7 @@ namespace Serenity
 
             OnLoadingData(data);
 
-            var entity = data.Entity ?? new TEntity();
+            var entity = data.Entity ?? new object().As<TEntity>();
 
             BeforeLoadEntity(entity);
 

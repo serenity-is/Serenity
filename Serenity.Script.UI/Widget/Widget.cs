@@ -22,6 +22,7 @@ namespace Serenity
         protected string widgetName;
         protected string uniqueName;
         protected jQueryObject element;
+        protected object options;
 
         /// <summary>
         /// Creates a widget on given element. Widget gets a unique name like MyNamespace_MyWidget1234.
@@ -32,9 +33,10 @@ namespace Serenity
         /// * All events attached by this widget class will be unbound when element is removed from document.
         /// * Elements gets a css class like "s-MyWidget" (it has no namespace by default, but this can be customized)
         /// </remarks>
-        protected Widget(jQueryObject element)
+        protected Widget(jQueryObject element, object options = null)
         {
             this.element = element;
+            this.options = options ?? new object();
             this.widgetName = WidgetExtensions.GetWidgetName(this.GetType());
             this.uniqueName = widgetName + (NextWidgetNumber++).ToString();
 

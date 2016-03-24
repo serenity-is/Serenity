@@ -13,6 +13,7 @@ namespace Serenity
         void DialogOpen();
     }
 
+    [IncludeGenericArguments(false), ScriptName("TemplatedDialog")]
     public abstract class TemplatedDialog<TOptions> : TemplatedWidget<TOptions>, IDialog
         where TOptions : class, new()
     {
@@ -22,8 +23,8 @@ namespace Serenity
         protected TabsObject tabs;
         protected Toolbar toolbar;
 
-        protected TemplatedDialog(jQueryObject div, TOptions opt)
-            : base(div, opt)
+        protected TemplatedDialog(TOptions opt = null)
+            : base(Q.NewBodyDiv(), opt)
         {
             isPanel = this.GetType().GetCustomAttributes(typeof(PanelAttribute), true).Length > 0;
             
@@ -33,16 +34,6 @@ namespace Serenity
             InitValidator();
             InitTabs();
             InitToolbar();
-        }
-
-        protected TemplatedDialog(TOptions opt)
-            : this(Q.NewBodyDiv(), opt)
-        {
-        }
-
-        protected TemplatedDialog()
-            : this(Q.NewBodyDiv(), null)
-        {
         }
 
         public override void Destroy()
@@ -334,7 +325,7 @@ namespace Serenity
 
             if (J(Document.Body).HasClass("mobile-device"))
             {
-                var data = this.Element.GetDataValue("responsiveData") as ResponsiveData;
+                var data = this.Element.GetDataValue("responsiveData").As<ResponsiveData>();
                 if (data == null)
                 {
                     data = new ResponsiveData();
@@ -366,7 +357,7 @@ namespace Serenity
             }
             else
             {
-                var data = this.Element.GetDataValue("responsiveData") as ResponsiveData;
+                var data = this.Element.GetDataValue("responsiveData").As<ResponsiveData>();
                 if (data != null)
                 {
                     dlg.Draggable = data.draggable;
@@ -386,19 +377,21 @@ namespace Serenity
                 }
             }
         }
-
-        private class ResponsiveData
-        {
-            public bool draggable;
-            public bool resizable;
-            public int width;
-            public int height;
-            public int left;
-            public int top;
-            public int contentHeight;
-        }
     }
 
+    [Imported, Serializable]
+    internal class ResponsiveData
+    {
+        public bool draggable;
+        public bool resizable;
+        public int width;
+        public int height;
+        public int left;
+        public int top;
+        public int contentHeight;
+    }
+
+    [Imported, ScriptName("TemplatedDialog")]
     public abstract class TemplatedDialog : TemplatedDialog<object>
     {
         public TemplatedDialog()

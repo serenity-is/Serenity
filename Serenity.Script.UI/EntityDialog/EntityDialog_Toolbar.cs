@@ -153,7 +153,7 @@ namespace Serenity
 
         protected virtual TEntity GetCloningEntity()
         {
-            var clone = new TEntity();
+            var clone = new object().As<TEntity>();
             clone = jQuery.Extend(clone, this.Entity).As<TEntity>().As<TEntity>();
 
             var idField = GetEntityIdField();

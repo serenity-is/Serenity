@@ -46,7 +46,7 @@ namespace Serenity
 
         protected virtual TEntity GetSaveEntity()
         {
-            var entity = new TEntity();
+            var entity = new object().As<TEntity>();
 
             if (this.propertyGrid != null)
                 this.propertyGrid.Save(entity);

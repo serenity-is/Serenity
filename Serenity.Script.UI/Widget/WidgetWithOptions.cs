@@ -1,17 +1,21 @@
 ﻿using jQueryApi;
-using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported, ScriptName("Widget"), IncludeGenericArguments(false)]
     public abstract class Widget<TOptions> : Widget
         where TOptions: class, new()
     {
-        protected readonly TOptions options;
+        protected new TOptions options
+        {
+            [InlineCode("{this}.options")]
+            get { return null; }
+        }
 
         protected Widget(jQueryObject element, TOptions opt = null)
-            : base(element)
+            : base(element, opt)
         {
-            this.options = (opt ?? new TOptions());
         }
     }
 }

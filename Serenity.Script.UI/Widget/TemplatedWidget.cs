@@ -1,12 +1,12 @@
 ﻿using jQueryApi;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Serenity
 {
+    [IncludeGenericArguments(false), ScriptName("TemplatedWidget")]
     public abstract class TemplatedWidget<TOptions> : Widget<TOptions>
         where TOptions: class, new()
     {
@@ -110,6 +110,7 @@ namespace Serenity
         }
     }
 
+    [Imported, ScriptName("TemplatedWidget")]
     public abstract class TemplatedWidget : TemplatedWidget<object>
     {
         protected TemplatedWidget(jQueryObject element)
