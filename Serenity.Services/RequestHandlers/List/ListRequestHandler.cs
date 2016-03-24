@@ -71,7 +71,7 @@
             if (isPrimaryKey && mode != SelectLevel.Explicit)
                 return true;
 
-            if (mode == SelectLevel.Default)
+            if (mode == SelectLevel.Auto)
             {
                 // assume that non-foreign calculated and reflective fields should be selected in list mode
                 bool isForeign = (field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign;
