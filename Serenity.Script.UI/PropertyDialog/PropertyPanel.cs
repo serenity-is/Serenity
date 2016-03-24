@@ -61,7 +61,7 @@ namespace Serenity
         protected TEntity Entity
         {
             get { return entity; }
-            set { entity = value ?? new TEntity(); }
+            set { entity = value ?? new object().As<TEntity>(); }
         }
 
         protected internal Nullable<Int64> EntityId
@@ -178,7 +178,7 @@ namespace Serenity
 
         protected virtual TEntity GetSaveEntity()
         {
-            var entity = new TEntity();
+            var entity = new object().As<TEntity>();
 
             if (this.propertyGrid != null)
                 this.propertyGrid.Save(entity);
