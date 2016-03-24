@@ -63,6 +63,7 @@ namespace Serenity
             });
         }
 
+        [IncludeGenericArguments(false)]
         public static void AddQuickSearchInput<TEntity>(jQueryObject toolDiv,
             SlickRemoteView<TEntity> view, List<QuickSearchField> fields = null)
         {

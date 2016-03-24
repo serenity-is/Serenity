@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -16,6 +17,7 @@ namespace Serenity
             return EnumFormatter.GetText(enumKey, name);
         }
 
+        [IncludeGenericArguments(false)]
         public static SlickFormatter TreeToggle<TEntity>(Func<SlickRemoteView<TEntity>> getView, Func<TEntity, object> getId, 
             SlickFormatter formatter)
         {
@@ -25,9 +27,9 @@ namespace Serenity
                 var view = getView();
                 var indent = (((object)ctx.Item._indent).As<Int32?>() ?? 0);
                 var spacer = "<span class=\"s-TreeIndent\" style=\"width:" + (15 * (indent)) + "px\"></span>";
-                var id = getId(ctx.Item);
+                var id = getId(((object)ctx.Item).As<TEntity>());
                 var idx = view.GetIdxById(id);
-                var next = view.GetItemByIdx(idx + 1);
+                var next = view.GetItemByIdx(idx.Value + 1);
                 
                 if (next != null)
                 {

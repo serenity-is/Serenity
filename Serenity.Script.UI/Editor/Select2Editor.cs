@@ -15,7 +15,7 @@ namespace Serenity
         public bool Disabled { get; set; }
     }
 
-    [Element("<input type=\"hidden\"/>")]
+    [Element("<input type=\"hidden\"/>"), IncludeGenericArguments(false), ScriptName("Select2Editor")]
     public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, ISetEditValue, IGetEditValue, IStringValue
         where TOptions : class, new()
         where TItem: class

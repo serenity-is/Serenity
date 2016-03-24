@@ -94,6 +94,7 @@ namespace Serenity
             }
         }
 
+        [IncludeGenericArguments(false)]
         public static void ToggleClick<TEntity>(jQueryEvent e, int row, int cell, SlickRemoteView<TEntity> view, Func<TEntity, object> getId)
         {
             var target = jQuery.FromElement(e.Target);
@@ -110,7 +111,7 @@ namespace Serenity
                         item._collapsed = true;
                     else
                         item._collapsed = false;
-                    view.UpdateItem(getId(item), item);
+                    view.UpdateItem(getId(((object)item).As<TEntity>()), ((object)item).As<TEntity>());
                 }
 
                 if (e.ShiftKey)

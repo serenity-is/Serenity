@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [IncludeGenericArguments(false), ScriptName("DataGrid")]
     public abstract class DataGrid<TItem, TOptions> : Widget<TOptions>, IDataGrid
         where TItem : class, new()
         where TOptions : class, new()
@@ -1064,6 +1065,7 @@ namespace Serenity
         }
     }
 
+    [Imported, IncludeGenericArguments(false), ScriptName("DataGrid")]
     public abstract class DataGrid<TItem> : DataGrid<TItem, object>
         where TItem : class, new()
     {
@@ -1071,8 +1073,9 @@ namespace Serenity
             : base(container, null)
         {
         }
-   }
+    }
 
+    [IncludeGenericArguments(false)]
     public class GridRows<TItem>
     {
         private GridRows()

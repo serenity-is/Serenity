@@ -4,10 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Html;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Element("<input type=\"hidden\"/>")]
+    [Element("<input type=\"hidden\"/>"), IncludeGenericArguments(false), ScriptName("LookupEditorBase")]
     public abstract class LookupEditorBase<TOptions, TItem> : Select2Editor<TOptions, TItem>
         where TOptions: LookupEditorOptions, new()
         where TItem: class, new()
@@ -83,17 +84,20 @@ namespace Serenity
             });
         }
 
+        [IncludeGenericArguments(false)]
         protected virtual IEnumerable<TItem> GetItems(Lookup<TItem> lookup)
         {
             return FilterItems(CascadeItems(lookup.Items));
         }
 
+        [IncludeGenericArguments(false)]
         protected virtual string GetItemText(TItem item, Lookup<TItem> lookup)
         {
             object textValue = (lookup.TextFormatter != null ? lookup.TextFormatter(item) : ((dynamic)item)[lookup.TextField]);
             return textValue == null ? "" : textValue.ToString();
         }
 
+        [IncludeGenericArguments(false)]
         protected virtual bool GetItemDisabled(TItem item, Lookup<TItem> lookup)
         {
             return false;
@@ -110,8 +114,8 @@ namespace Serenity
             var items = GetItems(lookup);
             foreach (dynamic item in items)
             {
-                var text = GetItemText(item, lookup);
-                var disabled = GetItemDisabled(item, lookup);
+                var text = GetItemText(((object)item).As<TItem>(), lookup);
+                var disabled = GetItemDisabled(((object)item).As<TItem>(), lookup);
 
                 object idValue = item[lookup.IdField];
                 string id = idValue == null ? "" : idValue.ToString();
@@ -135,8 +139,8 @@ namespace Serenity
                 var items = GetItems(lookup);
                 foreach (dynamic item in items)
                 {
-                    var text = GetItemText(item, lookup);
-                    var disabled = GetItemDisabled(item, lookup);
+                    var text = GetItemText(((object)item).As<TItem>(), lookup);
+                    var disabled = GetItemDisabled(((object)item).As<TItem>(), lookup);
 
                     object idValue = item[lookup.IdField];
                     string id = idValue == null ? "" : idValue.ToString();
@@ -194,7 +198,7 @@ namespace Serenity
 
                 if (this.Value.IsEmptyOrNull())
                 {
-                    var entity = new TItem();
+                    var entity = new object().As<TItem>();
                     entity.As<JsDictionary<string, object>>()[GetLookup().TextField] = lastCreateTerm.TrimToEmpty();
 
                     if (OnInitNewEntity != null)
@@ -345,15 +349,11 @@ namespace Serenity
         }
     }
 
+    [Imported, IncludeGenericArguments(false), ScriptName("LookupEditorBase")]
     public abstract class LookupEditorBase<TItem> : LookupEditorBase<LookupEditorOptions, TItem>
         where TItem: class, new()
     {
-        public LookupEditorBase(jQueryObject hidden)
-            : base(hidden, null)
-        {
-        }
-
-        public LookupEditorBase(jQueryObject hidden, LookupEditorOptions options)
+        public LookupEditorBase(jQueryObject hidden, LookupEditorOptions options = null)
             : base(hidden, options)
         {
         }
