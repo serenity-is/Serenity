@@ -14,6 +14,7 @@ namespace Serenity
         public Action Click { get; set; }
     }
 
+    [IncludeGenericArguments(false), ScriptName("PropertyDialog")]
     public abstract partial class PropertyDialog<TEntity, TOptions> : TemplatedDialog<TOptions>
         where TEntity : class, new()
         where TOptions: class, new()
@@ -116,7 +117,7 @@ namespace Serenity
         protected TEntity Entity
         {
             get { return entity; }
-            set { entity = value ?? new TEntity(); }
+            set { entity = value ?? new object().As<TEntity>(); }
         }
 
         protected internal Nullable<Int64> EntityId
@@ -246,7 +247,7 @@ namespace Serenity
 
         protected virtual TEntity GetSaveEntity()
         {
-            var entity = new TEntity();
+            var entity = new object().As<TEntity>();
 
             if (this.propertyGrid != null)
                 this.propertyGrid.Save(entity);
@@ -255,6 +256,7 @@ namespace Serenity
         }
     }
 
+    [Imported, IncludeGenericArguments(false), ScriptName("PropertyDialog")]
     public abstract partial class PropertyDialog<TEntity> : PropertyDialog<TEntity, object>
         where TEntity : class, new()
     {
