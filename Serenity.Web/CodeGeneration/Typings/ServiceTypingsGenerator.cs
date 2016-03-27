@@ -13,7 +13,7 @@ using System.Text;
 
 namespace Serenity.CodeGeneration
 {
-    public class ContractTypingsGenerator
+    public class ServiceTypingsGenerator
     {
         private StringBuilder sb;
         private CodeWriter cw;
@@ -21,7 +21,7 @@ namespace Serenity.CodeGeneration
         private Queue<Type> generateQueue;
         private List<Type> lookupScripts;
 
-        public ContractTypingsGenerator(params Assembly[] assemblies)
+        public ServiceTypingsGenerator(params Assembly[] assemblies)
         {
             RootNamespaces = new HashSet<string>
             {
@@ -486,15 +486,27 @@ namespace Serenity.CodeGeneration
                 {
                     foreach (var field in row.GetFields())
                     {
-                        cw.Indented("export const ");
+                        cw.Indented("export declare const ");
                         sb.Append(field.PropertyName ?? field.Name);
-                        sb.Append(" = \"");
+                        sb.Append(": \"");
                         sb.Append(field.PropertyName ?? field.Name);
                         sb.AppendLine("\";");
                     }
                 });
-            });
 
+                sb.AppendLine();
+                cw.Indented("[");
+                int i = 0;
+                foreach (var field in row.GetFields())
+                {
+                    if (i++ > 0)
+                        sb.Append(',');
+                    sb.Append('"');
+                    sb.Append(field.PropertyName ?? field.Name);
+                    sb.Append('"');
+                }
+                sb.AppendLine("].forEach(x => (<any>Fields)[x] = x);");
+            });
         }
 
         private void GenerateRowMembers(Type rowType)
@@ -613,7 +625,7 @@ namespace Serenity.CodeGeneration
                                 memberName = jsonProperty.PropertyName;
 
                             cw.Indented(memberName);
-                            sb.Append(": ");
+                            sb.Append("?: ");
                             HandleMemberType(memberType, codeNamespace);
                             sb.AppendLine();
                         }
