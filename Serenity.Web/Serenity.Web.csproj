@@ -99,6 +99,9 @@
     <Compile Include="CodeGeneration\ScriptDtoGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptEndpointGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
+    <Compile Include="CodeGeneration\Typings\EndpointTypingsGenerator.cs" />
+    <Compile Include="CodeGeneration\Typings\ContractTypingsGenerator.cs" />
+    <Compile Include="CodeGeneration\Typings\FormTypingsGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />
     <Compile Include="Common\ScriptCulture.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
@@ -728,6 +731,9 @@
     <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.Slick.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\typescriptServices.d.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\Serenity.CodeGeneration.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

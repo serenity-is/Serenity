@@ -30,10 +30,20 @@
         onNo?: () => void;
     }
 
-    interface ListRequest {
+    interface ServiceRequest {
+    }
+
+    interface ListRequest extends ServiceRequest {
         Skip?: number;
         Take?: number;
         Sort?: string[];
+    }
+
+    interface ListResponse<TEntity> extends ServiceResponse {
+        Entities?: TEntity[];
+        TotalCount: number;
+        Skip: number;
+        Take: number;
     }
 
     class ISlickFormatter {
@@ -44,15 +54,25 @@
         loadByIdAndOpenDialog(id: any): void;
     }
 
+    enum CaptureOperationType {
+        Before = 0,
+        Delete = 1,
+        Insert = 2,
+        Update = 3
+    }
+
     namespace CustomValidation {
         function registerValidationMethods(): void;
     }
 
     interface ServiceError {
+        Code?: string;
+        Arguments?: string;
+        Message?: string;
     }
 
     interface ServiceResponse {
-        error?: ServiceError;
+        Error?: ServiceError;
     }
 
     interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
@@ -1917,7 +1937,7 @@ namespace Serenity {
 
     export namespace Decorators {
 
-        function addAttribute(type: any, attr: any) {
+        export function addAttribute(type: any, attr: any) {
             let old: any = type.__metadata;
             type.__metadata = type.__metadata || {};
             type.__metadata.attr = type.__metadata.attr || [];

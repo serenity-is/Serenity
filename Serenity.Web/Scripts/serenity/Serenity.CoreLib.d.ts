@@ -25,10 +25,18 @@
         onCancel?: () => void;
         onNo?: () => void;
     }
-    interface ListRequest {
+    interface ServiceRequest {
+    }
+    interface ListRequest extends ServiceRequest {
         Skip?: number;
         Take?: number;
         Sort?: string[];
+    }
+    interface ListResponse<TEntity> extends ServiceResponse {
+        Entities?: TEntity[];
+        TotalCount: number;
+        Skip: number;
+        Take: number;
     }
     class ISlickFormatter {
     }
@@ -36,13 +44,22 @@
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
     }
+    enum CaptureOperationType {
+        Before = 0,
+        Delete = 1,
+        Insert = 2,
+        Update = 3,
+    }
     namespace CustomValidation {
         function registerValidationMethods(): void;
     }
     interface ServiceError {
+        Code?: string;
+        Arguments?: string;
+        Message?: string;
     }
     interface ServiceResponse {
-        error?: ServiceError;
+        Error?: ServiceError;
     }
     interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
         request?: any;
@@ -346,6 +363,7 @@ declare namespace Serenity {
         function paren(c: any[]): any[];
     }
     namespace Decorators {
+        function addAttribute(type: any, attr: any): void;
         function columnsKey(value: string): (target: Function) => void;
         function dialogType(value: Function): (target: Function) => void;
         function editor(key?: string): (target: Function) => void;

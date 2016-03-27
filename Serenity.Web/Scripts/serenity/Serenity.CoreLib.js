@@ -1727,6 +1727,7 @@ var Serenity;
             type.__metadata.attr = type.__metadata.attr || [];
             type.__metadata.attr.push(attr);
         }
+        Decorators.addAttribute = addAttribute;
         function columnsKey(value) {
             return function (target) {
                 addAttribute(target, new ColumnsKeyAttribute(value));
