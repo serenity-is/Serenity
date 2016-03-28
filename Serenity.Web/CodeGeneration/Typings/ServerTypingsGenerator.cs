@@ -10,10 +10,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Web.Mvc;
 
 namespace Serenity.CodeGeneration
 {
-    public class ServiceTypingsGenerator
+    public class ServerTypingsGenerator
     {
         private StringBuilder sb;
         private CodeWriter cw;
@@ -21,7 +22,7 @@ namespace Serenity.CodeGeneration
         private Queue<Type> generateQueue;
         private List<Type> lookupScripts;
 
-        public ServiceTypingsGenerator(params Assembly[] assemblies)
+        public ServerTypingsGenerator(params Assembly[] assemblies)
         {
             RootNamespaces = new HashSet<string>
             {
@@ -75,7 +76,20 @@ namespace Serenity.CodeGeneration
             if (ns.EndsWith(".Entities"))
                 return ns.Substring(0, ns.Length - ".Entities".Length);
 
+            if (ns.EndsWith(".Endpoints"))
+                return ns.Substring(0, ns.Length - ".Endpoints".Length);
+
             return ns;
+        }
+
+        private string GetControllerIdentifier(Type controller)
+        {
+            string className = controller.Name;
+
+            if (className.EndsWith("Controller"))
+                className = className.Substring(0, className.Length - 10);
+
+            return className + "Service";
         }
 
         public SortedDictionary<string, string> GenerateCode()
@@ -97,7 +111,10 @@ namespace Serenity.CodeGeneration
                     if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
                         fromType.IsSubclassOf(typeof(ServiceResponse)) ||
                         fromType.IsSubclassOf(typeof(Row)) ||
-                        fromType.GetCustomAttribute<ScriptIncludeAttribute>() != null)
+                        fromType.GetCustomAttribute<ScriptIncludeAttribute>() != null ||
+                        fromType.IsSubclassOf(typeof(ServiceEndpoint)) ||
+                        (fromType.IsSubclassOf(typeof(Controller)) && // backwards compability
+                         fromType.Namespace.EndsWith(".Endpoints"))) 
                     {
                         EnqueueType(fromType);
                         continue;
@@ -126,7 +143,10 @@ namespace Serenity.CodeGeneration
                     continue;
 
                 var ns = GetNamespace(type);
-                var filename = ns + "." + type.Name + ".ts";
+                bool isController = type.IsSubclassOf(typeof(Controller));
+
+                var identifier = isController ? GetControllerIdentifier(type) : type.Name;
+                var filename = ns + "." + identifier + ".ts";
 
                 foreach (var rn in RootNamespaces)
                 {
@@ -138,6 +158,7 @@ namespace Serenity.CodeGeneration
                 }
 
                 GenerateCodeFor(type);
+
                 generatedCode[filename] = sb.ToString();
                 sb.Clear();
             }
@@ -390,9 +411,9 @@ namespace Serenity.CodeGeneration
 
             cw.Indented("Serenity.Decorators.addAttribute(");
             sb.Append(enumType.Name);
-            sb.Append(", new Serenity.EnumKeyAttribute(\"");
+            sb.Append(", new Serenity.EnumKeyAttribute('");
             sb.Append(enumKey);
-            sb.AppendLine("\"));");
+            sb.AppendLine("'));");
         }
 
         private void GenerateRowMetadata(Type rowType)
@@ -424,62 +445,55 @@ namespace Serenity.CodeGeneration
 
                 if (idRow != null)
                 {
-                    cw.Indented("export const idProperty = \"");
+                    cw.Indented("export const idProperty = '");
                     var field = ((Field)idRow.IdField);
                     sb.Append(field.PropertyName ?? field.Name);
-                    sb.AppendLine("\";");
+                    sb.AppendLine("';");
                     anyMetadata = true;
                 }
 
 
                 if (isActiveRow != null)
                 {
-                    cw.Indented("export const isActiveProperty = \"");
+                    cw.Indented("export const isActiveProperty = '");
                     var field = (isActiveRow.IsActiveField);
                     sb.Append(field.PropertyName ?? field.Name);
-                    sb.AppendLine("\";");
+                    sb.AppendLine("';");
                     anyMetadata = true;
                 }
 
                 if (nameRow != null)
                 {
-                    cw.Indented("export const nameProperty = \"");
+                    cw.Indented("export const nameProperty = '");
                     var field = (nameRow.NameField);
                     sb.Append(field.PropertyName ?? field.Name);
-                    sb.AppendLine("\";");
+                    sb.AppendLine("';");
                     anyMetadata = true;
                 }
 
                 var localTextPrefix = row.GetFields().LocalTextPrefix;
                 if (!string.IsNullOrEmpty(localTextPrefix))
                 {
-                    cw.Indented("export const localTextPrefix = \"");
+                    cw.Indented("export const localTextPrefix = '");
                     sb.Append(localTextPrefix);
-                    sb.AppendLine("\";");
+                    sb.AppendLine("';");
                     anyMetadata = true;
                 }
 
                 if (lookupAttr != null)
                 {
-                    cw.Indented("export const lookupKey = \"");
+                    cw.Indented("export const lookupKey = '");
                     sb.Append(lookupAttr.Key);
-                    sb.AppendLine("\";");
+                    sb.AppendLine("';");
 
                     sb.AppendLine();
                     cw.Indented("export function lookup()");
                     cw.InBrace(delegate
                     {
-                        cw.Indented("return Q.getLookup(\"");
+                        cw.Indented("return Q.getLookup('");
                         sb.Append(lookupAttr.Key);
-                        sb.AppendLine("\");");
+                        sb.AppendLine("');");
                     });
-
-                    //sb.AppendLine();
-                    //cw.Indented("public static Lookup<");
-                    //sb.Append(MakeFriendlyName(rowType, null));
-                    //sb.Append("> Lookup { [InlineCode(\"Q.getLookup('");
-                    //sb.Append(attr.Key);
-                    //sb.AppendLine("')\")] get { return null; } }");
 
                     anyMetadata = true;
 
@@ -497,9 +511,9 @@ namespace Serenity.CodeGeneration
                     {
                         cw.Indented("export declare const ");
                         sb.Append(field.PropertyName ?? field.Name);
-                        sb.Append(": \"");
+                        sb.Append(": '");
                         sb.Append(field.PropertyName ?? field.Name);
-                        sb.AppendLine("\";");
+                        sb.AppendLine("';");
                     }
                 });
 
@@ -509,10 +523,10 @@ namespace Serenity.CodeGeneration
                 foreach (var field in row.GetFields())
                 {
                     if (i++ > 0)
-                        sb.Append(',');
-                    sb.Append('"');
+                        sb.Append(", ");
+                    sb.Append("'");
                     sb.Append(field.PropertyName ?? field.Name);
-                    sb.Append('"');
+                    sb.Append("'");
                 }
                 sb.AppendLine("].forEach(x => (<any>Fields)[x] = x);");
             });
@@ -590,6 +604,12 @@ namespace Serenity.CodeGeneration
                     return;
                 }
 
+                if (type.IsSubclassOf(typeof(Controller)))
+                {
+                    GenerateService(type);
+                    return;
+                }
+
                 cw.Indented("export interface ");
 
                 MakeFriendlyName(sb, type, codeNamespace, enqueueType: (t) => EnqueueType(t));
@@ -642,6 +662,173 @@ namespace Serenity.CodeGeneration
                 if (type.IsSubclassOf(typeof(Row)))
                     GenerateRowMetadata(type);
             });
+        }
+
+        private void GenerateService(Type type)
+        {
+            var codeNamespace = GetNamespace(type);
+
+            cw.Indented("export namespace ");
+            var identifier = GetControllerIdentifier(type);
+            sb.Append(identifier);
+            cw.InBrace(delegate
+            {
+                var serviceUrl = GetServiceUrlFromRoute(type);
+                if (serviceUrl == null)
+                    serviceUrl = GetNamespace(type).Replace(".", "/");
+
+                cw.Indented("export const baseUrl = '");
+                sb.Append(serviceUrl);
+                sb.AppendLine("';");
+                sb.AppendLine();
+
+                Type responseType;
+                Type requestType;
+                string requestParam;
+
+                var methodNames = new List<string>();
+                foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
+                {
+                    if (methodNames.Contains(method.Name))
+                        continue;
+
+                    if (!IsPublicServiceMethod(method, out requestType, out responseType, out requestParam))
+                        continue;
+
+                    methodNames.Add(method.Name);
+
+                    cw.Indented("export declare function ");
+                    sb.Append(method.Name);
+
+                    sb.Append("(request: ");
+                    MakeFriendlyReference(sb, requestType, codeNamespace, t => EnqueueType(t));
+
+                    sb.Append(", onSuccess?: (response: ");
+                    MakeFriendlyReference(sb, responseType, codeNamespace, t => EnqueueType(t));
+                    sb.AppendLine(") => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;");
+                }
+
+                sb.AppendLine();
+                cw.Indented("export namespace ");
+                sb.Append("Methods");
+                cw.InBrace(delegate
+                {
+                    foreach (var methodName in methodNames)
+                    {
+                        cw.Indented("export declare const ");
+                        sb.Append(methodName);
+                        sb.Append(": '");
+                        sb.Append(serviceUrl);
+                        sb.Append("/");
+                        sb.Append(methodName);
+                        sb.AppendLine("';");
+                    }
+                });
+
+                sb.AppendLine();
+                cw.Indented("[");
+                int i = 0;
+                foreach (var methodName in methodNames)
+                {
+                    if (i++ > 0)
+                        sb.Append(", ");
+
+                    sb.Append("'");
+                    sb.Append(methodName);
+                    sb.Append("'");
+                }
+                sb.AppendLine("].forEach(x => {");
+                cw.Block(delegate () {
+                    cw.Indented("(<any>");
+                    sb.Append(identifier);
+                    sb.AppendLine(")[x] = function (r, s, o) { return Q.serviceRequest(baseUrl + '/' + x, r, s, o); };");
+                    cw.IndentedLine("(<any>Methods)[x] = baseUrl + '/' + x;");
+                });
+                cw.IndentedLine("});");
+            });
+        }
+
+        private bool IsPublicServiceMethod(MethodInfo method, out Type requestType, out Type responseType,
+            out string requestParam)
+        {
+            responseType = null;
+            requestType = null;
+            requestParam = null;
+
+            if (method.GetCustomAttribute<NonActionAttribute>() != null)
+                return false;
+
+            if (typeof(Controller).IsSubclassOf(method.DeclaringType))
+                return false;
+
+            if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
+                return false;
+
+            var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
+            if (parameters.Length > 1)
+                return false;
+
+            if (parameters.Length == 1)
+            {
+                requestType = parameters[0].ParameterType;
+                if (requestType.IsPrimitive || !CanHandleType(requestType))
+                    return false;
+            }
+            else
+                requestType = typeof(ServiceRequest);
+
+            requestParam = parameters.Length == 0 ? "request" : parameters[0].Name;
+
+            responseType = method.ReturnType;
+            if (responseType != null &&
+                responseType.IsGenericType &&
+                responseType.GetGenericTypeDefinition() == typeof(Result<>))
+            {
+                responseType = responseType.GenericTypeArguments[0];
+            }
+            else if (typeof(ActionResult).IsAssignableFrom(responseType))
+                return false;
+            else if (responseType == typeof(void))
+                return false;
+
+            return true;
+        }
+
+        private string GetServiceUrlFromRoute(Type controller)
+        {
+            var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            string url = route.Template ?? "";
+
+            if (!url.StartsWith("~/"))
+            {
+                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
+                if (routePrefix != null)
+                    url = UriHelper.Combine(routePrefix.Prefix, url);
+            }
+
+            if (!url.StartsWith("~/") && !url.StartsWith("/"))
+                url = "~/" + url;
+
+            while (true)
+            {
+                var idx1 = url.IndexOf('{');
+                if (idx1 <= 0)
+                    break;
+
+                var idx2 = url.IndexOf("}", idx1 + 1);
+                if (idx2 <= 0)
+                    break;
+
+                url = url.Substring(0, idx1) + url.Substring(idx2 + 1);
+            }
+
+            if (url.StartsWith("~/Services/", StringComparison.OrdinalIgnoreCase))
+                url = url.Substring("~/Services/".Length);
+
+            if (url.Length > 1 && url.EndsWith("/"))
+                url = url.Substring(0, url.Length - 1);
+
+            return url;
         }
     }
 }

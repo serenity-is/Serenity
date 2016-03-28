@@ -30,7 +30,43 @@
         onNo?: () => void;
     }
 
+    interface ServiceError {
+        Code?: string;
+        Arguments?: string;
+        Message?: string;
+    }
+
+    interface ServiceResponse {
+        Error?: ServiceError;
+    }
+
     interface ServiceRequest {
+    }
+
+    interface SaveRequest<TEntity> extends ServiceRequest {
+        EntityId?: any;
+        Entity?: TEntity;
+    }
+
+    interface SaveResponse extends ServiceResponse {
+    }
+
+    interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
+        Localizations?: { [key: string]: TEntity };
+    }
+
+    interface DeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+
+    interface DeleteResponse extends ServiceResponse {
+    }
+
+    interface UndeleteRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+
+    interface UndeleteResponse extends ServiceResponse {
     }
 
     interface ListRequest extends ServiceRequest {
@@ -44,6 +80,21 @@
         TotalCount: number;
         Skip: number;
         Take: number;
+    }
+
+    interface RetrieveRequest extends ServiceRequest {
+        EntityId?: any;
+    }
+
+    interface RetrieveResponse<TEntity> extends ServiceResponse {
+        Entity: TEntity;
+    }
+
+    interface RetrieveLocalizationRequest extends RetrieveRequest {
+    }
+
+    interface RetrieveLocalizationResponse<TEntity> extends ServiceResponse {
+        Entities?: { [key: string]: TEntity };
     }
 
     class ISlickFormatter {
@@ -63,16 +114,6 @@
 
     namespace CustomValidation {
         function registerValidationMethods(): void;
-    }
-
-    interface ServiceError {
-        Code?: string;
-        Arguments?: string;
-        Message?: string;
-    }
-
-    interface ServiceResponse {
-        Error?: ServiceError;
     }
 
     interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
