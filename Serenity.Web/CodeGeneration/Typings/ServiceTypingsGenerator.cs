@@ -82,6 +82,8 @@ namespace Serenity.CodeGeneration
         {
             this.sb = new StringBuilder(4096);
             this.cw = new CodeWriter(sb, 4);
+            this.cw.BraceOnSameLine = true;
+
             this.generateQueue = new Queue<Type>();
             this.visited = new HashSet<Type>();
             this.lookupScripts = new List<Type>();
@@ -363,13 +365,9 @@ namespace Serenity.CodeGeneration
         private void GenerateEnum(Type enumType)
         {
             var enumKey = EnumMapper.GetEnumTypeKey(enumType);
-            //sb.AppendLine();
-            //cw.Indented("@D.enumKey(\"");
-            //sb.Append(enumKey);
-            //sb.AppendLine("\")");
 
             cw.Indented("export enum ");
-            sb.AppendLine(enumType.Name);
+            sb.Append(enumType.Name);
             cw.InBrace(delegate
             {
                 var names = Enum.GetNames(enumType);
@@ -418,7 +416,7 @@ namespace Serenity.CodeGeneration
 
             sb.AppendLine();
             cw.Indented("export namespace ");
-            sb.AppendLine(rowType.Name);
+            sb.Append(rowType.Name);
 
             cw.InBrace(delegate
             {
@@ -426,7 +424,7 @@ namespace Serenity.CodeGeneration
 
                 if (idRow != null)
                 {
-                    cw.Indented("export const IdProperty = \"");
+                    cw.Indented("export const idProperty = \"");
                     var field = ((Field)idRow.IdField);
                     sb.Append(field.PropertyName ?? field.Name);
                     sb.AppendLine("\";");
@@ -436,7 +434,7 @@ namespace Serenity.CodeGeneration
 
                 if (isActiveRow != null)
                 {
-                    cw.Indented("export const IsActiveProperty = \"");
+                    cw.Indented("export const isActiveProperty = \"");
                     var field = (isActiveRow.IsActiveField);
                     sb.Append(field.PropertyName ?? field.Name);
                     sb.AppendLine("\";");
@@ -445,7 +443,7 @@ namespace Serenity.CodeGeneration
 
                 if (nameRow != null)
                 {
-                    cw.Indented("export const NameProperty = \"");
+                    cw.Indented("export const nameProperty = \"");
                     var field = (nameRow.NameField);
                     sb.Append(field.PropertyName ?? field.Name);
                     sb.AppendLine("\";");
@@ -455,7 +453,7 @@ namespace Serenity.CodeGeneration
                 var localTextPrefix = row.GetFields().LocalTextPrefix;
                 if (!string.IsNullOrEmpty(localTextPrefix))
                 {
-                    cw.Indented("export const LocalTextPrefix = \"");
+                    cw.Indented("export const localTextPrefix = \"");
                     sb.Append(localTextPrefix);
                     sb.AppendLine("\";");
                     anyMetadata = true;
@@ -463,10 +461,18 @@ namespace Serenity.CodeGeneration
 
                 if (lookupAttr != null)
                 {
-                    cw.Indented("export const LookupKey = \"");
+                    cw.Indented("export const lookupKey = \"");
                     sb.Append(lookupAttr.Key);
                     sb.AppendLine("\";");
-                    anyMetadata = true;
+
+                    sb.AppendLine();
+                    cw.Indented("export function lookup()");
+                    cw.InBrace(delegate
+                    {
+                        cw.Indented("return Q.getLookup(\"");
+                        sb.Append(lookupAttr.Key);
+                        sb.AppendLine("\");");
+                    });
 
                     //sb.AppendLine();
                     //cw.Indented("public static Lookup<");
@@ -474,13 +480,16 @@ namespace Serenity.CodeGeneration
                     //sb.Append("> Lookup { [InlineCode(\"Q.getLookup('");
                     //sb.Append(attr.Key);
                     //sb.AppendLine("')\")] get { return null; } }");
+
+                    anyMetadata = true;
+
                 }
 
                 if (anyMetadata)
                     sb.AppendLine();
 
                 cw.Indented("export namespace ");
-                sb.AppendLine("Fields");
+                sb.Append("Fields");
 
                 cw.InBrace(delegate
                 {
@@ -518,7 +527,7 @@ namespace Serenity.CodeGeneration
             foreach (var field in row.GetFields())
             {
                 cw.Indented(field.PropertyName ?? field.Name);
-                sb.Append(": ");
+                sb.Append("?: ");
                 var enumField = field as IEnumTypeField;
                 if (enumField != null && enumField.EnumType != null)
                 {
@@ -571,7 +580,7 @@ namespace Serenity.CodeGeneration
             var codeNamespace = GetNamespace(type);
 
             cw.Indented("namespace ");
-            sb.AppendLine(codeNamespace);
+            sb.Append(codeNamespace);
 
             cw.InBrace(delegate
             {
@@ -591,8 +600,6 @@ namespace Serenity.CodeGeneration
                     sb.Append(" extends ");
                     MakeFriendlyReference(sb, baseClass, GetNamespace(type), t => EnqueueType(t));
                 }
-
-                sb.AppendLine();
 
                 cw.InBrace(delegate
                 {
