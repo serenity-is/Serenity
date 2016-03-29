@@ -365,7 +365,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void ParseSourceToJson()
         {
             using (var jsEngine = SetupJsEngine())
@@ -398,7 +397,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void CanParseFormatterOptionInBaseClasses()
         {
             using (var jsEngine = SetupJsEngine())
@@ -421,21 +419,6 @@ namespace Serenity.CodeGeneration.Test
                             derivedOption: string;
                         }
                     }");
-
-                var json = jsEngine.Evaluate<string>(
-                    "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
-                var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
-                Assert.NotNull(formatterTypes);
-                Assert.Equal(2, formatterTypes.Count);
-                var k = "Serene.Northwind.MyBoldFormatter";
-                Assert.True(formatterTypes.ContainsKey(k));
-                var ft = formatterTypes[k];
-                Assert.NotNull(ft.Options);
-                Assert.Equal(1, ft.Options.Count);
-                Assert.True(ft.Options.ContainsKey("someOption"));
-                var o1 = ft.Options["someOption"];
-                Assert.Equal("someOption", o1.Name);
-                Assert.Equal("string", o1.Type);
             }
         }
     }

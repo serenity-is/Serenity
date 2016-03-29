@@ -99,6 +99,7 @@
     <Compile Include="CodeGeneration\ScriptDtoGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptEndpointGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
+    <Compile Include="CodeGeneration\Typings\ScriptTypeInfo.cs" />
     <Compile Include="CodeGeneration\Typings\ServerTypingsGenerator.cs" />
     <Compile Include="CodeGeneration\Typings\FormTypingsGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />
@@ -736,7 +737,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="CompileSiteLess" AfterTargets="AfterBuild">
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>-->
+  <Target Name="AfterBuild">
     <Exec Command="$(ProjectDir)..\tools\node\lessc.cmd $(ProjectDir)style\serenity.less &gt; $(OutDir)serenity.css">
     </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\Saltarelle\mscorlib.js -o $(ProjectDir)Includes\Scripts\Saltarelle\mscorlib.min.js --comments --mangle">
@@ -749,16 +754,11 @@
     </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.js -o $(ProjectDir)Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js --comments --mangle">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.Externals.js -o $(ProjectDir)Serenity.Externals.min.js --comments --mangle">
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.Externals.js -o $(ProjectDir)Scripts\Serenity\Serenity.Externals.min.js --comments --mangle">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.js -o $(ProjectDir)Serenity.Externals.Slick.min.js --comments --mangle">
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.CoreLib.js -o $(ProjectDir)Scripts\Serenity\Serenity.CoreLib.min.js --comments --mangle">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.js -o $(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.min.js --comments --mangle">
     </Exec>
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

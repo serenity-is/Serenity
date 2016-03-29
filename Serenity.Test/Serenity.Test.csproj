@@ -536,9 +536,6 @@
     <Content Include="Scripts\select2.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\serenity\Serenity.Script.Core.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Scripts\serenity\Serenity.Script.Test.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
