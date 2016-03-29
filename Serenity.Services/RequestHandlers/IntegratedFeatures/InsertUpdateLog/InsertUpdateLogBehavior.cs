@@ -23,14 +23,18 @@ namespace Serenity.Services
             var updateLogRow = row as IUpdateLogRow;
             var insertLogRow = row as IInsertLogRow;
 
+            Field field;
+
             if (updateLogRow != null && (handler.IsUpdate || insertLogRow == null))
             {
                 updateLogRow.UpdateDateField[row] = DateTimeField.ToDateTimeKind(DateTime.Now, updateLogRow.UpdateDateField.DateTimeKind);
                 if (updateLogRow.UpdateUserIdField.IsIntegerType)
                     updateLogRow.UpdateUserIdField[row] = Authorization.UserId.TryParseID();
                 else
-                    ((Field)updateLogRow.UpdateUserIdField).AsObject(row,
-                        ((Field)updateLogRow).ConvertValue(Authorization.UserId, CultureInfo.InvariantCulture));
+                {
+                    field = (Field)updateLogRow.UpdateUserIdField;
+                    field.AsObject(row, field.ConvertValue(Authorization.UserId, CultureInfo.InvariantCulture));
+                }
             }
             else if (insertLogRow != null && handler.IsCreate)
             {
@@ -38,8 +42,10 @@ namespace Serenity.Services
                 if (insertLogRow.InsertUserIdField.IsIntegerType)
                     insertLogRow.InsertUserIdField[row] = Authorization.UserId.TryParseID();
                 else
-                    ((Field)insertLogRow.InsertUserIdField).AsObject(row,
-                        ((Field)insertLogRow).ConvertValue(Authorization.UserId, CultureInfo.InvariantCulture));
+                {
+                    field = (Field)insertLogRow.InsertUserIdField;
+                    field.AsObject(row, field.ConvertValue(Authorization.UserId, CultureInfo.InvariantCulture));
+                }
                 insertLogRow.InsertUserIdField[row] = Authorization.UserId.TryParseID();
             }
         }

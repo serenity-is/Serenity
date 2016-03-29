@@ -1,3 +1,11 @@
+## 1.9.26 (2016-03-29)
+
+Features:
+  - added DisplayProperty and UrlProperty attributes to UrlFormatter (thanks @wldkrd1)
+
+Bugfixes:
+  - error in InsertUpdateLogBehavior when ID fields are not of integer type
+  
 ## 1.9.25 (2016-03-19)
 
 Features:

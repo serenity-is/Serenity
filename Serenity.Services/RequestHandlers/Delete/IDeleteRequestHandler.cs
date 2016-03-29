@@ -5,7 +5,7 @@ using System.Data;
 namespace Serenity.Services
 {
     /// <summary>
-    /// Represents a SaveRequestHandler. Is used with SaveBehavior objects.
+    /// Represents a DeleteRequestHandler. Is used with DeleteBehavior objects.
     /// </summary>
     public interface IDeleteRequestHandler
     {
@@ -15,12 +15,12 @@ namespace Serenity.Services
         Row Row { get; }
 
         /// <summary>
-        /// Save request
+        /// Delete request
         /// </summary>
         DeleteRequest Request { get; }
 
         /// <summary>
-        /// Save response
+        /// Delete response
         /// </summary>
         DeleteResponse Response { get; }
 
