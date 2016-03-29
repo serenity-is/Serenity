@@ -133,8 +133,8 @@ namespace Serenity.ComponentModel
         
         public String DisplayProperty
         {
-            get { return GetOption<String>("displayColumn"); }
-            set { SetOption("displayColumn", value); }
+            get { return GetOption<String>("displayProperty"); }
+            set { SetOption("displayProperty", value); }
         }
 
         public String UrlProperty
