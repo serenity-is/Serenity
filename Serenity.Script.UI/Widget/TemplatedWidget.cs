@@ -56,15 +56,22 @@ namespace Serenity
 
             while (type != null && type != typeof(Widget))
             {
-                var name = noGeneric(type.FullName.Replace(".", "_"));
+                var name = noGeneric(type.FullName);
 
                 foreach (var k in Q.Config.RootNamespaces)
-                    if (name.StartsWith(k + "_"))
+                    if (name.StartsWith(k + "."))
                     {
                         name = name.Substr(k.Length + 1);
                         break;
                     }
 
+                if (Q.CanLoadScriptData("Template." + name))
+                {
+                    templateNames[name] = name;
+                    return name;
+                }
+
+                name = name.Replace(".", "_");
                 if (Q.CanLoadScriptData("Template." + name) ||
                     J("script#Template_" + name).Length > 0)
                 {

@@ -21,12 +21,20 @@ namespace Serenity.CodeGeneration
         private HashSet<Type> visited;
         private Queue<Type> generateQueue;
         private List<Type> lookupScripts;
+        private Dictionary<string, ExternalType> ssTypes;
+        private HashSet<ExternalType> tsToSSRef;
+        private Dictionary<string, ExternalType> tsTypes;
 
         public ServerTypingsGenerator(params Assembly[] assemblies)
         {
             RootNamespaces = new HashSet<string>
             {
+                "Serenity"
             };
+
+            ssTypes = new Dictionary<string, ExternalType>();
+            tsToSSRef = new HashSet<ExternalType>();
+            tsTypes = new Dictionary<string, ExternalType>();
 
             if (assemblies == null || assemblies.Length == 0)
                 throw new ArgumentNullException("assembly");
@@ -45,6 +53,18 @@ namespace Serenity.CodeGeneration
             visited.Add(type);
             generateQueue.Enqueue(type);
             return true;
+        }
+
+        public void AddSSType(ExternalType type)
+        {
+            type.Origin = ExternalTypeOrigin.SS;
+            ssTypes[type.FullName] = type;
+        }
+
+        public void AddTSType(ExternalType type)
+        {
+            type.Origin = ExternalTypeOrigin.TS;
+            tsTypes[type.FullName] = type;
         }
 
         private void EnqueueTypeMembers(Type type)
@@ -75,9 +95,15 @@ namespace Serenity.CodeGeneration
             var ns = type.Namespace;
             if (ns.EndsWith(".Entities"))
                 return ns.Substring(0, ns.Length - ".Entities".Length);
-
+            
             if (ns.EndsWith(".Endpoints"))
                 return ns.Substring(0, ns.Length - ".Endpoints".Length);
+
+            if (ns.EndsWith(".Forms"))
+                return ns.Substring(0, ns.Length - ".Forms".Length);
+
+            if (ns.EndsWith(".Columns"))
+                return ns.Substring(0, ns.Length - ".Columns".Length);
 
             return ns;
         }
@@ -112,18 +138,13 @@ namespace Serenity.CodeGeneration
                         fromType.IsSubclassOf(typeof(ServiceResponse)) ||
                         fromType.IsSubclassOf(typeof(Row)) ||
                         fromType.GetCustomAttribute<ScriptIncludeAttribute>() != null ||
+                        fromType.GetCustomAttribute<FormScriptAttribute>() != null ||
+                        fromType.GetCustomAttribute<ColumnsScriptAttribute>() != null ||
                         fromType.IsSubclassOf(typeof(ServiceEndpoint)) ||
                         (fromType.IsSubclassOf(typeof(Controller)) && // backwards compability
                          fromType.Namespace.EndsWith(".Endpoints"))) 
                     {
                         EnqueueType(fromType);
-                        continue;
-                    }
-
-                    if (fromType.GetCustomAttribute<FormScriptAttribute>() != null ||
-                        fromType.GetCustomAttribute<ColumnsScriptAttribute>() != null)
-                    {
-                        EnqueueTypeMembers(fromType);
                         continue;
                     }
 
@@ -162,6 +183,9 @@ namespace Serenity.CodeGeneration
                 generatedCode[filename] = sb.ToString();
                 sb.Clear();
             }
+
+            GenerateSSDeclarations();
+            generatedCode["SSDeclarations.ts"] = sb.ToString();
 
             return generatedCode;
         }
@@ -305,6 +329,35 @@ namespace Serenity.CodeGeneration
             return ns;
         }
 
+        public static string ShortenFullName(ExternalType type, string codeNamespace)
+        {
+            var ns = ShortenNamespace(type, codeNamespace);
+            if (!string.IsNullOrEmpty(ns))
+                return ns + "." + type.Name;
+            else
+                return type.Name;
+        }
+
+        public static string ShortenNamespace(ExternalType type, string codeNamespace)
+        {
+            string ns = type.Namespace ?? "";
+
+            if ((codeNamespace != null && (ns == codeNamespace)) ||
+                (codeNamespace != null && codeNamespace.StartsWith((ns + "."))))
+            {
+                return "";
+            }
+
+            if (codeNamespace != null)
+            {
+                var idx = codeNamespace.IndexOf('.');
+                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1)))
+                    return ns.Substring(idx + 1);
+            }
+
+            return ns;
+        }
+
         public static void MakeFriendlyName(StringBuilder sb, Type type, string codeNamespace,
             Action<Type> enqueueType)
         {
@@ -382,6 +435,7 @@ namespace Serenity.CodeGeneration
             else
                 sb.Append(type.Name);
         }
+
 
         private void GenerateEnum(Type enumType)
         {
@@ -610,6 +664,19 @@ namespace Serenity.CodeGeneration
                     return;
                 }
 
+                var formScriptAttr = type.GetCustomAttribute<FormScriptAttribute>();
+                if (formScriptAttr != null)
+                {
+                    GenerateForm(type, formScriptAttr);
+                    return;
+                }
+
+                if (type.GetCustomAttribute<ColumnsScriptAttribute>() != null)
+                {
+                    //GenerateColumns(type);
+                    return;
+                }
+
                 cw.Indented("export interface ");
 
                 MakeFriendlyName(sb, type, codeNamespace, enqueueType: (t) => EnqueueType(t));
@@ -829,6 +896,123 @@ namespace Serenity.CodeGeneration
                 url = url.Substring(0, url.Length - 1);
 
             return url;
+        }
+
+        private ExternalType GetScriptType(string fullName)
+        {
+            ExternalType type;
+            if (tsTypes.TryGetValue(fullName, out type))
+                return type;
+
+            if (ssTypes.TryGetValue(fullName, out type))
+                return type;
+
+            return null;
+        }
+
+        private void GenerateForm(Type type, FormScriptAttribute formScriptAttribute)
+        {
+            var codeNamespace = GetNamespace(type);
+
+            cw.Indented("export class ");
+            MakeFriendlyName(sb, type, codeNamespace, (t) => EnqueueType(t));
+            sb.Append(" extends Serenity.PrefixedContext");
+            cw.InBrace(delegate
+            {
+                cw.Indented("static formKey = '");
+                sb.Append(formScriptAttribute.Key);
+                sb.AppendLine("';");
+                sb.AppendLine();
+            });
+
+            sb.AppendLine();
+
+            cw.Indented("export interface ");
+            MakeFriendlyName(sb, type, codeNamespace, (t) => EnqueueType(t));
+            sb.Append(" extends Serenity.PrefixedContext");
+
+            StringBuilder initializer = new StringBuilder("[");
+
+            cw.InBrace(delegate
+            {
+                int j = 0;
+                foreach (var item in Serenity.PropertyGrid.PropertyItemHelper.GetPropertyItemsFor(type))
+                {
+                    var editorType = item.EditorType ?? "String";
+
+                    ExternalType scriptType = null;
+
+                    foreach (var rootNamespace in RootNamespaces)
+                    {
+                        string wn = rootNamespace + "." + editorType;
+                        if ((scriptType = (GetScriptType(wn) ?? GetScriptType(wn + "Editor"))) != null)
+                            break;
+                    }
+
+                    if (scriptType == null &&
+                        (scriptType = (GetScriptType(editorType) ?? GetScriptType(editorType + "Editor"))) == null)
+                        continue;
+
+                    if (scriptType.Origin == ExternalTypeOrigin.SS)
+                        tsToSSRef.Add(scriptType);
+
+                    var fullName = ShortenFullName(scriptType, codeNamespace);
+
+                    if (j++ > 0)
+                        initializer.Append(", ");
+
+                    initializer.Append("['");
+                    initializer.Append(item.Name);
+                    initializer.Append("', ");
+                    initializer.Append(fullName);
+                    initializer.Append("]");
+
+                    cw.Indented(item.Name);
+                    sb.AppendLine("();");
+                }
+            });
+
+            initializer.Append("].forEach(x => ");
+            MakeFriendlyName(initializer, type, codeNamespace, (t) => EnqueueType(t));
+            initializer.Append(".prototype[<string>x[0]] = function() { return this.w(x[0], x[1]); });");
+
+            sb.AppendLine();
+            cw.IndentedLine(initializer.ToString());
+        }
+
+        private void GenerateSSDeclarations()
+        {
+            var byNamespace = tsToSSRef
+                .Where(x => !x.AssemblyName.StartsWith("Serenity.Script"))
+                .OrderBy(x => x.Namespace)
+                .ThenBy(x => x.Name)
+                .ToLookup(x => x.Namespace);
+
+            int i = 0;
+            foreach (var item in byNamespace)
+            {
+                if (i++ > 0)
+                    sb.AppendLine();
+
+                cw.Indented("declare namespace ");
+                sb.Append(item.Key);
+
+                cw.InBrace(delegate
+                {
+                    int j = 0;
+                    foreach (var type in item)
+                    {
+                        if (j++ > 0)
+                            sb.AppendLine();
+
+                        cw.Indented("class ");
+                        sb.Append(type.Name);
+                        cw.InBrace(delegate
+                        {
+                        });
+                    }
+                });
+            }
         }
     }
 }

@@ -99,7 +99,7 @@
     <Compile Include="CodeGeneration\ScriptDtoGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptEndpointGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
-    <Compile Include="CodeGeneration\Typings\ScriptTypeInfo.cs" />
+    <Compile Include="CodeGeneration\Typings\ExternalType.cs" />
     <Compile Include="CodeGeneration\Typings\ServerTypingsGenerator.cs" />
     <Compile Include="CodeGeneration\Typings\FormTypingsGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />

@@ -24,9 +24,6 @@ namespace Serenity.CodeGeneration
                 "Serenity",
                 "Serenity.ComponentModel",
                 "System",
-                "System.Collections",
-                "System.Collections.Generic",
-                "System.ComponentModel",
                 "System.Runtime.CompilerServices"
             };
 
@@ -124,6 +121,8 @@ namespace Serenity.CodeGeneration
                         if (widgetTypeName == null)
                             continue;
 
+                        var fullName = widgetTypeName;
+
                         if (widgetTypeName.StartsWith(ns + "."))
                             widgetTypeName = widgetTypeName.Substring(ns.Length + 1);
                         else
@@ -139,11 +138,12 @@ namespace Serenity.CodeGeneration
                         sb.Append(widgetTypeName);
                         sb.Append(" ");
                         sb.Append(item.Name);
-                        sb.Append(" { get { return ById<");
-                        sb.Append(widgetTypeName);
-                        sb.Append(">(\"");
+                        sb.Append(" { ");
+                        sb.Append("[InlineCode(\"{this}.w('");
                         sb.Append(item.Name);
-                        sb.AppendLine("\"); } }");
+                        sb.Append("', ");
+                        sb.Append(fullName);
+                        sb.AppendLine(")\")] get; private set; }");
                     }
                 });
 

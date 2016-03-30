@@ -79,10 +79,20 @@ WriteLiteral(" ");
 
                   Write(x.Ident);
 
-WriteLiteral(" { get; set; }");
+WriteLiteral(" { [InlineCode(\"{this}.m(\'");
 
 
-                                                    }
+                                                     Write(x.Ident);
+
+WriteLiteral("\', Serenity.");
+
+
+                                                                           Write(x.Type);
+
+WriteLiteral(")\")] get; private set; }");
+
+
+                                                                                                                       }
     }
 
 WriteLiteral("\r\n    }\r\n}");

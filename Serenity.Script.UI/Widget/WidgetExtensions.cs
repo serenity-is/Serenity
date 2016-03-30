@@ -23,7 +23,7 @@ namespace Serenity
             return widget;
         }
 
-        [InlineCode("Serenity.WX.getWidget({widgetType})(element)")]
+        [InlineCode("Serenity.WX.getWidget({widgetType})({element})")]
         public static object GetWidget(this jQueryObject element, Type widgetType)
         {
             return null;

@@ -82,6 +82,41 @@
     }
     class ISlickFormatter {
     }
+    class ScriptContext {
+    }
+    class PrefixedContext extends ScriptContext {
+        constructor(prefix: string);
+        w(id: string, type: Function): any;
+    }
+    class Widget<TOptions> {
+        constructor(element: JQuery, options?: TOptions);
+    }
+    class StringEditor extends Widget<any> {
+    }
+    interface EmailEditorOptions {
+        domain?: string;
+        readOnlyDomain: boolean;
+    }
+    class EmailEditor extends Widget<EmailEditorOptions> {
+    }
+    class PasswordEditor extends StringEditor {
+    }
+    class DateEditor extends Widget<any> {
+    }
+    class DateTimeEditor extends Widget<any> {
+    }
+    interface LookupEditorOptions {
+    }
+    class LookupEditor extends Widget<LookupEditorOptions> {
+    }
+    class ImageUploadEditor extends Widget<any> {
+    }
+    class BooleanEditor extends Widget<any> {
+    }
+    class IntegerEditor extends Widget<any> {
+    }
+    class DecimalEditor extends Widget<any> {
+    }
     class EntityDialog<TEntity> {
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
