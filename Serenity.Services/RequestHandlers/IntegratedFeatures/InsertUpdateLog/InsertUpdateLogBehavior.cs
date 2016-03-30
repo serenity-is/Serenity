@@ -46,7 +46,6 @@ namespace Serenity.Services
                     field = (Field)insertLogRow.InsertUserIdField;
                     field.AsObject(row, field.ConvertValue(Authorization.UserId, CultureInfo.InvariantCulture));
                 }
-                insertLogRow.InsertUserIdField[row] = Authorization.UserId.TryParseID();
             }
         }
     }
