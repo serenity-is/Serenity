@@ -26,14 +26,5 @@
     <file src="Serenity.Data.Entity.dll" target="tools" />
     <file src="..\..\Includes\tools\**\*" target="content\tools" />
     <file src="..\..\..\Serenity.Web\Scripts\tsservices\typescriptServices.js" target="content\tools\JsEngine" />
-	<file src="..\..\..\Serenity.Web\bin\${configuration}\Newtonsoft.Json.dll" target="content\tools\Serenity" />
-	<file src="..\..\..\Serenity.Web\bin\${configuration}\Serenity.Core.dll" target="content\tools\Serenity" />
-	<file src="..\..\..\Serenity.Web\bin\${configuration}\Serenity.Data.dll" target="content\tools\Serenity" />
-	<file src="..\..\..\Serenity.Web\bin\${configuration}\Serenity.Data.Entity.dll" target="content\tools\Serenity" />
-	<file src="..\..\..\Serenity.Web\bin\${configuration}\Serenity.Services.dll" target="content\tools\Serenity" />
-	<file src="..\..\..\Serenity.Web\bin\${configuration}\Serenity.Web.dll" target="content\tools\Serenity" />	
-	<file src="..\..\..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.Imports.dll" target="content\tools\Serenity" />
-	<file src="..\..\..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.Core.dll" target="content\tools\Serenity" />
-	<file src="..\..\..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.dll" target="content\tools\Serenity" />
   </files>
 </package>
