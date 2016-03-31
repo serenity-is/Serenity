@@ -97,6 +97,9 @@
         Entities?: { [key: string]: TEntity };
     }
 
+    interface CheckTreeItem {
+    }
+
     class ISlickFormatter {
     }
 
@@ -109,7 +112,7 @@
     }
 
     class Widget<TOptions> {
-        constructor(element: JQuery, options?: TOptions); 
+        constructor(element: JQuery, options?: TOptions);
     }
 
     class StringEditor extends Widget<any> {
@@ -159,6 +162,19 @@
     class EntityDialog<TEntity> {
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
+    }
+
+    class FilterStore {
+    }
+
+    interface IDataGrid {
+        getElement(): JQuery;
+        getGrid(): Slick.Grid;
+        getView(): Slick.Data.RemoteView;
+        getFilterStore(): Serenity.FilterStore;
+    }
+
+    interface ToolButton {
     }
 
     enum CaptureOperationType {
@@ -211,6 +227,9 @@ declare namespace Slick {
 
     interface Formatter {
         format(ctx: FormatterContext): string;
+    }
+
+    class Grid {
     }
 }
 

@@ -80,6 +80,8 @@
             [key: string]: TEntity;
         };
     }
+    interface CheckTreeItem {
+    }
     class ISlickFormatter {
     }
     class ScriptContext {
@@ -125,6 +127,16 @@
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
     }
+    class FilterStore {
+    }
+    interface IDataGrid {
+        getElement(): JQuery;
+        getGrid(): Slick.Grid;
+        getView(): Slick.Data.RemoteView;
+        getFilterStore(): Serenity.FilterStore;
+    }
+    interface ToolButton {
+    }
     enum CaptureOperationType {
         Before = 0,
         Delete = 1,
@@ -166,6 +178,8 @@ declare namespace Slick {
     }
     interface Formatter {
         format(ctx: FormatterContext): string;
+    }
+    class Grid {
     }
 }
 interface Toastr {

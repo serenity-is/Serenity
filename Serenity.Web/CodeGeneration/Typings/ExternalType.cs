@@ -19,6 +19,7 @@ namespace Serenity.CodeGeneration
         public bool IsAbstract { get; set; }
         public bool IsDeclaration { get; set; }
         public bool IsInterface { get; set; }
+        public bool IsSealed { get; set; }
 
         public ExternalType()
         {

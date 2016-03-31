@@ -331,6 +331,9 @@ namespace Serenity.CodeGeneration
 
         public static string ShortenFullName(ExternalType type, string codeNamespace)
         {
+            if (type.FullName == "Serenity.Widget")
+                return "Serenity.Widget<any>";
+
             var ns = ShortenNamespace(type, codeNamespace);
             if (!string.IsNullOrEmpty(ns))
                 return ns + "." + type.Name;
@@ -747,6 +750,8 @@ namespace Serenity.CodeGeneration
             cw.Indented("export namespace ");
             var identifier = GetControllerIdentifier(type);
             sb.Append(identifier);
+            tsGenerated.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
+
             cw.InBrace(delegate
             {
                 var serviceUrl = GetServiceUrlFromRoute(type);
@@ -1031,6 +1036,98 @@ namespace Serenity.CodeGeneration
             }
         }
 
+        private void SSMethodArguments(IEnumerable<ExternalArgument> arguments, string codeNamespace)
+        {
+            int k = 0;
+            foreach (var arg in arguments)
+            {
+                if (k++ > 0)
+                    sb.Append(", ");
+
+                sb.Append(arg.Name);
+                if (arg.IsOptional || arg.HasDefault)
+                    sb.Append("?");
+
+                sb.Append(": ");
+
+                var argType = GetScriptType(arg.Type);
+                if (argType == null)
+                {
+                    sb.Append(SSTypeNameToTS(arg.Type));
+                }
+                else
+                    sb.Append(ShortenFullName(argType, codeNamespace));
+            }
+        }
+
+        private void SSDeclarationConstructor(ExternalMethod ctor, string codeNamespace)
+        {
+            cw.Indented("constructor(");
+            SSMethodArguments(ctor.Arguments, codeNamespace);
+            sb.AppendLine(");");
+        }
+
+        private void SSDeclarationMethod(ExternalMethod method, string codeNamespace,
+            bool isStaticClass, bool preserveMemberCase)
+        {
+            if (method.IsConstructor)
+                return;
+
+            if (method.Attributes.Any(x =>
+                x.Type == "System.Runtime.CompilerServices.InlineCodeAttribute"))
+                return;
+
+            string methodName = method.Name;
+
+            var scriptNameAttr = method.Attributes.FirstOrDefault(x =>
+                x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
+
+            if (scriptNameAttr != null)
+                methodName = scriptNameAttr.Arguments[0].Value as string;
+            else if (!preserveMemberCase && !method.Attributes.Any(x =>
+                    x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute"))
+            {
+                methodName = methodName.Substring(0, 1).ToLowerInvariant()
+                    + methodName.Substring(1);
+            }
+
+            if (isStaticClass && method.IsStatic)
+            {
+                cw.Indented("function ");
+                sb.Append(methodName);
+            }
+            else if (method.IsStatic)
+            {
+                cw.Indented("static ");
+                sb.Append(methodName);
+            }
+            else
+            {
+                cw.Indented(methodName);
+            }
+
+            sb.Append("(");
+            SSMethodArguments(method.Arguments, codeNamespace);
+            sb.Append("): ");
+
+            if (method.Type == null ||
+                method.Type == "System.Void")
+            {
+                sb.Append("void");
+            }
+            else
+            {
+                var resultType = GetScriptType(method.Type);
+                if (resultType == null)
+                {
+                    sb.Append(SSTypeNameToTS(method.Type));
+                }
+                else
+                    sb.Append(ShortenFullName(resultType, codeNamespace));
+            }
+            sb.AppendLine(";");
+        }
+
         private void GenerateSSDeclarations()
         {
             var byNamespace = 
@@ -1049,7 +1146,8 @@ namespace Serenity.CodeGeneration
                     sb.AppendLine();
 
                 cw.Indented("declare namespace ");
-                sb.Append(item.Key);
+                var codeNamespace = item.Key;
+                sb.Append(codeNamespace);
 
                 cw.InBrace(delegate
                 {
@@ -1062,44 +1160,35 @@ namespace Serenity.CodeGeneration
                         if (j++ > 0)
                             sb.AppendLine();
 
-                        cw.Indented(type.IsInterface ? "interface " : "class ");
+                        bool isStatic = type.IsAbstract && type.IsSealed;
+
+                        if (type.IsInterface)
+                            cw.Indented("interface ");
+                        else if (isStatic)
+                            cw.Indented("namespace ");
+                        else
+                            cw.Indented("class ");
+
                         sb.Append(type.Name);
                         cw.InBrace(delegate
                         {
-                            if (!type.IsInterface)
+                            if (!type.IsInterface && !isStatic)
                             {
                                 var ctors = type.Methods.Where(x => x.IsConstructor)
                                     .OrderByDescending(x => x.Arguments.Count);
 
                                 var ctor = ctors.FirstOrDefault();
 
-                                if (ctor != null)
-                                {
-                                    cw.Indented("constructor(");
+                                if (ctor != null && ctor.Arguments.Count > 0)
+                                    SSDeclarationConstructor(ctor, codeNamespace);
+                            }
 
-                                    int k = 0;
-                                    foreach (var arg in ctor.Arguments)
-                                    {
-                                        if (k++ > 0)
-                                            sb.Append(", ");
+                            bool preserveMemberCase = type.Attributes.Any(x =>
+                                x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
 
-                                        sb.Append(arg.Name);
-                                        if (arg.IsOptional || arg.HasDefault)
-                                            sb.Append("?");
-
-                                        sb.Append(": ");
-
-                                        var argType = GetScriptType(arg.Type);
-                                        if (argType == null)
-                                        {
-                                            sb.Append(SSTypeNameToTS(arg.Type));
-                                        }
-                                        else
-                                            sb.Append(ShortenFullName(argType, item.Key));
-                                    }
-
-                                    sb.AppendLine(");");
-                                }
+                            foreach (var method in type.Methods)
+                            {
+                                SSDeclarationMethod(method, codeNamespace, isStatic, preserveMemberCase);
                             }
                         });
                     }
