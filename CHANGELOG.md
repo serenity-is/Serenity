@@ -1,3 +1,8 @@
+## 1.9.27 (2016-03-31)
+
+Bugfixes:
+  - error in InsertUpdateLogBehavior was still intact
+
 ## 1.9.26 (2016-03-29)
 
 Features:
