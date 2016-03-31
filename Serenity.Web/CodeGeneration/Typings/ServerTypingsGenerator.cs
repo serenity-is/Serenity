@@ -22,7 +22,7 @@ namespace Serenity.CodeGeneration
         private Queue<Type> generateQueue;
         private List<Type> lookupScripts;
         private Dictionary<string, ExternalType> ssTypes;
-        private HashSet<ExternalType> tsToSSRef;
+        private HashSet<string> tsGenerated;
         private Dictionary<string, ExternalType> tsTypes;
 
         public ServerTypingsGenerator(params Assembly[] assemblies)
@@ -33,7 +33,7 @@ namespace Serenity.CodeGeneration
             };
 
             ssTypes = new Dictionary<string, ExternalType>();
-            tsToSSRef = new HashSet<ExternalType>();
+            tsGenerated = new HashSet<string>();
             tsTypes = new Dictionary<string, ExternalType>();
 
             if (assemblies == null || assemblies.Length == 0)
@@ -358,7 +358,7 @@ namespace Serenity.CodeGeneration
             return ns;
         }
 
-        public static void MakeFriendlyName(StringBuilder sb, Type type, string codeNamespace,
+        public static string MakeFriendlyName(StringBuilder sb, Type type, string codeNamespace,
             Action<Type> enqueueType)
         {
             if (type.IsGenericType)
@@ -382,9 +382,14 @@ namespace Serenity.CodeGeneration
                 }
 
                 sb.Append(">");
+
+                return name + "`" + type.GetGenericArguments().Length;
             }
             else
+            {
                 sb.Append(type.Name);
+                return type.Name;
+            }
         }
 
         public static void MakeFriendlyReference(StringBuilder sb, Type type, string codeNamespace,
@@ -439,10 +444,13 @@ namespace Serenity.CodeGeneration
 
         private void GenerateEnum(Type enumType)
         {
+            var codeNamespace = GetNamespace(enumType);
             var enumKey = EnumMapper.GetEnumTypeKey(enumType);
 
             cw.Indented("export enum ");
-            sb.Append(enumType.Name);
+            var generatedName = MakeFriendlyName(sb, enumType, codeNamespace, enqueueType: (t) => EnqueueType(t));
+            tsGenerated.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+
             cw.InBrace(delegate
             {
                 var names = Enum.GetNames(enumType);
@@ -679,7 +687,8 @@ namespace Serenity.CodeGeneration
 
                 cw.Indented("export interface ");
 
-                MakeFriendlyName(sb, type, codeNamespace, enqueueType: (t) => EnqueueType(t));
+                var generatedName = MakeFriendlyName(sb, type, codeNamespace, enqueueType: (t) => EnqueueType(t));
+                tsGenerated.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
 
                 var baseClass = GetBaseClass(type);
                 if (baseClass != null)
@@ -915,7 +924,9 @@ namespace Serenity.CodeGeneration
             var codeNamespace = GetNamespace(type);
 
             cw.Indented("export class ");
-            MakeFriendlyName(sb, type, codeNamespace, (t) => EnqueueType(t));
+            var generatedName = MakeFriendlyName(sb, type, codeNamespace, (t) => EnqueueType(t));
+            tsGenerated.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+
             sb.Append(" extends Serenity.PrefixedContext");
             cw.InBrace(delegate
             {
@@ -953,9 +964,6 @@ namespace Serenity.CodeGeneration
                         (scriptType = (GetScriptType(editorType) ?? GetScriptType(editorType + "Editor"))) == null)
                         continue;
 
-                    if (scriptType.Origin == ExternalTypeOrigin.SS)
-                        tsToSSRef.Add(scriptType);
-
                     var fullName = ShortenFullName(scriptType, codeNamespace);
 
                     if (j++ > 0)
@@ -980,9 +988,55 @@ namespace Serenity.CodeGeneration
             cw.IndentedLine(initializer.ToString());
         }
 
+        private string SSTypeNameToTS(string typeName)
+        {
+            const string nullable = "System.Nullable<";
+
+            if (typeName.StartsWith(nullable) &&
+                typeName.EndsWith(">"))
+            {
+                typeName = typeName.Substring(nullable.Length, typeName.Length - nullable.Length - 1);
+            }
+
+            switch (typeName)
+            {
+                case "System.Type":
+                    return "Function";
+
+                case "System.String":
+                    return "string";
+
+                case "System.Int16":
+                case "System.Int32":
+                case "System.Int64":
+                case "System.UInt16":
+                case "System.UInt32":
+                case "System.UInt64":
+                case "System.Single":
+                case "System.Double":
+                case "System.Decimal":
+                    return "number";
+
+                case "System.Boolean":
+                    return "boolean";
+
+                case "System.JsDate":
+                    return "Date";
+
+                case "jQueryApi.jQueryObject":
+                    return "JQuery";
+
+                default:
+                    return "any";
+            }
+        }
+
         private void GenerateSSDeclarations()
         {
-            var byNamespace = tsToSSRef
+            var byNamespace = 
+                ssTypes.Values.Where(x => 
+                    !tsTypes.ContainsKey(x.FullName) &&
+                    !tsGenerated.Contains(x.FullName))
                 .Where(x => !x.AssemblyName.StartsWith("Serenity.Script"))
                 .OrderBy(x => x.Namespace)
                 .ThenBy(x => x.Name)
@@ -1002,13 +1056,51 @@ namespace Serenity.CodeGeneration
                     int j = 0;
                     foreach (var type in item)
                     {
+                        if (type.FullName.Contains("`")) // TODO: Generics
+                            continue;
+
                         if (j++ > 0)
                             sb.AppendLine();
 
-                        cw.Indented("class ");
+                        cw.Indented(type.IsInterface ? "interface " : "class ");
                         sb.Append(type.Name);
                         cw.InBrace(delegate
                         {
+                            if (!type.IsInterface)
+                            {
+                                var ctors = type.Methods.Where(x => x.IsConstructor)
+                                    .OrderByDescending(x => x.Arguments.Count);
+
+                                var ctor = ctors.FirstOrDefault();
+
+                                if (ctor != null)
+                                {
+                                    cw.Indented("constructor(");
+
+                                    int k = 0;
+                                    foreach (var arg in ctor.Arguments)
+                                    {
+                                        if (k++ > 0)
+                                            sb.Append(", ");
+
+                                        sb.Append(arg.Name);
+                                        if (arg.IsOptional || arg.HasDefault)
+                                            sb.Append("?");
+
+                                        sb.Append(": ");
+
+                                        var argType = GetScriptType(arg.Type);
+                                        if (argType == null)
+                                        {
+                                            sb.Append(SSTypeNameToTS(arg.Type));
+                                        }
+                                        else
+                                            sb.Append(ShortenFullName(argType, item.Key));
+                                    }
+
+                                    sb.AppendLine(");");
+                                }
+                            }
                         });
                     }
                 });

@@ -150,6 +150,12 @@
     class DecimalEditor extends Widget<any> {
     }
 
+    interface HtmlContentEditorOptions {
+    }
+
+    class HtmlContentEditor {
+    }
+
     class EntityDialog<TEntity> {
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
