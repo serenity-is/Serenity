@@ -1338,6 +1338,45 @@ namespace Serenity.CodeGeneration
             }
         }
 
+        private void SSDeclarationField(ExternalType type, ExternalMember field, string codeNamespace,
+            bool isStaticClass, bool isSerializable, bool preserveMemberCase)
+        {
+            string fieldName = field.Name;
+
+            var scriptNameAttr = field.Attributes.FirstOrDefault(x =>
+                x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
+
+            if (scriptNameAttr != null)
+                fieldName = scriptNameAttr.Arguments[0].Value as string;
+            else if (!preserveMemberCase && !field.Attributes.Any(x =>
+                    x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute"))
+            {
+                if (fieldName == "ID")
+                    fieldName = "id";
+                else fieldName = fieldName.Substring(0, 1).ToLowerInvariant()
+                    + fieldName.Substring(1);
+            }
+
+            if (isStaticClass && field.IsStatic)
+            {
+                cw.Indented("let ");
+                sb.Append(fieldName);
+            }
+            else if (field.IsStatic)
+            {
+                cw.Indented("static ");
+                sb.Append(fieldName);
+            }
+            else
+            {
+                cw.Indented(fieldName);
+            }
+
+            sb.Append(": ");
+            SSTypeNameToTS(field.Type, codeNamespace);
+            sb.AppendLine(";");
+        }
+
         private bool IsGenericTypeName(string typeName)
         {
             return typeName.IndexOf("`") >= 0;
@@ -1504,6 +1543,17 @@ namespace Serenity.CodeGeneration
 
                         cw.InBrace(delegate
                         {
+
+                            bool preserveMemberCase = type.Attributes.Any(x =>
+                                x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
+
+                            bool isSerializable = type.IsSerializable ||
+                                type.Attributes.Any(x =>
+                                    x.Type == "System.SerializableAttribute");
+
+                            foreach (var field in type.Fields)
+                                SSDeclarationField(type, field, codeNamespace, isStatic, isSerializable, preserveMemberCase);
+
                             if (isClass)
                             {
                                 var ctors = type.Methods.Where(x => x.IsConstructor)
@@ -1515,13 +1565,6 @@ namespace Serenity.CodeGeneration
                                     SSDeclarationConstructor(ctor, codeNamespace);
                             }
 
-                            bool preserveMemberCase = type.Attributes.Any(x =>
-                                x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
-
-                            bool isSerializable = type.IsSerializable ||
-                                type.Attributes.Any(x =>
-                                    x.Type == "System.SerializableAttribute");
-
                             foreach (var method in type.Methods)
                             {
                                 SSDeclarationMethod(method, codeNamespace, isStatic, preserveMemberCase);
@@ -1531,6 +1574,7 @@ namespace Serenity.CodeGeneration
                             {
                                 SSDeclarationProperty(type, prop, codeNamespace, isStatic, isSerializable, preserveMemberCase);
                             }
+
                         });
                     }
                 });
