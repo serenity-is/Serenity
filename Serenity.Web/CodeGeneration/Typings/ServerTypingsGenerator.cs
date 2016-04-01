@@ -1066,8 +1066,22 @@ namespace Serenity.CodeGeneration
                     sb.Append("JQuery");
                     return;
 
+                case "System.Action":
+                    sb.Append("() => void");
+                    return;
+
                 default:
+
                     typeName = FixupSSGenerics(typeName);
+
+                    Action<string> handlePart = part =>
+                    {
+                        if (leaveAsIs != null &&
+                            leaveAsIs.Contains(part))
+                            sb.Append(part);
+                        else
+                            SSTypeNameToTS(part, codeNamespace, "any", leaveAsIs);
+                    };
 
                     if (IsGenericTypeName(typeName))
                     {
@@ -1075,7 +1089,55 @@ namespace Serenity.CodeGeneration
 
                         var scriptType = GetScriptType(typeName);
                         if (scriptType == null)
-                            sb.Append(defaultType);
+                        {
+                            if (parts.Length == 1 &&
+                                typeName == "System.Collections.Generic.List`1" ||
+                                typeName == "System.Collections.Generic.IList`1")
+                            {
+                                handlePart(parts[0]);
+                                sb.Append("[]");
+                                return;
+                            }
+                            else if (parts.Length > 0 &&
+                                typeName.StartsWith("System.Func`"))
+                            {
+                                int k = 0;
+                                sb.Append("(");
+                                foreach (var part in parts.Take(parts.Length - 1))
+                                {
+                                    if (k++ > 0)
+                                        sb.Append(", ");
+
+                                    sb.Append("p" + k);
+                                    sb.Append(": ");
+                                    handlePart(part);
+                                }
+                                sb.Append(") => ");
+                                handlePart(parts.Last());
+                                return;
+                            }
+                            else if (typeName.StartsWith("System.Action`"))
+                            {
+                                int k = 0;
+                                sb.Append("(");
+                                foreach (var part in parts)
+                                {
+                                    if (k++ > 0)
+                                        sb.Append(", ");
+
+                                    sb.Append("p" + k);
+                                    sb.Append(": ");
+                                    handlePart(part);
+                                }
+                                sb.Append(") => void");
+                                return;
+                            }
+                            else
+                            {
+                                sb.Append(defaultType);
+                                return;
+                            }
+                        }
                         else
                         {
                             var ns = ShortenNamespace(scriptType, codeNamespace);
@@ -1086,22 +1148,23 @@ namespace Serenity.CodeGeneration
                             }
 
                             sb.Append(scriptType.Name.Split('`')[0]);
-                            sb.Append("<");
-                            int i = 0;
-                            foreach (var part in parts)
-                            {
-                                if (i++ > 0)
-                                    sb.Append(", ");
-
-                                if (leaveAsIs != null &&
-                                    leaveAsIs.Contains(part))
-                                    sb.Append(part);
-                                else
-                                    SSTypeNameToTS(part, codeNamespace, "any", leaveAsIs);
-                            }
-
-                            sb.Append(">");
                         }
+
+                        sb.Append("<");
+                        int i = 0;
+                        foreach (var part in parts)
+                        {
+                            if (i++ > 0)
+                                sb.Append(", ");
+
+                            if (leaveAsIs != null &&
+                                leaveAsIs.Contains(part))
+                                sb.Append(part);
+                            else
+                                SSTypeNameToTS(part, codeNamespace, "any", leaveAsIs);
+                        }
+
+                        sb.Append(">");
                     }
                     else
                     {
