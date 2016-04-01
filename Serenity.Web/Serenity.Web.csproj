@@ -101,7 +101,6 @@
     <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
     <Compile Include="CodeGeneration\Typings\ExternalType.cs" />
     <Compile Include="CodeGeneration\Typings\ServerTypingsGenerator.cs" />
-    <Compile Include="CodeGeneration\Typings\FormTypingsGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />
     <Compile Include="Common\ScriptCulture.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
