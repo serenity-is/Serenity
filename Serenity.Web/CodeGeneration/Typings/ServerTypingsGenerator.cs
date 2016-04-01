@@ -1203,16 +1203,8 @@ namespace Serenity.CodeGeneration
             sb.AppendLine(");");
         }
 
-        private void SSDeclarationMethod(ExternalMethod method, string codeNamespace,
-            bool isStaticClass, bool preserveMemberCase)
+        private string GetMethodName(ExternalMethod method, bool preserveMemberCase)
         {
-            if (method.IsConstructor || method.IsOverride)
-                return;
-
-            if (method.Attributes.Any(x =>
-                x.Type == "System.Runtime.CompilerServices.InlineCodeAttribute"))
-                return;
-
             string methodName = method.Name;
 
             var scriptNameAttr = method.Attributes.FirstOrDefault(x =>
@@ -1223,9 +1215,23 @@ namespace Serenity.CodeGeneration
             else if (!preserveMemberCase && !method.Attributes.Any(x =>
                     x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute"))
             {
-                methodName = methodName.Substring(0, 1).ToLowerInvariant()
+                if (methodName == "ID")
+                    methodName = "id";
+                else methodName = methodName.Substring(0, 1).ToLowerInvariant()
                     + methodName.Substring(1);
             }
+
+            return methodName;
+        }
+
+        private void SSDeclarationMethodInternal(ExternalMethod method, string codeNamespace,
+            bool isStaticClass, bool preserveMemberCase)
+        {
+            if (method.Attributes.Any(x =>
+                    x.Type == "System.Runtime.CompilerServices.InlineCodeAttribute"))
+                return;
+
+            var methodName = GetMethodName(method, preserveMemberCase);
 
             if (isStaticClass && method.IsStatic)
             {
@@ -1256,6 +1262,80 @@ namespace Serenity.CodeGeneration
                 SSTypeNameToTS(method.Type, codeNamespace);
             }
             sb.AppendLine(";");
+        }
+
+        private void SSDeclarationMethod(ExternalMethod method, string codeNamespace,
+            bool isStaticClass, bool preserveMemberCase)
+        {
+            if (method.IsConstructor || method.IsOverride || method.IsGetter || method.IsSetter)
+                return;
+
+            SSDeclarationMethodInternal(method, codeNamespace, isStaticClass, preserveMemberCase);
+        }
+
+        private void SSDeclarationProperty(ExternalType type, ExternalProperty prop, string codeNamespace,
+            bool isStaticClass, bool isSerializable, bool preserveMemberCase)
+        {
+            if (string.IsNullOrEmpty(prop.GetMethod) &&
+                string.IsNullOrEmpty(prop.SetMethod))
+                return;
+
+            string propName = prop.Name;
+
+            var scriptNameAttr = prop.Attributes.FirstOrDefault(x =>
+                x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
+
+            if (scriptNameAttr != null)
+                propName = scriptNameAttr.Arguments[0].Value as string;
+            else if (!preserveMemberCase && !prop.Attributes.Any(x =>
+                    x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute"))
+            {
+                if (propName == "ID")
+                    propName = "id";
+                else propName = propName.Substring(0, 1).ToLowerInvariant()
+                    + propName.Substring(1);
+            }
+
+            if (isSerializable ||
+                prop.Attributes.FirstOrDefault(x => 
+                    x.Type == "System.Runtime.CompilerServices.IntrinsicPropertyAttribute") != null)
+            {
+                if (isStaticClass && prop.IsStatic)
+                {
+                    cw.Indented("let ");
+                    sb.Append(propName);
+                }
+                else if (prop.IsStatic)
+                {
+                    cw.Indented("static ");
+                    sb.Append(propName);
+                }
+                else
+                {
+                    cw.Indented(propName);
+                }
+
+                sb.Append(": ");
+                SSTypeNameToTS(prop.Type, codeNamespace);
+                sb.AppendLine(";");
+            }
+            else
+            {
+                var getMethod = type.Methods.FirstOrDefault(x => x.Name == prop.GetMethod);
+
+                if (getMethod != null)
+                {
+                    getMethod.Name = "get_" + propName;
+                    SSDeclarationMethodInternal(getMethod, codeNamespace, isStaticClass, preserveMemberCase);
+                }
+
+                var setMethod = type.Methods.FirstOrDefault(x => x.Name == prop.SetMethod);
+                if (setMethod != null)
+                {
+                    setMethod.Name = "set_" + propName;
+                    SSDeclarationMethodInternal(setMethod, codeNamespace, isStaticClass, preserveMemberCase);
+                }
+            }
         }
 
         private bool IsGenericTypeName(string typeName)
@@ -1438,9 +1518,18 @@ namespace Serenity.CodeGeneration
                             bool preserveMemberCase = type.Attributes.Any(x =>
                                 x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
 
+                            bool isSerializable = type.IsSerializable ||
+                                type.Attributes.Any(x =>
+                                    x.Type == "System.SerializableAttribute");
+
                             foreach (var method in type.Methods)
                             {
                                 SSDeclarationMethod(method, codeNamespace, isStatic, preserveMemberCase);
+                            }
+
+                            foreach (var prop in type.Properties)
+                            {
+                                SSDeclarationProperty(type, prop, codeNamespace, isStatic, isSerializable, preserveMemberCase);
                             }
                         });
                     }

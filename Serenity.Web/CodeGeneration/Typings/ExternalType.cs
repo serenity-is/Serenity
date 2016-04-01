@@ -20,6 +20,7 @@ namespace Serenity.CodeGeneration
         public bool IsDeclaration { get; set; }
         public bool IsInterface { get; set; }
         public bool IsSealed { get; set; }
+        public bool IsSerializable { get; set; }
 
         public ExternalType()
         {
@@ -70,6 +71,8 @@ namespace Serenity.CodeGeneration
         public List<ExternalArgument> Arguments { get; private set; }
         public bool IsConstructor { get; set; }
         public bool IsOverride { get; set; }
+        public bool IsGetter { get; set; }
+        public bool IsSetter { get; set; }
     }
 
     public class ExternalProperty : ExternalMember
@@ -78,8 +81,8 @@ namespace Serenity.CodeGeneration
         {
         }
 
-        public bool CanGet { get; set; }
-        public bool CanSet { get; set; }
+        public string GetMethod { get; set; }
+        public string SetMethod { get; set; }
     }
 
     public class ExternalAttribute
