@@ -173,6 +173,9 @@ declare namespace Slick {
 namespace Slick.Data {
     var GroupItemMetadataProvider;
 
+    export interface RemoteViewOptions {
+    }
+
     export class RemoteView {
         constructor(options: any) {
             var self = this;

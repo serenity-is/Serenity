@@ -8,6 +8,8 @@ declare namespace Slick {
     function GroupTotals(): void;
 }
 declare namespace Slick.Data {
+    interface RemoteViewOptions {
+    }
     class RemoteView {
         constructor(options: any);
     }

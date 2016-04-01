@@ -15,7 +15,7 @@ namespace Serenity.CodeGeneration
         public List<ExternalMember> Fields { get; set; }
         public List<ExternalMethod> Methods { get; set; }
         public string OptionsType { get; set; }
-        public bool HasGenericParameters { get; set; }
+        public List<ExternalGenericParameter> GenericParameters { get; set; }
         public bool IsAbstract { get; set; }
         public bool IsDeclaration { get; set; }
         public bool IsInterface { get; set; }
@@ -30,6 +30,7 @@ namespace Serenity.CodeGeneration
             Fields = new List<ExternalMember>();
             Methods = new List<ExternalMethod>();
             Attributes = new List<ExternalAttribute>();
+            GenericParameters = new List<ExternalGenericParameter>();
         }
 
         public string FullName
@@ -68,6 +69,7 @@ namespace Serenity.CodeGeneration
 
         public List<ExternalArgument> Arguments { get; private set; }
         public bool IsConstructor { get; set; }
+        public bool IsOverride { get; set; }
     }
 
     public class ExternalProperty : ExternalMember
@@ -98,6 +100,11 @@ namespace Serenity.CodeGeneration
         public string Name { get; set; }
         public bool IsOptional { get; set; }
         public bool HasDefault { get; set; }
+    }
+
+    public class ExternalGenericParameter
+    {
+        public string Name { get; set; }
     }
 
     public enum ExternalTypeOrigin

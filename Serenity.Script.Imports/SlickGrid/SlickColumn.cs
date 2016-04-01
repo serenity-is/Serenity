@@ -7,7 +7,7 @@ namespace Serenity
     public delegate void SlickAsyncPostRender(object cellNode, int row, dynamic item, SlickColumn column);
     public delegate string SlickColumnFormatter(int row, int cell, object value, SlickColumn column, dynamic item);
 
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("FormatterContext")]
     public class SlickFormatterContext
     {
         public int Row;
@@ -22,7 +22,7 @@ namespace Serenity
     /// <summary>
     /// Options for the Slick columns
     /// </summary>
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("Column")]
     public class SlickColumn
     {
         /// <summary>

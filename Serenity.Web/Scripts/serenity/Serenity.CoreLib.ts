@@ -1,4 +1,7 @@
-﻿declare namespace Serenity {
+﻿declare interface RSVP<TResult> {
+}
+
+declare namespace Serenity {
     interface PostToServiceOptions {
         url?: string;
         service?: string;
@@ -100,6 +103,9 @@
     interface CheckTreeItem {
     }
 
+    interface PropertyItem {
+    }
+
     class ISlickFormatter {
     }
 
@@ -116,6 +122,12 @@
     }
 
     class StringEditor extends Widget<any> {
+    }
+
+    class Select2Editor<TItem, TOptions> {
+    }
+
+    class CheckTreeEditor<TItem, TOptions> {
     }
 
     interface EmailEditorOptions {
@@ -138,7 +150,10 @@
     interface LookupEditorOptions {
     }
 
-    class LookupEditor extends Widget<LookupEditorOptions> {
+    class LookupEditorBase<TOptions, TItem> extends Widget<TOptions> {
+    }
+
+    class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
     }
 
     class ImageUploadEditor extends Widget<any> {
@@ -159,12 +174,40 @@
     class HtmlContentEditor {
     }
 
-    class EntityDialog<TEntity> {
+    class TemplatedWidget<TOptions> extends Widget<TOptions> {
+    }
+
+    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+    }
+
+    class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
+    }
+
+    class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+    }
+
+    class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+    }
+
+    class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        dialogOpen(): void;
+        loadByIdAndOpenDialog(id: any): void;
+    }
+
+    class DataGrid<TItem, TOptions> {
+        dialogOpen(): void;
+        loadByIdAndOpenDialog(id: any): void;
+    }
+
+    class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
     }
 
     class FilterStore {
+    }
+
+    interface CKEditorConfig {
     }
 
     interface IDataGrid {
@@ -230,6 +273,12 @@ declare namespace Slick {
     }
 
     class Grid {
+    }
+
+    interface GridOptions {
+    }
+
+    interface Column {
     }
 }
 

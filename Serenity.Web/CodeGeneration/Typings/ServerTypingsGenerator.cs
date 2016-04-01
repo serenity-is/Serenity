@@ -22,6 +22,7 @@ namespace Serenity.CodeGeneration
         private Queue<Type> generateQueue;
         private List<Type> lookupScripts;
         private Dictionary<string, ExternalType> ssTypes;
+        private Dictionary<string, ExternalType> ssTypeMapping;
         private HashSet<string> tsGenerated;
         private Dictionary<string, ExternalType> tsTypes;
 
@@ -33,6 +34,7 @@ namespace Serenity.CodeGeneration
             };
 
             ssTypes = new Dictionary<string, ExternalType>();
+            ssTypeMapping = new Dictionary<string, ExternalType>();
             tsGenerated = new HashSet<string>();
             tsTypes = new Dictionary<string, ExternalType>();
 
@@ -58,6 +60,29 @@ namespace Serenity.CodeGeneration
         public void AddSSType(ExternalType type)
         {
             type.Origin = ExternalTypeOrigin.SS;
+
+            var oldFullName = type.FullName;
+            var ignoreNS = type.Attributes.FirstOrDefault(x => 
+                x.Type == "System.Runtime.CompilerServices.IgnoreNamespaceAttribute");
+
+            if (ignoreNS != null)
+                type.Namespace = "";
+
+            var scriptNS = type.Attributes.FirstOrDefault(x =>
+                x.Type == "System.Runtime.CompilerServices.ScriptNamespaceAttribute");
+
+            if (scriptNS != null)
+                type.Namespace = scriptNS.Arguments[0].Value as string;
+
+            var scriptName = type.Attributes.FirstOrDefault(x =>
+                x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
+
+            if (scriptName != null)
+                type.Name = scriptName.Arguments[0].Value as string;
+
+            if (oldFullName != type.FullName)
+                ssTypeMapping[oldFullName] = type;
+
             ssTypes[type.FullName] = type;
         }
 
@@ -921,6 +946,9 @@ namespace Serenity.CodeGeneration
             if (ssTypes.TryGetValue(fullName, out type))
                 return type;
 
+            if (ssTypeMapping.TryGetValue(fullName, out type))
+                return type;
+
             return null;
         }
 
@@ -993,7 +1021,8 @@ namespace Serenity.CodeGeneration
             cw.IndentedLine(initializer.ToString());
         }
 
-        private string SSTypeNameToTS(string typeName)
+        private void SSTypeNameToTS(string typeName, string codeNamespace, string defaultType = "any",
+            string[] leaveAsIs = null)
         {
             const string nullable = "System.Nullable<";
 
@@ -1006,10 +1035,12 @@ namespace Serenity.CodeGeneration
             switch (typeName)
             {
                 case "System.Type":
-                    return "Function";
+                    sb.Append("Function");
+                    return;
 
                 case "System.String":
-                    return "string";
+                    sb.Append("string");
+                    return;
 
                 case "System.Int16":
                 case "System.Int32":
@@ -1020,19 +1051,67 @@ namespace Serenity.CodeGeneration
                 case "System.Single":
                 case "System.Double":
                 case "System.Decimal":
-                    return "number";
+                    sb.Append("number");
+                    return;
 
                 case "System.Boolean":
-                    return "boolean";
+                    sb.Append("boolean");
+                    return;
 
                 case "System.JsDate":
-                    return "Date";
+                    sb.Append("Date");
+                    return;
 
                 case "jQueryApi.jQueryObject":
-                    return "JQuery";
+                    sb.Append("JQuery");
+                    return;
 
                 default:
-                    return "any";
+                    typeName = FixupSSGenerics(typeName);
+
+                    if (IsGenericTypeName(typeName))
+                    {
+                        var parts = SplitGenericArguments(ref typeName);
+
+                        var scriptType = GetScriptType(typeName);
+                        if (scriptType == null)
+                            sb.Append(defaultType);
+                        else
+                        {
+                            var ns = ShortenNamespace(scriptType, codeNamespace);
+                            if (!string.IsNullOrEmpty(ns))
+                            {
+                                sb.Append(ns);
+                                sb.Append(".");
+                            }
+
+                            sb.Append(scriptType.Name.Split('`')[0]);
+                            sb.Append("<");
+                            int i = 0;
+                            foreach (var part in parts)
+                            {
+                                if (i++ > 0)
+                                    sb.Append(", ");
+
+                                if (leaveAsIs != null &&
+                                    leaveAsIs.Contains(part))
+                                    sb.Append(part);
+                                else
+                                    SSTypeNameToTS(part, codeNamespace, "any", leaveAsIs);
+                            }
+
+                            sb.Append(">");
+                        }
+                    }
+                    else
+                    {
+                        var scriptType = GetScriptType(typeName);
+                        if (scriptType == null)
+                            sb.Append(defaultType);
+                        else
+                            sb.Append(ShortenFullName(scriptType, codeNamespace));
+                    }
+                    break;
             }
         }
 
@@ -1050,13 +1129,7 @@ namespace Serenity.CodeGeneration
 
                 sb.Append(": ");
 
-                var argType = GetScriptType(arg.Type);
-                if (argType == null)
-                {
-                    sb.Append(SSTypeNameToTS(arg.Type));
-                }
-                else
-                    sb.Append(ShortenFullName(argType, codeNamespace));
+                SSTypeNameToTS(arg.Type, codeNamespace);
             }
         }
 
@@ -1070,7 +1143,7 @@ namespace Serenity.CodeGeneration
         private void SSDeclarationMethod(ExternalMethod method, string codeNamespace,
             bool isStaticClass, bool preserveMemberCase)
         {
-            if (method.IsConstructor)
+            if (method.IsConstructor || method.IsOverride)
                 return;
 
             if (method.Attributes.Any(x =>
@@ -1117,15 +1190,114 @@ namespace Serenity.CodeGeneration
             }
             else
             {
-                var resultType = GetScriptType(method.Type);
-                if (resultType == null)
-                {
-                    sb.Append(SSTypeNameToTS(method.Type));
-                }
-                else
-                    sb.Append(ShortenFullName(resultType, codeNamespace));
+                SSTypeNameToTS(method.Type, codeNamespace);
             }
             sb.AppendLine(";");
+        }
+
+        private bool IsGenericTypeName(string typeName)
+        {
+            return typeName.IndexOf("`") >= 0;
+        }
+
+        private string[] SplitGenericArguments(ref string typeName)
+        {
+            if (!IsGenericTypeName(typeName))
+                return new string[0];
+
+            var pos = typeName.IndexOf("<");
+            var last = typeName.LastIndexOf(">");
+            if (pos >= 0 && last > pos)
+            {
+                char[] c = typeName.Substring(pos + 1, last - pos - 1).ToCharArray();
+                typeName = typeName.Substring(0, pos);
+
+                int nestingLevel = 0;
+                for (int i = 0; i < c.Length; i++)
+                {
+                    if (c[i] == '<')
+                        nestingLevel++;
+                    else if (c[i] == '>')
+                        nestingLevel--;
+                    else if ((c[i] == ',') && (nestingLevel == 0))
+                        c[i] = '€';
+                }
+
+                return new string(c).Split(new char[] { '€' });
+            }
+            else
+                return new string[0];
+        }
+
+        private string FixupSSGenerics(string typeName)
+        {
+            if (typeName == "Serenity.TemplatedDialog")
+                typeName = "Serenity.TemplatedDialog`1<System.Object>";
+            else if (typeName == "Serenity.EntityDialog")
+                typeName = "Serenity.EntityDialog`2<System.Object, System.Object>";
+            else if (typeName.StartsWith("Serenity.EntityDialog`1<"))
+            {
+                typeName = typeName.Replace("Serenity.EntityDialog`1<", "Serenity.EntityDialog`2<");
+                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+            }
+            else if (typeName == "Serenity.PropertyDialog")
+                typeName = "Serenity.PropertyDialog`2<System.Object, System.Object>";
+            else if (typeName.StartsWith("PropertyDialog`1<"))
+            {
+                typeName = typeName.Replace("Serenity.PropertyDialog`1<", "Serenity.PropertyDialog`2<");
+                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+            }
+            else if (typeName == "Serenity.EntityGrid")
+                typeName = "Serenity.EntityGrid`2<System.Object, System.Object>";
+            else if (typeName.StartsWith("Serenity.EntityGrid`1<"))
+            {
+                typeName = typeName.Replace("Serenity.EntityGrid`1<", "Serenity.EntityGrid`2<");
+                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+            }
+            else if (typeName == "Serenity.PropertyPanel")
+                typeName = "Serenity.PropertyPanel`2<System.Object, System.Object>";
+            else if (typeName.StartsWith("Serenity.PropertyPanel`1<"))
+            {
+                typeName = typeName.Replace("Serenity.PropertyPanel`1<", "Serenity.PropertyPanel`2<");
+                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+            }
+            else if (typeName == "Serenity.CheckTreeEditor")
+                typeName = "Serenity.CheckTreeEditor`2<System.Object, System.Object>";
+            else if (typeName.StartsWith("Serenity.CheckTreeEditor`1<"))
+            {
+                typeName = typeName.Replace("Serenity.CheckTreeEditor`1<", "Serenity.CheckTreeEditor`2<System.Object, ");
+            }
+            else if (typeName == "Serenity.LookupEditorBase")
+                typeName = "Serenity.LookupEditorBase`2<System.Object, System.Object>";
+            else if (typeName.StartsWith("Serenity.LookupEditorBase`1<"))
+            {
+                typeName = typeName.Replace("Serenity.LookupEditorBase`1<", "Serenity.LookupEditorBase`2<System.Object, ");
+            }
+            else if (typeName == "Serenity.TemplatedWidget")
+                typeName = "Serenity.TemplatedWidget`1<System.Object>";
+            else if (typeName == "Serenity.ServiceCallOptions")
+            {
+                typeName = "Serenity.ServiceCallOptions`1<System.Object>";
+            }
+            else if (typeName == "System.Promise")
+            {
+                typeName = "System.Promise`1<System.Object>";
+            }
+            return typeName;
+        }
+
+        private void SSDeclarationBaseTypeReference(ExternalType type, string baseType, string codeNamespace)
+        {
+            if (string.IsNullOrEmpty(baseType))
+                return;
+
+            if (baseType == "System.Object")
+                return;
+
+            sb.Append(" extends ");
+
+            SSTypeNameToTS(baseType, codeNamespace, "Object",
+                type.GenericParameters.Select(x => x.Name).ToArray());
         }
 
         private void GenerateSSDeclarations()
@@ -1154,13 +1326,11 @@ namespace Serenity.CodeGeneration
                     int j = 0;
                     foreach (var type in item)
                     {
-                        if (type.FullName.Contains("`")) // TODO: Generics
-                            continue;
-
                         if (j++ > 0)
                             sb.AppendLine();
 
                         bool isStatic = type.IsAbstract && type.IsSealed;
+                        bool isClass = !type.IsInterface && !isStatic;
 
                         if (type.IsInterface)
                             cw.Indented("interface ");
@@ -1169,10 +1339,29 @@ namespace Serenity.CodeGeneration
                         else
                             cw.Indented("class ");
 
-                        sb.Append(type.Name);
+                        sb.Append(type.Name.Split('`')[0]);
+
+                        if (isClass && type.GenericParameters.Count > 0)
+                        {
+                            sb.Append("<");
+
+                            var k = 0;
+                            foreach (var arg in type.GenericParameters)
+                            {
+                                if (k++ > 0)
+                                    sb.Append(", ");
+
+                                sb.Append(arg.Name);
+                            }
+                            sb.Append(">");
+                        }
+
+                        if (isClass)
+                            SSDeclarationBaseTypeReference(type, type.BaseType, codeNamespace);
+
                         cw.InBrace(delegate
                         {
-                            if (!type.IsInterface && !isStatic)
+                            if (isClass)
                             {
                                 var ctors = type.Methods.Where(x => x.IsConstructor)
                                     .OrderByDescending(x => x.Arguments.Count);

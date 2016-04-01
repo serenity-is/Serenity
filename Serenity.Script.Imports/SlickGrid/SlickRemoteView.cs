@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick.Data"), ScriptName("RemoteViewOptions")]
     public class SlickRemoteViewOptions
     {
         public bool AutoLoad { get; set; }
