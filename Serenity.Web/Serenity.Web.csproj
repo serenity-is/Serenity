@@ -100,6 +100,9 @@
     <Compile Include="CodeGeneration\ScriptEndpointGenerator.cs" />
     <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
     <Compile Include="CodeGeneration\Typings\ExternalType.cs" />
+    <Compile Include="CodeGeneration\Typings\ClientTypesGenerator.cs" />
+    <Compile Include="CodeGeneration\CodeGeneratorBase.cs" />
+    <Compile Include="CodeGeneration\Typings\ImportGeneratorBase.cs" />
     <Compile Include="CodeGeneration\Typings\ServerTypingsGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />
     <Compile Include="Common\ScriptCulture.cs" />

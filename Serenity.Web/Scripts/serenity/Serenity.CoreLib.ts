@@ -367,10 +367,6 @@ declare namespace Serenity {
         set_required(value: boolean): void;
     }
 
-    class HtmlBasicContentEditor extends HtmlContentEditor {
-        constructor(textArea: JQuery, opt: HtmlContentEditorOptions);
-    }
-
     class HtmlContentEditor extends Widget<HtmlContentEditorOptions> {
         constructor(textArea: JQuery, opt: HtmlContentEditorOptions);
         instanceReady(x: any): void;

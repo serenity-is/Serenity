@@ -14,29 +14,17 @@ using System.Web.Mvc;
 
 namespace Serenity.CodeGeneration
 {
-    public class ServerTypingsGenerator
+    public class ServerTypingsGenerator : ImportGeneratorBase
     {
-        private StringBuilder sb;
-        private CodeWriter cw;
         private HashSet<Type> visited;
         private Queue<Type> generateQueue;
         private List<Type> lookupScripts;
-        private Dictionary<string, ExternalType> ssTypes;
-        private Dictionary<string, ExternalType> ssTypeMapping;
         private HashSet<string> tsGenerated;
-        private Dictionary<string, ExternalType> tsTypes;
 
         public ServerTypingsGenerator(params Assembly[] assemblies)
+            : base()
         {
-            RootNamespaces = new HashSet<string>
-            {
-                "Serenity"
-            };
-
-            ssTypes = new Dictionary<string, ExternalType>();
-            ssTypeMapping = new Dictionary<string, ExternalType>();
             tsGenerated = new HashSet<string>();
-            tsTypes = new Dictionary<string, ExternalType>();
 
             if (assemblies == null || assemblies.Length == 0)
                 throw new ArgumentNullException("assembly");
@@ -45,7 +33,6 @@ namespace Serenity.CodeGeneration
         }
 
         public Assembly[] Assemblies { get; private set; }
-        public HashSet<string> RootNamespaces { get; private set; }
 
         private bool EnqueueType(Type type)
         {
@@ -55,41 +42,6 @@ namespace Serenity.CodeGeneration
             visited.Add(type);
             generateQueue.Enqueue(type);
             return true;
-        }
-
-        public void AddSSType(ExternalType type)
-        {
-            type.Origin = ExternalTypeOrigin.SS;
-
-            var oldFullName = type.FullName;
-            var ignoreNS = type.Attributes.FirstOrDefault(x => 
-                x.Type == "System.Runtime.CompilerServices.IgnoreNamespaceAttribute");
-
-            if (ignoreNS != null)
-                type.Namespace = "";
-
-            var scriptNS = type.Attributes.FirstOrDefault(x =>
-                x.Type == "System.Runtime.CompilerServices.ScriptNamespaceAttribute");
-
-            if (scriptNS != null)
-                type.Namespace = scriptNS.Arguments[0].Value as string;
-
-            var scriptName = type.Attributes.FirstOrDefault(x =>
-                x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
-
-            if (scriptName != null)
-                type.Name = scriptName.Arguments[0].Value as string;
-
-            if (oldFullName != type.FullName)
-                ssTypeMapping[oldFullName] = type;
-
-            ssTypes[type.FullName] = type;
-        }
-
-        public void AddTSType(ExternalType type)
-        {
-            type.Origin = ExternalTypeOrigin.TS;
-            tsTypes[type.FullName] = type;
         }
 
         private void EnqueueTypeMembers(Type type)
@@ -143,16 +95,18 @@ namespace Serenity.CodeGeneration
             return className + "Service";
         }
 
-        public SortedDictionary<string, string> GenerateCode()
+        protected override void Reset()
         {
-            this.sb = new StringBuilder(4096);
-            this.cw = new CodeWriter(sb, 4);
-            this.cw.BraceOnSameLine = true;
+            base.Reset();
 
+            this.cw.BraceOnSameLine = true;
             this.generateQueue = new Queue<Type>();
             this.visited = new HashSet<Type>();
             this.lookupScripts = new List<Type>();
+        }
 
+        protected override void GenerateAll()
+        {
             foreach (var assembly in this.Assemblies)
                 foreach (var fromType in assembly.GetTypes())
                 {
@@ -180,7 +134,6 @@ namespace Serenity.CodeGeneration
                     }
                 }
 
-            SortedDictionary<string, string> generatedCode = new SortedDictionary<string, string>();
             while (generateQueue.Count > 0)
             {
                 var type = generateQueue.Dequeue();
@@ -192,27 +145,13 @@ namespace Serenity.CodeGeneration
                 bool isController = type.IsSubclassOf(typeof(Controller));
 
                 var identifier = isController ? GetControllerIdentifier(type) : type.Name;
-                var filename = ns + "." + identifier + ".ts";
-
-                foreach (var rn in RootNamespaces)
-                {
-                    if (filename.StartsWith(rn + "."))
-                    {
-                        filename = filename.Substring(rn.Length + 1);
-                        break;
-                    }
-                }
-
                 GenerateCodeFor(type);
 
-                generatedCode[filename] = sb.ToString();
-                sb.Clear();
+                AddFile(RemoveRootNamespace(ns, identifier + ".ts"));
             }
 
             GenerateSSDeclarations();
-            generatedCode["SSDeclarations.ts"] = sb.ToString();
-
-            return generatedCode;
+            AddFile("SSDeclarations.ts");
         }
 
         private void HandleMemberType(Type memberType, string codeNamespace)
@@ -937,21 +876,6 @@ namespace Serenity.CodeGeneration
             return url;
         }
 
-        private ExternalType GetScriptType(string fullName)
-        {
-            ExternalType type;
-            if (tsTypes.TryGetValue(fullName, out type))
-                return type;
-
-            if (ssTypes.TryGetValue(fullName, out type))
-                return type;
-
-            if (ssTypeMapping.TryGetValue(fullName, out type))
-                return type;
-
-            return null;
-        }
-
         private void GenerateForm(Type type, FormScriptAttribute formScriptAttribute)
         {
             var codeNamespace = GetNamespace(type);
@@ -1280,21 +1204,7 @@ namespace Serenity.CodeGeneration
                 string.IsNullOrEmpty(prop.SetMethod))
                 return;
 
-            string propName = prop.Name;
-
-            var scriptNameAttr = prop.Attributes.FirstOrDefault(x =>
-                x.Type == "System.Runtime.CompilerServices.ScriptNameAttribute");
-
-            if (scriptNameAttr != null)
-                propName = scriptNameAttr.Arguments[0].Value as string;
-            else if (!preserveMemberCase && !prop.Attributes.Any(x =>
-                    x.Type == "System.Runtime.CompilerServices.PreserveCaseAttribute"))
-            {
-                if (propName == "ID")
-                    propName = "id";
-                else propName = propName.Substring(0, 1).ToLowerInvariant()
-                    + propName.Substring(1);
-            }
+            var propName = GetPropertyScriptName(prop, preserveMemberCase);
 
             if (isSerializable ||
                 prop.Attributes.FirstOrDefault(x => 
@@ -1375,40 +1285,6 @@ namespace Serenity.CodeGeneration
             sb.Append(": ");
             SSTypeNameToTS(field.Type, codeNamespace);
             sb.AppendLine(";");
-        }
-
-        private bool IsGenericTypeName(string typeName)
-        {
-            return typeName.IndexOf("`") >= 0;
-        }
-
-        private string[] SplitGenericArguments(ref string typeName)
-        {
-            if (!IsGenericTypeName(typeName))
-                return new string[0];
-
-            var pos = typeName.IndexOf("<");
-            var last = typeName.LastIndexOf(">");
-            if (pos >= 0 && last > pos)
-            {
-                char[] c = typeName.Substring(pos + 1, last - pos - 1).ToCharArray();
-                typeName = typeName.Substring(0, pos);
-
-                int nestingLevel = 0;
-                for (int i = 0; i < c.Length; i++)
-                {
-                    if (c[i] == '<')
-                        nestingLevel++;
-                    else if (c[i] == '>')
-                        nestingLevel--;
-                    else if ((c[i] == ',') && (nestingLevel == 0))
-                        c[i] = '€';
-                }
-
-                return new string(c).Split(new char[] { '€' });
-            }
-            else
-                return new string[0];
         }
 
         private string FixupSSGenerics(string typeName)
