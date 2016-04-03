@@ -7,8 +7,6 @@
 namespace Serenity.CodeGeneration {
     export type Imports = { [key: string]: string };
 
-    type TypeDictionary = { [key: string]: ExternalType };
-
     export interface ExternalType {
         AssemblyName?: string;
         Namespace?: string;
@@ -52,10 +50,12 @@ namespace Serenity.CodeGeneration {
     }
 
     export interface ExternalAttribute {
+        Type?: string;
         Arguments?: ExternalArgument[];
     }
 
     export interface ExternalArgument {
+        Type?: string;
         Value?: any;
         Name?: string;
         IsOptional?: boolean;
@@ -153,24 +153,40 @@ namespace Serenity.CodeGeneration {
         }
     }
 
-    function isFormatter(node: ts.ClassDeclaration): boolean {
+    function getInterfaces(node: ts.ClassDeclaration): string[] {
+        var result: string[] = [];
+        if (!node.heritageClauses)
+            return result;
+
         for (let heritage of node.heritageClauses) {
             if (heritage.token == ts.SyntaxKind.ImplementsKeyword &&
                 heritage.types != null) {
 
                 for (let type of heritage.types) {
-                    if (type.typeArguments == null ||
-                        !type.typeArguments.length) {
-                        let expression = getExpandedExpression(type);
-                        if (expression == "Slick.Formatter") {
-                            return true;
-                        }
-                    }
+                    result.push(getExpandedExpression(type));
                 }
             }
         }
 
-        return false;
+        return result;
+    }
+
+    function getBaseInterfaces(node: ts.InterfaceDeclaration): string[] {
+        var result: string[] = [];
+        if (!node.heritageClauses)
+            return result;
+
+        for (let heritage of node.heritageClauses) {
+            if (heritage.token == ts.SyntaxKind.ExtendsKeyword &&
+                heritage.types != null) {
+
+                for (let type of heritage.types) {
+                    result.push(getExpandedExpression(type));
+                }
+            }
+        }
+
+        return result;
     }
 
     function isUnderAmbientNamespace(node: ts.Node): boolean {
@@ -237,47 +253,155 @@ namespace Serenity.CodeGeneration {
         return expression == "Serenity.Decorators.option";
     }
 
-    function getMembers(sourceFile: ts.SourceFile, node: ts.Node): ExternalMember[] {
-        let result: ExternalMember[] = [];
+    function decoratorToExternalAttribute(decorator: ts.Decorator): ExternalAttribute {
+        let result: ExternalAttribute = {
+            Type: "",
+            Arguments: []
+        };
 
-        let isInterface = node.kind == ts.SyntaxKind.InterfaceDeclaration;
-        let isClass = node.kind == ts.SyntaxKind.ClassDeclaration;
+        if (decorator.expression == null)
+            return null;
 
-        if (isInterface) {
-            for (let member of (node as ts.InterfaceDeclaration).members) {
+        let pae: ts.PropertyAccessExpression = null;
+        if (decorator.expression.kind == ts.SyntaxKind.CallExpression) {
+            let ce = decorator.expression as ts.CallExpression;
 
-                let name = member.name.getText();
+            if (ce.expression != null &&
+                ce.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+                pae = ce.expression as ts.PropertyAccessExpression;
+                result.Type = getExpandedExpression(pae);
+            }
 
-                if (result[name] != null)
-                    continue;
+            for (let arg of ce.arguments) {
+                switch (arg.kind) {
+                    case ts.SyntaxKind.StringLiteral:
+                        result.Arguments.push({
+                            Value: (arg as ts.StringLiteral).text
+                        });
+                        break;
+                    case ts.SyntaxKind.NumericLiteral:
+                        result.Arguments.push({
+                            Value: parseFloat((arg as ts.LiteralExpression).text)
+                        });
+                        break;
+                    default:
+                        result.Arguments.push({
+                            Value: null
+                        });
+                        break;
+                }
             }
         }
+        else if (decorator.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+            pae = decorator.expression as ts.PropertyAccessExpression;
+            result.Type = getExpandedExpression(pae);
+        }
 
-        else if (isClass) {
-            for (let member of (node as ts.ClassDeclaration).members) {
+        return result;
+    }
 
-                if (member.kind != ts.SyntaxKind.MethodDeclaration &&
-                    member.kind != ts.SyntaxKind.PropertyDeclaration)
-                    continue;
+    function getInterfaceMembers(node: ts.InterfaceDeclaration): ExternalMember[] {
+        let result: ExternalMember[] = [];
 
-                let name = member.name.getText();
-                if (result[name])
-                    continue;
+        for (let member of node.members) {
 
-                
+            if (member.kind != ts.SyntaxKind.PropertySignature &&
+                member.kind != ts.SyntaxKind.MethodSignature)
+                continue;
 
-                let typeName: string = "";
-                if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
-                    let pd = (member as ts.PropertyDeclaration);
-                    if (pd.type)
-                        typeName = pd.type.getText();
+            let name = member.name.getText();
+            if (result[name])
+                continue;
+
+            var externalMember: ExternalMember = {
+                Name: name,
+                Type: ""
+            };
+
+            if (member.kind == ts.SyntaxKind.PropertySignature) {
+                let pd = (member as ts.PropertySignature);
+                if (pd.type)
+                    externalMember.Type = getExpandedExpression(pd.type);
+            }
+            else if (member.kind == ts.SyntaxKind.MethodSignature) {
+                let emo = externalMember as ExternalMethod;
+                emo.Arguments = [];
+                let md = (member as ts.MethodSignature);
+                if (md.type) {
+                    externalMember.Type = getExpandedExpression(md.type);
                 }
 
-                result[name] = {
-                    Name: name,
-                    Type: typeName
-                };
+                for (var arg of md.parameters) {
+                    emo.Arguments.push({
+                        Name: arg.name.getText(),
+                        Type: getExpandedExpression(arg.type)
+                    });
+                }
             }
+
+            result[name] = externalMember;
+            result.push(externalMember);
+        }
+        return result;
+    }
+
+    function getClassMembers(node: ts.ClassDeclaration): ExternalMember[] {
+        let result: ExternalMember[] = [];
+
+        for (let member of node.members) {
+
+            if (member.kind != ts.SyntaxKind.MethodDeclaration &&
+                member.kind != ts.SyntaxKind.PropertyDeclaration &&
+                member.kind != ts.SyntaxKind.Constructor)
+                continue;
+
+            let name = member.name ? member.name.getText() : "$ctor";
+
+            if (result[name])
+                continue;
+
+            var externalMember: ExternalMember = {
+                Name: name,
+                IsStatic: any(member.modifiers, x => x.getText() == "static"),
+                Type: ""
+            };
+
+            if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
+                let pd = (member as ts.PropertyDeclaration);
+                if (pd.type)
+                    externalMember.Type = getExpandedExpression(pd.type);
+            }
+            else if (member.kind == ts.SyntaxKind.MethodDeclaration) {
+                let emo = externalMember as ExternalMethod;
+                emo.Arguments = [];
+                let md = (member as ts.MethodDeclaration);
+                if (md.type) {
+                    externalMember.Type = getExpandedExpression(md.type);
+                }
+
+                for (var arg of md.parameters) {
+                    emo.Arguments.push({
+                        Name: arg.name.getText(),
+                        Type: getExpandedExpression(arg.type)
+                    });
+                }
+            }
+            else if (member.kind == ts.SyntaxKind.Constructor) {
+                let emo = externalMember as ExternalMethod;
+                emo.Arguments = [];
+                emo.IsConstructor = true;
+                let md = (member as ts.ConstructorDeclaration);
+
+                for (var arg of md.parameters) {
+                    emo.Arguments.push({
+                        Name: arg.name.getText(),
+                        Type: getExpandedExpression(arg.type)
+                    });
+                }
+            }
+
+            result[name] = externalMember;
+            result.push(externalMember);
         }
 
         return result;
@@ -294,13 +418,7 @@ namespace Serenity.CodeGeneration {
                     break;
 
                 case ts.SyntaxKind.ClassDeclaration:
-                    node.$imports = cloneDictionary(node.$imports);
-                    break;
-
                 case ts.SyntaxKind.ModuleDeclaration:
-                    node.$imports = cloneDictionary(node.$imports);
-                    break;
-
                 case ts.SyntaxKind.InterfaceDeclaration:
                     node.$imports = cloneDictionary(node.$imports);
                     break;
@@ -312,27 +430,28 @@ namespace Serenity.CodeGeneration {
         visitNode(sourceFile);
     }
 
-    function typeParameterstoExternal(p: ts.NodeArray<ts.TypeParameterDeclaration>): ExternalArgument[] {
+    function typeParametersToExternal(p: ts.NodeArray<ts.TypeParameterDeclaration>): ExternalArgument[] {
         if (p == null || p.length == 0)
             return [];
 
         let result: ExternalArgument[] = [];
+
         for (var k of p)
-            result.push(k.getText());
+            result.push({
+                Name: k.getText()
+            });
+
+        return result;
     }
 
     function classToExternalType(klass: ts.ClassDeclaration): ExternalType {
         let result: ExternalType = {
             AssemblyName: "",
-            Attributes: [],
             BaseType: getBaseType(klass),
-            Fields: [],
-            GenericParameters: typeParameterstoExternal(klass.typeParameters),
+            GenericParameters: typeParametersToExternal(klass.typeParameters),
             IsAbstract: any(klass.modifiers, x => x.getText() == "abstract"),
-            Interfaces: [],
             IsSealed: false,
             IsSerializable: false,
-            Methods: [],
             Origin: ExternalTypeOrigin.TS,
             Properties: [],
             Namespace: getNamespace(klass),
@@ -340,6 +459,37 @@ namespace Serenity.CodeGeneration {
             IsInterface: false,
             IsDeclaration: isUnderAmbientNamespace(klass)
         };
+
+        var members = getClassMembers(klass);
+        result.Fields = members.filter(x => (x as ExternalMethod).Arguments == null);
+        result.Methods = members.filter(x => (x as ExternalMethod).Arguments != null);
+
+        result.Interfaces = getInterfaces(klass);
+        result.Attributes = klass.decorators == null ? <ExternalAttribute[]>[] :
+            klass.decorators.map(x => decoratorToExternalAttribute(x));
+
+        return result;
+    }
+
+    function interfaceToExternalType(intf: ts.InterfaceDeclaration): ExternalType {
+        let result: ExternalType = {
+            AssemblyName: "",
+            GenericParameters: typeParametersToExternal(intf.typeParameters),
+            Origin: ExternalTypeOrigin.TS,
+            Properties: [],
+            Namespace: getNamespace(intf),
+            Name: intf.name.getText(),
+            IsInterface: true,
+            IsDeclaration: isUnderAmbientNamespace(intf)
+        };
+
+        var members = getInterfaceMembers(intf);
+        result.Fields = members.filter(x => (x as ExternalMethod).Arguments == null);
+        result.Methods = members.filter(x => (x as ExternalMethod).Arguments != null);
+
+        result.Interfaces = getBaseInterfaces(intf);
+        result.Attributes = intf.decorators == null ? <ExternalAttribute[]>[] :
+            intf.decorators.map(x => decoratorToExternalAttribute(x));
 
         return result;
     }
@@ -355,13 +505,26 @@ namespace Serenity.CodeGeneration {
 
                     if (hasExportModifier(node))
                     {
-                        var name = prependNamespace(klass.name.getText(), klass);
-                        var exportedType = classToExternalType(klass);
+                        let name = prependNamespace(klass.name.getText(), klass);
+                        let exportedType = classToExternalType(klass);
                         result[name] = exportedType;
                         result.push(exportedType);
                     }
 
                     break;
+
+                case ts.SyntaxKind.InterfaceDeclaration:
+                    let intf = node as ts.InterfaceDeclaration;
+
+                    if (hasExportModifier(node)) {
+                        let name = prependNamespace(intf.name.getText(), intf);
+                        let exportedType = interfaceToExternalType(intf);
+                        result[name] = exportedType;
+                        result.push(exportedType);
+                    }
+
+                    break;
+
             }
 
             ts.forEachChild(node, child => visitNode(child));
@@ -415,7 +578,13 @@ namespace Serenity.CodeGeneration {
     }
 
     export function parseTypes(sourceText: string): any[] {
-        return extractTypes(parseSourceFile(sourceText));
+        try {
+            return extractTypes(parseSourceFile(sourceText));
+        }
+        catch (e) {
+            throw new Error(e.stack);
+        }
+         
     }
 
     export function parseSourceToJson(sourceText: string): string {

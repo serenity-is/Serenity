@@ -46,9 +46,11 @@ declare namespace Serenity.CodeGeneration {
         SetMethod?: string;
     }
     interface ExternalAttribute {
+        Type?: string;
         Arguments?: ExternalArgument[];
     }
     interface ExternalArgument {
+        Type?: string;
         Value?: any;
         Name?: string;
         IsOptional?: boolean;

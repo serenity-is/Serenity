@@ -71,24 +71,37 @@
                 }
             }
         }
-        function isFormatter(node) {
+        function getInterfaces(node) {
+            var result = [];
+            if (!node.heritageClauses)
+                return result;
             for (var _i = 0, _a = node.heritageClauses; _i < _a.length; _i++) {
                 var heritage = _a[_i];
                 if (heritage.token == ts.SyntaxKind.ImplementsKeyword &&
                     heritage.types != null) {
                     for (var _b = 0, _c = heritage.types; _b < _c.length; _b++) {
                         var type = _c[_b];
-                        if (type.typeArguments == null ||
-                            !type.typeArguments.length) {
-                            var expression = getExpandedExpression(type);
-                            if (expression == "Slick.Formatter") {
-                                return true;
-                            }
-                        }
+                        result.push(getExpandedExpression(type));
                     }
                 }
             }
-            return false;
+            return result;
+        }
+        function getBaseInterfaces(node) {
+            var result = [];
+            if (!node.heritageClauses)
+                return result;
+            for (var _i = 0, _a = node.heritageClauses; _i < _a.length; _i++) {
+                var heritage = _a[_i];
+                if (heritage.token == ts.SyntaxKind.ExtendsKeyword &&
+                    heritage.types != null) {
+                    for (var _b = 0, _c = heritage.types; _b < _c.length; _b++) {
+                        var type = _c[_b];
+                        result.push(getExpandedExpression(type));
+                    }
+                }
+            }
+            return result;
         }
         function isUnderAmbientNamespace(node) {
             return any(getParents(node), function (x) {
@@ -142,38 +155,138 @@
             var expression = getExpandedExpression(pae);
             return expression == "Serenity.Decorators.option";
         }
-        function getMembers(sourceFile, node) {
-            var result = [];
-            var isInterface = node.kind == ts.SyntaxKind.InterfaceDeclaration;
-            var isClass = node.kind == ts.SyntaxKind.ClassDeclaration;
-            if (isInterface) {
-                for (var _i = 0, _a = node.members; _i < _a.length; _i++) {
-                    var member = _a[_i];
-                    var name_1 = member.name.getText();
-                    if (result[name_1] != null)
-                        continue;
+        function decoratorToExternalAttribute(decorator) {
+            var result = {
+                Type: "",
+                Arguments: []
+            };
+            if (decorator.expression == null)
+                return null;
+            var pae = null;
+            if (decorator.expression.kind == ts.SyntaxKind.CallExpression) {
+                var ce = decorator.expression;
+                if (ce.expression != null &&
+                    ce.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+                    pae = ce.expression;
+                    result.Type = getExpandedExpression(pae);
+                }
+                for (var _i = 0, _a = ce.arguments; _i < _a.length; _i++) {
+                    var arg = _a[_i];
+                    switch (arg.kind) {
+                        case ts.SyntaxKind.StringLiteral:
+                            result.Arguments.push({
+                                Value: arg.text
+                            });
+                            break;
+                        case ts.SyntaxKind.NumericLiteral:
+                            result.Arguments.push({
+                                Value: parseFloat(arg.text)
+                            });
+                            break;
+                        default:
+                            result.Arguments.push({
+                                Value: null
+                            });
+                            break;
+                    }
                 }
             }
-            else if (isClass) {
-                for (var _b = 0, _c = node.members; _b < _c.length; _b++) {
-                    var member = _c[_b];
-                    if (member.kind != ts.SyntaxKind.MethodDeclaration &&
-                        member.kind != ts.SyntaxKind.PropertyDeclaration)
-                        continue;
-                    var name_2 = member.name.getText();
-                    if (result[name_2])
-                        continue;
-                    var typeName = "";
-                    if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
-                        var pd = member;
-                        if (pd.type)
-                            typeName = pd.type.getText();
-                    }
-                    result[name_2] = {
-                        Name: name_2,
-                        Type: typeName
-                    };
+            else if (decorator.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+                pae = decorator.expression;
+                result.Type = getExpandedExpression(pae);
+            }
+            return result;
+        }
+        function getInterfaceMembers(node) {
+            var result = [];
+            for (var _i = 0, _a = node.members; _i < _a.length; _i++) {
+                var member = _a[_i];
+                if (member.kind != ts.SyntaxKind.PropertySignature &&
+                    member.kind != ts.SyntaxKind.MethodSignature)
+                    continue;
+                var name_1 = member.name.getText();
+                if (result[name_1])
+                    continue;
+                var externalMember = {
+                    Name: name_1,
+                    Type: ""
+                };
+                if (member.kind == ts.SyntaxKind.PropertySignature) {
+                    var pd = member;
+                    if (pd.type)
+                        externalMember.Type = getExpandedExpression(pd.type);
                 }
+                else if (member.kind == ts.SyntaxKind.MethodSignature) {
+                    var emo = externalMember;
+                    emo.Arguments = [];
+                    var md = member;
+                    if (md.type) {
+                        externalMember.Type = getExpandedExpression(md.type);
+                    }
+                    for (var _b = 0, _c = md.parameters; _b < _c.length; _b++) {
+                        var arg = _c[_b];
+                        emo.Arguments.push({
+                            Name: arg.name.getText(),
+                            Type: getExpandedExpression(arg.type)
+                        });
+                    }
+                }
+                result[name_1] = externalMember;
+                result.push(externalMember);
+            }
+            return result;
+        }
+        function getClassMembers(node) {
+            var result = [];
+            for (var _i = 0, _a = node.members; _i < _a.length; _i++) {
+                var member = _a[_i];
+                if (member.kind != ts.SyntaxKind.MethodDeclaration &&
+                    member.kind != ts.SyntaxKind.PropertyDeclaration &&
+                    member.kind != ts.SyntaxKind.Constructor)
+                    continue;
+                var name_2 = member.name ? member.name.getText() : "$ctor";
+                if (result[name_2])
+                    continue;
+                var externalMember = {
+                    Name: name_2,
+                    IsStatic: any(member.modifiers, function (x) { return x.getText() == "static"; }),
+                    Type: ""
+                };
+                if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
+                    var pd = member;
+                    if (pd.type)
+                        externalMember.Type = getExpandedExpression(pd.type);
+                }
+                else if (member.kind == ts.SyntaxKind.MethodDeclaration) {
+                    var emo = externalMember;
+                    emo.Arguments = [];
+                    var md = member;
+                    if (md.type) {
+                        externalMember.Type = getExpandedExpression(md.type);
+                    }
+                    for (var _b = 0, _c = md.parameters; _b < _c.length; _b++) {
+                        var arg = _c[_b];
+                        emo.Arguments.push({
+                            Name: arg.name.getText(),
+                            Type: getExpandedExpression(arg.type)
+                        });
+                    }
+                }
+                else if (member.kind == ts.SyntaxKind.Constructor) {
+                    var emo = externalMember;
+                    emo.Arguments = [];
+                    emo.IsConstructor = true;
+                    var md = member;
+                    for (var _d = 0, _e = md.parameters; _d < _e.length; _d++) {
+                        var arg = _e[_d];
+                        emo.Arguments.push({
+                            Name: arg.name.getText(),
+                            Type: getExpandedExpression(arg.type)
+                        });
+                    }
+                }
+                result[name_2] = externalMember;
+                result.push(externalMember);
             }
             return result;
         }
@@ -186,11 +299,7 @@
                         node.$imports[ied.name.getText()] = ied.moduleReference.getText();
                         break;
                     case ts.SyntaxKind.ClassDeclaration:
-                        node.$imports = cloneDictionary(node.$imports);
-                        break;
                     case ts.SyntaxKind.ModuleDeclaration:
-                        node.$imports = cloneDictionary(node.$imports);
-                        break;
                     case ts.SyntaxKind.InterfaceDeclaration:
                         node.$imports = cloneDictionary(node.$imports);
                         break;
@@ -199,27 +308,26 @@
             }
             visitNode(sourceFile);
         }
-        function typeParameterstoExternal(p) {
+        function typeParametersToExternal(p) {
             if (p == null || p.length == 0)
                 return [];
             var result = [];
             for (var _i = 0, p_1 = p; _i < p_1.length; _i++) {
                 var k = p_1[_i];
-                result.push(k.getText());
+                result.push({
+                    Name: k.getText()
+                });
             }
+            return result;
         }
         function classToExternalType(klass) {
             var result = {
                 AssemblyName: "",
-                Attributes: [],
                 BaseType: getBaseType(klass),
-                Fields: [],
-                GenericParameters: typeParameterstoExternal(klass.typeParameters),
+                GenericParameters: typeParametersToExternal(klass.typeParameters),
                 IsAbstract: any(klass.modifiers, function (x) { return x.getText() == "abstract"; }),
-                Interfaces: [],
                 IsSealed: false,
                 IsSerializable: false,
-                Methods: [],
                 Origin: 3 /* TS */,
                 Properties: [],
                 Namespace: getNamespace(klass),
@@ -227,6 +335,31 @@
                 IsInterface: false,
                 IsDeclaration: isUnderAmbientNamespace(klass)
             };
+            var members = getClassMembers(klass);
+            result.Fields = members.filter(function (x) { return x.Arguments == null; });
+            result.Methods = members.filter(function (x) { return x.Arguments != null; });
+            result.Interfaces = getInterfaces(klass);
+            result.Attributes = klass.decorators == null ? [] :
+                klass.decorators.map(function (x) { return decoratorToExternalAttribute(x); });
+            return result;
+        }
+        function interfaceToExternalType(intf) {
+            var result = {
+                AssemblyName: "",
+                GenericParameters: typeParametersToExternal(intf.typeParameters),
+                Origin: 3 /* TS */,
+                Properties: [],
+                Namespace: getNamespace(intf),
+                Name: intf.name.getText(),
+                IsInterface: true,
+                IsDeclaration: isUnderAmbientNamespace(intf)
+            };
+            var members = getInterfaceMembers(intf);
+            result.Fields = members.filter(function (x) { return x.Arguments == null; });
+            result.Methods = members.filter(function (x) { return x.Arguments != null; });
+            result.Interfaces = getBaseInterfaces(intf);
+            result.Attributes = intf.decorators == null ? [] :
+                intf.decorators.map(function (x) { return decoratorToExternalAttribute(x); });
             return result;
         }
         function extractTypes(sourceFile) {
@@ -236,9 +369,18 @@
                     case ts.SyntaxKind.ClassDeclaration:
                         var klass = node;
                         if (hasExportModifier(node)) {
-                            var name = prependNamespace(klass.name.getText(), klass);
+                            var name_3 = prependNamespace(klass.name.getText(), klass);
                             var exportedType = classToExternalType(klass);
-                            result[name] = exportedType;
+                            result[name_3] = exportedType;
+                            result.push(exportedType);
+                        }
+                        break;
+                    case ts.SyntaxKind.InterfaceDeclaration:
+                        var intf = node;
+                        if (hasExportModifier(node)) {
+                            var name_4 = prependNamespace(intf.name.getText(), intf);
+                            var exportedType = interfaceToExternalType(intf);
+                            result[name_4] = exportedType;
                             result.push(exportedType);
                         }
                         break;
@@ -282,7 +424,12 @@
             return sourceFile;
         }
         function parseTypes(sourceText) {
-            return extractTypes(parseSourceFile(sourceText));
+            try {
+                return extractTypes(parseSourceFile(sourceText));
+            }
+            catch (e) {
+                throw new Error(e.stack);
+            }
         }
         CodeGeneration.parseTypes = parseTypes;
         function parseSourceToJson(sourceText) {
