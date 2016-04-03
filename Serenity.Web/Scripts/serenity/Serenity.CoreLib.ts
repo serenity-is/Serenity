@@ -3346,6 +3346,27 @@ namespace Serenity {
             type.__metadata.attr.push(attr);
         }
 
+        export function addMemberAttr(type: any, memberName: string, attr: any) {
+            let old: any = type.__metadata;
+            type.__metadata = type.__metadata || {};
+            type.__metadata.members = type.__metadata.members || [];
+            let member: any = undefined;
+            for (var m of type.__metadata.members) {
+                if (m.name == memberName) {
+                    member = m;
+                    break;
+                }
+            }
+
+            if (!member) {
+                member = { name: memberName };
+                type.__metadata.members.push(member);
+            }
+
+            member.attr = member.attr || [];
+            member.attr.push(attr);
+        }
+
         export function columnsKey(value: string) {
             return function (target: Function) {
                 addAttribute(target, new ColumnsKeyAttribute(value));
@@ -3452,9 +3473,9 @@ namespace Serenity {
             }
         }
 
-        export function option(value: Function) {
-            return function (target: Function) {
-                addAttribute(target, new OptionAttribute());
+        export function option() {
+            return function (target: Object, propertyKey: string): void {
+                addMemberAttr(target.constructor, propertyKey, new OptionAttribute());
             }
         }
 

@@ -1565,6 +1565,7 @@ declare namespace Serenity {
     }
     namespace Decorators {
         function addAttribute(type: any, attr: any): void;
+        function addMemberAttr(type: any, memberName: string, attr: any): void;
         function columnsKey(value: string): (target: Function) => void;
         function dialogType(value: Function): (target: Function) => void;
         function editor(key?: string): (target: Function) => void;
@@ -1582,7 +1583,7 @@ declare namespace Serenity {
         function localTextPrefix(value: string): (target: Function) => void;
         function maximizable(value?: boolean): (target: Function) => void;
         function nameProperty(value: string): (target: Function) => void;
-        function option(value: Function): (target: Function) => void;
+        function option(): (target: Object, propertyKey: string) => void;
         function optionsType(value: Function): (target: Function) => void;
         function panel(value?: boolean): (target: Function) => void;
         function resizable(value?: boolean): (target: Function) => void;

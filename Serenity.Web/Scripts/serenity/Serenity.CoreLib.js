@@ -1735,6 +1735,26 @@ var Serenity;
             type.__metadata.attr.push(attr);
         }
         Decorators.addAttribute = addAttribute;
+        function addMemberAttr(type, memberName, attr) {
+            var old = type.__metadata;
+            type.__metadata = type.__metadata || {};
+            type.__metadata.members = type.__metadata.members || [];
+            var member = undefined;
+            for (var _i = 0, _a = type.__metadata.members; _i < _a.length; _i++) {
+                var m = _a[_i];
+                if (m.name == memberName) {
+                    member = m;
+                    break;
+                }
+            }
+            if (!member) {
+                member = { name: memberName };
+                type.__metadata.members.push(member);
+            }
+            member.attr = member.attr || [];
+            member.attr.push(attr);
+        }
+        Decorators.addMemberAttr = addMemberAttr;
         function columnsKey(value) {
             return function (target) {
                 addAttribute(target, new ColumnsKeyAttribute(value));
@@ -1844,9 +1864,9 @@ var Serenity;
             };
         }
         Decorators.nameProperty = nameProperty;
-        function option(value) {
-            return function (target) {
-                addAttribute(target, new OptionAttribute());
+        function option() {
+            return function (target, propertyKey) {
+                addMemberAttr(target.constructor, propertyKey, new OptionAttribute());
             };
         }
         Decorators.option = option;
