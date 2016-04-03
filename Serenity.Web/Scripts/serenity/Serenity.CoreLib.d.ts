@@ -1507,6 +1507,10 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
+    class GeneratedCodeAttribute {
+        origin: string;
+        constructor(origin?: string);
+    }
     class IdPropertyAttribute {
         value: string;
         constructor(value: string);
@@ -1569,6 +1573,7 @@ declare namespace Serenity {
         function enumKey(value: string): (target: Function) => void;
         function flexify(value?: boolean): (target: Function) => void;
         function formKey(value: string): (target: Function) => void;
+        function generatedCode(origin?: string): (target: Function) => void;
         function idProperty(value: string): (target: Function) => void;
         function registerClass(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
         function registerFormatter(intf?: typeof ISlickFormatter[], asm?: ss.AssemblyReg): (target: Function) => void;

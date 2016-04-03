@@ -7,20 +7,62 @@ declare namespace Serenity.CodeGeneration {
     type Imports = {
         [key: string]: string;
     };
-    interface OptionInfo {
-        Name: string;
-        Type: string;
+    interface ExternalType {
+        AssemblyName?: string;
+        Namespace?: string;
+        Name?: string;
+        BaseType?: string;
+        Interfaces?: string[];
+        Attributes?: ExternalAttribute[];
+        Properties?: ExternalProperty[];
+        Fields?: ExternalMember[];
+        Methods?: ExternalMethod[];
+        GenericParameters?: ExternalGenericParameter[];
+        IsAbstract?: boolean;
+        IsDeclaration?: boolean;
+        IsInterface?: boolean;
+        IsSealed?: boolean;
+        IsSerializable?: boolean;
+        Origin?: ExternalTypeOrigin;
     }
-    type OptionInfos = {
-        [key: string]: OptionInfo;
-    };
-    interface FormatterTypeInfo {
-        Options: OptionInfos;
+    interface ExternalMember {
+        Name?: string;
+        Type?: string;
+        Attributes?: ExternalAttribute[];
+        IsDeclaration?: boolean;
+        IsNullable?: boolean;
+        IsProtected?: boolean;
+        IsStatic?: boolean;
     }
-    type FormatterTypes = {
-        [key: string]: FormatterTypeInfo;
-    };
+    interface ExternalMethod extends ExternalMember {
+        Arguments?: ExternalArgument[];
+        IsConstructor?: boolean;
+        IsOverride?: boolean;
+        IsGetter?: boolean;
+        IsSetter?: boolean;
+    }
+    interface ExternalProperty extends ExternalMember {
+        GetMethod?: string;
+        SetMethod?: string;
+    }
+    interface ExternalAttribute {
+        Arguments?: ExternalArgument[];
+    }
+    interface ExternalArgument {
+        Value?: any;
+        Name?: string;
+        IsOptional?: boolean;
+        HasDefault?: boolean;
+    }
+    interface ExternalGenericParameter {
+        Name?: string;
+    }
+    const enum ExternalTypeOrigin {
+        Server = 1,
+        SS = 2,
+        TS = 3,
+    }
     function stringifyNode(node: any): string;
-    function parseFormatterTypes(sourceText: string): FormatterTypes;
+    function parseTypes(sourceText: string): any[];
     function parseSourceToJson(sourceText: string): string;
 }

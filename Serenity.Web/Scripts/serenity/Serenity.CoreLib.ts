@@ -3259,6 +3259,10 @@ namespace Serenity {
         constructor(public value: string) { }
     }
 
+    export class GeneratedCodeAttribute {
+        constructor(public origin?: string) { }
+    }
+
     export class IdPropertyAttribute {
         constructor(public value: string) { }
     }
@@ -3390,6 +3394,12 @@ namespace Serenity {
         export function formKey(value: string) {
             return function (target: Function) {
                 addAttribute(target, new FormKeyAttribute(value));
+            }
+        }
+
+        export function generatedCode(origin?: string) {
+            return function (target: Function) {
+                addAttribute(target, new GeneratedCodeAttribute(origin));
             }
         }
 

@@ -933,7 +933,9 @@ namespace Serenity.CodeGeneration
                     initializer.Append("]");
 
                     cw.Indented(item.Name);
-                    sb.AppendLine("();");
+                    sb.Append("(): ");
+                    sb.Append(fullName);
+                    sb.AppendLine(";");
                 }
             });
 

@@ -1608,6 +1608,13 @@ var Serenity;
         return FormKeyAttribute;
     }());
     Serenity.FormKeyAttribute = FormKeyAttribute;
+    var GeneratedCodeAttribute = (function () {
+        function GeneratedCodeAttribute(origin) {
+            this.origin = origin;
+        }
+        return GeneratedCodeAttribute;
+    }());
+    Serenity.GeneratedCodeAttribute = GeneratedCodeAttribute;
     var IdPropertyAttribute = (function () {
         function IdPropertyAttribute(value) {
             this.value = value;
@@ -1780,6 +1787,12 @@ var Serenity;
             };
         }
         Decorators.formKey = formKey;
+        function generatedCode(origin) {
+            return function (target) {
+                addAttribute(target, new GeneratedCodeAttribute(origin));
+            };
+        }
+        Decorators.generatedCode = generatedCode;
         function idProperty(value) {
             return function (target) {
                 addAttribute(target, new IdPropertyAttribute(value));

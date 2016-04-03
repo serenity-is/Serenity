@@ -35,6 +35,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Attribute\GeneratedCode.cs" />
     <Compile Include="CKEditor\CKEditor.cs" />
     <Compile Include="Criteria\BaseCriteria.cs" />
     <Compile Include="Criteria\BinaryCriteria.cs" />

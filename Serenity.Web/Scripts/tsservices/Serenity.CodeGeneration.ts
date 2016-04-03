@@ -7,18 +7,70 @@
 namespace Serenity.CodeGeneration {
     export type Imports = { [key: string]: string };
 
-    export interface OptionInfo {
-        Name: string;
-        Type: string;
+    type TypeDictionary = { [key: string]: ExternalType };
+
+    export interface ExternalType {
+        AssemblyName?: string;
+        Namespace?: string;
+        Name?: string;
+        BaseType?: string;
+        Interfaces?: string[];
+        Attributes?: ExternalAttribute[];
+        Properties?: ExternalProperty[];
+        Fields?: ExternalMember[];
+        Methods?: ExternalMethod[];
+        GenericParameters?: ExternalGenericParameter[];
+        IsAbstract?: boolean;
+        IsDeclaration?: boolean;
+        IsInterface?: boolean;
+        IsSealed?: boolean;
+        IsSerializable?: boolean;
+        Origin?: ExternalTypeOrigin;
     }
 
-    export type OptionInfos = { [key: string]: OptionInfo };
-    
-    export interface FormatterTypeInfo {
-        Options: OptionInfos;
+    export interface ExternalMember {
+        Name?: string;
+        Type?: string;
+        Attributes?: ExternalAttribute[];
+        IsDeclaration?: boolean;
+        IsNullable?: boolean;
+        IsProtected?: boolean;
+        IsStatic?: boolean;
     }
 
-    export type FormatterTypes = { [key: string]: FormatterTypeInfo };
+    export interface ExternalMethod extends ExternalMember {
+        Arguments?: ExternalArgument[];
+        IsConstructor?: boolean;
+        IsOverride?: boolean;
+        IsGetter?: boolean;
+        IsSetter?: boolean;
+    }
+
+    export interface ExternalProperty extends ExternalMember {
+        GetMethod?: string;
+        SetMethod?: string;
+    }
+
+    export interface ExternalAttribute {
+        Arguments?: ExternalArgument[];
+    }
+
+    export interface ExternalArgument {
+        Value?: any;
+        Name?: string;
+        IsOptional?: boolean;
+        HasDefault?: boolean;
+    }
+
+    export interface ExternalGenericParameter {
+        Name?: string;
+    }
+
+    export const enum ExternalTypeOrigin {
+        Server = 1,
+        SS = 2,
+        TS = 3
+    }
 
     function any<T>(arr: T[], check: (item: T) => boolean): boolean {
         if (!arr || !arr.length)
@@ -87,6 +139,18 @@ namespace Serenity.CodeGeneration {
         }
 
         return copy;
+    }
+
+    function getBaseType(node: ts.ClassDeclaration): string {
+        for (let heritage of node.heritageClauses) {
+            if (heritage.token == ts.SyntaxKind.ExtendsKeyword &&
+                heritage.types != null) {
+
+                for (let type of heritage.types) {
+                    return getExpandedExpression(type);
+                }
+            }
+        }
     }
 
     function isFormatter(node: ts.ClassDeclaration): boolean {
@@ -173,62 +237,49 @@ namespace Serenity.CodeGeneration {
         return expression == "Serenity.Decorators.option";
     }
 
-    function getOptions(sourceFile: ts.SourceFile, node: ts.Node): OptionInfos {
-        let result : OptionInfos = {};
+    function getMembers(sourceFile: ts.SourceFile, node: ts.Node): ExternalMember[] {
+        let result: ExternalMember[] = [];
 
-        function scanOptions(node: ts.Node, isOptions: boolean): void {
-            let isInterface = node.kind == ts.SyntaxKind.InterfaceDeclaration;
-            let isClass = node.kind == ts.SyntaxKind.ClassDeclaration;
+        let isInterface = node.kind == ts.SyntaxKind.InterfaceDeclaration;
+        let isClass = node.kind == ts.SyntaxKind.ClassDeclaration;
 
-            if (isInterface) {
-                for (let member of (node as ts.InterfaceDeclaration).members) {
+        if (isInterface) {
+            for (let member of (node as ts.InterfaceDeclaration).members) {
 
-                    let name = member.name.getText();
+                let name = member.name.getText();
 
-                    if (result[name])
-                        continue;
-
-                    if (!isOptions && !any(member.decorators, isOptionDecorator))
-                        continue;
-
-                    result[name] = {
-                        Name: name,
-                        Type: "System.Object"
-                    };
-                }
+                if (result[name] != null)
+                    continue;
             }
-            else if (isClass) {
-                for (let member of (node as ts.ClassDeclaration).members) {
-
-                    if (member.kind != ts.SyntaxKind.MethodDeclaration &&
-                        member.kind != ts.SyntaxKind.PropertyDeclaration)
-                        continue;
-
-                    let name = member.name.getText();
-                    if (result[name])
-                        continue;
-
-                    if (!isOptions && !any(member.decorators, isOptionDecorator))
-                        continue;
-
-                    let typeName: string = "";
-                    if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
-                        let pd = (member as ts.PropertyDeclaration);
-                        if (pd.type)
-                            typeName = pd.type.getText();
-                    }
-
-                    result[name] = {
-                        Name: name,
-                        Type: typeName
-                    };
-                }
-            }
-            else
-                return;
         }
 
-        scanOptions(node, false);
+        else if (isClass) {
+            for (let member of (node as ts.ClassDeclaration).members) {
+
+                if (member.kind != ts.SyntaxKind.MethodDeclaration &&
+                    member.kind != ts.SyntaxKind.PropertyDeclaration)
+                    continue;
+
+                let name = member.name.getText();
+                if (result[name])
+                    continue;
+
+                
+
+                let typeName: string = "";
+                if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
+                    let pd = (member as ts.PropertyDeclaration);
+                    if (pd.type)
+                        typeName = pd.type.getText();
+                }
+
+                result[name] = {
+                    Name: name,
+                    Type: typeName
+                };
+            }
+        }
+
         return result;
     }
 
@@ -261,23 +312,53 @@ namespace Serenity.CodeGeneration {
         visitNode(sourceFile);
     }
 
-    function extractFormatterTypes(sourceFile: ts.SourceFile): FormatterTypes {
+    function typeParameterstoExternal(p: ts.NodeArray<ts.TypeParameterDeclaration>): ExternalArgument[] {
+        if (p == null || p.length == 0)
+            return [];
 
-        var result: FormatterTypes = {};
+        let result: ExternalArgument[] = [];
+        for (var k of p)
+            result.push(k.getText());
+    }
+
+    function classToExternalType(klass: ts.ClassDeclaration): ExternalType {
+        let result: ExternalType = {
+            AssemblyName: "",
+            Attributes: [],
+            BaseType: getBaseType(klass),
+            Fields: [],
+            GenericParameters: typeParameterstoExternal(klass.typeParameters),
+            IsAbstract: any(klass.modifiers, x => x.getText() == "abstract"),
+            Interfaces: [],
+            IsSealed: false,
+            IsSerializable: false,
+            Methods: [],
+            Origin: ExternalTypeOrigin.TS,
+            Properties: [],
+            Namespace: getNamespace(klass),
+            Name: klass.name.getText(),
+            IsInterface: false,
+            IsDeclaration: isUnderAmbientNamespace(klass)
+        };
+
+        return result;
+    }
+
+    function extractTypes(sourceFile: ts.SourceFile): ExternalType[] {
+
+        let result: ExternalType[] = [];
 
         function visitNode(node: ts.Node) {
             switch (node.kind) {
                 case ts.SyntaxKind.ClassDeclaration:
                     let klass = node as ts.ClassDeclaration;
 
-                    if (!isUnderAmbientNamespace(node) &&
-                        hasExportModifier(node) &&
-                        isFormatter(klass))
+                    if (hasExportModifier(node))
                     {
                         var name = prependNamespace(klass.name.getText(), klass);
-                        result[name] = {
-                            Options: getOptions(sourceFile, node)
-                        }
+                        var exportedType = classToExternalType(klass);
+                        result[name] = exportedType;
+                        result.push(exportedType);
                     }
 
                     break;
@@ -333,8 +414,8 @@ namespace Serenity.CodeGeneration {
         return sourceFile;
     }
 
-    export function parseFormatterTypes(sourceText: string): FormatterTypes {
-        return extractFormatterTypes(parseSourceFile(sourceText));
+    export function parseTypes(sourceText: string): any[] {
+        return extractTypes(parseSourceFile(sourceText));
     }
 
     export function parseSourceToJson(sourceText: string): string {
