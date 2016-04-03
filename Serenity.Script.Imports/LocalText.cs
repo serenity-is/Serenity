@@ -8,7 +8,7 @@ namespace Serenity
     /// <summary>
     /// Class that holds local text dictionary
     /// </summary>
-    [Imported, ScriptName("Q$LT"), IgnoreNamespace]
+    [Imported, ScriptNamespace("Q"), ScriptName("LT")]
     public class LocalText
     {
         /// <summary>
@@ -53,7 +53,7 @@ namespace Serenity
         ///   Local text key.</param>
         /// <returns>
         ///   A local text object containing given key.</returns>
-        [InlineCode("new Q$LT({key})")]
+        [InlineCode("new Q.LT({key})")]
         public static implicit operator LocalText(string key)
         {
             return null;

@@ -25,7 +25,7 @@ namespace Serenity.Web
         public override string GetScript()
         {
             var data = getData();
-            return String.Format("Q$ScriptData.set({0}, {1});", name.ToSingleQuoted(), data.ToJson());
+            return String.Format("Q.ScriptData.set({0}, {1});", name.ToSingleQuoted(), data.ToJson());
         }
     }
 }

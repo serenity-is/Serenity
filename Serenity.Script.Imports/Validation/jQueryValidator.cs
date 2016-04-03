@@ -10,7 +10,7 @@ namespace jQueryApi
     public delegate bool jQueryValidationMethod(string value, Element element);
     public delegate bool jQueryValidationMethodWithParameters(string value, Element element, object[] parameters);
 
-    [Imported, IgnoreNamespace]
+    [Imported, ScriptNamespace("jQuery"), ScriptName("Validator")]
     public sealed class jQueryValidator
     {
         private jQueryValidator()

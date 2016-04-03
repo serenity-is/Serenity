@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class EditorOptionAttribute : Attribute
@@ -11,7 +12,9 @@ namespace Serenity.ComponentModel
             Value = value;
         }
 
+        [IntrinsicProperty]
         public string Key { get; private set; }
+        [IntrinsicProperty]
         public object Value { get; private set; }
     }
 }

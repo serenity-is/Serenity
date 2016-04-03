@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class ReadOnlyAttribute : Attribute
     {
@@ -9,6 +10,7 @@ namespace Serenity.ComponentModel
             this.Value = readOnly;
         }
 
+        [IntrinsicProperty]
         public bool Value
         {
             get;

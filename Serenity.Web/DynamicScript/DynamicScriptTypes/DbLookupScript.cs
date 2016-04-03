@@ -110,7 +110,7 @@ namespace Serenity.Web
             {
                 items = _getItems(connection);
             }
-            return String.Format("Q$ScriptData.set({0}, new Q$Lookup({1}, \n{2}\n));", 
+            return String.Format("Q.ScriptData.set({0}, new Q.Lookup({1}, \n{2}\n));", 
                 ("Lookup." + _lookup).ToSingleQuoted(), LookupParams.ToJson(), items.ToJson());
  	    }
 

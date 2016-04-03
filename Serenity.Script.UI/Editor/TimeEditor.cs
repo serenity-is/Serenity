@@ -1,6 +1,5 @@
 ﻿using jQueryApi;
 using jQueryApi.UI.Widgets;
-using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

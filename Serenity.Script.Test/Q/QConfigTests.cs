@@ -12,7 +12,7 @@ namespace Serenity.Test
         public void ApplicationPathCanBeSet()
         {
             // to check script name safety
-            var qConfig = Window.Instance.As<dynamic>()["Q$Config"];
+            var qConfig = Window.Instance.As<dynamic>().Q.Config;
             var backup = Q.Config.ApplicationPath;
             try
             {

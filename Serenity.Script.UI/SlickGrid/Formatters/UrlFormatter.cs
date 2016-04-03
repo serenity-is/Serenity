@@ -1,4 +1,3 @@
-using Serenity.ComponentModel;
 
 namespace Serenity
 {

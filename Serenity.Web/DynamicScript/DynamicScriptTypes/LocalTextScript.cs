@@ -74,7 +74,7 @@ namespace Serenity.Web
 
             list.Sort((i1, i2) => String.CompareOrdinal(i1.Key, i2.Key));
 
-            StringBuilder jwBuilder = new StringBuilder("Q$LT.add(");
+            StringBuilder jwBuilder = new StringBuilder("Q.LT.add(");
             JsonWriter jw = new JsonTextWriter(new StringWriter(jwBuilder));
                 
             jw.WriteStartObject();

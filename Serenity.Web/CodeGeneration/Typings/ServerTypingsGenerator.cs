@@ -1485,7 +1485,7 @@ namespace Serenity.CodeGeneration
         private void GenerateSSDeclarations()
         {
             var byNamespace = 
-                ssTypes.Values.Where(x => 
+                ssTypes.Values.Where(x =>
                     !tsTypes.ContainsKey(x.FullName) &&
                     !tsGenerated.Contains(x.FullName))
                 .Where(x => !x.AssemblyName.StartsWith("Serenity.Script"))

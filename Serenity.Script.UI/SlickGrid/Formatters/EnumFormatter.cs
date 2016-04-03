@@ -1,5 +1,4 @@
 ﻿using jQueryApi;
-using Serenity.ComponentModel;
 using System;
 
 namespace Serenity

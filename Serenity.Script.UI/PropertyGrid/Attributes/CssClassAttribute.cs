@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class CssClassAttribute : Attribute
     {
@@ -9,6 +10,7 @@ namespace Serenity.ComponentModel
             CssClass = cssClass;
         }
 
+        [IntrinsicProperty]
         public string CssClass { get; private set; }
     }
 }

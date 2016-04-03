@@ -1,5 +1,4 @@
-﻿using Serenity.ComponentModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Serenity
 {

@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class CategoryAttribute : Attribute
     {
@@ -9,6 +10,11 @@ namespace Serenity.ComponentModel
             Category = category;
         }
 
+        [IntrinsicProperty]
         public string Category { get; private set; }
     }
+}
+
+namespace Serenity.ComponentModel
+{
 }

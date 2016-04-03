@@ -12,7 +12,7 @@ namespace Serenity.Test
         public void CultureDateSeparatorCanBeSet()
         {
             // to check script name safety
-            var qCulture = Window.Instance.As<dynamic>()["Q$Culture"];
+            var qCulture = Window.Instance.As<dynamic>().Q.Culture;
             var backup = Q.Culture.DateSeparator;
             try
             {
@@ -32,7 +32,7 @@ namespace Serenity.Test
         public void CultureDateOrderCanBeSet()
         {
             // to check script name safety
-            var qCulture = Window.Instance.As<dynamic>()["Q$Culture"];
+            var qCulture = Window.Instance.As<dynamic>().Q.Culture;
             var backup = Q.Culture.DateOrder;
             try
             {
@@ -52,7 +52,7 @@ namespace Serenity.Test
         public void CultureDateFormatCanBeSet()
         {
             // to check script name safety
-            var qCulture = Window.Instance.As<dynamic>()["Q$Culture"];
+            var qCulture = Window.Instance.As<dynamic>().Q.Culture;
             var backup = Q.Culture.DateFormat;
             try
             {
@@ -72,7 +72,7 @@ namespace Serenity.Test
         public void CultureDateTimeFormatCanBeSet()
         {
             // to check script name safety
-            var qCulture = Window.Instance.As<dynamic>()["Q$Culture"];
+            var qCulture = Window.Instance.As<dynamic>().Q.Culture;
             var backup = Q.Culture.DateTimeFormat;
             try
             {
@@ -92,7 +92,7 @@ namespace Serenity.Test
         public void CultureDecimalSeparatorCanBeSet()
         {
             // to check script name safety
-            var qCulture = Window.Instance.As<dynamic>()["Q$Culture"];
+            var qCulture = Window.Instance.As<dynamic>().Q.Culture;
             var backup = Q.Culture.DecimalSeparator;
             try
             {

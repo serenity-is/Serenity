@@ -1321,16 +1321,6 @@
     var LT = (function () {
         function LT(key) {
             this.key = key;
-            this.getDefault = function (key, defaultText) {
-                var t = LT.$table[key];
-                if (t == null) {
-                    t = defaultText;
-                    if (t == null) {
-                        t = key || '';
-                    }
-                }
-                return t;
-            };
         }
         LT.add = function (obj, pre) {
             if (!obj) {
@@ -1383,6 +1373,16 @@
                     type[member] = new LT(key);
                 }
             }
+        };
+        LT.getDefault = function (key, defaultText) {
+            var t = LT.$table[key];
+            if (t == null) {
+                t = defaultText;
+                if (t == null) {
+                    t = key || '';
+                }
+            }
+            return t;
         };
         return LT;
     }());

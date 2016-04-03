@@ -16,7 +16,7 @@ namespace Serenity.Web
 
         public override string GetScript()
         {
-            return "Q$ScriptData.setRegisteredScripts(" +
+            return "Q.ScriptData.setRegisteredScripts(" +
                 ToJsonFast(DynamicScriptManager.GetRegisteredScripts()) + ");";
         }
 

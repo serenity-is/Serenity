@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class PlaceholderAttribute : Attribute
     {
@@ -9,6 +10,7 @@ namespace Serenity.ComponentModel
             Value = value;
         }
 
+        [IntrinsicProperty]
         public string Value { get; private set; }
     }
 }

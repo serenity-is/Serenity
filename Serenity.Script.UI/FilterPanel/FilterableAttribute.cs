@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -14,6 +15,7 @@ namespace Serenity
             this.Value = value;
         }
 
+        [IntrinsicProperty]
         public bool Value { get; private set; }
     }
 }

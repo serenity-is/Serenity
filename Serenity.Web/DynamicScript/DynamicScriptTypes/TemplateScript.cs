@@ -23,7 +23,7 @@ namespace Serenity.Web
         {
             string templateText = getTemplate();
 
-            return String.Format("Q$ScriptData.set({0}, {1})", 
+            return String.Format("Q.ScriptData.set({0}, {1})", 
                 ("Template." + key).ToSingleQuoted(),
                 templateText.ToSingleQuoted()); 
         }

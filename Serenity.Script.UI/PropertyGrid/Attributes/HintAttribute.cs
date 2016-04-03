@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class HintAttribute : Attribute
     {
@@ -9,6 +10,7 @@ namespace Serenity.ComponentModel
             Hint = hint;
         }
 
+        [IntrinsicProperty]
         public string Hint { get; private set; }
     }
 }

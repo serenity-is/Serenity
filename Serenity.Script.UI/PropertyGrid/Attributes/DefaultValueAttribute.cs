@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class DefaultValueAttribute : Attribute
     {
@@ -9,6 +10,7 @@ namespace Serenity.ComponentModel
             Value = defaultValue;
         }
 
+        [IntrinsicProperty]
         public object Value { get; private set; }
     }
 }

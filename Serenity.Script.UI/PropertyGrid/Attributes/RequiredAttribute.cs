@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public sealed class RequiredAttribute : Attribute
     {
@@ -9,6 +10,7 @@ namespace Serenity.ComponentModel
             this.IsRequired = isRequired;
         }
 
+        [IntrinsicProperty]
         public bool IsRequired { get; private set; }
     }
 }
