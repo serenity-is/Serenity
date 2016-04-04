@@ -207,7 +207,9 @@
                     continue;
                 var externalMember = {
                     Name: name_1,
-                    Type: ""
+                    Type: "",
+                    Attributes: member.decorators == null ? [] :
+                        member.decorators.map(decoratorToExternalAttribute)
                 };
                 if (member.kind == ts.SyntaxKind.PropertySignature) {
                     var pd = member;
@@ -248,7 +250,9 @@
                 var externalMember = {
                     Name: name_2,
                     IsStatic: any(member.modifiers, function (x) { return x.getText() == "static"; }),
-                    Type: ""
+                    Type: "",
+                    Attributes: member.decorators == null ? [] :
+                        member.decorators.map(decoratorToExternalAttribute)
                 };
                 if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
                     var pd = member;

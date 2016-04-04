@@ -27,12 +27,12 @@ namespace Serenity.CodeGeneration
         }
 
         private void GenerateOptionMembers(ExternalType type,
-            HashSet<string> skip)
+            HashSet<string> skip, bool isWidget)
         {
             bool preserveMemberCase = type.Attributes.Any(x =>
                 x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
 
-            var options = GetOptionMembers(type);
+            var options = GetOptionMembers(type, isWidget);
 
             foreach (var option in options.Values)
             {
@@ -46,21 +46,47 @@ namespace Serenity.CodeGeneration
                 cw.Indented("public ");
                 sb.Append(typeName);
                 sb.Append(" ");
-                sb.AppendLine(option.Name);
+
+                string jsName = option.Name;
+                string optionName = option.Name;
+                var prop = option as ExternalProperty;
+                if (prop != null)
+                    jsName = GetPropertyScriptName(prop, preserveMemberCase);
+                else if (type.Origin == ExternalTypeOrigin.TS)
+                {
+                    var emo = option as ExternalMethod;
+                    if (emo != null && emo.Arguments.Count == 1)
+                    {
+                        if (jsName.StartsWith("set_"))
+                        {
+                            jsName = jsName.Substring(4);
+                            optionName = optionName.Substring(4);
+                        }
+
+                        typeName = FormatterTypeGenerator.GetOptionTypeName(emo.Arguments[0].Type);
+                    }
+
+                    if (Char.IsLower(jsName[0]))
+                    {
+                        if (optionName == "id")
+                            optionName = "ID";
+                        else
+                            optionName = Char.ToUpperInvariant(optionName[0]) +
+                                optionName.Substring(1);
+                    }
+                }
+
+                sb.AppendLine(optionName);
+
                 cw.InBrace(() =>
                 {
-                    string propName = option.Name;
-                    var prop = option as ExternalProperty;
-                    if (prop != null)
-                        propName = GetPropertyScriptName(prop, preserveMemberCase);
-
                     cw.Indented("get { return GetOption<");
                     sb.Append(typeName);
                     sb.Append(">(\"");
-                    sb.Append(propName);
+                    sb.Append(jsName);
                     sb.AppendLine("\"); }");
                     cw.Indented("set { SetOption(\"");
-                    sb.Append(propName);
+                    sb.Append(jsName);
                     sb.AppendLine("\", value); }");
                 });
             }
@@ -100,7 +126,33 @@ namespace Serenity.CodeGeneration
                 cw.IndentedLine("{");
                 cw.IndentedLine("}");
 
-                GenerateOptionMembers(type, isLookupEditor ? lookupEditorBaseOptions : null);
+                GenerateOptionMembers(type, 
+                    skip: isLookupEditor ? lookupEditorBaseOptions : null,
+                    isWidget: true);
+            });
+        }
+
+        private void GenerateFormatter(ExternalType type, string name)
+        {
+            cw.Indented("public partial class ");
+            sb.Append(name);
+            sb.AppendLine(" : CustomFormatterAttribute");
+
+            cw.InBrace(delegate
+            {
+                cw.Indented("public const string Key = \"");
+                sb.Append(type.FullName);
+                sb.AppendLine("\";");
+                sb.AppendLine();
+
+                cw.Indented("public ");
+                sb.Append(name);
+                sb.AppendLine("()");
+                cw.IndentedLine("    : base(Key)");
+                cw.IndentedLine("{");
+                cw.IndentedLine("}");
+
+                GenerateOptionMembers(type, skip: null, isWidget: false);
             });
         }
 
@@ -112,7 +164,10 @@ namespace Serenity.CodeGeneration
             members.AddRange(type.Properties);
 
             if (type.Origin == ExternalTypeOrigin.TS)
+            {
                 members.AddRange(type.Fields);
+                members.AddRange(type.Methods.Where(x => x.Arguments.Count == 1));
+            }
 
             foreach (var member in members)
             {
@@ -137,6 +192,9 @@ namespace Serenity.CodeGeneration
                     if (getMethod == null || setMethod == null || getMethod.IsProtected || setMethod.IsProtected)
                         continue;
                 }
+                else if (type.Origin == ExternalTypeOrigin.TS)
+                {
+                }
 
                 if (member.Type.StartsWith("System.Func`") ||
                     member.Type.StartsWith("System.Action`") ||
@@ -147,28 +205,33 @@ namespace Serenity.CodeGeneration
 
                 if (!isOptions &&
                     !member.Attributes.Any(x =>
-                    x.Type == "System.ComponentModel.DisplayNameAttribute" ||
-                    x.Type == "Serenity.OptionAttribute"))
+                        x.Type == "System.ComponentModel.DisplayNameAttribute" ||
+                        x.Type == "Serenity.OptionAttribute" ||
+                        x.Type == "Serenity.Decorators.option" ||
+                        x.Type == "Serenity.Decorators.displayName"))
                     continue;
 
                 dict[member.Name] = member;
             }
         }
 
-        //string propField = property.Name;
-        //propField = GetPropertyScriptName(prop, preserveMemberCase);
-
-        private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type)
+        private SortedDictionary<string, ExternalMember> GetOptionMembers(ExternalType type,
+            bool isWidget)
         {
             var result = new SortedDictionary<string, ExternalMember>();
 
-            var constructor = type.Methods.FirstOrDefault(x => x.IsConstructor && x.Arguments.Count == 2);
-            if (constructor != null &&
-                (constructor.Arguments[0].Type == "jQueryApi.jQueryObject" ||
-                 constructor.Arguments[0].Type == "JQuery"))
+            var constructor = type.Methods.FirstOrDefault(x => x.IsConstructor && 
+                x.Arguments.Count == (isWidget ? 2 : 1));
+
+            if (constructor != null)
             {
-                var optionsType = GetScriptType(constructor.Arguments[1].Type);
-                AddOptionMembers(result, optionsType, isOptions: true);
+                if (!isWidget ||
+                    (constructor.Arguments[0].Type == "jQueryApi.jQueryObject" ||
+                     constructor.Arguments[0].Type == "JQuery"))
+                {
+                    var optionsType = GetScriptType(constructor.Arguments[isWidget ? 1 : 0].Type);
+                    AddOptionMembers(result, optionsType, isOptions: true);
+                }
             }
 
             int loop = 0;
@@ -204,7 +267,7 @@ namespace Serenity.CodeGeneration
             sb.AppendLine();
 
             var ns = GetNamespace(type.Namespace);
-            string name = isEditorType ? type.Name + "Attribute" : type.Name;
+            string name = type.Name + "Attribute";
 
             cw.Indented("namespace ");
             sb.AppendLine(ns);
@@ -213,6 +276,8 @@ namespace Serenity.CodeGeneration
             {
                 if (isEditorType)
                     GenerateEditor(type, name);
+                else if (isFormatterType)
+                    GenerateFormatter(type, name);
             });
 
             AddFile(RemoveRootNamespace(ns, name) + ".cs");
@@ -234,12 +299,26 @@ namespace Serenity.CodeGeneration
                 return false;
 
             return GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||
-                GetAttribute(type, "Serenity.ElementAttribute", inherited: true) != null;
+                GetAttribute(type, "Serenity.ElementAttribute", inherited: true) != null ||
+                GetAttribute(type, "Serenity.Decorators.editor", inherited: true) != null ||
+                GetAttribute(type, "Serenity.Decorators.element", inherited: true) != null;
         }
 
         private bool IsFormatterType(ExternalType type)
         {
-            return false;
+            if (type.IsAbstract)
+                return false;
+
+            if (type.GenericParameters.Count > 0)
+                return false;
+
+            if (type.AssemblyName != null &&
+                type.AssemblyName.StartsWith("Serenity."))
+                return false;
+
+            return type.Interfaces.Any(x =>
+                x == "Serenity.ISlickFormatter" ||
+                x == "Slick.Formatter");
         }
     }
 }

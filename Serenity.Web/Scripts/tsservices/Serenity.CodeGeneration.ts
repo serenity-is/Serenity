@@ -313,7 +313,9 @@ namespace Serenity.CodeGeneration {
 
             var externalMember: ExternalMember = {
                 Name: name,
-                Type: ""
+                Type: "",
+                Attributes: member.decorators == null ? [] :
+                    member.decorators.map(decoratorToExternalAttribute)
             };
 
             if (member.kind == ts.SyntaxKind.PropertySignature) {
@@ -361,7 +363,9 @@ namespace Serenity.CodeGeneration {
             var externalMember: ExternalMember = {
                 Name: name,
                 IsStatic: any(member.modifiers, x => x.getText() == "static"),
-                Type: ""
+                Type: "",
+                Attributes: member.decorators == null ? [] :
+                    member.decorators.map(decoratorToExternalAttribute)
             };
 
             if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
