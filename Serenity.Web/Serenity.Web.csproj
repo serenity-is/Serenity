@@ -722,6 +722,7 @@
     <Folder Include="StyleLegacy\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Scripts\tsservices\lib.d.ts_" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />

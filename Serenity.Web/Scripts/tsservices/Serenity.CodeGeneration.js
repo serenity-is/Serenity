@@ -2,6 +2,7 @@
 (function (Serenity) {
     var CodeGeneration;
     (function (CodeGeneration) {
+        var typeChecker;
         function any(arr, check) {
             if (!arr || !arr.length)
                 return false;
@@ -125,16 +126,13 @@
         function getExpandedExpression(node) {
             if (!node)
                 return "";
-            var expression = node.getText();
-            var parts = expression.split(".");
-            if (parts.length > 1 && node.$imports) {
-                var resolved = node.$imports[parts[0]];
-                if (resolved) {
-                    parts[0] = resolved;
-                    expression = parts.join(".");
-                }
+            try {
+                var type = typeChecker.getTypeAtLocation(node);
+                return typeChecker.getFullyQualifiedName(type.getSymbol());
             }
-            return expression;
+            catch (e) {
+                return node.getText();
+            }
         }
         function isOptionDecorator(decorator) {
             if (decorator.expression == null)
@@ -423,18 +421,81 @@
             setImports(sourceFile);
             return sourceFile;
         }
-        function parseTypes(sourceText) {
-            try {
-                return extractTypes(parseSourceFile(sourceText));
-            }
-            catch (e) {
-                throw new Error(e.stack);
-            }
-        }
-        CodeGeneration.parseTypes = parseTypes;
         function parseSourceToJson(sourceText) {
             return stringifyNode(parseSourceFile(sourceText));
         }
         CodeGeneration.parseSourceToJson = parseSourceToJson;
+        var MyCompilerHost = (function () {
+            function MyCompilerHost() {
+                var _this = this;
+                this.files = {};
+                this.options = {
+                    target: ts.ScriptTarget.ES5,
+                    moduleKind: ts.ModuleKind.None
+                };
+                this.fileExists = function (fileName) {
+                    return !!(_this.files[fileName]);
+                };
+                this.getCurrentDirectory = function () { return "/"; };
+                this.getDefaultLibFileName = function (_) { return "/lib.d.ts"; };
+                this.getCanonicalFileName = function (fileName) { return fileName.toLowerCase(); };
+                this.useCaseSensitiveFileNames = function () { return false; };
+                this.getNewLine = function () { return "\r\n"; };
+                this.readFile = function (fileName) {
+                    return _this.files[fileName];
+                };
+            }
+            MyCompilerHost.prototype.writeFile = function (fileName, data, writeByteOrderMark, onError) {
+            };
+            ;
+            MyCompilerHost.prototype.getSourceFile = function (fileName, languageVersion, onError) {
+                var sourceText = this.files[fileName];
+                return sourceText !== undefined ? ts.createSourceFile(fileName, sourceText, languageVersion, true) : undefined;
+            };
+            MyCompilerHost.prototype.resolveModuleNames = function (moduleNames, containingFile) {
+                var _this = this;
+                return moduleNames.map(function (moduleName) {
+                    // try to use standard resolution
+                    var result = ts.resolveModuleName(moduleName, containingFile, _this.options, { fileExists: _this.fileExists, readFile: _this.readFile });
+                    if (result.resolvedModule) {
+                        return result.resolvedModule;
+                    }
+                    return undefined;
+                });
+            };
+            return MyCompilerHost;
+        }());
+        var host = new MyCompilerHost();
+        function addSourceFile(fileName, body) {
+            host.files[fileName] = body;
+        }
+        CodeGeneration.addSourceFile = addSourceFile;
+        function parseTypes() {
+            try {
+                var fileNames = Object.getOwnPropertyNames(host.files);
+                var program = ts.createProgram(fileNames, host.options, host);
+                typeChecker = program.getTypeChecker();
+                var result = [];
+                for (var fileName in host.files) {
+                    if (fileName == "/lib.d.ts")
+                        continue;
+                    var types = extractTypes(program.getSourceFile(fileName));
+                    for (var _i = 0, types_1 = types; _i < types_1.length; _i++) {
+                        var k = types_1[_i];
+                        k.AssemblyName = fileName;
+                        var fullName = k.Namespace ? k.Namespace + "." + k.Name : k.Name;
+                        if (result[fullName])
+                            continue;
+                        result[fullName] = k;
+                        result.push(k);
+                    }
+                }
+                return result;
+            }
+            catch (e) {
+                throw new Error(e.toString() + e.stack);
+            }
+        }
+        CodeGeneration.parseTypes = parseTypes;
     })(CodeGeneration = Serenity.CodeGeneration || (Serenity.CodeGeneration = {}));
 })(Serenity || (Serenity = {}));

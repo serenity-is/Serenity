@@ -5,6 +5,8 @@
 }
 
 namespace Serenity.CodeGeneration {
+    let typeChecker: ts.TypeChecker;
+
     export type Imports = { [key: string]: string };
 
     export interface ExternalType {
@@ -216,17 +218,13 @@ namespace Serenity.CodeGeneration {
         if (!node)
             return "";
 
-        let expression = node.getText();
-        let parts = expression.split(".");
-        if (parts.length > 1 && node.$imports) {
-            var resolved = node.$imports[parts[0]];
-            if (resolved) {
-                parts[0] = resolved;
-                expression = parts.join(".");
-            }
+        try {
+            var type = typeChecker.getTypeAtLocation(node);
+            return typeChecker.getFullyQualifiedName(type.getSymbol());
         }
-
-        return expression;
+        catch (e) {
+            return node.getText();
+        }
     }
 
     function isOptionDecorator(decorator: ts.Decorator): boolean {
@@ -503,8 +501,7 @@ namespace Serenity.CodeGeneration {
                 case ts.SyntaxKind.ClassDeclaration:
                     let klass = node as ts.ClassDeclaration;
 
-                    if (hasExportModifier(node))
-                    {
+                    if (hasExportModifier(node)) {
                         let name = prependNamespace(klass.name.getText(), klass);
                         let exportedType = classToExternalType(klass);
                         result[name] = exportedType;
@@ -577,17 +574,86 @@ namespace Serenity.CodeGeneration {
         return sourceFile;
     }
 
-    export function parseTypes(sourceText: string): any[] {
-        try {
-            return extractTypes(parseSourceFile(sourceText));
-        }
-        catch (e) {
-            throw new Error(e.stack);
-        }
-         
-    }
-
     export function parseSourceToJson(sourceText: string): string {
         return stringifyNode(parseSourceFile(sourceText));
     }
+
+    class MyCompilerHost implements ts.CompilerHost {
+        files: { [fileName: string]: string } = {};
+        options: ts.CompilerOptions  = {
+            target: ts.ScriptTarget.ES5,
+            moduleKind: ts.ModuleKind.None
+        };
+
+        fileExists = (fileName: string) => {
+            return !!(this.files[fileName]);
+        }
+
+        getCurrentDirectory = () => "/";
+        getDefaultLibFileName = _ => "/lib.d.ts";
+        getCanonicalFileName = fileName => fileName.toLowerCase();
+        useCaseSensitiveFileNames = () => false;
+        getNewLine = () => "\r\n";
+        readFile = (fileName: string) => {
+            return this.files[fileName];
+        }
+        writeFile(fileName: string, data: string, writeByteOrderMark: boolean, onError?: (message: string) => void) {
+        };
+        getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void) {
+            const sourceText = this.files[fileName];
+            return sourceText !== undefined ? ts.createSourceFile(fileName, sourceText, languageVersion, true) : undefined;
+        }
+
+        resolveModuleNames(moduleNames: string[], containingFile: string): ts.ResolvedModule[] {
+            return moduleNames.map(moduleName => {
+                // try to use standard resolution
+                let result = ts.resolveModuleName(moduleName, containingFile, this.options,
+                    { fileExists: this.fileExists, readFile: this.readFile });
+
+                if (result.resolvedModule) {
+                    return result.resolvedModule;
+                }
+
+                return undefined;
+            });
+        }
+    }
+
+    let host = new MyCompilerHost();
+
+    export function addSourceFile(fileName: string, body: string) {
+        host.files[fileName] = body;
+    }
+    
+    export function parseTypes(): any[] {
+        try {
+            var fileNames = Object.getOwnPropertyNames(host.files);
+            var program = ts.createProgram(fileNames, host.options, host);
+            typeChecker = program.getTypeChecker();
+
+            let result: ExternalType[] = [];
+            for (var fileName in host.files) {
+                if (fileName == "/lib.d.ts")
+                    continue;
+
+                var types = extractTypes(program.getSourceFile(fileName));
+                for (var k of types) {
+                    k.AssemblyName = fileName;
+                    var fullName = k.Namespace ? k.Namespace + "." + k.Name : k.Name;
+                    if (result[fullName])
+                        continue;
+
+                    result[fullName] = k;
+                    result.push(k);
+                }
+            }
+
+            return result;
+        }
+        catch (e) {
+            throw new Error(e.toString() + e.stack);
+        }
+
+    }
+
 }

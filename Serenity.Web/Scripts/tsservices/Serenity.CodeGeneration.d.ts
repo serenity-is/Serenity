@@ -65,6 +65,7 @@ declare namespace Serenity.CodeGeneration {
         TS = 3,
     }
     function stringifyNode(node: any): string;
-    function parseTypes(sourceText: string): any[];
     function parseSourceToJson(sourceText: string): string;
+    function addSourceFile(fileName: string, body: string): void;
+    function parseTypes(): any[];
 }
