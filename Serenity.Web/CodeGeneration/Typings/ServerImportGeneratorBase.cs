@@ -145,7 +145,7 @@ namespace Serenity.CodeGeneration
                 var identifier = isController ? GetControllerIdentifier(type) : type.Name;
                 GenerateCodeFor(type);
 
-                AddFile(RemoveRootNamespace(ns, identifier + (IsTS() ? ".ts" : ".cs")));
+                AddFile(RemoveRootNamespace(ns, identifier + (IsTS() ? ".ts" : ".cs.txt")));
             }
         }
 
@@ -178,6 +178,9 @@ namespace Serenity.CodeGeneration
                 return "";
             }
 
+            if (IsUsingNamespace(ns))
+                return "";
+
             if (codeNamespace != null)
             {
                 var idx = codeNamespace.IndexOf('.');
@@ -186,6 +189,11 @@ namespace Serenity.CodeGeneration
             }
 
             return ns;
+        }
+
+        protected virtual bool IsUsingNamespace(string ns)
+        {
+            return false;
         }
 
         protected virtual string ShortenNamespace(ExternalType type, string codeNamespace)
@@ -197,6 +205,9 @@ namespace Serenity.CodeGeneration
             {
                 return "";
             }
+
+            if (IsUsingNamespace(ns))
+                return "";
 
             if (codeNamespace != null)
             {
