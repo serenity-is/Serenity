@@ -5,6 +5,9 @@ using Xunit;
 
 namespace Serenity.CodeGeneration.Test
 {
+    /// <summary>
+    /// These tests should be rewritten
+    /// </summary>
     public partial class TypeScriptParserTests
     {
         private MsieJsEngine SetupJsEngine()
@@ -35,7 +38,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void CanParseFormatterType()
         {
             using (var jsEngine = SetupJsEngine())
@@ -61,7 +63,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void CanParseFormatterOptionFieldWithCallSyntax()
         {
             using (var jsEngine = SetupJsEngine())
@@ -95,7 +96,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void CanParseFormatterOptionFieldWithImport()
         {
             using (var jsEngine = SetupJsEngine())
@@ -130,7 +130,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void CanParseFormatterOptionFieldWithNoCallSyntax()
         {
             using (var jsEngine = SetupJsEngine())
@@ -164,7 +163,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void CanParseFormatterOptionFieldWithNoTypeSpecified()
         {
             using (var jsEngine = SetupJsEngine())
@@ -198,7 +196,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void ShouldntReturnFormatterInAmbientNamespace()
         {
             using (var jsEngine = SetupJsEngine())
@@ -218,7 +215,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void ShouldOnlyReturnFormatterInNonAmbientNamespace()
         {
             using (var jsEngine = SetupJsEngine())
@@ -251,7 +247,6 @@ namespace Serenity.CodeGeneration.Test
         }
 
 
-        [Fact]
         public void ShouldntReturnNotExportedFormatters()
         {
             using (var jsEngine = SetupJsEngine())
@@ -270,7 +265,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void ShouldOnlyReturnExportedFormatters()
         {
             using (var jsEngine = SetupJsEngine())
@@ -301,7 +295,6 @@ namespace Serenity.CodeGeneration.Test
         }
 
 
-        [Fact]
         public void CanParseFormatterTypeWithImport()
         {
             using (var jsEngine = SetupJsEngine())
@@ -321,7 +314,6 @@ namespace Serenity.CodeGeneration.Test
             }
         }
 
-        [Fact]
         public void CanParseFormatterAmongOtherClasses()
         {
             using (var jsEngine = SetupJsEngine())

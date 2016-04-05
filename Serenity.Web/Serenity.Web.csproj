@@ -89,13 +89,16 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Option.cs" />
+    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Editor.cs" />
+    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Formatter.cs" />
     <Compile Include="CodeGeneration\Legacy\ManualTsParser.cs" />
     <Compile Include="CodeGeneration\Legacy\Lexer.cs" />
     <Compile Include="CodeGeneration\Legacy\DtoActionResult.cs" />
     <Compile Include="CodeGeneration\Legacy\DtoGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\FormatterTypeGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\EditorTypeGenerator.cs" />
-    <Compile Include="CodeGeneration\GeneratorUtils.cs" />
+    <Compile Include="CodeGeneration\Base\GeneratorUtils.cs" />
     <Compile Include="CodeGeneration\Legacy\ScriptDtoGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\ScriptEndpointGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\ScriptFormGenerator.cs" />
@@ -107,12 +110,23 @@
     <Compile Include="CodeGeneration\Model\ExternalGenericParameter.cs" />
     <Compile Include="CodeGeneration\Model\ExternalTypeOrigin.cs" />
     <Compile Include="CodeGeneration\Model\ExternalType.cs" />
-    <Compile Include="CodeGeneration\ClientTypesGenerator.cs" />
-    <Compile Include="CodeGeneration\CodeGeneratorBase.cs" />
-    <Compile Include="CodeGeneration\ImportGeneratorBase.cs" />
-    <Compile Include="CodeGeneration\ServerImportGeneratorBase.cs" />
-    <Compile Include="CodeGeneration\ServerImportsGenerator.cs" />
-    <Compile Include="CodeGeneration\ServerTypingsGenerator.cs" />
+    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.cs" />
+    <Compile Include="CodeGeneration\Base\CodeGeneratorBase.cs" />
+    <Compile Include="CodeGeneration\Base\ImportGeneratorBase.cs" />
+    <Compile Include="CodeGeneration\Base\ServerImportGeneratorBase.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.MemberType.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Enum.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Row.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Service.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Form.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Service.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Form.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Enum.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />
     <Compile Include="Common\ScriptCulture.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />

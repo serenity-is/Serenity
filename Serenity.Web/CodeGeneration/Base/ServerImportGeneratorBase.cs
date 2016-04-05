@@ -145,7 +145,7 @@ namespace Serenity.CodeGeneration
                 var identifier = isController ? GetControllerIdentifier(type) : type.Name;
                 GenerateCodeFor(type);
 
-                AddFile(RemoveRootNamespace(ns, identifier + (IsTS() ? ".ts" : ".cs.txt")));
+                AddFile(RemoveRootNamespace(ns, identifier + (IsTS() ? ".ts" : ".cs")));
             }
         }
 

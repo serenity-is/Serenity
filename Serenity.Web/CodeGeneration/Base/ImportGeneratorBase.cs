@@ -5,8 +5,8 @@ namespace Serenity.CodeGeneration
 {
     public abstract class ImportGeneratorBase : CodeGeneratorBase
     {
-        protected Dictionary<string, ExternalType> ssTypes;
-        protected Dictionary<string, ExternalType> ssTypeMapping;
+        protected Dictionary<string, ExternalType> ssByClassName;
+        protected Dictionary<string, ExternalType> ssByScriptName;
         protected Dictionary<string, ExternalType> tsTypes;
 
         public ImportGeneratorBase()
@@ -16,8 +16,8 @@ namespace Serenity.CodeGeneration
                 "Serenity"
             };
 
-            ssTypes = new Dictionary<string, ExternalType>();
-            ssTypeMapping = new Dictionary<string, ExternalType>();
+            ssByClassName = new Dictionary<string, ExternalType>();
+            ssByScriptName = new Dictionary<string, ExternalType>();
             tsTypes = new Dictionary<string, ExternalType>();
         }
 
@@ -28,6 +28,7 @@ namespace Serenity.CodeGeneration
             type.Origin = ExternalTypeOrigin.SS;
 
             var oldFullName = type.FullName;
+            ssByClassName[oldFullName] = type;
             var ignoreNS = type.Attributes.FirstOrDefault(x =>
                 x.Type == "System.Runtime.CompilerServices.IgnoreNamespaceAttribute");
 
@@ -47,19 +48,13 @@ namespace Serenity.CodeGeneration
                 type.Name = scriptName.Arguments[0].Value as string;
 
             ExternalType overriding;
-            if (ssTypes.TryGetValue(type.FullName, out overriding) &&
+            if (ssByScriptName.TryGetValue(type.FullName, out overriding) &&
                 type.GenericParameters.Count <= overriding.GenericParameters.Count)
             {
-                if (oldFullName != type.FullName)
-                    ssTypeMapping[oldFullName] = overriding;
-
                 return;
             }
 
-            if (oldFullName != type.FullName)
-                ssTypeMapping[oldFullName] = type;
-
-            ssTypes[type.FullName] = type;
+            ssByScriptName[type.FullName] = type;
         }
 
         public void AddTSType(ExternalType type)
@@ -74,10 +69,10 @@ namespace Serenity.CodeGeneration
             if (tsTypes.TryGetValue(fullName, out type))
                 return type;
 
-            if (ssTypes.TryGetValue(fullName, out type))
+            if (ssByScriptName.TryGetValue(fullName, out type))
                 return type;
 
-            if (ssTypeMapping.TryGetValue(fullName, out type))
+            if (ssByClassName.TryGetValue(fullName, out type))
                 return type;
 
             return null;

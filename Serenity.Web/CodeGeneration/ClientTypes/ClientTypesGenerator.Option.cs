@@ -1,31 +1,11 @@
-﻿using Serenity.ComponentModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public class ClientTypesGenerator : ImportGeneratorBase
+    public partial class ClientTypesGenerator : ImportGeneratorBase
     {
-        protected override void GenerateAll()
-        {
-            foreach (var type in ssTypes.Values)
-                GenerateType(type);
-
-            foreach (var p in tsTypes)
-                if (!ssTypes.ContainsKey(p.Key))
-                    GenerateType(p.Value);
-        }
-
-        private string GetNamespace(string ns)
-        {
-            if (ns == "Serenity")
-                return "Serenity.ComponentModel";
-
-            return ns;
-        }
-
         private void GenerateOptionMembers(ExternalType type,
             HashSet<string> skip, bool isWidget)
         {
@@ -90,70 +70,6 @@ namespace Serenity.CodeGeneration
                     sb.AppendLine("\", value); }");
                 });
             }
-        }
-
-        static HashSet<string> lookupEditorBaseOptions;
-
-        static ClientTypesGenerator()
-        {
-            lookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            lookupEditorBaseOptions.AddRange(typeof(LookupEditorBaseAttribute)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                .Select(x => x.Name));
-        }
-
-        private void GenerateEditor(ExternalType type, string name)
-        {
-            cw.Indented("public partial class ");
-            sb.Append(name);
-
-            bool isLookupEditor = HasBaseType(type, "Serenity.LookupEditorBase`1");
-
-            sb.AppendLine(isLookupEditor ?
-                " : LookupEditorBaseAttribute" : " : CustomEditorAttribute");
-
-            cw.InBrace(delegate
-            {
-                cw.Indented("public const string Key = \"");
-                sb.Append(type.FullName);
-                sb.AppendLine("\";");
-                sb.AppendLine();
-
-                cw.Indented("public ");
-                sb.Append(name);
-                sb.AppendLine("()");
-                cw.IndentedLine("    : base(Key)");
-                cw.IndentedLine("{");
-                cw.IndentedLine("}");
-
-                GenerateOptionMembers(type, 
-                    skip: isLookupEditor ? lookupEditorBaseOptions : null,
-                    isWidget: true);
-            });
-        }
-
-        private void GenerateFormatter(ExternalType type, string name)
-        {
-            cw.Indented("public partial class ");
-            sb.Append(name);
-            sb.AppendLine(" : CustomFormatterAttribute");
-
-            cw.InBrace(delegate
-            {
-                cw.Indented("public const string Key = \"");
-                sb.Append(type.FullName);
-                sb.AppendLine("\";");
-                sb.AppendLine();
-
-                cw.Indented("public ");
-                sb.Append(name);
-                sb.AppendLine("()");
-                cw.IndentedLine("    : base(Key)");
-                cw.IndentedLine("{");
-                cw.IndentedLine("}");
-
-                GenerateOptionMembers(type, skip: null, isWidget: false);
-            });
         }
 
         private void AddOptionMembers(SortedDictionary<string, ExternalMember> dict,
@@ -245,80 +161,6 @@ namespace Serenity.CodeGeneration
             while ((type = GetBaseType(type)) != null && loop++ < 100);
 
             return result;
-        }
-
-        private void GenerateType(ExternalType type)
-        {
-            bool isEditorType = IsEditorType(type);
-            bool isFormatterType = IsFormatterType(type);
-
-            if (!isEditorType && !isFormatterType)
-                return;
-
-            AppendUsings(new string[] {
-                "Serenity",
-                "Serenity.ComponentModel",
-                "System",
-                "System.Collections",
-                "System.Collections.Generic",
-                "System.ComponentModel"
-            });
-
-            sb.AppendLine();
-
-            var ns = GetNamespace(type.Namespace);
-            string name = type.Name + "Attribute";
-
-            cw.Indented("namespace ");
-            sb.AppendLine(ns);
-
-            cw.InBrace(delegate
-            {
-                if (isEditorType)
-                    GenerateEditor(type, name);
-                else if (isFormatterType)
-                    GenerateFormatter(type, name);
-            });
-
-            AddFile(RemoveRootNamespace(ns, name) + ".cs");
-        }
-
-        private bool IsEditorType(ExternalType type)
-        {
-            if (type.IsAbstract)
-                return false;
-
-            if (type.GenericParameters.Count > 0)
-                return false;
-
-            if (!HasBaseType(type, "Serenity.Widget"))
-                return false;
-
-            if (type.AssemblyName != null &&
-                type.AssemblyName.StartsWith("Serenity."))
-                return false;
-
-            return GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||
-                GetAttribute(type, "Serenity.ElementAttribute", inherited: true) != null ||
-                GetAttribute(type, "Serenity.Decorators.editor", inherited: true) != null ||
-                GetAttribute(type, "Serenity.Decorators.element", inherited: true) != null;
-        }
-
-        private bool IsFormatterType(ExternalType type)
-        {
-            if (type.IsAbstract)
-                return false;
-
-            if (type.GenericParameters.Count > 0)
-                return false;
-
-            if (type.AssemblyName != null &&
-                type.AssemblyName.StartsWith("Serenity."))
-                return false;
-
-            return type.Interfaces.Any(x =>
-                x == "Serenity.ISlickFormatter" ||
-                x == "Slick.Formatter");
         }
     }
 }
