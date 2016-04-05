@@ -512,7 +512,7 @@ namespace Serenity.CodeGeneration {
                         result.push(exportedType);
                     }
 
-                    break;
+                    return;
 
                 case ts.SyntaxKind.InterfaceDeclaration:
                     let intf = node as ts.InterfaceDeclaration;
@@ -523,8 +523,7 @@ namespace Serenity.CodeGeneration {
                         result[name] = exportedType;
                         result.push(exportedType);
                     }
-
-                    break;
+                    return;
 
             }
 

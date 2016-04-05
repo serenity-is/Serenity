@@ -376,7 +376,7 @@
                             result[name_3] = exportedType;
                             result.push(exportedType);
                         }
-                        break;
+                        return;
                     case ts.SyntaxKind.InterfaceDeclaration:
                         var intf = node;
                         if (hasExportModifier(node)) {
@@ -385,7 +385,7 @@
                             result[name_4] = exportedType;
                             result.push(exportedType);
                         }
-                        break;
+                        return;
                 }
                 ts.forEachChild(node, function (child) { return visitNode(child); });
             }

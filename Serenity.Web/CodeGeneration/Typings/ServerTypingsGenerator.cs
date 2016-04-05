@@ -14,157 +14,31 @@ using System.Web.Mvc;
 
 namespace Serenity.CodeGeneration
 {
-    public class ServerTypingsGenerator : ImportGeneratorBase
+    public class ServerTypingsGenerator : ServerImportGeneratorBase
     {
-        private HashSet<Type> visited;
-        private Queue<Type> generateQueue;
-        private List<Type> lookupScripts;
-        private HashSet<string> tsGenerated;
-
         public ServerTypingsGenerator(params Assembly[] assemblies)
-            : base()
+            : base(assemblies)
         {
-            tsGenerated = new HashSet<string>();
-
-            if (assemblies == null || assemblies.Length == 0)
-                throw new ArgumentNullException("assembly");
-
-            this.Assemblies = assemblies;
         }
 
-        public Assembly[] Assemblies { get; private set; }
-
-        private bool EnqueueType(Type type)
+        protected override bool IsTS()
         {
-            if (visited.Contains(type))
-                return false;
-
-            visited.Add(type);
-            generateQueue.Enqueue(type);
             return true;
-        }
-
-        private void EnqueueTypeMembers(Type type)
-        {
-            foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance))
-            {
-                var pi = member as PropertyInfo;
-                var fi = member as FieldInfo;
-
-                if (pi == null && fi == null)
-                    continue;
-
-                var memberType = pi != null ? pi.PropertyType : fi.FieldType;
-                if (memberType == null)
-                    continue;
-
-                var nullableType = Nullable.GetUnderlyingType(memberType);
-                if (nullableType != null)
-                    memberType = nullableType;
-
-                if (memberType.IsEnum)
-                    EnqueueType(memberType);
-            }
-        }
-
-        private static string GetNamespace(Type type)
-        {
-            var ns = type.Namespace;
-            if (ns.EndsWith(".Entities"))
-                return ns.Substring(0, ns.Length - ".Entities".Length);
-            
-            if (ns.EndsWith(".Endpoints"))
-                return ns.Substring(0, ns.Length - ".Endpoints".Length);
-
-            if (ns.EndsWith(".Forms"))
-                return ns.Substring(0, ns.Length - ".Forms".Length);
-
-            if (ns.EndsWith(".Columns"))
-                return ns.Substring(0, ns.Length - ".Columns".Length);
-
-            return ns;
-        }
-
-        private string GetControllerIdentifier(Type controller)
-        {
-            string className = controller.Name;
-
-            if (className.EndsWith("Controller"))
-                className = className.Substring(0, className.Length - 10);
-
-            return className + "Service";
-        }
-
-        protected override void Reset()
-        {
-            base.Reset();
-
-            this.cw.BraceOnSameLine = true;
-            this.generateQueue = new Queue<Type>();
-            this.visited = new HashSet<Type>();
-            this.lookupScripts = new List<Type>();
         }
 
         protected override void GenerateAll()
         {
-            foreach (var assembly in this.Assemblies)
-                foreach (var fromType in assembly.GetTypes())
-                {
-                    if (fromType.IsAbstract)
-                        continue;
-
-                    if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
-                        fromType.IsSubclassOf(typeof(ServiceResponse)) ||
-                        fromType.IsSubclassOf(typeof(Row)) ||
-                        fromType.GetCustomAttribute<ScriptIncludeAttribute>() != null ||
-                        fromType.GetCustomAttribute<FormScriptAttribute>() != null ||
-                        fromType.GetCustomAttribute<ColumnsScriptAttribute>() != null ||
-                        fromType.IsSubclassOf(typeof(ServiceEndpoint)) ||
-                        (fromType.IsSubclassOf(typeof(Controller)) && // backwards compability
-                         fromType.Namespace.EndsWith(".Endpoints"))) 
-                    {
-                        EnqueueType(fromType);
-                        continue;
-                    }
-
-                    if (fromType.GetCustomAttribute<LookupScriptAttribute>() != null)
-                    {
-                        lookupScripts.Add(fromType);
-                        continue;
-                    }
-                }
-
-            while (generateQueue.Count > 0)
-            {
-                var type = generateQueue.Dequeue();
-
-                if (!this.Assemblies.Contains(type.Assembly))
-                    continue;
-
-                var ns = GetNamespace(type);
-                bool isController = type.IsSubclassOf(typeof(Controller));
-
-                var identifier = isController ? GetControllerIdentifier(type) : type.Name;
-                GenerateCodeFor(type);
-
-                AddFile(RemoveRootNamespace(ns, identifier + ".ts"));
-            }
-
+            base.GenerateAll();
             GenerateSSDeclarations();
-            AddFile("SSDeclarations.ts");
         }
 
-        private void HandleMemberType(Type memberType, string codeNamespace)
+        protected override void HandleMemberType(Type memberType, string codeNamespace, StringBuilder sb = null)
         {
-            HandleMemberType(sb, memberType, codeNamespace, t => EnqueueType(t));
-        }
+            sb = sb ?? this.sb;
 
-        public static void HandleMemberType(StringBuilder code, Type memberType, string codeNamespace,
-            Action<Type> enqueueType = null)
-        {
             if (memberType == typeof(String))
             {
-                code.Append("string");
+                sb.Append("string");
                 return;
             }
 
@@ -182,51 +56,51 @@ namespace Serenity.CodeGeneration
                 memberType == typeof(Double) ||
                 memberType == typeof(Decimal))
             {
-                code.Append("number");
+                sb.Append("number");
                 return;
             }
 
             if (memberType == typeof(Boolean))
             {
-                code.Append("boolean");
+                sb.Append("boolean");
                 return;
             }
 
             if (memberType == typeof(TimeSpan))
             {
-                code.Append("string");
+                sb.Append("string");
                 return;
             }
 
             if (memberType == typeof(DateTime?) || memberType == typeof(DateTime) ||
                 memberType == typeof(TimeSpan) || memberType == typeof(TimeSpan?))
             {
-                code.Append("string"); // for now transfer datetime as string, as its ISO formatted
+                sb.Append("string"); // for now transfer datetime as string, as its ISO formatted
                 return;
             }
 
             if (memberType == typeof(SortBy[]))
             {
-                code.Append("string[]");
+                sb.Append("string[]");
                 return;
             }
 
             if (memberType == typeof(Stream))
             {
-                code.Append("number[]");
+                sb.Append("number[]");
                 return;
             }
 
             if (memberType == typeof(Object))
             {
-                code.Append("any");
+                sb.Append("any");
                 return;
             }
 
             if (memberType.IsArray)
             {
-                HandleMemberType(code, memberType.GetElementType(), codeNamespace, enqueueType);
-                code.Append("[]");
+                HandleMemberType(memberType.GetElementType(), codeNamespace, sb);
+                sb.Append("[]");
                 return;
             }
 
@@ -234,66 +108,27 @@ namespace Serenity.CodeGeneration
                 (memberType.GetGenericTypeDefinition() == typeof(List<>) ||
                 memberType.GetGenericTypeDefinition() == typeof(HashSet<>)))
             {
-                HandleMemberType(code, memberType.GenericTypeArguments[0], codeNamespace, enqueueType);
-                code.Append("[]");
+                HandleMemberType(memberType.GenericTypeArguments[0], codeNamespace, sb);
+                sb.Append("[]");
                 return;
             }
 
             if (memberType.IsGenericType &&
                 memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                code.Append("{ [key: ");
-                HandleMemberType(code, memberType.GenericTypeArguments[0], codeNamespace, enqueueType);
-                code.Append("]: ");
-                HandleMemberType(code, memberType.GenericTypeArguments[1], codeNamespace, enqueueType);
-                code.Append(" }");
+                sb.Append("{ [key: ");
+                HandleMemberType(memberType.GenericTypeArguments[0], codeNamespace, sb);
+                sb.Append("]: ");
+                HandleMemberType(memberType.GenericTypeArguments[1], codeNamespace, sb);
+                sb.Append(" }");
                 return;
             }
 
-            if (enqueueType != null)
-                enqueueType(memberType);
+            EnqueueType(memberType);
 
-            MakeFriendlyReference(code, memberType, codeNamespace, enqueueType);
+            MakeFriendlyReference(memberType, codeNamespace);
         }
-
-        public static bool CanHandleType(Type memberType)
-        {
-            if (memberType.IsInterface)
-                return false;
-
-            if (memberType.IsAbstract)
-                return false;
-
-            if (typeof(Delegate).IsAssignableFrom(memberType))
-                return false;
-
-            return true;
-        }
-
-        public static string ShortenNamespace(Type type, string codeNamespace)
-        {
-            string ns = GetNamespace(type);
-
-            if (ns == "Serenity.Services")
-                return "Serenity";
-
-            if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith((ns + "."))))
-            {
-                return "";
-            }
-
-            if (codeNamespace != null)
-            {
-                var idx = codeNamespace.IndexOf('.');
-                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1)))
-                    return ns.Substring(idx + 1);
-            }
-
-            return ns;
-        }
-
-        public static string ShortenFullName(ExternalType type, string codeNamespace)
+        protected string ShortenFullName(ExternalType type, string codeNamespace)
         {
             if (type.FullName == "Serenity.Widget")
                 return "Serenity.Widget<any>";
@@ -305,118 +140,14 @@ namespace Serenity.CodeGeneration
                 return type.Name;
         }
 
-        public static string ShortenNamespace(ExternalType type, string codeNamespace)
-        {
-            string ns = type.Namespace ?? "";
-
-            if ((codeNamespace != null && (ns == codeNamespace)) ||
-                (codeNamespace != null && codeNamespace.StartsWith((ns + "."))))
-            {
-                return "";
-            }
-
-            if (codeNamespace != null)
-            {
-                var idx = codeNamespace.IndexOf('.');
-                if (idx >= 0 && ns.StartsWith(codeNamespace.Substring(0, idx + 1)))
-                    return ns.Substring(idx + 1);
-            }
-
-            return ns;
-        }
-
-        public static string MakeFriendlyName(StringBuilder sb, Type type, string codeNamespace,
-            Action<Type> enqueueType)
-        {
-            if (type.IsGenericType)
-            {
-                var gtd = type.GetGenericTypeDefinition();
-                var name = gtd.Name;
-                var idx = name.IndexOf('`');
-                if (idx >= 0)
-                    name = name.Substring(0, idx);
-
-                sb.Append(name);
-                sb.Append("<");
-
-                int i = 0;
-                foreach (var argument in type.GetGenericArguments())
-                {
-                    if (i++ > 0)
-                        sb.Append(", ");
-
-                    HandleMemberType(sb, argument, codeNamespace, enqueueType);
-                }
-
-                sb.Append(">");
-
-                return name + "`" + type.GetGenericArguments().Length;
-            }
-            else
-            {
-                sb.Append(type.Name);
-                return type.Name;
-            }
-        }
-
-        public static void MakeFriendlyReference(StringBuilder sb, Type type, string codeNamespace,
-            Action<Type> enqueueType)
-        {
-            string ns;
-
-            if (type.IsGenericType)
-            {
-                var gtd = type.GetGenericTypeDefinition();
-                ns = ShortenNamespace(gtd, codeNamespace);
-
-                if (!string.IsNullOrEmpty(ns))
-                {
-                    sb.Append(ns);
-                    sb.Append(".");
-                }
-
-                var name = gtd.Name;
-                var idx = name.IndexOf('`');
-                if (idx >= 0)
-                    name = name.Substring(0, idx);
-
-                sb.Append(name);
-                sb.Append("<");
-
-                int i = 0;
-                foreach (var argument in type.GetGenericArguments())
-                {
-                    if (i++ > 0)
-                        sb.Append(", ");
-
-                    HandleMemberType(sb, argument, codeNamespace, enqueueType);
-                }
-
-                sb.Append(">");
-                return;
-            }
-
-            if (codeNamespace != null)
-            {
-                ns = ShortenNamespace(type, codeNamespace);
-                if (!string.IsNullOrEmpty(ns))
-                    sb.Append(ns + "." + type.Name);
-                else
-                    sb.Append(type.Name);
-            }
-            else
-                sb.Append(type.Name);
-        }
-
-
         private void GenerateEnum(Type enumType)
         {
             var codeNamespace = GetNamespace(enumType);
             var enumKey = EnumMapper.GetEnumTypeKey(enumType);
 
             cw.Indented("export enum ");
-            var generatedName = MakeFriendlyName(sb, enumType, codeNamespace, enqueueType: (t) => EnqueueType(t));
-            tsGenerated.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+            var generatedName = MakeFriendlyName(enumType, codeNamespace);
+            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
 
             cw.InBrace(delegate
             {
@@ -480,7 +211,6 @@ namespace Serenity.CodeGeneration
                     sb.AppendLine("';");
                     anyMetadata = true;
                 }
-
 
                 if (isActiveRow != null)
                 {
@@ -585,40 +315,7 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine(";");
             }
         }
-
-        private Type GetBaseClass(Type type)
-        {
-            Type derived;
-
-            if (typeof(ListRequest).IsAssignableFrom(type))
-                return typeof(ListRequest);
-            else if (GeneratorUtils.GetFirstDerivedOfGenericType(type, typeof(ListResponse<>), out derived))
-                return typeof(ListResponse<>).MakeGenericType(derived.GetGenericArguments()[0]);
-            else if (typeof(RetrieveRequest).IsAssignableFrom(type))
-                return typeof(RetrieveRequest);
-            else if (GeneratorUtils.GetFirstDerivedOfGenericType(type, typeof(RetrieveResponse<>), out derived))
-                return typeof(RetrieveResponse<>).MakeGenericType(derived.GetGenericArguments()[0]);
-            else if (GeneratorUtils.GetFirstDerivedOfGenericType(type, typeof(SaveRequest<>), out derived))
-                return typeof(SaveRequest<>).MakeGenericType(derived.GetGenericArguments()[0]);
-            else if (typeof(DeleteRequest).IsAssignableFrom(type))
-                return typeof(DeleteRequest);
-            else if (typeof(DeleteResponse).IsAssignableFrom(type))
-                return typeof(DeleteResponse);
-            else if (typeof(UndeleteRequest).IsAssignableFrom(type))
-                return typeof(UndeleteRequest);
-            else if (typeof(UndeleteResponse).IsAssignableFrom(type))
-                return typeof(UndeleteResponse);
-            else if (typeof(SaveResponse).IsAssignableFrom(type))
-                return typeof(SaveResponse);
-            else if (typeof(ServiceRequest).IsAssignableFrom(type))
-                return typeof(ServiceRequest);
-            else if (typeof(ServiceResponse).IsAssignableFrom(type))
-                return typeof(ServiceResponse);
-            else
-                return null;
-        }
-
-        private void GenerateCodeFor(Type type)
+        protected override void GenerateCodeFor(Type type)
         {
             var codeNamespace = GetNamespace(type);
 
@@ -654,14 +351,14 @@ namespace Serenity.CodeGeneration
 
                 cw.Indented("export interface ");
 
-                var generatedName = MakeFriendlyName(sb, type, codeNamespace, enqueueType: (t) => EnqueueType(t));
-                tsGenerated.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+                var generatedName = MakeFriendlyName(type, codeNamespace);
+                generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
 
                 var baseClass = GetBaseClass(type);
                 if (baseClass != null)
                 {
                     sb.Append(" extends ");
-                    MakeFriendlyReference(sb, baseClass, GetNamespace(type), t => EnqueueType(t));
+                    MakeFriendlyReference(baseClass, GetNamespace(type));
                 }
 
                 cw.InBrace(delegate
@@ -714,7 +411,7 @@ namespace Serenity.CodeGeneration
             cw.Indented("export namespace ");
             var identifier = GetControllerIdentifier(type);
             sb.Append(identifier);
-            tsGenerated.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
+            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
 
             cw.InBrace(delegate
             {
@@ -746,10 +443,10 @@ namespace Serenity.CodeGeneration
                     sb.Append(method.Name);
 
                     sb.Append("(request: ");
-                    MakeFriendlyReference(sb, requestType, codeNamespace, t => EnqueueType(t));
+                    MakeFriendlyReference(requestType, codeNamespace);
 
                     sb.Append(", onSuccess?: (response: ");
-                    MakeFriendlyReference(sb, responseType, codeNamespace, t => EnqueueType(t));
+                    MakeFriendlyReference(responseType, codeNamespace);
                     sb.AppendLine(") => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;");
                 }
 
@@ -793,96 +490,13 @@ namespace Serenity.CodeGeneration
             });
         }
 
-        private bool IsPublicServiceMethod(MethodInfo method, out Type requestType, out Type responseType,
-            out string requestParam)
-        {
-            responseType = null;
-            requestType = null;
-            requestParam = null;
-
-            if (method.GetCustomAttribute<NonActionAttribute>() != null)
-                return false;
-
-            if (typeof(Controller).IsSubclassOf(method.DeclaringType))
-                return false;
-
-            if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
-                return false;
-
-            var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
-            if (parameters.Length > 1)
-                return false;
-
-            if (parameters.Length == 1)
-            {
-                requestType = parameters[0].ParameterType;
-                if (requestType.IsPrimitive || !CanHandleType(requestType))
-                    return false;
-            }
-            else
-                requestType = typeof(ServiceRequest);
-
-            requestParam = parameters.Length == 0 ? "request" : parameters[0].Name;
-
-            responseType = method.ReturnType;
-            if (responseType != null &&
-                responseType.IsGenericType &&
-                responseType.GetGenericTypeDefinition() == typeof(Result<>))
-            {
-                responseType = responseType.GenericTypeArguments[0];
-            }
-            else if (typeof(ActionResult).IsAssignableFrom(responseType))
-                return false;
-            else if (responseType == typeof(void))
-                return false;
-
-            return true;
-        }
-
-        private string GetServiceUrlFromRoute(Type controller)
-        {
-            var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            string url = route.Template ?? "";
-
-            if (!url.StartsWith("~/"))
-            {
-                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
-                if (routePrefix != null)
-                    url = UriHelper.Combine(routePrefix.Prefix, url);
-            }
-
-            if (!url.StartsWith("~/") && !url.StartsWith("/"))
-                url = "~/" + url;
-
-            while (true)
-            {
-                var idx1 = url.IndexOf('{');
-                if (idx1 <= 0)
-                    break;
-
-                var idx2 = url.IndexOf("}", idx1 + 1);
-                if (idx2 <= 0)
-                    break;
-
-                url = url.Substring(0, idx1) + url.Substring(idx2 + 1);
-            }
-
-            if (url.StartsWith("~/Services/", StringComparison.OrdinalIgnoreCase))
-                url = url.Substring("~/Services/".Length);
-
-            if (url.Length > 1 && url.EndsWith("/"))
-                url = url.Substring(0, url.Length - 1);
-
-            return url;
-        }
-
         private void GenerateForm(Type type, FormScriptAttribute formScriptAttribute)
         {
             var codeNamespace = GetNamespace(type);
 
             cw.Indented("export class ");
-            var generatedName = MakeFriendlyName(sb, type, codeNamespace, (t) => EnqueueType(t));
-            tsGenerated.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+            var generatedName = MakeFriendlyName(type, codeNamespace);
+            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
 
             sb.Append(" extends Serenity.PrefixedContext");
             cw.InBrace(delegate
@@ -896,7 +510,7 @@ namespace Serenity.CodeGeneration
             sb.AppendLine();
 
             cw.Indented("export interface ");
-            MakeFriendlyName(sb, type, codeNamespace, (t) => EnqueueType(t));
+            MakeFriendlyName(type, codeNamespace);
             sb.Append(" extends Serenity.PrefixedContext");
 
             StringBuilder initializer = new StringBuilder("[");
@@ -940,7 +554,7 @@ namespace Serenity.CodeGeneration
             });
 
             initializer.Append("].forEach(x => ");
-            MakeFriendlyName(initializer, type, codeNamespace, (t) => EnqueueType(t));
+            MakeFriendlyName(type, codeNamespace, initializer);
             initializer.Append(".prototype[<string>x[0]] = function() { return this.w(x[0], x[1]); });");
 
             sb.AppendLine();
@@ -1365,7 +979,7 @@ namespace Serenity.CodeGeneration
             var byNamespace = 
                 ssTypes.Values.Where(x =>
                     !tsTypes.ContainsKey(x.FullName) &&
-                    !tsGenerated.Contains(x.FullName))
+                    !generatedTypes.Contains(x.FullName))
                 .Where(x => !x.AssemblyName.StartsWith("Serenity.Script"))
                 .OrderBy(x => x.Namespace)
                 .ThenBy(x => x.Name)
@@ -1457,6 +1071,8 @@ namespace Serenity.CodeGeneration
                     }
                 });
             }
+
+            AddFile("SSDeclarations.ts");
         }
     }
 }
