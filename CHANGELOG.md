@@ -1,3 +1,8 @@
+## 1.9.28 (2016-04-05)
+
+Bugfixes:
+  - resolve bug with json deserialization of guid fields
+
 ## 1.9.27 (2016-03-31)
 
 Bugfixes:
