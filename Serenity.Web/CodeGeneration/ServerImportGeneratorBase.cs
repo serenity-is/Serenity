@@ -170,7 +170,12 @@ namespace Serenity.CodeGeneration
             string ns = GetNamespace(type);
 
             if (ns == "Serenity.Services")
-                return "Serenity";
+            {
+                if (IsUsingNamespace("Serenity"))
+                    return "";
+                else
+                    return "Serenity";
+            }
 
             if ((codeNamespace != null && (ns == codeNamespace)) ||
                 (codeNamespace != null && codeNamespace.StartsWith((ns + "."))))

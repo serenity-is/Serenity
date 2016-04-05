@@ -23,6 +23,7 @@ namespace Serenity.CodeGeneration
 
         private string[] UsingNamespaces = new string[]
         {
+            "jQueryApi",
             "Serenity",
             "Serenity.ComponentModel",
             "System",
@@ -62,13 +63,13 @@ namespace Serenity.CodeGeneration
             {
                 if (type.IsEnum)
                 {
-                    //GenerateEnum(type);
+                    GenerateEnum(type);
                     return;
                 }
 
                 if (type.IsSubclassOf(typeof(Controller)))
                 {
-                    //GenerateService(type);
+                    GenerateService(type);
                     return;
                 }
 
@@ -252,10 +253,12 @@ namespace Serenity.CodeGeneration
             var codeNamespace = GetNamespace(enumType);
             var enumKey = EnumMapper.GetEnumTypeKey(enumType);
 
-            cw.Indented("export enum ");
-            var generatedName = MakeFriendlyName(enumType, codeNamespace);
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+            cw.Indented("[EnumKey(\"");
+            sb.Append(enumKey);
+            sb.AppendLine("\"), PreserveMemberCase]");
 
+            cw.Indented("public enum ");
+            sb.AppendLine(enumType.Name);
             cw.InBrace(delegate
             {
                 var names = Enum.GetNames(enumType);
@@ -275,12 +278,6 @@ namespace Serenity.CodeGeneration
 
                 sb.AppendLine();
             });
-
-            cw.Indented("Serenity.Decorators.addAttribute(");
-            sb.Append(enumType.Name);
-            sb.Append(", new Serenity.EnumKeyAttribute('");
-            sb.Append(enumKey);
-            sb.AppendLine("'));");
         }
 
         private void GenerateRowMembers(Type rowType)
@@ -400,10 +397,12 @@ namespace Serenity.CodeGeneration
         {
             var codeNamespace = GetNamespace(type);
 
-            cw.Indented("export namespace ");
             var identifier = GetControllerIdentifier(type);
-            sb.Append(identifier);
             generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
+
+            cw.IndentedLine("[Imported, PreserveMemberCase]");
+            cw.Indented("public partial class ");
+            sb.AppendLine(identifier);
 
             cw.InBrace(delegate
             {
@@ -411,10 +410,9 @@ namespace Serenity.CodeGeneration
                 if (serviceUrl == null)
                     serviceUrl = GetNamespace(type).Replace(".", "/");
 
-                cw.Indented("export const baseUrl = '");
+                cw.Indented("[InlineConstant] public const string BaseUrl = \"");
                 sb.Append(serviceUrl);
-                sb.AppendLine("';");
-                sb.AppendLine();
+                sb.AppendLine("\";");
 
                 Type responseType;
                 Type requestType;
@@ -431,54 +429,48 @@ namespace Serenity.CodeGeneration
 
                     methodNames.Add(method.Name);
 
-                    cw.Indented("export declare function ");
+                    sb.AppendLine();
+                    cw.Indented("[InlineCode(\"Q.serviceRequest(\'");
+                    sb.Append(UriHelper.Combine(serviceUrl, method.Name));
+                    sb.Append("\', {");
+                    sb.Append(requestParam);
+                    sb.AppendLine("}, {onSuccess}, {options})\")]");
+                    cw.Indented("public static jQueryXmlHttpRequest ");
                     sb.Append(method.Name);
 
-                    sb.Append("(request: ");
+                    sb.Append("(");
+
                     MakeFriendlyReference(requestType, codeNamespace);
 
-                    sb.Append(", onSuccess?: (response: ");
+                    sb.Append(' ');
+                    sb.Append(requestParam);
+                    sb.Append(", Action<");
+
                     MakeFriendlyReference(responseType, codeNamespace);
-                    sb.AppendLine(") => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;");
+
+                    sb.Append("> onSuccess = null, ServiceCallOptions options = null");
+                    sb.AppendLine(")");
+
+                    cw.InBrace(delegate
+                    {
+                        cw.IndentedLine("return null;");
+                    });
                 }
 
                 sb.AppendLine();
-                cw.Indented("export namespace ");
-                sb.Append("Methods");
+                cw.IndentedLine("[Imported, PreserveMemberCase]");
+                cw.IndentedLine("public static class Methods");
                 cw.InBrace(delegate
                 {
-                    foreach (var methodName in methodNames)
+                    foreach (var method in methodNames)
                     {
-                        cw.Indented("export declare const ");
-                        sb.Append(methodName);
-                        sb.Append(": '");
-                        sb.Append(serviceUrl);
-                        sb.Append("/");
-                        sb.Append(methodName);
-                        sb.AppendLine("';");
+                        cw.Indented("[InlineConstant] public const string ");
+                        sb.Append(method);
+                        sb.Append(" = \"");
+                        sb.Append(UriHelper.Combine(serviceUrl, method));
+                        sb.AppendLine("\";");
                     }
                 });
-
-                sb.AppendLine();
-                cw.Indented("[");
-                int i = 0;
-                foreach (var methodName in methodNames)
-                {
-                    if (i++ > 0)
-                        sb.Append(", ");
-
-                    sb.Append("'");
-                    sb.Append(methodName);
-                    sb.Append("'");
-                }
-                sb.AppendLine("].forEach(x => {");
-                cw.Block(delegate () {
-                    cw.Indented("(<any>");
-                    sb.Append(identifier);
-                    sb.AppendLine(")[x] = function (r, s, o) { return Q.serviceRequest(baseUrl + '/' + x, r, s, o); };");
-                    cw.IndentedLine("(<any>Methods)[x] = baseUrl + '/' + x;");
-                });
-                cw.IndentedLine("});");
             });
         }
 
