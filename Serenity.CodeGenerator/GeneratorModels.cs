@@ -30,6 +30,7 @@ namespace Serenity.CodeGenerator
     public class EntityCodeField
     {
         public string Type { get; set; }
+        public string TSType { get; set; }
         public string Ident { get; set; }
         public string Name { get; set; }
         public string Title { get; set; }

@@ -20,7 +20,7 @@ namespace @(Model.RootNamespace)@(dotModule).Forms
     {
         if (x.Ident != Model.IdField)
         {<text>
-        public @x.Type @x.Ident { [InlineCode("{this}.m('@(x.Ident)', Serenity.@(x.Type))")] get; private set; }</text>}
+        public @x.Type @x.Ident { get; set; }</text>}
     }
 
     }

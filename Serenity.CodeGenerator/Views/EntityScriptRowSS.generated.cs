@@ -17,7 +17,7 @@ namespace Serenity.CodeGenerator.Views
     using System.Text;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
-    public partial class EntityScriptRow : RazorGenerator.Templating.RazorTemplateBase
+    public partial class EntityScriptRowSS : RazorGenerator.Templating.RazorTemplateBase
     {
 #line hidden
  public dynamic Model { get; set; } 
@@ -32,7 +32,6 @@ WriteLiteral("\r\n");
                                                    
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
-    var schemaDot = Model.Schema == null ? "" : ("[" + Model.Schema + "].");
      
     Func<string, string, string> jf = (x, y) =>
     {

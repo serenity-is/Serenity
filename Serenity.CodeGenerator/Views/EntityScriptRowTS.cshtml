@@ -1,0 +1,47 @@
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+
+    Func<string, string, string> jf = (x, y) =>
+    {
+        if (x.ToLowerInvariant() == y.ToLowerInvariant())
+            return y;
+        else
+            return x + y;
+    };
+
+    var fields = (IEnumerable<EntityCodeField>)Model.Fields;
+    var joins = (IEnumerable<EntityCodeJoin>)Model.Joins;
+    var fieldList = String.Join(", ", fields.Select(x => "'" + x.Ident + "'").Concat(joins.SelectMany(x => x.Fields.Select(y => "'" + jf(x.Name, y.Ident) + "'"))));
+}
+namespace @(Model.RootNamespace)@(dotModule) {
+    export interface @(Model.RowClassName) {
+@foreach (var x in Model.Fields) {
+<text>
+        @x.Ident: @(x.TSType);</text>}
+@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+<text>
+        @(jf(x.Name, y.Ident)): @(x.TSType);</text>}}
+
+    }
+
+    export namespace @(Model.RowClassName) {@if (Model.Identity != null) {<text>
+        export const idProperty = "@(Model.Identity)";</text>}@if (Model.NameField != null) {<text>
+        export const nameProperty = "@(Model.NameField)";</text>}
+
+        export const localTextPrefix = "@moduleDot@Model.ClassName";
+
+        export namespace Fields {@foreach (var x in Model.Fields) {
+<text>
+            export const @x.Ident = "@(x.Ident)";</text>}
+@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+<text>
+            export const @(jf(x.Name, y.Ident)) = "@(jf(x.Name, y.Ident))";</text>}}
+
+        }
+
+        [@fieldList].forEach(x => (<any>Fields)[x] = x);
+    }
+}
+

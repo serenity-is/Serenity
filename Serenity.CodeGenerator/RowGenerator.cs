@@ -51,6 +51,32 @@ namespace Serenity.CodeGenerator
                 return join + "_" + field;
         }
 
+        public static string FieldTypeToTS(string ft)
+        {
+            switch (ft)
+            {
+                case "Boolean":
+                    return "boolean";
+                case "String":
+                case "DateTime":
+                case "TimeSpan":
+                case "Guid":
+                    return "string";
+                case "Int32":
+                case "Int16":
+                case "Int64":
+                case "Single":
+                case "Double":
+                case "Decimal":
+                    return "number";
+                case "Stream":
+                    return "number[]";
+            }
+
+            return "any";
+        }
+
+
         public static EntityCodeGenerationModel GenerateModel(IDbConnection connection, string tableSchema, string table,
             string module, string connectionKey, string entityClass, string permission, GeneratorConfig config)
         {
@@ -146,6 +172,7 @@ namespace Serenity.CodeGenerator
                         model.RowBaseFields.Add(new EntityCodeField
                         {
                             Type = ft,
+                            TSType = FieldTypeToTS(ft),
                             Ident = GenerateVariableName(f.FieldName.Substring(prefix)),
                             Title = Inflector.Inflector.Titleize(f.FieldName.Substring(prefix)),
                             Name = f.FieldName,
@@ -183,6 +210,7 @@ namespace Serenity.CodeGenerator
                 var f = new EntityCodeField()
                 {
                     Type = fieldType,
+                    TSType = FieldTypeToTS(fieldType),
                     Ident = GenerateVariableName(field.FieldName.Substring(prefix)),
                     Title = Inflector.Inflector.Titleize(field.FieldName.Substring(prefix)),
                     Name = field.FieldName,
@@ -232,6 +260,7 @@ namespace Serenity.CodeGenerator
                         var k = new EntityCodeField()
                         {
                             Type = kType,
+                            TSType = FieldTypeToTS(kType),
                             Ident = GenerateVariableName(frg.FieldName.Substring(frgPrefix)),
                             Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName.Substring(frgPrefix))),
                             Name = frg.FieldName,

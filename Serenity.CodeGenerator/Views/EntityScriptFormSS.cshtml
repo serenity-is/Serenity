@@ -43,7 +43,7 @@ namespace @(Model.RootNamespace)@(dotModule)
     {
         if (x.Ident != Model.Identity)
         {<text>
-        public @(gt(x)) @x.Ident { get { return ById<@(gt(x))>("@(x.Ident)"); } }</text>}
+        public @(gt(x)) @x.Ident { [InlineCode("{this}.m('@(x.Ident)', Serenity.@(x.Type))")] get; private set; }</text>}
     }
 
     }

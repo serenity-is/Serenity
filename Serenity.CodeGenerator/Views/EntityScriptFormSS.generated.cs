@@ -17,7 +17,7 @@ namespace Serenity.CodeGenerator.Views
     using System.Text;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
-    public partial class EntityScriptForm : RazorGenerator.Templating.RazorTemplateBase
+    public partial class EntityScriptFormSS : RazorGenerator.Templating.RazorTemplateBase
     {
 #line hidden
  public dynamic Model { get; set; } 
@@ -108,20 +108,20 @@ WriteLiteral(" ");
 
                    Write(x.Ident);
 
-WriteLiteral(" { get { return ById<");
+WriteLiteral(" { [InlineCode(\"{this}.m(\'");
 
 
-                                                 Write(gt(x));
+                                                      Write(x.Ident);
 
-WriteLiteral(">(\"");
-
-
-                                                            Write(x.Ident);
-
-WriteLiteral("\"); } }");
+WriteLiteral("\', Serenity.");
 
 
-                                                                                        }
+                                                                            Write(x.Type);
+
+WriteLiteral(")\")] get; private set; }");
+
+
+                                                                                                                        }
     }
 
 WriteLiteral("\r\n    }\r\n}");
