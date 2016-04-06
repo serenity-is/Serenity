@@ -16,6 +16,9 @@ namespace Serenity.CodeGenerator
         public string RootNamespace { get; set; }
         public List<BaseRowClass> BaseRowClasses { get; set; }
         public List<string> RemoveForeignFields { get; set; }
+        public bool GenerateSSImports { get; set; }
+        public bool GenerateTSTypings { get; set; }
+        public bool GenerateTSCode { get; set; }
 
         public GeneratorConfig()
         {
@@ -23,6 +26,9 @@ namespace Serenity.CodeGenerator
             KDiff3Path = Path.Combine(Environment.GetFolderPath(
                 Environment.SpecialFolder.ProgramFilesX86), @"KDiff3\kdiff3.exe");
             BaseRowClasses = new List<BaseRowClass>();
+            GenerateTSTypings = true;
+            GenerateSSImports = true;
+            GenerateTSCode = false;
             SetDefaults();
         }
 

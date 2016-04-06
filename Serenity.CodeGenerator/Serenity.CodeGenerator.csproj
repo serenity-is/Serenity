@@ -122,13 +122,53 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Views\EntityScriptForm.generated.cs">
-      <DependentUpon>EntityScriptForm.cshtml</DependentUpon>
+    <Compile Include="Views\EntityForm.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityForm.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptFormTS.generated.cs">
+      <DependentUpon>EntityScriptFormTS.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Views\EntityScriptService.generated.cs">
-      <DependentUpon>EntityScriptService.cshtml</DependentUpon>
+    <Compile Include="Views\EntityScriptFormSS.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptFormSS.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptGridSS.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptGridSS.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptDialogTS.generated.cs">
+      <DependentUpon>EntityScriptDialogTS.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Views\EntityScriptGridTS.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptGridTS.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptRowSS.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptRowSS.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptRowTS.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptRowTS.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptServiceTS.generated.cs">
+      <DependentUpon>EntityScriptServiceTS.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Views\EntityScriptServiceSS.generated.cs">
+      <DependentUpon>EntityScriptServiceSS.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
@@ -141,11 +181,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityCss.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityForm.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityForm.cshtml</DependentUpon>
     </Compile>
     <Compile Include="Views\EntityPageController.generated.cs">
       <AutoGen>True</AutoGen>
@@ -162,37 +197,47 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityRepository.cshtml</DependentUpon>
     </Compile>
-    <Compile Include="Views\EntityScriptRow.generated.cs">
-      <DependentUpon>EntityScriptRow.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Include="Views\EntityRow.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityRow.cshtml</DependentUpon>
     </Compile>
-    <Compile Include="Views\EntityScriptDialog.generated.cs">
+    <Compile Include="Views\EntityScriptDialogSS.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptDialog.cshtml</DependentUpon>
+      <DependentUpon>EntityScriptDialogSS.cshtml</DependentUpon>
     </Compile>
-    <Compile Include="Views\EntityScriptGrid.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>EntityScriptGrid.cshtml</DependentUpon>
-    </Compile>
-    <None Include="Views\EntityScriptForm.cshtml">
+    <None Include="Views\EntityScriptFormTS.cshtml">
       <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptForm.generated.cs</LastGenOutput>
+      <LastGenOutput>EntityScriptFormTS.generated.cs</LastGenOutput>
     </None>
-    <None Include="Views\EntityScriptService.cshtml">
+    <None Include="Views\EntityScriptFormSS.cshtml">
       <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptService.generated.cs</LastGenOutput>
+      <LastGenOutput>EntityScriptFormSS.generated.cs</LastGenOutput>
     </None>
-    <None Include="Views\EntityScriptRow.cshtml">
+    <None Include="Views\EntityScriptDialogTS.cshtml">
       <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptRow.generated.cs</LastGenOutput>
+      <LastGenOutput>EntityScriptDialogTS.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptGridTS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptGridTS.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptRowTS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptRowTS.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptServiceTS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptServiceTS.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptServiceSS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptServiceSS.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptRowSS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptRowSS.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\razorgenerator.directives" />
     <Page Include="AddConnectionStringWindow.xaml">
@@ -249,9 +294,9 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityCss.generated.cs</LastGenOutput>
     </None>
-    <None Include="Views\EntityScriptGrid.cshtml">
+    <None Include="Views\EntityScriptGridSS.cshtml">
       <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptGrid.generated.cs</LastGenOutput>
+      <LastGenOutput>EntityScriptGridSS.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityPageIndex.cshtml">
       <Generator>RazorGenerator</Generator>
@@ -277,9 +322,9 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityRepository.generated.cs</LastGenOutput>
     </None>
-    <None Include="Views\EntityScriptDialog.cshtml">
+    <None Include="Views\EntityScriptDialogSS.cshtml">
       <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptDialog.generated.cs</LastGenOutput>
+      <LastGenOutput>EntityScriptDialogSS.generated.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

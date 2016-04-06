@@ -66,8 +66,6 @@ namespace Serenity.Test.PropertyGrid
         public void PreservesDeclarationOrderingFor_ClassWithUnorderedProperties()
         {
             var actual = PropertyItemHelper.GetPropertyItemsFor(typeof(ClassWithUnorderedProperties));
-            for (var i = 0; i < 10000; i++)
-                PropertyItemHelper.GetPropertyItemsFor(typeof(ClassWithUnorderedProperties));
 
             var expected = new PropertyItem[]
             {

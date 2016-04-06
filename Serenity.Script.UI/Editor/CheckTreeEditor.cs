@@ -1,5 +1,4 @@
 ﻿using jQueryApi;
-using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Html;
@@ -9,6 +8,7 @@ namespace Serenity
 {
     [Element("<div/>")]
     [IdProperty("id")]
+    [IncludeGenericArguments(false), ScriptName("CheckTreeEditor")]
     public abstract class CheckTreeEditor<TItem, TOptions> : DataGrid<TItem, TOptions>, IGetEditValue, ISetEditValue
         where TOptions: class, new()
         where TItem: CheckTreeItem, new()
@@ -330,7 +330,7 @@ namespace Serenity
                     SlickFormatting.TreeToggle(() => self.view, x => x.Id, ctx => 
                     {
                         var cls = "check-box";
-                        var item = (TItem)ctx.Item;
+                        var item = ((object)ctx.Item).As<TItem>();
 
                         if (item.HideCheckBox)
                             return GetItemText(ctx);
@@ -444,6 +444,7 @@ namespace Serenity
 
     public static class GridSelectAllButtonHelper
     {
+        [IncludeGenericArguments(false)]
         public static void Update<TItem>(IDataGrid grid,
             Func<TItem, bool> getSelected)
             where TItem: class, new()
@@ -460,6 +461,7 @@ namespace Serenity
             btn.ToggleClass("checked", items.Count > 0 && !items.Some(x => !getSelected(x)));
         }
 
+        [IncludeGenericArguments(false)]
         public static ToolButton Define<TItem>(
             Func<IDataGrid> getGrid,
             Func<TItem, object> getId,
@@ -502,6 +504,7 @@ namespace Serenity
         }
     }
 
+    [Imported, IncludeGenericArguments(false), ScriptName("CheckTreeEditor")]
     public abstract class CheckTreeEditor<TOptions> : CheckTreeEditor<CheckTreeItem, TOptions>, IGetEditValue, ISetEditValue
         where TOptions : class, new()
     {

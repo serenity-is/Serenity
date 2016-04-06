@@ -1,4 +1,6 @@
 ﻿using jQueryApi;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -20,6 +22,12 @@ namespace Serenity
             where TWidget : Widget
         {
             return ById(id).GetWidget<TWidget>();
+        }
+
+        [ScriptName("w")]
+        private object w(string id, Type t)
+        {
+            return J("#" + idPrefix + id).GetWidget(t);
         }
 
         public string IdPrefix { get { return idPrefix; } }

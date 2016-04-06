@@ -173,7 +173,7 @@ namespace Serenity
             
             opt.OnSuccess = response => 
             {
-                var copy = jQuery.ExtendObject(new TEntity(), self.Entity).As<JsDictionary<string, object>>();
+                var copy = jQuery.ExtendObject(new object().As<TEntity>(), self.Entity).As<JsDictionary<string, object>>();
                 
                 foreach (var language in response.Entities.Keys)
                 {

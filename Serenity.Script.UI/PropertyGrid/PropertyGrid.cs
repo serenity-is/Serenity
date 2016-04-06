@@ -156,12 +156,12 @@ namespace Serenity
 
             if (item.Required == true)
                 J("<sup>*</sup>")
-                    .Attribute("title", Texts.Controls.PropertyGrid.RequiredHint)
+                    .Attribute("title", Q.Text("Controls.PropertyGrid.RequiredHint"))
                     .PrependTo(label);
 
             var editorType = EditorTypeRegistry.Get(item.EditorType ?? "String");
             var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
-            string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Html : "<input/>";
+            string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Value : "<input/>";
 
             var element = Widget.ElementFor(editorType)
                 .AddClass("editor")

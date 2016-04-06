@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
-using Serenity.ComponentModel;
 using System.ComponentModel;
 
 namespace Serenity

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class HiddenAttribute : Attribute
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class EditorTypeAttribute : EditorTypeAttributeBase
     {

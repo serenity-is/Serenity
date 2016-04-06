@@ -1,0 +1,42 @@
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var modulePrefix = (Model.Module == null ? "" : (Model.Module + "/"));
+
+    Func<string, string, string> jf = (x, y) =>
+    {
+        if (x.ToLowerInvariant() == y.ToLowerInvariant())
+            return y;
+        else
+            return x + y;
+    };
+
+    var fields = (IEnumerable<EntityCodeField>)Model.Fields;
+    var joins = (IEnumerable<EntityCodeJoin>)Model.Joins;
+    var fieldList = String.Join(", ", fields.Select(x => "'" + x.Ident + "'").Concat(joins.SelectMany(x => x.Fields.Select(y => "'" + jf(x.Name, y.Ident) + "'"))));
+}
+
+namespace @(Model.RootNamespace)@(dotModule) {
+    export namespace @(Model.ClassName)Service {
+        export const baseUrl = '@(modulePrefix)@(Model.ClassName)';
+
+        export declare function Create(request: Serenity.SaveRequest<@(Model.RowClassName)>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
+        export declare function Update(request: Serenity.SaveRequest<@(Model.RowClassName)>, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
+        export declare function Delete(request: Serenity.DeleteRequest, onSuccess?: (response: Serenity.DeleteResponse) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
+        export declare function Retrieve(request: Serenity.RetrieveRequest, onSuccess?: (response: Serenity.RetrieveResponse<@(Model.RowClassName)>) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
+        export declare function List(request: Serenity.ListRequest, onSuccess?: (response: Serenity.ListResponse<@(Model.RowClassName)>) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
+
+        export namespace Methods {
+            export declare const Create: '@(modulePrefix)@(Model.ClassName)/Create';
+            export declare const Update: '@(modulePrefix)@(Model.ClassName)/Update';
+            export declare const Delete: '@(modulePrefix)@(Model.ClassName)/Delete';
+            export declare const Retrieve: '@(modulePrefix)@(Model.ClassName)/Retrieve';
+            export declare const List: '@(modulePrefix)@(Model.ClassName)/List';
+        }
+
+        ['Create', 'Update', 'Delete', 'Retrieve', 'List'].forEach(x => {
+            (<any>@(Model.ClassName)Service)[x] = function (r, s, o) { return Q.serviceRequest(baseUrl + '/' + x, r, s, o); };
+            (<any>Methods)[x] = baseUrl + '/' + x;
+        });
+    }
+}

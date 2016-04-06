@@ -12,7 +12,7 @@ namespace Serenity
     {
         public void Load(object entityOrId, Action done, Action<object> fail)
         {
-            fail.TryCatch(delegate()
+            Action action = delegate
             {
                 if (entityOrId == null)
                 {
@@ -29,11 +29,26 @@ namespace Serenity
                     LoadById(entityId, response => Window.SetTimeout(done, 0));
                     return;
                 }
-                 
-                var entity = entityOrId.As<TEntity>() ?? new TEntity();
+
+                var entity = entityOrId.As<TEntity>() ?? new object().As<TEntity>();
                 LoadResponse(new RetrieveResponse<TEntity> { Entity = entity });
                 done();
-            });
+            };
+
+            if (fail == null)
+            {
+                action();
+                return;
+            }
+
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                fail(ex);
+            }
         }
 
         public void LoadNewAndOpenDialog()
@@ -58,7 +73,7 @@ namespace Serenity
 
             OnLoadingData(data);
 
-            var entity = data.Entity ?? new TEntity();
+            var entity = data.Entity ?? new object().As<TEntity>();
 
             BeforeLoadEntity(entity);
 

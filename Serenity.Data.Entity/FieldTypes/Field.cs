@@ -37,7 +37,7 @@ namespace Serenity.Data
             this.flags = flags;
             this.type = type;
             index = -1;
-            minSelectLevel = SelectLevel.Default;
+            minSelectLevel = SelectLevel.Auto;
             naturalOrder = 0;
             this.caption = caption;
             if (fields != null)

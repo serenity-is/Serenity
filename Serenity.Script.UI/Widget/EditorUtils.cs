@@ -76,7 +76,7 @@ namespace Serenity
                 {
                     object value = source[item.Name];
                     if (Script.TypeOf(value) == "number")
-                        booleanValue.Value = IdExtensions.IsPositiveId(value.As<Int64>());
+                        booleanValue.Value = value.As<double>() > 0;
                     else
                         booleanValue.Value = Q.IsTrue(value);
                 }
@@ -162,7 +162,7 @@ namespace Serenity
             if (isRequired && !hasSupItem)
             {
                 jQuery.FromHtml("<sup>*</sup>")
-                    .Attribute("title", Texts.Controls.PropertyGrid.RequiredHint)
+                    .Attribute("title", Q.Text("Controls.PropertyGrid.RequiredHint"))
                     .PrependTo(gridField.Find(".caption")[0]);
             }
             else if (!isRequired && hasSupItem)

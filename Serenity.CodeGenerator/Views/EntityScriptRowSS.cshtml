@@ -1,0 +1,56 @@
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+     
+    Func<string, string, string> jf = (x, y) =>
+    {
+        if (x.ToLowerInvariant() == y.ToLowerInvariant())
+            return y;
+        else
+            return x + y;
+    };
+
+    Func<EntityCodeField, string> gt = (x) =>
+    {
+        return (x.Type == "Stream" ? "byte[]" : (x.Type == "DateTime" ? "String" : (x.Type + (x.IsValueType ? "?" : ""))));
+    };
+}
+using jQueryApi;
+using Serenity;
+using Serenity.ComponentModel;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace @(Model.RootNamespace)@(dotModule)
+{
+    [Imported, Serializable, PreserveMemberCase]
+    public partial class @Model.RowClassName
+    {@if (Model.Identity != null) {<text>
+        [InlineConstant] public const string IdProperty = "@(Model.Identity)";</text>}@if (Model.NameField != null) {<text>
+        [InlineConstant] public const string NameProperty = "@(Model.NameField)";</text>}
+
+        [InlineConstant] public const string LocalTextPrefix = "@moduleDot@Model.ClassName";
+@foreach (var x in Model.Fields) {
+<text>
+        public @gt(x) @x.Ident { get; set; }</text>}
+@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+<text>
+        public @gt(y) @(jf(x.Name, y.Ident)) { get; set; }</text>}}
+
+
+        [Imported, PreserveMemberCase]
+        public static class Fields
+        {@foreach (var x in Model.Fields) {
+<text>
+            [InlineConstant] public const string @x.Ident = "@(x.Ident)";</text>}
+@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+<text>
+            [InlineConstant] public const string @(jf(x.Name, y.Ident)) = "@(jf(x.Name, y.Ident))";</text>}}
+
+        }
+    }
+}

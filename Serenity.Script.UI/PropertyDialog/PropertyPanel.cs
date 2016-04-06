@@ -1,9 +1,11 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [IncludeGenericArguments(false), ScriptName("PropertyPanel")]
     public abstract partial class PropertyPanel<TEntity, TOptions> : TemplatedPanel<TOptions>
         where TEntity : class, new()
         where TOptions: class, new()
@@ -11,12 +13,7 @@ namespace Serenity
         private TEntity entity;
         private Int64? entityId;
 
-        protected PropertyPanel(jQueryObject container)
-            : base(container)
-        {
-        }
-
-        protected PropertyPanel(jQueryObject div, TOptions opt)
+        protected PropertyPanel(jQueryObject div, TOptions opt = null)
             : base(div, opt)
         {
             if (!IsAsyncWidget())
@@ -64,7 +61,7 @@ namespace Serenity
         protected TEntity Entity
         {
             get { return entity; }
-            set { entity = value ?? new TEntity(); }
+            set { entity = value ?? new object().As<TEntity>(); }
         }
 
         protected internal Nullable<Int64> EntityId
@@ -181,7 +178,7 @@ namespace Serenity
 
         protected virtual TEntity GetSaveEntity()
         {
-            var entity = new TEntity();
+            var entity = new object().As<TEntity>();
 
             if (this.propertyGrid != null)
                 this.propertyGrid.Save(entity);
@@ -190,6 +187,7 @@ namespace Serenity
         }
     }
 
+    [Imported, IncludeGenericArguments(false), ScriptName("PropertyPanel")]
     public abstract partial class PropertyPanel<TEntity> : PropertyPanel<TEntity, object>
         where TEntity : class, new()
     {

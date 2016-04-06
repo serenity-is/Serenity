@@ -35,7 +35,7 @@ namespace Serenity
 
         protected virtual string EmptyItemText()
         {
-            return element.GetAttribute("placeholder") ?? Texts.Controls.SelectEditor.EmptyItemText;
+            return element.GetAttribute("placeholder") ?? Q.Text("Controls.SelectEditor.EmptyItemText");
         }
 
         protected virtual string GetService()

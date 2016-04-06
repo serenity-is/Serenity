@@ -35,12 +35,16 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Attribute\GeneratedCode.cs" />
     <Compile Include="CKEditor\CKEditor.cs" />
     <Compile Include="Criteria\BaseCriteria.cs" />
     <Compile Include="Criteria\BinaryCriteria.cs" />
     <Compile Include="Criteria\Criteria.cs" />
+    <Compile Include="Criteria\CriteriaUtil.cs" />
     <Compile Include="Criteria\UnaryCriteria.cs" />
     <Compile Include="Criteria\ValueCriteria.cs" />
+    <Compile Include="Extensions\IdExtensions.cs" />
+    <Compile Include="Extensions\TabsExtensions.cs" />
     <Compile Include="GoogleMaps\AdSenseLibrary\AdFormat.cs" />
     <Compile Include="GoogleMaps\AdSenseLibrary\AdUnit.cs" />
     <Compile Include="GoogleMaps\AdSenseLibrary\AdUnitOptions.cs" />
@@ -172,8 +176,28 @@
     <Compile Include="GoogleMaps\_Customs\StreetViewPanorama.cs" />
     <Compile Include="GoogleMaps\_Customs\StreetViewPanoramaOptions.cs" />
     <Compile Include="GoogleMaps\_Customs\StreetViewService.cs" />
+    <Compile Include="LocalText.cs" />
+    <Compile Include="Lookup.cs" />
     <Compile Include="Mousetrap\Mousetrap.cs" />
     <Compile Include="Promise\Promise.cs" />
+    <Compile Include="Q\Q.BlockUI.cs" />
+    <Compile Include="Q\Q.Config.cs" />
+    <Compile Include="Q\Q.cs" />
+    <Compile Include="Q\Q.Culture.cs" />
+    <Compile Include="Q\Q.Date.cs" />
+    <Compile Include="Q\Q.Dialogs.cs" />
+    <Compile Include="Q\Q.ErrorHandling.cs" />
+    <Compile Include="Q\Q.Externals.cs" />
+    <Compile Include="Q\Q.HtmlUtils.cs" />
+    <Compile Include="Q\Q.Layout.cs" />
+    <Compile Include="Q\Q.Notifications.cs" />
+    <Compile Include="Q\Q.Number.cs" />
+    <Compile Include="Q\Q.ScriptData.cs" />
+    <Compile Include="Q\Q.Services.cs" />
+    <Compile Include="Q\Q.StringHelper.cs" />
+    <Compile Include="Q\Q.Text.cs" />
+    <Compile Include="Q\Q.UrlUtils.cs" />
+    <Compile Include="ScriptContext.cs" />
     <Compile Include="Select2\Select2.cs" />
     <Compile Include="Dialogs\AlertOptions.cs" />
     <Compile Include="Dialogs\BlockUIOptions.cs" />
@@ -181,6 +205,25 @@
     <Compile Include="Dialogs\ConfirmOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyGrid\PropertyItem.cs" />
+    <Compile Include="Attribute\ColumnsKeyAttribute.cs" />
+    <Compile Include="Attribute\DialogTypeAttribute.cs" />
+    <Compile Include="Attribute\EditorAttribute.cs" />
+    <Compile Include="Attribute\ElementAttribute.cs" />
+    <Compile Include="Attribute\EntityTypeAttribute.cs" />
+    <Compile Include="Attribute\EnumKeyAttribute.cs" />
+    <Compile Include="Attribute\FlexifyAttribute.cs" />
+    <Compile Include="Attribute\FormKeyAttribute.cs" />
+    <Compile Include="Attribute\IdPropertyAttribute.cs" />
+    <Compile Include="Attribute\IsActivePropertyAttribute.cs" />
+    <Compile Include="Attribute\ItemNameAttribute.cs" />
+    <Compile Include="Attribute\LocalTextPrefixAttribute.cs" />
+    <Compile Include="Attribute\MaximizableAttribute.cs" />
+    <Compile Include="Attribute\NamePropertyAttribute.cs" />
+    <Compile Include="Attribute\OptionAttribute.cs" />
+    <Compile Include="Attribute\PanelAttribute.cs" />
+    <Compile Include="Attribute\ResizableAttribute.cs" />
+    <Compile Include="Attribute\ResponsiveAttribute.cs" />
+    <Compile Include="Attribute\ServiceAttribute.cs" />
     <Compile Include="Services\CaptureOperationType.cs" />
     <Compile Include="Services\PostToUrlOptions.cs" />
     <Compile Include="Services\RequestResponse\RetrieveLocalizationResponse.cs" />
@@ -235,7 +278,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup />
-  <Import Project="..\tools\Saltarelle\Saltarelle.Compiler.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

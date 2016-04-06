@@ -48,7 +48,7 @@ namespace Serenity
             AddToggleButton(toolDiv,
                 cssClass: "s-IncludeDeletedToggle",
                 initial: initial,
-                hint: hint ?? Texts.Controls.EntityGrid.IncludeDeletedToggle,
+                hint: hint ?? Q.Text("Controls.EntityGrid.IncludeDeletedToggle"),
                 callback: (pressed) =>
                 {
                     includeDeleted = pressed;
@@ -63,6 +63,7 @@ namespace Serenity
             });
         }
 
+        [IncludeGenericArguments(false)]
         public static void AddQuickSearchInput<TEntity>(jQueryObject toolDiv,
             SlickRemoteView<TEntity> view, List<QuickSearchField> fields = null)
         {

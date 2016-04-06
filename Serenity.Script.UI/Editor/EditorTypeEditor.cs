@@ -1,5 +1,4 @@
 ﻿using jQueryApi;
-using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,7 +13,7 @@ namespace Serenity
         private static List<object> editorTypeList;
 
         public EditorTypeEditor(jQueryObject select)
-            : base(select, new SelectEditorOptions { EmptyOptionText = Texts.Controls.SelectEditor.EmptyItemText })
+            : base(select, new SelectEditorOptions { EmptyOptionText = Q.Text("Controls.SelectEditor.EmptyItemText") })
         {
         }
 

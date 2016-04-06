@@ -25,5 +25,7 @@
     <file src="Serenity.Data.dll" target="tools" />
     <file src="Serenity.Data.Entity.dll" target="tools" />
     <file src="..\..\Includes\tools\**\*" target="content\tools" />
+    <file src="..\..\..\Serenity.Web\Scripts\tsservices\typescriptServices.js" target="content\tools\JsEngine" />
+	<file src="..\..\..\Serenity.Web\Scripts\tsservices\lib.d.ts_" target="content\tools\JsEngine" />
   </files>
 </package>

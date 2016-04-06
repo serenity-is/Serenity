@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [IncludeGenericArguments(false), ScriptName("DataGrid")]
     public abstract class DataGrid<TItem, TOptions> : Widget<TOptions>, IDataGrid
         where TItem : class, new()
         where TOptions : class, new()
@@ -186,9 +187,9 @@ namespace Serenity
 
             if (Script.TypeOf(value) == "number")
             {
-                if (IdExtensions.IsNegativeId(value.As<Int64>()))
+                if (value.As<double>() < 0)
                     return "deleted";
-                else if (value.As<Int32>() == 0)
+                else if (value.As<double>() == 0)
                     return "inactive";
             }
             else if (Script.TypeOf(value) == "boolean")
@@ -1064,6 +1065,7 @@ namespace Serenity
         }
     }
 
+    [Imported, IncludeGenericArguments(false), ScriptName("DataGrid")]
     public abstract class DataGrid<TItem> : DataGrid<TItem, object>
         where TItem : class, new()
     {
@@ -1071,8 +1073,9 @@ namespace Serenity
             : base(container, null)
         {
         }
-   }
+    }
 
+    [IncludeGenericArguments(false)]
     public class GridRows<TItem>
     {
         private GridRows()

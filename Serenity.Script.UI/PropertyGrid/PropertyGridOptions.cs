@@ -11,7 +11,7 @@ namespace Serenity
         public PropertyGridOptions()
         {
             UseCategories = true;
-            DefaultCategory = Texts.Controls.PropertyGrid.DefaultCategory;
+            DefaultCategory = Q.Text("Controls.PropertyGrid.DefaultCategory");
         }
 
         public string IdPrefix { get; set; }

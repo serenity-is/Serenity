@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
-namespace Serenity.ComponentModel
+namespace Serenity
 {
     public class MaxLengthAttribute : Attribute
     {
@@ -9,6 +10,7 @@ namespace Serenity.ComponentModel
             this.MaxLength = maxLength;
         }
 
+        [IntrinsicProperty]
         public int MaxLength { get; private set; }
     }
 }

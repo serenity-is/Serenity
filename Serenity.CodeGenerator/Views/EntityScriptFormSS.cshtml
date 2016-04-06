@@ -1,0 +1,51 @@
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+
+    Func<EntityCodeField, string> gt = (f) => {
+        if (f.Type == "String") {
+            return "StringEditor";
+        }
+        else if (f.Type == "Int32" || f.Type == "Int16" || f.Type == "Int64") {
+            return "IntegerEditor";
+        }
+        else if (f.Type == "Single" || f.Type == "Double" || f.Type == "Decimal") {
+            return "DecimalEditor";
+        }
+        else if (f.Type == "DateTime") {
+            return "DateEditor";
+        }
+        else if (f.Type == "Boolean") {
+            return "BooleanEditor";
+        }
+        else
+            return "StringEditor";
+    };
+}
+using jQueryApi;
+using Serenity;
+using Serenity.ComponentModel;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace @(Model.RootNamespace)@(dotModule)
+{
+    public partial class @(Model.ClassName)Form : PrefixedContext
+    {
+        [InlineConstant] public const string FormKey = "@(moduleDot)@(Model.ClassName)";
+
+        public @(Model.ClassName)Form(string idPrefix) : base(idPrefix) {}
+
+@foreach (var x in Model.Fields)
+    {
+        if (x.Ident != Model.Identity)
+        {<text>
+        public @(gt(x)) @x.Ident { [InlineCode("{this}.w('@(x.Ident)', Serenity.@(gt(x)))")] get; private set; }</text>}
+    }
+
+    }
+}

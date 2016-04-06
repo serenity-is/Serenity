@@ -6,7 +6,7 @@ namespace Serenity
     /// <summary>
     /// Options for the SlickGrid constructor
     /// </summary>
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("GridOptions")]
     public class SlickGridOptions
     {
         /// <summary>

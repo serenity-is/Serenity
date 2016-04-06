@@ -41,7 +41,10 @@ namespace Serenity.Reflection
 
         public void InBrace(Action insideBlock)
         {
-            sb.Append(indent);
+            if (!BraceOnSameLine)
+                sb.Append(indent);
+            else
+                sb.Append(" ");
             sb.AppendLine("{");
             IncreaseIndent();
             insideBlock();
@@ -76,5 +79,7 @@ namespace Serenity.Reflection
                 IndentedLine(x);
             }
         }
+
+        public bool BraceOnSameLine { get; set; }
     }
 }

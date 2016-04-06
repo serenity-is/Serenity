@@ -23,6 +23,7 @@ namespace Serenity.CodeGenerator
                     foreach (var group in doc.Elements(ns + "ItemGroup"))
                     {
                         foreach (var c in group.Elements(ns + "Compile")
+                                    .Concat(group.Elements(ns + "TypeScriptCompile"))
                                     .Concat(group.Elements(ns + "Content"))
                                     .Concat(group.Elements(ns + "None")))
                             if (c.Attribute("Include").Value.ToLowerInvariant() == fileName.ToLowerInvariant())
@@ -48,6 +49,8 @@ namespace Serenity.CodeGenerator
                 string contentType;
                 if (String.Compare(Path.GetExtension(codeFile), ".cs") == 0)
                     contentType = "Compile";
+                else if (String.Compare(Path.GetExtension(codeFile), ".ts") == 0)
+                    contentType = "TypeScriptCompile";
                 else
                     contentType = "Content";
 

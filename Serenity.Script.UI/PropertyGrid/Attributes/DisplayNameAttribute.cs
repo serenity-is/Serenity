@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace System.ComponentModel
 {
@@ -9,6 +10,7 @@ namespace System.ComponentModel
             DisplayName = displayName;
         }
 
+        [IntrinsicProperty]
         public string DisplayName { get; private set; }
     }
 }

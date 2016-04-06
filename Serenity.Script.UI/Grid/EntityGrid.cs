@@ -1,11 +1,12 @@
 ﻿using jQueryApi;
-using Serenity.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [IncludeGenericArguments(false), ScriptName("EntityGrid")]
     public abstract class EntityGrid<TEntity, TOptions> : DataGrid<TEntity, TOptions>
         where TEntity: class, new()
         where TOptions: class, new()
@@ -119,7 +120,7 @@ namespace Serenity
 
         protected override string GetAddButtonCaption()
         {
-            return String.Format(Texts.Controls.EntityGrid.NewButton, GetEntitySingular());
+            return String.Format(Q.Text("Controls.EntityGrid.NewButton"), GetEntitySingular());
         }
 
         protected override List<ToolButton> GetButtons()
@@ -148,8 +149,8 @@ namespace Serenity
 
             return new ToolButton
             {
-                Title = noText ? null : Texts.Controls.EntityGrid.RefreshButton.Get(),
-                Hint = noText ? Texts.Controls.EntityGrid.RefreshButton.Get() : null,
+                Title = noText ? null : Q.Text("Controls.EntityGrid.RefreshButton"),
+                Hint = noText ? Q.Text("Controls.EntityGrid.RefreshButton") : null,
                 CssClass = "refresh-button",
                 OnClick = delegate
                 {
@@ -160,7 +161,7 @@ namespace Serenity
 
         protected virtual void AddButtonClick()
         {
-            EditItem(new TEntity());
+            EditItem(new object().As<TEntity>());
         }
 
         protected override void EditItem(object entityOrId)
@@ -300,6 +301,7 @@ namespace Serenity
         }
     }
 
+    [Imported, IncludeGenericArguments(false), ScriptName("EntityGrid")]
     public abstract class EntityGrid<TEntity> : EntityGrid<TEntity, object>
         where TEntity : class, new()
     {

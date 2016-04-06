@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("RemoteViewOptions")]
     public class SlickRemoteViewOptions
     {
         public bool AutoLoad { get; set; }
@@ -75,7 +75,7 @@ namespace Serenity
     public delegate ListResponse<TEntity> SlickRemoteViewProcessCallback<TEntity>(ListResponse<TEntity> data, SlickRemoteView<TEntity> view);
     public delegate bool SlickRemoteViewFilter<TEntity>(TEntity item, SlickRemoteView<TEntity> view);
 
-    [Imported, ScriptNamespace("Slick.Data"), ScriptName("RemoteView")]
+    [Imported, ScriptNamespace("Slick"), ScriptName("RemoteView")]
     public class SlickRemoteView
     {
         public SlickRemoteView(SlickRemoteViewOptions options)
@@ -185,7 +185,7 @@ namespace Serenity
         public Int32? SeekToPage;
     }
 
-    [Imported, ScriptNamespace("Slick.Data"), ScriptName("RemoteView"), IncludeGenericArguments(false)]
+    [Imported, ScriptNamespace("Slick"), ScriptName("RemoteView"), IncludeGenericArguments(false)]
     public class SlickRemoteView<TEntity> : SlickRemoteView
     {
         public SlickRemoteView(SlickRemoteViewOptions options)
@@ -258,12 +258,12 @@ namespace Serenity
         public new SlickRemoteViewProcessCallback<TEntity> OnProcessData;
     }
 
-    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Aggregator")]
+    [Imported, ScriptNamespace("Slick.Aggregators"), ScriptName("Aggregator")]
     public abstract class SlickAggregator
     {
     }
 
-    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Avg")]
+    [Imported, ScriptNamespace("Slick.Aggregators"), ScriptName("Avg")]
     public class SlickAvg : SlickAggregator
     {
         public SlickAvg(string field)
@@ -271,7 +271,7 @@ namespace Serenity
         }
     }
 
-    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Sum")]
+    [Imported, ScriptNamespace("Slick.Aggregators"), ScriptName("Sum")]
     public class SlickSum : SlickAggregator
     {
         public SlickSum(string field)
@@ -279,7 +279,7 @@ namespace Serenity
         }
     }
 
-    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Min")]
+    [Imported, ScriptNamespace("Slick.Aggregators"), ScriptName("Min")]
     public class SlickMin : SlickAggregator
     {
         public SlickMin(string field)
@@ -287,7 +287,7 @@ namespace Serenity
         }
     }
 
-    [Imported, ScriptNamespace("Slick.Data.Aggregators"), ScriptName("Max")]
+    [Imported, ScriptNamespace("Slick.Aggregators"), ScriptName("Max")]
     public class SlickMax : SlickAggregator
     {
         public SlickMax(string field)

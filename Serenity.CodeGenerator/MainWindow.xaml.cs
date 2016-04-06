@@ -219,6 +219,48 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        public bool GenerateTSCode
+        {
+            get { return config.GenerateTSCode; }
+            set
+            {
+                if (value != config.GenerateTSCode)
+                {
+                    config.GenerateTSCode = value;
+                    config.Save();
+                    Changed("GenerateTSCode");
+                }
+            }
+        }
+
+        public bool GenerateTSTypings
+        {
+            get { return config.GenerateTSTypings; }
+            set
+            {
+                if (value != config.GenerateTSTypings)
+                {
+                    config.GenerateTSTypings = value;
+                    config.Save();
+                    Changed("GenerateTSTypings");
+                }
+            }
+        }
+
+        public bool GenerateSSImports
+        {
+            get { return config.GenerateSSImports; }
+            set
+            {
+                if (value != config.GenerateSSImports)
+                {
+                    config.GenerateSSImports = value;
+                    config.Save();
+                    Changed("GenerateSSImports");
+                }
+            }
+        }
+
         private void Ekle_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new AddConnectionStringWindow();

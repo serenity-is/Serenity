@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +13,13 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TypeScriptCharset>utf-8</TypeScriptCharset>
+    <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -81,14 +89,44 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CodeGeneration\DtoActionResult.cs" />
-    <Compile Include="CodeGeneration\DtoGenerator.cs" />
-    <Compile Include="CodeGeneration\FormatterTypeGenerator.cs" />
-    <Compile Include="CodeGeneration\EditorTypeGenerator.cs" />
-    <Compile Include="CodeGeneration\GeneratorUtils.cs" />
-    <Compile Include="CodeGeneration\ScriptDtoGenerator.cs" />
-    <Compile Include="CodeGeneration\ScriptEndpointGenerator.cs" />
-    <Compile Include="CodeGeneration\ScriptFormGenerator.cs" />
+    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Option.cs" />
+    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Editor.cs" />
+    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Formatter.cs" />
+    <Compile Include="CodeGeneration\Legacy\ManualTsParser.cs" />
+    <Compile Include="CodeGeneration\Legacy\Lexer.cs" />
+    <Compile Include="CodeGeneration\Legacy\DtoActionResult.cs" />
+    <Compile Include="CodeGeneration\Legacy\DtoGenerator.cs" />
+    <Compile Include="CodeGeneration\Legacy\FormatterTypeGenerator.cs" />
+    <Compile Include="CodeGeneration\Legacy\EditorTypeGenerator.cs" />
+    <Compile Include="CodeGeneration\Base\GeneratorUtils.cs" />
+    <Compile Include="CodeGeneration\Legacy\ScriptDtoGenerator.cs" />
+    <Compile Include="CodeGeneration\Legacy\ScriptEndpointGenerator.cs" />
+    <Compile Include="CodeGeneration\Legacy\ScriptFormGenerator.cs" />
+    <Compile Include="CodeGeneration\Model\ExternalMember.cs" />
+    <Compile Include="CodeGeneration\Model\ExternalMethod.cs" />
+    <Compile Include="CodeGeneration\Model\ExternalProperty.cs" />
+    <Compile Include="CodeGeneration\Model\ExternalAttribute.cs" />
+    <Compile Include="CodeGeneration\Model\ExternalArgument.cs" />
+    <Compile Include="CodeGeneration\Model\ExternalGenericParameter.cs" />
+    <Compile Include="CodeGeneration\Model\ExternalTypeOrigin.cs" />
+    <Compile Include="CodeGeneration\Model\ExternalType.cs" />
+    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.cs" />
+    <Compile Include="CodeGeneration\Base\CodeGeneratorBase.cs" />
+    <Compile Include="CodeGeneration\Base\ImportGeneratorBase.cs" />
+    <Compile Include="CodeGeneration\Base\ServerImportGeneratorBase.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.MemberType.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Enum.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Row.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Service.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Form.cs" />
+    <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Service.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Form.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Enum.cs" />
+    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />
     <Compile Include="Common\ScriptCulture.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
@@ -135,26 +173,26 @@
     <Compile Include="Reporting\ReportRetrieveResponse.cs" />
     <Compile Include="Reporting\Worksheet\ReportColumn.cs" />
     <Compile Include="Reporting\Worksheet\ReportColumnConverter.cs" />
-    <Compile Include="Script\DynamicScriptTypes\DynamicScript.cs" />
-    <Compile Include="Script\DynamicScriptTypes\RowLookupScript.cs" />
-    <Compile Include="Script\DynamicScriptTypes\LookupScript.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\DynamicScript.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\RowLookupScript.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\LookupScript.cs" />
     <Compile Include="Common\CommonIncludes.cs" />
-    <Compile Include="Script\PropertyEditor\ColumnsScript.cs" />
-    <Compile Include="Script\PropertyEditor\ColumnsScriptRegistration.cs" />
-    <Compile Include="Script\PropertyEditor\FormScript.cs" />
-    <Compile Include="Script\PropertyEditor\DynamicScriptRegistration.cs" />
-    <Compile Include="Script\PropertyEditor\LookupScriptRegistration.cs" />
-    <Compile Include="Script\PropertyEditor\FormScriptRegistration.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\ColumnsScript.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\ColumnsScriptRegistration.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\FormScript.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\DynamicScriptRegistration.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\LookupScriptRegistration.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\FormScriptRegistration.cs" />
     <Compile Include="Mvc\TemplateHelper.cs" />
-    <Compile Include="Script\DynamicScript\DynamicScriptManager.Script.cs" />
-    <Compile Include="Script\DynamicScript\DynamicScriptManager.cs" />
-    <Compile Include="Script\DynamicScript\INamedDynamicScript.cs" />
-    <Compile Include="Script\DynamicScript\ITwoLevelCached.cs" />
-    <Compile Include="Script\DynamicScript\IScriptName.cs" />
-    <Compile Include="Script\DynamicScript\IDynamicScript.cs" />
-    <Compile Include="Script\PropertyEditor\PhoneEditorAttribute.cs" />
-    <Compile Include="Script\PropertyEditor\EmailEditorAttribute.cs" />
-    <Compile Include="Script\DynamicScriptTypes\DataScript.cs">
+    <Compile Include="DynamicScript\DynamicScript\DynamicScriptManager.Script.cs" />
+    <Compile Include="DynamicScript\DynamicScript\DynamicScriptManager.cs" />
+    <Compile Include="DynamicScript\DynamicScript\INamedDynamicScript.cs" />
+    <Compile Include="DynamicScript\DynamicScript\ITwoLevelCached.cs" />
+    <Compile Include="DynamicScript\DynamicScript\IScriptName.cs" />
+    <Compile Include="DynamicScript\DynamicScript\IDynamicScript.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\PhoneEditorAttribute.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\EmailEditorAttribute.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\DataScript.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Security\RecaptchaValidation.cs" />
@@ -164,6 +202,7 @@
     <Compile Include="Texts\Texts.Controls.EntityGrid.cs" />
     <Compile Include="Texts\Texts.Controls.FilterPanel.cs" />
     <Compile Include="Texts\Texts.Controls.Pager.cs" />
+    <Compile Include="Texts\Texts.Controls.SelectEditor.cs" />
     <Compile Include="Texts\Texts.Controls.PropertyGrid.cs" />
     <Compile Include="Texts\Texts.Controls.QuickSearch.cs" />
     <Compile Include="Texts\Texts.cs" />
@@ -188,18 +227,18 @@
     <Compile Include="Mvc\Fakes\FakeIdentity.cs" />
     <Compile Include="Mvc\Fakes\FakePrincipal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Script\DynamicScriptTypes\ConcatenatedScript.cs" />
-    <Compile Include="Script\DynamicScript\DynamicScriptHandler.cs" />
-    <Compile Include="Script\DynamicScript\DynamicScriptManager.Item.cs" />
-    <Compile Include="Script\HtmlScriptExtensions.cs" />
-    <Compile Include="Script\ContentHashCache.cs" />
-    <Compile Include="Script\DynamicScriptTypes\LocalTextScript.cs" />
-    <Compile Include="Script\DynamicScriptTypes\DbLookupScript.cs" />
-    <Compile Include="Script\PropertyEditor\PropertyItemsScript.cs" />
-    <Compile Include="Script\PropertyEditor\ICustomizedFormScript.cs" />
-    <Compile Include="Script\DynamicScriptTypes\RegisteredScripts.cs" />
-    <Compile Include="Script\ScriptBundleManager.cs" />
-    <Compile Include="Script\DynamicScriptTypes\TemplateScript.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\ConcatenatedScript.cs" />
+    <Compile Include="DynamicScript\DynamicScript\DynamicScriptHandler.cs" />
+    <Compile Include="DynamicScript\DynamicScript\DynamicScriptManager.Item.cs" />
+    <Compile Include="Mvc\HtmlScriptExtensions.cs" />
+    <Compile Include="Mvc\ContentHashCache.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\LocalTextScript.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\DbLookupScript.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\PropertyItemsScript.cs" />
+    <Compile Include="DynamicScript\PropertyEditor\ICustomizedFormScript.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\RegisteredScripts.cs" />
+    <Compile Include="Mvc\ScriptBundleManager.cs" />
+    <Compile Include="DynamicScript\DynamicScriptTypes\TemplateScript.cs" />
     <Compile Include="Security\SiteMembershipProvider.cs" />
     <Compile Include="Security\SiteRoleProvider.cs" />
     <Compile Include="Mvc\Throttling.cs" />
@@ -639,9 +678,12 @@
     <Content Include="Includes\Scripts\jsrender.min.js" />
     <Content Include="Includes\Scripts\pace.js" />
     <Content Include="Includes\Scripts\pace.min.js" />
-    <None Include="Includes\Scripts\serenity\texts\serenity.texts.tr.json" />
+    <Content Include="Includes\Scripts\serenity\texts\serenity.texts.tr.json" />
     <Content Include="Includes\Scripts\rsvp.js" />
     <Content Include="Includes\Scripts\rsvp.min.js" />
+    <Content Include="Includes\Scripts\saltarelle\mscorlib.js" />
+    <Content Include="Includes\Scripts\saltarelle\linq.js" />
+    <Content Include="Includes\Scripts\saltarelle\mscorlib.min.js" />
     <Content Include="Includes\Scripts\SlickGrid\Controls\slick.columnpicker.js" />
     <Content Include="Includes\Scripts\SlickGrid\Controls\slick.pager.js" />
     <Content Include="Includes\Scripts\SlickGrid\MIT-LICENSE.txt" />
@@ -667,6 +709,8 @@
     <Content Include="Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js" />
     <Content Include="Includes\Scripts\SlickGrid\slick.remotemodel-yahoo.js" />
     <Content Include="Includes\Scripts\SlickGrid\slick.remotemodel.js" />
+    <None Include="Scripts\tsservices\typescriptServices.js" />
+    <EmbeddedResource Include="Scripts\tsservices\Serenity.CodeGeneration.js" />
     <Content Include="Style\images\32px.png" />
     <Content Include="Style\images\accordion-down.png" />
     <Content Include="Style\images\accordion-left.png" />
@@ -700,9 +744,35 @@
   <ItemGroup>
     <Folder Include="StyleLegacy\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\tsservices\lib.d.ts_" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.Slick.ts" />
+    <TypeScriptCompile Include="Scripts\tsservices\typescriptServices.d.ts" />
+    <TypeScriptCompile Include="Scripts\tsservices\Serenity.CodeGeneration.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="CompileSiteLess" AfterTargets="AfterBuild">
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>-->
+  <Target Name="AfterBuild">
     <Exec Command="$(ProjectDir)..\tools\node\lessc.cmd $(ProjectDir)style\serenity.less &gt; $(OutDir)serenity.css">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\Saltarelle\mscorlib.js -o $(ProjectDir)Includes\Scripts\Saltarelle\mscorlib.min.js --comments --mangle">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\Saltarelle\linq.js -o $(ProjectDir)Includes\Scripts\Saltarelle\linq.min.js --comments --mangle">
     </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\SlickGrid\slick.core.js -o $(ProjectDir)Includes\Scripts\SlickGrid\slick.core.min.js --comments --mangle">
     </Exec>
@@ -710,12 +780,11 @@
     </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.js -o $(ProjectDir)Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js --comments --mangle">
     </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.Externals.js -o $(ProjectDir)Scripts\Serenity\Serenity.Externals.min.js --comments --mangle">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.CoreLib.js -o $(ProjectDir)Scripts\Serenity\Serenity.CoreLib.min.js --comments --mangle">
+    </Exec>
+    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.js -o $(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.min.js --comments --mangle">
+    </Exec>
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

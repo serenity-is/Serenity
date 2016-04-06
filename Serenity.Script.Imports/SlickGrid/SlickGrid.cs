@@ -13,7 +13,7 @@ namespace Serenity
     // When looking up a property, the grid checks in the following order: 1Row-level item metadata. 2Column-level item metadata by column id. 3Column-level item metadata by column index.
     // 4 Column definition. 5 Grid options. 6 Grid defaults.
 
-    [Imported, IncludeGenericArguments(false)]
+    [Imported, IncludeGenericArguments(false), ScriptNamespace("Slick"), ScriptName("Event")]
     public class SlickEvent
     {
         public void Subscribe(Action<jQueryEvent, dynamic> handler)
@@ -34,21 +34,21 @@ namespace Serenity
         }
     }
 
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("ColumnSort")]
     public class SlickColumnSort
     {
         public string ColumnId { get; set; }
         public bool SortAsc { get; set; }
     }
 
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("RowCell")]
     public class SlickRowCell
     {
         public int Row { get; set; }
         public int Cell { get; set; }
     }
 
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("PositionInfo")]
     public class SlickPositionInfo
     {
         public int Bottom { get; set; }
@@ -60,7 +60,7 @@ namespace Serenity
         public int Width { get; set; }
     }
 
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("RangeInfo")]
     public class SlickRangeInfo
     {
         public int Top { get; set; }
@@ -81,7 +81,7 @@ namespace Serenity
         }
     }
 
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("AutoTooltipsOptions")]
     public class SlickAutoTooltipsOptions
     {
         
