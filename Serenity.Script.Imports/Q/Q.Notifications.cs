@@ -45,7 +45,6 @@ namespace Serenity
         {
         }
 
-        [IntrinsicProperty]
         public static ToastrOptions DefaultNotifyOptions { [InlineCode("Q.defaultNotifyOptions")] get; private set; }
 
         [InlineCode("window.console && window.console.log({message})")]
