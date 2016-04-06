@@ -1,3 +1,8 @@
+## 2.0.0 (2016-04-07)
+
+Features:
+  - Serenity now has TypeScript support, make sure you install TypeScript 1.8. Serene and migration guide coming soon...
+
 ## 1.9.28 (2016-04-05)
 
 Bugfixes:
