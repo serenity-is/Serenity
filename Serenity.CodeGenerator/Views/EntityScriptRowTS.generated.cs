@@ -59,10 +59,10 @@ WriteLiteral(" {\r\n    export interface ");
 
                  Write(Model.RowClassName);
 
-WriteLiteral(" {\r\n");
 
+                                          WriteLiteral(" {");
 
- foreach (var x in Model.Fields) {
+                                             foreach (var x in Model.Fields) {
 
 WriteLiteral("\r\n        ");
 

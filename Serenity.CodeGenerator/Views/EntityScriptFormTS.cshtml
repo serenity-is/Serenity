@@ -32,14 +32,14 @@ namespace @(Model.RootNamespace)@(dotModule) {
         static formKey = '@(moduleDot)@(Model.ClassName)';
     }
 
-    export interface @(Model.ClassName)Form {
-        @foreach (var x in Model.Fields)
+    export interface @(Model.ClassName)Form {@foreach (var x in Model.Fields)
     {
         if (x.Ident != Model.Identity)
         {<text>
-        @(x.Ident)(): Serenity.@(gt(x));}</text>}
-    }
+        @(x.Ident)(): Serenity.@(gt(x));</text>}
     }
 
-    [fieldList].forEach(x => LanguageForm.prototype[<string>x[0]] = function() { return this.w(x[0], x[1]); });
+    }
+
+    [@fieldList].forEach(x => @(Model.ClassName)Form.prototype[<string>x[0]] = function() { return this.w(x[0], x[1]); });
 }

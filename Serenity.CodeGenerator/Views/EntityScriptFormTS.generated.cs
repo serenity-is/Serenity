@@ -84,10 +84,10 @@ WriteLiteral("\';\r\n    }\r\n\r\n    export interface ");
 
                  Write(Model.ClassName);
 
-WriteLiteral("Form {\r\n");
 
+                                       WriteLiteral("Form {");
 
-         foreach (var x in Model.Fields)
+                                              foreach (var x in Model.Fields)
     {
         if (x.Ident != Model.Identity)
         {
@@ -101,14 +101,23 @@ WriteLiteral("(): Serenity.");
 
                            Write(gt(x));
 
-WriteLiteral(";}");
+WriteLiteral(";");
 
 
-                                                }
+                                               }
     }
 
-WriteLiteral("    }\r\n\r\n    [fieldList].forEach(x => LanguageForm.prototype[<string>x[0]] = func" +
-"tion() { return this.w(x[0], x[1]); });\r\n}");
+WriteLiteral("\r\n    }\r\n\r\n    [");
+
+
+Write(fieldList);
+
+WriteLiteral("].forEach(x => ");
+
+
+                          Write(Model.ClassName);
+
+WriteLiteral("Form.prototype[<string>x[0]] = function() { return this.w(x[0], x[1]); });\r\n}");
 
 
         }
