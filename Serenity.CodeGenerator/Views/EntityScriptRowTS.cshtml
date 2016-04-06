@@ -18,25 +18,25 @@
 namespace @(Model.RootNamespace)@(dotModule) {
     export interface @(Model.RowClassName) {@foreach (var x in Model.Fields) {
 <text>
-        @x.Ident: @(x.TSType);</text>}
+        @(x.Ident)?: @(x.TSType);</text>}
 @foreach (var x in Model.Joins){foreach (var y in x.Fields){
 <text>
-        @(jf(x.Name, y.Ident)): @(x.TSType);</text>}}
+        @(jf(x.Name, y.Ident))?: @(x.TSType);</text>}}
 
     }
 
     export namespace @(Model.RowClassName) {@if (Model.Identity != null) {<text>
-        export const idProperty = "@(Model.Identity)";</text>}@if (Model.NameField != null) {<text>
-        export const nameProperty = "@(Model.NameField)";</text>}
+        export const idProperty = '@(Model.Identity)';</text>}@if (Model.NameField != null) {<text>
+        export const nameProperty = '@(Model.NameField)';</text>}
 
-        export const localTextPrefix = "@moduleDot@Model.ClassName";
+        export const localTextPrefix = '@moduleDot@Model.ClassName';
 
         export namespace Fields {@foreach (var x in Model.Fields) {
 <text>
-            export const @x.Ident = "@(x.Ident)";</text>}
+            export declare const @x.Ident: '@(x.Ident)';</text>}
 @foreach (var x in Model.Joins){foreach (var y in x.Fields){
 <text>
-            export const @(jf(x.Name, y.Ident)) = "@(jf(x.Name, y.Ident))";</text>}}
+            export declare const @(jf(x.Name, y.Ident)): '@(jf(x.Name, y.Ident))';</text>}}
 
         }
 

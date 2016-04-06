@@ -46,7 +46,7 @@ WriteLiteral("\r\n");
     var fieldList = String.Join(", ", fields.Select(x => "'" + x.Ident + "'").Concat(joins.SelectMany(x => x.Fields.Select(y => "'" + jf(x.Name, y.Ident) + "'"))));
 
 
-WriteLiteral("namespace ");
+WriteLiteral("\r\nnamespace ");
 
 
       Write(Model.RootNamespace);

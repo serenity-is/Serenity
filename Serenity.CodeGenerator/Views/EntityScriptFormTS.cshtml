@@ -24,9 +24,11 @@
     };
 
     var fields = (IEnumerable<EntityCodeField>)Model.Fields;
-    var fieldList = String.Join(", ", fields.Select(x => "['" + x.Ident + "', Serenity." + gt(x) + "]"));
+    var fieldList = String.Join(", ", fields.Where(x => x.Name != Model.Identity)
+        .Select(x => "['" + x.Ident + "', Serenity." + gt(x) + "]"));
 
 }
+
 namespace @(Model.RootNamespace)@(dotModule) {
     export class @(Model.ClassName)Form extends Serenity.PrefixedContext {
         static formKey = '@(moduleDot)@(Model.ClassName)';

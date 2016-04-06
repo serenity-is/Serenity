@@ -1,11 +1,5 @@
-﻿declare class RSVP {
-}
-interface RSVP<TResult> {
-    constructor(constructor: (p1: (p1: any) => void, p2: any) => void): any;
-    then(onFulfilled: (p1: any) => void, onRejected?: any): RSVP<any>;
-    then(onFulfilled: (p1: any) => any, onRejected?: any): RSVP<any>;
-    then(onFulfilled: (p1: any) => RSVP<any>, onRejected?: any): RSVP<any>;
-    then(onFulfilled: (p1: any) => RSVP<any>, onRejected?: any): RSVP<any>;
+﻿declare class RSVP<TResult> {
+    constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
 declare namespace JsRender {
     function render(markup: string, data?: any): string;
@@ -819,6 +813,33 @@ declare namespace Serenity {
     }
     class Widget<TOptions> {
         constructor(element: JQuery, options?: TOptions);
+        protected destroy(): any;
+        protected addCssClass(): any;
+        protected getCssClass(): string;
+        protected initializeAsync(): PromiseLike<void>;
+        protected asyncPromise: PromiseLike<void>;
+        protected widgetName: string;
+        protected uniqueName: string;
+        protected element: JQuery;
+        protected options: TOptions;
+        initialize(): PromiseLike<void>;
+        isAsyncWidget(): boolean;
+        get_element(): JQuery;
+        get_uniqueName(): string;
+        get_widgetName(): string;
+        static create<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }): (element?: (e: JQuery) => void, options?: any, init?: (w: TWidget) => void) => TWidget;
+        static createInside<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }): (container: JQuery, options?: any, init?: (w: TWidget) => void) => TWidget;
+        static createOfType<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }, element?: (e: JQuery) => void, options?: any, init?: (w: TWidget) => void): TWidget;
+        static elementFor<TEditor>(type: TEditor): () => JQuery;
+        static elementFor$1<TEditor>(editorType: {
+            new (...args: any[]): any;
+        }): JQuery;
     }
     class StringEditor extends Widget<any> {
     }
@@ -1110,27 +1131,248 @@ declare namespace Serenity {
         set_value(value: string): void;
     }
     class TemplatedWidget<TOptions> extends Widget<TOptions> {
+        protected byId<TWidget>(type: TWidget): (id: string) => TWidget;
+        protected byId$1(id: string): JQuery;
+        protected getTemplate(): string;
+        protected getTemplateName(): string;
     }
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+        protected arrange(): void;
+        dialogClose(): void;
+        dialogOpen(): void;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getToolbarButtons(): ToolButton[];
+        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
+        protected get_idPrefix(): string;
+        protected handleResponsive(): any;
+        protected initDialog(): any;
+        protected initTabs(): any;
+        protected initToolbar(): any;
+        protected initValidator(): any;
+        protected onDialogClose(): any;
+        protected onDialogOpen(): any;
+        protected resetValidation(): any;
+        protected validateForm(): boolean;
+        get_dialogTitle(): string;
+        set_dialogTitle(value: string): void;
     }
     class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
+        protected arrange(): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
+        protected get_idPrefix(): string;
+        protected initTabs(): any;
+        protected initToolbar(): any;
+        protected initValidator(): any;
+        protected resetValidation(): any;
+        protected validateForm(): boolean;
     }
     class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected getFormKey(): string;
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
+        protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
+        protected getSaveEntity(): TItem;
+        protected get_entity(): TItem;
+        protected get_entityId(): any;
+        protected initializeAsync(): PromiseLike<void>;
+        protected loadInitialEntity(): void;
+        protected set_entity(entity: TItem): any;
+        protected set_entityId(value: any): any;
+        protected validateBeforeSave(): boolean;
     }
     class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+        protected getFormKey(): string;
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
+        protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
+        protected getSaveEntity(): TItem;
+        protected get_entity(): TItem;
+        protected get_entityId(): any;
+        protected initializeAsync(): PromiseLike<void>;
+        protected loadInitialEntity(): void;
+        protected set_entity(entity: TItem): any;
+        protected set_entityId(value: any): any;
+        protected validateBeforeSave(): boolean;
     }
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
+        protected afterLoadEntity(): void;
+        protected beforeLoadEntity(entity: TItem): void;
+        protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): any;
+        protected doDelete(callback: (response: DeleteResponse) => void): any;
+        protected getCloningEntity(): TItem;
+        protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse>;
+        protected getEntityIdField(): string;
+        protected getEntityIsActiveField(): string;
+        protected getEntityNameField(): string;
+        protected getEntityNameFieldValue(): any;
+        protected getEntitySingular(): string;
+        protected getEntityTitle(): string;
+        protected getEntityType(): string;
+        protected getFormKey(): string;
+        protected getLanguages(): string[][];
+        protected getLoadByIdOptions(id: any, callback: (response: RetrieveResponse<TItem>) => void): ServiceOptions<RetrieveResponse<TItem>>;
+        protected getLoadByIdRequest(id: any): RetrieveRequest;
+        protected getLocalTextPrefix(): string;
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
+        protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
+        protected getSaveEntity(): TItem;
+        protected getSaveOptions(callback: (response: SaveResponse) => void): ServiceOptions<SaveResponse>;
+        protected getSaveRequest(): SaveRequest<TItem>;
+        protected getService(): string;
+        protected getToolbarButtons(): ToolButton[];
+        protected getUndeleteOptions(callback: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
+        protected get_entity(): TItem;
+        protected get_entityId(): any;
+        protected get_isCloneMode(): boolean;
+        protected get_isDeleted(): boolean;
+        protected get_isEditMode(): boolean;
+        protected get_isLocalizationMode(): boolean;
+        protected get_isNew(): boolean;
+        protected get_isNewOrDeleted(): boolean;
+        protected initToolbar(): void;
+        protected initializeAsync(): PromiseLike<void>;
+        load(entityOrId: any, done: () => void, fail: () => void): void;
+        loadById(id: any): void;
+        loadByIdAndOpenDialog(id: any): void;
+        protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): any;
+        loadEntity(entity: any): void;
+        loadEntityAndOpenDialog(entity: any): void;
+        loadNewAndOpenDialog(): void;
+        loadResponse(response: RetrieveResponse<TItem>): void;
+        protected onDeleteSuccess(response: DeleteResponse): void;
+        protected onLoadingData(data: RetrieveResponse<TItem>): void;
+        protected onSaveSuccess(response: SaveResponse): void;
+        protected reloadById(): void;
+        protected save(callback: (response: SaveResponse) => void): void;
+        protected saveHandler(options: ServiceOptions<SaveResponse>, callback: (response: SaveResponse) => void): void;
+        protected save_submitHandler(callback: (response: SaveResponse) => void): void;
+        protected set_entity(entity: any): void;
+        protected set_entityId(id: any): void;
+        protected showSaveSuccessMessage(response: SaveResponse): void;
+        protected undelete(): void;
+        protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): any;
+        protected updateInterface(): void;
+        protected updateTitle(): void;
+        protected validateBeforeSave(): boolean;
     }
-    class DataGrid<TItem, TOptions> {
+    class DataGrid<TItem, TOptions> extends Widget<TOptions> {
+        constructor(container: JQuery, options?: TOptions);
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
+        protected addDateRangeFilter(field: string, title?: string): any;
+        protected addEqualityFilter<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }): (field: string, title?: string, options?: any, handler?: (h: QuickFilterArgs<TWidget>) => void, element?: (e: JQuery) => void, init?: (w: TWidget) => void) => TWidget;
+        protected addFilterSeperator(): void;
+        protected add_submitHandlers(action: () => void): void;
+        protected remove_submitHandlers(action: () => void): void;
+        protected bindToSlickEvents(): void;
+        protected bindToViewEvents(): void;
+        protected createFilterBar(): void;
+        protected createIncludeDeletedButton(): void;
+        protected createPager(): void;
+        protected createQuickSearchInput(): void;
+        protected createSlickContainer(): JQuery;
+        protected createSlickGrid(): Slick.Grid;
+        protected createToolbar(): void;
+        protected createToolbarExtensions(): void;
+        protected createView(): Slick.RemoteView<TItem>;
+        protected determineText(text: string, getKey: (s: string) => string): any;
+        protected editItem(entityOrId: any): any;
+        protected editItem$1(itemType: string, entityOrId: any): any;
+        protected enableFiltering(): boolean;
+        protected getAddButtonCaption(): string;
+        protected getButtons(): ToolButton[];
+        protected getColumns(): Slick.Column[];
+        protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
+        protected getDefaultSortBy(): string[];
+        protected getGridCanLoad(): boolean;
+        protected getIdFieldName(): string;
+        protected getIncludeColumns(include: {
+            [key: string]: boolean;
+        }): any;
+        protected getInitialTitle(): string;
+        protected getIsActiveFieldName(): string;
+        protected getItemCssClass(item: TItem, index: number): string;
+        protected getItemMetadata(item: TItem): any;
+        protected getItemType(): string;
+        protected getLocalTextPrefix(): string;
+        protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
+        protected getQuickSearchFields(): QuickSearchField[];
+        protected getSlickOptions(): Slick.GridOptions;
+        protected getViewOptions(): Slick.RemoteViewOptions;
+        protected initialPopulate(): any;
+        protected initializeAsync(): PromiseLike<void>;
+        protected internalRefresh(): any;
+        protected invokeSubmitHandlers(): any;
+        protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string, cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): any;
+        protected layout(): void;
+        protected markupReady(): void;
+        protected onClick(e: JQueryEventObject, row: number, cell: number): any;
+        protected onViewFilter(item: TItem): boolean;
+        protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
+        protected onViewSubmit(): boolean;
+        protected populateLock(): void;
+        protected populateUnlock(): void;
+        protected populateWhenVisible(): void;
+        protected postProcessColumns(columns: Slick.Column[]): Slick.Column[];
+        protected propertyItemsToSlickColumns(items: PropertyItem[]): Slick.Column[];
+        protected quickFilterChange(e: JQueryEventObject): void;
+        protected resizeCanvas(): void;
+        protected setCriteriaParameter(): void;
+        protected setEquality(field: string, value: any): void;
+        protected setIncludeColumnsParameter(): any;
+        protected setInitialSortOrder(): any;
+        protected subDialogDataChange(): any;
+        protected updateDisabledState(): any;
+        protected usePager(): boolean;
+        refresh(): void;
+        get_items(): TItem[];
+        set_items(value: TItem[]): any;
+        get_isDisabled(): boolean;
+        set_isDisabled(value: boolean): any;
+        get_slickGrid(): Slick.Grid;
+        get_title(): string;
+        set_title(value: string): any;
+        get_view(): Slick.RemoteView<TItem>;
+        getElement(): JQuery;
+        getFilterStore(): FilterStore;
+        getGrid(): Slick.Grid;
+        getView(): Slick.RemoteView<TItem>;
+        static get_defaultHeaderHeight(): number;
+        static set_defaultHeaderHeight(value: number): void;
+        static get_defaultRowHeight(): number;
+        static set_defaultRowHeight(value: number): void;
     }
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
-        constructor(container: JQuery);
+        constructor(container: JQuery, options?: TOptions);
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
+        protected addButtonClick(): void;
+        protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
+        protected getEntityDialogOptions(): any;
+        protected getEntityDialogOptions$1(itemType: string): any;
+        protected getEntityDialogType(): {
+            new (...args: any[]): Widget<any>;
+        };
+        protected getEntityDialogType$1(itemType: string): {
+            new (...args: any[]): Widget<any>;
+        };
+        protected getEntityPlural(): string;
+        protected getEntitySingular(): string;
+        protected getEntityType(): string;
+        protected getService(): string;
+        protected initEntityDialog(dialog: Widget<any>): any;
+        protected initEntityDialog$1(itemType: string, dialog: Widget<any>): any;
+        protected newRefreshButton(noText?: boolean): ToolButton;
     }
     interface CKEditorConfig {
     }
@@ -1139,8 +1381,6 @@ declare namespace Serenity {
         getGrid(): Slick.Grid;
         getView(): Slick.RemoteView<any>;
         getFilterStore(): Serenity.FilterStore;
-    }
-    interface ToolButton {
     }
     enum CaptureOperationType {
         Before = 0,

@@ -43,7 +43,10 @@ namespace Serenity.CodeGeneration
                         (scriptType = (GetScriptType(editorType) ?? GetScriptType(editorType + "Editor"))) == null)
                         continue;
 
-                    var fullTypeName = scriptType;
+                    var fullTypeName = scriptType.FullName;
+                    if (type.FullName == "Serenity.Widget")
+                        fullTypeName = "Serenity.Widget<any>";
+
                     var shortTypeName = ShortenFullName(scriptType, codeNamespace);
 
                     cw.Indented("public ");

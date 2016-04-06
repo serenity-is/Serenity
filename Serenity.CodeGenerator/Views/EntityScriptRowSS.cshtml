@@ -16,16 +16,17 @@
         return (x.Type == "Stream" ? "byte[]" : (x.Type == "DateTime" ? "String" : (x.Type + (x.IsValueType ? "?" : ""))));
     };
 }
+using jQueryApi;
+using Serenity;
+using Serenity.ComponentModel;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
 namespace @(Model.RootNamespace)@(dotModule)
 {
-    using Serenity;
-    using Serenity.ComponentModel;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
-
     [Imported, Serializable, PreserveMemberCase]
     public partial class @Model.RowClassName
     {@if (Model.Identity != null) {<text>

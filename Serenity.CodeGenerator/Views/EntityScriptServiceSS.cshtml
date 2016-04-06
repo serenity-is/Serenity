@@ -3,46 +3,48 @@
     var dotModule = Model.Module == null ? "" : ("." + Model.Module); 
     var modulePrefix = (Model.Module == null ? "" : (Model.Module + "/"));
 }
+using jQueryApi;
+using Serenity;
+using Serenity.ComponentModel;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
 namespace @(Model.RootNamespace)@(dotModule)
 {
-    using jQueryApi;
-    using Serenity;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
-
     [Imported, PreserveMemberCase]
     public partial class @(Model.ClassName)Service
     {
         [InlineConstant] public const string BaseUrl = "@(modulePrefix)@(Model.ClassName)";
 
         [InlineCode("Q.serviceRequest('@(modulePrefix)@(Model.ClassName)/Create', {request}, {onSuccess}, {options})")]
-        public static jQueryXmlHttpRequest Create(SaveRequest<@(Model.RowClassName)> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Create(SaveRequest<@(Model.RowClassName)> request, Action<SaveResponse> onSuccess = null, ServiceCallOptions options = null)
         {
             return null;
         }
 
         [InlineCode("Q.serviceRequest('@(modulePrefix)@(Model.ClassName)/Update', {request}, {onSuccess}, {options})")]
-        public static jQueryXmlHttpRequest Update(SaveRequest<@(Model.RowClassName)> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Update(SaveRequest<@(Model.RowClassName)> request, Action<SaveResponse> onSuccess = null, ServiceCallOptions options = null)
         {
             return null;
         }
  
         [InlineCode("Q.serviceRequest('@(modulePrefix)@(Model.ClassName)/Delete', {request}, {onSuccess}, {options})")]
-        public static jQueryXmlHttpRequest Delete(DeleteRequest request, Action<DeleteResponse> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Delete(DeleteRequest request, Action<DeleteResponse> onSuccess = null, ServiceCallOptions options = null)
         {
             return null;
         }
 
         [InlineCode("Q.serviceRequest('@(modulePrefix)@(Model.ClassName)/Retrieve', {request}, {onSuccess}, {options})")]
-        public static jQueryXmlHttpRequest Retrieve(RetrieveRequest request, Action<RetrieveResponse<@(Model.RowClassName)>> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Retrieve(RetrieveRequest request, Action<RetrieveResponse<@(Model.RowClassName)>> onSuccess = null, ServiceCallOptions options = null)
         {
             return null;
         }
 
         [InlineCode("Q.serviceRequest('@(modulePrefix)@(Model.ClassName)/List', {request}, {onSuccess}, {options})")]
-        public static jQueryXmlHttpRequest List(ListRequest request, Action<ListResponse<@(Model.RowClassName)>> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest List(ListRequest request, Action<ListResponse<@(Model.RowClassName)>> onSuccess = null, ServiceCallOptions options = null)
         {
             return null;
         }

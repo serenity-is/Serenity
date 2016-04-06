@@ -67,17 +67,17 @@ WriteLiteral(" {\r\n    export interface ");
 WriteLiteral("\r\n        ");
 
 
-   Write(x.Ident);
+    Write(x.Ident);
 
-WriteLiteral(": ");
+WriteLiteral("?: ");
 
 
-              Write(x.TSType);
+                 Write(x.TSType);
 
 WriteLiteral(";");
 
 
-                                     }
+                                        }
 
 
  foreach (var x in Model.Joins){foreach (var y in x.Fields){
@@ -87,15 +87,15 @@ WriteLiteral("\r\n        ");
 
     Write(jf(x.Name, y.Ident));
 
-WriteLiteral(": ");
+WriteLiteral("?: ");
 
 
-                            Write(x.TSType);
+                             Write(x.TSType);
 
 WriteLiteral(";");
 
 
-                                                   }}
+                                                    }}
 
 WriteLiteral("\r\n    }\r\n\r\n    export namespace ");
 
@@ -106,28 +106,28 @@ WriteLiteral("\r\n    }\r\n\r\n    export namespace ");
                                           WriteLiteral(" {");
 
                                              if (Model.Identity != null) {
-WriteLiteral("\r\n        export const idProperty = \"");
+WriteLiteral("\r\n        export const idProperty = \'");
 
 
                                Write(Model.Identity);
 
-WriteLiteral("\";");
+WriteLiteral("\';");
 
 
                                                              }
 
                                                                if (Model.NameField != null) {
-WriteLiteral("\r\n        export const nameProperty = \"");
+WriteLiteral("\r\n        export const nameProperty = \'");
 
 
                                  Write(Model.NameField);
 
-WriteLiteral("\";");
+WriteLiteral("\';");
 
 
                                                                 }
 
-WriteLiteral("\r\n        export const localTextPrefix = \"");
+WriteLiteral("\r\n        export const localTextPrefix = \'");
 
 
                                    Write(moduleDot);
@@ -136,42 +136,42 @@ WriteLiteral("\r\n        export const localTextPrefix = \"");
                                              Write(Model.ClassName);
 
 
-                                                                  WriteLiteral("\";\r\n\r\n        export namespace Fields {");
+                                                                  WriteLiteral("\';\r\n\r\n        export namespace Fields {");
 
                                   foreach (var x in Model.Fields) {
 
-WriteLiteral("\r\n            export const ");
+WriteLiteral("\r\n            export declare const ");
 
 
-                    Write(x.Ident);
+                            Write(x.Ident);
 
-WriteLiteral(" = \"");
-
-
-                                 Write(x.Ident);
-
-WriteLiteral("\";");
+WriteLiteral(": \'");
 
 
-                                                        }
+                                        Write(x.Ident);
+
+WriteLiteral("\';");
+
+
+                                                               }
 
 
  foreach (var x in Model.Joins){foreach (var y in x.Fields){
 
-WriteLiteral("\r\n            export const ");
+WriteLiteral("\r\n            export declare const ");
 
 
-                     Write(jf(x.Name, y.Ident));
+                             Write(jf(x.Name, y.Ident));
 
-WriteLiteral(" = \"");
-
-
-                                               Write(jf(x.Name, y.Ident));
-
-WriteLiteral("\";");
+WriteLiteral(": \'");
 
 
-                                                                                  }}
+                                                      Write(jf(x.Name, y.Ident));
+
+WriteLiteral("\';");
+
+
+                                                                                         }}
 
 WriteLiteral("\r\n        }\r\n\r\n        [");
 

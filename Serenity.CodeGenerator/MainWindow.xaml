@@ -47,6 +47,12 @@
             <TextBlock DockPanel.Dock="Right" Width="140" Background="AliceBlue" Padding="4 2 4 0">sample: Administration</TextBlock>
             <TextBox Text="{Binding Path=Permission}"></TextBox>
         </DockPanel>
+        <DockPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="0 6 0 0">
+            <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Generation Options</TextBlock>
+            <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateTSCode}">Grid/Dialog in TypeScript (instead of Saltaralle)</CheckBox>
+            <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateTSTypings}">TypeScript Typings</CheckBox>
+            <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateSSImports}">Saltaralle Imports</CheckBox>
+        </DockPanel>
         <DockPanel HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" Margin="0 4 0 0">
             <Button HorizontalAlignment="Right" Name="GenerateCodeButton" IsEnabled ="False" Padding="6" FontWeight="Bold" Click="GenerateCodes_Click">Generate Code for Entity</Button>
         </DockPanel>

@@ -34,7 +34,9 @@ WriteLiteral("\r\n");
     var modulePrefix = (Model.Module == null ? "" : (Model.Module + "/"));
 
 
-WriteLiteral("namespace ");
+WriteLiteral("using jQueryApi;\r\nusing Serenity;\r\nusing Serenity.ComponentModel;\r\nusing System;\r" +
+"\nusing System.Collections;\r\nusing System.Collections.Generic;\r\nusing System.Comp" +
+"onentModel;\r\nusing System.Runtime.CompilerServices;\r\n\r\nnamespace ");
 
 
       Write(Model.RootNamespace);
@@ -42,10 +44,7 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral("\r\n{\r\n    using jQueryApi;\r\n    using Serenity;\r\n    using System;\r\n    using Syst" +
-"em.Collections;\r\n    using System.Collections.Generic;\r\n    using System.Runtime" +
-".CompilerServices;\r\n\r\n    [Imported, PreserveMemberCase]\r\n    public partial cla" +
-"ss ");
+WriteLiteral("\r\n{\r\n    [Imported, PreserveMemberCase]\r\n    public partial class ");
 
 
                      Write(Model.ClassName);
@@ -72,9 +71,9 @@ WriteLiteral("/Create\', {request}, {onSuccess}, {options})\")]\r\n        publi
 
                                                           Write(Model.RowClassName);
 
-WriteLiteral("> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)\r\n  " +
-"      {\r\n            return null;\r\n        }\r\n\r\n        [InlineCode(\"Q.serviceRe" +
-"quest(\'");
+WriteLiteral("> request, Action<SaveResponse> onSuccess = null, ServiceCallOptions options = nu" +
+"ll)\r\n        {\r\n            return null;\r\n        }\r\n\r\n        [InlineCode(\"Q.se" +
+"rviceRequest(\'");
 
 
                                    Write(modulePrefix);
@@ -88,9 +87,9 @@ WriteLiteral("/Update\', {request}, {onSuccess}, {options})\")]\r\n        publi
 
                                                           Write(Model.RowClassName);
 
-WriteLiteral("> request, Action<SaveResponse> onSuccess, ServiceCallOptions options = null)\r\n  " +
-"      {\r\n            return null;\r\n        }\r\n \r\n        [InlineCode(\"Q.serviceR" +
-"equest(\'");
+WriteLiteral("> request, Action<SaveResponse> onSuccess = null, ServiceCallOptions options = nu" +
+"ll)\r\n        {\r\n            return null;\r\n        }\r\n \r\n        [InlineCode(\"Q.s" +
+"erviceRequest(\'");
 
 
                                    Write(modulePrefix);
@@ -99,7 +98,7 @@ WriteLiteral("> request, Action<SaveResponse> onSuccess, ServiceCallOptions opti
                                                   Write(Model.ClassName);
 
 WriteLiteral(@"/Delete', {request}, {onSuccess}, {options})"")]
-        public static jQueryXmlHttpRequest Delete(DeleteRequest request, Action<DeleteResponse> onSuccess, ServiceCallOptions options = null)
+        public static jQueryXmlHttpRequest Delete(DeleteRequest request, Action<DeleteResponse> onSuccess = null, ServiceCallOptions options = null)
         {
             return null;
         }
@@ -118,8 +117,8 @@ WriteLiteral("/Retrieve\', {request}, {onSuccess}, {options})\")]\r\n        pub
 
                                                                                                  Write(Model.RowClassName);
 
-WriteLiteral(">> onSuccess, ServiceCallOptions options = null)\r\n        {\r\n            return n" +
-"ull;\r\n        }\r\n\r\n        [InlineCode(\"Q.serviceRequest(\'");
+WriteLiteral(">> onSuccess = null, ServiceCallOptions options = null)\r\n        {\r\n            r" +
+"eturn null;\r\n        }\r\n\r\n        [InlineCode(\"Q.serviceRequest(\'");
 
 
                                    Write(modulePrefix);
@@ -133,10 +132,10 @@ WriteLiteral("/List\', {request}, {onSuccess}, {options})\")]\r\n        public 
 
                                                                                      Write(Model.RowClassName);
 
-WriteLiteral(">> onSuccess, ServiceCallOptions options = null)\r\n        {\r\n            return n" +
-"ull;\r\n        }\r\n\r\n        [Imported, PreserveMemberCase]\r\n        public static" +
-" class Methods\r\n        {\r\n            [InlineConstant] public const string Crea" +
-"te = \"");
+WriteLiteral(">> onSuccess = null, ServiceCallOptions options = null)\r\n        {\r\n            r" +
+"eturn null;\r\n        }\r\n\r\n        [Imported, PreserveMemberCase]\r\n        public" +
+" static class Methods\r\n        {\r\n            [InlineConstant] public const stri" +
+"ng Create = \"");
 
 
                                                        Write(modulePrefix);

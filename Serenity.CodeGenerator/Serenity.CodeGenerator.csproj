@@ -142,6 +142,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptGridSS.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EntityScriptDialogTS.generated.cs">
+      <DependentUpon>EntityScriptDialogTS.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Views\EntityScriptGridTS.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptGridTS.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EntityScriptRowSS.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -204,6 +214,14 @@
     <None Include="Views\EntityScriptFormSS.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityScriptFormSS.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptDialogTS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptDialogTS.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptGridTS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptGridTS.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityScriptRowTS.cshtml">
       <Generator>RazorGenerator</Generator>

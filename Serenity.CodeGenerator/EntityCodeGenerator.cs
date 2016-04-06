@@ -73,6 +73,8 @@ namespace Serenity.CodeGenerator
 
             if (config.GenerateTSCode)
             {
+                GenerateScriptGridTS();
+                GenerateScriptDialogTS();
             }
             else
             {
@@ -262,6 +264,7 @@ namespace Serenity.CodeGenerator
 
             CreateNewSiteScriptFile(content, targetFile, dependentUpon);
         }
+
         private void GenerateScriptRowTS()
         {
             var targetFile = model.RowClassName + ".ts";
@@ -340,17 +343,28 @@ namespace Serenity.CodeGenerator
             CreateNewSiteWebFile(content, targetFile, serverTypings);
         }
 
-
         private void GenerateScriptGridSS()
         {
             CreateNewSiteScriptFile(Templates.Render(new Views.EntityScriptGridSS(), model),
                 Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Grid.cs")));
         }
 
+        private void GenerateScriptGridTS()
+        {
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptGridTS(), model),
+                Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Grid.ts"))));
+        }
+
         private void GenerateScriptDialogSS()
         {
             CreateNewSiteScriptFile(Templates.Render(new Views.EntityScriptDialogSS(), model),
                 Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Dialog.cs")));
+        }
+
+        private void GenerateScriptDialogTS()
+        {
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptDialogTS(), model),
+                Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Dialog.ts"))));
         }
     }
 }

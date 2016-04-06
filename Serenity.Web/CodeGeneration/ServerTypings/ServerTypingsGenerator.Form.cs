@@ -27,7 +27,6 @@ namespace Serenity.CodeGeneration
 
             cw.Indented("export interface ");
             MakeFriendlyName(type, codeNamespace);
-            sb.Append(" extends Serenity.PrefixedContext");
 
             StringBuilder initializer = new StringBuilder("[");
 

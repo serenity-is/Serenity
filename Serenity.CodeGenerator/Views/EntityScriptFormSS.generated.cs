@@ -54,7 +54,9 @@ WriteLiteral("\r\n");
     };
 
 
-WriteLiteral("namespace ");
+WriteLiteral("using jQueryApi;\r\nusing Serenity;\r\nusing Serenity.ComponentModel;\r\nusing System;\r" +
+"\nusing System.Collections;\r\nusing System.Collections.Generic;\r\nusing System.Comp" +
+"onentModel;\r\nusing System.Runtime.CompilerServices;\r\n\r\nnamespace ");
 
 
       Write(Model.RootNamespace);
@@ -62,17 +64,7 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(@"
-{
-    using Serenity;
-    using Serenity.ComponentModel;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
-
-    public partial class ");
+WriteLiteral("\r\n{\r\n    public partial class ");
 
 
                      Write(Model.ClassName);
@@ -108,7 +100,7 @@ WriteLiteral(" ");
 
                    Write(x.Ident);
 
-WriteLiteral(" { [InlineCode(\"{this}.m(\'");
+WriteLiteral(" { [InlineCode(\"{this}.w(\'");
 
 
                                                       Write(x.Ident);
@@ -116,12 +108,12 @@ WriteLiteral(" { [InlineCode(\"{this}.m(\'");
 WriteLiteral("\', Serenity.");
 
 
-                                                                            Write(x.Type);
+                                                                            Write(gt(x));
 
 WriteLiteral(")\")] get; private set; }");
 
 
-                                                                                                                        }
+                                                                                                                       }
     }
 
 WriteLiteral("\r\n    }\r\n}");

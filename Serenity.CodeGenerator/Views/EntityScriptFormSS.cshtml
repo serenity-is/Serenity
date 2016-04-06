@@ -23,16 +23,17 @@
             return "StringEditor";
     };
 }
+using jQueryApi;
+using Serenity;
+using Serenity.ComponentModel;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
 namespace @(Model.RootNamespace)@(dotModule)
 {
-    using Serenity;
-    using Serenity.ComponentModel;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
-
     public partial class @(Model.ClassName)Form : PrefixedContext
     {
         [InlineConstant] public const string FormKey = "@(moduleDot)@(Model.ClassName)";
@@ -43,7 +44,7 @@ namespace @(Model.RootNamespace)@(dotModule)
     {
         if (x.Ident != Model.Identity)
         {<text>
-        public @(gt(x)) @x.Ident { [InlineCode("{this}.m('@(x.Ident)', Serenity.@(x.Type))")] get; private set; }</text>}
+        public @(gt(x)) @x.Ident { [InlineCode("{this}.w('@(x.Ident)', Serenity.@(gt(x)))")] get; private set; }</text>}
     }
 
     }

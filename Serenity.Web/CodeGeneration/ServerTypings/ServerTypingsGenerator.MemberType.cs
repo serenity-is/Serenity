@@ -48,16 +48,11 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType == typeof(TimeSpan))
+            if (memberType == typeof(DateTime) ||
+                memberType == typeof(TimeSpan) ||
+                memberType == typeof(Guid))
             {
                 sb.Append("string");
-                return;
-            }
-
-            if (memberType == typeof(DateTime?) || memberType == typeof(DateTime) ||
-                memberType == typeof(TimeSpan) || memberType == typeof(TimeSpan?))
-            {
-                sb.Append("string"); // for now transfer datetime as string, as its ISO formatted
                 return;
             }
 
@@ -107,7 +102,6 @@ namespace Serenity.CodeGeneration
             }
 
             EnqueueType(memberType);
-
             MakeFriendlyReference(memberType, codeNamespace);
         }
 

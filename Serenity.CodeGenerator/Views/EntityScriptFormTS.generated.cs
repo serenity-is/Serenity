@@ -54,11 +54,12 @@ WriteLiteral("\r\n");
     };
 
     var fields = (IEnumerable<EntityCodeField>)Model.Fields;
-    var fieldList = String.Join(", ", fields.Select(x => "['" + x.Ident + "', Serenity." + gt(x) + "]"));
+    var fieldList = String.Join(", ", fields.Where(x => x.Name != Model.Identity)
+        .Select(x => "['" + x.Ident + "', Serenity." + gt(x) + "]"));
 
 
 
-WriteLiteral("namespace ");
+WriteLiteral("\r\nnamespace ");
 
 
       Write(Model.RootNamespace);

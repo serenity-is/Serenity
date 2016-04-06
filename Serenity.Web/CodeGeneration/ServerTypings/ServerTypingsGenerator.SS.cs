@@ -63,6 +63,10 @@ namespace Serenity.CodeGeneration
                     sb.Append("() => void");
                     return;
 
+                case "System.Guid":
+                    sb.Append("string");
+                    return;
+
                 default:
 
                     typeName = FixupSSGenerics(typeName);
