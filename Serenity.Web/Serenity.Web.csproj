@@ -678,6 +678,7 @@
     <Content Include="Includes\Scripts\jsrender.min.js" />
     <Content Include="Includes\Scripts\pace.js" />
     <Content Include="Includes\Scripts\pace.min.js" />
+    <Content Include="Includes\Scripts\saltarelle\linq.min.js" />
     <Content Include="Includes\Scripts\serenity\texts\serenity.texts.tr.json" />
     <Content Include="Includes\Scripts\rsvp.js" />
     <Content Include="Includes\Scripts\rsvp.min.js" />
