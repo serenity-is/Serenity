@@ -127,6 +127,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityForm.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EntityScriptDialogTS.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptDialogTS.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EntityScriptFormTS.generated.cs">
       <DependentUpon>EntityScriptFormTS.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -141,11 +146,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptGridSS.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptDialogTS.generated.cs">
-      <DependentUpon>EntityScriptDialogTS.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Views\EntityScriptGridTS.generated.cs">
       <AutoGen>True</AutoGen>

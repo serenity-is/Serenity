@@ -58,33 +58,6 @@ WriteLiteral("@D.columnsKey(\"");
                                                   WriteLiteral("\")");
 
                                                      if (Model.Identity != null) {
-WriteLiteral(" ");
-
-
-WriteLiteral("@D.idProperty(");
-
-
-                                                                                                    Write(Model.RowClassName);
-
-WriteLiteral(".idProperty)");
-
-
-                                                                                                                                                }
-
-                                                                                                                                                  if (Model.NameField != null){
-WriteLiteral(" ");
-
-
-WriteLiteral("@D.nameProperty(");
-
-
-                                                                                                                                                                                                   Write(Model.RowClassName);
-
-WriteLiteral(".nameProperty)");
-
-
-                                                                                                                                                                                                                                                 }
-
 WriteLiteral("\r\n    ");
 
 
@@ -93,21 +66,51 @@ WriteLiteral("@D.dialogType(");
 
                Write(Model.ClassName);
 
-WriteLiteral("Dialog) ");
+WriteLiteral("Dialog)\r\n    ");
+
+
+WriteLiteral("@D.idProperty(");
+
+
+               Write(Model.RowClassName);
+
+WriteLiteral(".idProperty)");
+
+
+                                                           }
+
+WriteLiteral("\r\n    ");
 
 
 WriteLiteral("@D.localTextPrefix(");
 
 
-                                                             Write(Model.RowClassName);
+                    Write(Model.RowClassName);
 
-WriteLiteral(".localTextPrefix) ");
+
+                                             WriteLiteral(".localTextPrefix)");
+
+                                                               if (Model.NameField != null){
+WriteLiteral("\r\n    ");
+
+
+WriteLiteral("@D.nameProperty(");
+
+
+                 Write(Model.RowClassName);
+
+WriteLiteral(".nameProperty)");
+
+
+                                                               }
+
+WriteLiteral("\r\n    ");
 
 
 WriteLiteral("@D.service(");
 
 
-                                                                                                                Write(Model.ClassName);
+            Write(Model.ClassName);
 
 WriteLiteral("Service.baseUrl)\r\n    export class ");
 

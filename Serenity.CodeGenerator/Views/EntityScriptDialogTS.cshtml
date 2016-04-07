@@ -7,9 +7,13 @@
 namespace @(Model.RootNamespace)@(dotModule) {
     import D = Serenity.Decorators;
 
-    @@D.formKey("@(Model.ClassName)Form.formKey")@if (Model.Identity != null) {<text> @@D.idProperty(@(Model.RowClassName).idProperty)</text>}@if (Model.NameField != null){<text> @@D.nameProperty(@(Model.RowClassName).nameProperty)</text>}
+    @@D.formKey(@(Model.ClassName)Form.formKey)@if (Model.Identity != null) {<text>
+    @@D.idProperty(@(Model.RowClassName).idProperty)</text>}
 
-    @@D.localTextPrefix(@(Model.RowClassName).localTextPrefix) @@D.service(@(Model.ClassName)Service.baseUrl)
+    @@D.localTextPrefix(@(Model.RowClassName).localTextPrefix)@if (Model.NameField != null){<text>
+    @@D.nameProperty(@(Model.RowClassName).nameProperty)</text>}
+
+    @@D.service(@(Model.ClassName)Service.baseUrl)
     export class @(Model.ClassName)Dialog extends Serenity.EntityDialog<@(Model.RowClassName), any> {
         protected form = new @(Model.ClassName)Form(this.get_idPrefix());
     }

@@ -46,41 +46,27 @@ WriteLiteral("namespace ");
 WriteLiteral(" {\r\n    import D = Serenity.Decorators;\r\n\r\n    ");
 
 
-WriteLiteral("@D.formKey(\"");
+WriteLiteral("@D.formKey(");
 
 
-             Write(Model.ClassName);
+            Write(Model.ClassName);
 
 
-                                   WriteLiteral("Form.formKey\")");
+                                  WriteLiteral("Form.formKey)");
 
-                                                  if (Model.Identity != null) {
-WriteLiteral(" ");
+                                                if (Model.Identity != null) {
+WriteLiteral("\r\n    ");
 
 
 WriteLiteral("@D.idProperty(");
 
 
-                                                                                                 Write(Model.RowClassName);
+               Write(Model.RowClassName);
 
 WriteLiteral(".idProperty)");
 
 
-                                                                                                                                             }
-
-                                                                                                                                               if (Model.NameField != null){
-WriteLiteral(" ");
-
-
-WriteLiteral("@D.nameProperty(");
-
-
-                                                                                                                                                                                                Write(Model.RowClassName);
-
-WriteLiteral(".nameProperty)");
-
-
-                                                                                                                                                                                                                                              }
+                                                           }
 
 WriteLiteral("\r\n    ");
 
@@ -90,13 +76,30 @@ WriteLiteral("@D.localTextPrefix(");
 
                     Write(Model.RowClassName);
 
-WriteLiteral(".localTextPrefix) ");
+
+                                             WriteLiteral(".localTextPrefix)");
+
+                                                               if (Model.NameField != null){
+WriteLiteral("\r\n    ");
+
+
+WriteLiteral("@D.nameProperty(");
+
+
+                 Write(Model.RowClassName);
+
+WriteLiteral(".nameProperty)");
+
+
+                                                               }
+
+WriteLiteral("\r\n    ");
 
 
 WriteLiteral("@D.service(");
 
 
-                                                                       Write(Model.ClassName);
+            Write(Model.ClassName);
 
 WriteLiteral("Service.baseUrl)\r\n    export class ");
 

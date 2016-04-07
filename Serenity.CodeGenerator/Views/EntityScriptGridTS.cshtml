@@ -7,9 +7,14 @@
 namespace @(Model.RootNamespace)@(dotModule) {
     import D = Serenity.Decorators;
 
-    @@D.columnsKey("@(moduleDot)@(Model.ClassName)")@if (Model.Identity != null) {<text> @@D.idProperty(@(Model.RowClassName).idProperty)</text>}@if (Model.NameField != null){<text> @@D.nameProperty(@(Model.RowClassName).nameProperty)</text>}
+    @@D.columnsKey("@(moduleDot)@(Model.ClassName)")@if (Model.Identity != null) {<text>
+    @@D.dialogType(@(Model.ClassName)Dialog)
+    @@D.idProperty(@(Model.RowClassName).idProperty)</text>}
 
-    @@D.dialogType(@(Model.ClassName)Dialog) @@D.localTextPrefix(@(Model.RowClassName).localTextPrefix) @@D.service(@(Model.ClassName)Service.baseUrl)
+    @@D.localTextPrefix(@(Model.RowClassName).localTextPrefix)@if (Model.NameField != null){<text>
+    @@D.nameProperty(@(Model.RowClassName).nameProperty)</text>}
+
+    @@D.service(@(Model.ClassName)Service.baseUrl)
     export class @(Model.ClassName)Grid extends Serenity.EntityGrid<@(Model.RowClassName), any> {
         constructor(container: JQuery) {
             super(container);
