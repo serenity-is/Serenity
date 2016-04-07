@@ -1,3 +1,11 @@
+## 2.0.2 (2016-04-07)
+
+Features:
+  - add group collapse, expand and comparer methods
+
+Bugfixes:
+  - fix problems with SlickGrid grouping in 2.0
+
 ## 2.0.1 (2016-04-07)
 
 Bugfixes:
