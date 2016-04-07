@@ -1,3 +1,8 @@
+## 2.0.1 (2016-04-07)
+
+Bugfixes:
+  - fix TypeScript dialog generated code
+
 ## 2.0.0 (2016-04-07)
 
 Features:
