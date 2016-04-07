@@ -150,12 +150,6 @@ var Slick;
 })(Slick || (Slick = {}));
 var Slick;
 (function (Slick) {
-    var Group = (function () {
-        function Group() {
-        }
-        return Group;
-    }());
-    Slick.Group = Group;
     var RemoteView = (function () {
         function RemoteView(options) {
             var self = this;

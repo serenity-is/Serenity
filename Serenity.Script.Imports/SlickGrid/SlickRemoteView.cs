@@ -37,36 +37,53 @@ namespace Serenity
     {
         public TypeOption<string, Func<TItem, object>> Getter { get; set; }
         public Func<SlickGroup<TItem>, string> Formatter { get; set; }
+        public Func<SlickGroup<TItem>, SlickGroup<TItem>, int> Comparer { get; set; }
         public List<SlickAggregator> Aggregators { get; set; }
         public bool AggregateCollapsed { get; set; }
         public bool LazyTotalsCalculation { get; set; }
     }
 
-    [Imported, ScriptNamespace("Slick"), ScriptName("Group"), IncludeGenericArguments(false), Serializable]
+    [Imported, ScriptNamespace("Slick"), ScriptName("Group"), IncludeGenericArguments(false)]
     public class SlickGroup<TItem>
     {
         public bool IsGroup { [InlineCode("!!{this}.__group")] get { return false; } }
+        [IntrinsicProperty]
         public int Level { get { return 0; } }
+        [IntrinsicProperty]
         public int Count { get { return 0; } }
+        [IntrinsicProperty]
         public object Value { get { return null; } }
+        [IntrinsicProperty]
         public string Title { get { return null; } }
+        [IntrinsicProperty]
         public bool Collapsed { get { return false; } }
+        [IntrinsicProperty]
         public object Totals { get { return null; } }
+        [IntrinsicProperty]
         public TItem[] Rows { get { return null; } }
+        [IntrinsicProperty]
         public SlickGroup<TItem> Groups { get { return null; } }
+        [IntrinsicProperty]
         public string GroupingKey { get { return null; } }
     }
 
-    [Imported, ScriptNamespace("Slick"), ScriptName("GroupTotals"), Serializable]
+    [Imported, ScriptNamespace("Slick"), ScriptName("GroupTotals")]
     public class SlickGroupTotals<TItem>
     {
         [ScriptName("__groupTotals")]
+        [IntrinsicProperty]
         public bool IsGroupTotals { get { return false; } }
+        [IntrinsicProperty]
         public SlickGroup<TItem> Group { get { return null; } }
+        [IntrinsicProperty]
         public bool Initialized { get { return false; } }
+        [IntrinsicProperty]
         public JsDictionary<string, object> Sum { get { return null; } }
+        [IntrinsicProperty]
         public JsDictionary<string, object> Avg { get { return null; } }
+        [IntrinsicProperty]
         public JsDictionary<string, object> Min { get { return null; } }
+        [IntrinsicProperty]
         public JsDictionary<string, object> Max { get { return null; } }
     }
 
@@ -153,6 +170,24 @@ namespace Serenity
         public List<SlickGroupInfo<dynamic>> GetGrouping()
         {
             return null;
+        }
+
+        public void CollapseAllGroups(int level = 0)
+        {
+        }
+
+        public void ExpandAllGroups(int level = 0)
+        {
+        }
+
+        [ExpandParams]
+        public void CollapseGroup(params object[] keys)
+        {
+        }
+
+        [ExpandParams]
+        public void ExpandGroup(params object[] keys)
+        {
         }
 
         [IntrinsicProperty]
