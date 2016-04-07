@@ -239,12 +239,12 @@ namespace Serenity.CodeGenerator
         }
 
         // old script contracts tt file in script project for backward compability
-        const string formContexts = @"Imports\ServiceContracts\ServiceContracts.tt";
+        const string formContexts = @"Imports\FormContexts\FormContexts.tt";
         // old form context tt file in script project for backward compability
         const string serviceContracts = @"Imports\ServiceContracts\ServiceContracts.tt";
         // newer server imports file in script project
         const string serverImports = @"Imports\ServerImports\ServerImports.tt";
-        // newer server imports file in script project
+        // newer server imports file in web project
         const string serverTypings = @"Modules\Common\Imports\ServerTypings\ServerTypings.tt";
 
         private void GenerateScriptRowSS()
