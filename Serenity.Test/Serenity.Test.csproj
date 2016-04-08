@@ -19,6 +19,16 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TypeScriptCharset>utf-8</TypeScriptCharset>
+    <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
+    <TypeScriptOutFile>Scripts/serenity/Serenity.Test.js</TypeScriptOutFile>
+    <TypeScriptCompileOnSaveEnabled>False</TypeScriptCompileOnSaveEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -209,9 +219,7 @@
     <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="fonts\glyphicons-halflings-regular.woff2" />
     <None Include="packages.config" />
-    <None Include="Scripts\jquery-2.2.0.min.map">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Scripts\jquery-2.2.0.min.map" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SqlScript\DbSerenity.sql" />
@@ -221,162 +229,81 @@
       <Link>phantomjs.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\Saltarelle\linq.js">
-      <Link>Scripts\saltarelle\linq.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\Saltarelle\mscorlib.js">
-      <Link>Scripts\saltarelle\mscorlib.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Scripts\Serenity\Serenity.CoreLib.js">
-      <Link>Scripts\serenity\Serenity.CoreLib.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Scripts\Serenity\Serenity.Externals.js">
-      <Link>Scripts\serenity\Serenity.Externals.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Scripts\Serenity\Serenity.Externals.Slick.js">
-      <Link>Scripts\serenity\Serenity.Externals.Slick.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jquery.autoNumeric.js">
-      <Link>Scripts\jquery.autoNumeric.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jquery.blockUI.js">
-      <Link>Scripts\jquery.blockUI.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jquery.colorbox.js">
-      <Link>Scripts\jquery.colorbox.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jquery.cookie.js">
-      <Link>Scripts\jquery.cookie.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jquery.cropzoom.js">
-      <Link>Scripts\jquery.cropzoom.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jquery.dialogextendQ.js">
-      <Link>Scripts\jquery.dialogextendQ.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jquery.json.js">
-      <Link>Scripts\jquery.json.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jquery.scrollintoview.js">
-      <Link>Scripts\jquery.scrollintoview.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\jsrender.js">
-      <Link>Scripts\jsrender.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\rsvp.js">
-      <Link>Scripts\rsvp.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Controls\slick.columnpicker.js">
-      <Link>Scripts\SlickGrid\controls\slick.columnpicker.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Controls\slick.pager.js">
-      <Link>Scripts\SlickGrid\controls\slick.pager.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.autotooltips.js">
-      <Link>Scripts\SlickGrid\plugins\slick.autotooltips.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.autotooltips.min.js">
-      <Link>Scripts\SlickGrid\plugins\slick.autotooltips.min.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.cellcopymanager.js">
-      <Link>Scripts\SlickGrid\plugins\slick.cellcopymanager.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.cellrangedecorator.js">
-      <Link>Scripts\SlickGrid\plugins\slick.cellrangedecorator.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.cellrangeselector.js">
-      <Link>Scripts\SlickGrid\plugins\slick.cellrangeselector.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.cellselectionmodel.js">
-      <Link>Scripts\SlickGrid\plugins\slick.cellselectionmodel.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.checkboxselectcolumn.js">
-      <Link>Scripts\SlickGrid\plugins\slick.checkboxselectcolumn.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.headerbuttons.js">
-      <Link>Scripts\SlickGrid\plugins\slick.headerbuttons.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.headermenu.js">
-      <Link>Scripts\SlickGrid\plugins\slick.headermenu.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.rowmovemanager.js">
-      <Link>Scripts\SlickGrid\plugins\slick.rowmovemanager.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\Plugins\slick.rowselectionmodel.js">
-      <Link>Scripts\SlickGrid\plugins\slick.rowselectionmodel.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.core.js">
-      <Link>Scripts\SlickGrid\slick.core.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.core.min.js">
-      <Link>Scripts\SlickGrid\slick.core.min.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.dataview.js">
-      <Link>Scripts\SlickGrid\slick.dataview.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.editors.js">
-      <Link>Scripts\SlickGrid\slick.editors.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.formatters.js">
-      <Link>Scripts\SlickGrid\slick.formatters.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.grid.js">
-      <Link>Scripts\SlickGrid\slick.grid.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.grid.min.js">
-      <Link>Scripts\SlickGrid\slick.grid.min.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.js">
-      <Link>Scripts\SlickGrid\slick.groupitemmetadataprovider.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js">
-      <Link>Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.remotemodel-yahoo.js">
-      <Link>Scripts\SlickGrid\slick.remotemodel-yahoo.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Serenity.Web\Includes\Scripts\SlickGrid\slick.remotemodel.js">
-      <Link>Scripts\SlickGrid\slick.remotemodel.js</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\jlayout.border.js" />
+    <Content Include="Scripts\jlayout.border.min.js" />
+    <Content Include="Scripts\jquery-ui-i18n.js" />
+    <Content Include="Scripts\jquery-ui-i18n.min.js" />
+    <Content Include="Scripts\jquery.autoNumeric.js" />
+    <Content Include="Scripts\jquery.autoNumeric.min.js" />
+    <Content Include="Scripts\jquery.blockUI.js" />
+    <Content Include="Scripts\jquery.blockUI.min.js" />
+    <Content Include="Scripts\jquery.colorbox.js" />
+    <Content Include="Scripts\jquery.colorbox.min.js" />
+    <Content Include="Scripts\jquery.cookie.js" />
+    <Content Include="Scripts\jquery.cookie.min.js" />
+    <Content Include="Scripts\jquery.cropzoom.js" />
+    <Content Include="Scripts\jquery.cropzoom.min.js" />
+    <Content Include="Scripts\jquery.dialogextendQ.js" />
+    <Content Include="Scripts\jquery.dialogextendQ.min.js" />
+    <Content Include="Scripts\jquery.fileupload.js" />
+    <Content Include="Scripts\jquery.fileupload.min.js" />
+    <Content Include="Scripts\jquery.iframe-transport.js" />
+    <Content Include="Scripts\jquery.iframe-transport.min.js" />
+    <Content Include="Scripts\jquery.jlayout.js" />
+    <Content Include="Scripts\jquery.jlayout.min.js" />
+    <Content Include="Scripts\jquery.json.js" />
+    <Content Include="Scripts\jquery.json.min.js" />
+    <Content Include="Scripts\jquery.metisMenu.js" />
+    <Content Include="Scripts\jquery.metisMenu.min.js" />
+    <Content Include="Scripts\jquery.scrollintoview.js" />
+    <Content Include="Scripts\jquery.scrollintoview.min.js" />
+    <Content Include="Scripts\jquery.slimscroll.js" />
+    <Content Include="Scripts\jquery.slimscroll.min.js" />
+    <Content Include="Scripts\jsrender.js" />
+    <Content Include="Scripts\jsrender.min.js" />
+    <Content Include="Scripts\pace.js" />
+    <Content Include="Scripts\pace.min.js" />
+    <Content Include="Scripts\rsvp.js" />
+    <Content Include="Scripts\rsvp.min.js" />
+    <Content Include="Scripts\saltarelle\linq.js" />
+    <Content Include="Scripts\saltarelle\linq.min.js" />
+    <Content Include="Scripts\saltarelle\mscorlib.js" />
+    <Content Include="Scripts\saltarelle\mscorlib.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Test.js" />
+    <Content Include="Scripts\SlickGrid\controls\slick.columnpicker.js" />
+    <Content Include="Scripts\SlickGrid\controls\slick.pager.js" />
+    <Content Include="Scripts\SlickGrid\MIT-LICENSE.txt" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.autotooltips.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.autotooltips.min.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.cellcopymanager.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.cellrangedecorator.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.cellrangeselector.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.cellselectionmodel.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.checkboxselectcolumn.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.headerbuttons.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.headermenu.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.rowmovemanager.js" />
+    <Content Include="Scripts\SlickGrid\plugins\slick.rowselectionmodel.js" />
+    <Content Include="Scripts\SlickGrid\slick.core.js" />
+    <Content Include="Scripts\SlickGrid\slick.core.min.js" />
+    <Content Include="Scripts\SlickGrid\slick.dataview.js" />
+    <Content Include="Scripts\SlickGrid\slick.editors.js" />
+    <Content Include="Scripts\SlickGrid\slick.formatters.js" />
+    <Content Include="Scripts\SlickGrid\slick.grid.js" />
+    <Content Include="Scripts\SlickGrid\slick.grid.min.js" />
+    <Content Include="Scripts\SlickGrid\slick.groupitemmetadataprovider.js" />
+    <Content Include="Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js" />
+    <Content Include="Scripts\SlickGrid\slick.remotemodel-yahoo.js" />
+    <Content Include="Scripts\SlickGrid\slick.remotemodel.js" />
+    <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.d.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.d.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.Slick.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
+    <TypeScriptCompile Include="ScriptTests\Formatters\Formatters.UrlFormatterTests.ts" />
+    <TypeScriptCompile Include="ScriptTests\Editors\Editors.TextAreaEditorTests.ts" />
     <EmbeddedResource Include="..\Serenity.Web\Scripts\tsservices\typescriptServices.js">
       <Link>CodeGeneration\TypeScriptParserTests\typescriptServices.js</Link>
     </EmbeddedResource>
@@ -437,53 +364,39 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <None Include="Scripts\serenity\Serenity.Test.js.map" />
+    <None Include="Scripts\serenity\texts\serenity.texts.de.json" />
+    <None Include="Scripts\serenity\texts\serenity.texts.es.json" />
+    <None Include="Scripts\serenity\texts\serenity.texts.ru.json" />
+    <None Include="Scripts\serenity\texts\serenity.texts.tr.json" />
+    <None Include="Scripts\SlickGrid\README.md" />
+    <None Include="tsconfig.json" />
     <Content Include="phantomjs-license.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\bootstrap.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\bootstrap.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery-2.2.0.intellisense.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery-2.2.0.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery-2.2.0.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery-ui-1.11.4.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery-ui-1.11.4.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery.event.drag.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery.event.drag.live.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery.event.drag.live.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\jquery.event.drag.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\jquery-2.2.0.intellisense.js" />
+    <Content Include="Scripts\jquery-2.2.0.js" />
+    <Content Include="Scripts\jquery-2.2.0.min.js" />
+    <Content Include="Scripts\jquery-ui-1.11.4.js" />
+    <Content Include="Scripts\jquery-ui-1.11.4.min.js" />
+    <Content Include="Scripts\jquery.event.drag.js" />
+    <Content Include="Scripts\jquery.event.drag.live.js" />
+    <Content Include="Scripts\jquery.event.drag.live.min.js" />
+    <Content Include="Scripts\jquery.event.drag.min.js" />
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\jquery.validate.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\qunit-1.12.0.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\qunit-1.12.0.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\serenity\Serenity.CoreLib.js" />
+    <Content Include="Scripts\serenity\Serenity.CoreLib.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Externals.js" />
+    <Content Include="Scripts\serenity\Serenity.Externals.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Externals.Slick.js" />
+    <Content Include="Scripts\serenity\Serenity.Externals.Slick.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
+    <Content Include="ScriptTests\qunit\qunit.css" />
+    <Content Include="ScriptTests\qunit\qunit.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_az.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_bg.js" />
@@ -530,25 +443,16 @@
     <Content Include="Scripts\Select2-locales\select2_locale_vi.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_zh-CN.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_zh-TW.js" />
-    <Content Include="Scripts\select2.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\select2.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\serenity\Serenity.Script.Test.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\serenity\Serenity.Script.UI.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Scripts\toastr.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\select2.js" />
+    <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\serenity\Serenity.Script.Test.js" />
+    <Content Include="Scripts\serenity\Serenity.Script.UI.js" />
+    <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
-    <Content Include="ScriptTests.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="ScriptTests\Runner.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\typings\qunit\qunit.d.ts" />
   </ItemGroup>
   <ItemGroup />
   <Choose>
@@ -571,17 +475,29 @@
   </Choose>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
+    <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Includes\Scripts\**\*.*">
+      <Output TaskParameter="Include" ItemName="SerenityWebIncludesScripts" />
+    </CreateItem>
+    <Copy SourceFiles="@(SerenityWebIncludesScripts)" DestinationFiles="@(SerenityWebIncludesScripts->'$(ProjectDir)Scripts\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true">
+    </Copy>
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.min.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.min.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.d.ts')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.min.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.d.ts')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js')" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

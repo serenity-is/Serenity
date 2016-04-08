@@ -16,7 +16,8 @@ namespace Serenity.Test
     {
         protected override string GetWebPath()
         {
-            return AppDomain.CurrentDomain.BaseDirectory;
+            return Path.GetDirectoryName(Path.GetDirectoryName(
+                AppDomain.CurrentDomain.BaseDirectory));
         }
 
         private Dictionary<string, object> GetQunitTestResults()
@@ -33,7 +34,7 @@ namespace Serenity.Test
             int tries = 0;
             while (tries++ < 3000 && true)
             {
-                GoToUrl("~/ScriptTests.html");
+                GoToUrl("~/ScriptTests/Runner.html");
                 if (Browser.Title == "Serenity Tests")
                     break;
                 Thread.Sleep(100);
