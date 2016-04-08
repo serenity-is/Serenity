@@ -144,6 +144,9 @@ namespace Serenity.CodeGeneration {
     }
 
     function getBaseType(node: ts.ClassDeclaration): string {
+        if (!node.heritageClauses)
+            return null;
+
         for (let heritage of node.heritageClauses) {
             if (heritage.token == ts.SyntaxKind.ExtendsKeyword &&
                 heritage.types != null) {

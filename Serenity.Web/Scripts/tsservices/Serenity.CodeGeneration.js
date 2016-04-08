@@ -61,6 +61,8 @@
             return copy;
         }
         function getBaseType(node) {
+            if (!node.heritageClauses)
+                return null;
             for (var _i = 0, _a = node.heritageClauses; _i < _a.length; _i++) {
                 var heritage = _a[_i];
                 if (heritage.token == ts.SyntaxKind.ExtendsKeyword &&
