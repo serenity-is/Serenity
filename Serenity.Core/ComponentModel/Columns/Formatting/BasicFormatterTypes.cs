@@ -137,10 +137,28 @@ namespace Serenity.ComponentModel
             set { SetOption("displayProperty", value); }
         }
 
+        public String DisplayFormat
+        {
+            get { return GetOption<String>("displayFormat"); }
+            set { SetOption("displayFormat", value); }
+        }
+
         public String UrlProperty
         {
             get { return GetOption<String>("urlProperty"); }
             set { SetOption("urlProperty", value); }
+        }
+
+        public String UrlFormat
+        {
+            get { return GetOption<String>("urlFormat"); }
+            set { SetOption("urlFormat", value); }
+        }
+
+        public String Target
+        {
+            get { return GetOption<String>("target"); }
+            set { SetOption("target", value); }
         }
     }
 }
