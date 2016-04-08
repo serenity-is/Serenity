@@ -13,10 +13,10 @@ namespace Serenity
             : base(input, opt)
         {
             if (options.Cols != 0)
-                input.Attribute("cols", options.Cols.ToString());
+                input.Attribute("cols", (options.Cols ?? 80).ToString());
 
             if (options.Rows != 0)
-                input.Attribute("rows", options.Rows.ToString());
+                input.Attribute("rows", (options.Rows ?? 6).ToString());
         }
 
         public string Value
@@ -26,18 +26,10 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable]
     public class TextAreaEditorOptions
     {
-        public TextAreaEditorOptions()
-        {
-            Cols = 80;
-            Rows = 6;
-        }
-
-        [Hidden]
-        public int Cols { get; set; }
-        [Hidden]
-        public int Rows { get; set; }
+        public int? Cols { get; set; }
+        public int? Rows { get; set; }
     }
 }
