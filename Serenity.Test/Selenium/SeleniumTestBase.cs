@@ -13,6 +13,11 @@ namespace Serenity.Testing
     {
         IISProcessManager iisProcess;
 
+        protected virtual bool UseFileSystem()
+        {
+            return false;
+        }
+
         public void GoToUrl(string relativeUrl)
         {
             if (relativeUrl.StartsWith("~/"))
@@ -40,8 +45,13 @@ namespace Serenity.Testing
         {
             get
             {
-                iisProcess = iisProcess ?? new IISProcessManager(GetWebPath());
-                return iisProcess.ApplicationUrl;
+                if (!UseFileSystem())
+                {
+                    iisProcess = iisProcess ?? new IISProcessManager(GetWebPath());
+                    return iisProcess.ApplicationUrl;
+                }
+                else
+                    return "file:///" + GetWebPath().Replace("\\", "/");
             }
         }
 

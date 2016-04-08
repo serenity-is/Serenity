@@ -14,6 +14,11 @@ namespace Serenity.Test
     [Collection("AvoidParallel")]
     public class ScriptTests : SeleniumTestBase
     {
+        protected override bool UseFileSystem()
+        {
+            return true;
+        }
+
         protected override string GetWebPath()
         {
             return Path.GetDirectoryName(Path.GetDirectoryName(
