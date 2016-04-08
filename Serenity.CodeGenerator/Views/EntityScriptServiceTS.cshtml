@@ -27,11 +27,11 @@ namespace @(Model.RootNamespace)@(dotModule) {
         export declare function List(request: Serenity.ListRequest, onSuccess?: (response: Serenity.ListResponse<@(Model.RowClassName)>) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
 
         export namespace Methods {
-            export declare const Create: '@(modulePrefix)@(Model.ClassName)/Create';
-            export declare const Update: '@(modulePrefix)@(Model.ClassName)/Update';
-            export declare const Delete: '@(modulePrefix)@(Model.ClassName)/Delete';
-            export declare const Retrieve: '@(modulePrefix)@(Model.ClassName)/Retrieve';
-            export declare const List: '@(modulePrefix)@(Model.ClassName)/List';
+            export declare const Create: string;
+            export declare const Update: string;
+            export declare const Delete: string;
+            export declare const Retrieve: string;
+            export declare const List: string;
         }
 
         ['Create', 'Update', 'Delete', 'Retrieve', 'List'].forEach(x => {

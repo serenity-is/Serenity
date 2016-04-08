@@ -93,49 +93,18 @@ WriteLiteral(">) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;\r\n   
 
                                                                                                              Write(Model.RowClassName);
 
-WriteLiteral(">) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;\r\n\r\n        export nam" +
-"espace Methods {\r\n            export declare const Create: \'");
+WriteLiteral(@">) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
 
+        export namespace Methods {
+            export declare const Create: string;
+            export declare const Update: string;
+            export declare const Delete: string;
+            export declare const Retrieve: string;
+            export declare const List: string;
+        }
 
-                                      Write(modulePrefix);
-
-
-                                                     Write(Model.ClassName);
-
-WriteLiteral("/Create\';\r\n            export declare const Update: \'");
-
-
-                                      Write(modulePrefix);
-
-
-                                                     Write(Model.ClassName);
-
-WriteLiteral("/Update\';\r\n            export declare const Delete: \'");
-
-
-                                      Write(modulePrefix);
-
-
-                                                     Write(Model.ClassName);
-
-WriteLiteral("/Delete\';\r\n            export declare const Retrieve: \'");
-
-
-                                        Write(modulePrefix);
-
-
-                                                       Write(Model.ClassName);
-
-WriteLiteral("/Retrieve\';\r\n            export declare const List: \'");
-
-
-                                    Write(modulePrefix);
-
-
-                                                   Write(Model.ClassName);
-
-WriteLiteral("/List\';\r\n        }\r\n\r\n        [\'Create\', \'Update\', \'Delete\', \'Retrieve\', \'List\']." +
-"forEach(x => {\r\n            (<any>");
+        ['Create', 'Update', 'Delete', 'Retrieve', 'List'].forEach(x => {
+            (<any>");
 
 
               Write(Model.ClassName);
