@@ -1,6 +1,6 @@
 ## 2.0.3 (2016-04-08)
 
-Features:
+Bugfixes:
   - fix null reference error with TextAreaEditorOptions
 
 ## 2.0.2 (2016-04-07)
