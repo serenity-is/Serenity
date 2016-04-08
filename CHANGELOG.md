@@ -1,3 +1,12 @@
+## 2.0.4 (2016-04-08)
+
+Features:
+  - add displayformat, urlformat and target properties to UrlFormatter
+  - don't use colon string definition for export declare const strings in typescript declarations
+
+Bugfixes:
+  - fix possible null reference error for nodes without heritage clauses in typescript typings generator
+
 ## 2.0.3 (2016-04-08)
 
 Bugfixes:
