@@ -6052,6 +6052,9 @@
 			if (ss.isValue(text) && ss.startsWithString(text, '`')) {
 				text = text.substr(1);
 			}
+			if (ss.isValue(text)) {
+				return text;
+			}
 			var localTextPrefix = this.getLocalTextPrefix();
 			if (!Q.isEmptyOrNull(localTextPrefix)) {
 				var local1 = Q.tryGetText(getKey(localTextPrefix));
@@ -9674,6 +9677,9 @@
 			}
 			if (ss.isValue(text) && ss.startsWithString(text, '`')) {
 				text = text.substr(1);
+			}
+			if (ss.isValue(text)) {
+				return text;
 			}
 			if (!Q.isEmptyOrNull(this.options.localTextPrefix)) {
 				var local1 = Q.tryGetText(getKey(this.options.localTextPrefix));

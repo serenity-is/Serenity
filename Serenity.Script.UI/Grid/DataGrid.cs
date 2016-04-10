@@ -905,6 +905,9 @@ namespace Serenity
             if (text != null && text.StartsWith("`"))
                 text = text.Substr(1);
 
+            if (text != null)
+                return text;
+
             var localTextPrefix = GetLocalTextPrefix();
 
             if (!localTextPrefix.IsEmptyOrNull())
