@@ -116,7 +116,6 @@ declare namespace Serenity {
         function getValidator(element: JQuery): JQueryValidation.Validator;
     }
     namespace VX {
-        function addValidationRule(widget: Serenity.Widget<any>, eventClass: string, rule: (p1: JQuery) => string): JQuery;
         function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
         function removeValidationRule(element: JQuery, eventClass: string): JQuery;
         function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
@@ -202,7 +201,6 @@ declare namespace Serenity {
         static setReadOnly(elements: JQuery, isReadOnly: boolean): JQuery;
         get_editors(): any;
         get_items(): any;
-        get_idPrefix(): string;
         get_mode(): PropertyGridMode;
         set_mode(value: PropertyGridMode): void;
     }
@@ -813,7 +811,6 @@ declare namespace Serenity {
     class PrefixedContext extends ScriptContext {
         constructor(prefix: string);
         w(id: string, type: Function): any;
-        get_idPrefix(): string;
     }
     class Widget<TOptions> {
         constructor(element: JQuery, options?: TOptions);
@@ -826,11 +823,9 @@ declare namespace Serenity {
         protected uniqueName: string;
         protected element: JQuery;
         protected options: TOptions;
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         initialize(): PromiseLike<void>;
         isAsyncWidget(): boolean;
-        get_element(): JQuery;
-        get_uniqueName(): string;
-        get_widgetName(): string;
         static create<TWidget>(type: {
             new (...args: any[]): TWidget;
         }): (element?: (e: JQuery) => void, options?: any, init?: (w: TWidget) => void) => TWidget;
@@ -845,7 +840,15 @@ declare namespace Serenity {
             new (...args: any[]): any;
         }): JQuery;
     }
-    class StringEditor extends Widget<any> {
+    class IStringValue {
+    }
+    interface StringValue {
+        get_value(): string;
+        set_value(value: string): void;
+    }
+    class StringEditor extends Widget<any> implements StringValue {
+        get_value(): string;
+        set_value(value: string): void;
     }
     namespace Select2Extensions {
         function select2(element: JQuery): JQuery;
@@ -1135,19 +1138,20 @@ declare namespace Serenity {
         set_value(value: string): void;
     }
     class TemplatedWidget<TOptions> extends Widget<TOptions> {
-        protected byId<TWidget>(type: TWidget): (id: string) => TWidget;
-        protected byId$1(id: string): JQuery;
+        protected idPrefix: string;
+        protected byId(id: string): JQuery;
+        protected byID<TWidget>(type: TWidget): (id: string) => TWidget;
         protected getTemplate(): string;
         protected getTemplateName(): string;
     }
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+        constructor(options?: TOptions);
         protected arrange(): void;
         dialogClose(): void;
         dialogOpen(): void;
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected get_idPrefix(): string;
         protected handleResponsive(): any;
         protected initDialog(): any;
         protected initTabs(): any;
@@ -1164,7 +1168,6 @@ declare namespace Serenity {
         protected arrange(): void;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected get_idPrefix(): string;
         protected initTabs(): any;
         protected initToolbar(): any;
         protected initValidator(): any;
@@ -1172,14 +1175,14 @@ declare namespace Serenity {
         protected validateForm(): boolean;
     }
     class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected entity: TItem;
+        protected entityId: any;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
         protected getPropertyItems(): PropertyItem[];
         protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
         protected getSaveEntity(): TItem;
-        protected get_entity(): TItem;
-        protected get_entityId(): any;
         protected initializeAsync(): PromiseLike<void>;
         protected loadInitialEntity(): void;
         protected set_entity(entity: TItem): any;
@@ -1202,6 +1205,9 @@ declare namespace Serenity {
         protected validateBeforeSave(): boolean;
     }
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected entity: TItem;
+        protected entityId: any;
+        protected toolbar: Toolbar;
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
         protected afterLoadEntity(): void;
@@ -1234,12 +1240,12 @@ declare namespace Serenity {
         protected getUndeleteOptions(callback: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
         protected get_entity(): TItem;
         protected get_entityId(): any;
-        protected get_isCloneMode(): boolean;
-        protected get_isDeleted(): boolean;
-        protected get_isEditMode(): boolean;
-        protected get_isLocalizationMode(): boolean;
-        protected get_isNew(): boolean;
-        protected get_isNewOrDeleted(): boolean;
+        protected isCloneMode(): boolean;
+        protected isDeleted(): boolean;
+        protected isEditMode(): boolean;
+        protected isLocalizationMode(): boolean;
+        protected isNew(): boolean;
+        protected isNewOrDeleted(): boolean;
         protected initToolbar(): void;
         protected initializeAsync(): PromiseLike<void>;
         load(entityOrId: any, done: () => void, fail: () => void): void;
@@ -1290,15 +1296,16 @@ declare namespace Serenity {
         protected createView(): Slick.RemoteView<TItem>;
         protected determineText(text: string, getKey: (s: string) => string): any;
         protected editItem(entityOrId: any): any;
-        protected editItem$1(itemType: string, entityOrId: any): any;
+        protected editItemOfType(itemType: string, entityOrId: any): any;
         protected enableFiltering(): boolean;
         protected getAddButtonCaption(): string;
         protected getButtons(): ToolButton[];
         protected getColumns(): Slick.Column[];
         protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
+        protected getColumnsKey(): string;
         protected getDefaultSortBy(): string[];
         protected getGridCanLoad(): boolean;
-        protected getIdFieldName(): string;
+        protected getIdProperty(): string;
         protected getIncludeColumns(include: {
             [key: string]: boolean;
         }): any;
@@ -1358,24 +1365,22 @@ declare namespace Serenity {
     }
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(container: JQuery, options?: TOptions);
-        dialogOpen(): void;
-        loadByIdAndOpenDialog(id: any): void;
         protected addButtonClick(): void;
         protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
-        protected getEntityDialogOptions(): any;
-        protected getEntityDialogOptions$1(itemType: string): any;
-        protected getEntityDialogType(): {
+        protected getDialogOptions(): any;
+        protected getDialogOptionsFor(itemType: string): any;
+        protected getDialogType(): {
             new (...args: any[]): Widget<any>;
         };
-        protected getEntityDialogType$1(itemType: string): {
+        protected getDialogTypeFor(itemType: string): {
             new (...args: any[]): Widget<any>;
         };
-        protected getEntityPlural(): string;
-        protected getEntitySingular(): string;
+        protected getDisplayName(): string;
+        protected getItemName(): string;
         protected getEntityType(): string;
         protected getService(): string;
-        protected initEntityDialog(dialog: Widget<any>): any;
-        protected initEntityDialog$1(itemType: string, dialog: Widget<any>): any;
+        protected initDialog(dialog: Widget<any>): any;
+        protected initEntityDialog(itemType: string, dialog: Widget<any>): any;
         protected newRefreshButton(noText?: boolean): ToolButton;
     }
     interface CKEditorConfig {
@@ -1545,6 +1550,7 @@ declare namespace ss {
         __types: ClassReg[];
     }
     interface ClassReg {
+        __register: boolean;
         __class: boolean;
         __assembly: AssemblyReg;
         __interfaces: any[];

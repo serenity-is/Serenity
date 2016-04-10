@@ -6,7 +6,7 @@ namespace Serenity
 {
     public class PrefixedContext : ScriptContext
     {
-        private string idPrefix;
+        protected readonly string idPrefix;
 
         public PrefixedContext(string idPrefix)
         {
@@ -30,6 +30,6 @@ namespace Serenity
             return J("#" + idPrefix + id).GetWidget(t);
         }
 
-        public string IdPrefix { get { return idPrefix; } }
+        public string IdPrefix { [InlineCode("{this}.idPrefix")] get { return idPrefix; } }
     }
 }

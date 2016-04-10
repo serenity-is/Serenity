@@ -1519,7 +1519,8 @@
         function initializeTypes() {
             enumerateTypes(global, Q.Config.rootNamespaces, function (obj, fullName) {
                 // probably Saltaralle class
-                if (obj.__typeName)
+                if (obj.hasOwnProperty("__typeName") &&
+                    !obj.__register)
                     return;
                 if (!obj.__interfaces &&
                     obj.prototype.format &&
@@ -1527,7 +1528,7 @@
                     obj.__class = true;
                     obj.__interfaces = [Serenity.ISlickFormatter];
                 }
-                if (!obj.class) {
+                if (!obj.__class) {
                     var baseType = ss.getBaseType(obj);
                     if (baseType.__class)
                         obj.__class = true;
@@ -1539,6 +1540,7 @@
                     }
                     obj.__assembly.__types[fullName] = obj;
                 }
+                delete obj.__register;
             });
         }
         $(function () {
@@ -1821,6 +1823,7 @@ var Serenity;
         Decorators.idProperty = idProperty;
         function registerClass(intf, asm) {
             return function (target) {
+                target.__register = true;
                 target.__class = true;
                 target.__assembly = asm || ss.__assemblies['App'];
                 if (intf)

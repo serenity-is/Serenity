@@ -151,6 +151,7 @@ namespace Serenity
         /// </summary>
         public string UniqueName
         {
+            [InlineCode("{this}.uniqueName")]
             get { return uniqueName; }
         }
 
@@ -161,6 +162,7 @@ namespace Serenity
         /// </summary>
         public string WidgetName
         {
+            [InlineCode("{this}.widgetName")]
             get { return widgetName; }
         }
 

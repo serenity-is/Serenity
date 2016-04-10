@@ -8,9 +8,9 @@ namespace Serenity
 {
     [IncludeGenericArguments(false), ScriptName("TemplatedWidget")]
     public abstract class TemplatedWidget<TOptions> : Widget<TOptions>
-        where TOptions: class, new()
+        where TOptions : class, new()
     {
-        protected string idPrefix;
+        protected readonly string idPrefix;
         private static JsDictionary<string, string> templateNames = new JsDictionary<string, string>();
 
         protected TemplatedWidget(jQueryObject element, TOptions opt = null)
@@ -24,11 +24,15 @@ namespace Serenity
             this.element.Html(widgetMarkup);
         }
 
+        public string IdPrefix { [InlineCode("{this}.idPrefix")] get { return idPrefix; } }
+
+        [ScriptName("ById")]
         public jQueryObject ById(string id)
         {
             return J("#" + idPrefix + id);
         }
 
+        [ScriptName("ByID")]
         public TWidget ById<TWidget>(string id)
             where TWidget: Widget
         {

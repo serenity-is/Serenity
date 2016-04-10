@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Serenity
@@ -100,6 +101,7 @@ namespace Serenity
 
         protected bool IsLocalizationMode
         {
+            [ScriptName("isLocalizationMode")]
             get 
             {
                 return
@@ -110,6 +112,7 @@ namespace Serenity
 
         private bool IsLocalizationModeAndChanged
         {
+            [ScriptName("isLocalizationModeAndChanged")]
             get
             {
                 if (!IsLocalizationMode)
@@ -238,7 +241,7 @@ namespace Serenity
 
             var result = new JsDictionary<string, TEntity>();
 
-            string idField = GetEntityIdField();
+            string idField = GetIdProperty();
 
             foreach (var pair in GetLanguages())
             {

@@ -137,7 +137,6 @@ declare namespace Serenity {
     }
 
     namespace VX {
-        function addValidationRule(widget: Serenity.Widget<any>, eventClass: string, rule: (p1: JQuery) => string): JQuery;
         function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
         function removeValidationRule(element: JQuery, eventClass: string): JQuery;
         function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
@@ -240,7 +239,6 @@ declare namespace Serenity {
         static setReadOnly(elements: JQuery, isReadOnly: boolean): JQuery;
         get_editors(): any;
         get_items(): any;
-        get_idPrefix(): string;
         get_mode(): PropertyGridMode;
         set_mode(value: PropertyGridMode): void;
     }
@@ -949,7 +947,6 @@ declare namespace Serenity {
     class PrefixedContext extends ScriptContext {
         constructor(prefix: string);
         w(id: string, type: Function): any;
-        get_idPrefix(): string;
     }
 
     class Widget<TOptions> {
@@ -963,11 +960,9 @@ declare namespace Serenity {
         protected uniqueName: string;
         protected element: JQuery;
         protected options: TOptions;
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         initialize(): PromiseLike<void>;
         isAsyncWidget(): boolean;
-        get_element(): JQuery;
-        get_uniqueName(): string;
-        get_widgetName(): string;
 
         static create<TWidget>(type: { new (...args: any[]): TWidget }):
             (element?: (e: JQuery) => void, options?: any, init?: (w: TWidget) => void) => TWidget;
@@ -979,7 +974,17 @@ declare namespace Serenity {
         static elementFor$1<TEditor>(editorType: { new (...args: any[]): any }): JQuery;
     }
 
-    class StringEditor extends Widget<any> {
+    class IStringValue {
+    }
+
+    interface StringValue {
+        get_value(): string;
+        set_value(value: string): void;
+    }
+
+    class StringEditor extends Widget<any> implements StringValue {
+        get_value(): string;
+        set_value(value: string): void;
     }
 
     namespace Select2Extensions {
@@ -1319,20 +1324,21 @@ declare namespace Serenity {
     }
 
     class TemplatedWidget<TOptions> extends Widget<TOptions> {
-        protected byId<TWidget>(type: TWidget): (id: string) => TWidget;
-        protected byId$1(id: string): JQuery;
+        protected idPrefix: string;
+        protected byId(id: string): JQuery;
+        protected byID<TWidget>(type: TWidget): (id: string) => TWidget;
         protected getTemplate(): string;
         protected getTemplateName(): string;
     }
 
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+        constructor(options?: TOptions);
         protected arrange(): void;
         public dialogClose(): void;
         public dialogOpen(): void;
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected get_idPrefix(): string;
         protected handleResponsive();
         protected initDialog();
         protected initTabs();
@@ -1350,7 +1356,6 @@ declare namespace Serenity {
         protected arrange(): void;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected get_idPrefix(): string;
         protected initTabs();
         protected initToolbar();
         protected initValidator();
@@ -1359,14 +1364,14 @@ declare namespace Serenity {
     }
 
     class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected entity: TItem;
+        protected entityId: any;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
         protected getPropertyItems(): PropertyItem[];
         protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
         protected getSaveEntity(): TItem;
-        protected get_entity(): TItem;
-        protected get_entityId(): any;
         protected initializeAsync(): PromiseLike<void>;
         protected loadInitialEntity(): void;
         protected set_entity(entity: TItem);
@@ -1391,6 +1396,9 @@ declare namespace Serenity {
     }
 
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected entity: TItem;
+        protected entityId: any;
+        protected toolbar: Toolbar;
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
         protected afterLoadEntity(): void;
@@ -1423,12 +1431,12 @@ declare namespace Serenity {
         protected getUndeleteOptions(callback: (response: UndeleteResponse) => void): ServiceOptions<UndeleteResponse>;
         protected get_entity(): TItem;
         protected get_entityId(): any;
-        protected get_isCloneMode(): boolean;
-        protected get_isDeleted(): boolean;
-        protected get_isEditMode(): boolean;
-        protected get_isLocalizationMode(): boolean;
-        protected get_isNew(): boolean;
-        protected get_isNewOrDeleted(): boolean;
+        protected isCloneMode(): boolean;
+        protected isDeleted(): boolean;
+        protected isEditMode(): boolean;
+        protected isLocalizationMode(): boolean;
+        protected isNew(): boolean;
+        protected isNewOrDeleted(): boolean;
         protected initToolbar(): void;
         protected initializeAsync(): PromiseLike<void>;
         public load(entityOrId, done: () => void, fail: () => void): void;
@@ -1480,15 +1488,16 @@ declare namespace Serenity {
         protected createView(): Slick.RemoteView<TItem>;
         protected determineText(text: string, getKey: (s: string) => string);
         protected editItem(entityOrId: any);
-        protected editItem$1(itemType: string, entityOrId: any);
+        protected editItemOfType(itemType: string, entityOrId: any);
         protected enableFiltering(): boolean;
         protected getAddButtonCaption(): string;
         protected getButtons(): ToolButton[];
         protected getColumns(): Slick.Column[];
         protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
+        protected getColumnsKey(): string;
         protected getDefaultSortBy(): string[];
         protected getGridCanLoad(): boolean;
-        protected getIdFieldName(): string;
+        protected getIdProperty(): string;
         protected getIncludeColumns(include: { [key: string]: boolean });
         protected getInitialTitle(): string;
         protected getIsActiveFieldName(): string;
@@ -1548,20 +1557,18 @@ declare namespace Serenity {
 
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(container: JQuery, options?: TOptions);
-        dialogOpen(): void;
-        loadByIdAndOpenDialog(id: any): void;
         protected addButtonClick(): void;
         protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
-        protected getEntityDialogOptions(): any;
-        protected getEntityDialogOptions$1(itemType: string): any;
-        protected getEntityDialogType(): { new (...args: any[]): Widget<any> };
-        protected getEntityDialogType$1(itemType: string): { new (...args: any[]): Widget<any> };
-        protected getEntityPlural(): string;
-        protected getEntitySingular(): string;
+        protected getDialogOptions(): any;
+        protected getDialogOptionsFor(itemType: string): any;
+        protected getDialogType(): { new (...args: any[]): Widget<any> };
+        protected getDialogTypeFor(itemType: string): { new (...args: any[]): Widget<any> };
+        protected getDisplayName(): string;
+        protected getItemName(): string;
         protected getEntityType(): string;
         protected getService(): string;
-        protected initEntityDialog(dialog: Widget<any>);
-        protected initEntityDialog$1(itemType: string, dialog: Widget<any>);
+        protected initDialog(dialog: Widget<any>);
+        protected initEntityDialog(itemType: string, dialog: Widget<any>);
         protected newRefreshButton(noText?: boolean): ToolButton;
     }
 
@@ -1758,6 +1765,7 @@ declare namespace ss {
     }
 
     interface ClassReg {
+        __register: boolean;
         __class: boolean;
         __assembly: AssemblyReg;
         __interfaces: any[];
@@ -3419,7 +3427,8 @@ namespace Q {
         function initializeTypes() {
             enumerateTypes(global, Q.Config.rootNamespaces, function (obj, fullName) {
                 // probably Saltaralle class
-                if (obj.__typeName)
+                if (obj.hasOwnProperty("__typeName") &&
+                    !obj.__register)
                     return;
 
                 if (!obj.__interfaces &&
@@ -3429,7 +3438,7 @@ namespace Q {
                     obj.__interfaces = [Serenity.ISlickFormatter]
                 }
 
-                if (!obj.class) {
+                if (!obj.__class) {
                     var baseType = ss.getBaseType(obj);
                     if (baseType.__class)
                         obj.__class = true;
@@ -3442,6 +3451,8 @@ namespace Q {
                     }
                     obj.__assembly.__types[fullName] = obj;
                 }
+
+                delete obj.__register;
             });
         }
 
@@ -3664,6 +3675,7 @@ namespace Serenity {
 
         export function registerClass(intf?: any[], asm?: ss.AssemblyReg) {
             return function (target: Function) {
+                (target as any).__register = true;
                 (target as any).__class = true;
                 (target as any).__assembly = asm || ss.__assemblies['App'];
                 if (intf)

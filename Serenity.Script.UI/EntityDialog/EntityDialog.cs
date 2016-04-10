@@ -17,8 +17,8 @@ namespace Serenity
         where TEntity : class, new()
         where TOptions: class, new()
     {
-        private TEntity entity;
-        private object entityId;
+        protected TEntity entity;
+        protected object entityId;
         
         protected EntityDialog(TOptions opt = null)
             : base(opt)
@@ -75,7 +75,7 @@ namespace Serenity
 
         protected virtual string GetEntityNameFieldValue()
         {
-            return (Entity.As<JsDictionary>()[GetEntityNameField()] ?? "").ToString();
+            return (Entity.As<JsDictionary>()[GetNameProperty()] ?? "").ToString();
         }
 
         protected virtual string GetEntityTitle()
@@ -98,22 +98,25 @@ namespace Serenity
 
         protected virtual bool IsCloneMode
         {
+            [ScriptName("isCloneMode")]
             get { return false; }
         }
 
         protected bool IsEditMode
         {
+            [ScriptName("isEditMode")]
             get { return EntityId != null && !IsCloneMode; }
         }
 
         protected bool IsDeleted
         {
+            [ScriptName("isDeleted")]
             get 
             { 
                 if (EntityId == null)
                     return false;
 
-                var value = Entity.As<JsDictionary>()[GetEntityIsActiveField()].As<Int32?>();
+                var value = Entity.As<JsDictionary>()[GetIsActiveProperty()].As<Int32?>();
                 if (value == null)
                     return false;
 
@@ -123,11 +126,13 @@ namespace Serenity
 
         protected bool IsNew
         {
+            [ScriptName("isNew")]
             get { return EntityId == null; }
         }
 
         protected bool IsNewOrDeleted
         {
+            [ScriptName("isNewOrDeleted")]
             get { return IsNew || this.IsDeleted; }
         }
     }
