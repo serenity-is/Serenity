@@ -21,7 +21,7 @@ namespace @(Model.RootNamespace)@(dotModule) {
         @(x.Ident)?: @(x.TSType);</text>}
 @foreach (var x in Model.Joins){foreach (var y in x.Fields){
 <text>
-        @(jf(x.Name, y.Ident))?: @(x.TSType);</text>}}
+        @(jf(x.Name, y.Ident))?: @(y.TSType);</text>}}
 
     }
 
