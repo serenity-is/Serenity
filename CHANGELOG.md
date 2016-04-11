@@ -1,3 +1,17 @@
+## 2.0.5 (2016-04-11)
+
+Features:
+  - ported UserDialog and UserGrid to TypeScript [Serene]
+  - started writing isolated script tests for Serene interface [Serene]
+  - equality filter title can be overridden
+  - changes to support better TypeScript interop
+  - use method overriding instead of decorators, as TypeScript can't order types properly in combined file
+
+Bugfixes:
+  - generated ts row was causing error in sergen for join fields
+  - groups wasn't updated properly in PermissionCheckEditor after slickgrid update [Serene]
+  
+
 ## 2.0.4 (2016-04-08)
 
 Features:
