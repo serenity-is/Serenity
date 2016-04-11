@@ -1,3 +1,9 @@
+## 2.0.6 (2016-04-12)
+
+Bugfixes:
+  - fix equality filter captions showing ID captions after recent change
+
+
 ## 2.0.5 (2016-04-11)
 
 Features:
