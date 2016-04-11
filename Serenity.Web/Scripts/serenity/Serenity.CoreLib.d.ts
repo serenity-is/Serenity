@@ -819,9 +819,9 @@ declare namespace Serenity {
         protected getCssClass(): string;
         protected initializeAsync(): PromiseLike<void>;
         protected asyncPromise: PromiseLike<void>;
-        protected widgetName: string;
-        protected uniqueName: string;
-        protected element: JQuery;
+        widgetName: string;
+        uniqueName: string;
+        element: JQuery;
         protected options: TOptions;
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         initialize(): PromiseLike<void>;

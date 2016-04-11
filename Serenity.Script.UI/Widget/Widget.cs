@@ -143,6 +143,7 @@ namespace Serenity
         /// </summary>
         public jQueryObject Element 
         { 
+            [InlineCode("{this}.element")]
             get { return element; } 
         }
 
