@@ -120,9 +120,6 @@ namespace Serenity
             if (text != null && text.StartsWith("`"))
                 text = text.Substr(1);
 
-            if (text != null)
-                return text;
-
             if (!options.LocalTextPrefix.IsEmptyOrNull())
             {
                 var local = Q.TryGetText(getKey(options.LocalTextPrefix));

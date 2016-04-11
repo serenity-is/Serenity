@@ -6044,27 +6044,15 @@
 				this.quickFiltersDiv.append($('<hr/>'));
 			}
 		},
-		determineText: function(text, getKey) {
-			if (ss.isValue(text) && !ss.startsWithString(text, '`')) {
-				var local = Q.tryGetText(text);
+		determineText: function(getKey) {
+			var localTextPrefix = this.getLocalTextDbPrefix();
+			if (!Q.isEmptyOrNull(localTextPrefix)) {
+				var local = Q.tryGetText(getKey(localTextPrefix));
 				if (ss.isValue(local)) {
 					return local;
 				}
 			}
-			if (ss.isValue(text) && ss.startsWithString(text, '`')) {
-				text = text.substr(1);
-			}
-			if (ss.isValue(text)) {
-				return text;
-			}
-			var localTextPrefix = this.getLocalTextPrefix();
-			if (!Q.isEmptyOrNull(localTextPrefix)) {
-				var local1 = Q.tryGetText(getKey(localTextPrefix));
-				if (ss.isValue(local1)) {
-					return local1;
-				}
-			}
-			return text;
+			return null;
 		},
 		addEqualityFilter: function(TWidget) {
 			return function(field, title, options, handler, element, init) {
@@ -6072,9 +6060,14 @@
 					$('<div/>').addClass('clear').appendTo(this.toolbar.element);
 					this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar').appendTo(this.toolbar.element);
 				}
-				var quickFilter = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>").appendTo(this.quickFiltersDiv).children().text(ss.coalesce(this.determineText(ss.coalesce(title, field), function(pre) {
-					return pre + field;
-				}), '')).parent();
+				var $t2 = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>").appendTo(this.quickFiltersDiv).children();
+				var $t1 = title;
+				if (ss.isNullOrUndefined($t1)) {
+					$t1 = ss.coalesce(this.determineText(function(pre) {
+						return pre + field;
+					}), field);
+				}
+				var quickFilter = $t2.text($t1).parent();
 				var widget = $Serenity_Widget.create(TWidget).call(null, ss.mkdel(this, function(e) {
 					if (!Q.isEmptyOrNull(field)) {
 						e.attr('id', this.uniqueName + '_QuickFilter_' + field);
@@ -6127,7 +6120,7 @@
 				});
 				$('<span/>').addClass('range-separator').text('-').insertAfter(e1);
 			};
-			return this.addEqualityFilter($Serenity_DateEditor).call(this, field, null, null, function(args) {
+			return this.addEqualityFilter($Serenity_DateEditor).call(this, field, title, null, function(args) {
 				args.active = !ss.isNullOrEmptyString(args.widget.get_value()) || !ss.isNullOrEmptyString(end.get_value());
 				if (!ss.isNullOrEmptyString(args.widget.get_value())) {
 					args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.get_value()]);
@@ -9670,9 +9663,6 @@
 			}
 			if (ss.isValue(text) && ss.startsWithString(text, '`')) {
 				text = text.substr(1);
-			}
-			if (ss.isValue(text)) {
-				return text;
 			}
 			if (!Q.isEmptyOrNull(this.options.localTextPrefix)) {
 				var local1 = Q.tryGetText(getKey(this.options.localTextPrefix));

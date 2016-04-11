@@ -909,23 +909,9 @@ namespace Serenity
                 quickFiltersDiv.Append(J("<hr/>"));
         }
 
-        protected string DetermineText(string text, Func<string, string> getKey)
+        protected string DetermineText(Func<string, string> getKey)
         {
-            if (text != null &&
-                !text.StartsWith("`"))
-            {
-                var local = Q.TryGetText(text);
-                if (local != null)
-                    return local;
-            }
-
-            if (text != null && text.StartsWith("`"))
-                text = text.Substr(1);
-
-            if (text != null)
-                return text;
-
-            var localTextPrefix = GetLocalTextPrefix();
+            var localTextPrefix = GetLocalTextDbPrefix();
 
             if (!localTextPrefix.IsEmptyOrNull())
             {
@@ -934,7 +920,7 @@ namespace Serenity
                     return local;
             }
 
-            return text;
+            return null;
         }
 
         public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
@@ -949,7 +935,7 @@ namespace Serenity
            
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)
-                .Children().Text(DetermineText(title ?? field, pre => pre + field) ?? "")
+                .Children().Text(title ?? DetermineText(pre => pre + field) ?? field)
                 .Parent();
 
             var widget = Widget.Create<TWidget>(
@@ -1022,7 +1008,7 @@ namespace Serenity
         {
             DateEditor end = null;
 
-            return AddEqualityFilter<DateEditor>(field,
+            return AddEqualityFilter<DateEditor>(field, title,
                 element: e1 =>
                 {
                     end = Widget.Create<DateEditor>(element: e2 => e2.InsertAfter(e1));
