@@ -224,14 +224,14 @@ declare namespace Slick {
         identifier?: string;
         maxWidth?: any;
         minWidth?: number;
-        title?: string;
+        name?: string;
         rerenderOnResize?: boolean;
         resizable?: boolean;
         selectable?: boolean;
         sortable?: boolean;
         toolTip?: string;
         width?: number;
-        format?: Slick.Formatter;
+        format?: (ctx: Slick.FormatterContext) => string;
         referencedFields?: string[];
         sourceItem?: Serenity.PropertyItem;
         sortOrder?: number;
