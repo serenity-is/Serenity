@@ -1,8 +1,15 @@
+## 2.0.7 (2016-04-14)
+
+Features:
+
+  - included jsPDF and jsPDF autoTable plugin [Serene]
+  - pdf export samples in Order, Product and Customer grids [Serene]
+  - removed fastclick.min.js as it was reportedly causing some problems in IE 11 [Serene]
+
 ## 2.0.6 (2016-04-12)
 
 Bugfixes:
   - fix equality filter captions showing ID captions after recent change
-
 
 ## 2.0.5 (2016-04-11)
 
