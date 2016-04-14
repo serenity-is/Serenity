@@ -322,10 +322,12 @@ namespace Serenity
         /// </summary>
         public List<TItem> Items
         {
+            [ScriptName("getItems")]
             get
             {
                 return view.GetItems().As<List<TItem>>();
             }
+            [ScriptName("setItems")]
             set
             {
                 view.SetItems(value, true);
@@ -625,6 +627,7 @@ namespace Serenity
 
         protected string Title
         {
+            [ScriptName("getTitle")]
             get
             {
                 if (titleDiv == null)
@@ -632,6 +635,7 @@ namespace Serenity
 
                 return titleDiv.Children().GetText();
             }
+            [ScriptName("setTitle")]
             set
             {
                 if (value != Title)
@@ -822,7 +826,9 @@ namespace Serenity
 
         public bool IsDisabled
         {
+            [InlineCode("{this}.isDisabled")]
             get { return isDisabled; }
+            [ScriptName("setIsDisabled")]
             set
             {
                 if (isDisabled != value)
@@ -1044,11 +1050,13 @@ namespace Serenity
             this.Refresh();
         }
 
+        [IntrinsicProperty]
         public static int DefaultRowHeight { get; set; }
+        [IntrinsicProperty]
         public static int DefaultHeaderHeight { get; set; }
 
-        public SlickRemoteView<TItem> View { get { return view; } }
-        public SlickGrid SlickGrid { get { return slickGrid; } }
+        public SlickRemoteView<TItem> View { [InlineCode("{this}.view")] get { return view; } }
+        public SlickGrid SlickGrid { [InlineCode("{this}.slickGrid")] get { return slickGrid; } }
 
         jQueryObject IDataGrid.GetElement()
         {

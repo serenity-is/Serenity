@@ -1346,22 +1346,20 @@ declare namespace Serenity {
         protected updateDisabledState(): any;
         protected usePager(): boolean;
         refresh(): void;
-        get_items(): TItem[];
-        set_items(value: TItem[]): any;
-        get_isDisabled(): boolean;
-        set_isDisabled(value: boolean): any;
-        get_slickGrid(): Slick.Grid;
-        get_title(): string;
-        set_title(value: string): any;
-        get_view(): Slick.RemoteView<TItem>;
+        getItems(): TItem[];
+        setItems(value: TItem[]): any;
+        isDisabled: boolean;
+        setIsDisabled(value: boolean): any;
+        getTitle(): string;
+        setTitle(value: string): any;
+        view: Slick.RemoteView<TItem>;
+        slickGrid: Slick.Grid;
         getElement(): JQuery;
         getFilterStore(): FilterStore;
         getGrid(): Slick.Grid;
         getView(): Slick.RemoteView<TItem>;
-        static get_defaultHeaderHeight(): number;
-        static set_defaultHeaderHeight(value: number): void;
-        static get_defaultRowHeight(): number;
-        static set_defaultRowHeight(value: number): void;
+        static defaultHeaderHeight: number;
+        static defaultRowHeight: number;
     }
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(container: JQuery, options?: TOptions);

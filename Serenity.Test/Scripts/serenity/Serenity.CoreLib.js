@@ -1117,7 +1117,11 @@
         $.fn.btn = btn;
     }
     // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
-    function deepClone(arg1, arg2) {
+    function deepClone(arg1) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         var options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
         // Handle case when target is a string or something (possible in deep copy)
         if (typeof target !== "object" && !$.isFunction(target)) {

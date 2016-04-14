@@ -185,6 +185,9 @@ declare namespace Slick {
         setSummaryOptions(options: Slick.SummaryOptions): void;
         refresh(): void;
         getItem(row: number): any;
+        params: any;
+        sortBy: string[];
+        url: string;
     }
     interface RemoteViewOptions {
         autoLoad?: boolean;

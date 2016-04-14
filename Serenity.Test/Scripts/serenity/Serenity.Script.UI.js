@@ -364,7 +364,7 @@
 		this.element.addClass('require-layout').bind('layout', function() {
 			self.layout();
 		});
-		this.set_title(this.getInitialTitle());
+		this.setTitle(this.getInitialTitle());
 		var buttons = this.getButtons();
 		if (ss.isValue(buttons)) {
 			this.createToolbar(buttons);
@@ -389,18 +389,6 @@
 		}
 	};
 	$Serenity_DataGrid.__typeName = 'Serenity.DataGrid';
-	$Serenity_DataGrid.get_defaultRowHeight = function() {
-		return $Serenity_DataGrid.$4$DefaultRowHeightField;
-	};
-	$Serenity_DataGrid.set_defaultRowHeight = function(value) {
-		$Serenity_DataGrid.$4$DefaultRowHeightField = value;
-	};
-	$Serenity_DataGrid.get_defaultHeaderHeight = function() {
-		return $Serenity_DataGrid.$4$DefaultHeaderHeightField;
-	};
-	$Serenity_DataGrid.set_defaultHeaderHeight = function(value) {
-		$Serenity_DataGrid.$4$DefaultHeaderHeightField = value;
-	};
 	global.Serenity.DataGrid = $Serenity_DataGrid;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.DateEditor
@@ -1863,7 +1851,7 @@
 			return;
 		}
 		var btn = $Serenity_WX.getWidget($Serenity_Toolbar).call(null, toolbar).findButton('select-all-button');
-		var items = grd.get_view().getItems();
+		var items = grd.view.getItems();
 		btn.toggleClass('checked', items.length > 0 && !items.some(function(x) {
 			return !getSelected(x);
 		}));
@@ -1874,7 +1862,7 @@
 			cssClass: 'select-all-button',
 			onClick: function() {
 				var grid = getGrid();
-				var view = grid.get_view();
+				var view = grid.view;
 				var btn = $Serenity_WX.getWidget($Serenity_Toolbar).call(null, grid.element.children('.s-Toolbar')).findButton('select-all-button');
 				var makeSelected = !btn.hasClass('checked');
 				view.beginUpdate();
@@ -2019,7 +2007,7 @@
 	};
 	$Serenity_GridUtils.makeOrderableWithUpdateRequest = function(TItem, TOptions) {
 		return function(grid, getId, getDisplayOrder, service, getUpdateRequest) {
-			$Serenity_GridUtils.makeOrderable(grid.get_slickGrid(), function(rows, insertBefore) {
+			$Serenity_GridUtils.makeOrderable(grid.slickGrid, function(rows, insertBefore) {
 				if (rows.length === 0) {
 					return;
 				}
@@ -2055,7 +2043,7 @@
 								next();
 							}
 							else {
-								grid.get_view().populate();
+								grid.view.populate();
 							}
 						}
 					});
@@ -5601,10 +5589,10 @@
 			});
 			this.slickGrid.setSortColumns(mapped);
 		},
-		get_items: function() {
+		getItems: function() {
 			return this.view.getItems();
 		},
-		set_items: function(value) {
+		setItems: function(value) {
 			this.view.setItems(value, true);
 		},
 		bindToSlickEvents: function() {
@@ -5752,7 +5740,7 @@
 			this.view.params.IncludeColumns = array;
 		},
 		onViewSubmit: function() {
-			if (this.get_isDisabled() || !this.getGridCanLoad()) {
+			if (this.isDisabled || !this.getGridCanLoad()) {
 				return false;
 			}
 			this.setCriteriaParameter();
@@ -5837,14 +5825,14 @@
 			var toolbarDiv = $('<div class="grid-toolbar"></div>').appendTo(this.element);
 			this.toolbar = new $Serenity_Toolbar(toolbarDiv, { buttons: buttons, hotkeyContext: this.element[0] });
 		},
-		get_title: function() {
+		getTitle: function() {
 			if (ss.isNullOrUndefined(this.titleDiv)) {
 				return null;
 			}
 			return this.titleDiv.children().text();
 		},
-		set_title: function(value) {
-			if (!ss.referenceEquals(value, this.get_title())) {
+		setTitle: function(value) {
+			if (!ss.referenceEquals(value, this.getTitle())) {
 				if (ss.isNullOrUndefined(value)) {
 					if (ss.isValue(this.titleDiv)) {
 						this.titleDiv.remove();
@@ -5942,8 +5930,8 @@
 			opt.multiSelect = false;
 			opt.multiColumnSort = true;
 			opt.enableCellNavigation = false;
-			opt.headerRowHeight = $Serenity_DataGrid.get_defaultHeaderHeight();
-			opt.rowHeight = $Serenity_DataGrid.get_defaultRowHeight();
+			opt.headerRowHeight = $Serenity_DataGrid.defaultHeaderHeight;
+			opt.rowHeight = $Serenity_DataGrid.defaultRowHeight;
 			return opt;
 		},
 		populateLock: function() {
@@ -5976,10 +5964,7 @@
 		internalRefresh: function() {
 			this.view.populate();
 		},
-		get_isDisabled: function() {
-			return this.$isDisabled;
-		},
-		set_isDisabled: function(value) {
+		setIsDisabled: function(value) {
 			if (this.$isDisabled !== value) {
 				this.$isDisabled = value;
 				if (this.$isDisabled) {
@@ -6031,7 +6016,7 @@
 			return this.$isActiveProperty;
 		},
 		updateDisabledState: function() {
-			this.slickContainer.toggleClass('ui-state-disabled', !!this.get_isDisabled());
+			this.slickContainer.toggleClass('ui-state-disabled', !!this.isDisabled);
 		},
 		resizeCanvas: function() {
 			this.slickGrid.resizeCanvas();
@@ -6140,12 +6125,6 @@
 		quickFilterChange: function(e) {
 			this.refresh();
 		},
-		get_view: function() {
-			return this.view;
-		},
-		get_slickGrid: function() {
-			return this.slickGrid;
-		},
 		getElement: function() {
 			return this.element;
 		},
@@ -6160,11 +6139,11 @@
 		}
 	}, Serenity.Widget, [$Serenity_IDataGrid]);
 	ss.initClass($Serenity_CheckTreeEditor, $asm, {
-		getItems: function() {
+		getItems$1: function() {
 			return [];
 		},
 		updateItems: function() {
-			var items = this.getItems();
+			var items = this.getItems$1();
 			var itemById = {};
 			for (var i = 0; i < items.length; i++) {
 				var item = items[i];
@@ -6461,7 +6440,7 @@
 		},
 		get_value: function() {
 			var list = [];
-			var items = this.get_view().getItems();
+			var items = this.view.getItems();
 			for (var i = 0; i < items.length; i++) {
 				if (items[i].isSelected) {
 					list.push(items[i].id);
@@ -6478,7 +6457,7 @@
 			}
 			this.view.beginUpdate();
 			try {
-				var items = this.get_view().getItems();
+				var items = this.view.getItems();
 				for (var i1 = 0; i1 < items.length; i1++) {
 					var item = items[i1];
 					var select = selected[item.id];
@@ -10501,10 +10480,10 @@
 		};
 	})();
 	(function() {
-		$Serenity_DataGrid.$4$DefaultRowHeightField = 0;
-		$Serenity_DataGrid.$4$DefaultHeaderHeightField = 0;
-		$Serenity_DataGrid.set_defaultRowHeight(27);
-		$Serenity_DataGrid.set_defaultHeaderHeight(30);
+		$Serenity_DataGrid.defaultRowHeight = 0;
+		$Serenity_DataGrid.defaultHeaderHeight = 0;
+		$Serenity_DataGrid.defaultRowHeight = 27;
+		$Serenity_DataGrid.defaultHeaderHeight = 30;
 	})();
 	(function() {
 		$Serenity_EditorTypeRegistry.$knownTypes = null;
