@@ -1,3 +1,8 @@
+## 2.0.8 (2016-04-15)
+
+Features:
+  - better generated output in ssdeclarations.d.ts for exported namespaces
+
 ## 2.0.7 (2016-04-14)
 
 Features:

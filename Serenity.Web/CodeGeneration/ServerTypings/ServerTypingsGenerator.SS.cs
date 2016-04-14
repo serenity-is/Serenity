@@ -529,7 +529,7 @@ namespace Serenity.CodeGeneration
                 });
             }
 
-            AddFile("SSDeclarations.d.ts");
+            AddFile("SSDeclarations.ts");
         }
     }
 }
