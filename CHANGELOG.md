@@ -1,3 +1,8 @@
+## 2.0.9 (2016-04-15)
+
+Features:
+  - remove useless npm files from Serenity.CodeGenerator
+
 ## 2.0.8 (2016-04-15)
 
 Features:
