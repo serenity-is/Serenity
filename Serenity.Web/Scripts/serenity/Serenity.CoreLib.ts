@@ -2986,7 +2986,7 @@ namespace Q {
     }
 
     // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
-    export function deepClone(arg1: any, arg2: any) {
+    export function deepClone(arg1: any, ...args: any[]) {
         let options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
         // Handle case when target is a string or something (possible in deep copy)
         if (typeof target !== "object" && !$.isFunction(target)) {

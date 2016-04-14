@@ -1659,7 +1659,7 @@ declare namespace Q {
     function turkishLocaleToUpper(a: string): string;
     function postToService(options: S.PostToServiceOptions): void;
     function postToUrl(options: S.PostToUrlOptions): void;
-    function deepClone(arg1: any, arg2: any): any;
+    function deepClone(arg1: any, ...args: any[]): any;
     namespace ErrorHandling {
         function showServiceError(error: any): void;
     }
