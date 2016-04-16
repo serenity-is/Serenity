@@ -14,6 +14,12 @@ declare namespace System.ComponentModel {
     }
 }
 
+declare namespace Select2 {
+    namespace util {
+        function stripDiacritics(input: string): string;
+    }
+}
+
 declare namespace Serenity {
 
     namespace SlickTreeHelper {
@@ -961,6 +967,9 @@ declare namespace Serenity {
         element: JQuery;
         protected options: TOptions;
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getGridField(): JQuery;
+        change(handler: (e: JQueryEventObject) => void);
+        changeSelect2(handler: (e: JQueryEventObject) => void);
         initialize(): PromiseLike<void>;
         isAsyncWidget(): boolean;
 
@@ -1176,6 +1185,8 @@ declare namespace Serenity {
     }
 
     class LookupEditorBase<TOptions, TItem> extends Widget<TOptions> {
+        get_value(): string;
+        set_value(value: string): void;
     }
 
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
@@ -1468,6 +1479,11 @@ declare namespace Serenity {
         constructor(container: JQuery, options?: TOptions);
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
+        protected titleDiv: JQuery;
+        protected filterBar: FilterDisplayBar;
+        protected quickFiltersDiv: JQuery;
+        protected slickContainer: JQuery;
+        protected toolbar: Toolbar;
         protected addDateRangeFilter(field: string, title?: string);
         protected addEqualityFilter<TWidget>(type: { new (...args: any[]): TWidget }):
             (field: string, title?: string, options?: any, handler?: (h: QuickFilterArgs<TWidget>) => void,
@@ -1543,6 +1559,8 @@ declare namespace Serenity {
         public setIsDisabled(value: boolean);
         public getTitle(): string;
         public setTitle(value: string);
+        public itemAt(row: number): TItem;
+        public rowCount(): number;
         public view: Slick.RemoteView<TItem>;
         public slickGrid: Slick.Grid;
         public getElement(): JQuery;
@@ -1780,6 +1798,9 @@ declare namespace ss {
     }
 
     function arrayClone<T>(a: T[]): T[];
+    function cast<T>(a: any, type: { new (...args: any[]): T }): T;
+    function coalesce(a: any, b: any): any;
+    function isValue(a: any): boolean;
     function formatString(msg: string, ...prm: any[]): string;
     function getEnumerator(e: any): any;
     function getBaseType(e: any): any;

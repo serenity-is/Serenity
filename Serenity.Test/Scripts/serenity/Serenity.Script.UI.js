@@ -5589,6 +5589,12 @@
 			});
 			this.slickGrid.setSortColumns(mapped);
 		},
+		itemAt: function(row) {
+			return this.slickGrid.getDataItem(row);
+		},
+		rowCount: function() {
+			return this.slickGrid.getDataLength();
+		},
 		getItems: function() {
 			return this.view.getItems();
 		},
@@ -10424,6 +10430,23 @@
 	ss.setMetadata($Serenity_UrlFormatter, { members: [{ attr: [new Serenity.OptionAttribute()], name: 'DisplayFormat', type: 16, returnType: String, getter: { name: 'get_DisplayFormat', type: 8, sname: 'get_displayFormat', returnType: String, params: [] }, setter: { name: 'set_DisplayFormat', type: 8, sname: 'set_displayFormat', returnType: Object, params: [String] } }, { attr: [new Serenity.OptionAttribute()], name: 'DisplayProperty', type: 16, returnType: String, getter: { name: 'get_DisplayProperty', type: 8, sname: 'get_displayProperty', returnType: String, params: [] }, setter: { name: 'set_DisplayProperty', type: 8, sname: 'set_displayProperty', returnType: Object, params: [String] } }, { attr: [new Serenity.OptionAttribute()], name: 'Target', type: 16, returnType: String, getter: { name: 'get_Target', type: 8, sname: 'get_target', returnType: String, params: [] }, setter: { name: 'set_Target', type: 8, sname: 'set_target', returnType: Object, params: [String] } }, { attr: [new Serenity.OptionAttribute()], name: 'UrlFormat', type: 16, returnType: String, getter: { name: 'get_UrlFormat', type: 8, sname: 'get_urlFormat', returnType: String, params: [] }, setter: { name: 'set_UrlFormat', type: 8, sname: 'set_urlFormat', returnType: Object, params: [String] } }, { attr: [new Serenity.OptionAttribute()], name: 'UrlProperty', type: 16, returnType: String, getter: { name: 'get_UrlProperty', type: 8, sname: 'get_urlProperty', returnType: String, params: [] }, setter: { name: 'set_UrlProperty', type: 8, sname: 'set_urlProperty', returnType: Object, params: [String] } }] });
 	(function() {
 		$Serenity_Widget.$nextWidgetNumber = 0;
+	})();
+	(function() {
+		$Serenity_Widget.prototype['changeSelect2'] = function(handler) {
+			var widget = this;
+			widget.element.bind('change.' + widget.uniqueName, function(e, x) {
+				if (!!($Serenity_WX.hasOriginalEvent(e) || !x)) {
+					handler(e);
+				}
+			});
+		};
+		$Serenity_Widget.prototype['change'] = function(handler1) {
+			var widget1 = this;
+			widget1.element.bind('change.' + widget1.uniqueName, handler1);
+		};
+		$Serenity_Widget.prototype['getGridField'] = function() {
+			return this.element.closest('.field');
+		};
 	})();
 	(function() {
 		$Serenity_DialogTypeRegistry.$knownTypes = {};

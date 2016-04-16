@@ -10,6 +10,11 @@ declare namespace System.ComponentModel {
         displayName: string;
     }
 }
+declare namespace Select2 {
+    namespace util {
+        function stripDiacritics(input: string): string;
+    }
+}
 declare namespace Serenity {
     namespace SlickTreeHelper {
         function filterCustom(item: any, getParent: (p1: any) => any): boolean;
@@ -824,6 +829,9 @@ declare namespace Serenity {
         element: JQuery;
         protected options: TOptions;
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getGridField(): JQuery;
+        change(handler: (e: JQueryEventObject) => void): any;
+        changeSelect2(handler: (e: JQueryEventObject) => void): any;
         initialize(): PromiseLike<void>;
         isAsyncWidget(): boolean;
         static create<TWidget>(type: {
@@ -1016,6 +1024,8 @@ declare namespace Serenity {
         delimited?: boolean;
     }
     class LookupEditorBase<TOptions, TItem> extends Widget<TOptions> {
+        get_value(): string;
+        set_value(value: string): void;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
     }
@@ -1276,6 +1286,11 @@ declare namespace Serenity {
         constructor(container: JQuery, options?: TOptions);
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
+        protected titleDiv: JQuery;
+        protected filterBar: FilterDisplayBar;
+        protected quickFiltersDiv: JQuery;
+        protected slickContainer: JQuery;
+        protected toolbar: Toolbar;
         protected addDateRangeFilter(field: string, title?: string): any;
         protected addEqualityFilter<TWidget>(type: {
             new (...args: any[]): TWidget;
@@ -1352,6 +1367,8 @@ declare namespace Serenity {
         setIsDisabled(value: boolean): any;
         getTitle(): string;
         setTitle(value: string): any;
+        itemAt(row: number): TItem;
+        rowCount(): number;
         view: Slick.RemoteView<TItem>;
         slickGrid: Slick.Grid;
         getElement(): JQuery;
@@ -1563,6 +1580,11 @@ declare namespace ss {
         constructor(msg: string);
     }
     function arrayClone<T>(a: T[]): T[];
+    function cast<T>(a: any, type: {
+        new (...args: any[]): T;
+    }): T;
+    function coalesce(a: any, b: any): any;
+    function isValue(a: any): boolean;
     function formatString(msg: string, ...prm: any[]): string;
     function getEnumerator(e: any): any;
     function getBaseType(e: any): any;

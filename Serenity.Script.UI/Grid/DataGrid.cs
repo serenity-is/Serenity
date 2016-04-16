@@ -308,6 +308,16 @@ namespace Serenity
             slickGrid.SetSortColumns(mapped);
         }
 
+        public TItem ItemAt(int row)
+        {
+            return ((object)slickGrid.GetDataItem(row)).As<TItem>();
+        }
+
+        public int RowCount()
+        {
+            return slickGrid.GetDataLength();
+        }
+
         [System.Runtime.CompilerServices.IntrinsicProperty]
         public GridRows<TItem> Rows
         {
