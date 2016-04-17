@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -35,6 +36,10 @@ namespace Serenity.CodeGenerator
 
             this.model = model;
             CodeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
+
+            if (config.TFSIntegration)
+                CodeFileHelper.SetupTFSIntegration(config.TFPath);
+
             siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
             siteWebPath = Path.GetDirectoryName(siteWebProj);
             scriptProject = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.ScriptProjectFile));
@@ -99,7 +104,7 @@ namespace Serenity.CodeGenerator
             if (File.Exists(file))
             {
                 var backupFile = string.Format("{0}.{1}.bak", file, DateTime.Now.ToString("yyyyMMdd_HHmmss"));
-                File.Move(file, backupFile);
+                CodeFileHelper.CheckoutAndWrite(backupFile, File.ReadAllBytes(file), false);
                 return backupFile;
             }
 
@@ -110,8 +115,7 @@ namespace Serenity.CodeGenerator
         {
             string file = Path.Combine(siteWebPath, relativeFile);
             var backup = CreateDirectoryOrBackupFile(file);
-            using (var sw = new StreamWriter(file, false, utf8))
-                sw.Write(code);
+            CodeFileHelper.CheckoutAndWrite(file, utf8.GetBytes(code), true);
             CodeFileHelper.MergeChanges(backup, file);
             ProjectFileHelper.AddFileToProject(siteWebProj, relativeFile, dependentUpon);
         }
@@ -126,8 +130,7 @@ namespace Serenity.CodeGenerator
         {
             string file = Path.Combine(scriptPath, relativeFile);
             var backup = CreateDirectoryOrBackupFile(file);
-            using (var sw = new StreamWriter(file, false, utf8))
-                sw.Write(code);
+            CodeFileHelper.CheckoutAndWrite(file, utf8.GetBytes(code), true);
             CodeFileHelper.MergeChanges(backup, file);
             ProjectFileHelper.AddFileToProject(scriptProject, relativeFile, dependentUpon);
         }

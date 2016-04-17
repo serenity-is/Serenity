@@ -11,6 +11,8 @@ namespace Serenity.CodeGenerator
     {
         private static Encoding utf8 = new UTF8Encoding(true);
         public static string Kdiff3Path;
+        public static bool TFSIntegration;
+        public static string TFPath;
 
         private bool InsertDefinition(string file, string type, string key, string code)
         {
@@ -105,6 +107,52 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        public static void ExecuteTFCommand(string file, string command)
+        {
+            if (TFPath.IsNullOrEmpty() ||
+                !File.Exists(TFPath))
+            {
+                if (TFPath.IsNullOrEmpty())
+                    throw new Exception(
+                        "Couldn't locate TF.EXE utility which is required for TFS integration. " +
+                        "Please install it, or if it is not installed to default location, " +
+                        "set its path in CodeGenerator.config file!");
+
+                throw new Exception(String.Format(
+                    "Couldn't locate TF.EXE utility at '{0}' which is required for TFS integration. " +
+                    "Please install it, or if it is not installed to default location, " +
+                    "set its path in CodeGenerator.config file!", TFPath));
+            }
+
+            Process.Start(TFPath, command + " " + file).WaitForExit(10000);
+        }
+
+        public static bool CheckoutAndWrite(string file, byte[] contents, bool addToSourceControl)
+        {
+            if (!File.Exists(file))
+            {
+                File.WriteAllBytes(file, contents);
+                if (addToSourceControl && TFSIntegration)
+                    ExecuteTFCommand(file, "add");
+            }
+
+            var attr = File.GetAttributes(file);
+            if (attr.HasFlag(FileAttributes.ReadOnly) && TFSIntegration)
+            {
+                ExecuteTFCommand(file, "checkout");
+                attr = File.GetAttributes(file);
+            }
+
+            if (attr.HasFlag(FileAttributes.ReadOnly))
+            {
+                attr -= FileAttributes.ReadOnly;
+                File.SetAttributes(file, attr);
+            }
+
+            File.WriteAllBytes(file, contents);
+            return true;
+        }
+
         public static void MergeChanges(string backup, string file)
         {
             if (backup == null || !File.Exists(backup) || !File.Exists(file))
@@ -122,8 +170,8 @@ namespace Serenity.CodeGenerator
             }
 
             var generated = Path.ChangeExtension(file, Path.GetExtension(file) + ".gen.bak");
-            File.Copy(file, generated, true);
-            File.Copy(backup, file, true);
+            CheckoutAndWrite(generated, File.ReadAllBytes(file), false);
+            CheckoutAndWrite(file, File.ReadAllBytes(backup), true);
 
             if (Kdiff3Path.IsNullOrEmpty() ||
                 !File.Exists(Kdiff3Path))
@@ -141,6 +189,39 @@ namespace Serenity.CodeGenerator
             }
 
             Process.Start(Kdiff3Path, "--auto " + file + " " + generated + " -o " + file);
+        }
+
+        public static void SetupTFSIntegration(string tfPath)
+        {
+            TFSIntegration = true;
+            var tfPaths = new List<string>();
+            if (!string.IsNullOrEmpty(tfPath) && File.Exists(tfPath))
+                TFPath = tfPath;
+            else
+            {
+                var pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                var pf64 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
+                for (var i = 20; i < 10; i--)
+                {
+                    var folder = @"Microsoft Visual Studio " + i + @".0\Common7\IDE\TF.exe";
+                    var f86 = Path.Combine(pf86, folder);
+                    if (File.Exists(f86))
+                    {
+                        TFPath = f86;
+                        break;
+                    }
+                    var f64 = Path.Combine(pf64, folder);
+                    if (File.Exists(f64))
+                    {
+                        TFPath = f64;
+                        return;
+                    }
+                }
+
+                // to give meaningfull error
+                TFPath = tfPath.TrimToNull();
+            }
         }
     }
 }

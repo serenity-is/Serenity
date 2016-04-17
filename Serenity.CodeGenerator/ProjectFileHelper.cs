@@ -93,10 +93,14 @@ namespace Serenity.CodeGenerator
                     newElement.Add(new XElement(ns + "DependentUpon", Path.GetFileName(dependentUpon)));
                 }
 
-                using (var sw = new StreamWriter(projectFile, false, new UTF8Encoding(true)))
+                using (var ms = new MemoryStream())
+                using (var sw = new StreamWriter(ms, new UTF8Encoding(true)))
                 {
                     sw.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
                     sw.Write(doc.ToString());
+                    sw.Flush();
+                    var bytes = ms.ToArray();
+                    CodeFileHelper.CheckoutAndWrite(projectFile, bytes, false);
                 }
             }
         }
