@@ -1,3 +1,11 @@
+## 2.0.10 (2016-04-17)
+
+Features:
+  - added chinese (simplified) zh-CN translations and language option (thanks @billyxing)
+  - ported language dialog, language grid and translation grid to TypeScript
+  - use 24 hour filename format in grid to pdf output files
+  - experimental TFS integration in Sergen using tf.exe. set TFSIntegration to true in CodeGenerator.config
+
 ## 2.0.9 (2016-04-15)
 
 Features:
