@@ -147,14 +147,25 @@ namespace Serenity.CodeGenerator
             string file = Path.Combine(siteWebPath, relativeFile);
             Directory.CreateDirectory(Path.GetDirectoryName(file));
             if (!File.Exists(file))
-                using (var sw = new StreamWriter(file, false, utf8))
-                    sw.Write("\r\n");
+            {
+                CodeFileHelper.CheckoutAndWrite(file, utf8.GetBytes("\r\n"),
+                    false);
+            }
 
             string code = Templates.Render(new Views.EntityCss(), model);
-            using (var sw = new StreamWriter(file, true, utf8))
+            using (var ms = new MemoryStream())
             {
-                AppendComment(sw);
-                sw.Write(code);
+                var old = File.ReadAllBytes(file);
+                if (old.Length > 0)
+                    ms.Write(old, 0, old.Length);
+                using (var sw = new StreamWriter(ms, utf8))
+                {
+                    AppendComment(sw);
+                    sw.Write(code);
+                    sw.Flush();
+
+                    CodeFileHelper.CheckoutAndWrite(file, ms.ToArray(), false);
+                }
             }
 
             ProjectFileHelper.AddFileToProject(siteWebProj, relativeFile);
