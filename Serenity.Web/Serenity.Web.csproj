@@ -260,6 +260,7 @@
     <None Include="Includes\Fonts\Simple-Line-Icons.woff" />
     <None Include="Includes\Fonts\Simple-Line-Icons.woff2" />
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.es.json" />
+    <None Include="Includes\Scripts\serenity\texts\serenity.texts.it.json" />
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Includes\Scripts\serenity\texts\serenity.texts.de.json" />
     <Content Include="Includes\Scripts\serenity\texts\serenity.texts.zh-CN.json" />

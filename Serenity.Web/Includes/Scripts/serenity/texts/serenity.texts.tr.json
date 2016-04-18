@@ -91,6 +91,7 @@
     "Controls.SelectEditor.InplaceAdd": "Yeni Tanımla",
     "Controls.SelectEditor.InplaceEdit": "Düzenle",
     "Controls.SelectEditor.NoResultsClickToDefine": "*** Sonuç bulunamadı. Yeni tanımlamak için tıklayınız ***",
+    "Db.Shared.RecordId": "ID",
     "Dialogs.AlertTitle": "Hata",
     "Dialogs.CancelButton": "İptal",
     "Dialogs.ConfirmationTitle": "Onay",

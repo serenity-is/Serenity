@@ -372,6 +372,8 @@
     <None Include="Scripts\serenity\texts\serenity.texts.es.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.tr.json" />
+    <None Include="Scripts\serenity\texts\serenity.texts.zh-CN.json" />
+    <None Include="Scripts\serenity\texts\serenity.texts.it.json" />
     <None Include="Scripts\SlickGrid\README.md" />
     <None Include="tsconfig.json" />
     <Content Include="phantomjs-license.txt">
