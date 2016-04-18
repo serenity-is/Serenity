@@ -1,3 +1,17 @@
+## 2.0.11 (2016-04-18)
+
+Features:
+  - added italian translations and language option (thanks @Estrusco)
+  - added porteguese translations and language option (thanks @fernandocarvalho)
+  - updated Newtonsoft.Json to 8.0.30
+  - updated jQuery to 2.2.3
+  - updated jQuery typings to 3.0.5
+  - updated jQuery UI typings to 1.4.6
+  - updated Toastr typings to 0.3.01
+ 
+ Bugfixes:
+  - fix loop condition in TF location search (thanks @wldkrd1)
+
 ## 2.0.10 (2016-04-17)
 
 Features:
