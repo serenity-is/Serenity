@@ -127,13 +127,14 @@ namespace Serenity.CodeGenerator
             Process.Start(TFPath, command + " " + file).WaitForExit(10000);
         }
 
-        public static bool CheckoutAndWrite(string file, byte[] contents, bool addToSourceControl)
+        public static void CheckoutAndWrite(string file, byte[] contents, bool addToSourceControl)
         {
             if (!File.Exists(file))
             {
                 File.WriteAllBytes(file, contents);
                 if (addToSourceControl && TFSIntegration)
                     ExecuteTFCommand(file, "add");
+                return;
             }
 
             var attr = File.GetAttributes(file);
@@ -150,7 +151,6 @@ namespace Serenity.CodeGenerator
             }
 
             File.WriteAllBytes(file, contents);
-            return true;
         }
 
         public static void MergeChanges(string backup, string file)
