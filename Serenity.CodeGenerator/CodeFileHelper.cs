@@ -220,7 +220,7 @@ namespace Serenity.CodeGenerator
                 }
 
                 // to give meaningfull error
-                TFPath = TFPath.TrimToNull();
+                TFPath = tfPath.TrimToNull();
             }
         }
     }
