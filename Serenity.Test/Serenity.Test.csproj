@@ -370,6 +370,7 @@
     <None Include="Scripts\serenity\Serenity.Test.js.map" />
     <None Include="Scripts\serenity\texts\serenity.texts.de.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.es.json" />
+    <None Include="Scripts\serenity\texts\serenity.texts.pt.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.tr.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.zh-CN.json" />
