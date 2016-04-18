@@ -202,7 +202,7 @@ namespace Serenity.CodeGenerator
                 var pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
                 var pf64 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 
-                for (var i = 20; i < 10; i--)
+                for (var i = 20; i > 10; i--)
                 {
                     var folder = @"Microsoft Visual Studio " + i + @".0\Common7\IDE\TF.exe";
                     var f86 = Path.Combine(pf86, folder);
