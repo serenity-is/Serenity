@@ -9,7 +9,7 @@ Features:
   - updated jQuery UI typings to 1.4.6
   - updated Toastr typings to 0.3.01
  
- Bugfixes:
+Bugfixes:
   - fix loop condition in TF location search (thanks @wldkrd1)
 
 ## 2.0.10 (2016-04-17)
