@@ -209,7 +209,7 @@ namespace Serenity.CodeGenerator
                     if (File.Exists(f86))
                     {
                         TFPath = f86;
-                        break;
+                        return;
                     }
                     var f64 = Path.Combine(pf64, folder);
                     if (File.Exists(f64))
