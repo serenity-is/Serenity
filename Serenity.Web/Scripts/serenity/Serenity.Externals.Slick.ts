@@ -176,6 +176,8 @@ declare namespace Slick {
         format(ctx: FormatterContext): string;
     }
 
+    export type Format = (ctx: Slick.FormatterContext) => string;
+
     class Event {
         subscribe(handler: (p1: any, p2?: any) => void): void;
         subscribe(handler: (p1: any, p2?: any) => any): void;

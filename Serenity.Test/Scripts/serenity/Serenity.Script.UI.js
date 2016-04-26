@@ -2258,8 +2258,8 @@
 	// Serenity.IntegerEditor
 	var $Serenity_IntegerEditor = function(input, opt) {
 		Serenity.Widget.call(this, input, opt);
-		input.addClass('decimalQ');
-		var numericOptions = $.extend($Serenity_DecimalEditor.defaultAutoNumericOptions(), { vMin: this.options.minValue, vMax: this.options.maxValue, aSep: null });
+		input.addClass('integerQ');
+		var numericOptions = $.extend($Serenity_DecimalEditor.defaultAutoNumericOptions(), { vMin: ss.coalesce(this.options.minValue, 0), vMax: ss.coalesce(this.options.maxValue, 2147483647), aSep: null });
 		input.autoNumeric(numericOptions);
 	};
 	$Serenity_IntegerEditor.__typeName = 'Serenity.IntegerEditor';
@@ -2274,8 +2274,8 @@
 	};
 	$Serenity_IntegerEditorOptions.$ctor = function() {
 		var $this = {};
-		$this.minValue = 0;
-		$this.maxValue = 0;
+		$this.minValue = null;
+		$this.maxValue = null;
 		$this.minValue = 0;
 		$this.maxValue = 2147483647;
 		return $this;

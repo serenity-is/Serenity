@@ -222,6 +222,39 @@
         $.unblockUI({ fadeOut: 0 });
     }
     Q.blockUndo = blockUndo;
+    function toGrouping(items, getKey) {
+        var lookup = {};
+        for (var _i = 0, items_1 = items; _i < items_1.length; _i++) {
+            var x = items_1[_i];
+            var key = getKey(x) || "";
+            var d = lookup[key];
+            if (!d) {
+                d = lookup[key] = [];
+            }
+            d.push(x);
+        }
+        return lookup;
+    }
+    Q.toGrouping = toGrouping;
+    function any(array, predicate) {
+        for (var _i = 0, array_1 = array; _i < array_1.length; _i++) {
+            var x = array_1[_i];
+            if (predicate(x))
+                return true;
+        }
+        return false;
+    }
+    Q.any = any;
+    function count(array, predicate) {
+        var count = 0;
+        for (var _i = 0, array_2 = array; _i < array_2.length; _i++) {
+            var x = array_2[_i];
+            if (predicate(x))
+                count++;
+        }
+        return count;
+    }
+    Q.count = count;
     function formatDate(date, format) {
         if (!date) {
             return '';
