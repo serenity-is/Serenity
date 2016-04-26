@@ -294,7 +294,7 @@ declare namespace Serenity {
         set_value(value: string): void;
     }
 
-    class PhoneEditorOptions {
+    interface PhoneEditorOptions {
         multiple?: boolean;
         internal?: boolean;
         mobile?: boolean;
@@ -378,7 +378,7 @@ declare namespace Serenity {
         set_value(value: string): void;
     }
 
-    class HtmlContentEditorOptions {
+    interface HtmlContentEditorOptions {
         cols?: any;
         rows?: any;
     }
@@ -602,7 +602,7 @@ declare namespace Serenity {
         constructor(container: JQuery, options: FlexifyOptions);
     }
 
-    class FlexifyOptions {
+    interface FlexifyOptions {
         getXFactor?: (p1: JQuery) => any;
         getYFactor?: (p1: JQuery) => any;
         designWidth?: any;
@@ -1142,7 +1142,7 @@ declare namespace Serenity {
         updateItems(): void;
     }
 
-    class SelectEditorOptions {
+    interface SelectEditorOptions {
         items?: any[];
         emptyOptionText?: string;
     }
@@ -1151,7 +1151,7 @@ declare namespace Serenity {
         constructor(hidden: JQuery, opt: DateYearEditorOptions);
     }
 
-    class DateYearEditorOptions extends SelectEditorOptions {
+    interface DateYearEditorOptions extends SelectEditorOptions {
         minYear?: string;
         maxYear?: string;
         descending?: boolean;
@@ -1165,7 +1165,7 @@ declare namespace Serenity {
         get_isValid(): boolean;
     }
 
-    class DecimalEditorOptions {
+    interface DecimalEditorOptions {
         minValue?: string;
         maxValue?: string;
         decimals?: any;
@@ -1280,7 +1280,7 @@ declare namespace Serenity {
         updateItems(): void;
     }
 
-    class CheckListEditorOptions {
+    interface CheckListEditorOptions {
         items?: CheckListItem[];
         selectAllOptionText?: string;
     }
@@ -1292,14 +1292,14 @@ declare namespace Serenity {
     }
 
     interface CheckTreeItem<TSource> {
-        isSelected: boolean;
-        hideCheckBox: boolean;
-        isAllDescendantsSelected: boolean;
-        id: string;
-        text: string;
-        parentId: string;
-        children: CheckTreeItem<TSource>[];
-        source: TSource;
+        isSelected?: boolean;
+        hideCheckBox?: boolean;
+        isAllDescendantsSelected?: boolean;
+        id?: string;
+        text?: string;
+        parentId?: string;
+        children?: CheckTreeItem<TSource>[];
+        source?: TSource;
     }
 
     const enum ColumnSelection {
@@ -3215,7 +3215,7 @@ namespace Q {
         idField?: string;
         parentIdField?: string;
         textField?: string;
-        textFormatter(item: TItem)?: string;
+        textFormatter?(item: TItem): string;
     }
 
     export class Lookup<TItem> {

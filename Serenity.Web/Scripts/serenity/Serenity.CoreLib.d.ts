@@ -247,7 +247,7 @@ declare namespace Serenity {
         get_value(): string;
         set_value(value: string): void;
     }
-    class PhoneEditorOptions {
+    interface PhoneEditorOptions {
         multiple?: boolean;
         internal?: boolean;
         mobile?: boolean;
@@ -318,7 +318,7 @@ declare namespace Serenity {
         get_value(): string;
         set_value(value: string): void;
     }
-    class HtmlContentEditorOptions {
+    interface HtmlContentEditorOptions {
         cols?: any;
         rows?: any;
     }
@@ -511,7 +511,7 @@ declare namespace Serenity {
     class Flexify extends Widget<FlexifyOptions> {
         constructor(container: JQuery, options: FlexifyOptions);
     }
-    class FlexifyOptions {
+    interface FlexifyOptions {
         getXFactor?: (p1: JQuery) => any;
         getYFactor?: (p1: JQuery) => any;
         designWidth?: any;
@@ -985,14 +985,14 @@ declare namespace Serenity {
         getItems(): any[];
         updateItems(): void;
     }
-    class SelectEditorOptions {
+    interface SelectEditorOptions {
         items?: any[];
         emptyOptionText?: string;
     }
     class DateYearEditor extends SelectEditor {
         constructor(hidden: JQuery, opt: DateYearEditorOptions);
     }
-    class DateYearEditorOptions extends SelectEditorOptions {
+    interface DateYearEditorOptions extends SelectEditorOptions {
         minYear?: string;
         maxYear?: string;
         descending?: boolean;
@@ -1004,7 +1004,7 @@ declare namespace Serenity {
         set_value(value: any): void;
         get_isValid(): boolean;
     }
-    class DecimalEditorOptions {
+    interface DecimalEditorOptions {
         minValue?: string;
         maxValue?: string;
         decimals?: any;
@@ -1101,7 +1101,7 @@ declare namespace Serenity {
         getItems(): CheckListItem[];
         updateItems(): void;
     }
-    class CheckListEditorOptions {
+    interface CheckListEditorOptions {
         items?: CheckListItem[];
         selectAllOptionText?: string;
     }
@@ -1111,14 +1111,14 @@ declare namespace Serenity {
         parentId: string;
     }
     interface CheckTreeItem<TSource> {
-        isSelected: boolean;
-        hideCheckBox: boolean;
-        isAllDescendantsSelected: boolean;
-        id: string;
-        text: string;
-        parentId: string;
-        children: CheckTreeItem<TSource>[];
-        source: TSource;
+        isSelected?: boolean;
+        hideCheckBox?: boolean;
+        isAllDescendantsSelected?: boolean;
+        id?: string;
+        text?: string;
+        parentId?: string;
+        children?: CheckTreeItem<TSource>[];
+        source?: TSource;
     }
     const enum ColumnSelection {
         List = 0,
@@ -1714,8 +1714,7 @@ declare namespace Q {
         idField?: string;
         parentIdField?: string;
         textField?: string;
-        textFormatter(item: TItem): any;
-        string: any;
+        textFormatter?(item: TItem): string;
     }
     class Lookup<TItem> {
         private options;
@@ -1726,7 +1725,7 @@ declare namespace Q {
         get_idField(): string;
         get_parentIdField(): string;
         get_textField(): string;
-        get_textFormatter(): (item: TItem) => any;
+        get_textFormatter(): (item: TItem) => string;
         get_itemById(): {
             [key: string]: TItem;
         };

@@ -26,13 +26,13 @@ namespace Serenity
 
         public string IdPrefix { [InlineCode("{this}.idPrefix")] get { return idPrefix; } }
 
-        [ScriptName("ById")]
+        [ScriptName("byId")]
         public jQueryObject ById(string id)
         {
             return J("#" + idPrefix + id);
         }
 
-        [ScriptName("ByID")]
+        [ScriptName("byID")]
         public TWidget ById<TWidget>(string id)
             where TWidget: Widget
         {

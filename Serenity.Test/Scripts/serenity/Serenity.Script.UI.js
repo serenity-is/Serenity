@@ -1408,7 +1408,7 @@
 	var $Serenity_FilterDialog = function() {
 		this.$filterPanel = null;
 		Serenity.TemplatedDialog.call(this);
-		this.$filterPanel = new $Serenity_FilterPanel(this.ById('FilterPanel'));
+		this.$filterPanel = new $Serenity_FilterPanel(this.byId('FilterPanel'));
 		this.$filterPanel.set_showInitialLine(true);
 		this.$filterPanel.set_showSearchButton(false);
 		this.$filterPanel.set_updateStoreOnReset(false);
@@ -1523,7 +1523,7 @@
 		this.$updateStoreOnReset = false;
 		ss.makeGenericType($Serenity_FilterWidgetBase$1, [Object]).call(this, div, null);
 		this.element.addClass('s-FilterPanel');
-		this.$rowsDiv = this.ById('Rows');
+		this.$rowsDiv = this.byId('Rows');
 		this.$initButtons();
 		this.$updateButtons();
 	};
@@ -7002,12 +7002,12 @@
 	}, Serenity.Widget, [$Serenity_IStringValue, $Serenity_IReadOnly]);
 	ss.initClass($Serenity_EmailEditorOptions, $asm, {});
 	ss.initClass($Serenity_TemplatedWidget, $asm, {
-		ById: function(id) {
+		byId: function(id) {
 			return $('#' + this.idPrefix + id);
 		},
-		ByID: function(TWidget) {
+		byID: function(TWidget) {
 			return function(id) {
-				return $Serenity_WX.getWidget(TWidget).call(null, this.ById(id));
+				return $Serenity_WX.getWidget(TWidget).call(null, this.byId(id));
 			};
 		},
 		getTemplateName: function() {
@@ -7077,7 +7077,7 @@
 				this.toolbar = null;
 			}
 			if (ss.isValue(this.validator)) {
-				this.ById('Form').remove();
+				this.byId('Form').remove();
 				this.validator = null;
 			}
 			if (!this.isPanel) {
@@ -7119,7 +7119,7 @@
 			});
 		},
 		initToolbar: function() {
-			var toolbarDiv = this.ById('Toolbar');
+			var toolbarDiv = this.byId('Toolbar');
 			if (toolbarDiv.length === 0) {
 				return;
 			}
@@ -7137,7 +7137,7 @@
 			return {};
 		},
 		initValidator: function() {
-			var form = this.ById('Form');
+			var form = this.byId('Form');
 			if (form.length > 0) {
 				var valOptions = this.getValidatorOptions();
 				this.validator = form.validate(Q.validateOptions(valOptions));
@@ -7222,7 +7222,7 @@
 			this.element.dialog().dialog('option', 'title', value);
 		},
 		initTabs: function() {
-			var tabsDiv = this.ById('Tabs');
+			var tabsDiv = this.byId('Tabs');
 			if (tabsDiv.length === 0) {
 				return;
 			}
@@ -7606,7 +7606,7 @@
 			}
 		},
 		$initLocalizationGrid: function() {
-			var pgDiv = this.ById('PropertyGrid');
+			var pgDiv = this.byId('PropertyGrid');
 			if (pgDiv.length <= 0) {
 				return;
 			}
@@ -7615,7 +7615,7 @@
 		},
 		$initLocalizationGridAsync: function() {
 			return RSVP.resolve().then(ss.mkdel(this, function() {
-				var pgDiv = this.ById('PropertyGrid');
+				var pgDiv = this.byId('PropertyGrid');
 				if (pgDiv.length <= 0) {
 					return RSVP.resolve();
 				}
@@ -7625,7 +7625,7 @@
 			}), null);
 		},
 		$initLocalizationGridCommon: function(pgOptions) {
-			var pgDiv = this.ById('PropertyGrid');
+			var pgDiv = this.byId('PropertyGrid');
 			var anyLocalizable = false;
 			for (var $t1 = 0; $t1 < pgOptions.items.length; $t1++) {
 				var item = pgOptions.items[$t1];
@@ -7753,7 +7753,7 @@
 			var valueByName = {};
 			this.localizationGrid.enumerateItems(ss.mkdel(this, function(item, widget) {
 				if (item.name.indexOf('$') < 0 && widget.element.is(':input')) {
-					valueByName[item.name] = this.ById(item.name).val();
+					valueByName[item.name] = this.byId(item.name).val();
 					widget.element.val(valueByName[item.name]);
 				}
 			}));
@@ -7821,7 +7821,7 @@
 			return result;
 		},
 		$initPropertyGrid: function() {
-			var pgDiv = this.ById('PropertyGrid');
+			var pgDiv = this.byId('PropertyGrid');
 			if (pgDiv.length <= 0) {
 				return;
 			}
@@ -7833,7 +7833,7 @@
 		},
 		$initPropertyGridAsync: function() {
 			return RSVP.resolve().then(ss.mkdel(this, function() {
-				var pgDiv = this.ById('PropertyGrid');
+				var pgDiv = this.byId('PropertyGrid');
 				if (pgDiv.length <= 0) {
 					return RSVP.resolve();
 				}
@@ -7950,7 +7950,7 @@
 		},
 		save: function(callback) {
 			var self = this;
-			return $Serenity_ValidationHelper.submit(this.ById('Form'), function() {
+			return $Serenity_ValidationHelper.submit(this.byId('Form'), function() {
 				return self.validateBeforeSave();
 			}, function() {
 				self.save_SubmitHandler(callback);
@@ -8507,9 +8507,9 @@
 			return $Serenity_FilterPanel.panelTemplate;
 		},
 		$initButtons: function() {
-			this.ById('AddButton').text(Q.text('Controls.FilterPanel.AddFilter')).click(ss.mkdel(this, this.$addButtonClick));
-			this.ById('SearchButton').text(Q.text('Controls.FilterPanel.SearchButton')).click(ss.mkdel(this, this.$searchButtonClick));
-			this.ById('ResetButton').text(Q.text('Controls.FilterPanel.ResetButton')).click(ss.mkdel(this, this.$resetButtonClick));
+			this.byId('AddButton').text(Q.text('Controls.FilterPanel.AddFilter')).click(ss.mkdel(this, this.$addButtonClick));
+			this.byId('SearchButton').text(Q.text('Controls.FilterPanel.SearchButton')).click(ss.mkdel(this, this.$searchButtonClick));
+			this.byId('ResetButton').text(Q.text('Controls.FilterPanel.ResetButton')).click(ss.mkdel(this, this.$resetButtonClick));
 		},
 		$searchButtonClick: function(e) {
 			e.preventDefault();
@@ -8740,8 +8740,8 @@
 			this.$updateButtons();
 		},
 		$updateButtons: function() {
-			this.ById('SearchButton').toggle(this.$rowsDiv.children().length >= 1 && this.$showSearchButton);
-			this.ById('ResetButton').toggle(this.$rowsDiv.children().length >= 1);
+			this.byId('SearchButton').toggle(this.$rowsDiv.children().length >= 1 && this.$showSearchButton);
+			this.byId('ResetButton').toggle(this.$rowsDiv.children().length >= 1);
 		},
 		$andOrClick: function(e) {
 			e.preventDefault();
@@ -9510,7 +9510,7 @@
 				this.propertyGrid = null;
 			}
 			if (ss.isValue(this.validator)) {
-				this.ById('Form').remove();
+				this.byId('Form').remove();
 				this.validator = null;
 			}
 			$Serenity_TemplatedDialog.prototype.destroy.call(this);
@@ -9533,7 +9533,7 @@
 			$Serenity_TemplatedDialog.prototype.onDialogOpen.call(this);
 		},
 		$initPropertyGrid: function() {
-			var pgDiv = this.ById('PropertyGrid');
+			var pgDiv = this.byId('PropertyGrid');
 			if (pgDiv.length <= 0) {
 				return;
 			}
@@ -9545,7 +9545,7 @@
 		},
 		$initPropertyGridAsync: function() {
 			return RSVP.resolve().then(ss.mkdel(this, function() {
-				var pgDiv = this.ById('PropertyGrid');
+				var pgDiv = this.byId('PropertyGrid');
 				if (pgDiv.length <= 0) {
 					return RSVP.resolve();
 				}
@@ -9871,13 +9871,13 @@
 				this.toolbar = null;
 			}
 			if (ss.isValue(this.validator)) {
-				this.ById('Form').remove();
+				this.byId('Form').remove();
 				this.validator = null;
 			}
 			$Serenity_Widget.prototype.destroy.call(this);
 		},
 		initToolbar: function() {
-			var toolbarDiv = this.ById('Toolbar');
+			var toolbarDiv = this.byId('Toolbar');
 			if (toolbarDiv.length === 0) {
 				return;
 			}
@@ -9891,7 +9891,7 @@
 			return {};
 		},
 		initValidator: function() {
-			var form = this.ById('Form');
+			var form = this.byId('Form');
 			if (form.length > 0) {
 				var valOptions = this.getValidatorOptions();
 				this.validator = form.validate(Q.validateOptions(valOptions));
@@ -9911,7 +9911,7 @@
 			});
 		},
 		initTabs: function() {
-			var tabsDiv = this.ById('Tabs');
+			var tabsDiv = this.byId('Tabs');
 			if (tabsDiv.length === 0) {
 				return;
 			}
@@ -9935,7 +9935,7 @@
 				this.propertyGrid = null;
 			}
 			if (ss.isValue(this.validator)) {
-				this.ById('Form').remove();
+				this.byId('Form').remove();
 				this.validator = null;
 			}
 			$Serenity_TemplatedPanel.prototype.destroy.call(this);
@@ -9953,7 +9953,7 @@
 			this.$entityId = value;
 		},
 		$initPropertyGrid: function() {
-			var pgDiv = this.ById('PropertyGrid');
+			var pgDiv = this.byId('PropertyGrid');
 			if (pgDiv.length <= 0) {
 				return;
 			}
@@ -9965,7 +9965,7 @@
 		},
 		$initPropertyGridAsync: function() {
 			return RSVP.resolve().then(ss.mkdel(this, function() {
-				var pgDiv = this.ById('PropertyGrid');
+				var pgDiv = this.byId('PropertyGrid');
 				if (pgDiv.length <= 0) {
 					return RSVP.resolve();
 				}
@@ -10268,10 +10268,10 @@
 	ss.initClass($Serenity_Reporting_ReportDialog, $asm, {
 		createPropertyGrid: function() {
 			if (ss.isValue(this.$propertyGrid)) {
-				this.ById('PropertyGrid').html('').attr('class', '');
+				this.byId('PropertyGrid').html('').attr('class', '');
 				this.$propertyGrid = null;
 			}
-			var $t2 = this.ById('PropertyGrid');
+			var $t2 = this.byId('PropertyGrid');
 			var $t1 = $Serenity_PropertyGridOptions.$ctor();
 			$t1.idPrefix = this.idPrefix;
 			$t1.useCategories = true;
