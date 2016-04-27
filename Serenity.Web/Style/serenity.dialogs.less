@@ -30,7 +30,7 @@
     border: none;
     border-top: 1px solid #fff;
     border-bottom: 1px solid #d0d0d0;
-    padding: 5px 4px 5px 4px;
+    padding: 5px 4px 0 4px;
     min-height: 44px;
 }
 
@@ -112,6 +112,9 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
     .s-DateTimeEditor.dateQ { .flex(1, 1, 50%); }
     .s-DateTimeEditor.time { .flex(0, 0, auto); margin-left: 4px; }
 
+    .s-EmailEditor.emailuser { .flex(1, 1, 50%); }
+    .s-DateTimeEditor.emaildomain { .flex(0, 0, auto); margin-left: 4px; }
+
     .vx { .flex(0, 0, auto); }
 
     .category { .display(flex); .flex-wrap(wrap); .flex-direction(row); }
@@ -137,7 +140,7 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
 
     .s-PropertyGrid .categories {
         .flex-grow(1);
-        overflow-y: scroll;
+        //overflow-y: auto;
     }
 
     @media (max-width: 760px) {
@@ -174,5 +177,9 @@ body.mobile-device.modal-dialog-open {
 
     .ui-dialog-titlebar-buttonpane {
         display: none;
+    }
+
+    .s-PropertyGrid .categories {
+        //overflow-y: scroll;
     }
 }
