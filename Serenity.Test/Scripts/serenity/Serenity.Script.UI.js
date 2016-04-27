@@ -10164,7 +10164,9 @@
 		$createButton: function(container, b) {
 			var cssClass = ss.coalesce(b.cssClass, '');
 			var btn = $('<div class="tool-button"><div class="button-outer"><span class="button-inner"></span></div></div>').appendTo(container);
-			btn.addClass(cssClass);
+			if (cssClass.length > 0) {
+				btn.addClass(cssClass);
+			}
 			if (!Q.isEmptyOrNull(b.hint)) {
 				btn.attr('title', b.hint);
 			}
@@ -10177,6 +10179,17 @@
 			var text = b.title;
 			if (b.htmlEncode !== false) {
 				text = Q.htmlEncode(b.title);
+			}
+			if (!ss.isNullOrEmptyString(b.icon)) {
+				btn.addClass('icon-tool-button');
+				var klass = b.icon;
+				if (ss.startsWithString(klass, 'fa-')) {
+					klass = 'fa ' + klass;
+				}
+				else if (ss.startsWithString(klass, 'glyphicon-')) {
+					klass = 'glyphicon ' + klass;
+				}
+				text = "<i class='" + klass + "'></i> " + text;
 			}
 			if (ss.isNullOrUndefined(text) || text.length === 0) {
 				btn.addClass('no-text');

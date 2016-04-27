@@ -69,6 +69,7 @@ declare namespace Serenity {
         title?: string;
         hint?: string;
         cssClass?: string;
+        icon?: string;
         onClick?: any;
         htmlEncode?: any;
         hotkey?: string;

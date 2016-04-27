@@ -13,7 +13,8 @@ namespace Serenity
             : base(div, options)
         {
             this.element.AddClass("s-Toolbar clearfix")
-                .Html("<div class=\"tool-buttons\"><div class=\"buttons-outer\"><div class=\"buttons-inner\"></div></div></div>");
+                .Html("<div class=\"tool-buttons\"><div class=\"buttons-outer\">" + 
+                    "<div class=\"buttons-inner\"></div></div></div>");
 
             var container = J("div.buttons-inner", this.element);
         
@@ -35,7 +36,8 @@ namespace Serenity
                     "</div>")
                 .AppendTo(container);
 
-            btn.AddClass(cssClass);
+            if (cssClass.Length > 0)
+                btn.AddClass(cssClass);
 
             if (!b.Hint.IsEmptyOrNull())
                 btn.Attribute("title", b.Hint);
@@ -51,6 +53,19 @@ namespace Serenity
             var text = b.Title;
             if (b.HtmlEncode != false)
                 text = Q.HtmlEncode(b.Title);
+
+            if (!string.IsNullOrEmpty(b.Icon))
+            {
+                btn.AddClass("icon-tool-button");
+
+                var klass = b.Icon;
+                if (klass.StartsWith("fa-"))
+                    klass = "fa " + klass;
+                else if (klass.StartsWith("glyphicon-"))
+                    klass = "glyphicon " + klass;
+
+                text = "<i class='" + klass + "'></i> " + text;
+            }
 
             if (text == null || text.Length == 0)
                 btn.AddClass("no-text");
@@ -100,6 +115,7 @@ namespace Serenity
         public string Title { get; set; }
         public string Hint { get; set; }
         public string CssClass { get; set; }
+        public string Icon { get; set; }
         public jQueryEventHandler OnClick { get; set; }
         public bool? HtmlEncode { get; set; }
         public string Hotkey { get; set; }
