@@ -258,6 +258,12 @@ namespace Serenity.ComponentModel
             set { SetOption("inplaceAdd", value); }
         }
 
+        /// <summary>
+        /// This property is meaningfull when InplaceAdd is true. By default, dialog type name
+        /// is determined by LookupKey, e.g. if lookup key is "Northwind.CustomerCity", 
+        /// a dialog class named "Northwind.CustomerCityDialog" is used. If dialog type is different
+        /// than lookup key, set this to classname, e.g. "MyModule.MyDialog"
+        /// </summary>
         public string DialogType
         {
             get { return GetOption<string>("dialogType"); }
@@ -275,6 +281,8 @@ namespace Serenity.ComponentModel
 
         /// <summary>
         /// Cascade filtering field (items will be filtered on this key, e.g. CountryID)
+        /// Make sure you have [LookupInclude] attribute on this field of lookup row,
+        /// otherwise you'll have empty results as this field won't be available client side.
         /// </summary>
         public object CascadeField
         {
@@ -294,6 +302,8 @@ namespace Serenity.ComponentModel
 
         /// <summary>
         /// Optional filtering field (items will be filtered on this key, e.g. GroupID)
+        /// Make sure you have [LookupInclude] attribute on this field of lookup row,
+        /// otherwise you'll have empty results as this field won't be available client side.
         /// </summary>
         public object FilterField
         {
@@ -349,6 +359,11 @@ namespace Serenity.ComponentModel
             SetOption("lookupKey", lookupKey);
         }
 
+        /// <summary>
+        /// If you use this constructor, lookupKey will be determined by [LookupScript] attribute
+        /// on specified lookup type. If this is a row type, make sure it has [LookupScript] attribute
+        /// on it.
+        /// </summary>
         public LookupEditorAttribute(Type lookupType)
             : base("Lookup")
         {
