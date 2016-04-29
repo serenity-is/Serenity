@@ -196,7 +196,7 @@
 				if (Q.isEmptyOrNull(this.$parentID)) {
 					return null;
 				}
-				var parent = $Serenity_WX.tryGetWidget(TParent).call(null, Q.findElementWithRelativeId(this.$widget.element, this.$parentID));
+				var parent = Q.findElementWithRelativeId(this.$widget.element, this.$parentID).tryGetWidget(TParent);
 				if (ss.isValue(parent)) {
 					parent.element.bind('change.' + this.$widget.uniqueName, ss.mkdel(this, function() {
 						this.$parentChange(parent);
@@ -212,7 +212,7 @@
 				if (Q.isEmptyOrNull(this.$parentID)) {
 					return null;
 				}
-				var parent = $Serenity_WX.tryGetWidget(TParent).call(null, Q.findElementWithRelativeId(this.$widget.element, this.$parentID));
+				var parent = Q.findElementWithRelativeId(this.$widget.element, this.$parentID).tryGetWidget(TParent);
 				if (ss.isValue(parent)) {
 					parent.element.unbind('.' + this.$widget.uniqueName);
 				}
@@ -4502,44 +4502,11 @@
 			if (element.length === 0) {
 				throw new ss.Exception(ss.formatString("Searching for widget of type '{0}' on a non-existent element! ({1})", ss.getTypeFullName(TWidget), element.selector));
 			}
-			var widget = $Serenity_WX.tryGetWidget(TWidget).call(null, element);
+			var widget = element.tryGetWidget(TWidget);
 			if (ss.isNullOrUndefined(widget)) {
 				throw new ss.Exception(ss.formatString("Element has no widget of type '{0}'!", ss.getTypeFullName(TWidget)));
 			}
 			return widget;
-		};
-	};
-	$Serenity_WX.tryGetWidget = function(TWidget) {
-		return function(element) {
-			if (ss.isNullOrUndefined(element)) {
-				throw new ss.Exception("Argument 'element' is null!");
-			}
-			var widget;
-			if (ss.isAssignableFrom(TWidget, $Serenity_Widget)) {
-				var widgetName = $Serenity_WX.getWidgetName(TWidget);
-				widget = ss.safeCast(element.data(widgetName), TWidget);
-				if (ss.isValue(widget)) {
-					return widget;
-				}
-			}
-			var data = element.data();
-			if (ss.isNullOrUndefined(data)) {
-				return null;
-			}
-			var $t1 = ss.getEnumerator(Object.keys(data));
-			try {
-				while ($t1.moveNext()) {
-					var key = $t1.current();
-					widget = ss.safeCast(data[key], TWidget);
-					if (ss.isValue(widget)) {
-						return widget;
-					}
-				}
-			}
-			finally {
-				$t1.dispose();
-			}
-			return null;
 		};
 	};
 	$Serenity_WX.getWidgetName = function(type) {
@@ -10459,6 +10426,52 @@
 		};
 		$Serenity_Widget.prototype['getGridField'] = function() {
 			return this.element.closest('.field');
+		};
+		$.fn.tryGetWidget = function(widgetType) {
+			var element = this;
+			var widget2;
+			if (ss.isAssignableFrom(widgetType, $Serenity_Widget)) {
+				var widgetName = $Serenity_WX.getWidgetName(widgetType);
+				widget2 = element.data(widgetName);
+				if (ss.isValue(widget2) && !ss.isAssignableFrom(widgetType, ss.getInstanceType(widget2))) {
+					widget2 = null;
+				}
+				if (ss.isValue(widget2)) {
+					return widget2;
+				}
+			}
+			var data = element.data();
+			if (ss.isNullOrUndefined(data)) {
+				return null;
+			}
+			var $t1 = ss.getEnumerator(Object.keys(data));
+			try {
+				while ($t1.moveNext()) {
+					var key = $t1.current();
+					widget2 = data[key];
+					if (ss.isValue(widget2) && ss.isAssignableFrom(widgetType, ss.getInstanceType(widget2))) {
+						return widget2;
+					}
+				}
+			}
+			finally {
+				$t1.dispose();
+			}
+			return null;
+		};
+		$.fn.getWidget = function(widgetType1) {
+			var element1 = this;
+			if (ss.isNullOrUndefined(element1)) {
+				throw new ss.ArgumentNullException('element');
+			}
+			if (element1.length === 0) {
+				throw new ss.Exception(ss.formatString("Searching for widget of type '{0}' on a non-existent element! ({1})", ss.getTypeFullName(widgetType1), element1.selector));
+			}
+			var widget3 = element1.tryGetWidget(widgetType1);
+			if (ss.isNullOrUndefined(widget3)) {
+				throw new ss.Exception(ss.formatString("Element has no widget of type '{0}'!", ss.getTypeFullName(widgetType1)));
+			}
+			return widget3;
 		};
 	})();
 	(function() {

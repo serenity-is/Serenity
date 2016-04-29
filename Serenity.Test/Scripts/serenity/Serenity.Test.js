@@ -119,4 +119,46 @@ var Serenity;
         });
     })(Test = Serenity.Test || (Serenity.Test = {}));
 })(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Widget');
+        QUnit.test('GetWidget tests', function () {
+            var input = $('<input />');
+            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'!", 'should throw before widget creation');
+            var stringEditor = new Serenity.StringEditor(input);
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
+            var secondaryWidget = new Serenity.DecimalEditor(input);
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
+            secondaryWidget.destroy();
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
+            assert.strictEqual(input.getWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
+            stringEditor.destroy();
+            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'!", 'should throw after string editor is destroyed');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Widget');
+        QUnit.test('TryGetWidget tests', function () {
+            var input = $('<input />');
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), null, 'should return null before widget creation');
+            var stringEditor = new Serenity.StringEditor(input);
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
+            var secondaryWidget = new Serenity.DecimalEditor(input);
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
+            secondaryWidget.destroy();
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
+            assert.strictEqual(input.tryGetWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
+            stringEditor.destroy();
+            assert.equal(input.tryGetWidget(Serenity.StringEditor), null, 'should return null after string editor is destroyed');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
 //# sourceMappingURL=Serenity.Test.js.map

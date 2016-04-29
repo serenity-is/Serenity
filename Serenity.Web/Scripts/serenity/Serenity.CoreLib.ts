@@ -1,4 +1,9 @@
-﻿declare class RSVP<TResult> {
+﻿declare interface JQuery {
+    getWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
+    tryGetWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
+}
+
+declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
 
@@ -1159,7 +1164,7 @@ declare namespace Serenity {
     }
 
     class DecimalEditor extends Widget<DecimalEditorOptions> {
-        constructor(input: JQuery, opt: DecimalEditorOptions);
+        constructor(input: JQuery, opt?: DecimalEditorOptions);
         static defaultAutoNumericOptions(): any;
         get_value(): any;
         set_value(value: any): void;

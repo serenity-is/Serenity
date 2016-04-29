@@ -454,6 +454,7 @@
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="ScriptTests\Runner.html" />
+    <TypeScriptCompile Include="ScriptTests\Widget\Widget.TryGetWidgetTests.ts" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\typings\qunit\qunit.d.ts" />
