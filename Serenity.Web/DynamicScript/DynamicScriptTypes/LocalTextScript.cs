@@ -46,6 +46,11 @@ namespace Serenity.Web
                 packageItems.Length == 0)
                 return String.Empty;
 
+            return GetLocalTextPackageScript(packageItems, languageId, isPending);
+        }
+
+        public static string GetLocalTextPackageScript(string[] packageItems, string languageId, bool isPending)
+        { 
             StringBuilder sb = new StringBuilder("^(");
             bool append = false;
             foreach (object obj in packageItems)

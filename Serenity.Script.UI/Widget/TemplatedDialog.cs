@@ -316,8 +316,6 @@ namespace Serenity
             tabs = tabsDiv.Tabs(new TabsOptions());
         }
 
-        public string IdPrefix { get { return idPrefix; } }
-
         protected void HandleResponsive()
         {
             var dlg = this.Element.Dialog();

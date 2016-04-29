@@ -34,6 +34,8 @@ If you are using Serenity in any open source / commercial projects let me know, 
 .NET open source community is a bit limited and is not so active, so if you help spread the word by posting in forums, starring the project here and in Visual Studio Gallery, i'll appreciate it much.
 
 
-
+## Video Tutorials
+Youtube Channel
+https://www.youtube.com/channel/UCUL4l2DlXCOCprdUfsoP0iw
 
 

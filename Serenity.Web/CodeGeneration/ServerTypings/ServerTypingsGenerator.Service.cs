@@ -61,11 +61,7 @@ namespace Serenity.CodeGeneration
                     {
                         cw.Indented("export declare const ");
                         sb.Append(methodName);
-                        sb.Append(": '");
-                        sb.Append(serviceUrl);
-                        sb.Append("/");
-                        sb.Append(methodName);
-                        sb.AppendLine("';");
+                        sb.AppendLine(": string;");
                     }
                 });
 

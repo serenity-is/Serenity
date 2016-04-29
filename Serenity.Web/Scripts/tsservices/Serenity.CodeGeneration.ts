@@ -144,6 +144,9 @@ namespace Serenity.CodeGeneration {
     }
 
     function getBaseType(node: ts.ClassDeclaration): string {
+        if (!node.heritageClauses)
+            return null;
+
         for (let heritage of node.heritageClauses) {
             if (heritage.token == ts.SyntaxKind.ExtendsKeyword &&
                 heritage.types != null) {
@@ -409,6 +412,56 @@ namespace Serenity.CodeGeneration {
         return result;
     }
 
+    function getModuleMembers(node: ts.ModuleDeclaration): ExternalMember[] {
+        let result: ExternalMember[] = [];
+
+        for (let member of node.body.getChildren()) {
+
+            if (member.kind != ts.SyntaxKind.MethodDeclaration &&
+                member.kind != ts.SyntaxKind.PropertyDeclaration)
+                continue;
+
+            let name = (member as any).name ? (member as any).name.getText() : "";
+            if (!name || result[name])
+                continue;
+
+            var externalMember: ExternalMember = {
+                Name: name,
+                IsStatic: true,
+                Type: "",
+                Attributes: member.decorators == null ? [] :
+                    member.decorators.map(decoratorToExternalAttribute)
+            };
+
+            if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
+                let pd = (member as ts.PropertyDeclaration);
+                if (pd.type)
+                    externalMember.Type = getExpandedExpression(pd.type);
+            }
+            else if (member.kind == ts.SyntaxKind.MethodDeclaration) {
+                let emo = externalMember as ExternalMethod;
+                emo.Arguments = [];
+                let md = (member as ts.MethodDeclaration);
+                if (md.type) {
+                    externalMember.Type = getExpandedExpression(md.type);
+                }
+
+                for (var arg of md.parameters) {
+                    emo.Arguments.push({
+                        Name: arg.name.getText(),
+                        Type: getExpandedExpression(arg.type)
+                    });
+                }
+            }
+
+            result[name] = externalMember;
+            result.push(externalMember);
+        }
+
+        return result;
+    }
+
+
     function setImports(sourceFile: ts.SourceFile) {
         function visitNode(node: ts.Node) {
             node.$imports = node.parent ? node.parent.$imports : {};
@@ -496,6 +549,28 @@ namespace Serenity.CodeGeneration {
         return result;
     }
 
+    function moduleToExternalType(module: ts.ModuleDeclaration): ExternalType {
+        let result: ExternalType = {
+            AssemblyName: "",
+            GenericParameters: [],
+            Origin: ExternalTypeOrigin.TS,
+            Properties: [],
+            Namespace: getNamespace(module),
+            Name: module.name.getText(),
+            IsInterface: true,
+            IsDeclaration: isUnderAmbientNamespace(module)
+        };
+
+        var members = getModuleMembers(module);
+        result.Fields = members.filter(x => (x as ExternalMethod).Arguments == null);
+        result.Methods = members.filter(x => (x as ExternalMethod).Arguments != null);
+
+        result.Interfaces = [];
+        result.Attributes = [];
+
+        return result;
+    }
+
     function extractTypes(sourceFile: ts.SourceFile): ExternalType[] {
 
         let result: ExternalType[] = [];
@@ -524,6 +599,17 @@ namespace Serenity.CodeGeneration {
                         result.push(exportedType);
                     }
                     return;
+
+                case ts.SyntaxKind.ModuleDeclaration:
+                    let module = node as ts.ModuleDeclaration;
+
+                    if (hasExportModifier(module)) {
+                        let name = prependNamespace(module.name.getText(), module);
+                        let exportedType = moduleToExternalType(module);
+                        result[name] = exportedType;
+                        result.push(exportedType);
+                    }
+                    break;
 
             }
 

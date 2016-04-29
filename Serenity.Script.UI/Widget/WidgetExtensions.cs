@@ -7,6 +7,38 @@ namespace Serenity
     [ScriptName("WX")]
     public static class WidgetExtensions
     {
+        static WidgetExtensions()
+        {
+            typeof(Widget).Prototype["changeSelect2"] =
+                new Action<jQueryEventHandler>((handler) =>
+                {
+                    var widget = Script.This.As<Widget>();
+                    widget.Element.Bind2("change." + widget.UniqueName, (e, x) =>
+                    {
+                        if (e.HasOriginalEvent() || Q.IsFalse(x))
+                        {
+                            handler(e);
+                        }
+                    });
+                }
+            );
+
+            typeof(Widget).Prototype["change"] =
+                new Action<jQueryEventHandler>((handler) =>
+                {
+                    var widget = Script.This.As<Widget>();
+                    widget.Element.Bind("change." + widget.UniqueName, handler);
+                }
+            );
+
+            typeof(Widget).Prototype["getGridField"] =
+                new Func<jQueryObject>(() =>
+                {
+                    return Script.This.As<Widget>().Element.Closest(".field");
+                }
+            );
+        }
+
         public static TWidget GetWidget<TWidget>(this jQueryObject element) where TWidget : class
         {
             if (element == null)

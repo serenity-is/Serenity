@@ -50,7 +50,11 @@ namespace Serenity.Data
                     _setValue(row, null);
                     break;
                 case JsonToken.String:
-                    Guid.Parse((string)reader.Value);
+                    var val = reader.Value as string;
+                    if (val == "")
+                        _setValue(row, null);
+                    else
+                        _setValue(row, Guid.Parse((string)reader.Value));
                     break;
                 default:
                     throw JsonUnexpectedToken(reader);
@@ -68,8 +72,14 @@ namespace Serenity.Data
             if (source is Guid)
                 return (Guid)source;
 
-            if (source is string)
-                return new Guid(source as string);
+            var value = source as string;
+            if (value != null)
+            {
+                if (value == "")
+                    return null;
+
+                return new Guid(value);
+            }
 
             if (source is byte[])
                 return new Guid(source as byte[]);

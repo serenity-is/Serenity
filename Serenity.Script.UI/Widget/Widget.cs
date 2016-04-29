@@ -143,6 +143,7 @@ namespace Serenity
         /// </summary>
         public jQueryObject Element 
         { 
+            [InlineCode("{this}.element")]
             get { return element; } 
         }
 
@@ -151,6 +152,7 @@ namespace Serenity
         /// </summary>
         public string UniqueName
         {
+            [InlineCode("{this}.uniqueName")]
             get { return uniqueName; }
         }
 
@@ -161,6 +163,7 @@ namespace Serenity
         /// </summary>
         public string WidgetName
         {
+            [InlineCode("{this}.widgetName")]
             get { return widgetName; }
         }
 

@@ -7,12 +7,12 @@ namespace Serenity
         where TOptions: class, new()
     {
         private string entityType;
-        private string localTextPrefix;
         private string entitySingular;
-        private string entityIdField;
-        private string entityNameField;
-        private string entityIsActiveField;
         private string formKey;
+        private string idProperty;
+        private string isActiveProperty;
+        private string localTextDbPrefix;
+        private string nameProperty;
         private string service;
 
         protected virtual string GetEntityType()
@@ -58,20 +58,25 @@ namespace Serenity
             return formKey;
         }
 
-        protected virtual string GetLocalTextPrefix()
+        protected virtual string GetLocalTextDbPrefix()
         {
-            if (localTextPrefix == null)
+            if (localTextDbPrefix == null)
             {
-                var attributes = this.GetType().GetCustomAttributes(typeof(LocalTextPrefixAttribute), true);
-                if (attributes.Length >= 1)
-                    localTextPrefix = attributes[0].As<LocalTextPrefixAttribute>().Value;
-                else
-                    localTextPrefix = GetEntityType();
-
-                localTextPrefix = ("Db." + localTextPrefix + ".");
+                localTextDbPrefix = GetLocalTextPrefix() ?? "";
+                if (localTextDbPrefix.Length > 0 && !localTextDbPrefix.EndsWith("."))
+                    localTextDbPrefix = "Db." + localTextDbPrefix + ".";
             }
 
-            return localTextPrefix;
+            return localTextDbPrefix;
+        }
+
+        protected virtual string GetLocalTextPrefix()
+        {
+            var attributes = this.GetType().GetCustomAttributes(typeof(LocalTextPrefixAttribute), true);
+            if (attributes.Length >= 1)
+                return attributes[0].As<LocalTextPrefixAttribute>().Value;
+
+            return GetEntityType();
         }
 
         protected virtual string GetEntitySingular()
@@ -85,52 +90,52 @@ namespace Serenity
                     entitySingular = LocalText.GetDefault(entitySingular, entitySingular);
                 }
                 else
-                    entitySingular = (Q.TryGetText(GetLocalTextPrefix() + "EntitySingular") ?? GetEntityType());
+                    entitySingular = (Q.TryGetText(GetLocalTextDbPrefix() + "EntitySingular") ?? GetEntityType());
             }
 
             return entitySingular;
         }
 
-        protected virtual string GetEntityNameField()
+        protected virtual string GetNameProperty()
         {
-            if (entityNameField == null)
+            if (nameProperty == null)
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(NamePropertyAttribute), true);
                 if (attributes.Length >= 1)
-                    entityNameField = attributes[0].As<NamePropertyAttribute>().Value;
+                    nameProperty = attributes[0].As<NamePropertyAttribute>().Value;
                 else
-                    entityNameField = "Name";
+                    nameProperty = "Name";
             }
 
-            return entityNameField;
+            return nameProperty;
         }
 
-        protected virtual string GetEntityIdField()
+        protected virtual string GetIdProperty()
         {
-            if (entityIdField == null)
+            if (idProperty == null)
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IdPropertyAttribute), true);
                 if (attributes.Length >= 1)
-                    entityIdField = attributes[0].As<IdPropertyAttribute>().Value;
+                    idProperty = attributes[0].As<IdPropertyAttribute>().Value;
                 else
-                    entityIdField = "ID";
+                    idProperty = "ID";
             }
 
-            return entityIdField;
+            return idProperty;
         }
 
-        protected virtual string GetEntityIsActiveField()
+        protected virtual string GetIsActiveProperty()
         {
-            if (entityIsActiveField == null)
+            if (isActiveProperty == null)
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IsActivePropertyAttribute), true);
                 if (attributes.Length >= 1)
-                    entityIsActiveField = attributes[0].As<IsActivePropertyAttribute>().Value;
+                    isActiveProperty = attributes[0].As<IsActivePropertyAttribute>().Value;
                 else
-                    entityIsActiveField = "IsActive";
+                    isActiveProperty = "IsActive";
             }
 
-            return entityIsActiveField;
+            return isActiveProperty;
         }
 
         protected virtual string GetService()

@@ -5,7 +5,7 @@
 .s-Toolbar {
     border-style: none;
     min-height: 40px;
-    padding-bottom: 8px;
+    padding-bottom: 3px;
     margin-bottom: 8px;
 
     .sep-button {
@@ -18,7 +18,7 @@
 
     .buttons-inner {
         float: left;
-        padding: 2px 3px;
+        padding: 2px 3px 2px 0;
     }
 
     .button-inner {
@@ -52,6 +52,7 @@
     cursor: pointer;
     border: 1px solid #aaa;
     margin-right: 3px;
+    margin-bottom: 5px;
     border-radius: 3px;
     background: linear-gradient(rgb(255, 255, 255) 0px, rgb(238, 238, 238) 100%) repeat-x rgb(247, 247, 247);
 
@@ -115,6 +116,19 @@
             border-bottom: 1px solid #eee;
         }
     }
+}
+
+.icon-tool-button {
+     span.button-inner {
+         background: none;
+         padding: 3px 3px 3px 3px;
+     }
+
+     span.button-inner i {
+         font-size: 15px;
+         position: relative;
+         top: 1px;
+     }
 }
 
 .s-Toolbar .s-ToggleButton {

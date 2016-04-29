@@ -12,12 +12,12 @@ namespace Serenity
         public IntegerEditor(jQueryObject input, IntegerEditorOptions opt)
             : base(input, opt)
         {
-            input.AddClass("decimalQ");
+            input.AddClass("integerQ");
 
             dynamic numericOptions = jQuery.ExtendObject(DecimalEditor.DefaultAutoNumericOptions(), new
             {
-                vMin = options.MinValue,
-                vMax = options.MaxValue,
+                vMin = options.MinValue ?? 0,
+                vMax = options.MaxValue ?? 2147483647,
                 aSep = (string)null
             });
 
@@ -65,7 +65,7 @@ namespace Serenity
             MaxValue = 2147483647;
         }
 
-        public Int64 MinValue { get; set; }
-        public Int64 MaxValue { get; set; }
+        public Int64? MinValue { get; set; }
+        public Int64? MaxValue { get; set; }
     }
 }

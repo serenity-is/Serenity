@@ -35,7 +35,9 @@ namespace Serenity.Web
                 var httpBase = new HttpContextWrapper(HttpContext.Current);
 
                 var controller = new FakeController();
-                var controllerContext = new ControllerContext(httpBase, new RouteData(), controller);
+                var route = new RouteData();
+                route.Values.Add("controller", "something");
+                var controllerContext = new ControllerContext(httpBase, route, controller);
 
                 var actualPath = controlPath;
                 if (actualPath.StartsWith("~/"))

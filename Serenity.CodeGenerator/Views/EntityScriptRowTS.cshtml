@@ -21,7 +21,7 @@ namespace @(Model.RootNamespace)@(dotModule) {
         @(x.Ident)?: @(x.TSType);</text>}
 @foreach (var x in Model.Joins){foreach (var y in x.Fields){
 <text>
-        @(jf(x.Name, y.Ident))?: @(x.TSType);</text>}}
+        @(jf(x.Name, y.Ident))?: @(y.TSType);</text>}}
 
     }
 
@@ -33,10 +33,10 @@ namespace @(Model.RootNamespace)@(dotModule) {
 
         export namespace Fields {@foreach (var x in Model.Fields) {
 <text>
-            export declare const @x.Ident: '@(x.Ident)';</text>}
+            export declare const @x.Ident;</text>}
 @foreach (var x in Model.Joins){foreach (var y in x.Fields){
 <text>
-            export declare const @(jf(x.Name, y.Ident)): '@(jf(x.Name, y.Ident))';</text>}}
+            export declare const @(jf(x.Name, y.Ident)): string;</text>}}
 
         }
 

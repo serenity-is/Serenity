@@ -156,11 +156,11 @@ namespace Serenity
             var clone = new object().As<TEntity>();
             clone = jQuery.Extend(clone, this.Entity).As<TEntity>().As<TEntity>();
 
-            var idField = GetEntityIdField();
+            var idField = GetIdProperty();
             if (!idField.IsEmptyOrNull())
                 Script.Delete(clone, idField);
 
-            var isActiveField = GetEntityIsActiveField();
+            var isActiveField = GetIsActiveProperty();
             if (!isActiveField.IsEmptyOrNull())
                 Script.Delete(clone, isActiveField);
 

@@ -1,3 +1,104 @@
+## 2.0.11 (2016-04-18)
+
+Features:
+  - added italian translations and language option (thanks @Estrusco)
+  - added porteguese translations and language option (thanks @fernandocarvalho)
+  - updated Newtonsoft.Json to 8.0.30
+  - updated jQuery to 2.2.3
+  - updated jQuery typings to 3.0.5
+  - updated jQuery UI typings to 1.4.6
+  - updated Toastr typings to 0.3.01
+ 
+Bugfixes:
+  - fix loop condition in TF location search (thanks @wldkrd1)
+
+## 2.0.10 (2016-04-17)
+
+Features:
+  - added chinese (simplified) zh-CN translations and language option (thanks @billyxing)
+  - ported language dialog, language grid and translation grid to TypeScript
+  - use 24 hour filename format in grid to pdf output files
+  - experimental TFS integration in Sergen using tf.exe. set TFSIntegration to true in CodeGenerator.config
+
+## 2.0.9 (2016-04-15)
+
+Features:
+  - remove useless npm files from Serenity.CodeGenerator
+
+## 2.0.8 (2016-04-15)
+
+Features:
+  - better generated output in ssdeclarations.d.ts for exported namespaces
+
+## 2.0.7 (2016-04-14)
+
+Features:
+
+  - included jsPDF and jsPDF autoTable plugin [Serene]
+  - pdf export samples in Order, Product and Customer grids [Serene]
+  - removed fastclick.min.js as it was reportedly causing some problems in IE 11 [Serene]
+
+## 2.0.6 (2016-04-12)
+
+Bugfixes:
+  - fix equality filter captions showing ID captions after recent change
+
+## 2.0.5 (2016-04-11)
+
+Features:
+  - ported UserDialog and UserGrid to TypeScript [Serene]
+  - started writing isolated script tests for Serene interface [Serene]
+  - equality filter title can be overridden
+  - changes to support better TypeScript interop
+  - use method overriding instead of decorators, as TypeScript can't order types properly in combined file
+
+Bugfixes:
+  - generated ts row was causing error in sergen for join fields
+  - groups wasn't updated properly in PermissionCheckEditor after slickgrid update [Serene]
+  
+
+## 2.0.4 (2016-04-08)
+
+Features:
+  - add displayformat, urlformat and target properties to UrlFormatter
+  - don't use colon string definition for export declare const strings in typescript declarations
+
+Bugfixes:
+  - fix possible null reference error for nodes without heritage clauses in typescript typings generator
+
+## 2.0.3 (2016-04-08)
+
+Bugfixes:
+  - fix null reference error with TextAreaEditorOptions
+
+## 2.0.2 (2016-04-07)
+
+Features:
+  - add group collapse, expand and comparer methods
+
+Bugfixes:
+  - fix problems with SlickGrid grouping in 2.0
+
+## 2.0.1 (2016-04-07)
+
+Bugfixes:
+  - fix TypeScript dialog generated code
+
+## 2.0.0 (2016-04-07)
+
+Features:
+  - Serenity now has TypeScript support, make sure you install TypeScript 1.8. Serene and migration guide coming soon...
+
+## 1.9.28 (2016-04-05)
+
+Bugfixes:
+  - resolve bug with json deserialization of guid fields
+
+## 1.9.27 (2016-03-31)
+
+Bugfixes:
+  - error in InsertUpdateLogBehavior was still intact
+
 ## 1.9.26 (2016-03-29)
 
 Features:

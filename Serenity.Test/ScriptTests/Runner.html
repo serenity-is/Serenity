@@ -1,0 +1,80 @@
+<html>
+<head>
+    <title>Serenity Tests</title>
+    <script src="qunit/qunit.js"></script>
+    <link href="qunit/qunit.css" rel="stylesheet" />
+    <script src="../Scripts/rsvp.js"></script>
+    <script src="../Scripts/jquery-2.2.3.js"></script>
+    <script src="../Scripts/jquery-ui-1.11.4.js"></script>
+    <script src="../Scripts/jquery.validate.js"></script>
+    <script src="../Scripts/jquery.blockUI.js"></script>
+    <script src="../Scripts/jquery.json.js"></script>
+    <script src="../Scripts/jquery.autoNumeric.js"></script>
+    <script src="../Scripts/jquery.colorbox.js"></script>
+    <script src="../Scripts/jquery.dialogextendQ.js"></script>
+    <script src="../Scripts/jquery.event.drag.js"></script>
+    <script src="../Scripts/jquery.scrollintoview.js"></script>
+    <script src="../Scripts/jsrender.js"></script>
+    <script src="../Scripts/toastr.js"></script>
+    <script src="../Scripts/select2.js"></script>
+    <script src="../Scripts/SlickGrid/slick.core.js"></script>
+    <script src="../Scripts/SlickGrid/slick.grid.js"></script>
+    <script src="../Scripts/SlickGrid/Plugins/slick.autotooltips.js"></script>
+    <script src="../Scripts/bootstrap.js"></script>
+    <script src="../Scripts/saltarelle/mscorlib.js"></script>
+    <script src="../Scripts/saltarelle/linq.js"></script>
+    <script src="../Scripts/serenity/Serenity.CoreLib.js"></script>
+    <script src="../Scripts/serenity/Serenity.Script.UI.js"></script>
+    <script src="../Scripts/serenity/Serenity.Externals.js"></script>
+    <script src="../Scripts/serenity/Serenity.Externals.Slick.js"></script>
+    <script src="../Scripts/serenity/Serenity.Script.Test.js"></script>
+    <script src="../Scripts/serenity/Serenity.Test.js"></script>
+</head>
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+
+    <script type="text/javascript">
+        QUnit.config.autostart = false;
+
+        for (var k in Serenity.Test) {
+            var t = Serenity.Test[k];
+            if (t && t.prototype && t.prototype.runTests) {
+                QUnit.module(k);
+                new t().runTests();
+            }
+        }
+
+        var log = [];
+
+        QUnit.done(function (test_results) {
+            var tests = [];
+            for (var i = 0, len = log.length; i < len; i++) {
+                var details = log[i];
+                tests.push({
+                    name: details.name,
+                    result: details.result,
+                    expected: details.expected,
+                    actual: details.actual,
+                    source: details.source
+                });
+            }
+            test_results.tests = tests;
+
+            window.global_test_results = test_results;
+        });
+        QUnit.testStart(function (testDetails) {
+            QUnit.log(function (details) {
+                if (!details.result) {
+                    details.name = testDetails.name;
+                    log.push(details);
+                }
+            });
+        });
+
+        $(function () {
+            QUnit.start();
+        });
+    </script>
+</body>
+</html>

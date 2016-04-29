@@ -128,9 +128,7 @@ namespace Serenity.CodeGeneration
                     {
                         cw.Indented("export declare const ");
                         sb.Append(field.PropertyName ?? field.Name);
-                        sb.Append(": '");
-                        sb.Append(field.PropertyName ?? field.Name);
-                        sb.AppendLine("';");
+                        sb.AppendLine(": string;");
                     }
                 });
 

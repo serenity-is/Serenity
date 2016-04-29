@@ -105,8 +105,6 @@ namespace Serenity
 
             tabs = tabsDiv.Tabs(new TabsOptions());
         }
-
-        public string IdPrefix { get { return idPrefix; } }
     }
 
     [Imported, ScriptName("TemplatedPanel")]

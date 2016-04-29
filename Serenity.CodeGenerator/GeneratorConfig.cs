@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 
 namespace Serenity.CodeGenerator
@@ -11,6 +12,8 @@ namespace Serenity.CodeGenerator
     {
         public List<Connection> Connections { get; set; }
         public string KDiff3Path { get; set; }
+        public string TFPath { get; set; }
+        public bool TFSIntegration { get; set; }
         public string WebProjectFile { get; set; }
         public string ScriptProjectFile { get; set; }
         public string RootNamespace { get; set; }
@@ -92,7 +95,8 @@ namespace Serenity.CodeGenerator
         public void Save()
         {
             Connections.Sort((x, y) => x.Key.CompareTo(y.Key));
-            File.WriteAllText(GeneratorConfig.GetConfigurationFilePath(), JSON.StringifyIndented(this));
+            CodeFileHelper.CheckoutAndWrite(GeneratorConfig.GetConfigurationFilePath(),
+                Encoding.UTF8.GetBytes(JSON.StringifyIndented(this)), false);
         }
 
         public static GeneratorConfig Load()

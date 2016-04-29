@@ -21,9 +21,9 @@ namespace Serenity
         protected SlickRemoteView<TItem> view;
         protected jQueryObject slickContainer;
         protected SlickGrid slickGrid;
-        protected string idFieldName;
-        protected string isActiveFieldName;
-        protected string localTextPrefix;
+        private string idProperty;
+        private string isActiveProperty;
+        private string localTextDbPrefix;
         private bool isDisabled;
         protected event Action submitHandlers;
 
@@ -120,7 +120,7 @@ namespace Serenity
 
         protected virtual void CreateIncludeDeletedButton()
         {
-            if (!GetIsActiveFieldName().IsEmptyOrNull())
+            if (!GetIsActiveProperty().IsEmptyOrNull())
                 GridUtils.AddIncludeDeletedToggle(toolbar.Element, view);
         }
 
@@ -177,7 +177,7 @@ namespace Serenity
 
         protected virtual string GetItemCssClass(TItem item, int index)
         {
-            var activeFieldName = GetIsActiveFieldName();
+            var activeFieldName = GetIsActiveProperty();
             if (activeFieldName.IsEmptyOrNull())
                 return null;
 
@@ -212,7 +212,7 @@ namespace Serenity
 
         protected virtual List<SlickColumn> PostProcessColumns(List<SlickColumn> columns)
         {
-            columns.SetDefaults(localTextPrefix: GetLocalTextPrefix());
+            columns.SetDefaults(localTextPrefix: GetLocalTextDbPrefix());
             return columns;
         }
 
@@ -308,6 +308,16 @@ namespace Serenity
             slickGrid.SetSortColumns(mapped);
         }
 
+        public TItem ItemAt(int row)
+        {
+            return ((object)slickGrid.GetDataItem(row)).As<TItem>();
+        }
+
+        public int RowCount()
+        {
+            return slickGrid.GetDataLength();
+        }
+
         [System.Runtime.CompilerServices.IntrinsicProperty]
         public GridRows<TItem> Rows
         {
@@ -322,10 +332,12 @@ namespace Serenity
         /// </summary>
         public List<TItem> Items
         {
+            [ScriptName("getItems")]
             get
             {
                 return view.GetItems().As<List<TItem>>();
             }
+            [ScriptName("setItems")]
             set
             {
                 view.SetItems(value, true);
@@ -393,7 +405,7 @@ namespace Serenity
             throw new NotImplementedException();
         }
 
-        protected virtual void EditItem(string itemType, object entityOrId)
+        protected virtual void EditItemOfType(string itemType, object entityOrId)
         {
             if (itemType == GetItemType())
             {
@@ -416,7 +428,7 @@ namespace Serenity
             {
                 e.PreventDefault();
 
-                EditItem(SlickFormatting.GetItemType(target), SlickFormatting.GetItemId(target));
+                EditItemOfType(SlickFormatting.GetItemType(target), SlickFormatting.GetItemId(target));
             }
         }
 
@@ -596,7 +608,7 @@ namespace Serenity
         protected virtual SlickRemoteViewOptions GetViewOptions()
         {
             var opt = new SlickRemoteViewOptions();
-            opt.IdField = GetIdFieldName();
+            opt.IdField = GetIdProperty();
             opt.SortBy = GetDefaultSortBy().As<string[]>();
 
             if (!UsePager())
@@ -625,6 +637,7 @@ namespace Serenity
 
         protected string Title
         {
+            [ScriptName("getTitle")]
             get
             {
                 if (titleDiv == null)
@@ -632,6 +645,7 @@ namespace Serenity
 
                 return titleDiv.Children().GetText();
             }
+            [ScriptName("setTitle")]
             set
             {
                 if (value != Title)
@@ -669,19 +683,28 @@ namespace Serenity
             Func<SlickFormatterContext, string> text = null, Func<SlickFormatterContext, string> cssClass = null, bool encode = true)
         {
             itemType = itemType ?? GetItemType();
-            idField = idField ?? GetIdFieldName();
+            idField = idField ?? GetIdProperty();
 
             return SlickFormatting.ItemLink(itemType, idField, text, cssClass, encode);
+        }
+
+        protected virtual string GetColumnsKey()
+        {
+            var attr = this.GetType().GetCustomAttributes(typeof(ColumnsKeyAttribute), true);
+
+            if (attr != null && attr.Length > 0)
+                return attr[0].As<ColumnsKeyAttribute>().Value;
+
+            return null;
         }
 
         protected virtual Promise<List<PropertyItem>> GetPropertyItemsAsync()
         {
             return Promise.Void.ThenAwait(() => 
             {
-                var attr = this.GetType().GetCustomAttributes(typeof(ColumnsKeyAttribute), true);
-
-                if (attr != null && attr.Length > 0)
-                    return Q.GetColumnsAsync(attr[0].As<ColumnsKeyAttribute>().Value);
+                var columnsKey = GetColumnsKey();
+                if (!string.IsNullOrEmpty(columnsKey))
+                    return Q.GetColumnsAsync(columnsKey);
 
                 return Promise.FromValue(new List<PropertyItem>());
             });
@@ -691,8 +714,9 @@ namespace Serenity
         {
             var attr = this.GetType().GetCustomAttributes(typeof(ColumnsKeyAttribute), true);
 
-            if (attr != null && attr.Length > 0)
-                return Q.GetColumns(attr[0].As<ColumnsKeyAttribute>().Value);
+            var columnsKey = GetColumnsKey();
+            if (!string.IsNullOrEmpty(columnsKey))
+                return Q.GetColumns(columnsKey);
 
             return new List<PropertyItem>();
         }
@@ -812,7 +836,9 @@ namespace Serenity
 
         public bool IsDisabled
         {
+            [InlineCode("{this}.isDisabled")]
             get { return isDisabled; }
+            [ScriptName("setIsDisabled")]
             set
             {
                 if (isDisabled != value)
@@ -825,50 +851,57 @@ namespace Serenity
             }
         }
 
-        protected virtual string GetLocalTextPrefix()
+        protected virtual string GetLocalTextDbPrefix()
         {
-            if (localTextPrefix == null)
+            if (localTextDbPrefix == null)
             {
-                var attributes = this.GetType().GetCustomAttributes(typeof(LocalTextPrefixAttribute), true);
-                if (attributes.Length >= 1)
-                    localTextPrefix = attributes[0].As<LocalTextPrefixAttribute>().Value;
-                else
-                    localTextPrefix = "";
+                localTextDbPrefix = GetLocalTextPrefix() ?? "";
+                if (localTextDbPrefix.Length > 0 && !localTextDbPrefix.EndsWith("."))
+                    localTextDbPrefix = "Db." + localTextDbPrefix + ".";
             }
 
-            return localTextPrefix;
+            return localTextDbPrefix;
         }
 
-        protected virtual string GetIdFieldName()
+        protected virtual string GetLocalTextPrefix()
         {
-            if (idFieldName == null)
+            var attributes = this.GetType().GetCustomAttributes(typeof(LocalTextPrefixAttribute), true);
+            if (attributes.Length >= 1)
+                return attributes[0].As<LocalTextPrefixAttribute>().Value;
+            else
+                return "";
+        }
+
+        protected virtual string GetIdProperty()
+        {
+            if (idProperty == null)
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IdPropertyAttribute), true);
                 if (attributes.Length == 1)
-                    idFieldName = attributes[0].As<IdPropertyAttribute>().Value;
+                    idProperty = attributes[0].As<IdPropertyAttribute>().Value;
                 else
-                    idFieldName = "ID";
+                    idProperty = "ID";
             }
 
-            return idFieldName;
+            return idProperty;
         }
 
-        protected virtual string GetIsActiveFieldName()
+        protected virtual string GetIsActiveProperty()
         {
-            if (isActiveFieldName == null)
+            if (isActiveProperty == null)
             {
                 var attributes = this.GetType().GetCustomAttributes(typeof(IsActivePropertyAttribute), true);
                 if (attributes.Length == 1)
                 {
-                    isActiveFieldName = attributes[0].As<IsActivePropertyAttribute>().Value;
+                    isActiveProperty = attributes[0].As<IsActivePropertyAttribute>().Value;
                 }
                 else
                 {
-                    isActiveFieldName = String.Empty;
+                    isActiveProperty = String.Empty;
                 }
             }
 
-            return isActiveFieldName;
+            return isActiveProperty;
         }
 
         protected virtual void UpdateDisabledState()
@@ -892,20 +925,9 @@ namespace Serenity
                 quickFiltersDiv.Append(J("<hr/>"));
         }
 
-        protected string DetermineText(string text, Func<string, string> getKey)
+        protected string DetermineText(Func<string, string> getKey)
         {
-            if (text != null &&
-                !text.StartsWith("`"))
-            {
-                var local = Q.TryGetText(text);
-                if (local != null)
-                    return local;
-            }
-
-            if (text != null && text.StartsWith("`"))
-                text = text.Substr(1);
-
-            var localTextPrefix = GetLocalTextPrefix();
+            var localTextPrefix = GetLocalTextDbPrefix();
 
             if (!localTextPrefix.IsEmptyOrNull())
             {
@@ -914,7 +936,7 @@ namespace Serenity
                     return local;
             }
 
-            return text;
+            return null;
         }
 
         public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
@@ -929,7 +951,7 @@ namespace Serenity
            
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)
-                .Children().Text(DetermineText(title ?? field, pre => pre + field) ?? "")
+                .Children().Text(title ?? DetermineText(pre => pre + field) ?? field)
                 .Parent();
 
             var widget = Widget.Create<TWidget>(
@@ -1002,7 +1024,7 @@ namespace Serenity
         {
             DateEditor end = null;
 
-            return AddEqualityFilter<DateEditor>(field,
+            return AddEqualityFilter<DateEditor>(field, title,
                 element: e1 =>
                 {
                     end = Widget.Create<DateEditor>(element: e2 => e2.InsertAfter(e1));
@@ -1038,11 +1060,13 @@ namespace Serenity
             this.Refresh();
         }
 
+        [IntrinsicProperty]
         public static int DefaultRowHeight { get; set; }
+        [IntrinsicProperty]
         public static int DefaultHeaderHeight { get; set; }
 
-        public SlickRemoteView<TItem> View { get { return view; } }
-        public SlickGrid SlickGrid { get { return slickGrid; } }
+        public SlickRemoteView<TItem> View { [InlineCode("{this}.view")] get { return view; } }
+        public SlickGrid SlickGrid { [InlineCode("{this}.slickGrid")] get { return slickGrid; } }
 
         jQueryObject IDataGrid.GetElement()
         {

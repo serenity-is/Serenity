@@ -14,9 +14,15 @@ namespace Serenity.Test
     [Collection("AvoidParallel")]
     public class ScriptTests : SeleniumTestBase
     {
+        protected override bool UseFileSystem()
+        {
+            return true;
+        }
+
         protected override string GetWebPath()
         {
-            return AppDomain.CurrentDomain.BaseDirectory;
+            return Path.GetDirectoryName(Path.GetDirectoryName(
+                AppDomain.CurrentDomain.BaseDirectory));
         }
 
         private Dictionary<string, object> GetQunitTestResults()
@@ -30,18 +36,19 @@ namespace Serenity.Test
         [Fact]
         public void ScriptTestsPasses()
         {
+            GoToUrl("~/ScriptTests/Runner.html");
             int tries = 0;
-            while (tries++ < 3000 && true)
+            while (tries++ < 3000)
             {
-                GoToUrl("~/ScriptTests.html");
-                if (Browser.Title == "Serenity Tests")
+                if (Browser.Title.IndexOf("Serenity Tests") >= 0)
                     break;
+
                 Thread.Sleep(100);
                 tries++;
             }
             try
             {
-                Assert.True(Browser.Title == "Serenity Tests",
+                Assert.True(Browser.Title.IndexOf("Serenity Tests") >= 0,
                     "Couldn't load test page. Probably IIS express launch error!");
 
                 Dictionary<string, object> qunitResults = null;

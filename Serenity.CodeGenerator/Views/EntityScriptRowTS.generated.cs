@@ -90,7 +90,7 @@ WriteLiteral("\r\n        ");
 WriteLiteral("?: ");
 
 
-                             Write(x.TSType);
+                             Write(y.TSType);
 
 WriteLiteral(";");
 
@@ -145,15 +145,10 @@ WriteLiteral("\r\n            export declare const ");
 
                             Write(x.Ident);
 
-WriteLiteral(": \'");
+WriteLiteral(";");
 
 
-                                        Write(x.Ident);
-
-WriteLiteral("\';");
-
-
-                                                               }
+                                                 }
 
 
  foreach (var x in Model.Joins){foreach (var y in x.Fields){
@@ -163,15 +158,10 @@ WriteLiteral("\r\n            export declare const ");
 
                              Write(jf(x.Name, y.Ident));
 
-WriteLiteral(": \'");
+WriteLiteral(": string;");
 
 
-                                                      Write(jf(x.Name, y.Ident));
-
-WriteLiteral("\';");
-
-
-                                                                                         }}
+                                                                       }}
 
 WriteLiteral("\r\n        }\r\n\r\n        [");
 

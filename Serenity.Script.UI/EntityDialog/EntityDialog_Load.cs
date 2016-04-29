@@ -86,7 +86,7 @@ namespace Serenity
 
         protected virtual void LoadEntity(TEntity entity)
         {
-            string idField = GetEntityIdField();
+            string idField = GetIdProperty();
             if (idField != null)
                 this.EntityId = entity.As<JsDictionary>()[idField];
 

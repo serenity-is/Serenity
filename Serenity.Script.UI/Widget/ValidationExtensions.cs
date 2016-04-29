@@ -9,10 +9,22 @@ namespace Serenity
     [ScriptName("VX")]
     public static class ValidationExtensions
     {
+        static ValidationExtensions()
+        {
+            typeof(Widget).Prototype["addValidationRule"] = 
+                new Func<string, Func<jQueryObject, string>, jQueryObject>(
+                    (eventClass, rule) =>
+                    {
+                        return AddValidationRule(Script.This.As<Widget>().Element, eventClass, rule);
+                    }
+            );
+        }
+
+        [InlineCode("{widget}.addValidationRule({eventClass}, {rule})")]
         public static jQueryObject AddValidationRule(this Widget widget, string eventClass,
             Func<jQueryObject, string> rule)
         {
-            return AddValidationRule(widget.Element, eventClass, rule);
+            return null;
         }
 
         public static jQueryObject AddValidationRule(this jQueryObject element, string eventClass,

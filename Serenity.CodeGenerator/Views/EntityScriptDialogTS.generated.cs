@@ -31,8 +31,6 @@ WriteLiteral("\r\n");
 
                                                    
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
-    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
-    var moduleSlash = Model.Module == null ? "" : (Model.Module + "/");
 
 
 WriteLiteral("namespace ");
@@ -43,62 +41,10 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(" {\r\n    import D = Serenity.Decorators;\r\n\r\n    ");
+WriteLiteral(" {\r\n    \r\n    ");
 
 
-WriteLiteral("@D.formKey(\"");
-
-
-             Write(Model.ClassName);
-
-
-                                   WriteLiteral("Form.formKey\")");
-
-                                                  if (Model.Identity != null) {
-WriteLiteral(" ");
-
-
-WriteLiteral("@D.idProperty(");
-
-
-                                                                                                 Write(Model.RowClassName);
-
-WriteLiteral(".idProperty)");
-
-
-                                                                                                                                             }
-
-                                                                                                                                               if (Model.NameField != null){
-WriteLiteral(" ");
-
-
-WriteLiteral("@D.nameProperty(");
-
-
-                                                                                                                                                                                                Write(Model.RowClassName);
-
-WriteLiteral(".nameProperty)");
-
-
-                                                                                                                                                                                                                                              }
-
-WriteLiteral("\r\n    ");
-
-
-WriteLiteral("@D.localTextPrefix(");
-
-
-                    Write(Model.RowClassName);
-
-WriteLiteral(".localTextPrefix) ");
-
-
-WriteLiteral("@D.service(");
-
-
-                                                                       Write(Model.ClassName);
-
-WriteLiteral("Service.baseUrl)\r\n    export class ");
+WriteLiteral("@Serenity.Decorators.registerClass()\r\n    export class ");
 
 
              Write(Model.ClassName);
@@ -108,12 +54,55 @@ WriteLiteral("Dialog extends Serenity.EntityDialog<");
 
                                                                     Write(Model.RowClassName);
 
-WriteLiteral(", any> {\r\n        protected form = new ");
+WriteLiteral(", any> {\r\n        protected getFormKey() { return ");
+
+
+                                    Write(Model.ClassName);
+
+
+                                                          WriteLiteral("Form.formKey; }");
+
+                                                                          if (Model.Identity != null) {
+WriteLiteral("\r\n        protected getIdProperty() { return ");
+
+
+                                       Write(Model.RowClassName);
+
+WriteLiteral(".idProperty; }");
+
+
+                                                                                     }
+
+WriteLiteral("\r\n        protected getLocalTextPrefix() { return ");
+
+
+                                            Write(Model.RowClassName);
+
+
+                                                                     WriteLiteral(".localTextPrefix; }");
+
+                                                                                         if (Model.NameField != null){
+WriteLiteral("\r\n        protected getNameProperty() { return ");
+
+
+                                         Write(Model.RowClassName);
+
+WriteLiteral(".nameProperty; }");
+
+
+                                                                                         }
+
+WriteLiteral("\r\n        protected getService() { return ");
+
+
+                                    Write(Model.ClassName);
+
+WriteLiteral("Service.baseUrl; }\r\n\r\n        protected form = new ");
 
 
                          Write(Model.ClassName);
 
-WriteLiteral("Form(this.get_idPrefix());\r\n    }\r\n}");
+WriteLiteral("Form(this.idPrefix);\r\n    }\r\n}");
 
 
         }

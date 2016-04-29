@@ -61,6 +61,8 @@
             return copy;
         }
         function getBaseType(node) {
+            if (!node.heritageClauses)
+                return null;
             for (var _i = 0, _a = node.heritageClauses; _i < _a.length; _i++) {
                 var heritage = _a[_i];
                 if (heritage.token == ts.SyntaxKind.ExtendsKeyword &&
@@ -292,6 +294,48 @@
             }
             return result;
         }
+        function getModuleMembers(node) {
+            var result = [];
+            for (var _i = 0, _a = node.body.getChildren(); _i < _a.length; _i++) {
+                var member = _a[_i];
+                if (member.kind != ts.SyntaxKind.MethodDeclaration &&
+                    member.kind != ts.SyntaxKind.PropertyDeclaration)
+                    continue;
+                var name_3 = member.name ? member.name.getText() : "";
+                if (!name_3 || result[name_3])
+                    continue;
+                var externalMember = {
+                    Name: name_3,
+                    IsStatic: true,
+                    Type: "",
+                    Attributes: member.decorators == null ? [] :
+                        member.decorators.map(decoratorToExternalAttribute)
+                };
+                if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
+                    var pd = member;
+                    if (pd.type)
+                        externalMember.Type = getExpandedExpression(pd.type);
+                }
+                else if (member.kind == ts.SyntaxKind.MethodDeclaration) {
+                    var emo = externalMember;
+                    emo.Arguments = [];
+                    var md = member;
+                    if (md.type) {
+                        externalMember.Type = getExpandedExpression(md.type);
+                    }
+                    for (var _b = 0, _c = md.parameters; _b < _c.length; _b++) {
+                        var arg = _c[_b];
+                        emo.Arguments.push({
+                            Name: arg.name.getText(),
+                            Type: getExpandedExpression(arg.type)
+                        });
+                    }
+                }
+                result[name_3] = externalMember;
+                result.push(externalMember);
+            }
+            return result;
+        }
         function setImports(sourceFile) {
             function visitNode(node) {
                 node.$imports = node.parent ? node.parent.$imports : {};
@@ -364,6 +408,24 @@
                 intf.decorators.map(function (x) { return decoratorToExternalAttribute(x); });
             return result;
         }
+        function moduleToExternalType(module) {
+            var result = {
+                AssemblyName: "",
+                GenericParameters: [],
+                Origin: 3 /* TS */,
+                Properties: [],
+                Namespace: getNamespace(module),
+                Name: module.name.getText(),
+                IsInterface: true,
+                IsDeclaration: isUnderAmbientNamespace(module)
+            };
+            var members = getModuleMembers(module);
+            result.Fields = members.filter(function (x) { return x.Arguments == null; });
+            result.Methods = members.filter(function (x) { return x.Arguments != null; });
+            result.Interfaces = [];
+            result.Attributes = [];
+            return result;
+        }
         function extractTypes(sourceFile) {
             var result = [];
             function visitNode(node) {
@@ -371,21 +433,30 @@
                     case ts.SyntaxKind.ClassDeclaration:
                         var klass = node;
                         if (hasExportModifier(node)) {
-                            var name_3 = prependNamespace(klass.name.getText(), klass);
+                            var name_4 = prependNamespace(klass.name.getText(), klass);
                             var exportedType = classToExternalType(klass);
-                            result[name_3] = exportedType;
+                            result[name_4] = exportedType;
                             result.push(exportedType);
                         }
                         return;
                     case ts.SyntaxKind.InterfaceDeclaration:
                         var intf = node;
                         if (hasExportModifier(node)) {
-                            var name_4 = prependNamespace(intf.name.getText(), intf);
+                            var name_5 = prependNamespace(intf.name.getText(), intf);
                             var exportedType = interfaceToExternalType(intf);
-                            result[name_4] = exportedType;
+                            result[name_5] = exportedType;
                             result.push(exportedType);
                         }
                         return;
+                    case ts.SyntaxKind.ModuleDeclaration:
+                        var module = node;
+                        if (hasExportModifier(module)) {
+                            var name_6 = prependNamespace(module.name.getText(), module);
+                            var exportedType = moduleToExternalType(module);
+                            result[name_6] = exportedType;
+                            result.push(exportedType);
+                        }
+                        break;
                 }
                 ts.forEachChild(node, function (child) { return visitNode(child); });
             }

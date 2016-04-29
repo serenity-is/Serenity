@@ -32,7 +32,6 @@ WriteLiteral("\r\n");
                                                    
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
-    var moduleSlash = Model.Module == null ? "" : (Model.Module + "/");
 
 
 WriteLiteral("namespace ");
@@ -43,73 +42,10 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(" {\r\n    import D = Serenity.Decorators;\r\n\r\n    ");
+WriteLiteral(" {\r\n    \r\n    ");
 
 
-WriteLiteral("@D.columnsKey(\"");
-
-
-                Write(moduleDot);
-
-
-                            Write(Model.ClassName);
-
-
-                                                  WriteLiteral("\")");
-
-                                                     if (Model.Identity != null) {
-WriteLiteral(" ");
-
-
-WriteLiteral("@D.idProperty(");
-
-
-                                                                                                    Write(Model.RowClassName);
-
-WriteLiteral(".idProperty)");
-
-
-                                                                                                                                                }
-
-                                                                                                                                                  if (Model.NameField != null){
-WriteLiteral(" ");
-
-
-WriteLiteral("@D.nameProperty(");
-
-
-                                                                                                                                                                                                   Write(Model.RowClassName);
-
-WriteLiteral(".nameProperty)");
-
-
-                                                                                                                                                                                                                                                 }
-
-WriteLiteral("\r\n    ");
-
-
-WriteLiteral("@D.dialogType(");
-
-
-               Write(Model.ClassName);
-
-WriteLiteral("Dialog) ");
-
-
-WriteLiteral("@D.localTextPrefix(");
-
-
-                                                             Write(Model.RowClassName);
-
-WriteLiteral(".localTextPrefix) ");
-
-
-WriteLiteral("@D.service(");
-
-
-                                                                                                                Write(Model.ClassName);
-
-WriteLiteral("Service.baseUrl)\r\n    export class ");
+WriteLiteral("@Serenity.Decorators.registerClass()\r\n    export class ");
 
 
              Write(Model.ClassName);
@@ -119,8 +55,45 @@ WriteLiteral("Grid extends Serenity.EntityGrid<");
 
                                                                 Write(Model.RowClassName);
 
-WriteLiteral(", any> {\r\n        constructor(container: JQuery) {\r\n            super(container);" +
-"\r\n        }\r\n    }\r\n}");
+WriteLiteral(", any> {\r\n        protected getColumnsKey() { return \'");
+
+
+                                        Write(moduleDot);
+
+
+                                                    Write(Model.ClassName);
+
+WriteLiteral("\'; }\r\n        protected getDialogType() { return ");
+
+
+                                       Write(Model.ClassName);
+
+
+                                                             WriteLiteral("Dialog; }");
+
+                                                                       if (Model.Identity != null) {
+WriteLiteral("\r\n        protected getIdProperty() { return ");
+
+
+                                       Write(Model.RowClassName);
+
+WriteLiteral(".idProperty; }");
+
+
+                                                                                     }
+
+WriteLiteral("\r\n        protected getLocalTextPrefix() { return ");
+
+
+                                            Write(Model.RowClassName);
+
+WriteLiteral(".localTextPrefix; }\r\n        protected getService() { return ");
+
+
+                                    Write(Model.ClassName);
+
+WriteLiteral("Service.baseUrl; }\r\n\r\n        constructor(container: JQuery) {\r\n            super" +
+"(container);\r\n        }\r\n    }\r\n}");
 
 
         }

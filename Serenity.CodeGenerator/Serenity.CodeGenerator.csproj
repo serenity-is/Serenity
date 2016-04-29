@@ -77,8 +77,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RazorGenerator.Templating, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
@@ -127,6 +126,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityForm.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EntityScriptDialogTS.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EntityScriptDialogTS.cshtml</DependentUpon>
+    </Compile>
     <Compile Include="Views\EntityScriptFormTS.generated.cs">
       <DependentUpon>EntityScriptFormTS.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -141,11 +145,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptGridSS.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\EntityScriptDialogTS.generated.cs">
-      <DependentUpon>EntityScriptDialogTS.cshtml</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Views\EntityScriptGridTS.generated.cs">
       <AutoGen>True</AutoGen>

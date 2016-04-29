@@ -176,6 +176,8 @@ declare namespace Slick {
         format(ctx: FormatterContext): string;
     }
 
+    export type Format = (ctx: Slick.FormatterContext) => string;
+
     class Event {
         subscribe(handler: (p1: any, p2?: any) => void): void;
         subscribe(handler: (p1: any, p2?: any) => any): void;
@@ -224,14 +226,14 @@ declare namespace Slick {
         identifier?: string;
         maxWidth?: any;
         minWidth?: number;
-        title?: string;
+        name?: string;
         rerenderOnResize?: boolean;
         resizable?: boolean;
         selectable?: boolean;
         sortable?: boolean;
         toolTip?: string;
         width?: number;
-        format?: Slick.Formatter;
+        format?: (ctx: Slick.FormatterContext) => string;
         referencedFields?: string[];
         sourceItem?: Serenity.PropertyItem;
         sortOrder?: number;
@@ -260,6 +262,7 @@ declare namespace Slick {
     interface GroupInfo<TItem> {
         getter: any;
         formatter: (p1: Slick.Group<TItem>) => string;
+        comparer: (a: Slick.Group<TItem>, b: Slick.Group<TItem>) => number;
         aggregators: any[];
         aggregateCollapsed: boolean;
         lazyTotalsCalculation: boolean;
@@ -278,7 +281,7 @@ declare namespace Slick {
         aggregators: any[];
     }
 
-    interface Group<TEntity> {
+    class Group<TEntity> {
         isGroup: boolean;
         level: number;
         count: number;
@@ -292,9 +295,6 @@ declare namespace Slick {
     }
 
     class GroupTotals<TEntity> {
-    }
-
-    interface GroupTotals<TEntity> {
         isGroupTotals: boolean;
         group: Group<TEntity>;
         initialized: boolean;
@@ -361,9 +361,16 @@ declare namespace Slick {
         getIdxById(id: any): any;
         getItemByIdx(index: number): any;
         setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
+        collapseAllGroups(level: number): void;
+        expandAllGroups(level: number): void;
+        expandGroup(keys: any[]): void;
+        collapseGroup(keys: any[]): void;
         setSummaryOptions(options: Slick.SummaryOptions): void;
         refresh(): void;
         getItem(row: number): any;
+        params: any;
+        sortBy: string[];
+        url: string;
     }
 
     interface RemoteViewOptions {
@@ -501,9 +508,6 @@ namespace Slick.Data {
 }
 
 namespace Slick {
-    export class Group<TEntity> {
-    }
-
     export class RemoteView<TEntity> {
         constructor(options: any) {
             var self = this;
