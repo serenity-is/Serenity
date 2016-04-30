@@ -1,3 +1,22 @@
+## 2.0.12 (2016-04-30)
+
+Features:
+  - added some linq like helpers to Q for TypeScript, toGrouping (similar toLookup), any and count
+  - added integer editor tests and resolve integer editor allows decimals
+  - made most interface members optional in TypeScript defs
+  - allow using font-awesome, simple line etc. font icons in toolbuttons via new icon property
+  - better look and margins for toolbuttons when wrapped
+  - getWidget and tryGetWidget extensions on jQuery.fn for easier access from TypeScript
+  - include json2.min.js in T4 templates for users that have IE8
+  - rewrote PermissionCheckEditor in TypeScript [Serene]
+  - rewrote RolePermissionDialog and UserPermissionDialog in TypeScript [Serene]
+  - extensive tests with QUnit for User, Role and Language dialogs [Serene]
+  - added favicon.ico [Serene] 
+  
+Bugfixes:
+  - handle TFS and site.less append problem with sergen
+  - fix tfpath location search (thanks @wldkrd1)
+
 ## 2.0.11 (2016-04-18)
 
 Features:
