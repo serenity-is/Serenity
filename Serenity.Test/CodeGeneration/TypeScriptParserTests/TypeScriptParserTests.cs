@@ -17,6 +17,13 @@ namespace Serenity.CodeGeneration.Test
             {
                 using (var sr = new StreamReader(
                     typeof(TypeScriptParserTests).Assembly.GetManifestResourceStream(
+                        "Serenity.Test.CodeGeneration.TypeScriptParserTests.json2.min.js")))
+                {
+                    jsEngine.Evaluate(sr.ReadToEnd());
+                }
+
+                using (var sr = new StreamReader(
+                    typeof(TypeScriptParserTests).Assembly.GetManifestResourceStream(
                         "Serenity.Test.CodeGeneration.TypeScriptParserTests.typescriptServices.js")))
                 {
                     jsEngine.Evaluate(sr.ReadToEnd());

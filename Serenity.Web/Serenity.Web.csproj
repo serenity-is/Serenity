@@ -714,6 +714,7 @@
     <Content Include="Includes\Scripts\SlickGrid\slick.remotemodel.js" />
     <None Include="Scripts\tsservices\typescriptServices.js" />
     <EmbeddedResource Include="Scripts\tsservices\Serenity.CodeGeneration.js" />
+    <None Include="Scripts\tsservices\json2.min.js" />
     <Content Include="Style\images\32px.png" />
     <Content Include="Style\images\accordion-down.png" />
     <Content Include="Style\images\accordion-left.png" />

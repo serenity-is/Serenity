@@ -227,6 +227,9 @@
       <Link>phantomjs.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="..\Serenity.Web\Scripts\tsservices\json2.min.js">
+      <Link>CodeGeneration\TypeScriptParserTests\json2.min.js</Link>
+    </EmbeddedResource>
     <Content Include="Scripts\jlayout.border.js" />
     <Content Include="Scripts\jlayout.border.min.js" />
     <Content Include="Scripts\jquery-2.2.3.intellisense.js" />
