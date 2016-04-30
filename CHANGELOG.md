@@ -1,3 +1,11 @@
+## 2.0.13 (2016-04-31)
+
+Features:
+  - updated Spanish translations (thanks @ArsenioInojosa)
+  - update dialogExtendQ.min.js as old one didn't use translations
+  - embed uglifyjs and use it with ScriptBundleManager
+  - added scripts/site/ScriptBundles.json to enable script bundling / minification with a simple web.config setting (see how to in Serenity Developer Guide) [Serene]
+
 ## 2.0.12 (2016-04-30)
 
 Features:
