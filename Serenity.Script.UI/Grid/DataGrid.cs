@@ -6,6 +6,7 @@ using System.Linq;
 using Serenity.Data;
 using System.Html;
 using System.Runtime.CompilerServices;
+using Serenity;
 
 namespace Serenity
 {
@@ -939,33 +940,31 @@ namespace Serenity
             return null;
         }
 
-        public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
-            Action<jQueryObject> element = null, Action<TWidget> init = null)
-            where TWidget: Widget
+        [ScriptName("addQuickFilter"), IncludeGenericArguments(false)]
+        protected object AddQuickFilter<TWidget>(string field, Type type, QuickFilterOptions<Widget> opt)
         {
+            opt = opt ?? new QuickFilterOptions<Widget>();
+
             if (quickFiltersDiv == null)
             {
                 J("<div/>").AddClass("clear").AppendTo(toolbar.Element);
                 quickFiltersDiv = J("<div/>").AddClass("quick-filters-bar").AppendTo(toolbar.Element);
             }
-           
+
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)
-                .Children().Text(title ?? DetermineText(pre => pre + field) ?? field)
+                .Children().Text(opt.Title ?? DetermineText(pre => pre + field) ?? field)
                 .Parent();
 
-            var widget = Widget.Create<TWidget>(
-                element: e =>
-                {
-                    if (!field.IsEmptyOrNull())
-                        e.Attribute("id", this.UniqueName + "_QuickFilter_" + field);
-                    e.Attribute("placeholder", " ");
-                    e.AppendTo(quickFilter);
-                    if (element != null)
-                        element(e);
-                },
-                options: options,
-                init: init);
+            var widget = Widget.CreateOfType(type, e =>
+            {
+                if (!field.IsEmptyOrNull())
+                    e.Attribute("id", this.UniqueName + "_QuickFilter_" + field);
+                e.Attribute("placeholder", " ");
+                e.AppendTo(quickFilter);
+                if (opt.Element != null)
+                    opt.Element(e);
+            }, opt.Options, opt.Init);
 
             Action submitHandler = () =>
             {
@@ -978,7 +977,7 @@ namespace Serenity
                 var value = EditorUtils.GetValue(widget);
                 bool active = Script.IsValue(value) && !string.IsNullOrEmpty(value.ToString());
 
-                if (handler != null)
+                if (opt.Handler != null)
                 {
                     var args = new QuickFilterArgs<TWidget>
                     {
@@ -987,11 +986,11 @@ namespace Serenity
                         EqualityFilter = request.EqualityFilter,
                         Value = value,
                         Active = active,
-                        Widget = widget,
+                        Widget = widget.As<TWidget>(),
                         Handled = true
                     };
 
-                    handler(args);
+                    opt.Handler(args.As<Serenity.QuickFilterArgs<Widget>>());
 
                     quickFilter.ToggleClass("quick-filter-active", args.Active);
 
@@ -1018,6 +1017,14 @@ namespace Serenity
             });
 
             return widget;
+        }
+
+        [InlineCode("{this}.addQuickFilter({field}, {TWidget}, {{ title: {title}, options: {options}, handler: {handler}, init: {init}, element: {element} }})")]
+        public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
+            Action<jQueryObject> element = null, Action<TWidget> init = null)
+            where TWidget: Widget
+        {
+            return null;
         }
 
         public DateEditor AddDateRangeFilter(string field, string title = null)

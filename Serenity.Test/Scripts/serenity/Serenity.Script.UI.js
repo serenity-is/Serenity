@@ -1283,6 +1283,7 @@
 	$Serenity_EnumEditorOptions.$ctor = function() {
 		var $this = {};
 		$this.enumKey = null;
+		$this.enumType = null;
 		return $this;
 	};
 	$Serenity_EnumEditorOptions.isInstanceOfType = function() {
@@ -6012,60 +6013,59 @@
 			}
 			return null;
 		},
-		addEqualityFilter: function(TWidget) {
-			return function(field, title, options, handler, element, init) {
-				if (ss.isNullOrUndefined(this.quickFiltersDiv)) {
-					$('<div/>').addClass('clear').appendTo(this.toolbar.element);
-					this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar').appendTo(this.toolbar.element);
+		addQuickFilter: function(field, type, opt) {
+			opt = opt || {};
+			if (ss.isNullOrUndefined(this.quickFiltersDiv)) {
+				$('<div/>').addClass('clear').appendTo(this.toolbar.element);
+				this.quickFiltersDiv = $('<div/>').addClass('quick-filters-bar').appendTo(this.toolbar.element);
+			}
+			var $t2 = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>").appendTo(this.quickFiltersDiv).children();
+			var $t1 = opt.title;
+			if (ss.isNullOrUndefined($t1)) {
+				$t1 = ss.coalesce(this.determineText(function(pre) {
+					return pre + field;
+				}), field);
+			}
+			var quickFilter = $t2.text($t1).parent();
+			var widget = $Serenity_Widget.createOfType(type, ss.mkdel(this, function(e) {
+				if (!Q.isEmptyOrNull(field)) {
+					e.attr('id', this.uniqueName + '_QuickFilter_' + field);
 				}
-				var $t2 = $("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>").appendTo(this.quickFiltersDiv).children();
-				var $t1 = title;
-				if (ss.isNullOrUndefined($t1)) {
-					$t1 = ss.coalesce(this.determineText(function(pre) {
-						return pre + field;
-					}), field);
+				e.attr('placeholder', ' ');
+				e.appendTo(quickFilter);
+				if (!ss.staticEquals(opt.element, null)) {
+					opt.element(e);
 				}
-				var quickFilter = $t2.text($t1).parent();
-				var widget = $Serenity_Widget.create(TWidget).call(null, ss.mkdel(this, function(e) {
-					if (!Q.isEmptyOrNull(field)) {
-						e.attr('id', this.uniqueName + '_QuickFilter_' + field);
-					}
-					e.attr('placeholder', ' ');
-					e.appendTo(quickFilter);
-					if (!ss.staticEquals(element, null)) {
-						element(e);
-					}
-				}), options, init);
-				var submitHandler = ss.mkdel(this, function() {
-					if (quickFilter.hasClass('ignore')) {
-						return;
-					}
-					var request = this.view.params;
-					request.EqualityFilter = request.EqualityFilter || {};
-					var value = $Serenity_EditorUtils.getValue(widget);
-					var active = ss.isValue(value) && !ss.isNullOrEmptyString(value.toString());
-					if (!ss.staticEquals(handler, null)) {
-						var args = { field: field, request: request, equalityFilter: request.EqualityFilter, value: value, active: active, widget: widget, handled: true };
-						handler(args);
-						quickFilter.toggleClass('quick-filter-active', args.active);
-						if (!args.handled) {
-							request.EqualityFilter[field] = value;
-						}
-					}
-					else {
+			}), opt.options, opt.init);
+			var submitHandler = ss.mkdel(this, function() {
+				if (quickFilter.hasClass('ignore')) {
+					return;
+				}
+				var request = this.view.params;
+				request.EqualityFilter = request.EqualityFilter || {};
+				var value = $Serenity_EditorUtils.getValue(widget);
+				var active = ss.isValue(value) && !ss.isNullOrEmptyString(value.toString());
+				if (!ss.staticEquals(opt.handler, null)) {
+					var args = { field: field, request: request, equalityFilter: request.EqualityFilter, value: value, active: active, widget: widget, handled: true };
+					opt.handler(args);
+					quickFilter.toggleClass('quick-filter-active', args.active);
+					if (!args.handled) {
 						request.EqualityFilter[field] = value;
-						quickFilter.toggleClass('quick-filter-active', active);
 					}
-				});
-				$Serenity_WX.change(widget, ss.mkdel(this, function(e1) {
-					this.quickFilterChange(e1);
-				}));
-				this.add_submitHandlers(submitHandler);
-				widget.element.bind('remove.' + this.uniqueName, ss.mkdel(this, function(x) {
-					this.remove_submitHandlers(submitHandler);
-				}));
-				return widget;
-			};
+				}
+				else {
+					request.EqualityFilter[field] = value;
+					quickFilter.toggleClass('quick-filter-active', active);
+				}
+			});
+			$Serenity_WX.change(widget, ss.mkdel(this, function(e1) {
+				this.quickFilterChange(e1);
+			}));
+			this.add_submitHandlers(submitHandler);
+			widget.element.bind('remove.' + this.uniqueName, ss.mkdel(this, function(x) {
+				this.remove_submitHandlers(submitHandler);
+			}));
+			return widget;
 		},
 		addDateRangeFilter: function(field, title) {
 			var end = null;
@@ -6078,17 +6078,23 @@
 				});
 				$('<span/>').addClass('range-separator').text('-').insertAfter(e1);
 			};
-			return this.addEqualityFilter($Serenity_DateEditor).call(this, field, title, null, function(args) {
-				args.active = !ss.isNullOrEmptyString(args.widget.get_value()) || !ss.isNullOrEmptyString(end.get_value());
-				if (!ss.isNullOrEmptyString(args.widget.get_value())) {
-					args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.get_value()]);
-				}
-				if (!ss.isNullOrEmptyString(end.get_value())) {
-					var next = new Date(end.get_valueAsDate().valueOf());
-					next.setDate(next.getDate() + 1);
-					args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<', Q.formatDate(next, 'yyyy-MM-dd')]);
-				}
-			}, $t1, null);
+			return this.addQuickFilter(field, $Serenity_DateEditor, {
+				title: title,
+				options: null,
+				handler: function(args) {
+					args.active = !ss.isNullOrEmptyString(args.widget.get_value()) || !ss.isNullOrEmptyString(end.get_value());
+					if (!ss.isNullOrEmptyString(args.widget.get_value())) {
+						args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.get_value()]);
+					}
+					if (!ss.isNullOrEmptyString(end.get_value())) {
+						var next = new Date(end.get_valueAsDate().valueOf());
+						next.setDate(next.getDate() + 1);
+						args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<', Q.formatDate(next, 'yyyy-MM-dd')]);
+					}
+				},
+				init: null,
+				element: $t1
+			});
 		},
 		invokeSubmitHandlers: function() {
 			if (!ss.staticEquals(this.$4$submitHandlersField, null)) {
@@ -8304,12 +8310,19 @@
 	ss.initClass($Serenity_EnumEditor, $asm, {
 		updateItems: function() {
 			this.clearItems();
-			var enumType = $Serenity_EnumTypeRegistry.get(this.options.enumKey);
+			var enumType = this.options.enumType || $Serenity_EnumTypeRegistry.get(this.options.enumKey);
+			var enumKey = this.options.enumKey;
+			if (ss.isNullOrUndefined(enumKey) && ss.isValue(enumType)) {
+				var enumKeyAttr = ss.getAttributes(enumType, Serenity.EnumKeyAttribute, false);
+				if (enumKeyAttr.length > 0) {
+					enumKey = enumKeyAttr[0].value;
+				}
+			}
 			var $t1 = ss.Enum.getValues(enumType);
 			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
 				var x = $t1[$t2];
 				var name = ss.Enum.toString(enumType, x);
-				this.addItem$1(ss.unbox(ss.cast(x, ss.Int32)).toString(), ss.coalesce(Q.tryGetText('Enums.' + this.options.enumKey + '.' + name), name), null, false);
+				this.addItem$1(ss.unbox(ss.cast(x, ss.Int32)).toString(), ss.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name), null, false);
 			}
 		}
 	}, $Serenity_Select2Editor, [$Serenity_ISetEditValue, $Serenity_IGetEditValue, $Serenity_IStringValue]);
@@ -10377,7 +10390,7 @@
 	ss.setMetadata($Serenity_EmailEditor, { attr: [new Serenity.EditorAttribute(), new $System_ComponentModel_DisplayNameAttribute('E-posta'), new Serenity.ElementAttribute('<input type="text"/>')] });
 	ss.setMetadata($Serenity_EmailEditorOptions, { members: [{ attr: [new $System_ComponentModel_DisplayNameAttribute('Etki Alanı')], name: 'Domain', type: 16, returnType: String, getter: { name: 'get_Domain', type: 8, params: [], returnType: String, fget: 'domain' }, setter: { name: 'set_Domain', type: 8, params: [String], returnType: Object, fset: 'domain' }, fname: 'domain' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Etki Alanı Salt Okunur')], name: 'ReadOnlyDomain', type: 16, returnType: Boolean, getter: { name: 'get_ReadOnlyDomain', type: 8, params: [], returnType: Boolean, fget: 'readOnlyDomain' }, setter: { name: 'set_ReadOnlyDomain', type: 8, params: [Boolean], returnType: Object, fset: 'readOnlyDomain' }, fname: 'readOnlyDomain' }] });
 	ss.setMetadata($Serenity_EnumEditor, { attr: [new Serenity.EditorAttribute(), new $System_ComponentModel_DisplayNameAttribute('Enumeration'), new Serenity.OptionsTypeAttribute($Serenity_EnumEditorOptions), new Serenity.ElementAttribute('<input type="hidden"/>')] });
-	ss.setMetadata($Serenity_EnumEditorOptions, { members: [{ attr: [new $System_ComponentModel_DisplayNameAttribute('Enum Type Key')], name: 'EnumKey', type: 16, returnType: String, getter: { name: 'get_EnumKey', type: 8, params: [], returnType: String, fget: 'enumKey' }, setter: { name: 'set_EnumKey', type: 8, params: [String], returnType: Object, fset: 'enumKey' }, fname: 'enumKey' }] });
+	ss.setMetadata($Serenity_EnumEditorOptions, { members: [{ attr: [new $System_ComponentModel_DisplayNameAttribute('Enum Type Key')], name: 'EnumKey', type: 16, returnType: String, getter: { name: 'get_EnumKey', type: 8, params: [], returnType: String, fget: 'enumKey' }, setter: { name: 'set_EnumKey', type: 8, params: [String], returnType: Object, fset: 'enumKey' }, fname: 'enumKey' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Enum Type Key'), new $Serenity_HiddenAttribute()], name: 'EnumType', type: 16, returnType: Function, getter: { name: 'get_EnumType', type: 8, params: [], returnType: Function, fget: 'enumType' }, setter: { name: 'set_EnumType', type: 8, params: [Function], returnType: Object, fset: 'enumType' }, fname: 'enumType' }] });
 	ss.setMetadata($Serenity_EnumFormatter, { members: [{ attr: [new Serenity.OptionAttribute()], name: 'EnumKey', type: 16, returnType: String, getter: { name: 'get_EnumKey', type: 8, sname: 'get_enumKey', returnType: String, params: [] }, setter: { name: 'set_EnumKey', type: 8, sname: 'set_enumKey', returnType: Object, params: [String] } }] });
 	ss.setMetadata($Serenity_FileDownloadFormatter, { members: [{ attr: [new Serenity.OptionAttribute()], name: 'DisplayFormat', type: 16, returnType: String, getter: { name: 'get_DisplayFormat', type: 8, sname: 'get_displayFormat', returnType: String, params: [] }, setter: { name: 'set_DisplayFormat', type: 8, sname: 'set_displayFormat', returnType: Object, params: [String] } }, { attr: [new Serenity.OptionAttribute()], name: 'OriginalNameProperty', type: 16, returnType: String, getter: { name: 'get_OriginalNameProperty', type: 8, sname: 'get_originalNameProperty', returnType: String, params: [] }, setter: { name: 'set_OriginalNameProperty', type: 8, sname: 'set_originalNameProperty', returnType: Object, params: [String] } }] });
 	ss.setMetadata($Serenity_GoogleMap, { attr: [new Serenity.ElementAttribute('<div/>')] });

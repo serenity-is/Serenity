@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Imported, Serializable]
+    [Imported, Serializable, IncludeGenericArguments(false)]
     public class QuickFilterArgs<TWidget>
     {
         public string Field { get; set; }

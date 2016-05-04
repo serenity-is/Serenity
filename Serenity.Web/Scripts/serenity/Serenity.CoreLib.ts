@@ -546,7 +546,8 @@ declare namespace Serenity {
 
 
     interface EnumEditorOptions {
-        enumKey: string;
+        enumKey?: string;
+        enumType?: any;
     }
 
     class EnumFormatter implements Slick.Formatter {
@@ -1489,6 +1490,14 @@ declare namespace Serenity {
         protected validateBeforeSave(): boolean;
     }
 
+    interface QuickFilterOptions<TWidget extends Widget<TOptions>, TOptions> {
+        handler?: (h: QuickFilterArgs<TWidget>) => void;
+        title?: string;
+        options?: TOptions;
+        element?: (e: JQuery) => void;
+        init?: (w: TWidget) => void;
+    }
+
     class DataGrid<TItem, TOptions> extends Widget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
         dialogOpen(): void;
@@ -1499,9 +1508,8 @@ declare namespace Serenity {
         protected slickContainer: JQuery;
         protected toolbar: Toolbar;
         protected addDateRangeFilter(field: string, title?: string);
-        protected addEqualityFilter<TWidget>(type: { new (...args: any[]): TWidget }):
-            (field: string, title?: string, options?: any, handler?: (h: QuickFilterArgs<TWidget>) => void,
-                element?: (e: JQuery) => void, init?: (w: TWidget) => void) => TWidget;
+        protected addQuickFilter<TWidget extends Widget<TOptions>, TOptions>(field: string, type: { new (element: JQuery, options: TOptions): TWidget },
+            opt?: QuickFilterOptions<TWidget, TOptions>): TWidget;
         protected addFilterSeperator(): void;
         protected add_submitHandlers(action: () => void): void;
         protected remove_submitHandlers(action: () => void): void;
