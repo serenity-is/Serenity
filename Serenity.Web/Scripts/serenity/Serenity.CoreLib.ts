@@ -1043,12 +1043,28 @@ declare namespace Serenity {
         get_text(): string;
     }
 
-    class CheckTreeEditor<TItem, TOptions> {
+    class CheckTreeEditor<TItem, TOptions> extends DataGrid<TItem, TOptions> {
+        constructor(input: JQuery, opt?: TOptions);
+        protected getTreeItems(): TItem[];
+        protected updateItems(): void;
+        protected itemSelectedChanged(item: TItem): void;
+        protected getSelectAllText(): string;
+        protected isThreeStateHierarchy(): boolean;
+        protected getInitialCollapse(): boolean;
+        protected updateSelectAll(): void;
+        protected updateFlags(): void;
+        protected getDescendantsSelected(item: TItem): boolean;
+        protected allDescendantsSelected(item: TItem): boolean;
+        protected getItemText(ctx: Slick.FormatterContext): string;
+        protected sortItems(): void;
+        protected moveSelectedUp(): boolean;
+        public get_value(): string[];
+        public set_value(value: string[]);
     }
 
     interface EmailEditorOptions {
         domain?: string;
-        readOnlyDomain: boolean;
+        readOnlyDomain?: boolean;
     }
 
     class EmailEditor extends Widget<EmailEditorOptions> {
@@ -2420,11 +2436,11 @@ namespace Q {
         return ScriptData.ensureAsync('RemoteData.' + key);
     }
 
-    export function getLookup(key) {
+    export function getLookup<TItem>(key): Lookup<TItem> {
         return ScriptData.ensure('Lookup.' + key);
     }
 
-    export function getLookupAsync(key) {
+    export function getLookupAsync<TItem>(key) {
         return ScriptData.ensureAsync('Lookup.' + key);
     }
 
@@ -3233,10 +3249,21 @@ namespace Q {
     }
 
     export class Lookup<TItem> {
-        private items: TItem[] = [];
-        private itemById: { [key: string]: TItem } = {};
+        public items: TItem[] = [];
+        public itemById: { [key: string]: TItem } = {};
+        public idField: string;
+        public parentIdField: string;
+        public textField: string;
+        public textFormatter: (item: TItem) => string;
 
-        constructor(private options: LookupOptions<TItem>, items?: TItem[]) {
+        constructor(options: LookupOptions<TItem>, items?: TItem[]) {
+            options = options || {};
+            this.textFormatter = options.textFormatter;
+            this.idField = options.idField;
+            this.parentIdField = options.parentIdField;
+            this.textField = options.textField;
+            this.textFormatter = options.textFormatter;
+
             if (items != null)
                 this.update(items);
         }
@@ -3248,7 +3275,7 @@ namespace Q {
                 for (var k of value)
                     this.items.push(k);
             }
-            var idField = this.options.idField;
+            var idField = this.idField;
             if (!Q.isEmptyOrNull(idField)) {
                 for (var r of this.items) {
                     var v = r[idField];
@@ -3259,27 +3286,27 @@ namespace Q {
             }
         }
 
-        get_idField() {
-            return this.options.idField;
+        protected get_idField() {
+            return this.idField;
         }
 
-        get_parentIdField() {
-            return this.options.parentIdField;
+        protected get_parentIdField() {
+            return this.parentIdField;
         }
 
-        get_textField() {
-            return this.options.textField;
+        protected get_textField() {
+            return this.textField;
         }
 
-        get_textFormatter() {
-            return this.options.textFormatter;
+        protected get_textFormatter() {
+            return this.textFormatter;
         }
 
-        get_itemById() {
+        protected get_itemById() {
             return this.itemById;
         }
 
-        get_items() {
+        protected get_items() {
             return this.items;
         }
     }

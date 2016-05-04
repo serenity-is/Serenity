@@ -23,6 +23,7 @@ namespace Serenity
             UpdateItems();
         }
 
+        [IncludeGenericArguments(false), ScriptName("getTreeItems")]
         protected virtual List<TItem> GetItems()
         {
             return new List<TItem>();
@@ -207,7 +208,7 @@ namespace Serenity
             GridSelectAllButtonHelper.Update<TItem>(this, x => x.IsSelected);
         }
 
-        protected  virtual void UpdateFlags()
+        protected virtual void UpdateFlags()
         {
             var view = this.view;
             var items = view.GetItems();

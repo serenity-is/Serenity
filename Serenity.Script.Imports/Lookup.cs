@@ -23,31 +23,38 @@ namespace Serenity
         {
         }
 
+        [IntrinsicProperty]
         public string IdField
         {
             get { return null; }
         }
 
+        [IntrinsicProperty]
         public string ParentIdField
         {
             get { return null; }
         }
 
+        [IntrinsicProperty]
         public string TextField
         {
             get { return null; }
         }
 
+        [IntrinsicProperty]
         public Func<TItem, string> TextFormatter
         {
             get { return null; }
         }
 
+        [IntrinsicProperty]
         public JsDictionary<object, TItem> ItemById
         {
+            [InlineCode("{this}.itemById")]
             get { return null; }
         }
 
+        [IntrinsicProperty]
         public List<TItem> Items
         {
             get { return null; }

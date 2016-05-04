@@ -4863,10 +4863,10 @@
 			}), null);
 		},
 		getItems: function(lookup) {
-			return this.filterItems(this.cascadeItems(lookup.get_items()));
+			return this.filterItems(this.cascadeItems(lookup.items));
 		},
 		getItemText: function(item, lookup) {
-			var textValue = (!ss.staticEquals(lookup.get_textFormatter(), null) ? lookup.get_textFormatter()(item) : item[lookup.get_textField()]);
+			var textValue = (!ss.staticEquals(lookup.textFormatter, null) ? lookup.textFormatter(item) : item[lookup.textField]);
 			return (ss.isNullOrUndefined(textValue) ? '' : textValue.toString());
 		},
 		getItemDisabled: function(item, lookup) {
@@ -4882,7 +4882,7 @@
 					var item = $t1.current();
 					var text = this.getItemText(item, lookup);
 					var disabled = this.getItemDisabled(item, lookup);
-					var idValue = item[lookup.get_idField()];
+					var idValue = item[lookup.idField];
 					var id = (ss.isNullOrUndefined(idValue) ? '' : idValue.toString());
 					this.addItem({ id: id, text: text, source: item, disabled: disabled });
 				}
@@ -4901,7 +4901,7 @@
 						var item = $t1.current();
 						var text = this.getItemText(item, lookup);
 						var disabled = this.getItemDisabled(item, lookup);
-						var idValue = item[lookup.get_idField()];
+						var idValue = item[lookup.idField];
 						var id = (ss.isNullOrUndefined(idValue) ? '' : idValue.toString());
 						this.addItem({ id: id, text: text, source: item, disabled: disabled });
 					}
@@ -4948,7 +4948,7 @@
 				}), true);
 				if (Q.isEmptyOrNull(this.get_value())) {
 					var entity = new Object();
-					entity[this.getLookup().get_textField()] = Q.trimToEmpty(this.lastCreateTerm);
+					entity[this.getLookup().textField] = Q.trimToEmpty(this.lastCreateTerm);
 					if (!ss.staticEquals(this.get_onInitNewEntity(), null)) {
 						this.get_onInitNewEntity()(entity);
 					}
@@ -6118,11 +6118,11 @@
 		}
 	}, Serenity.Widget, [$Serenity_IDataGrid]);
 	ss.initClass($Serenity_CheckTreeEditor, $asm, {
-		getItems$1: function() {
+		getTreeItems: function() {
 			return [];
 		},
 		updateItems: function() {
-			var items = this.getItems$1();
+			var items = this.getTreeItems();
 			var itemById = {};
 			for (var i = 0; i < items.length; i++) {
 				var item = items[i];

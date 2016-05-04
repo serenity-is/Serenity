@@ -903,11 +903,27 @@ declare namespace Serenity {
         set_values(value: any): void;
         get_text(): string;
     }
-    class CheckTreeEditor<TItem, TOptions> {
+    class CheckTreeEditor<TItem, TOptions> extends DataGrid<TItem, TOptions> {
+        constructor(input: JQuery, opt?: TOptions);
+        protected getTreeItems(): TItem[];
+        protected updateItems(): void;
+        protected itemSelectedChanged(item: TItem): void;
+        protected getSelectAllText(): string;
+        protected isThreeStateHierarchy(): boolean;
+        protected getInitialCollapse(): boolean;
+        protected updateSelectAll(): void;
+        protected updateFlags(): void;
+        protected getDescendantsSelected(item: TItem): boolean;
+        protected allDescendantsSelected(item: TItem): boolean;
+        protected getItemText(ctx: Slick.FormatterContext): string;
+        protected sortItems(): void;
+        protected moveSelectedUp(): boolean;
+        get_value(): string[];
+        set_value(value: string[]): any;
     }
     interface EmailEditorOptions {
         domain?: string;
-        readOnlyDomain: boolean;
+        readOnlyDomain?: boolean;
     }
     class EmailEditor extends Widget<EmailEditorOptions> {
         constructor(input: JQuery, opt: EmailEditorOptions);
@@ -1675,8 +1691,8 @@ declare namespace Q {
     function notifyError(message: string, title?: string, options?: ToastrOptions): void;
     function getRemoteData(key: any): any;
     function getRemoteDataAsync(key: any): RSVP.Thenable<any>;
-    function getLookup(key: any): any;
-    function getLookupAsync(key: any): RSVP.Thenable<any>;
+    function getLookup<TItem>(key: any): Lookup<TItem>;
+    function getLookupAsync<TItem>(key: any): RSVP.Thenable<any>;
     function reloadLookup(key: any): void;
     function reloadLookupAsync(key: any): RSVP.Thenable<any>;
     function getColumns(key: any): any;
@@ -1734,19 +1750,24 @@ declare namespace Q {
         textFormatter?(item: TItem): string;
     }
     class Lookup<TItem> {
-        private options;
-        private items;
-        private itemById;
-        constructor(options: LookupOptions<TItem>, items?: TItem[]);
-        update(value: TItem[]): void;
-        get_idField(): string;
-        get_parentIdField(): string;
-        get_textField(): string;
-        get_textFormatter(): (item: TItem) => string;
-        get_itemById(): {
+        items: TItem[];
+        itemById: {
             [key: string]: TItem;
         };
-        get_items(): TItem[];
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+        constructor(options: LookupOptions<TItem>, items?: TItem[]);
+        update(value: TItem[]): void;
+        protected get_idField(): string;
+        protected get_parentIdField(): string;
+        protected get_textField(): string;
+        protected get_textFormatter(): (item: TItem) => string;
+        protected get_itemById(): {
+            [key: string]: TItem;
+        };
+        protected get_items(): TItem[];
     }
     class LT {
         private key;

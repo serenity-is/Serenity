@@ -1308,9 +1308,14 @@
     })(Culture = Q.Culture || (Q.Culture = {}));
     var Lookup = (function () {
         function Lookup(options, items) {
-            this.options = options;
             this.items = [];
             this.itemById = {};
+            options = options || {};
+            this.textFormatter = options.textFormatter;
+            this.idField = options.idField;
+            this.parentIdField = options.parentIdField;
+            this.textField = options.textField;
+            this.textFormatter = options.textFormatter;
             if (items != null)
                 this.update(items);
         }
@@ -1323,7 +1328,7 @@
                     this.items.push(k);
                 }
             }
-            var idField = this.options.idField;
+            var idField = this.idField;
             if (!Q.isEmptyOrNull(idField)) {
                 for (var _a = 0, _b = this.items; _a < _b.length; _a++) {
                     var r = _b[_a];
@@ -1335,16 +1340,16 @@
             }
         };
         Lookup.prototype.get_idField = function () {
-            return this.options.idField;
+            return this.idField;
         };
         Lookup.prototype.get_parentIdField = function () {
-            return this.options.parentIdField;
+            return this.parentIdField;
         };
         Lookup.prototype.get_textField = function () {
-            return this.options.textField;
+            return this.textField;
         };
         Lookup.prototype.get_textFormatter = function () {
-            return this.options.textFormatter;
+            return this.textFormatter;
         };
         Lookup.prototype.get_itemById = function () {
             return this.itemById;
