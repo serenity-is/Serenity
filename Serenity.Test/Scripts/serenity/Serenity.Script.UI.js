@@ -1635,27 +1635,6 @@
 	$Serenity_Flexify.__typeName = 'Serenity.Flexify';
 	global.Serenity.Flexify = $Serenity_Flexify;
 	////////////////////////////////////////////////////////////////////////////////
-	// Serenity.FlexifyExtensions
-	var $Serenity_FLX = function() {
-	};
-	$Serenity_FLX.__typeName = 'Serenity.FLX';
-	$Serenity_FLX.flexHeightOnly = function(element, flexY) {
-		return element.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
-	};
-	$Serenity_FLX.flexWidthOnly = function(element, flexX) {
-		return element.addClass('flexify').data('flex-x', flexX).data('flex-y', 0);
-	};
-	$Serenity_FLX.flexWidthHeight = function(element, flexX, flexY) {
-		return element.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
-	};
-	$Serenity_FLX.flexXFactor = function(element, flexX) {
-		return element.data('flex-x', flexX);
-	};
-	$Serenity_FLX.flexYFactor = function(element, flexY) {
-		return element.data('flex-y', flexY);
-	};
-	global.Serenity.FLX = $Serenity_FLX;
-	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.FormatterTypeRegistry
 	var $Serenity_FormatterTypeRegistry = function() {
 	};
@@ -7801,7 +7780,7 @@
 			var pgOptions = this.getPropertyGridOptions();
 			this.propertyGrid = (new $Serenity_PropertyGrid(pgDiv, pgOptions)).init(null);
 			if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
-				$Serenity_FLX.flexHeightOnly(this.propertyGrid.element.children('.categories'), 1);
+				this.propertyGrid.element.children('.categories').flexHeightOnly(1);
 			}
 		},
 		$initPropertyGridAsync: function() {
@@ -7813,7 +7792,7 @@
 				return this.getPropertyGridOptionsAsync().then(ss.mkdel(this, function(pgOptions) {
 					this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
 					if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
-						$Serenity_FLX.flexHeightOnly(this.propertyGrid.element.children('.categories'), 1);
+						this.propertyGrid.element.children('.categories').flexHeightOnly(1);
 					}
 					return this.propertyGrid.initialize();
 				}), null);
@@ -8967,7 +8946,6 @@
 			}
 		}
 	}, Serenity.Widget);
-	ss.initClass($Serenity_FLX, $asm, {});
 	ss.initClass($Serenity_FormatterTypeRegistry, $asm, {});
 	ss.initClass($Serenity_GoogleMap, $asm, {
 		get_map: function() {
@@ -9520,7 +9498,7 @@
 			var pgOptions = this.getPropertyGridOptions();
 			this.propertyGrid = (new $Serenity_PropertyGrid(pgDiv, pgOptions)).init(null);
 			if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
-				$Serenity_FLX.flexHeightOnly(this.propertyGrid.element.children('.categories'), 1);
+				this.propertyGrid.element.children('.categories').flexHeightOnly(1);
 			}
 		},
 		$initPropertyGridAsync: function() {
@@ -9532,7 +9510,7 @@
 				return this.getPropertyGridOptionsAsync().then(ss.mkdel(this, function(pgOptions) {
 					this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
 					if (this.element.closest('.ui-dialog').hasClass('s-Flexify')) {
-						$Serenity_FLX.flexHeightOnly(this.propertyGrid.element.children('.categories'), 1);
+						this.propertyGrid.element.children('.categories').flexHeightOnly(1);
 					}
 					return this.propertyGrid.initialize();
 				}), null);
@@ -9940,7 +9918,7 @@
 			var pgOptions = this.getPropertyGridOptions();
 			this.propertyGrid = (new $Serenity_PropertyGrid(pgDiv, pgOptions)).init(null);
 			if (this.element.closest('.ui-Panel').hasClass('s-Flexify')) {
-				$Serenity_FLX.flexHeightOnly(this.propertyGrid.element.children('.categories'), 1);
+				this.propertyGrid.element.children('.categories').flexHeightOnly(1);
 			}
 		},
 		$initPropertyGridAsync: function() {
@@ -9952,7 +9930,7 @@
 				return this.getPropertyGridOptionsAsync().then(ss.mkdel(this, function(pgOptions) {
 					this.propertyGrid = new $Serenity_PropertyGrid(pgDiv, pgOptions);
 					if (this.element.closest('.ui-Panel').hasClass('s-Flexify')) {
-						$Serenity_FLX.flexHeightOnly(this.propertyGrid.element.children('.categories'), 1);
+						this.propertyGrid.element.children('.categories').flexHeightOnly(1);
 					}
 					return this.propertyGrid.initialize();
 				}), null);
@@ -10443,7 +10421,7 @@
 		$.fn.tryGetWidget = function(widgetType) {
 			var element = this;
 			var widget2;
-			if (ss.isAssignableFrom(widgetType, $Serenity_Widget)) {
+			if (ss.isAssignableFrom($Serenity_Widget, widgetType)) {
 				var widgetName = $Serenity_WX.getWidgetName(widgetType);
 				widget2 = element.data(widgetName);
 				if (ss.isValue(widget2) && !ss.isAssignableFrom(widgetType, ss.getInstanceType(widget2))) {

@@ -1,6 +1,11 @@
 ﻿declare interface JQuery {
     getWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
     tryGetWidget<TWidget>(widgetType: { new (...args: any[]): TWidget }): TWidget;
+    flexHeightOnly(flexY?: number): JQuery;
+    flexWidthOnly(flexX?: number): JQuery;
+    flexWidthHeight(flexX: number, flexY: number): JQuery;
+    flexX(flexX: number): JQuery;
+    flexY(flexY: number): JQuery;
 }
 
 declare class RSVP<TResult> {
@@ -1212,9 +1217,17 @@ declare namespace Serenity {
         delimited?: boolean;
     }
 
-    class LookupEditorBase<TOptions, TItem> extends Widget<TOptions> {
+    class LookupEditorBase<TOptions, TItem> extends Select2Editor<TOptions, TItem> {
         get_value(): string;
         set_value(value: string): void;
+        get_cascadeField(): string;
+        set_cascadeField(name: string): void;
+        get_cascadeValue(): any;
+        set_cascadeValue(value: any): void;
+        get_filterField(): string;
+        set_filterField(name: string): void;
+        get_filterValue(): any;
+        set_filterValue(value: any): void;
     }
 
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
@@ -2179,7 +2192,7 @@ namespace Q {
         };
 
         return format.replace(new RegExp('dd?|MM?|yy?y?y?|hh?|HH?|mm?|ss?|tt?|fff|zz?z?|\\/', 'g'),
-            function (fmt) {
+            function (fmt): any {
                 switch (fmt) {
                     case '/': return Culture.dateSeparator;
                     case 'hh': return pad(((date.getHours() < 13) ? date.getHours() : (date.getHours() - 12)));
@@ -3118,6 +3131,30 @@ namespace Q {
         $.fn.btn = btn;
     }
 
+    $.fn.flexHeightOnly = function (flexY = 1) {
+        return this.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
+    }
+
+    $.fn.flexWidthOnly = function (flexX = 1) {
+        return this.addClass('flexify').data('flex-x', flexX).data('flex-y', 0);
+    }
+
+    $.fn.flexWidthHeight = function (flexX = 1, flexY = 1) {
+        return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
+    }
+
+    $.fn.flexHeightOnly = function (flexY = 1) {
+        return this.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
+    }
+
+    $.fn.flexX = function (flexX: number): JQuery {
+        return this.data('flex-x', flexX);
+    }
+
+    $.fn.flexY = function (flexY): JQuery {
+        return this.data('flex-y', flexY);
+    }
+
     // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
     export function deepClone(arg1: any, ...args: any[]) {
         let options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
@@ -3394,7 +3431,7 @@ namespace Q {
         }
 
         static initializeTextClass = function (type, prefix) {
-            var $t1 = Q.cloneArray(Object.keys(type));
+            var $t1 = Q.arrayClone(Object.keys(type));
             for (var $t2 = 0; $t2 < $t1.length; $t2++) {
                 var member = $t1[$t2];
                 var value = type[member];

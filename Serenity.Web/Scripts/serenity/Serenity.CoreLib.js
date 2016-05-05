@@ -1192,6 +1192,29 @@
         var btn = $.fn.button.noConflict();
         $.fn.btn = btn;
     }
+    $.fn.flexHeightOnly = function (flexY) {
+        if (flexY === void 0) { flexY = 1; }
+        return this.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
+    };
+    $.fn.flexWidthOnly = function (flexX) {
+        if (flexX === void 0) { flexX = 1; }
+        return this.addClass('flexify').data('flex-x', flexX).data('flex-y', 0);
+    };
+    $.fn.flexWidthHeight = function (flexX, flexY) {
+        if (flexX === void 0) { flexX = 1; }
+        if (flexY === void 0) { flexY = 1; }
+        return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
+    };
+    $.fn.flexHeightOnly = function (flexY) {
+        if (flexY === void 0) { flexY = 1; }
+        return this.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
+    };
+    $.fn.flexX = function (flexX) {
+        return this.data('flex-x', flexX);
+    };
+    $.fn.flexY = function (flexY) {
+        return this.data('flex-y', flexY);
+    };
     // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
     function deepClone(arg1) {
         var args = [];
@@ -1441,7 +1464,7 @@
         LT.$table = {};
         LT.empty = new LT('');
         LT.initializeTextClass = function (type, prefix) {
-            var $t1 = Q.cloneArray(Object.keys(type));
+            var $t1 = Q.arrayClone(Object.keys(type));
             for (var $t2 = 0; $t2 < $t1.length; $t2++) {
                 var member = $t1[$t2];
                 var value = type[member];

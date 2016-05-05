@@ -5,6 +5,11 @@
     tryGetWidget<TWidget>(widgetType: {
         new (...args: any[]): TWidget;
     }): TWidget;
+    flexHeightOnly(flexY?: number): JQuery;
+    flexWidthOnly(flexX?: number): JQuery;
+    flexWidthHeight(flexX: number, flexY: number): JQuery;
+    flexX(flexX: number): JQuery;
+    flexY(flexY: number): JQuery;
 }
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
@@ -1051,9 +1056,17 @@ declare namespace Serenity {
         multiple?: boolean;
         delimited?: boolean;
     }
-    class LookupEditorBase<TOptions, TItem> extends Widget<TOptions> {
+    class LookupEditorBase<TOptions, TItem> extends Select2Editor<TOptions, TItem> {
         get_value(): string;
         set_value(value: string): void;
+        get_cascadeField(): string;
+        set_cascadeField(name: string): void;
+        get_cascadeValue(): any;
+        set_cascadeValue(value: any): void;
+        get_filterField(): string;
+        set_filterField(name: string): void;
+        get_filterValue(): any;
+        set_filterValue(value: any): void;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
     }
@@ -1671,7 +1684,7 @@ declare namespace Q {
     function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Grouping<TItem>;
     function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
     function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
-    function formatDate(date: Date, format?: string): any;
+    function formatDate(date: Date, format?: string): string;
     /**
      * Html encodes a string
      * @param s String to be HTML encoded

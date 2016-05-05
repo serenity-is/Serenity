@@ -5,6 +5,11 @@
     tryGetWidget<TWidget>(widgetType: {
         new (...args: any[]): TWidget;
     }): TWidget;
+    flexHeightOnly(flexY?: number): JQuery;
+    flexWidthOnly(flexX?: number): JQuery;
+    flexWidthHeight(flexX: number, flexY: number): JQuery;
+    flexX(flexX: number): JQuery;
+    flexY(flexY: number): JQuery;
 }
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
@@ -1051,9 +1056,17 @@ declare namespace Serenity {
         multiple?: boolean;
         delimited?: boolean;
     }
-    class LookupEditorBase<TOptions, TItem> extends Widget<TOptions> {
+    class LookupEditorBase<TOptions, TItem> extends Select2Editor<TOptions, TItem> {
         get_value(): string;
         set_value(value: string): void;
+        get_cascadeField(): string;
+        set_cascadeField(name: string): void;
+        get_cascadeValue(): any;
+        set_cascadeValue(value: any): void;
+        get_filterField(): string;
+        set_filterField(name: string): void;
+        get_filterValue(): any;
+        set_filterValue(value: any): void;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
     }
@@ -1621,6 +1634,8 @@ declare namespace ss {
         new (...args: any[]): T;
     }): T;
     function coalesce(a: any, b: any): any;
+    function insert(obj: any, index: number, item: any): void;
+    function isArray(a: any): boolean;
     function isValue(a: any): boolean;
     function formatString(msg: string, ...prm: any[]): string;
     function getEnumerator(e: any): any;
@@ -1634,10 +1649,16 @@ declare namespace ss {
 }
 declare namespace Q {
     import S = Serenity;
-    function cloneArray<T>(a: T[]): T[];
+    function arrayClone<T>(a: T[]): T[];
+    function isArray(a: any): boolean;
+    function insert(obj: any, index: number, item: any): void;
     function coalesce(a: any, b: any): any;
     function isValue(a: any): boolean;
     function format(msg: string, ...prm: any[]): string;
+    function padLeft(s: string, len: number, ch?: string): string;
+    function zeroPad(n: number, digits: number): string;
+    function replaceAll(s: string, f: string, r: string): string;
+    function startsWith(s: string, search: string): boolean;
     function alert(message: string, options?: S.AlertOptions): void;
     function confirm(message: string, onYes: () => void, options?: S.ConfirmOptions): void;
     function information(message: string, onOk: () => void, options?: S.ConfirmOptions): void;
@@ -1713,7 +1734,6 @@ declare namespace Q {
     function text(key: string): string;
     function tryGetText(key: any): string;
     function resolveUrl(url: any): any;
-    function zeroPad(n: number, digits: number): string;
     function formatDayHourAndMin(n: number): string;
     function formatISODateTimeUTC(d: Date): string;
     function formatNumber(n: number, fmt: string, dec?: string, grp?: string): string;

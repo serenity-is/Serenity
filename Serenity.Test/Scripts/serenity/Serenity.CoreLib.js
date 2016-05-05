@@ -1,9 +1,17 @@
 ﻿var Q;
 (function (Q) {
-    function cloneArray(a) {
+    function arrayClone(a) {
         return ss.arrayClone(a);
     }
-    Q.cloneArray = cloneArray;
+    Q.arrayClone = arrayClone;
+    function isArray(a) {
+        return ss.isArray(a);
+    }
+    Q.isArray = isArray;
+    function insert(obj, index, item) {
+        ss.insert(obj, index, item);
+    }
+    Q.insert = insert;
     function coalesce(a, b) {
         return ss.coalesce(a, b);
     }
@@ -20,15 +28,28 @@
         return ss.formatString.apply(ss, [msg].concat(prm));
     }
     Q.format = format;
-    function padLeft(s, m, n) {
-        return ss.padLeftString(s, m, n);
+    function padLeft(s, len, ch) {
+        if (ch === void 0) { ch = ' '; }
+        while (s.length < len)
+            s = "0" + s;
+        return s;
     }
+    Q.padLeft = padLeft;
+    function zeroPad(n, digits) {
+        var s = n.toString();
+        while (s.length < digits)
+            s = "0" + s;
+        return s;
+    }
+    Q.zeroPad = zeroPad;
     function replaceAll(s, f, r) {
         return ss.replaceAllString(s, f, r);
     }
+    Q.replaceAll = replaceAll;
     function startsWith(s, search) {
         return ss.startsWithString(s, search);
     }
+    Q.startsWith = startsWith;
     function alert(message, options) {
         var dialog;
         options = $.extend({
@@ -292,7 +313,7 @@
             format = Culture.dateFormat;
         }
         var pad = function (i) {
-            return ss.padLeftString(i.toString(), 2, 48);
+            return Q.zeroPad(i, 2);
         };
         return format.replace(new RegExp('dd?|MM?|yy?y?y?|hh?|HH?|mm?|ss?|tt?|fff|zz?z?|\\/', 'g'), function (fmt) {
             switch (fmt) {
@@ -313,7 +334,7 @@
                 case 'M': return date.getMonth() + 1;
                 case 't': return ((date.getHours() < 12) ? 'A' : 'P');
                 case 'tt': return ((date.getHours() < 12) ? 'AM' : 'PM');
-                case 'fff': return ss.padLeftString(date.getMilliseconds().toString(), 3, 48);
+                case 'fff': return Q.zeroPad(date.getMilliseconds(), 3);
                 case 'zzz':
                 case 'zz':
                 case 'z': return '';
@@ -715,7 +736,7 @@
     }
     Q.setEquality = setEquality;
     function toSingleLine(str) {
-        return ss.replaceAllString(ss.replaceAllString(trimToEmpty(str), '\r\n', ' '), '\n', ' ').trim();
+        return Q.replaceAll(Q.replaceAll(trimToEmpty(str), '\r\n', ' '), '\n', ' ').trim();
     }
     Q.toSingleLine = toSingleLine;
     function text(key) {
@@ -737,13 +758,6 @@
         return url;
     }
     Q.resolveUrl = resolveUrl;
-    function zeroPad(n, digits) {
-        var s = n.toString();
-        while (s.length < digits)
-            s = "0" + digits;
-        return s;
-    }
-    Q.zeroPad = zeroPad;
     function formatDayHourAndMin(n) {
         if (n === 0)
             return '0';
@@ -1178,6 +1192,29 @@
         var btn = $.fn.button.noConflict();
         $.fn.btn = btn;
     }
+    $.fn.flexHeightOnly = function (flexY) {
+        if (flexY === void 0) { flexY = 1; }
+        return this.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
+    };
+    $.fn.flexWidthOnly = function (flexX) {
+        if (flexX === void 0) { flexX = 1; }
+        return this.addClass('flexify').data('flex-x', flexX).data('flex-y', 0);
+    };
+    $.fn.flexWidthHeight = function (flexX, flexY) {
+        if (flexX === void 0) { flexX = 1; }
+        if (flexY === void 0) { flexY = 1; }
+        return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
+    };
+    $.fn.flexHeightOnly = function (flexY) {
+        if (flexY === void 0) { flexY = 1; }
+        return this.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
+    };
+    $.fn.flexX = function (flexX) {
+        return this.data('flex-x', flexX);
+    };
+    $.fn.flexY = function (flexY) {
+        return this.data('flex-y', flexY);
+    };
     // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
     function deepClone(arg1) {
         var args = [];
@@ -1398,22 +1435,16 @@
                 return;
             }
             pre = pre || '';
-            var e = ss.getEnumerator(Object.keys(obj));
-            try {
-                while (e.moveNext()) {
-                    var k = e.current();
-                    var actual = pre + k;
-                    var o = obj[k];
-                    if (typeof (o) === 'object') {
-                        LT.add(o, actual + '.');
-                    }
-                    else {
-                        LT.$table[actual] = o;
-                    }
+            for (var _i = 0, _a = Object.keys(obj); _i < _a.length; _i++) {
+                var k = _a[_i];
+                var actual = pre + k;
+                var o = obj[k];
+                if (typeof (o) === 'object') {
+                    LT.add(o, actual + '.');
                 }
-            }
-            finally {
-                e.dispose();
+                else {
+                    LT.$table[actual] = o;
+                }
             }
         };
         LT.prototype.get = function () {
@@ -1433,7 +1464,7 @@
         LT.$table = {};
         LT.empty = new LT('');
         LT.initializeTextClass = function (type, prefix) {
-            var $t1 = Q.cloneArray(Object.keys(type));
+            var $t1 = Q.arrayClone(Object.keys(type));
             for (var $t2 = 0; $t2 < $t1.length; $t2++) {
                 var member = $t1[$t2];
                 var value = type[member];
@@ -1491,7 +1522,7 @@
         }
         function loadScriptData(name) {
             if (registered[name] == null) {
-                throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+                throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
             }
             name = name + '.js?' + registered[name];
             syncLoadScript(Q.resolveUrl('~/DynJS.axd/') + name);
@@ -1499,7 +1530,7 @@
         function loadScriptDataAsync(name) {
             return RSVP.resolve().then(function () {
                 if (registered[name] == null) {
-                    throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+                    throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
                 name = name + '.js?' + registered[name];
                 return loadScriptAsync(Q.resolveUrl('~/DynJS.axd/') + name);
@@ -1512,7 +1543,7 @@
             }
             data = loadedData[name];
             if (data == null)
-                throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
+                throw new Error(Q.format("Can't load script data: {0}!", name));
             return data;
         }
         ScriptData.ensure = ensure;
@@ -1525,7 +1556,7 @@
                 return loadScriptDataAsync(name).then(function () {
                     data = loadedData[name];
                     if (data == null) {
-                        throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
+                        throw new Error(Q.format("Can't load script data: {0}!", name));
                     }
                     return data;
                 }, null);
@@ -1534,7 +1565,7 @@
         ScriptData.ensureAsync = ensureAsync;
         function reload(name) {
             if (registered[name] == null) {
-                throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+                throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
             }
             registered[name] = (new Date()).getTime().toString();
             loadScriptData(name);
@@ -1545,7 +1576,7 @@
         function reloadAsync(name) {
             return RSVP.resolve().then(function () {
                 if (registered[name] == null) {
-                    throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+                    throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
                 registered[name] = (new Date()).getTime().toString();
                 return loadScriptDataAsync(name).then(function () {

@@ -43,7 +43,7 @@ namespace Serenity
                 var element = Script.This.As<jQueryObject>();
 
                 object widget;
-                if (widgetType.IsAssignableFrom(typeof(Widget)))
+                if (typeof(Widget).IsAssignableFrom(widgetType))
                 {
                     var widgetName = WidgetExtensions.GetWidgetName(widgetType);
 
