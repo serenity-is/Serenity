@@ -1812,6 +1812,8 @@ interface Toastr {
     getContainer(options?: ToastrOptions, create?: boolean): JQuery;
 }
 
+// this class will go obsolete once all code is ported to TypeScript
+// prefer alternative methods under Q
 declare namespace ss {
     interface AssemblyReg {
         name: string;
@@ -1838,6 +1840,8 @@ declare namespace ss {
     function arrayClone<T>(a: T[]): T[];
     function cast<T>(a: any, type: { new (...args: any[]): T }): T;
     function coalesce(a: any, b: any): any;
+    function insert(obj: any, index: number, item: any): void;
+    function isArray(a: any): boolean;
     function isValue(a: any): boolean;
     function formatString(msg: string, ...prm: any[]): string;
     function getEnumerator(e: any): any;
@@ -1850,6 +1854,51 @@ declare namespace ss {
 
 namespace Q {
     import S = Serenity;
+
+    export function arrayClone<T>(a: T[]): T[] {
+        return ss.arrayClone(a);
+    }
+
+    export function isArray(a: any): boolean {
+        return ss.isArray(a);
+    }
+
+    export function insert(obj: any, index: number, item: any): void {
+        ss.insert(obj, index, item);
+    }
+
+    export function coalesce(a: any, b: any): any {
+        return ss.coalesce(a, b);
+    }
+
+    export function isValue(a: any): boolean {
+        return ss.isValue(a);
+    }
+
+    export function format(msg: string, ...prm: any[]): string {
+        return ss.formatString(msg, ...prm);
+    }
+
+    export function padLeft(s: string, len: number, ch: string = ' ') {
+        while (s.length < len)
+            s = "0" + s;
+        return s;
+    }
+
+    export function zeroPad(n: number, digits: number): string {
+        let s = n.toString();
+        while (s.length < digits)
+            s = "0" + s;
+        return s;
+    }
+
+    export function replaceAll(s: string, f: string, r: string): string {
+        return ss.replaceAllString(s, f, r);
+    }
+
+    export function startsWith(s: string, search: string): boolean {
+        return ss.startsWithString(s, search);
+    }
 
     export function alert(message: string, options?: S.AlertOptions) {
         let dialog;
@@ -2126,7 +2175,7 @@ namespace Q {
         }
 
         let pad = function (i) {
-            return ss.padLeftString(i.toString(), 2, 48);
+            return Q.zeroPad(i, 2);
         };
 
         return format.replace(new RegExp('dd?|MM?|yy?y?y?|hh?|HH?|mm?|ss?|tt?|fff|zz?z?|\\/', 'g'),
@@ -2149,7 +2198,7 @@ namespace Q {
                     case 'M': return date.getMonth() + 1;
                     case 't': return ((date.getHours() < 12) ? 'A' : 'P');
                     case 'tt': return ((date.getHours() < 12) ? 'AM' : 'PM');
-                    case 'fff': return ss.padLeftString(date.getMilliseconds().toString(), 3, 48);
+                    case 'fff': return Q.zeroPad(date.getMilliseconds(), 3);
                     case 'zzz':
                     case 'zz':
                     case 'z': return '';
@@ -2581,7 +2630,7 @@ namespace Q {
     }
 
     export function toSingleLine(str: string) {
-        return ss.replaceAllString(ss.replaceAllString(trimToEmpty(str), '\r\n', ' '), '\n', ' ').trim();
+        return Q.replaceAll(Q.replaceAll(trimToEmpty(str), '\r\n', ' '), '\n', ' ').trim();
     }
 
     export function text(key: string): string {
@@ -2602,13 +2651,6 @@ namespace Q {
         }
 
         return url;
-    }
-
-    export function zeroPad(n: number, digits: number): string {
-        let s = n.toString();
-        while (s.length < digits)
-            s = "0" + digits;
-        return s;
     }
 
     export function formatDayHourAndMin(n: number): string {
@@ -3323,22 +3365,15 @@ namespace Q {
                 return;
             }
             pre = pre || '';
-            var e = ss.getEnumerator(Object.keys(obj));
-            try {
-                while (e.moveNext()) {
-                    var k = e.current();
-                    var actual = pre + k;
-                    var o = obj[k];
-                    if (typeof (o) === 'object') {
-                        LT.add(o, actual + '.');
-                    }
-                    else {
-                        LT.$table[actual] = o;
-                    }
+            for (let k of Object.keys(obj)) {
+                let actual = pre + k;
+                let o = obj[k];
+                if (typeof (o) === 'object') {
+                    LT.add(o, actual + '.');
                 }
-            }
-            finally {
-                e.dispose();
+                else {
+                    LT.$table[actual] = o;
+                }
             }
         }
 
@@ -3359,7 +3394,7 @@ namespace Q {
         }
 
         static initializeTextClass = function (type, prefix) {
-            var $t1 = ss.arrayClone(Object.keys(type));
+            var $t1 = Q.cloneArray(Object.keys(type));
             for (var $t2 = 0; $t2 < $t1.length; $t2++) {
                 var member = $t1[$t2];
                 var value = type[member];
@@ -3419,7 +3454,7 @@ namespace Q {
 
         function loadScriptData(name: string) {
             if (registered[name] == null) {
-                throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+                throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
             }
 
             name = name + '.js?' + registered[name];
@@ -3429,7 +3464,7 @@ namespace Q {
         function loadScriptDataAsync(name: string): RSVP.Thenable<any> {
             return RSVP.resolve().then(function () {
                 if (registered[name] == null) {
-                    throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+                    throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
 
                 name = name + '.js?' + registered[name];
@@ -3446,7 +3481,7 @@ namespace Q {
             data = loadedData[name];
 
             if (data == null)
-                throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
+                throw new Error(Q.format("Can't load script data: {0}!", name));
 
             return data;
         }
@@ -3461,7 +3496,7 @@ namespace Q {
                 return loadScriptDataAsync(name).then(function () {
                     data = loadedData[name];
                     if (data == null) {
-                        throw new ss.NotSupportedException(ss.formatString("Can't load script data: {0}!", name));
+                        throw new Error(Q.format("Can't load script data: {0}!", name));
                     }
                     return data;
                 }, null);
@@ -3470,7 +3505,7 @@ namespace Q {
 
         export function reload(name: string) {
             if (registered[name] == null) {
-                throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+                throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
             }
             registered[name] = (new Date()).getTime().toString();
             loadScriptData(name);
@@ -3481,7 +3516,7 @@ namespace Q {
         export function reloadAsync(name: string) {
             return RSVP.resolve().then(function () {
                 if (registered[name] == null) {
-                    throw new ss.Exception(ss.formatString('Script data {0} is not found in registered script list!', name));
+                    throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
                 registered[name] = (new Date()).getTime().toString();
                 return loadScriptDataAsync(name).then(function () {

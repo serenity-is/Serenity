@@ -1634,6 +1634,10 @@ declare namespace ss {
 }
 declare namespace Q {
     import S = Serenity;
+    function cloneArray<T>(a: T[]): T[];
+    function coalesce(a: any, b: any): any;
+    function isValue(a: any): boolean;
+    function format(msg: string, ...prm: any[]): string;
     function alert(message: string, options?: S.AlertOptions): void;
     function confirm(message: string, onYes: () => void, options?: S.ConfirmOptions): void;
     function information(message: string, onOk: () => void, options?: S.ConfirmOptions): void;

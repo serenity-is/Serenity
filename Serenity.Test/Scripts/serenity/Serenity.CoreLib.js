@@ -1,5 +1,34 @@
 ﻿var Q;
 (function (Q) {
+    function cloneArray(a) {
+        return ss.arrayClone(a);
+    }
+    Q.cloneArray = cloneArray;
+    function coalesce(a, b) {
+        return ss.coalesce(a, b);
+    }
+    Q.coalesce = coalesce;
+    function isValue(a) {
+        return ss.isValue(a);
+    }
+    Q.isValue = isValue;
+    function format(msg) {
+        var prm = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            prm[_i - 1] = arguments[_i];
+        }
+        return ss.formatString.apply(ss, [msg].concat(prm));
+    }
+    Q.format = format;
+    function padLeft(s, m, n) {
+        return ss.padLeftString(s, m, n);
+    }
+    function replaceAll(s, f, r) {
+        return ss.replaceAllString(s, f, r);
+    }
+    function startsWith(s, search) {
+        return ss.startsWithString(s, search);
+    }
     function alert(message, options) {
         var dialog;
         options = $.extend({
@@ -1404,7 +1433,7 @@
         LT.$table = {};
         LT.empty = new LT('');
         LT.initializeTextClass = function (type, prefix) {
-            var $t1 = ss.arrayClone(Object.keys(type));
+            var $t1 = Q.cloneArray(Object.keys(type));
             for (var $t2 = 0; $t2 < $t1.length; $t2++) {
                 var member = $t1[$t2];
                 var value = type[member];
