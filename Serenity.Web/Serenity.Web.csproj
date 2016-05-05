@@ -650,8 +650,6 @@
     <Content Include="Includes\Fonts\ionicons.svg" />
     <Content Include="Includes\Fonts\Simple-Line-Icons.dev.svg" />
     <Content Include="Includes\Fonts\Simple-Line-Icons.svg" />
-    <Content Include="Includes\Scripts\jlayout.border.js" />
-    <Content Include="Includes\Scripts\jlayout.border.min.js" />
     <Content Include="Includes\Scripts\jquery-ui-i18n.js" />
     <Content Include="Includes\Scripts\jquery-ui-i18n.min.js" />
     <Content Include="Includes\Scripts\jquery.autoNumeric.js" />
@@ -670,12 +668,8 @@
     <Content Include="Includes\Scripts\jquery.fileupload.min.js" />
     <Content Include="Includes\Scripts\jquery.iframe-transport.js" />
     <Content Include="Includes\Scripts\jquery.iframe-transport.min.js" />
-    <Content Include="Includes\Scripts\jquery.jlayout.js" />
-    <Content Include="Includes\Scripts\jquery.jlayout.min.js" />
     <Content Include="Includes\Scripts\jquery.json.js" />
     <Content Include="Includes\Scripts\jquery.json.min.js" />
-    <Content Include="Includes\Scripts\jquery.metisMenu.js" />
-    <Content Include="Includes\Scripts\jquery.metisMenu.min.js" />
     <Content Include="Includes\Scripts\jquery.scrollintoview.js" />
     <Content Include="Includes\Scripts\jquery.scrollintoview.min.js" />
     <Content Include="Includes\Scripts\jquery.slimscroll.js" />
