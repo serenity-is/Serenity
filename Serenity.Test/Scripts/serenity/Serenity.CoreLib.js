@@ -1194,20 +1194,16 @@
     }
     $.fn.flexHeightOnly = function (flexY) {
         if (flexY === void 0) { flexY = 1; }
-        return this.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
+        return this.flexWidthHeight(0, flexY);
     };
     $.fn.flexWidthOnly = function (flexX) {
         if (flexX === void 0) { flexX = 1; }
-        return this.addClass('flexify').data('flex-x', flexX).data('flex-y', 0);
+        return this.flexWidthHeight(flexX, 0);
     };
     $.fn.flexWidthHeight = function (flexX, flexY) {
         if (flexX === void 0) { flexX = 1; }
         if (flexY === void 0) { flexY = 1; }
         return this.addClass('flexify').data('flex-x', flexX).data('flex-y', flexY);
-    };
-    $.fn.flexHeightOnly = function (flexY) {
-        if (flexY === void 0) { flexY = 1; }
-        return this.addClass('flexify').data('flex-y', flexY).data('flex-x', 0);
     };
     $.fn.flexX = function (flexX) {
         return this.data('flex-x', flexX);
