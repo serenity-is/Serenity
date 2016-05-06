@@ -286,9 +286,44 @@
         return lookup;
     }
     Q.toGrouping = toGrouping;
-    function any(array, predicate) {
+    function first(array, predicate) {
         for (var _i = 0, array_1 = array; _i < array_1.length; _i++) {
             var x = array_1[_i];
+            if (predicate(x))
+                return x;
+        }
+        throw new Error("first:No element satisfies the condition.!");
+    }
+    Q.first = first;
+    function tryFirst(array, predicate) {
+        for (var _i = 0, array_2 = array; _i < array_2.length; _i++) {
+            var x = array_2[_i];
+            if (predicate(x))
+                return x;
+        }
+        return null;
+    }
+    Q.tryFirst = tryFirst;
+    function single(array, predicate) {
+        var match;
+        var found = false;
+        for (var _i = 0, array_3 = array; _i < array_3.length; _i++) {
+            var x = array_3[_i];
+            if (predicate(x)) {
+                if (found)
+                    throw new Error("single:sequence contains more than one element.");
+                found = true;
+                match = x;
+            }
+        }
+        if (!found)
+            throw new Error("single:No element satisfies the condition.");
+        return match;
+    }
+    Q.single = single;
+    function any(array, predicate) {
+        for (var _i = 0, array_4 = array; _i < array_4.length; _i++) {
+            var x = array_4[_i];
             if (predicate(x))
                 return true;
         }
@@ -297,8 +332,8 @@
     Q.any = any;
     function count(array, predicate) {
         var count = 0;
-        for (var _i = 0, array_2 = array; _i < array_2.length; _i++) {
-            var x = array_2[_i];
+        for (var _i = 0, array_5 = array; _i < array_5.length; _i++) {
+            var x = array_5[_i];
             if (predicate(x))
                 count++;
         }

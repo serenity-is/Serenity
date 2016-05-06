@@ -1217,7 +1217,8 @@ declare namespace Serenity {
         delimited?: boolean;
     }
 
-    class LookupEditorBase<TOptions, TItem> extends Select2Editor<TOptions, TItem> {
+    class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+        constructor(input: JQuery, opt?: TOptions);
         get_value(): string;
         set_value(value: string): void;
         get_cascadeField(): string;
@@ -1231,6 +1232,7 @@ declare namespace Serenity {
     }
 
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
+        constructor(input: JQuery, opt?: LookupEditorOptions);
     }
 
     class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
@@ -2159,6 +2161,37 @@ namespace Q {
             d.push(x);
         }
         return lookup;
+    }
+
+    export function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
+        for (let x of array)
+            if (predicate(x))
+                return x;
+
+        throw new Error("first:No element satisfies the condition.!");
+    }
+
+    export function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
+        for (let x of array)
+            if (predicate(x))
+                return x;
+    }
+
+    export function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
+        let match;
+        let found = false;
+        for (let x of array)
+            if (predicate(x)) {
+                if (found)
+                    throw new Error("single:sequence contains more than one element.");
+                found = true;
+                match = x;
+            }
+
+        if (!found)
+            throw new Error("single:No element satisfies the condition.");
+
+        return match;
     }
 
     export function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean {

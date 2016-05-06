@@ -1056,7 +1056,8 @@ declare namespace Serenity {
         multiple?: boolean;
         delimited?: boolean;
     }
-    class LookupEditorBase<TOptions, TItem> extends Select2Editor<TOptions, TItem> {
+    class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+        constructor(input: JQuery, opt?: TOptions);
         get_value(): string;
         set_value(value: string): void;
         get_cascadeField(): string;
@@ -1069,6 +1070,7 @@ declare namespace Serenity {
         set_filterValue(value: any): void;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
+        constructor(input: JQuery, opt?: LookupEditorOptions);
     }
     class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt: LookupEditorOptions);
@@ -1682,6 +1684,9 @@ declare namespace Q {
         [key: string]: TItem[];
     };
     function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Grouping<TItem>;
+    function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
     function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
     function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
     function formatDate(date: Date, format?: string): string;

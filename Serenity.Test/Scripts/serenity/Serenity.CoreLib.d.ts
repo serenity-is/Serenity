@@ -1682,6 +1682,9 @@ declare namespace Q {
         [key: string]: TItem[];
     };
     function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Grouping<TItem>;
+    function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
     function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
     function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
     function formatDate(date: Date, format?: string): string;
