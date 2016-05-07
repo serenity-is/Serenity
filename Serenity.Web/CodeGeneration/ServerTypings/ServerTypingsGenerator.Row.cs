@@ -104,7 +104,7 @@ namespace Serenity.CodeGeneration
                     sb.AppendLine("';");
 
                     sb.AppendLine();
-                    cw.Indented("export function lookup(): Q.Lookup<");
+                    cw.Indented("export function getLookup(): Q.Lookup<");
                     sb.Append(rowType.Name);
                     sb.Append(">");
                     cw.InBrace(delegate
