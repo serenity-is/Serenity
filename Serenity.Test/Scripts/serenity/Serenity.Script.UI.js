@@ -4858,7 +4858,7 @@
 			}), null);
 		},
 		getItems: function(lookup) {
-			return this.filterItems(this.cascadeItems(lookup.items));
+			return Enumerable.from(this.filterItems(this.cascadeItems(lookup.items))).toArray();
 		},
 		getItemText: function(item, lookup) {
 			var textValue = (!ss.staticEquals(lookup.textFormatter, null) ? lookup.textFormatter(item) : item[lookup.textField]);
@@ -4973,7 +4973,7 @@
 				}
 				var itemKey = $t1;
 				return !!(ss.isValue(itemKey) && ss.referenceEquals(itemKey.toString(), key));
-			}));
+			})).toArray();
 		},
 		filterItems: function(items) {
 			if (ss.isNullOrUndefined(this.get_filterValue()) || ss.safeCast(this.get_filterValue(), String) === '') {
@@ -4987,7 +4987,7 @@
 				}
 				var itemKey = $t1;
 				return !!(ss.isValue(itemKey) && ss.referenceEquals(itemKey.toString(), key));
-			}));
+			})).toArray();
 		},
 		getCascadeFromValue: function(parent) {
 			return $Serenity_EditorUtils.getValue(parent);

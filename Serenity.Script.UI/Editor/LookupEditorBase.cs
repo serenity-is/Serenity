@@ -86,7 +86,7 @@ namespace Serenity
         [IncludeGenericArguments(false)]
         protected virtual IEnumerable<TItem> GetItems(Lookup<TItem> lookup)
         {
-            return FilterItems(CascadeItems(lookup.Items));
+            return FilterItems(CascadeItems(lookup.Items)).ToList();
         }
 
         [IncludeGenericArguments(false)]
@@ -212,7 +212,7 @@ namespace Serenity
             });
         }
 
-        protected virtual IEnumerable<TItem> CascadeItems(IEnumerable<TItem> items)
+        protected virtual List<TItem> CascadeItems(List<TItem> items)
         {
             if (CascadeValue == null || (CascadeValue as string) == "")
             {
@@ -227,10 +227,10 @@ namespace Serenity
             {
                 var itemKey = ((dynamic)x)[CascadeField] ?? ReflectionUtils.GetPropertyValue(x, CascadeField);
                 return itemKey != null && ((object)itemKey).ToString() == key;
-            });
+            }).ToList();
         }
 
-        protected virtual IEnumerable<TItem> FilterItems(IEnumerable<TItem> items)
+        protected virtual List<TItem> FilterItems(List<TItem> items)
         {
             if (FilterValue == null || (FilterValue as string) == "")
                 return items;
@@ -240,7 +240,7 @@ namespace Serenity
             {
                 var itemKey = ((dynamic)x)[FilterField] ?? ReflectionUtils.GetPropertyValue(x, FilterField);
                 return itemKey != null && ((object)itemKey).ToString() == key;
-            });
+            }).ToList();
         }
 
         protected virtual object GetCascadeFromValue(Widget parent)

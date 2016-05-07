@@ -343,18 +343,18 @@ declare namespace Serenity {
     }
     class IBooleanValue {
     }
-    interface BooleanValue {
+    interface IBooleanValue {
         get_value(): boolean;
         set_value(value: boolean): void;
     }
     class IDialog {
     }
-    interface Dialog {
+    interface IDialog {
         dialogOpen(): void;
     }
     class IDoubleValue {
     }
-    interface DoubleValue {
+    interface IDoubleValue {
         get_value(): any;
         set_value(value: any): void;
     }
@@ -870,11 +870,11 @@ declare namespace Serenity {
     }
     class IStringValue {
     }
-    interface StringValue {
+    interface IStringValue {
         get_value(): string;
         set_value(value: string): void;
     }
-    class StringEditor extends Widget<any> implements StringValue {
+    class StringEditor extends Widget<any> implements IStringValue {
         get_value(): string;
         set_value(value: string): void;
     }
@@ -1061,6 +1061,19 @@ declare namespace Serenity {
     }
     class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
+        protected cascadeItems(items: TItem[]): TItem[];
+        protected filterItems(items: TItem[]): TItem[];
+        protected getCasecadeFromValue(parent: Widget<any>): any;
+        protected getItems(lookup: Q.Lookup<TItem>): TItem[];
+        protected getItemText(item: TItem, lookup: Q.Lookup<TItem>): string;
+        protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>): boolean;
+        protected getLookup(): Q.Lookup<TItem>;
+        protected getLookupKey(): string;
+        protected initNewEntity(entity: TItem): any;
+        protected updateItems(): void;
+        protected getDialogTypeKey(): string;
+        protected createEditDialog(callback: (dlg: Serenity.EditDialog) => void): void;
+        onInitNewEntity: (entity: TItem) => void;
         get_value(): string;
         set_value(value: string): void;
         get_cascadeField(): string;
@@ -1923,10 +1936,13 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
+    function Criteria(field: string): any[];
     namespace Criteria {
         function isEmpty(c: any[]): boolean;
         function join(c1: any[], op: string, c2: any[]): any[];
         function paren(c: any[]): any[];
+        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
+        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
     }
     namespace Decorators {
         function addAttribute(type: any, attr: any): void;
