@@ -1263,6 +1263,11 @@ declare namespace Serenity {
         protected validateBeforeSave(): boolean;
     }
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected saveAndCloseButton: JQuery;
+        protected applyChangesButton: JQuery;
+        protected deleteButton: JQuery;
+        protected undeleteButton: JQuery;
+        protected cloneButton: JQuery;
         protected entity: TItem;
         protected entityId: any;
         protected toolbar: Toolbar;
@@ -1655,6 +1660,7 @@ declare namespace ss {
     }): any;
     function padLeftString(s: string, m: number, n: number): any;
     function replaceAllString(s: string, f: string, r: string): string;
+    function endsWithString(s: string, search: string): boolean;
     function startsWithString(s: string, search: string): boolean;
 }
 declare namespace Q {
@@ -1664,6 +1670,7 @@ declare namespace Q {
     function insert(obj: any, index: number, item: any): void;
     function coalesce(a: any, b: any): any;
     function isValue(a: any): boolean;
+    function endsWith(s: string, search: string): boolean;
     function format(msg: string, ...prm: any[]): string;
     function padLeft(s: string, len: number, ch?: string): string;
     function zeroPad(n: number, digits: number): string;

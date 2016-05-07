@@ -20,6 +20,10 @@
         return ss.isValue(a);
     }
     Q.isValue = isValue;
+    function endsWith(s, search) {
+        return ss.endsWithString(s, search);
+    }
+    Q.endsWith = endsWith;
     function format(msg) {
         var prm = [];
         for (var _i = 1; _i < arguments.length; _i++) {

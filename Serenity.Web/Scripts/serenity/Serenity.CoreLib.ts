@@ -1456,6 +1456,11 @@ declare namespace Serenity {
     }
 
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        protected saveAndCloseButton: JQuery;
+        protected applyChangesButton: JQuery;
+        protected deleteButton: JQuery;
+        protected undeleteButton: JQuery;
+        protected cloneButton: JQuery;
         protected entity: TItem;
         protected entityId: any;
         protected toolbar: Toolbar;
@@ -1871,6 +1876,7 @@ declare namespace ss {
     function initAssembly(obj, name: string, res: { [name: string]: any });
     function padLeftString(s: string, m: number, n: number);
     function replaceAllString(s: string, f: string, r: string): string;
+    function endsWithString(s: string, search: string): boolean;
     function startsWithString(s: string, search: string): boolean;
 }
 
@@ -1895,6 +1901,10 @@ namespace Q {
 
     export function isValue(a: any): boolean {
         return ss.isValue(a);
+    }
+
+    export function endsWith(s: string, search: string): boolean {
+        return ss.endsWithString(s, search);
     }
 
     export function format(msg: string, ...prm: any[]): string {
