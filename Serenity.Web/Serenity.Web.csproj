@@ -16,6 +16,7 @@
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptCharset>utf-8</TypeScriptCharset>
     <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
     <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
