@@ -1968,6 +1968,13 @@ var Serenity;
             return registerClass(intf, asm);
         }
         Decorators.registerFormatter = registerFormatter;
+        function filterable(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                addAttribute(target, new Serenity.FilterableAttribute(value));
+            };
+        }
+        Decorators.filterable = filterable;
         function itemName(value) {
             return function (target) {
                 addAttribute(target, new ItemNameAttribute(value));

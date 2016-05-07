@@ -3,6 +3,7 @@ using Serenity.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -57,7 +58,9 @@ namespace Serenity
 
         protected virtual object GetEditorOptions()
         {
-            return Field.FilteringParams;
+            var opt = Q.DeepExtend(new JsDictionary(), Field.EditorParams);
+            Script.Delete(opt, "cascadeFrom"); // currently can't support cascadeFrom in filtering
+            return Q.DeepExtend(opt, Field.FilteringParams);
         }
 
         public override void LoadState(object state)
@@ -94,6 +97,13 @@ namespace Serenity
             }
 
             return base.GetEditorValue();
+        }
+
+        public override void InitQuickFilter(QuickFilter<Widget, object> filter)
+        {
+            base.InitQuickFilter(filter);
+            filter.Type = typeof(TEditor);
+            filter.Options = Q.DeepExtend(new JsDictionary<string, object>(), GetEditorOptions(), Field.QuickFilterParams);
         }
     }
 }

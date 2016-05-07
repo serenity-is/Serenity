@@ -112,7 +112,7 @@
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.ReadOnly.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Required.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Resizable.cs" />
-    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.SortOrder.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Sorting.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Title.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Updatable.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Visible.cs" />

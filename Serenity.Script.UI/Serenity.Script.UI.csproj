@@ -59,6 +59,7 @@
     <Compile Include="FilterPanel\FilteringTypes\DateTimeFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\DateFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\EditorFiltering.cs" />
+    <Compile Include="FilterPanel\FilteringTypes\IQuickFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\LookupFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\DecimalFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\IntegerFiltering.cs" />
@@ -79,7 +80,7 @@
     <Compile Include="FilterPanel\FilterableAttribute.cs" />
     <Compile Include="FilterPanel\FilterDisplayBar.cs" />
     <Compile Include="Grid\GridRowSelectionMixin.cs" />
-    <Compile Include="Grid\QuickFilterOptions.cs" />
+    <Compile Include="Grid\QuickFilter.cs" />
     <Compile Include="Grid\QuickFilterArgs.cs" />
     <Compile Include="Grid\IDataGrid.cs" />
     <Compile Include="Grid\ReflectionOptionsSetter.cs" />

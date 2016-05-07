@@ -26,6 +26,7 @@ namespace Serenity
             result.Field = item.Name;
             result.Title = Q.TryGetText(item.Title) ?? item.Title;
             result.CssClass = item.CssClass;
+            result.Sortable = item.Sortable != false;
             result.SortOrder = item.SortOrder ?? 0;
             
             if (Script.IsValue(item.Alignment) && item.Alignment.Length > 0)

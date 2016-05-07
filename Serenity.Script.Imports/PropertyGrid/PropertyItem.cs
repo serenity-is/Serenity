@@ -35,6 +35,7 @@ namespace Serenity
         public int? MinWidth { get; set; }
         public int? MaxWidth { get; set; }
         public bool? Resizable { get; set; }
+        public bool? Sortable { get; set; }
         public int? SortOrder { get; set; }
 
         public bool? EditLink { get; set; }
@@ -47,5 +48,8 @@ namespace Serenity
         public string FilteringIdField { get; set; }
         public bool? NotFilterable { get; set; }
         public bool? FilterOnly { get; set; }
+
+        public bool? QuickFilter { get; set; }
+        public JsDictionary QuickFilterParams { get; set; }
     }
 }

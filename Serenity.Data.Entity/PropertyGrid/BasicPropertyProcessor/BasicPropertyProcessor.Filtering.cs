@@ -22,6 +22,10 @@ namespace Serenity.PropertyGrid
             if (item.NotFilterable == true)
                 return;
 
+            var quickFilterAttr = source.GetAttribute<QuickFilterAttribute>();
+            if (quickFilterAttr != null && quickFilterAttr.Value)
+                item.QuickFilter = true;
+
             var basedOnField = source.BasedOnField;
 
             Field idField;
@@ -130,7 +134,7 @@ namespace Serenity.PropertyGrid
                 {
                     if (!item.FilteringParams.ContainsKey("editorType"))
                     {
-                        var editorAttr =source.GetAttribute<EditorTypeAttribute>() ??
+                        var editorAttr = source.GetAttribute<EditorTypeAttribute>() ??
                             idField.GetAttribute<EditorTypeAttribute>();
 
                         if (editorAttr != null)
@@ -168,6 +172,18 @@ namespace Serenity.PropertyGrid
                     item.FilteringIdField = (param.Value as string) ?? item.FilteringIdField;
 
                 item.FilteringParams[key] = param.Value;
+            }
+
+            foreach (QuickFilterOptionAttribute param in
+                idField.GetAttributes<QuickFilterOptionAttribute>().Concat(
+                source.GetAttributes<QuickFilterOptionAttribute>()))
+            {
+                var key = param.Key;
+                if (key != null &&
+                    key.Length >= 1)
+                    key = key.Substring(0, 1).ToLowerInvariant() + key.Substring(1);
+
+                item.QuickFilterParams[key] = param.Value;
             }
         }
 

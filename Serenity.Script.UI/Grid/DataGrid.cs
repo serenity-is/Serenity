@@ -70,6 +70,8 @@ namespace Serenity
             if (buttons != null)
                 CreateToolbarExtensions();
 
+            CreateQuickFilters();
+
             UpdateDisabledState();
 
             if (!IsAsyncWidget())
@@ -117,6 +119,62 @@ namespace Serenity
 
         protected virtual void CreateToolbarExtensions()
         {
+        }
+
+        protected virtual void CreateQuickFilters()
+        {
+            foreach (var filter in GetQuickFilters())
+                AddQuickFilter(filter);
+        }
+
+        protected virtual List<QuickFilter<Widget, object>> GetQuickFilters()
+        {
+            var list = new List<QuickFilter<Widget, object>>();
+
+            foreach (var item in this.GetPropertyItems().Where(x => x.QuickFilter == true))
+            {
+                var quick = new QuickFilter<Widget, object>();
+
+                var filteringType = FilteringTypeRegistry.Get(item.FilteringType ?? "String");
+
+                if (filteringType == typeof(DateFiltering) || filteringType == typeof(DateTimeFiltering))
+                {
+                    quick = DateRangeQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name)
+                        .As<QuickFilter<Widget, object>>();
+                }
+                else
+                {
+                    var filtering = (IFiltering)Activator.CreateInstance(filteringType);
+                    if (filtering != null && filtering is IQuickFiltering)
+                    {
+                        ReflectionOptionsSetter.Set(filtering, item.FilteringParams);
+                        filtering.Field = item;
+                        filtering.Operator = FilterOperators.EQ;
+
+                        ((IQuickFiltering)filtering).InitQuickFilter(quick);
+                        quick.Options = Q.DeepExtend(quick.Options, item.QuickFilterParams);
+                    }
+                    else
+                        continue;
+                }
+
+                list.Add(quick);
+            }
+
+            return list;
+        }
+
+        [IncludeGenericArguments(false), ScriptName("findQuickFilter")]
+        private Widget FindQuickFilter(Type type, string field)
+        {
+            return J("#" + this.UniqueName + "_QuickFilter_" + field).GetWidget(type).As<Widget>();
+        }
+
+        [InlineCode("{this}.findQuickFilter({TWidget}, {field})")]
+        protected TWidget FindQuickFilter<TWidget>(string field)
+            where TWidget : Widget
+        {
+            return null;
         }
 
         protected virtual void CreateIncludeDeletedButton()
@@ -941,9 +999,11 @@ namespace Serenity
         }
 
         [ScriptName("addQuickFilter"), IncludeGenericArguments(false)]
-        protected object AddQuickFilter<TWidget>(string field, Type type, QuickFilterOptions<Widget> opt)
+        protected object AddQuickFilter<TWidget, TOpt>(QuickFilter<TWidget, TOpt> opt)
+            where TWidget: Widget
         {
-            opt = opt ?? new QuickFilterOptions<Widget>();
+            if (opt == null)
+                throw new ArgumentNullException("opt");
 
             if (quickFiltersDiv == null)
             {
@@ -953,18 +1013,18 @@ namespace Serenity
 
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)
-                .Children().Text(opt.Title ?? DetermineText(pre => pre + field) ?? field)
+                .Children().Text(opt.Title ?? DetermineText(pre => pre + opt.Field) ?? opt.Field)
                 .Parent();
 
-            var widget = Widget.CreateOfType(type, e =>
+            var widget = Widget.CreateOfType(opt.Type, e =>
             {
-                if (!field.IsEmptyOrNull())
-                    e.Attribute("id", this.UniqueName + "_QuickFilter_" + field);
+                if (!opt.Field.IsEmptyOrNull())
+                    e.Attribute("id", this.UniqueName + "_QuickFilter_" + opt.Field);
                 e.Attribute("placeholder", " ");
                 e.AppendTo(quickFilter);
                 if (opt.Element != null)
                     opt.Element(e);
-            }, opt.Options, opt.Init);
+            }, opt.Options, opt.Init.As<Action<Widget>>());
 
             Action submitHandler = () =>
             {
@@ -981,7 +1041,7 @@ namespace Serenity
                 {
                     var args = new QuickFilterArgs<TWidget>
                     {
-                        Field = field,
+                        Field = opt.Field,
                         Request = request,
                         EqualityFilter = request.EqualityFilter,
                         Value = value,
@@ -990,16 +1050,28 @@ namespace Serenity
                         Handled = true
                     };
 
-                    opt.Handler(args.As<Serenity.QuickFilterArgs<Widget>>());
+                    opt.Handler(args.As<Serenity.QuickFilterArgs<TWidget>>());
 
                     quickFilter.ToggleClass("quick-filter-active", args.Active);
 
                     if (!args.Handled)
-                        request.EqualityFilter[field] = value;
+                    {
+                        if (value.As<object[]>().Length > 0)
+                            request.Criteria &= new Criteria(opt.Field).In(value.As<object[]>());
+                        else
+                            request.EqualityFilter[opt.Field] = value;
+                    }
                 }
                 else
                 {
-                    request.EqualityFilter[field] = value;
+                    if (jQuery.IsArray(value))
+                    {
+                        if (value.As<object[]>().Length > 0)
+                            request.Criteria &= new Criteria(opt.Field).In(value.As<object[]>());
+                    }
+                    else
+                        request.EqualityFilter[opt.Field] = value;
+
                     quickFilter.ToggleClass("quick-filter-active", active);
 
                 }
@@ -1019,7 +1091,7 @@ namespace Serenity
             return widget;
         }
 
-        [InlineCode("{this}.addQuickFilter({field}, {TWidget}, {{ title: {title}, options: {options}, handler: {handler}, init: {init}, element: {element} }})")]
+        [InlineCode("{this}.addQuickFilter({{ field: {field}, type: {TWidget}, title: {title}, options: {options}, handler: {handler}, init: {init}, element: {element} }})")]
         public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
             Action<jQueryObject> element = null, Action<TWidget> init = null)
             where TWidget: Widget
@@ -1029,16 +1101,25 @@ namespace Serenity
 
         public DateEditor AddDateRangeFilter(string field, string title = null)
         {
+            return (DateEditor)AddQuickFilter(DateRangeQuickFilter(field, title));
+        }
+
+        private QuickFilter<DateEditor, DateTimeEditorOptions> DateRangeQuickFilter(string field, string title)
+        {
             DateEditor end = null;
 
-            return AddEqualityFilter<DateEditor>(field, title,
-                element: e1 =>
+            return new QuickFilter<DateEditor, DateTimeEditorOptions>
+            {
+                Field = field,
+                Type = typeof(DateEditor),
+                Title = title,
+                Element = e1 =>
                 {
                     end = Widget.Create<DateEditor>(element: e2 => e2.InsertAfter(e1));
                     end.Element.Change(x => e1.TriggerHandler("change"));
                     J("<span/>").AddClass("range-separator").Text("-").InsertAfter(e1);
                 },
-                handler: args =>
+                Handler = args =>
                 {
                     args.Active =
                         !string.IsNullOrEmpty(args.Widget.Value) ||
@@ -1053,7 +1134,8 @@ namespace Serenity
                         next.SetDate(next.GetDate() + 1);
                         args.Request.Criteria &= new Criteria(args.Field) < Q.FormatDate(next, "yyyy-MM-dd");
                     }
-                });
+                }
+            };
         }
 
         protected virtual void InvokeSubmitHandlers()

@@ -796,35 +796,38 @@ declare namespace Serenity {
         editorParams?: any;
         category?: string;
         cssClass?: string;
-        maxLength?: any;
-        required?: any;
-        insertable?: any;
-        hideOnInsert?: any;
-        updatable?: any;
-        hideOnUpdate?: any;
-        readOnly?: any;
-        oneWay?: any;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        oneWay?: boolean;
         defaultValue?: any;
-        localizable?: any;
-        visible?: any;
+        localizable?: boolean;
+        visible?: boolean;
         formatterType?: string;
         formatterParams?: any;
         displayFormat?: string;
         alignment?: string;
         width?: number;
-        minWidth?: any;
-        maxWidth?: any;
-        resizable?: any;
-        sortOrder?: any;
-        editLink?: any;
+        minWidth?: number;
+        maxWidth?: number;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        editLink?: boolean;
         editLinkItemType?: string;
         editLinkIdField?: string;
         editLinkCssClass?: string;
         filteringType?: string;
         filteringParams?: any;
         filteringIdField?: string;
-        notFilterable?: any;
-        filterOnly?: any;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
     }
     class ISlickFormatter {
     }
@@ -1056,7 +1059,8 @@ declare namespace Serenity {
         multiple?: boolean;
         delimited?: boolean;
     }
-    class LookupEditorBase<TOptions, TItem> extends Select2Editor<TOptions, TItem> {
+    class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+        constructor(input: JQuery, opt?: TOptions);
         get_value(): string;
         set_value(value: string): void;
         get_cascadeField(): string;
@@ -1069,6 +1073,7 @@ declare namespace Serenity {
         set_filterValue(value: any): void;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
+        constructor(input: JQuery, opt?: LookupEditorOptions);
     }
     class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt: LookupEditorOptions);
@@ -1325,7 +1330,9 @@ declare namespace Serenity {
         protected updateTitle(): void;
         protected validateBeforeSave(): boolean;
     }
-    interface QuickFilterOptions<TWidget extends Widget<TOptions>, TOptions> {
+    interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
+        field?: string;
+        type?: new (element: JQuery, options: TOptions) => TWidget;
         handler?: (h: QuickFilterArgs<TWidget>) => void;
         title?: string;
         options?: TOptions;
@@ -1342,9 +1349,7 @@ declare namespace Serenity {
         protected slickContainer: JQuery;
         protected toolbar: Toolbar;
         protected addDateRangeFilter(field: string, title?: string): any;
-        protected addQuickFilter<TWidget extends Widget<TOptions>, TOptions>(field: string, type: {
-            new (element: JQuery, options: TOptions): TWidget;
-        }, opt?: QuickFilterOptions<TWidget, TOptions>): TWidget;
+        protected addQuickFilter<TWidget extends Widget<any>, TOptions>(filter: QuickFilter<TWidget, TOptions>): TWidget;
         protected addFilterSeperator(): void;
         protected add_submitHandlers(action: () => void): void;
         protected remove_submitHandlers(action: () => void): void;
@@ -1353,6 +1358,7 @@ declare namespace Serenity {
         protected createFilterBar(): void;
         protected createIncludeDeletedButton(): void;
         protected createPager(): void;
+        protected createQuickFilters(): void;
         protected createQuickSearchInput(): void;
         protected createSlickContainer(): JQuery;
         protected createSlickGrid(): Slick.Grid;
@@ -1363,6 +1369,9 @@ declare namespace Serenity {
         protected editItem(entityOrId: any): any;
         protected editItemOfType(itemType: string, entityOrId: any): any;
         protected enableFiltering(): boolean;
+        protected findQuickFilter<TWidget>(type: {
+            new (...args: any[]): TWidget;
+        }, field: string): TWidget;
         protected getAddButtonCaption(): string;
         protected getButtons(): ToolButton[];
         protected getColumns(): Slick.Column[];
@@ -1382,6 +1391,7 @@ declare namespace Serenity {
         protected getLocalTextPrefix(): string;
         protected getPropertyItems(): PropertyItem[];
         protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
+        protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
         protected getQuickSearchFields(): QuickSearchField[];
         protected getSlickOptions(): Slick.GridOptions;
         protected getViewOptions(): Slick.RemoteViewOptions;
@@ -1926,6 +1936,7 @@ declare namespace Serenity {
         function idProperty(value: string): (target: Function) => void;
         function registerClass(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
         function registerFormatter(intf?: typeof ISlickFormatter[], asm?: ss.AssemblyReg): (target: Function) => void;
+        function filterable(value?: boolean): (target: Function) => void;
         function itemName(value: string): (target: Function) => void;
         function isActiveProperty(value: string): (target: Function) => void;
         function localTextPrefix(value: string): (target: Function) => void;

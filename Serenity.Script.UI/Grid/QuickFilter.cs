@@ -8,12 +8,13 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Imported, Serializable, IncludeGenericArguments(false)]
-    public class QuickFilterOptions<TWidget>
+    public class QuickFilter<TWidget, TOptions>
+        where TWidget: Widget
     {
-        public Type Type { get; set; }
         public string Field { get; set; }
         public string Title { get; set; }
-        public object Options { get; set; }
+        public Type Type { get; set; }
+        public TOptions Options { get; set; }
         public Action<jQueryObject> Element { get; set; }
         public Action<TWidget> Init { get; set; }
         public Action<QuickFilterArgs<TWidget>> Handler { get; set; }

@@ -2,10 +2,11 @@
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    public abstract class BaseFiltering : IFiltering
+    public abstract class BaseFiltering : IFiltering, IQuickFiltering
     {
         public PropertyItem Field { get; set; }
         public jQueryObject Container { get; set; }
@@ -211,6 +212,15 @@ namespace Serenity
                 value = input.GetValue();
 
             return value;
+        }
+
+        [IncludeGenericArguments(false)]
+        public virtual void InitQuickFilter(QuickFilter<Widget, object> filter)
+        {
+            filter.Field = GetCriteriaField();
+            filter.Type = typeof(StringEditor);
+            filter.Title = GetTitle(this.Field);
+            filter.Options = Q.DeepExtend<object>(new JsDictionary<string, object>(), Field.QuickFilterParams);
         }
     }
 }

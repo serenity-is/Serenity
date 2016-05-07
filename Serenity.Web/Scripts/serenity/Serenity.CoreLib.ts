@@ -930,35 +930,38 @@ declare namespace Serenity {
         editorParams?: any;
         category?: string;
         cssClass?: string;
-        maxLength?: any;
-        required?: any;
-        insertable?: any;
-        hideOnInsert?: any;
-        updatable?: any;
-        hideOnUpdate?: any;
-        readOnly?: any;
-        oneWay?: any;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        oneWay?: boolean;
         defaultValue?: any;
-        localizable?: any;
-        visible?: any;
+        localizable?: boolean;
+        visible?: boolean;
         formatterType?: string;
         formatterParams?: any;
         displayFormat?: string;
         alignment?: string;
         width?: number;
-        minWidth?: any;
-        maxWidth?: any;
-        resizable?: any;
-        sortOrder?: any;
-        editLink?: any;
+        minWidth?: number;
+        maxWidth?: number;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        editLink?: boolean;
         editLinkItemType?: string;
         editLinkIdField?: string;
         editLinkCssClass?: string;
         filteringType?: string;
         filteringParams?: any;
         filteringIdField?: string;
-        notFilterable?: any;
-        filterOnly?: any;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
     }
 
     class ISlickFormatter {
@@ -1521,7 +1524,9 @@ declare namespace Serenity {
         protected validateBeforeSave(): boolean;
     }
 
-    interface QuickFilterOptions<TWidget extends Widget<TOptions>, TOptions> {
+    interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
+        field?: string;
+        type?: new (element: JQuery, options: TOptions) => TWidget;
         handler?: (h: QuickFilterArgs<TWidget>) => void;
         title?: string;
         options?: TOptions;
@@ -1539,8 +1544,7 @@ declare namespace Serenity {
         protected slickContainer: JQuery;
         protected toolbar: Toolbar;
         protected addDateRangeFilter(field: string, title?: string);
-        protected addQuickFilter<TWidget extends Widget<TOptions>, TOptions>(field: string, type: { new (element: JQuery, options: TOptions): TWidget },
-            opt?: QuickFilterOptions<TWidget, TOptions>): TWidget;
+        protected addQuickFilter<TWidget extends Widget<any>, TOptions>(filter: QuickFilter<TWidget, TOptions>): TWidget;
         protected addFilterSeperator(): void;
         protected add_submitHandlers(action: () => void): void;
         protected remove_submitHandlers(action: () => void): void;
@@ -1549,6 +1553,7 @@ declare namespace Serenity {
         protected createFilterBar(): void;
         protected createIncludeDeletedButton(): void;
         protected createPager(): void;
+        protected createQuickFilters(): void;
         protected createQuickSearchInput(): void;
         protected createSlickContainer(): JQuery;
         protected createSlickGrid(): Slick.Grid;
@@ -1559,6 +1564,7 @@ declare namespace Serenity {
         protected editItem(entityOrId: any);
         protected editItemOfType(itemType: string, entityOrId: any);
         protected enableFiltering(): boolean;
+        protected findQuickFilter<TWidget>(type: { new (...args: any[]): TWidget }, field: string): TWidget
         protected getAddButtonCaption(): string;
         protected getButtons(): ToolButton[];
         protected getColumns(): Slick.Column[];
@@ -1576,6 +1582,7 @@ declare namespace Serenity {
         protected getLocalTextPrefix(): string;
         protected getPropertyItems(): PropertyItem[];
         protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
+        protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
         protected getQuickSearchFields(): QuickSearchField[];
         protected getSlickOptions(): Slick.GridOptions;
         protected getViewOptions(): Slick.RemoteViewOptions;
@@ -3888,6 +3895,12 @@ namespace Serenity {
 
         export function registerFormatter(intf = [Serenity.ISlickFormatter], asm?: ss.AssemblyReg) {
             return registerClass(intf, asm);
+        }
+
+        export function filterable(value = true) {
+            return function (target: Function) {
+                addAttribute(target, new FilterableAttribute(value));
+            }
         }
 
         export function itemName(value: string) {

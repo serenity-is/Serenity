@@ -79,5 +79,12 @@ namespace Serenity
         {
             return base.GetEditorText();
         }
+
+        public override void InitQuickFilter(QuickFilter<Widget, object> filter)
+        {
+            base.InitQuickFilter(filter);
+
+            filter.Type = EditorTypeRegistry.Get(EditorType);
+        }
     }
 }
