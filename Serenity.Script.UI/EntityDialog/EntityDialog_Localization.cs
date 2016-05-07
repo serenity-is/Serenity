@@ -74,7 +74,15 @@ namespace Serenity
                     copy.DefaultValue = null;
                     items.Add(copy);
 
-                    foreach (var lang in GetLanguages())
+                    var langs = GetLanguages();
+                    var langsArr = (langs as object) as string[][];
+                    if (langsArr != null && langsArr.Length > 0 && langsArr[0] != null &&
+                        Q.IsArray(langsArr[0]))
+                    {
+                        langs = langsArr.Select(x => new Tuple<string, string>(x[0], x[1]));
+                    }
+
+                    foreach (var lang in langs)
                     {
                         copy = jQuery.ExtendObject(new PropertyItem(), item);
                         copy.Name = lang.Item1 + "$" + copy.Name;
