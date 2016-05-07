@@ -53,7 +53,7 @@ declare namespace Slick {
         focusable?: boolean;
         formatter?: Slick.ColumnFormatter;
         headerCssClass?: string;
-        identifier?: string;
+        id?: string;
         maxWidth?: any;
         minWidth?: number;
         name?: string;
