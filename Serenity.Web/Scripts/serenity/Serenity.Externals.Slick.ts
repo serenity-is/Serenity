@@ -260,12 +260,12 @@ declare namespace Slick {
     }
 
     interface GroupInfo<TItem> {
-        getter: any;
-        formatter: (p1: Slick.Group<TItem>) => string;
-        comparer: (a: Slick.Group<TItem>, b: Slick.Group<TItem>) => number;
-        aggregators: any[];
-        aggregateCollapsed: boolean;
-        lazyTotalsCalculation: boolean;
+        getter?: any;
+        formatter?: (p1: Slick.Group<TItem>) => string;
+        comparer?: (a: Slick.Group<TItem>, b: Slick.Group<TItem>) => number;
+        aggregators?: any[];
+        aggregateCollapsed?: boolean;
+        lazyTotalsCalculation?: boolean;
     }
 
     interface RowCell {
