@@ -21,31 +21,43 @@ namespace Serenity
         {
             var getEditValue = editor as IGetEditValue;
             if (getEditValue != null)
-                getEditValue.GetEditValue(item, target);
-            else
             {
-                var stringValue = editor as IStringValue;
-                if (stringValue != null)
-                    target[item.Name] = stringValue.Value;
-                else
-                {
-                    var booleanValue = editor as IBooleanValue;
-                    if (booleanValue != null)
-                        target[item.Name] = booleanValue.Value;
-                    else
-                    {
-                        var doubleValue = editor as IDoubleValue;
-                        if (doubleValue != null)
-                        {
-                            var value = doubleValue.Value;
-                            target[item.Name] = Double.IsNaN(value.As<double>()) ? null : value;
-                        }
-                        else if (editor.Element.Is(":input"))
-                        {
-                            target[item.Name] = editor.Element.GetValue();
-                        }
-                    }
-                }
+                getEditValue.GetEditValue(item, target);
+                return;
+            }
+
+            var stringValue = editor as IStringValue;
+            if (stringValue != null)
+            {
+                target[item.Name] = stringValue.Value;
+                return;
+            }
+
+            var booleanValue = editor as IBooleanValue;
+            if (booleanValue != null)
+            {
+                target[item.Name] = booleanValue.Value;
+                return;
+            }
+
+            var doubleValue = editor as IDoubleValue;
+            if (doubleValue != null)
+            {
+                var value = doubleValue.Value;
+                target[item.Name] = Double.IsNaN(value.As<double>()) ? null : value;
+                return;
+            }
+
+            if (Script.IsValue((editor as dynamic).getEditValue))
+            {
+                (editor as dynamic).getEditValue(item, target);
+                return;
+            }
+
+            if (editor.Element.Is(":input"))
+            {
+                target[item.Name] = editor.Element.GetValue();
+                return;
             }
         }
 
@@ -59,7 +71,10 @@ namespace Serenity
         {
             var setEditValue = editor as ISetEditValue;
             if (setEditValue != null)
+            {
                 setEditValue.SetEditValue(source, item);
+                return;
+            }
 
             var stringValue = editor as IStringValue;
             if (stringValue != null)
@@ -68,42 +83,52 @@ namespace Serenity
                 if (value != null)
                     value = value.toString();
                 stringValue.Value = value;
+                return;
             }
-            else
+
+            var booleanValue = editor as IBooleanValue;
+            if (booleanValue != null)
             {
-                var booleanValue = editor as IBooleanValue;
-                if (booleanValue != null)
-                {
-                    object value = source[item.Name];
-                    if (Script.TypeOf(value) == "number")
-                        booleanValue.Value = value.As<double>() > 0;
-                    else
-                        booleanValue.Value = Q.IsTrue(value);
-                }
+                object value = source[item.Name];
+                if (Script.TypeOf(value) == "number")
+                    booleanValue.Value = value.As<double>() > 0;
                 else
-                {
-                    var doubleValue = editor as IDoubleValue;
-                    if (doubleValue != null)
-                    {
-                        var d = source[item.Name];
-                        if (d == null || (d is string && Q.IsTrimmedEmpty(d)))
-                            doubleValue.Value = null;
-                        else if (d is string)
-                            doubleValue.Value = Q.ParseDecimal(d);
-                        else if (d is Boolean)
-                            doubleValue.Value = (Boolean)d ? 1 : 0;
-                        else
-                            doubleValue.Value = d;
-                    }
-                    else if (editor.Element.Is(":input"))
-                    {
-                        var v = source[item.Name];
-                        if (!Script.IsValue(v))
-                            editor.Element.Value("");
-                        else
-                            editor.Element.Value(((object)v).As<string>());
-                    }
-                }
+                    booleanValue.Value = Q.IsTrue(value);
+
+                return;
+            }
+
+            var doubleValue = editor as IDoubleValue;
+            if (doubleValue != null)
+            {
+                var d = source[item.Name];
+                if (d == null || (d is string && Q.IsTrimmedEmpty(d)))
+                    doubleValue.Value = null;
+                else if (d is string)
+                    doubleValue.Value = Q.ParseDecimal(d);
+                else if (d is Boolean)
+                    doubleValue.Value = (Boolean)d ? 1 : 0;
+                else
+                    doubleValue.Value = d;
+
+                return;
+            }
+
+            if (Script.IsValue((editor as dynamic).setEditValue))
+            {
+                (editor as dynamic).setEditValue(source, item);
+                return;
+            }
+
+            if (editor.Element.Is(":input"))
+            {
+                var v = source[item.Name];
+                if (!Script.IsValue(v))
+                    editor.Element.Value("");
+                else
+                    editor.Element.Value(((object)v).As<string>());
+
+                return;
             }
         }
 

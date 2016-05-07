@@ -1017,28 +1017,31 @@
 		var getEditValue = ss.safeCast(editor, $Serenity_IGetEditValue);
 		if (ss.isValue(getEditValue)) {
 			getEditValue.getEditValue(item, target);
+			return;
 		}
-		else {
-			var stringValue = ss.safeCast(editor, $Serenity_IStringValue);
-			if (ss.isValue(stringValue)) {
-				target[item.name] = stringValue.get_value();
-			}
-			else {
-				var booleanValue = ss.safeCast(editor, $Serenity_IBooleanValue);
-				if (ss.isValue(booleanValue)) {
-					target[item.name] = booleanValue.get_value();
-				}
-				else {
-					var doubleValue = ss.safeCast(editor, $Serenity_IDoubleValue);
-					if (ss.isValue(doubleValue)) {
-						var value = doubleValue.get_value();
-						target[item.name] = (isNaN(value) ? null : value);
-					}
-					else if (editor.element.is(':input')) {
-						target[item.name] = editor.element.val();
-					}
-				}
-			}
+		var stringValue = ss.safeCast(editor, $Serenity_IStringValue);
+		if (ss.isValue(stringValue)) {
+			target[item.name] = stringValue.get_value();
+			return;
+		}
+		var booleanValue = ss.safeCast(editor, $Serenity_IBooleanValue);
+		if (ss.isValue(booleanValue)) {
+			target[item.name] = booleanValue.get_value();
+			return;
+		}
+		var doubleValue = ss.safeCast(editor, $Serenity_IDoubleValue);
+		if (ss.isValue(doubleValue)) {
+			var value = doubleValue.get_value();
+			target[item.name] = (isNaN(value) ? null : value);
+			return;
+		}
+		if (!!ss.isValue(editor.getEditValue)) {
+			editor.getEditValue(item, target);
+			return;
+		}
+		if (editor.element.is(':input')) {
+			target[item.name] = editor.element.val();
+			return;
 		}
 	};
 	$Serenity_EditorUtils.setValue = function(editor, value) {
@@ -1049,6 +1052,7 @@
 		var setEditValue = ss.safeCast(editor, $Serenity_ISetEditValue);
 		if (ss.isValue(setEditValue)) {
 			setEditValue.setEditValue(source, item);
+			return;
 		}
 		var stringValue = ss.safeCast(editor, $Serenity_IStringValue);
 		if (ss.isValue(stringValue)) {
@@ -1057,45 +1061,49 @@
 				value = value.toString();
 			}
 			stringValue.set_value(ss.cast(value, String));
+			return;
 		}
-		else {
-			var booleanValue = ss.safeCast(editor, $Serenity_IBooleanValue);
-			if (ss.isValue(booleanValue)) {
-				var value1 = source[item.name];
-				if (typeof(value1) === 'number') {
-					booleanValue.set_value(value1 > 0);
-				}
-				else {
-					booleanValue.set_value(!!value1);
-				}
+		var booleanValue = ss.safeCast(editor, $Serenity_IBooleanValue);
+		if (ss.isValue(booleanValue)) {
+			var value1 = source[item.name];
+			if (typeof(value1) === 'number') {
+				booleanValue.set_value(value1 > 0);
 			}
 			else {
-				var doubleValue = ss.safeCast(editor, $Serenity_IDoubleValue);
-				if (ss.isValue(doubleValue)) {
-					var d = source[item.name];
-					if (!!(ss.isNullOrUndefined(d) || ss.isInstanceOfType(d, String) && Q.isTrimmedEmpty(ss.cast(d, String)))) {
-						doubleValue.set_value(null);
-					}
-					else if (ss.isInstanceOfType(d, String)) {
-						doubleValue.set_value(ss.cast(Q.parseDecimal(ss.cast(d, String)), Number));
-					}
-					else if (ss.isInstanceOfType(d, Boolean)) {
-						doubleValue.set_value((!!d ? 1 : 0));
-					}
-					else {
-						doubleValue.set_value(ss.cast(d, Number));
-					}
-				}
-				else if (editor.element.is(':input')) {
-					var v = source[item.name];
-					if (!!!ss.isValue(v)) {
-						editor.element.val('');
-					}
-					else {
-						editor.element.val(v);
-					}
-				}
+				booleanValue.set_value(!!value1);
 			}
+			return;
+		}
+		var doubleValue = ss.safeCast(editor, $Serenity_IDoubleValue);
+		if (ss.isValue(doubleValue)) {
+			var d = source[item.name];
+			if (!!(ss.isNullOrUndefined(d) || ss.isInstanceOfType(d, String) && Q.isTrimmedEmpty(ss.cast(d, String)))) {
+				doubleValue.set_value(null);
+			}
+			else if (ss.isInstanceOfType(d, String)) {
+				doubleValue.set_value(ss.cast(Q.parseDecimal(ss.cast(d, String)), Number));
+			}
+			else if (ss.isInstanceOfType(d, Boolean)) {
+				doubleValue.set_value((!!d ? 1 : 0));
+			}
+			else {
+				doubleValue.set_value(ss.cast(d, Number));
+			}
+			return;
+		}
+		if (!!ss.isValue(editor.setEditValue)) {
+			editor.setEditValue(source, item);
+			return;
+		}
+		if (editor.element.is(':input')) {
+			var v = source[item.name];
+			if (!!!ss.isValue(v)) {
+				editor.element.val('');
+			}
+			else {
+				editor.element.val(v);
+			}
+			return;
 		}
 	};
 	$Serenity_EditorUtils.setReadOnly$1 = function(elements, isReadOnly) {
