@@ -2241,6 +2241,14 @@ namespace Q {
         return count;
     }
 
+    export function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number {
+        for (var i = 0; i < array.length; i++)
+            if (predicate(array[i]))
+                return i;
+
+        return -1;
+    }
+
     export function formatDate(date: Date, format?: string) {
         if (!date) {
             return '';
@@ -3215,7 +3223,7 @@ namespace Q {
     }
 
     // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
-    export function deepClone(arg1: any, ...args: any[]) {
+    export function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem {
         let options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
         // Handle case when target is a string or something (possible in deep copy)
         if (typeof target !== "object" && !$.isFunction(target)) {

@@ -1717,6 +1717,7 @@ declare namespace Q {
     function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
     function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
     function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
+    function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
     function formatDate(date: Date, format?: string): string;
     /**
      * Html encodes a string
@@ -1782,7 +1783,7 @@ declare namespace Q {
     function turkishLocaleToUpper(a: string): string;
     function postToService(options: S.PostToServiceOptions): void;
     function postToUrl(options: S.PostToUrlOptions): void;
-    function deepClone(arg1: any, ...args: any[]): any;
+    function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
     namespace ErrorHandling {
         function showServiceError(error: any): void;
     }

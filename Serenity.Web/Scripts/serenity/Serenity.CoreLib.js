@@ -343,6 +343,13 @@
         return count;
     }
     Q.count = count;
+    function indexOf(array, predicate) {
+        for (var i = 0; i < array.length; i++)
+            if (predicate(array[i]))
+                return i;
+        return -1;
+    }
+    Q.indexOf = indexOf;
     function formatDate(date, format) {
         if (!date) {
             return '';

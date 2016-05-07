@@ -352,12 +352,13 @@ declare namespace Slick {
         onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
         constructor(options: RemoteViewOptions);
         addData(data: Serenity.ListResponse<TEntity>): void;
-        getItems(): any[];
+        deleteItem(id: any);
+        getItems(): TEntity[];
         setFilter(filter: RemoteViewFilter<TEntity>): void;
         setItems(items: any[], fullReset: boolean): void;
-        getItemById(id: any): any;
-        updateItem(id: any, item: any): void;
-        addItem(item: any): void;
+        getItemById(id: any): TEntity;
+        updateItem(id: any, item: TEntity): void;
+        addItem(item: TEntity): void;
         getIdxById(id: any): any;
         getItemByIdx(index: number): any;
         setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
