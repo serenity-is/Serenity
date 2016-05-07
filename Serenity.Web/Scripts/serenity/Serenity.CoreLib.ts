@@ -3893,6 +3893,10 @@ namespace Serenity {
             }
         }
 
+        export function registerEditor(intf?: any[], asm?: ss.AssemblyReg) {
+            return registerClass(intf, asm);
+        }
+
         export function registerFormatter(intf = [Serenity.ISlickFormatter], asm?: ss.AssemblyReg) {
             return registerClass(intf, asm);
         }

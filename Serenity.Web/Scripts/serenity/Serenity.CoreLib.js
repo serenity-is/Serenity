@@ -1963,6 +1963,10 @@ var Serenity;
             };
         }
         Decorators.registerClass = registerClass;
+        function registerEditor(intf, asm) {
+            return registerClass(intf, asm);
+        }
+        Decorators.registerEditor = registerEditor;
         function registerFormatter(intf, asm) {
             if (intf === void 0) { intf = [Serenity.ISlickFormatter]; }
             return registerClass(intf, asm);

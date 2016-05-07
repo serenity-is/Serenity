@@ -50,6 +50,7 @@
 
             return GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||
                 GetAttribute(type, "Serenity.ElementAttribute", inherited: true) != null ||
+                GetAttribute(type, "Serenity.Decorators.registerEditor", inherited: true) != null ||
                 GetAttribute(type, "Serenity.Decorators.editor", inherited: true) != null ||
                 GetAttribute(type, "Serenity.Decorators.element", inherited: true) != null;
         }
