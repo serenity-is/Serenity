@@ -15,6 +15,11 @@ namespace Serenity
         protected jQueryObject fileSymbols;
         protected jQueryObject uploadInput;
 
+        static ImageUploadEditor()
+        {
+            Q.Prop(typeof(ImageUploadEditor), "value");
+        }
+
         public ImageUploadEditor(jQueryObject div, ImageUploadEditorOptions opt)
             : base(div, opt)
         {

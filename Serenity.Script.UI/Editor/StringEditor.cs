@@ -7,6 +7,11 @@ namespace Serenity
     [Element("<input type=\"text\"/>")]
     public class StringEditor : Widget<object>, IStringValue
     {
+        static StringEditor()
+        {
+            Q.Prop(typeof(StringEditor), "value");
+        }
+
         public StringEditor(jQueryObject input)
             : base(input, new object())
         {

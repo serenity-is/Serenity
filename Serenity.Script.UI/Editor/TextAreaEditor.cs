@@ -9,6 +9,11 @@ namespace Serenity
     [Element("<textarea />")]
     public class TextAreaEditor : Widget<TextAreaEditorOptions>, IStringValue
     {
+        static TextAreaEditor()
+        {
+            Q.Prop(typeof(TextAreaEditor), "value");
+        }
+
         public TextAreaEditor(jQueryObject input, TextAreaEditorOptions opt)
             : base(input, opt)
         {

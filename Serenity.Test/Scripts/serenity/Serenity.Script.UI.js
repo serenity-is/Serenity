@@ -3550,126 +3550,26 @@
 	global.Serenity.RequiredAttribute = $Serenity_RequiredAttribute;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Select2AjaxEditor
-	var $Serenity_Select2AjaxEditor$2 = function(TOptions, TItem) {
-		var $type = function(hidden, opt) {
-			this.pageSize = 50;
-			Serenity.Widget.call(this, hidden, opt);
-			var emptyItemText = this.emptyItemText();
-			if (ss.isValue(emptyItemText)) {
-				hidden.attr('placeholder', emptyItemText);
-			}
-			hidden.select2(this.getSelect2Options());
-			hidden.attr('type', 'text');
-			// jquery validate to work
-			hidden.bind('change.' + this.uniqueName, function(e, x) {
-				if (!!($Serenity_WX.hasOriginalEvent(e) || !x)) {
-					if (ss.isValue($Serenity_ValidationHelper.getValidator(hidden))) {
-						hidden.valid();
-					}
-				}
-			});
-		};
-		ss.registerGenericClassInstance($type, $Serenity_Select2AjaxEditor$2, [TOptions, TItem], {
-			emptyItemText: function() {
-				var $t1 = this.element.attr('placeholder');
-				if (ss.isNullOrUndefined($t1)) {
-					$t1 = Q.text('Controls.SelectEditor.EmptyItemText');
-				}
-				return $t1;
-			},
-			getService: function() {
-				throw new ss.NotImplementedException();
-			},
-			query: function(request, callback) {
-				var options = {
-					blockUI: false,
-					service: this.getService() + '/List',
-					request: request,
-					onSuccess: function(response) {
-						callback(response);
-					}
-				};
-				this.executeQuery(options);
-			},
-			executeQuery: function(options) {
-				Q.serviceCall(options);
-			},
-			queryByKey: function(key, callback) {
-				var options = {
-					blockUI: false,
-					service: this.getService() + '/Retrieve',
-					request: { EntityId: key },
-					onSuccess: function(response) {
-						callback(response.Entity);
-					}
-				};
-				this.executeQueryByKey(options);
-			},
-			executeQueryByKey: function(options) {
-				Q.serviceCall(options);
-			},
-			getItemKey: null,
-			getItemText: null,
-			getTypeDelay: function() {
-				return 500;
-			},
-			getSelect2Options: function() {
-				var emptyItemText = this.emptyItemText();
-				var queryTimeout = 0;
-				return { minimumResultsForSearch: 10, placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null), allowClear: ss.isValue(emptyItemText), query: ss.mkdel(this, function(query) {
-					var request = { ContainsText: Q.trimToNull(query.term), Skip: (query.page - 1) * this.pageSize, Take: this.pageSize + 1 };
-					if (queryTimeout !== 0) {
-						window.clearTimeout(queryTimeout);
-					}
-					queryTimeout = window.setTimeout(ss.mkdel(this, function() {
-						this.query(request, ss.mkdel(this, function(response) {
-							query.callback({ results: Enumerable.from(response.Entities).take(this.pageSize).select(ss.mkdel(this, function(x) {
-								return { id: this.getItemKey(x), text: this.getItemText(x), source: x };
-							})).toArray(), more: response.Entities.length >= this.pageSize });
-						}));
-					}), this.getTypeDelay());
-				}), initSelection: ss.mkdel(this, function(element, callback) {
-					var val = element.val();
-					if (Q.isEmptyOrNull(val)) {
-						callback(null);
-						return;
-					}
-					this.queryByKey(val, ss.mkdel(this, function(result) {
-						callback((ss.isNullOrUndefined(result) ? null : { id: this.getItemKey(result), text: this.getItemText(result), source: result }));
-					}));
-				}) };
-			},
-			addInplaceCreate: function(title) {
-				var self = this;
-				$('<a><b/></a>').addClass('inplace-button inplace-create').attr('title', title).insertAfter(this.element).click(function(e) {
-					self.inplaceCreateClick(e);
-				});
-				this.get_select2Container().add(this.element).addClass('has-inplace-button');
-			},
-			inplaceCreateClick: function(e) {
-			},
-			get_select2Container: function() {
-				return this.element.prevAll('.select2-container');
-			},
-			get_value: function() {
-				return ss.safeCast(this.element.select2('val'), String);
-			},
-			set_value: function(value) {
-				if (!ss.referenceEquals(value, this.get_value())) {
-					this.element.select2('val', value).triggerHandler('change', [true]);
+	var $Serenity_Select2AjaxEditor = function(hidden, opt) {
+		this.pageSize = 50;
+		Serenity.Widget.call(this, hidden, opt);
+		var emptyItemText = this.emptyItemText();
+		if (ss.isValue(emptyItemText)) {
+			hidden.attr('placeholder', emptyItemText);
+		}
+		hidden.select2(this.getSelect2Options());
+		hidden.attr('type', 'text');
+		// jquery validate to work
+		hidden.bind('change.' + this.uniqueName, function(e, x) {
+			if (!!($Serenity_WX.hasOriginalEvent(e) || !x)) {
+				if (ss.isValue($Serenity_ValidationHelper.getValidator(hidden))) {
+					hidden.valid();
 				}
 			}
-		}, function() {
-			return Serenity.Widget;
-		}, function() {
-			return [$Serenity_IStringValue];
 		});
-		ss.setMetadata($type, { attr: [new Serenity.ElementAttribute('<input type="hidden"/>')] });
-		return $type;
 	};
-	$Serenity_Select2AjaxEditor$2.__typeName = 'Serenity.Select2AjaxEditor$2';
-	ss.initGenericClass($Serenity_Select2AjaxEditor$2, $asm, 2);
-	global.Serenity.Select2AjaxEditor$2 = $Serenity_Select2AjaxEditor$2;
+	$Serenity_Select2AjaxEditor.__typeName = 'Serenity.Select2AjaxEditor';
+	global.Serenity.Select2AjaxEditor = $Serenity_Select2AjaxEditor;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.Select2Editor
 	var $Serenity_Select2Editor = function(hidden, opt) {
@@ -10178,6 +10078,97 @@
 	ss.initClass($Serenity_ReflectionOptionsSetter, $asm, {});
 	ss.initClass($Serenity_ReflectionUtils, $asm, {});
 	ss.initClass($Serenity_RequiredAttribute, $asm, {});
+	ss.initClass($Serenity_Select2AjaxEditor, $asm, {
+		emptyItemText: function() {
+			var $t1 = this.element.attr('placeholder');
+			if (ss.isNullOrUndefined($t1)) {
+				$t1 = Q.text('Controls.SelectEditor.EmptyItemText');
+			}
+			return $t1;
+		},
+		getService: function() {
+			throw new ss.NotImplementedException();
+		},
+		query: function(request, callback) {
+			var options = {
+				blockUI: false,
+				service: this.getService() + '/List',
+				request: request,
+				onSuccess: function(response) {
+					callback(response);
+				}
+			};
+			this.executeQuery(options);
+		},
+		executeQuery: function(options) {
+			Q.serviceCall(options);
+		},
+		queryByKey: function(key, callback) {
+			var options = {
+				blockUI: false,
+				service: this.getService() + '/Retrieve',
+				request: { EntityId: key },
+				onSuccess: function(response) {
+					callback(response.Entity);
+				}
+			};
+			this.executeQueryByKey(options);
+		},
+		executeQueryByKey: function(options) {
+			Q.serviceCall(options);
+		},
+		getItemKey: null,
+		getItemText: null,
+		getTypeDelay: function() {
+			return 500;
+		},
+		getSelect2Options: function() {
+			var emptyItemText = this.emptyItemText();
+			var queryTimeout = 0;
+			return { minimumResultsForSearch: 10, placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null), allowClear: ss.isValue(emptyItemText), query: ss.mkdel(this, function(query) {
+				var request = { ContainsText: Q.trimToNull(query.term), Skip: (query.page - 1) * this.pageSize, Take: this.pageSize + 1 };
+				if (queryTimeout !== 0) {
+					window.clearTimeout(queryTimeout);
+				}
+				queryTimeout = window.setTimeout(ss.mkdel(this, function() {
+					this.query(request, ss.mkdel(this, function(response) {
+						query.callback({ results: Enumerable.from(response.Entities).take(this.pageSize).select(ss.mkdel(this, function(x) {
+							return { id: this.getItemKey(x), text: this.getItemText(x), source: x };
+						})).toArray(), more: response.Entities.length >= this.pageSize });
+					}));
+				}), this.getTypeDelay());
+			}), initSelection: ss.mkdel(this, function(element, callback) {
+				var val = element.val();
+				if (Q.isEmptyOrNull(val)) {
+					callback(null);
+					return;
+				}
+				this.queryByKey(val, ss.mkdel(this, function(result) {
+					callback((ss.isNullOrUndefined(result) ? null : { id: this.getItemKey(result), text: this.getItemText(result), source: result }));
+				}));
+			}) };
+		},
+		addInplaceCreate: function(title) {
+			var self = this;
+			$('<a><b/></a>').addClass('inplace-button inplace-create').attr('title', title).insertAfter(this.element).click(function(e) {
+				self.inplaceCreateClick(e);
+			});
+			this.get_select2Container().add(this.element).addClass('has-inplace-button');
+		},
+		inplaceCreateClick: function(e) {
+		},
+		get_select2Container: function() {
+			return this.element.prevAll('.select2-container');
+		},
+		get_value: function() {
+			return ss.safeCast(this.element.select2('val'), String);
+		},
+		set_value: function(value) {
+			if (!ss.referenceEquals(value, this.get_value())) {
+				this.element.select2('val', value).triggerHandler('change', [true]);
+			}
+		}
+	}, Serenity.Widget, [$Serenity_IStringValue]);
 	ss.initClass($Serenity_SlickFormatting, $asm, {});
 	ss.initClass($Serenity_SlickHelper, $asm, {});
 	ss.initClass($Serenity_SlickTreeHelper, $asm, {});
@@ -10504,7 +10495,7 @@
 	ss.setMetadata($Serenity_PhoneEditor, { attr: [new Serenity.EditorAttribute(), new $System_ComponentModel_DisplayNameAttribute('Telefon'), new Serenity.OptionsTypeAttribute($Serenity_PhoneEditorOptions), new Serenity.ElementAttribute('<input type="text"/>')] });
 	ss.setMetadata($Serenity_PhoneEditorOptions, { members: [{ attr: [new $System_ComponentModel_DisplayNameAttribute('Dahili Girişine İzin Ver')], name: 'AllowExtension', type: 16, returnType: Boolean, getter: { name: 'get_AllowExtension', type: 8, params: [], returnType: Boolean, fget: 'allowExtension' }, setter: { name: 'set_AllowExtension', type: 8, params: [Boolean], returnType: Object, fset: 'allowExtension' }, fname: 'allowExtension' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Uluslararası Telefon Girişine İzin Ver')], name: 'AllowInternational', type: 16, returnType: Boolean, getter: { name: 'get_AllowInternational', type: 8, params: [], returnType: Boolean, fget: 'allowInternational' }, setter: { name: 'set_AllowInternational', type: 8, params: [Boolean], returnType: Object, fset: 'allowInternational' }, fname: 'allowInternational' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Dahili Telefon')], name: 'Internal', type: 16, returnType: Boolean, getter: { name: 'get_Internal', type: 8, params: [], returnType: Boolean, fget: 'internal' }, setter: { name: 'set_Internal', type: 8, params: [Boolean], returnType: Object, fset: 'internal' }, fname: 'internal' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Cep Telefonu')], name: 'Mobile', type: 16, returnType: Boolean, getter: { name: 'get_Mobile', type: 8, params: [], returnType: Boolean, fget: 'mobile' }, setter: { name: 'set_Mobile', type: 8, params: [Boolean], returnType: Object, fset: 'mobile' }, fname: 'mobile' }, { attr: [new $System_ComponentModel_DisplayNameAttribute('Birden Çok Girişe İzin Ver')], name: 'Multiple', type: 16, returnType: Boolean, getter: { name: 'get_Multiple', type: 8, params: [], returnType: Boolean, fget: 'multiple' }, setter: { name: 'set_Multiple', type: 8, params: [Boolean], returnType: Object, fset: 'multiple' }, fname: 'multiple' }] });
 	ss.setMetadata($Serenity_Recaptcha, { attr: [new Serenity.EditorAttribute(), new Serenity.ElementAttribute('<div />')] });
-	ss.setMetadata($Serenity_Select2AjaxEditor$2, { attr: [new Serenity.ElementAttribute('<input type="hidden"/>')] });
+	ss.setMetadata($Serenity_Select2AjaxEditor, { attr: [new Serenity.ElementAttribute('<input type="hidden"/>')] });
 	ss.setMetadata($Serenity_Select2Editor, { attr: [new Serenity.ElementAttribute('<input type="hidden"/>')] });
 	ss.setMetadata($Serenity_SelectEditor, { attr: [new Serenity.EditorAttribute(), new $System_ComponentModel_DisplayNameAttribute('Açılır Liste'), new Serenity.OptionsTypeAttribute($Serenity_SelectEditorOptions), new Serenity.ElementAttribute('<input type="hidden"/>')] });
 	ss.setMetadata($Serenity_SelectEditorOptions, { members: [{ attr: [new $System_ComponentModel_DisplayNameAttribute('Boş Eleman Metni')], name: 'EmptyOptionText', type: 16, returnType: String, getter: { name: 'get_EmptyOptionText', type: 8, params: [], returnType: String, fget: 'emptyOptionText' }, setter: { name: 'set_EmptyOptionText', type: 8, params: [String], returnType: Object, fset: 'emptyOptionText' }, fname: 'emptyOptionText' }, { attr: [new $Serenity_HiddenAttribute()], name: 'Items', type: 16, returnType: Array, getter: { name: 'get_Items', type: 8, params: [], returnType: Array, fget: 'items' }, setter: { name: 'set_Items', type: 8, params: [Array], returnType: Object, fset: 'items' }, fname: 'items' }] });
@@ -10581,10 +10572,20 @@
 		};
 	})();
 	(function() {
+		Q.prop($Serenity_Select2Editor, 'value');
+		Q.prop($Serenity_Select2Editor, 'values');
+	})();
+	(function() {
 		$Serenity_DialogTypeRegistry.$knownTypes = {};
 	})();
 	(function() {
 		$Serenity_EditorUtils.$dummy = { name: '_' };
+	})();
+	(function() {
+		Q.prop($Serenity_LookupEditorBase, 'cascadeFrom');
+		Q.prop($Serenity_LookupEditorBase, 'cascadeValue');
+		Q.prop($Serenity_LookupEditorBase, 'filterField');
+		Q.prop($Serenity_LookupEditorBase, 'filterValue');
 	})();
 	(function() {
 		$Serenity_FilterOperators.isTrue = 'true';
@@ -10611,12 +10612,22 @@
 		$Serenity_FilterOperators.toCriteriaOperator[$Serenity_FilterOperators.LE] = '<=';
 	})();
 	(function() {
+		Q.prop($Serenity_StringEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_BooleanEditor, 'value');
+	})();
+	(function() {
 		$Serenity_FilteringTypeRegistry.$knownTypes = null;
 	})();
 	(function() {
 		$Serenity_Widget.prototype['addValidationRule'] = function(eventClass, rule) {
 			return $Serenity_VX.addValidationRule(this.element, eventClass, rule);
 		};
+	})();
+	(function() {
+		Q.prop($Serenity_DateEditor, 'value');
+		Q.prop($Serenity_DateEditor, 'valueAsDate');
 	})();
 	(function() {
 		$Serenity_EnumTypeRegistry.$knownTypes = null;
@@ -10641,6 +10652,16 @@
 		$Serenity_DataGrid.defaultHeaderHeight = 30;
 	})();
 	(function() {
+		Q.prop($Serenity_CheckTreeEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_DateTimeEditor, 'value');
+		Q.prop($Serenity_DateTimeEditor, 'valueAsDate');
+	})();
+	(function() {
+		Q.prop($Serenity_DecimalEditor, 'value');
+	})();
+	(function() {
 		$Serenity_EditorTypeRegistry.$knownTypes = null;
 	})();
 	(function() {
@@ -10650,7 +10671,37 @@
 		$Serenity_EditorTypeEditor.$editorTypeList = null;
 	})();
 	(function() {
+		Q.prop($Serenity_EmailEditor, 'value');
+	})();
+	(function() {
 		$Serenity_PropertyGrid.$knownEditorTypes = null;
 		$Serenity_PropertyGrid.$knownEditorTypes = {};
+	})();
+	(function() {
+		Q.prop($Serenity_HtmlContentEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_ImageUploadEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_IntegerEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_MaskedEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_MultipleImageUploadEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_PhoneEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_Select2AjaxEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_TextAreaEditor, 'value');
+	})();
+	(function() {
+		Q.prop($Serenity_TimeEditor, 'value');
 	})();
 })();

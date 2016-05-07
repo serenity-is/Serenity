@@ -11,6 +11,11 @@ namespace Serenity
     [Element("<select/>")]
     public class TimeEditor : Widget<TimeEditorOptions>, IDoubleValue
     {
+        static TimeEditor()
+        {
+            Q.Prop(typeof(TimeEditor), "value");
+        }
+
         private jQueryObject minutes;
 
         public TimeEditor(jQueryObject input, TimeEditorOptions opt)

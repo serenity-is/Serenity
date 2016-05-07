@@ -9,6 +9,11 @@ namespace Serenity
     [Element("<input type=\"checkbox\"/>")]
     public class BooleanEditor : Widget<object>, IBooleanValue
     {
+        static BooleanEditor()
+        {
+            Q.Prop(typeof(BooleanEditor), "value");
+        }
+
         public BooleanEditor(jQueryObject input)
             : base(input, new object())
         {

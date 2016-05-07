@@ -9,6 +9,11 @@ namespace Serenity
     [Element("<input type=\"text\"/>")]
     public class IntegerEditor : Widget<IntegerEditorOptions>, IDoubleValue
     {
+        static IntegerEditor()
+        {
+            Q.Prop(typeof(IntegerEditor), "value");
+        }
+
         public IntegerEditor(jQueryObject input, IntegerEditorOptions opt)
             : base(input, opt)
         {

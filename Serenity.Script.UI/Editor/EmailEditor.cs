@@ -13,6 +13,11 @@ namespace Serenity
     [Element("<input type=\"text\"/>")]
     public class EmailEditor : Widget<EmailEditorOptions>, IStringValue, IReadOnly
     {
+        static EmailEditor()
+        {
+            Q.Prop(typeof(EmailEditor), "value");
+        }
+
         public EmailEditor(jQueryObject input, EmailEditorOptions opt)
             : base(input, opt)
         {

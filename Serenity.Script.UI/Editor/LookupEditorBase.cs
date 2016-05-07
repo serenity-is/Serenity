@@ -14,6 +14,14 @@ namespace Serenity
     {
         private CascadedWidgetLink<Widget> cascadeLink;
 
+        static LookupEditorBase()
+        {
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "cascadeFrom");
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "cascadeValue");
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "filterField");
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "filterValue");
+        }
+
         protected LookupEditorBase(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)
         {

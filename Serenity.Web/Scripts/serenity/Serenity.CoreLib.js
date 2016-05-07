@@ -230,6 +230,21 @@
     function log(m) {
         window.console && window.console.log(m);
     }
+    function prop(type, name, getter, setter) {
+        getter = getter || "get_" + name;
+        setter = setter || "set_" + name;
+        Object.defineProperty(type.prototype, name, {
+            get: function () {
+                return this[getter]();
+            },
+            set: function (value) {
+                return this[setter](value);
+            },
+            configurable: true,
+            enumerable: true
+        });
+    }
+    Q.prop = prop;
     var blockUICount = 0;
     function blockUIWithCheck(opt) {
         if (blockUICount > 0) {

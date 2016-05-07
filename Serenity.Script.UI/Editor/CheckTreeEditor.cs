@@ -13,6 +13,11 @@ namespace Serenity
         where TOptions: class, new()
         where TItem: CheckTreeItem, new()
     {
+        static CheckTreeEditor()
+        {
+            Q.Prop(typeof(CheckTreeEditor<CheckTreeItem, object>), "value");
+        }
+
         private JsDictionary<string, TItem> byId;
 
         public CheckTreeEditor(jQueryObject div, TOptions opt)

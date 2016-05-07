@@ -2,15 +2,21 @@
 using System;
 using System.Html;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Element("<input type=\"hidden\"/>")]
+    [Element("<input type=\"hidden\"/>"), IncludeGenericArguments(false), ScriptName("Select2AjaxEditor")]
     public abstract class Select2AjaxEditor<TOptions, TItem> : Widget<TOptions>, IStringValue
         where TOptions : class, new()
         where TItem: class
     {
         protected int pageSize = 50;
+
+        static Select2AjaxEditor()
+        {
+            Q.Prop(typeof(Select2AjaxEditor<object, object>), "value");
+        }
 
         public Select2AjaxEditor(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)

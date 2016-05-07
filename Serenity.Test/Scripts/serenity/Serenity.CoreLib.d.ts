@@ -49,8 +49,7 @@ declare namespace Serenity {
     }
     class TextAreaEditor extends Widget<TextAreaEditorOptions> {
         constructor(input: JQuery, opt?: TextAreaEditorOptions);
-        get_value(): string;
-        set_value(value: string): void;
+        value: string;
     }
     interface TextAreaEditorOptions {
         cols?: number;
@@ -58,8 +57,7 @@ declare namespace Serenity {
     }
     class TimeEditor extends Widget<TimeEditorOptions> {
         constructor(input: JQuery, opt?: TimeEditorOptions);
-        get_value(): any;
-        set_value(value: any): void;
+        value: number;
     }
     interface TimeEditorOptions {
         noEmptyOption?: boolean;
@@ -258,8 +256,7 @@ declare namespace Serenity {
         validate(value: string): string;
         formatValue(): void;
         getFormattedValue(): string;
-        get_value(): string;
-        set_value(value: string): void;
+        value: string;
     }
     interface PhoneEditorOptions {
         multiple?: boolean;
@@ -294,8 +291,7 @@ declare namespace Serenity {
         updateInterface(): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
-        get_value(): UploadedFile[];
-        set_value(value: UploadedFile[]): void;
+        value: UploadedFile[];
         get_jsonEncodeValue(): boolean;
         set_jsonEncodeValue(value: boolean): void;
     }
@@ -311,8 +307,7 @@ declare namespace Serenity {
     }
     class MaskedEditor extends Widget<MaskedEditorOptions> {
         constructor(input: JQuery, opt: MaskedEditorOptions);
-        get_value(): string;
-        set_value(value: string): void;
+        value: string;
     }
     interface MaskedEditorOptions {
         mask?: string;
@@ -329,8 +324,7 @@ declare namespace Serenity {
         instanceReady(x: any): void;
         getLanguage(): string;
         getConfig(): CKEditorConfig;
-        get_value(): string;
-        set_value(value: string): void;
+        value: string;
     }
     interface HtmlContentEditorOptions {
         cols?: any;
@@ -413,8 +407,7 @@ declare namespace Serenity {
         addInplaceCreate(title: string): void;
         inplaceCreateClick(e: any): void;
         get_select2Container(): JQuery;
-        get_value(): string;
-        set_value(value: string): void;
+        value: string;
     }
     interface Select2QueryOptions {
         element?: JQuery;
@@ -874,9 +867,8 @@ declare namespace Serenity {
         get_value(): string;
         set_value(value: string): void;
     }
-    class StringEditor extends Widget<any> implements IStringValue {
-        get_value(): string;
-        set_value(value: string): void;
+    class StringEditor extends Widget<any> {
+        value: string;
     }
     namespace Select2Extensions {
         function select2(element: JQuery): JQuery;
@@ -905,10 +897,8 @@ declare namespace Serenity {
         get_select2Container(): JQuery;
         get_items(): Select2Item[];
         get_itemByKey(): any;
-        get_value(): string;
-        set_value(value: string): void;
-        get_values(): any;
-        set_values(value: any): void;
+        value: string;
+        values: string[];
         get_text(): string;
     }
     class CheckTreeEditor<TItem, TOptions> extends DataGrid<TItem, TOptions> {
@@ -926,8 +916,7 @@ declare namespace Serenity {
         protected getItemText(ctx: Slick.FormatterContext): string;
         protected sortItems(): void;
         protected moveSelectedUp(): boolean;
-        get_value(): string[];
-        set_value(value: string[]): any;
+        value: string[];
     }
     interface EmailEditorOptions {
         domain?: string;
@@ -936,8 +925,7 @@ declare namespace Serenity {
     class EmailEditor extends Widget<EmailEditorOptions> {
         constructor(input: JQuery, opt: EmailEditorOptions);
         static registerValidationMethods(): void;
-        get_value(): string;
-        set_value(value: string): void;
+        value: string;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
     }
@@ -954,10 +942,8 @@ declare namespace Serenity {
         static dateInputChange(e: any): void;
         static dateInputKeyup(e: any): void;
         static defaultAutoNumericOptions(): any;
-        get_value(): string;
-        set_value(value: string): void;
-        get_valueAsDate(): Date;
-        set_valueAsDate(value: Date): void;
+        value: string;
+        valueAsDate: Date;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         get_minValue(): string;
@@ -982,10 +968,8 @@ declare namespace Serenity {
     class DateTimeEditor extends Widget<DateTimeEditorOptions> {
         constructor(input: JQuery, opt: DateTimeEditorOptions);
         static roundToMinutes(date: Date, minutesStep: number): Date;
-        get_value(): string;
-        set_value(value: string): void;
-        get_valueAsDate(): Date;
-        set_valueAsDate(value: Date): void;
+        value: string;
+        valueAsDate: Date;
         get_minValue(): string;
         set_minValue(value: string): void;
         get_maxValue(): string;
@@ -1034,8 +1018,7 @@ declare namespace Serenity {
     class DecimalEditor extends Widget<DecimalEditorOptions> {
         constructor(input: JQuery, opt?: DecimalEditorOptions);
         static defaultAutoNumericOptions(): any;
-        get_value(): any;
-        set_value(value: any): void;
+        value: number;
         get_isValid(): boolean;
     }
     interface DecimalEditorOptions {
@@ -1074,16 +1057,11 @@ declare namespace Serenity {
         protected getDialogTypeKey(): string;
         protected createEditDialog(callback: (dlg: Serenity.EditDialog) => void): void;
         onInitNewEntity: (entity: TItem) => void;
-        get_value(): string;
-        set_value(value: string): void;
-        get_cascadeField(): string;
-        set_cascadeField(name: string): void;
-        get_cascadeValue(): any;
-        set_cascadeValue(value: any): void;
-        get_filterField(): string;
-        set_filterField(name: string): void;
-        get_filterValue(): any;
-        set_filterValue(value: any): void;
+        value: string;
+        cascadeField: string;
+        cascadeValue: any;
+        filterField: string;
+        filterValue: any;
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(input: JQuery, opt?: LookupEditorOptions);
@@ -1115,8 +1093,7 @@ declare namespace Serenity {
         updateInterface(): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
-        get_value(): UploadedFile;
-        set_value(value: UploadedFile): void;
+        value: UploadedFile;
     }
     interface ImageUploadEditorOptions {
         minWidth?: number;
@@ -1131,8 +1108,7 @@ declare namespace Serenity {
     }
     class BooleanEditor extends Widget<any> {
         constructor(input: JQuery);
-        get_value(): boolean;
-        set_value(value: boolean): void;
+        value: boolean;
     }
     class BooleanFiltering extends BaseFiltering {
     }
@@ -1184,8 +1160,7 @@ declare namespace Serenity {
     }
     class IntegerEditor extends Widget<IntegerEditorOptions> {
         constructor(input: JQuery, opt?: IntegerEditorOptions);
-        get_value(): any;
-        set_value(value: any): void;
+        value: number;
     }
     interface IntegerEditorOptions {
         minValue?: number;
@@ -1695,6 +1670,7 @@ declare namespace Q {
     function warning(message: string, options?: S.AlertOptions): void;
     function iframeDialog(options: S.IFrameDialogOptions): void;
     function toId(id: any): any;
+    function prop(type: any, name: string, getter?: any, setter?: any): void;
     /**
      * Uses jQuery BlockUI plugin to block access to whole page (default) or
      * a part of it, by using a transparent overlay covering the whole area.

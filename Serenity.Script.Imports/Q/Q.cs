@@ -102,6 +102,15 @@ namespace Serenity
         public static T DeepExtend<T>(T target, T merge1, T merge2, T merge3)
         {
             return default(T);
-        }    
+        }
+
+        [AlternateSignature]
+        public static void Prop(Type target, string name)
+        {
+        }
+
+        public static void Prop(Type target, string name, string getter, string setter)
+        {
+        }
     }
 }

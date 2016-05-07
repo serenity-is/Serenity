@@ -9,6 +9,11 @@ namespace Serenity
     [Element("<input type=\"text\"/>")]
     public class MaskedEditor : Widget<MaskedEditorOptions>, IStringValue
     {
+        static MaskedEditor()
+        {
+            Q.Prop(typeof(MaskedEditor), "value");
+        }
+
         public MaskedEditor(jQueryObject input, MaskedEditorOptions opt)
             : base(input, opt)
         {

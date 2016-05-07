@@ -11,6 +11,11 @@ namespace Serenity
     [Element("<input type=\"text\"/>")]
     public class PhoneEditor : Widget<PhoneEditorOptions>, IStringValue
     {
+        static PhoneEditor()
+        {
+            Q.Prop(typeof(PhoneEditor), "value");
+        }
+
         public PhoneEditor(jQueryObject input, PhoneEditorOptions opt)
             : base(input, opt)
         {
