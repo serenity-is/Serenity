@@ -3774,6 +3774,10 @@ namespace Serenity {
         constructor(public value: string) { }
     }
 
+    export function Criteria(field: string): any[] {
+        return [field];
+    }
+
     export namespace Criteria {
         import C = Criteria;
 
@@ -3797,6 +3801,27 @@ namespace Serenity {
 
         export function paren(c: any[]): any[] {
             return C.isEmpty(c) ? c : ['()', c];
+        }
+
+        export function and(c1: any[], c2: any[], ...rest: any[][]): any[] {
+            var result = join(c1, 'and', c2);
+            if (rest) {
+                for (let k of rest)
+                    result = join(result, 'and', k);
+            }
+
+            return result;
+        }
+
+        export function or(c1: any[], c2: any[], ...rest: any[][]): any[] {
+            var result = join(c1, 'or', c2);
+
+            if (rest) {
+                for (let k of rest)
+                    result = join(result, 'or', k);
+            }
+
+            return result;
         }
     }
 

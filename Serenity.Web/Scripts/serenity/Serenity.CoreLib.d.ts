@@ -1923,10 +1923,13 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
+    function Criteria(field: string): any[];
     namespace Criteria {
         function isEmpty(c: any[]): boolean;
         function join(c1: any[], op: string, c2: any[]): any[];
         function paren(c: any[]): any[];
+        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
+        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
     }
     namespace Decorators {
         function addAttribute(type: any, attr: any): void;
