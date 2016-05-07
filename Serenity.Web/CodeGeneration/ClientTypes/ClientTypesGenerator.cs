@@ -20,12 +20,34 @@ namespace Serenity.CodeGeneration
 
         protected override void GenerateAll()
         {
-            foreach (var type in ssByScriptName.Values)
-                GenerateType(type);
+            var generatedTypes = new HashSet<string>();
 
-            foreach (var p in tsTypes)
-                if (!ssByScriptName.ContainsKey(p.Key))
-                    GenerateType(p.Value);
+            foreach (var type in ssByScriptName)
+            {
+                var key = type.Key;
+                var ssType = type.Value;
+                ExternalType tsType;
+                if (ssType.IsDeclaration &&
+                    tsTypes.TryGetValue(key, out tsType) &&
+                    !tsType.IsDeclaration)
+                    continue;
+
+                if (!IsEditorType(ssType) &&
+                    !IsFormatterType(ssType))
+                    continue;
+
+                generatedTypes.Add(key);
+
+                GenerateType(ssType);
+            }
+
+            foreach (var tsType in tsTypes)
+            {
+                if (generatedTypes.Contains(tsType.Key))
+                    continue;
+
+                GenerateType(tsType.Value);
+            }
         }
 
         private string GetNamespace(string ns)

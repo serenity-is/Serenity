@@ -40,7 +40,8 @@
             if (type.GenericParameters.Count > 0)
                 return false;
 
-            if (!HasBaseType(type, "Serenity.Widget"))
+            if (!HasBaseType(type, "Serenity.Widget") &&
+                !HasBaseType(type, "Serenity.Widget<any>"))
                 return false;
 
             if (type.AssemblyName != null &&
