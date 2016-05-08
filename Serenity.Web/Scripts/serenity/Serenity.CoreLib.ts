@@ -16,7 +16,6 @@ declare namespace JsRender {
     function render(markup: string, data?: any): string;
 }
 
-
 declare namespace System.ComponentModel {
     class DisplayNameAttribute {
         constructor(displayName: string);

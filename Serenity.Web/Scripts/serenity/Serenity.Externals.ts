@@ -21,30 +21,6 @@
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
 
-        jQuery.validator.addMethod("xss", function (value, element) {
-            if (value.length == 0)
-                return true;
-            let startIndex = 0;
-            while (true) {
-                let pos = value.indexOf('&', startIndex);
-                if (pos < 0)
-                    pos = value.indexOf('<', startIndex);
-                if (pos < 0)
-                    return true;
-                if (pos == value.length - 1)
-                    return true;
-                let ch = value.charAt(pos);
-                let ch2 = value.charAt(pos + 1);
-                if (ch != '&') {
-                    if ((ch == '<') && ((((ch2 >= 'a' && ch2 <= 'z') || (ch2 >= 'A' && ch2 <= 'Z')) || (ch2 == '!')) || (ch2 == '/')))
-                        return false;
-                }
-                else if (ch2 == '#')
-                    return false;
-                startIndex = pos + 1;
-            }
-        });
-
         $.validator.addMethod("dateQ", function (value, element) {
             return this.optional(element) || parseDate(value) != false;
         });
