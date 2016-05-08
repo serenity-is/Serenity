@@ -1727,7 +1727,7 @@ declare namespace Q {
     function getRemoteData(key: any): any;
     function getRemoteDataAsync(key: any): RSVP.Thenable<any>;
     function getLookup<TItem>(key: any): Lookup<TItem>;
-    function getLookupAsync<TItem>(key: any): RSVP.Thenable<any>;
+    function getLookupAsync<TItem>(key: any): RSVP.Thenable<Lookup<TItem>>;
     function reloadLookup(key: any): void;
     function reloadLookupAsync(key: any): RSVP.Thenable<any>;
     function getColumns(key: any): any;

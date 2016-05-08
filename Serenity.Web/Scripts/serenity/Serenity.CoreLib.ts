@@ -2563,7 +2563,7 @@ namespace Q {
         return ScriptData.ensure('Lookup.' + key);
     }
 
-    export function getLookupAsync<TItem>(key) {
+    export function getLookupAsync<TItem>(key): RSVP.Thenable<Lookup<TItem>> {
         return ScriptData.ensureAsync('Lookup.' + key);
     }
 
@@ -3284,7 +3284,7 @@ namespace Q {
             if (depth > 3)
                 return;
 
-            for (var k of Object.getOwnPropertyNames(root)) {
+            for (var k of Object.keys(root)) {
                 if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
                     continue;
 
