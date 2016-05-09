@@ -193,6 +193,26 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class HtmlNoteContentEditor : CustomEditorAttribute
+    {
+        public HtmlNoteContentEditor()
+            : base("HtmlNoteContent")
+        {
+        }
+
+        public Int32 Cols
+        {
+            get { return GetOption<Int32>("cols"); }
+            set { SetOption("cols", value); }
+        }
+
+        public Int32 Rows
+        {
+            get { return GetOption<Int32>("rows"); }
+            set { SetOption("rows", value); }
+        }
+    }
+
     public partial class HtmlReportContentEditorAttribute : CustomEditorAttribute
     {
         public HtmlReportContentEditorAttribute()

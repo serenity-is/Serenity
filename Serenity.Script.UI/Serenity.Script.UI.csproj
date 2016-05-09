@@ -39,6 +39,7 @@
     <Compile Include="Editor\CheckListEditor.cs" />
     <Compile Include="Editor\CheckTreeEditor.cs" />
     <Compile Include="Editor\AsyncLookupEditor.cs" />
+    <Compile Include="Editor\HtmlNoteContentEditor.cs" />
     <Compile Include="Editor\MultipleImageUploadEditor.cs" />
     <Compile Include="Editor\TimeEditor.cs" />
     <Compile Include="Editor\LookupEditor.cs" />

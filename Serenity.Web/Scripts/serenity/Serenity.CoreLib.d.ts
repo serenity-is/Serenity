@@ -320,7 +320,7 @@ declare namespace Serenity {
         set_required(value: boolean): void;
     }
     class HtmlContentEditor extends Widget<HtmlContentEditorOptions> {
-        constructor(textArea: JQuery, opt: HtmlContentEditorOptions);
+        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
         instanceReady(x: any): void;
         getLanguage(): string;
         getConfig(): CKEditorConfig;
@@ -330,8 +330,11 @@ declare namespace Serenity {
         cols?: any;
         rows?: any;
     }
+    class HtmlNoteContentEditor extends HtmlContentEditor {
+        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+    }
     class HtmlReportContentEditor extends HtmlContentEditor {
-        constructor(textArea: JQuery, opt: HtmlContentEditorOptions);
+        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
     }
     class IAsyncInit {
     }
@@ -372,6 +375,8 @@ declare namespace Serenity {
     }
     interface IGetEditValue {
         getEditValue(property: PropertyItem, target: any): void;
+    }
+    class IInitializeColumn {
     }
     interface IInitializeColumn {
         initializeColumn(column: Slick.Column): void;
@@ -1184,6 +1189,7 @@ declare namespace Serenity {
         set_value(value: string): void;
     }
     class TemplatedWidget<TOptions> extends Widget<TOptions> {
+        constructor(container: JQuery, options?: TOptions);
         protected idPrefix: string;
         protected byId(id: string): JQuery;
         protected byID<TWidget>(type: TWidget): (id: string) => TWidget;
@@ -1192,6 +1198,12 @@ declare namespace Serenity {
     }
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         constructor(options?: TOptions);
+        protected tabs: JQuery;
+        protected toolbar: Serenity.Toolbar;
+        protected validator: JQueryValidation.Validator;
+        protected arrange(): void;
+        protected isPanel: boolean;
+        protected responsive: boolean;
         protected arrange(): void;
         dialogClose(): void;
         dialogOpen(): void;
@@ -1211,6 +1223,13 @@ declare namespace Serenity {
         set_dialogTitle(value: string): void;
     }
     class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
+        constructor(container: JQuery, options?: TOptions);
+        protected tabs: JQuery;
+        protected toolbar: Serenity.Toolbar;
+        protected validator: JQueryValidation.Validator;
+        protected arrange(): void;
+        protected isPanel: boolean;
+        protected responsive: boolean;
         protected arrange(): void;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
@@ -1221,6 +1240,7 @@ declare namespace Serenity {
         protected validateForm(): boolean;
     }
     class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        constructor(options?: TOptions);
         protected entity: TItem;
         protected entityId: any;
         protected getFormKey(): string;
@@ -1236,6 +1256,7 @@ declare namespace Serenity {
         protected validateBeforeSave(): boolean;
     }
     class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+        constructor(container: JQuery, options?: TOptions);
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
@@ -1251,6 +1272,7 @@ declare namespace Serenity {
         protected validateBeforeSave(): boolean;
     }
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        constructor(options?: TOptions);
         protected saveAndCloseButton: JQuery;
         protected applyChangesButton: JQuery;
         protected deleteButton: JQuery;
