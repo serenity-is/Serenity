@@ -1874,52 +1874,37 @@ declare namespace ss {
     class NotSupportedException extends Exception {
         constructor(msg: string);
     }
-
-    function arrayClone<T>(a: T[]): T[];
-    function cast<T>(a: any, type: { new (...args: any[]): T }): T;
-    function coalesce(a: any, b: any): any;
-    function insert(obj: any, index: number, item: any): void;
-    function isArray(a: any): boolean;
-    function isValue(a: any): boolean;
-    function formatString(msg: string, ...prm: any[]): string;
-    function getEnumerator(e: any): any;
-    function getBaseType(e: any): any;
-    function initAssembly(obj, name: string, res: { [name: string]: any });
-    function padLeftString(s: string, m: number, n: number);
-    function replaceAllString(s: string, f: string, r: string): string;
-    function endsWithString(s: string, search: string): boolean;
-    function startsWithString(s: string, search: string): boolean;
 }
 
 namespace Q {
     import S = Serenity;
 
     export function arrayClone<T>(a: T[]): T[] {
-        return ss.arrayClone(a);
+        return (ss as any).arrayClone(a);
     }
 
     export function isArray(a: any): boolean {
-        return ss.isArray(a);
+        return (ss as any).isArray(a);
     }
 
     export function insert(obj: any, index: number, item: any): void {
-        ss.insert(obj, index, item);
+        (ss as any).insert(obj, index, item);
     }
 
     export function coalesce(a: any, b: any): any {
-        return ss.coalesce(a, b);
+        return (ss as any).coalesce(a, b);
     }
 
     export function isValue(a: any): boolean {
-        return ss.isValue(a);
+        return (ss as any).isValue(a);
     }
 
     export function endsWith(s: string, search: string): boolean {
-        return ss.endsWithString(s, search);
+        return (ss as any).endsWithString(s, search);
     }
 
     export function format(msg: string, ...prm: any[]): string {
-        return ss.formatString(msg, ...prm);
+        return (ss as any).formatString(msg, ...prm);
     }
 
     export function padLeft(s: string, len: number, ch: string = ' ') {
@@ -1936,11 +1921,11 @@ namespace Q {
     }
 
     export function replaceAll(s: string, f: string, r: string): string {
-        return ss.replaceAllString(s, f, r);
+        return (ss as any).replaceAllString(s, f, r);
     }
 
     export function startsWith(s: string, search: string): boolean {
-        return ss.startsWithString(s, search);
+        return (ss as any).startsWithString(s, search);
     }
 
     export function alert(message: string, options?: S.AlertOptions) {
@@ -3669,7 +3654,7 @@ namespace Q {
         }
 
         // fake assembly for typescript apps
-        ss.initAssembly({}, 'App', {});
+        (ss as any).initAssembly({}, 'App', {});
 
         // for backward compability, avoid!
         global.Q$Externals = Q;
@@ -3694,7 +3679,7 @@ namespace Q {
                 }
 
                 if (!obj.__class) {
-                    var baseType = ss.getBaseType(obj);
+                    var baseType = (ss as any).getBaseType(obj);
                     if (baseType.__class)
                         obj.__class = true;
                 }

@@ -1654,24 +1654,6 @@ declare namespace ss {
     class NotSupportedException extends Exception {
         constructor(msg: string);
     }
-    function arrayClone<T>(a: T[]): T[];
-    function cast<T>(a: any, type: {
-        new (...args: any[]): T;
-    }): T;
-    function coalesce(a: any, b: any): any;
-    function insert(obj: any, index: number, item: any): void;
-    function isArray(a: any): boolean;
-    function isValue(a: any): boolean;
-    function formatString(msg: string, ...prm: any[]): string;
-    function getEnumerator(e: any): any;
-    function getBaseType(e: any): any;
-    function initAssembly(obj: any, name: string, res: {
-        [name: string]: any;
-    }): any;
-    function padLeftString(s: string, m: number, n: number): any;
-    function replaceAllString(s: string, f: string, r: string): string;
-    function endsWithString(s: string, search: string): boolean;
-    function startsWithString(s: string, search: string): boolean;
 }
 declare namespace Q {
     import S = Serenity;

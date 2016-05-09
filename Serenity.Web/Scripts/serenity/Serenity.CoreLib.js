@@ -29,7 +29,8 @@
         for (var _i = 1; _i < arguments.length; _i++) {
             prm[_i - 1] = arguments[_i];
         }
-        return ss.formatString.apply(ss, [msg].concat(prm));
+        return (_a = ss).formatString.apply(_a, [msg].concat(prm));
+        var _a;
     }
     Q.format = format;
     function padLeft(s, len, ch) {
