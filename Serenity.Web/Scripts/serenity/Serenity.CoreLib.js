@@ -1338,7 +1338,7 @@
             if (t == "string" ||
                 t == "number")
                 return;
-            if ($.isFunction(root))
+            if ($.isFunction(root) || (root.__enum && root.__register))
                 callback(root, fullName);
             if (depth > 3)
                 return;
@@ -1692,7 +1692,7 @@
                     if (baseType.__class)
                         obj.__class = true;
                 }
-                if (obj.__class) {
+                if (obj.__class || obj.__enum) {
                     obj.__typeName = fullName;
                     if (!obj.__assembly) {
                         obj.__assembly = ss.__assemblies['App'];
@@ -2024,6 +2024,25 @@ var Serenity;
             };
         }
         Decorators.registerClass = registerClass;
+        function registerEnum(target, enumKey, asm) {
+            if (!target.__enum) {
+                Object.defineProperty(target, '__enum', {
+                    get: function () {
+                        return true;
+                    }
+                });
+                target.prototype = target.prototype || {};
+                for (var _i = 0, _a = Object.keys(target); _i < _a.length; _i++) {
+                    var k = _a[_i];
+                    if (isNaN(Q.parseInteger(k)) && target[k] != null && !isNaN(Q.parseInteger(target[k])))
+                        target.prototype[k] = target[k];
+                }
+                target.__register = true;
+                if (enumKey)
+                    addAttribute(target, new Serenity.EnumKeyAttribute(enumKey));
+            }
+        }
+        Decorators.registerEnum = registerEnum;
         function registerEditor(intf, asm) {
             return registerClass(intf, asm);
         }

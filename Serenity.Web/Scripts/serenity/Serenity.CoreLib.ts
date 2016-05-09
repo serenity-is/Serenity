@@ -3287,7 +3287,7 @@ namespace Q {
                 t == "number")
                 return;
 
-            if ($.isFunction(root))
+            if ($.isFunction(root) || (root.__enum && root.__register))
                 callback(root, fullName);
 
             if (depth > 3)
@@ -3684,7 +3684,7 @@ namespace Q {
                         obj.__class = true;
                 }
 
-                if (obj.__class) {
+                if (obj.__class || obj.__enum) {
                     obj.__typeName = fullName;
                     if (!obj.__assembly) {
                         obj.__assembly = ss.__assemblies['App'];
@@ -3945,6 +3945,26 @@ namespace Serenity {
                 (target as any).__assembly = asm || ss.__assemblies['App'];
                 if (intf)
                     (target as any).__interfaces = intf;
+            }
+        }
+
+        export function registerEnum(target: any, enumKey?: string, asm?: ss.AssemblyReg) {
+            if (!target.__enum) {
+                Object.defineProperty(target, '__enum', {
+                    get: function () {
+                        return true;
+                    }
+                });
+
+                target.prototype = target.prototype || {};
+                for (var k of Object.keys(target))
+                    if (isNaN(Q.parseInteger(k)) && target[k] != null && !isNaN(Q.parseInteger(target[k])))
+                        target.prototype[k] = target[k];
+
+                target.__register = true;
+
+                if (enumKey)
+                    addAttribute(target, new Serenity.EnumKeyAttribute(enumKey));
             }
         }
 
