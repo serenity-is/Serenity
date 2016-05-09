@@ -57,7 +57,7 @@ namespace Serenity.CodeGeneration
 
                     initializer.Append("['");
                     initializer.Append(item.Name);
-                    initializer.Append("', ");
+                    initializer.Append("', () => ");
                     initializer.Append(fullName);
                     initializer.Append("]");
 
@@ -70,7 +70,7 @@ namespace Serenity.CodeGeneration
 
             initializer.Append("].forEach(x => Object.defineProperty(");
             MakeFriendlyName(type, codeNamespace, initializer);
-            initializer.Append(".prototype, <string>x[0], { get: function () { return this.w(x[0], x[1]); }, enumerable: true, configurable: true }));");
+            initializer.Append(".prototype, <string>x[0], { get: function () { return this.w(x[0], (x[1] as any)()); }, enumerable: true, configurable: true }));");
 
             sb.AppendLine();
             cw.IndentedLine(initializer.ToString());

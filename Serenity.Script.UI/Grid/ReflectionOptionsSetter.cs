@@ -15,15 +15,18 @@ namespace Serenity
 
             var props = target.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-            var propByName = props.Where(x => x.CanWrite &&
+            var propList = props.Where(x => x.CanWrite &&
                     (x.GetCustomAttributes(typeof(OptionAttribute)).Length > 0 ||
-                        x.GetCustomAttributes(typeof(DisplayNameAttribute)).Length > 0))
-                .ToDictionary(x => ReflectionUtils.MakeCamelCase(x.Name));
+                        x.GetCustomAttributes(typeof(DisplayNameAttribute)).Length > 0));
+
+            var propByName = new JsDictionary<string, PropertyInfo>();
+            foreach (var k in propList)
+                propByName[ReflectionUtils.MakeCamelCase(k.Name)] = k;
 
             foreach (var k in options.Keys)
             {
-                PropertyInfo p;
-                if (propByName.TryGetValue(ReflectionUtils.MakeCamelCase(k), out p))
+                PropertyInfo p = propByName[ReflectionUtils.MakeCamelCase(k)];
+                if (p != null)
                     p.SetValue(target, options[k]);
             }
         }

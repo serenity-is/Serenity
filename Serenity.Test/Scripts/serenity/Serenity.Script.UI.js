@@ -3458,27 +3458,36 @@
 			return;
 		}
 		var props = ss.getMembers(ss.getInstanceType(target), 16, 20);
-		var propByName = Enumerable.from(props).where(function(x) {
+		var propList = Enumerable.from(props).where(function(x) {
 			return !!x.setter && ((x.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, Serenity.OptionAttribute);
 			}).length > 0 || (x.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $System_ComponentModel_DisplayNameAttribute);
 			}).length > 0);
-		}).toDictionary(function(x1) {
-			return $Serenity_ReflectionUtils.makeCamelCase(x1.name);
-		}, null, String, Object);
-		var $t1 = ss.getEnumerator(Object.keys(options));
+		});
+		var propByName = {};
+		var $t1 = propList.getEnumerator();
 		try {
 			while ($t1.moveNext()) {
 				var k = $t1.current();
-				var p = {};
-				if (propByName.tryGetValue($Serenity_ReflectionUtils.makeCamelCase(k), p)) {
-					ss.midel(p.$.setter, target)(options[k]);
-				}
+				propByName[$Serenity_ReflectionUtils.makeCamelCase(k.name)] = k;
 			}
 		}
 		finally {
 			$t1.dispose();
+		}
+		var $t2 = ss.getEnumerator(Object.keys(options));
+		try {
+			while ($t2.moveNext()) {
+				var k1 = $t2.current();
+				var p = propByName[$Serenity_ReflectionUtils.makeCamelCase(k1)];
+				if (ss.isValue(p)) {
+					ss.midel(p.setter, target)(options[k1]);
+				}
+			}
+		}
+		finally {
+			$t2.dispose();
 		}
 	};
 	global.Serenity.ReflectionOptionsSetter = $Serenity_ReflectionOptionsSetter;
