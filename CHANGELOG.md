@@ -11,6 +11,7 @@ Features:
   - make use of Object.defineProperty to make properties like value etc. feel more natural in TypeScript
   - added EnumType option to EnumEditor, usable instead of EnumKey
   - ability to define quick filters on columns at server side
+  - quick filters support multiple selection option
   - added sortable attribute for controlling column sortability at server side 
   - multiple and or helpers for client side criteria building
   - remove unused xss validation method
@@ -18,6 +19,7 @@ Features:
   - HtmlBasicContentEditor in Serene moved to Serenity.Script.UI as HtmlNoteContentEditor
   - ClientTypes.tt and ServerTypings.tt works with/without Saltaralle libraries
   - all Serene dialogs will use responsive layout, e.g. flexbox by default (requires IE10+, can be turned off)
+  - Serene products inline editing sample has dropdowns in category and supplier columns
 
 Bugfixes:
   - error about restoreCssFromHiddenInit method in Mac/Safari
