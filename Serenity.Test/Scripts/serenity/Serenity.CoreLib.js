@@ -1341,7 +1341,7 @@
                 callback(root, fullName);
             if (depth > 3)
                 return;
-            for (var _i = 0, _a = Object.getOwnPropertyNames(root); _i < _a.length; _i++) {
+            for (var _i = 0, _a = Object.keys(root); _i < _a.length; _i++) {
                 var k = _a[_i];
                 if (k.charAt(0) < 'A' || k.charAt(0) > 'Z')
                     continue;
