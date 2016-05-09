@@ -204,6 +204,10 @@ namespace Serenity.CodeGeneration {
         return any(node.modifiers, x => x.kind == ts.SyntaxKind.ExportKeyword);
     }
 
+    function hasDeclareModifier(node: ts.Node): boolean {
+        return any(node.modifiers, x => x.kind == ts.SyntaxKind.DeclareKeyword);
+    }
+
     function isPrivateOrProtected(node: ts.Node): boolean {
         return !any(node.modifiers, x => x.kind == ts.SyntaxKind.PrivateKeyword ||
             x.kind == ts.SyntaxKind.ProtectedKeyword);
@@ -603,7 +607,9 @@ namespace Serenity.CodeGeneration {
                 case ts.SyntaxKind.ModuleDeclaration:
                     let module = node as ts.ModuleDeclaration;
 
-                    if (hasExportModifier(module)) {
+                    if (hasExportModifier(module) ||
+                        (!isUnderAmbientNamespace(module) &&
+                         !hasDeclareModifier(module))) {
                         let name = prependNamespace(module.name.getText(), module);
                         let exportedType = moduleToExternalType(module);
                         result[name] = exportedType;

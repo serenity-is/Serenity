@@ -115,6 +115,9 @@
         function hasExportModifier(node) {
             return any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.ExportKeyword; });
         }
+        function hasDeclareModifier(node) {
+            return any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.DeclareKeyword; });
+        }
         function isPrivateOrProtected(node) {
             return !any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.PrivateKeyword ||
                 x.kind == ts.SyntaxKind.ProtectedKeyword; });
@@ -450,7 +453,9 @@
                         return;
                     case ts.SyntaxKind.ModuleDeclaration:
                         var module = node;
-                        if (hasExportModifier(module)) {
+                        if (hasExportModifier(module) ||
+                            (!isUnderAmbientNamespace(module) &&
+                                !hasDeclareModifier(module))) {
                             var name_6 = prependNamespace(module.name.getText(), module);
                             var exportedType = moduleToExternalType(module);
                             result[name_6] = exportedType;
