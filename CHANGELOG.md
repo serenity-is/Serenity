@@ -1,3 +1,27 @@
+## 2.1.0 (2016-05-09)
+
+Features:
+  - Serene no longer comes with Serene.Script project. It's TypeScript only. Developer Guide needs to be updated.
+  - your existing code written in Saltaralle should continue to work. Please report any issues at GitHub repository.
+  - all Serene code is ported to TypeScript
+  - start obsoleting mscorlib.js and linq.js to lower dependencies and library size. can't remove yet as Serenity.Script.UI depends on it.
+  - linq like first, tryFirst, single etc. extensions in Q
+  - removed unused jlayout and metisMenu plugins
+  - IE8 is no longer supported as now we are targeting ES5 (jQuery 2.0 that we used for long time didn't support it anyway)
+  - make use of Object.defineProperty to make properties like value etc. feel more natural in TypeScript
+  - added EnumType option to EnumEditor, usable instead of EnumKey
+  - ability to define quick filters on columns at server side
+  - added sortable attribute for controlling column sortability at server side 
+  - multiple and or helpers for client side criteria building
+  - remove unused xss validation method
+  - root namespaces doesn't need export keyword to be available in ClientTypes.tt etc.
+  - HtmlBasicContentEditor in Serene moved to Serenity.Script.UI as HtmlNoteContentEditor
+  - ClientTypes.tt and ServerTypings.tt works with/without Saltaralle libraries
+  - all Serene dialogs will use responsive layout, e.g. flexbox by default (requires IE10+, can be turned off)
+
+Bugfixes:
+  - error about restoreCssFromHiddenInit method in Mac/Safari
+
 ## 2.0.13 (2016-05-01)
 
 Features:
