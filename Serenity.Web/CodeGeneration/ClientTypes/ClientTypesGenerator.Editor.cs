@@ -7,7 +7,8 @@
             cw.Indented("public partial class ");
             sb.Append(name);
 
-            bool isLookupEditor = HasBaseType(type, "Serenity.LookupEditorBase`1");
+            bool isLookupEditor = HasBaseType(type, "Serenity.LookupEditorBase`1") ||
+                HasBaseType(type, "Serenity.LookupEditorBase");
 
             sb.AppendLine(isLookupEditor ?
                 " : LookupEditorBaseAttribute" : " : CustomEditorAttribute");

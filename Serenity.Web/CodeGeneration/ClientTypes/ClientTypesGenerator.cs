@@ -46,6 +46,9 @@ namespace Serenity.CodeGeneration
                 if (generatedTypes.Contains(tsType.Key))
                     continue;
 
+                if (tsType.Value.IsDeclaration)
+                    continue;
+
                 GenerateType(tsType.Value);
             }
         }
