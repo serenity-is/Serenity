@@ -6,7 +6,7 @@ namespace Serenity
     /// <summary>
     /// Options for the BlockUI plugin
     /// </summary>
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Q")]
     public class BlockUIOptions
     {
         /// <summary>

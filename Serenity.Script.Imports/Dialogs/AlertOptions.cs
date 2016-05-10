@@ -6,7 +6,7 @@ namespace Serenity
     /// <summary>
     /// Options for the Q.Alert function
     /// </summary>
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Q")]
     public class AlertOptions
     {
         /// <summary>

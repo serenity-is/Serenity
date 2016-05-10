@@ -310,44 +310,6 @@
 	$Serenity_CssClassAttribute.__typeName = 'Serenity.CssClassAttribute';
 	global.Serenity.CssClassAttribute = $Serenity_CssClassAttribute;
 	////////////////////////////////////////////////////////////////////////////////
-	// Serenity.CustomValidation
-	var $Serenity_CustomValidation = function() {
-	};
-	$Serenity_CustomValidation.__typeName = 'Serenity.CustomValidation';
-	$Serenity_CustomValidation.registerValidationMethods = function() {
-		if (ss.staticEquals($.validator.methods['customValidate'], null)) {
-			$.validator.addMethod('customValidate', function(value, element) {
-				var result = this.optional(element);
-				if (ss.isNullOrUndefined(element) || !!result) {
-					return result;
-				}
-				var events = $._data(element, 'events');
-				if (!!ss.isNullOrUndefined(events)) {
-					return true;
-				}
-				var handlers = events.customValidate;
-				if (!!(ss.isNullOrUndefined(handlers) || ss.referenceEquals(handlers.length, 0))) {
-					return true;
-				}
-				var el = $(element);
-				for (var i = 0; !!(i < handlers.length); i++) {
-					var handler = ss.safeCast(handlers[i].handler, Function);
-					if (!ss.staticEquals(handler, null)) {
-						var message = handler(el);
-						if (ss.isValue(message)) {
-							el.data('customValidationMessage', message);
-							return false;
-						}
-					}
-				}
-				return true;
-			}, function(o, e) {
-				return $(e).data('customValidationMessage');
-			});
-		}
-	};
-	global.Serenity.CustomValidation = $Serenity_CustomValidation;
-	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.DataGrid
 	var $Serenity_DataGrid = function(container, opt) {
 		this.titleDiv = null;
@@ -6454,7 +6416,6 @@
 		}
 	}, $Serenity_DataGrid, [$Serenity_IDataGrid, $Serenity_IGetEditValue, $Serenity_ISetEditValue]);
 	ss.initClass($Serenity_CssClassAttribute, $asm, {});
-	ss.initClass($Serenity_CustomValidation, $asm, {});
 	ss.initInterface($Serenity_IReadOnly, $asm, { get_readOnly: null, set_readOnly: null });
 	ss.initClass($Serenity_DateEditor, $asm, {
 		get_value: function() {

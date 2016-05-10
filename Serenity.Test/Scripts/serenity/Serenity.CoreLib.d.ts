@@ -1,674 +1,100 @@
-﻿interface JQuery {
-    getWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    tryGetWidget<TWidget>(widgetType: {
-        new (...args: any[]): TWidget;
-    }): TWidget;
-    flexHeightOnly(flexY?: number): JQuery;
-    flexWidthOnly(flexX?: number): JQuery;
-    flexWidthHeight(flexX: number, flexY: number): JQuery;
-    flexX(flexX: number): JQuery;
-    flexY(flexY: number): JQuery;
-}
-declare class RSVP<TResult> {
+﻿declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
-declare namespace JsRender {
-    function render(markup: string, data?: any): string;
-}
-declare namespace System.ComponentModel {
-    class DisplayNameAttribute {
-        constructor(displayName: string);
-        displayName: string;
-    }
+declare module RSVP {
+    function on(handler: (e: any) => void): any;
+    function resolve(): Thenable<any>;
 }
 declare namespace Select2 {
     namespace util {
         function stripDiacritics(input: string): string;
     }
 }
+interface Select2QueryOptions {
+    element?: JQuery;
+    term?: string;
+    page?: number;
+    context?: any;
+    callback?: (p1: Select2Result) => void;
+}
+interface Select2Result {
+    results: any;
+    more: boolean;
+    context: any;
+}
+interface Select2AjaxOptions {
+    transport?: any;
+    url?: any;
+    dataType?: string;
+    quietMillis?: number;
+    cache?: boolean;
+    jsonpCallback?: any;
+    data?: (p1: string, p2: number, p3: any) => any;
+    results?: (p1: any, p2: number, p3: any) => any;
+    params?: any;
+}
+interface Select2Options {
+    width?: any;
+    minimumInputLength?: number;
+    maximumInputLength?: number;
+    minimumResultsForSearch?: number;
+    maximumSelectionSize?: any;
+    placeHolder?: string;
+    placeHolderOption?: any;
+    separator?: string;
+    allowClear?: boolean;
+    multiple?: boolean;
+    closeOnSelect?: boolean;
+    openOnEnter?: boolean;
+    id?: (p1: any) => string;
+    matcher?: (p1: string, p2: string, p3: JQuery) => boolean;
+    sortResults?: (p1: any, p2: JQuery, p3: any) => any;
+    formatSelection?: (p1: any, p2: JQuery, p3: (p1: string) => string) => string;
+    formatResult?: (p1: any, p2: JQuery, p3: any, p4: (p1: string) => string) => string;
+    formatResultCssClass?: (p1: any) => string;
+    formatNoMatches?: (p1: string) => string;
+    formatSearching?: () => string;
+    formatInputTooShort?: (p1: string, p2: number) => string;
+    formatSelectionTooBig?: (p1: string) => string;
+    createSearchChoice?: (p1: string) => any;
+    createSearchChoicePosition?: string;
+    initSelection?: (p1: JQuery, p2: (p1: any) => void) => void;
+    tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
+    tokenSeparators?: any;
+    query?: (p1: Select2QueryOptions) => void;
+    ajax?: Select2AjaxOptions;
+    data?: any;
+    tags?: any;
+    containerCss?: any;
+    containerCssClass?: any;
+    dropdownCss?: any;
+    dropdownCssClass?: any;
+    dropdownAutoWidth?: boolean;
+    adaptContainerCssClass?: (p1: string) => string;
+    adaptDropdownCssClass?: (p1: string) => string;
+    escapeMarkup?: (p1: string) => string;
+    selectOnBlur?: boolean;
+    loadMorePadding?: number;
+    nextSearchTerm?: (p1: any, p2: string) => string;
+}
+interface Toastr {
+    getContainer(options?: ToastrOptions, create?: boolean): JQuery;
+}
+interface JQueryStatic {
+    extend<T>(target: T, object1?: T, ...objectN: T[]): T;
+    toJSON(obj: any): string;
+}
+interface JQBlockUIOptions {
+    useTimeout?: boolean;
+}
 declare namespace Serenity {
-    namespace SlickTreeHelper {
-        function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
-        function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
-        function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
-        function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
-        function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
-        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
-    }
-    class StringFiltering extends BaseFiltering {
-    }
-    namespace SubDialogHelper {
-        function bindToDataChange(dialog: any, owner: Serenity.Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
-        function triggerDataChange(dialog: any): any;
-        function triggerDataChange(element: JQuery): JQuery;
-        function bubbleDataChange(dialog: any, owner: Serenity.Widget<any>, useTimeout?: boolean): any;
-        function cascade(cascadedDialog: any, ofElement: JQuery): any;
-        function cascadedDialogOffset(element: JQuery): any;
-    }
-    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
-        constructor(input: JQuery, opt?: TextAreaEditorOptions);
-        value: string;
-    }
-    interface TextAreaEditorOptions {
-        cols?: number;
-        rows?: number;
-    }
-    class TimeEditor extends Widget<TimeEditorOptions> {
-        constructor(input: JQuery, opt?: TimeEditorOptions);
-        value: number;
-    }
-    interface TimeEditorOptions {
-        noEmptyOption?: boolean;
-        startHour?: any;
-        endHour?: any;
-        intervalMinutes?: any;
-    }
-    interface ToastrOptions {
-        target?: any;
-        containerId?: string;
-        positionClass?: string;
-        timeOut?: number;
-        showDuration?: number;
-        hideDuration?: number;
-        extendedTimeOut?: number;
-        progressBar?: boolean;
-        closeButton?: boolean;
-    }
-    interface ToolButton {
-        title?: string;
-        hint?: string;
-        cssClass?: string;
-        icon?: string;
-        onClick?: any;
-        htmlEncode?: any;
-        hotkey?: string;
-        hotkeyAllowDefault?: boolean;
-    }
-    namespace UploadHelper {
-        function addUploadInput(options: UploadInputOptions): JQuery;
-        function checkImageConstraints(file: UploadResponse, opt: ImageUploadEditorOptions): boolean;
-        function fileNameSizeDisplay(name: string, bytes: number): string;
-        function fileSizeDisplay(bytes: number): string;
-        function hasImageExtension(filename: string): boolean;
-        function thumbFileName(filename: string): string;
-        function dbFileUrl(filename: string): string;
-        function colorBox(link: JQuery, options: any): void;
-        function populateFileSymbols(container: JQuery, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
-    }
-    interface UploadInputOptions {
-        container?: JQuery;
-        progress?: JQuery;
-        inputName?: string;
-        allowMultiple?: boolean;
-        fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
-    }
-    interface UploadResponse {
-        TemporaryFile: string;
-        Size: number;
-        IsImage: boolean;
-        Width: number;
-        Height: number;
-    }
-    class URLEditor extends StringEditor {
-        constructor(input: JQuery);
-    }
-    class UrlFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
-        get_displayProperty(): string;
-        set_displayProperty(value: string): void;
-        get_displayFormat(): string;
-        set_displayFormat(value: string): void;
-        get_urlProperty(): string;
-        set_urlProperty(value: string): void;
-        get_urlFormat(): string;
-        set_urlFormat(value: string): void;
-        get_target(): string;
-        set_target(value: string): void;
-    }
-    namespace ValidationHelper {
-        function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-        function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-        function getValidator(element: JQuery): JQueryValidation.Validator;
-    }
-    namespace VX {
-        function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-        function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
-    }
-    namespace WX {
-        function getWidget(element: JQuery): any;
-        function tryGetWidget(element: JQuery): any;
-        function getWidgetName(type: Function): string;
-        function hasOriginalEvent(e: any): boolean;
-        function change(widget: any, handler: any): void;
-        function changeSelect2(widget: any, handler: any): void;
-        function getGridField(widget: Serenity.Widget<any>): JQuery;
-        function create(initElement: (p1: JQuery) => void, options?: any): any;
-    }
-    namespace ComponentModel {
-        class CategoryAttribute {
-            constructor(category: string);
-            category: string;
-        }
-        class CssClassAttribute {
-            constructor(cssClass: string);
-            cssClass: string;
-        }
-        class DefaultValueAttribute {
-            constructor(defaultValue: any);
-            value: any;
-        }
-        class EditorOptionAttribute {
-            constructor(key: string, value: any);
-            key: string;
-            value: any;
-        }
-        class EditorTypeAttribute extends EditorTypeAttributeBase {
-            constructor(editorType: string);
-        }
-        class EditorTypeAttributeBase {
-            constructor(type: string);
-            setParams(editorParams: any): void;
-            editorType: string;
-        }
-        class HiddenAttribute {
-        }
-        class HintAttribute {
-            constructor(hint: string);
-            hint: string;
-        }
-        class InsertableAttribute {
-            constructor(insertable?: boolean);
-            value: boolean;
-        }
-        class MaxLengthAttribute {
-            constructor(maxLength: number);
-            maxLength: number;
-        }
-        class OneWayAttribute {
-        }
-        class PlaceholderAttribute {
-            constructor(value: string);
-            value: string;
-        }
-        class ReadOnlyAttribute {
-            constructor(readOnly?: boolean);
-            value: boolean;
-        }
-        class RequiredAttribute {
-            constructor(isRequired: boolean);
-            isRequired: boolean;
-        }
-        class UpdatableAttribute {
-            constructor(updatable?: boolean);
-            value: boolean;
-        }
-    }
-    class PropertyGrid extends Widget<PropertyGridOptions> {
-        constructor(div: JQuery, opt: PropertyGridOptions);
-        load(source: any): void;
-        static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
-        save(target: any): void;
-        static saveEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
-        enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
-        static setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
-        static setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
-        static setReadOnly(elements: JQuery, isReadOnly: boolean): JQuery;
-        get_editors(): any;
-        get_items(): any;
-        get_mode(): PropertyGridMode;
-        set_mode(value: PropertyGridMode): void;
-    }
-    const enum PropertyGridMode {
-        insert = 1,
-        update = 2,
-    }
-    interface PropertyGridOptions {
-        idPrefix?: string;
-        items?: PropertyItem[];
-        useCategories?: boolean;
-        categoryOrder?: string;
-        defaultCategory?: string;
-        localTextPrefix?: string;
-        mode?: PropertyGridMode;
-    }
-    namespace SlickFormatting {
-        function getEnumText(value: any): string;
-        function getEnumText(enumKey: string, name: string): string;
-        function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any, formatter: Slick.Format): Slick.Format;
-        function date(format?: string): Slick.Format;
-        function dateTime(format?: string): Slick.Format;
-        function checkBox(): Slick.Format;
-        function number(format: string): Slick.Format;
-        function getItemType(link: JQuery): string;
-        function getItemId(link: JQuery): string;
-        function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
-        function itemLink(itemType: string, idField: string, getText: Slick.Format, cssClass?: Slick.Format, encode?: boolean): Slick.Format;
-    }
-    namespace SlickHelper {
-        function setDefaults(columns: any, localTextPrefix?: string): any;
-        function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter;
-    }
-    class PhoneEditor extends Widget<PhoneEditorOptions> {
-        constructor(input: JQuery, opt?: PhoneEditorOptions);
-        validate(value: string): string;
-        formatValue(): void;
-        getFormattedValue(): string;
-        value: string;
-    }
-    interface PhoneEditorOptions {
-        multiple?: boolean;
-        internal?: boolean;
-        mobile?: boolean;
-        allowExtension?: boolean;
-        allowInternational?: boolean;
-    }
-    class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
-        constructor(div: JQuery, opt: PopupMenuButtonOptions);
-    }
-    interface PopupMenuButtonOptions {
-        menu?: JQuery;
-        onPopup?: () => void;
-        positionMy?: string;
-        positionAt?: string;
-    }
-    class PopupToolButton extends PopupMenuButton {
-        constructor(div: JQuery, opt: PopupToolButtonOptions);
-    }
-    interface PopupToolButtonOptions extends PopupMenuButtonOptions {
-    }
-    class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> {
-        entities: UploadedFile[];
-        toolbar: Toolbar;
-        fileSymbols: JQuery;
-        uploadInput: JQuery;
-        constructor(div: JQuery, opt: ImageUploadEditorOptions);
-        addFileButtonText(): string;
-        getToolButtons(): ToolButton[];
-        populate(): void;
-        updateInterface(): void;
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-        value: UploadedFile[];
-        get_jsonEncodeValue(): boolean;
-        set_jsonEncodeValue(value: boolean): void;
-    }
-    class NumberFormatter {
-        format(ctx: Slick.FormatterContext): string;
-        static format(value: any, format: string): string;
-        get_displayFormat(): string;
-        set_displayFormat(value: string): void;
-    }
-    class MinuteFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
-        static format(value: any): string;
-    }
-    class MaskedEditor extends Widget<MaskedEditorOptions> {
-        constructor(input: JQuery, opt: MaskedEditorOptions);
-        value: string;
-    }
-    interface MaskedEditorOptions {
-        mask?: string;
-        placeholder?: string;
-    }
-    class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
-    }
-    interface IValidateRequired {
-        get_required(): boolean;
-        set_required(value: boolean): void;
-    }
-    class HtmlContentEditor extends Widget<HtmlContentEditorOptions> {
-        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
-        instanceReady(x: any): void;
-        getLanguage(): string;
-        getConfig(): CKEditorConfig;
-        value: string;
-    }
-    interface HtmlContentEditorOptions {
-        cols?: any;
-        rows?: any;
-    }
-    class HtmlNoteContentEditor extends HtmlContentEditor {
-        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
-    }
-    class HtmlReportContentEditor extends HtmlContentEditor {
-        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
-    }
-    class IAsyncInit {
-    }
-    class IBooleanValue {
-    }
-    interface IBooleanValue {
-        get_value(): boolean;
-        set_value(value: boolean): void;
-    }
-    class IDialog {
-    }
-    interface IDialog {
-        dialogOpen(): void;
-    }
-    class IDoubleValue {
-    }
-    interface IDoubleValue {
-        get_value(): any;
-        set_value(value: any): void;
-    }
-    interface EditDialog {
-        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
-    }
-    interface IFiltering {
-        createEditor(): void;
-        getCriteria(displayText: any): any[];
-        getOperators(): FilterOperator[];
-        loadState(state: any): void;
-        saveState(): any;
-        get_field(): PropertyItem;
-        set_field(value: PropertyItem): void;
-        get_container(): JQuery;
-        set_container(value: JQuery): void;
-        get_operator(): FilterOperator;
-        set_operator(value: FilterOperator): void;
-    }
-    class IGetEditValue {
-    }
-    interface IGetEditValue {
-        getEditValue(property: PropertyItem, target: any): void;
-    }
-    class IInitializeColumn {
-    }
-    interface IInitializeColumn {
-        initializeColumn(column: Slick.Column): void;
-    }
-    class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
-        constructor(hidden: JQuery, opt: EnumEditorOptions);
-        updateItems(): void;
-    }
-    interface Select2AjaxOptions {
-        transport?: any;
-        url?: any;
-        dataType?: string;
-        quietMillis?: number;
-        cache?: boolean;
-        jsonpCallback?: any;
-        data?: (p1: string, p2: number, p3: any) => any;
-        results?: (p1: any, p2: number, p3: any) => any;
-        params?: any;
-    }
-    class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> {
-        pageSize: number;
-        constructor(hidden: JQuery, opt: any);
-        emptyItemText(): string;
-        getService(): string;
-        query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
-        executeQuery(options: ServiceOptions<ListResponse<any>>): void;
-        queryByKey(key: string, callback: (p1: any) => void): void;
-        executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
-        getItemKey(item: any): string;
-        getItemText(item: any): string;
-        getTypeDelay(): number;
-        getSelect2Options(): Select2Options;
-        addInplaceCreate(title: string): void;
-        inplaceCreateClick(e: any): void;
-        get_select2Container(): JQuery;
-        value: string;
-    }
-    interface Select2QueryOptions {
-        element?: JQuery;
-        term?: string;
-        page?: number;
-        context?: any;
-        callback?: (p1: Select2Result) => void;
-    }
-    interface Select2Result {
-        results: any;
-        more: boolean;
-        context: any;
-    }
-    interface Select2Options {
-        width?: any;
-        minimumInputLength?: number;
-        maximumInputLength?: number;
-        minimumResultsForSearch?: number;
-        maximumSelectionSize?: any;
-        placeHolder?: string;
-        placeHolderOption?: any;
-        separator?: string;
-        allowClear?: boolean;
-        multiple?: boolean;
-        closeOnSelect?: boolean;
-        openOnEnter?: boolean;
-        id?: (p1: any) => string;
-        matcher?: (p1: string, p2: string, p3: JQuery) => boolean;
-        sortResults?: (p1: any, p2: JQuery, p3: any) => any;
-        formatSelection?: (p1: any, p2: JQuery, p3: (p1: string) => string) => string;
-        formatResult?: (p1: any, p2: JQuery, p3: any, p4: (p1: string) => string) => string;
-        formatResultCssClass?: (p1: any) => string;
-        formatNoMatches?: (p1: string) => string;
-        formatSearching?: () => string;
-        formatInputTooShort?: (p1: string, p2: number) => string;
-        formatSelectionTooBig?: (p1: string) => string;
-        createSearchChoice?: (p1: string) => any;
-        createSearchChoicePosition?: string;
-        initSelection?: (p1: JQuery, p2: (p1: any) => void) => void;
-        tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
-        tokenSeparators?: any;
-        query?: (p1: Select2QueryOptions) => void;
-        ajax?: Select2AjaxOptions;
-        data?: any;
-        tags?: any;
-        containerCss?: any;
-        containerCssClass?: any;
-        dropdownCss?: any;
-        dropdownCssClass?: any;
-        dropdownAutoWidth?: boolean;
-        adaptContainerCssClass?: (p1: string) => string;
-        adaptDropdownCssClass?: (p1: string) => string;
-        escapeMarkup?: (p1: string) => string;
-        selectOnBlur?: boolean;
-        loadMorePadding?: number;
-        nextSearchTerm?: (p1: any, p2: string) => string;
-    }
-    interface EnumEditorOptions {
-        enumKey?: string;
-        enumType?: any;
-    }
-    class EnumFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
-        static format(enumType: Function, value: any): string;
-        static getText(enumKey: string, name: string): string;
-        static getText(value: any): string;
-        static getName(value: any): string;
-        get_enumKey(): string;
-        set_enumKey(value: string): void;
-    }
-    namespace EnumTypeRegistry {
-        function get(key: string): Function;
-    }
-    class FileDownloadFormatter {
-        format(ctx: Slick.FormatterContext): string;
-        static dbFileUrl(filename: string): string;
-        initializeColumn(column: Slick.Column): void;
-        get_displayFormat(): string;
-        set_displayFormat(value: string): void;
-        get_originalNameProperty(): string;
-        set_originalNameProperty(value: string): void;
-    }
-    class FilterableAttribute {
-        constructor(value: boolean);
-        value: boolean;
-    }
-    class FilterDialog extends TemplatedDialog<any> {
-        get_filterPanel(): FilterPanel;
-    }
-    class FilterDisplayBar extends FilterWidgetBase<any> {
-        constructor(div: JQuery);
-    }
-    namespace FilteringTypeRegistry {
-        function get(key: string): Function;
-        function initialize(): void;
-        function reset(): void;
-    }
-    class FilterLine {
-        field: string;
-        operator: string;
-        isOr: boolean;
-        leftParen: boolean;
-        rightParen: boolean;
-        validationError: string;
-        criteria: any[];
-        displayText: string;
-        state: any;
-    }
-    class Flexify extends Widget<FlexifyOptions> {
-        constructor(container: JQuery, options: FlexifyOptions);
-    }
-    interface FlexifyOptions {
-        getXFactor?: (p1: JQuery) => any;
-        getYFactor?: (p1: JQuery) => any;
-        designWidth?: any;
-        designHeight?: any;
-    }
-    namespace FLX {
-        function flexHeightOnly(element: JQuery, flexY?: number): JQuery;
-        function flexWidthOnly(element: JQuery, flexX?: number): JQuery;
-        function flexWidthHeight(element: JQuery, flexX?: number, flexY?: number): JQuery;
-        function flexXFactor(element: JQuery, flexX: number): JQuery;
-        function flexYFactor(element: JQuery, flexY: number): JQuery;
-    }
-    namespace FormatterTypeRegistry {
-        function get(key: string): Function;
-        function initialize(): void;
-        function reset(): void;
-    }
-    class FilterPanel extends FilterWidgetBase<any> {
-        static panelTemplate: string;
-        static rowTemplate: string;
-        constructor(div: JQuery);
-        updateRowsFromStore(): void;
-        search(): void;
-        get_showInitialLine(): boolean;
-        set_showInitialLine(value: boolean): void;
-        get_showSearchButton(): boolean;
-        set_showSearchButton(value: boolean): void;
-        get_updateStoreOnReset(): boolean;
-        set_updateStoreOnReset(value: boolean): void;
-        get_hasErrors(): boolean;
-    }
-    class FilterStore {
-        constructor(fields: any);
-        raiseChanged(): void;
-        add_Changed(value: any): void;
-        remove_Changed(value: any): void;
-        get_fields(): PropertyItem[];
-        get_fieldByName(): any;
-        get_items(): FilterLine[];
-        get_activeCriteria(): any[];
-        get_displayText(): string;
-    }
-    class FilterWidgetBase<TOptions> extends TemplatedWidget<TOptions> {
-        constructor(div: JQuery, opt: any);
-        filterStoreChanged(): void;
-        get_store(): FilterStore;
-        set_store(value: FilterStore): void;
-    }
-    namespace EditorUtils {
-        function getValue(editor: Serenity.Widget<any>): any;
-        function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
-        function setValue(editor: Serenity.Widget<any>, value: any): void;
-        function loadValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
-        function setReadOnly(elements: JQuery, isReadOnly: boolean): JQuery;
-        function setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
-        function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
-    }
-    class GoogleMap extends Widget<GoogleMapOptions> {
-        constructor(container: JQuery, opt: GoogleMapOptions);
-        get_map(): any;
-    }
-    interface GoogleMapOptions {
-        latitude?: any;
-        longitude?: any;
-        zoom?: any;
-        mapTypeId?: any;
-        markerTitle?: string;
-        markerLatitude?: any;
-        markerLongitude?: any;
-    }
-    class GridRows<TItem> {
-    }
-    class GridRowSelectionMixin extends ScriptContext {
-        constructor(grid: IDataGrid);
-        clear(): void;
-        resetCheckedAndRefresh(): void;
-        getSelectedKeys(): string[];
-        getSelectedAsInt32(): number[];
-        getSelectedAsInt64(): number[];
-        static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
-    }
-    namespace GridSelectAllButtonHelper {
-        function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
-        function define(getGrid: () => IDataGrid, getId: (p1: any) => any, getSelected: (p1: any) => boolean, setSelected: (p1: any, p2: boolean) => void, text?: string, onClick?: () => void): ToolButton;
-    }
-    namespace GridUtils {
-        function addToggleButton(toolDiv: JQuery, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
-        function addIncludeDeletedToggle(toolDiv: JQuery, view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void;
-        function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[]): void;
-        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string) => void, fields?: QuickSearchField[]): void;
-        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, p3: (p1: boolean) => void) => void, fields?: QuickSearchField[]): void;
-        function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
-        function makeOrderableWithUpdateRequest(grid: DataGrid<any, any>, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
-    }
-    interface QuickSearchField {
-        name: string;
-        title: string;
-    }
-    namespace PropertyItemSlickConverter {
-        function toSlickColumns(items: PropertyItem[]): Slick.Column[];
-        function toSlickColumn(item: PropertyItem): Slick.Column;
-    }
-    interface PostToServiceOptions {
-        url?: string;
-        service?: string;
-        target?: string;
-        request: any;
-    }
-    interface PostToUrlOptions {
-        url?: string;
-        target?: string;
-        params: any;
-    }
-    interface CommonDialogOptions extends JQueryUI.DialogOptions {
-        onOpen?: () => void;
-        onClose?: () => void;
-        htmlEncode?: boolean;
-        dialogClass?: string;
-        title?: string;
-    }
-    interface AlertOptions extends CommonDialogOptions {
-        okButton?: string;
-    }
-    interface ConfirmOptions extends CommonDialogOptions {
-        yesButton?: string;
-        noButton?: string;
-        cancelButton?: string;
-        onCancel?: () => void;
-        onNo?: () => void;
-    }
-    namespace CustomValidation {
-        function registerValidationMethods(): void;
-    }
-    type CustomValidationRule = (element: JQuery) => string;
-    interface DataChangeInfo {
-        type: string;
-        entityId: any;
-        entity: any;
-    }
     interface ServiceError {
         Code?: string;
         Arguments?: string;
         Message?: string;
     }
+}
+declare namespace Serenity {
     interface ServiceResponse {
         Error?: ServiceError;
     }
@@ -735,11 +161,844 @@ declare namespace Serenity {
             [key: string]: TEntity;
         };
     }
-    class PropertyItemHelper {
-        static getPropertyItemsFor(type: Function): PropertyItem[];
+}
+declare namespace Q {
+    type Dictionary<TItem> = {
+        [key: string]: TItem;
+    };
+    type Grouping<TItem> = {
+        [key: string]: TItem[];
+    };
+}
+declare namespace ss {
+    interface AssemblyReg {
+        name: string;
+        __types: ClassReg[];
+    }
+    interface ClassReg {
+        __register: boolean;
+        __class: boolean;
+        __assembly: AssemblyReg;
+        __interfaces: any[];
+    }
+    let __assemblies: {
+        [name: string]: AssemblyReg;
+    };
+    class Exception {
+        constructor(msg: string);
+    }
+    class NotSupportedException extends Exception {
+        constructor(msg: string);
+    }
+}
+declare namespace System.ComponentModel {
+    class DisplayNameAttribute {
+        constructor(displayName: string);
+        displayName: string;
+    }
+}
+declare namespace Q {
+    function coalesce(a: any, b: any): any;
+    function isValue(a: any): boolean;
+    function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
+}
+declare namespace Q {
+    function arrayClone<T>(a: T[]): T[];
+    function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
+    function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
+    function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
+    function insert(obj: any, index: number, item: any): void;
+    function isArray(a: any): boolean;
+    function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Grouping<TItem>;
+    function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+}
+declare namespace Q {
+    function endsWith(s: string, search: string): boolean;
+    function isEmptyOrNull(s: string): boolean;
+    function isTrimmedEmpty(s: string): boolean;
+    function format(msg: string, ...prm: any[]): string;
+    function padLeft(s: string, len: number, ch?: string): string;
+    function startsWith(s: string, search: string): boolean;
+    function toSingleLine(str: string): string;
+    function trim(s: string): string;
+    function trimToEmpty(s: string): string;
+    function trimToNull(s: string): string;
+    function turkishLocaleCompare(a: string, b: string): number;
+    function turkishLocaleToUpper(a: string): string;
+    function replaceAll(s: string, f: string, r: string): string;
+    function zeroPad(n: number, digits: number): string;
+}
+declare namespace Q {
+    namespace Culture {
+        let decimalSeparator: string;
+        let dateSeparator: string;
+        let dateOrder: string;
+        let dateFormat: string;
+        let dateTimeFormat: string;
+        function get_groupSeperator(): string;
+    }
+}
+declare namespace Q {
+    function formatNumber(n: number, fmt: string, dec?: string, grp?: string): string;
+    function parseInteger(s: string): number;
+    function parseDecimal(s: string): number;
+    function toId(id: any): any;
+}
+declare namespace Q {
+    function formatDate(date: Date, format?: string): string;
+    function formatDayHourAndMin(n: number): string;
+    function formatISODateTimeUTC(d: Date): string;
+    function parseISODateTime(s: string): Date;
+    function parseHourAndMin(value: string): any;
+    function parseDayHourAndMin(s: string): number;
+    function parseDate(s: string, dateOrder?: string): any;
+    function splitDateString(s: string): string[];
+}
+declare namespace Q {
+    function text(key: string): string;
+    function tryGetText(key: any): string;
+    class LT {
+        private key;
+        static $table: {
+            [key: string]: string;
+        };
+        static empty: LT;
+        constructor(key: string);
+        static add(obj: any, pre?: string): void;
+        get(): string;
+        toString(): string;
+        static initializeTextClass: (type: any, prefix: any) => void;
+        static getDefault: (key: any, defaultText: any) => string;
+    }
+}
+declare namespace Q {
+    interface LookupOptions<TItem> {
+        idField?: string;
+        parentIdField?: string;
+        textField?: string;
+        textFormatter?(item: TItem): string;
+    }
+    class Lookup<TItem> {
+        items: TItem[];
+        itemById: {
+            [key: string]: TItem;
+        };
+        idField: string;
+        parentIdField: string;
+        textField: string;
+        textFormatter: (item: TItem) => string;
+        constructor(options: LookupOptions<TItem>, items?: TItem[]);
+        update(value: TItem[]): void;
+        protected get_idField(): string;
+        protected get_parentIdField(): string;
+        protected get_textField(): string;
+        protected get_textFormatter(): (item: TItem) => string;
+        protected get_itemById(): {
+            [key: string]: TItem;
+        };
+        protected get_items(): TItem[];
+    }
+}
+declare namespace Q {
+    /**
+     * Uses jQuery BlockUI plugin to block access to whole page (default) or
+     * a part of it, by using a transparent overlay covering the whole area.
+     * @param options Parameters for the BlockUI plugin
+     * @remarks If options are not specified, this function blocks
+     * whole page with a transparent overlay. Default z-order of the overlay
+     * div is 2000, so a higher z-order shouldn't be used in page.
+     */
+    function blockUI(options: JQBlockUIOptions): void;
+    function blockUndo(): void;
+}
+declare namespace Q {
+    function addOption(select: JQuery, key: string, text: string): void;
+    function addEmptyOption(select: JQuery): void;
+    function clearOptions(select: JQuery): void;
+    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
+    /**
+     * Html encodes a string
+     * @param s String to be HTML encoded
+     */
+    function htmlEncode(s: any): string;
+    function log(m: any): void;
+    function newBodyDiv(): JQuery;
+    function outerHtml(element: JQuery): string;
+}
+declare namespace Q {
+    interface CommonDialogOptions extends JQueryUI.DialogOptions {
+        onOpen?: () => void;
+        onClose?: () => void;
+        htmlEncode?: boolean;
+        dialogClass?: string;
+        title?: string;
+    }
+    interface AlertOptions extends CommonDialogOptions {
+        okButton?: string;
+    }
+    function alert(message: string, options?: AlertOptions): void;
+    interface ConfirmOptions extends CommonDialogOptions {
+        yesButton?: string;
+        noButton?: string;
+        cancelButton?: string;
+        onCancel?: () => void;
+        onNo?: () => void;
+    }
+    function confirm(message: string, onYes: () => void, options?: ConfirmOptions): void;
+    interface IFrameDialogOptions {
+        html?: string;
+    }
+    function iframeDialog(options: IFrameDialogOptions): void;
+    function information(message: string, onOk: () => void, options?: Q.ConfirmOptions): void;
+    function warning(message: string, options?: Q.AlertOptions): void;
+}
+declare namespace Q {
+    let defaultNotifyOptions: ToastrOptions;
+    function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
+    function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
+    function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
+    function notifyError(message: string, title?: string, options?: ToastrOptions): void;
+    function positionToastContainer(create: boolean): void;
+}
+declare namespace Q {
+    namespace Config {
+        let applicationPath: string;
+        let emailAllowOnlyAscii: boolean;
+        let rootNamespaces: string[];
+        let notLoggedInHandler: Function;
+    }
+}
+declare namespace Q {
+    interface PostToServiceOptions {
+        url?: string;
+        service?: string;
+        target?: string;
+        request: any;
+    }
+    interface PostToUrlOptions {
+        url?: string;
+        target?: string;
+        params: any;
+    }
+    function parseQueryString(s?: string): {};
+    function postToService(options: Q.PostToServiceOptions): void;
+    function postToUrl(options: Q.PostToUrlOptions): void;
+    function resolveUrl(url: any): any;
+}
+declare namespace Q {
+    namespace ErrorHandling {
+        function showServiceError(error: Serenity.ServiceError): void;
+    }
+}
+declare namespace Q {
+    interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends JQueryAjaxSettings {
+        request?: any;
+        service?: string;
+        blockUI?: boolean;
+        onError?(response: TResponse): void;
+        onSuccess?(response: TResponse): void;
+        onCleanup?(): void;
+    }
+    function serviceCall<TResponse>(options: Q.ServiceOptions<TResponse>): JQueryXHR;
+    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: Q.ServiceOptions<TResponse>): JQueryXHR;
+    function setEquality(request: any, field: any, value: any): void;
+}
+declare namespace Serenity {
+    type ServiceOptions<TResponse extends Serenity.ServiceResponse> = Q.ServiceOptions<TResponse>;
+}
+declare namespace Q {
+    function addFullHeightResizeHandler(handler: any): void;
+    function autoFullHeight(element: JQuery): void;
+    function initFullHeightGridPage(gridDiv: JQuery): void;
+    function layoutFillHeightValue(element: JQuery): number;
+    function layoutFillHeight(element: JQuery): void;
+    function setMobileDeviceMode(): void;
+    function triggerLayoutOnShow(element: any): void;
+}
+declare namespace Q {
+    namespace ScriptData {
+        function bindToChange(name: any, regClass: any, onChange: any): void;
+        function triggerChange(name: any): void;
+        function unbindFromChange(regClass: any): void;
+        function ensure(name: string): any;
+        function ensureAsync(name: string): RSVP.Thenable<any>;
+        function reload(name: string): any;
+        function reloadAsync(name: string): RSVP.Thenable<any>;
+        function canLoad(name: string): boolean;
+        function setRegisteredScripts(scripts: any): void;
+        function set(name: string, value: any): void;
+    }
+    function getRemoteData(key: any): any;
+    function getRemoteDataAsync(key: any): RSVP.Thenable<any>;
+    function getLookup<TItem>(key: any): Lookup<TItem>;
+    function getLookupAsync<TItem>(key: any): RSVP.Thenable<Lookup<TItem>>;
+    function reloadLookup(key: any): void;
+    function reloadLookupAsync(key: any): RSVP.Thenable<any>;
+    function getColumns(key: any): any;
+    function getColumnsAsync(key: any): RSVP.Thenable<any>;
+    function getForm(key: any): any;
+    function getFormAsync(key: any): RSVP.Thenable<any>;
+    function getTemplate(key: any): any;
+    function getTemplateAsync(key: any): RSVP.Thenable<any>;
+    function canLoadScriptData(name: any): boolean;
+}
+declare namespace Q {
+    function prop(type: any, name: string, getter?: any, setter?: any): void;
+}
+declare namespace Serenity {
+    class ColumnsKeyAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class DialogTypeAttribute {
+        value: Function;
+        constructor(value: Function);
+    }
+    class EditorAttribute {
+        constructor();
+        key: string;
+    }
+    class ElementAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class EntityTypeAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class EnumKeyAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class FlexifyAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class FormKeyAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class GeneratedCodeAttribute {
+        origin: string;
+        constructor(origin?: string);
+    }
+    class IdPropertyAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class IsActivePropertyAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class ItemNameAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class LocalTextPrefixAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class MaximizableAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class NamePropertyAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class OptionAttribute {
+        constructor();
+    }
+    class OptionsTypeAttribute {
+        value: Function;
+        constructor(value: Function);
+    }
+    class PanelAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class ResizableAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class ResponsiveAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class ServiceAttribute {
+        value: string;
+        constructor(value: string);
+    }
+}
+declare namespace Serenity {
+    class CategoryAttribute {
+        constructor(category: string);
+        category: string;
+    }
+    class CssClassAttribute {
+        constructor(cssClass: string);
+        cssClass: string;
+    }
+    class DefaultValueAttribute {
+        constructor(defaultValue: any);
+        value: any;
+    }
+    class EditorOptionAttribute {
+        constructor(key: string, value: any);
+        key: string;
+        value: any;
+    }
+    class EditorTypeAttribute extends EditorTypeAttributeBase {
+        constructor(editorType: string);
+    }
+    class EditorTypeAttributeBase {
+        constructor(type: string);
+        setParams(editorParams: any): void;
+        editorType: string;
+    }
+    class FilterableAttribute {
+        constructor(value: boolean);
+        value: boolean;
+    }
+    class HiddenAttribute {
+    }
+    class HintAttribute {
+        constructor(hint: string);
+        hint: string;
+    }
+    class InsertableAttribute {
+        constructor(insertable?: boolean);
+        value: boolean;
+    }
+    class MaxLengthAttribute {
+        constructor(maxLength: number);
+        maxLength: number;
+    }
+    class OneWayAttribute {
+    }
+    class PlaceholderAttribute {
+        constructor(value: string);
+        value: string;
+    }
+    class ReadOnlyAttribute {
+        constructor(readOnly?: boolean);
+        value: boolean;
+    }
+    class RequiredAttribute {
+        constructor(isRequired: boolean);
+        isRequired: boolean;
+    }
+    class UpdatableAttribute {
+        constructor(updatable?: boolean);
+        value: boolean;
+    }
+}
+declare namespace Serenity {
+    namespace Decorators {
+        function addAttribute(type: any, attr: any): void;
+        function addMemberAttr(type: any, memberName: string, attr: any): void;
+        function columnsKey(value: string): (target: Function) => void;
+        function dialogType(value: Function): (target: Function) => void;
+        function editor(key?: string): (target: Function) => void;
+        function element(value: string): (target: Function) => void;
+        function entityType(value: string): (target: Function) => void;
+        function enumKey(value: string): (target: Function) => void;
+        function flexify(value?: boolean): (target: Function) => void;
+        function formKey(value: string): (target: Function) => void;
+        function generatedCode(origin?: string): (target: Function) => void;
+        function idProperty(value: string): (target: Function) => void;
+        function registerClass(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
+        function registerEnum(target: any, enumKey?: string, asm?: ss.AssemblyReg): void;
+        function registerEditor(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
+        function registerFormatter(intf?: typeof ISlickFormatter[], asm?: ss.AssemblyReg): (target: Function) => void;
+        function filterable(value?: boolean): (target: Function) => void;
+        function itemName(value: string): (target: Function) => void;
+        function isActiveProperty(value: string): (target: Function) => void;
+        function localTextPrefix(value: string): (target: Function) => void;
+        function maximizable(value?: boolean): (target: Function) => void;
+        function nameProperty(value: string): (target: Function) => void;
+        function option(): (target: Object, propertyKey: string) => void;
+        function optionsType(value: Function): (target: Function) => void;
+        function panel(value?: boolean): (target: Function) => void;
+        function resizable(value?: boolean): (target: Function) => void;
+        function responsive(value?: boolean): (target: Function) => void;
+        function service(value: string): (target: Function) => void;
+    }
+}
+declare namespace Serenity {
+    function Criteria(field: string): any[];
+    namespace Criteria {
+        function isEmpty(c: any[]): boolean;
+        function join(c1: any[], op: string, c2: any[]): any[];
+        function paren(c: any[]): any[];
+        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
+        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+    }
+}
+declare namespace Serenity {
+    class GridRows<TItem> {
+    }
+    class GridRowSelectionMixin extends ScriptContext {
+        constructor(grid: IDataGrid);
+        clear(): void;
+        resetCheckedAndRefresh(): void;
+        getSelectedKeys(): string[];
+        getSelectedAsInt32(): number[];
+        getSelectedAsInt64(): number[];
+        static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
+    }
+    namespace GridSelectAllButtonHelper {
+        function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void;
+        function define(getGrid: () => IDataGrid, getId: (p1: any) => any, getSelected: (p1: any) => boolean, setSelected: (p1: any, p2: boolean) => void, text?: string, onClick?: () => void): ToolButton;
+    }
+    namespace GridUtils {
+        function addToggleButton(toolDiv: JQuery, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
+        function addIncludeDeletedToggle(toolDiv: JQuery, view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void;
+        function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[]): void;
+        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string) => void, fields?: QuickSearchField[]): void;
+        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, p3: (p1: boolean) => void) => void, fields?: QuickSearchField[]): void;
+        function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
+        function makeOrderableWithUpdateRequest(grid: DataGrid<any, any>, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
+    }
+    interface QuickSearchField {
+        name: string;
+        title: string;
+    }
+    namespace PropertyItemSlickConverter {
+        function toSlickColumns(items: PropertyItem[]): Slick.Column[];
+        function toSlickColumn(item: PropertyItem): Slick.Column;
+    }
+    namespace SlickTreeHelper {
+        function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
+        function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
+        function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
+        function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
+        function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
+        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
+    }
+    namespace SlickFormatting {
+        function getEnumText(value: any): string;
+        function getEnumText(enumKey: string, name: string): string;
+        function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any, formatter: Slick.Format): Slick.Format;
+        function date(format?: string): Slick.Format;
+        function dateTime(format?: string): Slick.Format;
+        function checkBox(): Slick.Format;
+        function number(format: string): Slick.Format;
+        function getItemType(link: JQuery): string;
+        function getItemId(link: JQuery): string;
+        function itemLinkText(itemType: string, id: any, text: any, extraClass: string, encode: boolean): string;
+        function itemLink(itemType: string, idField: string, getText: Slick.Format, cssClass?: Slick.Format, encode?: boolean): Slick.Format;
+    }
+    namespace SlickHelper {
+        function setDefaults(columns: any, localTextPrefix?: string): any;
+        function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter;
+    }
+}
+declare namespace Serenity {
+    namespace LazyLoadHelper {
+        function executeOnceWhenShown(element: JQuery, callback: Function): void;
+        function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+    }
+}
+declare namespace Serenity {
+    namespace SubDialogHelper {
+        function bindToDataChange(dialog: any, owner: Serenity.Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
+        function triggerDataChange(dialog: any): any;
+        function triggerDataChange(element: JQuery): JQuery;
+        function bubbleDataChange(dialog: any, owner: Serenity.Widget<any>, useTimeout?: boolean): any;
+        function cascade(cascadedDialog: any, ofElement: JQuery): any;
+        function cascadedDialogOffset(element: JQuery): any;
+    }
+}
+declare namespace Serenity {
+    namespace TabsExtensions {
+        function setDisabled(tabs: JQuery, tabKey: string, isDisabled: boolean): void;
+        function activeTabKey(tabs: JQuery): string;
+        function indexByKey(tabs: JQuery): any;
+    }
+}
+declare namespace Serenity {
+    namespace UploadHelper {
+        function addUploadInput(options: UploadInputOptions): JQuery;
+        function checkImageConstraints(file: UploadResponse, opt: ImageUploadEditorOptions): boolean;
+        function fileNameSizeDisplay(name: string, bytes: number): string;
+        function fileSizeDisplay(bytes: number): string;
+        function hasImageExtension(filename: string): boolean;
+        function thumbFileName(filename: string): string;
+        function dbFileUrl(filename: string): string;
+        function colorBox(link: JQuery, options: any): void;
+        function populateFileSymbols(container: JQuery, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
+    }
+    interface UploadedFile {
+        Filename: string;
+        OriginalName: string;
+    }
+    interface UploadInputOptions {
+        container?: JQuery;
+        progress?: JQuery;
+        inputName?: string;
+        allowMultiple?: boolean;
+        fileDone?: (p1: UploadResponse, p2: string, p3: any) => void;
+    }
+    interface UploadResponse {
+        TemporaryFile: string;
+        Size: number;
+        IsImage: boolean;
+        Width: number;
+        Height: number;
+    }
+}
+declare namespace Serenity {
+    namespace ValidationHelper {
+        function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
+        function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
+        function getValidator(element: JQuery): JQueryValidation.Validator;
+    }
+    namespace VX {
+        function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        function removeValidationRule(element: JQuery, eventClass: string): JQuery;
+        function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
+    }
+}
+declare namespace Serenity {
+    namespace EditorUtils {
+        function getValue(editor: Serenity.Widget<any>): any;
+        function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
+        function setValue(editor: Serenity.Widget<any>, value: any): void;
+        function loadValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
+        function setReadOnly(elements: JQuery, isReadOnly: boolean): JQuery;
+        function setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
+        function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
     }
     class PublicEditorTypes {
         static get_registeredTypes(): any;
+    }
+    class GoogleMap extends Widget<GoogleMapOptions> {
+        constructor(container: JQuery, opt: GoogleMapOptions);
+        get_map(): any;
+    }
+    interface GoogleMapOptions {
+        latitude?: any;
+        longitude?: any;
+        zoom?: any;
+        mapTypeId?: any;
+        markerTitle?: string;
+        markerLatitude?: any;
+        markerLongitude?: any;
+    }
+    class BooleanEditor extends Widget<any> {
+        constructor(input: JQuery);
+        value: boolean;
+    }
+    interface EnumEditorOptions {
+        enumKey?: string;
+        enumType?: any;
+    }
+    interface HtmlContentEditorOptions {
+        cols?: any;
+        rows?: any;
+    }
+    class HtmlContentEditor extends Widget<HtmlContentEditorOptions> {
+        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+        instanceReady(x: any): void;
+        getLanguage(): string;
+        getConfig(): CKEditorConfig;
+        value: string;
+    }
+    class HtmlNoteContentEditor extends HtmlContentEditor {
+        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+    }
+    class HtmlReportContentEditor extends HtmlContentEditor {
+        constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+    }
+    interface ImageUploadEditorOptions {
+        minWidth?: number;
+        maxWidth?: number;
+        minHeight?: number;
+        maxHeight?: number;
+        minSize?: number;
+        maxSize?: number;
+        originalNameProperty?: string;
+        urlPrefix?: string;
+        allowNonImage?: boolean;
+    }
+    class ImageUploadEditor extends Widget<ImageUploadEditorOptions> {
+        entity: UploadedFile;
+        toolbar: Toolbar;
+        fileSymbols: JQuery;
+        uploadInput: JQuery;
+        constructor(div: JQuery, opt: ImageUploadEditorOptions);
+        addFileButtonText(): string;
+        getToolButtons(): ToolButton[];
+        populate(): void;
+        updateInterface(): void;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+        value: UploadedFile;
+    }
+    interface MaskedEditorOptions {
+        mask?: string;
+        placeholder?: string;
+    }
+    class MaskedEditor extends Widget<MaskedEditorOptions> {
+        constructor(input: JQuery, opt: MaskedEditorOptions);
+        value: string;
+    }
+    class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> {
+        entities: UploadedFile[];
+        toolbar: Toolbar;
+        fileSymbols: JQuery;
+        uploadInput: JQuery;
+        constructor(div: JQuery, opt: ImageUploadEditorOptions);
+        addFileButtonText(): string;
+        getToolButtons(): ToolButton[];
+        populate(): void;
+        updateInterface(): void;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+        value: UploadedFile[];
+        get_jsonEncodeValue(): boolean;
+        set_jsonEncodeValue(value: boolean): void;
+    }
+    interface PhoneEditorOptions {
+        multiple?: boolean;
+        internal?: boolean;
+        mobile?: boolean;
+        allowExtension?: boolean;
+        allowInternational?: boolean;
+    }
+    class PhoneEditor extends Widget<PhoneEditorOptions> {
+        constructor(input: JQuery, opt?: PhoneEditorOptions);
+        validate(value: string): string;
+        formatValue(): void;
+        getFormattedValue(): string;
+        value: string;
+    }
+    class EnumEditor extends Select2Editor<EnumEditorOptions, Select2Item> {
+        constructor(hidden: JQuery, opt: EnumEditorOptions);
+        updateItems(): void;
+    }
+    class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> {
+        pageSize: number;
+        constructor(hidden: JQuery, opt: any);
+        emptyItemText(): string;
+        getService(): string;
+        query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
+        executeQuery(options: ServiceOptions<ListResponse<any>>): void;
+        queryByKey(key: string, callback: (p1: any) => void): void;
+        executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
+        getItemKey(item: any): string;
+        getItemText(item: any): string;
+        getTypeDelay(): number;
+        getSelect2Options(): Select2Options;
+        addInplaceCreate(title: string): void;
+        inplaceCreateClick(e: any): void;
+        get_select2Container(): JQuery;
+        value: string;
+    }
+    interface TextAreaEditorOptions {
+        cols?: number;
+        rows?: number;
+    }
+    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+        constructor(input: JQuery, opt?: TextAreaEditorOptions);
+        value: string;
+    }
+    interface TimeEditorOptions {
+        noEmptyOption?: boolean;
+        startHour?: any;
+        endHour?: any;
+        intervalMinutes?: any;
+    }
+    class TimeEditor extends Widget<TimeEditorOptions> {
+        constructor(input: JQuery, opt?: TimeEditorOptions);
+        value: number;
+    }
+    class URLEditor extends StringEditor {
+        constructor(input: JQuery);
+    }
+    class Recaptcha extends Widget<RecaptchaOptions> {
+        constructor(div: JQuery, opt: RecaptchaOptions);
+        get_value(): string;
+        set_value(value: string): void;
+    }
+    interface RecaptchaOptions {
+        siteKey?: string;
+        language?: string;
+    }
+}
+declare namespace Serenity {
+    interface IFiltering {
+        createEditor(): void;
+        getCriteria(displayText: any): any[];
+        getOperators(): FilterOperator[];
+        loadState(state: any): void;
+        saveState(): any;
+        get_field(): PropertyItem;
+        set_field(value: PropertyItem): void;
+        get_container(): JQuery;
+        set_container(value: JQuery): void;
+        get_operator(): FilterOperator;
+        set_operator(value: FilterOperator): void;
+    }
+    class FilterPanel extends FilterWidgetBase<any> {
+        static panelTemplate: string;
+        static rowTemplate: string;
+        constructor(div: JQuery);
+        updateRowsFromStore(): void;
+        search(): void;
+        get_showInitialLine(): boolean;
+        set_showInitialLine(value: boolean): void;
+        get_showSearchButton(): boolean;
+        set_showSearchButton(value: boolean): void;
+        get_updateStoreOnReset(): boolean;
+        set_updateStoreOnReset(value: boolean): void;
+        get_hasErrors(): boolean;
+    }
+    class FilterStore {
+        constructor(fields: any);
+        raiseChanged(): void;
+        add_Changed(value: any): void;
+        remove_Changed(value: any): void;
+        get_fields(): PropertyItem[];
+        get_fieldByName(): any;
+        get_items(): FilterLine[];
+        get_activeCriteria(): any[];
+        get_displayText(): string;
+    }
+    class FilterWidgetBase<TOptions> extends TemplatedWidget<TOptions> {
+        constructor(div: JQuery, opt: any);
+        filterStoreChanged(): void;
+        get_store(): FilterStore;
+        set_store(value: FilterStore): void;
+    }
+    class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
+    }
+    class StringFiltering extends BaseFiltering {
+    }
+    class FilterDialog extends TemplatedDialog<any> {
+        get_filterPanel(): FilterPanel;
+    }
+    class FilterDisplayBar extends FilterWidgetBase<any> {
+        constructor(div: JQuery);
+    }
+    namespace FilteringTypeRegistry {
+        function get(key: string): Function;
+        function initialize(): void;
+        function reset(): void;
+    }
+    class FilterLine {
+        field: string;
+        operator: string;
+        isOr: boolean;
+        leftParen: boolean;
+        rightParen: boolean;
+        validationError: string;
+        criteria: any[];
+        displayText: string;
+        state: any;
     }
     interface QuickFilterArgs<TWidget> {
         field: string;
@@ -763,14 +1022,129 @@ declare namespace Serenity {
         onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
         fields?: QuickSearchField[];
     }
-    class Recaptcha extends Widget<RecaptchaOptions> {
-        constructor(div: JQuery, opt: RecaptchaOptions);
-        get_value(): string;
-        set_value(value: string): void;
+}
+declare namespace Serenity {
+    namespace FormatterTypeRegistry {
+        function get(key: string): Function;
+        function initialize(): void;
+        function reset(): void;
     }
-    interface RecaptchaOptions {
-        siteKey?: string;
-        language?: string;
+    class EnumFormatter implements Slick.Formatter {
+        format(ctx: Slick.FormatterContext): string;
+        static format(enumType: Function, value: any): string;
+        static getText(enumKey: string, name: string): string;
+        static getText(value: any): string;
+        static getName(value: any): string;
+        get_enumKey(): string;
+        set_enumKey(value: string): void;
+    }
+    class FileDownloadFormatter {
+        format(ctx: Slick.FormatterContext): string;
+        static dbFileUrl(filename: string): string;
+        initializeColumn(column: Slick.Column): void;
+        get_displayFormat(): string;
+        set_displayFormat(value: string): void;
+        get_originalNameProperty(): string;
+        set_originalNameProperty(value: string): void;
+    }
+    class NumberFormatter {
+        format(ctx: Slick.FormatterContext): string;
+        static format(value: any, format: string): string;
+        get_displayFormat(): string;
+        set_displayFormat(value: string): void;
+    }
+    class MinuteFormatter implements Slick.Formatter {
+        format(ctx: Slick.FormatterContext): string;
+        static format(value: any): string;
+    }
+    class UrlFormatter implements Slick.Formatter {
+        format(ctx: Slick.FormatterContext): string;
+        get_displayProperty(): string;
+        set_displayProperty(value: string): void;
+        get_displayFormat(): string;
+        set_displayFormat(value: string): void;
+        get_urlProperty(): string;
+        set_urlProperty(value: string): void;
+        get_urlFormat(): string;
+        set_urlFormat(value: string): void;
+        get_target(): string;
+        set_target(value: string): void;
+    }
+}
+declare namespace Serenity {
+    namespace EnumTypeRegistry {
+        function get(key: string): Function;
+    }
+    class Flexify extends Widget<FlexifyOptions> {
+        constructor(container: JQuery, options: FlexifyOptions);
+    }
+    interface FlexifyOptions {
+        getXFactor?: (p1: JQuery) => any;
+        getYFactor?: (p1: JQuery) => any;
+        designWidth?: any;
+        designHeight?: any;
+    }
+    namespace FLX {
+        function flexHeightOnly(element: JQuery, flexY?: number): JQuery;
+        function flexWidthOnly(element: JQuery, flexX?: number): JQuery;
+        function flexWidthHeight(element: JQuery, flexX?: number, flexY?: number): JQuery;
+        function flexXFactor(element: JQuery, flexX: number): JQuery;
+        function flexYFactor(element: JQuery, flexY: number): JQuery;
+    }
+    class IAsyncInit {
+    }
+    class IBooleanValue {
+    }
+    interface IBooleanValue {
+        get_value(): boolean;
+        set_value(value: boolean): void;
+    }
+    class IDialog {
+    }
+    interface IDialog {
+        dialogOpen(): void;
+    }
+    class IDoubleValue {
+    }
+    interface IDoubleValue {
+        get_value(): any;
+        set_value(value: any): void;
+    }
+    interface IEditDialog {
+        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
+    }
+    class IGetEditValue {
+    }
+    interface IGetEditValue {
+        getEditValue(property: PropertyItem, target: any): void;
+    }
+    class IInitializeColumn {
+    }
+    interface IInitializeColumn {
+        initializeColumn(column: Slick.Column): void;
+    }
+    namespace CustomValidation {
+        function registerValidationMethods(): void;
+    }
+    type CustomValidationRule = (element: JQuery) => string;
+    interface IValidateRequired {
+        get_required(): boolean;
+        set_required(value: boolean): void;
+    }
+    interface DataChangeInfo {
+        type: string;
+        entityId: any;
+        entity: any;
+    }
+    namespace WX {
+        function getWidget(element: JQuery): any;
+        function tryGetWidget(element: JQuery): any;
+        function getWidgetName(type: Function): string;
+        function hasOriginalEvent(e: any): boolean;
+        function change(widget: any, handler: any): void;
+        function changeSelect2(widget: any, handler: any): void;
+        function getGridField(widget: Serenity.Widget<any>): JQuery;
+        function create(initElement: (p1: JQuery) => void, options?: any): any;
     }
     namespace ReflectionOptionsSetter {
         function set(target: any, options: any): void;
@@ -1060,7 +1434,7 @@ declare namespace Serenity {
         protected initNewEntity(entity: TItem): any;
         protected updateItems(): void;
         protected getDialogTypeKey(): string;
-        protected createEditDialog(callback: (dlg: Serenity.EditDialog) => void): void;
+        protected createEditDialog(callback: (dlg: Serenity.IEditDialog) => void): void;
         onInitNewEntity: (entity: TItem) => void;
         value: string;
         cascadeField: string;
@@ -1074,10 +1448,6 @@ declare namespace Serenity {
     class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt: LookupEditorOptions);
     }
-    interface UploadedFile {
-        Filename: string;
-        OriginalName: string;
-    }
     interface ToolbarOptions {
         buttons?: ToolButton[];
         hotkeyContext?: any;
@@ -1085,35 +1455,6 @@ declare namespace Serenity {
     class Toolbar extends Widget<ToolbarOptions> {
         constructor(div: JQuery, options: ToolbarOptions);
         findButton(className: string): JQuery;
-    }
-    class ImageUploadEditor extends Widget<ImageUploadEditorOptions> {
-        entity: UploadedFile;
-        toolbar: Toolbar;
-        fileSymbols: JQuery;
-        uploadInput: JQuery;
-        constructor(div: JQuery, opt: ImageUploadEditorOptions);
-        addFileButtonText(): string;
-        getToolButtons(): ToolButton[];
-        populate(): void;
-        updateInterface(): void;
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-        value: UploadedFile;
-    }
-    interface ImageUploadEditorOptions {
-        minWidth?: number;
-        maxWidth?: number;
-        minHeight?: number;
-        maxHeight?: number;
-        minSize?: number;
-        maxSize?: number;
-        originalNameProperty?: string;
-        urlPrefix?: string;
-        allowNonImage?: boolean;
-    }
-    class BooleanEditor extends Widget<any> {
-        constructor(input: JQuery);
-        value: boolean;
     }
     class BooleanFiltering extends BaseFiltering {
     }
@@ -1490,17 +1831,6 @@ declare namespace Serenity {
     namespace CustomValidation {
         function registerValidationMethods(): void;
     }
-    interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSettings {
-        request?: any;
-        service?: string;
-        blockUI?: boolean;
-        onError?(response: TResponse): void;
-        onSuccess?(response: TResponse): void;
-        onCleanup?(): void;
-    }
-    interface IFrameDialogOptions {
-        html?: string;
-    }
     class BaseEditorFiltering<TEditor> extends BaseFiltering {
         editor: Serenity.Widget<any>;
         useEditor(): boolean;
@@ -1620,348 +1950,406 @@ declare namespace Serenity {
         }
     }
 }
-interface JQueryStatic {
-    extend<T>(target: T, object1?: T, ...objectN: T[]): T;
-    toJSON(obj: any): string;
-}
-interface JQBlockUIOptions {
-    useTimeout?: boolean;
-}
-declare module RSVP {
-    function on(handler: (e: any) => void): any;
-    function resolve(): Thenable<any>;
-}
-interface Toastr {
-    getContainer(options?: ToastrOptions, create?: boolean): JQuery;
-}
-declare namespace ss {
-    interface AssemblyReg {
-        name: string;
-        __types: ClassReg[];
+declare namespace Serenity {
+    class PropertyGrid extends Widget<PropertyGridOptions> {
+        constructor(div: JQuery, opt: PropertyGridOptions);
+        load(source: any): void;
+        static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
+        save(target: any): void;
+        static saveEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
+        enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
+        static setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
+        static setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
+        static setReadOnly(elements: JQuery, isReadOnly: boolean): JQuery;
+        get_editors(): any;
+        get_items(): any;
+        get_mode(): PropertyGridMode;
+        set_mode(value: PropertyGridMode): void;
     }
-    interface ClassReg {
-        __register: boolean;
-        __class: boolean;
-        __assembly: AssemblyReg;
-        __interfaces: any[];
+    const enum PropertyGridMode {
+        insert = 1,
+        update = 2,
     }
-    let __assemblies: {
-        [name: string]: AssemblyReg;
-    };
-    class Exception {
-        constructor(msg: string);
+    interface PropertyGridOptions {
+        idPrefix?: string;
+        items?: PropertyItem[];
+        useCategories?: boolean;
+        categoryOrder?: string;
+        defaultCategory?: string;
+        localTextPrefix?: string;
+        mode?: PropertyGridMode;
     }
-    class NotSupportedException extends Exception {
-        constructor(msg: string);
-    }
-}
-declare namespace Q {
-    import S = Serenity;
-    function arrayClone<T>(a: T[]): T[];
-    function isArray(a: any): boolean;
-    function insert(obj: any, index: number, item: any): void;
-    function coalesce(a: any, b: any): any;
-    function isValue(a: any): boolean;
-    function endsWith(s: string, search: string): boolean;
-    function format(msg: string, ...prm: any[]): string;
-    function padLeft(s: string, len: number, ch?: string): string;
-    function zeroPad(n: number, digits: number): string;
-    function replaceAll(s: string, f: string, r: string): string;
-    function startsWith(s: string, search: string): boolean;
-    function alert(message: string, options?: S.AlertOptions): void;
-    function confirm(message: string, onYes: () => void, options?: S.ConfirmOptions): void;
-    function information(message: string, onOk: () => void, options?: S.ConfirmOptions): void;
-    function warning(message: string, options?: S.AlertOptions): void;
-    function iframeDialog(options: S.IFrameDialogOptions): void;
-    function toId(id: any): any;
-    function prop(type: any, name: string, getter?: any, setter?: any): void;
-    /**
-     * Uses jQuery BlockUI plugin to block access to whole page (default) or
-     * a part of it, by using a transparent overlay covering the whole area.
-     * @param options Parameters for the BlockUI plugin
-     * @remarks If options are not specified, this function blocks
-     * whole page with a transparent overlay. Default z-order of the overlay
-     * div is 2000, so a higher z-order shouldn't be used in page.
-     */
-    function blockUI(options: JQBlockUIOptions): void;
-    function blockUndo(): void;
-    type Dictionary<TItem> = {
-        [key: string]: TItem;
-    };
-    type Grouping<TItem> = {
-        [key: string]: TItem[];
-    };
-    function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Grouping<TItem>;
-    function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-    function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-    function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-    function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
-    function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
-    function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
-    function formatDate(date: Date, format?: string): string;
-    /**
-     * Html encodes a string
-     * @param s String to be HTML encoded
-     */
-    function htmlEncode(s: any): string;
-    function newBodyDiv(): JQuery;
-    function addOption(select: JQuery, key: string, text: string): void;
-    function clearOptions(select: JQuery): void;
-    function addEmptyOption(select: JQuery): void;
-    function trim(s: string): string;
-    function isEmptyOrNull(s: string): boolean;
-    function trimToNull(s: string): string;
-    function isTrimmedEmpty(s: string): boolean;
-    function trimToEmpty(s: string): string;
-    function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
-    function outerHtml(element: JQuery): string;
-    function layoutFillHeightValue(element: JQuery): number;
-    function layoutFillHeight(element: JQuery): void;
-    function initFullHeightGridPage(gridDiv: JQuery): void;
-    function addFullHeightResizeHandler(handler: any): void;
-    function triggerLayoutOnShow(element: any): void;
-    function autoFullHeight(element: JQuery): void;
-    function setMobileDeviceMode(): void;
-    let defaultNotifyOptions: ToastrOptions;
-    function positionToastContainer(create: boolean): void;
-    function notifyWarning(message: string, title?: string, options?: ToastrOptions): void;
-    function notifySuccess(message: string, title?: string, options?: ToastrOptions): void;
-    function notifyInfo(message: string, title?: string, options?: ToastrOptions): void;
-    function notifyError(message: string, title?: string, options?: ToastrOptions): void;
-    function getRemoteData(key: any): any;
-    function getRemoteDataAsync(key: any): RSVP.Thenable<any>;
-    function getLookup<TItem>(key: any): Lookup<TItem>;
-    function getLookupAsync<TItem>(key: any): RSVP.Thenable<Lookup<TItem>>;
-    function reloadLookup(key: any): void;
-    function reloadLookupAsync(key: any): RSVP.Thenable<any>;
-    function getColumns(key: any): any;
-    function getColumnsAsync(key: any): RSVP.Thenable<any>;
-    function getForm(key: any): any;
-    function getFormAsync(key: any): RSVP.Thenable<any>;
-    function getTemplate(key: any): any;
-    function getTemplateAsync(key: any): RSVP.Thenable<any>;
-    function canLoadScriptData(name: any): boolean;
-    function serviceCall<TResponse>(options: S.ServiceOptions<TResponse>): JQueryXHR;
-    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: S.ServiceOptions<TResponse>): JQueryXHR;
-    function setEquality(request: any, field: any, value: any): void;
-    function toSingleLine(str: string): string;
-    function text(key: string): string;
-    function tryGetText(key: any): string;
-    function resolveUrl(url: any): any;
-    function formatDayHourAndMin(n: number): string;
-    function formatISODateTimeUTC(d: Date): string;
-    function formatNumber(n: number, fmt: string, dec?: string, grp?: string): string;
-    function parseInteger(s: string): number;
-    function parseDate(s: string, dateOrder?: string): any;
-    function parseDecimal(s: string): number;
-    function splitDateString(s: string): string[];
-    function parseISODateTime(s: string): Date;
-    function parseHourAndMin(value: string): any;
-    function parseDayHourAndMin(s: string): number;
-    function parseQueryString(s?: string): {};
-    function turkishLocaleCompare(a: string, b: string): number;
-    function turkishLocaleToUpper(a: string): string;
-    function postToService(options: S.PostToServiceOptions): void;
-    function postToUrl(options: S.PostToUrlOptions): void;
-    function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
-    namespace ErrorHandling {
-        function showServiceError(error: any): void;
-    }
-    namespace Config {
-        let applicationPath: string;
-        let emailAllowOnlyAscii: boolean;
-        let rootNamespaces: string[];
-        let notLoggedInHandler: Function;
-    }
-    namespace Culture {
-        let decimalSeparator: string;
-        let dateSeparator: string;
-        let dateOrder: string;
-        let dateFormat: string;
-        let dateTimeFormat: string;
-        function get_groupSeperator(): string;
-    }
-    interface LookupOptions<TItem> {
-        idField?: string;
-        parentIdField?: string;
-        textField?: string;
-        textFormatter?(item: TItem): string;
-    }
-    class Lookup<TItem> {
-        items: TItem[];
-        itemById: {
-            [key: string]: TItem;
-        };
-        idField: string;
-        parentIdField: string;
-        textField: string;
-        textFormatter: (item: TItem) => string;
-        constructor(options: LookupOptions<TItem>, items?: TItem[]);
-        update(value: TItem[]): void;
-        protected get_idField(): string;
-        protected get_parentIdField(): string;
-        protected get_textField(): string;
-        protected get_textFormatter(): (item: TItem) => string;
-        protected get_itemById(): {
-            [key: string]: TItem;
-        };
-        protected get_items(): TItem[];
-    }
-    class LT {
-        private key;
-        static $table: {
-            [key: string]: string;
-        };
-        static empty: LT;
-        constructor(key: string);
-        static add(obj: any, pre?: string): void;
-        get(): string;
-        toString(): string;
-        static initializeTextClass: (type: any, prefix: any) => void;
-        static getDefault: (key: any, defaultText: any) => string;
-    }
-    namespace ScriptData {
-        function bindToChange(name: any, regClass: any, onChange: any): void;
-        function triggerChange(name: any): void;
-        function unbindFromChange(regClass: any): void;
-        function ensure(name: string): any;
-        function ensureAsync(name: string): RSVP.Thenable<any>;
-        function reload(name: string): any;
-        function reloadAsync(name: string): RSVP.Thenable<any>;
-        function canLoad(name: string): boolean;
-        function setRegisteredScripts(scripts: any): void;
-        function set(name: string, value: any): void;
+    class PropertyItemHelper {
+        static getPropertyItemsFor(type: Function): PropertyItem[];
     }
 }
 declare namespace Serenity {
-    class ColumnsKeyAttribute {
-        value: string;
-        constructor(value: string);
+    interface ToolButton {
+        title?: string;
+        hint?: string;
+        cssClass?: string;
+        icon?: string;
+        onClick?: any;
+        htmlEncode?: any;
+        hotkey?: string;
+        hotkeyAllowDefault?: boolean;
     }
-    class DialogTypeAttribute {
-        value: Function;
-        constructor(value: Function);
+    class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
+        constructor(div: JQuery, opt: PopupMenuButtonOptions);
     }
-    class EditorAttribute {
-        constructor();
-        key: string;
+    interface PopupMenuButtonOptions {
+        menu?: JQuery;
+        onPopup?: () => void;
+        positionMy?: string;
+        positionAt?: string;
     }
-    class ElementAttribute {
-        value: string;
-        constructor(value: string);
+    class PopupToolButton extends PopupMenuButton {
+        constructor(div: JQuery, opt: PopupToolButtonOptions);
     }
-    class EntityTypeAttribute {
-        value: string;
-        constructor(value: string);
+    interface PopupToolButtonOptions extends PopupMenuButtonOptions {
     }
-    class EnumKeyAttribute {
-        value: string;
-        constructor(value: string);
+}
+interface JQuery {
+    flexHeightOnly(flexY?: number): JQuery;
+    flexWidthOnly(flexX?: number): JQuery;
+    flexWidthHeight(flexX: number, flexY: number): JQuery;
+    flexX(flexX: number): JQuery;
+    flexY(flexY: number): JQuery;
+}
+declare namespace Slick.Data {
+    function GroupItemMetadataProvider(): void;
+}
+declare namespace Slick {
+    interface FormatterContext {
+        row?: number;
+        cell?: number;
+        value?: any;
+        column?: any;
+        item?: any;
     }
-    class FlexifyAttribute {
-        value: boolean;
-        constructor(value?: boolean);
+    interface Formatter {
+        format(ctx: FormatterContext): string;
     }
-    class FormKeyAttribute {
-        value: string;
-        constructor(value: string);
+    type Format = (ctx: Slick.FormatterContext) => string;
+    class Event {
+        subscribe(handler: (p1: any, p2?: any) => void): void;
+        subscribe(handler: (p1: any, p2?: any) => any): void;
+        unsubscribe(handler: (p1: any, p2?: any) => void): void;
+        notify(p1?: any, p2?: any, p3?: any): void;
+        clear(): void;
     }
-    class GeneratedCodeAttribute {
-        origin: string;
-        constructor(origin?: string);
+    interface PositionInfo {
+        bottom: number;
+        height: number;
+        left: number;
+        right: number;
+        top: number;
+        visible: boolean;
+        width: number;
     }
-    class IdPropertyAttribute {
-        value: string;
-        constructor(value: string);
+    interface SlickRangeInfo {
+        top: number;
+        bottom: number;
+        leftPx: number;
+        rightPx: number;
     }
-    class IsActivePropertyAttribute {
-        value: string;
-        constructor(value: string);
+    function EventData(): void;
+    type AsyncPostRender = (cellNode: any, row: number, item: any, column: Slick.Column) => void;
+    type CancellableViewCallback<TEntity> = (view: Slick.RemoteView<TEntity>) => boolean;
+    type ColumnFormatter = (row: number, cell: number, value: any, column: Slick.Column, item: any) => string;
+    type RemoteViewAjaxCallback<TEntity> = (view: Slick.RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean;
+    type RemoteViewFilter<TEntity> = (item: TEntity, view: Slick.RemoteView<TEntity>) => boolean;
+    type RemoteViewProcessCallback<TEntity> = (data: Serenity.ListResponse<TEntity>, view: Slick.RemoteView<TEntity>) => Serenity.ListResponse<TEntity>;
+    interface Column {
+        asyncPostRender?: Slick.AsyncPostRender;
+        behavior?: any;
+        cannotTriggerInsert?: boolean;
+        cssClass?: string;
+        defaultSortAsc?: boolean;
+        editor?: Function;
+        field?: string;
+        focusable?: boolean;
+        formatter?: Slick.ColumnFormatter;
+        headerCssClass?: string;
+        id?: string;
+        maxWidth?: any;
+        minWidth?: number;
+        name?: string;
+        rerenderOnResize?: boolean;
+        resizable?: boolean;
+        selectable?: boolean;
+        sortable?: boolean;
+        toolTip?: string;
+        width?: number;
+        format?: (ctx: Slick.FormatterContext) => string;
+        referencedFields?: string[];
+        sourceItem?: Serenity.PropertyItem;
+        sortOrder?: number;
+        groupTotalsFormatter?: (p1?: GroupTotals<any>, p2?: Column) => string;
     }
-    class ItemNameAttribute {
-        value: string;
-        constructor(value: string);
+    class RowMoveManager {
+        constructor(options: Slick.RowMoveManagerOptions);
+        get_onBeforeMoveRows(): Slick.Event;
+        get_onMoveRows(): Slick.Event;
     }
-    class LocalTextPrefixAttribute {
-        value: string;
-        constructor(value: string);
+    class RowSelectionModel {
     }
-    class MaximizableAttribute {
-        value: boolean;
-        constructor(value?: boolean);
+    class AutoTooltips {
+        constructor(options: Slick.AutoTooltipsOptions);
     }
-    class NamePropertyAttribute {
-        value: string;
-        constructor(value: string);
+    interface AutoTooltipsOptions {
+        enableForHeaderCells: boolean;
+        enableForCells: boolean;
+        maxToolTipLength: number;
     }
-    class OptionAttribute {
-        constructor();
+    interface GroupInfo<TItem> {
+        getter?: any;
+        formatter?: (p1: Slick.Group<TItem>) => string;
+        comparer?: (a: Slick.Group<TItem>, b: Slick.Group<TItem>) => number;
+        aggregators?: any[];
+        aggregateCollapsed?: boolean;
+        lazyTotalsCalculation?: boolean;
     }
-    class OptionsTypeAttribute {
-        value: Function;
-        constructor(value: Function);
+    interface RowCell {
+        row: number;
+        cell: number;
     }
-    class PanelAttribute {
-        value: boolean;
-        constructor(value?: boolean);
+    interface RowMoveManagerOptions {
+        cancelEditOnDrag: boolean;
     }
-    class ResizableAttribute {
-        value: boolean;
-        constructor(value?: boolean);
+    interface SummaryOptions {
+        aggregators: any[];
     }
-    class ResponsiveAttribute {
-        value: boolean;
-        constructor(value?: boolean);
+    class Group<TEntity> {
+        isGroup: boolean;
+        level: number;
+        count: number;
+        value: any;
+        title: string;
+        collapsed: boolean;
+        totals: any;
+        rows: any;
+        groups: Group<TEntity>;
+        groupingKey: string;
     }
-    class ServiceAttribute {
-        value: string;
-        constructor(value: string);
+    class GroupTotals<TEntity> {
+        isGroupTotals: boolean;
+        group: Group<TEntity>;
+        initialized: boolean;
+        sum: any;
+        avg: any;
+        min: any;
+        max: any;
     }
-    function Criteria(field: string): any[];
-    namespace Criteria {
-        function isEmpty(c: any[]): boolean;
-        function join(c1: any[], op: string, c2: any[]): any[];
-        function paren(c: any[]): any[];
-        function and(c1: any[], c2: any[], ...rest: any[][]): any[];
-        function or(c1: any[], c2: any[], ...rest: any[][]): any[];
+    interface GridOptions {
+        asyncEditorLoading?: boolean;
+        asyncEditorLoadDelay?: number;
+        asyncPostRenderDelay?: number;
+        autoEdit?: boolean;
+        autoHeight?: boolean;
+        cellFlashingCssClass?: string;
+        cellHighlightCssClass?: string;
+        dataItemColumnValueExtractor?: () => void;
+        defaultColumnWidth?: number;
+        defaultFormatter?: () => void;
+        editable?: boolean;
+        editCommandHandler?: () => void;
+        editorFactory?: () => void;
+        editorLock?: any;
+        enableAddRow?: boolean;
+        enableAsyncPostRender?: boolean;
+        enableCellRangeSelection?: boolean;
+        enableCellNavigation?: boolean;
+        enableColumnReorder?: boolean;
+        enableRowReordering?: boolean;
+        enableTextSelectionOnCells?: boolean;
+        explicitInitialization?: boolean;
+        forceFitColumns?: boolean;
+        forceSyncScrolling?: boolean;
+        formatterFactory?: () => void;
+        fullWidthRows?: boolean;
+        frozenColumn?: number;
+        frozenRow?: number;
+        frozenBottom?: boolean;
+        headerRowHeight?: number;
+        leaveSpaceForNewRows?: boolean;
+        multiColumnSort?: boolean;
+        multiSelect?: boolean;
+        rowHeight?: number;
+        selectedCellCssClass?: string;
+        showHeaderRow?: boolean;
+        showFooterRow?: boolean;
+        syncColumnCellResize?: boolean;
+        topPanelHeight?: number;
     }
-    namespace Decorators {
-        function addAttribute(type: any, attr: any): void;
-        function addMemberAttr(type: any, memberName: string, attr: any): void;
-        function columnsKey(value: string): (target: Function) => void;
-        function dialogType(value: Function): (target: Function) => void;
-        function editor(key?: string): (target: Function) => void;
-        function element(value: string): (target: Function) => void;
-        function entityType(value: string): (target: Function) => void;
-        function enumKey(value: string): (target: Function) => void;
-        function flexify(value?: boolean): (target: Function) => void;
-        function formKey(value: string): (target: Function) => void;
-        function generatedCode(origin?: string): (target: Function) => void;
-        function idProperty(value: string): (target: Function) => void;
-        function registerClass(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
-        function registerEnum(target: any, enumKey?: string, asm?: ss.AssemblyReg): void;
-        function registerEditor(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
-        function registerFormatter(intf?: typeof ISlickFormatter[], asm?: ss.AssemblyReg): (target: Function) => void;
-        function filterable(value?: boolean): (target: Function) => void;
-        function itemName(value: string): (target: Function) => void;
-        function isActiveProperty(value: string): (target: Function) => void;
-        function localTextPrefix(value: string): (target: Function) => void;
-        function maximizable(value?: boolean): (target: Function) => void;
-        function nameProperty(value: string): (target: Function) => void;
-        function option(): (target: Object, propertyKey: string) => void;
-        function optionsType(value: Function): (target: Function) => void;
-        function panel(value?: boolean): (target: Function) => void;
-        function resizable(value?: boolean): (target: Function) => void;
-        function responsive(value?: boolean): (target: Function) => void;
-        function service(value: string): (target: Function) => void;
+    interface RemoteView<TEntity> {
+        onSubmit: Slick.CancellableViewCallback<TEntity>;
+        onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
+        onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
+        constructor(options: RemoteViewOptions): any;
+        addData(data: Serenity.ListResponse<TEntity>): void;
+        deleteItem(id: any): any;
+        getItems(): TEntity[];
+        setFilter(filter: RemoteViewFilter<TEntity>): void;
+        setItems(items: any[], fullReset: boolean): void;
+        getItemById(id: any): TEntity;
+        updateItem(id: any, item: TEntity): void;
+        addItem(item: TEntity): void;
+        getIdxById(id: any): any;
+        getItemByIdx(index: number): any;
+        setGrouping(groupInfo: Slick.GroupInfo<TEntity>[]): void;
+        collapseAllGroups(level: number): void;
+        expandAllGroups(level: number): void;
+        expandGroup(keys: any[]): void;
+        collapseGroup(keys: any[]): void;
+        setSummaryOptions(options: Slick.SummaryOptions): void;
+        refresh(): void;
+        getItem(row: number): any;
+        params: any;
+        sortBy: string[];
+        url: string;
     }
-    namespace TabsExtensions {
-        function setDisabled(tabs: JQuery, tabKey: string, isDisabled: boolean): void;
-        function activeTabKey(tabs: JQuery): string;
-        function indexByKey(tabs: JQuery): any;
+    interface RemoteViewOptions {
+        autoLoad?: boolean;
+        idField?: string;
+        contentType?: string;
+        dataType?: string;
+        filter?: any;
+        params?: any;
+        onSubmit?: Slick.Event;
+        url?: string;
+        sortBy?: any;
+        rowsPerPage?: number;
+        seekToPage?: number;
+        onProcessData?: Slick.Event;
+        method?: string;
+        getItemMetadata?: (p1?: any, p2?: number) => any;
+        errorMsg?: string;
     }
-    namespace LazyLoadHelper {
-        function executeOnceWhenShown(element: JQuery, callback: Function): void;
-        function executeEverytimeWhenShown(element: JQuery, callback: Function, callNowIfVisible: boolean): void;
+    interface ColumnSort {
+        columnId?: string;
+        sortAsc?: boolean;
     }
+    interface RangeInfo {
+        top?: number;
+        bottom?: number;
+        leftPx?: number;
+        rightPx?: number;
+    }
+    interface Grid {
+        init(): void;
+        destroy(): void;
+        getData(): any[];
+        getDataItem(index: number): any;
+        setData(data: any[], scrollToTop: boolean): void;
+        getDataLength(): number;
+        getOptions(): GridOptions;
+        setOptions(options: GridOptions): void;
+        getSelectedRows(): any;
+        getSelectionModel(): any;
+        setSelectionModel(model: any): any;
+        setSelectedRows(rows: any): void;
+        autoSizeColumns(): void;
+        getColumnIndex(id: string): number;
+        getColumns(): Column[];
+        setColumns(columns: Column[]): void;
+        setSortColumn(columnId: string, ascending: boolean): void;
+        setSortColumns(cols: Slick.ColumnSort[]): void;
+        updateColumnHeader(columnId: string, title: string, toolTip: string): void;
+        addCellCssStyles(key: string, hash: any): void;
+        canCellBeActive(row: number, col: number): boolean;
+        canCellBeSelected(row: number, col: number): boolean;
+        editActiveCell(editor: Function): void;
+        flashCell(row: number, cell: number, speed: number): void;
+        getActiveCell(): Slick.RowCell;
+        getActiveCellNode(): any;
+        getActiveCellPosition(): Slick.PositionInfo;
+        getCellCssStyles(key: string): any;
+        getCellEditor(): any;
+        getCellFromEvent(e: any): Slick.RowCell;
+        getCellFromPoint(x: number, y: number): Slick.RowCell;
+        getCellNode(row: number, cell: number): any;
+        getCellNodeBox(row: number, cell: number): Slick.PositionInfo;
+        goToCell(row: number, cell: number, forceEdit: boolean): void;
+        navigateDown(): void;
+        navigateLeft(): void;
+        navigateNext(): void;
+        navigatePrev(): void;
+        navigateRight(): void;
+        navigateUp(): void;
+        removeCellCssStyles(key: string): void;
+        resetActiveCell(): void;
+        registerPlugin(plugin: any): void;
+        setActiveCell(row: number, cell: number): void;
+        setCellCssStyles(key: string, hash: any): void;
+        getCanvasNode(): any;
+        getGridPosition(): Slick.PositionInfo;
+        getRenderedRange(viewportTop: number, viewportLeft: number): Slick.RangeInfo;
+        getViewport(viewportTop: number, viewportLeft: number): Slick.RangeInfo;
+        getViewport(): Slick.RangeInfo;
+        invalidate(): void;
+        invalidateAllRows(): void;
+        invalidateRow(row: number): void;
+        invalidateRows(rows: any): void;
+        render(): void;
+        resizeCanvas(): void;
+        scrollCellIntoView(row: number, cell: number): void;
+        scrollRowIntoView(row: number, doPaging: boolean): void;
+        scrollRowToTop(row: number): void;
+        updateCell(row: number, cell: number): void;
+        updateRow(row: number): void;
+        updateRowCount(): void;
+        getHeaderRow(): any;
+        getHeaderRowColumn(columnId: string): any;
+        getSortColumns(): any;
+        getTopPanel(): any;
+        setHeaderRowVisibility(visible: boolean): void;
+        onScroll?: Slick.Event;
+        onSort?: Slick.Event;
+        onHeaderContextMenu?: Slick.Event;
+        onHeaderClick?: Slick.Event;
+        onMouseEnter?: Slick.Event;
+        onMouseLeave?: Slick.Event;
+        onClick?: Slick.Event;
+        onDblClick?: Slick.Event;
+        onContextMenu?: Slick.Event;
+        onKeyDown?: Slick.Event;
+        onAddNewRow?: Slick.Event;
+        onValidationError?: Slick.Event;
+        onViewportChanged?: Slick.Event;
+        onColumnsReordered?: Slick.Event;
+        onColumnsResized?: Slick.Event;
+        onCellChange?: Slick.Event;
+        onBeforeEditCell?: Slick.Event;
+        onBeforeCellEditorDestroy?: Slick.Event;
+        onHeaderCellRendered?: Slick.Event;
+        onBeforeHeaderCellDestroy?: Slick.Event;
+        onBeforeDestroy?: Slick.Event;
+        onActiveCellChanged?: Slick.Event;
+        onActiveCellPositionChanged?: Slick.Event;
+        onDragInit?: Slick.Event;
+        onDragStart?: Slick.Event;
+        onDrag?: Slick.Event;
+        onDragEnd?: Slick.Event;
+        onSelectedRowsChanged?: Slick.Event;
+        onCellCssStylesChanged?: Slick.Event;
+    }
+}
+declare namespace Slick.Data {
+}
+declare namespace Slick {
+    class RemoteView<TEntity> {
+        constructor(options: any);
+    }
+}
+declare namespace Slick.Aggregators {
+    function Avg(field: any): void;
+    function WeightedAvg(field: any, weightedField: any): void;
+    function Min(field: any): void;
+    function Max(field: any): void;
+    function Sum(field: any): void;
+}
+declare namespace Q {
+    function validatorAbortHandler(validator: any): void;
+    function validateOptions(options: any): any;
 }

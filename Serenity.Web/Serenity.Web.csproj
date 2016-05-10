@@ -14,6 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
   </PropertyGroup>
   <PropertyGroup>
     <TypeScriptTarget>ES5</TypeScriptTarget>
@@ -21,6 +22,7 @@
     <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
     <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
+    <TypeScriptCompileOnSaveEnabled>False</TypeScriptCompileOnSaveEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -273,6 +275,7 @@
     <None Include="Includes\Scripts\SlickGrid\README.md" />
     <None Include="Includes\web.config.transform" />
     <None Include="packages.config" />
+    <None Include="Scripts\serenity\CoreLib\tsconfig.json" />
     <None Include="Style\images\accessright.png" />
     <None Include="Style\images\add.png" />
     <None Include="Style\images\add2.png" />
@@ -607,6 +610,7 @@
     <None Include="Style\bootstrap\mixins\vendor-prefixes.less" />
     <None Include="Style\bootstrap\variables.less" />
     <None Include="Style\serenity.slickgrid.less" />
+    <None Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
@@ -749,13 +753,58 @@
   <ItemGroup>
     <None Include="Scripts\tsservices\lib.d.ts_" />
     <TypeScriptCompile Include="Includes\Scripts\typings\rsvp\rsvp.d.ts" />
+    <TypeScriptCompile Include="Includes\Scripts\typings\slickgrid\slickgrid.d.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Decorators\Attributes.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Decorators\Decorators.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\jQueryStatic.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\JQBlockUI.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\Toastr.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\Select2.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\Criteria.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Editors\Editors.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Filtering\Filtering.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Formatters\Formatters.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\LazyLoadHelper.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\ValidationHelper.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\SubDialogHelper.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\UploadHelper.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\TabsExtensions.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\SlickHelpers.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\RSVP.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Culture.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Number.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ErrorHandling.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Date.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.BlockUI.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.BasicUtils.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.CommonTypes.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Lookup.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Services.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Url.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ScriptData.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Notify.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Layout.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Html.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Dialogs.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.TypeSystem.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.StringHelpers.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\SS.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ArrayUtils.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.LocalText.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Config.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\ServiceError.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\ServiceResponse.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQueryUI.ButtonNoConflict.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQuery.FlexifyPlugin.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Toolbar.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\PropertyGrid.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Widgets.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.Slick.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Serenity.Externals.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Serenity.Externals.Slick.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\typescriptServices.d.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\Serenity.CodeGeneration.ts" />
     <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
@@ -763,8 +812,8 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -782,11 +831,7 @@
     </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.js -o $(ProjectDir)Includes\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js --comments --mangle">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.Externals.js -o $(ProjectDir)Scripts\Serenity\Serenity.Externals.min.js --comments --mangle">
-    </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.CoreLib.js -o $(ProjectDir)Scripts\Serenity\Serenity.CoreLib.min.js --comments --mangle">
-    </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.js -o $(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.min.js --comments --mangle">
     </Exec>
   </Target>
 </Project>

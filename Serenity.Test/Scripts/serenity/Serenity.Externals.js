@@ -1,4 +1,4 @@
-﻿var Q;
+var Q;
 (function (Q) {
     var oldShowLabel;
     function validateShowLabel(element, message) {
@@ -17,19 +17,19 @@
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
         $.validator.addMethod("dateQ", function (value, element) {
-            return this.optional(element) || Q.parseDate(value) != false;
+            return this.optional(element) || parseDate(value) != false;
         });
         $.validator.addMethod("hourAndMin", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseHourAndMin(value));
+            return this.optional(element) || !isNaN(parseHourAndMin(value));
         });
         $.validator.addMethod("dayHourAndMin", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseDayHourAndMin(value));
+            return this.optional(element) || !isNaN(parseDayHourAndMin(value));
         });
         $.validator.addMethod("decimalQ", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseDecimal(value));
+            return this.optional(element) || !isNaN(parseDecimal(value));
         });
         $.validator.addMethod("integerQ", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseInteger(value));
+            return this.optional(element) || !isNaN(parseInteger(value));
         });
         var oldEmail = $.validator.methods['email'];
         $.validator.addMethod("email", function (value, element) {

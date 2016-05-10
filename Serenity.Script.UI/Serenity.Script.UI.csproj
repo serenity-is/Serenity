@@ -131,7 +131,6 @@
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
     <Compile Include="PropertyGrid\Attributes\InsertableAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\ReadOnlyAttribute.cs" />
-    <Compile Include="PropertyGrid\CustomValidation.cs" />
     <Compile Include="PropertyGrid\EditorTypeRegistry.cs" />
     <Compile Include="SlickGrid\Formatters\BooleanFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\CheckboxFormatter.cs" />

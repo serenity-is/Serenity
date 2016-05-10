@@ -1,61 +1,109 @@
-﻿var Q;
-(function (Q) {
-    var oldShowLabel;
-    function validateShowLabel(element, message) {
+﻿namespace Q {
+
+    let oldShowLabel: (HtmlElement, message) => void;
+
+    function validateShowLabel(element: HTMLElement, message: string) {
         oldShowLabel.call(this, element, message);
         this.errorsFor(element).each(function (i, e) {
+
             if ($(element).hasClass('error'))
                 $(e).removeClass('checked');
+
             $(e).attr('title', $(e).text());
         });
+    };
+
+    function registerCustomValidationMethods() {
+        if ($.validator.methods['customValidate'] == null) {
+            ($.validator as any).addMethod('customValidate', function (value, element) {
+                var result = this.optional(element);
+                if (element == null || !!result) {
+                    return result;
+                }
+                var events = ($ as any)._data(element, 'events');
+                if (events) {
+                    return true;
+                }
+                var handlers = events.customValidate;
+                if (handlers == null || handlers.length === 0) {
+                    return true;
+                }
+
+                var el = $(element);
+                for (var i = 0; !!(i < handlers.length); i++) {
+                    var handler = (ss as any).safeCast(handlers[i].handler, Function);
+                    if (handler) {
+                        var message = handler(el);
+                        if (message != null) {
+                            el.data('customValidationMessage', message);
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }, function (o, e) {
+                return $(e).data('customValidationMessage');
+            });
+        }
     }
-    ;
+
     function jQueryValidationInitialization() {
-        Serenity.CustomValidation.registerValidationMethods();
-        var p = $.validator;
+        registerCustomValidationMethods();
+
+        let p: any = $.validator;
         p = p.prototype;
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
+
         $.validator.addMethod("dateQ", function (value, element) {
-            return this.optional(element) || Q.parseDate(value) != false;
+            return this.optional(element) || parseDate(value) != false;
         });
+
         $.validator.addMethod("hourAndMin", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseHourAndMin(value));
+            return this.optional(element) || !isNaN(parseHourAndMin(value));
         });
+
         $.validator.addMethod("dayHourAndMin", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseDayHourAndMin(value));
+            return this.optional(element) || !isNaN(parseDayHourAndMin(value));
         });
+
         $.validator.addMethod("decimalQ", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseDecimal(value));
+            return this.optional(element) || !isNaN(parseDecimal(value));
         });
+
         $.validator.addMethod("integerQ", function (value, element) {
-            return this.optional(element) || !isNaN(Q.parseInteger(value));
+            return this.optional(element) || !isNaN(parseInteger(value));
         });
-        var oldEmail = $.validator.methods['email'];
+
+        let oldEmail = $.validator.methods['email'];
         $.validator.addMethod("email", function (value, element) {
             if (!Q.Config.emailAllowOnlyAscii)
                 return oldEmail.call(this, value, element);
             return this.optional(element) || /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(value);
         });
+
         $.validator.addMethod("emailMultiple", function (value, element) {
-            var result = this.optional(element);
+            let result = this.optional(element);
             if (result)
                 return result;
             if (value.indexOf(';') >= 0)
                 value = value.split(';');
             else
                 value = value.split(',');
-            for (var i = 0; i < value.length; i++) {
+            for (let i = 0; i < value.length; i++) {
                 result = $.validator.methods['email'].call(this, value[i], element);
                 if (!result)
                     return result;
             }
             return result;
         });
+
         $.validator.addMethod("anyvalue", function (value, element) {
             return true;
         });
-        var d = $.validator.defaults;
+
+        let d = (<any>$.validator).defaults;
+
         d.ignoreTitle = true;
         d.onchange = function (element) {
             this.element(element);
@@ -66,11 +114,11 @@
             function changeDelegate(event) {
                 if (this.form == null)
                     return;
-                var validator = $.data(this.form, "validator"), eventType = "on" + event.type.replace(/^validate/, "");
+                let validator = $.data(this.form, "validator"), eventType = "on" + event.type.replace(/^validate/, "");
                 validator && validator.settings[eventType] && validator.settings[eventType].call(validator, this);
             }
             function delegate(event) {
-                var el = this[0];
+                let el = this[0];
                 if (!$.data(el, 'changebound')) {
                     $(el).change(changeDelegate);
                     $.data(el, 'changebound', true);
@@ -87,7 +135,7 @@
         };
         p.oldstopRequest = p.focusInvalid;
         p.stopRequest = function (element, valid) {
-            var formSubmitted = this.formSubmitted;
+            let formSubmitted = this.formSubmitted;
             this.oldfocusInvalid.call(this, [element, valid]);
             if (!valid && this.pendingRequest == 0 && formSubmitted && this.settings.abortHandler) {
                 this.settings.abortHandler(this);
@@ -114,24 +162,23 @@
                 url: Q.text("Validation.Url")
             });
         });
-    }
-    ;
-    function validatorAbortHandler(validator) {
+    };
+
+    export function validatorAbortHandler(validator) {
         validator.settings.abortHandler = null;
         validator.settings.submitHandler = function () {
             return false;
         };
-    }
-    Q.validatorAbortHandler = validatorAbortHandler;
-    ;
-    function validateOptions(options) {
+    };
+
+    export function validateOptions(options) {
         return $.extend({
             ignore: ":hidden",
             meta: 'v',
             errorClass: 'error',
             errorPlacement: function (error, element) {
-                var field = null;
-                var vx = element.attr('data-vx-id');
+                let field = null;
+                let vx = element.attr('data-vx-id');
                 if (vx) {
                     field = $('#' + vx);
                     if (!field.length)
@@ -142,7 +189,7 @@
                 if (field == null) {
                     field = element.parents('div.field');
                     if (field.length) {
-                        var inner = $('div.vx', field[0]);
+                        let inner = $('div.vx', field[0]);
                         if (inner.length)
                             field = inner[0];
                     }
@@ -161,9 +208,8 @@
                 label.addClass('checked');
             }
         }, options);
-    }
-    Q.validateOptions = validateOptions;
-    ;
+    };
+
     if (window['jQuery'] && window['jQuery']['validator'])
         jQueryValidationInitialization();
     else if (window['jQuery']) {
@@ -172,10 +218,11 @@
                 jQueryValidationInitialization();
         });
     }
-    function jQueryDatepickerInitialization() {
-        var order = Q.Culture.dateOrder;
-        var s = Q.Culture.dateSeparator;
-        var culture = ($('html').attr('lang') || 'en').toLowerCase();
+
+    function jQueryDatepickerInitialization(): void {
+        let order = Q.Culture.dateOrder;
+        let s = Q.Culture.dateSeparator;
+        let culture = ($('html').attr('lang') || 'en').toLowerCase();
         if (!$.datepicker.regional[culture]) {
             culture = culture.split('-')[0];
             if (!$.datepicker.regional[culture]) {
@@ -195,8 +242,8 @@
             changeMonth: true,
             changeYear: true
         });
-    }
-    ;
+    };
+
     if (window['jQuery'] &&
         window['jQuery']['datepicker'] &&
         window['jQuery']['datepicker']['regional'] &&
@@ -209,15 +256,16 @@
                 jQueryDatepickerInitialization();
         });
     }
-    function jQuerySelect2Initialization() {
+
+    function jQuerySelect2Initialization(): void {
         $.ui.dialog.prototype._allowInteraction = function (event) {
             if ($(event.target).closest(".ui-dialog").length) {
                 return true;
             }
             return !!$(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, #support-modal").length;
         };
-    }
-    ;
+    };
+
     if (window['jQuery'] && window['jQuery']['ui']) {
         jQuerySelect2Initialization();
     }
@@ -227,12 +275,13 @@
                 jQuerySelect2Initialization();
         });
     }
+
     function ssExceptionInitialization() {
         ss.Exception.prototype.toString = function () {
             return this.get_message();
         };
-    }
-    ;
+    };
+
     if (ss && ss.Exception)
         ssExceptionInitialization();
     else {
@@ -241,4 +290,4 @@
                 ssExceptionInitialization();
         });
     }
-})(Q || (Q = {}));
+}

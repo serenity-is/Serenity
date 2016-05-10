@@ -1,0 +1,14 @@
+﻿{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "preserveConstEnums": true,
+        "experimentalDecorators": true,
+        "declaration": true,
+        "emitBOM": true,
+        "sourceMap": true,
+        "target": "ES5"
+    },
+    "exclude": [
+        "scripts/serenity"
+    ]
+}
