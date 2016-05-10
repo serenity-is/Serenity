@@ -44,7 +44,10 @@ WriteLiteral("namespace ");
 WriteLiteral(" {\r\n    \r\n    ");
 
 
-WriteLiteral("@Serenity.Decorators.registerClass()\r\n    export class ");
+WriteLiteral("@Serenity.Decorators.registerClass()\r\n    ");
+
+
+WriteLiteral("@Serenity.Decorators.responsive()\r\n    export class ");
 
 
              Write(Model.ClassName);
