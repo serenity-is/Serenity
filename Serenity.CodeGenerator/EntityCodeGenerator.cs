@@ -42,8 +42,18 @@ namespace Serenity.CodeGenerator
 
             siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
             siteWebPath = Path.GetDirectoryName(siteWebProj);
-            scriptProject = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.ScriptProjectFile));
-            scriptPath = Path.GetDirectoryName(scriptProject);
+            if (!string.IsNullOrEmpty(config.ScriptProjectFile))
+            {
+                scriptProject = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.ScriptProjectFile));
+                scriptPath = Path.GetDirectoryName(scriptProject);
+
+                if (!File.Exists(scriptProject))
+                {
+                    scriptProject = null;
+                    scriptPath = null;
+                }
+            }
+
             this.config = config;
         }
 
@@ -62,7 +72,7 @@ namespace Serenity.CodeGenerator
             GeneratePageController();
             GeneratePageIndex();
 
-            if (config.GenerateSSImports)
+            if (config.GenerateSSImports && scriptProject != null)
             {
                 GenerateScriptRowSS();
                 GenerateScriptServiceSS();
@@ -81,7 +91,7 @@ namespace Serenity.CodeGenerator
                 GenerateScriptGridTS();
                 GenerateScriptDialogTS();
             }
-            else
+            else if (scriptProject != null)
             {
                 GenerateScriptGridSS();
                 GenerateScriptDialogSS();
