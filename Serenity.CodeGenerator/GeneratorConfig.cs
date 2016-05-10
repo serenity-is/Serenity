@@ -53,7 +53,9 @@ namespace Serenity.CodeGenerator
             if (IsNugetPackage())
             {
                 var configPath = Path.GetDirectoryName(GetConfigurationFilePath());
-                var webProjectFile = Directory.GetFiles(configPath, "*.Web.csproj").FirstOrDefault();
+                var webProjectFile = Directory.GetFiles(configPath, "*.csproj", SearchOption.AllDirectories)
+                    .FirstOrDefault(x => x.EndsWith(".Web.csproj", StringComparison.OrdinalIgnoreCase));
+
                 if (webProjectFile != null)
                 {
                     var fn = Path.GetFileName(webProjectFile);
@@ -61,7 +63,9 @@ namespace Serenity.CodeGenerator
                     WebProjectFile = GetRelativePath(webProjectFile, AppDomain.CurrentDomain.BaseDirectory);
                 }
 
-                var scriptProjectFile = Directory.GetFiles(configPath, "*.Script.csproj").FirstOrDefault();
+                var scriptProjectFile = Directory.GetFiles(configPath, "*.csproj", SearchOption.AllDirectories)
+                    .FirstOrDefault(x => x.EndsWith(".Script.csproj", StringComparison.OrdinalIgnoreCase));
+
                 if (File.Exists(scriptProjectFile))
                 {
                     ScriptProjectFile = GetRelativePath(scriptProjectFile, AppDomain.CurrentDomain.BaseDirectory);
