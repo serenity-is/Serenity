@@ -127,7 +127,7 @@ namespace Serenity.CodeGenerator
                     "set its path in CodeGenerator.config file!", TFPath));
             }
 
-            Process.Start(TFPath, command + " " + file).WaitForExit(10000);
+            Process.Start(TFPath, command + " \"" + file + "\"").WaitForExit(10000);
         }
 
         public static void CheckoutAndWrite(string file, byte[] contents, bool addToSourceControl)
@@ -183,15 +183,15 @@ namespace Serenity.CodeGenerator
                     throw new Exception(
                         "Couldn't locate KDiff3 utility which is required to merge changes. " +
                         "Please install it, or if it is not installed to default location, " +
-                        "set its path in CodeGenerator.config file! (TFPath setting)");
+                        "set its path in CodeGenerator.config file!");
 
                 throw new Exception(String.Format(
                     "Couldn't locate KDiff3 utility at '{0}' which is required to merge changes. " +
                     "Please install it, or if it is not installed to default location, " +
-                    "set its path in CodeGenerator.config file! (TFPath setting)", Kdiff3Path));
+                    "set its path in CodeGenerator.config file!", Kdiff3Path));
             }
 
-            Process.Start(Kdiff3Path, "--auto " + file + " " + generated + " -o " + file);
+            Process.Start(Kdiff3Path, "--auto \"" + file + "\" \"" + generated + "\" -o \"" + file + "\"");
         }
 
         public static void SetupTFSIntegration(string tfPath)
