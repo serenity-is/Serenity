@@ -305,8 +305,6 @@
     <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
     <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.d.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.d.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\Serenity.Externals.Slick.d.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.IntegerEditorTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Formatters\Formatters.UrlFormatterTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.TextAreaEditorTests.ts" />
@@ -397,10 +395,6 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\serenity\Serenity.CoreLib.js" />
     <Content Include="Scripts\serenity\Serenity.CoreLib.min.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.min.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.Slick.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.Slick.min.js" />
     <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
     <Content Include="ScriptTests\qunit\qunit.css" />
     <Content Include="ScriptTests\qunit\qunit.js" />

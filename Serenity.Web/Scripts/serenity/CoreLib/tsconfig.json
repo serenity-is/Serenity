@@ -62,6 +62,7 @@
         "UI/Widgets/PropertyGrid.ts",
         "UI/Widgets/Toolbar.ts",
         "UI/jQuery/jQuery.FlexifyPlugin.ts",
+        "UI/jQuery/jQuery.WidgetPlugin.ts",
         "UI/jQuery/jQueryUI.ButtonNoConflict.ts",
         "Serenity.Externals.Slick.ts",
         "Serenity.Externals.ts"

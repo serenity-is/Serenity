@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -20,8 +20,9 @@
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptCharset>utf-8</TypeScriptCharset>
     <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
-    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
+    <TypeScriptOutFile>Dummy.js</TypeScriptOutFile>
     <TypeScriptCompileOnSaveEnabled>False</TypeScriptCompileOnSaveEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -794,6 +795,7 @@
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Config.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\ServiceError.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\ServiceResponse.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQuery.WidgetPlugin.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQueryUI.ButtonNoConflict.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQuery.FlexifyPlugin.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Toolbar.ts" />

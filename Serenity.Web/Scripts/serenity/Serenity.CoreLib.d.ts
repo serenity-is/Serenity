@@ -2016,6 +2016,14 @@ interface JQuery {
     flexX(flexX: number): JQuery;
     flexY(flexY: number): JQuery;
 }
+interface JQuery {
+    getWidget<TWidget>(widgetType: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+    tryGetWidget<TWidget>(widgetType: {
+        new (...args: any[]): TWidget;
+    }): TWidget;
+}
 declare namespace Slick.Data {
     function GroupItemMetadataProvider(): void;
 }
