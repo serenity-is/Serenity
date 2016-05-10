@@ -40,6 +40,8 @@ namespace Serenity.CodeGenerator
             if (config.TFSIntegration)
                 CodeFileHelper.SetupTFSIntegration(config.TFPath);
 
+            CodeFileHelper.SetupTSCPath(config.TSCPath);
+
             siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
             siteWebPath = Path.GetDirectoryName(siteWebProj);
             if (!string.IsNullOrEmpty(config.ScriptProjectFile))
@@ -59,9 +61,10 @@ namespace Serenity.CodeGenerator
 
         public void Run()
         {
-            Directory.CreateDirectory(scriptPath);
+            if (!scriptPath.IsEmptyOrNull())
+                Directory.CreateDirectory(scriptPath);
+
             Directory.CreateDirectory(siteWebPath);
-            Directory.CreateDirectory(scriptPath);
 
             GenerateRow();
             GenerateCss();
@@ -95,6 +98,12 @@ namespace Serenity.CodeGenerator
             {
                 GenerateScriptGridSS();
                 GenerateScriptDialogSS();
+            }
+
+            if (config.GenerateTSCode ||
+                config.GenerateTSTypings)
+            {
+                CodeFileHelper.ExecuteTSC(Path.Combine(siteWebPath, @"Scripts\"), "");
             }
         }
 

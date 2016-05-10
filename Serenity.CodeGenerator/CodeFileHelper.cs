@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace Serenity.CodeGenerator
 {
@@ -13,6 +15,7 @@ namespace Serenity.CodeGenerator
         public static string Kdiff3Path;
         public static bool TFSIntegration;
         public static string TFPath;
+        public static string TSCPath;
 
         private bool InsertDefinition(string file, string type, string key, string code)
         {
@@ -179,13 +182,13 @@ namespace Serenity.CodeGenerator
                 if (Kdiff3Path.IsNullOrEmpty())
                     throw new Exception(
                         "Couldn't locate KDiff3 utility which is required to merge changes. " +
-                        "Please install it, or if it is not installed to default location, " + 
-                        "set its path in CodeGenerator.config file!");
+                        "Please install it, or if it is not installed to default location, " +
+                        "set its path in CodeGenerator.config file! (TFPath setting)");
 
                 throw new Exception(String.Format(
                     "Couldn't locate KDiff3 utility at '{0}' which is required to merge changes. " +
                     "Please install it, or if it is not installed to default location, " +
-                    "set its path in CodeGenerator.config file!", Kdiff3Path));
+                    "set its path in CodeGenerator.config file! (TFPath setting)", Kdiff3Path));
             }
 
             Process.Start(Kdiff3Path, "--auto " + file + " " + generated + " -o " + file);
@@ -222,6 +225,59 @@ namespace Serenity.CodeGenerator
                 // to give meaningfull error
                 TFPath = tfPath.TrimToNull();
             }
+        }
+
+        public static void SetupTSCPath(string tscPath)
+        {
+            if (!string.IsNullOrEmpty(tscPath) && File.Exists(tscPath))
+                TSCPath = tscPath;
+            else
+            {
+                var pf86 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                    @"Microsoft SDKs\TypeScript\");
+
+                var pf64 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    @"Microsoft SDKs\TypeScript\");
+
+                var list = new List<string>();
+                if (Directory.Exists(pf86))
+                    list.AddRange(Directory.GetFiles(pf86, "tsc.exe", SearchOption.AllDirectories));
+                if (Directory.Exists(pf64))
+                    list.AddRange(Directory.GetFiles(pf64, "tsc.exe", SearchOption.AllDirectories));
+
+                if (list.Count > 0)
+                {
+                    TSCPath = list.OrderByDescending(x => Path.GetFileName(Path.GetDirectoryName(x)))
+                        .FirstOrDefault();
+
+                    return;
+                }
+                
+                // to give meaningfull error
+                TSCPath = tscPath.TrimToNull();
+            }
+        }
+
+        public static void ExecuteTSC(string workingDirectory, string arguments)
+        {
+            if (TSCPath.IsNullOrEmpty() ||
+                !File.Exists(TSCPath))
+            {
+                if (TSCPath.IsNullOrEmpty())
+                    throw new Exception(
+                        "Couldn't locate TSC.EXE file which is required for TypeScript compilation. " +
+                        "Please install it, or if it is not installed to default location, " +
+                        "set its path in CodeGenerator.config file (TSCPath setting)!");
+
+                throw new Exception(String.Format(
+                    "Couldn't locate TSC.EXE file at '{0}' which is required for TypeScript compilation. " +
+                    "Please install it, or if it is not installed to default location, " +
+                    "set its path in CodeGenerator.config file! (TSCPath setting)", TSCPath));
+            }
+
+            var psi = new ProcessStartInfo(TSCPath, arguments);
+            psi.WorkingDirectory = workingDirectory;
+            Process.Start(psi).WaitForExit(10000);
         }
     }
 }

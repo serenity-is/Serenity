@@ -13,6 +13,7 @@ namespace Serenity.CodeGenerator
         public List<Connection> Connections { get; set; }
         public string KDiff3Path { get; set; }
         public string TFPath { get; set; }
+        public string TSCPath { get; set; }
         public bool TFSIntegration { get; set; }
         public string WebProjectFile { get; set; }
         public string ScriptProjectFile { get; set; }
