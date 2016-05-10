@@ -1,3 +1,9 @@
+## 2.1.1 (2016-05-10)
+
+Features:
+  - Sergen will try to locate TSC and execute it after generating TypeScript code to avoid script errors
+  - if script project doesn't exist switch to TypeScript generation by default and don't try to generate Saltaralle code
+
 ## 2.1.0 (2016-05-09)
 
 Features:
