@@ -30,8 +30,8 @@ namespace Serenity.CodeGenerator
                 Environment.SpecialFolder.ProgramFilesX86), @"KDiff3\kdiff3.exe");
             BaseRowClasses = new List<BaseRowClass>();
             GenerateTSTypings = true;
-            GenerateSSImports = true;
-            GenerateTSCode = false;
+            GenerateSSImports = false;
+            GenerateTSCode = true;
             SetDefaults();
         }
 
@@ -52,21 +52,19 @@ namespace Serenity.CodeGenerator
             if (IsNugetPackage())
             {
                 var configPath = Path.GetDirectoryName(GetConfigurationFilePath());
-                var solutions = Directory.GetFiles(configPath, "*.sln");
-                if (solutions.Length == 1)
+                var webProjectFile = Directory.GetFiles(configPath, "*.Web.csproj").FirstOrDefault();
+                if (webProjectFile != null)
                 {
-                    RootNamespace = Path.GetFileNameWithoutExtension(solutions[0]);
-                    var subPath = Path.Combine(configPath, RootNamespace);
+                    var fn = Path.GetFileName(webProjectFile);
+                    RootNamespace = fn.Substring(0, fn.Length - ".Web.csproj".Length);
+                    WebProjectFile = GetRelativePath(webProjectFile, AppDomain.CurrentDomain.BaseDirectory);
+                }
 
-                    var webProjectFile = Path.Combine(subPath, RootNamespace + ".Web");
-                    webProjectFile = Path.Combine(webProjectFile, RootNamespace + ".Web.csproj");
-                    if (File.Exists(webProjectFile))
-                        WebProjectFile = GetRelativePath(webProjectFile, AppDomain.CurrentDomain.BaseDirectory);
-
-                    var scriptProjectFile = Path.Combine(subPath, RootNamespace + ".Script");
-                    scriptProjectFile = Path.Combine(scriptProjectFile, RootNamespace + ".Script.csproj");
-                    if (File.Exists(scriptProjectFile))
-                        ScriptProjectFile = GetRelativePath(scriptProjectFile, AppDomain.CurrentDomain.BaseDirectory);
+                var scriptProjectFile = Directory.GetFiles(configPath, "*.Script.csproj").FirstOrDefault();
+                if (File.Exists(scriptProjectFile))
+                {
+                    ScriptProjectFile = GetRelativePath(scriptProjectFile, AppDomain.CurrentDomain.BaseDirectory);
+                    GenerateSSImports = true;
                 }
             }
         }
