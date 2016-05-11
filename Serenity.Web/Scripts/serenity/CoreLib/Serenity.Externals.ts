@@ -1,10 +1,16 @@
-﻿namespace Q {
+﻿/// <reference path = "Q/Q.Config.ts" />
+/// <reference path = "Q/Q.Culture.ts" />
+/// <reference path = "Q/Q.LocalText.ts" />
+/// <reference path = "Q/Q.Notify.ts" />
+/// <reference path = "Q/Q.Url.ts" />
 
-    let oldShowLabel: (HtmlElement, message) => void;
+namespace Q {
+
+    let oldShowLabel: (e: HTMLElement, message: string) => void;
 
     function validateShowLabel(element: HTMLElement, message: string) {
         oldShowLabel.call(this, element, message);
-        this.errorsFor(element).each(function (i, e) {
+        this.errorsFor(element).each(function (i: number, e: any) {
 
             if ($(element).hasClass('error'))
                 $(e).removeClass('checked');
@@ -15,7 +21,7 @@
 
     function registerCustomValidationMethods() {
         if ($.validator.methods['customValidate'] == null) {
-            ($.validator as any).addMethod('customValidate', function (value, element) {
+            ($.validator as any).addMethod('customValidate', function (value: any, element: any) {
                 var result = this.optional(element);
                 if (element == null || !!result) {
                     return result;
@@ -41,7 +47,7 @@
                     }
                 }
                 return true;
-            }, function (o, e) {
+            }, function (o: any, e: any) {
                 return $(e).data('customValidationMessage');
             });
         }
@@ -105,19 +111,19 @@
         let d = (<any>$.validator).defaults;
 
         d.ignoreTitle = true;
-        d.onchange = function (element) {
+        d.onchange = function (element: any) {
             this.element(element);
         };
         p.oldinit = p.init;
         p.init = function () {
             p.oldinit.call(this);
-            function changeDelegate(event) {
+            function changeDelegate(event: any) {
                 if (this.form == null)
                     return;
                 let validator = $.data(this.form, "validator"), eventType = "on" + event.type.replace(/^validate/, "");
                 validator && validator.settings[eventType] && validator.settings[eventType].call(validator, this);
             }
-            function delegate(event) {
+            function delegate(event: any) {
                 let el = this[0];
                 if (!$.data(el, 'changebound')) {
                     $(el).change(changeDelegate);
@@ -134,7 +140,7 @@
             this.oldfocusInvalid.call(this);
         };
         p.oldstopRequest = p.focusInvalid;
-        p.stopRequest = function (element, valid) {
+        p.stopRequest = function (element: any, valid: boolean) {
             let formSubmitted = this.formSubmitted;
             this.oldfocusInvalid.call(this, [element, valid]);
             if (!valid && this.pendingRequest == 0 && formSubmitted && this.settings.abortHandler) {
@@ -164,20 +170,20 @@
         });
     };
 
-    export function validatorAbortHandler(validator) {
+    export function validatorAbortHandler(validator: any) {
         validator.settings.abortHandler = null;
         validator.settings.submitHandler = function () {
             return false;
         };
     };
 
-    export function validateOptions(options) {
+    export function validateOptions(options: JQueryValidation.ValidationOptions) {
         return $.extend({
             ignore: ":hidden",
             meta: 'v',
             errorClass: 'error',
-            errorPlacement: function (error, element) {
-                let field = null;
+            errorPlacement: function (error: any, element: any) {
+                let field: any = null;
                 let vx = element.attr('data-vx-id');
                 if (vx) {
                     field = $('#' + vx);
@@ -204,7 +210,7 @@
             invalidHandler: function () {
                 Q.notifyError(Q.text("Validation.InvalidFormMessage"));
             },
-            success: function (label) {
+            success: function (label: JQuery) {
                 label.addClass('checked');
             }
         }, options);
@@ -258,7 +264,7 @@
     }
 
     function jQuerySelect2Initialization(): void {
-        $.ui.dialog.prototype._allowInteraction = function (event) {
+        $.ui.dialog.prototype._allowInteraction = function (event: any) {
             if ($(event.target).closest(".ui-dialog").length) {
                 return true;
             }

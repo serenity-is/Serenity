@@ -27,6 +27,6 @@ $.fn.flexX = function (flexX: number): JQuery {
     return this.data('flex-x', flexX);
 }
 
-$.fn.flexY = function (flexY): JQuery {
+$.fn.flexY = function (flexY: number): JQuery {
     return this.data('flex-y', flexY);
 }

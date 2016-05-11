@@ -1,4 +1,6 @@
-﻿/// <reference path="Q.LocalText.ts" />
+﻿/// <reference path="../../../typings/jquery/jquery.d.ts" />
+/// <reference path="../../../typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="Q.LocalText.ts" />
 /// <reference path="Q.Html.ts" />
 
 namespace Q {
@@ -15,7 +17,7 @@ namespace Q {
     }
 
     export function alert(message: string, options?: AlertOptions) {
-        let dialog;
+        let dialog: JQuery;
         options = <Q.AlertOptions>$.extend({
             htmlEncode: true,
             okButton: text('Dialogs.OkButton'),
@@ -43,7 +45,7 @@ namespace Q {
         if (options.htmlEncode)
             message = htmlEncode(message);
         if (!options.buttons) {
-            let buttons = [];
+            let buttons: any[] = [];
             buttons.push({
                 text: options.okButton,
                 click: function () {
@@ -69,7 +71,7 @@ namespace Q {
     }
 
     export function confirm(message: string, onYes: () => void, options?: ConfirmOptions): void {
-        let dialog;
+        let dialog: JQuery;
         options = $.extend({
             htmlEncode: true,
             yesButton: text('Dialogs.YesButton'),
@@ -103,7 +105,7 @@ namespace Q {
             message = htmlEncode(message);
         let clicked = false;
         if (!options.buttons) {
-            let buttons = [];
+            let buttons: any[] = [];
             buttons.push({
                 text: options.yesButton,
                 click: function () {
@@ -140,7 +142,7 @@ namespace Q {
     }
 
     export function iframeDialog(options: IFrameDialogOptions) {
-        let doc;
+        let doc: any;
         let e = $('<div><iframe></iframe></div>');
         let settings: IFrameDialogOptions = $.extend(<JQueryUI.DialogOptions>{
             autoOpen: true,

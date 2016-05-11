@@ -584,3 +584,4 @@
         CodeGeneration.parseTypes = parseTypes;
     })(CodeGeneration = Serenity.CodeGeneration || (Serenity.CodeGeneration = {}));
 })(Serenity || (Serenity = {}));
+//# sourceMappingURL=Serenity.CodeGeneration.js.map

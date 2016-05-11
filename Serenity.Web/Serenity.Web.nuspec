@@ -47,6 +47,8 @@
     <file src="..\..\Style\images\*.png" target="content/Content/serenity/images" />
     <file src="..\..\Style\images\*.gif" target="content/Content/serenity/images" />
     <file src="..\..\Style\images\*.jpg" target="content/Content/serenity/images" />   
+    <file src="..\..\Scripts\typings\rsvp\rsvp.d.ts" target="content/Scripts/typings/rsvp" />	
+    <file src="..\..\Scripts\typings\slickgrid\slickgrid.d.ts" target="content/Scripts/typings/slickgrid" />	
     <file src="..\..\Scripts\Serenity\Serenity.CoreLib.js" target="content/Scripts/serenity" />
     <file src="..\..\Scripts\Serenity\Serenity.CoreLib.min.js" target="content/Scripts/serenity" />
     <file src="..\..\Scripts\Serenity\Serenity.CoreLib.d.ts" target="content/Scripts/serenity" />

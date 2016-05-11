@@ -1,4 +1,5 @@
-﻿/// <reference path="../Imports/JQBlockUI.ts" />
+﻿/// <reference path="../../../typings/jquery.blockUI/jquery.blockUI.d.ts" />
+/// <reference path="../Imports/JQBlockUI.ts" />
 
 namespace Q {
     let blockUICount: number = 0;

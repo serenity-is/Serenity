@@ -23,7 +23,7 @@
                         }
                     });
                 }
-                var dialog;
+                var dialog: JQuery;
                 if (element.hasClass('ui-dialog')) {
                     dialog = element.children('.ui-dialog-content');
                 }
@@ -61,7 +61,7 @@
                 callback();
             }
 
-            var check = function (e) {
+            var check = function (e: any) {
                 if (element.is(':visible')) {
                     if (!wasVisible) {
                         wasVisible = true;

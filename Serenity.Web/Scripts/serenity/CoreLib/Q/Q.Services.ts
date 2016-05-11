@@ -59,7 +59,7 @@ namespace Q {
             error: function (xhr, status, ev) {
                 try {
                     if (xhr.status === 403) {
-                        var l = null;
+                        var l: any = null;
                         try {
                             l = xhr.getResponseHeader('Location');
                         }
@@ -107,7 +107,7 @@ namespace Q {
         }, options));
     }
 
-    export function setEquality(request, field, value) {
+    export function setEquality(request: Serenity.ListRequest, field: string, value: any) {
         if (request.EqualityFilter == null) {
             request.EqualityFilter = {};
         }

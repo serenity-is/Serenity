@@ -1,4 +1,5 @@
-﻿/// <reference path="../Imports/SS.ts" />
+﻿/// <reference path="../../../typings/jquery/jquery.d.ts" />
+/// <reference path="../Imports/SS.ts" />
 
 namespace Q {
     export function coalesce(a: any, b: any): any {
@@ -11,7 +12,16 @@ namespace Q {
 
     // derived from https://github.com/mistic100/jQuery.extendext/blob/master/jQuery.extendext.js
     export function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem {
-        let options, name, src, copy, copyIsArray, clone, target = arguments[0] || {}, i = 1, length = arguments.length;
+        let options: any,
+            name: string,
+            src: any,
+            copy: any,
+            copyIsArray: boolean,
+            clone: any,
+            target = arguments[0] || {},
+            i = 1,
+            length = arguments.length;
+
         // Handle case when target is a string or something (possible in deep copy)
         if (typeof target !== "object" && !$.isFunction(target)) {
             target = {};

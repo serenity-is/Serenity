@@ -166,8 +166,8 @@
 
     class Widget<TOptions> {
         constructor(element: JQuery, options?: TOptions);
-        protected destroy();
-        protected addCssClass();
+        protected destroy(): void;
+        protected addCssClass(): void;
         protected getCssClass(): string;
         protected initializeAsync(): PromiseLike<void>;
         protected asyncPromise: PromiseLike<void>;
@@ -177,8 +177,8 @@
         protected options: TOptions;
         addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
         getGridField(): JQuery;
-        change(handler: (e: JQueryEventObject) => void);
-        changeSelect2(handler: (e: JQueryEventObject) => void);
+        change(handler: (e: JQueryEventObject) => void): void;
+        changeSelect2(handler: (e: JQueryEventObject) => void): void;
         initialize(): PromiseLike<void>;
         isAsyncWidget(): boolean;
 
@@ -409,7 +409,7 @@
         protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>): boolean;
         protected getLookup(): Q.Lookup<TItem>;
         protected getLookupKey(): string;
-        protected initNewEntity(entity: TItem);
+        protected initNewEntity(entity: TItem): void;
         protected updateItems(): void;
         protected getDialogTypeKey(): string;
         protected createEditDialog(callback: (dlg: Serenity.IEditDialog) => void): void;
@@ -552,14 +552,14 @@
         protected getDialogOptions(): JQueryUI.DialogOptions;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected handleResponsive();
-        protected initDialog();
-        protected initTabs();
-        protected initToolbar();
-        protected initValidator();
-        protected onDialogClose();
-        protected onDialogOpen();
-        protected resetValidation();
+        protected handleResponsive(): void;
+        protected initDialog(): void;
+        protected initTabs(): void;
+        protected initToolbar(): void;
+        protected initValidator(): void;
+        protected onDialogClose(): void;
+        protected onDialogOpen(): void;
+        protected resetValidation(): void;
         protected validateForm(): boolean;
         public get_dialogTitle(): string;
         public set_dialogTitle(value: string): void;
@@ -576,10 +576,10 @@
         protected arrange(): void;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected initTabs();
-        protected initToolbar();
-        protected initValidator();
-        protected resetValidation();
+        protected initTabs(): void;
+        protected initToolbar(): void;
+        protected initValidator(): void;
+        protected resetValidation(): void;
         protected validateForm(): boolean;
     }
 
@@ -595,8 +595,8 @@
         protected getSaveEntity(): TItem;
         protected initializeAsync(): PromiseLike<void>;
         protected loadInitialEntity(): void;
-        protected set_entity(entity: TItem);
-        protected set_entityId(value: any);
+        protected set_entity(entity: TItem): void;
+        protected set_entityId(value: any): void;
         protected validateBeforeSave(): boolean;
     }
 
@@ -612,8 +612,8 @@
         protected get_entityId(): any;
         protected initializeAsync(): PromiseLike<void>;
         protected loadInitialEntity(): void;
-        protected set_entity(entity: TItem);
-        protected set_entityId(value: any);
+        protected set_entity(entity: TItem): void;
+        protected set_entityId(value: any): void;
         protected validateBeforeSave(): boolean;
     }
 
@@ -631,8 +631,8 @@
         loadByIdAndOpenDialog(id: any): void;
         protected afterLoadEntity(): void;
         protected beforeLoadEntity(entity: TItem): void;
-        protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void);
-        protected doDelete(callback: (response: DeleteResponse) => void);
+        protected deleteHandler(options: ServiceOptions<DeleteResponse>, callback: (response: DeleteResponse) => void): void;
+        protected doDelete(callback: (response: DeleteResponse) => void): void;
         protected getCloningEntity(): TItem;
         protected getDeleteOptions(callback: (response: DeleteResponse) => void): ServiceOptions<DeleteResponse>;
         protected getEntityIdField(): string;
@@ -667,10 +667,10 @@
         protected isNewOrDeleted(): boolean;
         protected initToolbar(): void;
         protected initializeAsync(): PromiseLike<void>;
-        public load(entityOrId, done: () => void, fail: () => void): void;
+        public load(entityOrId: any, done: () => void, fail: () => void): void;
         public loadById(id: any): void;
         public loadByIdAndOpenDialog(id: any): void;
-        protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void);
+        protected loadByIdHandler(options: ServiceOptions<RetrieveResponse<TItem>>, callback: (response: RetrieveResponse<TItem>) => void, fail: () => void): void;
         public loadEntity(entity: any): void;
         public loadEntityAndOpenDialog(entity: any): void;
         public loadNewAndOpenDialog(): void;
@@ -686,7 +686,7 @@
         protected set_entityId(id: any): void;
         protected showSaveSuccessMessage(response: SaveResponse): void;;
         protected undelete(): void;
-        protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void);
+        protected undeleteHandler(options: ServiceOptions<UndeleteResponse>, callback: (response: UndeleteResponse) => void): void;
         protected updateInterface(): void;
         protected updateTitle(): void;
         protected validateBeforeSave(): boolean;
@@ -711,7 +711,7 @@
         protected quickFiltersDiv: JQuery;
         protected slickContainer: JQuery;
         protected toolbar: Toolbar;
-        protected addDateRangeFilter(field: string, title?: string);
+        protected addDateRangeFilter(field: string, title?: string): DateEditor;
         protected addQuickFilter<TWidget extends Widget<any>, TOptions>(filter: QuickFilter<TWidget, TOptions>): TWidget;
         protected addFilterSeperator(): void;
         protected add_submitHandlers(action: () => void): void;
@@ -728,9 +728,9 @@
         protected createToolbar(): void;
         protected createToolbarExtensions(): void;
         protected createView(): Slick.RemoteView<TItem>;
-        protected determineText(text: string, getKey: (s: string) => string);
-        protected editItem(entityOrId: any);
-        protected editItemOfType(itemType: string, entityOrId: any);
+        protected determineText(text: string, getKey: (s: string) => string): string;
+        protected editItem(entityOrId: any): void;
+        protected editItemOfType(itemType: string, entityOrId: any): void;
         protected enableFiltering(): boolean;
         protected findQuickFilter<TWidget>(type: { new (...args: any[]): TWidget }, field: string): TWidget
         protected getAddButtonCaption(): string;
@@ -741,7 +741,7 @@
         protected getDefaultSortBy(): string[];
         protected getGridCanLoad(): boolean;
         protected getIdProperty(): string;
-        protected getIncludeColumns(include: { [key: string]: boolean });
+        protected getIncludeColumns(include: { [key: string]: boolean }): void;
         protected getInitialTitle(): string;
         protected getIsActiveFieldName(): string;
         protected getItemCssClass(item: TItem, index: number): string;
@@ -754,15 +754,15 @@
         protected getQuickSearchFields(): QuickSearchField[];
         protected getSlickOptions(): Slick.GridOptions;
         protected getViewOptions(): Slick.RemoteViewOptions;
-        protected initialPopulate();
+        protected initialPopulate(): void;
         protected initializeAsync(): PromiseLike<void>;
-        protected internalRefresh();
-        protected invokeSubmitHandlers();
+        protected internalRefresh(): void;
+        protected invokeSubmitHandlers(): void;
         protected itemLink(itemType?: string, idField?: string, text?: (ctx: Slick.FormatterContext) => string,
-            cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean);
+            cssClass?: (ctx: Slick.FormatterContext) => string, encode?: boolean): void;
         protected layout(): void;
         protected markupReady(): void;
-        protected onClick(e: JQueryEventObject, row: number, cell: number);
+        protected onClick(e: JQueryEventObject, row: number, cell: number): void;
         protected onViewFilter(item: TItem): boolean;
         protected onViewProcessData(response: ListResponse<TItem>): ListResponse<TItem>;
         protected onViewSubmit(): boolean;
@@ -775,18 +775,18 @@
         protected resizeCanvas(): void;
         protected setCriteriaParameter(): void;
         protected setEquality(field: string, value: any): void;
-        protected setIncludeColumnsParameter();
-        protected setInitialSortOrder();
-        protected subDialogDataChange();
-        protected updateDisabledState();
+        protected setIncludeColumnsParameter(): void;
+        protected setInitialSortOrder(): void;
+        protected subDialogDataChange(): void;
+        protected updateDisabledState(): void;
         protected usePager(): boolean;
         public refresh(): void;
         public getItems(): TItem[];
-        public setItems(value: TItem[]);
+        public setItems(value: TItem[]): void;
         public isDisabled: boolean;
-        public setIsDisabled(value: boolean);
+        public setIsDisabled(value: boolean): void;
         public getTitle(): string;
-        public setTitle(value: string);
+        public setTitle(value: string): void;
         public itemAt(row: number): TItem;
         public rowCount(): number;
         public view: Slick.RemoteView<TItem>;
@@ -811,8 +811,8 @@
         protected getItemName(): string;
         protected getEntityType(): string;
         protected getService(): string;
-        protected initDialog(dialog: Widget<any>);
-        protected initEntityDialog(itemType: string, dialog: Widget<any>);
+        protected initDialog(dialog: Widget<any>): void;
+        protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
         protected newRefreshButton(noText?: boolean): ToolButton;
     }
 

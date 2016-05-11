@@ -4,7 +4,7 @@
 
 namespace Q {
 
-    export function prop(type: any, name: string, getter?, setter?) {
+    export function prop(type: any, name: string, getter?: string, setter?: string) {
         getter = getter || "get_" + name;
         setter = setter || "set_" + name;
 
@@ -20,8 +20,8 @@ namespace Q {
         });
     }
 
-    function enumerateTypes(global, namespaces: string[], callback: (type: any, fullName: string) => void) {
-        function scan(root, fullName, depth) {
+    function enumerateTypes(global: any, namespaces: string[], callback: (type: any, fullName: string) => void): void {
+        function scan(root: any, fullName: string, depth: number) {
             if (!root)
                 return;
 

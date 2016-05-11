@@ -1,6 +1,7 @@
 ﻿/// <reference path="Q.BlockUI.ts" />
 /// <reference path="Q.StringHelpers.ts" />
 /// <reference path="Q.Url.ts" />
+/// <reference path="../../../typings/rsvp/rsvp.d.ts" />
 
 namespace Q {
 
@@ -8,27 +9,27 @@ namespace Q {
         let registered: { [key: string]: any } = {};
         let loadedData: { [key: string]: any } = {};
 
-        export function bindToChange(name, regClass, onChange) {
-            ($(document.body) as any).bind('scriptdatachange.' + regClass, function (e, s) {
+        export function bindToChange(name: string, regClass: string, onChange: () => void) {
+            ($(document.body) as any).bind('scriptdatachange.' + regClass, function (e: any, s: string) {
                 if (s == name) {
                     onChange();
                 }
             });
         }
 
-        export function triggerChange(name) {
+        export function triggerChange(name: string) {
             $(document.body).triggerHandler('scriptdatachange', [name]);
         }
 
-        export function unbindFromChange(regClass) {
+        export function unbindFromChange(regClass: string) {
             $(document.body).unbind('scriptdatachange.' + regClass);
         }
 
-        function syncLoadScript(url) {
+        function syncLoadScript(url: string) {
             $.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
         }
 
-        function loadScriptAsync(url) {
+        function loadScriptAsync(url: string) {
             return RSVP.resolve().then(function () {
                 Q.blockUI(null);
                 return RSVP.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function () {
@@ -114,68 +115,68 @@ namespace Q {
             return (loadedData[name] != null || registered[name] != null);
         }
 
-        export function setRegisteredScripts(scripts) {
+        export function setRegisteredScripts(scripts: any[]) {
             registered = {};
             for (var k in scripts) {
                 registered[k] = scripts[k].toString();
             }
         }
 
-        export function set(name: string, value) {
+        export function set(name: string, value: any) {
             loadedData[name] = value;
             triggerChange(name);
         }
     }
 
-    export function getRemoteData(key) {
+    export function getRemoteData(key: string) {
         return ScriptData.ensure('RemoteData.' + key);
     }
 
-    export function getRemoteDataAsync(key) {
+    export function getRemoteDataAsync(key: string) {
         return ScriptData.ensureAsync('RemoteData.' + key);
     }
 
-    export function getLookup<TItem>(key): Lookup<TItem> {
+    export function getLookup<TItem>(key: string): Lookup<TItem> {
         return ScriptData.ensure('Lookup.' + key);
     }
 
-    export function getLookupAsync<TItem>(key): RSVP.Thenable<Lookup<TItem>> {
+    export function getLookupAsync<TItem>(key: string): RSVP.Thenable<Lookup<TItem>> {
         return ScriptData.ensureAsync('Lookup.' + key);
     }
 
-    export function reloadLookup(key) {
+    export function reloadLookup(key: string) {
         ScriptData.reload('Lookup.' + key);
     }
 
-    export function reloadLookupAsync(key) {
+    export function reloadLookupAsync(key: string) {
         return ScriptData.reloadAsync('Lookup.' + key);
     }
 
-    export function getColumns(key) {
+    export function getColumns(key: string) {
         return ScriptData.ensure('Columns.' + key);
     }
 
-    export function getColumnsAsync(key) {
+    export function getColumnsAsync(key: string) {
         return ScriptData.ensureAsync('Columns.' + key);
     }
 
-    export function getForm(key) {
+    export function getForm(key: string) {
         return ScriptData.ensure('Form.' + key);
     }
 
-    export function getFormAsync(key) {
+    export function getFormAsync(key: string) {
         return ScriptData.ensureAsync('Form.' + key);
     }
 
-    export function getTemplate(key) {
+    export function getTemplate(key: string) {
         return ScriptData.ensure('Template.' + key);
     }
 
-    export function getTemplateAsync(key) {
+    export function getTemplateAsync(key: string) {
         return ScriptData.ensureAsync('Template.' + key);
     }
 
-    export function canLoadScriptData(name) {
+    export function canLoadScriptData(name: string) {
         return ScriptData.canLoad(name);
     }
 }

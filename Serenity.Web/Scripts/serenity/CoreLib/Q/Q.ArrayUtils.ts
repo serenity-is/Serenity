@@ -48,7 +48,7 @@ namespace Q {
     }
 
     export function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem {
-        let match;
+        let match: any;
         let found = false;
         for (let x of array)
             if (predicate(x)) {

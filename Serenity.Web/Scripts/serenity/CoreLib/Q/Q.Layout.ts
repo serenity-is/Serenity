@@ -1,9 +1,9 @@
 ﻿namespace Q {
 
-    export function addFullHeightResizeHandler(handler) {
+    export function addFullHeightResizeHandler(handler: (n: number) => void) {
         $('body').addClass('full-height-page');
         let layout = function () {
-            let avail;
+            let avail: number;
             try {
                 avail = parseInt($('.page-content').css('min-height') || '0')
                     - parseInt($('.page-content').css('padding-top') || '0')
@@ -102,7 +102,7 @@
         }
     }
 
-    export function triggerLayoutOnShow(element) {
+    export function triggerLayoutOnShow(element: JQuery) {
         Serenity.LazyLoadHelper.executeEverytimeWhenShown(element, function () {
             element.triggerHandler('layout');
         }, true);

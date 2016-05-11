@@ -66,7 +66,7 @@
         window.setTimeout(function () { form.remove(); }, 0);
     }
 
-    export function resolveUrl(url) {
+    export function resolveUrl(url: string) {
         if (url && url.substr(0, 2) === '~/') {
             return Config.applicationPath + url.substr(2);
         }

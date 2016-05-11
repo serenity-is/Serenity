@@ -1,4 +1,7 @@
-﻿declare namespace Serenity {
+﻿/// <reference path="../../../../typings/jquery/jquery.d.ts" />
+/// <reference path="../../../../typings/jquery.validation/jquery.validation.d.ts" />
+
+declare namespace Serenity {
     namespace ValidationHelper {
         function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
         function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;

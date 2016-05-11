@@ -10,7 +10,7 @@ namespace Q {
         return t;
     }
 
-    export function tryGetText(key): string {
+    export function tryGetText(key: string): string {
         return LT.$table[key];
     }
 
@@ -54,7 +54,7 @@ namespace Q {
             return t;
         }
 
-        static initializeTextClass = function (type, prefix) {
+        static initializeTextClass = function (type: any, prefix: string) {
             var $t1 = arrayClone(Object.keys(type));
             for (var $t2 = 0; $t2 < $t1.length; $t2++) {
                 var member = $t1[$t2];
@@ -68,7 +68,7 @@ namespace Q {
             }
         }
 
-        static getDefault = function (key, defaultText) {
+        static getDefault = function (key: string, defaultText: string) {
             var t = LT.$table[key];
             if (t == null) {
                 t = defaultText;

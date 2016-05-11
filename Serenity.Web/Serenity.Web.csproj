@@ -14,16 +14,14 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
-    <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
   </PropertyGroup>
   <PropertyGroup>
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptCharset>utf-8</TypeScriptCharset>
     <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
-    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
-    <TypeScriptOutFile>Dummy.js</TypeScriptOutFile>
-    <TypeScriptCompileOnSaveEnabled>False</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -277,6 +275,7 @@
     <None Include="Includes\web.config.transform" />
     <None Include="packages.config" />
     <None Include="Scripts\serenity\CoreLib\tsconfig.json" />
+    <None Include="Scripts\serenity\Serenity.CoreLib.js.map" />
     <None Include="Style\images\accessright.png" />
     <None Include="Style\images\add.png" />
     <None Include="Style\images\add2.png" />
@@ -611,7 +610,6 @@
     <None Include="Style\bootstrap\mixins\vendor-prefixes.less" />
     <None Include="Style\bootstrap\variables.less" />
     <None Include="Style\serenity.slickgrid.less" />
-    <None Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
@@ -720,6 +718,8 @@
     <EmbeddedResource Include="Scripts\tsservices\Serenity.CodeGeneration.js" />
     <None Include="Scripts\tsservices\json2.min.js" />
     <EmbeddedResource Include="Scripts\optimization\uglifyjs.min.js" />
+    <Content Include="Scripts\serenity\Serenity.CoreLib.js" />
+    <Content Include="Scripts\serenity\Serenity.CoreLib.min.js" />
     <Content Include="Style\images\32px.png" />
     <Content Include="Style\images\accordion-down.png" />
     <Content Include="Style\images\accordion-left.png" />
@@ -753,60 +753,61 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="Scripts\tsservices\lib.d.ts_" />
-    <TypeScriptCompile Include="Includes\Scripts\typings\rsvp\rsvp.d.ts" />
-    <TypeScriptCompile Include="Includes\Scripts\typings\slickgrid\slickgrid.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\slickgrid\slickgrid.d.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\Decorators\Attributes.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\Decorators\Decorators.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\jQueryStatic.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\JQBlockUI.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\Toastr.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\jQueryStatic.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\RSVP.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\Select2.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\SS.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\Toastr.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ArrayUtils.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.BasicUtils.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.BlockUI.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.CommonTypes.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Config.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Culture.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Date.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Dialogs.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ErrorHandling.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Html.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Layout.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.LocalText.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Lookup.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Notify.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Number.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ScriptData.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Services.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.StringHelpers.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.TypeSystem.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Url.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Serenity.Externals.Slick.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Serenity.Externals.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\Criteria.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\ServiceError.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\ServiceResponse.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Editors\Editors.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Filtering\Filtering.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Formatters\Formatters.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\LazyLoadHelper.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\ValidationHelper.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\SubDialogHelper.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\UploadHelper.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\TabsExtensions.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\SlickHelpers.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\RSVP.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Culture.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Number.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ErrorHandling.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Date.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.BlockUI.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.BasicUtils.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.CommonTypes.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Lookup.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Services.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Url.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ScriptData.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Notify.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Layout.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Html.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Dialogs.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.TypeSystem.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.StringHelpers.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Imports\SS.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.ArrayUtils.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.LocalText.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Config.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\ServiceError.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Services\ServiceResponse.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\SubDialogHelper.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\TabsExtensions.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\UploadHelper.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Helpers\ValidationHelper.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQuery.FlexifyPlugin.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQuery.WidgetPlugin.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQueryUI.ButtonNoConflict.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\jQuery\jQuery.FlexifyPlugin.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Toolbar.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\PropertyGrid.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Toolbar.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Widgets.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Serenity.Externals.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Serenity.Externals.Slick.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\typescriptServices.d.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\Serenity.CodeGeneration.ts" />
     <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />

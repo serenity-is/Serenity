@@ -13,7 +13,7 @@ namespace Q {
             format = Culture.dateFormat;
         }
 
-        let pad = function (i) {
+        let pad = function (i: number) {
             return Q.zeroPad(i, 2);
         };
 
@@ -69,7 +69,7 @@ namespace Q {
     export function formatISODateTimeUTC(d: Date): string {
         if (d == null)
             return "";
-        let zeropad = function (num) { return ((num < 10) ? '0' : '') + num; };
+        let zeropad = function (num: number) { return ((num < 10) ? '0' : '') + num; };
         let str = d.getUTCFullYear() + "-" +
             zeropad(d.getUTCMonth() + 1) + "-" +
             zeropad(d.getUTCDate()) + "T" +
@@ -102,7 +102,7 @@ namespace Q {
             return null;
         }
 
-        let year, month, day, hour, min, sec, msec;
+        let year: number, month: number, day: number, hour: number, min: number, sec: number, msec: number;
         year = parseInt(res[1], 10);
 
         if (typeof (res[2]) == "undefined" || res[2] === '') {
@@ -130,7 +130,7 @@ namespace Q {
             return new Date(year, month, day, hour, min, sec, msec);
         }
 
-        let ofs;
+        let ofs: number;
         if (typeof (res[9]) != "undefined" && res[9] !== '') {
             ofs = parseInt(res[10], 10) * 3600000;
             if (typeof (res[11]) != "undefined" && res[11] !== '') {
@@ -150,7 +150,7 @@ namespace Q {
         let v = trim(value);
         if (v.length < 4 || v.length > 5)
             return NaN;
-        let h, m;
+        let h: number, m: number;
         if (v.charAt(1) == ':') {
             h = parseInteger(v.substr(0, 1));
             m = parseInteger(v.substr(2, 2));
@@ -167,7 +167,7 @@ namespace Q {
     }
 
     export function parseDayHourAndMin(s: string): number {
-        let days;
+        let days: number;
         let v = trim(s);
         if (!v)
             return NaN;
@@ -192,9 +192,9 @@ namespace Q {
     export function parseDate(s: string, dateOrder?: string): any {
         if (!s || !s.length)
             return null;
-        let dateVal;
-        let dArray;
-        let d, m, y;
+        let dateVal: any;
+        let dArray: any;
+        let d: number, m: number, y: number;
         dArray = splitDateString(s);
         if (!dArray)
             return false;

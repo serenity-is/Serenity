@@ -1,4 +1,6 @@
-﻿namespace Q {
+﻿/// <reference path="../../../typings/toastr/toastr.d.ts" />
+
+namespace Q {
     export let defaultNotifyOptions: ToastrOptions = {
         timeOut: 3000,
         showDuration: 250,
@@ -13,19 +15,19 @@
         return options;
     }
 
-    export function notifyWarning(message: string, title?: string, options?: ToastrOptions) {
+    export function notifyWarning(message: string, title?: string, options?: ToastrOptions): void {
         toastr.warning(message, title, getToastrOptions(options));
     }
 
-    export function notifySuccess(message: string, title?: string, options?: ToastrOptions) {
+    export function notifySuccess(message: string, title?: string, options?: ToastrOptions): void {
         toastr.success(message, title, getToastrOptions(options));
     }
 
-    export function notifyInfo(message: string, title?: string, options?: ToastrOptions) {
+    export function notifyInfo(message: string, title?: string, options?: ToastrOptions): void {
         toastr.info(message, title, getToastrOptions(options));
     }
 
-    export function notifyError(message: string, title?: string, options?: ToastrOptions) {
+    export function notifyError(message: string, title?: string, options?: ToastrOptions): void {
         toastr.error(message, title, getToastrOptions(options));
     }
 
