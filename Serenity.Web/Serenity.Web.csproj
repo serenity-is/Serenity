@@ -14,6 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
   </PropertyGroup>
   <PropertyGroup>
     <TypeScriptTarget>ES5</TypeScriptTarget>
@@ -21,7 +22,6 @@
     <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
     <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
     <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
-    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -275,7 +275,6 @@
     <None Include="Includes\web.config.transform" />
     <None Include="packages.config" />
     <None Include="Scripts\serenity\CoreLib\tsconfig.json" />
-    <None Include="Scripts\serenity\Serenity.CoreLib.js.map" />
     <None Include="Style\images\accessright.png" />
     <None Include="Style\images\add.png" />
     <None Include="Style\images\add2.png" />
@@ -610,6 +609,7 @@
     <None Include="Style\bootstrap\mixins\vendor-prefixes.less" />
     <None Include="Style\bootstrap\variables.less" />
     <None Include="Style\serenity.slickgrid.less" />
+    <None Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
