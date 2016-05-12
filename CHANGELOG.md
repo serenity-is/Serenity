@@ -8,6 +8,7 @@ Features:
   - add missing MsieJavascriptEngine reference to Serenity.Web.nuspec
   - Serenity.Externals.js and Serenity.Externals.Slick.js is merged into Serenity.CoreLib.js
   - made Note dialog responsive [Serene]
+  - invoke TSC (TypeScript compiler) after generating files with ServerTypings.tt
 
 ## 2.1.2 (2016-05-01)
 
