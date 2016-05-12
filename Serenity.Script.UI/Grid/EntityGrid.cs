@@ -132,7 +132,7 @@ namespace Serenity
                 }
             });
 
-            buttons.Add(NewRefreshButton());
+            buttons.Add(NewRefreshButton(noText: true));
 
             return buttons;
         }

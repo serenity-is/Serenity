@@ -319,6 +319,7 @@
 		this.view = null;
 		this.slickContainer = null;
 		this.slickGrid = null;
+		this.allColumns = null;
 		this.$idProperty = null;
 		this.$isActiveProperty = null;
 		this.$localTextDbPrefix = null;
@@ -3211,6 +3212,7 @@
 	$Serenity_PropertyItemSlickConverter.toSlickColumn = function(item) {
 		var result = {};
 		result.sourceItem = item;
+		result.visible = item.visible !== false && item.filterOnly !== true;
 		result.field = item.name;
 		var $t1 = Q.tryGetText(item.title);
 		if (ss.isNullOrUndefined($t1)) {
@@ -5311,12 +5313,13 @@
 		},
 		getQuickFilters: function() {
 			var list = [];
-			var $t1 = Enumerable.from(this.getPropertyItems()).where(function(x) {
-				return x.quickFilter === true;
+			var $t1 = Enumerable.from(this.allColumns).where(function(x) {
+				return ss.isValue(x.sourceItem) && x.sourceItem.quickFilter === true;
 			}).getEnumerator();
 			try {
 				while ($t1.moveNext()) {
-					var item = $t1.current();
+					var column = $t1.current();
+					var item = column.sourceItem;
 					var quick = {};
 					var filteringType = $Serenity_FilteringTypeRegistry.get(ss.coalesce(item.filteringType, 'String'));
 					if (ss.referenceEquals(filteringType, $Serenity_DateFiltering) || ss.referenceEquals(filteringType, $Serenity_DateTimeFiltering)) {
@@ -5444,33 +5447,41 @@
 		},
 		initializeAsync: function() {
 			return $Serenity_Widget.prototype.initializeAsync.call(this).then(ss.mkdel(this, this.getColumnsAsync), null).then(ss.mkdel(this, function(columns) {
-				columns = this.postProcessColumns(columns);
+				this.allColumns = columns;
+				this.postProcessColumns(this.allColumns);
 				var self = this;
 				if (ss.isValue(this.filterBar)) {
-					this.filterBar.set_store(new $Serenity_FilterStore(Enumerable.from(this.getPropertyItems()).where(function(x) {
-						return x.notFilterable !== true;
+					this.filterBar.set_store(new $Serenity_FilterStore(Enumerable.from(this.allColumns).where(function(x) {
+						return ss.isValue(x.sourceItem) && x.sourceItem.notFilterable !== true;
+					}).select(function(x1) {
+						return x1.sourceItem;
 					})));
 					this.filterBar.get_store().add_changed(function(s, e) {
 						self.refresh();
 					});
 				}
 				if (ss.isValue(this.slickGrid)) {
-					this.slickGrid.setColumns(columns);
+					this.slickGrid.setColumns(Enumerable.from(this.allColumns).where(function(x2) {
+						return x2.visible !== false;
+					}).toArray());
 				}
 				this.setInitialSortOrder();
 				this.initialPopulate();
 			}), null);
 		},
 		createSlickGrid: function() {
-			var slickColumns;
+			var visibleColumns;
 			if (this.isAsyncWidget()) {
-				slickColumns = [];
+				visibleColumns = [];
 			}
 			else {
-				slickColumns = this.postProcessColumns(this.getColumns());
+				this.allColumns = this.getColumns();
+				visibleColumns = Enumerable.from(this.postProcessColumns(this.allColumns)).where(function(x) {
+					return x.visible !== false;
+				}).toArray();
 			}
 			var slickOptions = this.getSlickOptions();
-			var grid = new Slick.Grid(this.slickContainer, this.view, slickColumns, slickOptions);
+			var grid = new Slick.Grid(this.slickContainer, this.view, visibleColumns, slickOptions);
 			grid.registerPlugin(new Slick.AutoTooltips({ enableForHeaderCells: true }));
 			this.slickGrid = grid;
 			this.rows = this.slickGrid;
@@ -5549,7 +5560,7 @@
 			this.slickGrid.onClick.subscribe(this.$slickGridOnClick);
 		},
 		getAddButtonCaption: function() {
-			return 'Yeni';
+			return 'New';
 		},
 		getButtons: function() {
 			return [];
@@ -5706,8 +5717,10 @@
 			var self = this;
 			this.filterBar = new $Serenity_FilterDisplayBar(filterBarDiv);
 			if (!this.isAsyncWidget()) {
-				this.filterBar.set_store(new $Serenity_FilterStore(Enumerable.from(this.getPropertyItems()).where(function(x) {
-					return x.notFilterable !== true;
+				this.filterBar.set_store(new $Serenity_FilterStore(Enumerable.from(this.allColumns).where(function(x) {
+					return ss.isValue(x.sourceItem) && x.sourceItem.notFilterable !== true;
+				}).select(function(x1) {
+					return x1.sourceItem;
 				})));
 				this.filterBar.get_store().add_changed(function(s, e) {
 					self.refresh();
@@ -5802,32 +5815,28 @@
 			return [];
 		},
 		getColumns: function() {
-			var columnItems = Enumerable.from(this.getPropertyItems()).where(function(x) {
-				return x.filterOnly !== true && x.visible !== false;
-			}).toArray();
-			return this.propertyItemsToSlickColumns(columnItems);
+			var propertyItems = this.getPropertyItems();
+			return this.propertyItemsToSlickColumns(propertyItems);
 		},
 		propertyItemsToSlickColumns: function(propertyItems) {
 			var columns = $Serenity_PropertyItemSlickConverter.toSlickColumns(propertyItems);
-			if (ss.isValue(propertyItems)) {
-				for (var i = 0; i < propertyItems.length; i++) {
-					var item = propertyItems[i];
-					var column = columns[i];
-					if (item.editLink === true) {
-						var oldFormat = { $: column.format };
-						var css = { $: (ss.isValue(item.editLinkCssClass) ? item.editLinkCssClass : null) };
-						column.format = this.itemLink((ss.isValue(item.editLinkItemType) ? item.editLinkItemType : null), (ss.isValue(item.editLinkIdField) ? item.editLinkIdField : null), ss.mkdel({ oldFormat: oldFormat }, function(ctx) {
-							if (!ss.staticEquals(this.oldFormat.$, null)) {
-								return this.oldFormat.$(ctx);
-							}
-							return Q.htmlEncode(ctx.value);
-						}), ss.mkdel({ css: css }, function(ctx1) {
-							return ss.coalesce(this.css.$, '');
-						}), false);
-						if (!ss.isNullOrEmptyString(item.editLinkIdField)) {
-							column.referencedFields = column.referencedFields || [];
-							column.referencedFields.push(item.editLinkIdField);
+			for (var i = 0; i < propertyItems.length; i++) {
+				var item = propertyItems[i];
+				var column = columns[i];
+				if (item.editLink === true) {
+					var oldFormat = { $: column.format };
+					var css = { $: (ss.isValue(item.editLinkCssClass) ? item.editLinkCssClass : null) };
+					column.format = this.itemLink((ss.isValue(item.editLinkItemType) ? item.editLinkItemType : null), (ss.isValue(item.editLinkIdField) ? item.editLinkIdField : null), ss.mkdel({ oldFormat: oldFormat }, function(ctx) {
+						if (!ss.staticEquals(this.oldFormat.$, null)) {
+							return this.oldFormat.$(ctx);
 						}
+						return Q.htmlEncode(ctx.value);
+					}), ss.mkdel({ css: css }, function(ctx1) {
+						return ss.coalesce(this.css.$, '');
+					}), false);
+					if (!ss.isNullOrEmptyString(item.editLinkIdField)) {
+						column.referencedFields = column.referencedFields || [];
+						column.referencedFields.push(item.editLinkIdField);
 					}
 				}
 			}
@@ -5835,9 +5844,7 @@
 		},
 		getColumnsAsync: function() {
 			return this.getPropertyItemsAsync().then(ss.mkdel(this, function(propertyItems) {
-				return this.propertyItemsToSlickColumns(Enumerable.from(propertyItems).where(function(x) {
-					return x.filterOnly !== true && x.visible !== false;
-				}).toArray());
+				return this.propertyItemsToSlickColumns(propertyItems);
 			}), null);
 		},
 		getSlickOptions: function() {
@@ -8159,7 +8166,7 @@
 					self.addButtonClick();
 				}
 			});
-			buttons.push(this.newRefreshButton(false));
+			buttons.push(this.newRefreshButton(true));
 			return buttons;
 		},
 		newRefreshButton: function(noText) {
@@ -10212,6 +10219,10 @@
 	ss.initClass($Serenity_Toolbar, $asm, {
 		$createButton: function(container, b) {
 			var cssClass = ss.coalesce(b.cssClass, '');
+			if (cssClass === 'separator') {
+				$('<div class="separator"></div>').appendTo(container);
+				return;
+			}
 			var btn = $('<div class="tool-button"><div class="button-outer"><span class="button-inner"></span></div></div>').appendTo(container);
 			if (cssClass.length > 0) {
 				btn.addClass(cssClass);

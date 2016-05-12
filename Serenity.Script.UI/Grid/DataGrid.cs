@@ -22,6 +22,7 @@ namespace Serenity
         protected SlickRemoteView<TItem> view;
         protected jQueryObject slickContainer;
         protected SlickGrid slickGrid;
+        protected List<SlickColumn> allColumns;
         private string idProperty;
         private string isActiveProperty;
         private string localTextDbPrefix;
@@ -131,8 +132,11 @@ namespace Serenity
         {
             var list = new List<QuickFilter<Widget, object>>();
 
-            foreach (var item in this.GetPropertyItems().Where(x => x.QuickFilter == true))
+            foreach (var column in this.allColumns.Where(x => 
+                x.SourceItem != null && x.SourceItem.QuickFilter == true))
             {
+                var item = column.SourceItem;
+
                 var quick = new QuickFilter<Widget, object>();
 
                 var filteringType = FilteringTypeRegistry.Get(item.FilteringType ?? "String");
@@ -294,17 +298,18 @@ namespace Serenity
             return base.InitializeAsync()
                 .ThenAwait(GetColumnsAsync)
                 .Then((columns) => {
-                    columns = PostProcessColumns(columns);
+                    this.allColumns = columns;
+                    PostProcessColumns(this.allColumns);
 
                     var self = this;
                     if (this.filterBar != null)
                     {
-                        filterBar.Store = new FilterStore(this.GetPropertyItems().Where(x => x.NotFilterable != true));
+                        filterBar.Store = new FilterStore(this.allColumns.Where(x => x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
                         filterBar.Store.Changed += (s, e) => self.Refresh();
                     }
 
                     if (this.slickGrid != null)
-                        this.slickGrid.SetColumns(columns);
+                        this.slickGrid.SetColumns(this.allColumns.Where(x => x.Visible != false).ToList());
 
                     SetInitialSortOrder();
                     InitialPopulate();
@@ -313,19 +318,21 @@ namespace Serenity
 
         protected virtual SlickGrid CreateSlickGrid()
         {
-            List<SlickColumn> slickColumns;
+            List<SlickColumn> visibleColumns;
 
             if (this.IsAsyncWidget())
             {
-                slickColumns = new List<SlickColumn>();
+                visibleColumns = new List<SlickColumn>();
             }
             else
             {
-                slickColumns = PostProcessColumns(GetColumns());
+                this.allColumns = GetColumns();
+                visibleColumns = PostProcessColumns(this.allColumns).Where(x => x.Visible != false).ToList();
             }
 
             var slickOptions = GetSlickOptions();
-            var grid = new SlickGrid(slickContainer, data: view.As<List<dynamic>>(), columns: slickColumns, options: slickOptions);
+            var grid = new SlickGrid(slickContainer, data: view.As<List<dynamic>>(), 
+                columns: visibleColumns, options: slickOptions);
 
             grid.RegisterPlugin(new SlickAutoTooltips(new SlickAutoTooltipsOptions
             {
@@ -451,7 +458,7 @@ namespace Serenity
 
         protected virtual string GetAddButtonCaption()
         {
-            return "Yeni";
+            return "New";
         }
 
         protected virtual List<ToolButton> GetButtons()
@@ -646,7 +653,8 @@ namespace Serenity
 
             if (!IsAsyncWidget())
             {
-                filterBar.Store = new FilterStore(this.GetPropertyItems().Where(x => x.NotFilterable != true));
+                filterBar.Store = new FilterStore(this.allColumns.Where(x => 
+                    x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
                 filterBar.Store.Changed += (s, e) => self.Refresh();
             }
         }
@@ -782,44 +790,41 @@ namespace Serenity
 
         protected virtual List<SlickColumn> GetColumns()
         {
-            var columnItems = GetPropertyItems().Where(x => x.FilterOnly != true && x.Visible != false).ToList();
-            return PropertyItemsToSlickColumns(columnItems);
+            var propertyItems = GetPropertyItems();
+            return PropertyItemsToSlickColumns(propertyItems);
         }
 
         protected virtual List<SlickColumn> PropertyItemsToSlickColumns(List<PropertyItem> propertyItems)
         {
             var columns = PropertyItemSlickConverter.ToSlickColumns(propertyItems);
 
-            if (propertyItems != null)
+            for (var i = 0; i < propertyItems.Count; i++)
             {
-                for (var i = 0; i < propertyItems.Count; i++)
+                var item = propertyItems[i];
+                var column = columns[i];
+
+                if (item.EditLink == true)
                 {
-                    var item = propertyItems[i];
-                    var column = columns[i];
+                    var oldFormat = column.Format;
+                    var css = Script.IsValue(item.EditLinkCssClass) ? item.EditLinkCssClass : null;
 
-                    if (item.EditLink == true)
-                    {
-                        var oldFormat = column.Format;
-                        var css = Script.IsValue(item.EditLinkCssClass) ? item.EditLinkCssClass : null;
-
-                        column.Format = this.ItemLink(
-                            itemType: Script.IsValue(item.EditLinkItemType) ? item.EditLinkItemType : (string)null,
-                            idField: Script.IsValue(item.EditLinkIdField) ? item.EditLinkIdField : (string)null,
-                            text: ctx =>
-                            {
-                                if (oldFormat != null)
-                                    return oldFormat(ctx);
-
-                                return Q.HtmlEncode(ctx.Value);
-                            },
-                            cssClass: ctx => css ?? "",
-                            encode: false);
-
-                        if (!string.IsNullOrEmpty(item.EditLinkIdField))
+                    column.Format = this.ItemLink(
+                        itemType: Script.IsValue(item.EditLinkItemType) ? item.EditLinkItemType : (string)null,
+                        idField: Script.IsValue(item.EditLinkIdField) ? item.EditLinkIdField : (string)null,
+                        text: ctx =>
                         {
-                            column.ReferencedFields = column.ReferencedFields ?? new List<string>();
-                            column.ReferencedFields.Add(item.EditLinkIdField);
-                        }
+                            if (oldFormat != null)
+                                return oldFormat(ctx);
+
+                            return Q.HtmlEncode(ctx.Value);
+                        },
+                        cssClass: ctx => css ?? "",
+                        encode: false);
+
+                    if (!string.IsNullOrEmpty(item.EditLinkIdField))
+                    {
+                        column.ReferencedFields = column.ReferencedFields ?? new List<string>();
+                        column.ReferencedFields.Add(item.EditLinkIdField);
                     }
                 }
             }
@@ -831,7 +836,7 @@ namespace Serenity
         {
             return GetPropertyItemsAsync().ThenSelect(propertyItems =>
             {
-                return PropertyItemsToSlickColumns(propertyItems.Where(x => x.FilterOnly != true && x.Visible != false).ToList());
+                return PropertyItemsToSlickColumns(propertyItems);
             });
         }
 

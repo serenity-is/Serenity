@@ -2163,6 +2163,7 @@ declare namespace Slick {
         sourceItem?: Serenity.PropertyItem;
         sortOrder?: number;
         groupTotalsFormatter?: (p1?: GroupTotals<any>, p2?: Column) => string;
+        visible?: boolean;
     }
     class RowMoveManager {
         constructor(options: Slick.RowMoveManagerOptions);

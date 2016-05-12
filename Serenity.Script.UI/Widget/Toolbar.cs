@@ -28,6 +28,14 @@ namespace Serenity
         {
             var cssClass = b.CssClass ?? "";
 
+            if (cssClass == "separator")
+            {
+                J("<div class=\"separator\"></div>")
+                    .AppendTo(container);
+
+                return;
+            }
+
             var btn = J(
                     "<div class=\"tool-button\">" +
                         "<div class=\"button-outer\">" +

@@ -148,5 +148,7 @@ namespace Serenity
         public int SortOrder { get; set; }
 
         public Func<SlickGroupTotals<dynamic>, SlickColumn, string> GroupTotalsFormatter { get; set; }
+
+        public bool? Visible { get; set; }
     }
 }
