@@ -8,6 +8,7 @@
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
+        separator?: boolean;
     }
 
     class PopupMenuButton extends Widget<PopupMenuButtonOptions> {

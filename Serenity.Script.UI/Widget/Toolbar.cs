@@ -28,12 +28,10 @@ namespace Serenity
         {
             var cssClass = b.CssClass ?? "";
 
-            if (cssClass == "separator")
+            if (b.Separator == true)
             {
                 J("<div class=\"separator\"></div>")
                     .AppendTo(container);
-
-                return;
             }
 
             var btn = J(
@@ -128,5 +126,6 @@ namespace Serenity
         public bool? HtmlEncode { get; set; }
         public string Hotkey { get; set; }
         public bool HotkeyAllowDefault { get; set; }
+        public bool Separator { get; set; }
     }
 }

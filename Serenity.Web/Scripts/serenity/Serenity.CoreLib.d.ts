@@ -2058,6 +2058,7 @@ declare namespace Serenity {
         htmlEncode?: any;
         hotkey?: string;
         hotkeyAllowDefault?: boolean;
+        separator?: boolean;
     }
     class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
         constructor(div: JQuery, opt: PopupMenuButtonOptions);

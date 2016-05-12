@@ -10219,9 +10219,8 @@
 	ss.initClass($Serenity_Toolbar, $asm, {
 		$createButton: function(container, b) {
 			var cssClass = ss.coalesce(b.cssClass, '');
-			if (cssClass === 'separator') {
+			if (b.separator === true) {
 				$('<div class="separator"></div>').appendTo(container);
-				return;
 			}
 			var btn = $('<div class="tool-button"><div class="button-outer"><span class="button-inner"></span></div></div>').appendTo(container);
 			if (cssClass.length > 0) {
