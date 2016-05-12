@@ -55,12 +55,6 @@
     <file src="..\..\Scripts\Serenity\Serenity.CoreLib.js" target="content/Scripts/serenity" />
     <file src="..\..\Scripts\Serenity\Serenity.CoreLib.min.js" target="content/Scripts/serenity" />
     <file src="..\..\Scripts\Serenity\Serenity.CoreLib.d.ts" target="content/Scripts/serenity" />
-    <file src="..\..\Scripts\Serenity\Serenity.Externals.js" target="content/Scripts/serenity" />
-    <file src="..\..\Scripts\Serenity\Serenity.Externals.min.js" target="content/Scripts/serenity" />
-    <file src="..\..\Scripts\Serenity\Serenity.Externals.d.ts" target="content/Scripts/serenity" />
-    <file src="..\..\Scripts\Serenity\Serenity.Externals.Slick.js" target="content/Scripts/serenity" />
-    <file src="..\..\Scripts\Serenity\Serenity.Externals.Slick.min.js" target="content/Scripts/serenity" />
-    <file src="..\..\Scripts\Serenity\Serenity.Externals.Slick.d.ts" target="content/Scripts/serenity" />
     <file src="..\..\..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.js" target="content/Scripts/serenity" />
     <file src="..\..\..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.min.js" target="content/Scripts/serenity" />
   </files>
