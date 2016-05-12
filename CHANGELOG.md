@@ -1,4 +1,4 @@
-## 2.1.3 (2016-05-01)
+## 2.1.3 (2016-05-12)
 
 Features:
   - made refresh button in grids without text to save space
@@ -10,7 +10,7 @@ Features:
   - made Note dialog responsive [Serene]
   - invoke TSC (TypeScript compiler) after generating files with ServerTypings.tt
 
-## 2.1.2 (2016-05-01)
+## 2.1.2 (2016-05-11)
 
 Features:
   - quote file names while calling Kdiff3 and TF.exe to prevent problems with whitespaces
