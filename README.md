@@ -11,6 +11,8 @@ Serenity is an ASP.NET MVC / TypeScript application platform designed to simplif
 
 It aims to make development easier while reducing maintenance costs by avoiding boiler-plate code, reducing the time spent on repetitive tasks and applying best software design practices. 
 
+<img src="https://github.com/volkanceylan/Serene/blob/master/Template/img/SereneAnimation.gif" />
+
 ## Documentation
 
 See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenity-guide) at https://www.gitbook.com/book/volkanceylan/serenity-guide for documentation.
