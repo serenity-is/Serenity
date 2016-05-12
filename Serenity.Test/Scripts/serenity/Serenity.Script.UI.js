@@ -7025,7 +7025,7 @@
 		},
 		initDialog: function() {
 			this.element.dialog(this.getDialogOptions());
-			this.responsive = ss.getAttributes(ss.getInstanceType(this), Serenity.ResponsiveAttribute, true).length > 0;
+			this.responsive = Q.Config.responsiveDialogs || ss.getAttributes(ss.getInstanceType(this), Serenity.ResponsiveAttribute, true).length > 0;
 			if (this.responsive) {
 				$Serenity_DialogExtensions.dialogResizable(this.element, null, null, null, null);
 				$(window).bind('resize.' + this.uniqueName, ss.mkdel(this, function(e) {
