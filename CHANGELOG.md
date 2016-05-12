@@ -1,3 +1,14 @@
+## 2.1.3 (2016-05-01)
+
+Features:
+  - made refresh button in grids without text to save space
+  - update TypeScript typings to latest versions
+  - added Q.Config.responsiveDialogs parameter to enable responsive for all dialogs without need to add responsive decorator
+  - added separator option to ToolButton, to put a separator line between groups
+  - add missing MsieJavascriptEngine reference to Serenity.Web.nuspec
+  - Serenity.Externals.js and Serenity.Externals.Slick.js is merged into Serenity.CoreLib.js
+  - made Note dialog responsive [Serene]
+
 ## 2.1.2 (2016-05-01)
 
 Features:
