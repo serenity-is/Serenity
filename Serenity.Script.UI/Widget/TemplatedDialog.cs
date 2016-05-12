@@ -65,7 +65,7 @@ namespace Serenity
         {
             element.Dialog(GetDialogOptions());
 
-            responsive = this.GetType().GetCustomAttributes(
+            responsive = Q.Config.ResponsiveDialogs || this.GetType().GetCustomAttributes(
                 typeof(ResponsiveAttribute), true).Length > 0;
 
             if (responsive)

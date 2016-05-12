@@ -209,15 +209,49 @@ declare namespace Q {
     function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
 }
 declare namespace Q {
-    function arrayClone<T>(a: T[]): T[];
+    /**
+     * Clones an array
+     */
+    function arrayClone<T>(array: T[]): T[];
+    /**
+     * Tests if any of array elements matches given predicate
+     */
     function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
+    /**
+     * Counts number of array elements that matches a given predicate
+     */
     function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
+    /**
+     * Gets first element in an array that matches given predicate.
+     * Throws an error if no match is found.
+     */
     function first<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    /**
+     * Gets index of first element in an array that matches given predicate
+     */
     function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean): number;
-    function insert(obj: any, index: number, item: any): void;
-    function isArray(a: any): boolean;
+    /**
+     * Inserts an item to the array at specified index
+     */
+    function insert<TItem>(array: TItem[], index: number, item: TItem): void;
+    /**
+     * Determines if the object is an array
+     */
+    function isArray(obj: any): boolean;
+    /**
+    * Gets first element in an array that matches given predicate.
+    * Throws an error if no matches is found, or there are multiple matches.
+    */
     function single<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
+    /**
+     * Maps an array into a dictionary with keys determined by specified getKey() callback,
+     * and values that are arrays containing elements for a particular key.
+     */
     function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Q.Grouping<TItem>;
+    /**
+     * Gets first element in an array that matches given predicate.
+     * Returns null if no match is found.
+     */
     function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
 }
 declare namespace Q {
@@ -372,6 +406,7 @@ declare namespace Q {
     namespace Config {
         let applicationPath: string;
         let emailAllowOnlyAscii: boolean;
+        let responsiveDialogs: boolean;
         let rootNamespaces: string[];
         let notLoggedInHandler: Function;
     }

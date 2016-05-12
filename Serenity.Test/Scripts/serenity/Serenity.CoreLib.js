@@ -72,10 +72,16 @@ var Q;
 /// <reference path="Q.CommonTypes.ts" />
 var Q;
 (function (Q) {
-    function arrayClone(a) {
-        return ss.arrayClone(a);
+    /**
+     * Clones an array
+     */
+    function arrayClone(array) {
+        return ss.arrayClone(array);
     }
     Q.arrayClone = arrayClone;
+    /**
+     * Tests if any of array elements matches given predicate
+     */
     function any(array, predicate) {
         for (var _i = 0, array_1 = array; _i < array_1.length; _i++) {
             var x = array_1[_i];
@@ -85,6 +91,9 @@ var Q;
         return false;
     }
     Q.any = any;
+    /**
+     * Counts number of array elements that matches a given predicate
+     */
     function count(array, predicate) {
         var count = 0;
         for (var _i = 0, array_2 = array; _i < array_2.length; _i++) {
@@ -95,6 +104,10 @@ var Q;
         return count;
     }
     Q.count = count;
+    /**
+     * Gets first element in an array that matches given predicate.
+     * Throws an error if no match is found.
+     */
     function first(array, predicate) {
         for (var _i = 0, array_3 = array; _i < array_3.length; _i++) {
             var x = array_3[_i];
@@ -104,6 +117,9 @@ var Q;
         throw new Error("first:No element satisfies the condition.!");
     }
     Q.first = first;
+    /**
+     * Gets index of first element in an array that matches given predicate
+     */
     function indexOf(array, predicate) {
         for (var i = 0; i < array.length; i++)
             if (predicate(array[i]))
@@ -111,14 +127,24 @@ var Q;
         return -1;
     }
     Q.indexOf = indexOf;
-    function insert(obj, index, item) {
-        ss.insert(obj, index, item);
+    /**
+     * Inserts an item to the array at specified index
+     */
+    function insert(array, index, item) {
+        ss.insert(array, index, item);
     }
     Q.insert = insert;
-    function isArray(a) {
-        return ss.isArray(a);
+    /**
+     * Determines if the object is an array
+     */
+    function isArray(obj) {
+        return ss.isArray(obj);
     }
     Q.isArray = isArray;
+    /**
+    * Gets first element in an array that matches given predicate.
+    * Throws an error if no matches is found, or there are multiple matches.
+    */
     function single(array, predicate) {
         var match;
         var found = false;
@@ -136,6 +162,10 @@ var Q;
         return match;
     }
     Q.single = single;
+    /**
+     * Maps an array into a dictionary with keys determined by specified getKey() callback,
+     * and values that are arrays containing elements for a particular key.
+     */
     function toGrouping(items, getKey) {
         var lookup = {};
         for (var _i = 0, items_1 = items; _i < items_1.length; _i++) {
@@ -150,6 +180,10 @@ var Q;
         return lookup;
     }
     Q.toGrouping = toGrouping;
+    /**
+     * Gets first element in an array that matches given predicate.
+     * Returns null if no match is found.
+     */
     function tryFirst(array, predicate) {
         for (var _i = 0, array_5 = array; _i < array_5.length; _i++) {
             var x = array_5[_i];
@@ -1192,6 +1226,7 @@ var Q;
     (function (Config) {
         Config.applicationPath = '/';
         Config.emailAllowOnlyAscii = true;
+        Config.responsiveDialogs = true;
         Config.rootNamespaces = ['Serenity'];
         Config.notLoggedInHandler = null;
         var pathLink = $('link#ApplicationPath');
