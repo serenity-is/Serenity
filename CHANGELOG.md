@@ -1,3 +1,10 @@
+## 2.1.4 (2016-05-13)
+
+Bugfixes:
+  - include enums that are not referenced in rows, but only columns/forms in ServerTypings.tt / ServerImports.tt
+  - fix CustomerDialog not opening due to script error in CustomerOrdersGrid [Serene]
+
+
 ## 2.1.3 (2016-05-12)
 
 Features:
