@@ -50,12 +50,14 @@ namespace Serenity.CodeGeneration
                 if (formScriptAttr != null)
                 {
                     GenerateForm(type, formScriptAttr);
+                    EnqueueTypeMembers(type);
                     return;
                 }
 
                 if (type.GetCustomAttribute<ColumnsScriptAttribute>() != null)
                 {
                     //GenerateColumns(type);
+                    EnqueueTypeMembers(type);
                     return;
                 }
 
