@@ -44,8 +44,13 @@ namespace Serenity
                 throw new Exception(String.Format("The element already has widget '{0}'!", widgetName));
 
             var self = this;
-            element.Bind("remove." + widgetName, (e) => self.Destroy())
-                .Data(widgetName, this);
+            element.Bind("remove." + widgetName, (e) => {
+                if (e.Bubbles ||
+                    e.Cancelable)
+                    return;
+
+                self.Destroy();
+            }).Data(widgetName, this);
 
             AddCssClass();
 

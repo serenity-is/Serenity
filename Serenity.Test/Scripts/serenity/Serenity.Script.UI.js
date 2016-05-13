@@ -4312,6 +4312,9 @@
 		}
 		var self = this;
 		element.bind('remove.' + this.widgetName, function(e) {
+			if (e.bubbles || e.cancelable) {
+				return;
+			}
 			self.destroy();
 		}).data(this.widgetName, this);
 		this.addCssClass();
