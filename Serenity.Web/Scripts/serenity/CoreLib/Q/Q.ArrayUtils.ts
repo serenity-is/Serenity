@@ -4,13 +4,6 @@
 namespace Q {
 
     /**
-     * Clones an array
-     */
-    export function arrayClone<T>(array: T[]): T[] {
-        return (ss as any).arrayClone(array);
-    }
-
-    /**
      * Tests if any of array elements matches given predicate
      */
     export function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean {

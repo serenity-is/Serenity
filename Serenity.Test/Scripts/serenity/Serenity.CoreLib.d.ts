@@ -210,10 +210,6 @@ declare namespace Q {
 }
 declare namespace Q {
     /**
-     * Clones an array
-     */
-    function arrayClone<T>(array: T[]): T[];
-    /**
      * Tests if any of array elements matches given predicate
      */
     function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
@@ -2146,7 +2142,7 @@ declare namespace Slick {
         cssClass?: string;
         defaultSortAsc?: boolean;
         editor?: Function;
-        field?: string;
+        field: string;
         focusable?: boolean;
         formatter?: Slick.ColumnFormatter;
         headerCssClass?: string;

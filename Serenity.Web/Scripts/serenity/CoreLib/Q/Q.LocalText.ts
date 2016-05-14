@@ -55,7 +55,7 @@ namespace Q {
         }
 
         static initializeTextClass = function (type: any, prefix: string) {
-            var $t1 = arrayClone(Object.keys(type));
+            var $t1 = Object.keys(type).slice();
             for (var $t2 = 0; $t2 < $t1.length; $t2++) {
                 var member = $t1[$t2];
                 var value = type[member];

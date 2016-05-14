@@ -73,13 +73,6 @@ var Q;
 var Q;
 (function (Q) {
     /**
-     * Clones an array
-     */
-    function arrayClone(array) {
-        return ss.arrayClone(array);
-    }
-    Q.arrayClone = arrayClone;
-    /**
      * Tests if any of array elements matches given predicate
      */
     function any(array, predicate) {
@@ -794,7 +787,7 @@ var Q;
         LT.$table = {};
         LT.empty = new LT('');
         LT.initializeTextClass = function (type, prefix) {
-            var $t1 = Q.arrayClone(Object.keys(type));
+            var $t1 = Object.keys(type).slice();
             for (var $t2 = 0; $t2 < $t1.length; $t2++) {
                 var member = $t1[$t2];
                 var value = type[member];

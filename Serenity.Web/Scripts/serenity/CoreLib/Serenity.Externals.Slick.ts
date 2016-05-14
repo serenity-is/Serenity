@@ -225,7 +225,7 @@ declare namespace Slick {
         cssClass?: string;
         defaultSortAsc?: boolean;
         editor?: Function;
-        field?: string;
+        field: string;
         focusable?: boolean;
         formatter?: Slick.ColumnFormatter;
         headerCssClass?: string;

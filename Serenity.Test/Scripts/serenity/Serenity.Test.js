@@ -124,22 +124,6 @@ var Serenity;
     var Test;
     (function (Test) {
         QUnit.module('Q.ArrayUtils');
-        QUnit.test('arrayClone()', function (assert) {
-            assert.throws(function () { return Q.arrayClone(null); }, null, "should throw for null reference");
-            assert.notEqual(null, Q.arrayClone([]), "shouldn't return null");
-            var a = ['a'];
-            var b = Q.arrayClone(a);
-            assert.strictEqual(b.length, 1, "clone has same length");
-            assert.strictEqual('a', b[0], "clone has 'a' at index 0");
-            assert.notStrictEqual(a, b, "clone doesn't have same reference");
-            a = ['a', 'b', 'c'];
-            b = Q.arrayClone(a);
-            assert.strictEqual(b.length, 3, "clone has same length");
-            assert.strictEqual('a', b[0], "clone has 'a' at index 0");
-            assert.strictEqual('b', b[1], "clone has 'b' at index 1");
-            assert.strictEqual('c', b[2], "clone has 'c' at index 2");
-            assert.notStrictEqual(a, b, "clone doesn't have same reference");
-        });
         QUnit.test('any()', function (assert) {
             assert.throws(function () { return Q.any(null, function () { return true; }); }, null, "should throw for null reference");
             assert.strictEqual(false, Q.any([], function () { return false; }), "should return false for empty array and false predicate");
