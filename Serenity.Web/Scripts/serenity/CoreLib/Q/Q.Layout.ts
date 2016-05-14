@@ -107,4 +107,16 @@
             element.triggerHandler('layout');
         }, true);
     }
+
+    export function centerDialog(el: JQuery) {
+        if (!el.hasClass("ui-dialog"))
+            el = el.closest(".ui-dialog");
+
+        el.position({ at: 'center center', of: window });
+        let pos = el.position();
+        if (pos.left < 0)
+            el.css("left", "0px");
+        if (pos.top < 0)
+            el.css("top", "0px");
+    }
 }

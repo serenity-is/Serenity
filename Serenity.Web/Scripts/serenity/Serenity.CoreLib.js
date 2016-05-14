@@ -1546,6 +1546,17 @@ var Q;
         }, true);
     }
     Q.triggerLayoutOnShow = triggerLayoutOnShow;
+    function centerDialog(el) {
+        if (!el.hasClass("ui-dialog"))
+            el = el.closest(".ui-dialog");
+        el.position({ at: 'center center', of: window });
+        var pos = el.position();
+        if (pos.left < 0)
+            el.css("left", "0px");
+        if (pos.top < 0)
+            el.css("top", "0px");
+    }
+    Q.centerDialog = centerDialog;
 })(Q || (Q = {}));
 /// <reference path="Q.BlockUI.ts" />
 /// <reference path="Q.StringHelpers.ts" />

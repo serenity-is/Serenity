@@ -481,6 +481,7 @@ declare namespace Q {
     function layoutFillHeight(element: JQuery): void;
     function setMobileDeviceMode(): void;
     function triggerLayoutOnShow(element: JQuery): void;
+    function centerDialog(el: JQuery): void;
 }
 declare namespace Q {
     namespace ScriptData {
