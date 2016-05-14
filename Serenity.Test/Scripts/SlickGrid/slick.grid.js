@@ -2152,7 +2152,9 @@ if (typeof Slick === "undefined") {
             setScroller();
             zombieRowNodeFromLastMouseWheelEvent = null;
 
-            setColumns(treeColumns.extractColumns());
+            if (args.columns)
+                setColumns(treeColumns.extractColumns());
+
             render();
         }
 

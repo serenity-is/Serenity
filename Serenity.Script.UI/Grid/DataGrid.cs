@@ -1,12 +1,12 @@
-﻿using System;
+﻿using jQueryApi;
+using Serenity.Data;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using jQueryApi;
-using System.Linq;
-using Serenity.Data;
+using System.Data.WebStorage;
 using System.Html;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using Serenity;
 
 namespace Serenity
 {
@@ -23,6 +23,8 @@ namespace Serenity
         protected jQueryObject slickContainer;
         protected SlickGrid slickGrid;
         protected List<SlickColumn> allColumns;
+        protected PersistedGridSettings initialSettings;
+        protected int restoringSettings;
         private string idProperty;
         private string isActiveProperty;
         private string localTextDbPrefix;
@@ -76,7 +78,11 @@ namespace Serenity
             UpdateDisabledState();
 
             if (!IsAsyncWidget())
+            {
+                initialSettings = GetCurrentSettings();
+                RestoreSettings();
                 InitialPopulate();
+            }
         }
 
         protected void Layout()
@@ -209,18 +215,10 @@ namespace Serenity
 
             if (this.slickGrid != null)
             {
-                if (this.slickGridOnSort != null)
-                {
-                    this.slickGrid.OnSort.Unsubscribe(this.slickGridOnSort);
-                    this.slickGridOnSort = null;
-                }
-
-                if (this.slickGridOnClick != null)
-                {
-                    this.slickGrid.OnSort.Unsubscribe(this.slickGridOnClick);
-                    this.slickGridOnClick = null;
-                }
-
+                this.slickGrid.OnClick.Clear();
+                this.slickGrid.OnSort.Clear();
+                this.slickGrid.OnColumnsResized.Clear();
+                this.slickGrid.OnColumnsReordered.Clear();
                 this.slickGrid.Destroy();
                 this.slickGrid = null;
             }
@@ -304,14 +302,26 @@ namespace Serenity
                     var self = this;
                     if (this.filterBar != null)
                     {
-                        filterBar.Store = new FilterStore(this.allColumns.Where(x => x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
-                        filterBar.Store.Changed += (s, e) => self.Refresh();
+                        filterBar.Store = new FilterStore(this.allColumns.Where(x => 
+                            x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
+                        filterBar.Store.Changed += (s, e) =>
+                        {
+                            if (restoringSettings <= 0)
+                            {
+                                self.PersistSettings();
+                                self.Refresh();
+                            }
+                        };
                     }
 
+                    var visibleColumns = this.allColumns.Where(x => x.Visible != false).ToList();
+
                     if (this.slickGrid != null)
-                        this.slickGrid.SetColumns(this.allColumns.Where(x => x.Visible != false).ToList());
+                        this.slickGrid.SetColumns(visibleColumns);
 
                     SetInitialSortOrder();
+                    initialSettings = GetCurrentSettings();
+                    RestoreSettings();
                     InitialPopulate();
                 });
         }
@@ -444,6 +454,7 @@ namespace Serenity
                     self.view.PopulateUnlock();
                 }
                 self.view.Populate();
+                PersistSettings();
             };
 
             this.slickGrid.OnSort.Subscribe(slickGridOnSort);
@@ -454,6 +465,8 @@ namespace Serenity
             };
 
             this.slickGrid.OnClick.Subscribe(slickGridOnClick);
+            this.slickGrid.OnColumnsReordered.Subscribe((e, p) => this.PersistSettings());
+            this.slickGrid.OnColumnsResized.Subscribe((e, p) => this.PersistSettings());
         }
 
         protected virtual string GetAddButtonCaption()
@@ -655,7 +668,14 @@ namespace Serenity
             {
                 filterBar.Store = new FilterStore(this.allColumns.Where(x => 
                     x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
-                filterBar.Store.Changed += (s, e) => self.Refresh();
+                filterBar.Store.Changed += (s, e) =>
+                {
+                    if (restoringSettings <= 0)
+                    {
+                        self.PersistSettings();
+                        self.Refresh();
+                    }
+                };
             }
         }
 
@@ -1154,6 +1174,212 @@ namespace Serenity
             this.Refresh();
         }
 
+        protected virtual Storage GetPersistanceStorage()
+        {
+            return null;
+        }
+
+        protected virtual string GetPersistanceKey()
+        {
+            var key = "GridSettings:";
+
+            var path = Window.Location.Pathname;
+            if (!string.IsNullOrEmpty(path))
+                key += string.Join("/", path.Substr(1).Split('/').Take(2).ToArray()) + ":";
+
+            key += this.GetType().FullName;
+
+            return key;
+        }
+
+        protected virtual GridPersistanceFlags GridPersistanceFlags()
+        {
+            return new GridPersistanceFlags();
+        }
+
+        protected virtual void RestoreSettings(PersistedGridSettings settings = null, GridPersistanceFlags flags = null)
+        {
+            if (settings == null)
+            {
+                var storage = GetPersistanceStorage();
+                if (storage == null)
+                    return;
+
+                var json = storage.GetItem(GetPersistanceKey()).TrimToNull();
+                if (json != null && json.StartsWith("{") && json.EndsWith("}"))
+                    settings = System.Serialization.Json.Parse<PersistedGridSettings>(json);
+                else
+                    return;
+            }
+
+            if (slickGrid == null)
+                return;
+
+            var columns = slickGrid.GetColumns();
+            JsDictionary<string, SlickColumn> colById = null;
+
+            Action<List<SlickColumn>> updateColById = (cl) =>
+            {
+                colById = new JsDictionary<string, SlickColumn>();
+                foreach (var c in cl)
+                    colById[c.Identifier] = c;
+            };
+
+            view.BeginUpdate();
+            restoringSettings++;
+            try
+            {
+                flags = flags ?? GridPersistanceFlags();
+                if (settings.Columns != null)
+                {
+                    if (flags.ColumnVisibility != false)
+                    {
+                        var visible = new JsDictionary<string, bool>();
+                        updateColById(this.allColumns);
+
+                        var newColumns = new List<SlickColumn>();
+                        foreach (var x in settings.Columns)
+                            if (x.ID != null && x.Visible == true)
+                            {
+                                var column = colById[x.ID];
+                                if (column != null && (column.SourceItem == null || column.SourceItem.FilterOnly != true))
+                                {
+                                    column.Visible = true;
+                                    newColumns.Add(column);
+                                    colById.Remove(x.ID);
+                                }
+                            }
+
+                        foreach (var c in this.allColumns)
+                            if (colById.ContainsKey(c.Identifier))
+                            {
+                                c.Visible = false;
+                                newColumns.Add(c);
+                            }
+
+                        this.allColumns = newColumns;
+                        columns = this.allColumns.Where(x => x.Visible == true).ToList();
+                    }
+
+                    if (flags.ColumnWidths != false)
+                    {
+                        updateColById(columns);
+                        foreach (var x in settings.Columns)
+                            if (x.ID != null && x.Width != null && x.Width != 0)
+                            {
+                                var column = colById[x.ID];
+                                if (column != null)
+                                    column.Width = x.Width.Value;
+                            }
+                    }
+
+                    if (flags.SortColumns != false)
+                    {
+                        updateColById(columns);
+                        var list = new List<SlickColumnSort>();
+                        foreach (var x in settings.Columns
+                            .Where(x => x.ID != null && (x.Sort ?? 0) != 0)
+                            .OrderBy(z => Math.Abs(z.Sort.Value)))
+                        {
+                            var column = colById[x.ID];
+                            if (column != null)
+                            {
+                                list.Add(new SlickColumnSort
+                                {
+                                    ColumnId = x.ID,
+                                    SortAsc = x.Sort > 0
+                                });
+                            }
+                        }
+
+                        this.slickGrid.SetSortColumns(list);
+                    }
+
+                    this.slickGrid.SetColumns(columns);
+                    this.slickGrid.Invalidate();
+                }
+
+                if (settings.FilterItems != null &&
+                    flags.FilterItems != false &&
+                    filterBar != null &&
+                    filterBar.Store != null)
+                {
+                    filterBar.Store.Items.Clear();
+                    filterBar.Store.Items.AddRange(settings.FilterItems);
+                    filterBar.Store.RaiseChanged();
+                }
+
+                if (settings.IncludeDeleted != null &&
+                    flags.IncludeDeleted != false)
+                {
+                    var includeDeletedToggle = this.Element.Find(".s-IncludeDeletedToggle");
+                    if (Q.IsTrue(settings.IncludeDeleted) != includeDeletedToggle.HasClass("pressed"))
+                        includeDeletedToggle.Children("a").Click();
+                }
+            }
+            finally
+            {
+                restoringSettings--;
+                view.EndUpdate();
+            }
+        }
+
+        protected virtual void PersistSettings(GridPersistanceFlags flags = null)
+        {
+            var storage = GetPersistanceStorage();
+            if (storage == null)
+                return;
+
+            var settings = GetCurrentSettings(flags);
+            storage.SetItem(GetPersistanceKey(), Q.ToJSON(settings));
+        }
+
+        protected virtual PersistedGridSettings GetCurrentSettings(GridPersistanceFlags flags = null)
+        {
+            flags = flags ?? GridPersistanceFlags();
+
+            var settings = new PersistedGridSettings();
+
+            if (flags.ColumnVisibility != false ||
+                flags.ColumnWidths != false ||
+                flags.SortColumns != false)
+            {
+                settings.Columns = new List<PersistedGridColumn>();
+                var sortColumns = slickGrid.GetSortColumns();
+                foreach (var column in this.slickGrid.GetColumns())
+                {
+                    var p = new PersistedGridColumn();
+                    p.ID = column.Identifier;
+
+                    if (flags.ColumnVisibility != false)
+                        p.Visible = true;
+
+                    if (flags.ColumnWidths != false)
+                        p.Width = column.Width;
+
+                    if (flags.SortColumns != false)
+                    {
+                        var sort = sortColumns.IndexOf(x => x.ColumnId == column.Identifier);
+                        p.Sort = sort >= 0 ? (sortColumns[sort].SortAsc != false ? (sort + 1) : (-sort - 1)) : 0;
+                    }
+
+                    settings.Columns.Add(p);
+                }
+            }
+
+            if (flags.IncludeDeleted != false)
+                settings.IncludeDeleted = this.Element.Find(".s-IncludeDeletedToggle").HasClass("pressed");
+
+            if (flags.FilterItems != false &&
+                this.filterBar != null &&
+                this.filterBar.Store != null)
+            {
+                settings.FilterItems = this.filterBar.Store.Items.ToList();
+            }
+
+            return settings;
+        }
+
         [IntrinsicProperty]
         public static int DefaultRowHeight { get; set; }
         [IntrinsicProperty]
@@ -1217,5 +1443,60 @@ namespace Serenity
                 return 0;
             }
         }
+    }
+
+    [Imported]
+    public class ColumnPickerDialog : TemplatedDialog
+    {
+        public ColumnPickerDialog()
+            : base()
+        {
+        }
+
+        public static ToolButton CreateToolButton(IDataGrid grid)
+        {
+            return null;
+        }
+
+        [IntrinsicProperty]
+        public List<SlickColumn> AllColumns { get; set; }
+
+        [IntrinsicProperty]
+        public string[] DefaultColumns { get; set; }
+
+        [IntrinsicProperty]
+        public string[] VisibleColumns { get; set; }
+
+        [IntrinsicProperty]
+        public Action Done { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class GridPersistanceFlags
+    {
+        public bool? ColumnWidths { get; set; }
+        public bool? ColumnVisibility { get; set; }
+        public bool? SortColumns { get; set; }
+        public bool? FilterItems { get; set; }
+        public bool? QuickFilters { get; set; }
+        public bool? IncludeDeleted { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class PersistedGridSettings
+    {
+        public List<PersistedGridColumn> Columns { get; set; }
+        public List<FilterLine> FilterItems { get; set; }
+        public Dictionary<string, object> QuickFilters { get; set; }
+        public bool? IncludeDeleted { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class PersistedGridColumn
+    {
+        public string ID { get; set; }
+        public int? Width { get; set; }
+        public int? Sort { get; set; }
+        public bool? Visible { get; set; }
     }
 }

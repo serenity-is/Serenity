@@ -720,6 +720,8 @@
     <EmbeddedResource Include="Scripts\tsservices\Serenity.CodeGeneration.js" />
     <None Include="Scripts\tsservices\json2.min.js" />
     <EmbeddedResource Include="Scripts\optimization\uglifyjs.min.js" />
+    <Content Include="Includes\Scripts\sortable.js" />
+    <Content Include="Includes\Scripts\sortable.min.js" />
     <Content Include="Scripts\serenity\Serenity.CoreLib.js" />
     <Content Include="Scripts\serenity\Serenity.CoreLib.min.js" />
     <Content Include="Style\images\32px.png" />
@@ -755,6 +757,11 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="Scripts\tsservices\lib.d.ts_" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\DataGrid\ColumnPickerDialog.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\CreateWidgetParams.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedDialog.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedWidget.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Widget.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\slickgrid\slickgrid.d.ts" />
@@ -812,6 +819,7 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\typescriptServices.d.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\Serenity.CodeGeneration.ts" />
+    <TypeScriptCompile Include="Scripts\typings\sortablejs\sortablejs.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
   </ItemGroup>
   <ItemGroup>

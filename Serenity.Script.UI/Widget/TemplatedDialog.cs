@@ -13,6 +13,7 @@ namespace Serenity
         void DialogOpen();
     }
 
+    [Imported]
     [IncludeGenericArguments(false), ScriptName("TemplatedDialog")]
     public abstract class TemplatedDialog<TOptions> : TemplatedWidget<TOptions>, IDialog
         where TOptions : class, new()
@@ -301,6 +302,7 @@ namespace Serenity
             this.element.Dialog().Close();
         }
 
+        [IntrinsicProperty]
         public string DialogTitle
         {
             get { if (isPanel) return null; return element.Dialog().Option("title") as string; }

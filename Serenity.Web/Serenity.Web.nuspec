@@ -36,6 +36,7 @@
       <dependency id="jquery.TypeScript.DefinitelyTyped" version="3.0.5" />
       <dependency id="jqueryui.TypeScript.DefinitelyTyped" version="1.4.6" />
       <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="0.2.8" />
+      <dependency id="sortablejs.TypeScript.DefinitelyTyped" version="0.1.7" />
       <dependency id="toastr.TypeScript.DefinitelyTyped" version="0.3.0" />
     </dependencies>
   </metadata>

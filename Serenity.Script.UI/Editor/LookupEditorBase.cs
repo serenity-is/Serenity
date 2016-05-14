@@ -191,7 +191,7 @@ namespace Serenity
             var self = this;
             CreateEditDialog(dialog =>
             {
-                (dialog as Widget).BindToDataChange(this, (x, dci) =>
+                (dialog.As<Widget>()).BindToDataChange(this, (x, dci) =>
                 {
                     Q.ReloadLookup(GetLookupKey());
                     self.UpdateItems();

@@ -65,6 +65,24 @@
         return text;
     }
 
+    export function jsRender(markup: string, data?: any) {
+        if (!markup || markup.indexOf('{{') < 0) {
+            return markup;
+        }
+
+        if (!($ as any).templates || !($ as any).views) {
+            throw new ss.Exception('Please make sure that jsrender.js is included in the page!');
+        }
+
+        data = data || {};
+        var template = ($ as any).templates(markup);
+        ($ as any).views.converters({
+            text: Q.text
+        }, template);
+
+        return template.render(data);
+    }
+
     export function log(m: any) {
         (<any>window).console && (<any>window).console.log(m);
     }

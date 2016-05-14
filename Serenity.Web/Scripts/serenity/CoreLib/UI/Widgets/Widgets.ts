@@ -84,7 +84,7 @@
     }
 
     namespace WX {
-        function getWidget(element: JQuery): any;
+        function getWidget<TWidget>(element: JQuery, type: Function): any;
         function tryGetWidget(element: JQuery): any;
         function getWidgetName(type: Function): string;
         function hasOriginalEvent(e: any): boolean;
@@ -162,34 +162,6 @@
     class PrefixedContext extends ScriptContext {
         constructor(prefix: string);
         w(id: string, type: Function): any;
-    }
-
-    class Widget<TOptions> {
-        constructor(element: JQuery, options?: TOptions);
-        protected destroy(): void;
-        protected addCssClass(): void;
-        protected getCssClass(): string;
-        protected initializeAsync(): PromiseLike<void>;
-        protected asyncPromise: PromiseLike<void>;
-        widgetName: string;
-        uniqueName: string;
-        element: JQuery;
-        protected options: TOptions;
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        getGridField(): JQuery;
-        change(handler: (e: JQueryEventObject) => void): void;
-        changeSelect2(handler: (e: JQueryEventObject) => void): void;
-        initialize(): PromiseLike<void>;
-        isAsyncWidget(): boolean;
-
-        static create<TWidget>(type: { new (...args: any[]): TWidget }):
-            (element?: (e: JQuery) => void, options?: any, init?: (w: TWidget) => void) => TWidget;
-        static createInside<TWidget>(type: { new (...args: any[]): TWidget }):
-            (container: JQuery, options?: any, init?: (w: TWidget) => void) => TWidget;
-        static createOfType<TWidget>(type: { new (...args: any[]): TWidget },
-            element?: (e: JQuery) => void, options?: any, init?: (w: TWidget) => void): TWidget;
-        static elementFor<TEditor>(type: TEditor): () => JQuery;
-        static elementFor$1<TEditor>(editorType: { new (...args: any[]): any }): JQuery;
     }
 
     class IStringValue {
@@ -529,42 +501,6 @@
         set_value(value: string): void;
     }
 
-    class TemplatedWidget<TOptions> extends Widget<TOptions> {
-        constructor(container: JQuery, options?: TOptions);
-        protected idPrefix: string;
-        protected byId(id: string): JQuery;
-        protected byID<TWidget>(type: TWidget): (id: string) => TWidget;
-        protected getTemplate(): string;
-        protected getTemplateName(): string;
-    }
-
-    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
-        constructor(options?: TOptions);
-        protected tabs: JQuery;
-        protected toolbar: Serenity.Toolbar;
-        protected validator: JQueryValidation.Validator;
-        protected arrange(): void;
-        protected isPanel: boolean;
-        protected responsive: boolean;
-        protected arrange(): void;
-        public dialogClose(): void;
-        public dialogOpen(): void;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getToolbarButtons(): ToolButton[];
-        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected handleResponsive(): void;
-        protected initDialog(): void;
-        protected initTabs(): void;
-        protected initToolbar(): void;
-        protected initValidator(): void;
-        protected onDialogClose(): void;
-        protected onDialogOpen(): void;
-        protected resetValidation(): void;
-        protected validateForm(): boolean;
-        public get_dialogTitle(): string;
-        public set_dialogTitle(value: string): void;
-    }
-
     class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
         protected tabs: JQuery;
@@ -702,10 +638,35 @@
         init?: (w: TWidget) => void;
     }
 
+    interface GridPersistanceFlags {
+        columnWidths?: boolean;
+        columnVisibility?: boolean;
+        sortColumns?: boolean;
+        filterItems?: boolean;
+        quickFilters?: boolean;
+        includeDeleted?: boolean;
+    }
+
+    interface PersistedGridColumn {
+        id: string;
+        width?: number;
+        sort?: number;
+        visible?: boolean;
+    }
+
+    interface PersistedGridSettings {
+        columns?: PersistedGridColumn[];
+        filterItems?: FilterLine[];
+        quickFilters?: Q.Dictionary<any>;
+        includeDeleted?: boolean;
+    }
+
     class DataGrid<TItem, TOptions> extends Widget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
+        protected allColumns: Slick.Column[];
+        protected defaultColumns: string[];
         protected titleDiv: JQuery;
         protected filterBar: FilterDisplayBar;
         protected quickFiltersDiv: JQuery;
@@ -738,6 +699,11 @@
         protected getColumns(): Slick.Column[];
         protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
         protected getColumnsKey(): string;
+        protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
+        protected getPersistanceStorage(): Storage;
+        protected getPersistanceKey(): string;
+        protected persistSettings(flags?: GridPersistanceFlags): void;
+        protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void;
         protected getDefaultSortBy(): string[];
         protected getGridCanLoad(): boolean;
         protected getIdProperty(): string;
@@ -795,8 +761,8 @@
         public getFilterStore(): FilterStore;
         public getGrid(): Slick.Grid;
         public getView(): Slick.RemoteView<TItem>;
-        static defaultHeaderHeight: number;
-        static defaultRowHeight: number;
+        public static defaultHeaderHeight: number;
+        public static defaultRowHeight: number;
     }
 
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {

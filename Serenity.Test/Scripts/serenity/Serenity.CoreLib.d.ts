@@ -4,6 +4,7 @@
 /// <reference path="../typings/jqueryui/jqueryui.d.ts" />
 /// <reference path="../typings/toastr/toastr.d.ts" />
 /// <reference path="../typings/jquery.validation/jquery.validation.d.ts" />
+/// <reference path="../typings/sortablejs/sortablejs.d.ts" />
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
@@ -359,6 +360,7 @@ declare namespace Q {
      * @param s String to be HTML encoded
      */
     function htmlEncode(s: any): string;
+    function jsRender(markup: string, data?: any): any;
     function log(m: any): void;
     function newBodyDiv(): JQuery;
     function outerHtml(element: JQuery): string;
@@ -1199,7 +1201,7 @@ declare namespace Serenity {
         entity: any;
     }
     namespace WX {
-        function getWidget(element: JQuery): any;
+        function getWidget<TWidget>(element: JQuery, type: Function): any;
         function tryGetWidget(element: JQuery): any;
         function getWidgetName(type: Function): string;
         function hasOriginalEvent(e: any): boolean;
@@ -1270,37 +1272,6 @@ declare namespace Serenity {
     class PrefixedContext extends ScriptContext {
         constructor(prefix: string);
         w(id: string, type: Function): any;
-    }
-    class Widget<TOptions> {
-        constructor(element: JQuery, options?: TOptions);
-        protected destroy(): void;
-        protected addCssClass(): void;
-        protected getCssClass(): string;
-        protected initializeAsync(): PromiseLike<void>;
-        protected asyncPromise: PromiseLike<void>;
-        widgetName: string;
-        uniqueName: string;
-        element: JQuery;
-        protected options: TOptions;
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        getGridField(): JQuery;
-        change(handler: (e: JQueryEventObject) => void): void;
-        changeSelect2(handler: (e: JQueryEventObject) => void): void;
-        initialize(): PromiseLike<void>;
-        isAsyncWidget(): boolean;
-        static create<TWidget>(type: {
-            new (...args: any[]): TWidget;
-        }): (element?: (e: JQuery) => void, options?: any, init?: (w: TWidget) => void) => TWidget;
-        static createInside<TWidget>(type: {
-            new (...args: any[]): TWidget;
-        }): (container: JQuery, options?: any, init?: (w: TWidget) => void) => TWidget;
-        static createOfType<TWidget>(type: {
-            new (...args: any[]): TWidget;
-        }, element?: (e: JQuery) => void, options?: any, init?: (w: TWidget) => void): TWidget;
-        static elementFor<TEditor>(type: TEditor): () => JQuery;
-        static elementFor$1<TEditor>(editorType: {
-            new (...args: any[]): any;
-        }): JQuery;
     }
     class IStringValue {
     }
@@ -1591,40 +1562,6 @@ declare namespace Serenity {
         get_value(): string;
         set_value(value: string): void;
     }
-    class TemplatedWidget<TOptions> extends Widget<TOptions> {
-        constructor(container: JQuery, options?: TOptions);
-        protected idPrefix: string;
-        protected byId(id: string): JQuery;
-        protected byID<TWidget>(type: TWidget): (id: string) => TWidget;
-        protected getTemplate(): string;
-        protected getTemplateName(): string;
-    }
-    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
-        constructor(options?: TOptions);
-        protected tabs: JQuery;
-        protected toolbar: Serenity.Toolbar;
-        protected validator: JQueryValidation.Validator;
-        protected arrange(): void;
-        protected isPanel: boolean;
-        protected responsive: boolean;
-        protected arrange(): void;
-        dialogClose(): void;
-        dialogOpen(): void;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        protected getToolbarButtons(): ToolButton[];
-        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected handleResponsive(): void;
-        protected initDialog(): void;
-        protected initTabs(): void;
-        protected initToolbar(): void;
-        protected initValidator(): void;
-        protected onDialogClose(): void;
-        protected onDialogOpen(): void;
-        protected resetValidation(): void;
-        protected validateForm(): boolean;
-        get_dialogTitle(): string;
-        set_dialogTitle(value: string): void;
-    }
     class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
         protected tabs: JQuery;
@@ -1757,10 +1694,32 @@ declare namespace Serenity {
         element?: (e: JQuery) => void;
         init?: (w: TWidget) => void;
     }
+    interface GridPersistanceFlags {
+        columnWidths?: boolean;
+        columnVisibility?: boolean;
+        sortColumns?: boolean;
+        filterItems?: boolean;
+        quickFilters?: boolean;
+        includeDeleted?: boolean;
+    }
+    interface PersistedGridColumn {
+        id: string;
+        width?: number;
+        sort?: number;
+        visible?: boolean;
+    }
+    interface PersistedGridSettings {
+        columns?: PersistedGridColumn[];
+        filterItems?: FilterLine[];
+        quickFilters?: Q.Dictionary<any>;
+        includeDeleted?: boolean;
+    }
     class DataGrid<TItem, TOptions> extends Widget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
         dialogOpen(): void;
         loadByIdAndOpenDialog(id: any): void;
+        protected allColumns: Slick.Column[];
+        protected defaultColumns: string[];
         protected titleDiv: JQuery;
         protected filterBar: FilterDisplayBar;
         protected quickFiltersDiv: JQuery;
@@ -1795,6 +1754,11 @@ declare namespace Serenity {
         protected getColumns(): Slick.Column[];
         protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
         protected getColumnsKey(): string;
+        protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
+        protected getPersistanceStorage(): Storage;
+        protected getPersistanceKey(): string;
+        protected persistSettings(flags?: GridPersistanceFlags): void;
+        protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void;
         protected getDefaultSortBy(): string[];
         protected getGridCanLoad(): boolean;
         protected getIdProperty(): string;
@@ -2070,6 +2034,106 @@ declare namespace Serenity {
         constructor(div: JQuery, opt: PopupToolButtonOptions);
     }
     interface PopupToolButtonOptions extends PopupMenuButtonOptions {
+    }
+}
+declare namespace Serenity {
+    interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
+        type?: new (element: JQuery, options?: TOptions) => TWidget;
+        options?: TOptions;
+        container?: JQuery;
+        element?: (e: JQuery) => void;
+        init?: (w: TWidget) => void;
+    }
+}
+declare namespace Serenity {
+    class Widget<TOptions> {
+        private static nextWidgetNumber;
+        element: JQuery;
+        protected options: TOptions;
+        protected widgetName: string;
+        protected uniqueName: string;
+        protected asyncPromise: PromiseLike<void>;
+        constructor(element: JQuery, options?: TOptions);
+        destroy(): void;
+        protected addCssClass(): void;
+        protected getCssClass(): string;
+        protected initializeAsync(): PromiseLike<void>;
+        protected isAsyncWidget(): boolean;
+        static getWidgetName(type: Function): string;
+        static elementFor<TWidget>(editorType: {
+            new (...args: any[]): TWidget;
+        }): JQuery;
+        static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
+        init(action?: (widget: any) => void): this;
+        private initialize();
+    }
+    interface Widget<TOptions> {
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getGridField(): JQuery;
+        change(handler: (e: JQueryEventObject) => void): void;
+        changeSelect2(handler: (e: JQueryEventObject) => void): void;
+    }
+}
+declare namespace Serenity {
+    class TemplatedWidget<TOptions> extends Widget<TOptions> {
+        protected idPrefix: string;
+        private static templateNames;
+        constructor(container: JQuery, options?: TOptions);
+        protected byId(id: string): JQuery;
+        private byID<TWidget>(id, type);
+        protected getTemplateName(): string;
+        protected getTemplate(): string;
+    }
+}
+declare namespace Serenity {
+    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+        protected isPanel: boolean;
+        protected responsive: boolean;
+        protected tabs: JQuery;
+        protected toolbar: Serenity.Toolbar;
+        protected validator: JQueryValidation.Validator;
+        constructor(options?: TOptions);
+        private static getCssSize(element, name);
+        private static applyCssSizes(opt, dialogClass);
+        destroy(): void;
+        protected initDialog(): void;
+        protected initToolbar(): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
+        protected initValidator(): void;
+        protected resetValidation(): void;
+        protected validateForm(): boolean;
+        dialogOpen(): void;
+        protected onDialogOpen(): void;
+        protected arrange(): void;
+        protected onDialogClose(): void;
+        protected addCssClass(): void;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        dialogClose(): void;
+        dialogTitle: string;
+        set_dialogTitle(value: string): void;
+        protected initTabs(): void;
+        protected handleResponsive(): void;
+    }
+}
+declare namespace Serenity {
+    class ColumnPickerDialog extends Serenity.TemplatedDialog<any> {
+        private ulVisible;
+        private ulHidden;
+        private colById;
+        allColumns: Slick.Column[];
+        visibleColumns: string[];
+        defaultColumns: string[];
+        done: () => void;
+        constructor();
+        static createToolButton(grid: DataGrid<any, any>): ToolButton;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        private getTitle(col);
+        private createLI(col);
+        private updateListStates();
+        protected setupColumns(): void;
+        protected onDialogOpen(): void;
+        protected getTemplate(): string;
     }
 }
 interface JQuery {
