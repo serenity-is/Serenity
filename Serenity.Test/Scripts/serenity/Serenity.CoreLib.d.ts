@@ -1755,6 +1755,7 @@ declare namespace Serenity {
         protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
         protected getColumnsKey(): string;
         protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
+        protected getPersistanceFlags(): GridPersistanceFlags;
         protected getPersistanceStorage(): SettingStorage;
         protected getPersistanceKey(): string;
         protected persistSettings(flags?: GridPersistanceFlags): void;
