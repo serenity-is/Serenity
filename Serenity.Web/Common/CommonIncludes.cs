@@ -20,6 +20,7 @@ namespace Serenity.Web
             "~/Scripts/jquery.scrollintoview.js",
             "~/Scripts/jsrender.js",
             "~/Scripts/select2.js",
+            "~/Scripts/sortable.js",
             "~/Scripts/toastr.js",
             "~/Scripts/SlickGrid/slick.core.js",
             "~/Scripts/SlickGrid/slick.grid.js",
