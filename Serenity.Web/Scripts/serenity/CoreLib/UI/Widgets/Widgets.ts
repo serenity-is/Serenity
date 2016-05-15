@@ -700,7 +700,7 @@
         protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
         protected getColumnsKey(): string;
         protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
-        protected getPersistanceStorage(): Storage;
+        protected getPersistanceStorage(): SettingStorage;
         protected getPersistanceKey(): string;
         protected persistSettings(flags?: GridPersistanceFlags): void;
         protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void;
@@ -763,7 +763,12 @@
         public getView(): Slick.RemoteView<TItem>;
         public static defaultHeaderHeight: number;
         public static defaultRowHeight: number;
-        public static defaultPersistanceStorage: Storage;
+        public static defaultPersistanceStorage: SettingStorage;
+    }
+
+    interface SettingStorage {
+        getItem(key: string): string;
+        setItem(key: string, value: string): void;
     }
 
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {

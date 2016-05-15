@@ -1755,7 +1755,7 @@ declare namespace Serenity {
         protected getColumnsAsync(): PromiseLike<Slick.Column[]>;
         protected getColumnsKey(): string;
         protected getCurrentSettings(flags?: GridPersistanceFlags): PersistedGridSettings;
-        protected getPersistanceStorage(): Storage;
+        protected getPersistanceStorage(): SettingStorage;
         protected getPersistanceKey(): string;
         protected persistSettings(flags?: GridPersistanceFlags): void;
         protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistanceFlags): void;
@@ -1819,7 +1819,11 @@ declare namespace Serenity {
         getView(): Slick.RemoteView<TItem>;
         static defaultHeaderHeight: number;
         static defaultRowHeight: number;
-        static defaultPersistanceStorage: Storage;
+        static defaultPersistanceStorage: SettingStorage;
+    }
+    interface SettingStorage {
+        getItem(key: string): string;
+        setItem(key: string, value: string): void;
     }
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(container: JQuery, options?: TOptions);
