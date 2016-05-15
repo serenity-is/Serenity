@@ -2887,14 +2887,6 @@ var Serenity;
     Serenity.TemplatedDialog = TemplatedDialog;
 })(Serenity || (Serenity = {}));
 /// <reference path="../../../../typings/sortablejs/sortablejs.d.ts" />
-Q.LT.add({
-    "Controls.ColumnPickerDialog.Title": "Column Picker",
-    "Controls.ColumnPickerDialog.VisibleColumns": "Visible Columns",
-    "Controls.ColumnPickerDialog.HiddenColumns": "Hidden Columns",
-    "Controls.ColumnPickerDialog.HideHint": "hide",
-    "Controls.ColumnPickerDialog.ShowHint": "show",
-    "Controls.ColumnPickerDialog.RestoreDefaults": "Restore Defaults"
-}, "");
 var Serenity;
 (function (Serenity) {
     var ColumnPickerDialog = (function (_super) {

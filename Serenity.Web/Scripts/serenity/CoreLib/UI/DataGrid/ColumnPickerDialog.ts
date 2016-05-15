@@ -1,14 +1,5 @@
 ﻿/// <reference path="../../../../typings/sortablejs/sortablejs.d.ts" />
 
-Q.LT.add({
-    "Controls.ColumnPickerDialog.Title": "Column Picker",
-    "Controls.ColumnPickerDialog.VisibleColumns": "Visible Columns",
-    "Controls.ColumnPickerDialog.HiddenColumns": "Hidden Columns",
-    "Controls.ColumnPickerDialog.HideHint": "hide",
-    "Controls.ColumnPickerDialog.ShowHint": "show",
-    "Controls.ColumnPickerDialog.RestoreDefaults": "Restore Defaults"
-}, "");
-
 namespace Serenity {
 
     @Serenity.Decorators.registerClass()

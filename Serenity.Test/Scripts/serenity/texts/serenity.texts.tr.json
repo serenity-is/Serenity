@@ -1,6 +1,12 @@
 ﻿{
     "Authorization.AccessDenied": "Bu işlem için gerekli haklara sahip değilsiniz!",
     "Authorization.NotLoggedIn": "Bu işlem için giriş yapmış olmalısınız!",
+    "Controls.ColumnPickerDialog.HiddenColumns": "Gizli Kolonlar",
+    "Controls.ColumnPickerDialog.HideHint": "Sakla",
+    "Controls.ColumnPickerDialog.RestoreDefaults": "Varsayılanları Yükle",
+    "Controls.ColumnPickerDialog.ShowHint": "Göster",
+    "Controls.ColumnPickerDialog.Title": "Kolon Seçici",
+    "Controls.ColumnPickerDialog.VisibleColumns": "Görünür Kolonlar",
     "Controls.EntityDialog.ApplyChangesButton": "Değişiklikleri Uygula",
     "Controls.EntityDialog.CloneButton": "Klonla",
     "Controls.EntityDialog.DeleteButton": "Sil",
