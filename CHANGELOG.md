@@ -1,3 +1,16 @@
+## 2.1.5 (2016-05-13)
+
+Features:
+  - we now have a cute, responsive column picker that works also with touch devices
+  - integrate sortable.js (https://github.com/RubaXa/Sortable) for column picker
+  - ability to persist / restore grid settings like visible columns, column widths, sort order, advanced filter (quick filter can't be persisted yet) to local storage, session storage, database or any medium you like. thanks to Mark (@c9482) for sponsoring this feature. how-to is coming.
+  - compile TypeScript files on project build (in addition to compile on save) of Serene.Web, using tsc.exe as a build step, but reporting TypeScript errors as warnings to avoid potential problems with T4 files [Serene]
+  - Q.centerDialog to center an auto height dialog after open
+  - removed Q.arrayClone helper function as Array.slice does the same thing
+  - fixed some flexbox height issues with IE11
+  - port Widget, TemplatedWidget and TemplatedDialog to TypeScript
+  - [BREAKING CHANGE] Widget.create method had to be changed to a more TypeScript compatible signature. Please take TranslationGrid.ts createToolbarExtensions method source from latest Serene
+
 ## 2.1.4 (2016-05-13)
 
 Bugfixes:
