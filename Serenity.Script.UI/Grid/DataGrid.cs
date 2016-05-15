@@ -1176,7 +1176,7 @@ namespace Serenity
 
         protected virtual Storage GetPersistanceStorage()
         {
-            return null;
+            return DefaultPersistanceStorage;
         }
 
         protected virtual string GetPersistanceKey()
@@ -1380,6 +1380,8 @@ namespace Serenity
             return settings;
         }
 
+        [IntrinsicProperty]
+        public static Storage DefaultPersistanceStorage { get; set; }
         [IntrinsicProperty]
         public static int DefaultRowHeight { get; set; }
         [IntrinsicProperty]

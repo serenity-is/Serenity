@@ -763,6 +763,7 @@
         public getView(): Slick.RemoteView<TItem>;
         public static defaultHeaderHeight: number;
         public static defaultRowHeight: number;
+        public static defaultPersistanceStorage: Storage;
     }
 
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {

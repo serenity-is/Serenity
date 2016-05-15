@@ -1819,6 +1819,7 @@ declare namespace Serenity {
         getView(): Slick.RemoteView<TItem>;
         static defaultHeaderHeight: number;
         static defaultRowHeight: number;
+        static defaultPersistanceStorage: Storage;
     }
     class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(container: JQuery, options?: TOptions);

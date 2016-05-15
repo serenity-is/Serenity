@@ -5884,7 +5884,7 @@
 			this.refresh();
 		},
 		getPersistanceStorage: function() {
-			return null;
+			return $Serenity_DataGrid.defaultPersistanceStorage;
 		},
 		getPersistanceKey: function() {
 			var key = 'GridSettings:';
@@ -10351,6 +10351,7 @@
 		$Serenity_FormatterTypeRegistry.$knownTypes = null;
 	})();
 	(function() {
+		$Serenity_DataGrid.defaultPersistanceStorage = null;
 		$Serenity_DataGrid.defaultRowHeight = 0;
 		$Serenity_DataGrid.defaultHeaderHeight = 0;
 		$Serenity_DataGrid.defaultRowHeight = 27;
