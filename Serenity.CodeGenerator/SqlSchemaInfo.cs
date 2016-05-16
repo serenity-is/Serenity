@@ -590,6 +590,7 @@ order by 1, 5";
         const string SqlTinyInt = "tinyint";
         const string SqlTime = "time";
         const string SqlTimestamp = "timestamp";
+        const string SqlRowVersion = "rowversion";
         const string SqlInt8 = "int8";
         const string SqlInt4 = "int4";
 
@@ -600,7 +601,7 @@ order by 1, 5";
                 return "String";
             else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger || sqlTypeName == SqlInt4)
                 return "Int32";
-            else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlTimestamp || sqlTypeName == SqlInt8)
+            else if (sqlTypeName == SqlBigInt || sqlTypeName == SqlInt8)
                 return "Int64";
             else if (sqlTypeName == SqlMoney || sqlTypeName == SqlDecimal || sqlTypeName == SqlNumeric)
                 return "Decimal";
@@ -618,7 +619,7 @@ order by 1, 5";
                 return "Int16";
             else if (sqlTypeName == SqlUniqueIdentifier)
                 return "Guid";
-            else if (sqlTypeName == SqlVarBinary)
+            else if (sqlTypeName == SqlVarBinary || sqlTypeName == SqlTimestamp || sqlTypeName == SqlRowVersion)
                 return "Stream";
             else
                 return "Stream";
