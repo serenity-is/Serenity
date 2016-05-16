@@ -4456,7 +4456,7 @@ var Q;
                     return result;
                 }
                 var events = $._data(element, 'events');
-                if (events) {
+                if (!events) {
                     return true;
                 }
                 var handlers = events.customValidate;

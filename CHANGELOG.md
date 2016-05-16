@@ -1,4 +1,10 @@
-## 2.1.5 (2016-05-13)
+## 2.1.6 (2016-05-16)
+
+Bugfixes:
+  - addValidationRule stopped working after 2.1.3 due to a typo in conversion of CustomValidation.cs to TypeScript
+
+
+## 2.1.5 (2016-05-15)
 
 Features:
   - we now have a cute, responsive column picker that works also with touch devices

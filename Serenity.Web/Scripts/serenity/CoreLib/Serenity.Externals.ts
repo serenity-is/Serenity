@@ -27,7 +27,7 @@ namespace Q {
                     return result;
                 }
                 var events = ($ as any)._data(element, 'events');
-                if (events) {
+                if (!events) {
                     return true;
                 }
                 var handlers = events.customValidate;
