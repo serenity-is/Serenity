@@ -3987,34 +3987,34 @@
 	};
 	$Serenity_UploadHelper.checkImageConstraints = function(file, opt) {
 		if (!file.IsImage && !opt.allowNonImage) {
-			Q.alert('Yüklemeye çalıştığınız dosya bir resim değil!');
+			Q.alert(Q.text('Controls.ImageUpload.NotAnImageFile'));
 			return false;
 		}
 		if (opt.minSize > 0 && file.Size < opt.minSize) {
-			Q.alert(ss.formatString('Yükleyeceğiniz dosya en az {0} boyutunda olmalı!', opt.minSize));
+			Q.alert(ss.formatString(Q.text('Controls.ImageUpload.UploadFileTooSmall'), opt.minSize));
 			return false;
 		}
 		if (opt.maxSize > 0 && file.Size > opt.maxSize) {
-			Q.alert(ss.formatString('Yükleyeceğiniz dosya en çok {0} boyutunda olabilir!', opt.maxSize));
+			Q.alert(ss.formatString(Q.text('Controls.ImageUpload.UploadFileTooBig'), opt.maxSize));
 			return false;
 		}
 		if (!file.IsImage) {
 			return true;
 		}
 		if (opt.minWidth > 0 && file.Width < opt.minWidth) {
-			Q.alert(ss.formatString('Yükleyeceğiniz resim en az {0} genişliğinde olmalı!', opt.minWidth));
+			Q.alert(ss.formatString(Q.text('Controls.ImageUpload.MinWidth'), opt.minWidth));
 			return false;
 		}
 		if (opt.maxWidth > 0 && file.Width > opt.maxWidth) {
-			Q.alert(ss.formatString('Yükleyeceğiniz dosya en çok {0} genişliğinde olabilir!', opt.maxWidth));
+			Q.alert(ss.formatString(Q.text('Controls.ImageUpload.MaxWidth'), opt.maxWidth));
 			return false;
 		}
 		if (opt.minHeight > 0 && file.Height < opt.minHeight) {
-			Q.alert(ss.formatString('Yükleyeceğiniz resim en az {0} yüksekliğinde olmalı!', opt.minHeight));
+			Q.alert(ss.formatString(Q.text('Controls.ImageUpload.MinHeight'), opt.minHeight));
 			return false;
 		}
 		if (opt.maxHeight > 0 && file.Height > opt.maxHeight) {
-			Q.alert(ss.formatString('Yükleyeceğiniz dosya en çok {0} yüksekliğinde olabilir!', opt.maxHeight));
+			Q.alert(ss.formatString(Q.text('Controls.ImageUpload.MaxHeight'), opt.maxHeight));
 			return false;
 		}
 		return true;
@@ -4059,7 +4059,7 @@
 		return Q.resolveUrl('~/upload/') + filename;
 	};
 	$Serenity_UploadHelper.colorBox = function(link, options) {
-		link.colorbox({ current: 'resim {current} / {total}', previous: 'önceki', next: 'sonraki', close: 'kapat' });
+		link.colorbox({ current: Q.text('Controls.ImageUpload.ColorboxCurrent'), previous: Q.text('Controls.ImageUpload.ColorboxPrior'), next: Q.text('Controls.ImageUpload.ColorboxNext'), close: Q.text('Controls.ImageUpload.ColorboxClose') });
 	};
 	$Serenity_UploadHelper.populateFileSymbols = function(container, items, displayOriginalName, urlPrefix) {
 		items = items || [];
