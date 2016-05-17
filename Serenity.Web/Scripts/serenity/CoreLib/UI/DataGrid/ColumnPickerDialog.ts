@@ -135,6 +135,9 @@ namespace Serenity {
         }
 
         private getTitle(col: Slick.Column) {
+            if (col.id == "__select__")
+                return "[x]";
+
             return col.name || col.toolTip || col.id;
         }
 

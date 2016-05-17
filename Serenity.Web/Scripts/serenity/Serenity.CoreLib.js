@@ -2999,6 +2999,8 @@ var Serenity;
             return opt;
         };
         ColumnPickerDialog.prototype.getTitle = function (col) {
+            if (col.id == "__select__")
+                return "[x]";
             return col.name || col.toolTip || col.id;
         };
         ColumnPickerDialog.prototype.createLI = function (col) {
