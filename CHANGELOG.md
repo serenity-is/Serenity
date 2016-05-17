@@ -1,3 +1,12 @@
+## 2.1.7 (2016-05-17)
+
+Features:
+  - sergen generates StreamField for timestamp / rowversion columns, not Int64
+  - translate image upload editor errors
+  - show row selection column as [x] in column picker dialog
+  - don't display row selection column in pdf output [Serene]
+
+
 ## 2.1.6 (2016-05-16)
 
 Bugfixes:
