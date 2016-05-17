@@ -28,3 +28,5 @@ Serenity.CodeGenerator/App.config
 *.crunchsolution.cache
 *.ncrunchproject
 *.ncrunchsolution
+Serenity.Test/Scripts/serenity/Serenity.CoreLib.js
+Serenity.Test/Scripts/serenity/Serenity.CoreLib.min.js
