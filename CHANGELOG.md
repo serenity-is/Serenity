@@ -1,3 +1,8 @@
+## 2.1.8 (2016-05-18)
+
+Bugfixes:
+  - dialog translation save was broken after a TS conversion
+
 ## 2.1.7 (2016-05-17)
 
 Features:
