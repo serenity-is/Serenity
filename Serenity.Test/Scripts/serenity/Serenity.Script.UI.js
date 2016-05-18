@@ -7458,7 +7458,14 @@
 			}
 			var result = {};
 			var idField = this.getIdProperty();
-			var $t1 = ss.getEnumerator(this.getLanguages());
+			var langs = this.getLanguages();
+			var langsArr = ss.safeCast(langs, Array);
+			if (ss.isValue(langsArr) && langsArr.length > 0 && ss.isValue(langsArr[0]) && ss.isArray(langsArr[0])) {
+				langs = Enumerable.from(langsArr).select(function(x) {
+					return { item1: x[0], item2: x[1] };
+				});
+			}
+			var $t1 = ss.getEnumerator(langs);
 			try {
 				while ($t1.moveNext()) {
 					var pair = $t1.current();

@@ -251,7 +251,15 @@ namespace Serenity
 
             string idField = GetIdProperty();
 
-            foreach (var pair in GetLanguages())
+            var langs = GetLanguages();
+            var langsArr = (langs as object) as string[][];
+            if (langsArr != null && langsArr.Length > 0 && langsArr[0] != null &&
+                Q.IsArray(langsArr[0]))
+            {
+                langs = langsArr.Select(x => new Tuple<string, string>(x[0], x[1]));
+            }
+
+            foreach (var pair in langs)
             {
                 var language = pair.Item1;
 
