@@ -4,7 +4,7 @@ Please make sure these boxes are checked before submitting your issue --- thank 
 - [ ] Check Serenity WIKI in GitHub
 - [ ] Please have a look CHANGELOG.md for directions on breaking changes
 - [ ] Try a search for previous issues here, that might have similar case
-- [ ] Check your browsers's CONSOLE tab for errors, an include it in report
+- [ ] Check your browsers's CONSOLE tab for errors, and include them here
 - [ ] Please report with as many details as possible to help us identify the problem
 
 ### Configuration (Serenity / Serene version, OS, Browser used etc.)
