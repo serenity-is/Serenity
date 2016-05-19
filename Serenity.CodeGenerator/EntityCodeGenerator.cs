@@ -134,7 +134,7 @@ namespace Serenity.CodeGenerator
         {
             string file = Path.Combine(siteWebPath, relativeFile);
             var backup = CreateDirectoryOrBackupFile(file);
-            CodeFileHelper.CheckoutAndWrite(file, utf8.GetBytes(code), true);
+            CodeFileHelper.CheckoutAndWrite(file, code, true);
             CodeFileHelper.MergeChanges(backup, file);
             ProjectFileHelper.AddFileToProject(siteWebProj, relativeFile, dependentUpon);
         }
@@ -149,7 +149,7 @@ namespace Serenity.CodeGenerator
         {
             string file = Path.Combine(scriptPath, relativeFile);
             var backup = CreateDirectoryOrBackupFile(file);
-            CodeFileHelper.CheckoutAndWrite(file, utf8.GetBytes(code), true);
+            CodeFileHelper.CheckoutAndWrite(file, code, true);
             CodeFileHelper.MergeChanges(backup, file);
             ProjectFileHelper.AddFileToProject(scriptProject, relativeFile, dependentUpon);
         }
@@ -167,8 +167,7 @@ namespace Serenity.CodeGenerator
             Directory.CreateDirectory(Path.GetDirectoryName(file));
             if (!File.Exists(file))
             {
-                CodeFileHelper.CheckoutAndWrite(file, utf8.GetBytes("\r\n"),
-                    false);
+                CodeFileHelper.CheckoutAndWrite(file, "\r\n", false);
             }
 
             string code = Templates.Render(new Views.EntityCss(), model);

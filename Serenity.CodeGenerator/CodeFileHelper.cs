@@ -17,6 +17,11 @@ namespace Serenity.CodeGenerator
         public static string TFPath;
         public static string TSCPath;
 
+        public static byte[] ToUTF8BOM(string s)
+        {
+            return Encoding.UTF8.GetPreamble().Concat(utf8.GetBytes(s)).ToArray();
+        }
+
         private bool InsertDefinition(string file, string type, string key, string code)
         {
             int insertAfter = -1;
@@ -128,6 +133,11 @@ namespace Serenity.CodeGenerator
             }
 
             Process.Start(TFPath, command + " \"" + file + "\"").WaitForExit(10000);
+        }
+
+        public static void CheckoutAndWrite(string file, string contents, bool addToSourceControl)
+        {
+            CheckoutAndWrite(file, ToUTF8BOM(contents), addToSourceControl);
         }
 
         public static void CheckoutAndWrite(string file, byte[] contents, bool addToSourceControl)

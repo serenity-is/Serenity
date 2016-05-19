@@ -99,7 +99,7 @@ namespace Serenity.CodeGenerator
         {
             Connections.Sort((x, y) => x.Key.CompareTo(y.Key));
             CodeFileHelper.CheckoutAndWrite(GeneratorConfig.GetConfigurationFilePath(),
-                Encoding.UTF8.GetBytes(JSON.StringifyIndented(this)), false);
+                JSON.StringifyIndented(this), false);
         }
 
         public static GeneratorConfig Load()
