@@ -1,5 +1,10 @@
 ## 2.1.8 (2016-05-18)
 
+Features:
+  - sergen generates files with UTF-8 preamble (BOM) again. BOM was lost after TFS integration work, though files was still UTF-8.
+
+## 2.1.8 (2016-05-18)
+
 Bugfixes:
   - dialog translation save was broken after a TS conversion
 
