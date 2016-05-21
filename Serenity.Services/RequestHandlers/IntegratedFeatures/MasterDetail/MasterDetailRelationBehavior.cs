@@ -180,17 +180,18 @@ namespace Serenity.Services
 
             foreach (Row item in oldList)
             {
-                var idObj = rowIdField.AsObject(item).ToString();
+                var id = rowIdField.AsObject(item);
                 if (!newById.ContainsKey(id))
                     DeleteDetail(uow, id);
             }
 
             foreach (Row item in newList)
             {
-                var id = rowIdField[item];
+                var id = rowIdField.AsObject(item);
+                var idStr = AsString(id);
 
                 Row old;
-                if (id == null || !oldById.TryGetValue(id.Value, out old))
+                if (string.IsNullOrEmpty(id) || !oldById.TryGetValue(id, out old))
                     continue;
 
                 if (attr.CheckChangesOnUpdate)
@@ -211,7 +212,7 @@ namespace Serenity.Services
                         continue;
                 }
 
-                SaveDetail(uow, item, masterId, id.Value);
+                SaveDetail(uow, item, masterId, id);
             }
 
             foreach (Row item in newList)
