@@ -501,6 +501,7 @@
         ListRequest IListRequestHandler.Request { get { return this.Request; } }
         IListResponse IListRequestHandler.Response { get { return this.Response; } }
         public IDictionary<string, object> StateBag { get; private set; }
+        bool IListRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
     }
 
     public class ListRequestHandler<TRow> : ListRequestHandler<TRow, ListRequest, ListResponse<TRow>>
