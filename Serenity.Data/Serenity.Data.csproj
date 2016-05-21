@@ -79,6 +79,7 @@
     <Compile Include="Join\IAlias.cs" />
     <Compile Include="Join\BracketLocator.cs" />
     <Compile Include="Mapping\AutoIncrementAttribute.cs" />
+    <Compile Include="Mapping\ColumnSelection.cs" />
     <Compile Include="Mapping\DateTimeKindAttribute.cs" />
     <Compile Include="Mapping\LinkingSetRelationAttribute.cs" />
     <Compile Include="Mapping\MasterDetailRelationAttribute.cs" />
