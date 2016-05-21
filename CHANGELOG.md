@@ -1,4 +1,14 @@
-## 2.1.8 (2016-05-18)
+## 2.2.0 (2016-05-21)
+
+Features:
+  - linking set behavior can now load list of selected items in a list request, so it is possible to show them in a grid column, or use it with in combination with a master detail scenario
+  - showed representative names in customer grid
+  - master detail relation can now work with non integer keys
+  - multi level master detail is now possible
+  - columnselection and includecolumns can be overridden for master detail relation
+  - conditional row formatting sample [Serene]
+
+## 2.1.9 (2016-05-19)
 
 Features:
   - sergen generates files with UTF-8 preamble (BOM) again. BOM was lost after TFS integration work, though files was still UTF-8.
