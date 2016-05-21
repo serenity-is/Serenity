@@ -70,7 +70,26 @@ namespace Serenity.Extensibility
             {
                 var name = asm.GetName().Name;
                 if (!assemblies.ContainsKey(name) && ReferencesSerenity(asm))
+                {
                     assemblies.Add(name, asm);
+
+                    foreach (var reference in asm.GetReferencedAssemblies())
+                    {
+                        name = reference.Name;
+                        if (!assemblies.ContainsKey(name))
+                        {
+                            try
+                            {
+                                var refasm = Assembly.Load(reference);
+                                if (ReferencesSerenity(refasm))
+                                    assemblies.Add(name, refasm);
+                            }
+                            catch (Exception)
+                            {
+                            }
+                        }
+                    }
+                }
             }
 
             var asmPath = Path.GetDirectoryName(typeof(ExtensibilityHelper).Assembly.Location);

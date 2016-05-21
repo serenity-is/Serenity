@@ -112,7 +112,7 @@ namespace Serenity.Services
 
             var listRequest = new ListRequest
             {
-                ColumnSelection = attr.ColumnSelection,
+                ColumnSelection = this.attr.ColumnSelection,
                 IncludeColumns = this.includeColumns,
                 EqualityFilter = new Dictionary<string, object>
                 {

@@ -7,12 +7,11 @@ using Xunit;
 namespace Serenity.Test.Services
 {
     [Collection("AvoidParallel")]
-    public partial class MasterDetailRelationBehaviorTests
+    public partial class MasterDetailRelationBehaviorTests : SerenityTestBase
     {
         [Fact]
         public void LoadsDetailsOnRetrieve()
         {
-            using (new MunqContext())
             using (new DbTestContext<SerenityDbScript>())
             {
                 using (var connection = SqlConnections.NewFor<Int32MasterRow>())
@@ -60,10 +59,11 @@ namespace Serenity.Test.Services
                         Quantity = 12
                     });
 
-                    var result1 = new RetrieveRequestHandler<Int32MasterRow>().Process(connection, new RetrieveRequest
-                    {
-                        EntityId = master1
-                    });
+                    var result1 = new RetrieveRequestHandler<Int32MasterRow>().Process(connection, 
+                        new RetrieveRequest
+                        {
+                            EntityId = master1
+                        });
 
                     Assert.NotNull(result1.Entity.DetailList);
                     Assert.Equal(1, result1.Entity.DetailList.Count);
