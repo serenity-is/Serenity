@@ -89,7 +89,7 @@ namespace Serenity.Services
                 !handler.ShouldSelectField(Target))
                 return;
 
-            var idField = (handler.Row as IIdRow).IdField;
+            var idField = (Field)((handler.Row as IIdRow).IdField);
 
             var listHandler = listHandlerFactory();
 
@@ -98,7 +98,7 @@ namespace Serenity.Services
                 ColumnSelection = ColumnSelection.List,
                 EqualityFilter = new Dictionary<string, object>
                 {
-                    { foreignKeyField.PropertyName ?? foreignKeyField.Name, idField[handler.Row] }
+                    { foreignKeyField.PropertyName ?? foreignKeyField.Name, idField.AsObject(handler.Row) }
                 }
             };
 
@@ -111,12 +111,12 @@ namespace Serenity.Services
             Target.AsObject(handler.Row, list);
         }
 
-        private void SaveDetail(IUnitOfWork uow, Row detail, Int64 masterId, Int64? detailId)
+        private void SaveDetail(IUnitOfWork uow, Row detail, object masterId, object detailId)
         {
             detail = detail.Clone();
 
-            ((IIdRow)detail).IdField[detail] = detailId;
-            ((IIdField)foreignKeyField)[detail] = masterId;
+            foreignKeyField.AsObject(detail, masterId);
+            ((Field)((IIdRow)detail).IdField).AsObject(detail, detailId);
 
             var saveHandler = saveHandlerFactory();
             var saveRequest = saveRequestFactory();
@@ -124,11 +124,19 @@ namespace Serenity.Services
             saveHandler.Process(uow, saveRequest, detailId == null ? SaveRequestType.Create : SaveRequestType.Update);
         }
 
-        private void DeleteDetail(IUnitOfWork uow, Int64 detailId)
+        private void DeleteDetail(IUnitOfWork uow, object detailId)
         {
             var deleteHandler = deleteHandlerFactory();
             var deleteRequest = new DeleteRequest { EntityId = detailId };
             deleteHandler.Process(uow, deleteRequest);
+        }
+
+        private string AsString(object obj)
+        {
+            if (obj == null)
+                return null;
+
+            return obj.ToString();
         }
 
         private void DetailListSave(IUnitOfWork uow, Int64 masterId, IList oldList, IList newList)
@@ -147,31 +155,32 @@ namespace Serenity.Services
                 return;
             }
 
-            var rowIdField = (row as IIdRow).IdField;
+            var rowIdField = (Field)((row as IIdRow).IdField);
 
             if (newList.Count == 0)
             {
                 foreach (Row entity in oldList)
-                    DeleteDetail(uow, rowIdField[entity].Value);
+                    DeleteDetail(uow, rowIdField.AsObject(entity));
 
                 return;
             }
 
-            var oldById = new Dictionary<Int64, Row>(oldList.Count);
+            var oldById = new Dictionary<string, Row>(oldList.Count);
             foreach (Row item in oldList)
-                oldById[rowIdField[item].Value] = item;
+                oldById[rowIdField.AsObject(item).ToString()] = item;
 
-            var newById = new Dictionary<Int64, Row>(newList.Count);
+            var newById = new Dictionary<string, Row>(newList.Count);
             foreach (Row item in newList)
             {
-                var id = rowIdField[item];
-                if (id != null)
-                    newById[id.Value] = item;
+                var id = AsString(rowIdField.AsObject(item));
+
+                if (!string.IsNullOrEmpty(id))
+                    newById[id.ToString()] = item;
             }
 
             foreach (Row item in oldList)
             {
-                var id = rowIdField[item].Value;
+                var idObj = rowIdField.AsObject(item).ToString();
                 if (!newById.ContainsKey(id))
                     DeleteDetail(uow, id);
             }
