@@ -10,5 +10,18 @@ namespace Serenity.Data
             : base(collection, name, caption, size, flags, getValue, setValue)
         {
         }
+
+        protected override int CompareValues(List<TItem> value1, List<TItem> value2)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override List<TItem> Clone(List<TItem> value)
+        {
+            var clone = new List<TItem>();
+            foreach (var item in value)
+                clone.Add(item);
+            return clone;
+        }
     }
 }
