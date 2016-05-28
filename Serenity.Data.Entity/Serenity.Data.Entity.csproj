@@ -62,6 +62,7 @@
     <Compile Include="Extensions\EntityFieldExtensions.cs" />
     <Compile Include="Extensions\EntitySqlHelper.cs" />
     <Compile Include="Extensions\EntityLocalTexts.cs" />
+    <Compile Include="FieldTypes\ListField.cs" />
     <Compile Include="FieldTypes\TimeSpanField.cs" />
     <Compile Include="FieldTypes\SingleField.cs" />
     <Compile Include="FieldTypes\Field.CriteriaOperators.cs" />
