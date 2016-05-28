@@ -1,3 +1,12 @@
+## 2.2.1 (2016-05-28)
+
+Features:
+  - add ListField as an alias for CustomClassField<List<TItem>>. ListField also acts like RowListField when cloning rows, so it clones the list itself.
+  
+Bugfixes:
+  - options defined as property for formatters or editors written in TypeScript couldn't be set
+  - invalid cast error for Time fields, due to a bug in ADO.NET that converts parameter type to DateTime when you set it to Time!
+
 ## 2.2.0 (2016-05-21)
 
 Features:
