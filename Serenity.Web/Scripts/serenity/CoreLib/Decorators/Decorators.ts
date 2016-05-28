@@ -23,7 +23,7 @@ namespace Serenity {
             }
 
             if (!member) {
-                member = { name: memberName };
+                member = { name: memberName, attr: [], type: 4, returnType: Object, sname: memberName };
                 type.__metadata.members.push(member);
             }
 

@@ -3405,37 +3405,76 @@
 		if (ss.isNullOrUndefined(options)) {
 			return;
 		}
-		var props = ss.getMembers(ss.getInstanceType(target), 16, 20);
-		var propList = Enumerable.from(props).where(function(x) {
-			return !!x.setter && ((x.attr || []).filter(function(a) {
-				return ss.isInstanceOfType(a, Serenity.OptionAttribute);
-			}).length > 0 || (x.attr || []).filter(function(a) {
-				return ss.isInstanceOfType(a, $System_ComponentModel_DisplayNameAttribute);
-			}).length > 0);
-		});
-		var propByName = {};
-		var $t1 = propList.getEnumerator();
-		try {
-			while ($t1.moveNext()) {
-				var k = $t1.current();
-				propByName[$Serenity_ReflectionUtils.makeCamelCase(k.name)] = k;
+		var type = ss.getInstanceType(target);
+		if (ss.referenceEquals(type, Object)) {
+			return;
+		}
+		var propByName = type.__propByName;
+		var fieldByName = type.__fieldByName;
+		if (ss.isNullOrUndefined(propByName)) {
+			var props = ss.getMembers(type, 16, 20);
+			var propList = Enumerable.from(props).where(function(x) {
+				return !!x.setter && ((x.attr || []).filter(function(a) {
+					return ss.isInstanceOfType(a, Serenity.OptionAttribute);
+				}).length > 0 || (x.attr || []).filter(function(a) {
+					return ss.isInstanceOfType(a, $System_ComponentModel_DisplayNameAttribute);
+				}).length > 0);
+			});
+			propByName = {};
+			var $t1 = propList.getEnumerator();
+			try {
+				while ($t1.moveNext()) {
+					var k = $t1.current();
+					propByName[$Serenity_ReflectionUtils.makeCamelCase(k.name)] = k;
+				}
 			}
+			finally {
+				$t1.dispose();
+			}
+			type.__propByName = propByName;
 		}
-		finally {
-			$t1.dispose();
+		if (ss.isNullOrUndefined(fieldByName)) {
+			var fields = ss.getMembers(type, 4, 20);
+			var fieldList = Enumerable.from(fields).where(function(x1) {
+				return (x1.attr || []).filter(function(a) {
+					return ss.isInstanceOfType(a, Serenity.OptionAttribute);
+				}).length > 0 || (x1.attr || []).filter(function(a) {
+					return ss.isInstanceOfType(a, $System_ComponentModel_DisplayNameAttribute);
+				}).length > 0;
+			});
+			fieldByName = {};
+			var $t2 = fieldList.getEnumerator();
+			try {
+				while ($t2.moveNext()) {
+					var k1 = $t2.current();
+					fieldByName[$Serenity_ReflectionUtils.makeCamelCase(k1.name)] = k1;
+				}
+			}
+			finally {
+				$t2.dispose();
+			}
+			type.__fieldByName = fieldByName;
 		}
-		var $t2 = ss.getEnumerator(Object.keys(options));
+		var $t3 = ss.getEnumerator(Object.keys(options));
 		try {
-			while ($t2.moveNext()) {
-				var k1 = $t2.current();
-				var p = propByName[$Serenity_ReflectionUtils.makeCamelCase(k1)];
+			while ($t3.moveNext()) {
+				var k2 = $t3.current();
+				var v = options[k2];
+				var cc = $Serenity_ReflectionUtils.makeCamelCase(k2);
+				var p = propByName[cc] || propByName[k2];
 				if (ss.isValue(p)) {
-					ss.midel(p.setter, target)(options[k1]);
+					ss.midel(p.setter, target)(v);
+				}
+				else {
+					var f = fieldByName[cc] || fieldByName[k2];
+					if (ss.isValue(f)) {
+						ss.fieldAccess(f, target, v);
+					}
 				}
 			}
 		}
 		finally {
-			$t2.dispose();
+			$t3.dispose();
 		}
 	};
 	global.Serenity.ReflectionOptionsSetter = $Serenity_ReflectionOptionsSetter;
