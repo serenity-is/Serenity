@@ -272,8 +272,6 @@
             if (value == null)
                 return DBNull.Value;
 
-            if (value is DateTime)
-
             if (value is Stream)
             {
                 if (value is MemoryStream)
@@ -325,7 +323,9 @@
 
             if (value != null && value != DBNull.Value)
             {
-                param.DbType = SqlMapper.LookupDbType(value.GetType(), name);
+                var mappedType = SqlMapper.LookupDbType(value.GetType(), name); 
+                if (mappedType != param.DbType)
+                    param.DbType = mappedType;
 
                 if (param.DbType == DbType.DateTime &&
                     (dialect ?? SqlSettings.DefaultDialect).UseDateTime2)
