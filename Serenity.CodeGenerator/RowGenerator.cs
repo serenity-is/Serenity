@@ -15,7 +15,7 @@ namespace Serenity.CodeGenerator
             GeneratorConfig config)
         {
             var model = GenerateModel(connection, tableSchema, table, module, connectionKey, entityClass, permission, config);
-            return Templates.Render(new Views.EntityRow(), model);
+            return Templates.Render(GeneratorConfig.GetEntityRowView(config), model);
         }
 
         private static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)

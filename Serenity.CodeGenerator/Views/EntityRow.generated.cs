@@ -23,6 +23,8 @@ namespace Serenity.CodeGenerator.Views
  public dynamic Model { get; set; } 
         public override void Execute()
         {
+WriteLiteral("\r\n");
+
 
 
 WriteLiteral("\r\n");

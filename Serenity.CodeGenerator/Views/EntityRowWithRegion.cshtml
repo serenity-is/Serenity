@@ -1,0 +1,128 @@
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+    var schemaDot = Model.Schema == null ? "" : ("[" + Model.Schema + "].");
+
+    Func<string, string, string> jf = (x, y) =>
+    {
+        if (x.ToLowerInvariant() == y.ToLowerInvariant())
+            return y;
+        else
+            return x + y;
+    };
+}
+namespace @(Model.RootNamespace)@(dotModule).Entities
+{
+    using Newtonsoft.Json;
+    using Serenity;
+    using Serenity.ComponentModel;
+    using Serenity.Data;
+    using Serenity.Data.Mapping;
+    using System;
+    using System.ComponentModel;
+    using System.IO;
+
+    [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), TwoLevelCached]
+    [ReadPermission("@Model.Module:@Model.Tablename:Read")]
+    [InsertPermission("@Model.Module:@Model.Tablename:Insert")]
+    [UpdatePermission("@Model.Module:@Model.Tablename:Update")]
+    [DeletePermission("@Model.Module:@Model.Tablename:Delete")]
+    public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
+    {@foreach (var x in Model.Fields)
+    {
+        var attrs = new List<string>();
+        attrs.Add("DisplayName(\"" + x.Title + "\")");
+
+        if (x.Ident != x.Name)
+        {
+            attrs.Add("Column(\"" + x.Name + "\")");
+        }
+
+        if ((x.Size ?? 0) != 0)
+        {
+            attrs.Add("Size(" + x.Size + ")");
+        }
+        if (x.Scale != 0)
+        {
+            attrs.Add("Scale(" + x.Scale + ")");
+        }
+        if (!String.IsNullOrEmpty(x.Flags))
+        {
+            attrs.Add(x.Flags);
+        }
+        if (!String.IsNullOrEmpty(x.PKTable))
+        {
+            attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
+            attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
+        }
+        if (Model.NameField == x.Ident)
+        {
+            attrs.Add("QuickSearch");
+        }
+        if (x.TextualField != null)
+        {
+            attrs.Add("TextualField(\"" + x.TextualField + "\")");
+        }
+        var attrString = String.Join(", ", attrs.ToArray());
+        <text>
+
+        #region @x.Title
+        @if (!String.IsNullOrEmpty(attrString))
+        {
+            <text>        [@attrString]
+            </text>}        public @x.Type@(x.IsValueType ? "?" : "") @x.Ident { get { return Fields.@(x.Ident)[this]; } set { Fields.@(x.Ident)[this] = value; } }
+            public partial class RowFields { public @(x.Type)Field @(x.Ident); }
+            #endregion @x.Ident</text>}
+
+        #region Foreign Fields
+        @foreach (var x in Model.Joins)
+        {
+            foreach (var y in x.Fields)
+            {
+                <text>
+                [DisplayName("@y.Title"), Expression("@("j" + x.Name + ".[" + y.Name + "]")")]
+                public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident)) { get { return Fields.@(jf(x.Name, y.Ident))[this]; } set { Fields.@(jf(x.Name, y.Ident))[this] = value; } }
+                public partial class RowFields { public @(y.Type)Field @(jf(x.Name, y.Ident)); }
+
+                </text>}
+        }
+
+        #endregion Foreign Fields
+
+        #region Id and Name fields
+        IIdField IIdRow.IdField
+        {
+        get { return Fields.@(Model.Identity); }
+        }
+        @if (Model.NameField != null)
+        {
+        <text>
+        StringField INameRow.NameField
+        {
+        get { return Fields.@Model.NameField; }
+        }
+        #endregion Id and Name fields
+        </text>}
+
+        #region Constructor
+        public @(Model.RowClassName)()
+        : base(Fields)
+        {
+        }
+        #endregion Constructor
+
+        #region RowFields
+        public static readonly RowFields Fields = new RowFields().Init();
+
+        public partial class RowFields : @(Model.FieldsBaseClass)
+        {
+            public RowFields()
+            : base("@(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]")"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
+            {
+                LocalTextPrefix = "@(moduleDot)@(Model.ClassName)";
+            }
+        }
+        #endregion RowFields
+        }
+    }
