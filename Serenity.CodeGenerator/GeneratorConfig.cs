@@ -23,6 +23,7 @@ namespace Serenity.CodeGenerator
         public bool GenerateSSImports { get; set; }
         public bool GenerateTSTypings { get; set; }
         public bool GenerateTSCode { get; set; }
+        public bool RowFieldsSurroundWithRegion { get; set; }
 
         public GeneratorConfig()
         {
@@ -33,6 +34,7 @@ namespace Serenity.CodeGenerator
             GenerateTSTypings = true;
             GenerateSSImports = false;
             GenerateTSCode = true;
+            RowFieldsSurroundWithRegion = false;
             SetDefaults();
         }
 
@@ -45,7 +47,15 @@ namespace Serenity.CodeGenerator
 
             return Path.Combine(configPath, "Serenity.CodeGenerator.config");
         }
-
+        public static RazorGenerator.Templating.RazorTemplateBase GetEntityRowView(GeneratorConfig config)
+        {
+            RazorGenerator.Templating.RazorTemplateBase entityRow;
+            if (config.RowFieldsSurroundWithRegion)
+                entityRow = new Views.EntityRowWithRegion();
+            else
+                entityRow = new Views.EntityRow();
+            return entityRow;
+        }
         private void SetDefaults()
         {
             RootNamespace = "MyProject";
@@ -174,7 +184,7 @@ namespace Serenity.CodeGenerator
 
             public override string ToString()
             {
-                return Key + " [" + ConnectionString + "], " +  ProviderName;
+                return Key + " [" + ConnectionString + "], " + ProviderName;
             }
         }
 

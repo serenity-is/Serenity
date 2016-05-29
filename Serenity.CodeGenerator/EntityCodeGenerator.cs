@@ -156,7 +156,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateRow()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityRow(), model),
+            CreateNewSiteWebFile(Templates.Render(GeneratorConfig.GetEntityRowView(config), model),
                 Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
         }
 

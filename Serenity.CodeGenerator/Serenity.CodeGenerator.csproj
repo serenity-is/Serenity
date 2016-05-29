@@ -126,6 +126,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityForm.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="Views\EntityRowWithRegion.generated.cs">
+      <DependentUpon>EntityRowWithRegion.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Views\EntityScriptDialogTS.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -206,6 +211,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptDialogSS.cshtml</DependentUpon>
     </Compile>
+    <None Include="Views\EntityRowWithRegion.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityRowWithRegion.generated.cs</LastGenOutput>
+    </None>
     <None Include="Views\EntityScriptFormTS.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityScriptFormTS.generated.cs</LastGenOutput>
