@@ -24,10 +24,10 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     using System.IO;
 
     [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), TwoLevelCached]
-    [ReadPermission("@Model.Module:@Model.RowClassName:Read")]
-    [InsertPermission("@Model.Module:@Model.RowClassName:Insert")]
-    [UpdatePermission("@Model.Module:@Model.RowClassName:Update")]
-    [DeletePermission("@Model.Module:@Model.RowClassName:Delete")]
+    [ReadPermission("@Model.Module:@Model.Tablename:Read")]
+    [InsertPermission("@Model.Module:@Model.Tablename:Insert")]
+    [UpdatePermission("@Model.Module:@Model.Tablename:Update")]
+    [DeletePermission("@Model.Module:@Model.Tablename:Delete")]
     public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
     {@foreach (var x in Model.Fields)
     {
@@ -75,28 +75,28 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
             public partial class RowFields { public @(x.Type)Field @(x.Ident); }
             #endregion @x.Ident</text>}
 
-    #region Foreign Fields
-    @foreach (var x in Model.Joins)
-    {
-        foreach (var y in x.Fields)
+        #region Foreign Fields
+        @foreach (var x in Model.Joins)
         {
-            <text>
-            [DisplayName("@y.Title"), Expression("@("j" + x.Name + ".[" + y.Name + "]")")]
-            public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident)) { get { return Fields.@(jf(x.Name, y.Ident))[this]; } set { Fields.@(jf(x.Name, y.Ident))[this] = value; } }
-            public partial class RowFields { public @(y.Type)Field @(jf(x.Name, y.Ident)); }
+            foreach (var y in x.Fields)
+            {
+                <text>
+                [DisplayName("@y.Title"), Expression("@("j" + x.Name + ".[" + y.Name + "]")")]
+                public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident)) { get { return Fields.@(jf(x.Name, y.Ident))[this]; } set { Fields.@(jf(x.Name, y.Ident))[this] = value; } }
+                public partial class RowFields { public @(y.Type)Field @(jf(x.Name, y.Ident)); }
 
-            </text>}
-    }
+                </text>}
+        }
 
-    #endregion Foreign Fields
+        #endregion Foreign Fields
 
-    #region Id and Name fields
-    IIdField IIdRow.IdField
-    {
-    get { return Fields.@(Model.Identity); }
-    }
-    @if (Model.NameField != null)
-    {
+        #region Id and Name fields
+        IIdField IIdRow.IdField
+        {
+        get { return Fields.@(Model.Identity); }
+        }
+        @if (Model.NameField != null)
+        {
         <text>
         StringField INameRow.NameField
         {
@@ -105,24 +105,24 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
         #endregion Id and Name fields
         </text>}
 
-    #region Constructor
-    public @(Model.RowClassName)()
-    : base(Fields)
-    {
-    }
-    #endregion Constructor
+        #region Constructor
+        public @(Model.RowClassName)()
+        : base(Fields)
+        {
+        }
+        #endregion Constructor
 
-    #region RowFields
-    public static readonly RowFields Fields = new RowFields().Init();
+        #region RowFields
+        public static readonly RowFields Fields = new RowFields().Init();
 
-    public partial class RowFields : @(Model.FieldsBaseClass)
-    {
-    public RowFields()
-    : base("@(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]")"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
-    {
-    LocalTextPrefix = "@(moduleDot)@(Model.ClassName)";
-    }
-    }
-    #endregion RowFields
-    }
+        public partial class RowFields : @(Model.FieldsBaseClass)
+        {
+            public RowFields()
+            : base("@(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]")"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
+            {
+                LocalTextPrefix = "@(moduleDot)@(Model.ClassName)";
+            }
+        }
+        #endregion RowFields
+        }
     }

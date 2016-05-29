@@ -85,7 +85,7 @@ WriteLiteral("\"), TwoLevelCached]\r\n    [ReadPermission(\"");
 WriteLiteral(":");
 
 
-                              Write(Model.RowClassName);
+                              Write(Model.Tablename);
 
 WriteLiteral(":Read\")]\r\n    [InsertPermission(\"");
 
@@ -95,7 +95,7 @@ WriteLiteral(":Read\")]\r\n    [InsertPermission(\"");
 WriteLiteral(":");
 
 
-                                Write(Model.RowClassName);
+                                Write(Model.Tablename);
 
 WriteLiteral(":Insert\")]\r\n    [UpdatePermission(\"");
 
@@ -105,7 +105,7 @@ WriteLiteral(":Insert\")]\r\n    [UpdatePermission(\"");
 WriteLiteral(":");
 
 
-                                Write(Model.RowClassName);
+                                Write(Model.Tablename);
 
 WriteLiteral(":Update\")]\r\n    [DeletePermission(\"");
 
@@ -115,7 +115,7 @@ WriteLiteral(":Update\")]\r\n    [DeletePermission(\"");
 WriteLiteral(":");
 
 
-                                Write(Model.RowClassName);
+                                Write(Model.Tablename);
 
 WriteLiteral(":Delete\")]\r\n    public sealed class ");
 
@@ -240,76 +240,76 @@ WriteLiteral("; }\r\n            #endregion ");
 
                                       }
 
-WriteLiteral("\r\n    #region Foreign Fields\r\n");
+WriteLiteral("\r\n        #region Foreign Fields\r\n");
 
 
-     foreach (var x in Model.Joins)
-    {
-        foreach (var y in x.Fields)
+         foreach (var x in Model.Joins)
         {
+            foreach (var y in x.Fields)
+            {
 
-WriteLiteral("            ");
+WriteLiteral("                ");
 
-WriteLiteral("\r\n            [DisplayName(\"");
+WriteLiteral("\r\n                [DisplayName(\"");
 
 
-                     Write(y.Title);
+                         Write(y.Title);
 
 WriteLiteral("\"), Expression(\"");
 
 
-                                              Write("j" + x.Name + ".[" + y.Name + "]");
+                                                  Write("j" + x.Name + ".[" + y.Name + "]");
 
-WriteLiteral("\")]\r\n            public ");
-
-
-              Write(y.Type);
+WriteLiteral("\")]\r\n                public ");
 
 
-                      Write(y.IsValueType ? "?" : "");
+                  Write(y.Type);
+
+
+                          Write(y.IsValueType ? "?" : "");
 
 WriteLiteral(" ");
 
 
-                                                  Write(jf(x.Name, y.Ident));
+                                                      Write(jf(x.Name, y.Ident));
 
 WriteLiteral(" { get { return Fields.");
 
 
-                                                                                               Write(jf(x.Name, y.Ident));
+                                                                                                   Write(jf(x.Name, y.Ident));
 
 WriteLiteral("[this]; } set { Fields.");
 
 
-                                                                                                                                            Write(jf(x.Name, y.Ident));
+                                                                                                                                                Write(jf(x.Name, y.Ident));
 
-WriteLiteral("[this] = value; } }\r\n            public partial class RowFields { public ");
+WriteLiteral("[this] = value; } }\r\n                public partial class RowFields { public ");
 
 
-                                                Write(y.Type);
+                                                    Write(y.Type);
 
 WriteLiteral("Field ");
 
 
-                                                               Write(jf(x.Name, y.Ident));
+                                                                   Write(jf(x.Name, y.Ident));
 
-WriteLiteral("; }\r\n\r\n            ");
-
-
-                   }
-    }
-
-WriteLiteral("\r\n    #endregion Foreign Fields\r\n\r\n    #region Id and Name fields\r\n    IIdField I" +
-"IdRow.IdField\r\n    {\r\n    get { return Fields.");
+WriteLiteral("; }\r\n\r\n                ");
 
 
-                    Write(Model.Identity);
+                       }
+        }
 
-WriteLiteral("; }\r\n    }\r\n");
+WriteLiteral("\r\n        #endregion Foreign Fields\r\n\r\n        #region Id and Name fields\r\n      " +
+"  IIdField IIdRow.IdField\r\n        {\r\n        get { return Fields.");
 
 
-     if (Model.NameField != null)
-    {
+                        Write(Model.Identity);
+
+WriteLiteral("; }\r\n        }\r\n");
+
+
+         if (Model.NameField != null)
+        {
 
 WriteLiteral("        ");
 
@@ -324,37 +324,37 @@ WriteLiteral("; }\r\n        }\r\n        #endregion Id and Name fields\r\n     
 
                }
 
-WriteLiteral("\r\n    #region Constructor\r\n    public ");
+WriteLiteral("\r\n        #region Constructor\r\n        public ");
 
 
-       Write(Model.RowClassName);
+           Write(Model.RowClassName);
 
-WriteLiteral("()\r\n    : base(Fields)\r\n    {\r\n    }\r\n    #endregion Constructor\r\n\r\n    #region R" +
-"owFields\r\n    public static readonly RowFields Fields = new RowFields().Init();\r" +
-"\n\r\n    public partial class RowFields : ");
-
-
-                                 Write(Model.FieldsBaseClass);
-
-WriteLiteral("\r\n    {\r\n    public RowFields()\r\n    : base(\"");
+WriteLiteral("()\r\n        : base(Fields)\r\n        {\r\n        }\r\n        #endregion Constructor\r" +
+"\n\r\n        #region RowFields\r\n        public static readonly RowFields Fields = " +
+"new RowFields().Init();\r\n\r\n        public partial class RowFields : ");
 
 
-        Write(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]");
+                                     Write(Model.FieldsBaseClass);
+
+WriteLiteral("\r\n        {\r\n            public RowFields()\r\n            : base(\"");
+
+
+                Write(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]");
 
 WriteLiteral("\"");
 
 
-                                                                                                       Write(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\""));
+                                                                                                               Write(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\""));
 
-WriteLiteral(")\r\n    {\r\n    LocalTextPrefix = \"");
-
-
-                   Write(moduleDot);
+WriteLiteral(")\r\n            {\r\n                LocalTextPrefix = \"");
 
 
-                               Write(Model.ClassName);
+                               Write(moduleDot);
 
-WriteLiteral("\";\r\n    }\r\n    }\r\n    #endregion RowFields\r\n    }\r\n    }");
+
+                                           Write(Model.ClassName);
+
+WriteLiteral("\";\r\n            }\r\n        }\r\n        #endregion RowFields\r\n        }\r\n    }");
 
 
         }
