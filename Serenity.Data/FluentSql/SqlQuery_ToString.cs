@@ -333,10 +333,10 @@ namespace Serenity.Data
                 sb.Append(")");
 
             //code for oracle dialect
-            if(!dialect.CanUseTake && skip > 0)
+            if(!dialect.CanUseTake && (take + skip) > 0)
             {
                 sb.Insert(0, "SELECT * FROM (");
-                sb.Insert(sb.Length, ") WHERE  ROWNUM > " + skip + " AND ROWNUM <= "+ (take + skip));
+                sb.Insert(sb.Length, ") WHERE ROWNUM > " + skip + " AND ROWNUM <= "+ (take + skip));
 
             }
 
