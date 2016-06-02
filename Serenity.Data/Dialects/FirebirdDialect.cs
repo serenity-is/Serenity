@@ -192,5 +192,16 @@ namespace Serenity.Data
                 return false;
             }
         }
+
+        public bool CanUseTake
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public char ParameterPrefix { get { return '@'; } }
+
     }
 }

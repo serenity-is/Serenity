@@ -193,7 +193,7 @@ namespace Serenity.Data
             }
 
             // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (take != 0 && (!useOffset) && (useRowNumber || !dialect.UseTakeAtEnd))
+            if (take != 0 && (!useOffset) && (useRowNumber || !dialect.UseTakeAtEnd) && dialect.CanUseTake)
             {
                 sb.Append(dialect.TakeKeyword);
                 sb.Append(' ');
@@ -253,6 +253,7 @@ namespace Serenity.Data
 
                 sb.Append("ROW_NUMBER() OVER (ORDER BY ");
 
+                if(orderBy != null)
                 for (int i = 0; i < orderBy.Count; i++)
                 {
                     if (i > 0)
@@ -272,7 +273,7 @@ namespace Serenity.Data
                 sb.Append(skip);
             }
 
-            if (take != 0 && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd)
+            if (take != 0 && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd && dialect.CanUseTake)
             {
                 sb.Append(' ');
                 sb.Append(dialect.TakeKeyword);
@@ -330,6 +331,14 @@ namespace Serenity.Data
             // sub queries should be enclosed in paranthesis
             if (this.parent != null)
                 sb.Append(")");
+
+            //code for oracle dialect
+            if(!dialect.CanUseTake && (take + skip) > 0)
+            {
+                sb.Insert(0, "SELECT * FROM (");
+                sb.Insert(sb.Length, ") WHERE ROWNUM > " + skip + " AND ROWNUM <= "+ (take + skip));
+
+            }
 
             // select sorgusunu döndür
             return sb.ToString();

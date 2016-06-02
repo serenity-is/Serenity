@@ -229,7 +229,8 @@
             if (openBracket != '[')
                 commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
 
-            command.CommandText = commandText;
+            //Todo: replace @ with dialect.ParameterPrefix
+            command.CommandText = commandText;//.Replace('@', dialect.ParameterPrefix);
             return command;
         }
 
@@ -332,7 +333,7 @@
                     param.DbType = DbType.DateTime2;
             }
 
-            param.ParameterName = name;
+            param.ParameterName = dialect.ParameterPrefix + name.Substring(1);
             command.Parameters.Add(param);
             return param;
         }
@@ -355,7 +356,7 @@
                 var wrapped = connection as WrappedConnection;
                 if (wrapped != null &&
                     (wrapped.OpenedOnce || wrapped.CurrentTransaction != null))
-                        return false;
+                    return false;
 
                 System.Data.SqlClient.SqlConnection.ClearAllPools();
                 connection.Close();
