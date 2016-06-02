@@ -229,7 +229,8 @@
             if (openBracket != '[')
                 commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
 
-            command.CommandText = commandText.Replace('@', dialect.ParameterPrefix);
+            //Todo: replace @ with dialect.ParameterPrefix
+            command.CommandText = commandText;//.Replace('@', dialect.ParameterPrefix);
             return command;
         }
 
