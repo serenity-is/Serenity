@@ -229,7 +229,7 @@
             if (openBracket != '[')
                 commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
 
-            command.CommandText = commandText;
+            command.CommandText = commandText.Replace('@', dialect.ParameterPrefix);
             return command;
         }
 
@@ -332,7 +332,7 @@
                     param.DbType = DbType.DateTime2;
             }
 
-            param.ParameterName = name;
+            param.ParameterName = dialect.ParameterPrefix + name.Substring(1);
             command.Parameters.Add(param);
             return param;
         }

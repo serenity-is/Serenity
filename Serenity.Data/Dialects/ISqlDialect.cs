@@ -25,5 +25,7 @@
         bool UseReturningIdentity { get; }
         bool UseScopeIdentity { get; }
         bool UseTakeAtEnd { get; }
+        bool CanUseTake { get; }
+        char ParameterPrefix { get; }
     }
 }
