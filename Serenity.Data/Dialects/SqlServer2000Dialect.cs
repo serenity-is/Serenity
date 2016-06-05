@@ -177,6 +177,14 @@ namespace Serenity.Data
             }
         }
 
+        public bool UseReturningIntoVar
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public bool UseScopeIdentity
         {
             get
@@ -193,13 +201,14 @@ namespace Serenity.Data
             }
         }
 
-        public bool CanUseTake
+        public bool UseRowNum
         {
             get
             {
-                return true;
+                return false;
             }
         }
+
         public char ParameterPrefix { get { return '@'; } }
 
     }

@@ -29,12 +29,13 @@ namespace Serenity.Data
             bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
             bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch;
             bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && dialect.CanUseRowNumber;
+            bool useRowNum = (skip > 0 || take > 0) && dialect.UseRowNum;
             bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
 
             // atlanması istenen kayıt var mı?
-            if (useRowNumber || useSecondQuery)
+            if (useRowNumber || useRowNum || useSecondQuery)
             {
-                if (useRowNumber)
+                if (useRowNumber || useRowNum)
                 {
                     sb.Append("SELECT * FROM (\n");
                 }
@@ -193,7 +194,7 @@ namespace Serenity.Data
             }
 
             // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (take != 0 && (!useOffset) && (useRowNumber || !dialect.UseTakeAtEnd) && dialect.CanUseTake)
+            if (take != 0 && (!useOffset) && (!useRowNum) && (useRowNumber || !dialect.UseTakeAtEnd))
             {
                 sb.Append(dialect.TakeKeyword);
                 sb.Append(' ');
@@ -273,7 +274,13 @@ namespace Serenity.Data
                 sb.Append(skip);
             }
 
-            if (take != 0 && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd && dialect.CanUseTake)
+            if (useRowNum)
+            {
+                sb.Append(") WHERE ROWNUM > " + skip +
+                    " AND ROWNUM <= " + (skip + take));
+            }
+
+            if (take != 0 && (!useRowNum) && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd)
             {
                 sb.Append(' ');
                 sb.Append(dialect.TakeKeyword);
@@ -331,14 +338,6 @@ namespace Serenity.Data
             // sub queries should be enclosed in paranthesis
             if (this.parent != null)
                 sb.Append(")");
-
-            //code for oracle dialect
-            if(!dialect.CanUseTake && (take + skip) > 0)
-            {
-                sb.Insert(0, "SELECT * FROM (");
-                sb.Insert(sb.Length, ") WHERE ROWNUM > " + skip + " AND ROWNUM <= "+ (take + skip));
-
-            }
 
             // select sorgusunu döndür
             return sb.ToString();

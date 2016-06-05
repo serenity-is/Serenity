@@ -117,7 +117,7 @@ namespace Serenity.Data
         }
 
         static Link<Type, Action<IDbCommand, bool>> bindByNameCache;
-        static Action<IDbCommand, bool> GetBindByName(Type commandType)
+        public static Action<IDbCommand, bool> GetBindByName(Type commandType)
         {
             if (commandType == null) return null; // GIGO
             Action<IDbCommand, bool> action;

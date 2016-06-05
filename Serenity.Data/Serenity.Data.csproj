@@ -76,6 +76,7 @@
     <Compile Include="FluentSql\SqlQuery_Join.cs" />
     <Compile Include="FluentSql\SqlQuery_ToString.cs" />
     <Compile Include="Join\AliasExtensions.cs" />
+    <Compile Include="Join\ParamPrefixReplacer.cs" />
     <Compile Include="Join\DatabaseCaretReferences.cs" />
     <Compile Include="Join\IAlias.cs" />
     <Compile Include="Join\BracketLocator.cs" />

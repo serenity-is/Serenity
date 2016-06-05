@@ -23,9 +23,10 @@
         string TimeFormat { get; }
         bool UseDateTime2 { get; }
         bool UseReturningIdentity { get; }
+        bool UseReturningIntoVar { get; }
         bool UseScopeIdentity { get; }
         bool UseTakeAtEnd { get; }
-        bool CanUseTake { get; }
+        bool UseRowNum { get; }
         char ParameterPrefix { get; }
     }
 }

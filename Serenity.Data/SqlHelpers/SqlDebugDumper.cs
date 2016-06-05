@@ -35,6 +35,10 @@ namespace Serenity.Data
             if (openBracket != '[')
                 text = BracketLocator.ReplaceBrackets(text, dialect);
 
+            var paramPrefix = dialect.ParameterPrefix;
+            if (paramPrefix != '@')
+                text = ParamPrefixReplacer.Replace(text, paramPrefix);
+
             return text;
         }
 

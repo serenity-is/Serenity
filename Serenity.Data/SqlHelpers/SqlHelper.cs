@@ -45,12 +45,17 @@
         {
             string queryText = query.ToString();
             var dialect = connection.GetDialect();
-            if (dialect.UseReturningIdentity)
+            if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
             {
                 string identityColumn = query.IdentityColumn();
                 if (identityColumn == null)
                     throw new ArgumentNullException("query.IdentityColumn");
+
                 queryText += " RETURNING " + SqlSyntax.AutoBracket(identityColumn);
+
+                if (dialect.UseReturningIntoVar)
+                    queryText = "DECLARE\r\n INSERTED__VALUE NUMBER(18);\r\nBEGIN\r\n" +
+                        queryText + " INTO INSERTED__VALUE; DBMS_OUTPUT.PUT_LINE(INSERTED__VALUE);\r\nEND;";
 
                 using (var command = NewCommand(connection, queryText, query.Params))
                 {
@@ -222,6 +227,11 @@
                 throw new ArgumentNullException("connection");
 
             IDbCommand command = connection.CreateCommand();
+
+            var bindByName = SqlMapper.GetBindByName(command.GetType());
+            if (bindByName != null)
+                bindByName(command, true);
+
             commandText = DatabaseCaretReferences.Replace(commandText);
 
             var dialect = connection.GetDialect();
@@ -229,8 +239,11 @@
             if (openBracket != '[')
                 commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
 
-            //Todo: replace @ with dialect.ParameterPrefix
-            command.CommandText = commandText;//.Replace('@', dialect.ParameterPrefix);
+            var paramPrefix = dialect.ParameterPrefix;
+            if (paramPrefix != '@')
+                commandText = ParamPrefixReplacer.Replace(commandText, paramPrefix);
+
+            command.CommandText = commandText;
             return command;
         }
 
@@ -315,25 +328,39 @@
         {
             DbParameter param = command.CreateParameter();
 
-            value = FixParamType(value);
-            param.Value = value;
+            name = dialect.ParameterPrefix != '@' &&
+                name.StartsWith("@") ? dialect.ParameterPrefix + name.Substring(1) :
+                    name;
 
-            var str = value as string;
-            if (str != null && str.Length < 4000)
-                param.Size = 4000;
+            param.ParameterName = name;
 
-            if (value != null && value != DBNull.Value)
+            value = FixParamType(value) ?? DBNull.Value;
+
+            if (value is Boolean && dialect.GetType() == typeof(OracleDialect))
             {
-                var mappedType = SqlMapper.LookupDbType(value.GetType(), name); 
-                if (mappedType != param.DbType)
-                    param.DbType = mappedType;
+                // otherwise argument out of range exception!
+                param.Value = (Boolean)value ? 1 : 0;
+            }
+            else
+            {
+                param.Value = value;
 
-                if (param.DbType == DbType.DateTime &&
-                    (dialect ?? SqlSettings.DefaultDialect).UseDateTime2)
-                    param.DbType = DbType.DateTime2;
+                if (value != null && value != DBNull.Value)
+                {
+                    var mappedType = SqlMapper.LookupDbType(value.GetType(), name);
+                    if (mappedType != param.DbType)
+                        param.DbType = mappedType;
+
+                    if (param.DbType == DbType.DateTime &&
+                        (dialect ?? SqlSettings.DefaultDialect).UseDateTime2)
+                        param.DbType = DbType.DateTime2;
+                }
+
+                var str = value as string;
+                if (str != null && str.Length < 4000)
+                    param.Size = 4000;
             }
 
-            param.ParameterName = dialect.ParameterPrefix + name.Substring(1);
             command.Parameters.Add(param);
             return param;
         }
