@@ -791,7 +791,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT * FROM (SELECT c FROM t) WHERE ROWNUM > 0 AND ROWNUM <= 10"),
+                    "SELECT * FROM ( SELECT c FROM t) WHERE ROWNUM > 0 AND ROWNUM <= 10"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
