@@ -1,3 +1,13 @@
+## 2.2.2 (2016-06-06)
+
+Features:
+  - added OracleDialect(thanks @dfaruque)
+  - Serene and Northwind now works with Oracle [Serene]
+  - alternative row generation with RowFieldsSurroundWithRegion config option in Sergen for those who likes regions (by @dfaruque) 
+
+Bugfixes:
+  - resolve automatic trimming problem for NotNull fields
+
 ## 2.2.1 (2016-05-28)
 
 Features:
