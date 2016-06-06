@@ -130,6 +130,17 @@ namespace Serenity.Data
             }
         }
 
+        public string QuoteColumnAlias(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return s;
+
+            if (s.StartsWith("\"") && s.EndsWith("\""))
+                return s;
+
+            return '"' + s.ToUpperInvariant() + '"';
+        }
+
         public string QuoteIdentifier(string s)
         {
             if (string.IsNullOrEmpty(s))

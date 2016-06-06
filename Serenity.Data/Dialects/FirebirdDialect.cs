@@ -110,6 +110,11 @@ namespace Serenity.Data
             }
         }
 
+        public string QuoteColumnAlias(string s)
+        {
+            return QuoteIdentifier(s);
+        }
+
         public string QuoteIdentifier(string s)
         {
             if (string.IsNullOrEmpty(s))

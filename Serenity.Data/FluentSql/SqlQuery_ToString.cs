@@ -237,7 +237,7 @@ namespace Serenity.Data
                 if (!string.IsNullOrEmpty(s.ColumnName))
                 {
                     sb.Append(SqlKeywords.As);
-                    var quoted = dialect.QuoteIdentifier(s.ColumnName);
+                    var quoted = dialect.QuoteColumnAlias(s.ColumnName);
                     sb.Append(quoted);
                     if (distinct)
                     {
