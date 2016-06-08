@@ -5612,8 +5612,10 @@
 						this.titleDiv = null;
 					}
 				}
-				else if (ss.isNullOrUndefined(this.titleDiv)) {
-					this.titleDiv = $('<div class="grid-title"><div class="title-text"></div></div>').prependTo(this.element);
+				else {
+					if (ss.isNullOrUndefined(this.titleDiv)) {
+						this.titleDiv = $('<div class="grid-title"><div class="title-text"></div></div>').prependTo(this.element);
+					}
 					this.titleDiv.children().text(value);
 				}
 				this.layout();

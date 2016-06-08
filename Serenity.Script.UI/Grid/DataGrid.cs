@@ -752,8 +752,8 @@ namespace Serenity
                             titleDiv = J("<div class=\"grid-title\"><div class=\"title-text\"></div></div>")
                                 .PrependTo(this.Element);
 
-                            titleDiv.Children().Text(value);
                         }
+                        titleDiv.Children().Text(value);
                     }
 
                     Layout();
