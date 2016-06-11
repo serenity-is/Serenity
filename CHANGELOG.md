@@ -1,3 +1,12 @@
+## 2.2.3 (2016-06-11)
+
+Features:
+  - search for subdirectories when adding translation json files from a directory
+  - added pt-BR translations (thanks @rolemberfilho)
+
+Bugfixes:
+  - fix datagrid title can't be set if its not null
+
 ## 2.2.2 (2016-06-06)
 
 Features:
