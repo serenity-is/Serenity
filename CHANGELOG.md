@@ -3,6 +3,7 @@
 Features:
   - search for subdirectories when adding translation json files from a directory
   - added pt-BR translations (thanks @rolemberfilho)
+  - split site texts for Northwind / Samples to separate directories [Serene]
 
 Bugfixes:
   - fix datagrid title can't be set if its not null
