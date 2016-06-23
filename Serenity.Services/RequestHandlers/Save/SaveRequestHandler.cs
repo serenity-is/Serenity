@@ -77,10 +77,7 @@ namespace Serenity.Services
                         update.Where(idField == new ValueCriteria(idField.AsObject(Old)));
                         update.Execute(Connection, ExpectedRows.One);
                     }
-                    else
-                    {
-                        Connection.UpdateById(Row);
-                    }
+                    
 
                     Connection.UpdateById(Row);
                     Response.EntityId = idField.AsObject(Row);
