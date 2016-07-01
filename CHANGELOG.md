@@ -1,3 +1,9 @@
+## 2.2.4 (2016-07-02)
+
+Bugfixes:
+  - SaveHandler was updating two times in some cases
+  - dropdown filter text is lost in filter bar after editing second time
+
 ## 2.2.3 (2016-06-11)
 
 Features:
