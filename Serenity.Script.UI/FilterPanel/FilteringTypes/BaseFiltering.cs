@@ -200,6 +200,7 @@ namespace Serenity
         {
             var input = Container.Find(":input")
                 .Not(".select2-focusser")
+                .Not(".select2-input")
                 .First();
 
             if (input.Length == 0)
