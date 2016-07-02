@@ -24,6 +24,14 @@ namespace Serenity.CodeGenerator
         public bool GenerateTSTypings { get; set; }
         public bool GenerateTSCode { get; set; }
         public bool RowFieldsSurroundWithRegion { get; set; }
+        public bool GenerateRow { get; internal set; }
+        public bool GenerateColumn { get; internal set; }
+        public bool GenerateForm { get; internal set; }
+        public bool GenerateEndPoint { get; internal set; }
+        public bool GenerateRepository { get; internal set; }
+        public bool GeneratePage { get; internal set; }
+        public bool GenerateGrid { get; internal set; }
+        public bool GenerateDialog { get; internal set; }
 
         public GeneratorConfig()
         {
@@ -35,6 +43,14 @@ namespace Serenity.CodeGenerator
             GenerateSSImports = false;
             GenerateTSCode = true;
             RowFieldsSurroundWithRegion = false;
+            GenerateRow = true;
+            GenerateColumn = true;
+            GenerateForm = true;
+            GenerateEndPoint = true;
+            GenerateRepository = true;
+            GeneratePage = true;
+            GenerateGrid = true;
+            GenerateDialog = true;
             SetDefaults();
         }
 
