@@ -261,6 +261,111 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        public bool GenerateRow
+        {
+            get { return config.GenerateRow; }
+            set
+            {
+                if (value != config.GenerateRow)
+                {
+                    config.GenerateRow = value;
+                    config.Save();
+                    Changed("GenerateRow");
+                }
+            }
+        }
+        public bool GenerateColumn
+        {
+            get { return config.GenerateColumn; }
+            set
+            {
+                if (value != config.GenerateColumn)
+                {
+                    config.GenerateColumn = value;
+                    config.Save();
+                    Changed("GenerateColumn");
+                }
+            }
+        }
+        public bool GenerateForm
+        {
+            get { return config.GenerateForm; }
+            set
+            {
+                if (value != config.GenerateForm)
+                {
+                    config.GenerateForm = value;
+                    config.Save();
+                    Changed("GenerateForm");
+                }
+            }
+        }
+        public bool GenerateEndPoint
+        {
+            get { return config.GenerateEndPoint; }
+            set
+            {
+                if (value != config.GenerateEndPoint)
+                {
+                    config.GenerateEndPoint = value;
+                    config.Save();
+                    Changed("GenerateEndPoint");
+                }
+            }
+        }
+        public bool GenerateRepository
+        {
+            get { return config.GenerateRepository; }
+            set
+            {
+                if (value != config.GenerateRepository)
+                {
+                    config.GenerateRepository = value;
+                    config.Save();
+                    Changed("GenerateRepository");
+                }
+            }
+        }
+        public bool GeneratePage
+        {
+            get { return config.GeneratePage; }
+            set
+            {
+                if (value != config.GeneratePage)
+                {
+                    config.GeneratePage = value;
+                    config.Save();
+                    Changed("GeneratePage");
+                }
+            }
+        }
+
+        public bool GenerateGrid
+        {
+            get { return config.GenerateGrid; }
+            set
+            {
+                if (value != config.GenerateGrid)
+                {
+                    config.GenerateGrid = value;
+                    config.Save();
+                    Changed("GenerateGrid");
+                }
+            }
+        }
+        public bool GenerateDialog
+        {
+            get { return config.GenerateDialog; }
+            set
+            {
+                if (value != config.GenerateDialog)
+                {
+                    config.GenerateDialog = value;
+                    config.Save();
+                    Changed("GenerateDialog");
+                }
+            }
+        }
         private void Ekle_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new AddConnectionStringWindow();
