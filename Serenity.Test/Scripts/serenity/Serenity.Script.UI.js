@@ -4988,7 +4988,7 @@
 			return this.validateEditorValue(value);
 		},
 		getEditorText: function() {
-			var input = this.get_container().find(':input').not('.select2-focusser').first();
+			var input = this.get_container().find(':input').not('.select2-focusser').not('.select2-input').first();
 			if (input.length === 0) {
 				return this.get_container().text().trim();
 			}
