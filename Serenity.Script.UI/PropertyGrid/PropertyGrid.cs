@@ -202,6 +202,9 @@ namespace Serenity
             if (editor is BooleanEditor && (item.EditorParams == null || !Q.IsTrue(item.EditorParams["labelFor"])))
                 label.RemoveAttr("for");
 
+            if (editor is RadioButtonEditor && (item.EditorParams == null || !Q.IsTrue(item.EditorParams["labelFor"])))
+                label.RemoveAttr("for");
+                
             if (Script.IsValue(item.MaxLength))
                 SetMaxLength(editor, item.MaxLength.Value);
 
