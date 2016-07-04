@@ -10,6 +10,26 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class RadioButtonEditorAttribute : CustomEditorAttribute
+    {
+        public RadioButtonEditorAttribute()
+            : base("RadioButton")
+        {
+        }
+
+        public String[] Labels
+        {
+            get { return GetOption<String[]>("labels"); }
+            set { SetOption("labels", value); }
+        }
+
+        public String[] Values
+        {
+            get { return GetOption<String[]>("values"); }
+            set { SetOption("values", value); }
+        }
+    }
+    
     public partial class DateEditorAttribute : CustomEditorAttribute
     {
         public DateEditorAttribute()
