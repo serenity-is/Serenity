@@ -34,6 +34,16 @@
         value: boolean;
     }
 
+    interface RadioButtonEditorOptions {
+        labels: string[];
+        values: string[];
+    }
+
+    class RadioButtonEditor extends Widget<RadioButtonEditorOptions> {
+        constructor(input: JQuery);
+        value: boolean;
+    }
+    
     interface EnumEditorOptions {
         enumKey?: string;
         enumType?: any;
