@@ -41,6 +41,7 @@
     <Compile Include="Editor\AsyncLookupEditor.cs" />
     <Compile Include="Editor\HtmlNoteContentEditor.cs" />
     <Compile Include="Editor\MultipleImageUploadEditor.cs" />
+    <Compile Include="Editor\RadioButtonEditor.cs" />
     <Compile Include="Editor\TimeEditor.cs" />
     <Compile Include="Editor\LookupEditor.cs" />
     <Compile Include="Editor\PersonNameEditor.cs" />
