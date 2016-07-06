@@ -30,19 +30,9 @@
                 <ComboBox Name="ConnectionsCombo" ItemsSource="{Binding}" SelectionChanged="ConnectionsCombo_SelectionChanged"></ComboBox>
             </DockPanel>
             <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 6 0 0">
-                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Module Name</TextBlock>
-                <TextBlock DockPanel.Dock="Right" Width="140" Background="AliceBlue" Padding="4 2 4 0">sample: TaskManagement</TextBlock>
-                <TextBox Text="{Binding Path=Module}"></TextBox>
-            </DockPanel>
-            <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 6 0 0">
                 <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Connection Key</TextBlock>
                 <TextBlock DockPanel.Dock="Right" Width="140" Background="AliceBlue" Padding="4 2 4 0">sample: Default</TextBlock>
                 <TextBox Text="{Binding Path=ConnectionKey}"></TextBox>
-            </DockPanel>
-            <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 6 0 0">
-                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Permission Key</TextBlock>
-                <TextBlock DockPanel.Dock="Right" Width="140" Background="AliceBlue" Padding="4 2 4 0">sample: Administration</TextBlock>
-                <TextBox Text="{Binding Path=Permission}"></TextBox>
             </DockPanel>
             <DockPanel Visibility="{Binding ElementName=tabMultiple, Path=IsSelected,Converter={StaticResource BoolToVis}}" HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" Margin="0 10 0 0">
                 <Button HorizontalAlignment="Right" Name="btnGenerateCodesMultiple" Padding="6" FontWeight="Bold" Click="btnGenerateCodesMultiple_Click">Generate Code for Entities</Button>
@@ -59,11 +49,11 @@
             </DockPanel>
 
             <DockPanel DockPanel.Dock="Bottom" Margin="0 6 0 0">
-                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Generation Files</TextBlock>
+                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Files To Generate</TextBlock>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateRow}">Row</CheckBox>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateColumn}">Column</CheckBox>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateForm}">Form</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateEndPoint}">EndPoint</CheckBox>
+                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateEndpoint}">Endpoint</CheckBox>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateRepository}">Repository</CheckBox>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GeneratePage}">Page</CheckBox>
             </DockPanel>
@@ -73,6 +63,17 @@
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateTSTypings}">TypeScript Typings</CheckBox>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateSSImports}">Saltaralle Imports</CheckBox>
             </DockPanel>
+            <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 6 0 0">
+                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Module Name</TextBlock>
+                <TextBlock DockPanel.Dock="Right" Width="140" Background="AliceBlue" Padding="4 2 4 0">sample: TaskManagement</TextBlock>
+                <TextBox Text="{Binding Path=Module}"></TextBox>
+            </DockPanel>
+            <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 6 0 0">
+                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Permission Key</TextBlock>
+                <TextBlock DockPanel.Dock="Right" Width="140" Background="AliceBlue" Padding="4 2 4 0">sample: Administration</TextBlock>
+                <TextBox Text="{Binding Path=Permission}"></TextBox>
+            </DockPanel>
+
             <DockPanel HorizontalAlignment="Stretch" LastChildFill="True" DockPanel.Dock="Top" Margin="0 6 0 0">
 
                 <TabControl>
@@ -99,14 +100,14 @@
 
                             <DockPanel HorizontalAlignment="Stretch" Margin="0 6 0 0" DockPanel.Dock="Top">
                                 <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="4 0 4 4">Choose Tables and Views</TextBlock>
-                                <ListBox x:Name="lstTable" ItemsSource="{Binding Tables}" SelectionMode="Multiple">
+                                <ListBox x:Name="lstTable" ItemsSource="{Binding Tables}" SelectionMode="Multiple" SelectionChanged="MultipleTablesCombo_SelectionChanged">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <CheckBox Content="{Binding}"
                       Margin="3" IsChecked="{Binding RelativeSource=
                            {RelativeSource Mode=FindAncestor,
                             AncestorType={x:Type ListBoxItem}},
-                           Path=IsSelected}" />
+                           Path=IsSelected}"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ListBox>

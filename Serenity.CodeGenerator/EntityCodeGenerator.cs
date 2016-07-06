@@ -68,8 +68,9 @@ namespace Serenity.CodeGenerator
 
             if (config.GenerateRow)
                 GenerateRow();
-
-            GenerateCss();
+            
+            if (config.GenerateDialog)
+                GenerateCss();
 
             if (config.GenerateColumn)
                 GenerateColumns();
@@ -80,7 +81,7 @@ namespace Serenity.CodeGenerator
             if (config.GenerateRepository)
                 GenerateRepository();
 
-            if (config.GenerateEndPoint)
+            if (config.GenerateEndpoint)
                 GenerateEndpoint();
 
             if (config.GeneratePage)
@@ -91,22 +92,33 @@ namespace Serenity.CodeGenerator
 
             if (config.GenerateSSImports && scriptProject != null)
             {
-                GenerateScriptRowSS();
-                GenerateScriptServiceSS();
-                GenerateScriptFormSS();
+                if (config.GenerateRow)
+                    GenerateScriptRowSS();
+
+                if (config.GenerateEndpoint)
+                    GenerateScriptServiceSS();
+
+                if (config.GenerateForm)
+                    GenerateScriptFormSS();
             }
 
             if (config.GenerateTSTypings)
             {
-                GenerateScriptRowTS();
-                GenerateScriptServiceTS();
-                GenerateScriptFormTS();
+                if (config.GenerateRow)
+                    GenerateScriptRowTS();
+
+                if (config.GenerateEndpoint)
+                    GenerateScriptServiceTS();
+
+                if (config.GenerateForm)
+                    GenerateScriptFormTS();
             }
 
             if (config.GenerateTSCode)
             {
                 if (config.GenerateGrid)
                     GenerateScriptGridTS();
+
                 if (config.GenerateDialog)
                     GenerateScriptDialogTS();
                 if (config.GenerateEditor)
@@ -114,10 +126,12 @@ namespace Serenity.CodeGenerator
                 if (config.GenerateEditorDialog)
                     GenerateScriptEditorDialogTS();
             }
+
             else if (scriptProject != null)
             {
                 if (config.GenerateGrid)
                     GenerateScriptGridSS();
+
                 if (config.GenerateDialog)
                     GenerateScriptDialogSS();
             }

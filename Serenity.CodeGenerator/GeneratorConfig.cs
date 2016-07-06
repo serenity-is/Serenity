@@ -27,7 +27,7 @@ namespace Serenity.CodeGenerator
         public bool GenerateRow { get; set; }
         public bool GenerateColumn { get; set; }
         public bool GenerateForm { get; set; }
-        public bool GenerateEndPoint { get; set; }
+        public bool GenerateEndpoint { get; set; }
         public bool GenerateRepository { get; set; }
         public bool GeneratePage { get; set; }
         public bool GenerateGrid { get; set; }
@@ -48,7 +48,7 @@ namespace Serenity.CodeGenerator
             GenerateRow = true;
             GenerateColumn = true;
             GenerateForm = true;
-            GenerateEndPoint = true;
+            GenerateEndpoint = true;
             GenerateRepository = true;
             GeneratePage = true;
             GenerateGrid = true;
