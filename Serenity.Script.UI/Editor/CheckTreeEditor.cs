@@ -13,6 +13,11 @@ namespace Serenity
         where TOptions: class, new()
         where TItem: CheckTreeItem, new()
     {
+        static CheckTreeEditor()
+        {
+            Q.Prop(typeof(CheckTreeEditor<CheckTreeItem, object>), "value");
+        }
+
         private JsDictionary<string, TItem> byId;
 
         public CheckTreeEditor(jQueryObject div, TOptions opt)
@@ -23,6 +28,7 @@ namespace Serenity
             UpdateItems();
         }
 
+        [IncludeGenericArguments(false), ScriptName("getTreeItems")]
         protected virtual List<TItem> GetItems()
         {
             return new List<TItem>();
@@ -207,7 +213,7 @@ namespace Serenity
             GridSelectAllButtonHelper.Update<TItem>(this, x => x.IsSelected);
         }
 
-        protected  virtual void UpdateFlags()
+        protected virtual void UpdateFlags()
         {
             var view = this.view;
             var items = view.GetItems();

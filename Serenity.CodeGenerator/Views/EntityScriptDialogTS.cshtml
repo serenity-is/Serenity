@@ -5,6 +5,7 @@
 namespace @(Model.RootNamespace)@(dotModule) {
     
     @@Serenity.Decorators.registerClass()
+    @@Serenity.Decorators.responsive()
     export class @(Model.ClassName)Dialog extends Serenity.EntityDialog<@(Model.RowClassName), any> {
         protected getFormKey() { return @(Model.ClassName)Form.formKey; }@if (Model.Identity != null) {<text>
         protected getIdProperty() { return @(Model.RowClassName).idProperty; }</text>}

@@ -1,11 +1,13 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
     public static class JsRender
     {
+        [InlineCode("Q.jsRender(markup, data)")]
         public static string Render(string markup, object data = null)
         {
             if (markup == null || markup.IndexOf("{{") < 0)

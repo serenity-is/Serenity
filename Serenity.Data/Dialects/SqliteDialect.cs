@@ -110,6 +110,11 @@ namespace Serenity.Data
             }
         }
 
+        public string QuoteColumnAlias(string s)
+        {
+            return QuoteIdentifier(s);
+        }
+
         public string QuoteIdentifier(string s)
         {
             if (string.IsNullOrEmpty(s))
@@ -177,6 +182,14 @@ namespace Serenity.Data
             }
         }
 
+        public bool UseReturningIntoVar
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public bool UseScopeIdentity
         {
             get
@@ -192,5 +205,16 @@ namespace Serenity.Data
                 return true;
             }
         }
+
+        public bool UseRowNum
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public char ParameterPrefix { get { return '@'; } }
+
     }
 }

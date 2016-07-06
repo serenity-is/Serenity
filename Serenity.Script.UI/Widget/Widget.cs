@@ -11,6 +11,7 @@ namespace Serenity
     /// <summary>
     /// Base class for classes that add behaviour to HTML elements. Similar to jQuery UI widget factory.
     /// </summary>
+    [Imported]
     public abstract class Widget : ScriptContext
     {
         /// <summary>
@@ -44,8 +45,13 @@ namespace Serenity
                 throw new Exception(String.Format("The element already has widget '{0}'!", widgetName));
 
             var self = this;
-            element.Bind("remove." + widgetName, (e) => self.Destroy())
-                .Data(widgetName, this);
+            element.Bind("remove." + widgetName, (e) => {
+                if (e.Bubbles ||
+                    e.Cancelable)
+                    return;
+
+                self.Destroy();
+            }).Data(widgetName, this);
 
             AddCssClass();
 
@@ -120,22 +126,7 @@ namespace Serenity
 
         protected virtual string GetCssClass()
         {
-            var klass = "s-" + this.GetType().Name;
-            var fullClass = this.GetType().FullName.Replace(".", "-");
-            
-            foreach (var k in Q.Config.RootNamespaces)
-                if (fullClass.StartsWith(k + "-"))
-                {
-                    fullClass = fullClass.Substr(k.Length + 1);
-                    break;
-                }
-
-            fullClass = "s-" + fullClass;
-
-            if (klass == fullClass)
-                return klass;
-
-            return klass + " " + fullClass;
+            return null;
         }
 
         /// <summary>
@@ -169,51 +160,34 @@ namespace Serenity
 
         public static jQueryObject ElementFor<TEditor>()
         {
-            return ElementFor(typeof(TEditor));
+            return null;
         }
 
         public static jQueryObject ElementFor(Type editorType)
         {
-            var elementAttr = editorType.GetCustomAttributes(typeof(ElementAttribute), true);
-            string elementHtml = (elementAttr.Length > 0) ? elementAttr[0].As<ElementAttribute>().Value : "<input/>";
-            return jQuery.FromHtml(elementHtml);
+            return null;
         }
 
+        [IncludeGenericArguments(false)]
+        [InlineCode("Serenity.Widget.create({{ type: {widgetType}, element: {element}, options: {options}, init: {init} }})")]
         public static Widget CreateOfType(Type widgetType, Action<jQueryObject> element = null,
             object options = null, Action<Widget> init = null)
         {
-            Widget widget;
-
-            if (typeof(IDialog).IsAssignableFrom(widgetType))
-            {
-                widget = (Widget)Activator.CreateInstance(widgetType, options);
-
-                if (element != null)
-                    element(widget.element);
-            }
-            else
-            {
-                var e = ElementFor(widgetType);
-
-                if (element != null)
-                    element(e);
-
-                widget = (Widget)Activator.CreateInstance(widgetType, e, options);
-            }
-
-            widget.Init(init);
-
-            return widget;
+            return null;
         }
 
+        [IncludeGenericArguments(false)]
+        [InlineCode("Serenity.Widget.create({{ type: {TWidget}, element: {element}, options: {options}, init: {init} }})")]
         public static TWidget Create<TWidget>(Action<jQueryObject> element = null, object options = null,
-                Action<TWidget> init = null) 
+                Action<TWidget> init = null)
             where TWidget : Widget
         {
             return Widget.CreateOfType(typeof(TWidget), element, options,
                 init == null ? (Action<Widget>)null : (w => init(w.As<TWidget>()))).As<TWidget>();
         }
 
+        [IncludeGenericArguments(false)]
+        [InlineCode("Serenity.Widget.create({{ type: {TWidget}, container: {container}, options: {options}, init: {init} }})")]
         public static TWidget CreateInside<TWidget>(jQueryObject container, object options = null,
                 Action<TWidget> init = null)
             where TWidget : Widget

@@ -8,71 +8,32 @@ namespace Serenity.Services
 {
     public static class DataValidation
     {
-        public static void ValidateEditableFields(this Row row, params Field[] editableFields)
+        public static void AutoTrim(Row row, StringField stringField)
         {
-            ValidateEditableFields(row, (IEnumerable<Field>)editableFields);
-        }
-
-        public static void ValidateEditableFields(this Row row, IEnumerable<Field> editableFields)
-        {
-            BitArray allowed = new BitArray(row.FieldCount);
-            foreach (var field in editableFields)
-                allowed[field.Index] = true;
-
-            var fields = row.GetFields();
-            for (var i = 0; i < fields.Count; i++)
+            if ((stringField.Flags & FieldFlags.Trim) == FieldFlags.Trim)
             {
-                var field = fields[i];
+                string value = stringField[row];
 
-                var str = field as StringField;
-                if (!ReferenceEquals(null, str) && row.IsAssigned(field))
-                {
-                    if ((field.Flags & FieldFlags.Trim) == FieldFlags.Trim)
-                    {
-                        if ((field.Flags & FieldFlags.TrimToEmpty) == FieldFlags.TrimToEmpty)
-                        {
-                            str[row] = str[row].TrimToEmpty();
-                        }
-                        else
-                            str[row] = str[row].TrimToNull();
-                    }
-                }
+                if ((stringField.Flags & FieldFlags.TrimToEmpty) == FieldFlags.TrimToEmpty)
+                    value = value.TrimToEmpty();
+                else // TrimToNull
+                    value = value.TrimToNull();
 
-                if (!allowed[i] &&
-                    row.IsAssigned(field))
-                {
-                    row.ClearAssignment(field);
-                }
+                stringField[row] = value;
             }
-        }
-
-        public static void ValidateReadOnly(this Row row, params Field[] fields)
-        {
-            foreach (var field in fields)
-                if (row.IsAssigned(field))
-                    throw ReadOnlyError(row, field);
         }
 
         public static void ValidateRequired(this Row row, Field field)
         {
-            if (!field.IsNull(row))
-            {
-                var str = field as StringField;
-                if (!ReferenceEquals(null, str))
-                    TrimToNull(row, str);
-            }
-
-            if (field.IsNull(row))
+            var str = field as StringField;
+            if (!ReferenceEquals(null, str) &&
+                str[row].IsTrimmedEmpty())
+            { 
                 throw RequiredError(row, field);
+            }
         }
 
         public static void ValidateRequired(this Row row, IEnumerable<Field> fields)
-        {
-            foreach (var field in fields)
-                ValidateRequired(row, field);
-        }
-
-        public static void ValidateRequired(this Row row, params Field[] fields)
         {
             foreach (var field in fields)
                 ValidateRequired(row, field);
@@ -85,29 +46,10 @@ namespace Serenity.Services
                     ValidateRequired(row, field);
         }
 
-        public static bool ValidateRequiredIfModified(this Row row, Field field)
-        {
-            if (row.IsAssigned(field))
-                ValidateRequired(row, field);
-            return false;
-        }
-
-        public static void ValidateRequiredIfModified(this Row row, params Field[] fields)
-        {
-            foreach (var field in fields)
-                ValidateRequiredIfModified(row, field);
-        }
-
         public static void EnsureUniversalTime(this Row row, DateTimeField field)
         {
             if (!field.IsNull(row))
                 field[row] = field[row].Value.ToUniversalTime();
-        }
-
-        public static void EnsureUniversalTime(this Row row, params DateTimeField[] fields)
-        {
-            foreach (var field in fields)
-                EnsureUniversalTime(row, field);
         }
 
         public static void ValidateEnum(this Row row, Field field, Type enumType)
@@ -136,18 +78,6 @@ namespace Serenity.Services
             {
                 throw InvalidDateRangeError(row, start, finish);
             }
-        }
-
-        public static void TrimToNull(this Row row, StringField field)
-        {
-            if (!field.IsNull(row))
-                field[row] = field[row].TrimToNull();
-        }
-
-        public static void TrimToNull(this Row row, StringField[] fields)
-        {
-            foreach (var field in fields)
-                row.TrimToNull(field);
         }
 
         public static ValidationError RequiredError(Row row, Field field)

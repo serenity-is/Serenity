@@ -69,7 +69,7 @@ namespace Serenity.Localization
             if (!Directory.Exists(path))
                 return;
 
-            var files = Directory.GetFiles(path, "*.json");
+            var files = Directory.GetFiles(path, "*.json", SearchOption.AllDirectories);
             Array.Sort(files);
 
             foreach (var file in files)

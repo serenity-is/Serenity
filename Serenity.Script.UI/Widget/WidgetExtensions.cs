@@ -37,6 +37,56 @@ namespace Serenity
                     return Script.This.As<Widget>().Element.Closest(".field");
                 }
             );
+
+            jQuery.Instance.fn.tryGetWidget = new Func<Type, object>((widgetType) =>
+            {
+                var element = Script.This.As<jQueryObject>();
+
+                object widget;
+                if (typeof(Widget).IsAssignableFrom(widgetType))
+                {
+                    var widgetName = WidgetExtensions.GetWidgetName(widgetType);
+
+                    widget = element.GetDataValue(widgetName);
+                    if (widget != null && !widgetType.IsAssignableFrom(widget.GetType()))
+                        widget = null;
+
+                    if (widget != null)
+                        return widget;
+                }
+
+                var data = element.GetData();
+                if (data == null)
+                    return null;
+
+                foreach (string key in data.Keys)
+                {
+                    widget = data[key];
+                    if (widget != null && widgetType.IsAssignableFrom(widget.GetType()))
+                        return widget;
+                }
+
+                return null;
+            });
+
+
+            jQuery.Instance.fn.getWidget = new Func<Type, object>((widgetType) =>
+            {
+                var element = Script.This.As<jQueryObject>();
+
+                if (element == null)
+                    throw new ArgumentNullException("element");
+
+                if (element.Length == 0)
+                    throw new Exception(String.Format("Searching for widget of type '{0}' on a non-existent element! ({1})",
+                        widgetType.FullName, element.Selector));
+
+                var widget = TryGetWidget(element, widgetType);
+                if (widget == null)
+                    throw new Exception(String.Format("Element has no widget of type '{0}'!", widgetType.FullName));
+
+                return widget;
+            });
         }
 
         public static TWidget GetWidget<TWidget>(this jQueryObject element) where TWidget : class
@@ -61,36 +111,13 @@ namespace Serenity
             return null;
         }
 
+        [InlineCode("{element}.tryGetWidget({TWidget})")]
         public static TWidget TryGetWidget<TWidget>(this jQueryObject element) where TWidget : class
         {
-            if (element == null)
-                throw new Exception("Argument 'element' is null!");
-
-            TWidget widget;
-            if (typeof(TWidget).IsAssignableFrom(typeof(Widget)))
-            {
-                var widgetName = WidgetExtensions.GetWidgetName(typeof(TWidget));
-
-                widget = element.GetDataValue(widgetName) as TWidget;
-                if (widget != null)
-                    return widget;
-            }
-
-            var data = element.GetData();
-            if (data == null)
-                return null;
-
-            foreach (string key in data.Keys)
-            {
-                widget = data[key] as TWidget;
-                if (widget != null)
-                    return widget;
-            }
-
             return null;
         }
 
-        [InlineCode("Serenity.WX.tryGetWidget({widgetType})(element)")]
+        [InlineCode("{element}.tryGetWidget({widgetType})")]
         public static object TryGetWidget(this jQueryObject element, Type widgetType)
         {
             return null;

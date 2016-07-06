@@ -66,6 +66,8 @@ namespace Serenity.ComponentModel
         public int? MaxWidth { get; set; }
         [JsonProperty("resizable")]
         public bool? Resizable { get; set; }
+        [JsonProperty("sortable")]
+        public bool? Sortable { get; set; }
         [JsonProperty("sortOrder")]
         public int? SortOrder { get; set; }
        
@@ -88,6 +90,12 @@ namespace Serenity.ComponentModel
         public bool? FilterOnly { get; set; }
         [JsonProperty("notFilterable")]
         public bool? NotFilterable { get; set; }
+
+        [JsonProperty("quickFilter")]
+        public bool? QuickFilter { get; set; }
+        [JsonProperty("quickFilterParams")]
+        public Dictionary<string, object> QuickFilterParams { get; set; }
+
 
         public bool ShouldSerializeEditorType()
         {
@@ -114,11 +122,17 @@ namespace Serenity.ComponentModel
             return FilteringParams != null && FilteringParams.Count > 0;
         }
 
+        public bool ShouldSerializeQuickFilterParams()
+        {
+            return QuickFilterParams != null && QuickFilterParams.Count > 0;
+        }
+
         public PropertyItem()
         {
             EditorParams = new Dictionary<string, object>();
             FormatterParams = new Dictionary<string, object>();
             FilteringParams = new Dictionary<string, object>();
+            QuickFilterParams = new Dictionary<string, object>();
         }
     }
 }

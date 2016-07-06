@@ -30,13 +30,6 @@ namespace Serenity.Services
         public HashSet<string> ExcludeColumns { get; set; }
     }
 
-    public enum ColumnSelection
-    {
-        List = 0,
-        KeyOnly = 1,
-        Details = 2,
-    }
-
     //[Flags] //TODO: add this validation
     //public enum ListRequestSupport
     //{

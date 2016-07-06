@@ -13,6 +13,7 @@ namespace Serenity.CodeGenerator
         public List<Connection> Connections { get; set; }
         public string KDiff3Path { get; set; }
         public string TFPath { get; set; }
+        public string TSCPath { get; set; }
         public bool TFSIntegration { get; set; }
         public string WebProjectFile { get; set; }
         public string ScriptProjectFile { get; set; }
@@ -22,6 +23,15 @@ namespace Serenity.CodeGenerator
         public bool GenerateSSImports { get; set; }
         public bool GenerateTSTypings { get; set; }
         public bool GenerateTSCode { get; set; }
+        public bool RowFieldsSurroundWithRegion { get; set; }
+        public bool GenerateRow { get; set; }
+        public bool GenerateColumn { get; set; }
+        public bool GenerateForm { get; set; }
+        public bool GenerateEndpoint { get; set; }
+        public bool GenerateRepository { get; set; }
+        public bool GeneratePage { get; set; }
+        public bool GenerateGrid { get; set; }
+        public bool GenerateDialog { get; set; }
 
         public GeneratorConfig()
         {
@@ -30,8 +40,17 @@ namespace Serenity.CodeGenerator
                 Environment.SpecialFolder.ProgramFilesX86), @"KDiff3\kdiff3.exe");
             BaseRowClasses = new List<BaseRowClass>();
             GenerateTSTypings = true;
-            GenerateSSImports = true;
-            GenerateTSCode = false;
+            GenerateSSImports = false;
+            GenerateTSCode = true;
+            RowFieldsSurroundWithRegion = false;
+            GenerateRow = true;
+            GenerateColumn = true;
+            GenerateForm = true;
+            GenerateEndpoint = true;
+            GenerateRepository = true;
+            GeneratePage = true;
+            GenerateGrid = true;
+            GenerateDialog = true;
             SetDefaults();
         }
 
@@ -44,7 +63,15 @@ namespace Serenity.CodeGenerator
 
             return Path.Combine(configPath, "Serenity.CodeGenerator.config");
         }
-
+        public static RazorGenerator.Templating.RazorTemplateBase GetEntityRowView(GeneratorConfig config)
+        {
+            RazorGenerator.Templating.RazorTemplateBase entityRow;
+            if (config.RowFieldsSurroundWithRegion)
+                entityRow = new Views.EntityRowWithRegion();
+            else
+                entityRow = new Views.EntityRow();
+            return entityRow;
+        }
         private void SetDefaults()
         {
             RootNamespace = "MyProject";
@@ -52,21 +79,23 @@ namespace Serenity.CodeGenerator
             if (IsNugetPackage())
             {
                 var configPath = Path.GetDirectoryName(GetConfigurationFilePath());
-                var solutions = Directory.GetFiles(configPath, "*.sln");
-                if (solutions.Length == 1)
+                var webProjectFile = Directory.GetFiles(configPath, "*.csproj", SearchOption.AllDirectories)
+                    .FirstOrDefault(x => x.EndsWith(".Web.csproj", StringComparison.OrdinalIgnoreCase));
+
+                if (webProjectFile != null)
                 {
-                    RootNamespace = Path.GetFileNameWithoutExtension(solutions[0]);
-                    var subPath = Path.Combine(configPath, RootNamespace);
+                    var fn = Path.GetFileName(webProjectFile);
+                    RootNamespace = fn.Substring(0, fn.Length - ".Web.csproj".Length);
+                    WebProjectFile = GetRelativePath(webProjectFile, AppDomain.CurrentDomain.BaseDirectory);
+                }
 
-                    var webProjectFile = Path.Combine(subPath, RootNamespace + ".Web");
-                    webProjectFile = Path.Combine(webProjectFile, RootNamespace + ".Web.csproj");
-                    if (File.Exists(webProjectFile))
-                        WebProjectFile = GetRelativePath(webProjectFile, AppDomain.CurrentDomain.BaseDirectory);
+                var scriptProjectFile = Directory.GetFiles(configPath, "*.csproj", SearchOption.AllDirectories)
+                    .FirstOrDefault(x => x.EndsWith(".Script.csproj", StringComparison.OrdinalIgnoreCase));
 
-                    var scriptProjectFile = Path.Combine(subPath, RootNamespace + ".Script");
-                    scriptProjectFile = Path.Combine(scriptProjectFile, RootNamespace + ".Script.csproj");
-                    if (File.Exists(scriptProjectFile))
-                        ScriptProjectFile = GetRelativePath(scriptProjectFile, AppDomain.CurrentDomain.BaseDirectory);
+                if (File.Exists(scriptProjectFile))
+                {
+                    ScriptProjectFile = GetRelativePath(scriptProjectFile, AppDomain.CurrentDomain.BaseDirectory);
+                    GenerateSSImports = true;
                 }
             }
         }
@@ -96,7 +125,7 @@ namespace Serenity.CodeGenerator
         {
             Connections.Sort((x, y) => x.Key.CompareTo(y.Key));
             CodeFileHelper.CheckoutAndWrite(GeneratorConfig.GetConfigurationFilePath(),
-                Encoding.UTF8.GetBytes(JSON.StringifyIndented(this)), false);
+                JSON.StringifyIndented(this), false);
         }
 
         public static GeneratorConfig Load()
@@ -171,7 +200,7 @@ namespace Serenity.CodeGenerator
 
             public override string ToString()
             {
-                return Key + " [" + ConnectionString + "], " +  ProviderName;
+                return Key + " [" + ConnectionString + "], " + ProviderName;
             }
         }
 

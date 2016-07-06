@@ -70,6 +70,7 @@ namespace Serenity.Services
                 if (Row.IsAnyFieldAssigned)
                 {
                     var idField = (Field)Row.IdField;
+
                     if (idField.IndexCompare(Old, Row) != 0)
                     {
                         var update = new SqlUpdate(Row.Table);
@@ -82,7 +83,6 @@ namespace Serenity.Services
                         Connection.UpdateById(Row);
                     }
 
-                    Connection.UpdateById(Row);
                     Response.EntityId = idField.AsObject(Row);
                     InvalidateCacheOnCommit();
                 }
@@ -356,17 +356,9 @@ namespace Serenity.Services
 
                 var stringField = field as StringField;
                 if (!ReferenceEquals(null, stringField) &&
-                    Row.IsAssigned(field) &&
-                    (field.Flags & FieldFlags.Trim) == FieldFlags.Trim)
+                    Row.IsAssigned(field))
                 {
-                    string value = stringField[Row];
-
-                    if ((field.Flags & FieldFlags.TrimToEmpty) == FieldFlags.TrimToEmpty)
-                        value = value.TrimToEmpty();
-                    else // TrimToNull
-                        value = value.TrimToNull();
-
-                    stringField[Row] = value;
+                    DataValidation.AutoTrim(Row, stringField);
                 }
 
                 if (!editable.Contains(field))

@@ -34,11 +34,11 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine();
             });
 
-            cw.Indented("Serenity.Decorators.addAttribute(");
+            cw.Indented("Serenity.Decorators.registerEnum(");
             sb.Append(enumType.Name);
-            sb.Append(", new Serenity.EnumKeyAttribute('");
+            sb.Append(", '");
             sb.Append(enumKey);
-            sb.AppendLine("'));");
+            sb.AppendLine("');");
         }
     }
 }

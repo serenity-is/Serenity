@@ -4,6 +4,69 @@
     (function (Test) {
         var assert = QUnit.assert;
         QUnit.module('Editors');
+        QUnit.test('Create IntegerEditor with undefined options', function () {
+            var input = $('<input/>');
+            assert.notEqual(null, new Serenity.IntegerEditor(input), 'create on a input');
+            assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
+            var autoNumeric = input.data('autoNumeric');
+            assert.ok(autoNumeric != null, 'should have autonumeric data');
+            assert.strictEqual(autoNumeric.vMin, 0, 'its min value should be 0');
+            assert.strictEqual(autoNumeric.vMax, 2147483647, 'its max value should be 2147483647 when options is undefined');
+            assert.strictEqual(autoNumeric.mDec, 0, 'shouldnt allow decimals');
+            assert.strictEqual(autoNumeric.mInt, 10, 'should allow 10 digits');
+        });
+        QUnit.test('Create IntegerEditor with empty options', function () {
+            var input = $('<input/>');
+            assert.notEqual(null, new Serenity.IntegerEditor(input, {}), 'create on a input');
+            assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
+            var autoNumeric = input.data('autoNumeric');
+            assert.ok(autoNumeric != null, 'should have autoNumeric data');
+            assert.strictEqual(autoNumeric.vMin, 0, 'its min value should be 0');
+            assert.strictEqual(autoNumeric.vMax, 2147483647, 'its max value should be 2147483647');
+            assert.strictEqual(autoNumeric.mDec, 0, 'shouldnt allow decimals');
+            assert.strictEqual(autoNumeric.mInt, 10, 'should allow 10 digits');
+        });
+        QUnit.test('Create IntegerEditor with minValue option', function () {
+            var input = $('<input/>');
+            assert.notEqual(null, new Serenity.IntegerEditor(input, { minValue: 5 }), 'create on a input');
+            assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
+            var autoNumeric = input.data('autoNumeric');
+            assert.ok(autoNumeric != null, 'should have autoNumeric data');
+            assert.strictEqual(autoNumeric.vMin, 5, 'its min value should be 5');
+            assert.strictEqual(autoNumeric.vMax, 2147483647, 'its max value should be 2147483647');
+            assert.strictEqual(autoNumeric.mDec, 0, 'shouldnt allow decimals');
+            assert.strictEqual(autoNumeric.mInt, 10, 'should allow 10 digits');
+        });
+        QUnit.test('Create IntegerEditor with maxValue option', function () {
+            var input = $('<input/>');
+            assert.notEqual(null, new Serenity.IntegerEditor(input, { maxValue: 79 }), 'create on a input');
+            assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
+            var autoNumeric = input.data('autoNumeric');
+            assert.ok(autoNumeric != null, 'should have autoNumeric data');
+            assert.strictEqual(autoNumeric.vMin, 0, 'its min value should be 0');
+            assert.strictEqual(autoNumeric.vMax, 79, 'its max value should be 79');
+            assert.strictEqual(autoNumeric.mDec, 0, 'shouldnt allow decimals');
+            assert.strictEqual(autoNumeric.mInt, 2, 'should allow 2 digits');
+        });
+        QUnit.test('Create IntegerEditor with minValue and maxValue options', function () {
+            var input = $('<input/>');
+            assert.notEqual(null, new Serenity.IntegerEditor(input, { minValue: 10, maxValue: 999 }), 'create on a input');
+            assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
+            var autoNumeric = input.data('autoNumeric');
+            assert.ok(autoNumeric != null, 'should have autoNumeric data');
+            assert.strictEqual(autoNumeric.vMin, 10, 'its min value should be 10');
+            assert.strictEqual(autoNumeric.vMax, 999, 'its max value should be 999');
+            assert.strictEqual(autoNumeric.mDec, 0, 'shouldnt allow decimals');
+            assert.strictEqual(autoNumeric.mInt, 3, 'should allow 3 digits');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Editors');
         QUnit.test('TextAreaEditor creation tests', function () {
             assert.notEqual(null, new Serenity.TextAreaEditor($('<textarea/>')), 'create on a textarea with undefined options');
             assert.notEqual(null, new Serenity.TextAreaEditor($('<textarea/>'), {}), 'create on a textarea with empty options');
@@ -53,6 +116,72 @@ var Serenity;
             assert.strictEqual("<a href='x'>http://s/x</a>", formatter.format({
                 value: 'x'
             }), 'respects target');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        QUnit.module('Q.ArrayUtils');
+        QUnit.test('any()', function (assert) {
+            assert.throws(function () { return Q.any(null, function () { return true; }); }, null, "should throw for null reference");
+            assert.strictEqual(false, Q.any([], function () { return false; }), "should return false for empty array and false predicate");
+            assert.strictEqual(false, Q.any([], function () { return true; }), "should return false for empty array and true predicate");
+            assert.strictEqual(false, Q.any([1, 2, 3], function (x) { return x === 4; }), "should return false for non-matching predicate");
+            assert.strictEqual(true, Q.any([1, 2, 3], function (x) { return x === 2; }), "should return true for matching predicate");
+        });
+        QUnit.test('count()', function (assert) {
+            assert.throws(function () { return Q.count(null, function () { return true; }); }, null, "should throw for null reference");
+            assert.strictEqual(0, Q.count([], function () { return false; }), "should return 0 for empty array and false predicate");
+            assert.strictEqual(0, Q.count([], function () { return true; }), "should return 0 for empty array and true predicate");
+            assert.strictEqual(0, Q.count([1, 2, 3], function () { return false; }), "should return 0 for array with 3 elements and false predicate");
+            assert.strictEqual(3, Q.count([1, 2, 3], function () { return true; }), "should return 3 for array with 3 elements and true predicate");
+            assert.strictEqual(0, Q.count([1, 2, 3], function (x) { return x === 4; }), "should return 0 for non-matching predicate");
+            assert.strictEqual(1, Q.count([1, 2, 3], function (x) { return x === 2; }), "should return 1 for matching predicate");
+            assert.strictEqual(3, Q.count([4, 3, 2, 2, 1, 2], function (x) { return x === 2; }), "shouldn't short circuit at first match");
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Widget');
+        QUnit.test('GetWidget tests', function () {
+            var input = $('<input />');
+            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'!", 'should throw before widget creation');
+            var stringEditor = new Serenity.StringEditor(input);
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
+            var secondaryWidget = new Serenity.DecimalEditor(input);
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
+            secondaryWidget.destroy();
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
+            assert.strictEqual(input.getWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
+            stringEditor.destroy();
+            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'!", 'should throw after string editor is destroyed');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Widget');
+        QUnit.test('TryGetWidget tests', function () {
+            var input = $('<input />');
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), null, 'should return null before widget creation');
+            var stringEditor = new Serenity.StringEditor(input);
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
+            var secondaryWidget = new Serenity.DecimalEditor(input);
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
+            secondaryWidget.destroy();
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
+            assert.strictEqual(input.tryGetWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
+            stringEditor.destroy();
+            assert.equal(input.tryGetWidget(Serenity.StringEditor), null, 'should return null after string editor is destroyed');
         });
     })(Test = Serenity.Test || (Serenity.Test = {}));
 })(Serenity || (Serenity = {}));

@@ -14,6 +14,14 @@ namespace Serenity
     {
         private CascadedWidgetLink<Widget> cascadeLink;
 
+        static LookupEditorBase()
+        {
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "cascadeFrom");
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "cascadeValue");
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "filterField");
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "filterValue");
+        }
+
         protected LookupEditorBase(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)
         {
@@ -86,7 +94,7 @@ namespace Serenity
         [IncludeGenericArguments(false)]
         protected virtual IEnumerable<TItem> GetItems(Lookup<TItem> lookup)
         {
-            return FilterItems(CascadeItems(lookup.Items));
+            return FilterItems(CascadeItems(lookup.Items)).ToList();
         }
 
         [IncludeGenericArguments(false)]
@@ -183,7 +191,7 @@ namespace Serenity
             var self = this;
             CreateEditDialog(dialog =>
             {
-                (dialog as Widget).BindToDataChange(this, (x, dci) =>
+                (dialog.As<Widget>()).BindToDataChange(this, (x, dci) =>
                 {
                     Q.ReloadLookup(GetLookupKey());
                     self.UpdateItems();
@@ -212,7 +220,7 @@ namespace Serenity
             });
         }
 
-        protected virtual IEnumerable<TItem> CascadeItems(IEnumerable<TItem> items)
+        protected virtual List<TItem> CascadeItems(List<TItem> items)
         {
             if (CascadeValue == null || (CascadeValue as string) == "")
             {
@@ -227,10 +235,10 @@ namespace Serenity
             {
                 var itemKey = ((dynamic)x)[CascadeField] ?? ReflectionUtils.GetPropertyValue(x, CascadeField);
                 return itemKey != null && ((object)itemKey).ToString() == key;
-            });
+            }).ToList();
         }
 
-        protected virtual IEnumerable<TItem> FilterItems(IEnumerable<TItem> items)
+        protected virtual List<TItem> FilterItems(List<TItem> items)
         {
             if (FilterValue == null || (FilterValue as string) == "")
                 return items;
@@ -240,7 +248,7 @@ namespace Serenity
             {
                 var itemKey = ((dynamic)x)[FilterField] ?? ReflectionUtils.GetPropertyValue(x, FilterField);
                 return itemKey != null && ((object)itemKey).ToString() == key;
-            });
+            }).ToList();
         }
 
         protected virtual object GetCascadeFromValue(Widget parent)

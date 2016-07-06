@@ -11,6 +11,12 @@ namespace Serenity
     [Element("<input type=\"text\"/>")]
     public class DateTimeEditor : Widget<DateTimeEditorOptions>, IStringValue, IReadOnly
     {
+        static DateTimeEditor()
+        {
+            Q.Prop(typeof(DateTimeEditor), "value");
+            Q.Prop(typeof(DateTimeEditor), "valueAsDate");
+        }
+
         private jQueryObject time;
 
         public DateTimeEditor(jQueryObject input, DateTimeEditorOptions opt)

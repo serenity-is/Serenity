@@ -25,7 +25,7 @@
 
     var fields = (IEnumerable<EntityCodeField>)Model.Fields;
     var fieldList = String.Join(", ", fields.Where(x => x.Name != Model.Identity)
-        .Select(x => "['" + x.Ident + "', Serenity." + gt(x) + "]"));
+        .Select(x => "['" + x.Ident + "', () => Serenity." + gt(x) + "]"));
 
 }
 
@@ -38,10 +38,10 @@ namespace @(Model.RootNamespace)@(dotModule) {
     {
         if (x.Ident != Model.Identity)
         {<text>
-        @(x.Ident)(): Serenity.@(gt(x));</text>}
+        @(x.Ident): Serenity.@(gt(x));</text>}
     }
 
     }
 
-    [@fieldList].forEach(x => @(Model.ClassName)Form.prototype[<string>x[0]] = function() { return this.w(x[0], x[1]); });
+    [@fieldList].forEach(x => Object.defineProperty(@(Model.ClassName)Form.prototype, <string>x[0], { get: function () { return this.w(x[0], (x[1] as any)()); }, enumerable: true, configurable: true }));
 }

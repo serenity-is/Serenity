@@ -34,6 +34,17 @@ namespace Serenity
             }
 
             /// <summary>
+            /// Set this to true, to enable responsive dialogs by default, without having to add Responsive attribute to dialogs
+            /// </summary>
+            public static bool ResponsiveDialogs
+            {
+                [InlineCode("Q.Config.responsiveDialogs")]
+                get;
+                [InlineCode("Q.Config.responsiveDialogs = {value}")]
+                set;
+            }
+
+            /// <summary>
             /// Variable that holds list of application namespaces to search for objects
             /// </summary>
             public static List<string> RootNamespaces

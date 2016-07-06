@@ -146,29 +146,34 @@ namespace Serenity
         }
     }
 
-    [ScriptName("FLX")]
+    [Imported]
     public static class FlexifyExtensions
     {
+        [InstanceMethodOnFirstArgument]
         public static jQueryObject FlexHeightOnly(this jQueryObject element, double flexY = 1)
         {
             return element.AddClass("flexify").Data("flex-y", flexY).Data("flex-x", 0);
         }
 
+        [InstanceMethodOnFirstArgument]
         public static jQueryObject FlexWidthOnly(this jQueryObject element, double flexX = 1)
         {
             return element.AddClass("flexify").Data("flex-x", flexX).Data("flex-y", 0);
         }
 
+        [InstanceMethodOnFirstArgument]
         public static jQueryObject FlexWidthHeight(this jQueryObject element, double flexX = 1, double flexY = 1)
         {
             return element.AddClass("flexify").Data("flex-x", flexX).Data("flex-y", flexY);
         }
 
+        [InstanceMethodOnFirstArgument, ScriptName("flexX")]
         public static jQueryObject FlexXFactor(this jQueryObject element, double flexX)
         {
             return element.Data("flex-x", flexX);
         }
 
+        [InstanceMethodOnFirstArgument, ScriptName("flexY")]
         public static jQueryObject FlexYFactor(this jQueryObject element, double flexY)
         {
             return element.Data("flex-y", flexY);

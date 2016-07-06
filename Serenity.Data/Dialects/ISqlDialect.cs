@@ -15,6 +15,7 @@
         string OffsetFormat { get; }
         string OffsetFetchFormat { get; }
         char OpenQuote { get; }
+        string QuoteColumnAlias(string s);
         string QuoteIdentifier(string s);
         string QuoteUnicodeString(string s);
         string ScopeIdentityExpression { get; }
@@ -23,7 +24,10 @@
         string TimeFormat { get; }
         bool UseDateTime2 { get; }
         bool UseReturningIdentity { get; }
+        bool UseReturningIntoVar { get; }
         bool UseScopeIdentity { get; }
         bool UseTakeAtEnd { get; }
+        bool UseRowNum { get; }
+        char ParameterPrefix { get; }
     }
 }

@@ -29,12 +29,13 @@ namespace Serenity.Data
             bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
             bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch;
             bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && dialect.CanUseRowNumber;
+            bool useRowNum = (skip > 0 || take > 0) && dialect.UseRowNum;
             bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
 
             // atlanması istenen kayıt var mı?
-            if (useRowNumber || useSecondQuery)
+            if (useRowNumber || useRowNum || useSecondQuery)
             {
-                if (useRowNumber)
+                if (useRowNumber || useRowNum)
                 {
                     sb.Append("SELECT * FROM (\n");
                 }
@@ -193,7 +194,7 @@ namespace Serenity.Data
             }
 
             // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (take != 0 && (!useOffset) && (useRowNumber || !dialect.UseTakeAtEnd))
+            if (take != 0 && (!useOffset) && (!useRowNum) && (useRowNumber || !dialect.UseTakeAtEnd))
             {
                 sb.Append(dialect.TakeKeyword);
                 sb.Append(' ');
@@ -236,7 +237,7 @@ namespace Serenity.Data
                 if (!string.IsNullOrEmpty(s.ColumnName))
                 {
                     sb.Append(SqlKeywords.As);
-                    var quoted = dialect.QuoteIdentifier(s.ColumnName);
+                    var quoted = dialect.QuoteColumnAlias(s.ColumnName);
                     sb.Append(quoted);
                     if (distinct)
                     {
@@ -253,6 +254,7 @@ namespace Serenity.Data
 
                 sb.Append("ROW_NUMBER() OVER (ORDER BY ");
 
+                if(orderBy != null)
                 for (int i = 0; i < orderBy.Count; i++)
                 {
                     if (i > 0)
@@ -272,7 +274,13 @@ namespace Serenity.Data
                 sb.Append(skip);
             }
 
-            if (take != 0 && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd)
+            if (useRowNum)
+            {
+                sb.Append(") WHERE ROWNUM > " + skip +
+                    " AND ROWNUM <= " + (skip + take));
+            }
+
+            if (take != 0 && (!useRowNum) && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd)
             {
                 sb.Append(' ');
                 sb.Append(dialect.TakeKeyword);

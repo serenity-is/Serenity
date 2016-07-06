@@ -132,7 +132,8 @@ namespace Serenity
                 }
             });
 
-            buttons.Add(NewRefreshButton());
+            buttons.Add(NewRefreshButton(noText: true));
+            buttons.Add(ColumnPickerDialog.CreateToolButton(this));
 
             return buttons;
         }

@@ -9,7 +9,7 @@ namespace Serenity
     /// <summary>
     /// Options for the Q.ServiceCall function
     /// </summary>
-    [Imported, Serializable, ScriptName("ServiceOptions")]
+    [Imported, Serializable, ScriptNamespace("Q"), ScriptName("ServiceOptions")]
     public class ServiceCallOptions<TResponse>
         where TResponse: ServiceResponse
     {
@@ -190,7 +190,7 @@ namespace Serenity
 
     }
 
-    [Imported, Serializable, ScriptName("ServiceOptions")]
+    [Imported, Serializable, ScriptNamespace("Q"), ScriptName("ServiceOptions")]
     public class ServiceCallOptions : ServiceCallOptions<ServiceResponse>
     {
     }

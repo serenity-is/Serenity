@@ -68,10 +68,10 @@ namespace Serenity.CodeGeneration
                 return "object";
 
             switch (typeName) {
-                case "number": return "double";
-                case "string": return "string";
+                case "number": return "Double";
+                case "string": return "String";
                 case "Date": return "DateTime";
-                case "boolean": return "bool";
+                case "boolean": return "Boolean";
             }
 
             var nullablePrefix = "System.Nullable`1";

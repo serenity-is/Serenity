@@ -23,9 +23,11 @@ namespace Serenity
             var result = new SlickColumn();
 
             result.SourceItem = item;
+            result.Visible = item.Visible != false && item.FilterOnly != true;
             result.Field = item.Name;
             result.Title = Q.TryGetText(item.Title) ?? item.Title;
             result.CssClass = item.CssClass;
+            result.Sortable = item.Sortable != false;
             result.SortOrder = item.SortOrder ?? 0;
             
             if (Script.IsValue(item.Alignment) && item.Alignment.Length > 0)

@@ -39,6 +39,7 @@
     <Compile Include="Editor\CheckListEditor.cs" />
     <Compile Include="Editor\CheckTreeEditor.cs" />
     <Compile Include="Editor\AsyncLookupEditor.cs" />
+    <Compile Include="Editor\HtmlNoteContentEditor.cs" />
     <Compile Include="Editor\MultipleImageUploadEditor.cs" />
     <Compile Include="Editor\TimeEditor.cs" />
     <Compile Include="Editor\LookupEditor.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="FilterPanel\FilteringTypes\DateTimeFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\DateFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\EditorFiltering.cs" />
+    <Compile Include="FilterPanel\FilteringTypes\IQuickFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\LookupFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\DecimalFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\IntegerFiltering.cs" />
@@ -79,6 +81,7 @@
     <Compile Include="FilterPanel\FilterableAttribute.cs" />
     <Compile Include="FilterPanel\FilterDisplayBar.cs" />
     <Compile Include="Grid\GridRowSelectionMixin.cs" />
+    <Compile Include="Grid\QuickFilter.cs" />
     <Compile Include="Grid\QuickFilterArgs.cs" />
     <Compile Include="Grid\IDataGrid.cs" />
     <Compile Include="Grid\ReflectionOptionsSetter.cs" />
@@ -128,7 +131,6 @@
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
     <Compile Include="PropertyGrid\Attributes\InsertableAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\ReadOnlyAttribute.cs" />
-    <Compile Include="PropertyGrid\CustomValidation.cs" />
     <Compile Include="PropertyGrid\EditorTypeRegistry.cs" />
     <Compile Include="SlickGrid\Formatters\BooleanFormatter.cs" />
     <Compile Include="SlickGrid\Formatters\CheckboxFormatter.cs" />

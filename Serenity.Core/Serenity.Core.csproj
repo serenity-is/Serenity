@@ -46,6 +46,9 @@
     <Compile Include="Authorization\TransientGrantingPermissionService.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilteringIdFieldAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\QuickFilterOptionAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\SortableAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\QuickFilterAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\NotFilterableAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\CustomFilteringAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilteringOptionAttribute.cs" />

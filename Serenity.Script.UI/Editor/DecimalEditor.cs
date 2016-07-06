@@ -9,6 +9,11 @@ namespace Serenity
     [Element("<input type=\"text\"/>")]
     public class DecimalEditor : Widget<DecimalEditorOptions>, IDoubleValue
     {
+        static DecimalEditor()
+        {
+            Q.Prop(typeof(DecimalEditor), "value");
+        }
+
         public DecimalEditor(jQueryObject input, DecimalEditorOptions opt)
             : base(input, opt)
         {

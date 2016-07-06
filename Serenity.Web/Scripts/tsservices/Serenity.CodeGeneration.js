@@ -108,12 +108,17 @@
         }
         function isUnderAmbientNamespace(node) {
             return any(getParents(node), function (x) {
-                return x.kind == ts.SyntaxKind.ModuleDeclaration &&
-                    any(x.modifiers, function (z) { return z.kind == ts.SyntaxKind.DeclareKeyword; });
+                return (x.kind == ts.SyntaxKind.ModuleDeclaration &&
+                    any(x.modifiers, function (z) { return z.kind == ts.SyntaxKind.DeclareKeyword; })) ||
+                    (x.kind == ts.SyntaxKind.SourceFile &&
+                        x.isDeclarationFile);
             });
         }
         function hasExportModifier(node) {
             return any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.ExportKeyword; });
+        }
+        function hasDeclareModifier(node) {
+            return any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.DeclareKeyword; });
         }
         function isPrivateOrProtected(node) {
             return !any(node.modifiers, function (x) { return x.kind == ts.SyntaxKind.PrivateKeyword ||
@@ -432,7 +437,7 @@
                 switch (node.kind) {
                     case ts.SyntaxKind.ClassDeclaration:
                         var klass = node;
-                        if (hasExportModifier(node)) {
+                        if (sourceFile.isDeclarationFile || hasExportModifier(node)) {
                             var name_4 = prependNamespace(klass.name.getText(), klass);
                             var exportedType = classToExternalType(klass);
                             result[name_4] = exportedType;
@@ -441,7 +446,7 @@
                         return;
                     case ts.SyntaxKind.InterfaceDeclaration:
                         var intf = node;
-                        if (hasExportModifier(node)) {
+                        if (sourceFile.isDeclarationFile || hasExportModifier(node)) {
                             var name_5 = prependNamespace(intf.name.getText(), intf);
                             var exportedType = interfaceToExternalType(intf);
                             result[name_5] = exportedType;
@@ -450,7 +455,9 @@
                         return;
                     case ts.SyntaxKind.ModuleDeclaration:
                         var module = node;
-                        if (hasExportModifier(module)) {
+                        if (sourceFile.isDeclarationFile || hasExportModifier(module) ||
+                            (!isUnderAmbientNamespace(module) &&
+                                !hasDeclareModifier(module))) {
                             var name_6 = prependNamespace(module.name.getText(), module);
                             var exportedType = moduleToExternalType(module);
                             result[name_6] = exportedType;
@@ -525,7 +532,10 @@
             ;
             MyCompilerHost.prototype.getSourceFile = function (fileName, languageVersion, onError) {
                 var sourceText = this.files[fileName];
-                return sourceText !== undefined ? ts.createSourceFile(fileName, sourceText, languageVersion, true) : undefined;
+                var src = sourceText !== undefined ? ts.createSourceFile(fileName, sourceText, languageVersion, true) : undefined;
+                if (src != null && fileName.substr(-5).toLowerCase() == '.d.ts')
+                    src.isDeclarationFile = true;
+                return src;
             };
             MyCompilerHost.prototype.resolveModuleNames = function (moduleNames, containingFile) {
                 var _this = this;
@@ -574,3 +584,4 @@
         CodeGeneration.parseTypes = parseTypes;
     })(CodeGeneration = Serenity.CodeGeneration || (Serenity.CodeGeneration = {}));
 })(Serenity || (Serenity = {}));
+//# sourceMappingURL=Serenity.CodeGeneration.js.map

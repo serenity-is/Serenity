@@ -29,9 +29,9 @@ namespace Serenity.CodeGenerator
         {
             var kdiff3Paths = new[]
             {
-                config.KDiff3Path, 
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "KDiff3\\kdiff3.exe"), 
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "KDiff3\\kdiff3.exe"), 
+                config.KDiff3Path,
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "KDiff3\\kdiff3.exe"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "KDiff3\\kdiff3.exe"),
             };
 
             this.model = model;
@@ -40,51 +40,102 @@ namespace Serenity.CodeGenerator
             if (config.TFSIntegration)
                 CodeFileHelper.SetupTFSIntegration(config.TFPath);
 
+            CodeFileHelper.SetupTSCPath(config.TSCPath);
+
             siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
             siteWebPath = Path.GetDirectoryName(siteWebProj);
-            scriptProject = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.ScriptProjectFile));
-            scriptPath = Path.GetDirectoryName(scriptProject);
+            if (!string.IsNullOrEmpty(config.ScriptProjectFile))
+            {
+                scriptProject = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.ScriptProjectFile));
+                scriptPath = Path.GetDirectoryName(scriptProject);
+
+                if (!File.Exists(scriptProject))
+                {
+                    scriptProject = null;
+                    scriptPath = null;
+                }
+            }
+
             this.config = config;
         }
 
         public void Run()
         {
-            Directory.CreateDirectory(scriptPath);
+            if (!scriptPath.IsEmptyOrNull())
+                Directory.CreateDirectory(scriptPath);
+
             Directory.CreateDirectory(siteWebPath);
-            Directory.CreateDirectory(scriptPath);
 
-            GenerateRow();
-            GenerateCss();
-            GenerateColumns(); 
-            GenerateForm();
-            GenerateRepository();
-            GenerateEndpoint();
-            GeneratePageController();
-            GeneratePageIndex();
+            if (config.GenerateRow)
+                GenerateRow();
+            
+            if (config.GenerateDialog)
+                GenerateCss();
 
-            if (config.GenerateSSImports)
+            if (config.GenerateColumn)
+                GenerateColumns();
+
+            if (config.GenerateForm)
+                GenerateForm();
+
+            if (config.GenerateRepository)
+                GenerateRepository();
+
+            if (config.GenerateEndpoint)
+                GenerateEndpoint();
+
+            if (config.GeneratePage)
             {
-                GenerateScriptRowSS();
-                GenerateScriptServiceSS();
-                GenerateScriptFormSS();
+                GeneratePageController();
+                GeneratePageIndex();
+            }
+
+            if (config.GenerateSSImports && scriptProject != null)
+            {
+                if (config.GenerateRow)
+                    GenerateScriptRowSS();
+
+                if (config.GenerateEndpoint)
+                    GenerateScriptServiceSS();
+
+                if (config.GenerateForm)
+                    GenerateScriptFormSS();
             }
 
             if (config.GenerateTSTypings)
             {
-                GenerateScriptRowTS();
-                GenerateScriptServiceTS();
-                GenerateScriptFormTS();
+                if (config.GenerateRow)
+                    GenerateScriptRowTS();
+
+                if (config.GenerateEndpoint)
+                    GenerateScriptServiceTS();
+
+                if (config.GenerateForm)
+                    GenerateScriptFormTS();
             }
 
             if (config.GenerateTSCode)
             {
-                GenerateScriptGridTS();
-                GenerateScriptDialogTS();
+                if (config.GenerateGrid)
+                    GenerateScriptGridTS();
+
+                if (config.GenerateDialog)
+                    GenerateScriptDialogTS();
             }
-            else
+
+            else if (scriptProject != null)
             {
-                GenerateScriptGridSS();
-                GenerateScriptDialogSS();
+                if (config.GenerateGrid)
+                    GenerateScriptGridSS();
+
+                if (config.GenerateDialog)
+                    GenerateScriptDialogSS();
+            }
+
+            if (config.GenerateTSCode ||
+                config.GenerateTSTypings)
+            {
+                CodeFileHelper.ExecuteTSC(Path.Combine(siteWebPath, @"Scripts\"), "");
             }
         }
 
@@ -115,7 +166,7 @@ namespace Serenity.CodeGenerator
         {
             string file = Path.Combine(siteWebPath, relativeFile);
             var backup = CreateDirectoryOrBackupFile(file);
-            CodeFileHelper.CheckoutAndWrite(file, utf8.GetBytes(code), true);
+            CodeFileHelper.CheckoutAndWrite(file, code, true);
             CodeFileHelper.MergeChanges(backup, file);
             ProjectFileHelper.AddFileToProject(siteWebProj, relativeFile, dependentUpon);
         }
@@ -130,14 +181,14 @@ namespace Serenity.CodeGenerator
         {
             string file = Path.Combine(scriptPath, relativeFile);
             var backup = CreateDirectoryOrBackupFile(file);
-            CodeFileHelper.CheckoutAndWrite(file, utf8.GetBytes(code), true);
+            CodeFileHelper.CheckoutAndWrite(file, code, true);
             CodeFileHelper.MergeChanges(backup, file);
             ProjectFileHelper.AddFileToProject(scriptProject, relativeFile, dependentUpon);
         }
 
         private void GenerateRow()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityRow(), model),
+            CreateNewSiteWebFile(Templates.Render(GeneratorConfig.GetEntityRowView(config), model),
                 Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
         }
 
@@ -147,14 +198,24 @@ namespace Serenity.CodeGenerator
             string file = Path.Combine(siteWebPath, relativeFile);
             Directory.CreateDirectory(Path.GetDirectoryName(file));
             if (!File.Exists(file))
-                using (var sw = new StreamWriter(file, false, utf8))
-                    sw.Write("\r\n");
+            {
+                CodeFileHelper.CheckoutAndWrite(file, "\r\n", false);
+            }
 
             string code = Templates.Render(new Views.EntityCss(), model);
-            using (var sw = new StreamWriter(file, true, utf8))
+            using (var ms = new MemoryStream())
             {
-                AppendComment(sw);
-                sw.Write(code);
+                var old = File.ReadAllBytes(file);
+                if (old.Length > 0)
+                    ms.Write(old, 0, old.Length);
+                using (var sw = new StreamWriter(ms, utf8))
+                {
+                    AppendComment(sw);
+                    sw.Write(code);
+                    sw.Flush();
+
+                    CodeFileHelper.CheckoutAndWrite(file, ms.ToArray(), false);
+                }
             }
 
             ProjectFileHelper.AddFileToProject(siteWebProj, relativeFile);
@@ -176,9 +237,9 @@ namespace Serenity.CodeGenerator
 
         private void GenerateForm()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityForm(), new 
-            { 
-                ClassName = model.ClassName, 
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityForm(), new
+            {
+                ClassName = model.ClassName,
                 RowClassName = model.RowClassName,
                 Module = model.Module,
                 RootNamespace = model.RootNamespace,
@@ -215,7 +276,7 @@ namespace Serenity.CodeGenerator
 
         private void GeneratePageController()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityPageController(), new 
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityPageController(), new
             {
                 ConnectionKey = model.ConnectionKey,
                 RootNamespace = model.RootNamespace,

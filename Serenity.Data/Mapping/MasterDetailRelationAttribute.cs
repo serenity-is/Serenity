@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Serenity;
+using System;
+using Serenity.Services;
 
 namespace Serenity.Data.Mapping
 {
@@ -11,9 +13,12 @@ namespace Serenity.Data.Mapping
 
             this.ForeignKey = foreignKey;
             this.CheckChangesOnUpdate = true;
+            this.ColumnSelection = ColumnSelection.List;
         }
 
         public string ForeignKey { get; private set; }
         public bool CheckChangesOnUpdate { get; set; }
+        public ColumnSelection ColumnSelection { get; set; }
+        public string IncludeColumns { get; set; }
     }
 }

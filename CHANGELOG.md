@@ -1,3 +1,190 @@
+## 2.2.5 (2016-07-04)
+ 
+Features:
+  - ability to generate code for multiple tables at once in sergen (thanks @dfaruque)
+  - ability to choose which files to generate in sergen. e.g. row, endpoint, grid, page... (thanks @dfaruque)
+
+## 2.2.4 (2016-07-02)
+
+Bugfixes:
+  - SaveHandler was updating two times in some cases
+  - dropdown filter text is lost in filter bar after editing second time
+
+## 2.2.3 (2016-06-11)
+
+Features:
+  - search for subdirectories when adding translation json files from a directory
+  - added pt-BR translations (thanks @rolemberfilho)
+  - split site texts for Northwind / Samples to separate directories [Serene]
+
+Bugfixes:
+  - fix datagrid title can't be set if its not null
+
+## 2.2.2 (2016-06-06)
+
+Features:
+  - added OracleDialect(thanks @dfaruque)
+  - Serene and Northwind now works with Oracle [Serene]
+  - alternative row generation with RowFieldsSurroundWithRegion config option in Sergen for those who likes regions (by @dfaruque) 
+
+Bugfixes:
+  - resolve automatic trimming problem for NotNull fields
+
+## 2.2.1 (2016-05-28)
+
+Features:
+  - add ListField as an alias for CustomClassField<List<TItem>>. ListField also acts like RowListField when cloning rows, so it clones the list itself.
+  
+Bugfixes:
+  - options defined as property for formatters or editors written in TypeScript couldn't be set
+  - invalid cast error for Time fields, due to a bug in ADO.NET that converts parameter type to DateTime when you set it to Time!
+
+## 2.2.0 (2016-05-21)
+
+Features:
+  - linking set behavior can now load list of selected items in a list request, so it is possible to show them in a grid column, or use it with in combination with a master detail scenario
+  - showed representative names in customer grid
+  - master detail relation can now work with non integer keys
+  - multi level master detail is now possible
+  - columnselection and includecolumns can be overridden for master detail relation
+  - conditional row formatting sample [Serene]
+
+## 2.1.9 (2016-05-19)
+
+Features:
+  - sergen generates files with UTF-8 preamble (BOM) again. BOM was lost after TFS integration work, though files was still UTF-8.
+
+## 2.1.8 (2016-05-18)
+
+Bugfixes:
+  - dialog translation save was broken after a TS conversion
+
+## 2.1.7 (2016-05-17)
+
+Features:
+  - sergen generates StreamField for timestamp / rowversion columns, not Int64
+  - translate image upload editor errors
+  - show row selection column as [x] in column picker dialog
+  - don't display row selection column in pdf output [Serene]
+
+
+## 2.1.6 (2016-05-16)
+
+Bugfixes:
+  - addValidationRule stopped working after 2.1.3 due to a typo in conversion of CustomValidation.cs to TypeScript
+
+
+## 2.1.5 (2016-05-15)
+
+Features:
+  - we now have a cute, responsive column picker that works also with touch devices
+  - integrate sortable.js (https://github.com/RubaXa/Sortable) for column picker
+  - ability to persist / restore grid settings like visible columns, column widths, sort order, advanced filter (quick filter can't be persisted yet) to local storage, session storage, database or any medium you like. thanks to Mark (@c9482) for sponsoring this feature. how-to is coming.
+  - compile TypeScript files on project build (in addition to compile on save) of Serene.Web, using tsc.exe as a build step, but reporting TypeScript errors as warnings to avoid potential problems with T4 files [Serene]
+  - Q.centerDialog to center an auto height dialog after open
+  - [BREAKING CHANGE] removed Q.arrayClone helper function as Array.slice does the same thing. replace "Q.arrayClone(this.view.getItems())" with "this.view.getItems().slice()" in GridEditorBase.ts
+  - fixed some flexbox height issues with IE11
+  - port Widget, TemplatedWidget and TemplatedDialog to TypeScript
+  - [BREAKING CHANGE] Widget.create method had to be changed to a more TypeScript compatible signature. Please take TranslationGrid.ts createToolbarExtensions method source from latest Serene
+
+## 2.1.4 (2016-05-13)
+
+Bugfixes:
+  - include enums that are not referenced in rows, but only columns/forms in ServerTypings.tt / ServerImports.tt
+  - fix CustomerDialog not opening due to script error in CustomerOrdersGrid [Serene]
+
+
+## 2.1.3 (2016-05-12)
+
+Features:
+  - made refresh button in grids without text to save space
+  - update TypeScript typings to latest versions
+  - added Q.Config.responsiveDialogs parameter to enable responsive for all dialogs without need to add responsive decorator
+  - added separator option to ToolButton, to put a separator line between groups
+  - add missing MsieJavascriptEngine reference to Serenity.Web.nuspec
+  - Serenity.Externals.js and Serenity.Externals.Slick.js is merged into Serenity.CoreLib.js
+  - made Note dialog responsive [Serene]
+  - invoke TSC (TypeScript compiler) after generating files with ServerTypings.tt
+
+## 2.1.2 (2016-05-11)
+
+Features:
+  - quote file names while calling Kdiff3 and TF.exe to prevent problems with whitespaces
+  - made code generated by sergen more compatible with ones generated by .tt files
+
+## 2.1.1 (2016-05-10)
+
+Features:
+  - Sergen will try to locate TSC and execute it after generating TypeScript code to avoid script errors
+  - if script project doesn't exist switch to TypeScript generation by default and don't try to generate Saltaralle code
+
+## 2.1.0 (2016-05-09)
+
+Features:
+  - Serene no longer comes with Serene.Script project. It's TypeScript only. Developer Guide needs to be updated.
+  - your existing code written in Saltaralle should continue to work. Please report any issues at GitHub repository.
+  - all Serene code is ported to TypeScript
+  - start obsoleting mscorlib.js and linq.js to lower dependencies and library size. can't remove yet as Serenity.Script.UI depends on it.
+  - linq like first, tryFirst, single etc. extensions in Q
+  - removed unused jlayout and metisMenu plugins
+  - IE8 is no longer supported as now we are targeting ES5 (jQuery 2.0 that we used for long time didn't support it anyway)
+  - make use of Object.defineProperty to make properties like value etc. feel more natural in TypeScript
+  - added EnumType option to EnumEditor, usable instead of EnumKey
+  - ability to define quick filters on columns at server side
+  - quick filters support multiple selection option
+  - added sortable attribute for controlling column sortability at server side 
+  - multiple and or helpers for client side criteria building
+  - remove unused xss validation method
+  - root namespaces doesn't need export keyword to be available in ClientTypes.tt etc.
+  - HtmlBasicContentEditor in Serene moved to Serenity.Script.UI as HtmlNoteContentEditor
+  - ClientTypes.tt and ServerTypings.tt works with/without Saltaralle libraries
+  - all Serene dialogs will use responsive layout, e.g. flexbox by default (requires IE10+, can be turned off)
+  - Serene products inline editing sample has dropdowns in category and supplier columns
+
+Bugfixes:
+  - error about restoreCssFromHiddenInit method in Mac/Safari
+
+## 2.0.13 (2016-05-01)
+
+Features:
+  - updated Spanish translations (thanks @ArsenioInojosa)
+  - update dialogExtendQ.min.js as old one didn't use translations
+  - embed uglifyjs and use it with ScriptBundleManager
+  - added scripts/site/ScriptBundles.json to enable script bundling / minification with a simple web.config setting (see how to in Serenity Developer Guide) [Serene]
+
+## 2.0.12 (2016-04-30)
+
+Features:
+  - added some linq like helpers to Q for TypeScript, toGrouping (similar toLookup), any and count
+  - added integer editor tests and resolve integer editor allows decimals
+  - made most interface members optional in TypeScript defs
+  - allow using font-awesome, simple line etc. font icons in toolbuttons via new icon property
+  - better look and margins for toolbuttons when wrapped
+  - getWidget and tryGetWidget extensions on jQuery.fn for easier access from TypeScript
+  - include json2.min.js in T4 templates for users that have IE8
+  - rewrote PermissionCheckEditor in TypeScript [Serene]
+  - rewrote RolePermissionDialog and UserPermissionDialog in TypeScript [Serene]
+  - extensive tests with QUnit for User, Role and Language dialogs [Serene]
+  - added favicon.ico [Serene] 
+  
+Bugfixes:
+  - handle TFS and site.less append problem with sergen
+  - fix tfpath location search (thanks @wldkrd1)
+
+## 2.0.11 (2016-04-18)
+
+Features:
+  - added italian translations and language option (thanks @Estrusco)
+  - added porteguese translations and language option (thanks @fernandocarvalho)
+  - updated Newtonsoft.Json to 8.0.30
+  - updated jQuery to 2.2.3
+  - updated jQuery typings to 3.0.5
+  - updated jQuery UI typings to 1.4.6
+  - updated Toastr typings to 0.3.01
+ 
+Bugfixes:
+  - fix loop condition in TF location search (thanks @wldkrd1)
+
 ## 2.0.10 (2016-04-17)
 
 Features:

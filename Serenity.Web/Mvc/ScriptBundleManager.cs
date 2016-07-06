@@ -10,6 +10,7 @@ using Serenity.Configuration;
 using Serenity.Data;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using MsieJavaScriptEngine;
 
 namespace Serenity.Web
 {
@@ -19,6 +20,7 @@ namespace Serenity.Web
         {
             public bool? Enabled { get; set; }
             public bool? Minimize { get; set; }
+            public bool? UseMinJS { get; set; }
         }
 
         private static bool isEnabled;
@@ -71,6 +73,7 @@ namespace Serenity.Web
             isEnabled = false;
             bundleKeyBySourceUrl = null;
             bundleByKey = null;
+            MsieJsEngine jsEngine = null;
             try
             {
                 var settings = JsonConvert.DeserializeObject<ScriptBundlingSettings>(
@@ -127,9 +130,22 @@ namespace Serenity.Web
 
                             if (minimize)
                             {
-                                var minPath = Path.ChangeExtension(sourcePath, ".min.js");
-                                if (File.Exists(minPath))
-                                    sourcePath = minPath;
+                                if (settings.UseMinJS == true)
+                                {
+                                    var minPath = Path.ChangeExtension(sourcePath, ".min.js");
+                                    if (File.Exists(minPath))
+                                    {
+                                        sourcePath = minPath;
+                                        using (StreamReader sr = new StreamReader(sourcePath))
+                                            return sr.ReadToEnd();
+                                    }
+                                }
+
+                                string code;
+                                using (StreamReader sr = new StreamReader(sourcePath))
+                                    code = sr.ReadToEnd();
+
+                                return MinimizeWithUglifyJS(ref jsEngine, code);
                             }
 
                             using (StreamReader sr = new StreamReader(sourcePath))
@@ -149,6 +165,11 @@ namespace Serenity.Web
             catch (Exception ex)
             {
                 ex.Log();
+            }
+            finally
+            {
+                if (jsEngine != null)
+                    jsEngine.Dispose();
             }
         }
 
@@ -272,6 +293,47 @@ namespace Serenity.Web
 
             string include = DynamicScriptManager.GetScriptInclude("Bundle." + bundleKey);
             return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + include);
+        }
+
+        private static MsieJsEngine SetupJsEngine()
+        {
+            var jsEngine = new MsieJsEngine();
+            try
+            {
+                using (var sr = new StreamReader(
+                    typeof(ScriptBundleManager).Assembly.GetManifestResourceStream(
+                        "Serenity.Web.Scripts.optimization.uglifyjs.min.js")))
+                {
+                    jsEngine.Evaluate(sr.ReadToEnd());
+                }
+
+                return jsEngine;
+            }
+            catch
+            {
+                jsEngine.Dispose();
+                throw;
+            }
+        }
+
+        private static string MinimizeWithUglifyJS(ref MsieJsEngine jsEngine, string code)
+        {
+            jsEngine = jsEngine ?? SetupJsEngine();
+            jsEngine.SetVariableValue("CodeToCompress", code);
+
+            jsEngine.Evaluate(
+                @"(function() { 
+                    var ast = UglifyJS.parse(CodeToCompress);
+                    ast.figure_out_scope();
+                    var compressor = UglifyJS.Compressor();
+                    ast = ast.transform(compressor);
+                    ast.figure_out_scope();
+                    ast.compute_char_frequency();
+                    ast.mangle_names();
+                    CodeToCompress = ast.print_to_string();
+                })();");
+
+            return jsEngine.GetVariableValue<string>("CodeToCompress");
         }
     }
 }

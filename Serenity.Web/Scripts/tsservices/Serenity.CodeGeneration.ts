@@ -196,12 +196,18 @@ namespace Serenity.CodeGeneration {
 
     function isUnderAmbientNamespace(node: ts.Node): boolean {
         return any(getParents(node), x =>
-            x.kind == ts.SyntaxKind.ModuleDeclaration &&
-            any(x.modifiers, z => z.kind == ts.SyntaxKind.DeclareKeyword))
+            (x.kind == ts.SyntaxKind.ModuleDeclaration &&
+                any(x.modifiers, z => z.kind == ts.SyntaxKind.DeclareKeyword)) ||
+            (x.kind == ts.SyntaxKind.SourceFile &&
+                (x as ts.SourceFile).isDeclarationFile));
     }
 
     function hasExportModifier(node: ts.Node): boolean {
         return any(node.modifiers, x => x.kind == ts.SyntaxKind.ExportKeyword);
+    }
+
+    function hasDeclareModifier(node: ts.Node): boolean {
+        return any(node.modifiers, x => x.kind == ts.SyntaxKind.DeclareKeyword);
     }
 
     function isPrivateOrProtected(node: ts.Node): boolean {
@@ -580,7 +586,7 @@ namespace Serenity.CodeGeneration {
                 case ts.SyntaxKind.ClassDeclaration:
                     let klass = node as ts.ClassDeclaration;
 
-                    if (hasExportModifier(node)) {
+                    if (sourceFile.isDeclarationFile || hasExportModifier(node)) {
                         let name = prependNamespace(klass.name.getText(), klass);
                         let exportedType = classToExternalType(klass);
                         result[name] = exportedType;
@@ -592,7 +598,7 @@ namespace Serenity.CodeGeneration {
                 case ts.SyntaxKind.InterfaceDeclaration:
                     let intf = node as ts.InterfaceDeclaration;
 
-                    if (hasExportModifier(node)) {
+                    if (sourceFile.isDeclarationFile || hasExportModifier(node)) {
                         let name = prependNamespace(intf.name.getText(), intf);
                         let exportedType = interfaceToExternalType(intf);
                         result[name] = exportedType;
@@ -603,7 +609,9 @@ namespace Serenity.CodeGeneration {
                 case ts.SyntaxKind.ModuleDeclaration:
                     let module = node as ts.ModuleDeclaration;
 
-                    if (hasExportModifier(module)) {
+                    if (sourceFile.isDeclarationFile || hasExportModifier(module) ||
+                        (!isUnderAmbientNamespace(module) &&
+                         !hasDeclareModifier(module))) {
                         let name = prependNamespace(module.name.getText(), module);
                         let exportedType = moduleToExternalType(module);
                         result[name] = exportedType;
@@ -690,7 +698,11 @@ namespace Serenity.CodeGeneration {
         };
         getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void) {
             const sourceText = this.files[fileName];
-            return sourceText !== undefined ? ts.createSourceFile(fileName, sourceText, languageVersion, true) : undefined;
+            var src = sourceText !== undefined ? ts.createSourceFile(fileName, sourceText, languageVersion, true) : undefined;
+            if (src != null && fileName.substr(-5).toLowerCase() == '.d.ts')
+                src.isDeclarationFile = true;
+
+            return src;
         }
 
         resolveModuleNames(moduleNames: string[], containingFile: string): ts.ResolvedModule[] {
@@ -726,6 +738,7 @@ namespace Serenity.CodeGeneration {
                     continue;
 
                 var types = extractTypes(program.getSourceFile(fileName));
+
                 for (var k of types) {
                     k.AssemblyName = fileName;
                     var fullName = k.Namespace ? k.Namespace + "." + k.Name : k.Name;

@@ -781,6 +781,38 @@ namespace Serenity.Test.Data
         }
 
         [Fact]
+        public void TakeUsesCorrectSyntaxForOracleDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(OracleDialect.Instance)
+                .Select("c")
+                .From("t")
+                .Take(10);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT * FROM ( SELECT c FROM t) WHERE ROWNUM > 0 AND ROWNUM <= 10"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void WithoutTakeUsesCorrectSyntaxForOracleDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(OracleDialect.Instance)
+                .Select("c")
+                .From("t");
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT c FROM t"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+
+        }
+
+        [Fact]
         public void JoinIgnoresExistingJoinsWithSameAliasAndSameExpression()
         {
             var row = new Serenity.Test.Data.RowMappingTests.ComplexRow();

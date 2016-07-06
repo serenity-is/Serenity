@@ -521,7 +521,6 @@ if (typeof Slick === "undefined") {
                 // Work around http://crbug.com/312427.
                 if (navigator.userAgent.toLowerCase().match(/webkit/) &&
                     navigator.userAgent.toLowerCase().match(/macintosh/)) {
-                    restoreCssFromHiddenInit();
                     $canvas.on("mousewheel", handleMouseWheel);
                 }
             }
@@ -2153,7 +2152,9 @@ if (typeof Slick === "undefined") {
             setScroller();
             zombieRowNodeFromLastMouseWheelEvent = null;
 
-            setColumns(treeColumns.extractColumns());
+            if (args.columns)
+                setColumns(treeColumns.extractColumns());
+
             render();
         }
 

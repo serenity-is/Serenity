@@ -55,7 +55,7 @@ WriteLiteral("\r\n");
 
     var fields = (IEnumerable<EntityCodeField>)Model.Fields;
     var fieldList = String.Join(", ", fields.Where(x => x.Name != Model.Identity)
-        .Select(x => "['" + x.Ident + "', Serenity." + gt(x) + "]"));
+        .Select(x => "['" + x.Ident + "', () => Serenity." + gt(x) + "]"));
 
 
 
@@ -97,15 +97,15 @@ WriteLiteral("\r\n        ");
 
     Write(x.Ident);
 
-WriteLiteral("(): Serenity.");
+WriteLiteral(": Serenity.");
 
 
-                           Write(gt(x));
+                         Write(gt(x));
 
 WriteLiteral(";");
 
 
-                                               }
+                                             }
     }
 
 WriteLiteral("\r\n    }\r\n\r\n    [");
@@ -113,12 +113,13 @@ WriteLiteral("\r\n    }\r\n\r\n    [");
 
 Write(fieldList);
 
-WriteLiteral("].forEach(x => ");
+WriteLiteral("].forEach(x => Object.defineProperty(");
 
 
-                          Write(Model.ClassName);
+                                                Write(Model.ClassName);
 
-WriteLiteral("Form.prototype[<string>x[0]] = function() { return this.w(x[0], x[1]); });\r\n}");
+WriteLiteral("Form.prototype, <string>x[0], { get: function () { return this.w(x[0], (x[1] as a" +
+"ny)()); }, enumerable: true, configurable: true }));\r\n}");
 
 
         }

@@ -13,6 +13,7 @@ namespace Serenity
         void DialogOpen();
     }
 
+    [Imported]
     [IncludeGenericArguments(false), ScriptName("TemplatedDialog")]
     public abstract class TemplatedDialog<TOptions> : TemplatedWidget<TOptions>, IDialog
         where TOptions : class, new()
@@ -65,7 +66,7 @@ namespace Serenity
         {
             element.Dialog(GetDialogOptions());
 
-            responsive = this.GetType().GetCustomAttributes(
+            responsive = Q.Config.ResponsiveDialogs || this.GetType().GetCustomAttributes(
                 typeof(ResponsiveAttribute), true).Length > 0;
 
             if (responsive)
@@ -301,6 +302,7 @@ namespace Serenity
             this.element.Dialog().Close();
         }
 
+        [IntrinsicProperty]
         public string DialogTitle
         {
             get { if (isPanel) return null; return element.Dialog().Option("title") as string; }

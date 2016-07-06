@@ -7,7 +7,8 @@
             cw.Indented("public partial class ");
             sb.Append(name);
 
-            bool isLookupEditor = HasBaseType(type, "Serenity.LookupEditorBase`1");
+            bool isLookupEditor = HasBaseType(type, "Serenity.LookupEditorBase`1") ||
+                HasBaseType(type, "Serenity.LookupEditorBase");
 
             sb.AppendLine(isLookupEditor ?
                 " : LookupEditorBaseAttribute" : " : CustomEditorAttribute");
@@ -40,7 +41,8 @@
             if (type.GenericParameters.Count > 0)
                 return false;
 
-            if (!HasBaseType(type, "Serenity.Widget"))
+            if (!HasBaseType(type, "Serenity.Widget") &&
+                !HasBaseType(type, "Serenity.Widget<any>"))
                 return false;
 
             if (type.AssemblyName != null &&
@@ -49,6 +51,7 @@
 
             return GetAttribute(type, "Serenity.EditorAttribute", inherited: true) != null ||
                 GetAttribute(type, "Serenity.ElementAttribute", inherited: true) != null ||
+                GetAttribute(type, "Serenity.Decorators.registerEditor", inherited: true) != null ||
                 GetAttribute(type, "Serenity.Decorators.editor", inherited: true) != null ||
                 GetAttribute(type, "Serenity.Decorators.element", inherited: true) != null;
         }

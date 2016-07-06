@@ -7,7 +7,7 @@ namespace Serenity
     /// <summary>
     /// Options for the Q.Confirm and Q.Information functions
     /// </summary>
-    [Imported, Serializable]
+    [Imported, Serializable, ScriptNamespace("Q")]
     public class ConfirmOptions
     {
         /// <summary>

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using jQueryApi;
+using Serenity.Data;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using jQueryApi;
-using System.Linq;
-using Serenity.Data;
+using System.Data.WebStorage;
 using System.Html;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -21,6 +22,9 @@ namespace Serenity
         protected SlickRemoteView<TItem> view;
         protected jQueryObject slickContainer;
         protected SlickGrid slickGrid;
+        protected List<SlickColumn> allColumns;
+        protected PersistedGridSettings initialSettings;
+        protected int restoringSettings;
         private string idProperty;
         private string isActiveProperty;
         private string localTextDbPrefix;
@@ -69,10 +73,16 @@ namespace Serenity
             if (buttons != null)
                 CreateToolbarExtensions();
 
+            CreateQuickFilters();
+
             UpdateDisabledState();
 
             if (!IsAsyncWidget())
+            {
+                initialSettings = GetCurrentSettings();
+                RestoreSettings();
                 InitialPopulate();
+            }
         }
 
         protected void Layout()
@@ -118,6 +128,65 @@ namespace Serenity
         {
         }
 
+        protected virtual void CreateQuickFilters()
+        {
+            foreach (var filter in GetQuickFilters())
+                AddQuickFilter(filter);
+        }
+
+        protected virtual List<QuickFilter<Widget, object>> GetQuickFilters()
+        {
+            var list = new List<QuickFilter<Widget, object>>();
+
+            foreach (var column in this.allColumns.Where(x => 
+                x.SourceItem != null && x.SourceItem.QuickFilter == true))
+            {
+                var item = column.SourceItem;
+
+                var quick = new QuickFilter<Widget, object>();
+
+                var filteringType = FilteringTypeRegistry.Get(item.FilteringType ?? "String");
+
+                if (filteringType == typeof(DateFiltering) || filteringType == typeof(DateTimeFiltering))
+                {
+                    quick = DateRangeQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name)
+                        .As<QuickFilter<Widget, object>>();
+                }
+                else
+                {
+                    var filtering = (IFiltering)Activator.CreateInstance(filteringType);
+                    if (filtering != null && filtering is IQuickFiltering)
+                    {
+                        ReflectionOptionsSetter.Set(filtering, item.FilteringParams);
+                        filtering.Field = item;
+                        filtering.Operator = FilterOperators.EQ;
+
+                        ((IQuickFiltering)filtering).InitQuickFilter(quick);
+                        quick.Options = Q.DeepExtend(quick.Options, item.QuickFilterParams);
+                    }
+                    else
+                        continue;
+                }
+
+                list.Add(quick);
+            }
+
+            return list;
+        }
+
+        [IncludeGenericArguments(false), ScriptName("findQuickFilter")]
+        private Widget FindQuickFilter(Type type, string field)
+        {
+            return J("#" + this.UniqueName + "_QuickFilter_" + field).GetWidget(type).As<Widget>();
+        }
+
+        [InlineCode("{this}.findQuickFilter({TWidget}, {field})")]
+        protected TWidget FindQuickFilter<TWidget>(string field)
+            where TWidget : Widget
+        {
+            return null;
+        }
+
         protected virtual void CreateIncludeDeletedButton()
         {
             if (!GetIsActiveProperty().IsEmptyOrNull())
@@ -146,18 +215,10 @@ namespace Serenity
 
             if (this.slickGrid != null)
             {
-                if (this.slickGridOnSort != null)
-                {
-                    this.slickGrid.OnSort.Unsubscribe(this.slickGridOnSort);
-                    this.slickGridOnSort = null;
-                }
-
-                if (this.slickGridOnClick != null)
-                {
-                    this.slickGrid.OnSort.Unsubscribe(this.slickGridOnClick);
-                    this.slickGridOnClick = null;
-                }
-
+                this.slickGrid.OnClick.Clear();
+                this.slickGrid.OnSort.Clear();
+                this.slickGrid.OnColumnsResized.Clear();
+                this.slickGrid.OnColumnsReordered.Clear();
                 this.slickGrid.Destroy();
                 this.slickGrid = null;
             }
@@ -235,38 +296,53 @@ namespace Serenity
             return base.InitializeAsync()
                 .ThenAwait(GetColumnsAsync)
                 .Then((columns) => {
-                    columns = PostProcessColumns(columns);
+                    this.allColumns = columns;
+                    PostProcessColumns(this.allColumns);
 
                     var self = this;
                     if (this.filterBar != null)
                     {
-                        filterBar.Store = new FilterStore(this.GetPropertyItems().Where(x => x.NotFilterable != true));
-                        filterBar.Store.Changed += (s, e) => self.Refresh();
+                        filterBar.Store = new FilterStore(this.allColumns.Where(x => 
+                            x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
+                        filterBar.Store.Changed += (s, e) =>
+                        {
+                            if (restoringSettings <= 0)
+                            {
+                                self.PersistSettings();
+                                self.Refresh();
+                            }
+                        };
                     }
 
+                    var visibleColumns = this.allColumns.Where(x => x.Visible != false).ToList();
+
                     if (this.slickGrid != null)
-                        this.slickGrid.SetColumns(columns);
+                        this.slickGrid.SetColumns(visibleColumns);
 
                     SetInitialSortOrder();
+                    initialSettings = GetCurrentSettings();
+                    RestoreSettings();
                     InitialPopulate();
                 });
         }
 
         protected virtual SlickGrid CreateSlickGrid()
         {
-            List<SlickColumn> slickColumns;
+            List<SlickColumn> visibleColumns;
 
             if (this.IsAsyncWidget())
             {
-                slickColumns = new List<SlickColumn>();
+                visibleColumns = new List<SlickColumn>();
             }
             else
             {
-                slickColumns = PostProcessColumns(GetColumns());
+                this.allColumns = GetColumns();
+                visibleColumns = PostProcessColumns(this.allColumns).Where(x => x.Visible != false).ToList();
             }
 
             var slickOptions = GetSlickOptions();
-            var grid = new SlickGrid(slickContainer, data: view.As<List<dynamic>>(), columns: slickColumns, options: slickOptions);
+            var grid = new SlickGrid(slickContainer, data: view.As<List<dynamic>>(), 
+                columns: visibleColumns, options: slickOptions);
 
             grid.RegisterPlugin(new SlickAutoTooltips(new SlickAutoTooltipsOptions
             {
@@ -378,6 +454,7 @@ namespace Serenity
                     self.view.PopulateUnlock();
                 }
                 self.view.Populate();
+                PersistSettings();
             };
 
             this.slickGrid.OnSort.Subscribe(slickGridOnSort);
@@ -388,11 +465,13 @@ namespace Serenity
             };
 
             this.slickGrid.OnClick.Subscribe(slickGridOnClick);
+            this.slickGrid.OnColumnsReordered.Subscribe((e, p) => this.PersistSettings());
+            this.slickGrid.OnColumnsResized.Subscribe((e, p) => this.PersistSettings());
         }
 
         protected virtual string GetAddButtonCaption()
         {
-            return "Yeni";
+            return "New";
         }
 
         protected virtual List<ToolButton> GetButtons()
@@ -587,8 +666,16 @@ namespace Serenity
 
             if (!IsAsyncWidget())
             {
-                filterBar.Store = new FilterStore(this.GetPropertyItems().Where(x => x.NotFilterable != true));
-                filterBar.Store.Changed += (s, e) => self.Refresh();
+                filterBar.Store = new FilterStore(this.allColumns.Where(x => 
+                    x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
+                filterBar.Store.Changed += (s, e) =>
+                {
+                    if (restoringSettings <= 0)
+                    {
+                        self.PersistSettings();
+                        self.Refresh();
+                    }
+                };
             }
         }
 
@@ -665,8 +752,8 @@ namespace Serenity
                             titleDiv = J("<div class=\"grid-title\"><div class=\"title-text\"></div></div>")
                                 .PrependTo(this.Element);
 
-                            titleDiv.Children().Text(value);
                         }
+                        titleDiv.Children().Text(value);
                     }
 
                     Layout();
@@ -723,44 +810,41 @@ namespace Serenity
 
         protected virtual List<SlickColumn> GetColumns()
         {
-            var columnItems = GetPropertyItems().Where(x => x.FilterOnly != true && x.Visible != false).ToList();
-            return PropertyItemsToSlickColumns(columnItems);
+            var propertyItems = GetPropertyItems();
+            return PropertyItemsToSlickColumns(propertyItems);
         }
 
         protected virtual List<SlickColumn> PropertyItemsToSlickColumns(List<PropertyItem> propertyItems)
         {
             var columns = PropertyItemSlickConverter.ToSlickColumns(propertyItems);
 
-            if (propertyItems != null)
+            for (var i = 0; i < propertyItems.Count; i++)
             {
-                for (var i = 0; i < propertyItems.Count; i++)
+                var item = propertyItems[i];
+                var column = columns[i];
+
+                if (item.EditLink == true)
                 {
-                    var item = propertyItems[i];
-                    var column = columns[i];
+                    var oldFormat = column.Format;
+                    var css = Script.IsValue(item.EditLinkCssClass) ? item.EditLinkCssClass : null;
 
-                    if (item.EditLink == true)
-                    {
-                        var oldFormat = column.Format;
-                        var css = Script.IsValue(item.EditLinkCssClass) ? item.EditLinkCssClass : null;
-
-                        column.Format = this.ItemLink(
-                            itemType: Script.IsValue(item.EditLinkItemType) ? item.EditLinkItemType : (string)null,
-                            idField: Script.IsValue(item.EditLinkIdField) ? item.EditLinkIdField : (string)null,
-                            text: ctx =>
-                            {
-                                if (oldFormat != null)
-                                    return oldFormat(ctx);
-
-                                return Q.HtmlEncode(ctx.Value);
-                            },
-                            cssClass: ctx => css ?? "",
-                            encode: false);
-
-                        if (!string.IsNullOrEmpty(item.EditLinkIdField))
+                    column.Format = this.ItemLink(
+                        itemType: Script.IsValue(item.EditLinkItemType) ? item.EditLinkItemType : (string)null,
+                        idField: Script.IsValue(item.EditLinkIdField) ? item.EditLinkIdField : (string)null,
+                        text: ctx =>
                         {
-                            column.ReferencedFields = column.ReferencedFields ?? new List<string>();
-                            column.ReferencedFields.Add(item.EditLinkIdField);
-                        }
+                            if (oldFormat != null)
+                                return oldFormat(ctx);
+
+                            return Q.HtmlEncode(ctx.Value);
+                        },
+                        cssClass: ctx => css ?? "",
+                        encode: false);
+
+                    if (!string.IsNullOrEmpty(item.EditLinkIdField))
+                    {
+                        column.ReferencedFields = column.ReferencedFields ?? new List<string>();
+                        column.ReferencedFields.Add(item.EditLinkIdField);
                     }
                 }
             }
@@ -772,7 +856,7 @@ namespace Serenity
         {
             return GetPropertyItemsAsync().ThenSelect(propertyItems =>
             {
-                return PropertyItemsToSlickColumns(propertyItems.Where(x => x.FilterOnly != true && x.Visible != false).ToList());
+                return PropertyItemsToSlickColumns(propertyItems);
             });
         }
 
@@ -939,33 +1023,33 @@ namespace Serenity
             return null;
         }
 
-        public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
-            Action<jQueryObject> element = null, Action<TWidget> init = null)
+        [ScriptName("addQuickFilter"), IncludeGenericArguments(false)]
+        protected object AddQuickFilter<TWidget, TOpt>(QuickFilter<TWidget, TOpt> opt)
             where TWidget: Widget
         {
+            if (opt == null)
+                throw new ArgumentNullException("opt");
+
             if (quickFiltersDiv == null)
             {
                 J("<div/>").AddClass("clear").AppendTo(toolbar.Element);
                 quickFiltersDiv = J("<div/>").AddClass("quick-filters-bar").AppendTo(toolbar.Element);
             }
-           
+
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)
-                .Children().Text(title ?? DetermineText(pre => pre + field) ?? field)
+                .Children().Text(opt.Title ?? DetermineText(pre => pre + opt.Field) ?? opt.Field)
                 .Parent();
 
-            var widget = Widget.Create<TWidget>(
-                element: e =>
-                {
-                    if (!field.IsEmptyOrNull())
-                        e.Attribute("id", this.UniqueName + "_QuickFilter_" + field);
-                    e.Attribute("placeholder", " ");
-                    e.AppendTo(quickFilter);
-                    if (element != null)
-                        element(e);
-                },
-                options: options,
-                init: init);
+            var widget = Widget.CreateOfType(opt.Type, e =>
+            {
+                if (!opt.Field.IsEmptyOrNull())
+                    e.Attribute("id", this.UniqueName + "_QuickFilter_" + opt.Field);
+                e.Attribute("placeholder", " ");
+                e.AppendTo(quickFilter);
+                if (opt.Element != null)
+                    opt.Element(e);
+            }, opt.Options, opt.Init.As<Action<Widget>>());
 
             Action submitHandler = () =>
             {
@@ -978,29 +1062,41 @@ namespace Serenity
                 var value = EditorUtils.GetValue(widget);
                 bool active = Script.IsValue(value) && !string.IsNullOrEmpty(value.ToString());
 
-                if (handler != null)
+                if (opt.Handler != null)
                 {
                     var args = new QuickFilterArgs<TWidget>
                     {
-                        Field = field,
+                        Field = opt.Field,
                         Request = request,
                         EqualityFilter = request.EqualityFilter,
                         Value = value,
                         Active = active,
-                        Widget = widget,
+                        Widget = widget.As<TWidget>(),
                         Handled = true
                     };
 
-                    handler(args);
+                    opt.Handler(args.As<Serenity.QuickFilterArgs<TWidget>>());
 
                     quickFilter.ToggleClass("quick-filter-active", args.Active);
 
                     if (!args.Handled)
-                        request.EqualityFilter[field] = value;
+                    {
+                        if (value.As<object[]>().Length > 0)
+                            request.Criteria &= new Criteria(opt.Field).In(value.As<object[]>());
+                        else
+                            request.EqualityFilter[opt.Field] = value;
+                    }
                 }
                 else
                 {
-                    request.EqualityFilter[field] = value;
+                    if (jQuery.IsArray(value))
+                    {
+                        if (value.As<object[]>().Length > 0)
+                            request.Criteria &= new Criteria(opt.Field).In(value.As<object[]>());
+                    }
+                    else
+                        request.EqualityFilter[opt.Field] = value;
+
                     quickFilter.ToggleClass("quick-filter-active", active);
 
                 }
@@ -1020,18 +1116,35 @@ namespace Serenity
             return widget;
         }
 
+        [InlineCode("{this}.addQuickFilter({{ field: {field}, type: {TWidget}, title: {title}, options: {options}, handler: {handler}, init: {init}, element: {element} }})")]
+        public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
+            Action<jQueryObject> element = null, Action<TWidget> init = null)
+            where TWidget: Widget
+        {
+            return null;
+        }
+
         public DateEditor AddDateRangeFilter(string field, string title = null)
+        {
+            return (DateEditor)AddQuickFilter(DateRangeQuickFilter(field, title));
+        }
+
+        private QuickFilter<DateEditor, DateTimeEditorOptions> DateRangeQuickFilter(string field, string title)
         {
             DateEditor end = null;
 
-            return AddEqualityFilter<DateEditor>(field, title,
-                element: e1 =>
+            return new QuickFilter<DateEditor, DateTimeEditorOptions>
+            {
+                Field = field,
+                Type = typeof(DateEditor),
+                Title = title,
+                Element = e1 =>
                 {
                     end = Widget.Create<DateEditor>(element: e2 => e2.InsertAfter(e1));
                     end.Element.Change(x => e1.TriggerHandler("change"));
                     J("<span/>").AddClass("range-separator").Text("-").InsertAfter(e1);
                 },
-                handler: args =>
+                Handler = args =>
                 {
                     args.Active =
                         !string.IsNullOrEmpty(args.Widget.Value) ||
@@ -1046,7 +1159,8 @@ namespace Serenity
                         next.SetDate(next.GetDate() + 1);
                         args.Request.Criteria &= new Criteria(args.Field) < Q.FormatDate(next, "yyyy-MM-dd");
                     }
-                });
+                }
+            };
         }
 
         protected virtual void InvokeSubmitHandlers()
@@ -1060,6 +1174,214 @@ namespace Serenity
             this.Refresh();
         }
 
+        protected virtual Storage GetPersistanceStorage()
+        {
+            return DefaultPersistanceStorage;
+        }
+
+        protected virtual string GetPersistanceKey()
+        {
+            var key = "GridSettings:";
+
+            var path = Window.Location.Pathname;
+            if (!string.IsNullOrEmpty(path))
+                key += string.Join("/", path.Substr(1).Split('/').Take(2).ToArray()) + ":";
+
+            key += this.GetType().FullName;
+
+            return key;
+        }
+
+        protected virtual GridPersistanceFlags GridPersistanceFlags()
+        {
+            return new GridPersistanceFlags();
+        }
+
+        protected virtual void RestoreSettings(PersistedGridSettings settings = null, GridPersistanceFlags flags = null)
+        {
+            if (settings == null)
+            {
+                var storage = GetPersistanceStorage();
+                if (storage == null)
+                    return;
+
+                var json = storage.GetItem(GetPersistanceKey()).TrimToNull();
+                if (json != null && json.StartsWith("{") && json.EndsWith("}"))
+                    settings = System.Serialization.Json.Parse<PersistedGridSettings>(json);
+                else
+                    return;
+            }
+
+            if (slickGrid == null)
+                return;
+
+            var columns = slickGrid.GetColumns();
+            JsDictionary<string, SlickColumn> colById = null;
+
+            Action<List<SlickColumn>> updateColById = (cl) =>
+            {
+                colById = new JsDictionary<string, SlickColumn>();
+                foreach (var c in cl)
+                    colById[c.Identifier] = c;
+            };
+
+            view.BeginUpdate();
+            restoringSettings++;
+            try
+            {
+                flags = flags ?? GridPersistanceFlags();
+                if (settings.Columns != null)
+                {
+                    if (flags.ColumnVisibility != false)
+                    {
+                        var visible = new JsDictionary<string, bool>();
+                        updateColById(this.allColumns);
+
+                        var newColumns = new List<SlickColumn>();
+                        foreach (var x in settings.Columns)
+                            if (x.ID != null && x.Visible == true)
+                            {
+                                var column = colById[x.ID];
+                                if (column != null && (column.SourceItem == null || column.SourceItem.FilterOnly != true))
+                                {
+                                    column.Visible = true;
+                                    newColumns.Add(column);
+                                    colById.Remove(x.ID);
+                                }
+                            }
+
+                        foreach (var c in this.allColumns)
+                            if (colById.ContainsKey(c.Identifier))
+                            {
+                                c.Visible = false;
+                                newColumns.Add(c);
+                            }
+
+                        this.allColumns = newColumns;
+                        columns = this.allColumns.Where(x => x.Visible == true).ToList();
+                    }
+
+                    if (flags.ColumnWidths != false)
+                    {
+                        updateColById(columns);
+                        foreach (var x in settings.Columns)
+                            if (x.ID != null && x.Width != null && x.Width != 0)
+                            {
+                                var column = colById[x.ID];
+                                if (column != null)
+                                    column.Width = x.Width.Value;
+                            }
+                    }
+
+                    if (flags.SortColumns != false)
+                    {
+                        updateColById(columns);
+                        var list = new List<SlickColumnSort>();
+                        foreach (var x in settings.Columns
+                            .Where(x => x.ID != null && (x.Sort ?? 0) != 0)
+                            .OrderBy(z => Math.Abs(z.Sort.Value)))
+                        {
+                            var column = colById[x.ID];
+                            if (column != null)
+                            {
+                                list.Add(new SlickColumnSort
+                                {
+                                    ColumnId = x.ID,
+                                    SortAsc = x.Sort > 0
+                                });
+                            }
+                        }
+
+                        this.slickGrid.SetSortColumns(list);
+                    }
+
+                    this.slickGrid.SetColumns(columns);
+                    this.slickGrid.Invalidate();
+                }
+
+                if (settings.FilterItems != null &&
+                    flags.FilterItems != false &&
+                    filterBar != null &&
+                    filterBar.Store != null)
+                {
+                    filterBar.Store.Items.Clear();
+                    filterBar.Store.Items.AddRange(settings.FilterItems);
+                    filterBar.Store.RaiseChanged();
+                }
+
+                if (settings.IncludeDeleted != null &&
+                    flags.IncludeDeleted != false)
+                {
+                    var includeDeletedToggle = this.Element.Find(".s-IncludeDeletedToggle");
+                    if (Q.IsTrue(settings.IncludeDeleted) != includeDeletedToggle.HasClass("pressed"))
+                        includeDeletedToggle.Children("a").Click();
+                }
+            }
+            finally
+            {
+                restoringSettings--;
+                view.EndUpdate();
+            }
+        }
+
+        protected virtual void PersistSettings(GridPersistanceFlags flags = null)
+        {
+            var storage = GetPersistanceStorage();
+            if (storage == null)
+                return;
+
+            var settings = GetCurrentSettings(flags);
+            storage.SetItem(GetPersistanceKey(), Q.ToJSON(settings));
+        }
+
+        protected virtual PersistedGridSettings GetCurrentSettings(GridPersistanceFlags flags = null)
+        {
+            flags = flags ?? GridPersistanceFlags();
+
+            var settings = new PersistedGridSettings();
+
+            if (flags.ColumnVisibility != false ||
+                flags.ColumnWidths != false ||
+                flags.SortColumns != false)
+            {
+                settings.Columns = new List<PersistedGridColumn>();
+                var sortColumns = slickGrid.GetSortColumns();
+                foreach (var column in this.slickGrid.GetColumns())
+                {
+                    var p = new PersistedGridColumn();
+                    p.ID = column.Identifier;
+
+                    if (flags.ColumnVisibility != false)
+                        p.Visible = true;
+
+                    if (flags.ColumnWidths != false)
+                        p.Width = column.Width;
+
+                    if (flags.SortColumns != false)
+                    {
+                        var sort = sortColumns.IndexOf(x => x.ColumnId == column.Identifier);
+                        p.Sort = sort >= 0 ? (sortColumns[sort].SortAsc != false ? (sort + 1) : (-sort - 1)) : 0;
+                    }
+
+                    settings.Columns.Add(p);
+                }
+            }
+
+            if (flags.IncludeDeleted != false)
+                settings.IncludeDeleted = this.Element.Find(".s-IncludeDeletedToggle").HasClass("pressed");
+
+            if (flags.FilterItems != false &&
+                this.filterBar != null &&
+                this.filterBar.Store != null)
+            {
+                settings.FilterItems = this.filterBar.Store.Items.ToList();
+            }
+
+            return settings;
+        }
+
+        [IntrinsicProperty]
+        public static Storage DefaultPersistanceStorage { get; set; }
         [IntrinsicProperty]
         public static int DefaultRowHeight { get; set; }
         [IntrinsicProperty]
@@ -1123,5 +1445,60 @@ namespace Serenity
                 return 0;
             }
         }
+    }
+
+    [Imported]
+    public class ColumnPickerDialog : TemplatedDialog
+    {
+        public ColumnPickerDialog()
+            : base()
+        {
+        }
+
+        public static ToolButton CreateToolButton(IDataGrid grid)
+        {
+            return null;
+        }
+
+        [IntrinsicProperty]
+        public List<SlickColumn> AllColumns { get; set; }
+
+        [IntrinsicProperty]
+        public string[] DefaultColumns { get; set; }
+
+        [IntrinsicProperty]
+        public string[] VisibleColumns { get; set; }
+
+        [IntrinsicProperty]
+        public Action Done { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class GridPersistanceFlags
+    {
+        public bool? ColumnWidths { get; set; }
+        public bool? ColumnVisibility { get; set; }
+        public bool? SortColumns { get; set; }
+        public bool? FilterItems { get; set; }
+        public bool? QuickFilters { get; set; }
+        public bool? IncludeDeleted { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class PersistedGridSettings
+    {
+        public List<PersistedGridColumn> Columns { get; set; }
+        public List<FilterLine> FilterItems { get; set; }
+        public Dictionary<string, object> QuickFilters { get; set; }
+        public bool? IncludeDeleted { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class PersistedGridColumn
+    {
+        public string ID { get; set; }
+        public int? Width { get; set; }
+        public int? Sort { get; set; }
+        public bool? Visible { get; set; }
     }
 }

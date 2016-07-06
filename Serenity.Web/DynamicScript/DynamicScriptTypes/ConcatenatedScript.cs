@@ -24,7 +24,7 @@ namespace Serenity.Web
                 string partSource = part();
 
                 sb.AppendLine(partSource);
-                sb.AppendLine("\r\n");
+                sb.AppendLine("\r\n\r\n");
             }
 
             return sb.ToString();

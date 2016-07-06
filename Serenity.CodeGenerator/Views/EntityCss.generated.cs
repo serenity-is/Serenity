@@ -41,16 +41,7 @@ Write(moduleDash);
 
             Write(Model.ClassName);
 
-WriteLiteral("Dialog {\r\n    > .size { .widthAndMin(650px); }\r\n    .dialog-styles(");
-
-
-WriteLiteral("@h: auto, ");
-
-
-WriteLiteral("@l: 150px, ");
-
-
-WriteLiteral("@e: 400px);\r\n    .s-PropertyGrid .categories { height: 260px; }\r\n}");
+WriteLiteral("Dialog {\r\n    > .size { width: 650px; }\r\n    .caption { width: 150px; }\r\n}");
 
 
         }

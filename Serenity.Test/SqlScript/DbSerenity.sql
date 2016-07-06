@@ -19,3 +19,27 @@ CREATE TABLE SystemLogs (
     Exception nvarchar(MAX) NULL,
     SourceType nvarchar(200) NULL
 );
+
+CREATE TABLE Int32Master (
+    ID int IDENTITY(1, 1) NOT NULL,
+    Name nvarchar(100) NOT NULL
+);
+
+CREATE TABLE Int32Detail (
+    DetailID int IDENTITY(1, 1) NOT NULL,
+    MasterID int NOT NULL,
+    ProductID int NOT NULL,
+    Quantity numeric(18, 2) NOT NULL
+);
+
+CREATE TABLE GuidMaster (
+    ID uniqueidentifier NOT NULL default((newid())),
+    Name nvarchar(100) NOT NULL
+);
+
+CREATE TABLE GuidDetail (
+    DetailID uniqueidentifier NOT NULL default((newid())),
+    MasterID uniqueidentifier NOT NULL,
+    ProductID int NOT NULL,
+    Quantity numeric(18, 2) NOT NULL
+);

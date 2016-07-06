@@ -66,19 +66,19 @@ namespace Serenity
         {
             if (!file.IsImage && !opt.AllowNonImage)
             {
-                Q.Alert("Yüklemeye çalıştığınız dosya bir resim değil!");
+                Q.Alert(Q.Text("Controls.ImageUpload.NotAnImageFile"));
                 return false;
             }
 
             if (opt.MinSize > 0 && file.Size < opt.MinSize)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz dosya en az {0} boyutunda olmalı!", opt.MinSize));
+                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.UploadFileTooSmall"), opt.MinSize));
                 return false;
             }
 
             if (opt.MaxSize > 0 && file.Size > opt.MaxSize)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} boyutunda olabilir!", opt.MaxSize));
+                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.UploadFileTooBig"), opt.MaxSize));
                 return false;
             }
 
@@ -87,25 +87,25 @@ namespace Serenity
 
             if (opt.MinWidth > 0 && file.Width < opt.MinWidth)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz resim en az {0} genişliğinde olmalı!", opt.MinWidth));
+                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.MinWidth"), opt.MinWidth));
                 return false;
             }
 
             if (opt.MaxWidth > 0 && file.Width > opt.MaxWidth)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} genişliğinde olabilir!", opt.MaxWidth));
+                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.MaxWidth"), opt.MaxWidth));
                 return false;
             }
 
             if (opt.MinHeight > 0 && file.Height < opt.MinHeight)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz resim en az {0} yüksekliğinde olmalı!", opt.MinHeight));
+                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.MinHeight"), opt.MinHeight));
                 return false;
             }
 
             if (opt.MaxHeight > 0 && file.Height > opt.MaxHeight)
             {
-                Q.Alert(String.Format("Yükleyeceğiniz dosya en çok {0} yüksekliğinde olabilir!", opt.MaxHeight));
+                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.MaxHeight"), opt.MaxHeight));
                 return false;
             }
 
@@ -173,10 +173,10 @@ namespace Serenity
         {
             link.As<dynamic>().colorbox(new 
             {
-                current = "resim {current} / {total}",
-                previous = "önceki",
-                next = "sonraki",
-                close = "kapat"
+                current = Q.Text("Controls.ImageUpload.ColorboxCurrent"),
+                previous = Q.Text("Controls.ImageUpload.ColorboxPrior"),
+                next = Q.Text("Controls.ImageUpload.ColorboxNext"),
+                close = Q.Text("Controls.ImageUpload.ColorboxClose")
             });
         }
 

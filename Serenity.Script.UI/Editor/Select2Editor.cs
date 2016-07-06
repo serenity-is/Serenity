@@ -26,6 +26,12 @@ namespace Serenity
         protected int pageSize = 100;
         protected string lastCreateTerm;
 
+        static Select2Editor()
+        {
+            Q.Prop(typeof(Select2Editor<object, object>), "value");
+            Q.Prop(typeof(Select2Editor<object, object>), "values");
+        }
+
         public Select2Editor(jQueryObject hidden, TOptions opt)
             : base(hidden, opt)
         {

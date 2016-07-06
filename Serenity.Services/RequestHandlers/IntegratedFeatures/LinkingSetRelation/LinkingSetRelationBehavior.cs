@@ -11,7 +11,7 @@ using System.Linq;
 namespace Serenity.Services
 {
     public class LinkingSetRelationBehavior : BaseSaveDeleteBehavior, 
-        IImplicitBehavior, IRetrieveBehavior, IFieldBehavior
+        IImplicitBehavior, IRetrieveBehavior, IListBehavior, IFieldBehavior
     {
         public Field Target { get; set; }
 
@@ -111,6 +111,11 @@ namespace Serenity.Services
         public void OnBeforeExecuteQuery(IRetrieveRequestHandler handler) { }
         public void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
         public void OnValidateRequest(IRetrieveRequestHandler handler) { }
+        public void OnValidateRequest(IListRequestHandler handler) { }
+        public void OnPrepareQuery(IListRequestHandler handler, SqlQuery query) { }
+        public void OnApplyFilters(IListRequestHandler handler, SqlQuery query) { }
+        public void OnBeforeExecuteQuery(IListRequestHandler handler) { }
+        public void OnAfterExecuteQuery(IListRequestHandler handler) { }
 
         public void OnReturn(IRetrieveRequestHandler handler)
         {
@@ -142,6 +147,59 @@ namespace Serenity.Services
                 list.Add(itemKeyField.AsObject(item));
 
             Target.AsObject(handler.Row, list);
+        }
+
+        public void OnReturn(IListRequestHandler handler)
+        {
+            if (ReferenceEquals(null, Target) ||
+                !handler.ShouldSelectField(Target) ||
+                handler.Response.Entities.IsEmptyOrNull())
+                return;
+
+            var idField = (Field)((handler.Row as IIdRow).IdField);
+
+            var listHandler = listHandlerFactory();
+
+            var listRequest = new ListRequest
+            {
+                ColumnSelection = ColumnSelection.KeyOnly,
+                IncludeColumns = new HashSet<string>
+                {
+                    itemKeyField.PropertyName ?? itemKeyField.Name,
+                    thisKeyField.PropertyName ?? thisKeyField.Name
+                }
+            };
+
+            var thisKeyCriteria = new Criteria(thisKeyField.PropertyName ?? thisKeyField.Name);
+
+            var enumerator = handler.Response.Entities.Cast<Row>();
+            while (true)
+            {
+                var part = enumerator.Take(1000);
+                if (!part.Any())
+                    break;
+
+                enumerator = enumerator.Skip(1000);
+
+                listRequest.Criteria = thisKeyCriteria.In(
+                    part.Select(x => idField.AsObject(x)));
+
+                IListResponse response = listHandler.Process(
+                    handler.Connection, listRequest);
+
+                var lookup = response.Entities.Cast<Row>()
+                    .ToLookup(x => thisKeyField.AsObject(x).ToString());
+
+                foreach (var row in part)
+                {
+                    var list = listFactory();
+                    var matching = lookup[idField.AsObject(row).ToString()];
+                    foreach (var x in matching)
+                        list.Add(itemKeyField.AsObject(x));
+
+                    Target.AsObject(row, list);
+                }
+            }
         }
 
         private void SaveDetail(IUnitOfWork uow, object masterId, object detailId, object itemKey)

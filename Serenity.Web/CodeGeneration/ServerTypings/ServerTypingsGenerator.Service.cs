@@ -49,7 +49,7 @@ namespace Serenity.CodeGeneration
 
                     sb.Append(", onSuccess?: (response: ");
                     MakeFriendlyReference(responseType, codeNamespace);
-                    sb.AppendLine(") => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;");
+                    sb.AppendLine(") => void, opt?: Q.ServiceOptions<any>): JQueryXHR;");
                 }
 
                 sb.AppendLine();

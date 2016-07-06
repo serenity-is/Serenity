@@ -20,7 +20,9 @@ namespace Serenity.Data
                 { "FirebirdSql.Data.FirebirdClient", FirebirdDialect.Instance },
                 { "Npgsql", PostgresDialect.Instance },
                 { "MySql.Data.MySqlClient", MySqlDialect.Instance },
-                { "System.Data.SQLite", SqliteDialect.Instance }
+                { "System.Data.SQLite", SqliteDialect.Instance },
+                { "System.Data.OracleClient", OracleDialect.Instance },
+                { "Oracle.ManagedDataAccess.Client", OracleDialect.Instance }
             };
 
         private string databaseName;

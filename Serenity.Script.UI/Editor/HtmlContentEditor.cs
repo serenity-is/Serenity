@@ -12,6 +12,11 @@ namespace Serenity
     [Element("<textarea />")]
     public class HtmlContentEditor : Widget<HtmlContentEditorOptions>, IStringValue
     {
+        static HtmlContentEditor()
+        {
+            Q.Prop(typeof(HtmlContentEditor), "value");
+        }
+
         private bool instanceReady;
 
         public HtmlContentEditor(jQueryObject textArea, HtmlContentEditorOptions opt)

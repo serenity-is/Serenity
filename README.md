@@ -7,9 +7,11 @@ Serenity Application Platform
 
 ## What is Serenity Platform
 
-Serenity is an ASP.NET MVC application platform designed to simplify and shorten development of data-centric business applications with a service based architecture.
+Serenity is an ASP.NET MVC / TypeScript application platform designed to simplify and shorten development of data-centric business applications with a service based architecture.
 
 It aims to make development easier while reducing maintenance costs by avoiding boiler-plate code, reducing the time spent on repetitive tasks and applying best software design practices. 
+
+<img src="https://github.com/volkanceylan/Serene/blob/master/Template/img/SereneAnimation.gif" />
 
 ## Documentation
 
@@ -34,6 +36,8 @@ If you are using Serenity in any open source / commercial projects let me know, 
 .NET open source community is a bit limited and is not so active, so if you help spread the word by posting in forums, starring the project here and in Visual Studio Gallery, i'll appreciate it much.
 
 
-
+## Video Tutorials
+Youtube Channel
+https://www.youtube.com/channel/UCUL4l2DlXCOCprdUfsoP0iw
 
 

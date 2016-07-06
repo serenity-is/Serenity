@@ -10,6 +10,12 @@ namespace Serenity
     [Element("<input type=\"text\"/>")]
     public class DateEditor : Widget<object>, IStringValue, IReadOnly
     {
+        static DateEditor()
+        {
+            Q.Prop(typeof(DateEditor), "value");
+            Q.Prop(typeof(DateEditor), "valueAsDate");
+        }
+
         public DateEditor(jQueryObject input)
             : base(input, new object())
         {

@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor, DisplayName("Html İçerik (Rapor Uyumlu Kısıtlı Set)"), OptionsType(typeof(HtmlContentEditorOptions))]
+    [Editor, DisplayName("Html Content (Report Compatible Limited Set)"), OptionsType(typeof(HtmlContentEditorOptions))]
     [Element("<textarea />")]
     public class HtmlReportContentEditor : HtmlContentEditor, IStringValue
     {
@@ -20,7 +20,8 @@ namespace Serenity
         protected override CKEditorConfig GetConfig()
         {
             var config = base.GetConfig();
-            config.RemoveButtons += ",Image,Table,HorizontalRule,Anchor,Blockquote,CreatePlaceholder,BGColor,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,Superscript";
+            config.RemoveButtons += ",Image,Table,HorizontalRule,Anchor,Blockquote,CreatePlaceholder,BGColor," + 
+                "JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,Superscript";
             return config;
         }
     }

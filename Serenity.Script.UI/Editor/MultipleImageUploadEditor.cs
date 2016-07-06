@@ -11,6 +11,11 @@ namespace Serenity
     [Element("<div/>")]
     public class MultipleImageUploadEditor : Widget<ImageUploadEditorOptions>, IGetEditValue, ISetEditValue, IReadOnly
     {
+        static MultipleImageUploadEditor()
+        {
+            Q.Prop(typeof(MultipleImageUploadEditor), "value");
+        }
+
         protected List<UploadedFile> entities;
         protected Toolbar toolbar;
         protected jQueryObject fileSymbols;

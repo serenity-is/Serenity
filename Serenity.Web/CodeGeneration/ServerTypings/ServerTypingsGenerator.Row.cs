@@ -104,10 +104,14 @@ namespace Serenity.CodeGeneration
                     sb.AppendLine("';");
 
                     sb.AppendLine();
-                    cw.Indented("export function lookup()");
+                    cw.Indented("export function getLookup(): Q.Lookup<");
+                    sb.Append(rowType.Name);
+                    sb.Append(">");
                     cw.InBrace(delegate
                     {
-                        cw.Indented("return Q.getLookup('");
+                        cw.Indented("return Q.getLookup<");
+                        sb.Append(rowType.Name);
+                        sb.Append(">('");
                         sb.Append(lookupAttr.Key);
                         sb.AppendLine("');");
                     });
