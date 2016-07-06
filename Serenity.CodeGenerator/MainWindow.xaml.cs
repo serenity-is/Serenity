@@ -370,6 +370,32 @@ namespace Serenity.CodeGenerator
                 }
             }
         }
+        public bool GenerateEditor
+        {
+            get { return config.GenerateEditor; }
+            set
+            {
+                if (value != config.GenerateEditor)
+                {
+                    config.GenerateEditor = value;
+                    config.Save();
+                    Changed("GenerateEditor");
+                }
+            }
+        }
+        public bool GenerateEditorDialog
+        {
+            get { return config.GenerateEditorDialog; }
+            set
+            {
+                if (value != config.GenerateEditorDialog)
+                {
+                    config.GenerateEditorDialog = value;
+                    config.Save();
+                    Changed("GenerateEditorDialog");
+                }
+            }
+        }
         private void Ekle_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new AddConnectionStringWindow();

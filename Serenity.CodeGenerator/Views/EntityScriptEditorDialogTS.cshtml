@@ -1,0 +1,19 @@
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+}
+/// <reference path="../../Common/Helpers/GridEditorDialog.ts" />
+
+namespace @(Model.RootNamespace)@(dotModule) {
+    
+    @@Serenity.Decorators.registerClass()
+    @@Serenity.Decorators.responsive()
+    export class @(Model.ClassName)EditorDialog extends Common.GridEditorDialog<@(Model.RowClassName)> {
+        protected getFormKey() { return @(Model.ClassName)Form.formKey; }@if (Model.Identity != null) {<text>
+        </text>}
+        protected getLocalTextPrefix() { return @(Model.RowClassName).localTextPrefix; }@if (Model.NameField != null){<text>
+        protected getNameProperty() { return @(Model.RowClassName).nameProperty; }</text>}
+
+        protected form = new @(Model.ClassName)Form(this.idPrefix);
+    }
+}
