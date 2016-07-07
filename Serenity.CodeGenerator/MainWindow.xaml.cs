@@ -370,27 +370,27 @@ namespace Serenity.CodeGenerator
                 }
             }
         }
-        public bool GenerateEditor
+        public bool GenerateGridEditor
         {
-            get { return config.GenerateEditor; }
+            get { return config.GenerateGridEditor; }
             set
             {
-                if (value != config.GenerateEditor)
+                if (value != config.GenerateGridEditor)
                 {
-                    config.GenerateEditor = value;
+                    config.GenerateGridEditor = value;
                     config.Save();
                     Changed("GenerateEditor");
                 }
             }
         }
-        public bool GenerateEditorDialog
+        public bool GenerateGridEditorDialog
         {
-            get { return config.GenerateEditorDialog; }
+            get { return config.GenerateGridEditorDialog; }
             set
             {
-                if (value != config.GenerateEditorDialog)
+                if (value != config.GenerateGridEditorDialog)
                 {
-                    config.GenerateEditorDialog = value;
+                    config.GenerateGridEditorDialog = value;
                     config.Save();
                     Changed("GenerateEditorDialog");
                 }

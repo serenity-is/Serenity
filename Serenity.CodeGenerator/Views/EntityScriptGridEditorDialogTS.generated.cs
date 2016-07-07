@@ -17,7 +17,7 @@ namespace Serenity.CodeGenerator.Views
     using System.Text;
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "2.0.0.0")]
-    public partial class EntityScriptEditorDialogTS : RazorGenerator.Templating.RazorTemplateBase
+    public partial class EntityScriptGridEditorDialogTS : RazorGenerator.Templating.RazorTemplateBase
     {
 #line hidden
  public dynamic Model { get; set; } 

@@ -131,8 +131,8 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Views\EntityScriptEditorDialogTS.generated.cs">
-      <DependentUpon>EntityScriptEditorDialogTS.cshtml</DependentUpon>
+    <Compile Include="Views\EntityScriptGridEditorDialogTS.generated.cs">
+      <DependentUpon>EntityScriptGridEditorDialogTS.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
@@ -156,8 +156,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptGridSS.cshtml</DependentUpon>
     </Compile>
-    <Compile Include="Views\EntityScriptEditorTS.generated.cs">
-      <DependentUpon>EntityScriptEditorTS.cshtml</DependentUpon>
+    <Compile Include="Views\EntityScriptGridEditorTS.generated.cs">
+      <DependentUpon>EntityScriptGridEditorTS.cshtml</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
@@ -225,9 +225,9 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityRowWithRegion.generated.cs</LastGenOutput>
     </None>
-    <None Include="Views\EntityScriptEditorDialogTS.cshtml">
+    <None Include="Views\EntityScriptGridEditorDialogTS.cshtml">
       <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptEditorDialogTS.generated.cs</LastGenOutput>
+      <LastGenOutput>EntityScriptGridEditorDialogTS.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityScriptFormTS.cshtml">
       <Generator>RazorGenerator</Generator>
@@ -241,9 +241,9 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityScriptDialogTS.generated.cs</LastGenOutput>
     </None>
-    <None Include="Views\EntityScriptEditorTS.cshtml">
+    <None Include="Views\EntityScriptGridEditorTS.cshtml">
       <Generator>RazorGenerator</Generator>
-      <LastGenOutput>EntityScriptEditorTS.generated.cs</LastGenOutput>
+      <LastGenOutput>EntityScriptGridEditorTS.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityScriptGridTS.cshtml">
       <Generator>RazorGenerator</Generator>

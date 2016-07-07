@@ -70,10 +70,11 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
         #region @x.Title
         @if (!String.IsNullOrEmpty(attrString))
         {
-            <text>        [@attrString]
-            </text>}        public @x.Type@(x.IsValueType ? "?" : "") @x.Ident { get { return Fields.@(x.Ident)[this]; } set { Fields.@(x.Ident)[this] = value; } }
-            public partial class RowFields { public @(x.Type)Field @(x.Ident); }
-            #endregion @x.Ident</text>}
+        <text>        [@attrString]
+        </text>}        public @x.Type@(x.IsValueType ? "?" : "") @x.Ident { get { return Fields.@(x.Ident)[this]; } set { Fields.@(x.Ident)[this] = value; } }
+        public partial class RowFields { public @(x.Type)Field @(x.Ident); }
+        #endregion @x.Ident</text>}
+
 
         #region Foreign Fields
         @foreach (var x in Model.Joins)
