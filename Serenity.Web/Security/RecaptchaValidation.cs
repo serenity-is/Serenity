@@ -47,7 +47,7 @@ namespace Serenity.Web
             using (var sr = new StreamReader(webResponse.GetResponseStream()))
                 responseJson = sr.ReadToEnd();
 
-            var response = JSON.Parse<RecaptchaResponse>(responseJson);
+            var response = JSON.ParseTolerant<RecaptchaResponse>(responseJson);
             if (response == null ||
                 !response.Success)
             {
