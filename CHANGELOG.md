@@ -1,3 +1,8 @@
+## 2.2.6 (2016-07-07)
+
+Bugfixes:
+  - fix issue with Recaptcha due to their change in response and json deserialization by using tolerant mode
+
 ## 2.2.5 (2016-07-04)
  
 Features:
