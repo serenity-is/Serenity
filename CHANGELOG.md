@@ -1,3 +1,8 @@
+## 2.2.7 (2016-07-07)
+
+Bugfixes:
+  - CascadeField property of LookupEditorBase is not converted to an ES5 property
+
 ## 2.2.6 (2016-07-07)
 
 Bugfixes:
