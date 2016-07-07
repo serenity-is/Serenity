@@ -16,6 +16,7 @@ namespace Serenity
 
         static LookupEditorBase()
         {
+            Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "cascadeField");
             Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "cascadeFrom");
             Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "cascadeValue");
             Q.Prop(typeof(LookupEditorBase<LookupEditorOptions, object>), "filterField");

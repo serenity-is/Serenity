@@ -10341,6 +10341,7 @@
 		$Serenity_EditorUtils.$dummy = { name: '_' };
 	})();
 	(function() {
+		Q.prop($Serenity_LookupEditorBase, 'cascadeField');
 		Q.prop($Serenity_LookupEditorBase, 'cascadeFrom');
 		Q.prop($Serenity_LookupEditorBase, 'cascadeValue');
 		Q.prop($Serenity_LookupEditorBase, 'filterField');
