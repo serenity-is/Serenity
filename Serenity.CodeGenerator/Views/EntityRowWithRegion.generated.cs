@@ -180,59 +180,59 @@ WriteLiteral("\n");
          if (!String.IsNullOrEmpty(attrString))
         {
 
-WriteLiteral("            ");
+WriteLiteral("        ");
 
 WriteLiteral("        [");
 
 
-                      Write(attrString);
+                  Write(attrString);
 
-WriteLiteral("]\n            ");
+WriteLiteral("]\n        ");
 
 
-                   }
+               }
 WriteLiteral("        public ");
 
 
-                              Write(x.Type);
+                          Write(x.Type);
 
 
-                                      Write(x.IsValueType ? "?" : "");
+                                  Write(x.IsValueType ? "?" : "");
 
 WriteLiteral(" ");
 
 
-                                                                 Write(x.Ident);
+                                                             Write(x.Ident);
 
 WriteLiteral(" { get { return Fields.");
 
 
-                                                                                                 Write(x.Ident);
+                                                                                             Write(x.Ident);
 
 WriteLiteral("[this]; } set { Fields.");
 
 
-                                                                                                                                  Write(x.Ident);
+                                                                                                                              Write(x.Ident);
 
-WriteLiteral("[this] = value; } }\n            public partial class RowFields { public ");
+WriteLiteral("[this] = value; } }\n        public partial class RowFields { public ");
 
 
-                                                Write(x.Type);
+                                            Write(x.Type);
 
 WriteLiteral("Field ");
 
 
-                                                               Write(x.Ident);
+                                                           Write(x.Ident);
 
-WriteLiteral("; }\n            #endregion ");
-
-
-                  Write(x.Ident);
+WriteLiteral("; }\n        #endregion ");
 
 
-                                      }
+              Write(x.Ident);
 
-WriteLiteral("\n        #region Foreign Fields\n");
+
+                                  }
+
+WriteLiteral("\n\n        #region Foreign Fields\n");
 
 
          foreach (var x in Model.Joins)

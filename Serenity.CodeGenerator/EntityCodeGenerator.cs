@@ -121,6 +121,10 @@ namespace Serenity.CodeGenerator
 
                 if (config.GenerateDialog)
                     GenerateScriptDialogTS();
+                if (config.GenerateGridEditor)
+                    GenerateScriptGridEditorTS();
+                if (config.GenerateGridEditorDialog)
+                    GenerateScriptGridEditorDialogTS();
             }
 
             else if (scriptProject != null)
@@ -429,6 +433,18 @@ namespace Serenity.CodeGenerator
         {
             CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptDialogTS(), model),
                 Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Dialog.ts"))));
+        }
+
+        private void GenerateScriptGridEditorTS()
+        {
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptGridEditorTS(), model),
+                Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Editor.ts"))));
+        }
+
+        private void GenerateScriptGridEditorDialogTS()
+        {
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptGridEditorDialogTS(), model),
+                Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "EditorDialog.ts"))));
         }
     }
 }

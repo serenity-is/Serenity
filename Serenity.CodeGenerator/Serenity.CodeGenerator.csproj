@@ -131,6 +131,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="Views\EntityScriptGridEditorDialogTS.generated.cs">
+      <DependentUpon>EntityScriptGridEditorDialogTS.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Views\EntityScriptDialogTS.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -150,6 +155,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EntityScriptGridSS.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EntityScriptGridEditorTS.generated.cs">
+      <DependentUpon>EntityScriptGridEditorTS.cshtml</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Views\EntityScriptGridTS.generated.cs">
       <AutoGen>True</AutoGen>
@@ -215,6 +225,10 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityRowWithRegion.generated.cs</LastGenOutput>
     </None>
+    <None Include="Views\EntityScriptGridEditorDialogTS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptGridEditorDialogTS.generated.cs</LastGenOutput>
+    </None>
     <None Include="Views\EntityScriptFormTS.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityScriptFormTS.generated.cs</LastGenOutput>
@@ -226,6 +240,10 @@
     <None Include="Views\EntityScriptDialogTS.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>EntityScriptDialogTS.generated.cs</LastGenOutput>
+    </None>
+    <None Include="Views\EntityScriptGridEditorTS.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>EntityScriptGridEditorTS.generated.cs</LastGenOutput>
     </None>
     <None Include="Views\EntityScriptGridTS.cshtml">
       <Generator>RazorGenerator</Generator>

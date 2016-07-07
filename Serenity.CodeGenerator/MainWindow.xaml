@@ -40,6 +40,13 @@
             <DockPanel Visibility="{Binding ElementName=tabSingle, Path=IsSelected,Converter={StaticResource BoolToVis}}" HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" Margin="0 10 0 0">
                 <Button HorizontalAlignment="Right" Name="GenerateCodeButton" IsEnabled="False" Padding="6" FontWeight="Bold" Click="GenerateCodes_Click">Generate Code for Entity</Button>
             </DockPanel>
+            <DockPanel DockPanel.Dock="Bottom" Margin="0 6 0 0">
+                <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120"></TextBlock>
+                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateGrid}">Grid</CheckBox>
+                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateDialog}">Dialog</CheckBox>
+                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateEditor}">Grid Editor</CheckBox>
+                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateEditorDialog}">Grid Editor Dialog</CheckBox>
+            </DockPanel>
 
             <DockPanel DockPanel.Dock="Bottom" Margin="0 6 0 0">
                 <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Files To Generate</TextBlock>
@@ -49,8 +56,6 @@
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateEndpoint}">Endpoint</CheckBox>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateRepository}">Repository</CheckBox>
                 <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GeneratePage}">Page</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateGrid}">Grid</CheckBox>
-                <CheckBox HorizontalAlignment="Left" Margin="0 0 10 0" IsChecked="{Binding Path=GenerateDialog}">Dialog</CheckBox>
             </DockPanel>
             <DockPanel HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" Margin="0 6 0 0">
                 <TextBlock DockPanel.Dock="Left" Margin="0 0 4 0" Width="120">Generation Options</TextBlock>

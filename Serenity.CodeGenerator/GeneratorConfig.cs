@@ -32,6 +32,8 @@ namespace Serenity.CodeGenerator
         public bool GeneratePage { get; set; }
         public bool GenerateGrid { get; set; }
         public bool GenerateDialog { get; set; }
+        public bool GenerateGridEditor { get; set; }
+        public bool GenerateGridEditorDialog { get; set; }
 
         public GeneratorConfig()
         {
@@ -51,6 +53,8 @@ namespace Serenity.CodeGenerator
             GeneratePage = true;
             GenerateGrid = true;
             GenerateDialog = true;
+            GenerateGridEditor = false;
+            GenerateGridEditorDialog = false;
             SetDefaults();
         }
 
