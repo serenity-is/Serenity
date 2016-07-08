@@ -856,14 +856,14 @@ declare namespace Serenity {
         constructor(input: JQuery);
         value: boolean;
     }
-        interface RadioButtonEditorOptions {
-        lables: string[];
+    interface RadioButtonEditorOptions {
+        labels: string[];
         values: string[];
     }
     class RadioButtonEditor extends Widget<RadioButtonEditorOptions> {
         constructor(input: JQuery);
         value: string;
-    }    
+    }
     interface EnumEditorOptions {
         enumKey?: string;
         enumType?: any;
