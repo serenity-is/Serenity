@@ -265,6 +265,61 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        public List<GeneratorConfig.BaseRowClass> BaseRowClasses
+        {
+            get { return config.BaseRowClasses; }
+            set
+            {
+                if (value != config.BaseRowClasses)
+                {
+                    config.BaseRowClasses = value;
+                    config.Save();
+                    Changed("BaseRowClasses");
+                }
+            }
+        }
+
+        public List<string> RemoveForeignFields
+        {
+            get { return config.RemoveForeignFields; }
+            set
+            {
+                if (value != config.RemoveForeignFields)
+                {
+                    config.RemoveForeignFields = value;
+                    config.Save();
+                    Changed("RemoveForeignFields");
+                }
+            }
+        }
+
+        public bool RowFieldsSurroundWithRegion
+        {
+            get { return config.RowFieldsSurroundWithRegion; }
+            set
+            {
+                if (value != config.RowFieldsSurroundWithRegion)
+                {
+                    config.RowFieldsSurroundWithRegion = value;
+                    config.Save();
+                    Changed("RowFieldsSurroundWithRegion");
+                }
+            }
+        }
+
+        public string KDiff3Path
+        {
+            get { return config.KDiff3Path; }
+            set
+            {
+                if (value != config.KDiff3Path)
+                {
+                    config.KDiff3Path = value;
+                    config.Save();
+                    Changed("KDiff3Path");
+                }
+            }
+        }
         public bool GenerateRow
         {
             get { return config.GenerateRow; }
@@ -653,6 +708,31 @@ namespace Serenity.CodeGenerator
             }
 
             MessageBox.Show("Code files for selected tables are generated. Please REBUILD SOLUTION before running application, otherwise you may have script errors!");
+        }
+
+
+        private void btnKDiff3PathBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            if (string.IsNullOrWhiteSpace(config.KDiff3Path))
+            {
+                dlg.FileName = "*.exe";
+                dlg.InitialDirectory = Path.GetDirectoryName(GeneratorConfig.GetConfigurationFilePath());
+            }
+            else
+            {
+                dlg.FileName = Path.GetFileName(config.KDiff3Path);
+                dlg.InitialDirectory = Path.GetDirectoryName(config.KDiff3Path);
+            }
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                KDiff3Path = dlg.FileName;
+                config.Save();
+            }
+
         }
     }
 }
