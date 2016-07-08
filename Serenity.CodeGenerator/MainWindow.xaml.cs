@@ -379,7 +379,7 @@ namespace Serenity.CodeGenerator
                 {
                     config.GenerateGridEditor = value;
                     config.Save();
-                    Changed("GenerateEditor");
+                    Changed("GenerateGridEditor");
                 }
             }
         }
@@ -392,7 +392,7 @@ namespace Serenity.CodeGenerator
                 {
                     config.GenerateGridEditorDialog = value;
                     config.Save();
-                    Changed("GenerateEditorDialog");
+                    Changed("GenerateGridEditorDialog");
                 }
             }
         }
