@@ -4,6 +4,7 @@ Features:
   - added RadioButtonEditor (thanks @Estrusco)
   - made RadioButtonEditor work with enums and lookups
   - optional GridEditor and GridEditorDialog generation in sergen (thanks @dfaruque)
+  - added initial values for quick filters sample [Serene]
 
 ## 2.2.7 (2016-07-07)
 
