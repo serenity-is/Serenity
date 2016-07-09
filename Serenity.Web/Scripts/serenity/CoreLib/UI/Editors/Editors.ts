@@ -35,8 +35,9 @@
     }
 
     interface RadioButtonEditorOptions {
-        labels: string[];
-        values: string[];
+        enumKey?: string;
+        enumType?: any;
+        lookupKey?: string;
     }
 
     class RadioButtonEditor extends Widget<RadioButtonEditorOptions> {

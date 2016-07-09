@@ -67,26 +67,26 @@
         function reset(): void;
     }
 
-    class FilterLine {
-        field: string;
-        operator: string;
-        isOr: boolean;
-        leftParen: boolean;
-        rightParen: boolean;
-        validationError: string;
-        criteria: any[];
-        displayText: string;
-        state: any;
+    interface FilterLine {
+        field?: string;
+        operator?: string;
+        isOr?: boolean;
+        leftParen?: boolean;
+        rightParen?: boolean;
+        validationError?: string;
+        criteria?: any[];
+        displayText?: string;
+        state?: any;
     }
 
     interface QuickFilterArgs<TWidget> {
-        field: string;
-        widget: TWidget;
-        request: ListRequest;
-        equalityFilter: any;
-        value: any;
-        active: boolean;
-        handled: boolean;
+        field?: string;
+        widget?: TWidget;
+        request?: ListRequest;
+        equalityFilter?: any;
+        value?: any;
+        active?: boolean;
+        handled?: boolean;
     }
 
     class QuickSearchInput extends Widget<QuickSearchInputOptions> {

@@ -10,26 +10,6 @@ namespace Serenity.ComponentModel
         }
     }
 
-    public partial class RadioButtonEditorAttribute : CustomEditorAttribute
-    {
-        public RadioButtonEditorAttribute()
-            : base("RadioButton")
-        {
-        }
-
-        public String[] Labels
-        {
-            get { return GetOption<String[]>("labels"); }
-            set { SetOption("labels", value); }
-        }
-
-        public String[] Values
-        {
-            get { return GetOption<String[]>("values"); }
-            set { SetOption("values", value); }
-        }
-    }
-
     public partial class DateEditorAttribute : CustomEditorAttribute
     {
         public DateEditorAttribute()
@@ -532,6 +512,55 @@ namespace Serenity.ComponentModel
     {
         public string SiteKey { get; set; }
         public string SecretKey { get; set; }
+    }
+
+    public partial class RadioButtonEditorAttribute : CustomEditorAttribute
+    {
+        public RadioButtonEditorAttribute(Type enumOrLookupType)
+            : base("RadioButton")
+        {
+            if (enumOrLookupType == null)
+                throw new ArgumentNullException("enumOrLookupType");
+
+            if (enumOrLookupType.IsEnum)
+            {
+                var ek = enumOrLookupType.GetCustomAttributes(typeof(EnumKeyAttribute), false);
+                if (ek.Length == 0)
+                    EnumKey = enumOrLookupType.FullName;
+                else
+                    EnumKey = ((EnumKeyAttribute)ek[0]).Value;
+
+                return;
+            }
+
+            var lk = enumOrLookupType.GetCustomAttributes(typeof(LookupScriptAttribute), false);
+            if (lk.Length == 0)
+            {
+                throw new ArgumentException(String.Format(
+                    "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
+                    "be used with a LookupEditor!",
+                    enumOrLookupType.FullName), "lookupType");
+            }
+
+            LookupKey = ((LookupScriptAttribute)lk[0]).Key;
+        }
+
+        public RadioButtonEditorAttribute()
+            : base("RadioButton")
+        {
+        }
+
+        public String EnumKey
+        {
+            get { return GetOption<String>("enumKey"); }
+            set { SetOption("enumKey", value); }
+        }
+
+        public String LookupKey
+        {
+            get { return GetOption<String>("lookupKey"); }
+            set { SetOption("lookupKey", value); }
+        }
     }
 
     public partial class Recaptcha : CustomEditorAttribute
