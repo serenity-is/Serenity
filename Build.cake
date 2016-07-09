@@ -181,6 +181,7 @@ Task("NuGet-Push")
       foreach (var package in nugetPackages)
       {
           NuGetPush(package, new NuGetPushSettings {
+              Source = "https://www.nuget.org/api/v2/package"
           });
       }
   });

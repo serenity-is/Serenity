@@ -1,3 +1,10 @@
+## 2.2.8 (2016-07-09)
+
+Features:
+  - added RadioButtonEditor (thanks @Estrusco)
+  - made RadioButtonEditor work with enums and lookups
+  - optional GridEditor and GridEditorDialog generation in sergen (thanks @dfaruque)
+
 ## 2.2.7 (2016-07-07)
 
 Bugfixes:
