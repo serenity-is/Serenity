@@ -233,8 +233,11 @@
       <Link>phantomjs.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="..\Serenity.Web\Scripts\tsservices\json2.min.js">
+    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\json2.min.js">
       <Link>CodeGeneration\TypeScriptParserTests\json2.min.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
+      <Link>CodeGeneration\TypeScriptParserTests\typescriptServices.js</Link>
     </EmbeddedResource>
     <Content Include="Scripts\jlayout.border.js" />
     <Content Include="Scripts\jlayout.border.min.js" />
@@ -316,9 +319,6 @@
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.IntegerEditorTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Formatters\Formatters.UrlFormatterTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.TextAreaEditorTests.ts" />
-    <EmbeddedResource Include="..\Serenity.Web\Scripts\tsservices\typescriptServices.js">
-      <Link>CodeGeneration\TypeScriptParserTests\typescriptServices.js</Link>
-    </EmbeddedResource>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
