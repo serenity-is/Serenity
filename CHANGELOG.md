@@ -1,3 +1,12 @@
+## 2.3.1 (2016-07-13)
+
+Features:
+  - Serene template size gets down to 2.5MB from 21MB+, by excluding NuGet packages from VSIX
+  - static assets and code generation tools in Serenity.Web and Serenity.CodeGenerator NuGet packages are moved into new Serenity.Web.Assets and Serenity.Web.Tooling packages, which are separately versioned from other Serenity packages to reduce download sizes.
+  - converted Flot, iCheck and some other parts in Serene to NuGet references
+  - disable tslint by adding an empty tslint.json
+  - added removing add button sample [Serene]
+
 ## 2.2.8 (2016-07-09)
 
 Features:
