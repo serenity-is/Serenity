@@ -1,3 +1,9 @@
+## 2.3.2 (2016-07-15)
+
+Features:
+  - make RetrieveRequest interface members optional in TypeScript
+  - added get id of inserted record sample [Serene]
+
 ## 2.3.1 (2016-07-13)
 
 Features:
