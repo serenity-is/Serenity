@@ -112,10 +112,10 @@ declare namespace Serenity {
         Entity?: TEntity;
     }
     interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {
-        Attachments: any[];
+        Attachments?: any[];
     }
     interface SaveResponse extends ServiceResponse {
-        EntityId: any;
+        EntityId?: any;
     }
     interface SaveWithLocalizationRequest<TEntity> extends SaveRequest<TEntity> {
         Localizations?: {
@@ -154,12 +154,12 @@ declare namespace Serenity {
     }
     interface RetrieveRequest extends ServiceRequest {
         EntityId?: any;
-        ColumnSelection: RetrieveColumnSelection;
-        IncludeColumns: string[];
-        ExcludeColumns: string[];
+        ColumnSelection?: RetrieveColumnSelection;
+        IncludeColumns?: string[];
+        ExcludeColumns?: string[];
     }
     interface RetrieveResponse<TEntity> extends ServiceResponse {
-        Entity: TEntity;
+        Entity?: TEntity;
     }
     interface RetrieveLocalizationRequest extends RetrieveRequest {
     }
