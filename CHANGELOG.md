@@ -3,6 +3,8 @@
 Features:
   - make RetrieveRequest interface members optional in TypeScript
   - added get id of inserted record sample [Serene]
+  - added dialog boxes sample
+  - auto replace 'f' with '0' for excel date/time display formats
 
 ## 2.3.1 (2016-07-13)
 
