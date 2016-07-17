@@ -5,6 +5,7 @@ Features:
   - added get id of inserted record sample [Serene]
   - added dialog boxes sample
   - auto replace 'f' with '0' for excel date/time display formats
+  - changed login design using vegas plugin (thanks @jsbUSMBC)
 
 ## 2.3.1 (2016-07-13)
 
