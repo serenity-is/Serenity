@@ -6,6 +6,7 @@ Features:
   - added dialog boxes sample
   - auto replace 'f' with '0' for excel date/time display formats
   - changed login design using vegas plugin (thanks @jsbUSMBC)
+  - made login page responsive
 
 ## 2.3.1 (2016-07-13)
 
