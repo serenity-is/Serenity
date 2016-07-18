@@ -5,7 +5,7 @@
         function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
         function setValue(editor: Serenity.Widget<any>, value: any): void;
         function loadValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
-        function setReadOnly(elements: JQuery, isReadOnly: boolean): JQuery;
+        function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
         function setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
         function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
     }

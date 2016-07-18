@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Html;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -132,6 +133,7 @@ namespace Serenity
             }
         }
 
+        [ScriptName("setReadonly")]
         public static jQueryObject SetReadOnly(jQueryObject elements, bool isReadOnly)
         {
             elements.Each(delegate (int index, Element el)

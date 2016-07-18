@@ -1073,7 +1073,7 @@
 			return;
 		}
 	};
-	$Serenity_EditorUtils.setReadOnly$1 = function(elements, isReadOnly) {
+	$Serenity_EditorUtils.setReadonly = function(elements, isReadOnly) {
 		elements.each(function(index, el) {
 			var elx = $(el);
 			var type = elx.attr('type');
@@ -1101,7 +1101,7 @@
 			readOnly.set_readOnly(isReadOnly);
 		}
 		else if (widget.element.is(':input')) {
-			$Serenity_EditorUtils.setReadOnly$1(widget.element, isReadOnly);
+			$Serenity_EditorUtils.setReadonly(widget.element, isReadOnly);
 		}
 	};
 	$Serenity_EditorUtils.setRequired = function(widget, isRequired) {
@@ -2952,7 +2952,7 @@
 		$Serenity_EditorUtils.setReadOnly(widget, isReadOnly);
 	};
 	$Serenity_PropertyGrid.setReadOnly$1 = function(elements, isReadOnly) {
-		return $Serenity_EditorUtils.setReadOnly$1(elements, isReadOnly);
+		return $Serenity_EditorUtils.setReadonly(elements, isReadOnly);
 	};
 	global.Serenity.PropertyGrid = $Serenity_PropertyGrid;
 	////////////////////////////////////////////////////////////////////////////////
@@ -6689,7 +6689,7 @@
 					this.element.removeClass('readonly').removeAttr('readonly');
 					this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
 				}
-				$Serenity_EditorUtils.setReadOnly$1(this.$time, value);
+				$Serenity_EditorUtils.setReadonly(this.$time, value);
 			}
 		}
 	}, Serenity.Widget, [$Serenity_IStringValue, $Serenity_IReadOnly]);
