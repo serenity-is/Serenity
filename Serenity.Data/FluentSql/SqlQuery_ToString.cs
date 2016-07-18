@@ -28,8 +28,8 @@ namespace Serenity.Data
 
             bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
             bool useOffset = skip > 0 && !useSkipKeyword && dialect.CanUseOffsetFetch;
-            bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && dialect.CanUseRowNumber;
             bool useRowNum = (skip > 0 || take > 0) && dialect.UseRowNum;
+            bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && !useRowNum && dialect.CanUseRowNumber;
             bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
 
             // atlanması istenen kayıt var mı?
@@ -276,8 +276,9 @@ namespace Serenity.Data
 
             if (useRowNum)
             {
-                sb.Append(") WHERE ROWNUM > " + skip +
-                    " AND ROWNUM <= " + (skip + take));
+                sb.Append(") WHERE ROWNUM > " + skip);
+                if (take > 0)
+                    sb.Append(" AND ROWNUM <= " + (skip + take));
             }
 
             if (take != 0 && (!useRowNum) && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd)
