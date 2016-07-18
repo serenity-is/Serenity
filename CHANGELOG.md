@@ -1,12 +1,21 @@
+## 2.3.3 (2016-07-18)
+
+Features:
+  - rename EditorUtils.setReadOnly to setReadonly for overload that takes jQuery parameter
+  - added readonly dialog sample [Serene]
+
+Bugfixes:
+  - fix paging for Oracle queries
+
 ## 2.3.2 (2016-07-15)
 
 Features:
   - make RetrieveRequest interface members optional in TypeScript
   - added get id of inserted record sample [Serene]
-  - added dialog boxes sample
+  - added dialog boxes sample [Serene]
   - auto replace 'f' with '0' for excel date/time display formats
   - changed login design using vegas plugin (thanks @jsbUSMBC)
-  - made login page responsive
+  - made login page responsive [Serene]
 
 ## 2.3.1 (2016-07-13)
 
