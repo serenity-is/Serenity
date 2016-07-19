@@ -35,9 +35,23 @@ If you are using Serenity in any open source / commercial projects let me know, 
 
 .NET open source community is a bit limited and is not so active, so if you help spread the word by posting in forums, starring the project here and in Visual Studio Gallery, i'll appreciate it much.
 
+## Online Serene Demo
 
-## Video Tutorials
-Youtube Channel
+http://serenedemo.azurewebsites.net/
+
+*This demo is automatically updated when a new Serene version is pushed to GitHub repository. Thanks to @samdubey for setting it up.*
+
+## Video Tutorials (thanks a lot to @samdubey for these contributions)
+
+**Serenity Youtube Channel:** 
+
 https://www.youtube.com/channel/UCUL4l2DlXCOCprdUfsoP0iw
 
+**Introduction to Serene:**
+
+https://www.youtube.com/watch?v=_AqRl_U_gcw
+
+**Setting up Continuous Deployment on Microsoft Azure for Serenity Applications:**
+
+https://www.youtube.com/watch?v=tcywhS9k9Wc
 
