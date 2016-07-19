@@ -1,3 +1,8 @@
+## 2.3.4 (2016-07-19)
+
+Bugfixes:
+  - fix usage of ROWNUM for Oracle paging queries
+
 ## 2.3.3 (2016-07-18)
 
 Features:
