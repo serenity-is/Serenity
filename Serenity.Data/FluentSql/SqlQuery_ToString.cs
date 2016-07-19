@@ -19,7 +19,7 @@ namespace Serenity.Data
             if (this.parent != null)
                 sb.Append("(");
 
-            if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword)
+            if (skip > 0 && orderBy == null && !dialect.CanUseSkipKeyword && !dialect.UseRowNum)
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
 
@@ -247,22 +247,31 @@ namespace Serenity.Data
                 }
             }
 
-            if (useRowNumber)
+            if (useRowNumber || useRowNum)
             {
                 if (columns.Count > 0)
                     sb.Append(", ");
 
-                sb.Append("ROW_NUMBER() OVER (ORDER BY ");
-
-                if(orderBy != null)
-                for (int i = 0; i < orderBy.Count; i++)
+                if (useRowNum)
                 {
-                    if (i > 0)
-                        sb.Append(", ");
-
-                    sb.Append(orderBy[i]);
+                    sb.Append("ROWNUM AS numberingofrow");
                 }
-                sb.Append(") AS __num__");
+                else
+                {
+                    sb.Append("ROW_NUMBER() OVER (ORDER BY ");
+
+                    if (orderBy != null)
+                        for (int i = 0; i < orderBy.Count; i++)
+                        {
+                            if (i > 0)
+                                sb.Append(", ");
+
+                            sb.Append(orderBy[i]);
+                        }
+
+                    sb.Append(") AS __num__");
+                }
+                
             }
 
             // select sorgusunun kalan kısımlarını yaz
@@ -276,9 +285,9 @@ namespace Serenity.Data
 
             if (useRowNum)
             {
-                sb.Append(") WHERE ROWNUM > " + skip);
+                sb.Append(") WHERE numberingofrow > " + skip);
                 if (take > 0)
-                    sb.Append(" AND ROWNUM <= " + (skip + take));
+                    sb.Append(" AND ROWNUM <= " + take);
             }
 
             if (take != 0 && (!useRowNum) && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd)

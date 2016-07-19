@@ -781,6 +781,23 @@ namespace Serenity.Test.Data
         }
 
         [Fact]
+        public void SkipTakeUsesCorrectSyntaxForOracleDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(OracleDialect.Instance)
+                .Select("c")
+                .From("t")
+                .Take(20)
+                .Skip(50);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT * FROM ( SELECT c, ROWNUM AS numberingofrow FROM t) WHERE numberingofrow > 50 AND ROWNUM <= 20"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
         public void TakeUsesCorrectSyntaxForOracleDialect()
         {
             var query = new SqlQuery()
@@ -791,7 +808,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "SELECT * FROM ( SELECT c FROM t) WHERE ROWNUM > 0 AND ROWNUM <= 10"),
+                    "SELECT * FROM ( SELECT c, ROWNUM AS numberingofrow FROM t) WHERE numberingofrow > 0 AND ROWNUM <= 10"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
