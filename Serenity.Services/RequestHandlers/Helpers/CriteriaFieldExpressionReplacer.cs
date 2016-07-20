@@ -2,6 +2,9 @@
 {
     using Serenity.Services;
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Globalization;
 
     public class CriteriaFieldExpressionReplacer : SafeCriteriaValidator
     {
@@ -52,6 +55,66 @@
             }
 
             return result;
+        }
+
+        private bool ShouldConvertValues(BinaryCriteria criteria, out Field field, out object value)
+        {
+            field = null;
+            value = null;
+
+            if (ReferenceEquals(null, criteria) ||
+                criteria.Operator < CriteriaOperator.EQ ||
+                criteria.Operator > CriteriaOperator.NotIn)
+                return false;
+
+            var left = criteria.LeftOperand as Criteria;
+            if (ReferenceEquals(null, left))
+                return false;
+
+            field = FindField(left.Expression);
+            if (ReferenceEquals(null, field))
+                return false;
+
+            if (field is StringField)
+                return false;
+
+            var right = criteria.RightOperand as ValueCriteria;
+            if (ReferenceEquals(null, right))
+                return false;
+
+            value = right.Value;
+            return value != null;
+        }
+
+        protected override BaseCriteria VisitBinary(BinaryCriteria criteria)
+        {
+            Field field;
+            object value;
+            if (ShouldConvertValues(criteria, out field, out value))
+            try
+            {
+                var str = value as string;
+                if (str == null && value is IEnumerable)
+                {
+                    var values = new List<object>();
+                    foreach (var v in value as IEnumerable)
+                        values.Add(field.ConvertValue(v, CultureInfo.InvariantCulture));
+
+                    return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(values));
+                }
+
+                if (str == null || str.Length != 0)
+                {
+                    value = field.ConvertValue(str, CultureInfo.InvariantCulture);
+                    return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(value));
+                }
+            }
+            catch
+            {
+                // swallow exceptions for backward compability
+            }
+
+            return base.VisitBinary(criteria);
         }
     }
 }
