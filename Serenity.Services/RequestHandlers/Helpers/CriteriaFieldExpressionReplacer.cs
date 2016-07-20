@@ -105,7 +105,7 @@
 
                 if (str == null || str.Length != 0)
                 {
-                    value = field.ConvertValue(str, CultureInfo.InvariantCulture);
+                    value = field.ConvertValue(value, CultureInfo.InvariantCulture);
                     return new BinaryCriteria(new Criteria(field), criteria.Operator, new ValueCriteria(value));
                 }
             }
