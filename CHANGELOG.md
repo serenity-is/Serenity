@@ -1,3 +1,8 @@
+## 2.3.6 (2016-07-20)
+
+Bugfixes:
+  - fix error in client side criteria value conversion
+
 ## 2.3.5 (2016-07-20)
 
 Features:
