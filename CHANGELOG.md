@@ -1,3 +1,9 @@
+## 2.3.5 (2016-07-20)
+
+Features:
+  - use an older version of VSSDK.ComponentModelHost to keep compability with VS 2012 & 2013
+  - try to convert criteria values received from client side to field type, to avoid errors in some db engines like Oracle for dates, and get better performance for indexed fields
+
 ## 2.3.4 (2016-07-19)
 
 Bugfixes:
