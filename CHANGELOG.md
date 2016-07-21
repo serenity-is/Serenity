@@ -1,3 +1,8 @@
+## 2.3.7 (2016-07-21)
+
+Bugfixes:
+  - fix column ordering not restored properly from persistance
+
 ## 2.3.6 (2016-07-20)
 
 Bugfixes:
