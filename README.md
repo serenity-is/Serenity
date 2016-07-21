@@ -18,7 +18,7 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenity-guide) at https://www.gitbook.com/book/volkanceylan/serenity-guide for documentation.
 
 **Translations of Serenity Developer Guide:**
-- [Chinese Simplified (thanks @WuShenghui)](https://www.gitbook.com/book/volkanceylan/serenity-guide-zh-cn)
+- [Chinese Simplified (thanks @WuShenghui)](https://www.gitbook.com/book/volkanceylan/serenity-zh-cn)
 
 > Türkçe dökümantasyon için *[şu kılavuz](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)* incelenebilir. Katkıları için Adem beye teşekkür ederiz.
 
