@@ -6086,7 +6086,7 @@
 							$t5.dispose();
 						}
 						this.view.sortBy = Enumerable.from(list).select(function(x5) {
-							return x5.columnId + (x5.sortAsc ? '' : ' DESC');
+							return x5.columnId + ((x5.sortAsc === false) ? ' DESC' : '');
 						}).toArray();
 						this.slickGrid.setSortColumns(list);
 					}

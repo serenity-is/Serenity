@@ -1292,7 +1292,7 @@ namespace Serenity
                             }
                         }
                         this.view.SortBy = list.Select(x =>
-                            x.ColumnId + (x.SortAsc ? "" : " DESC")).ToArray();
+                            x.ColumnId + (x.SortAsc == false ? " DESC" : "")).ToArray();
 
                         this.slickGrid.SetSortColumns(list);
                     }
