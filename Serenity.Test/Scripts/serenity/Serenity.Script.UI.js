@@ -6085,6 +6085,9 @@
 						finally {
 							$t5.dispose();
 						}
+						this.view.sortBy = Enumerable.from(list).select(function(x5) {
+							return x5.columnId + (x5.sortAsc ? '' : ' DESC');
+						}).toArray();
 						this.slickGrid.setSortColumns(list);
 					}
 					this.slickGrid.setColumns(columns);
