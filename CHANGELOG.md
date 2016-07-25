@@ -1,7 +1,12 @@
 ## 2.3.7 (2016-07-21)
 
+Features:
+  - added populate linked data sample [Serene]
+  - added serial auto numbering sample [Serene]
+
 Bugfixes:
   - fix column ordering not restored properly from persistance
+  - use sheet name and table style specified properly in excel generator (thanks @Estrusco)
 
 ## 2.3.6 (2016-07-20)
 
