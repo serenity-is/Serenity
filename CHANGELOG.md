@@ -1,3 +1,8 @@
+## 2.4.0 (2016-07-27)
+
+Features:
+  - try to resolve issues with lessc file as some users report nuget doesn't copy it under tools folder
+
 ## 2.3.7 (2016-07-21)
 
 Features:
