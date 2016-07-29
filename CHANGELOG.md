@@ -1,3 +1,8 @@
+## 2.4.2 (2016-07-29)
+
+Bugfixes:
+  - add missing Serenity.Web.Assets package with rtl slick.grid.min.js
+
 ## 2.4.1 (2016-07-29)
 
 Features:
