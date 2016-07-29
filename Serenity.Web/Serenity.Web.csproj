@@ -1014,6 +1014,14 @@
     <None Include="Tooling\JsEngine\lib.d.ts_" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\DataGrid\ColumnPickerDialog.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\CreateWidgetParams.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Select2Editor.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\EntityGrid.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedPanel.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\PropertyPanel.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\PropertyDialog.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\EntityDialog.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\DataGrid.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\PropertyItem.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedDialog.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedWidget.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Widget.ts" />
