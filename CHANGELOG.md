@@ -1,3 +1,8 @@
+## 2.4.1 (2016-07-29)
+
+Features:
+  - serene and slickgrid now has RTL support (thanks @misafer)
+
 ## 2.4.0 (2016-07-27)
 
 Features:
