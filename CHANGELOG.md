@@ -1,5 +1,9 @@
 ## 2.4.2 (2016-07-29)
 
+Features:
+  - added sample for searchable Visual Studio Gallery questions and answers in Serene, which also acts as a sample for using non-SQL data sources with Serenity
+  - fix look of login panel in IE11 (need to not use flexbox for propertygrid, fieldset and form that is not under a dialog)
+
 Bugfixes:
   - add missing Serenity.Web.Assets package with rtl slick.grid.min.js
 
