@@ -165,7 +165,7 @@ namespace Q {
         id = $.trim(id);
         if (id == null || !id.length)
             return null;
-        if (id.length >= 15 || !(/^\d+$/.test(id)))
+        if (id.length >= 15 || !(/^-?\d+$/.test(id)))
             return id;
         let v = parseInt(id, 10);
         if (isNaN(v))
