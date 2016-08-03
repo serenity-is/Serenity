@@ -1281,37 +1281,6 @@ declare namespace Serenity {
     class StringEditor extends Widget<any> {
         value: string;
     }
-    namespace Select2Extensions {
-        function select2(element: JQuery): JQuery;
-        function select2(element: JQuery, options: Select2Options): JQuery;
-        function select2(element: JQuery, action: string): JQuery;
-        function select2(element: JQuery, option: string, value: any): JQuery;
-        function select2(element: JQuery, option: string): any;
-    }
-    class Select2Editor<TOptions, TItem> extends Widget<TOptions> {
-        items: Select2Item[];
-        itemById: any;
-        pageSize: number;
-        lastCreateTerm: string;
-        constructor(hidden: JQuery, opt: any);
-        emptyItemText(): string;
-        getSelect2Options(): Select2Options;
-        clearItems(): void;
-        addItem(item: Select2Item): void;
-        addItem(key: string, text: string, source?: any, disabled?: boolean): void;
-        addInplaceCreate(addTitle?: string, editTitle?: string): void;
-        inplaceCreateClick(e: any): void;
-        getCreateSearchChoice(getName?: (p1: any) => string): (p1: string) => any;
-        setEditValue(source: any, property: PropertyItem): void;
-        getEditValue(property: PropertyItem, target: any): void;
-        get_delimited(): boolean;
-        get_select2Container(): JQuery;
-        get_items(): Select2Item[];
-        get_itemByKey(): any;
-        value: string;
-        values: string[];
-        get_text(): string;
-    }
     class CheckTreeEditor<TItem, TOptions> extends DataGrid<TItem, TOptions> {
         constructor(input: JQuery, opt?: TOptions);
         protected getTreeItems(): TItem[];
@@ -1402,21 +1371,6 @@ declare namespace Serenity {
     class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
     }
     class DateTimeFormatter extends DateFormatter {
-    }
-    interface Select2Item {
-        id: string;
-        text: string;
-        source: any;
-        disabled: boolean;
-    }
-    class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
-        constructor(hidden: JQuery, opt: SelectEditorOptions);
-        getItems(): any[];
-        updateItems(): void;
-    }
-    interface SelectEditorOptions {
-        items?: any[];
-        emptyOptionText?: string;
     }
     class DateYearEditor extends SelectEditor {
         constructor(hidden: JQuery, opt: DateYearEditorOptions);
@@ -1593,26 +1547,6 @@ declare namespace Serenity {
     interface SettingStorage {
         getItem(key: string): string;
         setItem(key: string, value: string): void;
-    }
-    class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
-        constructor(container: JQuery, options?: TOptions);
-        protected addButtonClick(): void;
-        protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
-        protected getDialogOptions(): any;
-        protected getDialogOptionsFor(itemType: string): any;
-        protected getDialogType(): {
-            new (...args: any[]): Widget<any>;
-        };
-        protected getDialogTypeFor(itemType: string): {
-            new (...args: any[]): Widget<any>;
-        };
-        protected getDisplayName(): string;
-        protected getItemName(): string;
-        protected getEntityType(): string;
-        protected getService(): string;
-        protected initDialog(dialog: Widget<any>): void;
-        protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
-        protected newRefreshButton(noText?: boolean): ToolButton;
     }
     interface CKEditorConfig {
     }
@@ -1796,6 +1730,180 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    interface ToolButton {
+        title?: string;
+        hint?: string;
+        cssClass?: string;
+        icon?: string;
+        onClick?: any;
+        htmlEncode?: any;
+        hotkey?: string;
+        hotkeyAllowDefault?: boolean;
+        separator?: boolean;
+    }
+    class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
+        constructor(div: JQuery, opt: PopupMenuButtonOptions);
+    }
+    interface PopupMenuButtonOptions {
+        menu?: JQuery;
+        onPopup?: () => void;
+        positionMy?: string;
+        positionAt?: string;
+    }
+    class PopupToolButton extends PopupMenuButton {
+        constructor(div: JQuery, opt: PopupToolButtonOptions);
+    }
+    interface PopupToolButtonOptions extends PopupMenuButtonOptions {
+    }
+}
+declare namespace Serenity {
+    interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
+        type?: new (element: JQuery, options?: TOptions) => TWidget;
+        options?: TOptions;
+        container?: JQuery;
+        element?: (e: JQuery) => void;
+        init?: (w: TWidget) => void;
+    }
+}
+declare namespace Serenity {
+    class Widget<TOptions> {
+        private static nextWidgetNumber;
+        element: JQuery;
+        protected options: TOptions;
+        protected widgetName: string;
+        protected uniqueName: string;
+        protected asyncPromise: PromiseLike<void>;
+        constructor(element: JQuery, options?: TOptions);
+        destroy(): void;
+        protected addCssClass(): void;
+        protected getCssClass(): string;
+        protected initializeAsync(): PromiseLike<void>;
+        protected isAsyncWidget(): boolean;
+        static getWidgetName(type: Function): string;
+        static elementFor<TWidget>(editorType: {
+            new (...args: any[]): TWidget;
+        }): JQuery;
+        static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
+        init(action?: (widget: any) => void): this;
+        private initialize();
+    }
+    interface Widget<TOptions> {
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getGridField(): JQuery;
+        change(handler: (e: JQueryEventObject) => void): void;
+        changeSelect2(handler: (e: JQueryEventObject) => void): void;
+    }
+}
+declare namespace Serenity {
+    class Select2Editor<TOptions, TItem> extends Widget<TOptions> {
+        items: Select2Item[];
+        itemById: any;
+        pageSize: number;
+        lastCreateTerm: string;
+        constructor(hidden: JQuery, opt: any);
+        emptyItemText(): string;
+        getSelect2Options(): Select2Options;
+        clearItems(): void;
+        addItem(item: Select2Item): void;
+        addItem(key: string, text: string, source?: any, disabled?: boolean): void;
+        addInplaceCreate(addTitle?: string, editTitle?: string): void;
+        inplaceCreateClick(e: any): void;
+        getCreateSearchChoice(getName?: (p1: any) => string): (p1: string) => any;
+        setEditValue(source: any, property: PropertyItem): void;
+        getEditValue(property: PropertyItem, target: any): void;
+        get_delimited(): boolean;
+        get_select2Container(): JQuery;
+        get_items(): Select2Item[];
+        get_itemByKey(): any;
+        value: string;
+        values: string[];
+        get_text(): string;
+    }
+    namespace Select2Extensions {
+        function select2(element: JQuery): JQuery;
+        function select2(element: JQuery, options: Select2Options): JQuery;
+        function select2(element: JQuery, action: string): JQuery;
+        function select2(element: JQuery, option: string, value: any): JQuery;
+        function select2(element: JQuery, option: string): any;
+    }
+    interface Select2Item {
+        id: string;
+        text: string;
+        source: any;
+        disabled: boolean;
+    }
+    class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
+        constructor(hidden: JQuery, opt: SelectEditorOptions);
+        getItems(): any[];
+        updateItems(): void;
+    }
+    interface SelectEditorOptions {
+        items?: any[];
+        emptyOptionText?: string;
+    }
+}
+declare namespace Serenity {
+    class TemplatedWidget<TOptions> extends Widget<TOptions> {
+        protected idPrefix: string;
+        private static templateNames;
+        constructor(container: JQuery, options?: TOptions);
+        protected byId(id: string): JQuery;
+        private byID<TWidget>(id, type);
+        protected getTemplateName(): string;
+        protected getTemplate(): string;
+    }
+}
+declare namespace Serenity {
+    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
+        protected isPanel: boolean;
+        protected responsive: boolean;
+        protected tabs: JQuery;
+        protected toolbar: Serenity.Toolbar;
+        protected validator: JQueryValidation.Validator;
+        constructor(options?: TOptions);
+        private static getCssSize(element, name);
+        private static applyCssSizes(opt, dialogClass);
+        destroy(): void;
+        protected initDialog(): void;
+        protected initToolbar(): void;
+        protected getToolbarButtons(): ToolButton[];
+        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
+        protected initValidator(): void;
+        protected resetValidation(): void;
+        protected validateForm(): boolean;
+        dialogOpen(): void;
+        protected onDialogOpen(): void;
+        protected arrange(): void;
+        protected onDialogClose(): void;
+        protected addCssClass(): void;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        dialogClose(): void;
+        dialogTitle: string;
+        set_dialogTitle(value: string): void;
+        protected initTabs(): void;
+        protected handleResponsive(): void;
+    }
+}
+declare namespace Serenity {
+    class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
+        constructor(options?: TOptions);
+        protected entity: TItem;
+        protected entityId: any;
+        protected getFormKey(): string;
+        protected getPropertyGridOptions(): PropertyGridOptions;
+        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
+        protected getPropertyItems(): PropertyItem[];
+        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
+        protected getSaveEntity(): TItem;
+        protected initializeAsync(): PromiseLike<void>;
+        protected loadInitialEntity(): void;
+        protected set_entity(entity: TItem): void;
+        protected set_entityId(value: any): void;
+        protected validateBeforeSave(): boolean;
+        protected propertyGrid: Serenity.PropertyGrid;
+    }
+}
+declare namespace Serenity {
     class DataGrid<TItem, TOptions> extends Widget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
         dialogOpen(): void;
@@ -1906,6 +2014,28 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class EntityGrid<TItem, TOptions> extends DataGrid<TItem, TOptions> {
+        constructor(container: JQuery, options?: TOptions);
+        protected addButtonClick(): void;
+        protected createEntityDialog(itemType: string, callback?: (dlg: Widget<any>) => void): Widget<any>;
+        protected getDialogOptions(): any;
+        protected getDialogOptionsFor(itemType: string): any;
+        protected getDialogType(): {
+            new (...args: any[]): Widget<any>;
+        };
+        protected getDialogTypeFor(itemType: string): {
+            new (...args: any[]): Widget<any>;
+        };
+        protected getDisplayName(): string;
+        protected getItemName(): string;
+        protected getEntityType(): string;
+        protected getService(): string;
+        protected initDialog(dialog: Widget<any>): void;
+        protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
+        protected newRefreshButton(noText?: boolean): ToolButton;
+    }
+}
+declare namespace Serenity {
     class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
         protected tabs: JQuery;
@@ -1935,25 +2065,6 @@ declare namespace Serenity {
         protected getSaveEntity(): TItem;
         protected get_entity(): TItem;
         protected get_entityId(): any;
-        protected initializeAsync(): PromiseLike<void>;
-        protected loadInitialEntity(): void;
-        protected set_entity(entity: TItem): void;
-        protected set_entityId(value: any): void;
-        protected validateBeforeSave(): boolean;
-        protected propertyGrid: Serenity.PropertyGrid;
-    }
-}
-declare namespace Serenity {
-    class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
-        constructor(options?: TOptions);
-        protected entity: TItem;
-        protected entityId: any;
-        protected getFormKey(): string;
-        protected getPropertyGridOptions(): PropertyGridOptions;
-        protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
-        protected getPropertyItems(): PropertyItem[];
-        protected getPropertyItemsAsync(): PromiseLike<PropertyItem[]>;
-        protected getSaveEntity(): TItem;
         protected initializeAsync(): PromiseLike<void>;
         protected loadInitialEntity(): void;
         protected set_entity(entity: TItem): void;
@@ -2037,113 +2148,6 @@ declare namespace Serenity {
         protected updateTitle(): void;
         protected validateBeforeSave(): boolean;
         protected propertyGrid: Serenity.PropertyGrid;
-    }
-}
-declare namespace Serenity {
-    interface ToolButton {
-        title?: string;
-        hint?: string;
-        cssClass?: string;
-        icon?: string;
-        onClick?: any;
-        htmlEncode?: any;
-        hotkey?: string;
-        hotkeyAllowDefault?: boolean;
-        separator?: boolean;
-    }
-    class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
-        constructor(div: JQuery, opt: PopupMenuButtonOptions);
-    }
-    interface PopupMenuButtonOptions {
-        menu?: JQuery;
-        onPopup?: () => void;
-        positionMy?: string;
-        positionAt?: string;
-    }
-    class PopupToolButton extends PopupMenuButton {
-        constructor(div: JQuery, opt: PopupToolButtonOptions);
-    }
-    interface PopupToolButtonOptions extends PopupMenuButtonOptions {
-    }
-}
-declare namespace Serenity {
-    interface CreateWidgetParams<TWidget extends Widget<TOptions>, TOptions> {
-        type?: new (element: JQuery, options?: TOptions) => TWidget;
-        options?: TOptions;
-        container?: JQuery;
-        element?: (e: JQuery) => void;
-        init?: (w: TWidget) => void;
-    }
-}
-declare namespace Serenity {
-    class Widget<TOptions> {
-        private static nextWidgetNumber;
-        element: JQuery;
-        protected options: TOptions;
-        protected widgetName: string;
-        protected uniqueName: string;
-        protected asyncPromise: PromiseLike<void>;
-        constructor(element: JQuery, options?: TOptions);
-        destroy(): void;
-        protected addCssClass(): void;
-        protected getCssClass(): string;
-        protected initializeAsync(): PromiseLike<void>;
-        protected isAsyncWidget(): boolean;
-        static getWidgetName(type: Function): string;
-        static elementFor<TWidget>(editorType: {
-            new (...args: any[]): TWidget;
-        }): JQuery;
-        static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
-        init(action?: (widget: any) => void): this;
-        private initialize();
-    }
-    interface Widget<TOptions> {
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        getGridField(): JQuery;
-        change(handler: (e: JQueryEventObject) => void): void;
-        changeSelect2(handler: (e: JQueryEventObject) => void): void;
-    }
-}
-declare namespace Serenity {
-    class TemplatedWidget<TOptions> extends Widget<TOptions> {
-        protected idPrefix: string;
-        private static templateNames;
-        constructor(container: JQuery, options?: TOptions);
-        protected byId(id: string): JQuery;
-        private byID<TWidget>(id, type);
-        protected getTemplateName(): string;
-        protected getTemplate(): string;
-    }
-}
-declare namespace Serenity {
-    class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
-        protected isPanel: boolean;
-        protected responsive: boolean;
-        protected tabs: JQuery;
-        protected toolbar: Serenity.Toolbar;
-        protected validator: JQueryValidation.Validator;
-        constructor(options?: TOptions);
-        private static getCssSize(element, name);
-        private static applyCssSizes(opt, dialogClass);
-        destroy(): void;
-        protected initDialog(): void;
-        protected initToolbar(): void;
-        protected getToolbarButtons(): ToolButton[];
-        protected getValidatorOptions(): JQueryValidation.ValidationOptions;
-        protected initValidator(): void;
-        protected resetValidation(): void;
-        protected validateForm(): boolean;
-        dialogOpen(): void;
-        protected onDialogOpen(): void;
-        protected arrange(): void;
-        protected onDialogClose(): void;
-        protected addCssClass(): void;
-        protected getDialogOptions(): JQueryUI.DialogOptions;
-        dialogClose(): void;
-        dialogTitle: string;
-        set_dialogTitle(value: string): void;
-        protected initTabs(): void;
-        protected handleResponsive(): void;
     }
 }
 declare namespace Serenity {

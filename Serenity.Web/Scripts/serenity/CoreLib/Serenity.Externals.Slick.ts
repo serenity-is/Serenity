@@ -652,7 +652,14 @@ namespace Slick {
                 summaryOptions.totals = {};
                 updateIdxById();
                 ensureIdUniqueness();
-                refresh();
+
+                if (suspend) {
+                    recalc(items);
+                }
+                else {
+                    refresh();
+                }
+
                 onDataChanged.notify({ dataView: self }, null, self);
             }
 
