@@ -45,15 +45,15 @@ namespace Serenity.CodeGeneration
 
                         typeName = FormatterTypeGenerator.GetOptionTypeName(emo.Arguments[0].Type);
                     }
+                }
 
-                    if (Char.IsLower(jsName[0]))
-                    {
-                        if (optionName == "id")
-                            optionName = "ID";
-                        else
-                            optionName = Char.ToUpperInvariant(optionName[0]) +
-                                optionName.Substring(1);
-                    }
+                if (Char.IsLower(optionName[0]))
+                {
+                    if (optionName == "id")
+                        optionName = "ID";
+                    else
+                        optionName = Char.ToUpperInvariant(optionName[0]) +
+                            optionName.Substring(1);
                 }
 
                 sb.AppendLine(optionName);
