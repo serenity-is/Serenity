@@ -13,7 +13,7 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable, Reflectable]
     public class LookupEditorOptions
     {
         public string LookupKey { get; set; }

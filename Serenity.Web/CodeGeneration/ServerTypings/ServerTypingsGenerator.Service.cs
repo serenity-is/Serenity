@@ -66,25 +66,30 @@ namespace Serenity.CodeGeneration
                 });
 
                 sb.AppendLine();
-                cw.Indented("[");
-                int i = 0;
-                foreach (var methodName in methodNames)
-                {
-                    if (i++ > 0)
-                        sb.Append(", ");
 
-                    sb.Append("'");
-                    sb.Append(methodName);
-                    sb.Append("'");
+                if (methodNames.Count > 0)
+                {
+                    cw.Indented("[");
+                    int i = 0;
+                    foreach (var methodName in methodNames)
+                    {
+                        if (i++ > 0)
+                            sb.Append(", ");
+
+                        sb.Append("'");
+                        sb.Append(methodName);
+                        sb.Append("'");
+                    }
+                    sb.AppendLine("].forEach(x => {");
+                    cw.Block(delegate ()
+                    {
+                        cw.Indented("(<any>");
+                        sb.Append(identifier);
+                        sb.AppendLine(")[x] = function (r, s, o) { return Q.serviceRequest(baseUrl + '/' + x, r, s, o); };");
+                        cw.IndentedLine("(<any>Methods)[x] = baseUrl + '/' + x;");
+                    });
+                    cw.IndentedLine("});");
                 }
-                sb.AppendLine("].forEach(x => {");
-                cw.Block(delegate () {
-                    cw.Indented("(<any>");
-                    sb.Append(identifier);
-                    sb.AppendLine(")[x] = function (r, s, o) { return Q.serviceRequest(baseUrl + '/' + x, r, s, o); };");
-                    cw.IndentedLine("(<any>Methods)[x] = baseUrl + '/' + x;");
-                });
-                cw.IndentedLine("});");
             });
         }
     }

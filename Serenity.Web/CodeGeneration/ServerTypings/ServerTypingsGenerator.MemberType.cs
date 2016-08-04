@@ -110,6 +110,9 @@ namespace Serenity.CodeGeneration
             if (type.FullName == "Serenity.Widget")
                 return "Serenity.Widget<any>";
 
+            if (type.FullName == "Serenity.CheckTreeItem")
+                return "Serenity.CheckTreeItem<any>";
+
             var ns = ShortenNamespace(type, codeNamespace);
             if (!string.IsNullOrEmpty(ns))
                 return ns + "." + type.Name;

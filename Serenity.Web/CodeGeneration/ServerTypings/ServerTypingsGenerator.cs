@@ -106,6 +106,7 @@ namespace Serenity.CodeGeneration
                             cw.Indented(memberName);
                             sb.Append("?: ");
                             HandleMemberType(memberType, codeNamespace);
+                            sb.Append(';');
                             sb.AppendLine();
                         }
                     }

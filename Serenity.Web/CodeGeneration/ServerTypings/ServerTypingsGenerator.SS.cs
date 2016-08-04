@@ -373,7 +373,7 @@ namespace Serenity.CodeGeneration
             }
             else if (typeName == "Serenity.PropertyDialog")
                 typeName = "Serenity.PropertyDialog`2<System.Object, System.Object>";
-            else if (typeName.StartsWith("PropertyDialog`1<"))
+            else if (typeName.StartsWith("Serenity.PropertyDialog`1<"))
             {
                 typeName = typeName.Replace("Serenity.PropertyDialog`1<", "Serenity.PropertyDialog`2<");
                 typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
@@ -383,6 +383,13 @@ namespace Serenity.CodeGeneration
             else if (typeName.StartsWith("Serenity.EntityGrid`1<"))
             {
                 typeName = typeName.Replace("Serenity.EntityGrid`1<", "Serenity.EntityGrid`2<");
+                typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
+            }
+            else if (typeName == "Serenity.DataGrid")
+                typeName = "Serenity.DataGrid`2<System.Object, System.Object>";
+            else if (typeName.StartsWith("Serenity.DataGrid`1<"))
+            {
+                typeName = typeName.Replace("Serenity.DataGrid`1<", "Serenity.DataGrid`2<");
                 typeName = typeName.Substring(0, typeName.Length - 1) + ", System.Object>";
             }
             else if (typeName == "Serenity.PropertyPanel")
@@ -397,6 +404,10 @@ namespace Serenity.CodeGeneration
             else if (typeName.StartsWith("Serenity.CheckTreeEditor`1<"))
             {
                 typeName = typeName.Replace("Serenity.CheckTreeEditor`1<", "Serenity.CheckTreeEditor`2<System.Object, ");
+            }
+            else if (typeName == "Serenity.CheckTreeItem")
+            {
+                typeName = "Serenity.CheckTreeItem`1<System.Object>";
             }
             else if (typeName == "Serenity.LookupEditorBase")
                 typeName = "Serenity.LookupEditorBase`2<System.Object, System.Object>";
@@ -461,9 +472,12 @@ namespace Serenity.CodeGeneration
                             sb.AppendLine();
 
                         bool isStatic = type.IsAbstract && type.IsSealed;
+                        bool isSerializable = type.IsSerializable ||
+                            type.Attributes.Any(x =>
+                                x.Type == "System.SerializableAttribute");
                         bool isClass = !type.IsInterface && !isStatic;
 
-                        if (type.IsInterface)
+                        if (type.IsInterface || isSerializable)
                             cw.Indented("interface ");
                         else if (isStatic)
                             cw.Indented("namespace ");
@@ -495,10 +509,6 @@ namespace Serenity.CodeGeneration
 
                             bool preserveMemberCase = type.Attributes.Any(x =>
                                 x.Type == "System.Runtime.CompilerServices.PreserveMemberCaseAttribute");
-
-                            bool isSerializable = type.IsSerializable ||
-                                type.Attributes.Any(x =>
-                                    x.Type == "System.SerializableAttribute");
 
                             foreach (var field in type.Fields)
                                 SSDeclarationField(type, field, codeNamespace, isStatic, isSerializable, preserveMemberCase);

@@ -169,7 +169,8 @@ namespace Serenity.CodeGeneration
         {
             string ns = GetNamespace(type);
 
-            if (ns == "Serenity.Services")
+            if (ns == "Serenity.Services" ||
+                ns == "Serenity.ComponentModel")
             {
                 if (IsUsingNamespace("Serenity"))
                     return "";

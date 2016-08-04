@@ -172,7 +172,6 @@
     <Compile Include="Reporting\IReport.cs" />
     <Compile Include="Reporting\IReportWithAdditionalData.cs" />
     <Compile Include="Reporting\ReportAttribute.cs" />
-    <Compile Include="Reporting\ReportExportType.cs" />
     <Compile Include="Reporting\ReportRegistry.cs" />
     <Compile Include="Reporting\ReportRetrieveRequest.cs" />
     <Compile Include="Reporting\ReportRetrieveResponse.cs" />
