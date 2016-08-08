@@ -1,3 +1,15 @@
+## 2.4.3 (2016-08-08)
+
+Features:
+  - make option name pascal case even if option is not originating from TS in ClientTypesGenerator
+  - turned on xml docs for Serenity.Core and Serenity.Data on request, others assemblies will follow
+
+Bugfixes:
+  - close button was showing close text in a recent jQuery ui version
+  - Q.toId not working properly with negative IDs
+  - calling SlickRemoteView.updateItems between beginUpdate / endUpdate might cause problems in some cases
+  - resolve issues with SSDeclarations.ts in some complex legacy projects
+
 ## 2.4.2 (2016-07-29)
 
 Features:
