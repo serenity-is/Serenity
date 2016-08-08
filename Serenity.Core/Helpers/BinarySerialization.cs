@@ -32,7 +32,8 @@ namespace Serenity.Data
         /// A helper method to deserialize objects with BinaryWriter. Creates a memory stream 
         /// and a BinaryReader on it, and invokes the callback specified.
         /// </summary>
-        /// <param name="serialize">Deserialization delegate</param>
+        /// <param name="input">Input array</param>
+        /// <param name="deserialize">Deserialization delegate</param>
         public static TValue Deserialize<TValue>(byte[] input, Func<BinaryReader, TValue> deserialize)
         {
             using (var ms = new MemoryStream(input))

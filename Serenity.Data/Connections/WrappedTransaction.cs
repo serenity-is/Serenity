@@ -9,8 +9,8 @@ namespace Serenity.Data
 
         /// <summary>
         ///   Creates a new WrappedTransaction instance.</summary>
-        /// <param name="transaction">
-        ///   The actual transaction, this wrapped transaction is created for.</param>
+        /// <param name="wrappedConnection">Wrapped connection</param>
+        /// <param name="actualTransaction">The actual transaction, this wrapped transaction is created for.</param>
         internal WrappedTransaction(WrappedConnection wrappedConnection, IDbTransaction actualTransaction)
         {
             this.wrappedConnection = wrappedConnection;

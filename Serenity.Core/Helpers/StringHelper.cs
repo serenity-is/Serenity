@@ -306,7 +306,7 @@ namespace Serenity
         /// If <c>null</c> use the default format defined for the type of the IFormattable implementation.</param>
         /// <param name="provider">The format provider 
         /// If <c>null</c> the default provider is used</param>
-        /// <param name="defaultValue">The string to show when the source is <c>null</c>. 
+        /// <param name="empty">The string to show when the source is <c>null</c>. 
         /// If <c>null</c> an empty string is returned</param>
         /// <returns>The formatted string or the default value if the source is <c>null</c></returns>
         public static string ToStringDefault<T>(this T? source, string format = null, IFormatProvider provider = null, string empty = null)
@@ -326,7 +326,7 @@ namespace Serenity
         /// If <c>null</c> use the default format defined for the type of the IFormattable implementation.</param>
         /// <param name="provider">The format provider 
         /// If <c>null</c> the default provider is used</param>
-        /// <param name="defaultValue">The string to show when the source is <c>null</c>. 
+        /// <param name="empty">The string to show when the source is <c>null</c>. 
         /// If <c>null</c> an empty string is returned</param>
         /// <returns>The formatted string or the default value if the source is <c>null</c></returns>
         public static string ToStringDefault<T>(this T source, string format = null, IFormatProvider provider = null, string empty = null)

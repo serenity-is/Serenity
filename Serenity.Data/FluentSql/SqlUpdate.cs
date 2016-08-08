@@ -80,7 +80,7 @@
 
         /// <summary>
         ///   Sets field value to the expression.</summary>
-        /// <param name="meta">
+        /// <param name="field">
         ///   Field name (required).</param>
         /// <param name="value">
         ///   Field expression (required).</param>

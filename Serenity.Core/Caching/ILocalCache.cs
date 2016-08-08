@@ -26,7 +26,7 @@ namespace Serenity.Abstractions
         /// <summary>
         /// Removes the value with specified key from the local cache. If the value doesn't exist, no error is raised.
         /// </summary>
-        /// <param name="cacheKey">Key</param>
+        /// <param name="key">Key</param>
         object Remove(string key);
 
         /// <summary>

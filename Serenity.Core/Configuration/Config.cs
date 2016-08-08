@@ -22,7 +22,7 @@ namespace Serenity
         /// If setting is not found in its storage, returns a new object instance.
         /// </summary>
         /// <param name="settingType">Setting type.</param>
-        /// <exception cref="KeyNotFoundException">
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         /// IConfigurationRepository for setting scope is not set.</exception>
         public static object Get(Type settingType)
         {
@@ -49,7 +49,7 @@ namespace Serenity
         /// If setting is not found in its storage, returns a new object instance.
         /// </summary>
         /// <typeparam name="TSettings">Setting type</typeparam>
-        /// <exception cref="KeyNotFoundException">
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         /// IConfigurationRepository for setting scope is not set.</exception>
         public static TSettings Get<TSettings>()
             where TSettings: class, new()
@@ -62,7 +62,7 @@ namespace Serenity
         /// If setting is not found in its storage, returns a new object instance.
         /// If IConfigurationRepository for setting scope is not set returns null.
         /// </summary>
-        /// <typeparam name="TSettings">Setting type.</param>
+        /// <typeparam name="TSettings">Setting type.</typeparam>
         public static TSettings TryGet<TSettings>()
             where TSettings : class, new()
         {

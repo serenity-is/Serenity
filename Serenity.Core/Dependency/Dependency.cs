@@ -15,7 +15,7 @@
         /// Maps TService service to its registered provider.
         /// </summary>
         /// <typeparam name="TService">Service type</typeparam>
-        /// <exception cref="System.KeyNotFoundException">
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         /// No provider is registered for TService</exception>
         /// <exception cref="System.InvalidProgramException">
         /// No dependency resolver is configured using SetResolver</exception>
@@ -31,7 +31,7 @@
         /// </summary>
         /// <typeparam name="TService">Service type</typeparam>
         /// <param name="name">Scope name</param>
-        /// <exception cref="System.KeyNotFoundException">
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         /// No provider is registered for TService</exception>
         /// <exception cref="System.InvalidProgramException">
         /// No dependency resolver is configured using SetResolver</exception>

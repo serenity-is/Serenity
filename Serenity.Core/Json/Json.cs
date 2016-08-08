@@ -20,7 +20,7 @@ namespace Serenity
         /// <summary>
         /// Deserializes a JSON string to an object
         /// </summary>
-        /// <typeparam name="T">Type to deserialize</typeparam>
+        /// <param name="targetType">Type to deserialize</param>
         /// <param name="input">JSON string</param>
         /// <returns>Deserialized object</returns>
         public static object Parse(string input, Type targetType)
@@ -42,7 +42,7 @@ namespace Serenity
         /// <summary>
         /// Deserializes a JSON string to an object, using more tolerant settings
         /// </summary>
-        /// <typeparam name="T">Type to deserialize</typeparam>
+        /// <param name="targetType">Type to deserialize</param>
         /// <param name="input">JSON string</param>
         /// <returns>Deserialized object</returns>
         public static object ParseTolerant(string input, Type targetType)
@@ -64,7 +64,7 @@ namespace Serenity
         /// Converts object to its JSON representation
         /// </summary>
         /// <param name="value">Value to convert to JSON</param>
-        /// <param name="tabSize">Indentation (default 4)</param>
+        /// <param name="indentation">Indentation (default 4)</param>
         /// <returns>Serialized JSON string</returns>
         public static string StringifyIndented(object value, int indentation = 4)
         {

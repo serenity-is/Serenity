@@ -59,7 +59,7 @@
         /// <typeparam name="TValue">Value type.</typeparam>
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
-        /// <param name="expiresAt">The time the cached item will be expired on.</param>
+        /// <param name="expiration">The time the cached item will be expired on.</param>
         public static void Set<TValue>(string key, TValue value, TimeSpan expiration)
         {
             Provider.Set(key, value, expiration);

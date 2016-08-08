@@ -88,7 +88,7 @@
 
         /// <summary>
         ///   Sets field value.</summary>
-        /// <param name="meta">
+        /// <param name="field">
         ///   Field (required).</param>
         /// <param name="value">
         ///   Field value (expression, required).</param>
@@ -120,9 +120,8 @@
             return this;
         }
 
-        ///   Clones the query.</summary>
-        /// <returns>
-        ///   Clone.</returns>
+        /// <summary>Clones the query.</summary>
+        /// <returns>Clone.</returns>
         public SqlInsert Clone()
         {
             SqlInsert clone = new SqlInsert(tableName);

@@ -40,7 +40,7 @@
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <returns>
-        ///   <paramref name="returnIdentity"/> true ise eklenen kaydın IDENTITY değeri, değilse 1.</returns>
+        ///   Identity value of inserted record.</returns>
         public static Int64? ExecuteAndGetID(this SqlInsert query, IDbConnection connection)
         {
             string queryText = query.ToString();
@@ -110,6 +110,7 @@
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
         ///   Sorguyu içeren <see cref="SqlInsert"/> nesnesi.</param>
+        /// <param name="param">Parameter dictionary</param>
         public static void Execute(this SqlInsert query, IDbConnection connection, Dictionary param)
         {
             ExecuteNonQuery(connection, query.ToString(), param);
@@ -124,6 +125,7 @@
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
         ///   Sorguyu içeren <see cref="SqlUpdate"/> nesnesi.</param>
+        /// <param name="expectedRows">Expected number of rows to be updated (defaults to one)</param>
         /// <returns>
         ///   Etkilenen kayıt sayısı.</returns>
         public static int Execute(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One)
@@ -154,6 +156,7 @@
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
         ///   Sorguyu içeren <see cref="SqlDelete"/> nesnesi.</param>
+        /// <param name="expectedRows">Expected number of rows to be deleted (defaults to one)</param>
         /// <returns>
         ///   Etkilenen kayıt sayısı.</returns>
         public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One)
@@ -170,6 +173,8 @@
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
         ///   Sorguyu içeren <see cref="SqlDelete"/> nesnesi.</param>
+        /// <param name="expectedRows">Expected number of rows to be deleted (defaults to one)</param>
+        /// <param name="param">Parameters dictionary</param>
         /// <returns>
         ///   Etkilenen kayıt sayısı.</returns>
         public static int Execute(this SqlDelete query, IDbConnection connection, Dictionary param, ExpectedRows expectedRows = ExpectedRows.One)
@@ -181,9 +186,7 @@
         ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
         /// <remarks>
         ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
-        ///   çalıştırılabilir.</p>
-        ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
-        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
+        ///   çalıştırılabilir.</p></remarks>
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
@@ -200,12 +203,12 @@
         /// <remarks>
         ///   <p>Bu bir extension metodu olduğundan direk query.Execute(connection) şeklinde de 
         ///   çalıştırılabilir.</p>
-        ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
-        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
+        /// </remarks>
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
         ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
+        /// <param name="param">Parameter dictionary</param>
         /// <returns>
         ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
         public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, Dictionary param)
@@ -322,6 +325,7 @@
         ///   Parametre ismi.</param>
         /// <param name="value">
         ///   Parametre değeri.</param>
+        /// <param name="dialect">SQL dialect</param>
         /// <returns>
         ///   Yeni oluşturulan <see cref="DbParameter"/> nesnesi.</returns>
         public static DbParameter AddParamWithValue(this DbCommand command, string name, object value, ISqlDialect dialect)
@@ -565,6 +569,7 @@
         ///   Sorgunun çalıştırılacağı bağlantı.</param>
         /// <param name="selectQuery">
         ///   Çalıştırılacak sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
+        /// <param name="param">Parameter dictionary</param>
         /// <returns>
         ///   Sorgunun döndürdüğü skalar değer.</returns>
         public static object ExecuteScalar(IDbConnection connection, SqlQuery selectQuery, Dictionary param)
@@ -705,9 +710,6 @@
 
         /// <summary>
         ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <remarks>
-        ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
-        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>       
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
@@ -721,13 +723,11 @@
 
         /// <summary>
         ///   <see cref="SqlQuery"/> nesnesinin içerdiği sorguyu bağlantı üzerinde çalıştırır.</summary>
-        /// <remarks>
-        ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
-        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>       
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">
         ///   Sorguyu içeren <see cref="SqlQuery"/> nesnesi.</param>
+        /// <param name="param">Parameter dictionary</param>
         /// <returns>
         ///   Sorgu sonuçlarına erişim sağlayan <see cref="IDataReader"/> nesnesi.</returns>
         public static IDataReader ExecuteReader(IDbConnection connection, SqlQuery query, Dictionary param)
@@ -742,8 +742,7 @@
         /// <remarks>
         ///   <p>Bu bir extension metodu olduğundan direk <c>query.Exists(connection)</c> 
         ///   şeklinde de çalıştırılabilir.</p>
-        ///   <p>Eğer <see cref="SqlQuery.CacheTimeOut(int)"/> ile sorgu için saniye cinsinden bir önbellekleme 
-        ///   süresi belirlenmişse bu değer kullanılır.</p></remarks>
+        /// </remarks>
         /// <param name="connection">
         ///   Sorgunun çalıştırılacağı bağlantı. Gerekirse otomatik olarak açılır.</param>
         /// <param name="query">

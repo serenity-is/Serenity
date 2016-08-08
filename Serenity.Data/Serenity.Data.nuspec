@@ -20,5 +20,6 @@
   <files>
     <file src="${id}.dll" target="lib/${framework}" />
     <file src="${id}.pdb" target="lib/${framework}" />
+	<file src="${id}.xml" target="lib/${framework}" />
   </files>
 </package>

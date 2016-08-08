@@ -9,6 +9,7 @@ namespace Serenity
         /// <summary>
         /// Allows to reference the call chain object itself without breaking a call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as parameter.</param>
         /// <returns>
         /// The query itself.</returns>
@@ -27,6 +28,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// an inline object without breaking a call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <returns>
@@ -46,6 +48,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// two inline objects without breaking call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <param name="param2">An object that will be passed to action as third parameter</param>
@@ -66,6 +69,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// three inline objects without breaking call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param> 
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <param name="param2">An object that will be passed to action as third parameter</param>
@@ -88,6 +92,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// four inline objects without breaking call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <param name="param2">An object that will be passed to action as third parameter</param>
@@ -112,6 +117,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// five inline objects without breaking call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <param name="param2">An object that will be passed to action as third parameter</param>
@@ -137,6 +143,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// six inline objects without breaking call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <param name="param2">An object that will be passed to action as third parameter</param>
@@ -163,6 +170,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// seven inline objects without breaking call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <param name="param2">An object that will be passed to action as third parameter</param>
@@ -190,6 +198,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// seven inline objects without breaking call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <param name="param2">An object that will be passed to action as third parameter</param>
@@ -218,6 +227,7 @@ namespace Serenity
         /// Allows to reference the call chain object itself, while declaring
         /// seven inline objects without breaking call chain.
         /// </summary>
+        /// <param name="chain">Chaining object</param>
         /// <param name="action">An action that will be called with the chain object as first parameter.</param>
         /// <param name="param1">An object that will be passed to action as second parameter</param>
         /// <param name="param2">An object that will be passed to action as third parameter</param>

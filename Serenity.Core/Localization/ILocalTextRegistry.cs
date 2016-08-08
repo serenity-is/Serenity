@@ -10,6 +10,7 @@
         /// found in the registry.
         /// </summary>
         /// <param name="key">Local text key (e.g. Enums.Month.June)</param>
+        /// <param name="languageID">Language identifier</param>
         /// <returns></returns>
         string TryGet(string languageID, string key);
         /// <summary>

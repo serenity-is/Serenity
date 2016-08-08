@@ -384,6 +384,7 @@ button.ui-state-active {
 
 .ui-button-icon-only {
     width: 2.2em;
+    text-indent: -9999px;
 }
 
 button.ui-button-icon-only {

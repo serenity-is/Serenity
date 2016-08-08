@@ -3,8 +3,6 @@
     /// <summary>
     ///   Interface for query classes (e.g. SqlSelect, SqlUpdate) having a where method to filter
     ///   records</summary>
-    /// <typeparam name="T">
-    ///   Query class</typeparam>
     public interface IFilterableQuery : IQueryWithParams
     {
         /// <summary>

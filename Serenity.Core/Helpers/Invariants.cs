@@ -54,7 +54,7 @@ namespace Serenity
        /// <summary>
        ///   <p>Tries to converts an ID's string representation to its numerical ID value (Int64).</p>
        ///   <p>Unlike <see cref="Int64.Parse(string)"/>, <c>null</c>, empty string and all other
-       ///   invalid strings results in <see cref="Null.Int64"/> value (not an exception).</p></summary>
+       ///   invalid strings results in <see cref="System.Int64"/> value (not an exception).</p></summary>
        /// <param name="str">
        ///   String representation of an ID.</param>
        /// <returns>
@@ -73,7 +73,7 @@ namespace Serenity
        /// <summary>
        ///   <p>Tries to converts an ID's string representation to its numerical ID value (Int64).</p>
        ///   <p>Unlike <see cref="Int64.Parse(string)"/>, <c>null</c>, empty string and all other
-       ///   invalid strings results in <see cref="Null.Int64"/> value (not an exception).</p></summary>
+       ///   invalid strings results in <see cref="System.Int64"/> value (not an exception).</p></summary>
        /// <param name="str">
        ///   String representation of an ID.</param>
        /// <returns>
@@ -94,7 +94,7 @@ namespace Serenity
        /// <param name="id">
        ///   ID value.</param>
        /// <returns>
-       ///   If <paramref name="id"/> has <see cref="Null.Int64"/> value, <c>String.Empty</c>, 
+       ///   If <paramref name="id"/> has <see cref="System.Int64"/> value, <c>String.Empty</c>, 
        ///   otherwise its string representation</returns>
        public static string IDString(this Int64? id)
        {

@@ -73,7 +73,7 @@ namespace Serenity.Localization
         /// in requested language, its Fallbacks and invariant language in order. If not found in any,
         /// null is returned. See SetLanguageFallback for information about language fallbacks.
         /// </summary>
-        /// <param name="languageID"/>Language ID.</param>
+        /// <param name="languageID">Language ID.</param>
         /// <param name="textKey">Local text key (can be null).</param>
         /// <param name="isApprovalMode">If pending approval texts to be used, true.</param>
         public string TryGet(string languageID, string textKey, bool isApprovalMode)
@@ -186,7 +186,7 @@ namespace Serenity.Localization
         /// invariant language ID ("") is an implicit fallback of all languages.
         /// </summary>
         /// <param name="languageID">Language identifier. (e.g. en-US)</param>
-        /// <param name="LanguageFallbackID">language fallback identifier. (e.g. en)</param>
+        /// <param name="languageFallbackID">language fallback identifier. (e.g. en)</param>
         public void SetLanguageFallback(string languageID, string languageFallbackID)
         {
             Check.NotNull(languageID, "languageID");

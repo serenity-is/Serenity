@@ -47,7 +47,7 @@ namespace Serenity.Data
         /// <summary>Values should be unique.</summary>
         Unique = 4096,
         /// <summary>These are default flags unless specified otherwise. 
-        /// Insertable, updatable and nullable and trimmed (to null).
+        /// Insertable, updatable and nullable and trimmed (to null).</summary>
         Default = Insertable | Updatable | Trim,
         /// <summary>Default flags with NotNull included.</summary>
         Required = Default | NotNull,

@@ -97,6 +97,7 @@ namespace Serenity
         /// or distributed cache, or all found items are expired.</param>
         /// <param name="serialize">A function used to serialize items before cached.</param>
         /// <param name="deserialize">A function used to deserialize items before cached.</param>
+        /// <typeparam name="TSerialized">Serilized type</typeparam>
         public static TItem GetWithCustomSerializer<TItem, TSerialized>(string cacheKey, TimeSpan localExpiration, 
             TimeSpan remoteExpiration, string groupKey, Func<TItem> loader, 
             Func<TItem, TSerialized> serialize, Func<TSerialized, TItem> deserialize)
@@ -129,15 +130,11 @@ namespace Serenity
         /// <typeparam name="TItem">Data type</typeparam>
         /// <param name="cacheKey">The item key for local and distributed cache</param>
         /// <param name="localExpiration">Local expiration</param>
-        /// <param name="remoteExpiration">Distributed cache expiration (is usually same with 
-        /// local expiration)</param>
         /// <param name="groupKey">Group key that will hold generation (version). Can be used to expire all items
         /// that depend on it. This can be a table name. When a table changes, you change its version, and all
         /// cached data that depends on that table is expired.</param>
         /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
         /// or distributed cache, or all found items are expired.</param>
-        /// <param name="serialize">A function used to serialize items before cached.</param>
-        /// <param name="deserialize">A function used to deserialize items before cached.</param>        
         public static TItem GetLocalStoreOnly<TItem>(string cacheKey, TimeSpan localExpiration, 
             string groupKey, Func<TItem> loader)
             where TItem : class

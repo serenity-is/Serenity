@@ -101,6 +101,7 @@ namespace Serenity.Caching
         /// <typeparam name="TValue">Value type.</typeparam>
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>
+        /// <param name="expiration">Expiration</param>
         public void Set<TValue>(string key, TValue value, TimeSpan expiration)
         {
             // need a better implementation for expirations

@@ -2,8 +2,6 @@
 {
     /// <summary>
     ///   Interface for objects setting values by SetTo method (like SqlInsert, SqlUpdate...)</summary>
-    /// <typeparam name="T">
-    ///   Type of the parameterized object itself.</typeparam>
     public interface ISetFieldByStatement : IQueryWithParams
     {
         /// <summary>

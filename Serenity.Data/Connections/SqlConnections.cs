@@ -63,11 +63,10 @@ namespace Serenity.Data
         }
 
         /// <summary>
-        ///   Bağlantı string'ine göre yeni bir <see cref="DbConnection"/> nesnesi oluşturur.</summary>
-        /// <param name="connectionString">
-        ///   Oluşturulacak bağlantı string'i</param>
-        /// <returns>
-        ///   Oluşturulan <see cref="DbConnection"/> nesnesi</returns>
+        ///   Creates a new <see cref="DbConnection"/> for given connection string and provider name.</summary>
+        /// <param name="connectionString">Connection string</param>
+        /// <param name="providerName">Provider name</param>
+        /// <returns>A new <see cref="DbConnection"/> object.</returns>
         public static IDbConnection New(string connectionString, string providerName)
         {
             var factory = GetFactory(providerName);
