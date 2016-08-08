@@ -48,7 +48,7 @@ http://serenedemo.azurewebsites.net/
 
 **Serenity Youtube Channel:** 
 
-https://www.youtube.com/channel/UCUL4l2DlXCOCprdUfsoP0iw
+https://www.youtube.com/c/SerenityApplicationFramework
 
 **Introduction to Serene:**
 
