@@ -1376,6 +1376,7 @@ var Q;
             if (Q.Config.notLoggedInHandler != null &&
                 response &&
                 response.Error &&
+                response.Error.Code == 'NotLoggedIn' &&
                 Q.Config.notLoggedInHandler(options, response)) {
                 return;
             }

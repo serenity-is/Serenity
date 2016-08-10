@@ -19,6 +19,7 @@ namespace Q {
             if (Config.notLoggedInHandler != null &&
                 response &&
                 response.Error &&
+                response.Error.Code == 'NotLoggedIn' &&
                 Config.notLoggedInHandler(options, response)) {
                 return;
             }
