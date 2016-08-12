@@ -307,6 +307,20 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        public bool GenerateLookupEditor
+        {
+            get { return config.GenerateLookupEditor; }
+            set
+            {
+                if (value != config.GenerateLookupEditor)
+                {
+                    config.GenerateLookupEditor = value;
+                    config.Save();
+                    Changed("GenerateLookupEditor");
+                }
+            }
+        }
+
         public string KDiff3Path
         {
             get { return config.KDiff3Path; }

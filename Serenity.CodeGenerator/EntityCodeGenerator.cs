@@ -68,7 +68,7 @@ namespace Serenity.CodeGenerator
 
             if (config.GenerateRow)
                 GenerateRow();
-            
+
             if (config.GenerateDialog)
                 GenerateCss();
 
@@ -192,8 +192,16 @@ namespace Serenity.CodeGenerator
 
         private void GenerateRow()
         {
-            CreateNewSiteWebFile(Templates.Render(GeneratorConfig.GetEntityRowView(config), model),
-                Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
+            if (config.RowFieldsSurroundWithRegion)
+            {
+                CreateNewSiteWebFile(Templates.Render(GeneratorConfig.GetEntityRowView(config), model, config),
+                    Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
+            }
+            else
+            {
+                CreateNewSiteWebFile(Templates.Render(GeneratorConfig.GetEntityRowView(config), model),
+                    Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
+            }
         }
 
         private void GenerateCss()

@@ -139,7 +139,8 @@
                     <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateTSTypings}">TypeScript Typings</CheckBox>
                     <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=GenerateSSImports}">Saltaralle Imports</CheckBox>
 
-                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=RowFieldsSurroundWithRegion}">Row Fields Surround With Region</CheckBox>
+                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=RowFieldsSurroundWithRegion}">Row Fields Surround With Region</CheckBox>
+                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=GenerateLookupEditor}">Generate Lookup</CheckBox>
                 </StackPanel>
             </Border>
         </Popup>
