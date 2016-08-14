@@ -145,7 +145,15 @@ namespace Serenity.Web
                                 using (StreamReader sr = new StreamReader(sourcePath))
                                     code = sr.ReadToEnd();
 
-                                return MinimizeWithUglifyJS(ref jsEngine, code);
+                                try
+                                {
+                                    return MinimizeWithUglifyJS(ref jsEngine, code);
+                                }
+                                catch (Exception ex)
+                                {
+                                    ex.Log();
+                                    return code;
+                                }
                             }
 
                             using (StreamReader sr = new StreamReader(sourcePath))
@@ -297,7 +305,15 @@ namespace Serenity.Web
 
         private static MsieJsEngine SetupJsEngine()
         {
-            var jsEngine = new MsieJsEngine();
+            MsieJsEngine jsEngine;
+            try
+            {
+                jsEngine = new MsieJsEngine(new JsEngineSettings { EngineMode = JsEngineMode.ChakraIeJsRt });
+            }
+            catch
+            {
+                jsEngine = new MsieJsEngine();
+            }
             try
             {
                 using (var sr = new StreamReader(
