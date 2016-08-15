@@ -307,6 +307,34 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        public bool GenerateLookupEditor
+        {
+            get { return config.GenerateLookupEditor; }
+            set
+            {
+                if (value != config.GenerateLookupEditor)
+                {
+                    config.GenerateLookupEditor = value;
+                    config.Save();
+                    Changed("GenerateLookupEditor");
+                }
+            }
+        }
+
+        public bool MaximizableDialog
+        {
+            get { return config.MaximizableDialog; }
+            set
+            {
+                if (value != config.MaximizableDialog)
+                {
+                    config.MaximizableDialog = value;
+                    config.Save();
+                    Changed("MaximizableDialog");
+                }
+            }
+        }
+                
         public string KDiff3Path
         {
             get { return config.KDiff3Path; }

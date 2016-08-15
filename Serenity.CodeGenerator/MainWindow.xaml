@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Serenity.CodeGenerator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Serenity Code Generator" Height="600" Width="750" UseLayoutRounding="True">
+        Title="Serenity Code Generator" Height="600" Width="750" UseLayoutRounding="True" WindowStartupLocation="CenterScreen" Icon="SerenityLogo.ico">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
@@ -139,7 +139,9 @@
                     <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateTSTypings}">TypeScript Typings</CheckBox>
                     <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=GenerateSSImports}">Saltaralle Imports</CheckBox>
 
-                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=RowFieldsSurroundWithRegion}">Row Fields Surround With Region</CheckBox>
+                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=RowFieldsSurroundWithRegion}">Row Fields Surround With Region</CheckBox>
+                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateLookupEditor}">Generate Lookup</CheckBox>
+                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=MaximizableDialog}">Maximizable Dialog</CheckBox>
                 </StackPanel>
             </Border>
         </Popup>
