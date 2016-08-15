@@ -31,10 +31,8 @@ namespace Serenity.CodeGenerator.Views
 WriteLiteral("\r\n");
 
 
-WriteLiteral("\r\n");
 
-
-  
+   
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
     var schemaDot = Model.Schema == null ? "" : ("[" + Model.Schema + "].");
@@ -127,27 +125,24 @@ WriteLiteral(":Delete\")]\r\n");
 
      if (Config.GenerateLookupEditor)
     {
-
-WriteLiteral("        ");
+WriteLiteral("    ");
 
 WriteLiteral("[LookupScript(\"");
 
 
-                        Write(Model.Module);
+                         Write(Model.Module);
 
 WriteLiteral(".");
 
 
-                                      Write(Model.RowClassName);
+                                       Write(Inflector.Inflector.Titleize(Model.Tablename));
 
 WriteLiteral("\")]");
 
-WriteLiteral("\r\n");
 
+                                                                                                    }
 
-    }
-
-WriteLiteral("    public sealed class ");
+WriteLiteral("\r\n    public sealed class ");
 
 
                    Write(Model.RowClassName);
@@ -170,11 +165,9 @@ WriteLiteral(", IIdRow");
 
       foreach (var x in Model.Fields)
     {
-        var attrs = new List<string>
-            ();
+        var attrs = new List<string>();
         //ROLEMBERG
-        var attrsLookupEditorForm = new List<string>
-            ();
+        var attrsLookupEditorForm = new List<string>();
 
         attrs.Add("DisplayName(\"" + x.Title + "\")");
 
@@ -227,14 +220,14 @@ WriteLiteral("\r\n");
 
 
              if (!String.IsNullOrEmpty(attrString))
-                {
+            {
 
-WriteLiteral("                ");
+WriteLiteral("            ");
 
 WriteLiteral("[");
 
 
-                  Write(attrString);
+              Write(attrString);
 
 WriteLiteral("]");
 
@@ -242,31 +235,27 @@ WriteLiteral("\r\n");
 
 
             }
-
-WriteLiteral("\r\n");
 
 
              if (Config.GenerateLookupEditor)
-                {
-                
-                 if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
-                    {
+            {
+              if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
+            {
 
-WriteLiteral("                    ");
+WriteLiteral("            ");
 
 WriteLiteral("[");
 
 
-                      Write(attrStringLookupEditorForm);
+              Write(attrStringLookupEditorForm);
 
 WriteLiteral("]");
 
 WriteLiteral("\r\n");
 
 
-                }
-                 
             }
+             }
 
 WriteLiteral("            public ");
 
