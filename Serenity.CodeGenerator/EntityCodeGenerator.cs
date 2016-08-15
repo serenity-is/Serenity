@@ -439,7 +439,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateScriptDialogTS()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptDialogTS(), model),
+            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptDialogTS(), model, config),
                 Path.Combine(@"Modules\", Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Dialog.ts"))));
         }
 

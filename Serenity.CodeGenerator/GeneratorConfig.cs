@@ -35,7 +35,8 @@ namespace Serenity.CodeGenerator
         public bool GenerateGridEditor { get; set; }
         public bool GenerateGridEditorDialog { get; set; }
         public bool GenerateLookupEditor { get; set; }
-
+        public bool MaximizableDialog { get; set; }
+                
         public GeneratorConfig()
         {
             Connections = new List<Connection>();
@@ -57,6 +58,7 @@ namespace Serenity.CodeGenerator
             GenerateGridEditor = false;
             GenerateGridEditorDialog = false;
             GenerateLookupEditor = false;
+            MaximizableDialog = false;
             SetDefaults();
         }
 

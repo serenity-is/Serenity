@@ -321,6 +321,20 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        public bool MaximizableDialog
+        {
+            get { return config.MaximizableDialog; }
+            set
+            {
+                if (value != config.MaximizableDialog)
+                {
+                    config.MaximizableDialog = value;
+                    config.Save();
+                    Changed("MaximizableDialog");
+                }
+            }
+        }
+                
         public string KDiff3Path
         {
             get { return config.KDiff3Path; }

@@ -20,7 +20,10 @@ namespace Serenity.CodeGenerator.Views
     public partial class EntityScriptDialogTS : RazorGenerator.Templating.RazorTemplateBase
     {
 #line hidden
- public dynamic Model { get; set; } 
+
+    public dynamic Model { get; set; }
+    public Serenity.CodeGenerator.GeneratorConfig Config { get; set; }
+
         public override void Execute()
         {
 
@@ -29,7 +32,7 @@ WriteLiteral("\r\n");
 
 
 
-                                                   
+   
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
 
 
@@ -41,13 +44,28 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(" {\r\n    \r\n    ");
+WriteLiteral(" {\r\n\r\n    ");
 
 
 WriteLiteral("@Serenity.Decorators.registerClass()\r\n    ");
 
 
-WriteLiteral("@Serenity.Decorators.responsive()\r\n    export class ");
+WriteLiteral("@Serenity.Decorators.responsive()\r\n");
+
+
+ if (Config.GenerateLookupEditor)
+{
+WriteLiteral("    ");
+
+
+WriteLiteral("@Serenity.Decorators.maximizable()");
+
+WriteLiteral("\r\n");
+
+
+}
+
+WriteLiteral("    export class ");
 
 
              Write(Model.ClassName);
@@ -65,7 +83,8 @@ WriteLiteral(", any> {\r\n        protected getFormKey() { return ");
 
                                                           WriteLiteral("Form.formKey; }");
 
-                                                                          if (Model.Identity != null) {
+                                                                          if (Model.Identity != null)
+        {
 WriteLiteral("\r\n        protected getIdProperty() { return ");
 
 
@@ -84,7 +103,8 @@ WriteLiteral("\r\n        protected getLocalTextPrefix() { return ");
 
                                                                      WriteLiteral(".localTextPrefix; }");
 
-                                                                                         if (Model.NameField != null){
+                                                                                         if (Model.NameField != null)
+        {
 WriteLiteral("\r\n        protected getNameProperty() { return ");
 
 
