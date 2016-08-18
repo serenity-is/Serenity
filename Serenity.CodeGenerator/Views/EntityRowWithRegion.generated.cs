@@ -166,7 +166,6 @@ WriteLiteral(", IIdRow");
       foreach (var x in Model.Fields)
     {
         var attrs = new List<string>();
-        //ROLEMBERG
         var attrsLookupEditorForm = new List<string>();
 
         attrs.Add("DisplayName(\"" + x.Title + "\")");
@@ -193,7 +192,6 @@ WriteLiteral(", IIdRow");
             attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
             attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
 
-            //ROLEMBERG
             attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Inflector.Inflector.Titleize(x.PKTable) + "Row), InplaceAdd = true)");
         }
         if (Model.NameField == x.Ident)
@@ -205,7 +203,6 @@ WriteLiteral(", IIdRow");
             attrs.Add("TextualField(\"" + x.TextualField + "\")");
         }
         var attrString = String.Join(", ", attrs.ToArray());
-        //ROLEMBERG
         var attrStringLookupEditorForm = String.Join(", ", attrsLookupEditorForm.ToArray());
 
 
