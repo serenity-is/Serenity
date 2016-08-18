@@ -4155,7 +4155,7 @@
 				thumb.attr('title', originalName);
 			}
 			if (isImage) {
-				thumb.css('backgroundImage', 'url(' + $Serenity_UploadHelper.dbFileUrl($Serenity_UploadHelper.thumbFileName(item.Filename)) + ')');
+				thumb.css('backgroundImage', "url('" + $Serenity_UploadHelper.dbFileUrl($Serenity_UploadHelper.thumbFileName(item.Filename)) + "')");
 				$Serenity_UploadHelper.colorBox(thumb, new Object());
 			}
 			if (displayOriginalName) {

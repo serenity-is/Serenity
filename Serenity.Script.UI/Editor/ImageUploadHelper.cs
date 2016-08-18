@@ -222,7 +222,7 @@ namespace Serenity
 
                 if (isImage)
                 {
-                    thumb.CSS("backgroundImage", "url(" + DbFileUrl(ThumbFileName(item.Filename)) + ")");
+                    thumb.CSS("backgroundImage", "url('" + DbFileUrl(ThumbFileName(item.Filename)) + "')");
                     ColorBox(thumb, new object());
                 }
 
