@@ -1,3 +1,15 @@
+## 2.4.4 (2016-08-18)
+
+Features:
+  - option to generate lookup script and related lookup editor attributes in sergen (thanks @rolembergfilho)
+  - resolve problem with msiejavascriptengine in win10 anniversary update
+  - add quotes to support spaces in uploaded file names
+  - added a 3rd option to file name format in upload editors to reference current date/time, e.g. {3:yyyyMMdd}
+  - ability to reference field values in file name formats of upload editors using |SomeField|
+
+Bugfixes:
+  - call notLoggedInHandler only if received error code is NotLoggedIn
+
 ## 2.4.3 (2016-08-08)
 
 Features:
