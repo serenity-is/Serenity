@@ -84,7 +84,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
             <text>[@attrString]</text>
             }
             @if (Config.GenerateLookupEditor)
-            {@if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
+            {if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
             {
             <text>[@attrStringLookupEditorForm]</text>
             }}
