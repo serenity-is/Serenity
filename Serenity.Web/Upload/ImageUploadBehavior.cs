@@ -3,8 +3,10 @@ using Serenity.Data;
 using Serenity.IO;
 using Serenity.Web;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 
 namespace Serenity.Services
@@ -18,6 +20,7 @@ namespace Serenity.Services
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private UploadHelper uploadHelper;
         private StringField originalNameField;
+        private Dictionary<string, Field> replaceFields;
 
         public bool ActivateFor(Row row)
         {
@@ -46,7 +49,7 @@ namespace Serenity.Services
                 if (ReferenceEquals(null, originalNameField))
                     throw new ArgumentException(String.Format(
                         "Field '{0}' on row type '{1}' has a UploadEditor attribute but " +
-                        "a field with OriginalNameProperty '{2} is not found!'",
+                        "a field with OriginalNameProperty '{2}' is not found!",
                             Target.PropertyName ?? Target.Name, 
                             row.GetType().FullName,
                             attr.OriginalNameProperty));
@@ -65,15 +68,104 @@ namespace Serenity.Services
             }
 
             this.fileNameFormat = format.Replace("~", SplittedFormat);
+            this.replaceFields = ParseReplaceFields(fileNameFormat, row, Target);
             this.uploadHelper = new UploadHelper((attr.SubFolder.IsEmptyOrNull() ? "" : (attr.SubFolder + "/")) + (this.fileNameFormat));
 
             return true;
+        }
+
+        internal static Dictionary<string, Field> ParseReplaceFields(string fileNameFormat, Row row, Field target)
+        {
+            if (fileNameFormat.IndexOf('|') < 0)
+                return null;
+
+            var replaceFields = new Dictionary<string, Field>();
+
+            int start = 0;
+            while ((start = fileNameFormat.IndexOf('|', start)) >= 0)
+            {
+                var end = fileNameFormat.IndexOf('|', start + 1);
+                if (end <= start + 1)
+                    throw new ArgumentException(String.Format(
+                        "Field '{0}' on row type '{1}' has a UploadEditor attribute " +
+                        "with invalid format string '{2}'!",
+                            target.PropertyName ?? target.Name,
+                            row.GetType().FullName,
+                            fileNameFormat));
+
+                var fieldName = fileNameFormat.Substring(start + 1, end - start - 1);
+                var actualName = fieldName;
+                var colon = fieldName.IndexOf(":");
+                if (colon >= 0)
+                    actualName = fieldName.Substring(0, colon);
+
+                var replaceField = row.FindFieldByPropertyName(actualName) ??
+                    row.FindField(actualName);
+
+                if (ReferenceEquals(null, replaceField))
+                {
+                    throw new ArgumentException(String.Format(
+                        "Field '{0}' on row type '{1}' has a UploadEditor attribute that " +
+                        "references field '{2}', but no such field is found!'",
+                            target.PropertyName ?? target.Name,
+                            row.GetType().FullName,
+                            actualName));
+                }
+
+                replaceFields['|' + fieldName + '|'] = replaceField;
+
+                start = end + 1;
+            }
+
+            return replaceFields;
+        }
+
+        internal static string ProcessReplaceFields(string s, Dictionary<string, Field> replaceFields, Row row)
+        {
+            if (replaceFields == null)
+                return s;
+
+            foreach (var p in replaceFields)
+            {
+                var val = p.Value.AsObject(row);
+                string str;
+
+                var colon = p.Key.IndexOf(":");
+                if (colon >= 0)
+                    str = String.Format("{0:" + p.Key.Substring(colon + 1, p.Key.Length - colon - 2) + "}", val);
+                else
+                    str = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
+
+                str = StringHelper.SanitizeFilename(str).Replace('\\', '_').Replace("..", "_");
+                if (string.IsNullOrWhiteSpace(str))
+                    str = "_";
+
+                s = s.Replace(p.Key, str);
+            }
+
+            return s;
         }
 
         private class UploadedFile
         {
             public string Filename { get; set; }
             public string OriginalName { get; set; }
+        }
+
+        public override void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)
+        {
+            base.OnPrepareQuery(handler, query);
+
+            if (this.replaceFields != null)
+            {
+                foreach (var field in replaceFields.Values)
+                {
+                    if (!field.IsTableField() &&
+                        (!(query is ISqlQueryExtensible) ||
+                          ((ISqlQueryExtensible)query).GetSelectIntoIndex(field) <= 0))
+                        query.Select(field);
+                }
+            }
         }
 
         public override void OnBeforeSave(ISaveRequestHandler handler)
@@ -164,9 +256,13 @@ namespace Serenity.Services
             CheckUploadedImageAndCreateThumbs(attr, ref newFilename);
 
             var idField = (Field)(((IIdRow)handler.Row).IdField);
-            var copyResult = uploadHelper.CopyTemporaryFile(newFilename, idField.AsObject(handler.Row), filesToDelete);
+
+            var copyResult = uploadHelper.CopyTemporaryFile(newFilename, idField.AsObject(handler.Row), filesToDelete,
+                s => ImageUploadBehavior.ProcessReplaceFields(s, this.replaceFields, handler.Row));
+
             if (!attr.SubFolder.IsEmptyOrNull())
                 copyResult.DbFileName = copyResult.DbFileName.Substring(attr.SubFolder.Length + 1);
+
             return copyResult;
         }
 

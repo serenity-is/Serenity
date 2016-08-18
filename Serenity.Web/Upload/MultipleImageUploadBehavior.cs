@@ -4,6 +4,7 @@ using Serenity.Web;
 using System;
 using System.Linq;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Serenity.Services
 {
@@ -15,6 +16,7 @@ namespace Serenity.Services
         private string fileNameFormat;
         private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
         private UploadHelper uploadHelper;
+        private Dictionary<string, Field> replaceFields;
 
         public bool ActivateFor(Row row)
         {
@@ -46,6 +48,7 @@ namespace Serenity.Services
             }
 
             this.fileNameFormat = format.Replace("~", SplittedFormat);
+            this.replaceFields = ImageUploadBehavior.ParseReplaceFields(this.fileNameFormat, row, Target);
             this.uploadHelper = new UploadHelper((attr.SubFolder.IsEmptyOrNull() ? "" : (attr.SubFolder + "/")) + (this.fileNameFormat));
 
             return true;
@@ -71,6 +74,22 @@ namespace Serenity.Services
                 throw new ArgumentOutOfRangeException(key);
 
             return list;
+        }
+
+        public override void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)
+        {
+            base.OnPrepareQuery(handler, query);
+
+            if (this.replaceFields != null)
+            {
+                foreach (var field in replaceFields.Values)
+                {
+                    if (!field.IsTableField() &&
+                        (!(query is ISqlQueryExtensible) ||
+                          ((ISqlQueryExtensible)query).GetSelectIntoIndex(field) <= 0))
+                        query.Select(field);
+                }
+            }
         }
 
         public override void OnBeforeSave(ISaveRequestHandler handler)
@@ -165,7 +184,9 @@ namespace Serenity.Services
                 ImageUploadBehavior.CheckUploadedImageAndCreateThumbs(attr, ref filename);
 
                 var idField = (Field)(((IIdRow)handler.Row).IdField);
-                var copyResult = uploadHelper.CopyTemporaryFile(filename, idField.AsObject(handler.Row), filesToDelete);
+                var copyResult = uploadHelper.CopyTemporaryFile(filename, idField.AsObject(handler.Row), filesToDelete,
+                    s => ImageUploadBehavior.ProcessReplaceFields(s, this.replaceFields, handler.Row));
+
                 if (!attr.SubFolder.IsEmptyOrNull())
                     copyResult.DbFileName = copyResult.DbFileName.Substring(attr.SubFolder.Length + 1);
 

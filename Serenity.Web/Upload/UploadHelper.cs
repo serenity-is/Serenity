@@ -60,17 +60,20 @@ namespace Serenity.Web
             return FormatDbFileName(dbFileFormat, entityId, extension);
         }
 
-        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId, FilesToDelete filesToDelete)
+        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId, FilesToDelete filesToDelete, Func<string, string> fileNameReplacer = null)
         {
-            var result = CopyTemporaryFile(dbTemporaryFile, entityId);
+            var result = CopyTemporaryFile(dbTemporaryFile, entityId, fileNameReplacer);
             filesToDelete.Register(result);
             return result;
         }
 
-        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId)
+        public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId, Func<string, string> fileNameReplacer = null)
         {
             string temporaryFilePath = DbFilePath(dbTemporaryFile);
             string dbFileName = ToUrl(FormatDbFileName(entityId, Path.GetExtension(dbTemporaryFile)));
+            if (fileNameReplacer != null)
+                dbFileName = fileNameReplacer(dbFileName);
+
             string filePath = DbFilePath(dbFileName);
             UploadHelper.CopyFileAndRelated(temporaryFilePath, filePath);
             long size = new FileInfo(filePath).Length;
@@ -239,7 +242,7 @@ namespace Serenity.Web
                     groupKey = s.SafeSubstring(0, 2);
             }
 
-            return String.Format(format, identity, groupKey, TemporaryFileHelper.RandomFileCode()) + extension;
+            return String.Format(format, identity, groupKey, TemporaryFileHelper.RandomFileCode(), DateTime.Now) + extension;
         }
 
         public static void DeleteFileAndRelated(string dbFileName, DeleteType deleteType)
