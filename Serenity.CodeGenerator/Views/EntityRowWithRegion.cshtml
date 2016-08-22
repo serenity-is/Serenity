@@ -38,7 +38,6 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     {@foreach (var x in Model.Fields)
     {
         var attrs = new List<string>();
-        //ROLEMBERG
         var attrsLookupEditorForm = new List<string>();
 
         attrs.Add("DisplayName(\"" + x.Title + "\")");
@@ -65,8 +64,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
             attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
             attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
 
-            //ROLEMBERG
-            attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Inflector.Inflector.Titleize(x.PKTable) + "Row), InplaceAdd = true)");
+            attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Inflector.Inflector.Titleize(x.PKTable).Replace(" ","") + "Row), InplaceAdd = true)");
         }
         if (Model.NameField == x.Ident)
         {
@@ -77,7 +75,6 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
             attrs.Add("TextualField(\"" + x.TextualField + "\")");
         }
         var attrString = String.Join(", ", attrs.ToArray());
-        //ROLEMBERG
         var attrStringLookupEditorForm = String.Join(", ", attrsLookupEditorForm.ToArray());
 
         <text>
@@ -87,7 +84,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
             <text>[@attrString]</text>
             }
             @if (Config.GenerateLookupEditor)
-            {@if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
+            {if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
             {
             <text>[@attrStringLookupEditorForm]</text>
             }}

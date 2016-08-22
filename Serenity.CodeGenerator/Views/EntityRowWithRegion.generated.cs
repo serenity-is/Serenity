@@ -194,7 +194,7 @@ WriteLiteral(", IIdRow");
             attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
 
             //ROLEMBERG
-            attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Inflector.Inflector.Titleize(x.PKTable) + "Row), InplaceAdd = true)");
+            attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Inflector.Inflector.Titleize(x.PKTable).Replace(" ","") + "Row), InplaceAdd = true)");
         }
         if (Model.NameField == x.Ident)
         {
