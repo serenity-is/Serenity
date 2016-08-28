@@ -23,10 +23,10 @@ namespace Serenity {
                 onSearch: (fld, txt, done) => {
                     txt = Q.trimToNull(txt);
                     if (txt != null)
-                        txt = Select2.util.stripDiacritics(txt.toLowerCase());
+                        txt = Q.stripDiacritics(txt.toLowerCase());
 
                     this.element.find('li').each((x, e) => {
-                        $(e).toggle(!txt || Select2.util.stripDiacritics(
+                        $(e).toggle(!txt || Q.stripDiacritics(
                             $(e).text().toLowerCase()).indexOf(txt) >= 0);
                     });
                 }

@@ -1,9 +1,47 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported, Serializable]
+    public class Select2Result
+    {
+        public object Results { get; set; }
+        public bool More { get; set; }
+        public object Context { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class Select2QueryOptions
+    {
+        public string Term { get; set; }
+        public Int32 Page { get; set; }
+        public object Context { get; set; }
+        public Action<Select2Result> Callback { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class Select2AjaxOptions
+    {
+        public object Transport { get; set; }
+        public TypeOption<string, Func<string>> Url { get; set; }
+        public string DataType { get; set; }
+        public int? Delay { get; set; }
+        public bool Cache { get; set; }
+        public Func<string, int, dynamic, object> Data { get; set; }
+        public Func<dynamic, int, dynamic, object> Results { get; set; }
+        public Func<dynamic, JsDictionary, dynamic> ProcessResults { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class IdTextPair
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+    }
+
     /// <summary>
     /// Options for the Select2
     /// </summary>
@@ -24,14 +62,11 @@ namespace Serenity
         ///   if the width attribute contains a function it will be avaluated, otherwise the value is used verbatim.
         /// </summary>
         public TypeOption<string, Func<string>> Width { get; set; }
+        public bool DropdownAutoWidth { get; set; }
         /// <summary>
         /// Number of characters necessary to start a search.
         /// </summary>
         public int MinimumInputLength { get; set; }
-        /// <summary>
-        /// Maximum number of characters that can be entered for an input.
-        /// </summary>
-        public int MaximumInputLength { get; set; }
         /// <summary>
         /// The minimum number of results that must be initially (after opening the dropdown for the first time) populated in order to keep the search field. 
         /// This is useful for cases where local data is used with just a few results, in which case the search box is not very useful and wastes screen space.
@@ -50,13 +85,7 @@ namespace Serenity
         /// 
         /// Note that because browsers assume the first option element is selected in non-multi-value select boxes an empty first option element must be provided (<option></option>) for the placeholder to work.
         /// </summary>
-        public string PlaceHolder { get; set; }
-        /// <summary>
-        /// When attached to a select resolves the option that should be used as the placeholder. Can either be a function which given the select element should return the option element or a string first to indicate that the first option should be used.
-        /// 
-        /// This option is useful when Select2's default of using the first option only if it has no value and no text is not suitable.
-        /// </summary>
-        public TypeOption<string, Func<string>> PlaceHolderOption { get; set; }
+        public TypeOption<string, IdTextPair> PlaceHolder { get; set; }
         /// <summary>
         /// Separator character or string used to delimit ids in value attribute of the multi-valued selects. The default delimiter is the , character.
         /// </summary>
@@ -94,18 +123,15 @@ namespace Serenity
         /// The default implementation expects the object to have a id property that is returned.
         /// </summary>
         public Func<dynamic, string> Id { get; set; }
-        public Func<string, string, jQueryObject, Boolean> Matcher { get; set; }
-        public Func<dynamic, jQueryObject, dynamic, dynamic> SortResults { get; set; }
+        public Func<string, string, object, Boolean> Matcher { get; set; }
         public Func<dynamic, jQueryObject, Func<string, string>, string> FormatSelection { get; set; }
         public Func<dynamic, jQueryObject, dynamic, Func<string, string>, string> FormatResult { get; set; }
         public Func<dynamic, string> FormatResultCssClass { get; set; }
         public Func<string, string> FormatNoMatches { get; set; }
         public Func<string> FormatSearching { get; set; }
         public Func<string, int, string> FormatInputTooShort { get; set; }
-        public Func<string, string> FormatSelectionTooBig { get; set; }
-        public Func<string, object> CreateSearchChoice { get; set; }
-        public string CreateSearchChoicePosition { get; set; }
-        public Action<jQueryObject, Action<object>> InitSelection { get; set; }
+        public Func<int, string> FormatSelectionTooBig { get; set; }
+        public Func<int, string> FormatLoadMore { get; set; }
         public Func<string, dynamic[], Func<object, object>, dynamic, string> Tokenizer { get; set; }
         public string[] TokenSeparators { get; set; }
         public Action<Select2QueryOptions> Query { get; set; }
@@ -116,7 +142,7 @@ namespace Serenity
         public TypeOption<string, Func<string>> ContainerCssClass { get; set; }
         public TypeOption<object, Func<object>> DropdownCss { get; set; }
         public TypeOption<string, Func<string>> DropdownCssClass { get; set; }
-        public bool DropdownAutoWidth { get; set; }
+        
         public Func<string, string> AdaptContainerCssClass { get; set; }
         public Func<string, string> AdaptDropdownCssClass { get; set; }
         public Func<string, string> EscapeMarkup { get; set; }
@@ -125,37 +151,7 @@ namespace Serenity
         public Func<object, string, string> NextSearchTerm { get; set; }
     }
 
-    [Imported, Serializable]
-    public class Select2QueryOptions
-    {
-        public jQueryObject Element { get; set; }
-        public string Term { get; set; }
-        public Int32 Page { get; set; }
-        public object Context { get; set; }
-        public Action<Select2Result> Callback { get; set; }
-    }
-
-    [Imported, Serializable]
-    public class Select2Result
-    {
-        public object Results { get; set; }
-        public bool More { get; set; }
-        public object Context { get; set; }
-    }
-
-    [Imported, Serializable]
-    public class Select2AjaxOptions
-    {
-        public object Transport { get; set; }
-        public TypeOption<string, Func<string>> Url { get; set; }
-        public string DataType { get; set; }
-        public int QuietMillis { get; set; }
-        public bool Cache { get; set; }
-        public TypeOption<string, Func<string>> JsonpCallback { get; set; }
-        public Func<string, int, dynamic, object> Data { get; set; }
-        public Func<dynamic, int, dynamic, object> Results { get; set; }
-        public TypeOption<object, Func<object>> Params { get; set; }
-    }
+   
 
     [Imported]
     public static class Select2Extensions
