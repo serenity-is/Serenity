@@ -135,12 +135,12 @@ WriteLiteral("[LookupScript(\"");
 WriteLiteral(".");
 
 
-                                       Write(Inflector.Inflector.Titleize(Model.Tablename));
+                                       Write(Model.RowClassName);
 
 WriteLiteral("\")]");
 
 
-                                                                                                    }
+                                                                         }
 
 WriteLiteral("\r\n    public sealed class ");
 
@@ -164,35 +164,35 @@ WriteLiteral(", IIdRow");
                                                                                                                                                                 WriteLiteral("\r\n    {");
 
       foreach (var x in Model.Fields)
-    {
-        var attrs = new List<string>();
-        var attrsLookupEditorForm = new List<string>();
+                {
+                    var attrs = new List<string>();
+                    var attrsLookupEditorForm = new List<string>();
 
-        attrs.Add("DisplayName(\"" + x.Title + "\")");
+                    attrs.Add("DisplayName(\"" + x.Title + "\")");
 
-        if (x.Ident != x.Name)
-        {
-            attrs.Add("Column(\"" + x.Name + "\")");
-        }
+                    if (x.Ident != x.Name)
+                    {
+                        attrs.Add("Column(\"" + x.Name + "\")");
+                    }
 
-        if ((x.Size ?? 0) != 0)
-        {
-            attrs.Add("Size(" + x.Size + ")");
-        }
-        if (x.Scale != 0)
-        {
-            attrs.Add("Scale(" + x.Scale + ")");
-        }
-        if (!String.IsNullOrEmpty(x.Flags))
-        {
-            attrs.Add(x.Flags);
-        }
-        if (!String.IsNullOrEmpty(x.PKTable))
-        {
-            attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
-            attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
+                    if ((x.Size ?? 0) != 0)
+                    {
+                        attrs.Add("Size(" + x.Size + ")");
+                    }
+                    if (x.Scale != 0)
+                    {
+                        attrs.Add("Scale(" + x.Scale + ")");
+                    }
+                    if (!String.IsNullOrEmpty(x.Flags))
+                    {
+                        attrs.Add(x.Flags);
+                    }
+                    if (!String.IsNullOrEmpty(x.PKTable))
+                    {
+                        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
+                        attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
 
-            attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Inflector.Inflector.Titleize(x.PKTable) + "Row), InplaceAdd = true)");
+                        attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Serenity.CodeGenerator.RowGenerator.ClassNameFromTableName(x.PKTable) + "Row), InplaceAdd = true)");
         }
         if (Model.NameField == x.Ident)
         {
@@ -203,7 +203,7 @@ WriteLiteral(", IIdRow");
             attrs.Add("TextualField(\"" + x.TextualField + "\")");
         }
         var attrString = String.Join(", ", attrs.ToArray());
-        var attrStringLookupEditorForm = String.Join(", ", attrsLookupEditorForm.ToArray());
+    var attrStringLookupEditorForm = String.Join(", ", attrsLookupEditorForm.ToArray());
 
 
 WriteLiteral("        ");
@@ -235,8 +235,7 @@ WriteLiteral("\r\n");
 
 
              if (Config.GenerateLookupEditor)
-            {
-              if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
+            {if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
             {
 
 WriteLiteral("            ");
@@ -251,8 +250,7 @@ WriteLiteral("]");
 WriteLiteral("\r\n");
 
 
-            }
-             }
+            }}
 
 WriteLiteral("            public ");
 
