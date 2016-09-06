@@ -53,7 +53,7 @@ WriteLiteral("@Serenity.Decorators.registerClass()\r\n    ");
 WriteLiteral("@Serenity.Decorators.responsive()\r\n");
 
 
- if (Config.GenerateLookupEditor)
+ if (Config.MaximizableDialog)
 {
 WriteLiteral("    ");
 
@@ -125,7 +125,23 @@ WriteLiteral("Service.baseUrl; }\r\n\r\n        protected form = new ");
 
                          Write(Model.ClassName);
 
-WriteLiteral("Form(this.idPrefix);\r\n    }\r\n}");
+WriteLiteral("Form(this.idPrefix);\r\n\r\n");
+
+
+         if (Config.MaximizableDialog)
+        {
+WriteLiteral("        ");
+
+WriteLiteral("dialogOpen() {\r\n                    super.dialogOpen();\r\n                   this." +
+"element.closest(\".ui-dialog\").find(\".ui-icon-maximize-window\").click();\r\n       " +
+"          }");
+
+WriteLiteral("\r\n");
+
+
+        }
+
+WriteLiteral("    }\r\n}");
 
 
         }

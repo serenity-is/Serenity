@@ -9,7 +9,7 @@ namespace @(Model.RootNamespace)@(dotModule) {
 
     @@Serenity.Decorators.registerClass()
     @@Serenity.Decorators.responsive()
-@if (Config.GenerateLookupEditor)
+@if (Config.MaximizableDialog)
 {    <text>@@Serenity.Decorators.maximizable()</text>
 }
     export class @(Model.ClassName)Dialog extends Serenity.EntityDialog<@(Model.RowClassName), any> {
@@ -24,5 +24,12 @@ namespace @(Model.RootNamespace)@(dotModule) {
         protected getService() { return @(Model.ClassName)Service.baseUrl; }
 
         protected form = new @(Model.ClassName)Form(this.idPrefix);
+
+        @if (Config.MaximizableDialog)
+        {        <text>dialogOpen() {
+                    super.dialogOpen();
+                   this.element.closest(".ui-dialog").find(".ui-icon-maximize-window").click();
+                 }</text>
+        }
     }
 }
