@@ -1,3 +1,12 @@
+## 2.4.5 (2016-09-10)
+
+Features:
+  - dialog types specified in LookupEditor attribute can now be found with or without Dialog suffix
+  - can specify lookup cache expiration in LookupScriptAttributes with Expiration attribute in seconds
+  - fix generated dialog code for maximizable option
+  - added stored procedure grid sample (thanks @mrajalko) [Serene]
+  - deleted css applies to entire slick grid row (thanks @wldkrd1)
+
 ## 2.4.4 (2016-08-18)
 
 Features:
