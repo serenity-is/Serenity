@@ -1,10 +1,17 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    public class Select2TagParams
+    {
+        public string Term { get; set; }
+    }
+
+
     [Imported, Serializable]
     public class Select2Result
     {
@@ -33,6 +40,15 @@ namespace Serenity
         public Func<string, int, dynamic, object> Data { get; set; }
         public Func<dynamic, int, dynamic, object> Results { get; set; }
         public Func<dynamic, JsDictionary, dynamic> ProcessResults { get; set; }
+    }
+
+    [Imported, Serializable]
+    public class Select2Item
+    {
+        public string Id { get; set; }
+        public string Text { get; set; }
+        public object Source { get; set; }
+        public bool Disabled { get; set; }
     }
 
     [Imported, Serializable]
@@ -137,21 +153,20 @@ namespace Serenity
         public Action<Select2QueryOptions> Query { get; set; }
         public Select2AjaxOptions Ajax { get; set; }
         public TypeOption<object, Func<object>> Data { get; set; }
-        public TypeOption<string[], Func<string[]>> Tags { get; set; }
+        public TypeOption<bool, string[], Func<string[]>> Tags { get; set; }
         public TypeOption<object, Func<object>> ContainerCss { get; set; }
         public TypeOption<string, Func<string>> ContainerCssClass { get; set; }
         public TypeOption<object, Func<object>> DropdownCss { get; set; }
         public TypeOption<string, Func<string>> DropdownCssClass { get; set; }
-        
         public Func<string, string> AdaptContainerCssClass { get; set; }
+        public Func<Select2TagParams, Select2Item> CreateTag { get; set; }
         public Func<string, string> AdaptDropdownCssClass { get; set; }
+        public Action<List<object>, Select2Item> InsertTag { get; set; }
         public Func<string, string> EscapeMarkup { get; set; }
         public Boolean SelectOnBlur { get; set; }
         public Int32 LoadMorePadding { get; set; }
         public Func<object, string, string> NextSearchTerm { get; set; }
     }
-
-   
 
     [Imported]
     public static class Select2Extensions

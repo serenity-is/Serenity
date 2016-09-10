@@ -4,6 +4,7 @@
 /// <reference path="../typings/jqueryui/jqueryui.d.ts" />
 /// <reference path="../typings/toastr/toastr.d.ts" />
 /// <reference path="../typings/jquery.validation/jquery.validation.d.ts" />
+/// <reference path="../typings/select2/select2.d.ts" />
 /// <reference path="../typings/sortablejs/sortablejs.d.ts" />
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
@@ -186,6 +187,7 @@ declare namespace Q {
     function format(msg: string, ...prm: any[]): string;
     function padLeft(s: string, len: number, ch?: string): string;
     function startsWith(s: string, search: string): boolean;
+    function stripDiacritics(str: string): string;
     function toSingleLine(str: string): string;
     function trim(s: string): string;
     function trimToEmpty(s: string): string;

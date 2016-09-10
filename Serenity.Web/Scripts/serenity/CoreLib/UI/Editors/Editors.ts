@@ -1,4 +1,6 @@
-﻿declare namespace Serenity {
+﻿/// <reference path="../../../../typings/select2/select2.d.ts" />
+
+declare namespace Serenity {
 
     namespace EditorUtils {
         function getValue(editor: Serenity.Widget<any>): any;

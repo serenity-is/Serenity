@@ -140,7 +140,7 @@ namespace Serenity
                             });
                         });
                     }, GetTypeDelay());
-                },
+                }/*,
                 InitSelection = delegate(jQueryObject element, Action<object> callback)
                 {
                     var val = element.GetValue();
@@ -159,7 +159,7 @@ namespace Serenity
                             Source = result
                         });
                     });
-                }
+                }*/
             };
         }
 

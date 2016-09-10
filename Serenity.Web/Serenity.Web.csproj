@@ -1095,6 +1095,7 @@
   <Target Name="BeforeBuild">
   </Target>-->
   <Target Name="AfterBuild">
+    <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)Scripts\serenity\CoreLib\tsconfig.json&quot;" ContinueOnError="true" />
     <Exec Command="$(ProjectDir)..\tools\node\lessc.cmd $(ProjectDir)style\serenity.less &gt; $(OutDir)serenity.css">
     </Exec>
     <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Assets\Scripts\Saltarelle\mscorlib.js -o $(ProjectDir)Assets\Scripts\Saltarelle\mscorlib.min.js --comments --mangle">

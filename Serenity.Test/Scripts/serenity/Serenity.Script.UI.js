@@ -4388,7 +4388,7 @@
 		},
 		getSelect2Options: function() {
 			var emptyItemText = this.emptyItemText();
-			return { data: this.items, placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null), allowClear: ss.isValue(emptyItemText), createSearchChoicePosition: 'bottom', query: ss.mkdel(this, function(query) {
+			return { data: this.items, placeHolder: (!Q.isEmptyOrNull(emptyItemText) ? emptyItemText : null), allowClear: ss.isValue(emptyItemText), query: ss.mkdel(this, function(query) {
 				var term = (Q.isEmptyOrNull(query.term) ? '' : Select2.util.stripDiacritics(ss.coalesce(query.term, '')).toUpperCase());
 				var results = this.items.filter(function(item) {
 					return ss.isNullOrUndefined(term) || ss.startsWithString(Select2.util.stripDiacritics(ss.coalesce(item.text, '')).toUpperCase(), term);
@@ -4397,22 +4397,6 @@
 					return ss.isValue(term) && !ss.startsWithString(Select2.util.stripDiacritics(ss.coalesce(item1.text, '')).toUpperCase(), term) && Select2.util.stripDiacritics(ss.coalesce(item1.text, '')).toUpperCase().indexOf(term) >= 0;
 				}));
 				query.callback({ results: results.slice((query.page - 1) * this.pageSize, query.page * this.pageSize), more: results.length >= query.page * this.pageSize });
-			}), initSelection: ss.mkdel(this, function(element, callback) {
-				var val = element.val();
-				if (this.$multiple) {
-					var list = [];
-					var $t1 = val.split(',');
-					for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-						var z = $t1[$t2];
-						var item2 = this.itemById[z];
-						if (ss.isValue(item2)) {
-							list.push(item2);
-						}
-					}
-					callback(list);
-					return;
-				}
-				callback(this.itemById[val]);
 			}) };
 		},
 		get_delimited: function() {
@@ -4458,9 +4442,9 @@
 		},
 		inplaceCreateClick: function(e) {
 		},
-		getCreateSearchChoice: function(getName) {
-			return ss.mkdel(this, function(s) {
-				s = ss.coalesce(Select2.util.stripDiacritics(s), '').toLowerCase();
+		getCreateTag: function(getName) {
+			return ss.mkdel(this, function(p) {
+				var s = ss.coalesce(Select2.util.stripDiacritics(p.get_term()), '').toLowerCase();
 				this.lastCreateTerm = s;
 				if (Q.isTrimmedEmpty(s)) {
 					return null;
@@ -4774,7 +4758,11 @@
 				opt.minimumResultsForSearch = ss.unbox(this.options.minimumResultsForSearch);
 			}
 			if (this.options.inplaceAdd) {
-				opt.createSearchChoice = this.getCreateSearchChoice(null);
+				opt.tags = true;
+				opt.createTag = this.getCreateTag(null);
+				opt.insertTag = function(data, tag) {
+					data.push(tag);
+				};
 			}
 			if (this.options.multiple) {
 				opt.multiple = true;
@@ -9960,15 +9948,6 @@
 						})).toArray(), more: response.Entities.length >= this.pageSize });
 					}));
 				}), this.getTypeDelay());
-			}), initSelection: ss.mkdel(this, function(element, callback) {
-				var val = element.val();
-				if (Q.isEmptyOrNull(val)) {
-					callback(null);
-					return;
-				}
-				this.queryByKey(val, ss.mkdel(this, function(result) {
-					callback((ss.isNullOrUndefined(result) ? null : { id: this.getItemKey(result), text: this.getItemText(result), source: result }));
-				}));
 			}) };
 		},
 		addInplaceCreate: function(title) {

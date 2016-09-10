@@ -6,14 +6,6 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Imported, Serializable]
-    public class Select2Item
-    {
-        public string Id { get; set; }
-        public string Text { get; set; }
-        public object Source { get; set; }
-        public bool Disabled { get; set; }
-    }
 
     [Element("<input type=\"hidden\"/>"), IncludeGenericArguments(false), ScriptName("Select2Editor")]
     public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, ISetEditValue, IGetEditValue, IStringValue
@@ -71,7 +63,6 @@ namespace Serenity
                 Data = items,
                 PlaceHolder = !emptyItemText.IsEmptyOrNull() ? emptyItemText : null,
                 AllowClear = emptyItemText != null,
-                CreateSearchChoicePosition = "bottom",
                 Query = delegate(Select2QueryOptions query)
                 {
                     var term = query.Term.IsEmptyOrNull() ? "" : Q.Externals.StripDiacritics(query.Term ?? "").ToUpperCase();
@@ -93,7 +84,7 @@ namespace Serenity
                         Results = results.Slice((query.Page - 1) * pageSize, query.Page * pageSize),
                         More = results.Count >= query.Page * pageSize
                     });
-                },
+                }/*,
                 InitSelection = delegate(jQueryObject element, Action<object> callback)
                 {
                     var val = element.GetValue();
@@ -113,7 +104,7 @@ namespace Serenity
                     }
 
                     callback(itemById[val]);
-                }
+                }*/
             };
         }
 
@@ -187,12 +178,12 @@ namespace Serenity
         {
         }
 
-        public Func<string, object> GetCreateSearchChoice(
+        public Func<Select2TagParams, Select2Item> GetCreateTag(
             Func<TItem, string> getName = null)
         {
-            return s =>
+            return p =>
             {
-                s = (Q.Externals.StripDiacritics(s) ?? "").ToLower();
+                var s = (Q.Externals.StripDiacritics(p.Term) ?? "").ToLower();
                 lastCreateTerm = s;
 
                 if (s.IsTrimmedEmpty())

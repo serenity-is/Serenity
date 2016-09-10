@@ -284,7 +284,11 @@ namespace Serenity
                 opt.MinimumResultsForSearch = options.MinimumResultsForSearch.Value;
 
             if (options.InplaceAdd)
-                opt.CreateSearchChoice = GetCreateSearchChoice();
+            {
+                opt.Tags = true;
+                opt.CreateTag = GetCreateTag();
+                opt.InsertTag = (data, tag) => data.Add(tag);
+            }
 
             if (options.Multiple)
                 opt.Multiple = true;

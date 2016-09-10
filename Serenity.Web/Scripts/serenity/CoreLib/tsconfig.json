@@ -14,7 +14,6 @@
     "files": [
         "Imports/RSVP.ts",
         "Imports/Select2.ts",
-        "Imports/SSCompat.ts",
         "Imports/Toastr.ts",
         "Imports/jQueryStatic.ts",
         "Imports/JQBlockUI.ts",
@@ -41,7 +40,6 @@
         "Q/Q.TypeSystem.ts",
         "Decorators/Attributes.ts",
         "Decorators/Decorators.ts",
-        "Q/Q.Decorators.ts",
         "Services/Criteria.ts",
         "UI/Helpers/SlickHelpers.ts",
         "UI/Helpers/LazyLoadHelper.ts",

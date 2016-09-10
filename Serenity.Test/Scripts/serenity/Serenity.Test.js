@@ -17,7 +17,7 @@ var Serenity;
         QUnit.module('Editors');
         QUnit.test('Create IntegerEditor with undefined options', function () {
             var input = $('<input/>');
-            assert.notEqual(null, new Serenity.IntegerEditor(input), 'create on a input');
+            assert.notEqual(null, new IntegerEditor(input), 'create on a input');
             assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
             var autoNumeric = input.data('autoNumeric');
             assert.ok(autoNumeric != null, 'should have autonumeric data');
@@ -28,7 +28,7 @@ var Serenity;
         });
         QUnit.test('Create IntegerEditor with empty options', function () {
             var input = $('<input/>');
-            assert.notEqual(null, new Serenity.IntegerEditor(input, {}), 'create on a input');
+            assert.notEqual(null, new IntegerEditor(input, {}), 'create on a input');
             assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
             var autoNumeric = input.data('autoNumeric');
             assert.ok(autoNumeric != null, 'should have autoNumeric data');
@@ -39,7 +39,7 @@ var Serenity;
         });
         QUnit.test('Create IntegerEditor with minValue option', function () {
             var input = $('<input/>');
-            assert.notEqual(null, new Serenity.IntegerEditor(input, { minValue: 5 }), 'create on a input');
+            assert.notEqual(null, new IntegerEditor(input, { minValue: 5 }), 'create on a input');
             assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
             var autoNumeric = input.data('autoNumeric');
             assert.ok(autoNumeric != null, 'should have autoNumeric data');
@@ -50,7 +50,7 @@ var Serenity;
         });
         QUnit.test('Create IntegerEditor with maxValue option', function () {
             var input = $('<input/>');
-            assert.notEqual(null, new Serenity.IntegerEditor(input, { maxValue: 79 }), 'create on a input');
+            assert.notEqual(null, new IntegerEditor(input, { maxValue: 79 }), 'create on a input');
             assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
             var autoNumeric = input.data('autoNumeric');
             assert.ok(autoNumeric != null, 'should have autoNumeric data');
@@ -61,7 +61,7 @@ var Serenity;
         });
         QUnit.test('Create IntegerEditor with minValue and maxValue options', function () {
             var input = $('<input/>');
-            assert.notEqual(null, new Serenity.IntegerEditor(input, { minValue: 10, maxValue: 999 }), 'create on a input');
+            assert.notEqual(null, new IntegerEditor(input, { minValue: 10, maxValue: 999 }), 'create on a input');
             assert.ok(input.hasClass("integerQ"), 'should have integerQ class');
             var autoNumeric = input.data('autoNumeric');
             assert.ok(autoNumeric != null, 'should have autoNumeric data');
@@ -79,23 +79,23 @@ var Serenity;
         var assert = QUnit.assert;
         QUnit.module('Editors');
         QUnit.test('TextAreaEditor creation tests', function () {
-            assert.notEqual(null, new Serenity.TextAreaEditor($('<textarea/>')), 'create on a textarea with undefined options');
-            assert.notEqual(null, new Serenity.TextAreaEditor($('<textarea/>'), {}), 'create on a textarea with empty options');
+            assert.notEqual(null, new TextAreaEditor($('<textarea/>')), 'create on a textarea with undefined options');
+            assert.notEqual(null, new TextAreaEditor($('<textarea/>'), {}), 'create on a textarea with empty options');
             var txtarea = $('<textarea/>');
-            new Serenity.TextAreaEditor(txtarea, null);
+            new TextAreaEditor(txtarea, null);
             assert.equal(txtarea.attr('cols'), 80, 'should have 80 cols by default when options is undefined');
             assert.equal(txtarea.attr('rows'), 6, 'should have 6 rows by default when options is undefined');
             txtarea = $('<textarea/>');
-            new Serenity.TextAreaEditor(txtarea, {});
+            new TextAreaEditor(txtarea, {});
             assert.equal(txtarea.attr('cols'), 80, 'should have 80 cols by default when options is empty');
             assert.equal(txtarea.attr('rows'), 6, 'should have 6 rows by default when options is empty');
             txtarea = $('<textarea/>');
-            new Serenity.TextAreaEditor(txtarea, {
+            new TextAreaEditor(txtarea, {
                 cols: 77
             });
             assert.equal(txtarea.attr('cols'), 77, 'respects cols option');
             txtarea = $('<textarea/>');
-            new Serenity.TextAreaEditor(txtarea, {
+            new TextAreaEditor(txtarea, {
                 rows: 9
             });
             assert.equal(txtarea.attr('rows'), 9, 'respects rows option');
@@ -109,20 +109,20 @@ var Serenity;
         var assert = QUnit.assert;
         QUnit.module('Formatters');
         QUnit.test('UrlFormatter tests', function () {
-            assert.notEqual(null, new Serenity.UrlFormatter(), 'can create instance');
-            assert.strictEqual("<a href='http://simpleurl'>http://simpleurl</a>", new Serenity.UrlFormatter().format({
+            assert.notEqual(null, new UrlFormatter(), 'can create instance');
+            assert.strictEqual("<a href='http://simpleurl'>http://simpleurl</a>", new UrlFormatter().format({
                 value: 'http://simpleurl'
             }), 'field with simple url value and text');
-            assert.strictEqual("<a href='http://s?a=b&amp;c=d'>http://s?a=b&amp;c=d</a>", new Serenity.UrlFormatter().format({
+            assert.strictEqual("<a href='http://s?a=b&amp;c=d'>http://s?a=b&amp;c=d</a>", new UrlFormatter().format({
                 value: 'http://s?a=b&c=d'
             }), 'field with simple url value and text, html encoding check');
             var formatter;
-            formatter = new Serenity.UrlFormatter();
+            formatter = new UrlFormatter();
             formatter.set_target('my');
             assert.strictEqual("<a href='http://s' target='my'>http://s</a>", formatter.format({
                 value: 'http://s'
             }), 'respects target');
-            formatter = new Serenity.UrlFormatter();
+            formatter = new UrlFormatter();
             formatter.set_displayFormat('http://s/{0}');
             assert.strictEqual("<a href='x'>http://s/x</a>", formatter.format({
                 value: 'x'
@@ -214,9 +214,9 @@ var Serenity;
         QUnit.test('GetWidget tests', function () {
             var input = $('<input />');
             assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'!", 'should throw before widget creation');
-            var stringEditor = new Serenity.StringEditor(input);
+            var stringEditor = new StringEditor(input);
             assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
-            var secondaryWidget = new Serenity.DecimalEditor(input);
+            var secondaryWidget = new DecimalEditor(input);
             assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
             secondaryWidget.destroy();
             assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
@@ -235,9 +235,9 @@ var Serenity;
         QUnit.test('TryGetWidget tests', function () {
             var input = $('<input />');
             assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), null, 'should return null before widget creation');
-            var stringEditor = new Serenity.StringEditor(input);
+            var stringEditor = new StringEditor(input);
             assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
-            var secondaryWidget = new Serenity.DecimalEditor(input);
+            var secondaryWidget = new DecimalEditor(input);
             assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
             secondaryWidget.destroy();
             assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
