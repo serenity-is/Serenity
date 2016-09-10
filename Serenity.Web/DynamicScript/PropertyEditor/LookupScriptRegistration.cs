@@ -2,9 +2,6 @@
 using Serenity.Data;
 using Serenity.Extensibility;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Reflection;
 
 namespace Serenity.Web
@@ -43,6 +40,9 @@ namespace Serenity.Web
 
                     if (attr.Permission != null)
                         script.Permission = attr.Permission;
+
+                    if (attr.Expiration != 0)
+                        script.Expiration = TimeSpan.FromSeconds(attr.Expiration);
 
                     DynamicScriptManager.Register(script.ScriptName, script);
                 }
