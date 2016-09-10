@@ -830,16 +830,27 @@
 	var $Serenity_DialogTypeRegistry = function() {
 	};
 	$Serenity_DialogTypeRegistry.__typeName = 'Serenity.DialogTypeRegistry';
+	$Serenity_DialogTypeRegistry.$search = function(typeName) {
+		var dialogType = ss.getType(typeName);
+		if (ss.isValue(dialogType) && ss.isAssignableFrom($Serenity_IDialog, dialogType)) {
+			return dialogType;
+		}
+		for (var $t1 = 0; $t1 < Q.Config.rootNamespaces.length; $t1++) {
+			var ns = Q.Config.rootNamespaces[$t1];
+			dialogType = ss.getType(ns + '.' + typeName);
+			if (ss.isValue(dialogType) && ss.isAssignableFrom($Serenity_IDialog, dialogType)) {
+				return dialogType;
+			}
+		}
+		return null;
+	};
 	$Serenity_DialogTypeRegistry.get = function(key) {
 		if (!ss.keyExists($Serenity_DialogTypeRegistry.$knownTypes, key)) {
-			var typeName = key + 'Dialog';
-			var dialogType = null;
-			for (var $t1 = 0; $t1 < Q.Config.rootNamespaces.length; $t1++) {
-				var ns = Q.Config.rootNamespaces[$t1];
-				dialogType = ss.getType(ns + '.' + typeName);
-				if (ss.isValue(dialogType) && ss.isAssignableFrom($Serenity_IDialog, dialogType)) {
-					break;
-				}
+			var typeName = key;
+			var dialogType = $Serenity_DialogTypeRegistry.$search(typeName);
+			if (ss.isNullOrUndefined(dialogType) && !ss.endsWithString(key, 'Dialog')) {
+				typeName = key + 'Dialog';
+				dialogType = $Serenity_DialogTypeRegistry.$search(typeName);
 			}
 			if (ss.isNullOrUndefined(dialogType)) {
 				throw new ss.Exception(typeName + ' dialog class is not found!');

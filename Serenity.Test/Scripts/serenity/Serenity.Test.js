@@ -1,4 +1,15 @@
-﻿var Serenity;
+﻿var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var Serenity;
 (function (Serenity) {
     var Test;
     (function (Test) {
@@ -140,6 +151,57 @@ var Serenity;
             assert.strictEqual(0, Q.count([1, 2, 3], function (x) { return x === 4; }), "should return 0 for non-matching predicate");
             assert.strictEqual(1, Q.count([1, 2, 3], function (x) { return x === 2; }), "should return 1 for matching predicate");
             assert.strictEqual(3, Q.count([4, 3, 2, 2, 1, 2], function (x) { return x === 2; }), "shouldn't short circuit at first match");
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var DummyRoot;
+(function (DummyRoot) {
+    var SomeModule;
+    (function (SomeModule) {
+        var SomeDialog = (function (_super) {
+            __extends(SomeDialog, _super);
+            function SomeDialog() {
+                _super.apply(this, arguments);
+            }
+            SomeDialog = __decorate([
+                Serenity.Decorators.registerClass()
+            ], SomeDialog);
+            return SomeDialog;
+        }(Serenity.PropertyDialog));
+        SomeModule.SomeDialog = SomeDialog;
+        var SomeDialogWithoutDialogSuffix = (function (_super) {
+            __extends(SomeDialogWithoutDialogSuffix, _super);
+            function SomeDialogWithoutDialogSuffix() {
+                _super.apply(this, arguments);
+            }
+            SomeDialogWithoutDialogSuffix = __decorate([
+                Serenity.Decorators.registerClass()
+            ], SomeDialogWithoutDialogSuffix);
+            return SomeDialogWithoutDialogSuffix;
+        }(Serenity.PropertyDialog));
+        SomeModule.SomeDialogWithoutDialogSuffix = SomeDialogWithoutDialogSuffix;
+    })(SomeModule = DummyRoot.SomeModule || (DummyRoot.SomeModule = {}));
+})(DummyRoot || (DummyRoot = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Registry');
+        QUnit.test('DialogTypeRegistry tests', function () {
+            Q.Config.rootNamespaces.push("DummyRoot");
+            try {
+                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("DummyRoot.SomeModule.SomeDialog"), "should find dialog class with full namespace");
+                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("SomeModule.SomeDialog"), "should find dialog class with module name only");
+                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("SomeModule.Some"), "should find dialog class without specifying Dialog suffix");
+                assert.equal(DummyRoot.SomeModule.SomeDialogWithoutDialogSuffix, Serenity.DialogTypeRegistry.get("SomeModule.SomeDialogWithoutDialogSuffix"), "should find dialog class that doesn't have Dialog suffix");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialog"); }, "SomeDialog dialog class is not found!", "shouldn't find dialog class without module name");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("Some"); }, "SomeDialog dialog class is not found!", "shouldn't find dialog class without module name and suffix");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialogWithoutDialogSuffix"); }, "SomeDialogWithoutDialogSuffixDialog dialog class is not found!", "shouldn't find dialog class that doesn't have dialog suffix without module");
+            }
+            finally {
+                Q.Config.rootNamespaces = Q.Config.rootNamespaces.filter(function (x) { return x != "DummyRoot"; });
+            }
         });
     })(Test = Serenity.Test || (Serenity.Test = {}));
 })(Serenity || (Serenity = {}));

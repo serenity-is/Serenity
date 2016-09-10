@@ -460,6 +460,7 @@
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="ScriptTests\Runner.html" />
     <TypeScriptCompile Include="ScriptTests\Q\Q.ArrayUtilsTests.ts" />
+    <TypeScriptCompile Include="ScriptTests\Registry\DialogTypeRegistryTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Widget\Widget.GetWidgetTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Widget\Widget.TryGetWidgetTests.ts" />
   </ItemGroup>
