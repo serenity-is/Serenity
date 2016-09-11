@@ -1,3 +1,9 @@
+## 2.4.6 (2016-09-11)
+
+Bugfixes:
+
+  - if replace fields in fileNameFormat of upload editors are foreign / calculated, they might not be available in create. handle this case by reloading row from database before setting file name.
+
 ## 2.4.5 (2016-09-10)
 
 Features:
