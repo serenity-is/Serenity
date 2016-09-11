@@ -49,6 +49,7 @@ namespace Serenity.Services
 
             this.fileNameFormat = format.Replace("~", SplittedFormat);
             this.replaceFields = ImageUploadBehavior.ParseReplaceFields(this.fileNameFormat, row, Target);
+
             this.uploadHelper = new UploadHelper((attr.SubFolder.IsEmptyOrNull() ? "" : (attr.SubFolder + "/")) + (this.fileNameFormat));
 
             return true;
@@ -185,7 +186,7 @@ namespace Serenity.Services
 
                 var idField = (Field)(((IIdRow)handler.Row).IdField);
                 var copyResult = uploadHelper.CopyTemporaryFile(filename, idField.AsObject(handler.Row), filesToDelete,
-                    s => ImageUploadBehavior.ProcessReplaceFields(s, this.replaceFields, handler.Row));
+                    s => ImageUploadBehavior.ProcessReplaceFields(s, this.replaceFields, handler));
 
                 if (!attr.SubFolder.IsEmptyOrNull())
                     copyResult.DbFileName = copyResult.DbFileName.Substring(attr.SubFolder.Length + 1);

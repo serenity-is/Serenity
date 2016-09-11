@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
 namespace Serenity.Services
 {
@@ -120,10 +121,36 @@ namespace Serenity.Services
             return replaceFields;
         }
 
-        internal static string ProcessReplaceFields(string s, Dictionary<string, Field> replaceFields, Row row)
+        internal static string ProcessReplaceFields(string s, Dictionary<string, Field> replaceFields, ISaveRequestHandler handler)
         {
             if (replaceFields == null)
                 return s;
+
+            var row = handler.Row;
+
+            // foreign / calculated fields might not be available yet in new row
+            // so load them from database 
+
+            // TODO: if referenced foreign fields changed on update, 
+            // values might be wrong in before update where we set filename
+            // so need to handle update in AfterSave just like create
+
+            if (handler.IsCreate &&
+                replaceFields.Values.Any(x => !x.IsTableField()))
+            {
+                var idField = (Field)(((IIdRow)handler.Row).IdField);
+
+                row = handler.Row.Clone();
+                var query = new SqlQuery()
+                    .From(row);
+
+                foreach (var field in replaceFields.Values)
+                    query.Select(field);
+
+                query.Where(idField == new ValueCriteria(idField.AsObject(row)));
+
+                query.GetFirst(handler.Connection);
+            }
 
             foreach (var p in replaceFields)
             {
@@ -140,8 +167,14 @@ namespace Serenity.Services
                 if (string.IsNullOrWhiteSpace(str))
                     str = "_";
 
+                while (str.EndsWith("."))
+                    str = str.Substring(0, str.Length - 1) + "_";
+
                 s = s.Replace(p.Key, str);
             }
+
+            while (s.IndexOf("//") > 0)
+                s = s.Replace("//", "/_/");
 
             return s;
         }
@@ -258,7 +291,7 @@ namespace Serenity.Services
             var idField = (Field)(((IIdRow)handler.Row).IdField);
 
             var copyResult = uploadHelper.CopyTemporaryFile(newFilename, idField.AsObject(handler.Row), filesToDelete,
-                s => ImageUploadBehavior.ProcessReplaceFields(s, this.replaceFields, handler.Row));
+                s => ImageUploadBehavior.ProcessReplaceFields(s, this.replaceFields, handler));
 
             if (!attr.SubFolder.IsEmptyOrNull())
                 copyResult.DbFileName = copyResult.DbFileName.Substring(attr.SubFolder.Length + 1);
