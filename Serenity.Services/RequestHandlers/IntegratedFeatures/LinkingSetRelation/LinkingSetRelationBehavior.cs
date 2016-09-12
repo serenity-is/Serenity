@@ -202,17 +202,16 @@ namespace Serenity.Services
             }
         }
 
-        private void SaveDetail(IUnitOfWork uow, object masterId, object detailId, object itemKey)
+        private void InsertDetail(IUnitOfWork uow, object masterId, object itemKey)
         {
             var detail = rowFactory();
-            ((Field)(((IIdRow)detail).IdField)).AsObject(detail, detailId);
             thisKeyField.AsObject(detail, masterId);
             itemKeyField.AsObject(detail, itemKeyField.ConvertValue(itemKey, CultureInfo.InvariantCulture));
 
             var saveHandler = saveHandlerFactory();
             var saveRequest = saveRequestFactory();
             saveRequest.Entity = detail;
-            saveHandler.Process(uow, saveRequest, detailId == null ? SaveRequestType.Create : SaveRequestType.Update);
+            saveHandler.Process(uow, saveRequest, SaveRequestType.Create);
         }
 
         private void DeleteDetail(IUnitOfWork uow, object detailId)
@@ -228,7 +227,7 @@ namespace Serenity.Services
             if (oldRows.Count == 0)
             {
                 foreach (object itemKey in newItemKeys)
-                    SaveDetail(uow, masterId, null, itemKey);
+                    InsertDetail(uow, masterId, itemKey);
 
                 return;
             }
@@ -291,7 +290,7 @@ namespace Serenity.Services
                 if (oldByItemKey.ContainsKey(itemKey.ToString()))
                     continue;
 
-                SaveDetail(uow, masterId, null, itemKey);
+                InsertDetail(uow, masterId, itemKey);
             }
         }
 
@@ -308,7 +307,7 @@ namespace Serenity.Services
             {
                 foreach (object itemKey in newList)
                     if (itemKey != null)
-                        SaveDetail(handler.UnitOfWork, masterId, null, itemKey);
+                        InsertDetail(handler.UnitOfWork, masterId, itemKey);
 
                 return;
             }
