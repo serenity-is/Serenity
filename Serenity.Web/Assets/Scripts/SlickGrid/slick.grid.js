@@ -69,6 +69,8 @@ if (typeof Slick === "undefined") {
             forceFitColumns: false,
             enableAsyncPostRender: false,
             asyncPostRenderDelay: 50,
+            enableAsyncPostRenderCleanup: false,
+            asyncPostRenderCleanupDelay: 40,
             autoHeight: false,
             editorLock: Slick.GlobalEditorLock,
             showHeaderRow: false,
@@ -2518,6 +2520,8 @@ if (typeof Slick === "undefined") {
                     removeRowFromCache(i);
                 }
             }
+
+            options.enableAsyncPostRenderCleanup && startPostProcessingCleanup();
         }
 
         function invalidate() {
@@ -2534,41 +2538,43 @@ if (typeof Slick === "undefined") {
             for (var row in rowsCache) {
                 removeRowFromCache(row);
             }
+
+            options.enableAsyncPostRenderCleanup && startPostProcessingCleanup();
         }
 
-    function queuePostProcessedRowForCleanup(cacheEntry, postProcessedRow, rowIdx) {
-      postProcessgroupId++;
+        function queuePostProcessedRowForCleanup(cacheEntry, postProcessedRow, rowIdx) {
+          postProcessgroupId++;
 
-      // store and detach node for later async cleanup
-      for (var columnIdx in postProcessedRow) {
-        if (postProcessedRow.hasOwnProperty(columnIdx)) {
+          // store and detach node for later async cleanup
+          for (var columnIdx in postProcessedRow) {
+            if (postProcessedRow.hasOwnProperty(columnIdx)) {
+              postProcessedCleanupQueue.push({
+                actionType: 'C',
+                groupId: postProcessgroupId,
+                node: cacheEntry.cellNodesByColumnIdx[ columnIdx | 0],
+                columnIdx: columnIdx | 0,
+                rowIdx: rowIdx
+              });
+            }
+          }
+          postProcessedCleanupQueue.push({
+            actionType: 'R',
+            groupId: postProcessgroupId,
+            node: cacheEntry.rowNode
+          });
+          $(cacheEntry.rowNode).detach();
+        }
+
+        function queuePostProcessedCellForCleanup(cellnode, columnIdx, rowIdx) {
           postProcessedCleanupQueue.push({
             actionType: 'C',
             groupId: postProcessgroupId,
-            node: cacheEntry.cellNodesByColumnIdx[ columnIdx | 0],
-            columnIdx: columnIdx | 0,
+            node: cellnode,
+            columnIdx: columnIdx,
             rowIdx: rowIdx
           });
+          $(cellnode).detach();
         }
-      }
-      postProcessedCleanupQueue.push({
-        actionType: 'R',
-        groupId: postProcessgroupId,
-        node: cacheEntry.rowNode
-      });
-      $(cacheEntry.rowNode).detach();
-    }
-
-    function queuePostProcessedCellForCleanup(cellnode, columnIdx, rowIdx) {
-      postProcessedCleanupQueue.push({
-        actionType: 'C',
-        groupId: postProcessgroupId,
-        node: cellnode,
-        columnIdx: columnIdx,
-        rowIdx: rowIdx
-      });
-      $(cellnode).detach();
-    }
 
         function removeRowFromCache(row) {
             var cacheEntry = rowsCache[row];
@@ -2584,10 +2590,14 @@ if (typeof Slick === "undefined") {
                 zombieRowNodeFromLastMouseWheelEvent = cacheEntry.rowNode;
             } else {
 
-                cacheEntry.rowNode.each(function () {
-                    this.parentElement.removeChild(this);
-                });
-
+                if (options.enableAsyncPostRenderCleanup && postProcessedRows[row]) {
+                    queuePostProcessedRowForCleanup(cacheEntry, postProcessedRows[row], row);
+                }
+                else {
+                    cacheEntry.rowNode.each(function () {
+                        this.parentElement.removeChild(this);
+                    });
+                }
             }
 
             delete rowsCache[row];
@@ -2610,6 +2620,8 @@ if (typeof Slick === "undefined") {
                     removeRowFromCache(rows[i]);
                 }
             }
+
+            options.enableAsyncPostRenderCleanup && startPostProcessingCleanup();
         }
 
         function invalidateRow(row) {
@@ -2842,6 +2854,8 @@ if (typeof Slick === "undefined") {
                 }
             }
 
+            options.enableAsyncPostRenderCleanup && startPostProcessingCleanup();
+
             th = Math.max(options.rowHeight * numberOfRows, tempViewportH - scrollbarDimensions.height);
 
             if (activeCellNode && activeRow > l) {
@@ -2999,9 +3013,17 @@ if (typeof Slick === "undefined") {
                 }
             }
 
-            var cellToRemove;
+            var cellToRemove, node;
+            postProcessgroupId++;
             while ((cellToRemove = cellsToRemove.pop()) != null) {
-                cacheEntry.cellNodesByColumnIdx[cellToRemove][0].parentElement.removeChild(cacheEntry.cellNodesByColumnIdx[cellToRemove][0]);
+                node = cacheEntry.cellNodesByColumnIdx[cellToRemove][0];
+
+                if (options.enableAsyncPostRenderCleanup && postProcessedRows[row] && postProcessedRows[row][cellToRemove]) {
+                    queuePostProcessedCellForCleanup(node, cellToRemove, row);
+                } else {
+                    node.parentElement.removeChild(node);
+                }              
+
                 delete cacheEntry.cellColSpans[cellToRemove];
                 delete cacheEntry.cellNodesByColumnIdx[cellToRemove];
                 if (postProcessedRows[row]) {
@@ -3182,8 +3204,28 @@ if (typeof Slick === "undefined") {
             h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
         }
 
+        function startPostProcessingCleanup() {
+            if (!options.enableAsyncPostRenderCleanup) {
+                return;
+            }
+
+            clearTimeout(h_postrenderCleanup);
+            h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+        }
+
         function invalidatePostProcessingResults(row) {
-            delete postProcessedRows[row];
+            if (options.enableAsyncPostRenderCleanup) {
+                // change status of columns to be re-rendered
+                for (var columnIdx in postProcessedRows[row]) {
+                    if (postProcessedRows[row].hasOwnProperty(columnIdx)) {
+                        postProcessedRows[row][columnIdx] = 'C';
+                    }
+                }
+            }
+            else {
+                delete postProcessedRows[row];
+            }
+
             postProcessFromRow = Math.min(postProcessFromRow, row);
             postProcessToRow = Math.max(postProcessToRow, row);
             startPostProcessing();
@@ -3300,9 +3342,18 @@ if (typeof Slick === "undefined") {
 
                 if (zombieRowNodeFromLastMouseWheelEvent && zombieRowNodeFromLastMouseWheelEvent[left ? 0 : 1] != rowNode) {
                     var zombieRow = zombieRowNodeFromLastMouseWheelEvent[left || zombieRowNodeFromLastMouseWheelEvent.length == 1 ? 0 : 1];
-                    zombieRow.parentElement.removeChild(zombieRow);
 
+                    if (options.enableAsyncPostRenderCleanup && zombieRow) {
+                        queuePostProcessedRowForCleanup(zombieRowCacheFromLastMouseWheelEvent, zombieRow);
+                    } else {
+                        zombieRow.parentElement.removeChild(zombieRow);
+                    }
+
+                    zombieRowCacheFromLastMouseWheelEvent = null;
                     zombieRowNodeFromLastMouseWheelEvent = null;
+                    zombieRowPostProcessedFromLastMouseWheelEvent = null;
+
+                    options.enableAsyncPostRenderCleanup && startPostProcessingCleanup();
                 }
 
                 rowNodeFromLastMouseWheelEvent = rowNode;
@@ -3435,17 +3486,42 @@ if (typeof Slick === "undefined") {
                     columnIdx = columnIdx | 0;
 
                     var m = columns[columnIdx];
-                    if (m.asyncPostRender && !postProcessedRows[row][columnIdx]) {
+                    var processedStatus = postProcessedRows[row][columnIdx]; // C=cleanup and re-render, R=rendered
+                    if (m.asyncPostRender && processedStatus !== 'R') {
                         var node = cacheEntry.cellNodesByColumnIdx[columnIdx];
                         if (node) {
-                            m.asyncPostRender(node, row, getDataItem(row), m);
+                            m.asyncPostRender(node, row, getDataItem(row), m, (processedStatus === 'C'));
                         }
-                        postProcessedRows[row][columnIdx] = true;
+                        postProcessedRows[row][columnIdx] = 'R';
                     }
                 }
 
                 h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
                 return;
+            }
+        }
+
+        function asyncPostProcessCleanupRows() {
+            if (postProcessedCleanupQueue.length > 0) {
+                var groupId = postProcessedCleanupQueue[0].groupId;
+
+                // loop through all queue members with this groupID
+                while (postProcessedCleanupQueue.length > 0 && postProcessedCleanupQueue[0].groupId == groupId) {
+                    var entry = postProcessedCleanupQueue.shift();
+                    if (entry.actionType == 'R') {
+                        $(entry.node).remove();
+                    }
+                    if (entry.actionType == 'C') {
+                        var column = columns[entry.columnIdx];
+                        if (column.asyncPostRenderCleanup && entry.node) {
+                            // cleanup must also remove element
+                            column.asyncPostRenderCleanup(entry.node, entry.rowIdx, column);
+                        }
+                    }
+                }
+
+                // call this function again after the specified delay
+                h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
             }
         }
 
