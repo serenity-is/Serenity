@@ -211,7 +211,7 @@ declare namespace Slick {
         constructor();
     }
 
-    type AsyncPostRender = (cellNode: any, row: number, item: any, column: Slick.Column) => void;
+    type AsyncPostRender = (cellNode: any, row: number, item: any, column: Slick.Column, clean?: boolean) => void;
     type CancellableViewCallback<TEntity> = (view: Slick.RemoteView<TEntity>) => boolean;
     type ColumnFormatter = (row: number, cell: number, value: any, column: Slick.Column, item: any) => string;
     type RemoteViewAjaxCallback<TEntity> = (view: Slick.RemoteView<TEntity>, options: JQueryAjaxSettings) => boolean;
@@ -315,6 +315,7 @@ declare namespace Slick {
         asyncEditorLoading?: boolean;
         asyncEditorLoadDelay?: number;
         asyncPostRenderDelay?: number;
+        asyncPostRenderCleanupDelay?: number;
         autoEdit?: boolean;
         autoHeight?: boolean;
         cellFlashingCssClass?: string;
@@ -328,6 +329,7 @@ declare namespace Slick {
         editorLock?: any;
         enableAddRow?: boolean;
         enableAsyncPostRender?: boolean;
+        enableAsyncPostRenderCleanup?: boolean;
         enableCellRangeSelection?: boolean;
         enableCellNavigation?: boolean;
         enableColumnReorder?: boolean;

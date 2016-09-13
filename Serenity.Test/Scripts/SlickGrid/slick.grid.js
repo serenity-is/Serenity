@@ -3200,8 +3200,14 @@ if (typeof Slick === "undefined") {
             if (!options.enableAsyncPostRender) {
                 return;
             }
+
             clearTimeout(h_postrender);
-            h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
+
+            if (options.asyncPostRenderDelay < 0) {
+                asyncPostProcessRows();
+            } else {
+                h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
+            }
         }
 
         function startPostProcessingCleanup() {
@@ -3210,7 +3216,13 @@ if (typeof Slick === "undefined") {
             }
 
             clearTimeout(h_postrenderCleanup);
-            h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+
+            if (options.asyncPostRenderCleanupDelay < 0) {
+                asyncPostProcessCleanupRows();
+            }
+            else {
+                h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+            }
         }
 
         function invalidatePostProcessingResults(row) {
@@ -3496,13 +3508,15 @@ if (typeof Slick === "undefined") {
                     }
                 }
 
-                h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
-                return;
+                if (options.asyncPostRenderDelay >= 0) {
+                    h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
+                    return;
+                }
             }
         }
 
         function asyncPostProcessCleanupRows() {
-            if (postProcessedCleanupQueue.length > 0) {
+            while (postProcessedCleanupQueue.length > 0) {
                 var groupId = postProcessedCleanupQueue[0].groupId;
 
                 // loop through all queue members with this groupID
@@ -3521,7 +3535,10 @@ if (typeof Slick === "undefined") {
                 }
 
                 // call this function again after the specified delay
-                h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+                if (options.asyncPostRenderDelay >= 0) {
+                    h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+                    return;
+                }
             }
         }
 

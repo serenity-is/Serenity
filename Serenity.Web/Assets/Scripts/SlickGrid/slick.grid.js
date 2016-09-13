@@ -978,8 +978,8 @@ if (typeof Slick === "undefined") {
                     total = Q.formatNumber(total, "#,##0.##");
             }
 
-            return "<span class='aggregate agg-" + key + "'  title='" + text + "'>" + 
-                total + 
+            return "<span class='aggregate agg-" + key + "'  title='" + text + "'>" +
+                total +
                 "</span>";
         }
 
@@ -989,7 +989,7 @@ if (typeof Slick === "undefined") {
 
             var text = null;
 
-            ["sum", "avg", "min", "max", "cnt"].forEach(function(key) {
+            ["sum", "avg", "min", "max", "cnt"].forEach(function (key) {
                 if (text == null && totals[key] && totals[key][columnDef.field] != null) {
                     text = groupTotalText(totals, columnDef, key);
                     return false;
@@ -2543,37 +2543,37 @@ if (typeof Slick === "undefined") {
         }
 
         function queuePostProcessedRowForCleanup(cacheEntry, postProcessedRow, rowIdx) {
-          postProcessgroupId++;
+            postProcessgroupId++;
 
-          // store and detach node for later async cleanup
-          for (var columnIdx in postProcessedRow) {
-            if (postProcessedRow.hasOwnProperty(columnIdx)) {
-              postProcessedCleanupQueue.push({
-                actionType: 'C',
-                groupId: postProcessgroupId,
-                node: cacheEntry.cellNodesByColumnIdx[ columnIdx | 0],
-                columnIdx: columnIdx | 0,
-                rowIdx: rowIdx
-              });
+            // store and detach node for later async cleanup
+            for (var columnIdx in postProcessedRow) {
+                if (postProcessedRow.hasOwnProperty(columnIdx)) {
+                    postProcessedCleanupQueue.push({
+                        actionType: 'C',
+                        groupId: postProcessgroupId,
+                        node: cacheEntry.cellNodesByColumnIdx[columnIdx | 0],
+                        columnIdx: columnIdx | 0,
+                        rowIdx: rowIdx
+                    });
+                }
             }
-          }
-          postProcessedCleanupQueue.push({
-            actionType: 'R',
-            groupId: postProcessgroupId,
-            node: cacheEntry.rowNode
-          });
-          $(cacheEntry.rowNode).detach();
+            postProcessedCleanupQueue.push({
+                actionType: 'R',
+                groupId: postProcessgroupId,
+                node: cacheEntry.rowNode
+            });
+            $(cacheEntry.rowNode).detach();
         }
 
         function queuePostProcessedCellForCleanup(cellnode, columnIdx, rowIdx) {
-          postProcessedCleanupQueue.push({
-            actionType: 'C',
-            groupId: postProcessgroupId,
-            node: cellnode,
-            columnIdx: columnIdx,
-            rowIdx: rowIdx
-          });
-          $(cellnode).detach();
+            postProcessedCleanupQueue.push({
+                actionType: 'C',
+                groupId: postProcessgroupId,
+                node: cellnode,
+                columnIdx: columnIdx,
+                rowIdx: rowIdx
+            });
+            $(cellnode).detach();
         }
 
         function removeRowFromCache(row) {
@@ -3022,7 +3022,7 @@ if (typeof Slick === "undefined") {
                     queuePostProcessedCellForCleanup(node, cellToRemove, row);
                 } else {
                     node.parentElement.removeChild(node);
-                }              
+                }
 
                 delete cacheEntry.cellColSpans[cellToRemove];
                 delete cacheEntry.cellNodesByColumnIdx[cellToRemove];
@@ -3200,8 +3200,14 @@ if (typeof Slick === "undefined") {
             if (!options.enableAsyncPostRender) {
                 return;
             }
+
             clearTimeout(h_postrender);
-            h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
+
+            if (options.asyncPostRenderDelay < 0) {
+                asyncPostProcessRows();
+            } else {
+                h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
+            }
         }
 
         function startPostProcessingCleanup() {
@@ -3210,7 +3216,13 @@ if (typeof Slick === "undefined") {
             }
 
             clearTimeout(h_postrenderCleanup);
-            h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+
+            if (options.asyncPostRenderCleanupDelay < 0) {
+                asyncPostProcessCleanupRows();
+            }
+            else {
+                h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+            }
         }
 
         function invalidatePostProcessingResults(row) {
@@ -3251,7 +3263,7 @@ if (typeof Slick === "undefined") {
 
                 var content;
                 if (m.field && totals) {
-                    content = (m.groupTotalsFormatter && m.groupTotalsFormatter(totals, m, self)) || 
+                    content = (m.groupTotalsFormatter && m.groupTotalsFormatter(totals, m, self)) ||
                         (self.groupTotalsFormatter && self.groupTotalsFormatter(totals, m, self)) || "";
                 }
 
@@ -3496,13 +3508,15 @@ if (typeof Slick === "undefined") {
                     }
                 }
 
-                h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
-                return;
+                if (options.asyncPostRenderDelay >= 0) {
+                    h_postrender = setTimeout(asyncPostProcessRows, options.asyncPostRenderDelay);
+                    return;
+                }
             }
         }
 
         function asyncPostProcessCleanupRows() {
-            if (postProcessedCleanupQueue.length > 0) {
+            while (postProcessedCleanupQueue.length > 0) {
                 var groupId = postProcessedCleanupQueue[0].groupId;
 
                 // loop through all queue members with this groupID
@@ -3521,7 +3535,10 @@ if (typeof Slick === "undefined") {
                 }
 
                 // call this function again after the specified delay
-                h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+                if (options.asyncPostRenderDelay >= 0) {
+                    h_postrenderCleanup = setTimeout(asyncPostProcessCleanupRows, options.asyncPostRenderCleanupDelay);
+                    return;
+                }
             }
         }
 
@@ -4174,7 +4191,7 @@ if (typeof Slick === "undefined") {
                 height: $(elem).outerHeight(),
                 visible: true
             };
-            
+
             box[xLeft] = elem.offsetLeft;
             box[xRight] = 0;
 
