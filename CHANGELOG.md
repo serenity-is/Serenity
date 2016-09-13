@@ -1,3 +1,17 @@
+## 2.4.8 (2016-09-13)
+
+Bugfixes:
+  - increase version of Serenity.Web.Assets and publish as SlickGrid is released through its nuget package
+
+## 2.4.7 (2016-09-13)
+
+Features:
+  - add optional async post render cleanup support to slickgrid. this opens way to use Serenity widgets in slickgrid, though experimental.
+  - if async post render delay or async post cleanup delay is less than zero, work synchronously.
+
+Bugfixes:
+  - shouldn't set ID field to null on insert in LinkingSetRelation, as some users has GUID primary keys without Insertable(false) on them
+  
 ## 2.4.6 (2016-09-11)
 
 Bugfixes:
