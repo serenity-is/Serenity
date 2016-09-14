@@ -1,3 +1,9 @@
+## 2.4.9 (2016-09-14)
+
+Features:
+  - include maskedinput plugin (http://digitalbush.com/projects/masked-input-plugin/) by default in Serene.Web.Assets as it is required by MaskEditor
+
+
 ## 2.4.8 (2016-09-13)
 
 Bugfixes:
