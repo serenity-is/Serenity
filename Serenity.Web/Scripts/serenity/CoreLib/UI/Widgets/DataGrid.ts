@@ -12,6 +12,7 @@
         protected slickContainer: JQuery;
         protected toolbar: Toolbar;
         protected addDateRangeFilter(field: string, title?: string): DateEditor;
+        protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
         protected addQuickFilter<TWidget extends Widget<any>, TOptions>(filter: QuickFilter<TWidget, TOptions>): TWidget;
         protected addFilterSeperator(): void;
         protected add_submitHandlers(action: () => void): void;

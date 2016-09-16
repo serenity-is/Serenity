@@ -5205,7 +5205,7 @@
 							}
 							$t3 = $t2;
 						}
-						quick = this.$dateRangeQuickFilter($t4, $t3);
+						quick = this.dateRangeQuickFilter($t4, $t3);
 					}
 					else {
 						var filtering = ss.cast(ss.createInstance(filteringType), $Serenity_IFiltering);
@@ -5921,9 +5921,9 @@
 			return widget;
 		},
 		addDateRangeFilter: function(field, title) {
-			return ss.cast(this.addQuickFilter(this.$dateRangeQuickFilter(field, title)), $Serenity_DateEditor);
+			return ss.cast(this.addQuickFilter(this.dateRangeQuickFilter(field, title)), $Serenity_DateEditor);
 		},
-		$dateRangeQuickFilter: function(field, title) {
+		dateRangeQuickFilter: function(field, title) {
 			var end = null;
 			return {
 				field: field,

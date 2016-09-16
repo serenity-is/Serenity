@@ -1129,7 +1129,7 @@ namespace Serenity
             return (DateEditor)AddQuickFilter(DateRangeQuickFilter(field, title));
         }
 
-        private QuickFilter<DateEditor, DateTimeEditorOptions> DateRangeQuickFilter(string field, string title)
+        public QuickFilter<DateEditor, DateTimeEditorOptions> DateRangeQuickFilter(string field, string title = null)
         {
             DateEditor end = null;
 
