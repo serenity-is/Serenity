@@ -1,12 +1,15 @@
 ﻿namespace Serenity.Navigation
 {
-    using Reflection;
     using Serenity.Extensibility;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
+#if COREFX
+#else
     using System.Web;
     using System.Web.Hosting;
+#endif
 
     public class NavigationHelper
     {
@@ -63,7 +66,7 @@
 
                 foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
                 {
-                    foreach (NavigationItemAttribute attr in assembly.GetCustomAttributes(typeof(NavigationItemAttribute), false))
+                    foreach (NavigationItemAttribute attr in assembly.GetCustomAttributes<NavigationItemAttribute>())
                     {
                         if (filter == null || filter(attr))
                             list.Add(attr);
@@ -72,7 +75,7 @@
 
                 foreach (var navItemType in ExtensibilityHelper.GetTypesWithInterface(typeof(INavigationItemSource)))
                 {
-                    var navItem = (INavigationItemSource)navItemType.GetInstance();
+                    var navItem = (INavigationItemSource)Activator.CreateInstance(navItemType);
                     foreach (var item in navItem.GetItems())
                     {
                         if (filter == null || filter(item))

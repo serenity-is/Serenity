@@ -27,7 +27,7 @@ namespace Serenity.Web
                         script = (LookupScript)Activator.CreateInstance(typeof(RowLookupScript<>).MakeGenericType(type));
                     }
                     else if (!typeof(LookupScript).IsAssignableFrom(type) ||
-                        type.IsAbstract)
+                        type.GetIsAbstract())
                     {
                         throw new InvalidOperationException(String.Format("Type {0} can't be registered as a lookup script!", type.FullName));
                     }

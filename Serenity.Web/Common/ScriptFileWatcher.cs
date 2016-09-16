@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Web;
+using System.Web.Hosting;
 
 namespace Serenity.Web
 {
@@ -8,7 +8,8 @@ namespace Serenity.Web
     {
         public static void WatchForChanges(string path = "~/Scripts")
         {
-            var sw = new FileSystemWatcher(HttpContext.Current.Server.MapPath(path));
+            path = HostingEnvironment.MapPath(path);
+            var sw = new FileSystemWatcher(path);
             sw.IncludeSubdirectories = true;
             sw.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite;
             sw.Changed += (s, e) => Changed(e.Name);

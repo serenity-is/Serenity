@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿#if COREFX
+using IDictionary = System.Collections.Generic.IDictionary<object, object>;
+#else
+using System.Collections;
+#endif
 
 namespace Serenity.Abstractions
 {

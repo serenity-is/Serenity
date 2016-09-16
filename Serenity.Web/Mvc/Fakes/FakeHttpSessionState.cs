@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#if !COREFX
+using System.Collections;
 using System.Collections.Specialized;
 using System.Web;
 using System.Web.SessionState;
@@ -69,8 +70,5 @@ namespace Serenity.Web.MvcFakes
             _sessionItems.Remove(name);
         }
     }
-
-   
-
-
 }
+#endif

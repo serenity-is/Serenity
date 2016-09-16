@@ -8,7 +8,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+#else
 using System.Web.Mvc;
+#endif
 
 namespace Serenity.CodeGeneration
 {

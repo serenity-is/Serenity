@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Web.Mvc;
 using System;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+#else
+using System.Web.Mvc;
+#endif
 
 namespace Serenity.Web
 {

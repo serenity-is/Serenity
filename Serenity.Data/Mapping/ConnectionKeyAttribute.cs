@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Serenity.Data
 {
@@ -14,7 +15,7 @@ namespace Serenity.Data
             if (sourceType == null)
                 throw new ArgumentNullException("sourceType");
 
-            var attr = sourceType.GetAttribute<ConnectionKeyAttribute>(true);
+            var attr = sourceType.GetCustomAttribute<ConnectionKeyAttribute>(true);
             if (attr == null)
                 throw new ArgumentOutOfRangeException("sourceType",
                     "ConnectionKeyAttribute is created with source type " + sourceType.Name + 

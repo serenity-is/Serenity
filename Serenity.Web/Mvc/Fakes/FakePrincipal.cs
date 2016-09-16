@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿#if !COREFX
+using System.Linq;
 using System.Security.Principal;
 
 namespace Serenity.Web.MvcFakes
@@ -29,3 +30,4 @@ namespace Serenity.Web.MvcFakes
     }
 
 }
+#endif

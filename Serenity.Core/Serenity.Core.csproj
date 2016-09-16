@@ -49,7 +49,15 @@
     <Compile Include="Authorization\Throttler.cs" />
     <Compile Include="Authorization\LogicOperatorPermissionService.cs" />
     <Compile Include="Authorization\TransientGrantingPermissionService.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes.cs" />
+    <Compile Include="CompatibilityExtensions\Net45Extensions.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\BooleanFilteringAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\DateFilteringAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\DateTimeFilteringAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\LookupFilteringAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\EditorFilteringAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\DecimalFilteringAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\IntegerFilteringAttribute.cs" />
+    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\EnumFilteringAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilteringIdFieldAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\QuickFilterOptionAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\SortableAttribute.cs" />
@@ -189,16 +197,13 @@
     <Compile Include="Localization\ILocalTextContext.cs" />
     <Compile Include="Localization\ILocalTextRegistry.cs" />
     <Compile Include="Helpers\Invariants.cs" />
-    <Compile Include="Interface\ISupportAttached.cs" />
     <Compile Include="Localization\LocalText.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Localization\LocalTextRegistry.cs" />
     <Compile Include="Localization\EnumLocalTextRegistration.cs" />
     <Compile Include="Localization\NestedLocalTextRegistration.cs" />
-    <Compile Include="Reflection\CloneHelper.cs" />
     <Compile Include="Reflection\CodeWriter.cs" />
     <Compile Include="Reflection\ILGeneration.cs" />
-    <Compile Include="Reflection\InstanceCreator.cs" />
     <Compile Include="Reflection\FastReflection.cs" />
     <Compile Include="Reflection\ObjectAccessor.cs" />
     <Compile Include="Reflection\ReflectionExtensions.cs" />
@@ -211,7 +216,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.Serenity.Core.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

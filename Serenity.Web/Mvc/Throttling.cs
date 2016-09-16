@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.Web.Mvc;
 using System.Web;
 using System.Web.Caching;
@@ -110,3 +111,4 @@ namespace Serenity.Web
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -122,3 +123,4 @@ namespace Serenity.Web.HttpHandlers
         }
     }
 }
+#endif

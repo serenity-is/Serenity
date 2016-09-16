@@ -4,11 +4,13 @@ using Serenity.IO;
 using Serenity.Web;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+#if !COREFX
+using System.Drawing;
+using System.Drawing.Imaging;
+#endif
 
 namespace Serenity.Services
 {
@@ -333,6 +335,7 @@ namespace Serenity.Services
 
             UploadHelper.CheckFileNameSecurity(temporaryFile);
 
+#if !COREFX
             var checker = new ImageChecker();
             checker.MinWidth = attr.MinWidth;
             checker.MaxWidth = attr.MaxWidth;
@@ -341,6 +344,7 @@ namespace Serenity.Services
             checker.MaxDataSize = attr.MaxSize;
 
             Image image = null;
+#endif
             try
             {
                 var temporaryPath = UploadHelper.DbFilePath(temporaryFile);
@@ -362,7 +366,26 @@ namespace Serenity.Services
                     }
                     else
                     {
+#if COREFX
+                        switch ((Path.GetExtension(temporaryFile) ?? "").ToLowerInvariant())
+                        {
+                            case ".jpg":
+                            case ".jpeg":
+                                result = ImageCheckResult.JPEGImage;
+                                break;
+                            case ".png":
+                                result = ImageCheckResult.PNGImage;
+                                break;
+                            case ".gif":
+                                result = ImageCheckResult.GIFImage;
+                                break;
+                            default:
+                                result = ImageCheckResult.InvalidImage;
+                                break;
+                        }
+#else
                         result = checker.CheckStream(fs, true, out image);
+#endif
                     }
 
                     if (result == ImageCheckResult.InvalidImage &&
@@ -371,12 +394,14 @@ namespace Serenity.Services
                         return;
                     }
 
+#if !COREFX
                     if (result > ImageCheckResult.UnsupportedFormat || 
                         (supportedFormats != null && Array.IndexOf(supportedFormats, result) < 0))
                     {
                         string error = checker.FormatErrorMessage(result);
                         throw new ValidationError(error);
                     }
+#endif
 
                     if (result >= ImageCheckResult.FlashMovie)
                         return;
@@ -386,6 +411,7 @@ namespace Serenity.Services
 
                     TemporaryFileHelper.PurgeDirectoryDefault(basePath);
 
+#if !COREFX
                     if ((attr.ScaleWidth > 0 || attr.ScaleHeight > 0) &&
                         ((attr.ScaleWidth > 0 && (attr.ScaleSmaller || checker.Width > attr.ScaleWidth)) ||
                             (attr.ScaleHeight > 0 && (attr.ScaleSmaller || checker.Height > attr.ScaleHeight))))
@@ -424,12 +450,15 @@ namespace Serenity.Services
                             thumbImage.Save(thumbFile);
                         }
                     }
+#endif
                 }
             }
             finally
             {
+#if !COREFX
                 if (image != null)
                     image.Dispose();
+#endif
             }
         }
     }

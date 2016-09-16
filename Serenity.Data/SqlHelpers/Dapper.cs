@@ -1,4 +1,5 @@
-﻿/*
+﻿#if !COREFX
+/*
  License: http://www.apache.org/licenses/LICENSE-2.0 
  Home page: http://code.google.com/p/dapper-dot-net/
 
@@ -3549,3 +3550,4 @@ string name, object value = null, DbType? dbType = null, ParameterDirection? dir
 #endif
 
 }
+#endif

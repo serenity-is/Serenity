@@ -1,7 +1,11 @@
-﻿namespace Serenity.Reporting
-{
-    using System.Drawing;
+﻿#if COREFX
+using Color = System.String;
+#else
+using System.Drawing;
+#endif
 
+namespace Serenity.Reporting
+{
     public abstract class BaseCellDecorator : ICellDecorator
     {
         public object Item { get; set; }

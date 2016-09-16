@@ -2,7 +2,11 @@
 using System;
 using System.Linq;
 using System.Reflection;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+#else
 using System.Web.Mvc;
+#endif
 
 namespace Serenity.Navigation
 {
@@ -54,7 +58,9 @@ namespace Serenity.Navigation
             if (actionMethod == null)
                 throw new ArgumentOutOfRangeException("action");
 
-            var route = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault() ?? controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            var route = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault() ?? 
+                controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+
             if (route == null)
                 throw new InvalidOperationException(String.Format(
                     "Route attribute for {0} action of {1} controller is not found!",
@@ -62,14 +68,17 @@ namespace Serenity.Navigation
 
             string url = route.Template ?? "";
 
+#if COREFX
+            url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
+#else
             if (!url.StartsWith("~/"))
             {
+
                 var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
                 if (routePrefix != null)
-                {
                     url = UriHelper.Combine(routePrefix.Prefix, url);
-                }
             }
+#endif
 
             if (!url.StartsWith("~/") && !url.StartsWith("/"))
                 url = "~/" + url;

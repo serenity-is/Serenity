@@ -247,15 +247,19 @@ namespace Serenity.Data
         private static object unboxNullable(object value)
         {
             var typeOriginal = value.GetType();
-            if (typeOriginal.IsGenericType
+            if (typeOriginal.GetIsGenericType()
                 && typeOriginal.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
+#if COREFX
+                return (value as dynamic).GetValueOrDefault();
+#else
                 // generic value, unboxing needed
                 return typeOriginal.InvokeMember("GetValueOrDefault",
                     System.Reflection.BindingFlags.Public |
                     System.Reflection.BindingFlags.Instance |
                     System.Reflection.BindingFlags.InvokeMethod,
                     null, value, null);
+#endif
             }
             else
             {

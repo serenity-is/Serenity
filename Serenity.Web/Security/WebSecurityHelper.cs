@@ -1,4 +1,8 @@
-﻿using Serenity.Abstractions;
+﻿#if COREFX
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+#else
+using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.Services;
 using System;
@@ -6,7 +10,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Web;
 using System.Web.Security;
-using UserIdName = System.Tuple<System.Int64, System.String>;
+#endif
 
 namespace Serenity
 {
@@ -15,6 +19,7 @@ namespace Serenity
     ///   Static class contains helper functions associated with user rights, login, encrypting </summary>
     public static class WebSecurityHelper
     {
+#if !COREFX
         /// <summary>
         ///   Validate user identity by checking username and password and sets 
         ///   authentication ticket that is based on cookie  
@@ -77,15 +82,37 @@ namespace Serenity
             //FormsAuthentication.SignOut();
         }
 
+        public static void EnsurePermission(string permission)
+        {
+            if (!Authorization.HasPermission(permission))
+                FormsAuthentication.RedirectToLoginPage(
+                    Authorization.IsLoggedIn ? "denied=1" :null);
+        }
+#endif
+
         /// <summary>
         ///   Returns actual logged user, else if empty string or null.</summary>
         public static string HttpContextUsername
         {
             get
             {
-                if (HttpContext.Current != null &&
-                    HttpContext.Current.Request != null &&
-                    HttpContext.Current.Request.IsAuthenticated)
+#if COREFX
+                var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
+                if (httpContext == null)
+                    return null;
+                try
+                {
+                    return httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                }
+                catch
+                {
+                    return null;
+                }
+#else
+                var httpContext = HttpContext.Current;
+                if (httpContext != null &&
+                    httpContext.Request != null &&
+                    httpContext.Request.IsAuthenticated)
                 {
                     try
                     {
@@ -96,14 +123,8 @@ namespace Serenity
                     }
                 }
                 return null;
+#endif
             }
-        }
-
-        public static void EnsurePermission(string permission)
-        {
-            if (!Authorization.HasPermission(permission))
-                FormsAuthentication.RedirectToLoginPage(
-                    Authorization.IsLoggedIn ? "denied=1" :null);
         }
     }
 }

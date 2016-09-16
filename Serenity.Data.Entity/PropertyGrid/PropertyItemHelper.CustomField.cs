@@ -36,7 +36,7 @@ namespace Serenity.PropertyGrid
             if (!ReferenceEquals(null, basedOnField) && basedOnField is IEnumTypeField)
             {
                 enumType = (basedOnField as IEnumTypeField).EnumType;
-                if (enumType != null && !enumType.IsEnum)
+                if (enumType != null && !enumType.GetIsEnum())
                     enumType = null;
             }
 

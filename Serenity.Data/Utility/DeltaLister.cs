@@ -82,8 +82,11 @@ namespace Serenity.Data
                     }
 
                     if (_newById.Contains(id.Value))
+#if COREFX
+                        throw new ArgumentException("newItemId");
+#else
                         throw new DuplicateNameException("newItemId");
-
+#endif
                     _newById.Add(id.Value);
                 }
             }

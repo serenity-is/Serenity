@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Serenity.Reflection;
 using Serenity.ComponentModel;
 
 namespace Serenity.CodeGeneration
@@ -65,7 +64,7 @@ namespace Serenity.CodeGeneration
             foreach (var assembly in Assemblies)
             foreach (var type in assembly.GetTypes())
             {
-                var formScriptAttribute = (FormScriptAttribute)type.GetCustomAttribute(typeof(FormScriptAttribute));
+                var formScriptAttribute = type.GetCustomAttribute<FormScriptAttribute>();
                 if (formScriptAttribute == null)
                     continue;
 

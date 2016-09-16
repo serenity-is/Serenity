@@ -7,8 +7,12 @@ using Serenity.Logging;
 using Serenity.Services;
 using System.Linq;
 using System.Reflection;
-using System.Web.Compilation;
 using System.Web.Hosting;
+#if COREFX
+using Microsoft.Extensions.Caching.Memory;
+#else
+using System.Web.Compilation;
+#endif
 
 namespace Serenity.Web
 {
@@ -46,6 +50,7 @@ namespace Serenity.Web
 
         public static void InitializeSelfAssemblies()
         {
+#if !COREFX
             var selfAssemblies = BuildManager.GetReferencedAssemblies()
                 .Cast<Assembly>()
                 .Where(x =>
@@ -53,6 +58,7 @@ namespace Serenity.Web
                     x.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity")));
 
             ExtensibilityHelper.SelfAssemblies = Reflection.AssemblySorter.Sort(selfAssemblies).ToArray();
+#endif
         }
 
         public static void InitializeCaching()
@@ -60,8 +66,11 @@ namespace Serenity.Web
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
             if (Dependency.TryResolve<ILocalCache>() == null)
+#if COREFX
+                registrar.RegisterInstance<ILocalCache>(new MemoryCache(Dependency.Resolve<IMemoryCache>()));
+#else
                 registrar.RegisterInstance<ILocalCache>(new HttpRuntimeCache());
-
+#endif
             if (Dependency.TryResolve<IDistributedCache>() == null)
                 registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());
         }
@@ -124,7 +133,7 @@ namespace Serenity.Web
             where TAttribute : BaseRegistrarAttribute
         {
             foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
-                foreach (TAttribute attr in assembly.GetCustomAttributes(typeof(TAttribute), false))
+                foreach (TAttribute attr in assembly.GetCustomAttributes(typeof(TAttribute)))
                     Serenity.Extensibility.ExtensibilityHelper.RunClassConstructor(attr.Type);
         }
     }

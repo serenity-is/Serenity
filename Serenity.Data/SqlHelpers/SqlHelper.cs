@@ -235,13 +235,21 @@
 
             IDbCommand command = connection.CreateCommand();
 
+            // TODO: find a workaround in new Dapper
+#if !COREFX
             var bindByName = SqlMapper.GetBindByName(command.GetType());
             if (bindByName != null)
                 bindByName(command, true);
+#endif
+            commandText = FixCommandText(commandText, connection.GetDialect());
+            command.CommandText = commandText;
+            return command;
+        }
 
+        public static string FixCommandText(string commandText, ISqlDialect dialect)
+        {
             commandText = DatabaseCaretReferences.Replace(commandText);
 
-            var dialect = connection.GetDialect();
             var openBracket = dialect.OpenQuote;
             if (openBracket != '[')
                 commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
@@ -250,10 +258,8 @@
             if (paramPrefix != '@')
                 commandText = ParamPrefixReplacer.Replace(commandText, paramPrefix);
 
-            command.CommandText = commandText;
-            return command;
+            return commandText;
         }
-
 
         /// <summary>
         ///   İstenen bağlantıya bağlı ve verilen komutu içeren yeni bir IDbCommand nesnesi oluşturur.</summary>
@@ -355,7 +361,14 @@
 
                 if (value != null && value != DBNull.Value)
                 {
+#if COREFX
+#pragma warning disable CS0618
+                    var mappedType = Dapper.SqlMapper.GetDbType(value);
+#pragma warning restore CS0618
+#else
                     var mappedType = SqlMapper.LookupDbType(value.GetType(), name);
+#endif
+
                     if (mappedType != param.DbType)
                         param.DbType = mappedType;
 

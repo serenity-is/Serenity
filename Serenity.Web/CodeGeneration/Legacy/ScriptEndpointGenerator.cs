@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Web.Mvc;
 using Serenity.Reflection;
 using Serenity.Services;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+#else
+using System.Web.Mvc;
+#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -69,7 +73,7 @@ namespace Serenity.CodeGeneration
                     if (!type.IsSubclassOf(typeof(Controller)))
                         continue;
 
-                    if (type.IsAbstract)
+                    if (type.GetIsAbstract())
                         continue;
 
                     if (this.IsEndpoint != null && !this.IsEndpoint(type))
@@ -116,7 +120,7 @@ namespace Serenity.CodeGeneration
                                 continue;
 
                             // belki burada daha sonra metod listesini de verebiliriz (ayrı bir namespace de?)
-                            var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
+                            var parameters = method.GetParameters().Where(x => !x.ParameterType.GetIsInterface()).ToArray();
                             if (parameters.Length > 1)
                             {
                                 // tek parametreli olmalı
@@ -127,7 +131,7 @@ namespace Serenity.CodeGeneration
                             if (parameters.Length == 1)
                             {
                                 paramType = parameters[0].ParameterType;
-                                if (paramType.IsPrimitive || !ScriptDtoGenerator.CanHandleType(paramType))
+                                if (paramType.GetIsPrimitive() || !ScriptDtoGenerator.CanHandleType(paramType))
                                     continue;
                             }
                             else
@@ -137,7 +141,7 @@ namespace Serenity.CodeGeneration
 
                             Type responseType = returnType;
                             if (returnType != null &&
-                                returnType.IsGenericType &&
+                                returnType.GetIsGenericType() &&
                                 returnType.GetGenericTypeDefinition() == typeof(Result<>))
                             {
                                 responseType = returnType.GenericTypeArguments[0];
@@ -262,12 +266,16 @@ namespace Serenity.CodeGeneration
             var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
             string url = route.Template ?? "";
 
+#if COREFX
+            url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
+#else
             if (!url.StartsWith("~/"))
             {
                 var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
                 if (routePrefix != null)
                     url = UriHelper.Combine(routePrefix.Prefix, url);
             }
+#endif
 
             if (!url.StartsWith("~/") && !url.StartsWith("/"))
                 url = "~/" + url;

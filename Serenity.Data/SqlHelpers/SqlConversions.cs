@@ -82,7 +82,7 @@ namespace Serenity.Data
         {
             if (!value.HasValue)
                 return Null;
-            return "'" + value.Value.ToString("D", null) + "'";
+            return "'" + value.Value.ToString("D") + "'";
         }
 
         public static string ToSql(this string value, ISqlDialect dialect = null)

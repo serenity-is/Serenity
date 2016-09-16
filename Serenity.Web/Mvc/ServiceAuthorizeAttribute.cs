@@ -1,13 +1,61 @@
 ﻿using Serenity.Data;
 using System;
-using System.Web;
 using System.Linq;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+#else
+using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
+#endif
 
 namespace Serenity.Services
 {
+#if COREFX
+    public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
+    {
+        public void OnResourceExecuted(ResourceExecutedContext context)
+        {
+        }
+
+        public void OnResourceExecuting(ResourceExecutingContext context)
+        {
+            if ((string.IsNullOrEmpty(Permission) &&
+                    !Authorization.IsLoggedIn) ||
+                (!string.IsNullOrEmpty(Permission) &&
+                    !Authorization.HasPermission(Permission)))
+            {
+                if (Authorization.IsLoggedIn)
+                {
+                    context.Result = new Result<ServiceResponse>(new ServiceResponse
+                    {
+                        Error = new ServiceError
+                        {
+                            Code = "AccessDenied",
+                            Message = LocalText.Get("Authorization.AccessDenied")
+                        }
+                    });
+                    context.HttpContext.Response.StatusCode = 400;
+                }
+                else
+                {
+                    context.Result = new Result<ServiceResponse>(new ServiceResponse
+                    {
+                        Error = new ServiceError
+                        {
+                            Code = "NotLoggedIn",
+                            Message = LocalText.Get("Authorization.NotLoggedIn")
+                        }
+                    });
+                    context.HttpContext.Response.StatusCode = 400;
+                }
+            }
+        }
+#else
     public class ServiceAuthorizeAttribute : AuthorizeAttribute
     {
+#endif
         public ServiceAuthorizeAttribute()
         {
         }
@@ -69,6 +117,7 @@ namespace Serenity.Services
 
         public string Permission { get; private set; }
 
+#if !COREFX
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
             if (!base.AuthorizeCore(httpContext))
@@ -106,5 +155,6 @@ namespace Serenity.Services
             filterContext.HttpContext.Response.StatusCode = 400;
             filterContext.HttpContext.Response.TrySkipIisCustomErrors = true;
         }
+#endif
     }
 }

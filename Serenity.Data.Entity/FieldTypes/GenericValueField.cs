@@ -13,7 +13,6 @@ namespace Serenity.Data
         protected internal Func<Row, TValue?> _getValue;
         protected internal Action<Row, TValue?> _setValue;
         protected internal Type _enumType;
-        protected internal TypeConverter _converter;
 
         internal GenericValueField(ICollection<Field> collection, FieldType type, string name, LocalText caption, int size, FieldFlags flags, 
             Func<Row, TValue?> getValue = null, Action<Row, TValue?> setValue = null)

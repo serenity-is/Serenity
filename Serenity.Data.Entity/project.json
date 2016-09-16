@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+      "Newtonsoft.Json": "9.0.1",
+      "Serenity.Core": "1.0.0-*",
+      "Serenity.Data": "1.0.0-*"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [ "COREFX", "NETSTANDARD1_6" ]
+      },
+      "dependencies": {
+        "System.Data.Common": "4.1.0"
+      }
+    },
+    "net45": {
+    }
+  },
+
+  "buildOptions": {
+    "compile": {
+      "excludeFiles": [
+      ]
+    }
+  }
+}

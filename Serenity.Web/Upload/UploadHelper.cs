@@ -3,11 +3,13 @@ using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Web;
 using Serenity.IO;
+using System.Configuration;
 using System.Web.Hosting;
+#if !COREFX
+using System.Web;
+#endif
 
 namespace Serenity.Web
 {
@@ -31,8 +33,7 @@ namespace Serenity.Web
             get 
             {
                 current = current ?? JsonConvert.DeserializeObject<UploadSettings>(
-                    ConfigurationManager.AppSettings["UploadSettings"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
-
+                ConfigurationManager.AppSettings["UploadSettings"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
                 return current;
             }
         }
@@ -80,7 +81,7 @@ namespace Serenity.Web
             bool hasThumbnail = File.Exists(GetThumbFileName(filePath));
 
             string originalName;
-            using (var sr = new StreamReader(Path.ChangeExtension(temporaryFilePath, ".orig")))
+            using (var sr = new StreamReader(File.OpenRead(Path.ChangeExtension(temporaryFilePath, ".orig"))))
                 originalName = sr.ReadLine();
 
             return new CopyTemporaryFileResult()
@@ -281,7 +282,12 @@ namespace Serenity.Web
                 fileName.StartsWith("\\") ||
                 fileName.EndsWith("/") ||
                 fileName.EndsWith("\\"))
+#if COREFX
+                throw new ArgumentOutOfRangeException("fileName");
+#else
                 throw new HttpException(0x194, "Invalid_Request");
+#endif
+
         }
 
         public static string GetThumbFileName(string fileName, string thumbSuffix = "_t.jpg")

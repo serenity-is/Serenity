@@ -1,0 +1,9 @@
+{
+  "projects": [
+    "Serenity.Core",
+    "Serenity.Data",
+    "Serenity.Data.Entity",
+    "Serenity.Services",
+	"Serenity.Web"
+  ]
+}

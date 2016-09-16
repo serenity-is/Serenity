@@ -1,20 +1,61 @@
 ﻿using Serenity.Data;
 using System;
 using System.Linq;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+#else
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+#endif
 
 namespace Serenity.Web
 {
+#if COREFX
+    public class PageAuthorizeAttribute : TypeFilterAttribute
+    {
+        public PageAuthorizeAttribute()
+            : base(typeof(PageAuthorizeFilter))
+        {
+            Arguments = new[] { this };
+        }
+
+        private class PageAuthorizeFilter : Attribute, IResourceFilter
+        {
+            PageAuthorizeAttribute attr;
+
+            public PageAuthorizeFilter(PageAuthorizeAttribute attr)
+            {
+                this.attr = attr;
+            }
+
+            public void OnResourceExecuted(ResourceExecutedContext context)
+            {
+            }
+
+            public void OnResourceExecuting(ResourceExecutingContext context)
+            {
+                if ((string.IsNullOrEmpty(attr.Permission) &&
+                     !Authorization.IsLoggedIn) ||
+                    (!string.IsNullOrEmpty(attr.Permission) &&
+                     !Authorization.HasPermission(attr.Permission)))
+                {
+                    context.Result = new ChallengeResult();
+                }
+            }
+        }
+#else
     public class PageAuthorizeAttribute : AuthorizeAttribute
     {
         public PageAuthorizeAttribute()
             : base()
         {
         }
+#endif
 
         protected PageAuthorizeAttribute(Type sourceType, params Type[] attributeTypes)
+            : this()
         {
             if (sourceType == null)
                 throw new ArgumentNullException("sourceType");
@@ -54,6 +95,7 @@ namespace Serenity.Web
         }
 
         public PageAuthorizeAttribute(object permission)
+            : this()
         {
             this.Permission = permission == null ? null : permission.ToString();
         }
@@ -68,6 +110,7 @@ namespace Serenity.Web
         {
         }
 
+#if !COREFX
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
             if (!base.AuthorizeCore(httpContext))
@@ -91,6 +134,7 @@ namespace Serenity.Web
 
             base.HandleUnauthorizedRequest(filterContext);
         }
+#endif
 
         public string Permission { get; private set; }
     }

@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Services
 {
@@ -48,7 +49,7 @@ namespace Serenity.Services
 
 
             var listType = Target.ValueType;
-            if (!listType.IsGenericType ||
+            if (!listType.GetIsGenericType() ||
                 listType.GetGenericTypeDefinition() != typeof(List<>))
             {
                 throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
@@ -57,7 +58,7 @@ namespace Serenity.Services
             }
 
             var rowType = attr.RowType;
-            if (rowType.IsAbstract ||
+            if (rowType.GetIsAbstract() ||
                 !typeof(Row).IsAssignableFrom(rowType))
             {
                 throw new ArgumentException(String.Format(

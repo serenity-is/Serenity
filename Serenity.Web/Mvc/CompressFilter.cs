@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿#if !COREFX
+using System.Web;
 using System.Web.Mvc;
 using System.IO.Compression;
 
@@ -31,3 +32,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

@@ -1,16 +1,101 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
-using System.Web.Mvc;
 using System.Linq;
 using System.Reflection;
 using Serenity.Data;
 using System.Data;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+#else
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Security;
+#endif
 
 namespace Serenity.Services
 {
     public abstract class ServiceEndpoint : Controller
     {
+
+#if COREFX
+        private IDbConnection connection;
+        private UnitOfWork unitOfWork;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (unitOfWork != null)
+            {
+                unitOfWork.Dispose();
+                unitOfWork = null;
+            }
+
+            if (connection != null)
+            {
+                connection.Dispose();
+                connection = null;
+            }
+
+            base.Dispose(disposing);
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (!context.Filters.Any(x => x is JsonFilter))
+                context.Filters.Add(new JsonFilter());
+
+            var uowParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(IUnitOfWork));
+            if (uowParam != null)
+            {
+                var connectionKey = this.GetType().GetCustomAttribute<ConnectionKeyAttribute>();
+                if (connectionKey == null)
+                    throw new ArgumentNullException("connectionKey");
+
+                this.connection = SqlConnections.NewByKey(connectionKey.Value);
+                this.unitOfWork = new UnitOfWork(connection);
+                context.ActionArguments[uowParam.Name] = this.unitOfWork;
+                base.OnActionExecuting(context);
+                return;
+            }
+
+            var cnnParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(IDbConnection));
+            if (cnnParam != null)
+            {
+                var connectionKey = this.GetType().GetCustomAttribute<ConnectionKeyAttribute>();
+                if (connectionKey == null)
+                    throw new ArgumentNullException("connectionKey");
+
+                this.connection = SqlConnections.NewByKey(connectionKey.Value);
+                context.ActionArguments[cnnParam.Name] = connection;
+                base.OnActionExecuting(context);
+            }
+
+            base.OnActionExecuting(context);
+        }
+
+        public override void OnActionExecuted(ActionExecutedContext context)
+        {
+            if (unitOfWork != null)
+            {
+                unitOfWork.Commit();
+                unitOfWork = null;
+            }
+
+            if (connection != null)
+            {
+                connection.Dispose();
+                connection = null;
+            }
+
+            context.Result = (context.Result as ActionResult) ?? new Result<object>(context.Result);
+
+            base.OnActionExecuted(context);
+        }
+
+        //TODO: implement exception handling
+#else
         protected override IActionInvoker CreateActionInvoker()
         {
             return new ServiceEndpointActionInvoker();
@@ -101,5 +186,6 @@ namespace Serenity.Services
                 return result;
             }
         }
+#endif
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Serenity.Reflection
@@ -12,6 +13,14 @@ namespace Serenity.Reflection
 
         public static Func<TReturn> DelegateForConstructor<TReturn>(Type type)
         {
+#if COREFX
+            var constructor = type.GetTypeInfo().GetConstructor(Type.EmptyTypes);
+            if (constructor == null)
+                throw new ArgumentOutOfRangeException("type");
+
+            return () => (TReturn)Activator.CreateInstance(type);
+#else
+
             var ctor = type.GetConstructor(Type.EmptyTypes);
 
             if (ctor == null)
@@ -27,6 +36,7 @@ namespace Serenity.Reflection
             il.Emit(OpCodes.Ret);
 
             return (Func<TReturn>)dm.CreateDelegate(typeof(Func<TReturn>));
+#endif
         }
     }
 }

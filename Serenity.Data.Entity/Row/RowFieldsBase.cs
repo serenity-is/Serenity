@@ -21,7 +21,9 @@ namespace Serenity.Data
         internal Dictionary<string, Join> joins;
         internal string localTextPrefix;
         internal PropertyChangedEventArgs[] propertyChangedEventArgs;
+#if !COREFX
         internal PropertyDescriptorCollection propertyDescriptors;
+#endif
         internal Func<Row> rowFactory;
         internal Type rowType;
         internal string connectionKey;
@@ -381,14 +383,14 @@ namespace Serenity.Data
                             if (property.PropertyType != null &&
                                 field is IEnumTypeField)
                             {
-                                if (property.PropertyType.IsEnum)
+                                if (property.PropertyType.GetIsEnum())
                                 {
                                     (field as IEnumTypeField).EnumType = property.PropertyType;
                                 }
                                 else
                                 {
                                     var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
-                                    if (nullableType != null && nullableType.IsEnum)
+                                    if (nullableType != null && nullableType.GetIsEnum())
                                         (field as IEnumTypeField).EnumType = nullableType;
                                 }
                             }
@@ -406,7 +408,7 @@ namespace Serenity.Data
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
 
-                            field.CustomAttributes = property.GetCustomAttributes(false);
+                            field.CustomAttributes = property.GetCustomAttributes(false).ToArray();
                         }
                     }
                 }
@@ -420,6 +422,7 @@ namespace Serenity.Data
                 foreach (var attr in this.rowType.GetCustomAttributes<OuterApplyAttribute>())
                     new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
 
+#if !COREFX
                 var propertyDescriptorArray = new PropertyDescriptor[this.Count];
                 for (int i = 0; i < this.Count; i++)
                 {
@@ -428,6 +431,7 @@ namespace Serenity.Data
                 }
 
                 this.propertyDescriptors = new PropertyDescriptorCollection(propertyDescriptorArray);
+#endif
 
                 InferTextualFields();
                 AfterInitialize();

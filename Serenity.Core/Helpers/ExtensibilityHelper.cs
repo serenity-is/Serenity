@@ -33,7 +33,7 @@ namespace Serenity.Extensibility
             foreach (var assembly in assemblies ?? SelfAssemblies)
             {
                 foreach (var type in assembly.GetTypes())
-                    if (!type.IsInterface &&
+                    if (!type.GetIsInterface() &&
                         intf.IsAssignableFrom(type))
                         yield return type;
             }
@@ -45,6 +45,7 @@ namespace Serenity.Extensibility
                 assembly.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity"));
         }
 
+#if !COREFX
         private static void EnumerateDirectory(Dictionary<string, Assembly> assemblies, string path)
         {
             foreach (var filename in Directory.GetFiles(path, "*.dll"))
@@ -62,6 +63,7 @@ namespace Serenity.Extensibility
             {
             }
         }
+#endif
 
         private static Assembly[] DetermineSelfAssemblies()
         {
@@ -92,11 +94,14 @@ namespace Serenity.Extensibility
                 }
             }
 
+#if !COREFX
             var asmPath = Path.GetDirectoryName(typeof(ExtensibilityHelper).Assembly.Location);
             EnumerateDirectory(assemblies, asmPath);
+#endif
 
             return Reflection.AssemblySorter.Sort(assemblies.Values).ToArray();
         }
+
 
         public static void RunClassConstructor(Type type)
         {

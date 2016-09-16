@@ -1,10 +1,4 @@
-﻿using Serenity.Data;
-using Serenity.Services;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
+﻿using System;
 
 namespace Serenity.Reflection
 {
@@ -28,14 +22,14 @@ namespace Serenity.Reflection
 
         public static bool GetFirstDerivedOfGenericType(Type type, Type genericType, out Type derivedType)
         {
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
+            if (type.GetIsGenericType() && type.GetGenericTypeDefinition() == genericType)
             {
                 derivedType = type;
                 return true;
             }
 
-            if (type.BaseType != null)
-                return GetFirstDerivedOfGenericType(type.BaseType, genericType, out derivedType);
+            if (type.GetBaseType() != null)
+                return GetFirstDerivedOfGenericType(type.GetBaseType(), genericType, out derivedType);
 
             derivedType = null;
             return false;

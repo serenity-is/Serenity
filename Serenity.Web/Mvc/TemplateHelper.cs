@@ -1,4 +1,5 @@
-﻿using Serenity.Web.MvcFakes;
+﻿#if !COREFX
+using Serenity.Web.MvcFakes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,3 +78,4 @@ namespace Serenity.Web
         }
     }
 }
+#endif

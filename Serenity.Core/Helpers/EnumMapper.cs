@@ -9,14 +9,15 @@ namespace Serenity
     using System.Reflection;
     using Serenity.Abstractions;
     using Serenity.ComponentModel;
+    using System.Collections.Concurrent;
 
     public static class EnumMapper
     {
-        private static Hashtable cache;
+        private static ConcurrentDictionary<Type, EnumTypeItem> cache;
 
         static EnumMapper()
         {
-            cache = new Hashtable();
+            cache = new ConcurrentDictionary<Type, EnumTypeItem>();
         }
 
         private class EnumTypeItem
@@ -33,8 +34,8 @@ namespace Serenity
 
         private static EnumTypeItem Get(Type enumType)
         {
-            EnumTypeItem item = cache[enumType] as EnumTypeItem;
-            if (item == null)
+            EnumTypeItem item;
+            if (!cache.TryGetValue(enumType, out item))
             {
                 item = new EnumTypeItem();
 
@@ -45,8 +46,7 @@ namespace Serenity
                     item.valueToString[Convert.ToInt32(value)] = key;
                 }
 
-                var locked = Hashtable.Synchronized(cache);
-                locked[enumType] = item;
+                cache[enumType] = item;
             }
 
             return item;
@@ -112,7 +112,7 @@ namespace Serenity
                 return String.Empty;
 
             if (enumType != null &&
-                enumType.IsEnum &&
+                enumType.GetIsEnum() &&
                 System.Enum.GetName(enumType, value) != null)
             {
                 var enumName = System.Enum.GetName(enumType, value);
@@ -124,10 +124,10 @@ namespace Serenity
                     var memInfo = enumType.GetMember(enumName);
                     if (memInfo != null && memInfo.Length == 1)
                     {
-                        var attributes = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
-                        if (attributes.Length > 0)
+                        var attribute = memInfo[0].GetCustomAttribute<DescriptionAttribute>(false);
+                        if (attribute != null)
                         {
-                            text = ((DescriptionAttribute)attributes[0]).Description;
+                            text = attribute.Description;
                             Dependency.Resolve<ILocalTextRegistry>().Add(LocalText.InvariantLanguageID, key, text);
                         }
                     }

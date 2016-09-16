@@ -8,8 +8,10 @@ namespace Serenity.ComponentModel
         protected ImageUploadEditorAttribute(string editorType)
             : base(editorType)
         {
+#if !COREFX
             ScaleMode = ImageScaleMode.PreserveRatioNoFill;
             ThumbMode = ImageScaleMode.PreserveRatioNoFill;
+#endif
         }
 
         public ImageUploadEditorAttribute()
@@ -27,21 +29,31 @@ namespace Serenity.ComponentModel
         }
 
         /// <summary>
-        /// Maximum height in pixels of the uploaded image.
-        /// </summary>
-        public Int32 MaxHeight
-        {
-            get { return GetOption<Int32>("maxHeight"); }
-            set { SetOption("maxHeight", value); }
-        }
-
-        /// <summary>
         /// Maximum size in bytes of the uploaded file.
         /// </summary>
         public Int32 MaxSize
         {
             get { return GetOption<Int32>("maxSize"); }
             set { SetOption("maxSize", value); }
+        }
+
+        /// <summary>
+        /// Minimum size in bytes of the uploaded file.
+        /// </summary>
+        public Int32 MinSize
+        {
+            get { return GetOption<Int32>("minSize"); }
+            set { SetOption("minSize", value); }
+        }
+
+#if !COREFX
+        /// <summary>
+        /// Maximum height in pixels of the uploaded image.
+        /// </summary>
+        public Int32 MaxHeight
+        {
+            get { return GetOption<Int32>("maxHeight"); }
+            set { SetOption("maxHeight", value); }
         }
 
         /// <summary>
@@ -63,43 +75,12 @@ namespace Serenity.ComponentModel
         }
 
         /// <summary>
-        /// Minimum size in bytes of the uploaded file.
-        /// </summary>
-        public Int32 MinSize
-        {
-            get { return GetOption<Int32>("minSize"); }
-            set { SetOption("minSize", value); }
-        }
-
-        /// <summary>
         /// Minimum width in pixels of the uploaded image.
         /// </summary>
         public Int32 MinWidth
         {
             get { return GetOption<Int32>("minWidth"); }
             set { SetOption("minWidth", value); }
-        }
-
-        /// <summary>
-        /// Only useful for MultipleImageUploadeEditor. Specifies
-        /// wheter to JSON encode value. If your field is a string
-        /// field set it to true.
-        /// </summary>
-        public bool JsonEncodeValue
-        {
-            get { return GetOption<bool>("jsonEncodeValue"); }
-            set { SetOption("jsonEncodeValue", value); }
-        }
-
-        /// <summary>
-        /// If you want to store original name of the file uploaded,
-        /// set this to the name of another string field. Only used
-        /// for single image uploads.
-        /// </summary>
-        public String OriginalNameProperty
-        {
-            get { return GetOption<String>("originalNameProperty"); }
-            set { SetOption("originalNameProperty", value); }
         }
 
         /// <summary>
@@ -132,6 +113,29 @@ namespace Serenity.ComponentModel
         /// What kind of image scaling should be used to generate thumbnails.
         /// </summary>
         public ImageScaleMode ThumbMode { get; set; }
+#endif
+
+        /// <summary>
+        /// Only useful for MultipleImageUploadeEditor. Specifies
+        /// wheter to JSON encode value. If your field is a string
+        /// field set it to true.
+        /// </summary>
+        public bool JsonEncodeValue
+        {
+            get { return GetOption<bool>("jsonEncodeValue"); }
+            set { SetOption("jsonEncodeValue", value); }
+        }
+
+        /// <summary>
+        /// If you want to store original name of the file uploaded,
+        /// set this to the name of another string field. Only used
+        /// for single image uploads.
+        /// </summary>
+        public String OriginalNameProperty
+        {
+            get { return GetOption<String>("originalNameProperty"); }
+            set { SetOption("originalNameProperty", value); }
+        }
 
         /// <summary>
         /// Should a copy of file placed in a special history folder on upload. 

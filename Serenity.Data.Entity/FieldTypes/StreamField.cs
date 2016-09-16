@@ -74,7 +74,7 @@ namespace Serenity.Data
             {
                 var ms = new MemoryStream((int)value.Length);
                 CopyStream(value, ms);
-                writer.WriteValue(ms.GetBuffer());
+                writer.WriteValue(ms.ToArray());
             }
         }
 

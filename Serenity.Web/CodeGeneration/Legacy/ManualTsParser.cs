@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -1010,3 +1011,4 @@ namespace Serenity.CodeGeneration
         }
     }
 }
+#endif

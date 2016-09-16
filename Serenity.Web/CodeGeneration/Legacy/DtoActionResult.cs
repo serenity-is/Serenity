@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.IO;
 using System.Web.Mvc;
 using Newtonsoft.Json;
@@ -128,3 +129,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

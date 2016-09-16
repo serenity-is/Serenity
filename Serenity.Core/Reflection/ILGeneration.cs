@@ -8,6 +8,9 @@ namespace Serenity.Reflection
     {
         public static Func<object, object> GenerateGetter(FieldInfo fieldInfo)
         {
+#if COREFX
+            return x => fieldInfo.GetValue(x);
+#else
             // create a method without a name, object as result type and one parameter of type object
             // the last parameter is very import for accessing private fields
             var method = new DynamicMethod(string.Empty, typeof(object), new[] { typeof(object) }, fieldInfo.DeclaringType, true);
@@ -23,10 +26,14 @@ namespace Serenity.Reflection
             il.Emit(OpCodes.Ret); // return the value on the stack
 
             return (Func<object, object>)method.CreateDelegate(typeof(Func<object, object>));
+#endif
         }
 
         public static Action<object, object> GenerateSetter(FieldInfo fieldInfo)
         {
+#if COREFX
+            return (x, v) => fieldInfo.SetValue(x, v);
+#else
             var method = new DynamicMethod(string.Empty, null, new[] { typeof(object), typeof(object) }, fieldInfo.DeclaringType, true);
             var il = method.GetILGenerator();
 
@@ -43,6 +50,7 @@ namespace Serenity.Reflection
             il.Emit(OpCodes.Ret); // return
 
             return (Action<object, object>)method.CreateDelegate(typeof(Action<object, object>));
+#endif
         }
     }
 }

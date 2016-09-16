@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿#if !COREFX
+using Newtonsoft.Json;
 using Serenity.Configuration;
 using Serenity.Data;
 using System;
@@ -110,3 +111,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

@@ -1,13 +1,16 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using Serenity.IO;
+#if !COREFX
+using System.Drawing;
+using System.Drawing.Imaging;
+#endif
 
 namespace Serenity.Web
 {
     public class UploadProcessor
     {
+#if !COREFX
         public UploadProcessor()
         {
             ThumbBackColor = Color.Empty;
@@ -18,17 +21,18 @@ namespace Serenity.Web
         public Color ThumbBackColor { get; set; }
         public ImageScaleMode ThumbScaleMode { get; set; }
         public int ThumbQuality { get; set; }
-
+        public string ThumbFile { get; private set; }
+        public string ThumbUrl { get; private set; }
+        public int ImageWidth { get; private set; }
+        public int ImageHeight { get; private set; }
+#endif
         public ImageCheckResult CheckResult { get; private set; }
         public string ErrorMessage { get; private set; }
         public long FileSize { get; private set; }
         public string FilePath { get; private set; }
         public string FileUrl { get; private set; }
         public bool IsImage { get; private set; }
-        public int ImageWidth { get; private set; }
-        public int ImageHeight { get; private set; }
-        public string ThumbFile { get; private set; }
-        public string ThumbUrl { get; private set; }
+
 
         private bool IsImageExtension(string extension)
         {
@@ -66,14 +70,16 @@ namespace Serenity.Web
             extension = extension.TrimToEmpty().ToLowerInvariant();
             if (IsDangerousExtension(extension))
             {
-                ErrorMessage = "Desteklenmeyen dosya uzantısı!";
+                ErrorMessage = "Unsupported file extension!";
                 return false;
             }
 
             CheckResult = ImageCheckResult.InvalidImage;
             ErrorMessage = null;
+#if !COREFX
             ImageWidth = 0;
             ImageHeight = 0;
+#endif
             IsImage = false;
 
             var success = false;
@@ -88,7 +94,18 @@ namespace Serenity.Web
                 try
                 {
                     if (IsImageExtension(extension))
+                    {
+#if COREFX
+                        IsImage = true;
+                        success = true;
+                        FilePath = baseFileName + extension;
+                        fileContent.Seek(0, SeekOrigin.Begin);
+                        using (FileStream fs = new FileStream(FilePath, FileMode.Create))
+                            fileContent.CopyTo(fs);
+#else
                         success = ProcessImageStream(fileContent, extension);
+#endif
+                    }
                     else
                     {
                         FilePath = baseFileName + extension;
@@ -110,8 +127,10 @@ namespace Serenity.Web
             {
                 if (!success)
                 {
+#if !COREFX
                     if (!ThumbFile.IsNullOrEmpty())
                         TemporaryFileHelper.TryDelete(ThumbFile);
+#endif
                     if (!FilePath.IsNullOrEmpty())
                         TemporaryFileHelper.TryDelete(FilePath);
                 }
@@ -122,6 +141,7 @@ namespace Serenity.Web
             return success;
         }
 
+#if !COREFX
         private bool ProcessImageStream(Stream fileContent, string extension)
         {
             Image image = null;
@@ -150,7 +170,7 @@ namespace Serenity.Web
                     var temporaryPath = UploadHelper.TemporaryPath;
                     Directory.CreateDirectory(temporaryPath);
                     TemporaryFileHelper.PurgeDirectoryDefault(temporaryPath);
-                            
+
                     string baseFileName = System.IO.Path.Combine(temporaryPath, Guid.NewGuid().ToString("N"));
 
                     FilePath = baseFileName + extension;
@@ -199,5 +219,6 @@ namespace Serenity.Web
                 }
             }
         }
+#endif
     }
 }

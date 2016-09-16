@@ -7,7 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+#else
 using System.Web.Mvc;
+#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -60,7 +64,7 @@ namespace Serenity.CodeGeneration
                 if (nullableType != null)
                     memberType = nullableType;
 
-                if (memberType.IsEnum)
+                if (memberType.GetIsEnum())
                     EnqueueType(memberType);
             }
         }
@@ -109,7 +113,7 @@ namespace Serenity.CodeGeneration
             foreach (var assembly in this.Assemblies)
                 foreach (var fromType in assembly.GetTypes())
                 {
-                    if (fromType.IsAbstract)
+                    if (fromType.GetIsAbstract())
                         continue;
 
                     if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
@@ -137,7 +141,7 @@ namespace Serenity.CodeGeneration
             {
                 var type = generateQueue.Dequeue();
 
-                if (!this.Assemblies.Contains(type.Assembly))
+                if (!this.Assemblies.Contains(type.GetAssembly()))
                     continue;
 
                 var ns = GetNamespace(type);
@@ -153,10 +157,10 @@ namespace Serenity.CodeGeneration
 
         public static bool CanHandleType(Type memberType)
         {
-            if (memberType.IsInterface)
+            if (memberType.GetIsInterface())
                 return false;
 
-            if (memberType.IsAbstract)
+            if (memberType.GetIsAbstract())
                 return false;
 
             if (typeof(Delegate).IsAssignableFrom(memberType))
@@ -229,7 +233,7 @@ namespace Serenity.CodeGeneration
         {
             sb = sb ?? this.sb;
 
-            if (type.IsGenericType)
+            if (type.GetIsGenericType())
             {
                 var gtd = type.GetGenericTypeDefinition();
                 var name = gtd.Name;
@@ -266,7 +270,7 @@ namespace Serenity.CodeGeneration
 
             string ns;
 
-            if (type.IsGenericType)
+            if (type.GetIsGenericType())
             {
                 var gtd = type.GetGenericTypeDefinition();
                 ns = ShortenNamespace(gtd, codeNamespace);
@@ -360,14 +364,14 @@ namespace Serenity.CodeGeneration
             if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
                 return false;
 
-            var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
+            var parameters = method.GetParameters().Where(x => !x.ParameterType.GetIsInterface()).ToArray();
             if (parameters.Length > 1)
                 return false;
 
             if (parameters.Length == 1)
             {
                 requestType = parameters[0].ParameterType;
-                if (requestType.IsPrimitive || !CanHandleType(requestType))
+                if (requestType.GetIsPrimitive() || !CanHandleType(requestType))
                     return false;
             }
             else
@@ -377,7 +381,7 @@ namespace Serenity.CodeGeneration
 
             responseType = method.ReturnType;
             if (responseType != null &&
-                responseType.IsGenericType &&
+                responseType.GetIsGenericType() &&
                 responseType.GetGenericTypeDefinition() == typeof(Result<>))
             {
                 responseType = responseType.GenericTypeArguments[0];
@@ -395,12 +399,17 @@ namespace Serenity.CodeGeneration
             var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
             string url = route.Template ?? "";
 
+#if COREFX
+            url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
+#else
             if (!url.StartsWith("~/"))
             {
+
                 var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
                 if (routePrefix != null)
                     url = UriHelper.Combine(routePrefix.Prefix, url);
             }
+#endif
 
             if (!url.StartsWith("~/") && !url.StartsWith("/"))
                 url = "~/" + url;

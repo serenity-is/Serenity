@@ -205,6 +205,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Security\RecaptchaValidation.cs" />
+    <Compile Include="Security\SiteMembershipProvider.cs" />
     <Compile Include="Security\WebSecurityHelper.cs" />
     <Compile Include="Texts\Texts.Controls.ColumnPickerDialog.cs" />
     <Compile Include="Texts\Texts.Controls.ImageUpload.cs" />
@@ -249,8 +250,6 @@
     <Compile Include="DynamicScript\DynamicScriptTypes\RegisteredScripts.cs" />
     <Compile Include="Mvc\ScriptBundleManager.cs" />
     <Compile Include="DynamicScript\DynamicScriptTypes\TemplateScript.cs" />
-    <Compile Include="Security\SiteMembershipProvider.cs" />
-    <Compile Include="Security\SiteRoleProvider.cs" />
     <Compile Include="Mvc\Throttling.cs" />
   </ItemGroup>
   <ItemGroup>

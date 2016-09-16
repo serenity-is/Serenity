@@ -7,7 +7,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+#if COREFX
+using Microsoft.AspNetCore.Mvc;
+#else
 using System.Web.Mvc;
+#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -81,7 +85,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
+            if (memberType.GetIsGenericType() &&
                 (memberType.GetGenericTypeDefinition() == typeof(List<>) ||
                 memberType.GetGenericTypeDefinition() == typeof(HashSet<>)))
             {
@@ -90,7 +94,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
+            if (memberType.GetIsGenericType() &&
                 memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 sb.Append("{ [key: ");

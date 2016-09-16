@@ -1,4 +1,4 @@
-﻿
+﻿#if !COREFX
 namespace Serenity.Caching
 {
     using Serenity.Abstractions;
@@ -33,3 +33,4 @@ namespace Serenity.Caching
         }
     }
 }
+#endif

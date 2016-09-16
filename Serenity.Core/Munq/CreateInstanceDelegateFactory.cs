@@ -42,7 +42,7 @@ namespace Munq
 
         private static NewExpression BuildExpression(Type type, ParameterExpression container)
         {
-            if (!type.IsGenericTypeDefinition)
+            if (!type.GetIsGenericTypeDefinition())
             {
                 ConstructorInfo constructor = GetConstructorInfo(type);
                 ParameterInfo[] parameters = constructor.GetParameters();
