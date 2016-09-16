@@ -1,3 +1,11 @@
+## 2.4.10 (2016-09-16)
+
+Features:
+  - added quick filter for boolean fields
+  - made dateRangeQuickFilter method public in DataGrid so it can be customized simpler in StoredProcedureGrid sample
+  - update bootstrap-slider and fix clash with jquery slider
+  - add missing cascadeFrom property to declaration of LookupEditorBase in TypeScript
+
 ## 2.4.9 (2016-09-14)
 
 Features:
