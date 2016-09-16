@@ -1424,6 +1424,7 @@ declare namespace Serenity {
         onInitNewEntity: (entity: TItem) => void;
         value: string;
         cascadeField: string;
+        cascadeFrom: string;
         cascadeValue: any;
         filterField: string;
         filterValue: any;
