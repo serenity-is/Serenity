@@ -5207,6 +5207,18 @@
 						}
 						quick = this.dateRangeQuickFilter($t4, $t3);
 					}
+					else if (ss.referenceEquals(filteringType, $Serenity_BooleanFiltering)) {
+						var $t7 = item.name;
+						var $t6 = Q.tryGetText(item.title);
+						if (ss.isNullOrUndefined($t6)) {
+							var $t5 = item.title;
+							if (ss.isNullOrUndefined($t5)) {
+								$t5 = item.name;
+							}
+							$t6 = $t5;
+						}
+						quick = this.booleanQuickFilter($t7, $t6, null, null);
+					}
 					else {
 						var filtering = ss.cast(ss.createInstance(filteringType), $Serenity_IFiltering);
 						if (ss.isValue(filtering) && ss.isInstanceOfType(filtering, $Serenity_IQuickFiltering)) {
@@ -5891,8 +5903,10 @@
 					opt.handler(args);
 					quickFilter.toggleClass('quick-filter-active', args.active);
 					if (!args.handled) {
-						if (value.length > 0) {
-							request.Criteria = Serenity.Criteria.join(request.Criteria, 'and', [[opt.field], 'in', [value]]);
+						if ($.isArray(value)) {
+							if (value.length > 0) {
+								request.Criteria = Serenity.Criteria.join(request.Criteria, 'and', [[opt.field], 'in', [value]]);
+							}
 						}
 						else {
 							request.EqualityFilter[opt.field] = value;
@@ -5953,6 +5967,33 @@
 						next.setDate(next.getDate() + 1);
 						args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<', Q.formatDate(next, 'yyyy-MM-dd')]);
 					}
+				}
+			};
+		},
+		addBooleanFilter: function(field, title, yes, no) {
+			return ss.cast(this.addQuickFilter(this.booleanQuickFilter(field, title, yes, no)), $Serenity_SelectEditor);
+		},
+		booleanQuickFilter: function(field, title, yes, no) {
+			var $t1 = $Serenity_SelectEditorOptions.$ctor();
+			var $t2 = [];
+			var $t3 = yes;
+			if (ss.isNullOrUndefined($t3)) {
+				$t3 = Q.text('Controls.FilterPanel.OperatorNames.true');
+			}
+			$t2.push(['1', $t3]);
+			var $t4 = no;
+			if (ss.isNullOrUndefined($t4)) {
+				$t4 = Q.text('Controls.FilterPanel.OperatorNames.false');
+			}
+			$t2.push(['0', $t4]);
+			$t1.items = $t2;
+			return {
+				field: field,
+				type: $Serenity_SelectEditor,
+				title: title,
+				options: $t1,
+				handler: function(args) {
+					args.equalityFilter[args.field] = (ss.isNullOrEmptyString(ss.safeCast(args.value, String)) ? null : !!Q.toId(args.value));
 				}
 			};
 		},

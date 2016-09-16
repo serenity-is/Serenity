@@ -11,6 +11,8 @@
         protected quickFiltersDiv: JQuery;
         protected slickContainer: JQuery;
         protected toolbar: Toolbar;
+        protected addBooleanFilter(field: string, title?: string, yes?: string, no?: string): SelectEditor;
+        protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;;
         protected addDateRangeFilter(field: string, title?: string): DateEditor;
         protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
         protected addQuickFilter<TWidget extends Widget<any>, TOptions>(filter: QuickFilter<TWidget, TOptions>): TWidget;

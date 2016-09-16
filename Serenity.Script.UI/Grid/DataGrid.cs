@@ -152,6 +152,11 @@ namespace Serenity
                     quick = DateRangeQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name)
                         .As<QuickFilter<Widget, object>>();
                 }
+                else if (filteringType == typeof(BooleanFiltering))
+                {
+                    quick = BooleanQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name)
+                        .As<QuickFilter<Widget, object>>();
+                }
                 else
                 {
                     var filtering = (IFiltering)Activator.CreateInstance(filteringType);
@@ -1081,8 +1086,11 @@ namespace Serenity
 
                     if (!args.Handled)
                     {
-                        if (value.As<object[]>().Length > 0)
-                            request.Criteria &= new Criteria(opt.Field).In(value.As<object[]>());
+                        if (jQuery.IsArray(value))
+                        {
+                            if (value.As<object[]>().Length > 0)
+                                request.Criteria &= new Criteria(opt.Field).In(value.As<object[]>());
+                        }
                         else
                             request.EqualityFilter[opt.Field] = value;
                     }
@@ -1159,6 +1167,34 @@ namespace Serenity
                         next.SetDate(next.GetDate() + 1);
                         args.Request.Criteria &= new Criteria(args.Field) < Q.FormatDate(next, "yyyy-MM-dd");
                     }
+                }
+            };
+        }
+
+        public SelectEditor AddBooleanFilter(string field, string title = null, string yes = null, string no = null)
+        {
+            return (SelectEditor)AddQuickFilter(BooleanQuickFilter(field, title, yes, no));
+        }
+
+        public QuickFilter<SelectEditor, SelectEditorOptions> BooleanQuickFilter(string field, string title = null, string yes = null, string no = null)
+        {
+            return new QuickFilter<SelectEditor, SelectEditorOptions>
+            {
+                Field = field,
+                Type = typeof(SelectEditor),
+                Title = title,
+                Options = new SelectEditorOptions
+                {
+                    Items = new List<object>
+                    {
+                        new[] { "1", yes ?? Q.Text("Controls.FilterPanel.OperatorNames.true") },
+                        new[] { "0", no ?? Q.Text("Controls.FilterPanel.OperatorNames.false") }
+                    }
+                },
+                Handler = args =>
+                {
+                    args.EqualityFilter[args.Field] = string.IsNullOrEmpty(args.Value as string) ? (bool?)null : 
+                        Q.IsTrue(args.Value.ToInt32());
                 }
             };
         }
