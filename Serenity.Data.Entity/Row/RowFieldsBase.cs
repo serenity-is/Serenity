@@ -102,7 +102,7 @@ namespace Serenity.Data
             tableName = name;
         }
 
-        public static string ParseDatabaseAndSchema(string tableName, 
+        public static string ParseDatabaseAndSchema(string tableName,
             out string database, out string schema)
         {
             database = null;
@@ -211,7 +211,8 @@ namespace Serenity.Data
                         ScaleAttribute scale = null;
                         MinSelectLevelAttribute selectLevel = null;
                         ForeignKeyAttribute foreignKey = null;
-                        LeftJoinAttribute foreignJoin = null;
+                        LeftJoinAttribute leftJoin = null;
+                        InnerJoinAttribute innerJoin = null;
                         DefaultValueAttribute defaultValue = null;
                         TextualFieldAttribute textualField = null;
                         DateTimeKindAttribute dateTimeKind = null;
@@ -228,7 +229,8 @@ namespace Serenity.Data
                             scale = property.GetCustomAttribute<ScaleAttribute>(false);
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
                             foreignKey = property.GetCustomAttribute<ForeignKeyAttribute>(false);
-                            foreignJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                            leftJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                            innerJoin = property.GetCustomAttributes<InnerJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
                             defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
                             textualField = property.GetCustomAttribute<TextualFieldAttribute>(false);
                             dateTimeKind = property.GetCustomAttribute<DateTimeKindAttribute>(false);
@@ -324,10 +326,16 @@ namespace Serenity.Data
                             field.ForeignField = foreignKey.Field;
                         }
 
-                        if (foreignJoin != null)
+                        if (leftJoin != null)
                         {
-                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, foreignJoin.Alias,
-                                new Criteria(foreignJoin.Alias, field.ForeignField) == new Criteria(field));
+                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, leftJoin.Alias,
+                                new Criteria(leftJoin.Alias, field.ForeignField) == new Criteria(field));
+                        }
+
+                        if (innerJoin != null)
+                        {
+                            field.ForeignJoinAlias = new InnerJoin(this.joins, field.ForeignTable, innerJoin.Alias,
+                                new Criteria(innerJoin.Alias, field.ForeignField) == new Criteria(field));
                         }
 
                         if (textualField != null)
@@ -356,10 +364,15 @@ namespace Serenity.Data
                                         (field as IEnumTypeField).EnumType = nullableType;
                                 }
                             }
-                            
+
                             foreach (var attr in property.GetCustomAttributes<LeftJoinAttribute>())
                                 if (attr.ToTable != null && attr.OnCriteria != null)
                                     new LeftJoin(this.joins, attr.ToTable, attr.Alias,
+                                        new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
+
+                            foreach (var attr in property.GetCustomAttributes<InnerJoinAttribute>())
+                                if (attr.ToTable != null && attr.OnCriteria != null)
+                                    new InnerJoin(this.joins, attr.ToTable, attr.Alias,
                                         new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
 
                             field.PropertyName = property.Name;
@@ -372,6 +385,9 @@ namespace Serenity.Data
 
                 foreach (var attr in this.rowType.GetCustomAttributes<LeftJoinAttribute>())
                     new LeftJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
+
+                foreach (var attr in this.rowType.GetCustomAttributes<InnerJoinAttribute>())
+                    new InnerJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
                 foreach (var attr in this.rowType.GetCustomAttributes<OuterApplyAttribute>())
                     new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
@@ -436,7 +452,7 @@ namespace Serenity.Data
                     foreach (var join in this.joins.Values)
                     {
                         if (String.Compare(field.ForeignTable, join.Table) == 0 &&
-                            join is LeftJoin &&
+                            (join is LeftJoin || join is InnerJoin) &&
                             !Object.ReferenceEquals(null, join.OnCriteria) &&
                             join.OnCriteria.ToStringIgnoreParams().IndexOf(field.Expression, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
@@ -490,7 +506,7 @@ namespace Serenity.Data
 
         public string GenerationKey
         {
-            get 
+            get
             {
                 if (generationKey != null)
                     return generationKey;
@@ -592,7 +608,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("item");
 
             if (byName.ContainsKey(item.Name))
-                throw new ArgumentOutOfRangeException("item", 
+                throw new ArgumentOutOfRangeException("item",
                     String.Format("field list already contains a field with name '{0}'", item.Name));
 
             var old = base[index];
