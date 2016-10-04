@@ -1798,8 +1798,8 @@
 			name: '<span class="select-all-items check-box no-float "></span>',
 			toolTip: ' ',
 			field: '__select__',
-			width: 25,
-			minWidth: 25,
+			width: 26,
+			minWidth: 26,
 			headerCssClass: 'select-all-header',
 			sortable: false,
 			format: function(ctx) {

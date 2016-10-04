@@ -106,8 +106,8 @@ namespace Serenity
                 Title = "<span class=\"select-all-items check-box no-float " + ("") + "\"></span>",
                 ToolTip = " ",
                 Field = "__select__",
-                Width = 25,
-                MinWidth = 25,
+                Width = 26,
+                MinWidth = 26,
                 HeaderCssClass = "select-all-header",
                 Sortable = false,
                 Format = ctx =>
