@@ -40,7 +40,7 @@ If you are using Serenity in any open source / commercial projects let me know, 
 
 ## Online Serene Demo
 
-http://serenedemo.azurewebsites.net/
+http://serenity.is/demo/
 
 *This demo is automatically updated when a new Serene version is pushed to GitHub repository. Thanks to @samdubey for setting it up.*
 
