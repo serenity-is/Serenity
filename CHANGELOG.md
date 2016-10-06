@@ -1,3 +1,12 @@
+## 2.4.11 (2016-10-06)
+
+Features:
+  - increase checkbox column width for row selection mixin by 1 due to ie11 text overflow issue
+  - make source and disabled optional in Select2Item interface
+  - rename addItem method in Select2Editor that takes two strings to addOption to avoid confusion
+  - added enabling row selection sample [Serene]
+  - added user image to user table and navigation (thanks @edson)
+
 ## 2.4.10 (2016-09-16)
 
 Features:
