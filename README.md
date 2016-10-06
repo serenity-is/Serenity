@@ -42,8 +42,6 @@ If you are using Serenity in any open source / commercial projects let me know, 
 
 http://serenity.is/demo/
 
-*This demo is automatically updated when a new Serene version is pushed to GitHub repository. Thanks to @samdubey for setting it up.*
-
 ## Video Tutorials (thanks a lot to @samdubey for these contributions)
 
 **Serenity Youtube Channel:** 
