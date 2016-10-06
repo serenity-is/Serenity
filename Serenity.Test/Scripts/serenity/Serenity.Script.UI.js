@@ -23,7 +23,7 @@
 					}
 					$t3 = $t2;
 				}
-				this.addItem$1($t4, $t3, field, false);
+				this.addOption($t4, $t3, field, false);
 			}
 		}
 		finally {
@@ -48,7 +48,7 @@
 					$t3 = $t2;
 				}
 				var title = $t3;
-				this.addItem$1(op.key, title, op, false);
+				this.addOption(op.key, title, op, false);
 			}
 		}
 		finally {
@@ -4426,7 +4426,7 @@
 			this.items.push(item);
 			this.itemById[item.id] = item;
 		},
-		addItem$1: function(key, text, source, disabled) {
+		addOption: function(key, text, source, disabled) {
 			this.addItem({ id: key, text: text, source: source, disabled: disabled });
 		},
 		addInplaceCreate: function(addTitle, editTitle) {
@@ -6800,7 +6800,7 @@
 						$t3 = $t2;
 					}
 					var text = ss.cast($t3, String);
-					this.addItem$1(key, text, item, false);
+					this.addOption(key, text, item, false);
 				}
 			}
 		}
@@ -8150,7 +8150,7 @@
 			for (var $t2 = 0; $t2 < $t1.length; $t2++) {
 				var x = $t1[$t2];
 				var name = ss.Enum.toString(enumType, x);
-				this.addItem$1(ss.unbox(ss.cast(x, ss.Int32)).toString(), ss.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name), null, false);
+				this.addOption(ss.unbox(ss.cast(x, ss.Int32)).toString(), ss.coalesce(Q.tryGetText('Enums.' + enumKey + '.' + name), name), null, false);
 			}
 		}
 	}, $Serenity_Select2Editor, [$Serenity_ISetEditValue, $Serenity_IGetEditValue, $Serenity_IStringValue]);

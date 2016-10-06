@@ -131,12 +131,14 @@ namespace Serenity
             this.itemById = new JsDictionary<string, Select2Item>();
         }
 
+        [ScriptName("addItem")]
         protected void AddItem(Select2Item item)
         {
             this.items.Add(item);
             this.itemById[item.Id] = item;
         }
 
+        [ScriptName("addOption")]
         protected void AddItem(string key, string text, TItem source = null, bool disabled = false)
         {
             AddItem(new Select2Item

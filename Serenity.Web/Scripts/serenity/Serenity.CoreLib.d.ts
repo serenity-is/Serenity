@@ -1801,12 +1801,12 @@ declare namespace Serenity {
         itemById: any;
         pageSize: number;
         lastCreateTerm: string;
-        constructor(hidden: JQuery, opt: any);
+        constructor(hidden: JQuery, opt?: any);
         emptyItemText(): string;
         getSelect2Options(): Select2Options;
         clearItems(): void;
         addItem(item: Select2Item): void;
-        addItem(key: string, text: string, source?: any, disabled?: boolean): void;
+        addOption(key: string, text: string, source?: any, disabled?: boolean): void;
         addInplaceCreate(addTitle?: string, editTitle?: string): void;
         inplaceCreateClick(e: any): void;
         getCreateSearchChoice(getName?: (p1: any) => string): (p1: string) => any;
@@ -1830,8 +1830,8 @@ declare namespace Serenity {
     interface Select2Item {
         id: string;
         text: string;
-        source: any;
-        disabled: boolean;
+        source?: any;
+        disabled?: boolean;
     }
     class SelectEditor extends Select2Editor<SelectEditorOptions, Select2Item> {
         constructor(hidden: JQuery, opt: SelectEditorOptions);
