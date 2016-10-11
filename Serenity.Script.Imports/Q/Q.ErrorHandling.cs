@@ -7,7 +7,7 @@ namespace Serenity
         [Imported]
         public static class ErrorHandling
         {
-            [InlineCode("Q.showServiceError({error})")]
+            [InlineCode("Q.ErrorHandling.showServiceError({error})")]
             public static void ShowServiceError(ServiceError error)
             {
             }
