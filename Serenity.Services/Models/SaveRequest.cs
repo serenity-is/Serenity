@@ -6,6 +6,7 @@ namespace Serenity.Services
 {
     public interface ISaveRequest
     {
+        object EntityId { get; set; }
         object Entity { get; set; }
     }
 

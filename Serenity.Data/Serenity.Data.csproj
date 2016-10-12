@@ -88,6 +88,7 @@
     <Compile Include="Mapping\ColumnSelection.cs" />
     <Compile Include="Mapping\DateTimeKindAttribute.cs" />
     <Compile Include="Mapping\LinkingSetRelationAttribute.cs" />
+    <Compile Include="Mapping\UpdatableExtensionAttribute.cs" />
     <Compile Include="Mapping\MasterDetailRelationAttribute.cs" />
     <Compile Include="Mapping\ClientSideAttribute.cs" />
     <Compile Include="Mapping\UniqueAttribute.cs" />

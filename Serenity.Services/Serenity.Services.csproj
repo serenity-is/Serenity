@@ -57,6 +57,7 @@
     <Compile Include="RequestHandlers\Delete\IDeleteBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\CaptureOperationType.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\ICaptureLogHandler.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\UpdatableExtension\UpdatableExtensionBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\LinkingSetRelation\LinkingSetRelationBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\MasterDetail\MasterDetailRelationBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\InsertUpdateLog\InsertUpdateLogBehavior.cs" />
@@ -150,6 +151,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
