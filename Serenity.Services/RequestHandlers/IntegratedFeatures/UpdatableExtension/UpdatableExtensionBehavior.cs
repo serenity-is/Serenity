@@ -204,10 +204,7 @@ namespace Serenity.Services
             foreach (var info in infoList)
             {
                 handler.StateBag["UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias] =
-                    info.Mappings.Where(x =>
-                    {
-                        return handler.Row.IsAssigned(x.Item1);
-                    }).ToList();
+                    info.Mappings.Where(x => handler.Row.IsAssigned(x.Item1)).ToList();
             }
         }
 
@@ -279,6 +276,40 @@ namespace Serenity.Services
                     mapping.Item2.AsObject(extension, mapping.Item1.AsObject(handler.Row));
 
                 info.SaveHandlerFactory().Process(handler.UnitOfWork, request, oldID == null ? SaveRequestType.Create : SaveRequestType.Update);
+            }
+        }
+
+        public override void OnBeforeDelete(IDeleteRequestHandler handler)
+        {
+            foreach (var info in infoList)
+            {
+                if (!info.Attr.CascadeDelete)
+                    continue;
+
+                var thisKey = info.ThisKeyField.AsObject(handler.Row);
+                if (ReferenceEquals(null, thisKey))
+                    continue;
+
+                var existing = info.ListHandlerFactory().Process(handler.Connection, new ListRequest
+                {
+                    ColumnSelection = ColumnSelection.KeyOnly,
+                    Criteria = new Criteria(info.OtherKeyField.PropertyName ?? info.OtherKeyField.Name) == new ValueCriteria(thisKey)
+                }).Entities;
+
+                if (existing.Count == 0)
+                    continue;
+
+                if (existing.Count > 1)
+                    throw new Exception(String.Format("Found multiple extension rows for UpdatableExtension '{0}'", info.Attr.Alias));
+
+                var oldID = ((Field)((IIdRow)existing[0]).IdField).AsObject((Row)existing[0]);
+                if (oldID == null)
+                    continue;
+
+                info.DeleteHandlerFactory().Process(handler.UnitOfWork, new Services.DeleteRequest
+                {
+                    EntityId = oldID
+                });
             }
         }
     }
