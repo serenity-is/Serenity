@@ -1,3 +1,14 @@
+## 2.4.12 (2016-10-13)
+
+Features:
+  - added updatable extension attribute and related behavior for 1 to 1 extension tables
+  - added Static Text Block sample [Serene]
+  - handle IndexCompare for RowListField type
+  - added RowField type
+ 
+ Bugfixes:
+  - fix reference to Q.ErrorHandling.showServiceError in Saltaralle code
+
 ## 2.4.11 (2016-10-06)
 
 Features:
