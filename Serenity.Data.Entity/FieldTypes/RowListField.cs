@@ -13,7 +13,41 @@ namespace Serenity.Data
 
         protected override int CompareValues(List<TForeign> value1, List<TForeign> value2)
         {
-            throw new NotImplementedException();
+            if (value1 == null && value2 == null)
+                return 0;
+
+            if (value1 == null)
+                return -1;
+
+            if (value2 == null)
+                return 1;
+
+            if (value1.Count != value2.Count)
+                return value1.Count.CompareTo(value2.Count);
+
+            for (var i = 0; i < value1.Count; i++)
+            {
+                var v1 = value1[i];
+                var v2 = value2[i];
+
+                if (v1 == null && v2 == null)
+                    continue;
+
+                if (v1 == null)
+                    return -1;
+
+                if (v2 == null)
+                    return 1;
+
+                foreach (var f in v1.GetFields())
+                {
+                    var c = f.IndexCompare(v1, v2);
+                    if (c != 0)
+                        return c;
+                }
+            }
+
+            return 0;
         }
 
         protected override List<TForeign> Clone(List<TForeign> value)
