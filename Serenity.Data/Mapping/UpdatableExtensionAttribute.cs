@@ -12,7 +12,6 @@ namespace Serenity.Data.Mapping
 
             this.Alias = alias;
             this.RowType = rowType;
-            this.CheckChangesOnUpdate = true;
         }
 
         public Type RowType { get; private set; }
@@ -36,9 +35,24 @@ namespace Serenity.Data.Mapping
         public string OtherKey { get; set; }
 
         /// <summary>
-        /// Only update if there are any changes to extension table fields.
+        /// Name of a field in extension table that will be filtered in 
+        /// extension table in addition to key.
+        /// For example, if you have a CustomerAddresses table, and
+        /// your join condition is T0.CustomerID = ca.CustomerID and
+        /// ca.AddressType = 'Billing', your FilterField is AddressType
+        /// and your FilterValue is 'Billing'
         /// </summary>
-        public bool CheckChangesOnUpdate { get; set; }
+        public string FilterField { get; set; }
+
+        /// <summary>
+        /// Constant value of a field in extension table that will be 
+        /// filtered in extension table in addition to key.
+        /// For example, if you have a CustomerAddresses table, and
+        /// your join condition is T0.CustomerID = ca.CustomerID and
+        /// ca.AddressType = 'Billing', your FilterField is AddressType
+        /// and your FilterValue is 'Billing'
+        /// </summary>
+        public object FilterValue { get; set; }
 
         /// <summary>
         /// This extension should only be inserted if this field is equal to PresenceValue

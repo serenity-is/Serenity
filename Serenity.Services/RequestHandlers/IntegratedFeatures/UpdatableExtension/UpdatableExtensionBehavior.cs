@@ -3,6 +3,7 @@ using Serenity.Data.Mapping;
 using Serenity.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -21,6 +22,8 @@ namespace Serenity.Services
             public Func<ISaveRequest> SaveRequestFactory;
             public Field ThisKeyField;
             public Field OtherKeyField;
+            public Field FilterField;
+            public object FilterValue;
             public List<Tuple<Field, Field>> Mappings;
             public Field PresenceField;
             public object PresenceValue;
@@ -117,6 +120,19 @@ namespace Serenity.Services
                             row.GetType().FullName));
                 }
 
+                if (!string.IsNullOrEmpty(attr.FilterField))
+                {
+                    info.FilterField = ext.FindFieldByPropertyName(attr.FilterField) ?? ext.FindField(attr.FilterField);
+                    if (ReferenceEquals(info.FilterField, null))
+                        throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                            "This field is specified as FilterField for an ExtensionRelation attribute on '{2}'",
+                            attr.OtherKey,
+                            ext.GetType().FullName,
+                            row.GetType().FullName));
+
+                    info.FilterValue = info.FilterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
+                }
+
                 if (!string.IsNullOrEmpty(attr.PresenceField))
                 {
                     info.PresenceField = ext.FindFieldByPropertyName(attr.PresenceField) ?? ext.FindField(attr.PresenceField);
@@ -161,6 +177,9 @@ namespace Serenity.Services
                         continue;
 
                     if (ReferenceEquals(info.OtherKeyField, field))
+                        continue;
+
+                    if (ReferenceEquals(info.FilterField, field))
                         continue;
 
                     var expression = mapExpression(field.Expression);
@@ -208,6 +227,37 @@ namespace Serenity.Services
             }
         }
 
+        private object GetExistingID(IDbConnection connection, RelationInfo info,
+            object thisKey)
+        {
+            var criteria = new Criteria(info.OtherKeyField.PropertyName ?? info.OtherKeyField.Name) ==
+                new ValueCriteria(thisKey);
+
+            if (!ReferenceEquals(null, info.FilterField))
+            {
+                var flt = new Criteria(info.FilterField.PropertyName ?? info.FilterField.Name);
+                if (info.FilterValue == null)
+                    criteria &= flt.IsNull();
+                else
+                    criteria &= flt == new ValueCriteria(info.FilterValue);
+            }
+
+            var existing = info.ListHandlerFactory().Process(connection, new ListRequest
+            {
+                ColumnSelection = ColumnSelection.KeyOnly,
+                Criteria = criteria
+            }).Entities;
+
+            if (existing.Count > 1)
+                throw new Exception(String.Format("Found multiple extension rows for UpdatableExtension '{0}'", 
+                    info.Attr.Alias));
+
+            if (existing.Count == 0)
+                return null;
+
+            return ((Field)((IIdRow)existing[0]).IdField).AsObject((Row)existing[0]);
+        }
+
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
             foreach (var info in infoList)
@@ -224,14 +274,8 @@ namespace Serenity.Services
                 if (ReferenceEquals(null, thisKey))
                     continue;
 
-                var existing = info.ListHandlerFactory().Process(handler.Connection, new ListRequest
-                {
-                    ColumnSelection = ColumnSelection.KeyOnly,
-                    Criteria = new Criteria(info.OtherKeyField.PropertyName ?? info.OtherKeyField.Name) == new ValueCriteria(thisKey)
-                }).Entities;
-
-                object oldID;
-                if (existing.Count == 0)
+                object oldID = GetExistingID(handler.Connection, info, thisKey);
+                if (oldID == null)
                 {
                     if (!ReferenceEquals(null, info.PresenceField))
                     {
@@ -244,21 +288,12 @@ namespace Serenity.Services
                         else
                         {
                             var newRow = handler.Row.CreateNew();
-                            info.PresenceField.AsObject(newRow, info.PresenceField.ConvertValue(info.PresenceValue, CultureInfo.InvariantCulture));
+                            info.PresenceField.AsObject(newRow, info.PresenceField.ConvertValue(
+                                info.PresenceValue, CultureInfo.InvariantCulture));
                             if (info.PresenceField.IndexCompare(handler.Row, newRow) != 0)
                                 continue;
                         }
                     }
-
-                    oldID = null;
-                }
-                else if (existing.Count > 1)
-                {
-                    throw new Exception(String.Format("Found multiple extension rows for UpdatableExtension '{0}'", info.Attr.Alias));
-                }
-                else
-                {
-                    oldID = ((Field)((IIdRow)existing[0]).IdField).AsObject((Row)existing[0]);
                 }
 
                 var extension = info.RowFactory();
@@ -267,6 +302,8 @@ namespace Serenity.Services
                     ((Field)((IIdRow)extension).IdField).AsObject(extension, oldID);
 
                 info.OtherKeyField.AsObject(extension, thisKey);
+                if (!ReferenceEquals(null, info.FilterField))
+                    info.FilterField.AsObject(extension, info.FilterValue);
 
                 var request = info.SaveRequestFactory();
                 request.Entity = extension;
@@ -290,19 +327,7 @@ namespace Serenity.Services
                 if (ReferenceEquals(null, thisKey))
                     continue;
 
-                var existing = info.ListHandlerFactory().Process(handler.Connection, new ListRequest
-                {
-                    ColumnSelection = ColumnSelection.KeyOnly,
-                    Criteria = new Criteria(info.OtherKeyField.PropertyName ?? info.OtherKeyField.Name) == new ValueCriteria(thisKey)
-                }).Entities;
-
-                if (existing.Count == 0)
-                    continue;
-
-                if (existing.Count > 1)
-                    throw new Exception(String.Format("Found multiple extension rows for UpdatableExtension '{0}'", info.Attr.Alias));
-
-                var oldID = ((Field)((IIdRow)existing[0]).IdField).AsObject((Row)existing[0]);
+                var oldID = GetExistingID(handler.Connection, info, thisKey);
                 if (oldID == null)
                     continue;
 
