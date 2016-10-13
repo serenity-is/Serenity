@@ -38,7 +38,8 @@ namespace Serenity.Services
             if (attrs == null || !attrs.Any())
                 return false;
 
-            var sourceByExpression = row.GetFields().ToLookup(x => x.Expression);
+            var sourceByExpression = row.GetFields().ToLookup(x =>
+                BracketLocator.ReplaceBrackets(x.Expression.TrimToEmpty(), BracketRemoverDialect.Instance));
 
             this.infoList = attrs.Select(attr =>
             {
@@ -173,16 +174,21 @@ namespace Serenity.Services
                 info.Mappings = new List<Tuple<Field, Field>>();
                 foreach (var field in extFields)
                 {
-                    if (string.IsNullOrEmpty(field.Expression))
-                        continue;
-
                     if (ReferenceEquals(info.OtherKeyField, field))
                         continue;
 
                     if (ReferenceEquals(info.FilterField, field))
                         continue;
 
-                    var expression = mapExpression(field.Expression);
+                    var expression = field.Expression.TrimToEmpty();
+
+                    if (string.IsNullOrEmpty(expression))
+                        continue;
+
+                    expression = mapExpression(expression);
+                    expression = BracketLocator.ReplaceBrackets(expression, 
+                        BracketRemoverDialect.Instance);
+
                     var match = sourceByExpression[expression].FirstOrDefault();
                     if (ReferenceEquals(null, match))
                         continue;
@@ -196,9 +202,11 @@ namespace Serenity.Services
                     if (field.GetType() != match.GetType())
                         throw new ArgumentException(String.Format(
                             "Row type '{0}' has an ExtensionRelation attribute to '{1}'." +
-                            "Their '{2}' and '{3}' fields are matched but they have different types ({0} and {1})!",
+                            "Their '{2}' and '{3}' fields are matched but they have different types ({4} and {5})!",
                                 row.GetType().FullName,
                                 ext.GetType().FullName,
+                                field.PropertyName ?? field.Name,
+                                match.PropertyName ?? match.Name,
                                 field.GetType().Name,
                                 match.GetType().Name));
 

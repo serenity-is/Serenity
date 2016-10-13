@@ -57,6 +57,7 @@
     <Compile Include="RequestHandlers\Delete\IDeleteBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\CaptureOperationType.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\CaptureLog\ICaptureLogHandler.cs" />
+    <Compile Include="RequestHandlers\IntegratedFeatures\UpdatableExtension\BracketRemoverDialect.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\UpdatableExtension\UpdatableExtensionBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\LinkingSetRelation\LinkingSetRelationBehavior.cs" />
     <Compile Include="RequestHandlers\IntegratedFeatures\MasterDetail\MasterDetailRelationBehavior.cs" />
