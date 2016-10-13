@@ -24,7 +24,7 @@ namespace Serenity.Test.Services
                 set { Fields.Name[this] = value; }
             }
 
-            [ClientSide, MinSelectLevel(SelectLevel.Details)]
+            [NotMapped, MinSelectLevel(SelectLevel.Details)]
             [MasterDetailRelation(foreignKey: "MasterID")]
             public List<Int32DetailRow> DetailList
             {

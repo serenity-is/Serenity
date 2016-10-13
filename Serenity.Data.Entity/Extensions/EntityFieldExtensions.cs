@@ -10,7 +10,7 @@ namespace Serenity.Data
     public static class EntityFieldExtensions
     {
         private const FieldFlags NonTableFieldFlags =
-            FieldFlags.ClientSide | FieldFlags.Foreign | FieldFlags.Calculated | FieldFlags.Reflective;
+            FieldFlags.NotMapped | FieldFlags.Foreign | FieldFlags.Calculated | FieldFlags.Reflective;
 
         /// <summary>
         ///   Checks to see if field is an actual table field, e.g. not a foreign or calculated 

@@ -178,7 +178,7 @@ namespace Serenity.Services
 
             bool isNonTableField = ((field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign) ||
                   ((field.Flags & FieldFlags.Calculated) == FieldFlags.Calculated) ||
-                  ((field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide);
+                  ((field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped);
 
             if (IsUpdate)
             {

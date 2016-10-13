@@ -108,7 +108,7 @@ namespace Serenity.Data
             {
                 Field field = fields[i];
                 if (!EntityFieldExtensions.IsTableField(field) &&
-                    (field.Flags & FieldFlags.ClientSide) != FieldFlags.ClientSide)
+                    (field.Flags & FieldFlags.NotMapped) != FieldFlags.NotMapped)
                 {
                     if (excludeFields == null ||
                         !excludeFields.Contains(field))
@@ -137,7 +137,7 @@ namespace Serenity.Data
             foreach (var field in ((Row)ext.FirstIntoRow).GetFields())
             {
                 if (!EntityFieldExtensions.IsTableField(field) &&
-                    (field.Flags & FieldFlags.ClientSide) != FieldFlags.ClientSide)
+                    (field.Flags & FieldFlags.NotMapped) != FieldFlags.NotMapped)
                 {
                     query.Select(field);
                 }

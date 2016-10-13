@@ -54,7 +54,7 @@
         protected virtual bool AllowSelectField(Field field)
         {
             if (field.MinSelectLevel == SelectLevel.Never ||
-                (field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
+                (field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped)
                 return false;
 
             return true;

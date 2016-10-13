@@ -39,7 +39,7 @@
 
         protected virtual bool CanSelectField(Field field)
         {
-            if ((field.Flags & FieldFlags.ClientSide) == FieldFlags.ClientSide)
+            if ((field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped)
                 return false;
 
             return true;

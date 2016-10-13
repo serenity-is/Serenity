@@ -35,7 +35,11 @@ namespace Serenity.Data
         /// <summary>
         /// Field which is just a container to use in client side code (might 
         /// also be client side calculated / reflective).</summary>
+        [Obsolete("Prefer NotMapped flag")]
         ClientSide = 256,
+        /// <summary>
+        /// Property which is not mapped to a SQL field / expression.</summary>
+        NotMapped = 256,
         /// <summary>Should be trimmed (empty string as null) before 
         /// setting its value.</summary>
         Trim = 512,
