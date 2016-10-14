@@ -1,3 +1,14 @@
+## 2.4.13 (2016-10-14)
+
+Features:
+  - added FilterField / FilterValue to UpdatableExtensionAttribute for extension tables that might have a constant value in addition to key matching, e.g. an address extension table with CustomerID / AddressType field
+  - added FilterField/FilterValue option to MasterDetailRelation and LinkingSetRelation, which works just like UpdatableRelation
+  - make sure bracket differences don't affect field matching process in UpdatableExtensionBehavior, by removing brackets before expression comparison
+  - made ClientSide flag/attribute obsolete as it was causing confusion, use NotMapped instead
+  
+Bugfixes:
+  - fix look of static text block sample in IE11 [Serene]
+
 ## 2.4.12 (2016-10-13)
 
 Features:
@@ -6,7 +17,7 @@ Features:
   - handle IndexCompare for RowListField type
   - added RowField type
  
- Bugfixes:
+Bugfixes:
   - fix reference to Q.ErrorHandling.showServiceError in Saltaralle code
 
 ## 2.4.11 (2016-10-06)
