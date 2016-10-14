@@ -229,16 +229,19 @@
     <EmbeddedResource Include="SqlScript\DbSerenity.sql" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\packages\PhantomJS.2.0.0\tools\phantomjs\phantomjs.exe">
-      <Link>phantomjs.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\json2.min.js">
       <Link>CodeGeneration\TypeScriptParserTests\json2.min.js</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
       <Link>CodeGeneration\TypeScriptParserTests\typescriptServices.js</Link>
     </EmbeddedResource>
+    <Content Include="..\..\packages\PhantomJS.2.1.1\tools\phantomjs\phantomjs.exe">
+      <Link>phantomjs.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="phantomjs-license.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\jlayout.border.js" />
     <Content Include="Scripts\jlayout.border.min.js" />
     <Content Include="Scripts\jquery-2.2.3.intellisense.js" />
@@ -387,9 +390,6 @@
     <None Include="Scripts\serenity\texts\serenity.texts.it.json" />
     <None Include="Scripts\SlickGrid\README.md" />
     <None Include="tsconfig.json" />
-    <Content Include="phantomjs-license.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-ui-1.11.4.js" />
