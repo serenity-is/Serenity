@@ -26,7 +26,8 @@ namespace Serenity.Services
         private BaseCriteria foreignKeyCriteria;
         private Field filterField;
         private object filterValue;
-        public BaseCriteria filterCriteria;
+        private BaseCriteria filterCriteria;
+        private BaseCriteria filterCriteriaT0;
         private HashSet<string> includeColumns;
 
         public bool ActivateFor(Row row)
@@ -94,11 +95,17 @@ namespace Serenity.Services
                         Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
                 this.filterCriteria = new Criteria(filterField.PropertyName ?? filterField.Name);
-                this.filterValue = filterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);               
+                this.filterValue = filterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
                 if (this.filterValue == null)
+                {
                     this.filterCriteria = this.filterCriteria.IsNull();
+                    this.filterCriteriaT0 = this.filterField.IsNull();
+                }
                 else
+                {
                     this.filterCriteria = this.filterCriteria == new ValueCriteria(this.filterValue);
+                    this.filterCriteriaT0 = this.filterField == new ValueCriteria(this.filterValue);
+                }
             }
 
             this.includeColumns = new HashSet<string>();
@@ -347,7 +354,7 @@ namespace Serenity.Services
                         .Select((Field)rowIdField)
                         .Where(
                             foreignKeyField == new ValueCriteria(idField.AsObject(handler.Row)) &
-                            filterField == new ValueCriteria(filterValue))
+                            filterCriteriaT0)
                         .ForEach(handler.Connection, () =>
                         {
                             oldList.Add(row.Clone());
@@ -388,7 +395,7 @@ namespace Serenity.Services
                     .Select((Field)rowIdField)
                     .Where(
                             foreignKeyField == new ValueCriteria(idField.AsObject(handler.Row)) &
-                            filterField == new ValueCriteria(filterValue))
+                            filterCriteriaT0)
                     .ForEach(handler.Connection, () =>
                     {
                         deleteList.Add(rowIdField.AsObject(row));
