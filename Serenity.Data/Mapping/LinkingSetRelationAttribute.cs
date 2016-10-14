@@ -25,6 +25,8 @@ namespace Serenity.Data.Mapping
         public Type RowType { get; private set; }
         public string ThisKey { get; private set; }
         public string ItemKey { get; private set; }
+        public string FilterField { get; set; }
+        public object FilterValue { get; set; }
         public bool PreserveOrder { get; set; }
     }
 }

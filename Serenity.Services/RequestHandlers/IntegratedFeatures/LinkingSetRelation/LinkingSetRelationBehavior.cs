@@ -23,7 +23,12 @@ namespace Serenity.Services
         private Func<IDeleteRequestProcessor> deleteHandlerFactory;
         private Func<ISaveRequest> saveRequestFactory;
         private Field thisKeyField;
+        private Criteria thisKeyCriteria;
         private Field itemKeyField;
+        private Field filterField;
+        private object filterValue;
+        public BaseCriteria filterCriteria;
+        public BaseCriteria filterCriteriaT0;
 
         public bool ActivateFor(Row row)
         {
@@ -95,6 +100,8 @@ namespace Serenity.Services
                     attr.ThisKey, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
 
+            this.thisKeyCriteria = new Criteria(thisKeyField.PropertyName ?? thisKeyField.Name);
+
             itemKeyField = detailRow.FindFieldByPropertyName(attr.ItemKey) ??
                 detailRow.FindField(attr.ItemKey);
 
@@ -103,6 +110,29 @@ namespace Serenity.Services
                     "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                     attr.ItemKey, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
+
+            if (!string.IsNullOrEmpty(attr.FilterField))
+            {
+                this.filterField = detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField);
+                if (ReferenceEquals(null, this.filterField))
+                    throw new ArgumentException(String.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                        "This field is specified for a linking set relation as FilterField in field '{2}' of row type '{3}'.",
+                        attr.FilterField, detailRow.GetType().FullName,
+                        Target.PropertyName ?? Target.Name, row.GetType().FullName));
+
+                this.filterCriteria = new Criteria(filterField.PropertyName ?? filterField.Name);
+                this.filterValue = filterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
+                if (this.filterValue == null)
+                {
+                    this.filterCriteria = this.filterCriteria.IsNull();
+                    this.filterCriteriaT0 = this.filterField.IsNull();
+                }
+                else
+                {
+                    this.filterCriteria = this.filterCriteria == new ValueCriteria(this.filterValue);
+                    this.filterCriteriaT0 = this.filterField == new ValueCriteria(this.filterValue);
+                }
+            }
 
             return true;
         }
@@ -134,10 +164,7 @@ namespace Serenity.Services
                 {
                     itemKeyField.PropertyName ?? itemKeyField.Name
                 },
-                EqualityFilter = new Dictionary<string, object>
-                {
-                    { thisKeyField.PropertyName ?? thisKeyField.Name, idField.AsObject(handler.Row) }
-                }
+                Criteria = thisKeyCriteria == new ValueCriteria(idField.AsObject(handler.Row)) & filterCriteria
             };
 
             IListResponse response = listHandler.Process(handler.Connection, listRequest);
@@ -170,8 +197,6 @@ namespace Serenity.Services
                 }
             };
 
-            var thisKeyCriteria = new Criteria(thisKeyField.PropertyName ?? thisKeyField.Name);
-
             var enumerator = handler.Response.Entities.Cast<Row>();
             while (true)
             {
@@ -182,7 +207,7 @@ namespace Serenity.Services
                 enumerator = enumerator.Skip(1000);
 
                 listRequest.Criteria = thisKeyCriteria.In(
-                    part.Select(x => idField.AsObject(x)));
+                    part.Select(x => idField.AsObject(x))) & filterCriteria;
 
                 IListResponse response = listHandler.Process(
                     handler.Connection, listRequest);
@@ -207,6 +232,8 @@ namespace Serenity.Services
             var detail = rowFactory();
             thisKeyField.AsObject(detail, masterId);
             itemKeyField.AsObject(detail, itemKeyField.ConvertValue(itemKey, CultureInfo.InvariantCulture));
+            if (!ReferenceEquals(null, filterField))
+                filterField.AsObject(detail, filterValue);
 
             var saveHandler = saveHandlerFactory();
             var saveRequest = saveRequestFactory();
@@ -323,7 +350,9 @@ namespace Serenity.Services
                     .Select(rowIdField)
                     .Select(itemKeyField)
                     .OrderBy(rowIdField)
-                    .WhereEqual(thisKeyField, masterId)
+                    .Where(
+                        thisKeyField == new ValueCriteria(masterId) & 
+                        filterCriteriaT0)
                     .ForEach(handler.Connection, () =>
                     {
                         oldRows.Add(row.Clone());
@@ -350,7 +379,9 @@ namespace Serenity.Services
                     .Dialect(handler.Connection.GetDialect())
                     .From(row)
                     .Select(rowIdField)
-                    .WhereEqual(thisKeyField, masterId)
+                    .Where(
+                        thisKeyField == new ValueCriteria(masterId) &
+                        filterCriteriaT0)
                     .ForEach(handler.Connection, () =>
                     {
                         deleteList.Add(rowIdField.AsObject(row));
