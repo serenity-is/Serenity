@@ -20,5 +20,7 @@ namespace Serenity.Data.Mapping
         public bool CheckChangesOnUpdate { get; set; }
         public ColumnSelection ColumnSelection { get; set; }
         public string IncludeColumns { get; set; }
+        public string FilterField { get; set; }
+        public object FilterValue { get; set; }
     }
 }
