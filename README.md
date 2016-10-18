@@ -42,7 +42,11 @@ If you are using Serenity in any open source / commercial projects let me know, 
 
 http://serenity.is/demo/
 
+http://serenedemo.azurewebsites.net/ [alternative one from @samdubey]
+
 ## Video Tutorials (thanks a lot to @samdubey for these contributions)
+
+
 
 **Serenity Youtube Channel:** 
 
