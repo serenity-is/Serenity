@@ -51,5 +51,9 @@ namespace Serenity
         /// In multiple mode, use a comma separated string, instead of an array when serializing value
         /// </summary>
         public bool Delimited { get; set; }
+        /// <summary>
+        /// If this property is true, the Select2Item is not clearable
+        /// </summary>
+        public bool NotAllowClear { get; set; }
     }
 }
