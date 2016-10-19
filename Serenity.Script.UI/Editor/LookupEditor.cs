@@ -54,6 +54,6 @@ namespace Serenity
         /// <summary>
         /// If this property is false, the Select2Item is not clearable
         /// </summary>
-        public bool AllowClear { get; set; }
+        public bool? AllowClear { get; set; }
     }
 }
