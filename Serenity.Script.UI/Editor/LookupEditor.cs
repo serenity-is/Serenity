@@ -52,8 +52,8 @@ namespace Serenity
         /// </summary>
         public bool Delimited { get; set; }
         /// <summary>
-        /// If this property is true, the Select2Item is not clearable
+        /// If this property is false, the Select2Item is not clearable
         /// </summary>
-        public bool NotAllowClear { get; set; }
+        public bool AllowClear { get; set; }
     }
 }
