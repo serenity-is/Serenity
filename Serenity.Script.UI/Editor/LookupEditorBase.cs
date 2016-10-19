@@ -288,7 +288,10 @@ namespace Serenity
 
             if (options.Multiple)
                 opt.Multiple = true;
-
+            
+            if (options.NotAllowClear)
+                opt.AllowClear = false;
+            
             return opt;
         }
 
