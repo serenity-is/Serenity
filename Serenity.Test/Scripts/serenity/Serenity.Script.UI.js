@@ -4779,6 +4779,7 @@
 			if (this.options.multiple) {
 				opt.multiple = true;
 			}
+			opt.allowClear = ss.coalesce(this.options.allowClear, true);
 			return opt;
 		},
 		get_cascadeFrom: function() {
