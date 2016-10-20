@@ -84,8 +84,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="RazorGenerator.Templating, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\RazorGenerator.Templating.2.3.11\lib\portable-Profile328\RazorGenerator.Templating.dll</HintPath>
+      <HintPath>..\..\packages\RazorGenerator.Templating.2.4.7\lib\portable-Profile328\RazorGenerator.Templating.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
