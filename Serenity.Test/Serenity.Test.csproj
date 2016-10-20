@@ -238,9 +238,16 @@
       <Link>phantomjs.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\bootstrap-theme.css" />
+    <Content Include="Content\bootstrap-theme.min.css" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="phantomjs-license.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jlayout.border.js" />
     <Content Include="Scripts\jlayout.border.min.js" />
     <Content Include="Scripts\jquery-2.2.3.intellisense.js" />
@@ -323,10 +330,6 @@
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.IntegerEditorTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Formatters\Formatters.UrlFormatterTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.TextAreaEditorTests.ts" />
-    <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css" />
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.png" />
@@ -379,7 +382,6 @@
     <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
-    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <None Include="Scripts\jquery-2.2.3.min.map" />
     <None Include="Scripts\serenity\Serenity.Test.js.map" />
     <None Include="Scripts\serenity\texts\serenity.texts.de.json" />
@@ -391,8 +393,6 @@
     <None Include="Scripts\serenity\texts\serenity.texts.it.json" />
     <None Include="Scripts\SlickGrid\README.md" />
     <None Include="tsconfig.json" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-ui-1.11.4.js" />
     <Content Include="Scripts\jquery-ui-1.11.4.min.js" />
     <Content Include="Scripts\jquery.event.drag.js" />
