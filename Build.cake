@@ -153,10 +153,10 @@ Action fixNugetCache = delegate() {
         foreach (var package in nugetPackages)
             System.IO.File.Copy(package, @"C:\Sandbox\MyNugetFeed\" + System.IO.Path.GetFileName(package), true);
             
-        foreach (var package in System.IO.Directory.GetFiles(
+        /*foreach (var package in System.IO.Directory.GetFiles(
             System.IO.Path.Combine(System.Environment.GetFolderPath(
                 System.Environment.SpecialFolder.LocalApplicationData), @"nuget\cache"), "Seren*.nupkg"))
-            System.IO.File.Delete(package);
+            System.IO.File.Delete(package);*/
     }
 };
 

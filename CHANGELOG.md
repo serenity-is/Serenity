@@ -1,3 +1,29 @@
+## 2.5.0 (2016-10-21)
+
+Features:
+  - updated bootstrap from 3.3.6 to 3.3.7
+  - updated CouchbaseNetClient from 1.3.10 to 2.3.8
+  - updated FakeItEasy, from 1.25.3.0 to 2.3.1
+  - updated jQuery from 2.2.3 to 3.1.1
+  - updated jQuery.TypeScript.DefinitelyTyped from 3.0.5 to 3.1.2
+  - updated jQuery UI from 1.11.4 to 1.12.1
+  - updated jqueryui.TypeScript.DefinitelyTyped from 1.4.6 to 1.5.1
+  - updated jquery.validation from 1.14.0 to 1.15.1
+  - updated jquery.validation.TypeScript.DefinitelyTyped from 0.4.3 to 0.4.5
+  - updated MsieJavascriptEngine from 1.7.0 to 2.0.0
+  - updated Newtonsoft.Json from 8.0.3 to 9.0.1
+  - updated qunit.TypeScript.DefinitelyTyped from 0.3.3 to 0.3.5
+  - updated RazorGenerator.Templating from 2.3.11 to 2.4.7
+  - updated Selenium.WebDriver from 2.48.2 to 3.0.0
+  - updated sortablejs.TypeScript.DefinitelyTyped from 0.1.7 to 0.1.8
+  - updated StackExchange.Redis from 1.0.488 to 1.1.608
+  - updated System.Data.SqlLocalDb from 1.14.0 to 1.15.0
+  - updated toastr.TypeScript.DefinitelyTyped from 0.3.0 to 0.3.1
+  - removed jquery.event.drag 2.2 package and embedded version 2.3 (from 6pac/SlickGrid) in Serene.Web.Assets as it is compatible with jQuery v3
+  - added data-field attribute to input fields in product grid (@wldkrd1) [Serene]
+  - added showing another form in tab sample [Serene]
+  - removed VS 15 (which is vNext, not 2015) from supported list as it was preventing upload in VSGallery [Serene]
+  
 ## 2.4.13 (2016-10-14)
 
 Features:
