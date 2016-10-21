@@ -1027,6 +1027,7 @@
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Widget.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.cookie\jquery.cookie.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
@@ -1080,7 +1081,6 @@
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Toolbar.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Widgets.ts" />
     <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\typescriptServices.d.ts" />
     <TypeScriptCompile Include="Scripts\tsservices\Serenity.CodeGeneration.ts" />
     <TypeScriptCompile Include="Scripts\typings\sortablejs\sortablejs.d.ts" />
