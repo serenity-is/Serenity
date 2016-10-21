@@ -363,8 +363,8 @@
     <Content Include="Scripts\SlickGrid\slick.remotemodel-yahoo.js" />
     <Content Include="Scripts\SlickGrid\slick.remotemodel.js" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\qunit\qunit-1.16.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\qunit\qunit.d.ts" />
