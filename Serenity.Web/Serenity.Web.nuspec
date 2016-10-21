@@ -19,26 +19,25 @@
       <dependency id="Microsoft.AspNet.Razor" version="${microsoftAspNetRazorVersion}" />
       <dependency id="Microsoft.AspNet.WebPages" version="${microsoftAspNetWebPagesVersion}" />
       <dependency id="Microsoft.Web.Infrastructure" version="${microsoftWebInfrastructureVersion}" />
-      <dependency id="MsieJavaScriptEngine" version="1.7.0" />
+      <dependency id="MsieJavaScriptEngine" version="${msieEngineVersion}" />
       <dependency id="Serenity.Core" version="${version}" />
       <dependency id="Serenity.Data" version="${version}" />
       <dependency id="Serenity.Data.Entity" version="${version}" />
       <dependency id="Serenity.Services" version="${version}" />
       <dependency id="Serenity.Web.Assets" version="${serenityWebAssetsVersion}" />
-      <dependency id="jQuery" version="2.2.0" />
-      <dependency id="jquery.blockUI.TypeScript.DefinitelyTyped" version="0.0.4" />
-      <dependency id="jquery.cookie.TypeScript.DefinitelyTyped" version="0.2.1" />
-      <dependency id="jquery.event.drag" version="2.2.0" />
-      <dependency id="jQuery.UI.Combined" version="1.11.4" />
-      <dependency id="jQuery.Validation" version="1.14.0" />
-      <dependency id="bootstrap" version="3.3.6" />
-      <dependency id="toastr" version="2.1.1" />
+      <dependency id="jQuery" version="${jQueryVersion}" />
+      <dependency id="jquery.blockUI.TypeScript.DefinitelyTyped" version="${blockUITSVersion}" />
+      <dependency id="jquery.cookie.TypeScript.DefinitelyTyped" version="${cookieTSVersion}" />
+      <dependency id="jQuery.UI.Combined" version="${jQueryUIVersion}" />
+      <dependency id="jQuery.Validation" version="${validationVersion}" />
+      <dependency id="bootstrap" version="${bootstrapVersion}" />
+      <dependency id="toastr" version="${toastrVersion}" />
       <dependency id="Select2.js" version="[3.5.1]" />
-      <dependency id="jquery.TypeScript.DefinitelyTyped" version="3.0.5" />
-      <dependency id="jqueryui.TypeScript.DefinitelyTyped" version="1.4.6" />
-      <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="0.2.8" />
-      <dependency id="sortablejs.TypeScript.DefinitelyTyped" version="0.1.7" />
-      <dependency id="toastr.TypeScript.DefinitelyTyped" version="0.3.0" />
+      <dependency id="jquery.TypeScript.DefinitelyTyped" version="${jQueryTSVersion}" />
+      <dependency id="jqueryui.TypeScript.DefinitelyTyped" version="${jQueryUITSVersion}" />
+      <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="${validationTSVersion}" />
+      <dependency id="sortablejs.TypeScript.DefinitelyTyped" version="${sortableTSVersion}" />
+      <dependency id="toastr.TypeScript.DefinitelyTyped" version="${toastrTSVersion}" />
     </dependencies>
   </metadata>
   <files>

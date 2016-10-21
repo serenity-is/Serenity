@@ -1026,6 +1026,7 @@
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedWidget.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Widget.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.cookie\jquery.cookie.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />

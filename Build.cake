@@ -186,6 +186,19 @@ Action setPackageVersions = delegate() {
     nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value; 
     nuspecParams["serenityWebAssetsVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Assets.nuspec");
     nuspecParams["serenityWebToolingVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Tooling.nuspec");
+	nuspecParams["jQueryVersion"] = getPackageVersion("Serenity.Test", "jQuery");
+	nuspecParams["jQueryUIVersion"] = getPackageVersion("Serenity.Test", "jQuery.UI.Combined");
+	nuspecParams["validationVersion"] = getPackageVersion("Serenity.Test", "jQuery.Validation");
+	nuspecParams["msieVersion"] = getPackageVersion("Serenity.Test", "MsieJavaScriptEngine");
+	nuspecParams["bootstrapVersion"] = getPackageVersion("Serenity.Test", "bootstrap");
+	nuspecParams["toastrVersion"] = getPackageVersion("Serenity.Test", "toastr");
+	nuspecParams["blockUITSVersion"] = getPackageVersion("Serenity.Web", "jquery.blockUI.TypeScript.DefinitelyTyped");
+	nuspecParams["cookieTSVersion"] = getPackageVersion("Serenity.Web", "jquery.cookie.TypeScript.DefinitelyTyped");
+	nuspecParams["jQueryTSVersion"] = getPackageVersion("Serenity.Web", "jquery.TypeScript.DefinitelyTyped");
+	nuspecParams["jQueryUITSVersion"] = getPackageVersion("Serenity.Web", "jqueryui.TypeScript.DefinitelyTyped");
+	nuspecParams["validationTSVersion"] = getPackageVersion("Serenity.Web", "jquery.validation.TypeScript.DefinitelyTyped");
+	nuspecParams["sortableTSVersion"] = getPackageVersion("Serenity.Web", "sortablejs.TypeScript.DefinitelyTyped");
+	nuspecParams["toastrTSVersion"] = getPackageVersion("Serenity.Web", "toastr.TypeScript.DefinitelyTyped");
 };
 
 Task("NuGet")
