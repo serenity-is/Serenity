@@ -84,7 +84,7 @@ button.ui-state-default {
     border: 1px solid #B6B6B6; font-weight: normal; color: #4F4F4F; 
 }
 
-button.ui-state-default { 
+button.ui-state-default, button.ui-button { 
 	background: #ededed url(images/bg_fallback.png) 0 0 repeat-x; /* Old browsers */
 		background: -moz-linear-gradient(top, #ededed 0%, #c4c4c4 100%); /* FF3.6+ */
 		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ededed), color-stop(100%,#c4c4c4)); /* Chrome,Safari4+ */
@@ -370,13 +370,17 @@ button.ui-state-active {
 .ui-button {
     display: inline-block;
     position: relative;
-    padding: 0;
     margin-right: .1em;
     text-decoration: none !important;
     cursor: pointer;
     text-align: center;
     zoom: 1;
     overflow: visible;
+    line-height: 1.4;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    padding: .4em 1em;
     -webkit-user-select: none;
     -moz-user-select: none;
     user-select: none;
@@ -425,6 +429,10 @@ button.ui-button-icons-only {
     -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(255,255,255,0.8) inset;
     -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(255,255,255,0.8) inset;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(255,255,255,0.8) inset;
+}
+
+.ui-button {
+    border: 1px solid #aaa;
 }
 
 .ui-button .ui-button-text {
