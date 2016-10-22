@@ -62,7 +62,7 @@
         "UI/Widgets/TemplatedWidget.ts",
         "UI/Widgets/TemplatedDialog.ts",
         "UI/Widgets/PropertyDialog.ts",
-        "UI/Widgets/DataGrid.ts",
+        "UI/DataGrid/DataGrid.ts",
         "UI/Widgets/EntityGrid.ts",
         "UI/Widgets/TemplatedPanel.ts",
         "UI/Widgets/PropertyPanel.ts",

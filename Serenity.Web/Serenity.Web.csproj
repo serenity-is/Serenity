@@ -1020,7 +1020,7 @@
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\PropertyPanel.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\PropertyDialog.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\EntityDialog.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\DataGrid.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\DataGrid\DataGrid.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\PropertyItem.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedDialog.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedWidget.ts" />

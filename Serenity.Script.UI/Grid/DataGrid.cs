@@ -147,9 +147,14 @@ namespace Serenity
 
                 var filteringType = FilteringTypeRegistry.Get(item.FilteringType ?? "String");
 
-                if (filteringType == typeof(DateFiltering) || filteringType == typeof(DateTimeFiltering))
+                if (filteringType == typeof(DateFiltering))
                 {
                     quick = DateRangeQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name)
+                        .As<QuickFilter<Widget, object>>();
+                }
+                else if (filteringType == typeof(DateTimeFiltering))
+                {
+                    quick = DateTimeRangeQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name)
                         .As<QuickFilter<Widget, object>>();
                 }
                 else if (filteringType == typeof(BooleanFiltering))
@@ -1154,19 +1159,88 @@ namespace Serenity
                 },
                 Handler = args =>
                 {
-                    args.Active =
-                        !string.IsNullOrEmpty(args.Widget.Value) ||
-                        !string.IsNullOrEmpty(end.Value);
+                    bool active1 = !Q.IsTrimmedEmpty(args.Widget.Value);
+                    bool active2 = !Q.IsTrimmedEmpty(end.Value);
 
-                    if (!string.IsNullOrEmpty(args.Widget.Value))
+                    if (active1 && Q.IsFalse(Q.ParseDate(args.Widget.Element.GetValue())))
+                    {
+                        active1 = false;
+                        Q.NotifyWarning(Q.Text("Validation.DateInvalid"));
+                        args.Widget.Element.Value("");
+                    }
+
+                    if (active2 && Q.IsFalse(Q.ParseDate(end.Element.GetValue())))
+                    {
+                        active2 = false;
+                        Q.NotifyWarning(Q.Text("Validation.DateInvalid"));
+                        end.Element.Value("");
+                    }
+
+                    args.Active = active1 || active2;
+
+                    if (active1)
                         args.Request.Criteria &= new Criteria(args.Field) >= args.Widget.Value;
 
-                    if (!string.IsNullOrEmpty(end.Value))
+                    if (active2)
                     {
                         var next = new JsDate(end.ValueAsDate.ValueOf());
                         next.SetDate(next.GetDate() + 1);
                         args.Request.Criteria &= new Criteria(args.Field) < Q.FormatDate(next, "yyyy-MM-dd");
                     }
+                }
+            };
+        }
+
+        public DateTimeEditor AddDateTimeRangeFilter(string field, string title = null)
+        {
+            return (DateTimeEditor)AddQuickFilter(DateTimeRangeQuickFilter(field, title));
+        }
+
+        public QuickFilter<DateTimeEditor, DateTimeEditorOptions> DateTimeRangeQuickFilter(string field, string title = null)
+        {
+            DateTimeEditor end = null;
+
+            return new QuickFilter<DateTimeEditor, DateTimeEditorOptions>
+            {
+                Field = field,
+                Type = typeof(DateTimeEditor),
+                Title = title,
+                Element = e1 =>
+                {
+                    end = Widget.Create<DateTimeEditor>(element: e2 => e2.InsertAfter(e1));
+                    end.Element.Change(x => e1.TriggerHandler("change"));
+                    J("<span/>").AddClass("range-separator").Text("-").InsertAfter(e1);
+                },
+                Init = i =>
+                {
+                    i.Element.Parent().Find(".time").Change(x => i.Element.TriggerHandler("change"));
+                },
+                Handler = args =>
+                {
+                    bool active1 = !Q.IsTrimmedEmpty(args.Widget.Value);
+                    bool active2 = !Q.IsTrimmedEmpty(end.Value);
+
+                    if (active1 && Q.IsFalse(Q.ParseDate(args.Widget.Element.GetValue())))
+                    {
+                        active1 = false;
+                        Q.NotifyWarning(Q.Text("Validation.DateInvalid"));
+                        args.Widget.Element.Value("");
+                    }
+
+                    if (active2 && Q.IsFalse(Q.ParseDate(end.Element.GetValue())))
+                    {
+                        active2 = false;
+                        Q.NotifyWarning(Q.Text("Validation.DateInvalid"));
+                        end.Element.Value("");
+                    }
+
+                    args.Active = active1 || active2;
+
+                    if (active1)
+                        args.Request.Criteria &= new Criteria(args.Field) >= args.Widget.Value;
+
+                    if (active2)
+                        args.Request.Criteria &= new Criteria(args.Field) <= end.Value;
                 }
             };
         }

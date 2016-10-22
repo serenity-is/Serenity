@@ -14,7 +14,9 @@
         protected addBooleanFilter(field: string, title?: string, yes?: string, no?: string): SelectEditor;
         protected booleanQuickFilter(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions>;;
         protected addDateRangeFilter(field: string, title?: string): DateEditor;
+        protected addDateTimeRangeFilter(field: string, title?: string): DateTimeEditor;
         protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
+        protected dateTimeRangeQuickFilter(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
         protected addQuickFilter<TWidget extends Widget<any>, TOptions>(filter: QuickFilter<TWidget, TOptions>): TWidget;
         protected addFilterSeperator(): void;
         protected add_submitHandlers(action: () => void): void;

@@ -5196,7 +5196,7 @@
 					var item = column.sourceItem;
 					var quick = {};
 					var filteringType = $Serenity_FilteringTypeRegistry.get(ss.coalesce(item.filteringType, 'String'));
-					if (ss.referenceEquals(filteringType, $Serenity_DateFiltering) || ss.referenceEquals(filteringType, $Serenity_DateTimeFiltering)) {
+					if (ss.referenceEquals(filteringType, $Serenity_DateFiltering)) {
 						var $t4 = item.name;
 						var $t3 = Q.tryGetText(item.title);
 						if (ss.isNullOrUndefined($t3)) {
@@ -5208,7 +5208,7 @@
 						}
 						quick = this.dateRangeQuickFilter($t4, $t3);
 					}
-					else if (ss.referenceEquals(filteringType, $Serenity_BooleanFiltering)) {
+					else if (ss.referenceEquals(filteringType, $Serenity_DateTimeFiltering)) {
 						var $t7 = item.name;
 						var $t6 = Q.tryGetText(item.title);
 						if (ss.isNullOrUndefined($t6)) {
@@ -5218,7 +5218,19 @@
 							}
 							$t6 = $t5;
 						}
-						quick = this.booleanQuickFilter($t7, $t6, null, null);
+						quick = this.dateTimeRangeQuickFilter($t7, $t6);
+					}
+					else if (ss.referenceEquals(filteringType, $Serenity_BooleanFiltering)) {
+						var $t10 = item.name;
+						var $t9 = Q.tryGetText(item.title);
+						if (ss.isNullOrUndefined($t9)) {
+							var $t8 = item.title;
+							if (ss.isNullOrUndefined($t8)) {
+								$t8 = item.name;
+							}
+							$t9 = $t8;
+						}
+						quick = this.booleanQuickFilter($t10, $t9, null, null);
 					}
 					else {
 						var filtering = ss.cast(ss.createInstance(filteringType), $Serenity_IFiltering);
@@ -5959,14 +5971,77 @@
 					$('<span/>').addClass('range-separator').text('-').insertAfter(e1);
 				},
 				handler: function(args) {
-					args.active = !ss.isNullOrEmptyString(args.widget.get_value()) || !ss.isNullOrEmptyString(end.get_value());
-					if (!ss.isNullOrEmptyString(args.widget.get_value())) {
+					var active1 = !Q.isTrimmedEmpty(args.widget.get_value());
+					var active2 = !Q.isTrimmedEmpty(end.get_value());
+					if (active1 && !Q.parseDate(args.widget.element.val())) {
+						active1 = false;
+						Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+						args.widget.element.val('');
+					}
+					if (active2 && !Q.parseDate(end.element.val())) {
+						active2 = false;
+						Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+						end.element.val('');
+					}
+					args.active = active1 || active2;
+					if (active1) {
 						args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.get_value()]);
 					}
-					if (!ss.isNullOrEmptyString(end.get_value())) {
+					if (active2) {
 						var next = new Date(end.get_valueAsDate().valueOf());
 						next.setDate(next.getDate() + 1);
 						args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<', Q.formatDate(next, 'yyyy-MM-dd')]);
+					}
+				}
+			};
+		},
+		addDateTimeRangeFilter: function(field, title) {
+			return ss.cast(this.addQuickFilter(this.dateTimeRangeQuickFilter(field, title)), $Serenity_DateTimeEditor);
+		},
+		dateTimeRangeQuickFilter: function(field, title) {
+			var end = null;
+			return {
+				field: field,
+				type: $Serenity_DateTimeEditor,
+				title: title,
+				element: function(e1) {
+					end = Serenity.Widget.create({
+						type: $Serenity_DateTimeEditor,
+						element: function(e2) {
+							e2.insertAfter(e1);
+						},
+						options: null,
+						init: null
+					});
+					end.element.change(function(x) {
+						e1.triggerHandler('change');
+					});
+					$('<span/>').addClass('range-separator').text('-').insertAfter(e1);
+				},
+				init: function(i) {
+					i.element.parent().find('.time').change(function(x1) {
+						i.element.triggerHandler('change');
+					});
+				},
+				handler: function(args) {
+					var active1 = !Q.isTrimmedEmpty(args.widget.get_value());
+					var active2 = !Q.isTrimmedEmpty(end.get_value());
+					if (active1 && !Q.parseDate(args.widget.element.val())) {
+						active1 = false;
+						Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+						args.widget.element.val('');
+					}
+					if (active2 && !Q.parseDate(end.element.val())) {
+						active2 = false;
+						Q.notifyWarning(Q.text('Validation.DateInvalid'), '', null);
+						end.element.val('');
+					}
+					args.active = active1 || active2;
+					if (active1) {
+						args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '>=', args.widget.get_value()]);
+					}
+					if (active2) {
+						args.request.Criteria = Serenity.Criteria.join(args.request.Criteria, 'and', [[args.field], '<=', end.get_value()]);
 					}
 				}
 			};
@@ -10508,6 +10583,10 @@
 		$Serenity_FormatterTypeRegistry.$knownTypes = null;
 	})();
 	(function() {
+		Q.prop($Serenity_DateTimeEditor, 'value');
+		Q.prop($Serenity_DateTimeEditor, 'valueAsDate');
+	})();
+	(function() {
 		$Serenity_DataGrid.defaultPersistanceStorage = null;
 		$Serenity_DataGrid.defaultRowHeight = 0;
 		$Serenity_DataGrid.defaultHeaderHeight = 0;
@@ -10516,10 +10595,6 @@
 	})();
 	(function() {
 		Q.prop($Serenity_CheckTreeEditor, 'value');
-	})();
-	(function() {
-		Q.prop($Serenity_DateTimeEditor, 'value');
-		Q.prop($Serenity_DateTimeEditor, 'valueAsDate');
 	})();
 	(function() {
 		Q.prop($Serenity_DecimalEditor, 'value');
