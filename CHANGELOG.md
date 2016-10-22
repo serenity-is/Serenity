@@ -1,3 +1,12 @@
+
+## 2.5.1 (2016-10-22)
+
+Features:
+  - upgraded to TypeScript 2.0
+  - fix look of ui dialog buttons after jQuery UI update
+  - added date time quick filtering option
+  - better handling when date entered in a quick filter is invalid
+
 ## 2.5.0 (2016-10-21)
 
 Features:
