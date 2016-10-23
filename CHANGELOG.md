@@ -1,4 +1,6 @@
-
+## 2.5.2 (2016-10-23)
+  - fix jquery.event.drag.min.js causing problem when bundling is enabled
+  
 ## 2.5.1 (2016-10-22)
 
 Features:
