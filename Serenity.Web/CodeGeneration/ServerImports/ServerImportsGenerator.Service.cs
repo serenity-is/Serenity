@@ -11,6 +11,7 @@ namespace Serenity.CodeGeneration
             var codeNamespace = GetNamespace(type);
 
             var identifier = GetControllerIdentifier(type);
+            this.fileIdentifier = identifier;
             generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
 
             cw.IndentedLine("[Imported, PreserveMemberCase]");

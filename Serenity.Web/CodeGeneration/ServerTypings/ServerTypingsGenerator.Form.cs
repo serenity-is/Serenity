@@ -1,4 +1,5 @@
 ﻿using Serenity.ComponentModel;
+using Serenity.Services;
 using System;
 using System.Text;
 
@@ -6,13 +7,26 @@ namespace Serenity.CodeGeneration
 {
     public partial class ServerTypingsGenerator : ServerImportGeneratorBase
     {
+        const string requestSuffix = "Request";
+
         private void GenerateForm(Type type, FormScriptAttribute formScriptAttribute)
         {
             var codeNamespace = GetNamespace(type);
 
             cw.Indented("export class ");
-            var generatedName = MakeFriendlyName(type, codeNamespace);
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+
+            var identifier = type.Name;
+            if (identifier.EndsWith(requestSuffix) &&
+                type.IsSubclassOf(typeof(ServiceRequest)))
+            {
+                identifier = identifier.Substring(0,
+                    identifier.Length - requestSuffix.Length) + "Form";
+                this.fileIdentifier = identifier;
+            }
+
+            sb.Append(identifier);
+
+            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
 
             sb.Append(" extends Serenity.PrefixedContext");
             cw.InBrace(delegate
@@ -26,7 +40,7 @@ namespace Serenity.CodeGeneration
             sb.AppendLine();
 
             cw.Indented("export interface ");
-            MakeFriendlyName(type, codeNamespace);
+            sb.Append(identifier);
 
             StringBuilder initializer = new StringBuilder("[");
 
@@ -69,7 +83,7 @@ namespace Serenity.CodeGeneration
             });
 
             initializer.Append("].forEach(x => Object.defineProperty(");
-            MakeFriendlyName(type, codeNamespace, initializer);
+            initializer.Append(identifier);
             initializer.Append(".prototype, <string>x[0], { get: function () { return this.w(x[0], (x[1] as any)()); }, enumerable: true, configurable: true }));");
 
             sb.AppendLine();

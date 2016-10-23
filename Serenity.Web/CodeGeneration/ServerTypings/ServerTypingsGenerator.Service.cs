@@ -12,6 +12,7 @@ namespace Serenity.CodeGeneration
 
             cw.Indented("export namespace ");
             var identifier = GetControllerIdentifier(type);
+            this.fileIdentifier = identifier;
             sb.Append(identifier);
             generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
 

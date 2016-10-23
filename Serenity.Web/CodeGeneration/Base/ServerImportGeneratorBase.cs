@@ -17,6 +17,7 @@ namespace Serenity.CodeGeneration
         private Queue<Type> generateQueue;
         protected List<Type> lookupScripts;
         protected HashSet<string> generatedTypes;
+        protected string fileIdentifier;
 
         public ServerImportGeneratorBase(params Assembly[] assemblies)
             : base()
@@ -140,12 +141,11 @@ namespace Serenity.CodeGeneration
                     continue;
 
                 var ns = GetNamespace(type);
-                bool isController = type.IsSubclassOf(typeof(Controller));
+                this.fileIdentifier = type.Name;
 
-                var identifier = isController ? GetControllerIdentifier(type) : type.Name;
                 GenerateCodeFor(type);
 
-                AddFile(RemoveRootNamespace(ns, identifier + (IsTS() ? ".ts" : ".cs")));
+                AddFile(RemoveRootNamespace(ns, this.fileIdentifier + (IsTS() ? ".ts" : ".cs")));
             }
         }
 
