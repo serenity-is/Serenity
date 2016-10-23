@@ -518,6 +518,10 @@
     <None Include="Assets\Scripts\jspdf.min.js" />
     <None Include="Assets\Scripts\jspdf.plugin.autotable.js" />
     <None Include="Assets\Scripts\jspdf.plugin.autotable.min.js" />
+    <Content Include="Assets\Scripts\jquery.event.drag.js" />
+    <Content Include="Assets\Scripts\jquery.event.drag.min.js" />
+    <Content Include="Assets\Scripts\jquery.maskedinput.js" />
+    <Content Include="Assets\Scripts\jquery.maskedinput.min.js" />
     <Content Include="Scripts\serenity\texts\serenity.texts.pt-BR.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.de.json" />
