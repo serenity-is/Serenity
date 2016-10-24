@@ -81,7 +81,7 @@
 
     export function layoutFillHeight(element: JQuery) {
         let h = layoutFillHeightValue(element);
-        let n = h + 'px';
+        let n = Math.round(h) + 'px';
         if (element.css('height') != n) {
             element.css('height', n);
         }

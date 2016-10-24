@@ -617,8 +617,8 @@ if (typeof Slick === "undefined") {
         function measureScrollbar() {
             var $c = $("<div style='position:absolute; top:-10000px; " + xLeft + ":-10000px; width:100px; height:100px; overflow:scroll;'></div>").appendTo("body");
             var dim = {
-                width: $c.width() - $c[0].clientWidth,
-                height: $c.height() - $c[0].clientHeight
+                width: Math.round($c.width() - $c[0].clientWidth),
+                height: Math.round($c.height() - $c[0].clientHeight)
             };
             $c.remove();
             return dim;
@@ -812,7 +812,7 @@ if (typeof Slick === "undefined") {
             while (true) {
                 var test = supportedHeight * 2;
                 div.css("height", test);
-                if (test > testUpTo || div.height() !== test) {
+                if (test > testUpTo || Math.round(div.height()) !== test) {
                     break;
                 } else {
                     supportedHeight = test;
@@ -1295,7 +1295,7 @@ if (typeof Slick === "undefined") {
                 start: function (e, ui) {
                     ui.placeholder.width(ui.helper.outerWidth() - headerColumnWidthDiff);
                     canDragScroll = !hasFrozenColumns() ||
-                      (ui.placeholder.offset()[xLeft] + ui.placeholder.width()) > $viewportScrollContainerX.offset()[xLeft];
+                      (ui.placeholder.offset()[xLeft] + Math.round(ui.placeholder.width())) > $viewportScrollContainerX.offset()[xLeft];
                     $(ui.helper).addClass("slick-header-column-active");
                 },
                 beforeStop: function (e, ui) {
@@ -2003,7 +2003,7 @@ if (typeof Slick === "undefined") {
                         h.outerWidth(columns[i].width);
                     }
                 } else {
-                    if (h.width() !== columns[i].width - headerColumnWidthDiff) {
+                    if (Math.round(h.width()) !== columns[i].width - headerColumnWidthDiff) {
                         h.width(columns[i].width - headerColumnWidthDiff);
                     }
                 }
@@ -2300,7 +2300,7 @@ if (typeof Slick === "undefined") {
 
         function scrollTo(y) {
             y = Math.max(y, 0);
-            y = Math.min(y, th - $viewportScrollContainerY.height() + ((viewportHasHScroll || hasFrozenColumns()) ? scrollbarDimensions.height : 0));
+            y = Math.min(y, th - Math.round($viewportScrollContainerY.height()) + ((viewportHasHScroll || hasFrozenColumns()) ? scrollbarDimensions.height : 0));
 
             var oldOffset = offset;
 
@@ -2758,7 +2758,7 @@ if (typeof Slick === "undefined") {
             }
 
             $paneTopL.css({
-                'top': $paneHeaderL.height(), 'height': paneTopH
+                'top': Math.round($paneHeaderL.height()), 'height': paneTopH
             });
 
             var paneBottomTop = $paneTopL.position().top
@@ -2768,7 +2768,7 @@ if (typeof Slick === "undefined") {
 
             if (hasFrozenColumns()) {
                 $paneTopR.css({
-                    'top': $paneHeaderL.height(), 'height': paneTopH
+                    'top': Math.round($paneHeaderL.height()), 'height': paneTopH
                 });
 
                 $viewportTopR.height(viewportTopH);
@@ -2830,7 +2830,7 @@ if (typeof Slick === "undefined") {
 
             var dataLengthIncludingAddNew = getDataLengthIncludingAddNew();
             var numberOfRows = 0;
-            var oldH = (hasFrozenRows && !options.frozenBottom) ? $canvasBottomL.height() : $canvasTopL.height();
+            var oldH = (hasFrozenRows && !options.frozenBottom) ? Math.round($canvasBottomL.height()) : Math.round($canvasTopL.height());
 
             if (hasFrozenRows) {
                 var numberOfRows = getDataLength() - options.frozenRow;
@@ -2838,7 +2838,7 @@ if (typeof Slick === "undefined") {
                 var numberOfRows = dataLengthIncludingAddNew + (options.leaveSpaceForNewRows ? numVisibleRows - 1 : 0);
             }
 
-            var tempViewportH = $viewportScrollContainerY.height();
+            var tempViewportH = Math.round($viewportScrollContainerY.height());
             var oldViewportHasVScroll = viewportHasVScroll;
             // with autoHeight, we do not need to accommodate the vertical scroll bar
             viewportHasVScroll = !options.autoHeight && (numberOfRows * options.rowHeight > tempViewportH);
@@ -3900,7 +3900,7 @@ if (typeof Slick === "undefined") {
                 var isBottom = $cell.parents('.grid-canvas-bottom').length;
 
                 if (isBottom) {
-                    rowOffset = (options.frozenBottom) ? $canvasTopL.height() : frozenRowsHeight;
+                    rowOffset = (options.frozenBottom) ? Math.round($canvasTopL.height()) : frozenRowsHeight;
                 }
 
                 row = getCellFromPoint(e.clientX - c[xLeft], e.clientY - c.top + rowOffset + $(document).scrollTop()).row;
@@ -3978,7 +3978,7 @@ if (typeof Slick === "undefined") {
             var colspan = getColspan(row, cell);
             var left = columnPosLeft[cell],
               right = columnPosRight[cell + (colspan > 1 ? colspan - 1 : 0)],
-              scrollRight = scrollLeft + $viewportScrollContainerX.width();
+              scrollRight = scrollLeft + Math.round($viewportScrollContainerX.width());
 
             if (left < scrollLeft) {
                 $viewportScrollContainerX.scrollLeft(left);
@@ -4012,7 +4012,7 @@ if (typeof Slick === "undefined") {
 
                 if (hasFrozenRows && isBottom) {
                     rowOffset -= (options.frozenBottom)
-                      ? $canvasTopL.height()
+                      ? Math.round($canvasTopL.height())
                       : frozenRowsHeight;
                 }
 
@@ -4284,7 +4284,7 @@ if (typeof Slick === "undefined") {
               (!options.frozenBottom && row > actualFrozenRow - 1) ||
               (options.frozenBottom && row < actualFrozenRow - 1)) {
 
-                var viewportScrollH = $viewportScrollContainerY.height();
+                var viewportScrollH = Math.round($viewportScrollContainerY.height());
 
                 var rowAtTop = row * options.rowHeight;
                 var rowAtBottom = (row + 1) * options.rowHeight
