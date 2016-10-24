@@ -1540,7 +1540,7 @@ var Q;
     Q.layoutFillHeightValue = layoutFillHeightValue;
     function layoutFillHeight(element) {
         var h = layoutFillHeightValue(element);
-        var n = h + 'px';
+        var n = Math.round(h) + 'px';
         if (element.css('height') != n) {
             element.css('height', n);
         }
