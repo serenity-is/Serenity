@@ -1,4 +1,11 @@
+## 2.5.3 (2016-10-24)
+
+Bugfixes:
+  - resolve problem with IE11 and slickgrid layout, that is caused by height() returning non-integer values in jQuery v3, which leads to stack overflows
+
 ## 2.5.2 (2016-10-23)
+
+Bugfixes:
   - fix jquery.event.drag.min.js causing problem when bundling is enabled
   
 ## 2.5.1 (2016-10-22)
