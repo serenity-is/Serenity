@@ -1,3 +1,8 @@
+## 2.5.4 (2016-10-28)
+
+Bugfixes:
+  - fix paging LIMIT OFFSET statement for MySql dialect
+
 ## 2.5.3 (2016-10-24)
 
 Bugfixes:
