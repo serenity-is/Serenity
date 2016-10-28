@@ -98,7 +98,7 @@ namespace Serenity.Data
         {
             get
             {
-                return " LIMIT {0} OFFSET {1}";
+                return " LIMIT {1} OFFSET {0}";
             }
         }
 
