@@ -1,3 +1,8 @@
+## 2.5.6 (2016-10-30)
+
+Bugfixes:
+  - avoid multiple populate on quick filter initialization. it was due to usage of change event and async initialization
+
 ## 2.5.5 (2016-10-29)
 
 Features:
