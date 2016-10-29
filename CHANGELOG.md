@@ -1,3 +1,14 @@
+## 2.5.5 (2016-10-29)
+
+Features:
+  - integrated StackExchange.Exceptional [Serene]
+  - added validation to another form in tab sample [Serene]
+  - added inline action buttons sample [Serene]
+  
+Bugfixes:
+  - column picker dialog changing height while dragging
+  - fix dashboard link doesn't get active if url doesn't end with '/'
+  
 ## 2.5.4 (2016-10-28)
 
 Bugfixes:
