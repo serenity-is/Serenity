@@ -361,7 +361,7 @@
 		if (!this.isAsyncWidget()) {
 			this.initialSettings = this.getCurrentSettings(null);
 			this.restoreSettings(null, null);
-			this.initialPopulate();
+			window.setTimeout(ss.mkdel(this, this.initialPopulate), 0);
 		}
 	};
 	$Serenity_DataGrid.__typeName = 'Serenity.DataGrid';
@@ -5938,7 +5938,7 @@
 					quickFilter.toggleClass('quick-filter-active', active);
 				}
 			});
-			$Serenity_WX.change(widget, ss.mkdel(this, function(e1) {
+			$Serenity_WX.changeSelect2(widget, ss.mkdel(this, function(e1) {
 				this.quickFilterChange(e1);
 			}));
 			this.add_submitHandlers(submitHandler);

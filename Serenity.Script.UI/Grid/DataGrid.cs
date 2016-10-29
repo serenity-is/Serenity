@@ -81,7 +81,7 @@ namespace Serenity
             {
                 initialSettings = GetCurrentSettings();
                 RestoreSettings();
-                InitialPopulate();
+                Window.SetTimeout(InitialPopulate, 0);
             }
         }
 
@@ -1115,7 +1115,7 @@ namespace Serenity
                 }
             };
 
-            widget.Change(e =>
+            widget.ChangeSelect2(e =>
             {
                 this.QuickFilterChange(e);
             });
