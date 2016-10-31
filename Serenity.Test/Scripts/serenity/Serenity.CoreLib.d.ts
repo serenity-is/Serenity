@@ -781,6 +781,7 @@ declare namespace Serenity {
         function setDisabled(tabs: JQuery, tabKey: string, isDisabled: boolean): void;
         function activeTabKey(tabs: JQuery): string;
         function indexByKey(tabs: JQuery): any;
+        function selectTab(tabs: JQuery, tabKey: string): void;
     }
 }
 declare namespace Serenity {
