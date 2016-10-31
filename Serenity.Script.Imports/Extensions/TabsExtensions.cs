@@ -24,5 +24,9 @@ namespace Serenity
         {
             return null;
         }
+        
+        public static void SelectTab(this TabsObject tabs, string tabKey)
+        {
+        }        
     }
 }
