@@ -54,5 +54,18 @@
 
             return indexByKey;
         }
+        
+        export function selectTab(tabs: JQuery, tabKey: string) {
+            var ibk = indexByKey(this.tabs);
+            if (!ibk)
+                return;
+            var index = ibk[tabKey];
+            if (index == null) {
+                return;
+            }
+            if (index !== this.tabs.tabs('option', 'active')) {
+                this.tabs.tabs('option', 'active', index);
+            }
+        }
     }
 }
