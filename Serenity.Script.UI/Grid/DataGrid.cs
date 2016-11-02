@@ -580,10 +580,6 @@ namespace Serenity
         protected virtual void SetIncludeColumnsParameter()
         {
             var include = new JsDictionary<string, bool>();
-            if (!Script.IsNullOrUndefined(view.Params.IncludeColumns))
-                foreach (var key in (string[])view.Params.IncludeColumns)
-                    include[key] = true;
-
             GetIncludeColumns(include);
 
             List<string> array = null;
@@ -592,7 +588,6 @@ namespace Serenity
                 array = new List<string>();
                 foreach (var key in include.Keys)
                     array.Add(key);
-
             }
 
             view.Params.IncludeColumns = array;

@@ -5548,26 +5548,19 @@
 		},
 		setIncludeColumnsParameter: function() {
 			var include = {};
-			if (!!!ss.isNullOrUndefined(this.view.params.IncludeColumns)) {
-				var $t1 = ss.cast(this.view.params.IncludeColumns, Array);
-				for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-					var key = $t1[$t2];
-					include[key] = true;
-				}
-			}
 			this.getIncludeColumns(include);
 			var array = null;
 			if (ss.getKeyCount(include) > 0) {
 				array = [];
-				var $t3 = ss.getEnumerator(Object.keys(include));
+				var $t1 = ss.getEnumerator(Object.keys(include));
 				try {
-					while ($t3.moveNext()) {
-						var key1 = $t3.current();
-						array.push(key1);
+					while ($t1.moveNext()) {
+						var key = $t1.current();
+						array.push(key);
 					}
 				}
 				finally {
-					$t3.dispose();
+					$t1.dispose();
 				}
 			}
 			this.view.params.IncludeColumns = array;
