@@ -13,30 +13,21 @@ It aims to make development easier while reducing maintenance costs by avoiding 
 
 <img src="https://github.com/volkanceylan/Serene/blob/master/Template/img/SereneAnimation.gif" />
 
-## Documentation
+## Documentation and Tutorials
 
-See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenity-guide) at https://www.gitbook.com/book/volkanceylan/serenity-guide for documentation.
+See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenity-guide) at https://www.gitbook.com/book/volkanceylan/serenity-guide for documentation, and step by step tutorials.
 
 **Translations of Serenity Developer Guide:**
 - [Chinese Simplified (thanks @WuShenghui)](https://www.gitbook.com/book/volkanceylan/serenity-zh-cn)
+- [Türkçe Başlangıç Kılavuzu (thanks @ademc)](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)*.
 
-> Türkçe dökümantasyon için *[şu kılavuz](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)* incelenebilir. Katkıları için Adem beye teşekkür ederiz.
-
-## Quick Start
+## Quick Start with Serene
 
 The easiest and fastest way to get your hands dirty on Serenity is by using a sample application template (Serene) from Visual Studio Gallery at https://visualstudiogallery.msdn.microsoft.com/559ec6fc-feef-4077-b6d5-5a99408a6681
 
 You can also install it directly from Visual Studio, by entering File -> New -> Project -> Online and searching for *SERENE*.
 
-Please read documentation at https://volkanceylan.gitbooks.io/serenity-guide for step-by-step tutorials.
-
-## Support / Spread the Word
-
-You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open an issue here with relevant links.
-
-If you are using Serenity in any open source / commercial projects let me know, so i can add it to the list of references.
-
-.NET open source community is a bit limited and is not so active, so if you help spread the word by posting in forums, starring the project here and in Visual Studio Gallery, i'll appreciate it much.
+Serene source code is available in its own repository at https://github.com/volkanceylan/serene.
 
 ## Online Serene Demo
 
@@ -44,9 +35,27 @@ http://serenity.is/demo/
 
 http://serenedemo.azurewebsites.net/ [alternative one from @samdubey]
 
+## Contribute / Spread the Word
+
+You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open an issue here with relevant links.
+
+Please help spread the word by posting in forums, starring project here, or rating Serene extension in VSGallery.
+
+## Licence
+
+Serenity is free and open source project with MIT licence, which also allows usage in commercial applications. 
+
+## Donating
+
+If Serenity was helpful to you, please consider donating to keep Serenity alive and moving forward.
+
+http://serenity.is/#Donate
+
+## Commercial Support
+
+Paid support options are available from the author and a team of Serenity professionals. [Contact us](mailto:volkanceylan@gmail.com) for details.
+
 ## Video Tutorials (thanks a lot to @samdubey for these contributions)
-
-
 
 **Serenity Youtube Channel:** 
 
