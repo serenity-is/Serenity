@@ -2435,6 +2435,19 @@ var Serenity;
             return indexByKey;
         }
         TabsExtensions.indexByKey = indexByKey;
+        function selectTab(tabs, tabKey) {
+            var ibk = indexByKey(tabs);
+            if (!ibk)
+                return;
+            var index = ibk[tabKey];
+            if (index == null) {
+                return;
+            }
+            if (index !== tabs.tabs('option', 'active')) {
+                tabs.tabs('option', 'active', index);
+            }
+        }
+        TabsExtensions.selectTab = selectTab;
     })(TabsExtensions = Serenity.TabsExtensions || (Serenity.TabsExtensions = {}));
 })(Serenity || (Serenity = {}));
 /// <reference path="../../../../typings/jquery/jquery.d.ts" />

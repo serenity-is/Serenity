@@ -70,6 +70,14 @@ namespace Serenity
             UpdateSelectAll();
         }
 
+        public void SelectKeys(string[] keys)
+        {
+            foreach (var k in keys)
+                include[k] = true;
+
+            UpdateSelectAll();
+        }
+
         public void ResetCheckedAndRefresh()
         {
             include = new JsDictionary<string, bool>();

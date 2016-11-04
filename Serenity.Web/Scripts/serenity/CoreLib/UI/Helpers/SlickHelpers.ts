@@ -6,6 +6,7 @@
         constructor(grid: IDataGrid);
         clear(): void;
         resetCheckedAndRefresh(): void;
+        selectKeys(keys: string[]): void;
         getSelectedKeys(): string[];
         getSelectedAsInt32(): number[];
         getSelectedAsInt64(): number[];

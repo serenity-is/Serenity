@@ -8876,6 +8876,13 @@
 			ss.clearKeys(this.$include);
 			this.$updateSelectAll();
 		},
+		selectKeys: function(keys) {
+			for (var $t1 = 0; $t1 < keys.length; $t1++) {
+				var k = keys[$t1];
+				this.$include[k] = true;
+			}
+			this.$updateSelectAll();
+		},
 		resetCheckedAndRefresh: function() {
 			this.$include = {};
 			this.$updateSelectAll();
