@@ -19,7 +19,7 @@ See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenit
 
 **Translations of Serenity Developer Guide:**
 - [Chinese Simplified (thanks @WuShenghui)](https://www.gitbook.com/book/volkanceylan/serenity-zh-cn)
-- [Türkçe Başlangıç Kılavuzu (thanks @ademc)](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)*.
+- [Türkçe Başlangıç Kılavuzu (thanks @ademc)](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)
 
 ## Quick Start with Serene
 
@@ -43,7 +43,7 @@ Please help spread the word by posting in forums, starring project here, or rati
 
 ## Licence
 
-Serenity is free and open source project with MIT licence, which also allows usage in commercial applications. 
+Serenity is a free and open source project with MIT licence, which permits usage in commercial applications. 
 
 ## Donating
 
