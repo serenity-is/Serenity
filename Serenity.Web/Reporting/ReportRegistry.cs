@@ -107,7 +107,7 @@ namespace Serenity.Reporting
             foreach (var k in reportsByCategory)
                 if (categoryKey.IsNullOrEmpty() ||
                     String.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
-                    (categoryKey ?? "").StartsWith(k.Key + "/", StringComparison.OrdinalIgnoreCase))
+                    (k.Key + "/").StartsWith((categoryKey ?? ""), StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (var report in k.Value)
                         if (report.Permission.IsNullOrEmpty() ||
