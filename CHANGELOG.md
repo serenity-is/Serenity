@@ -1,3 +1,13 @@
+## 2.5.7 (2016-11-04)
+
+Features:
+  - added innerjoin attribute (thanks @marcobisio)
+  - added tabextesnsions.selectTab helper (thanks @estrusco)
+
+Bugfixes:
+  - fix includecolumns parameter in data grid doesn't get cleared when columns are made hidden
+  - fix category filtering in report repository
+  
 ## 2.5.6 (2016-10-30)
 
 Bugfixes:
