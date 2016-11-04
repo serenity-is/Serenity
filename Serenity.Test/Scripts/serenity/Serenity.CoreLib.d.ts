@@ -708,6 +708,7 @@ declare namespace Serenity {
         constructor(grid: IDataGrid);
         clear(): void;
         resetCheckedAndRefresh(): void;
+        selectKeys(keys: string[]): void;
         getSelectedKeys(): string[];
         getSelectedAsInt32(): number[];
         getSelectedAsInt64(): number[];
@@ -825,6 +826,35 @@ declare namespace Serenity {
         function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
         function removeValidationRule(element: JQuery, eventClass: string): JQuery;
         function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
+    }
+}
+declare namespace Serenity {
+    class Widget<TOptions> {
+        private static nextWidgetNumber;
+        element: JQuery;
+        protected options: TOptions;
+        protected widgetName: string;
+        protected uniqueName: string;
+        protected asyncPromise: PromiseLike<void>;
+        constructor(element: JQuery, options?: TOptions);
+        destroy(): void;
+        protected addCssClass(): void;
+        protected getCssClass(): string;
+        protected initializeAsync(): PromiseLike<void>;
+        protected isAsyncWidget(): boolean;
+        static getWidgetName(type: Function): string;
+        static elementFor<TWidget>(editorType: {
+            new (...args: any[]): TWidget;
+        }): JQuery;
+        static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
+        init(action?: (widget: any) => void): this;
+        private initialize();
+    }
+    interface Widget<TOptions> {
+        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        getGridField(): JQuery;
+        change(handler: (e: JQueryEventObject) => void): void;
+        changeSelect2(handler: (e: JQueryEventObject) => void): void;
     }
 }
 declare namespace Serenity {
@@ -1765,35 +1795,6 @@ declare namespace Serenity {
         container?: JQuery;
         element?: (e: JQuery) => void;
         init?: (w: TWidget) => void;
-    }
-}
-declare namespace Serenity {
-    class Widget<TOptions> {
-        private static nextWidgetNumber;
-        element: JQuery;
-        protected options: TOptions;
-        protected widgetName: string;
-        protected uniqueName: string;
-        protected asyncPromise: PromiseLike<void>;
-        constructor(element: JQuery, options?: TOptions);
-        destroy(): void;
-        protected addCssClass(): void;
-        protected getCssClass(): string;
-        protected initializeAsync(): PromiseLike<void>;
-        protected isAsyncWidget(): boolean;
-        static getWidgetName(type: Function): string;
-        static elementFor<TWidget>(editorType: {
-            new (...args: any[]): TWidget;
-        }): JQuery;
-        static create<TWidget extends Widget<TOpt>, TOpt>(params: CreateWidgetParams<TWidget, TOpt>): TWidget;
-        init(action?: (widget: any) => void): this;
-        private initialize();
-    }
-    interface Widget<TOptions> {
-        addValidationRule(eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        getGridField(): JQuery;
-        change(handler: (e: JQueryEventObject) => void): void;
-        changeSelect2(handler: (e: JQueryEventObject) => void): void;
     }
 }
 declare namespace Serenity {
