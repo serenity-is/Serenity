@@ -39,7 +39,7 @@ http://serenedemo.azurewebsites.net/ [alternative one from @samdubey]
 
 You may contribute to the project by opening a pull request, adding documentation, sample source code, asking a question or suggesting an improvement etc. Just open an issue here with relevant links.
 
-Please help spread the word by posting in forums, starring project here, or rating Serene extension in VSGallery.
+Please help spread the word by posting in blogs, forums, social media, starring project in GitHub, or reviewing the Serene extension in [VSGallery](https://visualstudiogallery.msdn.microsoft.com/559ec6fc-feef-4077-b6d5-5a99408a6681/view/Reviews).
 
 ## Licence
 
