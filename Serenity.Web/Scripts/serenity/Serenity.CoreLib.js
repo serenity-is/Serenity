@@ -3104,6 +3104,89 @@ var Serenity;
     }(Serenity.TemplatedDialog));
     Serenity.ColumnPickerDialog = ColumnPickerDialog;
 })(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    /**
+     * A mixin that can be applied to a DataGrid for tree functionality
+     */
+    var TreeGridMixin = (function () {
+        function TreeGridMixin(options) {
+            this.options = options;
+            var dg = this.dataGrid = options.grid;
+            var idProperty = dg.getIdProperty();
+            var getId = this.getId = function (item) { return item[idProperty]; };
+            dg.element.find('.grid-container').on('click', function (e) {
+                if ($(e.target).hasClass('s-TreeToggle')) {
+                    var src = dg.slickGrid.getCellFromEvent(e);
+                    if (src.cell >= 0 &&
+                        src.row >= 0) {
+                        Serenity.SlickTreeHelper.toggleClick(e, src.row, src.row, dg.view, getId);
+                    }
+                }
+            });
+            var oldViewFilter = dg.onViewFilter;
+            dg.onViewFilter = function (item) {
+                if (!oldViewFilter.apply(this, [item]))
+                    return false;
+                return Serenity.SlickTreeHelper.filterById(item, dg.view, options.getParentId);
+            };
+            var oldProcessData = dg.onViewProcessData;
+            dg.onViewProcessData = function (response) {
+                response = oldProcessData.apply(this, [response]);
+                response.Entities = TreeGridMixin.applyTreeOrdering(response.Entities, getId, options.getParentId);
+                Serenity.SlickTreeHelper.setIndents(response.Entities, getId, options.getParentId, (options.initialCollapse && options.initialCollapse()) || false);
+                return response;
+            };
+            if (options.toggleField) {
+                var col = Q.first(dg.getGrid().getColumns(), function (x) { return x.field == options.toggleField; });
+                col.format = Serenity.SlickFormatting.treeToggle(function () { return dg.view; }, getId, col.format);
+                col.formatter = Serenity.SlickHelper.convertToFormatter(col.format);
+            }
+        }
+        /**
+         * Expands / collapses all rows in a grid automatically
+         */
+        TreeGridMixin.prototype.toggleAll = function () {
+            Serenity.SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), !this.dataGrid.view.getItems().every(function (x) { return x._collapsed == true; }));
+            this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
+        };
+        /**
+         * Reorders a set of items so that parents comes before their children.
+         * This method is required for proper tree ordering, as it is not so easy to perform with SQL.
+         * @param items list of items to be ordered
+         * @param getId a delegate to get ID of a record (must return same ID with grid identity field)
+         * @param getParentId a delegate to get parent ID of a record
+         */
+        TreeGridMixin.applyTreeOrdering = function (items, getId, getParentId) {
+            var result = [];
+            var byId = Q.toGrouping(items, getId);
+            var byParentId = Q.toGrouping(items, getParentId);
+            var visited = {};
+            function takeChildren(theParentId) {
+                if (visited[theParentId])
+                    return;
+                visited[theParentId] = true;
+                for (var _i = 0, _a = (byParentId[theParentId] || []); _i < _a.length; _i++) {
+                    var child = _a[_i];
+                    result.push(child);
+                    takeChildren(getId(child));
+                }
+            }
+            for (var _i = 0, items_2 = items; _i < items_2.length; _i++) {
+                var item = items_2[_i];
+                var parentId = getParentId(item);
+                if (parentId == null ||
+                    !((byId[parentId] || []).length)) {
+                    result.push(item);
+                    takeChildren(getId(item));
+                }
+            }
+            return result;
+        };
+        return TreeGridMixin;
+    }());
+    Serenity.TreeGridMixin = TreeGridMixin;
+})(Serenity || (Serenity = {}));
 if ($.fn.button && $.fn.button.noConflict) {
     var btn = $.fn.button.noConflict();
     $.fn.btn = btn;

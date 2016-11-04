@@ -2178,6 +2178,22 @@ declare namespace Serenity {
         protected getTemplate(): string;
     }
 }
+declare namespace Serenity {
+    class TreeGridMixin<TItem> {
+        private options;
+        private dataGrid;
+        private getId;
+        constructor(options: TreeGridMixinOptions<TItem>);
+        toggleAll(): void;
+        static applyTreeOrdering<TItem>(items: TItem[], getId: (item: TItem) => any, getParentId: (item: TItem) => any): TItem[];
+    }
+    interface TreeGridMixinOptions<TItem> {
+        grid: Serenity.DataGrid<TItem, any>;
+        getParentId: (item: TItem) => any;
+        toggleField: string;
+        initialCollapse?: () => boolean;
+    }
+}
 interface JQuery {
     flexHeightOnly(flexY?: number): JQuery;
     flexWidthOnly(flexX?: number): JQuery;
