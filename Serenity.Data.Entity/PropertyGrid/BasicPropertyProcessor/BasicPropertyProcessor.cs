@@ -9,6 +9,7 @@ namespace Serenity.PropertyGrid
         {
             SetAlignment(source, item);
             SetCategory(source, item);
+            SetCollapsible(source, item);
             SetCssClass(source, item);
             SetDefaultValue(source, item);
             SetEditLink(source, item);

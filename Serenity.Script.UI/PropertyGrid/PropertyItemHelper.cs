@@ -65,6 +65,15 @@ namespace Serenity
                 else if (list.Count > 0)
                     pi.Category = list[list.Count - 1].Category;
 
+                var collapsibleAttribute = member.GetCustomAttributes(typeof(CollapsibleAttribute), false);
+                if (collapsibleAttribute.Length == 1)
+                {
+                    pi.Collapsible = true;
+                    pi.Collapsed = ((CollapsibleAttribute)collapsibleAttribute[0]).Collapsed;
+                }
+                else if (collapsibleAttribute.Length > 1)
+                    throw new Exception(String.Format("{0}.{1} için birden fazla katlanır belirlenmiş!", type.Name, pi.Name));
+
                 var cssClassAttr = member.GetCustomAttributes(typeof(CssClassAttribute), false);
                 if (cssClassAttr.Length == 1)
                     pi.CssClass = ((CssClassAttribute)cssClassAttr[0]).CssClass;

@@ -59,6 +59,7 @@
     <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilterOnlyAttribute.cs" />
     <Compile Include="ComponentModel\Common\HiddenAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\CollapsibleAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HideOnUpdateAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HideOnInsertAttribute.cs" />
     <Compile Include="ComponentModel\Common\VisibleAttribute.cs" />
