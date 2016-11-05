@@ -24,9 +24,9 @@ namespace Serenity.Reporting
 
         private static string GetReportCategory(Type type)
         {
-            var attr = type.GetCustomAttributes(typeof(CategoryAttribute), false);
+            var attr = type.GetCustomAttributes(typeof(ComponentModel.CategoryAttribute), false);
             if (attr.Length == 1)
-                return ((CategoryAttribute)attr[0]).Category;
+                return ((ComponentModel.CategoryAttribute)attr[0]).Category;
 
             return String.Empty;
         }
@@ -107,7 +107,7 @@ namespace Serenity.Reporting
             foreach (var k in reportsByCategory)
                 if (categoryKey.IsNullOrEmpty() ||
                     String.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
-                    (k.Key + "/").StartsWith((categoryKey ?? ""), StringComparison.OrdinalIgnoreCase))
+                    (categoryKey ?? "").StartsWith(k.Key + "/", StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (var report in k.Value)
                         if (report.Permission.IsNullOrEmpty() ||
