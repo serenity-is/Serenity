@@ -59,7 +59,11 @@ namespace Serenity
 
                 var categoryAttribute = member.GetCustomAttributes(typeof(CategoryAttribute), false);
                 if (categoryAttribute.Length == 1)
+                {
                     pi.Category = ((CategoryAttribute)categoryAttribute[0]).Category;
+                    pi.Collapsible = ((CategoryAttribute)categoryAttribute[0]).Collapsible;
+                    pi.Expanded = ((CategoryAttribute)categoryAttribute[0]).Expanded;
+                }
                 else if (categoryAttribute.Length > 1)
                     throw new Exception(String.Format("{0}.{1} için birden fazla kategori belirlenmiş!", type.Name, pi.Name));
                 else if (list.Count > 0)
