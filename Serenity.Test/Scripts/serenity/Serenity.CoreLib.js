@@ -2647,6 +2647,30 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var IBooleanValue = (function () {
+        function IBooleanValue() {
+        }
+        return IBooleanValue;
+    }());
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IDoubleValue = (function () {
+        function IDoubleValue() {
+        }
+        return IDoubleValue;
+    }());
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IStringValue = (function () {
+        function IStringValue() {
+        }
+        return IStringValue;
+    }());
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var TemplatedDialog = (function (_super) {
         __extends(TemplatedDialog, _super);
         function TemplatedDialog(options) {

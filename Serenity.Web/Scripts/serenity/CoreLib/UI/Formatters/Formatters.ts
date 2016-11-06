@@ -1,9 +1,13 @@
 ﻿declare namespace Serenity {
 
-    namespace FormatterTypeRegistry {
-        function get(key: string): Function;
-        function initialize(): void;
-        function reset(): void;
+    class DateFormatter implements Slick.Formatter {
+        format(ctx: Slick.FormatterContext): string;
+        static format(value: any, format: string): string;
+        get_displayFormat(): string;
+        set_displayFormat(value: string): void;
+    }
+
+    class DateTimeFormatter extends DateFormatter {
     }
 
     class EnumFormatter implements Slick.Formatter {
@@ -50,5 +54,11 @@
         set_urlFormat(value: string): void;
         get_target(): string;
         set_target(value: string): void;
+    }
+
+    namespace FormatterTypeRegistry {
+        function get(key: string): Function;
+        function initialize(): void;
+        function reset(): void;
     }
 }
