@@ -303,9 +303,10 @@
 	global.Serenity.CheckTreeEditor = $Serenity_CheckTreeEditor;
 	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.CollapsibleAttribute
-	var $Serenity_CollapsibleAttribute = function(collapsed) {
+	var $Serenity_CollapsibleAttribute = function(value) {
+		this.value = false;
 		this.collapsed = false;
-		this.collapsed = collapsed;
+		this.value = value;
 	};
 	$Serenity_CollapsibleAttribute.__typeName = 'Serenity.CollapsibleAttribute';
 	global.Serenity.CollapsibleAttribute = $Serenity_CollapsibleAttribute;
@@ -2892,7 +2893,7 @@
 		for (var i = 0; i < this.$items.length; i++) {
 			var item = this.$items[i];
 			if (this.options.useCategories && !ss.referenceEquals(priorCategory, item.category)) {
-				var categoryDiv = this.$createCategoryDiv(categoriesDiv, categoryIndexes, item.category, item.collapsible, item.collapsed);
+				var categoryDiv = this.$createCategoryDiv(categoriesDiv, categoryIndexes, item.category, ss.coalesce(item.collapsible, false), ss.coalesce(item.collapsed, true));
 				if (ss.isNullOrUndefined(priorCategory)) {
 					categoryDiv.addClass('first-category');
 				}
@@ -3007,21 +3008,12 @@
 			var displayNameAttribute = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $System_ComponentModel_DisplayNameAttribute);
 			});
-			if (displayNameAttribute.length > 1) {
-				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla başlık belirlenmiş!', ss.getTypeName(type), pi.name));
-			}
 			var hintAttribute = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_HintAttribute);
 			});
-			if (hintAttribute.length > 1) {
-				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla ipucu belirlenmiş!', ss.getTypeName(type), pi.name));
-			}
 			var placeholderAttribute = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_PlaceholderAttribute);
 			});
-			if (placeholderAttribute.length > 1) {
-				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla placeholder belirlenmiş!', ss.getTypeName(type), pi.name));
-			}
 			var memberType = ((member.type === 16) ? ss.cast(member, ss.isValue(member) && member.type === 16).returnType : ss.cast(member, ss.isValue(member) && member.type === 4).returnType);
 			if (member.type === 16) {
 				var p = ss.cast(member, ss.isValue(member) && member.type === 16);
@@ -3040,11 +3032,8 @@
 			var categoryAttribute = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_CategoryAttribute);
 			});
-			if (categoryAttribute.length === 1) {
+			if (categoryAttribute.length > 0) {
 				pi.category = ss.cast(categoryAttribute[0], $Serenity_CategoryAttribute).category;
-			}
-			else if (categoryAttribute.length > 1) {
-				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla kategori belirlenmiş!', ss.getTypeName(type), pi.name));
 			}
 			else if (list.length > 0) {
 				pi.category = list[list.length - 1].category;
@@ -3052,21 +3041,15 @@
 			var collapsibleAttribute = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_CollapsibleAttribute);
 			});
-			if (collapsibleAttribute.length === 1) {
+			if (collapsibleAttribute.length > 0 && ss.cast(collapsibleAttribute[0], $Serenity_CollapsibleAttribute).value) {
 				pi.collapsible = true;
 				pi.collapsed = ss.cast(collapsibleAttribute[0], $Serenity_CollapsibleAttribute).collapsed;
-			}
-			else if (collapsibleAttribute.length > 1) {
-				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla katlanır belirlenmiş!', ss.getTypeName(type), pi.name));
 			}
 			var cssClassAttr = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_CssClassAttribute);
 			});
-			if (cssClassAttr.length === 1) {
+			if (cssClassAttr.length > 0) {
 				pi.cssClass = ss.cast(cssClassAttr[0], $Serenity_CssClassAttribute).cssClass;
-			}
-			else if (cssClassAttr.length > 1) {
-				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla css class belirlenmiş!', ss.getTypeName(type), pi.name));
 			}
 			if ((member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_OneWayAttribute);
@@ -3117,9 +3100,6 @@
 			var typeAttrArray = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_EditorTypeAttribute);
 			});
-			if (typeAttrArray.length > 1) {
-				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla editör tipi belirlenmiş!', ss.getTypeName(type), pi.name));
-			}
 			var nullableType = memberType;
 			//Nullable.GetUnderlyingType(memberType);
 			var enumType = null;
@@ -8896,6 +8876,13 @@
 	ss.initClass($Serenity_GridRowSelectionMixin, $asm, {
 		clear: function() {
 			ss.clearKeys(this.$include);
+			this.$updateSelectAll();
+		},
+		selectKeys: function(keys) {
+			for (var $t1 = 0; $t1 < keys.length; $t1++) {
+				var k = keys[$t1];
+				this.$include[k] = true;
+			}
 			this.$updateSelectAll();
 		},
 		resetCheckedAndRefresh: function() {

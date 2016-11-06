@@ -1,5 +1,4 @@
 ﻿using Serenity.ComponentModel;
-using System.ComponentModel;
 
 namespace Serenity.PropertyGrid
 {
@@ -8,10 +7,11 @@ namespace Serenity.PropertyGrid
         private void SetCollapsible(IPropertySource source, PropertyItem item)
         {
             var attr = source.GetAttribute<CollapsibleAttribute>();
-            if (attr != null)
+            if (attr != null && attr.Value)
             {
                 item.Collapsible = true;
-                item.Collapsed = attr.Collapsed;
+                if (attr.Collapsed)
+                    item.Collapsed = true;
             }
         }
     }

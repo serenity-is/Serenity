@@ -4,11 +4,12 @@ namespace Serenity.ComponentModel
 {
     public class CollapsibleAttribute : Attribute
     {
-        public CollapsibleAttribute(bool collapsed = false)
+        public CollapsibleAttribute(bool value = false)
         {
-            Collapsed = collapsed;
+            Value = value;
         }
 
+        public bool Value { get; private set; }
         public bool Collapsed { get; private set; }
     }
 }

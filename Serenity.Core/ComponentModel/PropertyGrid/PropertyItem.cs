@@ -25,9 +25,9 @@ namespace Serenity.ComponentModel
         [JsonProperty("category")]
         public string Category { get; set; }
         [JsonProperty("collapsible")]
-        public bool Collapsible { get; set; }
+        public bool? Collapsible { get; set; }
         [JsonProperty("collapsed")]
-        public bool Collapsed { get; set; }
+        public bool? Collapsed { get; set; }
         [JsonProperty("cssClass")]
         public string CssClass { get; set; }
         [JsonProperty("maxLength")]

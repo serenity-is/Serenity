@@ -59,7 +59,7 @@ namespace Serenity
                 if (options.UseCategories &&
                     priorCategory != item.Category)
                 {
-                    var categoryDiv = CreateCategoryDiv(categoriesDiv, categoryIndexes, item.Category, item.Collapsible, item.Collapsed);
+                    var categoryDiv = CreateCategoryDiv(categoriesDiv, categoryIndexes, item.Category, item.Collapsible ?? false, item.Collapsed ?? true);
 
                     if (priorCategory == null)
                         categoryDiv.AddClass("first-category");

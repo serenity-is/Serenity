@@ -14,8 +14,8 @@ namespace Serenity
         public string EditorType { get; set; }
         public JsDictionary EditorParams { get; set; }
         public string Category { get; set; }
-        public bool Collapsible { get; set; }
-        public bool Collapsed { get; set; }
+        public bool? Collapsible { get; set; }
+        public bool? Collapsed { get; set; }
         public string CssClass { get; set; }
         public int? MaxLength { get; set; }
         public bool? Required { get; set; }
