@@ -38,7 +38,7 @@ namespace Serenity
                     .AddClass("category-links");
 
                 categoryIndexes = CreateCategoryLinks(linkContainer, items);
-
+                
                 if (categoryIndexes.Count > 1)
                     linkContainer.AppendTo(div);
                 else
@@ -48,7 +48,7 @@ namespace Serenity
                     .AddClass("categories")
                     .AppendTo(div);
             }
-
+            
             var fieldContainer = categoriesDiv;
 
             string priorCategory = null;
@@ -59,7 +59,8 @@ namespace Serenity
                 if (options.UseCategories &&
                     priorCategory != item.Category)
                 {
-                    var categoryDiv = CreateCategoryDiv(categoriesDiv, categoryIndexes, item.Category, item.Collapsible ?? false, item.Collapsed ?? true);
+                    var categoryDiv = CreateCategoryDiv(categoriesDiv, categoryIndexes, item.Category, 
+                        item.Collapsible != true ? (bool?)null : item.Collapsed ?? false);
 
                     if (priorCategory == null)
                         categoryDiv.AddClass("first-category");
@@ -90,64 +91,33 @@ namespace Serenity
             base.Destroy();
         }
 
-        private jQueryObject CreateCategoryDiv(jQueryObject categoriesDiv, JsDictionary<string, int> categoryIndexes, string category, bool collapsible, bool collapsed)
+        private jQueryObject CreateCategoryDiv(jQueryObject categoriesDiv, JsDictionary<string, int> categoryIndexes, string category,
+            bool? collapsed)
         {
-            var categoryId = options.IdPrefix + "Category" + categoryIndexes[category].ToString();
+            var categoryDiv = J("<div/>")
+                .AddClass("category")
+                .AppendTo(categoriesDiv);
 
-            var categoryTitleDiv = J("<div/>")
+            var title = J("<div/>")
                 .AddClass("category-title")
                 .Append(J("<a/>")
                     .AddClass("category-anchor")
                     .Text(DetermineText(category, prefix => prefix + "Categories." + category))
-                    .Attribute("name", categoryId));
+                    .Attribute("name", options.IdPrefix + "Category" + categoryIndexes[category].ToString()))
+                .AppendTo(categoryDiv);
 
-            var categoryDiv = J("<div/>")
-                .AddClass("category")
-                // add category-scroll class for CategoryLinkClick
-                .AddClass("category-scroll")
-                .Attribute("id", categoryId);
-
-            if (collapsible)
+            if (collapsed != null)
             {
-                var button = J("<button class='btn btn-box-tool' data-target='#" + categoryId + "'></button>");
-                var i = J("<i class='fa'></i>");
-                categoryTitleDiv.Prepend(button.Append(i));
-                categoryTitleDiv.Attribute("href", "#" + categoryId);
-                categoryTitleDiv.Attribute("data-toggle", "collapse");
-                categoryDiv.AddClass("collapse");
-                if (collapsed)
-                {
-                    // remove category class in order to remove flex behaviour
-                    // that doesn't work properly with bootstrap collapse
-                    categoryDiv.RemoveClass("category");
-                    i.AddClass("fa fa-plus");
-                }
-                else
-                {
-                    categoryDiv.AddClass("in");
-                    i.AddClass("fa fa-minus");
-                }
+                categoryDiv.AddClass(collapsed == true ? "collapsible collapsed" : "collapsible");
+                var img = J("<i/>").AddClass(collapsed == true ? "fa fa-plus" : "fa fa-minus").AppendTo(title);
 
-                // bind to on collapse / expand events
-                categoryDiv.On("hide.bs.collapse", (e) =>
+                title.Click(e =>
                 {
-                    i.RemoveClass("fa fa-minus");
-                    i.AddClass("fa fa-plus");
-                });
-                categoryDiv.On("hidden.bs.collapse", (e) =>
-                {
-                    categoryDiv.RemoveClass("category");
-                });
-                categoryDiv.On("show.bs.collapse", (e) =>
-                {
-                    categoryDiv.AddClass("category");
-                    i.RemoveClass("fa fa-plus");
-                    i.AddClass("fa fa-minus");
+                    categoryDiv.ToggleClass("collapsed");
+                    img.ToggleClass("fa-plus").ToggleClass("fa-minus");
                 });
             }
-            categoryTitleDiv.AppendTo(categoriesDiv);
-            categoryDiv.AppendTo(categoriesDiv);
-
+              
             return categoryDiv;
         }
 
@@ -309,11 +279,11 @@ namespace Serenity
 
             var self = this;
             var categoryOrder = GetCategoryOrder(items);
-
-            items.Sort((x, y) =>
+            
+            items.Sort((x, y) => 
             {
                 var c = 0;
-
+                
                 if (x.Category != y.Category)
                 {
                     var c1 = categoryOrder[x.Category];
@@ -351,7 +321,7 @@ namespace Serenity
                             .AddClass("separator")
                             .Text("|")
                             .PrependTo(container);
-
+                    
                     J("<a/>")
                         .AddClass("category-link")
                         .Text(DetermineText(item.Category, prefix => prefix + "Categories." + item.Category))
@@ -375,19 +345,19 @@ namespace Serenity
 
             var title = J("a[name=" + e.Target.GetAttribute("href").ToString().Substr(1) + "]");
 
-            Action animate = delegate
-            {
+            if (title.Closest(".category").HasClass("collapsed"))
+                title.Closest(".category").Click();
+
+            Action animate = delegate {
                 title.FadeTo(100, 0.5, () => title.FadeTo(100, 1, () => { }));
             };
 
-            var intoView = title.Parent().Next(".category-scroll");
-            if (!intoView.HasClass("in"))
-                ((dynamic)intoView).collapse("show");
+
+            var intoView = title.Closest(".category");
             if (intoView.Closest(":scrollable(both)").Length == 0)
                 animate();
             else
-                ((dynamic)intoView).scrollintoview(new
-                {
+                ((dynamic)intoView).scrollintoview(new {
                     duration = "fast",
                     direction = "y",
                     complete = animate
@@ -399,8 +369,8 @@ namespace Serenity
             get { return this.editors.As<Widget[]>(); }
         }
 
-        public PropertyItem[] Items
-        {
+        public PropertyItem[] Items 
+        { 
             get { return this.items.As<PropertyItem[]>(); }
         }
 
@@ -476,14 +446,14 @@ namespace Serenity
                     (Mode == PropertyGridMode.Update && item.Updatable == false);
 
                 EditorUtils.SetReadOnly(editor, readOnly);
-                EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) &&
+                EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
                     (item.EditorType != "Boolean"));
 
                 if (item.Visible == false ||
                     item.HideOnInsert == true ||
                     item.HideOnUpdate == true)
                 {
-                    bool hidden =
+                    bool hidden = 
                         item.Visible == false ||
                         (Mode == PropertyGridMode.Insert && item.HideOnInsert == true) ||
                         (Mode == PropertyGridMode.Update && item.HideOnUpdate == true);

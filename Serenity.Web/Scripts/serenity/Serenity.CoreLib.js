@@ -4728,8 +4728,12 @@ var Q;
             submitHandler: function () {
                 return false;
             },
-            invalidHandler: function () {
+            invalidHandler: function (event, validator) {
                 Q.notifyError(Q.text("Validation.InvalidFormMessage"));
+                $(validator.errorList.map(function (x) { return x.element; }))
+                    .closest('.category.collapsed')
+                    .children('.category-title')
+                    .each(function (i, x) { return $(x).click(); });
             },
             success: function (label) {
                 label.addClass('checked');

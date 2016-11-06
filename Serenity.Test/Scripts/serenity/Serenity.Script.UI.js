@@ -2893,7 +2893,7 @@
 		for (var i = 0; i < this.$items.length; i++) {
 			var item = this.$items[i];
 			if (this.options.useCategories && !ss.referenceEquals(priorCategory, item.category)) {
-				var categoryDiv = this.$createCategoryDiv(categoriesDiv, categoryIndexes, item.category, ss.coalesce(item.collapsible, false), ss.coalesce(item.collapsed, true));
+				var categoryDiv = this.$createCategoryDiv(categoriesDiv, categoryIndexes, item.category, ((item.collapsible !== true) ? null : ss.coalesce(item.collapsed, false)));
 				if (ss.isNullOrUndefined(priorCategory)) {
 					categoryDiv.addClass('first-category');
 				}
@@ -2909,16 +2909,16 @@
 	$Serenity_PropertyGrid.$categoryLinkClick = function(e) {
 		e.preventDefault();
 		var title = $('a[name=' + e.target.getAttribute('href').toString().substr(1) + ']');
+		if (title.closest('.category').hasClass('collapsed')) {
+			title.closest('.category').click();
+		}
 		var animate = function() {
 			title.fadeTo(100, 0.5, function() {
 				title.fadeTo(100, 1, function() {
 				});
 			});
 		};
-		var intoView = title.parent().next('.category-scroll');
-		if (!intoView.hasClass('in')) {
-			intoView.collapse('show');
-		}
+		var intoView = title.closest('.category');
 		if (intoView.closest(':scrollable(both)').length === 0) {
 			animate();
 		}
@@ -9524,45 +9524,19 @@
 			this.element.find('a.category-link').unbind('click', $Serenity_PropertyGrid.$categoryLinkClick).remove();
 			Serenity.Widget.prototype.destroy.call(this);
 		},
-		$createCategoryDiv: function(categoriesDiv, categoryIndexes, category, collapsible, collapsed) {
-			var categoryId = this.options.idPrefix + 'Category' + categoryIndexes[category].toString();
-			var categoryTitleDiv = $('<div/>').addClass('category-title').append($('<a/>').addClass('category-anchor').text(this.$determineText(category, function(prefix) {
+		$createCategoryDiv: function(categoriesDiv, categoryIndexes, category, collapsed) {
+			var categoryDiv = $('<div/>').addClass('category').appendTo(categoriesDiv);
+			var title = $('<div/>').addClass('category-title').append($('<a/>').addClass('category-anchor').text(this.$determineText(category, function(prefix) {
 				return prefix + 'Categories.' + category;
-			})).attr('name', categoryId));
-			var categoryDiv = $('<div/>').addClass('category').addClass('category-scroll').attr('id', categoryId);
-			if (collapsible) {
-				var button = $("<button class='btn btn-box-tool' data-target='#" + categoryId + "'></button>");
-				var i = $("<i class='fa'></i>");
-				categoryTitleDiv.prepend(button.append(i));
-				categoryTitleDiv.attr('href', '#' + categoryId);
-				categoryTitleDiv.attr('data-toggle', 'collapse');
-				categoryDiv.addClass('collapse');
-				if (collapsed) {
-					// remove category class in order to remove flex behaviour
-					// that doesn't work properly with bootstrap collapse
-					categoryDiv.removeClass('category');
-					i.addClass('fa fa-plus');
-				}
-				else {
-					categoryDiv.addClass('in');
-					i.addClass('fa fa-minus');
-				}
-				// bind to on collapse / expand events
-				categoryDiv.on('hide.bs.collapse', function(e) {
-					i.removeClass('fa fa-minus');
-					i.addClass('fa fa-plus');
-				});
-				categoryDiv.on('hidden.bs.collapse', function(e1) {
-					categoryDiv.removeClass('category');
-				});
-				categoryDiv.on('show.bs.collapse', function(e2) {
-					categoryDiv.addClass('category');
-					i.removeClass('fa fa-plus');
-					i.addClass('fa fa-minus');
+			})).attr('name', this.options.idPrefix + 'Category' + categoryIndexes[category].toString())).appendTo(categoryDiv);
+			if (ss.isValue(collapsed)) {
+				categoryDiv.addClass(((collapsed === true) ? 'collapsible collapsed' : 'collapsible'));
+				var img = $('<i/>').addClass(((collapsed === true) ? 'fa fa-plus' : 'fa fa-minus')).appendTo(title);
+				title.click(function(e) {
+					categoryDiv.toggleClass('collapsed');
+					img.toggleClass('fa-plus').toggleClass('fa-minus');
 				});
 			}
-			categoryTitleDiv.appendTo(categoriesDiv);
-			categoryDiv.appendTo(categoriesDiv);
 			return categoryDiv;
 		},
 		$determineText: function(text, getKey) {

@@ -207,8 +207,13 @@ namespace Q {
             submitHandler: function () {
                 return false;
             },
-            invalidHandler: function () {
+            invalidHandler: function (event: any, validator: JQueryValidation.Validator) {
                 Q.notifyError(Q.text("Validation.InvalidFormMessage"));
+
+                $(validator.errorList.map(x => x.element))
+                    .closest('.category.collapsed')
+                    .children('.category-title')
+                    .each((i, x) => $(x).click());
             },
             success: function (label: JQuery) {
                 label.addClass('checked');

@@ -67,6 +67,7 @@
         "UI/Widgets/TemplatedPanel.ts",
         "UI/Widgets/PropertyPanel.ts",
         "UI/Widgets/EntityDialog.ts",
+        "UI/Widgets/Reporting.ts",
         "UI/DataGrid/ColumnPickerDialog.ts",
         "UI/DataGrid/TreeGridMixin.ts",
         "UI/jQuery/jQuery.FlexifyPlugin.ts",
