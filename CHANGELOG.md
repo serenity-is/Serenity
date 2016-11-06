@@ -1,3 +1,16 @@
+## 2.5.8 (2016-11-08)
+
+Features:
+  - TreeGridMixin for tree view like grid functionality
+  - added Collapsible attribute, for collapsible categories in forms (thanks @marcobisio)
+  - added selectKeys method to GridRowSelectionMixin (so no need to access $items directly)
+  - added Tree Grid sample [Serene]
+  - filter sample for showing orders containing a specific products in details [Serene]
+  
+Bugfixes:
+  - don't show pdf button in new order dialog [Serene]
+  - use connection.InsertAndGetID with row, instead of SqlInsert to avoid errors in postgresql and similar
+
 ## 2.5.7 (2016-11-04)
 
 Features:
