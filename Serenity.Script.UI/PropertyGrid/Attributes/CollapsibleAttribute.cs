@@ -6,7 +6,7 @@ namespace Serenity
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class CollapsibleAttribute : Attribute
     {
-        public CollapsibleAttribute(bool value = false)
+        public CollapsibleAttribute(bool value = true)
         {
             Value = value;
         }

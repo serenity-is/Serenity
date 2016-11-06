@@ -4,7 +4,7 @@ namespace Serenity.ComponentModel
 {
     public class CollapsibleAttribute : Attribute
     {
-        public CollapsibleAttribute(bool value = false)
+        public CollapsibleAttribute(bool value = true)
         {
             Value = value;
         }
