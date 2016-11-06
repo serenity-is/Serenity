@@ -3106,6 +3106,9 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    /**
+     * A mixin that can be applied to a DataGrid for tree functionality
+     */
     var TreeGridMixin = (function () {
         function TreeGridMixin(options) {
             this.options = options;
@@ -3140,10 +3143,20 @@ var Serenity;
                 col.formatter = Serenity.SlickHelper.convertToFormatter(col.format);
             }
         }
+        /**
+         * Expands / collapses all rows in a grid automatically
+         */
         TreeGridMixin.prototype.toggleAll = function () {
             Serenity.SlickTreeHelper.setCollapsed(this.dataGrid.view.getItems(), !this.dataGrid.view.getItems().every(function (x) { return x._collapsed == true; }));
             this.dataGrid.view.setItems(this.dataGrid.view.getItems(), true);
         };
+        /**
+         * Reorders a set of items so that parents comes before their children.
+         * This method is required for proper tree ordering, as it is not so easy to perform with SQL.
+         * @param items list of items to be ordered
+         * @param getId a delegate to get ID of a record (must return same ID with grid identity field)
+         * @param getParentId a delegate to get parent ID of a record
+         */
         TreeGridMixin.applyTreeOrdering = function (items, getId, getParentId) {
             var result = [];
             var byId = Q.toGrouping(items, getId);
