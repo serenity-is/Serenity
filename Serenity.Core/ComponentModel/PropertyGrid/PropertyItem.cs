@@ -24,6 +24,10 @@ namespace Serenity.ComponentModel
         public Dictionary<string, object> EditorParams { get; set; }
         [JsonProperty("category")]
         public string Category { get; set; }
+        [JsonProperty("collapsible")]
+        public bool Collapsible { get; set; }
+        [JsonProperty("collapsed")]
+        public bool Collapsed { get; set; }
         [JsonProperty("cssClass")]
         public string CssClass { get; set; }
         [JsonProperty("maxLength")]
@@ -70,7 +74,7 @@ namespace Serenity.ComponentModel
         public bool? Sortable { get; set; }
         [JsonProperty("sortOrder")]
         public int? SortOrder { get; set; }
-       
+
         [JsonProperty("editLink")]
         public bool? EditLink { get; set; }
         [JsonProperty("editLinkItemType")]

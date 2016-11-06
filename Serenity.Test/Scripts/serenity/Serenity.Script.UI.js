@@ -302,6 +302,14 @@
 	$Serenity_CheckTreeEditor.__typeName = 'Serenity.CheckTreeEditor';
 	global.Serenity.CheckTreeEditor = $Serenity_CheckTreeEditor;
 	////////////////////////////////////////////////////////////////////////////////
+	// Serenity.CollapsibleAttribute
+	var $Serenity_CollapsibleAttribute = function(collapsed) {
+		this.collapsed = false;
+		this.collapsed = collapsed;
+	};
+	$Serenity_CollapsibleAttribute.__typeName = 'Serenity.CollapsibleAttribute';
+	global.Serenity.CollapsibleAttribute = $Serenity_CollapsibleAttribute;
+	////////////////////////////////////////////////////////////////////////////////
 	// Serenity.CssClassAttribute
 	var $Serenity_CssClassAttribute = function(cssClass) {
 		this.cssClass = null;
@@ -2884,7 +2892,7 @@
 		for (var i = 0; i < this.$items.length; i++) {
 			var item = this.$items[i];
 			if (this.options.useCategories && !ss.referenceEquals(priorCategory, item.category)) {
-				var categoryDiv = this.$createCategoryDiv(categoriesDiv, categoryIndexes, item.category);
+				var categoryDiv = this.$createCategoryDiv(categoriesDiv, categoryIndexes, item.category, item.collapsible, item.collapsed);
 				if (ss.isNullOrUndefined(priorCategory)) {
 					categoryDiv.addClass('first-category');
 				}
@@ -2906,7 +2914,10 @@
 				});
 			});
 		};
-		var intoView = title.closest('.category');
+		var intoView = title.parent().next('.category-scroll');
+		if (!intoView.hasClass('in')) {
+			intoView.collapse('show');
+		}
 		if (intoView.closest(':scrollable(both)').length === 0) {
 			animate();
 		}
@@ -3037,6 +3048,16 @@
 			}
 			else if (list.length > 0) {
 				pi.category = list[list.length - 1].category;
+			}
+			var collapsibleAttribute = (member.attr || []).filter(function(a) {
+				return ss.isInstanceOfType(a, $Serenity_CollapsibleAttribute);
+			});
+			if (collapsibleAttribute.length === 1) {
+				pi.collapsible = true;
+				pi.collapsed = ss.cast(collapsibleAttribute[0], $Serenity_CollapsibleAttribute).collapsed;
+			}
+			else if (collapsibleAttribute.length > 1) {
+				throw new ss.Exception(ss.formatString('{0}.{1} için birden fazla katlanır belirlenmiş!', ss.getTypeName(type), pi.name));
 			}
 			var cssClassAttr = (member.attr || []).filter(function(a) {
 				return ss.isInstanceOfType(a, $Serenity_CssClassAttribute);
@@ -6596,6 +6617,7 @@
 			}
 		}
 	}, $Serenity_DataGrid, [$Serenity_IDataGrid, $Serenity_IGetEditValue, $Serenity_ISetEditValue]);
+	ss.initClass($Serenity_CollapsibleAttribute, $asm, {});
 	ss.initClass($Serenity_CssClassAttribute, $asm, {});
 	ss.initInterface($Serenity_IReadOnly, $asm, { get_readOnly: null, set_readOnly: null });
 	ss.initClass($Serenity_DateEditor, $asm, {
@@ -8876,13 +8898,6 @@
 			ss.clearKeys(this.$include);
 			this.$updateSelectAll();
 		},
-		selectKeys: function(keys) {
-			for (var $t1 = 0; $t1 < keys.length; $t1++) {
-				var k = keys[$t1];
-				this.$include[k] = true;
-			}
-			this.$updateSelectAll();
-		},
 		resetCheckedAndRefresh: function() {
 			this.$include = {};
 			this.$updateSelectAll();
@@ -9522,11 +9537,45 @@
 			this.element.find('a.category-link').unbind('click', $Serenity_PropertyGrid.$categoryLinkClick).remove();
 			Serenity.Widget.prototype.destroy.call(this);
 		},
-		$createCategoryDiv: function(categoriesDiv, categoryIndexes, category) {
-			var categoryDiv = $('<div/>').addClass('category').appendTo(categoriesDiv);
-			$('<div/>').addClass('category-title').append($('<a/>').addClass('category-anchor').text(this.$determineText(category, function(prefix) {
+		$createCategoryDiv: function(categoriesDiv, categoryIndexes, category, collapsible, collapsed) {
+			var categoryId = this.options.idPrefix + 'Category' + categoryIndexes[category].toString();
+			var categoryTitleDiv = $('<div/>').addClass('category-title').append($('<a/>').addClass('category-anchor').text(this.$determineText(category, function(prefix) {
 				return prefix + 'Categories.' + category;
-			})).attr('name', this.options.idPrefix + 'Category' + categoryIndexes[category].toString())).appendTo(categoryDiv);
+			})).attr('name', categoryId));
+			var categoryDiv = $('<div/>').addClass('category').addClass('category-scroll').attr('id', categoryId);
+			if (collapsible) {
+				var button = $("<button class='btn btn-box-tool' data-target='#" + categoryId + "'></button>");
+				var i = $("<i class='fa'></i>");
+				categoryTitleDiv.prepend(button.append(i));
+				categoryTitleDiv.attr('href', '#' + categoryId);
+				categoryTitleDiv.attr('data-toggle', 'collapse');
+				categoryDiv.addClass('collapse');
+				if (collapsed) {
+					// remove category class in order to remove flex behaviour
+					// that doesn't work properly with bootstrap collapse
+					categoryDiv.removeClass('category');
+					i.addClass('fa fa-plus');
+				}
+				else {
+					categoryDiv.addClass('in');
+					i.addClass('fa fa-minus');
+				}
+				// bind to on collapse / expand events
+				categoryDiv.on('hide.bs.collapse', function(e) {
+					i.removeClass('fa fa-minus');
+					i.addClass('fa fa-plus');
+				});
+				categoryDiv.on('hidden.bs.collapse', function(e1) {
+					categoryDiv.removeClass('category');
+				});
+				categoryDiv.on('show.bs.collapse', function(e2) {
+					categoryDiv.addClass('category');
+					i.removeClass('fa fa-plus');
+					i.addClass('fa fa-minus');
+				});
+			}
+			categoryTitleDiv.appendTo(categoriesDiv);
+			categoryDiv.appendTo(categoriesDiv);
 			return categoryDiv;
 		},
 		$determineText: function(text, getKey) {
