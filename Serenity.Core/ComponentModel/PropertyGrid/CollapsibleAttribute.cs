@@ -10,6 +10,6 @@ namespace Serenity.ComponentModel
         }
 
         public bool Value { get; private set; }
-        public bool Collapsed { get; private set; }
+        public bool Collapsed { get; set; }
     }
 }
