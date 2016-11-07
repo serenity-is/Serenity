@@ -56,7 +56,7 @@ namespace Serenity
             for (int i = 0; i < items.Count; i++)
             {
                 var item = items[i];
-                if (options.UseCategories &&
+                if (options.UseCategories && categoryIndexes.Count > 1 && 
                     priorCategory != item.Category)
                 {
                     var categoryDiv = CreateCategoryDiv(categoriesDiv, categoryIndexes, item.Category, 

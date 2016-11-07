@@ -2892,7 +2892,7 @@
 		var priorCategory = null;
 		for (var i = 0; i < this.$items.length; i++) {
 			var item = this.$items[i];
-			if (this.options.useCategories && !ss.referenceEquals(priorCategory, item.category)) {
+			if (this.options.useCategories && ss.getKeyCount(categoryIndexes) > 1 && !ss.referenceEquals(priorCategory, item.category)) {
 				var categoryDiv = this.$createCategoryDiv(categoriesDiv, categoryIndexes, item.category, ((item.collapsible !== true) ? null : ss.coalesce(item.collapsed, false)));
 				if (ss.isNullOrUndefined(priorCategory)) {
 					categoryDiv.addClass('first-category');
