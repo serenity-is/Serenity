@@ -346,7 +346,7 @@ namespace Serenity
             var title = J("a[name=" + e.Target.GetAttribute("href").ToString().Substr(1) + "]");
 
             if (title.Closest(".category").HasClass("collapsed"))
-                title.Closest(".category").Click();
+                title.Closest(".category").Children(".category-title").Click();
 
             Action animate = delegate {
                 title.FadeTo(100, 0.5, () => title.FadeTo(100, 1, () => { }));

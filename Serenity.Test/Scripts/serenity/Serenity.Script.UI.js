@@ -2910,7 +2910,7 @@
 		e.preventDefault();
 		var title = $('a[name=' + e.target.getAttribute('href').toString().substr(1) + ']');
 		if (title.closest('.category').hasClass('collapsed')) {
-			title.closest('.category').click();
+			title.closest('.category').children('.category-title').click();
 		}
 		var animate = function() {
 			title.fadeTo(100, 0.5, function() {
