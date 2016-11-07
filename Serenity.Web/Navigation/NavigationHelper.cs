@@ -1,5 +1,6 @@
 ﻿namespace Serenity.Navigation
 {
+    using Reflection;
     using Serenity.Extensibility;
     using System;
     using System.Collections.Generic;
@@ -73,6 +74,24 @@
                         if (filter == null || filter(attr))
                             list.Add(attr);
                     }
+                }
+
+                foreach (var navItemType in ExtensibilityHelper.GetTypesWithInterface(typeof(IDynamicNavItems)))
+                {
+                    var navItem = (IDynamicNavItems)navItemType.GetInstance();
+                    if (navItem.NavItems != null)
+                        foreach (var item in navItem.NavItems)
+                        {
+                            NavigationItemAttribute attr = null;
+                            if (item.Type == NavItemType.Menu)
+                                attr= new NavigationMenuAttribute(item.Order, item.Title, item.Icon);
+                            else if (item.Type == NavItemType.Link)
+                                attr = new NavigationLinkAttribute(item.Order, item.Path, item.Url, item.Permission, item.Icon);
+                            else if (item.Type == NavItemType.Action)
+                                attr = new NavigationLinkAttribute(item.Order, item.Path, item.Controller, item.Icon, item.Action);
+                            if (filter == null || filter(attr))
+                                list.Add(attr);
+                        }
                 }
 
                 return list.OrderBy(x => (x.Category.TrimToNull() ?? ""))

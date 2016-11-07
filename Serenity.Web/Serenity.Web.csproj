@@ -152,6 +152,7 @@
     <Compile Include="Mvc\ServiceAuthorizeAttribute.cs" />
     <Compile Include="Mvc\TokenAuthorizeFilter.cs" />
     <Compile Include="Navigation\NavigationHelper.cs" />
+    <Compile Include="Navigation\IDynamicNavItems.cs" />
     <Compile Include="Navigation\NavigationItem.cs" />
     <Compile Include="Navigation\NavigationMenuAttribute.cs" />
     <Compile Include="Navigation\NavigationLinkAttribute.cs" />
