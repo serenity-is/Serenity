@@ -1,4 +1,12 @@
-## 2.5.8 (2016-11-08)
+## 2.5.9 (2016-11-07)
+
+Features:
+  - expand category when related link is clicked
+
+Bugfixes:
+  - fields in collapsed categories could be focused
+
+## 2.5.8 (2016-11-06)
 
 Features:
   - TreeGridMixin for tree view like grid functionality
