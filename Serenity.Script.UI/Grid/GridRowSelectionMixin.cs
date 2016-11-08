@@ -106,6 +106,15 @@ namespace Serenity
         {
             return include.Keys.Select(x => Int64.Parse(x)).ToList();
         }
+        
+        public void SetSelectedKeys(Int32[] keys)
+        {
+            foreach (var id in keys)
+                include[id.ToString()] = true;
+
+            UpdateSelectAll();
+            grid.GetView().Populate();
+        }
 
         public static SlickColumn CreateSelectColumn(Func<GridRowSelectionMixin> getMixin)
         {
