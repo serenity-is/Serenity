@@ -712,6 +712,7 @@ declare namespace Serenity {
         getSelectedKeys(): string[];
         getSelectedAsInt32(): number[];
         getSelectedAsInt64(): number[];
+        setSelectedKeys(keys: number[]): void;
         static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
     }
     namespace GridSelectAllButtonHelper {

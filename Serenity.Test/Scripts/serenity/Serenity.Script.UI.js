@@ -8908,6 +8908,14 @@
 			return Enumerable.from(Object.keys(this.$include)).select(function(x) {
 				return parseInt(x);
 			}).toArray();
+		},
+		setSelectedKeys: function(keys) {
+			this.clear();
+			for (var $t1 = 0; $t1 < keys.length; $t1++) {
+				var k = keys[$t1];
+				this.$include[k.toString()] = true;
+			}
+			this.$updateSelectAll();
 		}
 	});
 	ss.initClass($Serenity_GridSelectAllButtonHelper, $asm, {});
