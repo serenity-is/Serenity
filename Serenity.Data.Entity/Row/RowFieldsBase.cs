@@ -265,7 +265,12 @@ namespace Serenity.Data
                             prm[1] = column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name);
                             prm[2] = display != null ? new LocalText(display.DisplayName) : null;
                             prm[3] = size != null ? size.Value : 0;
-                            prm[4] = (FieldFlags.Default ^ removeFlags) | addFlags;
+
+                            var defaultFlags = FieldFlags.Default;
+                            if (fieldInfo.FieldType.GetCustomAttribute<NotMappedAttribute>() != null)
+                                defaultFlags |= FieldFlags.NotMapped;
+
+                            prm[4] = defaultFlags | addFlags;
                             prm[5] = null;
                             prm[6] = null;
 
