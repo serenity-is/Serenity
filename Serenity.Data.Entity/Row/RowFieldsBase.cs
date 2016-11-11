@@ -270,7 +270,7 @@ namespace Serenity.Data
                             if (fieldInfo.FieldType.GetCustomAttribute<NotMappedAttribute>() != null)
                                 defaultFlags |= FieldFlags.NotMapped;
 
-                            prm[4] = defaultFlags | addFlags;
+                            prm[4] = (defaultFlags ^ removeFlags) | addFlags;
                             prm[5] = null;
                             prm[6] = null;
 
