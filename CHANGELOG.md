@@ -1,3 +1,14 @@
+## 2.6.0 (2016-11-12)
+
+Features:
+  - implemented field level permissions, just add one or more of ReadPermission, ModifyPermission, InsertPermission, UpdatePermission attributes to properties in a row.
+  - added LogicOperatorPermissionService that allows using & (and), | (or) operators in permission checks, e.g. ReadPermission("A&B|C")
+  - ListField, RowField, RowListField types has NotMapped flag by default so no need to add [NotMapped] attribute explicitly
+  - ListField also supports value comparison just like RowListField
+  - added setSelectedKeys method to GridRowSelectionMixin (thanks @estrusco)
+  - added other form in tab with one toolbar sample (thanks @estrusco) [Serene]
+  - added a report page for Northwind, more report samples are on the way [Serene]
+
 ## 2.5.9 (2016-11-07)
 
 Features:
