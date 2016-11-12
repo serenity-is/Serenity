@@ -14,10 +14,12 @@ namespace Serenity
     public class UserDefinition
     {
         [IntrinsicProperty]
-        public string Username { get; }
+        public string Username { get { return null; } }
         [IntrinsicProperty]
-        public string DisplayName { get; }
+        public string DisplayName { get { return null; } }
         [IntrinsicProperty]
-        public JsDictionary<string, bool> Permissions { get; }
+        public bool IsAdmin { get { return false; } }
+        [IntrinsicProperty]
+        public JsDictionary<string, bool> Permissions { get { return null; } }
     }
 }
