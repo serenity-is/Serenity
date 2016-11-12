@@ -107,12 +107,12 @@ namespace Serenity
             return include.Keys.Select(x => Int64.Parse(x)).ToList();
         }
 
-        public void SetSelectedKeys(int[] keys)
+        public void SetSelectedKeys(string[] keys)
         {
             Clear();
 
             foreach (var k in keys)
-                include[k.ToString()] = true;
+                include[k] = true;
 
             UpdateSelectAll();
         }

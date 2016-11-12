@@ -8929,7 +8929,7 @@
 			this.clear();
 			for (var $t1 = 0; $t1 < keys.length; $t1++) {
 				var k = keys[$t1];
-				this.$include[k.toString()] = true;
+				this.$include[k] = true;
 			}
 			this.$updateSelectAll();
 		}
