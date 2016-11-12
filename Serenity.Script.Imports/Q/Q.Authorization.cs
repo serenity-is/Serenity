@@ -11,21 +11,21 @@ namespace Serenity
             public static UserDefinition UserDefinition
             {
                 [InlineCode("Q.Authorization.userDefinition")]
-                get;
+                get { return null; }
             }
 
             [IntrinsicProperty]
             public static string Username
             {
                 [InlineCode("Q.Authorization.username")]
-                get;
+                get { return null; }
             }
 
             [IntrinsicProperty]
-            public static string IsLoggedIn
+            public static bool IsLoggedIn
             {
                 [InlineCode("Q.Authorization.isLoggedIn")]
-                get;
+                get { return false; }
             }
 
             [InlineCode("Q.Authorization.hasPermission({permission})")]
