@@ -28,6 +28,9 @@ namespace Serenity.Data
         internal int naturalOrder;
         internal string textualField;
         private Criteria criteria;
+        internal string readPermission;
+        internal string insertPermission;
+        internal string updatePermission;
 
         protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
         {
@@ -259,6 +262,12 @@ namespace Serenity.Data
             get; set;
         }
 
+        public string InsertPermission
+        {
+            get { return InsertPermission; }
+            set { insertPermission = value; }
+        }
+
         public SelectLevel MinSelectLevel
         {
             get { return minSelectLevel; }
@@ -271,10 +280,22 @@ namespace Serenity.Data
             set { naturalOrder = value; }
         }
 
+        public string ReadPermission
+        {
+            get { return ReadPermission; }
+            set { readPermission = value; }
+        }
+
         public string TextualField
         {
             get { return textualField; }
             set { textualField = value; }
+        }
+
+        public string UpdatePermission
+        {
+            get { return UpdatePermission; }
+            set { updatePermission = value; }
         }
 
         public LeftJoin ForeignJoin(Int32? foreignIndex = null)

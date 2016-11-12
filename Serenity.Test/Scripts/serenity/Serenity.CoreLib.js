@@ -1869,6 +1869,73 @@ var Q;
         });
     })(window || {});
 })(Q || (Q = {}));
+var Q;
+(function (Q) {
+    var Authorization;
+    (function (Authorization) {
+        function hasPermission(permission) {
+            if (permission == null)
+                return false;
+            if (permission == "*")
+                return true;
+            if (permission == "" || permission == "?")
+                return Authorization.isLoggedIn;
+            var ud = Authorization.userDefinition;
+            if (ud && ud.Permissions) {
+                var p = ud.Permissions;
+                if (p[permission])
+                    return true;
+                var orParts = permission.split('|');
+                for (var _i = 0, orParts_1 = orParts; _i < orParts_1.length; _i++) {
+                    var r = orParts_1[_i];
+                    if (!r)
+                        continue;
+                    var andParts = r.split('&');
+                    if (!andParts.length)
+                        continue;
+                    var fail = false;
+                    for (var _a = 0, andParts_1 = andParts; _a < andParts_1.length; _a++) {
+                        var n = andParts_1[_a];
+                        if (!p[n]) {
+                            fail = true;
+                            break;
+                        }
+                    }
+                    if (!fail)
+                        return true;
+                }
+            }
+            return false;
+        }
+        Authorization.hasPermission = hasPermission;
+        function validatePermission(permission) {
+            if (!hasPermission(permission)) {
+                Q.notifyError(Q.text("Authorization.AccessDenied"));
+                throw new Error(Q.text("Authorization.AccessDenied"));
+            }
+        }
+        Authorization.validatePermission = validatePermission;
+    })(Authorization = Q.Authorization || (Q.Authorization = {}));
+    Object.defineProperty(Q.Authorization, "userDefinition", {
+        get: function () {
+            return Q.getRemoteData("UserData");
+        }
+    });
+    Object.defineProperty(Q.Authorization, "isLoggedIn", {
+        get: function () {
+            var ud = Authorization.userDefinition;
+            return ud && !!ud.Username;
+        }
+    });
+    Object.defineProperty(Q.Authorization, "username", {
+        get: function () {
+            var ud = Authorization.userDefinition;
+            if (ud)
+                return ud.Username;
+            return null;
+        }
+    });
+})(Q || (Q = {}));
 var Serenity;
 (function (Serenity) {
     var ColumnsKeyAttribute = (function () {

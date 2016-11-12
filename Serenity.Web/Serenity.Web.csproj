@@ -1016,6 +1016,7 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="Tooling\JsEngine\lib.d.ts_" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\Q\Q.Authorization.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\DataGrid\IInitializeColumn.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\DataGrid\TreeGridMixin.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\DataGrid\ColumnPickerDialog.ts" />

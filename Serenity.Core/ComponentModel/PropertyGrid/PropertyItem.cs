@@ -36,12 +36,18 @@ namespace Serenity.ComponentModel
         public bool? Required { get; set; }
         [JsonProperty("readOnly")]
         public bool? ReadOnly { get; set; }
+        [JsonProperty("readPermission")]
+        public string ReadPermission { get; set; }
         [JsonProperty("insertable")]
         public bool? Insertable { get; set; }
+        [JsonProperty("insertPermission")]
+        public string InsertPermission { get; set; }
         [JsonProperty("hideOnInsert")]
         public bool? HideOnInsert { get; set; }
         [JsonProperty("updatable")]
         public bool? Updatable { get; set; }
+        [JsonProperty("updatePermission")]
+        public string UpdatePermission { get; set; }
         [JsonProperty("hideOnUpdate")]
         public bool? HideOnUpdate { get; set; }
         [JsonProperty("oneWay")]

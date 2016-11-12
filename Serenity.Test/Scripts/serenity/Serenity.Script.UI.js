@@ -9755,8 +9755,8 @@
 				var readOnly = item.readOnly === true || this.get_mode() === 0 && item.insertable === false || this.get_mode() === 1 && item.updatable === false;
 				$Serenity_EditorUtils.setReadOnly(editor, readOnly);
 				$Serenity_EditorUtils.setRequired(editor, !readOnly && !!item.required && item.editorType !== 'Boolean');
-				if (item.visible === false || item.hideOnInsert === true || item.hideOnUpdate === true) {
-					var hidden = item.visible === false || this.get_mode() === 0 && item.hideOnInsert === true || this.get_mode() === 1 && item.hideOnUpdate === true;
+				if (item.visible === false || ss.isValue(item.readPermission) || ss.isValue(item.insertPermission) || ss.isValue(item.updatePermission) || item.hideOnInsert === true || item.hideOnUpdate === true) {
+					var hidden = ss.isValue(item.readPermission) && !Q.hasPermission(item.readPermission) || item.visible === false || this.get_mode() === 0 && (item.hideOnInsert === true || ss.isValue(item.insertPermission) && !Q.hasPermission(item.insertPermission)) || this.get_mode() === 1 && (item.hideOnUpdate === true || ss.isValue(item.updatePermission) && !Q.hasPermission(item.updatePermission));
 					$Serenity_WX.getGridField(editor).toggle(!hidden);
 				}
 			}

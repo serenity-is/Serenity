@@ -150,6 +150,7 @@ namespace Serenity.Services
         public void OnReturn(IRetrieveRequestHandler handler)
         {
             if (ReferenceEquals(null, Target) ||
+                !handler.AllowSelectField(Target) ||
                 !handler.ShouldSelectField(Target))
                 return;
 
@@ -179,6 +180,7 @@ namespace Serenity.Services
         public void OnReturn(IListRequestHandler handler)
         {
             if (ReferenceEquals(null, Target) ||
+                !handler.AllowSelectField(Target) ||
                 !handler.ShouldSelectField(Target) ||
                 handler.Response.Entities.IsEmptyOrNull())
                 return;

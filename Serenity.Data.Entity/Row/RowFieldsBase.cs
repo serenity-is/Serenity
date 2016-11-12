@@ -216,6 +216,9 @@ namespace Serenity.Data
                         DefaultValueAttribute defaultValue = null;
                         TextualFieldAttribute textualField = null;
                         DateTimeKindAttribute dateTimeKind = null;
+                        PermissionAttributeBase readPermission = null;
+                        PermissionAttributeBase insertPermission = null;
+                        PermissionAttributeBase updatePermission = null;
 
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
@@ -234,6 +237,11 @@ namespace Serenity.Data
                             defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
                             textualField = property.GetCustomAttribute<TextualFieldAttribute>(false);
                             dateTimeKind = property.GetCustomAttribute<DateTimeKindAttribute>(false);
+                            readPermission = property.GetCustomAttribute<ReadPermissionAttribute>(false);
+                            insertPermission = property.GetCustomAttribute<InsertPermissionAttribute>(false) ??
+                                property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
+                            updatePermission = property.GetCustomAttribute<UpdatePermissionAttribute>(false) ??
+                                property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                             var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
@@ -351,6 +359,21 @@ namespace Serenity.Data
                         if (dateTimeKind != null && field is DateTimeField)
                         {
                             ((DateTimeField)field).DateTimeKind = dateTimeKind.Value;
+                        }
+
+                        if (readPermission != null)
+                        {
+                            field.readPermission = readPermission.Permission ?? "?";
+                        }
+
+                        if (insertPermission != null)
+                        {
+                            field.insertPermission = insertPermission.Permission ?? "?";
+                        }
+
+                        if (updatePermission != null)
+                        {
+                            field.updatePermission = updatePermission.Permission ?? "?";
                         }
 
                         if (property != null)

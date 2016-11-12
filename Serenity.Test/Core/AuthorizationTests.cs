@@ -1,4 +1,5 @@
-﻿using Serenity.Abstractions;
+﻿using FakeItEasy;
+using Serenity.Abstractions;
 using Serenity.Services;
 using Serenity.Testing;
 using System.Collections.Generic;
@@ -60,7 +61,7 @@ namespace Serenity.Test
         }
 
         [Fact]
-        public void Authorization_HasPermssionThrowsExceptionIfNoPermissionServiceIsRegistered()
+        public void Authorization_HasPermissionThrowsExceptionIfNoPermissionServiceIsRegistered()
         {
             using (new MunqContext())
             {
@@ -219,6 +220,38 @@ namespace Serenity.Test
                 hasPermission = true;
 
                 Authorization.ValidatePermission("Dummy");
+            }
+        }
+
+        [Fact]
+        public void Authorization_HasPermissionReturnsTrueForAsterisk()
+        {
+            using (new MunqContext())
+            {
+                Assert.Equal(true, Authorization.HasPermission("*"));
+            }
+        }
+
+        [Fact]
+        public void Authorization_HasPermissionReturnsIsLoggedInForEmptyStringOrQuestionMark()
+        {
+            using (new MunqContext())
+            {
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                var fake = A.Fake<IAuthorizationService>();
+
+                bool isLoggedIn = false;
+                A.CallTo(() => fake.IsLoggedIn).ReturnsLazily(() => isLoggedIn);
+                A.CallTo(() => fake.Username).ReturnsLazily(() => isLoggedIn ? "dummy": null);
+                registrar.RegisterInstance<IAuthorizationService>(fake);
+
+                Assert.Equal(false, Authorization.HasPermission("?"));
+                Assert.Equal(false, Authorization.HasPermission(""));
+                Assert.Equal(false, Authorization.HasPermission(null));
+                isLoggedIn = true;
+                Assert.Equal(true, Authorization.HasPermission("?"));
+                Assert.Equal(true, Authorization.HasPermission(""));
+                Assert.Equal(false, Authorization.HasPermission(null));
             }
         }
     }

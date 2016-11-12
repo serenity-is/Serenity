@@ -450,13 +450,19 @@ namespace Serenity
                     (item.EditorType != "Boolean"));
 
                 if (item.Visible == false ||
+                    item.ReadPermission != null ||
+                    item.InsertPermission != null ||
+                    item.UpdatePermission != null ||
                     item.HideOnInsert == true ||
                     item.HideOnUpdate == true)
                 {
                     bool hidden = 
+                        (item.ReadPermission != null && !Q.Authorization.HasPermission(item.ReadPermission)) ||
                         item.Visible == false ||
-                        (Mode == PropertyGridMode.Insert && item.HideOnInsert == true) ||
-                        (Mode == PropertyGridMode.Update && item.HideOnUpdate == true);
+                        (Mode == PropertyGridMode.Insert && (item.HideOnInsert == true || 
+                            (item.InsertPermission != null && !Q.Authorization.HasPermission(item.InsertPermission)))) ||
+                        (Mode == PropertyGridMode.Update && (item.HideOnUpdate == true ||
+                            (item.UpdatePermission != null && !Q.Authorization.HasPermission(item.UpdatePermission))));
 
                     editor.GetGridField().Toggle(!hidden);
                 }
