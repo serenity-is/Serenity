@@ -419,8 +419,7 @@ namespace Serenity
             {
                 var item = items[i];
                 if (item.OneWay != true &&
-                    !(Mode == PropertyGridMode.Insert && item.Insertable == false) &&
-                    !(Mode == PropertyGridMode.Update && item.Updatable == false))
+                    !IsItemReadOnly(item))
                 {
                     var editor = editors[i];
                     EditorUtils.SaveValue(editor, item, target);
@@ -434,6 +433,35 @@ namespace Serenity
             EditorUtils.SaveValue(editor, item, target);
         }
 
+        private bool IsItemReadOnly(PropertyItem item)
+        {
+            if (item.ReadOnly == true)
+                return true;
+
+            if (Mode == PropertyGridMode.Insert)
+            {
+                if (item.Insertable == false)
+                    return true;
+
+                if (item.InsertPermission == null)
+                    return false;
+
+                return !Q.Authorization.HasPermission(item.InsertPermission);
+            }
+            else if (Mode == PropertyGridMode.Update)
+            {
+                if (item.Updatable == false)
+                    return true;
+
+                if (item.UpdatePermission == null)
+                    return false;
+
+                return !Q.Authorization.HasPermission(item.UpdatePermission);
+            }
+
+            return false;
+        }
+
         private void UpdateInterface()
         {
             for (var i = 0; i < editors.Count; i++)
@@ -441,10 +469,7 @@ namespace Serenity
                 var item = items[i];
                 var editor = editors[i];
 
-                bool readOnly = item.ReadOnly == true ||
-                    (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
-                    (Mode == PropertyGridMode.Update && item.Updatable == false);
-
+                bool readOnly = IsItemReadOnly(item);
                 EditorUtils.SetReadOnly(editor, readOnly);
                 EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
                     (item.EditorType != "Boolean"));
@@ -459,10 +484,8 @@ namespace Serenity
                     bool hidden = 
                         (item.ReadPermission != null && !Q.Authorization.HasPermission(item.ReadPermission)) ||
                         item.Visible == false ||
-                        (Mode == PropertyGridMode.Insert && (item.HideOnInsert == true || 
-                            (item.InsertPermission != null && !Q.Authorization.HasPermission(item.InsertPermission)))) ||
-                        (Mode == PropertyGridMode.Update && (item.HideOnUpdate == true ||
-                            (item.UpdatePermission != null && !Q.Authorization.HasPermission(item.UpdatePermission))));
+                        (Mode == PropertyGridMode.Insert && item.HideOnInsert == true) ||
+                        (Mode == PropertyGridMode.Update && item.HideOnUpdate == true);
 
                     editor.GetGridField().Toggle(!hidden);
                 }

@@ -28,14 +28,14 @@ namespace Serenity
                 get;
             }
 
-            [InlineCode("Q.hasPermission({permission})")]
+            [InlineCode("Q.Authorization.hasPermission({permission})")]
             public static bool HasPermission(string permission)
             {
                 return false;
             }
 
 
-            [InlineCode("Q.validatePermission({permission})")]
+            [InlineCode("Q.Authorization.validatePermission({permission})")]
             public static void ValidatePermission(string permission)
             {
             }

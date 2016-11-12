@@ -11,10 +11,13 @@
         maxLength?: number;
         required?: boolean;
         insertable?: boolean;
+        insertPermission?: string;
         hideOnInsert?: boolean;
         updatable?: boolean;
+        updatePermission?: string;
         hideOnUpdate?: boolean;
         readOnly?: boolean;
+        readPermission?: string;
         oneWay?: boolean;
         defaultValue?: any;
         localizable?: boolean;

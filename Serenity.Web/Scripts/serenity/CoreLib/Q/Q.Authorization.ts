@@ -11,6 +11,9 @@
                 return isLoggedIn;
 
             var ud = Authorization.userDefinition;
+            if (ud && ud.IsAdmin)
+                return true;
+
             if (ud && ud.Permissions) {
                 var p = ud.Permissions;
                 if (p[permission])
@@ -83,6 +86,7 @@ namespace Serenity {
     export interface UserDefinition {
         Username?: string;
         DisplayName?: string;
+        IsAdmin?: boolean;
         Permissions?: { [key: string]: boolean };
     }
 }

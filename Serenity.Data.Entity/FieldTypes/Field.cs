@@ -264,7 +264,7 @@ namespace Serenity.Data
 
         public string InsertPermission
         {
-            get { return InsertPermission; }
+            get { return insertPermission; }
             set { insertPermission = value; }
         }
 
@@ -282,7 +282,7 @@ namespace Serenity.Data
 
         public string ReadPermission
         {
-            get { return ReadPermission; }
+            get { return readPermission; }
             set { readPermission = value; }
         }
 
@@ -294,7 +294,7 @@ namespace Serenity.Data
 
         public string UpdatePermission
         {
-            get { return UpdatePermission; }
+            get { return updatePermission; }
             set { updatePermission = value; }
         }
 

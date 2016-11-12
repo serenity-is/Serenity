@@ -1302,6 +1302,25 @@ namespace Serenity
             return new GridPersistanceFlags();
         }
 
+        private bool CanShowColumn(SlickColumn column)
+        {
+            if (column == null)
+                return false;
+
+            var item = column.SourceItem;
+
+            if (item == null)
+                return true;
+
+            if (item.FilterOnly == true)
+                return false;
+
+            if (item.ReadPermission == null)
+                return true;
+
+            return Q.Authorization.HasPermission(item.ReadPermission);
+        }
+
         protected virtual void RestoreSettings(PersistedGridSettings settings = null, GridPersistanceFlags flags = null)
         {
             if (settings == null)
@@ -1347,7 +1366,7 @@ namespace Serenity
                             if (x.ID != null && x.Visible == true)
                             {
                                 var column = colById[x.ID];
-                                if (column != null && (column.SourceItem == null || column.SourceItem.FilterOnly != true))
+                                if (CanShowColumn(column))
                                 {
                                     column.Visible = true;
                                     newColumns.Add(column);

@@ -1881,6 +1881,8 @@ var Q;
             if (permission == "" || permission == "?")
                 return Authorization.isLoggedIn;
             var ud = Authorization.userDefinition;
+            if (ud && ud.IsAdmin)
+                return true;
             if (ud && ud.Permissions) {
                 var p = ud.Permissions;
                 if (p[permission])
@@ -3134,7 +3136,9 @@ var Serenity;
             var hidden = [];
             for (var _d = 0, _e = this.allColumns; _d < _e.length; _d++) {
                 var c_2 = _e[_d];
-                if (!visible[c_2.id] && (!c_2.sourceItem || c_2.sourceItem.filterOnly !== true)) {
+                if (!visible[c_2.id] && (!c_2.sourceItem ||
+                    (c_2.sourceItem.filterOnly !== true &&
+                        (c_2.sourceItem.readPermission == null || Q.Authorization.hasPermission(c_2.sourceItem.readPermission))))) {
                     hidden.push(c_2);
                 }
             }
