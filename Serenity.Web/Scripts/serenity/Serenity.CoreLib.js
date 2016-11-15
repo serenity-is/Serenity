@@ -3234,7 +3234,7 @@ var Serenity;
             };
             if (options.toggleField) {
                 var col = Q.first(dg.getGrid().getColumns(), function (x) { return x.field == options.toggleField; });
-                col.format = Serenity.SlickFormatting.treeToggle(function () { return dg.view; }, getId, col.format);
+                col.format = Serenity.SlickFormatting.treeToggle(function () { return dg.view; }, getId, col.format || (function (ctx) { return Q.htmlEncode(ctx.value); }));
                 col.formatter = Serenity.SlickHelper.convertToFormatter(col.format);
             }
         }
