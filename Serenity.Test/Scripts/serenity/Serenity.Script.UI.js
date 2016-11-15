@@ -9758,41 +9758,38 @@
 		save: function(target) {
 			for (var i = 0; i < this.$editors.length; i++) {
 				var item = this.$items[i];
-				if (item.oneWay !== true && !this.$isItemReadOnly(item)) {
+				if (item.oneWay !== true && this.$canModifyItem(item)) {
 					var editor = this.$editors[i];
 					$Serenity_EditorUtils.saveValue(editor, item, target);
 				}
 			}
 		},
-		$isItemReadOnly: function(item) {
-			if (item.readOnly === true) {
-				return true;
-			}
+		$canModifyItem: function(item) {
 			if (this.get_mode() === 0) {
 				if (item.insertable === false) {
-					return true;
-				}
-				if (ss.isNullOrUndefined(item.insertPermission)) {
 					return false;
 				}
-				return !Q.Authorization.hasPermission(item.insertPermission);
+				if (ss.isNullOrUndefined(item.insertPermission)) {
+					return true;
+				}
+				return Q.Authorization.hasPermission(item.insertPermission);
 			}
 			else if (this.get_mode() === 1) {
 				if (item.updatable === false) {
-					return true;
-				}
-				if (ss.isNullOrUndefined(item.updatePermission)) {
 					return false;
 				}
-				return !Q.Authorization.hasPermission(item.updatePermission);
+				if (ss.isNullOrUndefined(item.updatePermission)) {
+					return true;
+				}
+				return Q.Authorization.hasPermission(item.updatePermission);
 			}
-			return false;
+			return true;
 		},
 		$updateInterface: function() {
 			for (var i = 0; i < this.$editors.length; i++) {
 				var item = this.$items[i];
 				var editor = this.$editors[i];
-				var readOnly = this.$isItemReadOnly(item);
+				var readOnly = item.readOnly === true || !this.$canModifyItem(item);
 				$Serenity_EditorUtils.setReadOnly(editor, readOnly);
 				$Serenity_EditorUtils.setRequired(editor, !readOnly && !!item.required && item.editorType !== 'Boolean');
 				if (item.visible === false || ss.isValue(item.readPermission) || ss.isValue(item.insertPermission) || ss.isValue(item.updatePermission) || item.hideOnInsert === true || item.hideOnUpdate === true) {

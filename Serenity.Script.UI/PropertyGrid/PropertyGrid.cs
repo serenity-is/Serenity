@@ -419,7 +419,7 @@ namespace Serenity
             {
                 var item = items[i];
                 if (item.OneWay != true &&
-                    !IsItemReadOnly(item))
+                    CanModifyItem(item))
                 {
                     var editor = editors[i];
                     EditorUtils.SaveValue(editor, item, target);
@@ -433,33 +433,30 @@ namespace Serenity
             EditorUtils.SaveValue(editor, item, target);
         }
 
-        private bool IsItemReadOnly(PropertyItem item)
+        private bool CanModifyItem(PropertyItem item)
         {
-            if (item.ReadOnly == true)
-                return true;
-
             if (Mode == PropertyGridMode.Insert)
             {
                 if (item.Insertable == false)
-                    return true;
-
-                if (item.InsertPermission == null)
                     return false;
 
-                return !Q.Authorization.HasPermission(item.InsertPermission);
+                if (item.InsertPermission == null)
+                    return true;
+
+                return Q.Authorization.HasPermission(item.InsertPermission);
             }
             else if (Mode == PropertyGridMode.Update)
             {
                 if (item.Updatable == false)
-                    return true;
-
-                if (item.UpdatePermission == null)
                     return false;
 
-                return !Q.Authorization.HasPermission(item.UpdatePermission);
+                if (item.UpdatePermission == null)
+                    return true;
+
+                return Q.Authorization.HasPermission(item.UpdatePermission);
             }
 
-            return false;
+            return true;
         }
 
         private void UpdateInterface()
@@ -469,7 +466,7 @@ namespace Serenity
                 var item = items[i];
                 var editor = editors[i];
 
-                bool readOnly = IsItemReadOnly(item);
+                bool readOnly = item.ReadOnly == true || !CanModifyItem(item);
                 EditorUtils.SetReadOnly(editor, readOnly);
                 EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
                     (item.EditorType != "Boolean"));
