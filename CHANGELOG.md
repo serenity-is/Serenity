@@ -1,3 +1,12 @@
+## 2.6.1 (2016-11-15)
+
+Features:
+  - ability to use original ID column with GridEditorBase instead of "__id"
+
+Bugfixes:
+  - if an item is just readonly in property grid, it should still be serialized
+  - fix tree grid mixin doesn't work when toggle column has no formatter
+
 ## 2.6.0 (2016-11-12)
 
 Features:
