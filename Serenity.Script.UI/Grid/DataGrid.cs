@@ -1449,7 +1449,6 @@ namespace Serenity
                     flags.QuickFilters != false)
                 {
                     var qfSettings = settings.QuickFilters;
-                    //GetQuickFilters().ForEach(qf => EditorUtils.SetValue(FindQuickFilter(qf.Type, qf.Field), qfSettings[qf.Field]));
                     GetQuickFilters()
                         .Filter(qf => qfSettings.ContainsKey(qf.Field) && qfSettings[qf.Field] != null)
                         .ForEach(qf => EditorUtils.SetValue(FindQuickFilter(qf.Type, qf.Field), qfSettings[qf.Field]));
