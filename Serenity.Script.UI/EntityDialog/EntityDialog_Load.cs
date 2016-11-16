@@ -17,7 +17,8 @@ namespace Serenity
                 if (entityOrId == null)
                 {
                     LoadResponse(new RetrieveResponse<TEntity>());
-                    done();
+                    if (done != null)
+                        done();
                     return;
                 }
 
@@ -26,13 +27,18 @@ namespace Serenity
                 {
                     var self = this;
                     var entityId = entityOrId;
-                    LoadById(entityId, response => Window.SetTimeout(done, 0));
+                    LoadById(entityId, response =>
+                    {
+                        if (done != null)
+                            Window.SetTimeout(done, 0);
+                    });
                     return;
                 }
 
                 var entity = entityOrId.As<TEntity>() ?? new object().As<TEntity>();
                 LoadResponse(new RetrieveResponse<TEntity> { Entity = entity });
-                done();
+                if (done != null)
+                    done();
             };
 
             if (fail == null)
