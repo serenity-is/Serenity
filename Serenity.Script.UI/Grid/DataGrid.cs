@@ -138,7 +138,7 @@ namespace Serenity
         {
             var list = new List<QuickFilter<Widget, object>>();
 
-            foreach (var column in this.allColumns.Where(x => 
+            foreach (var column in this.allColumns.Where(x =>
                 x.SourceItem != null && x.SourceItem.QuickFilter == true))
             {
                 var item = column.SourceItem;
@@ -305,14 +305,15 @@ namespace Serenity
         {
             return base.InitializeAsync()
                 .ThenAwait(GetColumnsAsync)
-                .Then((columns) => {
+                .Then((columns) =>
+                {
                     this.allColumns = columns;
                     PostProcessColumns(this.allColumns);
 
                     var self = this;
                     if (this.filterBar != null)
                     {
-                        filterBar.Store = new FilterStore(this.allColumns.Where(x => 
+                        filterBar.Store = new FilterStore(this.allColumns.Where(x =>
                             x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
                         filterBar.Store.Changed += (s, e) =>
                         {
@@ -351,7 +352,7 @@ namespace Serenity
             }
 
             var slickOptions = GetSlickOptions();
-            var grid = new SlickGrid(slickContainer, data: view.As<List<dynamic>>(), 
+            var grid = new SlickGrid(slickContainer, data: view.As<List<dynamic>>(),
                 columns: visibleColumns, options: slickOptions);
 
             grid.RegisterPlugin(new SlickAutoTooltips(new SlickAutoTooltipsOptions
@@ -671,7 +672,7 @@ namespace Serenity
 
             if (!IsAsyncWidget())
             {
-                filterBar.Store = new FilterStore(this.allColumns.Where(x => 
+                filterBar.Store = new FilterStore(this.allColumns.Where(x =>
                     x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
                 filterBar.Store.Changed += (s, e) =>
                 {
@@ -792,7 +793,7 @@ namespace Serenity
 
         protected virtual Promise<List<PropertyItem>> GetPropertyItemsAsync()
         {
-            return Promise.Void.ThenAwait(() => 
+            return Promise.Void.ThenAwait(() =>
             {
                 var columnsKey = GetColumnsKey();
                 if (!string.IsNullOrEmpty(columnsKey))
@@ -1030,7 +1031,7 @@ namespace Serenity
 
         [ScriptName("addQuickFilter"), IncludeGenericArguments(false)]
         protected object AddQuickFilter<TWidget, TOpt>(QuickFilter<TWidget, TOpt> opt)
-            where TWidget: Widget
+            where TWidget : Widget
         {
             if (opt == null)
                 throw new ArgumentNullException("opt");
@@ -1127,7 +1128,7 @@ namespace Serenity
         [InlineCode("{this}.addQuickFilter({{ field: {field}, type: {TWidget}, title: {title}, options: {options}, handler: {handler}, init: {init}, element: {element} }})")]
         public TWidget AddEqualityFilter<TWidget>(string field, string title = null, object options = null, Action<QuickFilterArgs<TWidget>> handler = null,
             Action<jQueryObject> element = null, Action<TWidget> init = null)
-            where TWidget: Widget
+            where TWidget : Widget
         {
             return null;
         }
@@ -1262,7 +1263,7 @@ namespace Serenity
                 },
                 Handler = args =>
                 {
-                    args.EqualityFilter[args.Field] = string.IsNullOrEmpty(args.Value as string) ? (bool?)null : 
+                    args.EqualityFilter[args.Field] = string.IsNullOrEmpty(args.Value as string) ? (bool?)null :
                         Q.IsTrue(args.Value.ToInt32());
                 }
             };
@@ -1276,6 +1277,7 @@ namespace Serenity
 
         protected virtual void QuickFilterChange(jQueryEvent e)
         {
+            this.PersistSettings();
             this.Refresh();
         }
 
@@ -1442,6 +1444,16 @@ namespace Serenity
                     if (Q.IsTrue(settings.IncludeDeleted) != includeDeletedToggle.HasClass("pressed"))
                         includeDeletedToggle.Children("a").Click();
                 }
+
+                if (settings.QuickFilters != null &&
+                    flags.QuickFilters != false)
+                {
+                    var qfSettings = settings.QuickFilters;
+                    //GetQuickFilters().ForEach(qf => EditorUtils.SetValue(FindQuickFilter(qf.Type, qf.Field), qfSettings[qf.Field]));
+                    GetQuickFilters()
+                        .Filter(qf => qfSettings.ContainsKey(qf.Field) && qfSettings[qf.Field] != null)
+                        .ForEach(qf => EditorUtils.SetValue(FindQuickFilter(qf.Type, qf.Field), qfSettings[qf.Field]));
+                }
             }
             finally
             {
@@ -1501,6 +1513,20 @@ namespace Serenity
                 this.filterBar.Store != null)
             {
                 settings.FilterItems = this.filterBar.Store.Items.ToList();
+            }
+
+            if (flags.QuickFilters != false)
+            {
+                var qfSettings = new JsDictionary<string, object>();
+                GetQuickFilters().ForEach(qf =>
+                {
+                    var qfValue = EditorUtils.GetValue(FindQuickFilter(qf.Type, qf.Field));
+                    if (qfValue != null)
+                    {
+                        qfSettings[qf.Field] = qfValue;
+                    }
+                });
+                settings.QuickFilters = qfSettings;
             }
 
             return settings;
@@ -1615,7 +1641,7 @@ namespace Serenity
     {
         public List<PersistedGridColumn> Columns { get; set; }
         public List<FilterLine> FilterItems { get; set; }
-        public Dictionary<string, object> QuickFilters { get; set; }
+        public JsDictionary<string, object> QuickFilters { get; set; }
         public bool? IncludeDeleted { get; set; }
     }
 
