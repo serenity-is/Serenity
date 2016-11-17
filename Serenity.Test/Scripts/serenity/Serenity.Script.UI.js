@@ -7356,7 +7356,9 @@
 			var action = ss.mkdel(this, function() {
 				if (ss.isNullOrUndefined(entityOrId)) {
 					this.loadResponse({});
-					done();
+					if (!ss.staticEquals(done, null)) {
+						done();
+					}
 					return;
 				}
 				var scriptType = typeof(entityOrId);
@@ -7364,13 +7366,17 @@
 					var self = this;
 					var entityId = entityOrId;
 					this.loadById(entityId, function(response) {
-						window.setTimeout(done, 0);
+						if (!ss.staticEquals(done, null)) {
+							window.setTimeout(done, 0);
+						}
 					}, null);
 					return;
 				}
 				var entity = entityOrId || new Object();
 				this.loadResponse({ Entity: entity });
-				done();
+				if (!ss.staticEquals(done, null)) {
+					done();
+				}
 			});
 			if (ss.staticEquals(fail, null)) {
 				action();
