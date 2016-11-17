@@ -152,6 +152,7 @@
     <Compile Include="Mvc\ServiceAuthorizeAttribute.cs" />
     <Compile Include="Mvc\TokenAuthorizeFilter.cs" />
     <Compile Include="Navigation\NavigationHelper.cs" />
+    <Compile Include="Navigation\INavigationItemSource.cs" />
     <Compile Include="Navigation\NavigationItem.cs" />
     <Compile Include="Navigation\NavigationMenuAttribute.cs" />
     <Compile Include="Navigation\NavigationLinkAttribute.cs" />
@@ -255,6 +256,7 @@
     <Content Include="Assets\Scripts\ckeditor\README.md" />
     <Content Include="Assets\Scripts\ckeditor\skins\moono\readme.md" />
     <None Include="Scripts\serenity\texts\serenity.texts.fa.json" />
+    <None Include="Scripts\serenity\texts\serenity.texts.vi-VN.json" />
     <None Include="Tooling\Node\less\lib\less\colors.js" />
     <None Include="Tooling\Node\less\lib\less\encoder.js" />
     <None Include="Tooling\Node\less\lib\less\env.js" />
