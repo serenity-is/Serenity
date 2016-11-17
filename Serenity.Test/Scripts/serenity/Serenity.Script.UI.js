@@ -2910,7 +2910,7 @@
 		e.preventDefault();
 		var title = $('a[name=' + e.target.getAttribute('href').toString().substr(1) + ']');
 		if (title.closest('.category').hasClass('collapsed')) {
-			title.closest('.category').click();
+			title.closest('.category').children('.category-title').click();
 		}
 		var animate = function() {
 			title.fadeTo(100, 0.5, function() {
@@ -3181,7 +3181,7 @@
 	$Serenity_PropertyItemSlickConverter.toSlickColumn = function(item) {
 		var result = {};
 		result.sourceItem = item;
-		result.visible = item.visible !== false && item.filterOnly !== true;
+		result.visible = item.visible !== false && item.filterOnly !== true && (ss.isNullOrUndefined(item.readPermission) || Q.Authorization.hasPermission(item.readPermission));
 		result.field = item.name;
 		var $t1 = Q.tryGetText(item.title);
 		if (ss.isNullOrUndefined($t1)) {
@@ -6090,6 +6090,22 @@
 		gridPersistanceFlags: function() {
 			return {};
 		},
+		$canShowColumn: function(column) {
+			if (ss.isNullOrUndefined(column)) {
+				return false;
+			}
+			var item = column.sourceItem;
+			if (ss.isNullOrUndefined(item)) {
+				return true;
+			}
+			if (item.filterOnly === true) {
+				return false;
+			}
+			if (ss.isNullOrUndefined(item.readPermission)) {
+				return true;
+			}
+			return Q.Authorization.hasPermission(item.readPermission);
+		},
 		restoreSettings: function(settings, flags) {
 			if (ss.isNullOrUndefined(settings)) {
 				var storage = this.getPersistanceStorage();
@@ -6129,7 +6145,7 @@
 							var x = settings.columns[$t2];
 							if (ss.isValue(x.id) && x.visible === true) {
 								var column = colById[x.id];
-								if (ss.isValue(column) && (ss.isNullOrUndefined(column.sourceItem) || column.sourceItem.filterOnly !== true)) {
+								if (this.$canShowColumn(column)) {
 									column.visible = true;
 									newColumns.push(column);
 									delete colById[x.id];
@@ -8908,6 +8924,14 @@
 			return Enumerable.from(Object.keys(this.$include)).select(function(x) {
 				return parseInt(x);
 			}).toArray();
+		},
+		setSelectedKeys: function(keys) {
+			this.clear();
+			for (var $t1 = 0; $t1 < keys.length; $t1++) {
+				var k = keys[$t1];
+				this.$include[k] = true;
+			}
+			this.$updateSelectAll();
 		}
 	});
 	ss.initClass($Serenity_GridSelectAllButtonHelper, $asm, {});
@@ -9734,21 +9758,42 @@
 		save: function(target) {
 			for (var i = 0; i < this.$editors.length; i++) {
 				var item = this.$items[i];
-				if (item.oneWay !== true && !(this.get_mode() === 0 && item.insertable === false) && !(this.get_mode() === 1 && item.updatable === false)) {
+				if (item.oneWay !== true && this.$canModifyItem(item)) {
 					var editor = this.$editors[i];
 					$Serenity_EditorUtils.saveValue(editor, item, target);
 				}
 			}
 		},
+		$canModifyItem: function(item) {
+			if (this.get_mode() === 0) {
+				if (item.insertable === false) {
+					return false;
+				}
+				if (ss.isNullOrUndefined(item.insertPermission)) {
+					return true;
+				}
+				return Q.Authorization.hasPermission(item.insertPermission);
+			}
+			else if (this.get_mode() === 1) {
+				if (item.updatable === false) {
+					return false;
+				}
+				if (ss.isNullOrUndefined(item.updatePermission)) {
+					return true;
+				}
+				return Q.Authorization.hasPermission(item.updatePermission);
+			}
+			return true;
+		},
 		$updateInterface: function() {
 			for (var i = 0; i < this.$editors.length; i++) {
 				var item = this.$items[i];
 				var editor = this.$editors[i];
-				var readOnly = item.readOnly === true || this.get_mode() === 0 && item.insertable === false || this.get_mode() === 1 && item.updatable === false;
+				var readOnly = item.readOnly === true || !this.$canModifyItem(item);
 				$Serenity_EditorUtils.setReadOnly(editor, readOnly);
 				$Serenity_EditorUtils.setRequired(editor, !readOnly && !!item.required && item.editorType !== 'Boolean');
-				if (item.visible === false || item.hideOnInsert === true || item.hideOnUpdate === true) {
-					var hidden = item.visible === false || this.get_mode() === 0 && item.hideOnInsert === true || this.get_mode() === 1 && item.hideOnUpdate === true;
+				if (item.visible === false || ss.isValue(item.readPermission) || ss.isValue(item.insertPermission) || ss.isValue(item.updatePermission) || item.hideOnInsert === true || item.hideOnUpdate === true) {
+					var hidden = ss.isValue(item.readPermission) && !Q.Authorization.hasPermission(item.readPermission) || item.visible === false || this.get_mode() === 0 && item.hideOnInsert === true || this.get_mode() === 1 && item.hideOnUpdate === true;
 					$Serenity_WX.getGridField(editor).toggle(!hidden);
 				}
 			}

@@ -97,6 +97,9 @@
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Collapsible.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.HideOnUpdate.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.HideOnInsert.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.UpdatePermission.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.InsertPermission.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.ReadPermission.cs" />
     <Compile Include="PropertyGrid\IPropertyProcessor.cs" />
     <Compile Include="PropertyGrid\IPropertySource.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Alignment.cs" />

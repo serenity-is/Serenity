@@ -20,15 +20,8 @@ namespace Serenity.Web
 
         public virtual void CheckRights()
         {
-            if (Permission == null || Permission == "*")
-                return;
-
-            Authorization.ValidateLoggedIn();
-
-            if (Permission == "?" || Permission == "")
-                return;
-            
-            Authorization.ValidatePermission(Permission);
+            if (Permission != null)
+                Authorization.ValidatePermission(Permission);
         }
 
         public event System.EventHandler ScriptChanged

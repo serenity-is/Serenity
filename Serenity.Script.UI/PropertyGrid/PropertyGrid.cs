@@ -346,7 +346,7 @@ namespace Serenity
             var title = J("a[name=" + e.Target.GetAttribute("href").ToString().Substr(1) + "]");
 
             if (title.Closest(".category").HasClass("collapsed"))
-                title.Closest(".category").Click();
+                title.Closest(".category").Children(".category-title").Click();
 
             Action animate = delegate {
                 title.FadeTo(100, 0.5, () => title.FadeTo(100, 1, () => { }));
@@ -419,8 +419,7 @@ namespace Serenity
             {
                 var item = items[i];
                 if (item.OneWay != true &&
-                    !(Mode == PropertyGridMode.Insert && item.Insertable == false) &&
-                    !(Mode == PropertyGridMode.Update && item.Updatable == false))
+                    CanModifyItem(item))
                 {
                     var editor = editors[i];
                     EditorUtils.SaveValue(editor, item, target);
@@ -434,6 +433,32 @@ namespace Serenity
             EditorUtils.SaveValue(editor, item, target);
         }
 
+        private bool CanModifyItem(PropertyItem item)
+        {
+            if (Mode == PropertyGridMode.Insert)
+            {
+                if (item.Insertable == false)
+                    return false;
+
+                if (item.InsertPermission == null)
+                    return true;
+
+                return Q.Authorization.HasPermission(item.InsertPermission);
+            }
+            else if (Mode == PropertyGridMode.Update)
+            {
+                if (item.Updatable == false)
+                    return false;
+
+                if (item.UpdatePermission == null)
+                    return true;
+
+                return Q.Authorization.HasPermission(item.UpdatePermission);
+            }
+
+            return true;
+        }
+
         private void UpdateInterface()
         {
             for (var i = 0; i < editors.Count; i++)
@@ -441,19 +466,20 @@ namespace Serenity
                 var item = items[i];
                 var editor = editors[i];
 
-                bool readOnly = item.ReadOnly == true ||
-                    (Mode == PropertyGridMode.Insert && item.Insertable == false) ||
-                    (Mode == PropertyGridMode.Update && item.Updatable == false);
-
+                bool readOnly = item.ReadOnly == true || !CanModifyItem(item);
                 EditorUtils.SetReadOnly(editor, readOnly);
                 EditorUtils.SetRequired(editor, !readOnly && Q.IsTrue(item.Required) && 
                     (item.EditorType != "Boolean"));
 
                 if (item.Visible == false ||
+                    item.ReadPermission != null ||
+                    item.InsertPermission != null ||
+                    item.UpdatePermission != null ||
                     item.HideOnInsert == true ||
                     item.HideOnUpdate == true)
                 {
                     bool hidden = 
+                        (item.ReadPermission != null && !Q.Authorization.HasPermission(item.ReadPermission)) ||
                         item.Visible == false ||
                         (Mode == PropertyGridMode.Insert && item.HideOnInsert == true) ||
                         (Mode == PropertyGridMode.Update && item.HideOnUpdate == true);

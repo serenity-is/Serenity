@@ -10,6 +10,7 @@
         getSelectedKeys(): string[];
         getSelectedAsInt32(): number[];
         getSelectedAsInt64(): number[];
+        setSelectedKeys(keys: string[]): void;
         static createSelectColumn(getMixin: () => GridRowSelectionMixin): Slick.Column;
     }
 

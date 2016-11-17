@@ -23,7 +23,8 @@ namespace Serenity
             var result = new SlickColumn();
 
             result.SourceItem = item;
-            result.Visible = item.Visible != false && item.FilterOnly != true;
+            result.Visible = item.Visible != false && item.FilterOnly != true &&
+                (item.ReadPermission == null || Q.Authorization.HasPermission(item.ReadPermission));
             result.Field = item.Name;
             result.Title = Q.TryGetText(item.Title) ?? item.Title;
             result.CssClass = item.CssClass;

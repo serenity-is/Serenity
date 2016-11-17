@@ -37,9 +37,13 @@
             return cachedBehaviors;
         }
 
-        protected virtual bool CanSelectField(Field field)
+        protected virtual bool AllowSelectField(Field field)
         {
-            if ((field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped)
+            if (field.MinSelectLevel == SelectLevel.Never)
+                return false;
+
+            if (field.ReadPermission != null &&
+                !Authorization.HasPermission(field.ReadPermission))
                 return false;
 
             return true;
@@ -105,7 +109,10 @@
         {
             foreach (var field in Row.GetFields())
             {
-                if (CanSelectField(field) && ShouldSelectField(field))
+                if ((field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped)
+                    continue;
+
+                if (AllowSelectField(field) && ShouldSelectField(field))
                     SelectField(query, field);
             }
         }
@@ -153,12 +160,7 @@
         {
             var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(false);
             if (readAttr != null)
-            {
-                if (readAttr.Permission.IsNullOrEmpty())
-                    Authorization.ValidateLoggedIn();
-                else
-                    Authorization.ValidatePermission(readAttr.Permission);
-            }
+                Authorization.ValidatePermission(readAttr.Permission ?? "?");
         }
 
         protected virtual void ValidateRequest()
@@ -224,6 +226,7 @@
         RetrieveRequest IRetrieveRequestHandler.Request { get { return this.Request; } }
         IRetrieveResponse IRetrieveRequestHandler.Response { get { return this.Response; } }
         bool IRetrieveRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
+        bool IRetrieveRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
         public IDictionary<string, object> StateBag { get; private set; }
     }
 

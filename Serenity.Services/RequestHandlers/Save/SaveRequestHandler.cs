@@ -119,7 +119,11 @@ namespace Serenity.Services
 
             foreach (var field in Row.GetFields())
                 if (field.Flags.HasFlag(flag))
-                    editable.Add(field);
+                {
+                    if ((IsCreate && (field.InsertPermission == null || Authorization.HasPermission(field.InsertPermission))) ||
+                        (IsUpdate && (field.UpdatePermission == null || Authorization.HasPermission(field.UpdatePermission))))
+                        editable.Add(field);
+                }
         }
 
         protected virtual void GetRequiredFields(HashSet<Field> required, HashSet<Field> editable)
@@ -464,12 +468,7 @@ namespace Serenity.Services
             attr = attr ?? typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false);
 
             if (attr != null)
-            {
-                if (attr.Permission.IsNullOrEmpty())
-                    Authorization.ValidateLoggedIn();
-                else
-                    Authorization.ValidatePermission(attr.Permission);
-            }
+                Authorization.ValidatePermission(attr.Permission ?? "?");
         }
 
         protected virtual void InvalidateCacheOnCommit()

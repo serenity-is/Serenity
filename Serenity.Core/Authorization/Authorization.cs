@@ -75,6 +75,16 @@ namespace Serenity
         /// <param name="permission">Permission key (e.g. Administration)</param>
         public static bool HasPermission(string permission)
         {
+            // what is a null permission?
+            if (permission == null)
+                return false;
+
+            if (permission == "*")
+                return true;
+
+            if (permission == "" || permission == "?")
+                return IsLoggedIn;
+
             return Dependency.Resolve<IPermissionService>().HasPermission(permission);
         }
 

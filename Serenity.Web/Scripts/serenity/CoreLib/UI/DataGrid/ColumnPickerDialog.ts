@@ -176,7 +176,9 @@ namespace Serenity {
             let hidden: Slick.Column[] = [];
 
             for (let c of this.allColumns) {
-                if (!visible[c.id] && (!c.sourceItem || c.sourceItem.filterOnly !== true)) {
+                if (!visible[c.id] && (!c.sourceItem ||
+                    (c.sourceItem.filterOnly !== true &&
+                        (c.sourceItem.readPermission == null || Q.Authorization.hasPermission(c.sourceItem.readPermission))))) {
                     hidden.push(c);
                 }
             }

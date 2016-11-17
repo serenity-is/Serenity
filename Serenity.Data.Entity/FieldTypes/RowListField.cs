@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Serenity.Data.Mapping;
+using System;
 using System.Collections.Generic;
 
 namespace Serenity.Data
 {
+    [NotMapped]
     public class RowListField<TForeign> : CustomClassField<List<TForeign>> where TForeign: Row
     {
-        public RowListField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default, 
+        public RowListField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped, 
             Func<Row, List<TForeign>> getValue = null, Action<Row, List<TForeign>> setValue = null)
             : base(collection, name, caption, size, flags, getValue, setValue)
         {

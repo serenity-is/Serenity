@@ -69,7 +69,7 @@ namespace Serenity.Web
 
             var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>();
             if (readPermission != null)
-                this.Permission = readPermission.Permission.IsEmptyOrNull() ? null : readPermission.Permission;
+                this.Permission = readPermission.Permission ?? "?";
 
             this.GroupKey = row.GetFields().GenerationKey;
             this.getItems = GetItems;

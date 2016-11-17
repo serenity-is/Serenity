@@ -20,14 +20,17 @@ namespace Serenity.PropertyGrid
             SetHideOnUpdate(source, item);
             SetHint(source, item);
             SetInsertable(source, item);
+            SetInsertPermission(source, item);
             SetOneWay(source, item);
             SetPlaceholder(source, item);
             SetReadOnly(source, item);
+            SetReadPermission(source, item);
             SetRequired(source, item);
             SetResizable(source, item);
             SetSorting(source, item);
             SetTitle(source, item);
             SetUpdatable(source, item);
+            SetUpdatePermission(source, item);
             SetVisible(source, item);
             SetWidth(source, item);
         }

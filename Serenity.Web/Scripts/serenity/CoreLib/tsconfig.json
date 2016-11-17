@@ -39,6 +39,7 @@
     "Q/Q.Layout.ts",
     "Q/Q.ScriptData.ts",
     "Q/Q.TypeSystem.ts",
+    "Q/Q.Authorization.ts",
     "Decorators/Attributes.ts",
     "Decorators/Decorators.ts",
     "Q/Q.Decorators.ts",
