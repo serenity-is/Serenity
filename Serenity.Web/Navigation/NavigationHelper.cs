@@ -79,12 +79,11 @@
                 foreach (var navItemType in ExtensibilityHelper.GetTypesWithInterface(typeof(INavigationItemSource)))
                 {
                     var navItem = (INavigationItemSource)navItemType.GetInstance();
-                    if (navItem.GetItems != null)
-                        foreach (var item in navItem.GetItems)
-                        {
-                            if (filter == null || filter(item))
-                                list.Add(item);
-                        }
+                    foreach (var item in navItem.GetItems())
+                    {
+                        if (filter == null || filter(item))
+                            list.Add(item);
+                    }
                 }
 
                 return list.OrderBy(x => (x.Category.TrimToNull() ?? ""))
