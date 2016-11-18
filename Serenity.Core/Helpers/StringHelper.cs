@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Serenity
 {
@@ -353,6 +356,45 @@ namespace Serenity
                 return a ?? "";
 
             return a + separator + b;
+        }
+
+        public static string BreakUpString(this string value)
+        {
+            return Regex.Replace(value,
+                                 "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))",
+                                 " $1",
+                                 RegexOptions.Compiled).Trim();
+        }
+
+        public static string StripHtml(this string htmlString, string replaceHtmlWith = " ")
+        {
+            if (string.IsNullOrWhiteSpace(htmlString))
+                return "";
+            return Regex.Replace(htmlString, @"<(.|\n)*?>", replaceHtmlWith);
+        }
+
+        public static List<int> GetIntList(this string value)
+        {
+            return string.IsNullOrWhiteSpace(value)
+                       ? new List<int>()
+                       : value.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(s => Convert.ToInt32(s.Trim()))
+                             .ToList();
+        }
+
+        public static int GetIntValue(this string value, int defaultValue = 0)
+        {
+            int val;
+            return string.IsNullOrWhiteSpace(value)
+                       ? defaultValue
+                       : int.TryParse(value, out val) ? val : defaultValue;
+        }
+
+        public static string ToString(this IEnumerable<int> value)
+        {
+            if (value == null || !value.Any())
+                return string.Empty;
+
+            return string.Join(",", value);
         }
     }
 }
