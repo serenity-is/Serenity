@@ -1,5 +1,5 @@
 namespace Serenity.Test {
-    let assert: QUnitAssert = QUnit.assert;
+    let assert: Assert = QUnit.assert;
     QUnit.module('Widget');
 
     QUnit.test('TryGetWidget tests', function () {
