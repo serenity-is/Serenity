@@ -102,8 +102,17 @@ namespace Serenity
         public static void EnsurePermission(string permission)
         {
             if (!Authorization.HasPermission(permission))
-                FormsAuthentication.RedirectToLoginPage(
-                    Authorization.IsLoggedIn ? "denied=1" :null);
+            {
+                var loginUrl = FormsAuthentication.LoginUrl;
+                if (loginUrl.IndexOf('?') < 0)
+                    loginUrl += '?';
+                else
+                    loginUrl += '&';
+
+                loginUrl += "returnUrl=" + Uri.EscapeDataString(HttpContext.Current.Request.Url.PathAndQuery) +
+                    (Authorization.IsLoggedIn ? "&denied=1": "");
+
+            }
         }
     }
 }
