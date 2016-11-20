@@ -123,7 +123,7 @@ $.widget("ui.slickPager", {
         var pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
 
         $('.slick-pg-current', this.element).val(info.page);
-        $('.slick-pg-total', this.element).html(pages);
+        $('.slick-pg-total', this.element).html(pages.toString());
 
         var r1 = (info.page - 1) * info.rowsPerPage + 1;
         var r2 = r1 + info.rowsPerPage - 1;
