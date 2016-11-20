@@ -109,7 +109,12 @@ namespace Serenity
                 else
                     loginUrl += '&';
 
-                loginUrl += "returnUrl=" + Uri.EscapeDataString(HttpContext.Current.Request.Url.PathAndQuery) +
+                var currentUrl = loginUrl.IndexOf("://") < 0 ?
+                    HttpContext.Current.Request.Url.PathAndQuery :
+                    HttpContext.Current.Request.Url.OriginalString;
+
+                loginUrl += "returnUrl=" + 
+                    Uri.EscapeDataString(currentUrl) +
                     (Authorization.IsLoggedIn ? "&denied=1": "");
 
             }

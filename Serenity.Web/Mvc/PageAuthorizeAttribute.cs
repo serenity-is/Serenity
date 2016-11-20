@@ -37,9 +37,7 @@ namespace Serenity.Web
 
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
-            if (!string.IsNullOrEmpty(Permission) &&
-                Authorization.IsLoggedIn &&
-                FormsAuthentication.IsEnabled)
+            if (FormsAuthentication.IsEnabled)
             {
                 var loginUrl = FormsAuthentication.LoginUrl;
                 if (loginUrl.IndexOf('?') < 0)
@@ -47,8 +45,14 @@ namespace Serenity.Web
                 else
                     loginUrl += '&';
 
-                loginUrl += "returnUrl=" + Uri.EscapeDataString(HttpContext.Current.Request.Url.PathAndQuery) +
-                    "&denied=1";
+                var currentUrl = loginUrl.IndexOf("://") < 0 ?
+                    HttpContext.Current.Request.Url.PathAndQuery :
+                    HttpContext.Current.Request.Url.OriginalString;
+
+                loginUrl += "returnUrl=" + Uri.EscapeDataString(currentUrl);
+
+                if (Authorization.IsLoggedIn)
+                    loginUrl = "&denied=1";
 
                 filterContext.Result = new RedirectResult(loginUrl);
 
