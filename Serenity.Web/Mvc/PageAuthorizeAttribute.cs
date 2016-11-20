@@ -41,9 +41,16 @@ namespace Serenity.Web
                 Authorization.IsLoggedIn &&
                 FormsAuthentication.IsEnabled)
             {
-                filterContext.Result = new RedirectResult(FormsAuthentication.LoginUrl + 
-                    "?returnUrl=" + Uri.EscapeDataString(HttpContext.Current.Request.Url.PathAndQuery) +
-                    "&denied=1");
+                var loginUrl = FormsAuthentication.LoginUrl;
+                if (loginUrl.IndexOf('?') < 0)
+                    loginUrl += '?';
+                else
+                    loginUrl += '&';
+
+                loginUrl += "returnUrl=" + Uri.EscapeDataString(HttpContext.Current.Request.Url.PathAndQuery) +
+                    "&denied=1";
+
+                filterContext.Result = new RedirectResult(loginUrl);
 
                 return;
             }
