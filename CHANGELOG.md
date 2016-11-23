@@ -1,3 +1,16 @@
+## 2.6.2 (2016-11-19)
+
+Features:
+
+  - added tree grid drag & drop sample (thanks @dallemann for sponsoring this sample) [Serene]
+  - added entity dialog as panel sample [Serene]
+  - added vietnamese language and translation (thanks @DucThanhNguyen)
+  - added ability to inject dynamic navigation items through INavigationItemSource interface (thanks @DucThanhNguyen)
+  - include field level permission keys in permission dialog
+
+Bugfixes:
+  - entity dialog load fails when onSuccess parameter is null
+ 
 ## 2.6.1 (2016-11-15)
 
 Features:

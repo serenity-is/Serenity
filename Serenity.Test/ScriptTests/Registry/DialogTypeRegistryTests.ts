@@ -11,7 +11,7 @@ namespace DummyRoot {
 }
 
 namespace Serenity.Test {
-    let assert: QUnitAssert = QUnit.assert;
+    let assert: Assert = QUnit.assert;
     QUnit.module('Registry');
 
     QUnit.test('DialogTypeRegistry tests', function () {

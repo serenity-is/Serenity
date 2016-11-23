@@ -1,5 +1,5 @@
 namespace Serenity.Test {
-    let assert: QUnitAssert = QUnit.assert;
+    let assert: Assert = QUnit.assert;
     QUnit.module('Formatters');
 
     QUnit.test('UrlFormatter tests', function () {
