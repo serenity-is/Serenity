@@ -79,34 +79,7 @@ namespace Serenity
         /// </summary>
         public static string Get(string key)
         {
-            string text = TryGet(key);
-
-            if (!string.IsNullOrEmpty(text) || string.IsNullOrEmpty(key))
-                return text;
-                        
-            // Remove suffixes
-            string[] suffixes = { ".EntitySingular", ".EntityPlural"};
-            foreach (var suffix in suffixes)
-                if (key.EndsWith(suffix))
-                    key = key.Substring(0, key.Length - suffix.Length);
-
-            // Get last part after a dot
-            var lastDot = key.LastIndexOf('.');
-            if (lastDot > 0 && lastDot < key.Length - 1)
-            {
-                key = key.Substring(lastDot + 1);
-
-                // Remove Id
-                if (key.Length > 2 && key.EndsWith("Id"))
-                    key = key.Substring(0, key.Length - 2);
-
-                text = TryGet(key);
-
-                if (!string.IsNullOrEmpty(text))
-                    return text;
-            }
-
-            return key.BreakUpString();
+            return TryGet(key) ?? key;
         }
 
         /// <summary>
