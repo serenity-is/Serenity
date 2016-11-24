@@ -16,9 +16,6 @@ namespace Serenity.Services
             if (!(row is IIdRow))
                 return false;
 
-            if (!((IIdRow)row).IdField.IsIntegerType)
-                return false;
-
             captureLogHandler = (ICaptureLogHandler)Activator.CreateInstance(
                 typeof(CaptureLogHandler<>).MakeGenericType(row.GetType()));
 

@@ -230,8 +230,13 @@ namespace Serenity.Services
         {
             foreach (var info in infoList)
             {
+                var mappings = info.Mappings.Where(x => handler.Row.IsAssigned(x.Item1)).ToList();
+
+                if (!mappings.Any())
+                    continue;
+
                 handler.StateBag["UpdatableExtensionBehavior_Assignments_" + info.Attr.Alias] =
-                    info.Mappings.Where(x => handler.Row.IsAssigned(x.Item1)).ToList();
+                    mappings;
             }
         }
 
@@ -266,6 +271,29 @@ namespace Serenity.Services
             return ((Field)((IIdRow)existing[0]).IdField).AsObject((Row)existing[0]);
         }
 
+        private bool CheckPresenceValue(RelationInfo info, Row row)
+        {
+            if (!ReferenceEquals(null, info.PresenceField))
+            {
+                if (!(info.PresenceField is BooleanField) &&
+                    info.PresenceValue is Boolean)
+                {
+                    if (info.PresenceField.IsNull(row) == (bool)info.PresenceValue)
+                        return false;
+                }
+                else
+                {
+                    var newRow = row.CreateNew();
+                    info.PresenceField.AsObject(newRow, info.PresenceField.ConvertValue(
+                        info.PresenceValue, CultureInfo.InvariantCulture));
+                    if (info.PresenceField.IndexCompare(row, newRow) != 0)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
         public override void OnAfterSave(ISaveRequestHandler handler)
         {
             foreach (var info in infoList)
@@ -283,26 +311,8 @@ namespace Serenity.Services
                     continue;
 
                 object oldID = GetExistingID(handler.Connection, info, thisKey);
-                if (oldID == null)
-                {
-                    if (!ReferenceEquals(null, info.PresenceField))
-                    {
-                        if (!(info.PresenceField is BooleanField) &&
-                            info.PresenceValue is Boolean)
-                        {
-                            if (info.PresenceField.IsNull(handler.Row) == (bool)info.PresenceValue)
-                                continue;
-                        }
-                        else
-                        {
-                            var newRow = handler.Row.CreateNew();
-                            info.PresenceField.AsObject(newRow, info.PresenceField.ConvertValue(
-                                info.PresenceValue, CultureInfo.InvariantCulture));
-                            if (info.PresenceField.IndexCompare(handler.Row, newRow) != 0)
-                                continue;
-                        }
-                    }
-                }
+                if (oldID == null && !CheckPresenceValue(info, handler.Row))
+                    continue;
 
                 var extension = info.RowFactory();
 
