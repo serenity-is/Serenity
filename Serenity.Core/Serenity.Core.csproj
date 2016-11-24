@@ -97,6 +97,7 @@
     <Compile Include="Json\JsonConfigHelper.cs" />
     <Compile Include="Localization\JsonLocalTextRegistration.cs" />
     <Compile Include="Localization\InitializedLocalText.cs" />
+    <Compile Include="Localization\FallbackLocalTextRegistry.cs" />
     <Compile Include="Logging\FileLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Munq\AlwaysNewLifetime.cs" />
