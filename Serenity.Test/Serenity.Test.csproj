@@ -181,6 +181,7 @@
     <Compile Include="Testing\TestRow.cs" />
     <Compile Include="Testing\DbScriptTests.cs" />
     <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests.cs" />
+    <Compile Include="Web\NavigationHelperTests.cs" />
     <Compile Include="Web\NavigationItemTests.cs" />
   </ItemGroup>
   <ItemGroup>
