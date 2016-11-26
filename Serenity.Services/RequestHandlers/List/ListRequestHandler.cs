@@ -22,6 +22,7 @@
 
         protected static IEnumerable<IListBehavior> cachedBehaviors;
         protected IEnumerable<IListBehavior> behaviors;
+        protected HashSet<string> ignoredEqualityFilters;
 
         public ListRequestHandler()
         {
@@ -407,6 +408,10 @@
 
             foreach (var pair in Request.EqualityFilter)
             {
+                if (ignoredEqualityFilters != null &&
+                    ignoredEqualityFilters.Contains(pair.Key))
+                    continue;
+
                 if (IsEmptyEqualityFilterValue(pair.Value))
                     continue;
 
@@ -537,6 +542,14 @@
         IListResponse IListRequestProcessor.Process(IDbConnection connection, ListRequest request)
         {
             return Process(connection, (TListRequest)request);
+        }
+
+        public void IgnoreEqualityFilter(string field)
+        {
+            if (ignoredEqualityFilters == null)
+                ignoredEqualityFilters = new HashSet<string>();
+
+            ignoredEqualityFilters.Add(field);
         }
 
         public IDbConnection Connection { get; private set; }
