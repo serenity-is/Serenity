@@ -1,7 +1,26 @@
+## 2.6.3 (2016-11-26)
+
+Features:
+  - make capture log work without integer ID
+  - handle double slashes as single slash in navigation items
+  - auto create intermediate menus on secondary or more levels for navigation items
+  - auto created navigation items now has min display order of their children
+  - add FullPath property to NavigationItem which can be used to get localized captions for navigation items. see change in LeftNavigation.cshtml
+  - it's now possible to custom handle filters by overriding ApplyFieldEqualityFilter in ListRequestHandler
+  - equality filter multiple values with IN filtering are now supported natively by ListRequestHandler
+  - ability to custom handle and ignore an equality filter in ListRequestHandler by behaviors
+  - LinkingSetRelationBehavior handles equality filters by default. set HandleEqualityFilter to false for manual handling.
+  - don't allow sorting for fields with NotMapped or Sortable(false) attribute
+  - set sortable false for fields with NotMapped attribute
+  - don't allow filtering on NotMapped fields
+  - fix some mistakes in Vietnamese translation (thanks @DucThanhNguyen)
+  - add ReportHelper.execute method and related sample in OrderGrid for invoice printing [Serene]
+  - move forward 18 years 6 months in Northwind order dates with a migration (sql server only) [Serene]
+  - add quick filter to Representatives in customer grid which is handled by LinkingSetRelation [Serene]
+
 ## 2.6.2 (2016-11-19)
 
 Features:
-
   - added tree grid drag & drop sample (thanks @dallemann for sponsoring this sample) [Serene]
   - added entity dialog as panel sample [Serene]
   - added vietnamese language and translation (thanks @DucThanhNguyen)
