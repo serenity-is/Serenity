@@ -1,5 +1,6 @@
 ﻿namespace Serenity.Services
 {
+    using ComponentModel;
     using Serenity.Data;
     using Serenity.Data.Mapping;
     using System;
@@ -423,6 +424,19 @@
 
         protected virtual void ApplySortBy(SqlQuery query, SortBy sortBy)
         {
+            var field = this.Row.FindField(sortBy.Field) ??
+                this.Row.FindFieldByPropertyName(sortBy.Field);
+
+            if (!ReferenceEquals(null, field))
+            {
+                if (field.Flags.HasFlag(FieldFlags.NotMapped))
+                    return;
+
+                var sortable = field.GetAttribute<SortableAttribute>();
+                if (sortable != null && !sortable.Value)
+                    return;
+            }
+
             query.ApplySort(sortBy.Field, sortBy.Descending);
         }
 
