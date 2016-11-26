@@ -20,6 +20,7 @@ namespace Serenity.Data.Mapping
             this.RowType = rowType;
             this.ThisKey = thisKey;
             this.ItemKey = itemKey;
+            this.HandleEqualityFilter = true;
         }
 
         public Type RowType { get; private set; }
@@ -28,5 +29,6 @@ namespace Serenity.Data.Mapping
         public string FilterField { get; set; }
         public object FilterValue { get; set; }
         public bool PreserveOrder { get; set; }
+        public bool HandleEqualityFilter { get; set; }
     }
 }
