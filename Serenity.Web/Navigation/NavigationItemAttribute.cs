@@ -17,17 +17,18 @@ namespace Serenity.Navigation
             this.FullPath = path;
 
             var idx = path.LastIndexOf('/');
+
             if (idx > 0 && path[idx - 1] == '/')
                 idx = path.Replace("//", "\x1\x1").LastIndexOf('/');
 
             if (idx >= 0)
             {
-                this.Category = path.Substring(0, idx).TrimToEmpty();
-                this.Title = path.Substring(idx + 1).TrimToEmpty();
+                this.Category = path.Substring(0, idx);
+                this.Title = path.Substring(idx + 1);
             }
             else
             { 
-                this.Title = path.TrimToEmpty();
+                this.Title = path;
             }
 
             this.Order = order;

@@ -27,7 +27,7 @@
             {
                 var item = new NavigationItem
                 {
-                    Title = attr.Title,
+                    Title = (attr.Title ?? "").Replace("//", "/"),
                     FullPath = attr.FullPath,
                     Url = (!string.IsNullOrEmpty(attr.Url) && resolveUrl != null) ? resolveUrl(attr.Url) : attr.Url,
                     IconClass = attr.IconClass.TrimToNull(),
@@ -38,7 +38,7 @@
                     (attr.Permission.IsEmptyOrNull() || Authorization.HasPermission(attr.Permission));
 
                 var path = (attr.Category.IsEmptyOrNull() ? "" : (attr.Category + "/"));
-                path += (attr.Title.TrimToNull() ?? "");
+                path += (attr.Title ?? "");
 
                 var children = attrByCategory[path];
                 foreach (var child in children)
@@ -86,9 +86,9 @@
 
         public static ILookup<string, NavigationItemAttribute> ByCategory(IEnumerable<NavigationItemAttribute> list)
         {
-            var result = list.OrderBy(x => x.Category.TrimToEmpty())
+            var result = list.OrderBy(x => x.Category ?? "")
                 .ThenBy(x => x.Order)
-                .ToLookup(x => x.Category.TrimToEmpty());
+                .ToLookup(x => x.Category ?? "");
 
             var missing = new Dictionary<string, NavigationItemAttribute>();
             foreach (var group in result)
@@ -102,15 +102,15 @@
                     if (idx < 0)
                     {
                         parent = "";
-                        title = path.TrimToEmpty();
+                        title = path;
                     }
                     else
                     {
-                        parent = path.Substring(0, idx).TrimToEmpty();
-                        title = path.Substring(idx + 1).TrimToEmpty();
+                        parent = path.Substring(0, idx);
+                        title = path.Substring(idx + 1);
                     }
 
-                    if (!result[parent].Any(x => x.Title.IsTrimmedSame(title)))
+                    if (!result[parent].Any(x => x.Title == title))
                         missing.Add(path, new NavigationMenuAttribute(group.Min(x => x.Order), path));
 
                     path = parent;
@@ -119,9 +119,9 @@
 
             if (missing.Count > 0)
                 return list.Concat(missing.Values)
-                    .OrderBy(x => x.Category.TrimToEmpty())
+                    .OrderBy(x => x.Category ?? "")
                     .ThenBy(x => x.Order)
-                    .ToLookup(x => x.Category.TrimToEmpty());
+                    .ToLookup(x => x.Category ?? "");
 
             return result;
         }
