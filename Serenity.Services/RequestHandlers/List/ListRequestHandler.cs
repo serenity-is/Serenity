@@ -372,15 +372,16 @@
                     var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
                     if (!ReferenceEquals(null, field))
                     {
-                        if (field.MinSelectLevel == SelectLevel.Never ||
-                            field.Flags.HasFlag(FieldFlags.DenyFiltering))
-                        {
-                            throw new ArgumentOutOfRangeException("equalityFilter");
-                        }
-
                         var value = field.ConvertValue(pair.Value, CultureInfo.InvariantCulture);
                         if (value == null)
                             continue;
+
+                        if (field.MinSelectLevel == SelectLevel.Never ||
+                            field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
+                            field.Flags.HasFlag(FieldFlags.NotMapped))
+                        {
+                            throw new ArgumentOutOfRangeException(String.Format("Can't apply equality filter on field {0}", pair.Key));
+                        }
 
                         query.WhereEqual(field, value);
                     }

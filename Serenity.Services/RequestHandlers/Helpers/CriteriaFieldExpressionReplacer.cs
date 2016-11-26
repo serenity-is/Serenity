@@ -22,7 +22,8 @@
 
         protected virtual bool CanFilterField(Field field)
         {
-            if (field.Flags.HasFlag(FieldFlags.DenyFiltering))
+            if (field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
+                field.Flags.HasFlag(FieldFlags.NotMapped))
                 return false;
 
             if (field.MinSelectLevel == SelectLevel.Never)
@@ -45,10 +46,16 @@
             if (!Object.ReferenceEquals(null, criteria))
             {
                 var field = FindField(criteria.Expression);
-                if (ReferenceEquals(null, field) || !CanFilterField(field))
+                if (ReferenceEquals(null, field))
                 {
                     throw new ValidationError("InvalidCriteriaField", criteria.Expression,
                         String.Format("'{0}' criteria field is not found!", criteria.Expression));
+                }
+
+                if (!CanFilterField(field))
+                {
+                    throw new ValidationError("CantFilterField", criteria.Expression,
+                        String.Format("Can't filter on field '{0}'!", criteria.Expression));
                 }
 
                 return new Criteria(field);

@@ -27,6 +27,15 @@ namespace Serenity.PropertyGrid
                 item.QuickFilter = true;
 
             var basedOnField = source.BasedOnField;
+            if (!ReferenceEquals(null, basedOnField) &&
+                notFilterableAttr == null)
+            {
+                if (basedOnField.Flags.HasFlag(FieldFlags.DenyFiltering) ||
+                    basedOnField.Flags.HasFlag(FieldFlags.NotMapped))
+                {
+                    item.NotFilterable = true;
+                }
+            }
 
             Field idField;
             string idFieldName;
