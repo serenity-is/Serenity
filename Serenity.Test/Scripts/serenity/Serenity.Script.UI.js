@@ -5910,25 +5910,11 @@
 					opt.handler(args);
 					quickFilter.toggleClass('quick-filter-active', args.active);
 					if (!args.handled) {
-						if ($.isArray(value)) {
-							if (value.length > 0) {
-								request.Criteria = Serenity.Criteria.join(request.Criteria, 'and', [[opt.field], 'in', [value]]);
-							}
-						}
-						else {
-							request.EqualityFilter[opt.field] = value;
-						}
+						request.EqualityFilter[opt.field] = value;
 					}
 				}
 				else {
-					if ($.isArray(value)) {
-						if (value.length > 0) {
-							request.Criteria = Serenity.Criteria.join(request.Criteria, 'and', [[opt.field], 'in', [value]]);
-						}
-					}
-					else {
-						request.EqualityFilter[opt.field] = value;
-					}
+					request.EqualityFilter[opt.field] = value;
 					quickFilter.toggleClass('quick-filter-active', active);
 				}
 			});

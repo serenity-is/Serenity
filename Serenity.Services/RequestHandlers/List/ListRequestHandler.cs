@@ -4,6 +4,7 @@
     using Serenity.Data;
     using Serenity.Data.Mapping;
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Data;
     using System.Globalization;
@@ -357,37 +358,64 @@
             query.Where(~(criteria));
         }
 
+        protected virtual void ApplyFieldEqualityFilter(SqlQuery query, Field field, object value)
+        {
+            if (field.MinSelectLevel == SelectLevel.Never ||
+                field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
+                field.Flags.HasFlag(FieldFlags.NotMapped))
+            {
+                throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name, 
+                    String.Format("Can't apply equality filter on field {0}", field.PropertyName ?? field.Name));
+            }
+
+            if (!(value is string) && value is IEnumerable)
+            {
+                var values = new List<object>();
+                foreach (var val in (IEnumerable)value)
+                    values.Add(field.ConvertValue(val, CultureInfo.InvariantCulture));
+                if (values.Count > 0)
+                    query.Where(field.In(values));
+            }
+            else
+            {
+                value = field.ConvertValue(value, CultureInfo.InvariantCulture);
+                if (value == null)
+                    return;
+                query.WhereEqual(field, value);
+            }
+        }
+
+        protected bool IsEmptyEqualityFilterValue(object value)
+        {
+            if (value == null)
+                return true;
+
+            if (value is string && ((string)value).Length == 0)
+                return true;
+
+            if (!(value is string) && value is IEnumerable && 
+                !((value as IEnumerable).GetEnumerator().MoveNext()))
+                return true;
+
+            return false;
+        }
+
         protected virtual void ApplyEqualityFilter(SqlQuery query)
         {
-            if (Request.EqualityFilter != null)
+            if (Request.EqualityFilter == null)
+                return;
+
+            foreach (var pair in Request.EqualityFilter)
             {
-                foreach (var pair in Request.EqualityFilter)
-                {
-                    if (pair.Value == null)
-                        continue;
+                if (IsEmptyEqualityFilterValue(pair.Value))
+                    continue;
 
-                    if (pair.Value is string && ((string)pair.Value).Length == 0)
-                        continue;
+                var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
+                if (ReferenceEquals(null, field))
+                    throw new ArgumentOutOfRangeException(pair.Key, 
+                        String.Format("Can't find field {0} in row for equality filter.", pair.Key));
 
-                    var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
-                    if (!ReferenceEquals(null, field))
-                    {
-                        var value = field.ConvertValue(pair.Value, CultureInfo.InvariantCulture);
-                        if (value == null)
-                            continue;
-
-                        if (field.MinSelectLevel == SelectLevel.Never ||
-                            field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
-                            field.Flags.HasFlag(FieldFlags.NotMapped))
-                        {
-                            throw new ArgumentOutOfRangeException(String.Format("Can't apply equality filter on field {0}", pair.Key));
-                        }
-
-                        query.WhereEqual(field, value);
-                    }
-                    else
-                        throw new ArgumentOutOfRangeException(String.Format("Can't find field {0} in row for equality filter.", pair.Key));
-                }
+                ApplyFieldEqualityFilter(query, field, pair.Value);
             }
         }
 

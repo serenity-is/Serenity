@@ -1085,28 +1085,12 @@ namespace Serenity
                     quickFilter.ToggleClass("quick-filter-active", args.Active);
 
                     if (!args.Handled)
-                    {
-                        if (jQuery.IsArray(value))
-                        {
-                            if (value.As<object[]>().Length > 0)
-                                request.Criteria &= new Criteria(opt.Field).In(value.As<object[]>());
-                        }
-                        else
-                            request.EqualityFilter[opt.Field] = value;
-                    }
+                        request.EqualityFilter[opt.Field] = value;
                 }
                 else
                 {
-                    if (jQuery.IsArray(value))
-                    {
-                        if (value.As<object[]>().Length > 0)
-                            request.Criteria &= new Criteria(opt.Field).In(value.As<object[]>());
-                    }
-                    else
-                        request.EqualityFilter[opt.Field] = value;
-
+                    request.EqualityFilter[opt.Field] = value;
                     quickFilter.ToggleClass("quick-filter-active", active);
-
                 }
             };
 
