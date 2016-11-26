@@ -1,4 +1,5 @@
 ﻿using Serenity.ComponentModel;
+using Serenity.Data;
 
 namespace Serenity.PropertyGrid
 {
@@ -11,8 +12,17 @@ namespace Serenity.PropertyGrid
                 item.SortOrder = sortOrderAttr.SortOrder;
 
             var sortableAttr = source.GetAttribute<SortableAttribute>();
-            if (sortableAttr != null && !sortableAttr.Value)
-                item.Sortable = false;
+            if (sortableAttr != null)
+            {
+                if (!sortableAttr.Value)
+                    item.Sortable = false;
+
+                return;
+            }
+
+            if (!ReferenceEquals(null, source.BasedOnField) &&
+                source.BasedOnField.Flags.HasFlag(FieldFlags.NotMapped))
+                    item.Sortable = false;
         }
     }
 }
