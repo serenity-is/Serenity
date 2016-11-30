@@ -8712,13 +8712,16 @@
 			var activeCriteria = [''];
 			for (var i = 0; i < this.get_items().length; i++) {
 				var line = this.get_items()[i];
-				if (inParens && (line.rightParen || line.leftParen)) {
+				if (line.leftParen || inParens && line.rightParen) {
 					if (!Serenity.Criteria.isEmpty(currentBlock)) {
+						if (inParens) {
+							currentBlock = Serenity.Criteria.paren(currentBlock);
+						}
 						if (isBlockOr) {
-							activeCriteria = Serenity.Criteria.join(activeCriteria, 'or', Serenity.Criteria.paren(currentBlock));
+							activeCriteria = Serenity.Criteria.join(activeCriteria, 'or', currentBlock);
 						}
 						else {
-							activeCriteria = Serenity.Criteria.join(activeCriteria, 'and', Serenity.Criteria.paren(currentBlock));
+							activeCriteria = Serenity.Criteria.join(activeCriteria, 'and', currentBlock);
 						}
 						currentBlock = [''];
 					}

@@ -59,14 +59,17 @@ namespace Serenity
                 {
                     var line = Items[i];
 
-                    if (inParens && (line.RightParen || line.LeftParen))
+                    if (line.LeftParen || (inParens && line.RightParen))
                     {
                         if (!currentBlock.IsEmpty)
                         {
+                            if (inParens)
+                                currentBlock = ~(currentBlock);
+
                             if (isBlockOr)
-                                activeCriteria |= ~(currentBlock);
+                                activeCriteria |= currentBlock;
                             else
-                                activeCriteria &= ~(currentBlock);
+                                activeCriteria &= currentBlock;
 
                             currentBlock = Criteria.Empty;
                         }
