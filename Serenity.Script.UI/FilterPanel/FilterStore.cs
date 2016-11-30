@@ -131,6 +131,9 @@ namespace Serenity
 
                         displayText += line.DisplayText;
                     }
+
+                    if (inParens)
+                        displayText += ")";
                 }
 
                 return displayText;
