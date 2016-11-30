@@ -8767,6 +8767,9 @@
 					}
 					this.$displayText += line.displayText;
 				}
+				if (inParens) {
+					this.$displayText += ')';
+				}
 			}
 			return this.$displayText;
 		}
