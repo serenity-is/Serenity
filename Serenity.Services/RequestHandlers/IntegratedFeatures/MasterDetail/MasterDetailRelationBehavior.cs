@@ -385,6 +385,9 @@ namespace Serenity.Services
                 (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
                 return;
 
+            if (handler.Row is IIsActiveDeletedRow)
+                return;
+
             var idField = (Field)((handler.Row as IIdRow).IdField);
             var row = rowFactory();
             var rowIdField = (Field)((row as IIdRow).IdField);
