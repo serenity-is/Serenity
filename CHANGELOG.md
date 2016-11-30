@@ -1,3 +1,15 @@
+## 2.6.4 (2016-11-26)
+
+Features:
+  - updated font-awesome to 4.7.0
+  - updated simple line icons to 2.4.0
+  - LinkingSetRelation and MasterDetailRelation shouldn't delete detail records when master is IIsActiveDeletedRow
+  - local text key fallback registry (thanks @DucThanhNguyen)
+
+Bugfixes:
+  - filter panel incorrect paren handling when a paren comes right after a line without paren
+  - missing closing paren at end for filter panel display text
+
 ## 2.6.3 (2016-11-26)
 
 Features:
