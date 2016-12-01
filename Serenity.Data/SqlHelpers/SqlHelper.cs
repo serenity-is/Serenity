@@ -61,7 +61,7 @@
                 {
                     var param = command.CreateParameter();
                     param.Direction = ParameterDirection.Output;
-                    param.ParameterName = identityColumn;
+                    param.ParameterName = dialect.UseReturningIntoVar ? "INSERTED__VALUE" : identityColumn;
                     param.DbType = DbType.Int64;
                     command.Parameters.Add(param);
                     ExecuteNonQuery(command);
