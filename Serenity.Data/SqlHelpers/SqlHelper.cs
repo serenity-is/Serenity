@@ -60,7 +60,7 @@
                 using (var command = NewCommand(connection, queryText, query.Params))
                 {
                     var param = command.CreateParameter();
-                    param.Direction = ParameterDirection.Output;
+                    param.Direction = dialect.UseReturningIntoVar ? ParameterDirection.ReturnValue : ParameterDirection.Output;
                     param.ParameterName = dialect.UseReturningIntoVar ? "INSERTED__VALUE" : identityColumn;
                     param.DbType = DbType.Int64;
                     command.Parameters.Add(param);
