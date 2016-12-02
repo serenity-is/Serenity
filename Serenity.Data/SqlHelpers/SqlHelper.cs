@@ -54,14 +54,13 @@
                 queryText += " RETURNING " + SqlSyntax.AutoBracket(identityColumn);
 
                 if (dialect.UseReturningIntoVar)
-                    queryText = "DECLARE\r\n INSERTED__VALUE NUMBER(18);\r\nBEGIN\r\n" +
-                        queryText + " INTO INSERTED__VALUE; DBMS_OUTPUT.PUT_LINE(INSERTED__VALUE);\r\nEND;";
+                    queryText += " INTO " + dialect.ParameterPrefix + identityColumn;
 
                 using (var command = NewCommand(connection, queryText, query.Params))
                 {
                     var param = command.CreateParameter();
                     param.Direction = dialect.UseReturningIntoVar ? ParameterDirection.ReturnValue : ParameterDirection.Output;
-                    param.ParameterName = dialect.UseReturningIntoVar ? "INSERTED__VALUE" : identityColumn;
+                    param.ParameterName = identityColumn;
                     param.DbType = DbType.Int64;
                     command.Parameters.Add(param);
                     ExecuteNonQuery(command);
