@@ -2335,7 +2335,7 @@
 	// Serenity.LookupEditorBase
 	var $Serenity_LookupEditorBase = function(hidden, opt) {
 		this.$cascadeLink = null;
-		this.$5$OnInitNewEntityField = null;
+		this.onInitNewEntity = null;
 		$Serenity_Select2Editor.call(this, hidden, opt);
 		this.$setCascadeFrom(this.options.cascadeFrom);
 		var self = this;
@@ -4682,15 +4682,9 @@
 			});
 		},
 		initNewEntity: function(entity) {
-			if (!ss.staticEquals(this.get_onInitNewEntity(), null)) {
-				this.get_onInitNewEntity()(entity);
+			if (!ss.staticEquals(this.onInitNewEntity, null)) {
+				this.onInitNewEntity(entity);
 			}
-		},
-		get_onInitNewEntity: function() {
-			return this.$5$OnInitNewEntityField;
-		},
-		set_onInitNewEntity: function(value) {
-			this.$5$OnInitNewEntityField = value;
 		},
 		inplaceCreateClick: function(e) {
 			var self = this;
@@ -4706,8 +4700,8 @@
 				if (Q.isEmptyOrNull(this.get_value())) {
 					var entity = new Object();
 					entity[this.getLookup().textField] = Q.trimToEmpty(this.lastCreateTerm);
-					if (!ss.staticEquals(this.get_onInitNewEntity(), null)) {
-						this.get_onInitNewEntity()(entity);
+					if (!ss.staticEquals(this.onInitNewEntity, null)) {
+						this.onInitNewEntity(entity);
 					}
 					dialog.load(entity, function() {
 						dialog.dialogOpen();

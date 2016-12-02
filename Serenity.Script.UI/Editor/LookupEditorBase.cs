@@ -185,6 +185,7 @@ namespace Serenity
                 OnInitNewEntity(entity);
         }
 
+        [IntrinsicProperty]
         public Action<TItem> OnInitNewEntity { get; set; }
 
         protected override void InplaceCreateClick(jQueryEvent e)
