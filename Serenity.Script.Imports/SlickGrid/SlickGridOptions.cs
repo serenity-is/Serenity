@@ -175,6 +175,16 @@ namespace Serenity
         public bool MultiSelect { get; set; }
 
         /// <summary>
+        /// Min row buffer size (default: 3). Don't set to lower than 3!
+        /// </summary>
+        public int MinBuffer { get; set; }
+
+        /// <summary>
+        /// Renders all cells in a row (default: false)
+        /// </summary>
+        public bool RenderAllCells { get; set; }
+
+        /// <summary>
         /// (default: 25)
         /// </summary>
         public int RowHeight { get; set; }

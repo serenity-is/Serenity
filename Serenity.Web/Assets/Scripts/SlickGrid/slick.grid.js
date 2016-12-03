@@ -93,7 +93,9 @@ if (typeof Slick === "undefined") {
             multiColumnSort: false,
             defaultFormatter: defaultFormatter,
             forceSyncScrolling: false,
-            addNewRowCssClass: "new-row"
+            addNewRowCssClass: "new-row",
+            minBuffer: 3,
+            renderAllCells: false
         };
 
         var columnDefaults = {
@@ -2931,7 +2933,7 @@ if (typeof Slick === "undefined") {
         function getRenderedRange(viewportTop, viewportLeft) {
             var range = getVisibleRange(viewportTop, viewportLeft);
             var buffer = Math.round(viewportH / options.rowHeight);
-            var minBuffer = 3;
+            var minBuffer = options.minBuffer || 3;
 
             if (vScrollDir == -1) {
                 range.top -= buffer;
@@ -2947,11 +2949,17 @@ if (typeof Slick === "undefined") {
             range.top = Math.max(0, range.top);
             range.bottom = Math.min(getDataLengthIncludingAddNew() - 1, range.bottom);
 
-            range.leftPx -= viewportW;
-            range.rightPx += viewportW;
+            if (options.renderAllCells) {
+                range.leftPx = 0;
+                range.rightPx = canvasWidth;
+            }
+            else {
+                range.leftPx -= viewportW;
+                range.rightPx += viewportW;
 
-            range.leftPx = Math.max(0, range.leftPx);
-            range.rightPx = Math.min(canvasWidth, range.rightPx);
+                range.leftPx = Math.max(0, range.leftPx);
+                range.rightPx = Math.min(canvasWidth, range.rightPx);
+            }
 
             return range;
         }
