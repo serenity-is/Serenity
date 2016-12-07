@@ -1,7 +1,7 @@
 ﻿declare namespace Serenity {
 
     class DateTimeEditor extends Widget<DateTimeEditorOptions> {
-        constructor(input: JQuery, opt: DateTimeEditorOptions);
+        constructor(input: JQuery, opt?: DateTimeEditorOptions);
         static roundToMinutes(date: Date, minutesStep: number): Date;
         value: string;
         valueAsDate: Date;

@@ -131,7 +131,7 @@ namespace Serenity
             }
             set
             {
-                if (value == null)
+                if (string.IsNullOrEmpty(value))
                 {
                     this.element.Value("");
                     this.time.Value("00:00");
