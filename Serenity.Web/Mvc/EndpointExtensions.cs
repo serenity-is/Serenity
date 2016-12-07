@@ -37,7 +37,7 @@ namespace Serenity.Services
                     error.Details = exception.ToString();
                 }
                 else
-                    error.Message = "İsteğin işlenmesi esnasında bir hata oluştu!";
+                    error.Message = "An error occured while processing your request.";
             }
 
             response.Error = error;
