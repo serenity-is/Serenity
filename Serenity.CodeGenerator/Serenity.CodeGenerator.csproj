@@ -109,14 +109,17 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CodeFileHelper.cs" />
-    <Compile Include="ProjectFileHelper.cs" />
-    <Compile Include="GeneratorConfig.cs" />
-    <Compile Include="StringInflector.cs" />
-    <Compile Include="EntityCodeGenerator.cs" />
-    <Compile Include="RowGenerator.cs" />
-    <Compile Include="GeneratorModels.cs" />
-    <Compile Include="SqlSchemaInfo.cs" />
+    <Compile Include="Models\EntityField.cs" />
+    <Compile Include="Models\EntityModel.cs" />
+    <Compile Include="Helpers\CodeFileHelper.cs" />
+    <Compile Include="Models\TableItem.cs" />
+    <Compile Include="Helpers\ProjectFileHelper.cs" />
+    <Compile Include="Models\GeneratorConfig.cs" />
+    <Compile Include="Helpers\StringInflector.cs" />
+    <Compile Include="Generator\EntityCodeGenerator.cs" />
+    <Compile Include="Generator\RowGenerator.cs" />
+    <Compile Include="Models\EntityJoin.cs" />
+    <Compile Include="SchemaInfo\SqlSchemaInfo.cs" />
     <Compile Include="Templates.cs" />
     <Compile Include="Views\EntityColumns.generated.cs">
       <DependentUpon>EntityColumns.cshtml</DependentUpon>

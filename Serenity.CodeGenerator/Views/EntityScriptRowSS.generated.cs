@@ -41,9 +41,9 @@ WriteLiteral("\r\n");
             return x + y;
     };
 
-    Func<EntityCodeField, string> gt = (x) =>
+    Func<EntityField, string> gt = (x) =>
     {
-        return (x.Type == "Stream" ? "byte[]" : (x.Type == "DateTime" ? "String" : (x.Type + (x.IsValueType ? "?" : ""))));
+        return (x.FieldType == "Stream" || x.FieldType == "ByteArray" ? "byte[]" : (x.FieldType == "DateTime" ? "String" : (x.FieldType + (x.IsValueType ? "?" : ""))));
     };
 
 

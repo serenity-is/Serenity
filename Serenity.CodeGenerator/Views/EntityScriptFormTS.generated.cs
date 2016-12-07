@@ -33,27 +33,27 @@ WriteLiteral("\r\n");
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
 
-    Func<EntityCodeField, string> gt = (f) => {
-        if (f.Type == "String") {
+    Func<EntityField, string> gt = (f) => {
+        if (f.FieldType == "String") {
             return "StringEditor";
         }
-        else if (f.Type == "Int32" || f.Type == "Int16" || f.Type == "Int64") {
+        else if (f.FieldType == "Int32" || f.FieldType == "Int16" || f.FieldType == "Int64") {
             return "IntegerEditor";
         }
-        else if (f.Type == "Single" || f.Type == "Double" || f.Type == "Decimal") {
+        else if (f.FieldType == "Single" || f.FieldType == "Double" || f.FieldType == "Decimal") {
             return "DecimalEditor";
         }
-        else if (f.Type == "DateTime") {
+        else if (f.FieldType == "DateTime") {
             return "DateEditor";
         }
-        else if (f.Type == "Boolean") {
+        else if (f.FieldType == "Boolean") {
             return "BooleanEditor";
         }
         else
             return "StringEditor";
     };
 
-    var fields = (IEnumerable<EntityCodeField>)Model.Fields;
+    var fields = (IEnumerable<EntityField>)Model.Fields;
     var fieldList = String.Join(", ", fields.Where(x => x.Name != Model.Identity)
         .Select(x => "['" + x.Ident + "', () => Serenity." + gt(x) + "]"));
 

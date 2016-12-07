@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Serenity.Data;
+using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Text;
-using Serenity.Data;
 
 namespace Serenity.CodeGenerator
 {
@@ -74,17 +72,49 @@ namespace Serenity.CodeGenerator
                 case "Decimal":
                     return "number";
                 case "Stream":
+                case "ByteArray":
                     return "number[]";
             }
 
             return "any";
         }
 
+        private static EntityField ToEntityField(SqlSchemaInfo.FieldInfo fieldInfo, int prefixLength)
+        {
+            string flags;
+            if (fieldInfo.IsIdentity)
+                flags = "Identity";
+            else if (fieldInfo.IsPrimaryKey)
+                flags = "PrimaryKey";
+            else if (fieldInfo.DataType == "timestamp" || fieldInfo.DataType == "rowversion")
+                flags = "Insertable(false), Updatable(false), NotNull";
+            else if (!fieldInfo.IsNullable)
+                flags = "NotNull";
+            else
+                flags = null;
 
-        public static EntityCodeGenerationModel GenerateModel(IDbConnection connection, string tableSchema, string table,
+            string dataType;
+            var fieldType = SqlSchemaInfo.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out dataType);
+            dataType = dataType ?? fieldType;
+            return new EntityField
+            {
+                FieldType = fieldType,
+                DataType = dataType,
+                IsValueType = fieldType != "String" && fieldType != "Stream" && fieldType != "ByteArray",
+                TSType = FieldTypeToTS(fieldType),
+                Ident = GenerateVariableName(fieldInfo.FieldName.Substring(prefixLength)),
+                Title = Inflector.Inflector.Titleize(fieldInfo.FieldName.Substring(prefixLength)),
+                Flags = flags,
+                Name = fieldInfo.FieldName,
+                Size = fieldInfo.Size == 0 ? (Int32?)null : fieldInfo.Size,
+                Scale = fieldInfo.Scale
+            };
+        }
+
+        public static EntityModel GenerateModel(IDbConnection connection, string tableSchema, string table,
             string module, string connectionKey, string entityClass, string permission, GeneratorConfig config)
         {
-            var model = new EntityCodeGenerationModel();
+            var model = new EntityModel();
             model.Module = module;
 
             if (connection.GetDialect() is MySqlDialect)
@@ -99,8 +129,8 @@ namespace Serenity.CodeGenerator
             model.ClassName = className;
             model.RowClassName = className + "Row";
             model.Tablename = table;
-            model.Fields = new List<EntityCodeField>();
-            model.Joins = new List<EntityCodeJoin>();
+            model.Fields = new List<EntityField>();
+            model.Joins = new List<EntityJoin>();
             model.Instance = true;
 
             var fields = SqlSchemaInfo.GetTableFieldInfos(connection, tableSchema, table);
@@ -167,24 +197,14 @@ namespace Serenity.CodeGenerator
             {
                 model.RowBaseClass = baseRowMatch;
                 model.FieldsBaseClass = baseRowMatch + "Fields";
-                model.RowBaseFields = new List<EntityCodeField>();
+                model.RowBaseFields = new List<EntityField>();
                 fields.RemoveAll(f =>
                 {
                     if (baseRowFieldset.Contains(f.FieldName.Substring(prefix)))
                     {
-                        var ft = SqlSchemaInfo.SqlTypeNameToFieldType(f.DataType);
-                        model.RowBaseFields.Add(new EntityCodeField
-                        {
-                            Type = ft,
-                            TSType = FieldTypeToTS(ft),
-                            Ident = GenerateVariableName(f.FieldName.Substring(prefix)),
-                            Title = Inflector.Inflector.Titleize(f.FieldName.Substring(prefix)),
-                            Name = f.FieldName,
-                            IsValueType = ft != "String" && ft != "Stream",
-                            Size = f.Size == 0 ? (Int32?)null : f.Size,
-                            Scale = f.Scale
-                        });
-
+                        var ef = ToEntityField(f, prefix);
+                        ef.Flags = null;
+                        model.RowBaseFields.Add(ef);
                         return true;
                     }
                     return false;
@@ -193,38 +213,14 @@ namespace Serenity.CodeGenerator
             else
             {
                 model.RowBaseClass = "Row";
-                model.RowBaseFields = new List<EntityCodeField>();
+                model.RowBaseFields = new List<EntityField>();
                 model.FieldsBaseClass = "RowFieldsBase";
             }
 
             foreach (var field in fields)
             {
-                string flags;
-                if (field.IsIdentity)
-                    flags = "Identity";
-                else if (field.IsPrimaryKey)
-                    flags = "PrimaryKey";
-                else if (!field.IsNullable)
-                    flags = "NotNull";
-                else
-                    flags = null;
-
-                var fieldType = SqlSchemaInfo.SqlTypeNameToFieldType(field.DataType);
-
-                var f = new EntityCodeField()
-                {
-                    Type = fieldType,
-                    TSType = FieldTypeToTS(fieldType),
-                    Ident = GenerateVariableName(field.FieldName.Substring(prefix)),
-                    Title = Inflector.Inflector.Titleize(field.FieldName.Substring(prefix)),
-                    Name = field.FieldName,
-                    Flags = flags,
-                    IsValueType = fieldType != "String" && fieldType != "Stream",
-                    Size = field.Size == 0 ? (Int32?)null : field.Size,
-                    Scale = field.Scale
-                };
-
-                if (f.Name == className && fieldType == "String")
+                var f = ToEntityField(field, prefix);
+                if (f.Name == className && f.FieldType == "String")
                     model.NameField = f.Name;
 
                 var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.InvariantCultureIgnoreCase));
@@ -239,8 +235,8 @@ namespace Serenity.CodeGenerator
 
                     var frgfld = SqlSchemaInfo.GetTableFieldInfos(connection, foreign.PKSchema, foreign.PKTable);
                     int frgPrefix = RowGenerator.DeterminePrefixLength(frgfld, z => z.FieldName);
-                    var j = new EntityCodeJoin();
-                    j.Fields = new List<EntityCodeField>();
+                    var j = new EntityJoin();
+                    j.Fields = new List<EntityField>();
                     j.Name = GenerateVariableName(f.Name.Substring(prefix));
                     if (j.Name.EndsWith("Id") || j.Name.EndsWith("ID"))
                         j.Name = j.Name.Substring(0, j.Name.Length - 2);
@@ -249,32 +245,16 @@ namespace Serenity.CodeGenerator
 
                     frgfld.RemoveAll(y => removeForeignFields.Contains(y.FieldName));
 
-                    if (frgfld.Find(y => y.FieldName.Substring(frgPrefix) == "SonGuncelleyenID") != null)
-                    {
-                        //frgfld.RemoveAll(y => LoggingBaseFields.Contains(y.FieldName.Substring(frgPrefix)));
-                    }
-
                     foreach (var frg in frgfld)
                     {
                         if (frg.FieldName.Equals(foreign.PKColumn, StringComparison.InvariantCultureIgnoreCase))
                             continue;
 
-                        var kType = SqlSchemaInfo.SqlTypeNameToFieldType(frg.DataType);
+                        var k = ToEntityField(frg, frgPrefix);
+                        k.Flags = null;
+                        k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName.Substring(frgPrefix)));
 
-                        var k = new EntityCodeField()
-                        {
-                            Type = kType,
-                            TSType = FieldTypeToTS(kType),
-                            Ident = GenerateVariableName(frg.FieldName.Substring(frgPrefix)),
-                            Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName.Substring(frgPrefix))),
-                            Name = frg.FieldName,
-                            Flags = flags,
-                            IsValueType = kType != "String" && kType != "Stream",
-                            Size = frg.Size == 0 ? (Int32?)null : frg.Size,
-                            Scale = frg.Scale
-                        };
-
-                        if (f.TextualField == null && kType == "String")
+                        if (f.TextualField == null && k.FieldType == "String")
                             f.TextualField = JI(j.Name, k.Ident);
 
                         j.Fields.Add(k);
@@ -288,7 +268,7 @@ namespace Serenity.CodeGenerator
 
             if (model.NameField == null)
             {
-                var fld = model.Fields.FirstOrDefault(z => z.Type == "String");
+                var fld = model.Fields.FirstOrDefault(z => z.FieldType == "String");
                 if (fld != null)
                     model.NameField = fld.Ident;
             }
@@ -307,17 +287,6 @@ namespace Serenity.CodeGenerator
         public static string GenerateVariableName(string fieldName)
         {
             return Inflector.Inflector.Titleize(fieldName).Replace(" ", "");
-
-            /*string[] strArray = fieldName.Trim().Split(new char[1] { '_' });
-            string str1 = string.Empty;
-            foreach (string s in strArray)
-            {
-                string str2 = s;
-                if (RowGenerator.IsStringLowerCase(s))
-                    str2 = !(str2 == "id") ? ((object)char.ToUpper(str2[0], CultureInfo.InvariantCulture)).ToString() + ((object)str2.Remove(0, 1)).ToString() : "ID";
-                str1 = str1 + str2;
-            }
-            return str1;*/
         }
 
         public static string ClassNameFromTableName(string tableName)

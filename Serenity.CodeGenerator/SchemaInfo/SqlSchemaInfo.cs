@@ -7,6 +7,20 @@ using System.Linq;
 
 namespace Serenity.CodeGenerator
 {
+    public class TableName
+    {
+        public string Schema { get; set; }
+        public string Table { get; set; }
+
+        public string Tablename
+        {
+            get
+            {
+                return Schema.IsEmptyOrNull() ? Table : Schema + "." + Table;
+            }
+        }
+    }
+
     public class SqlSchemaInfo
     {
         public static string InformationSchema(IDbConnection connection)
@@ -14,29 +28,23 @@ namespace Serenity.CodeGenerator
             return "INFORMATION_SCHEMA.";
         }
 
-
-        public static List<Tuple<string, string>> GetTableNames(IDbConnection connection)
+        public static List<TableName> GetTableNames(IDbConnection connection)
         {
             var tables = ((DbConnection)(((WrappedConnection)connection)).ActualConnection).GetSchema("Tables");
 
-            var result = new List<Tuple<string, string>>();
+            var result = new List<TableName>();
 
             foreach (DataRow row in tables.Rows)
             {
                 var tableType = row["TABLE_TYPE"] as string;
                 
-                //if (tableType != null && tableType.ToLowerInvariant() == "view")
-                //    continue;
-
                 var schema = row["TABLE_SCHEMA"] as string;
                 var tableName = row["TABLE_NAME"] as string;
 
-                result.Add(new Tuple<string, string>(schema, tableName));
+                result.Add(new TableName { Schema = schema, Table = tableName });
             }
 
-            result.Sort();
-
-            return result;
+            return result.OrderBy(x => x.Schema).ThenBy(x => x.Table).ToList();
         }
 
         public static List<string> GetTablePrimaryFields(IDbConnection connection, string schema, string tableName)
@@ -502,7 +510,8 @@ order by 1, 5";
                     val = row[numPrec];
                     var prec = (val == null || val == DBNull.Value) ? (Int64?)null : Convert.ToInt64(val);
 
-                    if (prec != null && (SqlTypeNameToFieldType(fieldInfo.DataType) != "String") &&
+                    string dataType2;
+                    if (prec != null && (SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out dataType2) != "String") &&
                         prec >= 0 && prec < 1000000000)
                     {
                         fieldInfo.Size = Convert.ToInt32(prec.Value);
@@ -567,6 +576,7 @@ order by 1, 5";
         const string SqlDateTime = "datetime";
         const string SqlDateTime2 = "datetime2";
         const string SqlSmallDateTime = "smalldatetime";
+        const string SqlDateTimeOffset = "datetimeoffset";
         const string SqlDecimal = "decimal";
         const string SqlNumeric = "numeric";
         const string SqlBigInt = "bigint";
@@ -594,9 +604,11 @@ order by 1, 5";
         const string SqlInt8 = "int8";
         const string SqlInt4 = "int4";
 
-        public static string SqlTypeNameToFieldType(string sqlTypeName)
+        public static string SqlTypeNameToFieldType(string sqlTypeName, int size, out string dataType)
         {
-            if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlText || sqlTypeName == SqlNChar || 
+            dataType = null;
+
+            if (sqlTypeName == SqlNVarChar || sqlTypeName == SqlNText || sqlTypeName == SqlText || sqlTypeName == SqlNChar ||
                 sqlTypeName == SqlVarChar || sqlTypeName == SqlChar || sqlTypeName == SqlBlobSubType1)
                 return "String";
             else if (sqlTypeName == SqlInt || sqlTypeName == SqlInteger || sqlTypeName == SqlInt4)
@@ -607,6 +619,8 @@ order by 1, 5";
                 return "Decimal";
             else if (sqlTypeName == SqlDateTime || sqlTypeName == SqlDateTime2 || sqlTypeName == SqlDate || sqlTypeName == SqlSmallDateTime)
                 return "DateTime";
+            else if (sqlTypeName == SqlDateTimeOffset)
+                return "DateTimeOffset";
             else if (sqlTypeName == SqlTime)
                 return "TimeSpan";
             else if (sqlTypeName == SqlBit)
@@ -619,8 +633,19 @@ order by 1, 5";
                 return "Int16";
             else if (sqlTypeName == SqlUniqueIdentifier)
                 return "Guid";
-            else if (sqlTypeName == SqlVarBinary || sqlTypeName == SqlTimestamp || sqlTypeName == SqlRowVersion)
-                return "Stream";
+            else if (sqlTypeName == SqlVarBinary)
+            {
+                if (size == 0 || size > 256)
+                    return "Stream";
+
+                dataType = "byte[]";
+                return "ByteArray";
+            }
+            else if (sqlTypeName == SqlTimestamp || sqlTypeName == SqlRowVersion)
+            {
+                dataType = "byte[]";
+                return "ByteArray";
+            }
             else
                 return "Stream";
         }

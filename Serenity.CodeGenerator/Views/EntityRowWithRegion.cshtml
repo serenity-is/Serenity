@@ -35,7 +35,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     {    <text>[LookupScript("@Model.Module.@Model.RowClassName")]</text>}
 
     public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
-    {@foreach (var x in Model.Fields)
+    {@foreach (EntityCodeField x in Model.Fields)
                 {
                     var attrs = new List<string>();
                     var attrsLookupEditorForm = new List<string>();
@@ -88,8 +88,8 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
             {
             <text>[@attrStringLookupEditorForm]</text>
             }}
-            public @x.Type@(x.IsValueType ? "?" : "") @x.Ident { get { return Fields.@(x.Ident)[this]; } set { Fields.@(x.Ident)[this] = value; } }
-            public partial class RowFields { public @(x.Type)Field @(x.Ident); }
+            public @x.DataType@(x.IsValueType ? "?" : "") @x.Ident { get { return Fields.@(x.Ident)[this]; } set { Fields.@(x.Ident)[this] = value; } }
+            public partial class RowFields { public @(x.FieldType)Field @(x.Ident); }
             #endregion @x.Ident
         </text>}
 
@@ -102,7 +102,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
             <text>
                 [DisplayName("@y.Title"), Expression("@("j" + x.Name + ".[" + y.Name + "]")")]
                 public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident)) { get { return Fields.@(jf(x.Name, y.Ident))[this]; } set { Fields.@(jf(x.Name, y.Ident))[this] = value; } }
-                public partial class RowFields { public @(y.Type)Field @(jf(x.Name, y.Ident)); }
+                public partial class RowFields { public @(y.FieldType)Field @(jf(x.Name, y.Ident)); }
 
             </text>}
             }

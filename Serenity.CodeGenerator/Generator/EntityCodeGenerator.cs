@@ -9,23 +9,14 @@ namespace Serenity.CodeGenerator
     public class EntityCodeGenerator
     {
         private GeneratorConfig config;
-        private EntityCodeGenerationModel model;
+        private EntityModel model;
         private string siteWebPath;
         private string siteWebProj;
         private string scriptPath;
         private string scriptProject;
         private Encoding utf8 = new UTF8Encoding(true);
 
-        private void AppendComment(StreamWriter sw)
-        {
-            sw.WriteLine();
-            sw.WriteLine();
-            sw.WriteLine("/* ------------------------------------------------------------------------- */");
-            sw.WriteLine("/* APPENDED BY CODE GENERATOR, MOVE TO CORRECT PLACE AND REMOVE THIS COMMENT */");
-            sw.WriteLine("/* ------------------------------------------------------------------------- */");
-        }
-
-        public EntityCodeGenerator(EntityCodeGenerationModel model, GeneratorConfig config)
+        public EntityCodeGenerator(EntityModel model, GeneratorConfig config)
         {
             var kdiff3Paths = new[]
             {
@@ -135,12 +126,6 @@ namespace Serenity.CodeGenerator
                 if (config.GenerateDialog)
                     GenerateScriptDialogSS();
             }
-
-            if (config.GenerateTSCode ||
-                config.GenerateTSTypings)
-            {
-                CodeFileHelper.ExecuteTSC(Path.Combine(siteWebPath, @"Scripts\"), "");
-            }
         }
 
         private string CreateDirectoryOrBackupFile(string file)
@@ -206,12 +191,21 @@ namespace Serenity.CodeGenerator
 
         private void GenerateCss()
         {
-            string relativeFile = Path.Combine(@"Content\site\", "site.less");
+            string relativeFile = Path.Combine(@"Content\site\", "site" +  
+                (!string.IsNullOrEmpty(model.Module) ? ("." + model.Module.ToLowerInvariant()) : "") + ".less");
+
             string file = Path.Combine(siteWebPath, relativeFile);
             Directory.CreateDirectory(Path.GetDirectoryName(file));
             if (!File.Exists(file))
             {
-                CodeFileHelper.CheckoutAndWrite(file, "\r\n", false);
+                if (!string.IsNullOrEmpty(model.Module))
+                {
+                    relativeFile = Path.Combine(@"Content\site\", "site.less");
+                    file = Path.Combine(siteWebPath, relativeFile);
+                }
+
+                if (!File.Exists(file))
+                    CodeFileHelper.CheckoutAndWrite(file, "\r\n", false);
             }
 
             string code = Templates.Render(new Views.EntityCss(), model);
@@ -222,7 +216,6 @@ namespace Serenity.CodeGenerator
                     ms.Write(old, 0, old.Length);
                 using (var sw = new StreamWriter(ms, utf8))
                 {
-                    AppendComment(sw);
                     sw.Write(code);
                     sw.Flush();
 

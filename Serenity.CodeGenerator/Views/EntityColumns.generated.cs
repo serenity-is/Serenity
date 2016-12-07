@@ -65,7 +65,7 @@ WriteLiteral("))]\r\n    public class ");
 
                                    WriteLiteral("Columns\r\n    {");
 
-      foreach (var x in Model.Fields) {
+      foreach (EntityField x in Model.Fields) {
         var attrs = new List<string>();
         if (x.Ident == Model.IdField) {
             attrs.Add("EditLink");
@@ -89,17 +89,17 @@ WriteLiteral("]");
 WriteLiteral("\r\n        public ");
 
 
-          Write(x.Type);
+          Write(x.DataType);
 
 WriteLiteral(" ");
 
 
-                  Write(x.Ident);
+                      Write(x.Ident);
 
 WriteLiteral(" { get; set; }");
 
 
-                                                    }
+                                                        }
 
 WriteLiteral("\r\n    }\r\n}");
 

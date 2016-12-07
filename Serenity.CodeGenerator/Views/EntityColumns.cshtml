@@ -16,7 +16,7 @@ namespace @(Model.RootNamespace)@(dotModule).Columns
     [ColumnsScript("@(moduleDot)@(Model.ClassName)")]
     [BasedOnRow(typeof(Entities.@(Model.RowClassName)))]
     public class @(Model.ClassName)Columns
-    {@foreach (var x in Model.Fields) {
+    {@foreach (EntityCodeField x in Model.Fields) {
         var attrs = new List<string>();
         if (x.Ident == Model.IdField) {
             attrs.Add("EditLink");
@@ -29,7 +29,7 @@ namespace @(Model.RootNamespace)@(dotModule).Columns
         if (attrs.Count > 0)
         {<text>
         [@string.Join(", ", attrs)]</text>}<text>
-        public @x.Type @x.Ident { get; set; }</text>}
+        public @x.DataType @x.Ident { get; set; }</text>}
 
     }
 }

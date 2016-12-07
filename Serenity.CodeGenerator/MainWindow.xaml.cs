@@ -17,7 +17,7 @@ namespace Serenity.CodeGenerator
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private BindingList<GeneratorConfig.Connection> _connections;
-        private BindingList<string> _tables;
+        private BindingList<TableItem> _tables;
         private GeneratorConfig config;
 
         public MainWindow()
@@ -38,7 +38,7 @@ namespace Serenity.CodeGenerator
                 }
 
             _connections = new BindingList<GeneratorConfig.Connection>();
-            _tables = new BindingList<string>();
+            _tables = new BindingList<TableItem>();
 
             this.ConnectionsCombo.DataContext = _connections;
             this.DataContext = this;
@@ -52,7 +52,7 @@ namespace Serenity.CodeGenerator
                 config.UpdateConnectionsFrom(GetWebConfigLocation(), x => _connections.Add(x));
         }
 
-        public BindingList<string> Tables { get { return _tables; } }
+        public BindingList<TableItem> Tables { get { return _tables; } }
 
         public string RootNamespace
         {
@@ -64,7 +64,6 @@ namespace Serenity.CodeGenerator
                     config.RootNamespace = value;
                     config.Save();
                     Changed("RootNamespace");
-                    GenerateRowCode();
                 }
             }
         }
@@ -120,55 +119,10 @@ namespace Serenity.CodeGenerator
                 {
                     _entitySingular = value;
                     Changed("EntitySingular");
-                    GenerateRowCode();
                 }
             }
         }
-
-        public string Module
-        {
-            get { return _module; }
-            set
-            {
-                if (value != _module)
-                {
-                    _module = value.TrimToNull();
-                    Changed("Module");
-                    GenerateRowCode();
-                }
-            }
-        }
-        private string _module;
-
-        public string ConnectionKey
-        {
-            get { return _connectionKey; }
-            set
-            {
-                if (value != _connectionKey)
-                {
-                    _connectionKey = value;
-                    Changed("ConnectionKey");
-                }
-            }
-        }
-        private string _connectionKey;
-
-        public string Permission
-        {
-            get { return _permission; }
-            set
-            {
-                if (value != _permission)
-                {
-                    _permission = value;
-                    Changed("Permission");
-                    GenerateRowCode();
-                }
-            }
-        }
-        private string _permission;
-
+       
         private void Changed(string property)
         {
             if (PropertyChanged != null)
@@ -348,6 +302,21 @@ namespace Serenity.CodeGenerator
                 }
             }
         }
+
+        public string TSCPath
+        {
+            get { return config.TSCPath; }
+            set
+            {
+                if (value != config.TSCPath)
+                {
+                    config.TSCPath = value;
+                    config.Save();
+                    Changed("TSCPath");
+                }
+            }
+        }
+
         public bool GenerateRow
         {
             get { return config.GenerateRow; }
@@ -479,7 +448,7 @@ namespace Serenity.CodeGenerator
                 }
             }
         }
-        private void Ekle_Click(object sender, RoutedEventArgs e)
+        private void AddConnection_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new AddConnectionStringWindow();
             if (dlg.ShowDialog() == true)
@@ -517,7 +486,7 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private void Sil_Click(object sender, RoutedEventArgs e)
+        private void DeleteConnection_Click(object sender, RoutedEventArgs e)
         {
             var connection = (GeneratorConfig.Connection)this.ConnectionsCombo.SelectedItem;
             config.Connections.Remove(connection);
@@ -528,6 +497,7 @@ namespace Serenity.CodeGenerator
         private void ConnectionsCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this._tables.Clear();
+            GenerateCodeButton.IsEnabled = false;
 
             if (this.ConnectionsCombo.SelectedItem != null)
             {
@@ -540,194 +510,113 @@ namespace Serenity.CodeGenerator
                         connection.Open();
 
                         foreach (var t in SqlSchemaInfo.GetTableNames(connection))
-                            _tables.Add(((t.Item1 != null) ? (t.Item1 + ".") : "") + t.Item2);
+                        {
+                            var table = conn != null ? conn.Tables.FirstOrDefault(x => x.Tablename == t.Tablename) : null;
+                            var identifier = (table == null || table.Identifier.IsEmptyOrNull()) ?
+                                RowGenerator.ClassNameFromTableName(t.Table) : table.Identifier;
+                            var permission = table == null ? "Administration:General" : table.PermissionKey;
+                            var connectionKey = (table != null && !table.ConnectionKey.IsEmptyOrNull()) ?
+                                table.ConnectionKey : conn.Key;
+
+                            var module = (table != null && table.Module != null) ? table.Module :
+                                Inflector.Inflector.Capitalize(connectionKey);
+
+                            var tableItem = new TableItem
+                            {
+                                IsChecked = false,
+                                ConnectionKey = conn.Key,
+                                Module = module,
+                                Identifier = identifier,
+                                PermissionKey = permission,
+                                FullName = t.Tablename
+                            };
+
+                            _tables.Add(tableItem);
+                            tableItem.PropertyChanged += (s, e2) =>
+                            {
+                                var t2 = conn.Tables.FirstOrDefault(x => x.Tablename == tableItem.FullName);
+                                if (t2 == null)
+                                {
+                                    t2 = new GeneratorConfig.Table();
+                                    t2.Tablename = tableItem.FullName;
+                                    conn.Tables.Add(t2);
+                                }
+                                t2.Identifier = tableItem.Identifier;
+                                t2.Module = tableItem.Module;
+                                t2.ConnectionKey = tableItem.ConnectionKey;
+                                t2.PermissionKey = tableItem.PermissionKey;
+                                this.config.Save();
+
+                                GenerateCodeButton.IsEnabled = _tables.Any(x => x.IsChecked);
+                            };
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.ToString());
                 }
-
-                ConnectionKey = conn.Key;
-            }
-        }
-
-        private void GenerateRowCode()
-        {
-            if (lstTable.SelectedItems.Count > 1) return;
-
-            if (this.ConnectionsCombo.SelectedItem != null &&
-                this.TablesCombo.SelectedItem != null &&
-                !EntitySingular.IsTrimmedEmpty())
-            {
-                string table = (string)this.TablesCombo.SelectedItem;
-                string tableSchema = null;
-                if (table.IndexOf('.') > 0)
-                {
-                    tableSchema = table.Substring(0, table.IndexOf('.'));
-                    table = table.Substring(table.IndexOf('.') + 1);
-                }
-                try
-                {
-                    var conn = (GeneratorConfig.Connection)this.ConnectionsCombo.SelectedItem;
-                    using (var connection = SqlConnections.New(conn.ConnectionString, conn.ProviderName))
-                    {
-                        connection.Open();
-                        this.GeneratedCode.Text = RowGenerator.Generate(connection, tableSchema, table,
-                            Module, ConnectionKey, EntitySingular, Permission, config);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-            }
-        }
-
-        private void TablesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            GeneratedCode.Text = null;
-
-            if (e.RemovedItems != null && e.RemovedItems.Count == 1)
-                SaveTableInfo(e.RemovedItems[0] as string);
-
-            if (this.ConnectionsCombo.SelectedItem != null &&
-                this.TablesCombo.SelectedItem != null)
-            {
-                LoadTableInfo(this.TablesCombo.SelectedItem as string);
-                GenerateCodeButton.IsEnabled = true;
-                GenerateRowCode();
-            }
-        }
-
-        private void MultipleTablesCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count == 1)
-            {
-                TablesCombo.SelectedValue = e.AddedItems[0];
             }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void GenerateCodeFor(string tableName)
-        {
-            EntityCodeGenerationModel rowModel;
-            var conn = (GeneratorConfig.Connection)this.ConnectionsCombo.SelectedItem;
-            using (var connection = SqlConnections.New(conn.ConnectionString, conn.ProviderName))
-            {
-                connection.Open();
-                var table = tableName;
-                string tableSchema = null;
-                if (table.IndexOf('.') > 0)
-                {
-                    tableSchema = table.Substring(0, table.IndexOf('.'));
-                    table = table.Substring(table.IndexOf('.') + 1);
-                }
-                rowModel = RowGenerator.GenerateModel(connection, tableSchema, table,
-                    Module, ConnectionKey, EntitySingular, Permission, config);
-                new EntityCodeGenerator(rowModel, config).Run();
-            }
-        }
-
         private void GenerateCodes_Click(object sender, RoutedEventArgs e)
         {
-            if (this.ConnectionsCombo.SelectedItem == null ||
-                this.TablesCombo.SelectedItem == null)
+            var conn = (GeneratorConfig.Connection)this.ConnectionsCombo.SelectedItem;
+            if (conn == null)
             {
-                MessageBox.Show("A connection string and table name must be selected!");
+                MessageBox.Show("A connection must be selected!");
                 return;
             }
 
-            if (EntitySingular.IsTrimmedEmpty())
+            var tables = this._tables.Where(x => x.IsChecked == true);
+            if (this.ConnectionsCombo.SelectedItem == null)
             {
-                MessageBox.Show("Entity class identifier must be entered!");
+                MessageBox.Show("Please select at least one table!");
                 return;
-            }
+            };
 
-            if (Permission.IsTrimmedEmpty())
+            var noIdentifier = tables.FirstOrDefault(x => x.Identifier.IsTrimmedEmpty());
+            if (noIdentifier != null)
             {
-                MessageBox.Show("Permission key must be entered!");
+                MessageBox.Show("Identifier for table " + noIdentifier.FullName + " is empty!");
                 return;
-            }
+            };
 
-            string tableName = (string)this.TablesCombo.SelectedItem;
-            try
-            {
-                GenerateCodeFor(tableName);
-
-                MessageBox.Show("Code files for the selected table is generated. Please REBUILD SOLUTION before running application, otherwise you may have script errors!");
-                GenerateCodeButton.IsEnabled = false;
-                SaveTableInfo(tableName);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
-        private void SaveTableInfo(string tableName)
-        {
-            if (tableName.IsEmptyOrNull())
-                return;
-
-            var cnn = this.ConnectionsCombo.SelectedItem as GeneratorConfig.Connection;
-            var tableObj = cnn != null ? cnn.Tables.FirstOrDefault(x => x.Tablename == tableName) : null;
-            if (tableObj == null && cnn != null)
-            {
-                tableObj = new GeneratorConfig.Table();
-                tableObj.Tablename = tableName;
-                cnn.Tables.Add(tableObj);
-            }
-
-            if (tableObj != null)
-            {
-                tableObj.Identifier = EntitySingular;
-                tableObj.PermissionKey = Permission;
-                tableObj.Module = Module;
-                tableObj.ConnectionKey = ConnectionKey;
-            }
-
-            config.Save();
-        }
-
-        private void LoadTableInfo(string tableName)
-        {
-            var connection = this.ConnectionsCombo.SelectedItem as GeneratorConfig.Connection;
-            var table = connection != null ? connection.Tables.FirstOrDefault(x => x.Tablename == tableName) : null;
-            var tableOnly = tableName;
-            if (tableOnly.IndexOf('.') >= 0)
-                tableOnly = tableOnly.Substring(tableOnly.IndexOf('.') + 1);
-
-            EntitySingular = table == null ? Inflector.Inflector.Titleize(tableOnly).Replace(" ", "") : table.Identifier;
-
-            Permission = table == null ? Permission : table.PermissionKey;
-            ConnectionKey = table != null && !table.ConnectionKey.IsEmptyOrNull() ? table.ConnectionKey : connection != null ? connection.Key : "";
-            Module = table != null && !table.Module.IsEmptyOrNull() ? table.Module : Module;
-        }
-
-        private void btnGenerateCodesMultiple_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.lstTable.SelectedItems.Count == 0)
-            {
-                MessageBox.Show("Please select tables to generate code for!");
-                return;
-            }
-
-            if (Permission.IsTrimmedEmpty())
-            {
-                MessageBox.Show("Permission key must be entered!");
-                return;
-            }
-
-            foreach (string tableName in lstTable.SelectedItems)
+            foreach (var table in tables)
             {
                 try
                 {
-                    TablesCombo.SelectedValue = tableName;
-                    LoadTableInfo(tableName);
-                    GenerateCodeFor(tableName);
-                    SaveTableInfo(tableName);
+                    EntityModel rowModel;
+                    
+                    using (var connection = SqlConnections.New(conn.ConnectionString, conn.ProviderName))
+                    {
+                        connection.Open();
+                        var tableName = table.FullName;
+                        string schema = null;
+                        if (tableName.IndexOf('.') > 0)
+                        {
+                            schema = tableName.Substring(0, tableName.IndexOf('.'));
+                            tableName = tableName.Substring(tableName.IndexOf('.') + 1);
+                        }
+
+                        rowModel = RowGenerator.GenerateModel(connection, schema, tableName,
+                            table.Module, table.ConnectionKey, table.Identifier, table.PermissionKey, config);
+
+                        new EntityCodeGenerator(rowModel, config).Run();
+                    }
+
+                    if (config.GenerateTSCode ||
+                        config.GenerateTSTypings)
+                    {
+                        var siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
+                        var siteWebPath = Path.GetDirectoryName(siteWebProj);
+                        CodeFileHelper.ExecuteTSC(Path.Combine(siteWebPath, @"Scripts\"), "");
+                    }
+
+                    MessageBox.Show("Code files for the selected table is generated. Please REBUILD SOLUTION before running application, otherwise you may have script errors!");
+                    GenerateCodeButton.IsEnabled = false;
                 }
                 catch (Exception ex)
                 {
@@ -735,9 +624,8 @@ namespace Serenity.CodeGenerator
                 }
             }
 
-            MessageBox.Show("Code files for selected tables are generated. Please REBUILD SOLUTION before running application, otherwise you may have script errors!");
-        }
 
+        }
 
         private void btnKDiff3PathBrowse_Click(object sender, RoutedEventArgs e)
         {
@@ -760,7 +648,35 @@ namespace Serenity.CodeGenerator
                 KDiff3Path = dlg.FileName;
                 config.Save();
             }
+        }
 
+        private void btnTSCPathBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            if (string.IsNullOrWhiteSpace(config.TSCPath))
+            {
+                dlg.FileName = "*.exe";
+                dlg.InitialDirectory = Path.GetDirectoryName(GeneratorConfig.GetConfigurationFilePath());
+            }
+            else
+            {
+                dlg.FileName = Path.GetFileName(config.TSCPath);
+                dlg.InitialDirectory = Path.GetDirectoryName(config.TSCPath);
+            }
+
+            Nullable<bool> result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                TSCPath = dlg.FileName;
+                config.Save();
+            }
+        }
+
+        private void TablesGrid_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Space && TablesGrid.SelectedItem != null)
+                (TablesGrid.SelectedItem as TableItem).IsChecked = !(TablesGrid.SelectedItem as TableItem).IsChecked;
         }
     }
 }
