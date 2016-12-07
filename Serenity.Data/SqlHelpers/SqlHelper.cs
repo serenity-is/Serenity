@@ -132,16 +132,21 @@
             return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params));
         }
 
+        const string ExpectedRowsError = "Query affected {0} rows while {1} expected! " +
+            "This might mean that your query lacks a proper WHERE statement " +
+            "or a TRIGGER changes number of affected rows. In the latter case, " +
+            "you may try adding \"SET NOCOUNT ON\" to your trigger code.";
+
         private static int CheckExpectedRows(ExpectedRows expectedRows, int affectedRows)
         {
             if (expectedRows == ExpectedRows.Ignore)
                 return affectedRows;
 
             if (expectedRows == ExpectedRows.One && affectedRows != 1)
-                throw new InvalidOperationException(String.Format("Query affected {0} rows while 1 expected!", affectedRows));
+                throw new InvalidOperationException(String.Format(ExpectedRowsError, affectedRows, 1));
 
             if (expectedRows == ExpectedRows.ZeroOrOne && affectedRows > 1)
-                throw new InvalidOperationException("Query affected {0} rows while 1 expected!");
+                throw new InvalidOperationException(String.Format(ExpectedRowsError, affectedRows, "0 or 1"));
 
             return affectedRows;
         }
