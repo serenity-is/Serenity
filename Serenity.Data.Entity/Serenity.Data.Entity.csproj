@@ -65,6 +65,7 @@
     <Compile Include="FieldTypes\DateTimeOffsetField.cs" />
     <Compile Include="FieldTypes\ListField.cs" />
     <Compile Include="FieldTypes\RowField.cs" />
+    <Compile Include="FieldTypes\ByteArrayField.cs" />
     <Compile Include="FieldTypes\TimeSpanField.cs" />
     <Compile Include="FieldTypes\SingleField.cs" />
     <Compile Include="FieldTypes\Field.CriteriaOperators.cs" />

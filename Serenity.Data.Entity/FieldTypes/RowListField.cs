@@ -15,19 +15,9 @@ namespace Serenity.Data
 
         protected override int CompareValues(List<TForeign> value1, List<TForeign> value2)
         {
-            if (value1 == null && value2 == null)
-                return 0;
+            var length = Math.Min(value1.Count, value2.Count);
 
-            if (value1 == null)
-                return -1;
-
-            if (value2 == null)
-                return 1;
-
-            if (value1.Count != value2.Count)
-                return value1.Count.CompareTo(value2.Count);
-
-            for (var i = 0; i < value1.Count; i++)
+            for (var i = 0; i < length; i++)
             {
                 var v1 = value1[i];
                 var v2 = value2[i];
@@ -49,7 +39,7 @@ namespace Serenity.Data
                 }
             }
 
-            return 0;
+            return value2.Count.CompareTo(value2.Count);
         }
 
         protected override List<TForeign> Clone(List<TForeign> value)

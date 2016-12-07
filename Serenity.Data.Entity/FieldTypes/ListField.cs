@@ -15,28 +15,16 @@ namespace Serenity.Data
 
         protected override int CompareValues(List<TItem> value1, List<TItem> value2)
         {
-            if (value1 == null && value2 == null)
-                return 0;
-
-            if (value1 == null)
-                return -1;
-
-            if (value2 == null)
-                return 1;
-
-            if (value1.Count != value2.Count)
-                return value1.Count.CompareTo(value2.Count);
-
             var comparer = Comparer<TItem>.Default;
-
-            for (var i = 0; i < value1.Count; i++)
+            var length = Math.Min(value1.Count, value2.Count);
+            for (var i = 0; i < length; i++)
             {
                 var c = comparer.Compare(value1[i], value2[i]);
                 if (c != 0)
                     return c;
             }
 
-            return 0;
+            return value2.Count.CompareTo(value2.Count);
         }
 
         protected override List<TItem> Clone(List<TItem> value)
