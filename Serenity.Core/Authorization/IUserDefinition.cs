@@ -5,6 +5,8 @@ namespace Serenity
     /// <summary>
     /// User definition abstraction.
     /// </summary>
+    /// <remarks>Your application might have a class that implements this interface, e.g. UserDefinition, that has these properties plus some more
+    /// specific to your app.</remarks>
     public interface IUserDefinition
     {
         /// <summary>

@@ -7,6 +7,13 @@ namespace Serenity.Web
     /// <summary>
     /// Adds AND OR operator support to any IPermissionService implementation
     /// </summary>
+    /// <remarks>
+    /// Register this class in your application start, to allow | &amp; operators
+    /// in your permission services, e.g.
+    /// <code>
+    /// registrar.RegisterInstance&lt;IPermissionService&gt;(new LogicOperatorPermissionService(new MyPermissionService()))
+    /// </code>
+    /// </remarks>
     public class LogicOperatorPermissionService : IPermissionService
     {
         private static readonly char[] and = new char[] { '&' };

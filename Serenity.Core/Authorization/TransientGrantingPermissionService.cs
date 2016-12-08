@@ -8,6 +8,12 @@ namespace Serenity.Web
     /// <summary>
     /// Adds temporary granting support to any IPermissionService implementation
     /// </summary>
+    /// <remarks>
+    /// Register this class in your application start, to allow granting permissions temporarily.
+    /// <code>
+    /// registrar.RegisterInstance&lt;IPermissionService&gt;(new TransientGrantingPermissionService(new MyPermissionService()))
+    /// </code>
+    /// </remarks> 
     public class TransientGrantingPermissionService : IPermissionService, ITransientGrantor
     {
         private IPermissionService permissionService;
@@ -58,6 +64,10 @@ namespace Serenity.Web
             return permissionService.HasPermission(permission);
         }
 
+        /// <summary>
+        /// Grants specified permissions temporarily (or makes it look like)
+        /// </summary>
+        /// <param name="permissions">List of permission keys</param>
         public void Grant(params string[] permissions)
         {
             if (permissions == null || permissions.Length == 0)
@@ -83,12 +93,18 @@ namespace Serenity.Web
             }
         }
 
+        /// <summary>
+        /// Grants all permissions temporarily (or makes it look like)
+        /// </summary>
         public void GrantAll()
         {
             var grantingStack = GetGrantingStack(true);
             grantingStack.Push(null);
         }
 
+        /// <summary>
+        /// Undoes last grant or grant all operation
+        /// </summary>
         public void UndoGrant()
         {
             var grantingStack = GetGrantingStack(false);
