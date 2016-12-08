@@ -50,14 +50,14 @@
     }
 
     .filename {
-        height: 16px;
-        line-height: 16px;
+        position: relative;
+        white-space: nowrap;
+        padding-right: 16px;
         display: block;
-        width: 128px;
         text-overflow: ellipsis;
         overflow: hidden;
         text-align: center;
-        font-size: 9px;
+        font-size: 11px;
     }
 
     &.file-binary .thumb {
@@ -95,8 +95,8 @@
 
     .delete {
         display: block;
-        position: relative;
-        top: -16px;
+        position: absolute;
+        top: 2px;
         right: 0px;
         width: 16px;
         height: 16px;
