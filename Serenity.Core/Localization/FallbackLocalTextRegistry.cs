@@ -3,7 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
-namespace Serenity.Web
+namespace Serenity.Localization
 {
     /// <summary>
     /// Adds key fallback to any ILocalTextRegistry implementation
