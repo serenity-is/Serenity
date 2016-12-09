@@ -103,7 +103,15 @@ namespace Serenity.Data
                     _setValue(row, null);
                     break;
                 case JsonToken.Date:
-                    _setValue(row, DateTimeOffset.Parse(reader.Value.ToString(), CultureInfo.InvariantCulture));
+                    var obj = reader.Value;
+                    DateTimeOffset value;
+                    if (obj is DateTime)
+                        value = (DateTimeOffset)(DateTime)obj;
+                    else if (obj is DateTimeOffset)
+                        value = (DateTimeOffset)obj;
+                    else
+                        value = DateTimeOffset.Parse(reader.Value.ToString(), CultureInfo.InvariantCulture);
+                    _setValue(row, value);
                     break;
                 case JsonToken.String:
                     var s = ((string)reader.Value).TrimToNull();
