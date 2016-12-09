@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="CompileSerenityLess" AfterTargets="AfterBuild">
-    <Exec Command="$(SolutionDir)serenity\tools\node\node.exe $(SolutionDir)serenity\tools\node\node_modules\less\bin\lessc $(SolutionDir)Serenity\Serenity.Web\Style\serenity.less &gt; $(ProjectDir)Content\serenity\serenity.css"></Exec>
+    <Exec Command="&quot;$(SolutionDir)serenity\tools\node\node.exe&quot; &quot;$(SolutionDir)serenity\tools\node\node_modules\less\bin\lessc&quot; &quot;$(SolutionDir)Serenity\Serenity.Web\Style\serenity.less&quot; &gt; &quot;$(ProjectDir)Content\serenity\serenity.css&quot;"></Exec>
   </Target>
   <Target Name="BeforeBuild">
     <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Style\images\*.*">
