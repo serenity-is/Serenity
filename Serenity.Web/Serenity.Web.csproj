@@ -1144,19 +1144,19 @@
   <Target Name="BeforeBuild">
   </Target>-->
   <Target Name="AfterBuild">
-    <Exec Command="$(ProjectDir)..\tools\node\lessc.cmd $(ProjectDir)style\serenity.less &gt; $(OutDir)serenity.css">
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\lessc.cmd&quot; &quot;$(ProjectDir)style\serenity.less&quot; &gt; &quot;$(OutDir)serenity.css&quot;">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Assets\Scripts\Saltarelle\mscorlib.js -o $(ProjectDir)Assets\Scripts\Saltarelle\mscorlib.min.js --comments --mangle">
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Assets\Scripts\Saltarelle\mscorlib.js&quot; -o &quot;$(ProjectDir)Assets\Scripts\Saltarelle\mscorlib.min.js&quot; --comments --mangle">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Assets\Scripts\Saltarelle\linq.js -o $(ProjectDir)Assets\Scripts\Saltarelle\linq.min.js --comments --mangle">
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Assets\Scripts\Saltarelle\linq.js&quot; -o &quot;$(ProjectDir)Assets\Scripts\Saltarelle\linq.min.js&quot; --comments --mangle">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Assets\Scripts\SlickGrid\slick.core.js -o $(ProjectDir)Assets\Scripts\SlickGrid\slick.core.min.js --comments --mangle">
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Assets\Scripts\SlickGrid\slick.core.js&quot; -o &quot;$(ProjectDir)Assets\Scripts\SlickGrid\slick.core.min.js&quot; --comments --mangle">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Assets\Scripts\SlickGrid\slick.grid.js -o $(ProjectDir)Assets\Scripts\SlickGrid\slick.grid.min.js --comments --mangle">
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Assets\Scripts\SlickGrid\slick.grid.js&quot; -o &quot;$(ProjectDir)Assets\Scripts\SlickGrid\slick.grid.min.js&quot; --comments --mangle">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.js -o $(ProjectDir)Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js --comments --mangle">
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.js&quot; -o &quot;$(ProjectDir)Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js&quot; --comments --mangle">
     </Exec>
-    <Exec Command="$(ProjectDir)..\tools\node\uglifyjs.cmd $(ProjectDir)Scripts\Serenity\Serenity.CoreLib.js -o $(ProjectDir)Scripts\Serenity\Serenity.CoreLib.min.js --comments --mangle">
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.min.js&quot; --comments --mangle">
     </Exec>
   </Target>
 </Project>
