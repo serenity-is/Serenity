@@ -3535,7 +3535,7 @@ if (typeof Slick === "undefined") {
                     }
                     if (entry.actionType == 'C') {
                         var column = columns[entry.columnIdx];
-                        if (column.asyncPostRenderCleanup && entry.node) {
+                        if (column && column.asyncPostRenderCleanup && entry.node) {
                             // cleanup must also remove element
                             column.asyncPostRenderCleanup(entry.node, entry.rowIdx, column);
                         }
