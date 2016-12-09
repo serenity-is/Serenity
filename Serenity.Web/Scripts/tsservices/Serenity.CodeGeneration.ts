@@ -690,6 +690,7 @@ namespace Serenity.CodeGeneration {
         }
 
         getCurrentDirectory = () => "/";
+        getDirectories = (path: string) => [];
         getDefaultLibFileName = _ => "/lib.d.ts";
         getCanonicalFileName = fileName => fileName.toLowerCase();
         useCaseSensitiveFileNames = () => false;

@@ -527,6 +527,7 @@
                     return !!(_this.files[fileName]);
                 };
                 this.getCurrentDirectory = function () { return "/"; };
+                this.getDirectories = function (path) { return []; };
                 this.getDefaultLibFileName = function (_) { return "/lib.d.ts"; };
                 this.getCanonicalFileName = function (fileName) { return fileName.toLowerCase(); };
                 this.useCaseSensitiveFileNames = function () { return false; };
