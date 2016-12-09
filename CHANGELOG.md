@@ -1,3 +1,8 @@
+## 2.6.7 (2016-12-09)
+
+Bugfixes:
+  - fix datetimeoffset conversion bug affecting json deserialization
+
 ## 2.6.6 (2016-12-09)
 
 Bugfixes:
