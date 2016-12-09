@@ -1,3 +1,22 @@
+## 2.6.5 (2016-12-08)
+
+Features:
+  - code generator single & multiple tabs merged into a new datagrid based interface
+  - added DateTimeOffset field type 
+  - added ByteArray field type for small binary column types like timestamp, varbinary(8) etc.
+  - add minbuffer (number of buffered rows on top and bottom), and renderAllCells (render all cells in row, including non visible ones, helps with inline editing tab order) options to slick.grid
+  - give a more informational error message about "query affected N rows while 1 expected"
+  - added IReadOnly class to TypeScript defs
+  - add optional AdminLTE style for login and signup pages (thanks @DucThanhNguyen) [Serene]
+  - default timeout of 90 secs for running migrations [Serene]
+  - sample for dynamic navigation items (thanks @DucThanhNguyen) [Serene]
+  
+Bugfixes:
+  - delete button in multiple image upload editor gets lost for long file names
+  - fix android keyboard hiding when search on menu is clicked
+  - oracle sequences should now work (Oracle users, please report)
+  - datetimeeditor fails on empty string
+
 ## 2.6.4 (2016-11-26)
 
 Features:
