@@ -1,3 +1,10 @@
+## 2.6.6 (2016-12-09)
+
+Bugfixes:
+  - fix typescript services transform error when node is null somehow
+  - update typescript services used for t4 transforms to 2.0.6
+  - possible problem with asyncPostProcessCleanup when a column is removed
+
 ## 2.6.5 (2016-12-08)
 
 Features:
