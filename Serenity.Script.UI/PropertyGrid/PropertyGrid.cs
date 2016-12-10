@@ -53,7 +53,17 @@ namespace Serenity
                 .AddClass("categories")
                 .AppendTo(div);
 
-            var fieldContainer = categoriesDiv;
+            jQueryObject fieldContainer;
+            if (useCategories)
+            {
+                fieldContainer = categoriesDiv;
+            }
+            else
+            { 
+                fieldContainer = J("<div/>")
+                    .AddClass("category")
+                    .AppendTo(categoriesDiv);
+            }
 
             string priorCategory = null;
 
