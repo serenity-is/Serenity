@@ -1,6 +1,7 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Serenity
 {
@@ -32,23 +33,26 @@ namespace Serenity
 
             var categoriesDiv = div;
 
+            var useCategories = options.UseCategories &&
+                items.Any(x => !string.IsNullOrEmpty(x.Category));
+
             if (options.UseCategories)
             {
                 var linkContainer = J("<div/>")
                     .AddClass("category-links");
 
                 categoryIndexes = CreateCategoryLinks(linkContainer, items);
-                
+
                 if (categoryIndexes.Count > 1)
                     linkContainer.AppendTo(div);
                 else
                     linkContainer.Find("a.category-link").Unbind("click", CategoryLinkClick).Remove();
-
-                categoriesDiv = J("<div/>")
-                    .AddClass("categories")
-                    .AppendTo(div);
             }
-            
+
+            categoriesDiv = J("<div/>")
+                .AddClass("categories")
+                .AppendTo(div);
+
             var fieldContainer = categoriesDiv;
 
             string priorCategory = null;
@@ -56,7 +60,7 @@ namespace Serenity
             for (int i = 0; i < items.Count; i++)
             {
                 var item = items[i];
-                if (options.UseCategories &&
+                if (useCategories &&
                     priorCategory != item.Category)
                 {
                     var categoryDiv = CreateCategoryDiv(categoriesDiv, categoryIndexes, item.Category, 
