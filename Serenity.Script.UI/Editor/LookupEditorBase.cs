@@ -190,6 +190,9 @@ namespace Serenity
 
         protected override void InplaceCreateClick(jQueryEvent e)
         {
+            if (ReadOnly)
+                return;
+
             var self = this;
             CreateEditDialog(dialog =>
             {

@@ -1878,6 +1878,7 @@ declare namespace Serenity {
         value: string;
         values: string[];
         get_text(): string;
+        readOnly: boolean;
     }
     namespace Select2Extensions {
         function select2(element: JQuery): JQuery;

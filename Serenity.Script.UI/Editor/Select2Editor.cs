@@ -16,7 +16,7 @@ namespace Serenity
     }
 
     [Element("<input type=\"hidden\"/>"), IncludeGenericArguments(false), ScriptName("Select2Editor")]
-    public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, ISetEditValue, IGetEditValue, IStringValue
+    public abstract class Select2Editor<TOptions, TItem> : Widget<TOptions>, ISetEditValue, IGetEditValue, IStringValue, IReadOnly
         where TOptions : class, new()
         where TItem: class
     {
@@ -30,6 +30,7 @@ namespace Serenity
         {
             Q.Prop(typeof(Select2Editor<object, object>), "value");
             Q.Prop(typeof(Select2Editor<object, object>), "values");
+            Q.Prop(typeof(Select2Editor<object, object>), "readOnly");
         }
 
         public Select2Editor(jQueryObject hidden, TOptions opt)
@@ -322,6 +323,25 @@ namespace Serenity
             get
             {
                 return ((dynamic)element.Select2Get("data") ?? new object()).text;
+            }
+        }
+
+        public bool ReadOnly
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(this.element.GetAttribute("readonly"));
+            }
+            set
+            {
+                if (value != ReadOnly)
+                {
+                    EditorUtils.SetReadOnly(this.element, value);
+                    this.element.NextAll(".inplace-create")
+                        .Attribute("disabled", value ? "disabled" : "")
+                        .CSS("opacity", value ? "0.1" : "")
+                        .CSS("cursor", value ? "default" : "");
+                }
             }
         }
     }
