@@ -27,6 +27,7 @@
         lookupKey?: string;
         minimumResultsForSearch?: any;
         inplaceAdd?: boolean;
+        inplaceAddPermission?: string;
         dialogType?: string;
         cascadeFrom?: string;
         cascadeField?: string;

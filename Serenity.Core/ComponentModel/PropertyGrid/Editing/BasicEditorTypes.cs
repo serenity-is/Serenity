@@ -279,6 +279,15 @@ namespace Serenity.ComponentModel
         }
 
         /// <summary>
+        /// Permission required to use inplace add / edit
+        /// </summary>
+        public string InplaceAddPermission
+        {
+            get { return GetOption<string>("inplaceAddPermission"); }
+            set { SetOption("inplaceAddPermission", value); }
+        }
+
+        /// <summary>
         /// This property is meaningfull when InplaceAdd is true. By default, dialog type name
         /// is determined by LookupKey, e.g. if lookup key is "Northwind.CustomerCity", 
         /// a dialog class named "Northwind.CustomerCityDialog" is used. If dialog type is different
