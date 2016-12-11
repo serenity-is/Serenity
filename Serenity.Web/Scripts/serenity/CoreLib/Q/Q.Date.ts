@@ -9,8 +9,16 @@ namespace Q {
             return '';
         }
 
-        if (format == null) {
+        if (format == null || format == "d") {
             format = Culture.dateFormat;
+        }
+        else {
+            switch (format) {
+                case "g": format = Culture.dateTimeFormat.replace(":ss", ""); break;
+                case "G": format = Culture.dateTimeFormat; break;
+                case "s": format = "yyyy-MM-ddTHH:mm:ss"; break;
+                case "u": return Q.formatISODateTimeUTC(date);
+            }
         }
 
         let pad = function (i: number) {

@@ -505,8 +505,22 @@ var Q;
         if (!date) {
             return '';
         }
-        if (format == null) {
+        if (format == null || format == "d") {
             format = Q.Culture.dateFormat;
+        }
+        else {
+            switch (format) {
+                case "g":
+                    format = Q.Culture.dateTimeFormat.replace(":ss", "");
+                    break;
+                case "G":
+                    format = Q.Culture.dateTimeFormat;
+                    break;
+                case "s":
+                    format = "yyyy-MM-ddTHH:mm:ss";
+                    break;
+                case "u": return Q.formatISODateTimeUTC(date);
+            }
         }
         var pad = function (i) {
             return Q.zeroPad(i, 2);
@@ -1983,6 +1997,7 @@ var Serenity;
     Serenity.EnumKeyAttribute = EnumKeyAttribute;
     var FlexifyAttribute = (function () {
         function FlexifyAttribute(value) {
+            if (value === void 0) { value = true; }
             this.value = value;
         }
         return FlexifyAttribute;
@@ -2162,8 +2177,9 @@ var Serenity;
         }
         Decorators.enumKey = enumKey;
         function flexify(value) {
+            if (value === void 0) { value = true; }
             return function (target) {
-                addAttribute(target, new Serenity.FlexifyAttribute(value || true));
+                addAttribute(target, new Serenity.FlexifyAttribute(value));
             };
         }
         Decorators.flexify = flexify;
