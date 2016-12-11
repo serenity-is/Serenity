@@ -322,6 +322,7 @@
     <Content Include="Scripts\rsvp.js" />
     <Content Include="Scripts\rsvp.min.js" />
     <Content Include="Scripts\serenity\Serenity.Test.js" />
+    <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
@@ -438,10 +439,9 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
   <Target Name="BeforeBuild">
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.d.ts')" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.d.ts" />
   </Target>
   <Target Name="AfterBuild">
-    <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)tsconfig.json&quot;" ContinueOnError="false" />    
+    <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)tsconfig.json&quot;" ContinueOnError="false" />
   </Target>
 </Project>
