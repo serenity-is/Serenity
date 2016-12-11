@@ -45,9 +45,9 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="MsieJavaScriptEngine, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a3a2846a37ac0d3e, processorArchitecture=MSIL">
+    <Reference Include="MsieJavaScriptEngine, Version=2.0.2.0, Culture=neutral, PublicKeyToken=a3a2846a37ac0d3e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\MsieJavaScriptEngine.2.0.0\lib\net40-client\MsieJavaScriptEngine.dll</HintPath>
+      <HintPath>..\..\packages\MsieJavaScriptEngine.2.0.2\lib\net40-client\MsieJavaScriptEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
