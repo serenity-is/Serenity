@@ -82,6 +82,7 @@
 
         protected initDialog(): void {
             this.element.dialog(this.getDialogOptions());
+            this.element.closest('.ui-dialog').on('resize', e => this.arrange());
 
             let type = (ss as any).getInstanceType(this);
 
@@ -259,6 +260,7 @@
                 return;
             }
             this.tabs = tabsDiv.tabs({});
+            this.tabs.bind('tabsactivate', () => this.arrange());
         }
 
         protected handleResponsive(): void {

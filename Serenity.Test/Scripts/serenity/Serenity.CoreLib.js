@@ -1983,7 +1983,6 @@ var Serenity;
     Serenity.EnumKeyAttribute = EnumKeyAttribute;
     var FlexifyAttribute = (function () {
         function FlexifyAttribute(value) {
-            if (value === void 0) { value = true; }
             this.value = value;
         }
         return FlexifyAttribute;
@@ -2163,9 +2162,8 @@ var Serenity;
         }
         Decorators.enumKey = enumKey;
         function flexify(value) {
-            if (value === void 0) { value = true; }
             return function (target) {
-                addAttribute(target, new Serenity.FlexifyAttribute(value));
+                addAttribute(target, new Serenity.FlexifyAttribute(value || true));
             };
         }
         Decorators.flexify = flexify;
@@ -2803,6 +2801,7 @@ var Serenity;
         TemplatedDialog.prototype.initDialog = function () {
             var _this = this;
             this.element.dialog(this.getDialogOptions());
+            this.element.closest('.ui-dialog').on('resize', function (e) { return _this.arrange(); });
             var type = ss.getInstanceType(this);
             this.responsive = Q.Config.responsiveDialogs ||
                 ss.getAttributes(type, Serenity.ResponsiveAttribute, true).length > 0;
@@ -2944,11 +2943,13 @@ var Serenity;
             this.dialogTitle = value;
         };
         TemplatedDialog.prototype.initTabs = function () {
+            var _this = this;
             var tabsDiv = this.byId('Tabs');
             if (tabsDiv.length === 0) {
                 return;
             }
             this.tabs = tabsDiv.tabs({});
+            this.tabs.bind('tabsactivate', function () { return _this.arrange(); });
         };
         TemplatedDialog.prototype.handleResponsive = function () {
             var dlg = this.element.dialog();

@@ -559,7 +559,7 @@ declare namespace Serenity {
     }
     class FlexifyAttribute {
         value: boolean;
-        constructor(value?: boolean);
+        constructor(value: boolean);
     }
     class FormKeyAttribute {
         value: string;
