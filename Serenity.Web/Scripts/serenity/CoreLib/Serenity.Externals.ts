@@ -62,7 +62,16 @@ namespace Q {
         p.showLabel = validateShowLabel;
 
         $.validator.addMethod("dateQ", function (value, element) {
-            return this.optional(element) || parseDate(value) != false;
+            if (this.optional(element))
+                return false;
+
+            var d = parseDate(value);
+            if (!d)
+                return false;
+
+            var z = new Date(d);
+            z.setHours(0, 0, 0, 0);
+            return z.getTime() === d.getTime();
         });
 
         $.validator.addMethod("hourAndMin", function (value, element) {

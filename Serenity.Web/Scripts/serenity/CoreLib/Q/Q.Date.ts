@@ -11,19 +11,10 @@ namespace Q {
 
         let date: Date;
         if (typeof d == "string") {
-            if (d.length >= 10 && d.charAt(4) === '-' && d.charAt(7) === '-' &&
-                (d.length === 10 || (d.length > 10 && d.charAt(10) === 'T'))) {
-                date = Q.parseISODateTime(d);
-            }
-            else {
-                var z = Q.parseDate(d);
-                if (z === false)
-                    return d;
-                date = z as Date;
-            }
-
-            if (!date)
+            var res = Q.parseDate(d);
+            if (!res)
                 return d;
+            date = res as Date;
         }
         else
             date = d;
@@ -219,6 +210,15 @@ namespace Q {
     export function parseDate(s: string, dateOrder?: string): any {
         if (!s || !s.length)
             return null;
+
+        if (s.length >= 10 && s.charAt(4) === '-' && s.charAt(7) === '-' &&
+            (s.length === 10 || (s.length > 10 && s.charAt(10) === 'T'))) {
+            var res = Q.parseISODateTime(s);
+            if (res == null)
+                return false;
+            return res;
+        }
+
         let dateVal: any;
         let dArray: any;
         let d: number, m: number, y: number;

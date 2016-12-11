@@ -507,18 +507,10 @@ var Q;
         }
         var date;
         if (typeof d == "string") {
-            if (d.length >= 10 && d.charAt(4) === '-' && d.charAt(7) === '-' &&
-                (d.length === 10 || (d.length > 10 && d.charAt(10) === 'T'))) {
-                date = Q.parseISODateTime(d);
-            }
-            else {
-                var z = Q.parseDate(d);
-                if (z === false)
-                    return d;
-                date = z;
-            }
-            if (!date)
+            var res = Q.parseDate(d);
+            if (!res)
                 return d;
+            date = res;
         }
         else
             date = d;
@@ -704,6 +696,13 @@ var Q;
     function parseDate(s, dateOrder) {
         if (!s || !s.length)
             return null;
+        if (s.length >= 10 && s.charAt(4) === '-' && s.charAt(7) === '-' &&
+            (s.length === 10 || (s.length > 10 && s.charAt(10) === 'T'))) {
+            var res = Q.parseISODateTime(s);
+            if (res == null)
+                return false;
+            return res;
+        }
         var dateVal;
         var dArray;
         var d, m, y;
@@ -4720,7 +4719,14 @@ var Q;
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
         $.validator.addMethod("dateQ", function (value, element) {
-            return this.optional(element) || Q.parseDate(value) != false;
+            if (this.optional(element))
+                return false;
+            var d = Q.parseDate(value);
+            if (!d)
+                return false;
+            var z = new Date(d);
+            z.setHours(0, 0, 0, 0);
+            return z.getTime() === d.getTime();
         });
         $.validator.addMethod("hourAndMin", function (value, element) {
             return this.optional(element) || !isNaN(Q.parseHourAndMin(value));
