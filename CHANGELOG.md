@@ -1,3 +1,16 @@
+## 2.6.8 (2016-12-11)
+
+Features:
+  - when no category is specified for any of items, don't show default category name, even if useCategories is true, but create category div for CSS compability
+  - added inplaceaddpermission to lookup editor
+  - disable inplace add functionality if select2 editor is readonly
+  - call dialog arrange method on resize and active tab change
+  - add "d": date only, "g": dd/MM/yyyy HH:mm (culture specific dmy order), "G": dd/MM/yyyy HH:mm:ss (culture specific dmy order), "s": yyyy-MM-ddTHH:mm:ss, "u": yyyy-MM-ddTHH:mm:ss.fffZ format specifiers for Q.formatDate function
+  - Q.formatDate can now accept an iso date/time string or normal date string in addition to a Date object
+  - Q.parseDate can also parse iso date/time values
+  - feature selection wizard while creating a new application with Serene template. you can now optionally exclude Northwind, Meeting, Organization, Samples etc. [Serene]
+  - added attendee editor to meeting UI [Serene]
+
 ## 2.6.7 (2016-12-09)
 
 Bugfixes:
