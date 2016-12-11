@@ -284,7 +284,7 @@ declare namespace Q {
     function toId(id: any): any;
 }
 declare namespace Q {
-    function formatDate(date: Date, format?: string): string;
+    function formatDate(d: Date | string, format?: string): string;
     function formatDayHourAndMin(n: number): string;
     function formatISODateTimeUTC(d: Date): string;
     function parseISODateTime(s: string): Date;

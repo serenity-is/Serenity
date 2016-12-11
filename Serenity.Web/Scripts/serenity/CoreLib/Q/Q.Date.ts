@@ -4,10 +4,29 @@
 
 namespace Q {
 
-    export function formatDate(date: Date, format?: string) {
-        if (!date) {
+    export function formatDate(d: Date | string, format?: string) {
+        if (!d) {
             return '';
         }
+
+        let date: Date;
+        if (typeof d == "string") {
+            if (d.length >= 10 && d.charAt(4) === '-' && d.charAt(7) === '-' &&
+                (d.length === 10 || (d.length > 10 && d.charAt(10) === 'T'))) {
+                date = Q.parseISODateTime(d);
+            }
+            else {
+                var z = Q.parseDate(d);
+                if (z === false)
+                    return d;
+                date = z as Date;
+            }
+
+            if (!date)
+                return d;
+        }
+        else
+            date = d;
 
         if (format == null || format == "d") {
             format = Culture.dateFormat;

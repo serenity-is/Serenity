@@ -18,6 +18,12 @@ namespace Serenity
             return null;
         }
 
+        [InlineCode("Q.formatDate({date}, {format})")]
+        public static string FormatDate(string date, string format = null)
+        {
+            return null;
+        }
+
         [InlineCode("Q.formatISODateTimeUTC({date})")]
         public static string FormatISODateTimeUTC(JsDate date)
         {

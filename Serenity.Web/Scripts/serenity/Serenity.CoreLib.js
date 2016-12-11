@@ -501,10 +501,27 @@ var Q;
 /// <reference path="Q.Number.ts" />
 var Q;
 (function (Q) {
-    function formatDate(date, format) {
-        if (!date) {
+    function formatDate(d, format) {
+        if (!d) {
             return '';
         }
+        var date;
+        if (typeof d == "string") {
+            if (d.length >= 10 && d.charAt(4) === '-' && d.charAt(7) === '-' &&
+                (d.length === 10 || (d.length > 10 && d.charAt(10) === 'T'))) {
+                date = Q.parseISODateTime(d);
+            }
+            else {
+                var z = Q.parseDate(d);
+                if (z === false)
+                    return d;
+                date = z;
+            }
+            if (!date)
+                return d;
+        }
+        else
+            date = d;
         if (format == null || format == "d") {
             format = Q.Culture.dateFormat;
         }

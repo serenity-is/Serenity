@@ -47,12 +47,12 @@ namespace Serenity
                 if (!string.IsNullOrEmpty(MinValue) &&
                     String.Compare(value, MinValue) < 0)
                     return String.Format(Q.Text("Validation.MinDate"),
-                        Q.FormatDate(Q.ParseISODateTime(MinValue)));
+                        Q.FormatDate(MinValue));
 
                 if (!string.IsNullOrEmpty(MaxValue) &&
                     String.Compare(value, MaxValue) >= 0)
                     return String.Format(Q.Text("Validation.MaxDate"),
-                        Q.FormatDate(Q.ParseISODateTime(MaxValue)));
+                        Q.FormatDate(MaxValue));
 
                 return null;
             });
@@ -230,7 +230,7 @@ namespace Serenity
                 if (value != null && value.Length == 0)
                     return null;
 
-                return Q.FormatDate(Q.Externals.ParseDate(value), "yyyy-MM-dd");
+                return Q.FormatDate(value, "yyyy-MM-dd");
             }
             set
             {
@@ -239,7 +239,7 @@ namespace Serenity
                 else if (value.ToLower() == "today" || value.ToLower() == "now")
                     this.element.Value(Q.FormatDate(JsDate.Today));
                 else
-                    this.element.Value(Q.FormatDate(Q.Externals.ParseISODateTime(value)));
+                    this.element.Value(Q.FormatDate(value));
             }
         }
 

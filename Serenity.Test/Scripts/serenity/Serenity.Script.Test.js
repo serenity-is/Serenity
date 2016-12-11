@@ -544,6 +544,46 @@
 					Q.Culture.dateTimeFormat = backupDateTimeFormat;
 				}
 			}));
+			test('FormatDateWorksWithISOString', ss.mkdel(this, function() {
+				var backupDec = Q.Culture.dateSeparator;
+				var backupDateFormat = Q.Culture.dateFormat;
+				var backupDateTimeFormat = Q.Culture.dateTimeFormat;
+				try {
+					Q.Culture.dateSeparator = '/';
+					Q.Culture.dateFormat = 'dd/MM/yyyy';
+					Q.Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
+					deepEqual(Q.formatDate('2029-01-02', null), '02/01/2029', "'/': date only, empty format");
+					deepEqual(Q.formatDate('2029-01-02T16:35:24', null), '02/01/2029', "'/': date with time, empty format");
+					deepEqual(Q.formatDate('2029-01-02T16:35:24', 'g'), '02/01/2029 16:35', "'/': date with time, g format");
+					Q.Culture.dateSeparator = '.';
+					deepEqual(Q.formatDate('2029-01-02', null), '02.01.2029', "'.': date only, empty format");
+					deepEqual(Q.formatDate('2029-01-02T16:35:24', null), '02.01.2029', "'.': date with time, empty format");
+					deepEqual(Q.formatDate('2029-01-02T16:35:24', 'g'), '02.01.2029 16:35', "'.': date with time, g format");
+				}
+				finally {
+					Q.Culture.decimalSeparator = backupDec;
+					Q.Culture.dateFormat = backupDateFormat;
+					Q.Culture.dateTimeFormat = backupDateTimeFormat;
+				}
+			}));
+			test('FormatDateWorksWithDateString', ss.mkdel(this, function() {
+				var backupDec = Q.Culture.dateSeparator;
+				var backupDateFormat = Q.Culture.dateFormat;
+				var backupDateTimeFormat = Q.Culture.dateTimeFormat;
+				try {
+					Q.Culture.dateSeparator = '/';
+					Q.Culture.dateFormat = 'dd/MM/yyyy';
+					Q.Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
+					deepEqual(Q.formatDate('2/1/2029', null), '02/01/2029', "'/': date only, empty format");
+					Q.Culture.dateSeparator = '.';
+					deepEqual(Q.formatDate('2/1/2029', null), '02.01.2029', "'.': date only, empty format");
+				}
+				finally {
+					Q.Culture.decimalSeparator = backupDec;
+					Q.Culture.dateFormat = backupDateFormat;
+					Q.Culture.dateTimeFormat = backupDateTimeFormat;
+				}
+			}));
 		}
 	});
 	ss.initClass($Serenity_Test_QDialogTests, $asm, {

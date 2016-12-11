@@ -51,5 +51,59 @@ namespace Serenity.Test
                 Q.Culture.DateTimeFormat = backupDateTimeFormat;
             }
         }
+
+        [Test]
+        public void FormatDateWorksWithISOString()
+        {
+            var backupDec = Q.Culture.DateSeparator;
+            var backupDateFormat = Q.Culture.DateFormat;
+            var backupDateTimeFormat = Q.Culture.DateTimeFormat;
+            try
+            {
+                Q.Culture.DateSeparator = "/";
+                Q.Culture.DateFormat = "dd/MM/yyyy";
+                Q.Culture.DateTimeFormat = "dd/MM/yyyy HH:mm:ss";
+
+                Assert.AreEqual(Q.FormatDate("2029-01-02"), "02/01/2029", "'/': date only, empty format");
+                Assert.AreEqual(Q.FormatDate("2029-01-02T16:35:24"), "02/01/2029", "'/': date with time, empty format");
+                Assert.AreEqual(Q.FormatDate("2029-01-02T16:35:24", "g"), "02/01/2029 16:35", "'/': date with time, g format");
+
+                Q.Culture.DateSeparator = ".";
+                Assert.AreEqual(Q.FormatDate("2029-01-02"), "02.01.2029", "'.': date only, empty format");
+                Assert.AreEqual(Q.FormatDate("2029-01-02T16:35:24"), "02.01.2029", "'.': date with time, empty format");
+                Assert.AreEqual(Q.FormatDate("2029-01-02T16:35:24", "g"), "02.01.2029 16:35", "'.': date with time, g format");
+            }
+            finally
+            {
+                Q.Culture.DecimalSeparator = backupDec;
+                Q.Culture.DateFormat = backupDateFormat;
+                Q.Culture.DateTimeFormat = backupDateTimeFormat;
+            }
+        }
+
+        [Test]
+        public void FormatDateWorksWithDateString()
+        {
+            var backupDec = Q.Culture.DateSeparator;
+            var backupDateFormat = Q.Culture.DateFormat;
+            var backupDateTimeFormat = Q.Culture.DateTimeFormat;
+            try
+            {
+                Q.Culture.DateSeparator = "/";
+                Q.Culture.DateFormat = "dd/MM/yyyy";
+                Q.Culture.DateTimeFormat = "dd/MM/yyyy HH:mm:ss";
+
+                Assert.AreEqual(Q.FormatDate("2/1/2029"), "02/01/2029", "'/': date only, empty format");
+
+                Q.Culture.DateSeparator = ".";
+                Assert.AreEqual(Q.FormatDate("2/1/2029"), "02.01.2029", "'.': date only, empty format");
+            }
+            finally
+            {
+                Q.Culture.DecimalSeparator = backupDec;
+                Q.Culture.DateFormat = backupDateFormat;
+                Q.Culture.DateTimeFormat = backupDateTimeFormat;
+            }
+        }
     }
 }
