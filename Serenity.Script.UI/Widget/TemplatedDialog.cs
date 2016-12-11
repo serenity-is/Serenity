@@ -123,18 +123,6 @@ namespace Serenity
         }
     }
 
-    [Imported, Serializable]
-    internal class ResponsiveData
-    {
-        public bool draggable;
-        public bool resizable;
-        public int width;
-        public int height;
-        public int left;
-        public int top;
-        public int contentHeight;
-    }
-
     [Imported, ScriptName("TemplatedDialog")]
     public abstract class TemplatedDialog : TemplatedDialog<object>
     {

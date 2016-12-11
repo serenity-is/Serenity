@@ -84,6 +84,33 @@ interface Select2Options {
     loadMorePadding?: number;
     nextSearchTerm?: (p1: any, p2: string) => string;
 }
+declare namespace ss {
+    interface AssemblyReg {
+        name: string;
+        __types: ClassReg[];
+    }
+    interface ClassReg {
+        __register: boolean;
+        __class: boolean;
+        __assembly: AssemblyReg;
+        __interfaces: any[];
+    }
+    let __assemblies: {
+        [name: string]: AssemblyReg;
+    };
+    class Exception {
+        constructor(msg: string);
+    }
+    class NotSupportedException extends Exception {
+        constructor(msg: string);
+    }
+}
+declare namespace System.ComponentModel {
+    class DisplayNameAttribute {
+        constructor(displayName: string);
+        displayName: string;
+    }
+}
 interface Toastr {
     getContainer(options?: ToastrOptions, create?: boolean): JQuery;
 }
@@ -176,33 +203,6 @@ declare namespace Q {
     type Grouping<TItem> = {
         [key: string]: TItem[];
     };
-}
-declare namespace ss {
-    interface AssemblyReg {
-        name: string;
-        __types: ClassReg[];
-    }
-    interface ClassReg {
-        __register: boolean;
-        __class: boolean;
-        __assembly: AssemblyReg;
-        __interfaces: any[];
-    }
-    let __assemblies: {
-        [name: string]: AssemblyReg;
-    };
-    class Exception {
-        constructor(msg: string);
-    }
-    class NotSupportedException extends Exception {
-        constructor(msg: string);
-    }
-}
-declare namespace System.ComponentModel {
-    class DisplayNameAttribute {
-        constructor(displayName: string);
-        displayName: string;
-    }
 }
 declare namespace Q {
     function coalesce(a: any, b: any): any;

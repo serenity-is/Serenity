@@ -835,7 +835,7 @@ var Q;
                 if (value instanceof LT) {
                     var lt = value;
                     var key = prefix + member;
-                    LT.$table[key] = lt.$key;
+                    LT.$table[key] = lt.key;
                     type[member] = new LT(key);
                 }
             }
