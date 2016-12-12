@@ -1,3 +1,8 @@
+## 2.6.10 (2016-12-12)
+
+Bugfixes:
+  - fix date required even if not
+  
 ## 2.6.9 (2016-12-12)
 
 Bugfixes:
