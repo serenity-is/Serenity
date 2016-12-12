@@ -11,15 +11,15 @@
             return x + y;
     };
 
-    var fields = (IEnumerable<EntityCodeField>)Model.Fields;
-    var joins = (IEnumerable<EntityCodeJoin>)Model.Joins;
+    var fields = (IEnumerable<EntityField>)Model.Fields;
+    var joins = (IEnumerable<EntityJoin>)Model.Joins;
     var fieldList = String.Join(", ", fields.Select(x => "'" + x.Ident + "'").Concat(joins.SelectMany(x => x.Fields.Select(y => "'" + jf(x.Name, y.Ident) + "'"))));
 }
 namespace @(Model.RootNamespace)@(dotModule) {
-    export interface @(Model.RowClassName) {@foreach (var x in Model.Fields) {
+    export interface @(Model.RowClassName) {@foreach (EntityField x in Model.Fields) {
 <text>
         @(x.Ident)?: @(x.TSType);</text>}
-@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+@foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 <text>
         @(jf(x.Name, y.Ident))?: @(y.TSType);</text>}}
 
@@ -31,10 +31,10 @@ namespace @(Model.RootNamespace)@(dotModule) {
 
         export const localTextPrefix = '@moduleDot@Model.ClassName';
 
-        export namespace Fields {@foreach (var x in Model.Fields) {
+        export namespace Fields {@foreach (EntityField x in Model.Fields) {
 <text>
             export declare const @x.Ident;</text>}
-@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+@foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 <text>
             export declare const @(jf(x.Name, y.Ident)): string;</text>}}
 

@@ -16,7 +16,7 @@ namespace @(Model.RootNamespace)@(dotModule).Columns
     [ColumnsScript("@(moduleDot)@(Model.ClassName)")]
     [BasedOnRow(typeof(Entities.@(Model.RowClassName)))]
     public class @(Model.ClassName)Columns
-    {@foreach (EntityCodeField x in Model.Fields) {
+    {@foreach (EntityField x in Model.Fields) {
         var attrs = new List<string>();
         if (x.Ident == Model.IdField) {
             attrs.Add("EditLink");

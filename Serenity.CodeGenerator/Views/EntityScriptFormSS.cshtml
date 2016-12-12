@@ -3,7 +3,7 @@
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
 
-    Func<EntityCodeField, string> gt = (f) => {
+    Func<EntityField, string> gt = (f) => {
         if (f.FieldType == "String") {
             return "StringEditor";
         }
@@ -40,7 +40,7 @@ namespace @(Model.RootNamespace)@(dotModule)
 
         public @(Model.ClassName)Form(string idPrefix) : base(idPrefix) {}
 
-@foreach (var x in Model.Fields)
+@foreach (EntityField x in Model.Fields)
     {
         if (x.Ident != Model.Identity)
         {<text>

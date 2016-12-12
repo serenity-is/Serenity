@@ -86,7 +86,7 @@ WriteLiteral("\";\r\n\r\n        public ");
 WriteLiteral("Form(string idPrefix) : base(idPrefix) {}\r\n\r\n");
 
 
- foreach (var x in Model.Fields)
+ foreach (EntityField x in Model.Fields)
     {
         if (x.Ident != Model.Identity)
         {

@@ -16,7 +16,7 @@ namespace @(Model.RootNamespace)@(dotModule).Forms
     [FormScript("@(moduleDot)@(Model.ClassName)")]
     [BasedOnRow(typeof(Entities.@(Model.RowClassName)))]
     public class @(Model.ClassName)Form
-    {@foreach (EntityCodeField x in Model.Fields)
+    {@foreach (EntityField x in Model.Fields)
     {
         if (x.Ident != Model.IdField)
         {<text>

@@ -88,7 +88,7 @@ WriteLiteral("\';\r\n    }\r\n\r\n    export interface ");
 
                                        WriteLiteral("Form {");
 
-                                              foreach (var x in Model.Fields)
+                                              foreach (EntityField x in Model.Fields)
     {
         if (x.Ident != Model.Identity)
         {

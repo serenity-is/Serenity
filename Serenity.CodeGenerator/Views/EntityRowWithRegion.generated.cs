@@ -290,9 +290,9 @@ WriteLiteral("\n        ");
 WriteLiteral("\n\n    #region Foreign Fields\n");
 
 
-     foreach (var x in Model.Joins)
+     foreach (EntityJoin x in Model.Joins)
             {
-                foreach (var y in x.Fields)
+                foreach (EntityField y in x.Fields)
                 {
 
 WriteLiteral("            ");
@@ -310,25 +310,25 @@ WriteLiteral("\"), Expression(\"");
 WriteLiteral("\")]\n                public ");
 
 
-                  Write(y.Type);
+                  Write(y.DataType);
 
 
-                          Write(y.IsValueType ? "?" : "");
+                              Write(y.IsValueType ? "?" : "");
 
 WriteLiteral(" ");
 
 
-                                                      Write(jf(x.Name, y.Ident));
+                                                          Write(jf(x.Name, y.Ident));
 
 WriteLiteral(" { get { return Fields.");
 
 
-                                                                                                   Write(jf(x.Name, y.Ident));
+                                                                                                       Write(jf(x.Name, y.Ident));
 
 WriteLiteral("[this]; } set { Fields.");
 
 
-                                                                                                                                                Write(jf(x.Name, y.Ident));
+                                                                                                                                                    Write(jf(x.Name, y.Ident));
 
 WriteLiteral("[this] = value; } }\n                public partial class RowFields { public ");
 

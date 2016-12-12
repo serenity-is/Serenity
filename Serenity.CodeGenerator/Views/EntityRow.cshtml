@@ -27,7 +27,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     [ReadPermission("@Model.Permission")]
     [ModifyPermission("@Model.Permission")]
     public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
-    {@foreach (EntityCodeField x in Model.Fields) {
+    {@foreach (EntityField x in Model.Fields) {
     var attrs = new List<string>();
     attrs.Add("DisplayName(\"" + x.Title + "\")");
 
@@ -65,10 +65,10 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
             set { Fields.@(x.Ident)[this] = value; }
         }
 </text>}
-@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+@foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 <text>
         [DisplayName("@y.Title"), Expression("@("j" + x.Name + ".[" + y.Name + "]")")]
-        public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident))
+        public @y.DataType@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident))
         {
             get { return Fields.@(jf(x.Name, y.Ident))[this]; }
             set { Fields.@(jf(x.Name, y.Ident))[this] = value; }
@@ -95,11 +95,11 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
         }
 
         public class RowFields : @(Model.FieldsBaseClass)
-        {@foreach (var x in Model.Fields) {
+        {@foreach (EntityField x in Model.Fields) {
 <text>
             public @(x.FieldType)Field @(x.Ident);</text>}
-@foreach (var x in Model.Joins) {<text>
-</text>foreach (var y in x.Fields) {
+@foreach (EntityJoin x in Model.Joins) {<text>
+</text>foreach (EntityField y in x.Fields) {
 <text>
             public @(y.FieldType)Field @(jf(x.Name, y.Ident));</text>}}
 

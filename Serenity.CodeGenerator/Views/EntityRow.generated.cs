@@ -181,7 +181,7 @@ WriteLiteral("[this] = value; }\r\n        }\r\n");
        }
 
 
- foreach (var x in Model.Joins){foreach (var y in x.Fields){
+ foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 
 WriteLiteral("\r\n        [DisplayName(\"");
 
@@ -196,15 +196,15 @@ WriteLiteral("\"), Expression(\"");
 WriteLiteral("\")]\r\n        public ");
 
 
-          Write(y.Type);
+          Write(y.DataType);
 
 
-                  Write(y.IsValueType ? "?" : "");
+                      Write(y.IsValueType ? "?" : "");
 
 WriteLiteral(" ");
 
 
-                                              Write(jf(x.Name, y.Ident));
+                                                  Write(jf(x.Name, y.Ident));
 
 WriteLiteral("\r\n        {\r\n            get { return Fields.");
 
@@ -257,7 +257,7 @@ WriteLiteral("()\r\n            : base(Fields)\r\n        {\r\n        }\r\n\r\n
 
                                                          WriteLiteral("\r\n        {");
 
-          foreach (var x in Model.Fields) {
+          foreach (EntityField x in Model.Fields) {
 
 WriteLiteral("\r\n            public ");
 
@@ -275,11 +275,11 @@ WriteLiteral(";");
                                                          }
 
 
- foreach (var x in Model.Joins) {
+ foreach (EntityJoin x in Model.Joins) {
 WriteLiteral("\r\n");
 
 
-       foreach (var y in x.Fields) {
+       foreach (EntityField y in x.Fields) {
 
 WriteLiteral("\r\n            public ");
 

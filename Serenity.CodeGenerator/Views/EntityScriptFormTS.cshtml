@@ -3,7 +3,7 @@
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
 
-    Func<EntityCodeField, string> gt = (f) => {
+    Func<EntityField, string> gt = (f) => {
         if (f.FieldType == "String") {
             return "StringEditor";
         }
@@ -23,7 +23,7 @@
             return "StringEditor";
     };
 
-    var fields = (IEnumerable<EntityCodeField>)Model.Fields;
+    var fields = (IEnumerable<EntityField>)Model.Fields;
     var fieldList = String.Join(", ", fields.Where(x => x.Name != Model.Identity)
         .Select(x => "['" + x.Ident + "', () => Serenity." + gt(x) + "]"));
 
@@ -34,7 +34,7 @@ namespace @(Model.RootNamespace)@(dotModule) {
         static formKey = '@(moduleDot)@(Model.ClassName)';
     }
 
-    export interface @(Model.ClassName)Form {@foreach (var x in Model.Fields)
+    export interface @(Model.ClassName)Form {@foreach (EntityField x in Model.Fields)
     {
         if (x.Ident != Model.Identity)
         {<text>

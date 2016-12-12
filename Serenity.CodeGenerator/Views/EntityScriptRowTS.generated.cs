@@ -62,7 +62,7 @@ WriteLiteral(" {\r\n    export interface ");
 
                                           WriteLiteral(" {");
 
-                                             foreach (var x in Model.Fields) {
+                                             foreach (EntityField x in Model.Fields) {
 
 WriteLiteral("\r\n        ");
 
@@ -80,7 +80,7 @@ WriteLiteral(";");
                                         }
 
 
- foreach (var x in Model.Joins){foreach (var y in x.Fields){
+ foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 
 WriteLiteral("\r\n        ");
 
@@ -138,7 +138,7 @@ WriteLiteral("\r\n        export const localTextPrefix = \'");
 
                                                                   WriteLiteral("\';\r\n\r\n        export namespace Fields {");
 
-                                  foreach (var x in Model.Fields) {
+                                  foreach (EntityField x in Model.Fields) {
 
 WriteLiteral("\r\n            export declare const ");
 
@@ -151,7 +151,7 @@ WriteLiteral(";");
                                                  }
 
 
- foreach (var x in Model.Joins){foreach (var y in x.Fields){
+ foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 
 WriteLiteral("\r\n            export declare const ");
 

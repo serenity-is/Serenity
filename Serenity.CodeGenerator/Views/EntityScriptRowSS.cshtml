@@ -11,7 +11,7 @@
             return x + y;
     };
 
-    Func<EntityCodeField, string> gt = (x) =>
+    Func<EntityField, string> gt = (x) =>
     {
         return (x.FieldType == "Stream" || x.FieldType == "ByteArray" ? "byte[]" : (x.FieldType == "DateTime" ? "String" : (x.FieldType + (x.IsValueType ? "?" : ""))));
     };
@@ -34,20 +34,20 @@ namespace @(Model.RootNamespace)@(dotModule)
         [InlineConstant] public const string NameProperty = "@(Model.NameField)";</text>}
 
         [InlineConstant] public const string LocalTextPrefix = "@moduleDot@Model.ClassName";
-@foreach (var x in Model.Fields) {
+@foreach (EntityField x in Model.Fields) {
 <text>
         public @gt(x) @x.Ident { get; set; }</text>}
-@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+@foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 <text>
         public @gt(y) @(jf(x.Name, y.Ident)) { get; set; }</text>}}
 
 
         [Imported, PreserveMemberCase]
         public static class Fields
-        {@foreach (var x in Model.Fields) {
+        {@foreach (EntityField x in Model.Fields) {
 <text>
             [InlineConstant] public const string @x.Ident = "@(x.Ident)";</text>}
-@foreach (var x in Model.Joins){foreach (var y in x.Fields){
+@foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 <text>
             [InlineConstant] public const string @(jf(x.Name, y.Ident)) = "@(jf(x.Name, y.Ident))";</text>}}
 

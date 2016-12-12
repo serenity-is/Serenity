@@ -35,7 +35,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     {    <text>[LookupScript("@Model.Module.@Model.RowClassName")]</text>}
 
     public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
-    {@foreach (EntityCodeField x in Model.Fields)
+    {@foreach (EntityField x in Model.Fields)
                 {
                     var attrs = new List<string>();
                     var attrsLookupEditorForm = new List<string>();
@@ -95,13 +95,13 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 
 
     #region Foreign Fields
-    @foreach (var x in Model.Joins)
+    @foreach (EntityJoin x in Model.Joins)
             {
-                foreach (var y in x.Fields)
+                foreach (EntityField y in x.Fields)
                 {
             <text>
                 [DisplayName("@y.Title"), Expression("@("j" + x.Name + ".[" + y.Name + "]")")]
-                public @y.Type@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident)) { get { return Fields.@(jf(x.Name, y.Ident))[this]; } set { Fields.@(jf(x.Name, y.Ident))[this] = value; } }
+                public @y.DataType@(y.IsValueType ? "?" : "") @(jf(x.Name, y.Ident)) { get { return Fields.@(jf(x.Name, y.Ident))[this]; } set { Fields.@(jf(x.Name, y.Ident))[this] = value; } }
                 public partial class RowFields { public @(y.FieldType)Field @(jf(x.Name, y.Ident)); }
 
             </text>}

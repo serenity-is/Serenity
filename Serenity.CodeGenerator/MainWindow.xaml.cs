@@ -607,16 +607,6 @@ namespace Serenity.CodeGenerator
                         new EntityCodeGenerator(rowModel, config).Run();
                     }
 
-                    if (config.GenerateTSCode ||
-                        config.GenerateTSTypings)
-                    {
-                        var siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
-                        var siteWebPath = Path.GetDirectoryName(siteWebProj);
-                        CodeFileHelper.ExecuteTSC(Path.Combine(siteWebPath, @"Scripts\"), "");
-                    }
-
-                    MessageBox.Show("Code files for the selected table is generated. Please REBUILD SOLUTION before running application, otherwise you may have script errors!");
-                    GenerateCodeButton.IsEnabled = false;
                 }
                 catch (Exception ex)
                 {
@@ -624,7 +614,16 @@ namespace Serenity.CodeGenerator
                 }
             }
 
+            if (config.GenerateTSCode ||
+                config.GenerateTSTypings)
+            {
+                var siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
+                var siteWebPath = Path.GetDirectoryName(siteWebProj);
+                CodeFileHelper.ExecuteTSC(Path.Combine(siteWebPath, @"Scripts\"), "");
+            }
 
+            MessageBox.Show("Code files for the selected table is generated. Please REBUILD SOLUTION before running application, otherwise you may have script errors!");
+            GenerateCodeButton.IsEnabled = false;
         }
 
         private void btnKDiff3PathBrowse_Click(object sender, RoutedEventArgs e)

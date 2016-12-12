@@ -11,8 +11,8 @@
             return x + y;
     };
 
-    var fields = (IEnumerable<EntityCodeField>)Model.Fields;
-    var joins = (IEnumerable<EntityCodeJoin>)Model.Joins;
+    var fields = (IEnumerable<EntityField>)Model.Fields;
+    var joins = (IEnumerable<EntityJoin>)Model.Joins;
     var fieldList = String.Join(", ", fields.Select(x => "'" + x.Ident + "'").Concat(joins.SelectMany(x => x.Fields.Select(y => "'" + jf(x.Name, y.Ident) + "'"))));
 }
 
