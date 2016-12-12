@@ -1,3 +1,8 @@
+## 2.6.9 (2016-12-12)
+
+Bugfixes:
+  - fix code generator views
+
 ## 2.6.8 (2016-12-11)
 
 Features:
