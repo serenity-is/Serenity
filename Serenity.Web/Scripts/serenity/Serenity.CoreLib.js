@@ -4719,8 +4719,9 @@ var Q;
         oldShowLabel = p.showLabel;
         p.showLabel = validateShowLabel;
         $.validator.addMethod("dateQ", function (value, element) {
-            if (this.optional(element))
-                return false;
+            var o = this.optional(element);
+            if (o)
+                return o;
             var d = Q.parseDate(value);
             if (!d)
                 return false;
