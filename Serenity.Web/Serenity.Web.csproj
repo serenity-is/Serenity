@@ -527,8 +527,6 @@
     <Content Include="Scripts\serenity\texts\serenity.texts.pt-BR.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.ru.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.de.json" />
-    <Content Include="Scripts\serenity\Serenity.Externals.Slick.js" />
-    <Content Include="Scripts\serenity\Serenity.Externals.js" />
     <Content Include="Scripts\serenity\texts\serenity.texts.zh-CN.json" />
     <Content Include="Scripts\serenity\texts\serenity.texts.pt.json" />
     <None Include="Assets\Scripts\SlickGrid\README.md" />
