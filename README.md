@@ -21,6 +21,9 @@ See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenit
 - [Chinese Simplified (thanks @WuShenghui)](https://www.gitbook.com/book/volkanceylan/serenity-zh-cn)
 - [Türkçe Başlangıç Kılavuzu (thanks @ademc)](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)
 
+**Serenity Blog**
+http://serenity.is/blog/
+
 ## Quick Start with Serene
 
 The easiest and fastest way to get your hands dirty on Serenity is by using a sample application template (Serene) from Visual Studio Gallery at https://visualstudiogallery.msdn.microsoft.com/559ec6fc-feef-4077-b6d5-5a99408a6681
