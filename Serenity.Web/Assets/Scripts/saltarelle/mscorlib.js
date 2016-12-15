@@ -2911,7 +2911,7 @@ var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 		_setOrAdd: function(key, value, add) {
 			var hash = this.comparer.getObjectHashCode(key);
 			var entry = { key: key, value: value };
-			if (this.buckets.hasOwnProperty(hash)) {
+			if (this.buckets.hasOwnProperty(hash.toString())) {
 				var array = this.buckets[hash];
 				for (var i = 0; i < array.length; i++) {
 					if (this.comparer.areEqual(array[i].key, key)) {
@@ -2938,7 +2938,7 @@ var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 
 		_get: function(key) {
 			var hash = this.comparer.getObjectHashCode(key);
-			if (this.buckets.hasOwnProperty(hash)) {
+			if (this.buckets.hasOwnProperty(hash.toString())) {
 				var array = this.buckets[hash];
 				for (var i = 0; i < array.length; i++) {
 					var entry = array[i];
@@ -2970,7 +2970,7 @@ var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 
 		containsKey: function(key) {
 			var hash = this.comparer.getObjectHashCode(key);
-			if (!this.buckets.hasOwnProperty(hash))
+			if (!this.buckets.hasOwnProperty(hash.toString()))
 				return false;
 
 			var array = this.buckets[hash];
@@ -2988,7 +2988,7 @@ var ss_Dictionary$2 = function Dictionary$2$(TKey, TValue) {
 
 		remove: function(key) {
 			var hash = this.comparer.getObjectHashCode(key);
-			if (!this.buckets.hasOwnProperty(hash))
+			if (!this.buckets.hasOwnProperty(hash.toString()))
 				return false;
 
 			var array = this.buckets[hash];
