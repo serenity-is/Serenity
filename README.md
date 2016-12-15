@@ -21,8 +21,8 @@ See [Serenity Developer Guide](https://www.gitbook.com/book/volkanceylan/serenit
 - [Chinese Simplified (thanks @WuShenghui)](https://www.gitbook.com/book/volkanceylan/serenity-zh-cn)
 - [Türkçe Başlangıç Kılavuzu (thanks @ademc)](https://www.gitbook.com/book/ademc/serenity-gelistirici-dokumani)
 
-**Serenity Blog**
-http://serenity.is/blog/
+**Serenity Blog:**
+- http://serenity.is/blog/
 
 ## Quick Start with Serene
 
