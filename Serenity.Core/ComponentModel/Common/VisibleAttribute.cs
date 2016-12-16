@@ -2,6 +2,9 @@
 
 namespace Serenity.ComponentModel
 {
+    /// <summary>
+    /// Controls visibility of a column / form field.
+    /// </summary>
     public class VisibleAttribute : Attribute
     {
         public VisibleAttribute(bool value = true)
