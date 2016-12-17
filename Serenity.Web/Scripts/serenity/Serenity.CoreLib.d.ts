@@ -1729,6 +1729,7 @@ declare namespace Serenity {
         editorParams?: any;
         category?: string;
         cssClass?: string;
+        headerCssClass?: string;
         maxLength?: number;
         required?: boolean;
         insertable?: boolean;

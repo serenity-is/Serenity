@@ -25,6 +25,8 @@ namespace Serenity.ComponentModel
         public bool? Collapsed { get; set; }
         [JsonProperty("cssClass")]
         public string CssClass { get; set; }
+        [JsonProperty("headerCssClass")]
+        public string HeaderCssClass { get; set; }
         [JsonProperty("maxLength")]
         public int? MaxLength { get; set; }
         [JsonProperty("required")]

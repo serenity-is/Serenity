@@ -17,6 +17,7 @@ namespace Serenity
         public bool? Collapsible { get; set; }
         public bool? Collapsed { get; set; }
         public string CssClass { get; set; }
+        public string HeaderCssClass { get; set; }
         public int? MaxLength { get; set; }
         public bool? Required { get; set; }
         public bool? Insertable { get; set; }

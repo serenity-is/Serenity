@@ -104,10 +104,10 @@
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.ReadPermission.cs" />
     <Compile Include="PropertyGrid\IPropertyProcessor.cs" />
     <Compile Include="PropertyGrid\IPropertySource.cs" />
-    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Alignment.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.CssClass.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Category.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.cs" />
-    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.CssClass.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Alignment.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.DefaultValue.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Editing.cs" />
     <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.EditLink.cs" />
