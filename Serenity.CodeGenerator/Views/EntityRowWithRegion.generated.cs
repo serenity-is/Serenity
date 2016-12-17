@@ -54,10 +54,9 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(".Entities\n{\n    using Newtonsoft.Json;\n    using Serenity;\n    using Serenity.Com" +
-"ponentModel;\n    using Serenity.Data;\n    using Serenity.Data.Mapping;\n    using" +
-" System;\n    using System.ComponentModel;\n    using System.IO;\n\n    [ConnectionK" +
-"ey(\"");
+WriteLiteral(".Entities\n{\n    using Serenity;\n    using Serenity.ComponentModel;\n    using Sere" +
+"nity.Data;\n    using Serenity.Data.Mapping;\n    using System;\n    using System.C" +
+"omponentModel;\n    using System.IO;\n\n    [ConnectionKey(\"");
 
 
                Write(Model.ConnectionKey);
