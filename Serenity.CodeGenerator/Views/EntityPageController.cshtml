@@ -14,9 +14,9 @@ namespace @(Model.RootNamespace)@(dotModule).Pages
     using System.Web.Mvc;
 
     [RoutePrefix("@(modulePrefix)@(Model.ClassName)"), Route("{action=index}")]
+    [PageAuthorize(typeof(Entities.@(Model.RowClassName)))]
     public class @(Model.ClassName)Controller : Controller
     {
-        [PageAuthorize("@(Model.Permission)")]
         public ActionResult Index()
         {
             return View("~/Modules/@(modulePath)/@(Model.ClassName)/@(Model.ClassName)Index.cshtml");

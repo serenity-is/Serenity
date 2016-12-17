@@ -73,18 +73,18 @@ WriteLiteral(".Pages\r\n{\r\n    using Serenity;\r\n    using Serenity.Web;\r\n 
 
                              Write(Model.ClassName);
 
-WriteLiteral("\"), Route(\"{action=index}\")]\r\n    public class ");
+WriteLiteral("\"), Route(\"{action=index}\")]\r\n    [PageAuthorize(typeof(Entities.");
+
+
+                               Write(Model.RowClassName);
+
+WriteLiteral("))]\r\n    public class ");
 
 
              Write(Model.ClassName);
 
-WriteLiteral("Controller : Controller\r\n    {\r\n        [PageAuthorize(\"");
-
-
-                    Write(Model.Permission);
-
-WriteLiteral("\")]\r\n        public ActionResult Index()\r\n        {\r\n            return View(\"~/M" +
-"odules/");
+WriteLiteral("Controller : Controller\r\n    {\r\n        public ActionResult Index()\r\n        {\r\n " +
+"           return View(\"~/Modules/");
 
 
                                Write(modulePath);
