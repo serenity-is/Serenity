@@ -60,36 +60,27 @@ WriteLiteral(";\r\n\r\n    [RoutePrefix(\"Services/");
 
                                       Write(Model.ClassName);
 
-WriteLiteral("\"), Route(\"{action}\")]\r\n    [ConnectionKey(\"");
-
-
-               Write(Model.ConnectionKey);
-
-WriteLiteral("\"), ServiceAuthorize(\"");
-
-
-                                                          Write(Model.Permission);
-
-WriteLiteral("\")]\r\n    public class ");
+WriteLiteral("\"), Route(\"{action}\")]\r\n    [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeo" +
+"f(MyRow))]\r\n    public class ");
 
 
              Write(Model.ClassName);
 
 WriteLiteral(@"Controller : ServiceEndpoint
     {
-        [HttpPost]
+        [HttpPost, AuthorizeCreate(typeof(MyRow))]
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
             return new MyRepository().Create(uow, request);
         }
 
-        [HttpPost]
+        [HttpPost, AuthorizeUpdate(typeof(MyRow))]
         public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
             return new MyRepository().Update(uow, request);
         }
  
-        [HttpPost]
+        [HttpPost, AuthorizeDelete(typeof(MyRow))]
         public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
         {
             return new MyRepository().Delete(uow, request);

@@ -12,22 +12,22 @@ namespace @(Model.RootNamespace)@(dotModule).Endpoints
     using MyRow = Entities.@(Model.RowClassName);
 
     [RoutePrefix("Services/@(modulePrefix)@(Model.ClassName)"), Route("{action}")]
-    [ConnectionKey("@Model.ConnectionKey"), ServiceAuthorize("@(Model.Permission)")]
+    [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
     public class @(Model.ClassName)Controller : ServiceEndpoint
     {
-        [HttpPost]
+        [HttpPost, AuthorizeCreate(typeof(MyRow))]
         public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
             return new MyRepository().Create(uow, request);
         }
 
-        [HttpPost]
+        [HttpPost, AuthorizeUpdate(typeof(MyRow))]
         public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request)
         {
             return new MyRepository().Update(uow, request);
         }
  
-        [HttpPost]
+        [HttpPost, AuthorizeDelete(typeof(MyRow))]
         public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request)
         {
             return new MyRepository().Delete(uow, request);
