@@ -5,11 +5,11 @@ namespace Serenity.PropertyGrid
 {
     public partial class BasicPropertyProcessor : PropertyProcessor
     {
-        private void SetCssClass(IPropertySource source, PropertyItem item)
+        private void SetAlignment(IPropertySource source, PropertyItem item)
         {
-            var attr = source.GetAttribute<CssClassAttribute>();
+            var attr = source.GetAttribute<AlignmentAttribute>();
             if (attr != null)
-                item.CssClass = attr.CssClass;
+                item.Alignment = attr.Value;
         }
     }
 }
