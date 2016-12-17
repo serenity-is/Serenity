@@ -67,7 +67,7 @@ namespace Serenity.Web
                 this.ParentIdField = field.PropertyName ?? field.Name;
             }
 
-            var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>();
+            var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
             if (readPermission != null)
                 this.Permission = readPermission.Permission ?? "?";
 
