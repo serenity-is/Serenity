@@ -18,7 +18,7 @@ namespace Serenity.ComponentModel
     /// <para>If column is an integer, double or decimal it accepts.NET custom numeric format strings like "#,##0.00", "0.#"</para>
     /// </summary>
     /// <remarks>
-    /// public class SomeForm
+    /// public class SomeColumns
     /// {
     ///     [DisplayFormat("d")]
     ///     public DateTime DateWithCultureDMYOrder { get; set; }
