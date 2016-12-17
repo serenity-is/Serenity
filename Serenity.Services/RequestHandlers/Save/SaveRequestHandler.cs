@@ -458,14 +458,15 @@ namespace Serenity.Services
             
             if (IsUpdate) 
             {
-                attr = typeof(TRow).GetCustomAttribute<UpdatePermissionAttribute>(false);
+                attr = typeof(TRow).GetCustomAttribute<UpdatePermissionAttribute>(true);
             }
             else if (IsCreate)
             {
-                attr = typeof(TRow).GetCustomAttribute<InsertPermissionAttribute>(false);
+                attr = typeof(TRow).GetCustomAttribute<InsertPermissionAttribute>(true);
             }
 
-            attr = attr ?? typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false);
+            attr = attr ?? (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
+                typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
             if (attr != null)
                 Authorization.ValidatePermission(attr.Permission ?? "?");

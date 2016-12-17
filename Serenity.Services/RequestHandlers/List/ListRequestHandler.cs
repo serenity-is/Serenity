@@ -436,7 +436,7 @@
 
         protected virtual void ValidatePermissions()
         {
-            var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(false);
+            var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
             if (readAttr != null)
                 Authorization.ValidatePermission(readAttr.Permission ?? "?");
         }
