@@ -1498,29 +1498,6 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
-    function addFullHeightResizeHandler(handler) {
-        $('body').addClass('full-height-page');
-        var layout = function () {
-            var avail;
-            try {
-                avail = parseInt($('.page-content').css('min-height') || '0')
-                    - parseInt($('.page-content').css('padding-top') || '0')
-                    - parseInt($('.page-content').css('padding-bottom') || '0');
-            }
-            catch ($t1) {
-                avail = 100;
-            }
-            handler(avail);
-        };
-        if (window.Metronic) {
-            window.Metronic.addResizeHandler(layout);
-        }
-        else {
-            $(window).resize(layout);
-        }
-        layout();
-    }
-    Q.addFullHeightResizeHandler = addFullHeightResizeHandler;
     function autoFullHeight(element) {
         element.css('height', '100%');
         triggerLayoutOnShow(element);

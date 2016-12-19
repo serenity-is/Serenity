@@ -22,11 +22,6 @@ namespace Serenity
         {
         }
 
-        [InlineCode("Q.addFullHeightResizeHandler({handler})")]
-        public static void AddFullHeightResizeHandler(Action<int> handler)
-        {
-        }
-
         [InlineCode("Q.triggerLayoutOnShow({element})")]
         public static void TriggerLayoutOnShow(jQueryObject element)
         {
