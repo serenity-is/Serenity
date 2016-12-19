@@ -27,8 +27,6 @@
     }
 
     .s-QuickSearchInput {
-        line-height: 23px;
-        height: 28px;
         padding: 0 2px 0 4px;
         border-radius: 0 4px 4px 0;
         background-clip: padding-box;
@@ -41,13 +39,18 @@
             outline: none;
         }
     }
+
+    input.s-QuickSearchInput {
+        line-height: 23px;
+        height: 28px;
+    }
 }
 
 .has-quick-search-fields {
     border-right: none;
 }
 
-.s-QuickSearchBar.has-quick-search-fields .s-QuickSearchInput {
+.s-QuickSearchBar.has-quick-search-fields inp.s-QuickSearchInput {
     border-radius: 0;
 }
 
