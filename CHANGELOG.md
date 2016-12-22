@@ -1,3 +1,17 @@
+## 2.7.0 (2016-12-22)
+
+Features:
+  - ConnectionKeyAttribute can now accept a type, e.g. a row type, to get its value from that source type, instead of explicitly listing the connection key string.
+  - PageAuthorizeAttribute can now accept a source type, e.g. a row type that gets ReadPermission attribute from, instead of hardcoding the permission
+  - ServiceAuthorizeAttribute and its new subclasses, AuthorizeCreateAttribute and AuthorizeUpdateAttribute and AuthorizeDeleteAttribute can now get a source type parameter, e.g. a row type where they'll read relevant permissions from source type, instead of hard coding the permission. Their permission determination algorithms closely matches relevant handlers.
+  - RowLookupScript lookups inheritance chain for ReadPermissionAttribute 
+  - Request handler looks in inheritance chain for permission attributes, and save/delete handlers should also look for readpermissionattribute
+  - added HeaderCssClass attribute
+  
+Bugfixes:
+  - resolved latest Chrome bug with hasOwnProperty method when key is a negative integer, affecting Saltaralle dictionaries when hash is negative (https://bugs.chromium.org/p/chromium/issues/detail?id=673008)
+  - fix quick search height in dialog
+
 ## 2.6.10 (2016-12-12)
 
 Bugfixes:
