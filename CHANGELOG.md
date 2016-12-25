@@ -1,3 +1,12 @@
+## 2.7.1 (2016-12-25)
+
+Features:
+  - remove direct checks on ISqlDialect type and use new ISqlDialect.ServerType and ISqlDialect.NeedsBoolWorkaround properties, which also resolves problems with custom Oracle dialect
+  - OracleDialect like search is now case insensitive by default
+
+Bugfixes:
+  - fix slickgrid mousewheel bug occuring on mac / chrome (thanks @mkoval-ua)
+
 ## 2.7.0 (2016-12-22)
 
 Features:
