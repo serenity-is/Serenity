@@ -344,7 +344,7 @@
 
             value = FixParamType(value) ?? DBNull.Value;
 
-            if (value is Boolean && dialect.GetType() == typeof(OracleDialect))
+            if (value is Boolean && dialect.NeedsBoolWorkaround)
             {
                 // otherwise argument out of range exception!
                 param.Value = (Boolean)value ? 1 : 0;

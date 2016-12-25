@@ -79,6 +79,14 @@ namespace Serenity.Services
             }
         }
 
+        public bool NeedsBoolWorkaround
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public bool NeedsExecuteBlockStatement
         {
             get
@@ -120,6 +128,14 @@ namespace Serenity.Services
         }
 
         public string ScopeIdentityExpression
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public string ServerType
         {
             get
             {

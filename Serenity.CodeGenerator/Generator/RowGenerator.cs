@@ -117,7 +117,7 @@ namespace Serenity.CodeGenerator
             var model = new EntityModel();
             model.Module = module;
 
-            if (connection.GetDialect() is MySqlDialect)
+            if (connection.GetDialect().ServerType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase))
                 model.Schema = null;
             else
                 model.Schema = tableSchema;

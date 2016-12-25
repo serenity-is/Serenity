@@ -22,7 +22,7 @@ namespace Serenity.Data
             }
         }
 
-        public bool CanUseSkipKeyword
+        public virtual bool CanUseSkipKeyword
         {
             get
             {
@@ -30,7 +30,7 @@ namespace Serenity.Data
             }
         }
 
-        public char CloseQuote
+        public virtual char CloseQuote
         {
             get
             {
@@ -38,7 +38,7 @@ namespace Serenity.Data
             }
         }
 
-        public string ConcatOperator
+        public virtual string ConcatOperator
         {
             get
             {
@@ -46,7 +46,7 @@ namespace Serenity.Data
             }
         }
 
-        public string DateFormat
+        public virtual string DateFormat
         {
             get
             {
@@ -54,7 +54,7 @@ namespace Serenity.Data
             }
         }
 
-        public string DateTimeFormat
+        public virtual string DateTimeFormat
         {
             get
             {
@@ -62,7 +62,7 @@ namespace Serenity.Data
             }
         }
 
-        public bool IsLikeCaseSensitive
+        public virtual bool IsLikeCaseSensitive
         {
             get
             {
@@ -70,7 +70,7 @@ namespace Serenity.Data
             }
         }
 
-        public bool MultipleResultsets
+        public virtual bool MultipleResultsets
         {
             get
             {
@@ -78,7 +78,15 @@ namespace Serenity.Data
             }
         }
 
-        public bool NeedsExecuteBlockStatement
+        public virtual bool NeedsBoolWorkaround
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public virtual bool NeedsExecuteBlockStatement
         {
             get
             {
@@ -102,7 +110,7 @@ namespace Serenity.Data
             }
         }
 
-        public char OpenQuote
+        public virtual char OpenQuote
         {
             get
             {
@@ -110,12 +118,12 @@ namespace Serenity.Data
             }
         }
 
-        public string QuoteColumnAlias(string s)
+        public virtual string QuoteColumnAlias(string s)
         {
             return QuoteIdentifier(s);
         }
 
-        public string QuoteIdentifier(string s)
+        public virtual string QuoteIdentifier(string s)
         {
             if (string.IsNullOrEmpty(s))
                 return s;
@@ -126,7 +134,7 @@ namespace Serenity.Data
             return '[' + s + ']';
         }
 
-        public string QuoteUnicodeString(string s)
+        public virtual string QuoteUnicodeString(string s)
         {
             if (s.IndexOf('\'') >= 0)
                 return "N'" + s.Replace("'", "''") + "'";
@@ -134,7 +142,20 @@ namespace Serenity.Data
             return "N'" + s + "'";
         }
 
-        public string ScopeIdentityExpression
+        public virtual bool RequiresBoolConversion
+        {
+            get { return false; }
+        }
+
+        public virtual string ServerType
+        {
+            get
+            {
+                return "SqlServer";
+            }
+        }
+
+        public virtual string ScopeIdentityExpression
         {
             get
             {
@@ -142,7 +163,7 @@ namespace Serenity.Data
             }
         }
 
-        public string SkipKeyword
+        public virtual string SkipKeyword
         {
             get
             {
@@ -150,7 +171,7 @@ namespace Serenity.Data
             }
         }
 
-        public string TakeKeyword
+        public virtual string TakeKeyword
         {
             get
             {
@@ -158,7 +179,7 @@ namespace Serenity.Data
             }
         }
 
-        public string TimeFormat
+        public virtual string TimeFormat
         {
             get
             {
@@ -174,7 +195,7 @@ namespace Serenity.Data
             }
         }
 
-        public bool UseReturningIdentity
+        public virtual bool UseReturningIdentity
         {
             get
             {
@@ -182,7 +203,7 @@ namespace Serenity.Data
             }
         }
 
-        public bool UseReturningIntoVar
+        public virtual bool UseReturningIntoVar
         {
             get
             {
@@ -190,7 +211,7 @@ namespace Serenity.Data
             }
         }
 
-        public bool UseScopeIdentity
+        public virtual bool UseScopeIdentity
         {
             get
             {
@@ -198,7 +219,7 @@ namespace Serenity.Data
             }
         }
 
-        public bool UseTakeAtEnd
+        public virtual bool UseTakeAtEnd
         {
             get
             {
@@ -206,7 +227,7 @@ namespace Serenity.Data
             }
         }
 
-        public bool UseRowNum
+        public virtual bool UseRowNum
         {
             get
             {
@@ -214,7 +235,7 @@ namespace Serenity.Data
             }
         }
 
-        public char ParameterPrefix { get { return '@'; } }
+        public virtual char ParameterPrefix { get { return '@'; } }
 
     }
 }
