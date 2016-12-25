@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 #if COREFX
-using Dapper;
+using DynamicParameters = Dapper.DynamicParameters;
 #endif
 namespace Serenity.Logging
 {

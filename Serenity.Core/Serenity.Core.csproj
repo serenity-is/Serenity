@@ -1,229 +1,66 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Serenity</RootNamespace>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
+    <RuntimeIdentifiers>win7-x64;win7-x86;osx.10.10-x64;osx.10.11-x64;ubuntu.14.04-x64;ubuntu.16.04-x64;centos.7-x64;rhel.7.2-x64;debian.8-x64;fedora.23-x64;opensuse.13.2-x64</RuntimeIdentifiers>
     <AssemblyName>Serenity.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <PackageTags>Serenity</PackageTags>
+    <PackageIconUrl>https://raw.github.com/volkanceylan/Serenity/master/Tools/Images/serenity-logo-128.png</PackageIconUrl>
+    <PackageLicenseUrl>https://raw.github.com/volkanceylan/Serenity/master/LICENSE.md</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>http://github.com/volkanceylan/Serenity</RepositoryUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Serenity.Core.XML</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Serenity.Core.XML</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Compile Include="**\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+    <EmbeddedResource Include="**\*.resx" />
+    <EmbeddedResource Include="compiler\resources\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NETStandard.Library">
+      <Version>1.6.1</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>9.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions">
+      <Version>1.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyModel">
+      <Version>1.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.ComponentModel.Primitives">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Data.Common">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Globalization.Extensions">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Authorization\ImpersonatingAuthenticationService.cs" />
-    <Compile Include="Authorization\IRequestContext.cs" />
-    <Compile Include="Authorization\ITransientGrantor.cs" />
-    <Compile Include="Authorization\IImpersonator.cs" />
-    <Compile Include="Authorization\Throttler.cs" />
-    <Compile Include="Authorization\LogicOperatorPermissionService.cs" />
-    <Compile Include="Authorization\TransientGrantingPermissionService.cs" />
-    <Compile Include="CompatibilityExtensions\Net45Extensions.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\BooleanFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\DateFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\DateTimeFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\LookupFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\EditorFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\DecimalFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\IntegerFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\EnumFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\FilteringIdFieldAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\QuickFilterOptionAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\SortableAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\QuickFilterAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\NotFilterableAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\CustomFilteringAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\FilteringOptionAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Filtering\FilterOnlyAttribute.cs" />
-    <Compile Include="ComponentModel\Common\HiddenAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\CollapsibleAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\HeaderCssClassAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\HideOnUpdateAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\HideOnInsertAttribute.cs" />
-    <Compile Include="ComponentModel\Common\VisibleAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\ColumnsScriptAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\DataScriptAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\EnumKeyAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Formatting\BasicFormatterTypes.cs" />
-    <Compile Include="ComponentModel\Columns\Alignment\AlignRightAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Alignment\AlignmentAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Alignment\AlignCenterAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Formatting\DisplayFormatAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Formatting\FormatterOptionAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Formatting\FormatterTypeAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\Formatting\CustomFormatterAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\EditLinkAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
-    <Compile Include="ComponentModel\Permission\RegisterPermissionKeyAttribute.cs" />
-    <Compile Include="ComponentModel\Upload\FileUploadEditorAttribute.cs" />
-    <Compile Include="ComponentModel\Upload\ImageScaleMode.cs" />
-    <Compile Include="ComponentModel\Upload\ImageUploadEditorAttribute.cs" />
-    <Compile Include="ComponentModel\Upload\MultipleFileUploadEditorAttribute.cs" />
-    <Compile Include="ComponentModel\Upload\MultipleImageUploadEditorAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\SortOrderAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
-    <Compile Include="ComponentModel\Columns\WidthAttribute.cs" />
-    <Compile Include="Helpers\AssemblySorter.cs" />
-    <Compile Include="Helpers\Check.cs" />
-    <Compile Include="Helpers\BinarySerialization.cs" />
-    <Compile Include="ComponentModel\Extensibility\DynamicScriptAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\NestedLocalTextsAttribute.cs" />
-    <Compile Include="Interface\DateTimeProvider.cs" />
-    <Compile Include="Interface\IDateTimeProvider.cs" />
-    <Compile Include="Json\JsonLocalTextsHelper.cs" />
-    <Compile Include="Json\JsonConfigHelper.cs" />
-    <Compile Include="Localization\JsonLocalTextRegistration.cs" />
-    <Compile Include="Localization\InitializedLocalText.cs" />
-    <Compile Include="Localization\FallbackLocalTextRegistry.cs" />
-    <Compile Include="Logging\FileLogger.cs" />
-    <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Munq\AlwaysNewLifetime.cs" />
-    <Compile Include="Munq\Container.cs" />
-    <Compile Include="Munq\Container.Registrar.cs" />
-    <Compile Include="Munq\Container.Resolver.cs" />
-    <Compile Include="Munq\CreateInstanceDelegateFactory.cs" />
-    <Compile Include="Munq\IContainerFluent.cs" />
-    <Compile Include="Munq\IDependecyRegistrar.cs" />
-    <Compile Include="Munq\IDependencyResolver.cs" />
-    <Compile Include="Munq\ILifetimeManager.cs" />
-    <Compile Include="Munq\IRegistration.cs" />
-    <Compile Include="Munq\IRegistrationKey.cs" />
-    <Compile Include="Munq\MunqContainer.cs" />
-    <Compile Include="Munq\NamedRegistrationKey.cs" />
-    <Compile Include="Munq\Registration.cs" />
-    <Compile Include="Munq\TypeRegistry.cs" />
-    <Compile Include="Munq\UnNamedRegistrationKey.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>Properties\SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="Authorization\IPermissionService.cs" />
-    <Compile Include="Authorization\IAuthenticationService.cs" />
-    <Compile Include="Authorization\IUserDefinition.cs" />
-    <Compile Include="Caching\DistributedCache.cs" />
-    <Compile Include="Caching\DistributedCacheEmulator.cs" />
-    <Compile Include="Caching\ILocalCache.cs" />
-    <Compile Include="Caching\IDistributedCache.cs" />
-    <Compile Include="Caching\LocalCache.cs" />
-    <Compile Include="Caching\TwoLevelCache.cs" />
-    <Compile Include="ComponentModel\Common\InsertableAttribute.cs" />
-    <Compile Include="ComponentModel\Common\ScriptIncludeAttribute.cs" />
-    <Compile Include="ComponentModel\Common\UpdatableAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\BaseRegistrarAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\FormScriptAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\ScriptRegistrarAttribute.cs" />
-    <Compile Include="ComponentModel\Extensibility\SelfAssemblyAttribute.cs" />
-    <Compile Include="ComponentModel\Permission\InsertPermissionAtribute.cs" />
-    <Compile Include="ComponentModel\Permission\DeletePermissionAttribute.cs" />
-    <Compile Include="ComponentModel\Permission\ModifyPermissionAttribute.cs" />
-    <Compile Include="ComponentModel\Permission\PermissionAttributeBase.cs" />
-    <Compile Include="ComponentModel\Permission\ReadPermissionAttribute.cs" />
-    <Compile Include="ComponentModel\Permission\RequiredPermissionAttribute.cs" />
-    <Compile Include="ComponentModel\Permission\UpdatePermissionAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\BasedOnRowAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\CssClassAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\Editing\CustomEditorAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\Editing\EditorOptionAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\Editing\EditorTypeAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\Editing\BasicEditorTypes.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\IgnoreAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\HintAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\MaxLengthAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\OneWayAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\PlaceholderAttribute.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\PropertyItem.cs" />
-    <Compile Include="ComponentModel\PropertyGrid\RequiredAttribute.cs" />
-    <Compile Include="Dependency\IDependecyRegistrar.cs" />
-    <Compile Include="Helpers\Base32.cs" />
-    <Compile Include="Helpers\ExceptionExtensions.cs" />
-    <Compile Include="Helpers\DateElementOrder.cs" />
-    <Compile Include="Helpers\DateHelper.cs" />
-    <Compile Include="Dependency\Dependency.cs" />
-    <Compile Include="Dependency\IDependencyResolver.cs" />
-    <Compile Include="Helpers\EnumMapper.cs" />
-    <Compile Include="Helpers\CollectionExtensions.cs" />
-    <Compile Include="Helpers\ExtensibilityHelper.cs" />
-    <Compile Include="Logging\Log.cs" />
-    <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Helpers\UriHelper.cs" />
-    <Compile Include="Interface\ExceptionLog.cs" />
-    <Compile Include="Authorization\Authorization.cs" />
-    <Compile Include="Authorization\IAuthorizationService.cs" />
-    <Compile Include="Authorization\IUserRetrieveService.cs" />
-    <Compile Include="Interface\SettingScopeAttribute.cs" />
-    <Compile Include="Interface\SettingKeyAttribute.cs" />
-    <Compile Include="Interface\IExceptionLogger.cs" />
-    <Compile Include="Logging\LoggingLevel.cs" />
-    <Compile Include="Configuration\IConfigurationRepository.cs" />
-    <Compile Include="Interface\ValidationError.cs" />
-    <Compile Include="IO\DeleteType.cs" />
-    <Compile Include="IO\TemporaryFileHelper.cs" />
-    <Compile Include="Json\Json.cs" />
-    <Compile Include="Json\JsonSafeInt64Converter.cs" />
-    <Compile Include="Json\JsonSettings.cs" />
-    <Compile Include="Json\JsonStringHashSetConverter.cs" />
-    <Compile Include="Localization\ILocalTextContext.cs" />
-    <Compile Include="Localization\ILocalTextRegistry.cs" />
-    <Compile Include="Helpers\Invariants.cs" />
-    <Compile Include="Localization\LocalText.cs" />
-    <Compile Include="Helpers\StringHelper.cs" />
-    <Compile Include="Localization\LocalTextRegistry.cs" />
-    <Compile Include="Localization\EnumLocalTextRegistration.cs" />
-    <Compile Include="Localization\NestedLocalTextRegistration.cs" />
-    <Compile Include="Reflection\CodeWriter.cs" />
-    <Compile Include="Reflection\ILGeneration.cs" />
-    <Compile Include="Reflection\FastReflection.cs" />
-    <Compile Include="Reflection\ObjectAccessor.cs" />
-    <Compile Include="Reflection\ReflectionExtensions.cs" />
-    <Compile Include="Reflection\TypeAccessor.cs" />
-    <Compile Include="Reflection\TypeConversions.cs" />
-    <Compile Include="Reflection\VisitedGraph.cs" />
-    <Compile Include="Texts\Texts.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.Serenity.Core.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>$(DefineConstants);COREFX;NETSTANDARD1_6</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
+
 </Project>

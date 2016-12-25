@@ -14,7 +14,8 @@ var nuspecParams = new Dictionary<string, string> {
     { "projectUrl", "http://github.com/volkanceylan/Serenity" },
     { "copyright", "Copyright (c) Volkan Ceylan" },
     { "tags", "Serenity" },
-    { "framework", "net45" },
+    { "fw1", "net45" },
+	{ "fw2", "netstandard1.6" },
     { "configuration", configuration }
 };
 
@@ -65,18 +66,18 @@ Task("Restore-NuGet-Packages")
     .IsDependentOn("Clean")
     .Does(context =>
 {
-    NuGetRestore("./Serenity.sln");
+    NuGetRestore("./Serenity.NetStandard.sln");
 });
 
 Task("Build")
     .IsDependentOn("Restore-NuGet-Packages")
     .Does(context => 
 {
-    MSBuild("./Serenity.sln", s => {
+    MSBuild("./Serenity.NetStandard.sln", s => {
         s.SetConfiguration(configuration);
     });
     
-    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
+    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/net45/Serenity.Core.dll");
     serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
 });
 
