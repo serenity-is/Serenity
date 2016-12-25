@@ -3379,6 +3379,8 @@ if (typeof Slick === "undefined") {
                 rowNodeFromLastMouseWheelEvent = rowNode;
             }
 
+            deltaX = (typeof deltaX == "undefined" ? e.originalEvent.deltaX : deltaX) || 0;
+            deltaY = (typeof deltaY == "undefined" ? e.originalEvent.deltaY : deltaY) || 0;
             scrollTop = Math.max(0, $viewportScrollContainerY[0].scrollTop - (deltaY * options.rowHeight));
             scrollLeft = $viewportScrollContainerX[0].scrollLeft + (deltaX * 10);
             var handled = _handleScroll(true);
