@@ -64,4 +64,8 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup> 
+
+  <Target Name="PostcompileScript" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
+    <Exec Command="$(MsBuildThisFileDirectory)..\Tools\PdbGit\PdbGit.exe $(OutDir)Serenity.Core.pdb" />
+  </Target>  
 </Project>
