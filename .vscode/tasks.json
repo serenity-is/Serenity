@@ -9,7 +9,7 @@
         "tasks": [
             {
                 "taskName": "build",
-                "args": [ "-f", "NetStandard1.6", "Serenity.NetStandard.sln" ],
+                "args": [ "-f", "NetStandard1.6", "Serenity.sln" ],
                 "isBuildCommand": true,
                 "showOutput": "silent",
                 "problemMatcher": "$msCompile"
@@ -20,7 +20,7 @@
         "tasks": [
             {
                 "taskName": "build",
-                "args": [ "Serenity.NetStandard.sln" ],
+                "args": [ "Serenity.sln" ],
                 "isBuildCommand": true,
                 "showOutput": "silent",
                 "problemMatcher": "$msCompile"
