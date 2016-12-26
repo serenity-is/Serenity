@@ -5,13 +5,26 @@
     "command": "dotnet",
     "isShellCommand": true,
     "args": [],
-    "tasks": [
-        {
-            "taskName": "build",
-            "args": [ "Serenity.NetStandard.sln" ],
-            "isBuildCommand": true,
-            "showOutput": "silent",
-            "problemMatcher": "$msCompile"
-        }
-    ]
+    "osx": {
+        "tasks": [
+            {
+                "taskName": "build",
+                "args": [ "-f", "NetStandard1.6", "Serenity.NetStandard.sln" ],
+                "isBuildCommand": true,
+                "showOutput": "silent",
+                "problemMatcher": "$msCompile"
+            }
+        ]
+    },
+    "windows": {
+        "tasks": [
+            {
+                "taskName": "build",
+                "args": [ "Serenity.NetStandard.sln" ],
+                "isBuildCommand": true,
+                "showOutput": "silent",
+                "problemMatcher": "$msCompile"
+            }
+        ]
+    }    
 }
