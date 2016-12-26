@@ -1,6 +1,6 @@
 ﻿#if COREFX
 using Microsoft.AspNetCore.Http;
-using System;
+using Serenity;
 
 namespace System.Web
 {

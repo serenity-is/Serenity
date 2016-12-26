@@ -5,11 +5,9 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Web.Hosting;
 using System.Text;
-#if COREFX
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-#else
 using System.Web;
+#if COREFX
+using Microsoft.AspNetCore.WebUtilities;
 #endif
 
 namespace Serenity.Web

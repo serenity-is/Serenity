@@ -8,10 +8,10 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Web.Hosting;
 using System.Configuration;
+using System.Web;
 #if COREFX
 using Microsoft.Extensions.Configuration;
 #else
-using System.Web;
 using Serenity.Web;
 using MsieJavaScriptEngine;
 #endif
@@ -235,9 +235,7 @@ namespace Serenity.Web
                 {
                     if (s.Length < 0)
                         return false;
-
-                    int y;
-                    return s.Split('.').All(x => Int32.TryParse(x, out y));
+                    return s.Split('.').All(x => Int32.TryParse(x, out int y));
                 })
                 .ToArray();
 
@@ -272,9 +270,7 @@ namespace Serenity.Web
 
             if (idx < 0)
                 return scriptUrl;
-
-            string result;
-            if (expandVersion.TryGetValue(scriptUrl, out result))
+            if (expandVersion.TryGetValue(scriptUrl, out string result))
                 return result;
 
             var before = scriptUrl.Substring(0, idx);
@@ -307,9 +303,7 @@ namespace Serenity.Web
 
             if (!isEnabled || bundleKeyBySourceUrl == null)
                 return scriptUrl;
-
-            string bundleKey;
-            if (!bundleKeyBySourceUrl.TryGetValue(scriptUrl, out bundleKey))
+            if (!bundleKeyBySourceUrl.TryGetValue(scriptUrl, out string bundleKey))
                 return scriptUrl;
 
             string include = DynamicScriptManager.GetScriptInclude("Bundle." + bundleKey);
