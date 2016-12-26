@@ -29,6 +29,14 @@ namespace System.Web.Hosting
 
             return Path.Combine(Dependency.Resolve<IHostingEnvironment>().WebRootPath, path);
         }
+
+        public static string ApplicationVirtualPath
+        {
+            get
+            {
+                return VirtualPathUtility.ToAbsolute("~/");
+            }
+        }
     }
 }
 #endif
