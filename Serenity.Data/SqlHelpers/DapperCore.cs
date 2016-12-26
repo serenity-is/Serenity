@@ -29,6 +29,11 @@ namespace Serenity.Data
             return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), sql.Params == null ? null : new DynamicParameters(sql.Params), null, buffered, commandTimeout, commandType);
         }
 
+        public static IEnumerable<TValue> Query<TValue>(this IDbConnection cnn, ISqlQuery sql, IDbTransaction transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
+        {
+            return Dapper.SqlMapper.Query<TValue>(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), sql.Params == null ? null : new DynamicParameters(sql.Params), null, buffered, commandTimeout, commandType);
+        }
+
         public static IEnumerable<dynamic> Query(this IDbConnection cnn, string sql, object param, IDbTransaction transaction)
         {
             return Dapper.SqlMapper.Query(cnn, SqlHelper.FixCommandText(sql.ToString(), cnn.GetDialect()), param, transaction);

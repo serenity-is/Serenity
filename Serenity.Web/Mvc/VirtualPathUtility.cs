@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using System;
 
-namespace Serenity.Web
+namespace System.Web
 {
     public static class VirtualPathUtility
     {
