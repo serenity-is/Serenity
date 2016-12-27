@@ -1,8 +1,4 @@
-﻿#if COREFX
-using Color = System.String;
-#else
-using System.Drawing;
-#endif
+﻿using System.Drawing;
 
 namespace Serenity.Reporting
 {
