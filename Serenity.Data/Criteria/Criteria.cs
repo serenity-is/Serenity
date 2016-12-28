@@ -159,6 +159,16 @@
 
         /// <summary>
         ///   Creates a new EXISTS criteria</summary>
+        /// <param name="query">
+        ///   Expression</param>
+        /// <returns></returns>
+        public static BaseCriteria Exists(ISqlQuery query)
+        {
+            return new UnaryCriteria(CriteriaOperator.Exists, new Criteria(query));
+        }
+
+        /// <summary>
+        ///   Creates a new EXISTS criteria</summary>
         /// <param name="expression">
         ///   Expression</param>
         /// <returns></returns>
