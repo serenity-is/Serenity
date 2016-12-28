@@ -76,6 +76,7 @@
     "UI/Filtering/FilterDisplayBar.ts",
     "UI/Filtering/FilterPanel.ts",
     "UI/Filtering/QuickFilterArgs.ts",
+    "UI/Filtering/QuickFilter.ts",
     "UI/Filtering/QuickSearchInput.ts",
     "UI/Formatters/Formatters.ts",
     "UI/Widgets/Flexify.ts",

@@ -9,10 +9,7 @@ namespace Serenity.ComponentModel
             this.Value = value;
         }
 
-        public bool Value
-        {
-            get;
-            private set;
-        }
+        public bool Value { get; private set; }
+        public bool Separator { get; set; }
     }
 }

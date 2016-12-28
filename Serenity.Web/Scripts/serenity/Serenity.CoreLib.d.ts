@@ -1377,6 +1377,18 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
+        field?: string;
+        type?: new (element: JQuery, options: TOptions) => TWidget;
+        handler?: (h: QuickFilterArgs<TWidget>) => void;
+        title?: string;
+        options?: TOptions;
+        element?: (e: JQuery) => void;
+        init?: (w: TWidget) => void;
+        separator?: boolean;
+    }
+}
+declare namespace Serenity {
     class QuickSearchInput extends Widget<QuickSearchInputOptions> {
         constructor(input: JQuery, opt: QuickSearchInputOptions);
         checkIfValueChanged(): void;
@@ -1612,15 +1624,6 @@ declare namespace Serenity {
         get_value(): string;
         set_value(value: string): void;
     }
-    interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
-        field?: string;
-        type?: new (element: JQuery, options: TOptions) => TWidget;
-        handler?: (h: QuickFilterArgs<TWidget>) => void;
-        title?: string;
-        options?: TOptions;
-        element?: (e: JQuery) => void;
-        init?: (w: TWidget) => void;
-    }
     interface GridPersistanceFlags {
         columnWidths?: boolean;
         columnVisibility?: boolean;
@@ -1764,6 +1767,7 @@ declare namespace Serenity {
         filterOnly?: boolean;
         quickFilter?: boolean;
         quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
     }
 }
 declare namespace Serenity {
@@ -1984,7 +1988,7 @@ declare namespace Serenity {
         protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
         protected dateTimeRangeQuickFilter(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
         protected addQuickFilter<TWidget extends Widget<any>, TOptions>(filter: QuickFilter<TWidget, TOptions>): TWidget;
-        protected addFilterSeperator(): void;
+        protected addFilterSeparator(): void;
         protected add_submitHandlers(action: () => void): void;
         protected remove_submitHandlers(action: () => void): void;
         protected bindToSlickEvents(): void;

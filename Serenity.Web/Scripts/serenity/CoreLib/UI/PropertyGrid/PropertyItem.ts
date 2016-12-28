@@ -44,5 +44,6 @@
         filterOnly?: boolean;
         quickFilter?: boolean;
         quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
     }
 }

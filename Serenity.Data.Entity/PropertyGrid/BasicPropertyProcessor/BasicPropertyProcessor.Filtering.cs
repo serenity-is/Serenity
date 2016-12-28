@@ -26,6 +26,9 @@ namespace Serenity.PropertyGrid
             if (quickFilterAttr != null && quickFilterAttr.Value)
                 item.QuickFilter = true;
 
+            if (quickFilterAttr != null && quickFilterAttr.Separator)
+                item.QuickFilterSeparator = true;
+
             var basedOnField = source.BasedOnField;
             if (!ReferenceEquals(null, basedOnField) &&
                 notFilterableAttr == null)

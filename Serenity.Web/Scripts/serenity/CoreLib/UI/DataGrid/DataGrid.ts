@@ -18,7 +18,7 @@
         protected dateRangeQuickFilter(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions>;
         protected dateTimeRangeQuickFilter(field: string, title?: string): QuickFilter<DateTimeEditor, DateTimeEditorOptions>;
         protected addQuickFilter<TWidget extends Widget<any>, TOptions>(filter: QuickFilter<TWidget, TOptions>): TWidget;
-        protected addFilterSeperator(): void;
+        protected addFilterSeparator(): void;
         protected add_submitHandlers(action: () => void): void;
         protected remove_submitHandlers(action: () => void): void;
         protected bindToSlickEvents(): void;

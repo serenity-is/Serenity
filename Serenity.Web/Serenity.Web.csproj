@@ -1071,6 +1071,7 @@
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\PropertyGrid\PropertyItem.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Dialogs\TemplatedDialog.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\TemplatedWidget.ts" />
+    <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Filtering\QuickFilter.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Widget.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Reporting.ts" />
     <TypeScriptCompile Include="Scripts\serenity\CoreLib\UI\Widgets\Flexify.ts" />

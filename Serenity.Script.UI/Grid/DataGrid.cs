@@ -177,6 +177,8 @@ namespace Serenity
                     else
                         continue;
                 }
+                if (item.QuickFilterSeparator == true)
+                    quick.Seperator = true;
 
                 list.Add(quick);
             }
@@ -1040,6 +1042,9 @@ namespace Serenity
                 J("<div/>").AddClass("clear").AppendTo(toolbar.Element);
                 quickFiltersDiv = J("<div/>").AddClass("quick-filters-bar").AppendTo(toolbar.Element);
             }
+
+            if (opt.Seperator)
+                AddFilterSeparator();
 
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)

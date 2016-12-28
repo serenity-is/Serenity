@@ -102,7 +102,8 @@ namespace Serenity.ComponentModel
         public bool? QuickFilter { get; set; }
         [JsonProperty("quickFilterParams")]
         public Dictionary<string, object> QuickFilterParams { get; set; }
-
+        [JsonProperty("quickFilterSeparator")]
+        public bool QuickFilterSeparator { get; set; }
 
         public bool ShouldSerializeEditorType()
         {
