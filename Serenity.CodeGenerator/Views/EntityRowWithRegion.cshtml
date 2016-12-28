@@ -112,7 +112,10 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 
         #region RowFields
         public static readonly RowFields Fields = new RowFields().Init();
+
         public const string TableName = "@(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]")";
+        public const string IdField = "@Model.Identity";
+        public const string NameField = "@Model.NameField";
 
         public partial class RowFields : @(Model.FieldsBaseClass)
         {

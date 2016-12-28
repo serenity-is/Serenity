@@ -358,10 +358,20 @@ WriteLiteral("        #endregion\r\n\r\n        #region Constructor\r\n        p
 
 WriteLiteral("()\r\n        : base(Fields)\r\n        {\r\n        }\r\n        #endregion\r\n\r\n        #" +
 "region RowFields\r\n        public static readonly RowFields Fields = new RowField" +
-"s().Init();\r\n        public const string TableName = \"");
+"s().Init();\r\n\r\n        public const string TableName = \"");
 
 
                                      Write(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]");
+
+WriteLiteral("\";\r\n        public const string IdField = \"");
+
+
+                                  Write(Model.Identity);
+
+WriteLiteral("\";\r\n        public const string NameField = \"");
+
+
+                                    Write(Model.NameField);
 
 WriteLiteral("\";\r\n\r\n        public partial class RowFields : ");
 
