@@ -96,7 +96,11 @@ namespace Serenity.Web
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
             if (Dependency.TryResolve<IConfigurationRepository>() == null)
+#if COREFX
+                registrar.RegisterInstance<IConfigurationRepository>(new AppSettingsJsonConfigRepository());
+#else
                 registrar.RegisterInstance<IConfigurationRepository>("Application", new AppSettingsJsonConfigRepository());
+#endif
         }
 
         public static void InitializeLocalTexts()

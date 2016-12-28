@@ -177,12 +177,18 @@ namespace Serenity.Logging
                             {
                                 stream.Dispose();
                             }
+#if COREFX
+                            catch
+                            {
+                            }
+#else
                             catch (Exception ex1)
                             {
                                 var internalLogger = Dependency.TryResolve<ILogger>("Internal");
                                 if (internalLogger != null)
                                     internalLogger.Write(LoggingLevel.Fatal, null, ex1, this.GetType());
                             }
+#endif
 
                             stream = null;
                             stream = new StreamWriter(System.IO.File.OpenWrite(newFile), Encoding.UTF8);
@@ -197,12 +203,18 @@ namespace Serenity.Logging
                         flushTimeout > TimeSpan.Zero && (DateTime.Now - lastFlush) >= flushTimeout)
                         InternalFlush();
                 }
+#if COREFX
+                catch
+                {
+                }
+#else
                 catch (Exception ex2)
                 {
                     var internalLogger = Dependency.TryResolve<ILogger>("Internal");
                     if (internalLogger != null)
                         internalLogger.Write(LoggingLevel.Fatal, null, ex2, this.GetType());
                 }
+#endif
             }
         }
     }

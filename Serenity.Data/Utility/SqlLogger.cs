@@ -94,12 +94,19 @@ namespace Serenity.Logging
                         inProgress--;
                     }
                 }
+#if COREFX
+                catch
+                {
+
+                }
+#else
                 catch (Exception ex)
                 {
                     var internalLogger = Dependency.TryResolve<ILogger>("Internal");
                     if (internalLogger != null)
                         internalLogger.Write(LoggingLevel.Fatal, null, ex, this.GetType());
                 }
+#endif
             }
         }
 

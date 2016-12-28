@@ -53,7 +53,11 @@ namespace Serenity.Data
 
             var temp = new Dictionary<TableAndGroup, CacheItem>();
 
+#if COREFX
+            var rows = Dependency.Resolve<ICustomFieldListService>().List(schema).ToList();
+#else
             var rows = Dependency.Resolve<ICustomFieldListService>(schema).List(schema).ToList();
+#endif
             rows.Sort((x, y) =>
             {
                 var c = x.Table.CompareTo(y.Table);
