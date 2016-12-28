@@ -19,5 +19,6 @@ namespace Serenity
         public Action<TWidget> Init { get; set; }
         public Action<QuickFilterArgs<TWidget>> Handler { get; set; }
         public bool Seperator { get; set; }
+        public string CssClass { get; set; }
     }
 }

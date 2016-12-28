@@ -58,5 +58,6 @@ namespace Serenity
         public bool? QuickFilter { get; set; }
         public JsDictionary QuickFilterParams { get; set; }
         public bool? QuickFilterSeparator { get; set; }
+        public string QuickFilterCssClass { get; set; }
     }
 }

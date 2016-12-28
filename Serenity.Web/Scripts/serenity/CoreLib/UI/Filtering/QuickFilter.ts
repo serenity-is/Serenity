@@ -9,5 +9,6 @@
         element?: (e: JQuery) => void;
         init?: (w: TWidget) => void;
         separator?: boolean;
+        cssClass?: string;
     }
 }

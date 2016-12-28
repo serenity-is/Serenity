@@ -11,5 +11,6 @@ namespace Serenity.ComponentModel
 
         public bool Value { get; private set; }
         public bool Separator { get; set; }
+        public string CssClass { get; set; }
     }
 }

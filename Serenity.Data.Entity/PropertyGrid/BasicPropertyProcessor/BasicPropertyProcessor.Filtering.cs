@@ -23,11 +23,15 @@ namespace Serenity.PropertyGrid
                 return;
 
             var quickFilterAttr = source.GetAttribute<QuickFilterAttribute>();
-            if (quickFilterAttr != null && quickFilterAttr.Value)
+            if (quickFilterAttr != null)
+            {
                 item.QuickFilter = true;
+                if (quickFilterAttr.Separator)
+                    item.QuickFilterSeparator = true;
 
-            if (quickFilterAttr != null && quickFilterAttr.Separator)
-                item.QuickFilterSeparator = true;
+                if (!string.IsNullOrEmpty(quickFilterAttr.CssClass))
+                    item.QuickFilterCssClass = quickFilterAttr.CssClass;
+            }
 
             var basedOnField = source.BasedOnField;
             if (!ReferenceEquals(null, basedOnField) &&

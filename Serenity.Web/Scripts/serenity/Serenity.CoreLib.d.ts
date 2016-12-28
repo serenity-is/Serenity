@@ -1386,6 +1386,7 @@ declare namespace Serenity {
         element?: (e: JQuery) => void;
         init?: (w: TWidget) => void;
         separator?: boolean;
+        cssClass?: string;
     }
 }
 declare namespace Serenity {

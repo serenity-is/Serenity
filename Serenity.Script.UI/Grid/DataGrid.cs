@@ -177,8 +177,11 @@ namespace Serenity
                     else
                         continue;
                 }
+
                 if (item.QuickFilterSeparator == true)
                     quick.Seperator = true;
+
+                quick.CssClass = item.QuickFilterCssClass;
 
                 list.Add(quick);
             }
@@ -1050,6 +1053,9 @@ namespace Serenity
                 .AppendTo(quickFiltersDiv)
                 .Children().Text(opt.Title ?? DetermineText(pre => pre + opt.Field) ?? opt.Field)
                 .Parent();
+
+            if (!string.IsNullOrEmpty(opt.CssClass))
+                quickFilter.AddClass(opt.CssClass);
 
             var widget = Widget.CreateOfType(opt.Type, e =>
             {

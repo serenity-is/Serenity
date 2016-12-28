@@ -104,6 +104,8 @@ namespace Serenity.ComponentModel
         public Dictionary<string, object> QuickFilterParams { get; set; }
         [JsonProperty("quickFilterSeparator")]
         public bool QuickFilterSeparator { get; set; }
+        [JsonProperty("quickFilterCssClass")]
+        public string QuickFilterCssClass { get; set; }
 
         public bool ShouldSerializeEditorType()
         {
