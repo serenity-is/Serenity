@@ -28,7 +28,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\n");
+WriteLiteral("\r\n");
 
 
 
@@ -37,8 +37,7 @@ WriteLiteral("\n");
     var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
     var schemaDot = Model.Schema == null ? "" : ("[" + Model.Schema + "].");
 
-    Func<string, string, string> jf = (x, y) =>
-    {
+    Func<string, string, string> jf = (x, y) => {
         if (x.ToLowerInvariant() == y.ToLowerInvariant())
             return y;
         else
@@ -54,9 +53,9 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(".Entities\n{\n    using Serenity;\n    using Serenity.ComponentModel;\n    using Sere" +
-"nity.Data;\n    using Serenity.Data.Mapping;\n    using System;\n    using System.C" +
-"omponentModel;\n    using System.IO;\n\n    [ConnectionKey(\"");
+WriteLiteral(".Entities\r\n{\r\n    using Serenity;\r\n    using Serenity.ComponentModel;\r\n    using " +
+"Serenity.Data;\r\n    using Serenity.Data.Mapping;\r\n    using System;\r\n    using S" +
+"ystem.ComponentModel;\r\n    using System.IO;\r\n\r\n    [ConnectionKey(\"");
 
 
                Write(Model.ConnectionKey);
@@ -71,7 +70,7 @@ WriteLiteral("\"), InstanceName(\"");
 
                                                                                       Write(Model.Tablename);
 
-WriteLiteral("\"), TwoLevelCached]\n    [ReadPermission(\"");
+WriteLiteral("\"), TwoLevelCached]\r\n    [ReadPermission(\"");
 
 
                 Write(Model.Module);
@@ -81,7 +80,7 @@ WriteLiteral(":");
 
                               Write(Model.Tablename);
 
-WriteLiteral(":Read\")]\n    [InsertPermission(\"");
+WriteLiteral(":Read\")]\r\n    [InsertPermission(\"");
 
 
                   Write(Model.Module);
@@ -91,7 +90,7 @@ WriteLiteral(":");
 
                                 Write(Model.Tablename);
 
-WriteLiteral(":Insert\")]\n    [UpdatePermission(\"");
+WriteLiteral(":Insert\")]\r\n    [UpdatePermission(\"");
 
 
                   Write(Model.Module);
@@ -101,7 +100,7 @@ WriteLiteral(":");
 
                                 Write(Model.Tablename);
 
-WriteLiteral(":Update\")]\n    [DeletePermission(\"");
+WriteLiteral(":Update\")]\r\n    [DeletePermission(\"");
 
 
                   Write(Model.Module);
@@ -111,29 +110,28 @@ WriteLiteral(":");
 
                                 Write(Model.Tablename);
 
-WriteLiteral(":Delete\")]\n");
+WriteLiteral(":Delete\")]\r\n");
 
 
-     if (Config.GenerateLookupEditor)
-    {
+     if (Config.GenerateLookupEditor) {
 WriteLiteral("    ");
 
 WriteLiteral("[LookupScript(\"");
 
 
-                         Write(Model.Module);
+                                                           Write(Model.Module);
 
 WriteLiteral(".");
 
 
-                                       Write(Model.RowClassName);
+                                                                         Write(Model.RowClassName);
 
 WriteLiteral("\")]");
 
 
-                                                                         }
+                                                                                                           }
 
-WriteLiteral("\n    public sealed class ");
+WriteLiteral("    public sealed class ");
 
 
                    Write(Model.RowClassName);
@@ -152,82 +150,73 @@ WriteLiteral(", IIdRow");
                                                                                                               Write(Model.NameField == null ? "" : ", INameRow");
 
 
-                                                                                                                                                                WriteLiteral("\n    {");
+                                                                                                                                                                WriteLiteral("\r\n    {");
 
-      foreach (EntityField x in Model.Fields)
-                {
-                    var attrs = new List<string>();
-                    var attrsLookupEditorForm = new List<string>();
+      foreach (EntityField x in Model.Fields) {
+        var attrs = new List<string>();
+        var attrsLookupEditorForm = new List<string>();
 
-                    attrs.Add("DisplayName(\"" + x.Title + "\")");
+        attrs.Add("DisplayName(\"" + x.Title + "\")");
 
-                    if (x.Ident != x.Name)
-                    {
-                        attrs.Add("Column(\"" + x.Name + "\")");
-                    }
-
-                    if ((x.Size ?? 0) != 0)
-                    {
-                        attrs.Add("Size(" + x.Size + ")");
-                    }
-                    if (x.Scale != 0)
-                    {
-                        attrs.Add("Scale(" + x.Scale + ")");
-                    }
-                    if (!String.IsNullOrEmpty(x.Flags))
-                    {
-                        attrs.Add(x.Flags);
-                    }
-                    if (!String.IsNullOrEmpty(x.PKTable))
-                    {
-                        attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
-                        attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
-
-                        attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Serenity.CodeGenerator.RowGenerator.ClassNameFromTableName(x.PKTable) + "Row), InplaceAdd = true)");
+        if (x.Ident != x.Name) {
+            attrs.Add("Column(\"" + x.Name + "\")");
         }
-        if (Model.NameField == x.Ident)
-        {
+
+        if ((x.Size ?? 0) != 0) {
+            attrs.Add("Size(" + x.Size + ")");
+        }
+        if (x.Scale != 0) {
+            attrs.Add("Scale(" + x.Scale + ")");
+        }
+        if (!String.IsNullOrEmpty(x.Flags)) {
+            attrs.Add(x.Flags);
+        }
+        if (!String.IsNullOrEmpty(x.PKTable)) {
+            attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
+            attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
+
+            attrsLookupEditorForm.Add("LookupEditor(typeof(" + Model.Module + ".Entities." + Serenity.CodeGenerator.RowGenerator.ClassNameFromTableName(x.PKTable) + "Row), InplaceAdd = true)");
+        }
+        if (Model.NameField == x.Ident) {
             attrs.Add("QuickSearch");
         }
-        if (x.TextualField != null)
-        {
+        if (x.TextualField != null) {
             attrs.Add("TextualField(\"" + x.TextualField + "\")");
         }
         var attrString = String.Join(", ", attrs.ToArray());
-    var attrStringLookupEditorForm = String.Join(", ", attrsLookupEditorForm.ToArray());
+        var attrStringLookupEditorForm = String.Join(", ", attrsLookupEditorForm.ToArray());
+
 
 
 WriteLiteral("        ");
 
-WriteLiteral("\n            #region ");
+WriteLiteral("\r\n        #region ");
 
 
-               Write(x.Title);
+           Write(x.Ident);
 
-WriteLiteral("\n");
+WriteLiteral("\r\n");
 
 
-             if (!String.IsNullOrEmpty(attrString))
-            {
+         if (!String.IsNullOrEmpty(attrString)) {
 
-WriteLiteral("            ");
+WriteLiteral("        ");
 
 WriteLiteral("[");
 
 
-              Write(attrString);
+          Write(attrString);
 
 WriteLiteral("]");
 
-WriteLiteral("\n");
+WriteLiteral("\r\n");
 
 
-            }
+        }
 
 
-             if (Config.GenerateLookupEditor)
-            {if (!String.IsNullOrEmpty(attrStringLookupEditorForm))
-            {
+         if (Config.GenerateLookupEditor) {
+            if (!String.IsNullOrEmpty(attrStringLookupEditorForm)) {
 
 WriteLiteral("            ");
 
@@ -238,169 +227,166 @@ WriteLiteral("[");
 
 WriteLiteral("]");
 
-WriteLiteral("\n");
+WriteLiteral("\r\n");
 
 
-            }}
+            }
+        }
 
-WriteLiteral("            public ");
-
-
-              Write(x.DataType);
+WriteLiteral("        public ");
 
 
-                          Write(x.IsValueType ? "?" : "");
+          Write(x.DataType);
+
+
+                      Write(x.IsValueType ? "?" : "");
 
 WriteLiteral(" ");
 
 
-                                                     Write(x.Ident);
+                                                 Write(x.Ident);
 
 WriteLiteral(" { get { return Fields.");
 
 
-                                                                                     Write(x.Ident);
+                                                                                 Write(x.Ident);
 
 WriteLiteral("[this]; } set { Fields.");
 
 
-                                                                                                                      Write(x.Ident);
+                                                                                                                  Write(x.Ident);
 
-WriteLiteral("[this] = value; } }\n            public partial class RowFields { public ");
+WriteLiteral("[this] = value; } }\r\n        public partial class RowFields { public ");
 
 
-                                                Write(x.FieldType);
+                                            Write(x.FieldType);
 
 WriteLiteral("Field ");
 
 
-                                                                    Write(x.Ident);
+                                                                Write(x.Ident);
 
-WriteLiteral("; }\n            #endregion ");
-
-
-                  Write(x.Ident);
-
-WriteLiteral("\n        ");
+WriteLiteral("; }\r\n        #endregion\r\n        ");
 
 
                }
 
-WriteLiteral("\n\n    #region Foreign Fields\n");
+WriteLiteral("\r\n        #region Foreign Fields\r\n");
 
 
-     foreach (EntityJoin x in Model.Joins)
-            {
-                foreach (EntityField y in x.Fields)
-                {
+     foreach (EntityJoin x in Model.Joins) {
+        foreach (EntityField y in x.Fields) {
 
-WriteLiteral("            ");
+WriteLiteral("        ");
 
-WriteLiteral("\n                [DisplayName(\"");
+WriteLiteral("\r\n        [DisplayName(\"");
 
 
-                         Write(y.Title);
+                 Write(y.Title);
 
 WriteLiteral("\"), Expression(\"");
 
 
-                                                  Write("j" + x.Name + ".[" + y.Name + "]");
+                                          Write("j" + x.Name + ".[" + y.Name + "]");
 
-WriteLiteral("\")]\n                public ");
-
-
-                  Write(y.DataType);
+WriteLiteral("\")]\r\n        public ");
 
 
-                              Write(y.IsValueType ? "?" : "");
+          Write(y.DataType);
+
+
+                      Write(y.IsValueType ? "?" : "");
 
 WriteLiteral(" ");
 
 
-                                                          Write(jf(x.Name, y.Ident));
+                                                  Write(jf(x.Name, y.Ident));
 
 WriteLiteral(" { get { return Fields.");
 
 
-                                                                                                       Write(jf(x.Name, y.Ident));
+                                                                                               Write(jf(x.Name, y.Ident));
 
 WriteLiteral("[this]; } set { Fields.");
 
 
-                                                                                                                                                    Write(jf(x.Name, y.Ident));
+                                                                                                                                            Write(jf(x.Name, y.Ident));
 
-WriteLiteral("[this] = value; } }\n                public partial class RowFields { public ");
+WriteLiteral("[this] = value; } }\r\n        public partial class RowFields { public ");
 
 
-                                                    Write(y.FieldType);
+                                            Write(y.FieldType);
 
 WriteLiteral("Field ");
 
 
-                                                                        Write(jf(x.Name, y.Ident));
+                                                                Write(jf(x.Name, y.Ident));
 
-WriteLiteral("; }\n\n            ");
+WriteLiteral("; }\r\n\r\n        ");
 
 
-                   }
+               }
             }
 
-WriteLiteral("\n    #endregion Foreign Fields\n\n    #region Id and Name fields\n    IIdField IIdRo" +
-"w.IdField\n    {\n    get { return Fields.");
+WriteLiteral("        #endregion\r\n\r\n        #region Id and Name fields\r\n        IIdField IIdRow" +
+".IdField\r\n        { get { return Fields.");
 
 
-                    Write(Model.Identity);
+                          Write(Model.Identity);
 
-WriteLiteral("; }\n    }\n");
+WriteLiteral("; } }\r\n");
 
 
-     if (Model.NameField != null)
-            {
+     if (Model.NameField != null) {
 
 WriteLiteral("        ");
 
-WriteLiteral("\n            StringField INameRow.NameField\n            {\n            get { retur" +
-"n Fields.");
+WriteLiteral("\r\n            StringField INameRow.NameField\r\n            { get { return Fields.");
 
 
-                           Write(Model.NameField);
+                             Write(Model.NameField);
 
-WriteLiteral("; }\n            }\n        ");
+WriteLiteral("; } }\r\n        ");
 
 
                }
 
-WriteLiteral("    #endregion Id and Name fields\n\n    #region Constructor\n    public ");
+WriteLiteral("        #endregion\r\n\r\n        #region Constructor\r\n        public ");
 
 
-       Write(Model.RowClassName);
+           Write(Model.RowClassName);
 
-WriteLiteral("()\n    : base(Fields)\n    {\n    }\n    #endregion Constructor\n\n    #region RowFiel" +
-"ds\n    public static readonly RowFields Fields = new RowFields().Init();\n\n    pu" +
-"blic partial class RowFields : ");
-
-
-                                 Write(Model.FieldsBaseClass);
-
-WriteLiteral("\n    {\n    public RowFields()\n    : base(\"");
+WriteLiteral("()\r\n        : base(Fields)\r\n        {\r\n        }\r\n        #endregion\r\n\r\n        #" +
+"region RowFields\r\n        public static readonly RowFields Fields = new RowField" +
+"s().Init();\r\n        public const string TableName = \"");
 
 
-        Write(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]");
+                                     Write(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]");
 
-WriteLiteral("\"");
-
-
-                                                                                                       Write(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\""));
-
-WriteLiteral(")\n    {\n    LocalTextPrefix = \"");
+WriteLiteral("\";\r\n\r\n        public partial class RowFields : ");
 
 
-                   Write(moduleDot);
+                                     Write(Model.FieldsBaseClass);
+
+WriteLiteral("\r\n        {\r\n            public RowFields()\r\n            : base(");
 
 
-                               Write(Model.ClassName);
+               Write(Model.RowClassName);
 
-WriteLiteral("\";\n    }\n    }\n    #endregion RowFields\n    }\n    }\n");
+WriteLiteral(".TableName");
+
+
+                                              Write(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\""));
+
+WriteLiteral(")\r\n            {\r\n                LocalTextPrefix = \"");
+
+
+                               Write(moduleDot);
+
+
+                                           Write(Model.ClassName);
+
+WriteLiteral("\";\r\n            }\r\n        }\r\n        #endregion RowFields\r\n    }\r\n}\r\n");
 
 
         }
