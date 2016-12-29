@@ -159,7 +159,11 @@ namespace Serenity
                 }
                 else if (filteringType == typeof(BooleanFiltering))
                 {
-                    quick = BooleanQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name)
+                    var q = item.QuickFilterParams ?? new JsDictionary();
+                    var f = item.FilteringParams ?? new JsDictionary();
+
+                    quick = BooleanQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name,
+                        (q["trueText"] ?? f["trueText"]).As<string>(), (q["falseText"] ?? f["falseText"]).As<string>())
                         .As<QuickFilter<Widget, object>>();
                 }
                 else
