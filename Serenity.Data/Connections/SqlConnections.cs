@@ -30,7 +30,9 @@ namespace Serenity.Data
             if (!connections.TryGetValue(connectionKey, out connection))
             {
                 var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
-                var connectionSetting = ConfigurationManager.ConnectionStrings[connectionKey];
+                var connectionStringProvider = Dependency.TryResolve<IConnectionStringProvider>();
+                var connectionSetting = connectionStringProvider?.GetConnectionString(connectionKey) ?? 
+                    ConfigurationManager.ConnectionStrings[connectionKey];
                 if (connectionSetting == null)
                     return null;
 
