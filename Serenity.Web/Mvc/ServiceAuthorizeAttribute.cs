@@ -2,12 +2,10 @@
 using System;
 using System.Linq;
 #if COREFX
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Security;
 #endif
 
 namespace Serenity.Services

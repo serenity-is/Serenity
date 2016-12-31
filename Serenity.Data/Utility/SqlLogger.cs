@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Serenity.Abstractions;
+﻿using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using System;

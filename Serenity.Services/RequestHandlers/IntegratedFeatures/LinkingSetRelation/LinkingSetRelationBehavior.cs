@@ -7,7 +7,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+#if COREFX
 using System.Reflection;
+#endif
 
 namespace Serenity.Services
 {

@@ -1,6 +1,4 @@
 ﻿using Serenity.Abstractions;
-using System;
-using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
 namespace Serenity.Localization

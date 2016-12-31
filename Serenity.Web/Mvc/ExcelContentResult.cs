@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System;
+﻿using System;
 #if COREFX
 using Microsoft.AspNetCore.Mvc;
 #else

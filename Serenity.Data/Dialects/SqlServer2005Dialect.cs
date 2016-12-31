@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Serenity.Data
 {
     public class SqlServer2005Dialect : SqlServer2000Dialect

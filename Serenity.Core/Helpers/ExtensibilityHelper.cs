@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+#if !COREFX
 using System.IO;
+#endif
 using System.Linq;
 using System.Reflection;
 

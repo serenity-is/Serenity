@@ -1,5 +1,7 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
+#if COREFX
+using System;
+#endif
 
 namespace Serenity
 {

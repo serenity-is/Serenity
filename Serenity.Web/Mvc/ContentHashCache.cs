@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Web.Hosting;
-using System.Text;
 using System.Web;
 #if COREFX
 using Microsoft.AspNetCore.WebUtilities;

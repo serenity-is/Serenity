@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Linq;
 #if COREFX
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 #else

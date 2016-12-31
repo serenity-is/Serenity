@@ -1,8 +1,9 @@
 ﻿using Serenity.ComponentModel;
-using Serenity.Reflection;
 using Serenity.Web.PropertyEditor;
 using System;
+#if COREFX
 using System.Reflection;
+#endif
 
 namespace Serenity.Web
 {

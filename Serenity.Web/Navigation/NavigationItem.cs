@@ -1,6 +1,5 @@
 ﻿namespace Serenity.Navigation
 {
-    using System;
     using System.Collections.Generic;
 
     public class NavigationItem

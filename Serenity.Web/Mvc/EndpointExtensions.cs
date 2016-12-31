@@ -1,10 +1,7 @@
 ﻿#if !COREFX
-using Newtonsoft.Json;
-using Serenity.Configuration;
 using Serenity.Data;
 using System;
 using System.Data;
-using System.Text;
 using System.Web;
 using System.Web.Mvc;
 

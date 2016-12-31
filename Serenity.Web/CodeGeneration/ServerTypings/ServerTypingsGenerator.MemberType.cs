@@ -1,17 +1,8 @@
-﻿using Newtonsoft.Json;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using Serenity.Services;
+﻿using Serenity.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
-#if COREFX
-using Microsoft.AspNetCore.Mvc;
-#else
-using System.Web.Mvc;
-#endif
 
 namespace Serenity.CodeGeneration
 {

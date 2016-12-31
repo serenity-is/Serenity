@@ -1,5 +1,4 @@
 ﻿#if !COREFX
-using System.Text;
 using System;
 using System.ComponentModel;
 using System.Globalization;

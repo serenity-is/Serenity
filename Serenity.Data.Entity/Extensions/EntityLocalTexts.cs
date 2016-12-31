@@ -1,11 +1,11 @@
 ﻿
 namespace Serenity.Localization
 {
-    using Localization;
     using Serenity.Abstractions;
     using Serenity.Data;
+#if COREFX
     using System;
-    using System.Collections.Generic;
+#endif
     using System.ComponentModel;
     using System.Reflection;
 
@@ -52,6 +52,5 @@ namespace Serenity.Localization
                     provider.Add(languageID, "Db." + prefix + ".EntitySingular", instanceName.InstanceName);
             }
         }
-
     }
 }

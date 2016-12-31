@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 #if !COREFX
 using System.Drawing;
-using System.Drawing.Imaging;
 #endif
 
 namespace Serenity.Services

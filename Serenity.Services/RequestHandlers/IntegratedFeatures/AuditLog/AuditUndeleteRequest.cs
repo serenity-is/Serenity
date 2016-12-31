@@ -1,5 +1,4 @@
 ﻿using System;
-using Serenity.Data;
 using EntityType = System.String;
 
 namespace Serenity.Services

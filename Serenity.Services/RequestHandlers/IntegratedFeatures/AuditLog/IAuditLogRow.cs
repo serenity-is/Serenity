@@ -1,6 +1,4 @@
-﻿using System;
-using Newtonsoft.Json;
-
+﻿
 namespace Serenity.Data
 {
     public interface IAuditLogRow : IIdRow

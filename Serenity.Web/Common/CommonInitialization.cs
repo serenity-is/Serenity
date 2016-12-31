@@ -5,12 +5,12 @@ using Serenity.Extensibility;
 using Serenity.Localization;
 using Serenity.Logging;
 using Serenity.Services;
-using System.Linq;
 using System.Reflection;
 using System.Web.Hosting;
 #if COREFX
 using Microsoft.Extensions.Caching.Memory;
 #else
+using System.Linq;
 using System.Web.Compilation;
 #endif
 

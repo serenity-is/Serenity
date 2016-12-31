@@ -7,12 +7,11 @@ using Serenity.Data;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Web.Hosting;
-using System.Configuration;
 using System.Web;
 #if COREFX
 using Microsoft.Extensions.Configuration;
 #else
-using Serenity.Web;
+using System.Configuration;
 using MsieJavaScriptEngine;
 #endif
 

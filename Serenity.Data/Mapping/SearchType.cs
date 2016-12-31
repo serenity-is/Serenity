@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Serenity.Data.Mapping
 {
     public enum SearchType

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+#if !COREFX
 using System.Data;
+#endif
 
 namespace Serenity.Data
 {

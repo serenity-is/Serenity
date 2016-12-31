@@ -5,11 +5,11 @@ namespace Serenity.Web
     using Newtonsoft.Json;
     using Serenity.Services;
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Net;
+#if COREFX
     using System.Threading.Tasks;
-
+#endif
     public static class RecaptchaValidation
     {
         /// <summary>

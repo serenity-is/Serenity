@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
+#if !COREFX
 using System.Reflection.Emit;
+#endif
 
 namespace Serenity.Reflection
 {

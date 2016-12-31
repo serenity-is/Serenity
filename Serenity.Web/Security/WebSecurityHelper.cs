@@ -3,11 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 #else
 using Serenity.Abstractions;
-using Serenity.ComponentModel;
-using Serenity.Services;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Web;
 using System.Web.Security;
 #endif

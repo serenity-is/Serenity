@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Serenity.Data;
@@ -7,12 +6,10 @@ using System.Data;
 #if COREFX
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 #else
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Security;
 #endif
 
 namespace Serenity.Services

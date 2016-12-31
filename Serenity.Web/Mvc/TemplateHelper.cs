@@ -11,9 +11,7 @@ using System.Web.UI;
 
 namespace Serenity.Web
 {
-    using System.Collections.Specialized;
     using System.Web.Hosting;
-    using System.Web.SessionState;
 
     public interface ITemplateRenderer
     {

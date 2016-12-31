@@ -1,12 +1,10 @@
 ﻿using Newtonsoft.Json;
-using Serenity.Data;
 using System;
 using System.Text;
-using System.IO;
 #if COREFX
+using System.IO;
 using Microsoft.AspNetCore.Mvc;
 #else
-using System.Web;
 using System.Web.Mvc;
 #endif
 

@@ -5,11 +5,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-#if COREFX
-#else
-    using System.Web;
-    using System.Web.Hosting;
-#endif
 
     public class NavigationHelper
     {

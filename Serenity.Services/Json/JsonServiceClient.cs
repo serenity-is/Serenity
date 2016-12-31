@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.IO;
 using System.Net;
+#if COREFX
 using System.Threading.Tasks;
+#endif
 
 namespace Serenity.Services
 {

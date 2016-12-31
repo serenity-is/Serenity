@@ -2,8 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Net;
 #if COREFX
+using System.Net;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using IHtmlString = Microsoft.AspNetCore.Html.HtmlString;

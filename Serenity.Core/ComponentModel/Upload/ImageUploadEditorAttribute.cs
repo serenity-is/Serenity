@@ -1,4 +1,6 @@
-﻿using Serenity.Web;
+﻿#if !COREFX
+using Serenity.Web;
+#endif
 using System;
 
 namespace Serenity.ComponentModel
