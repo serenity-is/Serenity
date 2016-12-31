@@ -1,0 +1,3181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8632943D-2A88-4C83-8451-69D62F059EFC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Serenity.Web</RootNamespace>
+    <AssemblyName>Serenity.Web</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptCharset>utf-8</TypeScriptCharset>
+    <TypeScriptEmitBOM>True</TypeScriptEmitBOM>
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptExperimentalDecorators>True</TypeScriptExperimentalDecorators>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="MsieJavaScriptEngine, Version=2.0.2.0, Culture=neutral, PublicKeyToken=a3a2846a37ac0d3e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\MsieJavaScriptEngine.2.0.2\lib\net40-client\MsieJavaScriptEngine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ClientTypes\ClientTypesGenerator.Option.cs">
+      <Link>CodeGeneration\ClientTypes\ClientTypesGenerator.Option.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ClientTypes\ClientTypesGenerator.Editor.cs">
+      <Link>CodeGeneration\ClientTypes\ClientTypesGenerator.Editor.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ClientTypes\ClientTypesGenerator.Formatter.cs">
+      <Link>CodeGeneration\ClientTypes\ClientTypesGenerator.Formatter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\ManualTsParser.cs">
+      <Link>CodeGeneration\Legacy\ManualTsParser.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\Lexer.cs">
+      <Link>CodeGeneration\Legacy\Lexer.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\DtoActionResult.cs">
+      <Link>CodeGeneration\Legacy\DtoActionResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\DtoGenerator.cs">
+      <Link>CodeGeneration\Legacy\DtoGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\FormatterTypeGenerator.cs">
+      <Link>CodeGeneration\Legacy\FormatterTypeGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\EditorTypeGenerator.cs">
+      <Link>CodeGeneration\Legacy\EditorTypeGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Base\GeneratorUtils.cs">
+      <Link>CodeGeneration\Base\GeneratorUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\ScriptDtoGenerator.cs">
+      <Link>CodeGeneration\Legacy\ScriptDtoGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\ScriptEndpointGenerator.cs">
+      <Link>CodeGeneration\Legacy\ScriptEndpointGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Legacy\ScriptFormGenerator.cs">
+      <Link>CodeGeneration\Legacy\ScriptFormGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Model\ExternalMember.cs">
+      <Link>CodeGeneration\Model\ExternalMember.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Model\ExternalMethod.cs">
+      <Link>CodeGeneration\Model\ExternalMethod.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Model\ExternalProperty.cs">
+      <Link>CodeGeneration\Model\ExternalProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Model\ExternalAttribute.cs">
+      <Link>CodeGeneration\Model\ExternalAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Model\ExternalArgument.cs">
+      <Link>CodeGeneration\Model\ExternalArgument.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Model\ExternalGenericParameter.cs">
+      <Link>CodeGeneration\Model\ExternalGenericParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Model\ExternalTypeOrigin.cs">
+      <Link>CodeGeneration\Model\ExternalTypeOrigin.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Model\ExternalType.cs">
+      <Link>CodeGeneration\Model\ExternalType.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ClientTypes\ClientTypesGenerator.cs">
+      <Link>CodeGeneration\ClientTypes\ClientTypesGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Base\CodeGeneratorBase.cs">
+      <Link>CodeGeneration\Base\CodeGeneratorBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Base\ImportGeneratorBase.cs">
+      <Link>CodeGeneration\Base\ImportGeneratorBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\Base\ServerImportGeneratorBase.cs">
+      <Link>CodeGeneration\Base\ServerImportGeneratorBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerImports\ServerImportsGenerator.MemberType.cs">
+      <Link>CodeGeneration\ServerImports\ServerImportsGenerator.MemberType.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerImports\ServerImportsGenerator.Enum.cs">
+      <Link>CodeGeneration\ServerImports\ServerImportsGenerator.Enum.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerImports\ServerImportsGenerator.Row.cs">
+      <Link>CodeGeneration\ServerImports\ServerImportsGenerator.Row.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerImports\ServerImportsGenerator.Service.cs">
+      <Link>CodeGeneration\ServerImports\ServerImportsGenerator.Service.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerImports\ServerImportsGenerator.Form.cs">
+      <Link>CodeGeneration\ServerImports\ServerImportsGenerator.Form.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerImports\ServerImportsGenerator.cs">
+      <Link>CodeGeneration\ServerImports\ServerImportsGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerTypings\ServerTypingsGenerator.Service.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Service.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerTypings\ServerTypingsGenerator.Form.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Form.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerTypings\ServerTypingsGenerator.Enum.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Enum.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\CodeGeneration\ServerTypings\ServerTypingsGenerator.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Common\RequestContext.cs">
+      <Link>Common\RequestContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Common\ScriptCulture.cs">
+      <Link>Common\ScriptCulture.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\CompressFilter.cs">
+      <Link>Mvc\CompressFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\EndpointExtensions.cs">
+      <Link>Mvc\EndpointExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\ExcelContentResult.cs">
+      <Link>Mvc\ExcelContentResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\ForXmlHelper.cs">
+      <Link>Mvc\ForXmlHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Common\CommonInitialization.cs">
+      <Link>Common\CommonInitialization.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Common\CssFileWatcher.cs">
+      <Link>Common\CssFileWatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Common\ScriptFileWatcher.cs">
+      <Link>Common\ScriptFileWatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Common\TemplateScriptRegistrar.cs">
+      <Link>Common\TemplateScriptRegistrar.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\HttpRuntimeCache.cs">
+      <Link>Mvc\HttpRuntimeCache.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\JsonFilter.cs">
+      <Link>Mvc\JsonFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Result.cs">
+      <Link>Mvc\Result.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\PageAuthorizeAttribute.cs">
+      <Link>Mvc\PageAuthorizeAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\AuthorizeDeleteAttribute.cs">
+      <Link>Mvc\AuthorizeDeleteAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\AuthorizeUpdateAttribute.cs">
+      <Link>Mvc\AuthorizeUpdateAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\AuthorizeCreateAttribute.cs">
+      <Link>Mvc\AuthorizeCreateAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\ServiceModelBinder.cs">
+      <Link>Mvc\ServiceModelBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\ServiceEndpoint.cs">
+      <Link>Mvc\ServiceEndpoint.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\ServiceAuthorizeAttribute.cs">
+      <Link>Mvc\ServiceAuthorizeAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\TokenAuthorizeFilter.cs">
+      <Link>Mvc\TokenAuthorizeFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Navigation\NavigationHelper.cs">
+      <Link>Navigation\NavigationHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Navigation\INavigationItemSource.cs">
+      <Link>Navigation\INavigationItemSource.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Navigation\NavigationItem.cs">
+      <Link>Navigation\NavigationItem.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Navigation\NavigationMenuAttribute.cs">
+      <Link>Navigation\NavigationMenuAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Navigation\NavigationLinkAttribute.cs">
+      <Link>Navigation\NavigationLinkAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Navigation\NavigationItemAttribute.cs">
+      <Link>Navigation\NavigationItemAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\BaseReport.cs">
+      <Link>Reporting\BaseReport.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\ICustomizeHtmlToPdf.cs">
+      <Link>Reporting\ICustomizeHtmlToPdf.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Model\GenerateCsvRequest.cs">
+      <Link>Reporting\Model\GenerateCsvRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Model\GenerateExcelFileRequest.cs">
+      <Link>Reporting\Model\GenerateExcelFileRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\ReportDesignAttribute.cs">
+      <Link>Reporting\ReportDesignAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\IHtmlToPdfOptions.cs">
+      <Link>Reporting\IHtmlToPdfOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Worksheet\CellDecoratorAttribute.cs">
+      <Link>Reporting\Worksheet\CellDecoratorAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Worksheet\BaseCellDecorator.cs">
+      <Link>Reporting\Worksheet\BaseCellDecorator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Worksheet\ICellDecorator.cs">
+      <Link>Reporting\Worksheet\ICellDecorator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Worksheet\EnumDecorator.cs">
+      <Link>Reporting\Worksheet\EnumDecorator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Tools\CommandLineTools.cs">
+      <Link>Reporting\Tools\CommandLineTools.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Tools\HtmlToPdfConverter.cs">
+      <Link>Reporting\Tools\HtmlToPdfConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\ICustomFileName.cs">
+      <Link>Reporting\ICustomFileName.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\IDataOnlyReport.cs">
+      <Link>Reporting\IDataOnlyReport.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\IReport.cs">
+      <Link>Reporting\IReport.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\IReportWithAdditionalData.cs">
+      <Link>Reporting\IReportWithAdditionalData.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\ReportAttribute.cs">
+      <Link>Reporting\ReportAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\ReportRegistry.cs">
+      <Link>Reporting\ReportRegistry.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\ReportRetrieveRequest.cs">
+      <Link>Reporting\ReportRetrieveRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\ReportRetrieveResponse.cs">
+      <Link>Reporting\ReportRetrieveResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Worksheet\ReportColumn.cs">
+      <Link>Reporting\Worksheet\ReportColumn.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Reporting\Worksheet\ReportColumnConverter.cs">
+      <Link>Reporting\Worksheet\ReportColumnConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\DynamicScript.cs">
+      <Link>DynamicScript\DynamicScriptTypes\DynamicScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\RowLookupScript.cs">
+      <Link>DynamicScript\DynamicScriptTypes\RowLookupScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\LookupScript.cs">
+      <Link>DynamicScript\DynamicScriptTypes\LookupScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Common\CommonIncludes.cs">
+      <Link>Common\CommonIncludes.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\ColumnsScript.cs">
+      <Link>DynamicScript\PropertyEditor\ColumnsScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\ColumnsScriptRegistration.cs">
+      <Link>DynamicScript\PropertyEditor\ColumnsScriptRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\FormScript.cs">
+      <Link>DynamicScript\PropertyEditor\FormScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\DynamicScriptRegistration.cs">
+      <Link>DynamicScript\PropertyEditor\DynamicScriptRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\LookupScriptRegistration.cs">
+      <Link>DynamicScript\PropertyEditor\LookupScriptRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\FormScriptRegistration.cs">
+      <Link>DynamicScript\PropertyEditor\FormScriptRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\TemplateHelper.cs">
+      <Link>Mvc\TemplateHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScript\DynamicScriptManager.Script.cs">
+      <Link>DynamicScript\DynamicScript\DynamicScriptManager.Script.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScript\DynamicScriptManager.cs">
+      <Link>DynamicScript\DynamicScript\DynamicScriptManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScript\INamedDynamicScript.cs">
+      <Link>DynamicScript\DynamicScript\INamedDynamicScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScript\ITwoLevelCached.cs">
+      <Link>DynamicScript\DynamicScript\ITwoLevelCached.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScript\IScriptName.cs">
+      <Link>DynamicScript\DynamicScript\IScriptName.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScript\IDynamicScript.cs">
+      <Link>DynamicScript\DynamicScript\IDynamicScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\PhoneEditorAttribute.cs">
+      <Link>DynamicScript\PropertyEditor\PhoneEditorAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\EmailEditorAttribute.cs">
+      <Link>DynamicScript\PropertyEditor\EmailEditorAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\DataScript.cs">
+      <Link>Code</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Security\RecaptchaValidation.cs">
+      <Link>Security\RecaptchaValidation.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Security\SiteMembershipProvider.cs">
+      <Link>Security\SiteMembershipProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Security\WebSecurityHelper.cs">
+      <Link>Security\WebSecurityHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.ColumnPickerDialog.cs">
+      <Link>Texts\Texts.Controls.ColumnPickerDialog.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.ImageUpload.cs">
+      <Link>Texts\Texts.Controls.ImageUpload.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.EntityDialog.cs">
+      <Link>Texts\Texts.Controls.EntityDialog.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.EntityGrid.cs">
+      <Link>Texts\Texts.Controls.EntityGrid.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.FilterPanel.cs">
+      <Link>Texts\Texts.Controls.FilterPanel.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.Pager.cs">
+      <Link>Texts\Texts.Controls.Pager.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.SelectEditor.cs">
+      <Link>Texts\Texts.Controls.SelectEditor.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.PropertyGrid.cs">
+      <Link>Texts\Texts.Controls.PropertyGrid.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Controls.QuickSearch.cs">
+      <Link>Texts\Texts.Controls.QuickSearch.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.cs">
+      <Link>Texts\Texts.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Dialogs.cs">
+      <Link>Texts\Texts.Dialogs.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Texts\Texts.Validation.cs">
+      <Link>Texts\Texts.Validation.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\MultipleImageUploadBehavior.cs">
+      <Link>Upload\MultipleImageUploadBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\ImageUploadBehavior.cs">
+      <Link>Upload\ImageUploadBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\EmbeddedMultiFileUploadBehaviourAttribute.cs">
+      <Link>Upload\EmbeddedMultiFileUploadBehaviourAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\EmbeddedFileUploadBehaviourAttribute.cs">
+      <Link>Upload\EmbeddedFileUploadBehaviourAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\FilesToDelete.cs">
+      <Link>Upload\FilesToDelete.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\ImageChecker.cs">
+      <Link>Upload\ImageChecker.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\ImageCheckResult.cs">
+      <Link>Upload\ImageCheckResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\SwfInfo.cs">
+      <Link>Upload\SwfInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\UploadProcessor.cs">
+      <Link>Upload\UploadProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\ThumbnailGenerator.cs">
+      <Link>Upload\ThumbnailGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Upload\UploadHelper.cs">
+      <Link>Upload\UploadHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Fakes\FakeController.cs">
+      <Link>Mvc\Fakes\FakeController.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Fakes\FakeControllerContext.cs">
+      <Link>Mvc\Fakes\FakeControllerContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Fakes\FakeHttpContext.cs">
+      <Link>Mvc\Fakes\FakeHttpContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Fakes\FakeHttpRequest.cs">
+      <Link>Mvc\Fakes\FakeHttpRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Fakes\FakeHttpSessionState.cs">
+      <Link>Mvc\Fakes\FakeHttpSessionState.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Fakes\FakeIdentity.cs">
+      <Link>Mvc\Fakes\FakeIdentity.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Fakes\FakePrincipal.cs">
+      <Link>Mvc\Fakes\FakePrincipal.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\ConcatenatedScript.cs">
+      <Link>DynamicScript\DynamicScriptTypes\ConcatenatedScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScript\DynamicScriptHandler.cs">
+      <Link>DynamicScript\DynamicScript\DynamicScriptHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScript\DynamicScriptManager.Item.cs">
+      <Link>DynamicScript\DynamicScript\DynamicScriptManager.Item.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\HtmlScriptExtensions.cs">
+      <Link>Mvc\HtmlScriptExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\ContentHashCache.cs">
+      <Link>Mvc\ContentHashCache.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\LocalTextScript.cs">
+      <Link>DynamicScript\DynamicScriptTypes\LocalTextScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\DbLookupScript.cs">
+      <Link>DynamicScript\DynamicScriptTypes\DbLookupScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\PropertyItemsScript.cs">
+      <Link>DynamicScript\PropertyEditor\PropertyItemsScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\PropertyEditor\ICustomizedFormScript.cs">
+      <Link>DynamicScript\PropertyEditor\ICustomizedFormScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\RegisteredScripts.cs">
+      <Link>DynamicScript\DynamicScriptTypes\RegisteredScripts.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\ScriptBundleManager.cs">
+      <Link>Mvc\ScriptBundleManager.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\DynamicScript\DynamicScriptTypes\TemplateScript.cs">
+      <Link>DynamicScript\DynamicScriptTypes\TemplateScript.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Web\Mvc\Throttling.cs">
+      <Link>Mvc\Throttling.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\CHANGES.md">
+      <Link>Assets\Scripts\ckeditor\CHANGES.md</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\LICENSE.md">
+      <Link>Assets\Scripts\ckeditor\LICENSE.md</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\README.md">
+      <Link>Assets\Scripts\ckeditor\README.md</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\readme.md">
+      <Link>Assets\Scripts\ckeditor\skins\moono\readme.md</Link>
+    </Content>
+    <None Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.fa.json">
+      <Link>Scripts\serenity\texts\serenity.texts.fa.json</Link>
+    </None>
+    <None Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.vi-VN.json">
+      <Link>Scripts\serenity\texts\serenity.texts.vi-VN.json</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\colors.js">
+      <Link>Tooling\Node\less\lib\less\colors.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\encoder.js">
+      <Link>Tooling\Node\less\lib\less\encoder.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\env.js">
+      <Link>Tooling\Node\less\lib\less\env.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\extend-visitor.js">
+      <Link>Tooling\Node\less\lib\less\extend-visitor.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\fs.js">
+      <Link>Tooling\Node\less\lib\less\fs.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\functions.js">
+      <Link>Tooling\Node\less\lib\less\functions.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\import-visitor.js">
+      <Link>Tooling\Node\less\lib\less\import-visitor.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\index.js">
+      <Link>Tooling\Node\less\lib\less\index.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\join-selector-visitor.js">
+      <Link>Tooling\Node\less\lib\less\join-selector-visitor.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\lessc_helper.js">
+      <Link>Tooling\Node\less\lib\less\lessc_helper.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\parser.js">
+      <Link>Tooling\Node\less\lib\less\parser.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\rhino.js">
+      <Link>Tooling\Node\less\lib\less\rhino.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\source-map-output.js">
+      <Link>Tooling\Node\less\lib\less\source-map-output.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\to-css-visitor.js">
+      <Link>Tooling\Node\less\lib\less\to-css-visitor.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree.js">
+      <Link>Tooling\Node\less\lib\less\tree.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\alpha.js">
+      <Link>Tooling\Node\less\lib\less\tree\alpha.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\anonymous.js">
+      <Link>Tooling\Node\less\lib\less\tree\anonymous.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\assignment.js">
+      <Link>Tooling\Node\less\lib\less\tree\assignment.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\call.js">
+      <Link>Tooling\Node\less\lib\less\tree\call.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\color.js">
+      <Link>Tooling\Node\less\lib\less\tree\color.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\comment.js">
+      <Link>Tooling\Node\less\lib\less\tree\comment.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\condition.js">
+      <Link>Tooling\Node\less\lib\less\tree\condition.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\detached-ruleset.js">
+      <Link>Tooling\Node\less\lib\less\tree\detached-ruleset.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\dimension.js">
+      <Link>Tooling\Node\less\lib\less\tree\dimension.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\directive.js">
+      <Link>Tooling\Node\less\lib\less\tree\directive.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\element.js">
+      <Link>Tooling\Node\less\lib\less\tree\element.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\expression.js">
+      <Link>Tooling\Node\less\lib\less\tree\expression.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\extend.js">
+      <Link>Tooling\Node\less\lib\less\tree\extend.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\import.js">
+      <Link>Tooling\Node\less\lib\less\tree\import.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\javascript.js">
+      <Link>Tooling\Node\less\lib\less\tree\javascript.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\keyword.js">
+      <Link>Tooling\Node\less\lib\less\tree\keyword.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\media.js">
+      <Link>Tooling\Node\less\lib\less\tree\media.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\mixin.js">
+      <Link>Tooling\Node\less\lib\less\tree\mixin.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\negative.js">
+      <Link>Tooling\Node\less\lib\less\tree\negative.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\operation.js">
+      <Link>Tooling\Node\less\lib\less\tree\operation.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\paren.js">
+      <Link>Tooling\Node\less\lib\less\tree\paren.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\quoted.js">
+      <Link>Tooling\Node\less\lib\less\tree\quoted.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\rule.js">
+      <Link>Tooling\Node\less\lib\less\tree\rule.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\ruleset-call.js">
+      <Link>Tooling\Node\less\lib\less\tree\ruleset-call.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\ruleset.js">
+      <Link>Tooling\Node\less\lib\less\tree\ruleset.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\selector.js">
+      <Link>Tooling\Node\less\lib\less\tree\selector.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\unicode-descriptor.js">
+      <Link>Tooling\Node\less\lib\less\tree\unicode-descriptor.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\url.js">
+      <Link>Tooling\Node\less\lib\less\tree\url.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\value.js">
+      <Link>Tooling\Node\less\lib\less\tree\value.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\tree\variable.js">
+      <Link>Tooling\Node\less\lib\less\tree\variable.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\less\visitor.js">
+      <Link>Tooling\Node\less\lib\less\visitor.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\node.exe">
+      <Link>Tooling\Node\node.exe</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Mono.Cecil\Mono.Cecil.dll">
+      <Link>Tooling\Mono.Cecil\Mono.Cecil.dll</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Mono.Cecil\Mono.Cecil.Mdb.dll">
+      <Link>Tooling\Mono.Cecil\Mono.Cecil.Mdb.dll</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Mono.Cecil\Mono.Cecil.Pdb.dll">
+      <Link>Tooling\Mono.Cecil\Mono.Cecil.Pdb.dll</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Mono.Cecil\Mono.Cecil.Rocks.dll">
+      <Link>Tooling\Mono.Cecil\Mono.Cecil.Rocks.dll</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\JsEngine\MsieJavaScriptEngine.dll">
+      <Link>Tooling\JsEngine\MsieJavaScriptEngine.dll</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\fontawesome-webfont.eot">
+      <Link>Assets\Fonts\fontawesome-webfont.eot</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\fontawesome-webfont.ttf">
+      <Link>Assets\Fonts\fontawesome-webfont.ttf</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\fontawesome-webfont.woff">
+      <Link>Assets\Fonts\fontawesome-webfont.woff</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\fontawesome-webfont.woff2">
+      <Link>Assets\Fonts\fontawesome-webfont.woff2</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\FontAwesome.otf">
+      <Link>Assets\Fonts\FontAwesome.otf</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\glyphicons-halflings-regular.eot">
+      <Link>Assets\Fonts\glyphicons-halflings-regular.eot</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\glyphicons-halflings-regular.ttf">
+      <Link>Assets\Fonts\glyphicons-halflings-regular.ttf</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\glyphicons-halflings-regular.woff">
+      <Link>Assets\Fonts\glyphicons-halflings-regular.woff</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\glyphicons-halflings-regular.woff2">
+      <Link>Assets\Fonts\glyphicons-halflings-regular.woff2</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\ionicons.eot">
+      <Link>Assets\Fonts\ionicons.eot</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\ionicons.ttf">
+      <Link>Assets\Fonts\ionicons.ttf</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\ionicons.woff">
+      <Link>Assets\Fonts\ionicons.woff</Link>
+    </None>
+    <Content Include="..\Serenity.Web\Assets\Content\font-open-sans.css">
+      <Link>Assets\Content\font-open-sans.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Fonts\OpenSans.woff">
+      <Link>Assets\Fonts\OpenSans.woff</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Fonts\OpenSansBold.woff">
+      <Link>Assets\Fonts\OpenSansBold.woff</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Fonts\OpenSansItalic.woff">
+      <Link>Assets\Fonts\OpenSansItalic.woff</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Fonts\OpenSansLight.woff">
+      <Link>Assets\Fonts\OpenSansLight.woff</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Fonts\OpenSansSemiBold.woff">
+      <Link>Assets\Fonts\OpenSansSemiBold.woff</Link>
+    </Content>
+    <None Include="..\Serenity.Web\Assets\Fonts\Simple-Line-Icons.eot">
+      <Link>Assets\Fonts\Simple-Line-Icons.eot</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\Simple-Line-Icons.ttf">
+      <Link>Assets\Fonts\Simple-Line-Icons.ttf</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\Simple-Line-Icons.woff">
+      <Link>Assets\Fonts\Simple-Line-Icons.woff</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\Simple-Line-Icons.woff2">
+      <Link>Assets\Fonts\Simple-Line-Icons.woff2</Link>
+    </None>
+    <None Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.es.json">
+      <Link>Scripts\serenity\texts\serenity.texts.es.json</Link>
+    </None>
+    <None Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.it.json">
+      <Link>Scripts\serenity\texts\serenity.texts.it.json</Link>
+    </None>
+    <Content Include="..\Serenity.Web\Assets\Content\images\collapse.gif">
+      <Link>Assets\Content\images\collapse.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\images\down.gif">
+      <Link>Assets\Content\images\down.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\images\expand.gif">
+      <Link>Assets\Content\images\expand.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\images\header-columns-bg.gif">
+      <Link>Assets\Content\images\header-columns-bg.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\images\header-columns-over-bg.gif">
+      <Link>Assets\Content\images\header-columns-over-bg.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\images\sort-asc.gif">
+      <Link>Assets\Content\images\sort-asc.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\images\sort-desc.gif">
+      <Link>Assets\Content\images\sort-desc.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\slick-default-theme.css">
+      <Link>Assets\Content\slick-default-theme.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\slick.columnpicker.css">
+      <Link>Assets\Content\slick.columnpicker.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\slick.grid.css">
+      <Link>Assets\Content\slick.grid.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\slick.headerbuttons.css">
+      <Link>Assets\Content\slick.headerbuttons.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\slick.headermenu.css">
+      <Link>Assets\Content\slick.headermenu.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\slick.pager.css">
+      <Link>Assets\Content\slick.pager.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\adapters\jquery.js">
+      <Link>Assets\Scripts\ckeditor\adapters\jquery.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\build-config.js">
+      <Link>Assets\Scripts\ckeditor\build-config.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\ckeditor.js">
+      <Link>Assets\Scripts\ckeditor\ckeditor.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\config.js">
+      <Link>Assets\Scripts\ckeditor\config.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\contents.css">
+      <Link>Assets\Scripts\ckeditor\contents.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\af.js">
+      <Link>Assets\Scripts\ckeditor\lang\af.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ar.js">
+      <Link>Assets\Scripts\ckeditor\lang\ar.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\bg.js">
+      <Link>Assets\Scripts\ckeditor\lang\bg.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\bn.js">
+      <Link>Assets\Scripts\ckeditor\lang\bn.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\bs.js">
+      <Link>Assets\Scripts\ckeditor\lang\bs.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ca.js">
+      <Link>Assets\Scripts\ckeditor\lang\ca.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\cs.js">
+      <Link>Assets\Scripts\ckeditor\lang\cs.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\cy.js">
+      <Link>Assets\Scripts\ckeditor\lang\cy.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\da.js">
+      <Link>Assets\Scripts\ckeditor\lang\da.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\de-ch.js">
+      <Link>Assets\Scripts\ckeditor\lang\de-ch.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\de.js">
+      <Link>Assets\Scripts\ckeditor\lang\de.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\el.js">
+      <Link>Assets\Scripts\ckeditor\lang\el.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\en-au.js">
+      <Link>Assets\Scripts\ckeditor\lang\en-au.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\en-ca.js">
+      <Link>Assets\Scripts\ckeditor\lang\en-ca.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\en-gb.js">
+      <Link>Assets\Scripts\ckeditor\lang\en-gb.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\en.js">
+      <Link>Assets\Scripts\ckeditor\lang\en.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\eo.js">
+      <Link>Assets\Scripts\ckeditor\lang\eo.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\es.js">
+      <Link>Assets\Scripts\ckeditor\lang\es.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\et.js">
+      <Link>Assets\Scripts\ckeditor\lang\et.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\eu.js">
+      <Link>Assets\Scripts\ckeditor\lang\eu.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\fa.js">
+      <Link>Assets\Scripts\ckeditor\lang\fa.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\fi.js">
+      <Link>Assets\Scripts\ckeditor\lang\fi.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\fo.js">
+      <Link>Assets\Scripts\ckeditor\lang\fo.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\fr-ca.js">
+      <Link>Assets\Scripts\ckeditor\lang\fr-ca.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\fr.js">
+      <Link>Assets\Scripts\ckeditor\lang\fr.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\gl.js">
+      <Link>Assets\Scripts\ckeditor\lang\gl.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\gu.js">
+      <Link>Assets\Scripts\ckeditor\lang\gu.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\he.js">
+      <Link>Assets\Scripts\ckeditor\lang\he.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\hi.js">
+      <Link>Assets\Scripts\ckeditor\lang\hi.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\hr.js">
+      <Link>Assets\Scripts\ckeditor\lang\hr.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\hu.js">
+      <Link>Assets\Scripts\ckeditor\lang\hu.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\id.js">
+      <Link>Assets\Scripts\ckeditor\lang\id.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\is.js">
+      <Link>Assets\Scripts\ckeditor\lang\is.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\it.js">
+      <Link>Assets\Scripts\ckeditor\lang\it.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ja.js">
+      <Link>Assets\Scripts\ckeditor\lang\ja.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ka.js">
+      <Link>Assets\Scripts\ckeditor\lang\ka.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\km.js">
+      <Link>Assets\Scripts\ckeditor\lang\km.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ko.js">
+      <Link>Assets\Scripts\ckeditor\lang\ko.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ku.js">
+      <Link>Assets\Scripts\ckeditor\lang\ku.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\lt.js">
+      <Link>Assets\Scripts\ckeditor\lang\lt.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\lv.js">
+      <Link>Assets\Scripts\ckeditor\lang\lv.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\mk.js">
+      <Link>Assets\Scripts\ckeditor\lang\mk.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\mn.js">
+      <Link>Assets\Scripts\ckeditor\lang\mn.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ms.js">
+      <Link>Assets\Scripts\ckeditor\lang\ms.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\nb.js">
+      <Link>Assets\Scripts\ckeditor\lang\nb.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\nl.js">
+      <Link>Assets\Scripts\ckeditor\lang\nl.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\no.js">
+      <Link>Assets\Scripts\ckeditor\lang\no.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\pl.js">
+      <Link>Assets\Scripts\ckeditor\lang\pl.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\pt-br.js">
+      <Link>Assets\Scripts\ckeditor\lang\pt-br.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\pt.js">
+      <Link>Assets\Scripts\ckeditor\lang\pt.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ro.js">
+      <Link>Assets\Scripts\ckeditor\lang\ro.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ru.js">
+      <Link>Assets\Scripts\ckeditor\lang\ru.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\si.js">
+      <Link>Assets\Scripts\ckeditor\lang\si.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\sk.js">
+      <Link>Assets\Scripts\ckeditor\lang\sk.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\sl.js">
+      <Link>Assets\Scripts\ckeditor\lang\sl.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\sq.js">
+      <Link>Assets\Scripts\ckeditor\lang\sq.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\sr-latn.js">
+      <Link>Assets\Scripts\ckeditor\lang\sr-latn.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\sr.js">
+      <Link>Assets\Scripts\ckeditor\lang\sr.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\sv.js">
+      <Link>Assets\Scripts\ckeditor\lang\sv.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\th.js">
+      <Link>Assets\Scripts\ckeditor\lang\th.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\tr.js">
+      <Link>Assets\Scripts\ckeditor\lang\tr.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\tt.js">
+      <Link>Assets\Scripts\ckeditor\lang\tt.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\ug.js">
+      <Link>Assets\Scripts\ckeditor\lang\ug.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\uk.js">
+      <Link>Assets\Scripts\ckeditor\lang\uk.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\vi.js">
+      <Link>Assets\Scripts\ckeditor\lang\vi.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\zh-cn.js">
+      <Link>Assets\Scripts\ckeditor\lang\zh-cn.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\lang\zh.js">
+      <Link>Assets\Scripts\ckeditor\lang\zh.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\clipboard\dialogs\paste.js">
+      <Link>Assets\Scripts\ckeditor\plugins\clipboard\dialogs\paste.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\colordialog\dialogs\colordialog.js">
+      <Link>Assets\Scripts\ckeditor\plugins\colordialog\dialogs\colordialog.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\dialog\dialogDefinition.js">
+      <Link>Assets\Scripts\ckeditor\plugins\dialog\dialogDefinition.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\icons.png">
+      <Link>Assets\Scripts\ckeditor\plugins\icons.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\icons_hidpi.png">
+      <Link>Assets\Scripts\ckeditor\plugins\icons_hidpi.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\image\dialogs\image.js">
+      <Link>Assets\Scripts\ckeditor\plugins\image\dialogs\image.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\image\images\noimage.png">
+      <Link>Assets\Scripts\ckeditor\plugins\image\images\noimage.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\link\dialogs\anchor.js">
+      <Link>Assets\Scripts\ckeditor\plugins\link\dialogs\anchor.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\link\dialogs\link.js">
+      <Link>Assets\Scripts\ckeditor\plugins\link\dialogs\link.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\link\images\anchor.png">
+      <Link>Assets\Scripts\ckeditor\plugins\link\images\anchor.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\link\images\hidpi\anchor.png">
+      <Link>Assets\Scripts\ckeditor\plugins\link\images\hidpi\anchor.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\liststyle\dialogs\liststyle.js">
+      <Link>Assets\Scripts\ckeditor\plugins\liststyle\dialogs\liststyle.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\magicline\images\hidpi\icon-rtl.png">
+      <Link>Assets\Scripts\ckeditor\plugins\magicline\images\hidpi\icon-rtl.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\magicline\images\hidpi\icon.png">
+      <Link>Assets\Scripts\ckeditor\plugins\magicline\images\hidpi\icon.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\magicline\images\icon-rtl.png">
+      <Link>Assets\Scripts\ckeditor\plugins\magicline\images\icon-rtl.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\magicline\images\icon.png">
+      <Link>Assets\Scripts\ckeditor\plugins\magicline\images\icon.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\pastefromword\filter\default.js">
+      <Link>Assets\Scripts\ckeditor\plugins\pastefromword\filter\default.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\placeholder\dialogs\placeholder.js">
+      <Link>Assets\Scripts\ckeditor\plugins\placeholder\dialogs\placeholder.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\af.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\af.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ar.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ar.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\bg.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\bg.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ca.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ca.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\cs.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\cs.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\cy.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\cy.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\da.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\da.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\de.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\de.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\el.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\el.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\en-gb.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\en-gb.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\en.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\en.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\eo.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\eo.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\es.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\es.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\et.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\et.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\eu.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\eu.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\fa.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\fa.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\fi.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\fi.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\fr-ca.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\fr-ca.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\fr.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\fr.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\gl.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\gl.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\he.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\he.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\hr.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\hr.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\hu.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\hu.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\id.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\id.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\it.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\it.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ja.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ja.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\km.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\km.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ko.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ko.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ku.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ku.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\lt.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\lt.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\lv.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\lv.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\nb.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\nb.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\nl.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\nl.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\no.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\no.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\pl.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\pl.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\pt-br.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\pt-br.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\pt.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\pt.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ru.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ru.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\si.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\si.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\sk.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\sk.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\sl.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\sl.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\sq.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\sq.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\sv.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\sv.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\th.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\th.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\tr.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\tr.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\tt.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\tt.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ug.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\ug.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\uk.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\uk.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\vi.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\vi.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\zh-cn.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\zh-cn.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\zh.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\zh.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\_translationstatus.txt">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\lang\_translationstatus.txt</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\specialchar\dialogs\specialchar.js">
+      <Link>Assets\Scripts\ckeditor\plugins\specialchar\dialogs\specialchar.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\tabletools\dialogs\tableCell.js">
+      <Link>Assets\Scripts\ckeditor\plugins\tabletools\dialogs\tableCell.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\table\dialogs\table.js">
+      <Link>Assets\Scripts\ckeditor\plugins\table\dialogs\table.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\plugins\widget\images\handle.png">
+      <Link>Assets\Scripts\ckeditor\plugins\widget\images\handle.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\dialog.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\dialog.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\dialog_ie.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\dialog_ie.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\dialog_ie7.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\dialog_ie7.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\dialog_ie8.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\dialog_ie8.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\dialog_iequirks.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\dialog_iequirks.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\editor.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\editor.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\editor_gecko.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\editor_gecko.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\editor_ie.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\editor_ie.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\editor_ie7.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\editor_ie7.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\editor_ie8.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\editor_ie8.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\editor_iequirks.css">
+      <Link>Assets\Scripts\ckeditor\skins\moono\editor_iequirks.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\icons.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\icons.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\icons_hidpi.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\icons_hidpi.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\arrow.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\arrow.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\close.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\close.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\hidpi\close.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\hidpi\close.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\hidpi\lock-open.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\hidpi\lock-open.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\hidpi\lock.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\hidpi\lock.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\hidpi\refresh.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\hidpi\refresh.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\lock-open.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\lock-open.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\lock.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\lock.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\refresh.png">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\refresh.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\images\spinner.gif">
+      <Link>Assets\Scripts\ckeditor\skins\moono\images\spinner.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\styles.js">
+      <Link>Assets\Scripts\ckeditor\styles.js</Link>
+    </Content>
+    <None Include="..\Serenity.Web\Assets\Scripts\jspdf.js">
+      <Link>Assets\Scripts\jspdf.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jspdf.min.js">
+      <Link>Assets\Scripts\jspdf.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jspdf.plugin.autotable.js">
+      <Link>Assets\Scripts\jspdf.plugin.autotable.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jspdf.plugin.autotable.min.js">
+      <Link>Assets\Scripts\jspdf.plugin.autotable.min.js</Link>
+    </None>
+    <Content Include="..\Serenity.Web\Assets\Scripts\jquery.event.drag.js">
+      <Link>Assets\Scripts\jquery.event.drag.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\jquery.event.drag.min.js">
+      <Link>Assets\Scripts\jquery.event.drag.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\jquery.maskedinput.js">
+      <Link>Assets\Scripts\jquery.maskedinput.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\jquery.maskedinput.min.js">
+      <Link>Assets\Scripts\jquery.maskedinput.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.pt-BR.json">
+      <Link>Scripts\serenity\texts\serenity.texts.pt-BR.json</Link>
+    </Content>
+    <None Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.ru.json">
+      <Link>Scripts\serenity\texts\serenity.texts.ru.json</Link>
+    </None>
+    <None Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.de.json">
+      <Link>Scripts\serenity\texts\serenity.texts.de.json</Link>
+    </None>
+    <Content Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.zh-CN.json">
+      <Link>Scripts\serenity\texts\serenity.texts.zh-CN.json</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.pt.json">
+      <Link>Scripts\serenity\texts\serenity.texts.pt.json</Link>
+    </Content>
+    <None Include="..\Serenity.Web\Assets\Scripts\SlickGrid\README.md">
+      <Link>Assets\Scripts\SlickGrid\README.md</Link>
+    </None>
+    <None Include="..\Serenity.Web\Includes\web.config.transform">
+      <Link>Includes\web.config.transform</Link>
+    </None>
+    <None Include="..\Serenity.Web\Scripts\serenity\CoreLib\tsconfig.json">
+      <Link>Scripts\serenity\CoreLib\tsconfig.json</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\accessright.png">
+      <Link>Style\images\accessright.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\add.png">
+      <Link>Style\images\add.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\add2.png">
+      <Link>Style\images\add2.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\address-book-open.png">
+      <Link>Style\images\address-book-open.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\address-book.png">
+      <Link>Style\images\address-book.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\agenda.png">
+      <Link>Style\images\agenda.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\alarm-clock-exclamation.png">
+      <Link>Style\images\alarm-clock-exclamation.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\alarm-clock.png">
+      <Link>Style\images\alarm-clock.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\application-resize-actual.png">
+      <Link>Style\images\application-resize-actual.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\application-resize-full.png">
+      <Link>Style\images\application-resize-full.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\application-resize.png">
+      <Link>Style\images\application-resize.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\arrow-circle-135.png">
+      <Link>Style\images\arrow-circle-135.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\arrow-circle-double.png">
+      <Link>Style\images\arrow-circle-double.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\arrow-continue.png">
+      <Link>Style\images\arrow-continue.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\arrow-curve-left.png">
+      <Link>Style\images\arrow-curve-left.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\arrow-down.png">
+      <Link>Style\images\arrow-down.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\arrow-step-over.png">
+      <Link>Style\images\arrow-step-over.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\arrow-stop.png">
+      <Link>Style\images\arrow-stop.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\arrow-up.png">
+      <Link>Style\images\arrow-up.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\asterisk.png">
+      <Link>Style\images\asterisk.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\auction-hammer.png">
+      <Link>Style\images\auction-hammer.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\balance.png">
+      <Link>Style\images\balance.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\balloon.png">
+      <Link>Style\images\balloon.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\balloons.png">
+      <Link>Style\images\balloons.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\barcode.png">
+      <Link>Style\images\barcode.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\bell.png">
+      <Link>Style\images\bell.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\bin-exclamation.png">
+      <Link>Style\images\bin-exclamation.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\bin-minus.png">
+      <Link>Style\images\bin-minus.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\bin.png">
+      <Link>Style\images\bin.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\binocular.png">
+      <Link>Style\images\binocular.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\blank.gif">
+      <Link>Style\images\blank.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\block.png">
+      <Link>Style\images\block.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\blog.png">
+      <Link>Style\images\blog.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\bomb.png">
+      <Link>Style\images\bomb.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\book-open.png">
+      <Link>Style\images\book-open.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\book.png">
+      <Link>Style\images\book.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\bookmark.png">
+      <Link>Style\images\bookmark.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\box.png">
+      <Link>Style\images\box.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\briefcase.png">
+      <Link>Style\images\briefcase.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\brightness-small-low.png">
+      <Link>Style\images\brightness-small-low.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\brightness-small.png">
+      <Link>Style\images\brightness-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\bug.png">
+      <Link>Style\images\bug.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\building-arrow.png">
+      <Link>Style\images\building-arrow.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\building-medium.png">
+      <Link>Style\images\building-medium.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\building-old.png">
+      <Link>Style\images\building-old.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\building.png">
+      <Link>Style\images\building.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\calculator.png">
+      <Link>Style\images\calculator.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\calendar-blue.png">
+      <Link>Style\images\calendar-blue.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\calendar-day.png">
+      <Link>Style\images\calendar-day.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\calendar-task.png">
+      <Link>Style\images\calendar-task.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\calendar.png">
+      <Link>Style\images\calendar.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\card-small.png">
+      <Link>Style\images\card-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\categories.png">
+      <Link>Style\images\categories.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\category.png">
+      <Link>Style\images\category.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\chain-small.png">
+      <Link>Style\images\chain-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\check2.png">
+      <Link>Style\images\check2.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\checkbox-no.png">
+      <Link>Style\images\checkbox-no.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\checkbox-yes.png">
+      <Link>Style\images\checkbox-yes.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\clipboard-list.png">
+      <Link>Style\images\clipboard-list.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\clipboard-task.png">
+      <Link>Style\images\clipboard-task.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\clock.png">
+      <Link>Style\images\clock.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\construction.png">
+      <Link>Style\images\construction.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\control-record-small.png">
+      <Link>Style\images\control-record-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\counter.png">
+      <Link>Style\images\counter.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\credit-card.png">
+      <Link>Style\images\credit-card.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\cross-script.png">
+      <Link>Style\images\cross-script.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\cross.png">
+      <Link>Style\images\cross.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\csv.png">
+      <Link>Style\images\csv.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\currency.png">
+      <Link>Style\images\currency.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\cv.png">
+      <Link>Style\images\cv.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\datepicker.gif">
+      <Link>Style\images\datepicker.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\delete.png">
+      <Link>Style\images\delete.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\delete2.png">
+      <Link>Style\images\delete2.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\dialog-alert.png">
+      <Link>Style\images\dialog-alert.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\dialog-confirm.png">
+      <Link>Style\images\dialog-confirm.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\dialog-information.png">
+      <Link>Style\images\dialog-information.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\dialog-warning.png">
+      <Link>Style\images\dialog-warning.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\direction.png">
+      <Link>Style\images\direction.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\disk-arrow.png">
+      <Link>Style\images\disk-arrow.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\disk-black.png">
+      <Link>Style\images\disk-black.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\disk.png">
+      <Link>Style\images\disk.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\doc.png">
+      <Link>Style\images\doc.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\document-copy.png">
+      <Link>Style\images\document-copy.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\document-print-preview.png">
+      <Link>Style\images\document-print-preview.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\document-small-list.png">
+      <Link>Style\images\document-small-list.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\document-small.png">
+      <Link>Style\images\document-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\document-task.png">
+      <Link>Style\images\document-task.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\document.png">
+      <Link>Style\images\document.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\documents-stack.png">
+      <Link>Style\images\documents-stack.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\docx.png">
+      <Link>Style\images\docx.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\door.png">
+      <Link>Style\images\door.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\drawer.png">
+      <Link>Style\images\drawer.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\dropdown.png">
+      <Link>Style\images\dropdown.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\edit.png">
+      <Link>Style\images\edit.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\envelope.png">
+      <Link>Style\images\envelope.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\eraser-plus.png">
+      <Link>Style\images\eraser-plus.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\eraser.png">
+      <Link>Style\images\eraser.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\exclamation.png">
+      <Link>Style\images\exclamation.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\eye.png">
+      <Link>Style\images\eye.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\feed.png">
+      <Link>Style\images\feed.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\file-import.png">
+      <Link>Style\images\file-import.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\fingerprint.png">
+      <Link>Style\images\fingerprint.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\folder-arrow.png">
+      <Link>Style\images\folder-arrow.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\folder-close.png">
+      <Link>Style\images\folder-close.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\folder-horizontal.png">
+      <Link>Style\images\folder-horizontal.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\folder-import.png">
+      <Link>Style\images\folder-import.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\folder-open-document.png">
+      <Link>Style\images\folder-open-document.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\funnel.png">
+      <Link>Style\images\funnel.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\gear.png">
+      <Link>Style\images\gear.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\get-products.png">
+      <Link>Style\images\get-products.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\get.png">
+      <Link>Style\images\get.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\globe-small.png">
+      <Link>Style\images\globe-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\grid-title-bg.gif">
+      <Link>Style\images\grid-title-bg.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\gtk-print-preview.png">
+      <Link>Style\images\gtk-print-preview.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\hammer-screwdriver.png">
+      <Link>Style\images\hammer-screwdriver.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\hammer.png">
+      <Link>Style\images\hammer.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\header-columns-bg.gif">
+      <Link>Style\images\header-columns-bg.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\home.png">
+      <Link>Style\images\home.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\hourglass.png">
+      <Link>Style\images\hourglass.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\inbox-document-text.png">
+      <Link>Style\images\inbox-document-text.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\inbox-document.png">
+      <Link>Style\images\inbox-document.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\inbox.png">
+      <Link>Style\images\inbox.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\information-frame.png">
+      <Link>Style\images\information-frame.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\item.png">
+      <Link>Style\images\item.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\jpg.png">
+      <Link>Style\images\jpg.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\key.png">
+      <Link>Style\images\key.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\keyboard.png">
+      <Link>Style\images\keyboard.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\layer-small.png">
+      <Link>Style\images\layer-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\license-key.png">
+      <Link>Style\images\license-key.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\lifebuoy.png">
+      <Link>Style\images\lifebuoy.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\light-bulb.png">
+      <Link>Style\images\light-bulb.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\list-delete.png">
+      <Link>Style\images\list-delete.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\loading.gif">
+      <Link>Style\images\loading.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\location.png">
+      <Link>Style\images\location.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\lock.png">
+      <Link>Style\images\lock.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\luggage.png">
+      <Link>Style\images\luggage.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\magnifier-left.png">
+      <Link>Style\images\magnifier-left.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\magnifier-medium-left.png">
+      <Link>Style\images\magnifier-medium-left.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\magnifier-medium.png">
+      <Link>Style\images\magnifier-medium.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\magnifier-zoom.png">
+      <Link>Style\images\magnifier-zoom.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\magnifier.png">
+      <Link>Style\images\magnifier.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\mail-open.png">
+      <Link>Style\images\mail-open.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\mail.png">
+      <Link>Style\images\mail.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\medal.png">
+      <Link>Style\images\medal.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\meeting.png">
+      <Link>Style\images\meeting.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\mhtml.png">
+      <Link>Style\images\mhtml.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\money.png">
+      <Link>Style\images\money.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\new.png">
+      <Link>Style\images\new.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\newspaper.png">
+      <Link>Style\images\newspaper.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\node-insert-next.png">
+      <Link>Style\images\node-insert-next.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\node-select-all.png">
+      <Link>Style\images\node-select-all.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\notebook-pencil.png">
+      <Link>Style\images\notebook-pencil.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\notebook-share.png">
+      <Link>Style\images\notebook-share.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\notebook.png">
+      <Link>Style\images\notebook.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\notebooks.png">
+      <Link>Style\images\notebooks.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\odata.png">
+      <Link>Style\images\odata.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\open-share.png">
+      <Link>Style\images\open-share.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\order.png">
+      <Link>Style\images\order.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\organization-tree.png">
+      <Link>Style\images\organization-tree.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\outlook.png">
+      <Link>Style\images\outlook.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\pager-bg.gif">
+      <Link>Style\images\pager-bg.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\pager-load.gif">
+      <Link>Style\images\pager-load.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\paper-bag.png">
+      <Link>Style\images\paper-bag.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\paper-clip.png">
+      <Link>Style\images\paper-clip.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\pda.png">
+      <Link>Style\images\pda.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\pdf.png">
+      <Link>Style\images\pdf.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\pencil.png">
+      <Link>Style\images\pencil.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\picture-delete.png">
+      <Link>Style\images\picture-delete.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\picture.png">
+      <Link>Style\images\picture.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\pill.png">
+      <Link>Style\images\pill.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\pin.png">
+      <Link>Style\images\pin.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\pipette.png">
+      <Link>Style\images\pipette.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\place-empty.png">
+      <Link>Style\images\place-empty.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\plug.png">
+      <Link>Style\images\plug.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\plus-button.png">
+      <Link>Style\images\plus-button.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\plus-circle-false.png">
+      <Link>Style\images\plus-circle-false.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\plus-circle.png">
+      <Link>Style\images\plus-circle.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\plus-octagon-frame.png">
+      <Link>Style\images\plus-octagon-frame.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\plus.png">
+      <Link>Style\images\plus.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\png.png">
+      <Link>Style\images\png.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\price-tag.png">
+      <Link>Style\images\price-tag.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\printer.png">
+      <Link>Style\images\printer.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\product.png">
+      <Link>Style\images\product.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\project-logs.png">
+      <Link>Style\images\project-logs.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\project-module.png">
+      <Link>Style\images\project-module.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\project-version.png">
+      <Link>Style\images\project-version.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\project.png">
+      <Link>Style\images\project.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\projection-screen-presentation.png">
+      <Link>Style\images\projection-screen-presentation.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\projection-screen.png">
+      <Link>Style\images\projection-screen.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\property-blue.png">
+      <Link>Style\images\property-blue.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\property.png">
+      <Link>Style\images\property.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\question-frame.png">
+      <Link>Style\images\question-frame.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\receipt.png">
+      <Link>Style\images\receipt.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\report-arrow.png">
+      <Link>Style\images\report-arrow.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\report-excel.png">
+      <Link>Style\images\report-excel.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\report-minus.png">
+      <Link>Style\images\report-minus.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\report-pencil.png">
+      <Link>Style\images\report-pencil.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\report-plus.png">
+      <Link>Style\images\report-plus.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\report.png">
+      <Link>Style\images\report.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ruby.png">
+      <Link>Style\images\ruby.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ruler.png">
+      <Link>Style\images\ruler.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\safe.png">
+      <Link>Style\images\safe.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sale.png">
+      <Link>Style\images\sale.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\scissors.png">
+      <Link>Style\images\scissors.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\script.png">
+      <Link>Style\images\script.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\scripts-text.png">
+      <Link>Style\images\scripts-text.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sitemap-application-blue.png">
+      <Link>Style\images\sitemap-application-blue.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sitemap.png">
+      <Link>Style\images\sitemap.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\slash.png">
+      <Link>Style\images\slash.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\slick-header-columns-over-bg.gif">
+      <Link>Style\images\slick-header-columns-over-bg.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\slides.png">
+      <Link>Style\images\slides.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sofa.png">
+      <Link>Style\images\sofa.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sort-order.png">
+      <Link>Style\images\sort-order.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\spreadsheet-template.png">
+      <Link>Style\images\spreadsheet-template.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\star-pencil.png">
+      <Link>Style\images\star-pencil.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sticky-note-plus.png">
+      <Link>Style\images\sticky-note-plus.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sticky-note-small-pin.png">
+      <Link>Style\images\sticky-note-small-pin.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sticky-note-small.png">
+      <Link>Style\images\sticky-note-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sticky-notes-pin.png">
+      <Link>Style\images\sticky-notes-pin.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sticky-notes-stack.png">
+      <Link>Style\images\sticky-notes-stack.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\sticky-notes.png">
+      <Link>Style\images\sticky-notes.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\stock.png">
+      <Link>Style\images\stock.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\store.png">
+      <Link>Style\images\store.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\table-chart.png">
+      <Link>Style\images\table-chart.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\table-header.gif">
+      <Link>Style\images\table-header.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\table-select-all.png">
+      <Link>Style\images\table-select-all.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\table.png">
+      <Link>Style\images\table.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tag--arrow.png">
+      <Link>Style\images\tag--arrow.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tag--exclamation.png">
+      <Link>Style\images\tag--exclamation.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tag-label.png">
+      <Link>Style\images\tag-label.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tag-small.png">
+      <Link>Style\images\tag-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tag.png">
+      <Link>Style\images\tag.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tags-label.png">
+      <Link>Style\images\tags-label.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tags.png">
+      <Link>Style\images\tags.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\thumb-file-72.png">
+      <Link>Style\images\thumb-file-72.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tick-empty.png">
+      <Link>Style\images\tick-empty.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tick-green.png">
+      <Link>Style\images\tick-green.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tick-red.png">
+      <Link>Style\images\tick-red.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ticket-arrow.png">
+      <Link>Style\images\ticket-arrow.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ticket-exclamation.png">
+      <Link>Style\images\ticket-exclamation.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ticket-plus.png">
+      <Link>Style\images\ticket-plus.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ticket-stub.png">
+      <Link>Style\images\ticket-stub.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ticket-user.png">
+      <Link>Style\images\ticket-user.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\toggle-expand.png">
+      <Link>Style\images\toggle-expand.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\toggle-small-expand.png">
+      <Link>Style\images\toggle-small-expand.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\toggle-small.png">
+      <Link>Style\images\toggle-small.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\toggle.png">
+      <Link>Style\images\toggle.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\toolbar-bg.gif">
+      <Link>Style\images\toolbar-bg.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\toolbox.png">
+      <Link>Style\images\toolbox.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\trash.png">
+      <Link>Style\images\trash.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\tree-item.png">
+      <Link>Style\images\tree-item.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\truck.png">
+      <Link>Style\images\truck.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ui-check-box-uncheck.png">
+      <Link>Style\images\ui-check-box-uncheck.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\ui-radio-button-uncheck.png">
+      <Link>Style\images\ui-radio-button-uncheck.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\unchecked.gif">
+      <Link>Style\images\unchecked.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\universal.png">
+      <Link>Style\images\universal.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\unlock-disable.png">
+      <Link>Style\images\unlock-disable.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\unlock.png">
+      <Link>Style\images\unlock.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\user-arrow.png">
+      <Link>Style\images\user-arrow.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\user-business.png">
+      <Link>Style\images\user-business.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\user-female.png">
+      <Link>Style\images\user-female.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\user-share.png">
+      <Link>Style\images\user-share.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\user-worker.png">
+      <Link>Style\images\user-worker.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\user.png">
+      <Link>Style\images\user.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\users.png">
+      <Link>Style\images\users.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\viewtree.png">
+      <Link>Style\images\viewtree.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\wall-brick.png">
+      <Link>Style\images\wall-brick.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\wand-plus.png">
+      <Link>Style\images\wand-plus.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\wand.png">
+      <Link>Style\images\wand.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\warning.png">
+      <Link>Style\images\warning.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\wheel.png">
+      <Link>Style\images\wheel.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\wooden-box.png">
+      <Link>Style\images\wooden-box.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\wrench-screwdriver.png">
+      <Link>Style\images\wrench-screwdriver.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\wrench.png">
+      <Link>Style\images\wrench.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\xls.png">
+      <Link>Style\images\xls.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\xlsx.png">
+      <Link>Style\images\xlsx.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\xml.png">
+      <Link>Style\images\xml.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\zones-stack.png">
+      <Link>Style\images\zones-stack.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\images\zoom.png">
+      <Link>Style\images\zoom.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.util.less">
+      <Link>Style\serenity.util.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.quickfilters.less">
+      <Link>Style\serenity.quickfilters.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.quicksearch.less">
+      <Link>Style\serenity.quicksearch.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.toolbar.less">
+      <Link>Style\serenity.toolbar.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.datagrid.less">
+      <Link>Style\serenity.datagrid.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.variables.less">
+      <Link>Style\serenity.variables.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.select2.less">
+      <Link>Style\serenity.select2.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.fileupload.less">
+      <Link>Style\serenity.fileupload.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.tree.less">
+      <Link>Style\serenity.tree.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.toastr.less">
+      <Link>Style\serenity.toastr.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.inplacecreate.less">
+      <Link>Style\serenity.inplacecreate.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.linkdropdown.less">
+      <Link>Style\serenity.linkdropdown.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.form.less">
+      <Link>Style\serenity.form.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.checkbox.less">
+      <Link>Style\serenity.checkbox.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.checktreeeditor.less">
+      <Link>Style\serenity.checktreeeditor.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.dialogs.less">
+      <Link>Style\serenity.dialogs.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.filterpanel.less">
+      <Link>Style\serenity.filterpanel.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.jqueryui.less">
+      <Link>Style\serenity.jqueryui.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.less">
+      <Link>Style\serenity.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.mixins.less">
+      <Link>Style\serenity.mixins.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.propertygrid.less">
+      <Link>Style\serenity.propertygrid.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.slickpager.less">
+      <Link>Style\serenity.slickpager.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.toolbar.buttons.less">
+      <Link>Style\serenity.toolbar.buttons.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins.less">
+      <Link>Style\bootstrap\mixins.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\alerts.less">
+      <Link>Style\bootstrap\mixins\alerts.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\background-variant.less">
+      <Link>Style\bootstrap\mixins\background-variant.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\border-radius.less">
+      <Link>Style\bootstrap\mixins\border-radius.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\buttons.less">
+      <Link>Style\bootstrap\mixins\buttons.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\center-block.less">
+      <Link>Style\bootstrap\mixins\center-block.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\clearfix.less">
+      <Link>Style\bootstrap\mixins\clearfix.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\forms.less">
+      <Link>Style\bootstrap\mixins\forms.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\gradients.less">
+      <Link>Style\bootstrap\mixins\gradients.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\grid-framework.less">
+      <Link>Style\bootstrap\mixins\grid-framework.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\grid.less">
+      <Link>Style\bootstrap\mixins\grid.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\hide-text.less">
+      <Link>Style\bootstrap\mixins\hide-text.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\image.less">
+      <Link>Style\bootstrap\mixins\image.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\labels.less">
+      <Link>Style\bootstrap\mixins\labels.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\list-group.less">
+      <Link>Style\bootstrap\mixins\list-group.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\nav-divider.less">
+      <Link>Style\bootstrap\mixins\nav-divider.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\nav-vertical-align.less">
+      <Link>Style\bootstrap\mixins\nav-vertical-align.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\opacity.less">
+      <Link>Style\bootstrap\mixins\opacity.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\pagination.less">
+      <Link>Style\bootstrap\mixins\pagination.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\panels.less">
+      <Link>Style\bootstrap\mixins\panels.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\progress-bar.less">
+      <Link>Style\bootstrap\mixins\progress-bar.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\reset-filter.less">
+      <Link>Style\bootstrap\mixins\reset-filter.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\resize.less">
+      <Link>Style\bootstrap\mixins\resize.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\responsive-visibility.less">
+      <Link>Style\bootstrap\mixins\responsive-visibility.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\size.less">
+      <Link>Style\bootstrap\mixins\size.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\tab-focus.less">
+      <Link>Style\bootstrap\mixins\tab-focus.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\table-row.less">
+      <Link>Style\bootstrap\mixins\table-row.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\text-emphasis.less">
+      <Link>Style\bootstrap\mixins\text-emphasis.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\text-overflow.less">
+      <Link>Style\bootstrap\mixins\text-overflow.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\mixins\vendor-prefixes.less">
+      <Link>Style\bootstrap\mixins\vendor-prefixes.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\bootstrap\variables.less">
+      <Link>Style\bootstrap\variables.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Style\serenity.slickgrid.less">
+      <Link>Style\serenity.slickgrid.less</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\lessc.cmd">
+      <Link>Tooling\Node\lessc.cmd</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\bin\lessc">
+      <Link>Tooling\Node\less\bin\lessc</Link>
+    </None>
+    <None Include="..\Serenity.Web\Tooling\Node\less\lib\lessc">
+      <Link>Tooling\Node\less\lib\lessc</Link>
+    </None>
+    <None Include="..\Serenity.Web\tsconfig.json">
+      <Link>tsconfig.json</Link>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Core.Net45\Serenity.Core.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.Entity.Net45\Serenity.Data.Entity.csproj">
+      <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
+      <Name>Serenity.Data.Entity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data.Net45\Serenity.Data.csproj">
+      <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
+      <Name>Serenity.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Services.Net45\Serenity.Services.csproj">
+      <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>
+      <Name>Serenity.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Serenity.Web\Assets\Content\aristo\aristo.css">
+      <Link>Assets\Content\aristo\aristo.css</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\aristo\images\icon_sprite.png">
+      <Link>Assets\Content\aristo\images\icon_sprite.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\aristo\images\progress_bar.gif">
+      <Link>Assets\Content\aristo\images\progress_bar.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\aristo\images\slider_handles.png">
+      <Link>Assets\Content\aristo\images\slider_handles.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\aristo\images\ui-icons_222222_256x240.png">
+      <Link>Assets\Content\aristo\images\ui-icons_222222_256x240.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\aristo\images\ui-icons_454545_256x240.png">
+      <Link>Assets\Content\aristo\images\ui-icons_454545_256x240.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\colorbox\images\border.png">
+      <Link>Assets\Content\colorbox\images\border.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\colorbox\images\controls.png">
+      <Link>Assets\Content\colorbox\images\controls.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\colorbox\images\loading.gif">
+      <Link>Assets\Content\colorbox\images\loading.gif</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\colorbox\images\loading_background.png">
+      <Link>Assets\Content\colorbox\images\loading_background.png</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\colorbox\jquery.colorbox.css">
+      <Link>Assets\Content\colorbox\jquery.colorbox.css</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\font-awesome.css">
+      <Link>Assets\Content\font-awesome.css</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\font-awesome.min.css">
+      <Link>Assets\Content\font-awesome.min.css</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\glyphicons.css">
+      <Link>Assets\Content\glyphicons.css</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\ionicons.css">
+      <Link>Assets\Content\ionicons.css</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Content\ionicons.min.css">
+      <Link>Assets\Content\ionicons.min.css</Link>
+    </None>
+    <Content Include="..\Serenity.Web\Assets\Content\jquery.fileupload.css">
+      <Link>Assets\Content\jquery.fileupload.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\pace.css">
+      <Link>Assets\Content\pace.css</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Content\simple-line-icons.css">
+      <Link>Assets\Content\simple-line-icons.css</Link>
+    </Content>
+    <None Include="..\Serenity.Web\Assets\Fonts\fontawesome-webfont.svg">
+      <Link>Assets\Fonts\fontawesome-webfont.svg</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\glyphicons-halflings-regular.svg">
+      <Link>Assets\Fonts\glyphicons-halflings-regular.svg</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\ionicons.svg">
+      <Link>Assets\Fonts\ionicons.svg</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\Simple-Line-Icons.dev.svg">
+      <Link>Assets\Fonts\Simple-Line-Icons.dev.svg</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Fonts\Simple-Line-Icons.svg">
+      <Link>Assets\Fonts\Simple-Line-Icons.svg</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery-ui-i18n.js">
+      <Link>Assets\Scripts\jquery-ui-i18n.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery-ui-i18n.min.js">
+      <Link>Assets\Scripts\jquery-ui-i18n.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.autoNumeric.js">
+      <Link>Assets\Scripts\jquery.autoNumeric.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.autoNumeric.min.js">
+      <Link>Assets\Scripts\jquery.autoNumeric.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.blockUI.js">
+      <Link>Assets\Scripts\jquery.blockUI.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.blockUI.min.js">
+      <Link>Assets\Scripts\jquery.blockUI.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.colorbox.js">
+      <Link>Assets\Scripts\jquery.colorbox.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.colorbox.min.js">
+      <Link>Assets\Scripts\jquery.colorbox.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.cookie.js">
+      <Link>Assets\Scripts\jquery.cookie.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.cookie.min.js">
+      <Link>Assets\Scripts\jquery.cookie.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.cropzoom.js">
+      <Link>Assets\Scripts\jquery.cropzoom.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.cropzoom.min.js">
+      <Link>Assets\Scripts\jquery.cropzoom.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.dialogextendQ.js">
+      <Link>Assets\Scripts\jquery.dialogextendQ.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.dialogextendQ.min.js">
+      <Link>Assets\Scripts\jquery.dialogextendQ.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.fileupload.js">
+      <Link>Assets\Scripts\jquery.fileupload.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.fileupload.min.js">
+      <Link>Assets\Scripts\jquery.fileupload.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.iframe-transport.js">
+      <Link>Assets\Scripts\jquery.iframe-transport.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.iframe-transport.min.js">
+      <Link>Assets\Scripts\jquery.iframe-transport.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.json.js">
+      <Link>Assets\Scripts\jquery.json.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.json.min.js">
+      <Link>Assets\Scripts\jquery.json.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.scrollintoview.js">
+      <Link>Assets\Scripts\jquery.scrollintoview.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.scrollintoview.min.js">
+      <Link>Assets\Scripts\jquery.scrollintoview.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.slimscroll.js">
+      <Link>Assets\Scripts\jquery.slimscroll.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jquery.slimscroll.min.js">
+      <Link>Assets\Scripts\jquery.slimscroll.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jsrender.js">
+      <Link>Assets\Scripts\jsrender.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\jsrender.min.js">
+      <Link>Assets\Scripts\jsrender.min.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\pace.js">
+      <Link>Assets\Scripts\pace.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\pace.min.js">
+      <Link>Assets\Scripts\pace.min.js</Link>
+    </None>
+    <Content Include="..\Serenity.Web\Assets\Scripts\saltarelle\linq.min.js">
+      <Link>Assets\Scripts\saltarelle\linq.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.tr.json">
+      <Link>Scripts\serenity\texts\serenity.texts.tr.json</Link>
+    </Content>
+    <None Include="..\Serenity.Web\Assets\Scripts\rsvp.js">
+      <Link>Assets\Scripts\rsvp.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\rsvp.min.js">
+      <Link>Assets\Scripts\rsvp.min.js</Link>
+    </None>
+    <Content Include="..\Serenity.Web\Assets\Scripts\saltarelle\mscorlib.js">
+      <Link>Assets\Scripts\saltarelle\mscorlib.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\saltarelle\linq.js">
+      <Link>Assets\Scripts\saltarelle\linq.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\saltarelle\mscorlib.min.js">
+      <Link>Assets\Scripts\saltarelle\mscorlib.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Controls\slick.columnpicker.js">
+      <Link>Assets\Scripts\SlickGrid\Controls\slick.columnpicker.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Controls\slick.pager.js">
+      <Link>Assets\Scripts\SlickGrid\Controls\slick.pager.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\MIT-LICENSE.txt">
+      <Link>Assets\Scripts\SlickGrid\MIT-LICENSE.txt</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.autotooltips.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.autotooltips.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.autotooltips.min.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.autotooltips.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.cellcopymanager.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.cellcopymanager.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.cellrangedecorator.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.cellrangedecorator.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.cellrangeselector.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.cellrangeselector.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.cellselectionmodel.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.cellselectionmodel.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.checkboxselectcolumn.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.checkboxselectcolumn.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.headerbuttons.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.headerbuttons.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.headermenu.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.headermenu.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.rowmovemanager.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.rowmovemanager.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\Plugins\slick.rowselectionmodel.js">
+      <Link>Assets\Scripts\SlickGrid\Plugins\slick.rowselectionmodel.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.js">
+      <Link>Assets\Scripts\SlickGrid\slick.core.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.min.js">
+      <Link>Assets\Scripts\SlickGrid\slick.core.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.dataview.js">
+      <Link>Assets\Scripts\SlickGrid\slick.dataview.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.editors.js">
+      <Link>Assets\Scripts\SlickGrid\slick.editors.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.formatters.js">
+      <Link>Assets\Scripts\SlickGrid\slick.formatters.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.js">
+      <Link>Assets\Scripts\SlickGrid\slick.grid.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.min.js">
+      <Link>Assets\Scripts\SlickGrid\slick.grid.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.js">
+      <Link>Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js">
+      <Link>Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.remotemodel-yahoo.js">
+      <Link>Assets\Scripts\SlickGrid\slick.remotemodel-yahoo.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Assets\Scripts\SlickGrid\slick.remotemodel.js">
+      <Link>Assets\Scripts\SlickGrid\slick.remotemodel.js</Link>
+    </Content>
+    <None Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
+      <Link>Tooling\JsEngine\typescriptServices.js</Link>
+    </None>
+    <EmbeddedResource Include="..\Serenity.Web\Scripts\tsservices\Serenity.CodeGeneration.js">
+      <Link>Scripts\tsservices\Serenity.CodeGeneration.js</Link>
+    </EmbeddedResource>
+    <None Include="..\Serenity.Web\Tooling\JsEngine\json2.min.js">
+      <Link>Tooling\JsEngine\json2.min.js</Link>
+    </None>
+    <EmbeddedResource Include="..\Serenity.Web\Scripts\optimization\uglifyjs.min.js">
+      <Link>Scripts\optimization\uglifyjs.min.js</Link>
+    </EmbeddedResource>
+    <None Include="..\Serenity.Web\Assets\Scripts\sortable.js">
+      <Link>Assets\Scripts\sortable.js</Link>
+    </None>
+    <None Include="..\Serenity.Web\Assets\Scripts\sortable.min.js">
+      <Link>Assets\Scripts\sortable.min.js</Link>
+    </None>
+    <Content Include="..\Serenity.Web\Scripts\serenity\Serenity.CoreLib.js">
+      <Link>Scripts\serenity\Serenity.CoreLib.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Scripts\serenity\Serenity.CoreLib.min.js">
+      <Link>Scripts\serenity\Serenity.CoreLib.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\32px.png">
+      <Link>Style\images\32px.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\accordion-down.png">
+      <Link>Style\images\accordion-down.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\accordion-left.png">
+      <Link>Style\images\accordion-left.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\accordion-right.png">
+      <Link>Style\images\accordion-right.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\apply-button.png">
+      <Link>Style\images\apply-button.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\apply-changes-button.png">
+      <Link>Style\images\apply-changes-button.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\calculator2.png">
+      <Link>Style\images\calculator2.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\calculator3.png">
+      <Link>Style\images\calculator3.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\certificate-fail.png">
+      <Link>Style\images\certificate-fail.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\certificate-fail2.png">
+      <Link>Style\images\certificate-fail2.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\certificate-ok.png">
+      <Link>Style\images\certificate-ok.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\certificate-ok2.png">
+      <Link>Style\images\certificate-ok2.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\checkbox-gray.png">
+      <Link>Style\images\checkbox-gray.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\checkbox-null.png">
+      <Link>Style\images\checkbox-null.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\checkbox-states.png">
+      <Link>Style\images\checkbox-states.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\data-sync.png">
+      <Link>Style\images\data-sync.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\disk-black-accept.png">
+      <Link>Style\images\disk-black-accept.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\down.gif">
+      <Link>Style\images\down.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\full-screen-2.png">
+      <Link>Style\images\full-screen-2.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\header-columns-over-bg.gif">
+      <Link>Style\images\header-columns-over-bg.gif</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\maximize-button.png">
+      <Link>Style\images\maximize-button.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\maximize-button2.png">
+      <Link>Style\images\maximize-button2.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\ok.png">
+      <Link>Style\images\ok.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\pager-buttons.png">
+      <Link>Style\images\pager-buttons.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\payment.png">
+      <Link>Style\images\payment.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\spreadsheet.png">
+      <Link>Style\images\spreadsheet.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\sprites.png">
+      <Link>Style\images\sprites.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\tag-plus.png">
+      <Link>Style\images\tag-plus.png</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Style\images\trash.gif">
+      <Link>Style\images\trash.gif</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="..\Serenity.Web\Tooling\JsEngine\lib.d.ts_">
+      <Link>Tooling\JsEngine\lib.d.ts_</Link>
+    </None>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Authorization.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Authorization.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\DataGrid\IInitializeColumn.ts">
+      <Link>Scripts\serenity\CoreLib\UI\DataGrid\IInitializeColumn.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\DataGrid\TreeGridMixin.ts">
+      <Link>Scripts\serenity\CoreLib\UI\DataGrid\TreeGridMixin.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\DataGrid\ColumnPickerDialog.ts">
+      <Link>Scripts\serenity\CoreLib\UI\DataGrid\ColumnPickerDialog.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Editors\DateEditor.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Editors\DateEditor.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Editors\LookupEditor.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Editors\LookupEditor.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Editors\DecimalEditor.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Editors\DecimalEditor.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Editors\DateYearEditor.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Editors\DateYearEditor.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\DecimalFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\DecimalFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\DateTimeFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\DateTimeFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\DateFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\DateFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilterDisplayBar.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilterDisplayBar.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\QuickSearchInput.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\QuickSearchInput.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\QuickFilterArgs.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\QuickFilterArgs.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\StringFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\StringFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\LookupFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\LookupFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\EditorFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\EditorFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\BaseFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\BaseFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\BaseEditorFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\BaseEditorFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilterDialog.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilterDialog.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilterLine.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilterLine.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilteringTypeRegistry.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilteringTypeRegistry.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilterStore.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilterStore.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilterPanel.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilterPanel.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilterWidgetBase.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilterWidgetBase.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilterOperators.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilterOperators.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\FilterOperator.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\FilterOperator.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Filtering\IFiltering.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Filtering\IFiltering.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Editors\DateTimeEditor.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Editors\DateTimeEditor.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\PropertyGrid\IGetEditValue.ts">
+      <Link>Scripts\serenity\CoreLib\UI\PropertyGrid\IGetEditValue.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\PropertyGrid\IStringValue.ts">
+      <Link>Scripts\serenity\CoreLib\UI\PropertyGrid\IStringValue.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\PropertyGrid\IDoubleValue.ts">
+      <Link>Scripts\serenity\CoreLib\UI\PropertyGrid\IDoubleValue.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\PropertyGrid\IBooleanValue.ts">
+      <Link>Scripts\serenity\CoreLib\UI\PropertyGrid\IBooleanValue.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\PropertyGrid\IAsyncInit.ts">
+      <Link>Scripts\serenity\CoreLib\UI\PropertyGrid\IAsyncInit.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\CustomValidation.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\CustomValidation.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\CreateWidgetParams.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\CreateWidgetParams.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Editors\CheckTreeEditor.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Editors\CheckTreeEditor.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\DataChangeInfo.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\DataChangeInfo.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\EnumTypeRegistry.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\EnumTypeRegistry.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\IValidateRequired.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\IValidateRequired.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Dialogs\IEditDialog.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Dialogs\IEditDialog.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Dialogs\IDialog.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Dialogs\IDialog.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\Select2Editor.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\Select2Editor.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\EntityGrid.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\EntityGrid.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\TemplatedPanel.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\TemplatedPanel.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\PropertyPanel.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\PropertyPanel.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Dialogs\PropertyDialog.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Dialogs\PropertyDialog.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Dialogs\EntityDialog.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Dialogs\EntityDialog.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\DataGrid\DataGrid.ts">
+      <Link>Scripts\serenity\CoreLib\UI\DataGrid\DataGrid.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\PropertyGrid\PropertyItem.ts">
+      <Link>Scripts\serenity\CoreLib\UI\PropertyGrid\PropertyItem.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Dialogs\TemplatedDialog.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Dialogs\TemplatedDialog.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\TemplatedWidget.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\TemplatedWidget.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\Widget.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\Widget.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\Reporting.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\Reporting.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\Flexify.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\Flexify.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\WX.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\WX.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts">
+      <Link>Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\jquery.cookie\jquery.cookie.d.ts">
+      <Link>Scripts\typings\jquery.cookie\jquery.cookie.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\jquery.validation\jquery.validation.d.ts">
+      <Link>Scripts\typings\jquery.validation\jquery.validation.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\jqueryui\jqueryui.d.ts">
+      <Link>Scripts\typings\jqueryui\jqueryui.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\jquery\jquery.d.ts">
+      <Link>Scripts\typings\jquery\jquery.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\rsvp\rsvp.d.ts">
+      <Link>Scripts\typings\rsvp\rsvp.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\slickgrid\slickgrid.d.ts">
+      <Link>Scripts\typings\slickgrid\slickgrid.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Decorators\Attributes.ts">
+      <Link>Scripts\serenity\CoreLib\Decorators\Attributes.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Decorators\Decorators.ts">
+      <Link>Scripts\serenity\CoreLib\Decorators\Decorators.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Imports\JQBlockUI.ts">
+      <Link>Scripts\serenity\CoreLib\Imports\JQBlockUI.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Imports\jQueryStatic.ts">
+      <Link>Scripts\serenity\CoreLib\Imports\jQueryStatic.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Imports\RSVP.ts">
+      <Link>Scripts\serenity\CoreLib\Imports\RSVP.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Imports\Select2.ts">
+      <Link>Scripts\serenity\CoreLib\Imports\Select2.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Imports\SS.ts">
+      <Link>Scripts\serenity\CoreLib\Imports\SS.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Imports\Toastr.ts">
+      <Link>Scripts\serenity\CoreLib\Imports\Toastr.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.ArrayUtils.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.ArrayUtils.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.BasicUtils.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.BasicUtils.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.BlockUI.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.BlockUI.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.CommonTypes.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.CommonTypes.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Config.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Config.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Culture.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Culture.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Date.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Date.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Dialogs.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Dialogs.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.ErrorHandling.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.ErrorHandling.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Html.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Html.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Layout.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Layout.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.LocalText.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.LocalText.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Lookup.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Lookup.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Notify.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Notify.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Number.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Number.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.ScriptData.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.ScriptData.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Services.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Services.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.StringHelpers.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.StringHelpers.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.TypeSystem.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.TypeSystem.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Url.ts">
+      <Link>Scripts\serenity\CoreLib\Q\Q.Url.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Serenity.Externals.Slick.ts">
+      <Link>Scripts\serenity\CoreLib\Serenity.Externals.Slick.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Serenity.Externals.ts">
+      <Link>Scripts\serenity\CoreLib\Serenity.Externals.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Services\Criteria.ts">
+      <Link>Scripts\serenity\CoreLib\Services\Criteria.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Services\ServiceError.ts">
+      <Link>Scripts\serenity\CoreLib\Services\ServiceError.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Services\ServiceResponse.ts">
+      <Link>Scripts\serenity\CoreLib\Services\ServiceResponse.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Editors\Editors.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Editors\Editors.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Formatters\Formatters.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Formatters\Formatters.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Helpers\LazyLoadHelper.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Helpers\LazyLoadHelper.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Helpers\SlickHelpers.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Helpers\SlickHelpers.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Helpers\SubDialogHelper.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Helpers\SubDialogHelper.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Helpers\TabsExtensions.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Helpers\TabsExtensions.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Helpers\UploadHelper.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Helpers\UploadHelper.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Helpers\ValidationHelper.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Helpers\ValidationHelper.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\jQuery\jQuery.FlexifyPlugin.ts">
+      <Link>Scripts\serenity\CoreLib\UI\jQuery\jQuery.FlexifyPlugin.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\jQuery\jQuery.WidgetPlugin.ts">
+      <Link>Scripts\serenity\CoreLib\UI\jQuery\jQuery.WidgetPlugin.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\jQuery\jQueryUI.ButtonNoConflict.ts">
+      <Link>Scripts\serenity\CoreLib\UI\jQuery\jQueryUI.ButtonNoConflict.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\PropertyGrid\PropertyGrid.ts">
+      <Link>Scripts\serenity\CoreLib\UI\PropertyGrid\PropertyGrid.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\Toolbar.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\Toolbar.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\Widgets.ts">
+      <Link>Scripts\serenity\CoreLib\UI\Widgets\Widgets.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts">
+      <Link>Scripts\serenity\Serenity.CoreLib.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\tsservices\typescriptServices.d.ts">
+      <Link>Scripts\tsservices\typescriptServices.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\tsservices\Serenity.CodeGeneration.ts">
+      <Link>Scripts\tsservices\Serenity.CodeGeneration.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\sortablejs\sortablejs.d.ts">
+      <Link>Scripts\typings\sortablejs\sortablejs.d.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\typings\toastr\toastr.d.ts">
+      <Link>Scripts\typings\toastr\toastr.d.ts</Link>
+    </TypeScriptCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>-->
+  <Target Name="AfterBuild">
+    <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)..\Serenity.Web\Scripts\serenity\CoreLib\tsconfig.json&quot;" ContinueOnError="false" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\lessc.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\style\serenity.less&quot; &gt; &quot;$(OutDir)serenity.css&quot;">
+    </Exec>
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\mscorlib.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\mscorlib.min.js&quot; --comments --mangle">
+    </Exec>
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\linq.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\linq.min.js&quot; --comments --mangle">
+    </Exec>
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.min.js&quot; --comments --mangle">
+    </Exec>
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.min.js&quot; --comments --mangle">
+    </Exec>
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js&quot; --comments --mangle">
+    </Exec>
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Scripts\Serenity\Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Scripts\Serenity\Serenity.CoreLib.min.js&quot; --comments --mangle">
+    </Exec>
+  </Target>
+</Project>
