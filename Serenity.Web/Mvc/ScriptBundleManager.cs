@@ -235,7 +235,8 @@ namespace Serenity.Web
                 {
                     if (s.Length < 0)
                         return false;
-                    return s.Split('.').All(x => Int32.TryParse(x, out int y));
+                    int y;
+                    return s.Split('.').All(x => Int32.TryParse(x, out y));
                 })
                 .ToArray();
 
@@ -270,7 +271,8 @@ namespace Serenity.Web
 
             if (idx < 0)
                 return scriptUrl;
-            if (expandVersion.TryGetValue(scriptUrl, out string result))
+            string result;
+            if (expandVersion.TryGetValue(scriptUrl, out result))
                 return result;
 
             var before = scriptUrl.Substring(0, idx);
@@ -303,7 +305,8 @@ namespace Serenity.Web
 
             if (!isEnabled || bundleKeyBySourceUrl == null)
                 return scriptUrl;
-            if (!bundleKeyBySourceUrl.TryGetValue(scriptUrl, out string bundleKey))
+            string bundleKey;
+            if (!bundleKeyBySourceUrl.TryGetValue(scriptUrl, out bundleKey))
                 return scriptUrl;
 
             string include = DynamicScriptManager.GetScriptInclude("Bundle." + bundleKey);

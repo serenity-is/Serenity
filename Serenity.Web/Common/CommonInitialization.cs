@@ -20,7 +20,9 @@ namespace Serenity.Web
     {
         public static void Run()
         {
+#if !COREFX
             InitializeServiceLocator();
+#endif
             InitializeSelfAssemblies();
             InitializeCaching();
             InitializeConfigurationSystem();
@@ -31,6 +33,7 @@ namespace Serenity.Web
             InitializeRequestBehaviors();
         }
 
+#if !COREFX
         public static void InitializeServiceLocator()
         {
             if (!Dependency.HasResolver)
@@ -39,6 +42,7 @@ namespace Serenity.Web
                 Dependency.SetResolver(container);
             }
         }
+#endif
 
         public static void InitializeLogging()
         {
