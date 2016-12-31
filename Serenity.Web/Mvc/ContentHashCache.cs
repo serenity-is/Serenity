@@ -4,7 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Web.Hosting;
 using System.Web;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.AspNetCore.WebUtilities;
 #endif
 
@@ -30,7 +30,7 @@ namespace Serenity.Web
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000))
             { 
-#if COREFX
+#if ASPNETCORE
                 var md5 = MD5.Create();
                 byte[] hash = md5.ComputeHash(fs);
                 return WebEncoders.Base64UrlEncode(hash);

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 #else

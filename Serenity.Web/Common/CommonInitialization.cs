@@ -7,7 +7,7 @@ using Serenity.Logging;
 using Serenity.Services;
 using System.Reflection;
 using System.Web.Hosting;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.Extensions.Caching.Memory;
 #else
 using System.Linq;
@@ -54,7 +54,7 @@ namespace Serenity.Web
 
         public static void InitializeSelfAssemblies()
         {
-#if !COREFX
+#if !ASPNETCORE
             var selfAssemblies = BuildManager.GetReferencedAssemblies()
                 .Cast<Assembly>()
                 .Where(x =>
@@ -70,8 +70,8 @@ namespace Serenity.Web
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
             if (Dependency.TryResolve<ILocalCache>() == null)
-#if COREFX
-                registrar.RegisterInstance<ILocalCache>(new MemoryCache(Dependency.Resolve<IMemoryCache>()));
+#if ASPNETCORE
+                registrar.RegisterInstance<ILocalCache>(new Serenity.Caching.MemoryCache(Dependency.Resolve<IMemoryCache>()));
 #else
                 registrar.RegisterInstance<ILocalCache>(new HttpRuntimeCache());
 #endif

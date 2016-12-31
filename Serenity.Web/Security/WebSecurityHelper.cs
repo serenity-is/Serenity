@@ -1,9 +1,10 @@
-﻿#if COREFX
+﻿using System;
+using Serenity.Abstractions;
+#if ASPNETCORE
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using System.Security.Principal;
 #else
-using Serenity.Abstractions;
-using System;
 using System.Web;
 using System.Web.Security;
 #endif
@@ -15,7 +16,7 @@ namespace Serenity
     ///   Static class contains helper functions associated with user rights, login, encrypting </summary>
     public static class WebSecurityHelper
     {
-#if !COREFX
+
         /// <summary>
         ///   Validate user identity by checking username and password and sets 
         ///   authentication ticket that is based on cookie  
@@ -56,9 +57,15 @@ namespace Serenity
             if (username == null)
                 throw new ArgumentNullException(username);
 
+#if ASPNETCORE
+            var principal = new GenericPrincipal(new GenericIdentity(username), EmptyStringArray);
+            var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
+            httpContext.Authentication.SignInAsync("CookieAuthentication", principal).Wait();
+#else
             HttpCookie authCookie = FormsAuthentication.GetAuthCookie(username, persist);
             HttpContext.Current.Response.Cookies.Remove(authCookie.Name);
             HttpContext.Current.Response.Cookies.Add(authCookie);
+#endif
         }
 
         private static string[] EmptyStringArray = new string[0];
@@ -67,6 +74,10 @@ namespace Serenity
         ///   Logs out to logged user.</summary>
         public static void LogOut()
         {
+#if ASPNETCORE
+            var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
+            httpContext.Authentication.SignOutAsync("CookieAuthentication").Wait();
+#else
             HttpCookie authCookie = new HttpCookie(FormsAuthentication.FormsCookieName);
             // Setting up a cookie which has expired, Enforce client to delete this cookie.
             authCookie.Expires = DateTime.Now.AddYears(-30);
@@ -76,8 +87,10 @@ namespace Serenity
             authCookie.Path = HttpContext.Current.Request.ApplicationPath;
             HttpContext.Current.Response.Cookies.Add(authCookie);
             //FormsAuthentication.SignOut();
+#endif
         }
 
+#if !ASPNETCORE
         public static void EnsurePermission(string permission)
         {
             if (!Authorization.HasPermission(permission))
@@ -92,7 +105,7 @@ namespace Serenity
         {
             get
             {
-#if COREFX
+#if ASPNETCORE
                 var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
                 if (httpContext == null)
                     return null;

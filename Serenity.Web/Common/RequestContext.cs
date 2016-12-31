@@ -1,5 +1,5 @@
 ﻿using Serenity.Abstractions;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.AspNetCore.Http;
 using IDictionary = System.Collections.Generic.IDictionary<object, object>;
 #else
@@ -15,7 +15,7 @@ namespace Serenity.Web
         {
             get 
             {
-#if COREFX
+#if ASPNETCORE
                 var context = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
                 if (context != null)
                     return context.Items;

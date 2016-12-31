@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-#if COREFX
+#if ASPNETCORE
 using System.Net;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -40,7 +40,7 @@ namespace Serenity.Web
                 scripts.Add(script);
 
                 return new HtmlString(String.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
-#if COREFX
+#if ASPNETCORE
                     WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(script))));
 #else
                     HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(script))));

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.AspNetCore.Mvc;
 #else
 using System.Web.Mvc;
@@ -399,7 +399,7 @@ namespace Serenity.CodeGeneration
             var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
             string url = route.Template ?? "";
 
-#if COREFX
+#if ASPNETCORE
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
 #else
             if (!url.StartsWith("~/"))

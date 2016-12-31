@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
@@ -16,13 +16,13 @@ namespace Serenity.Services
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             var request = filterContext.HttpContext.Request;
-#if COREFX
+#if ASPNETCORE
             string method = request.Method ?? "";
 #else
             string method = request.HttpMethod ?? "";
 #endif
             var prms = filterContext.ActionDescriptor
-#if COREFX
+#if ASPNETCORE
                 .Parameters
 #else
                 .GetParameters()
@@ -34,7 +34,7 @@ namespace Serenity.Services
 
             if (prms.Count() != 1)
             {
-#if COREFX
+#if ASPNETCORE
                 prms = prms.Where(x => x.Name == "request");
 #else
                 prms = prms.Where(x => x.ParameterName == "request");
@@ -44,7 +44,7 @@ namespace Serenity.Services
                     throw new ArgumentOutOfRangeException(String.Format(
                         "Method {0} has {1} parameters. JsonFilter requires an action method with only one parameter," + 
                         "or a parameter with name 'request'!",
-#if COREFX
+#if ASPNETCORE
                             ((ControllerActionDescriptor)filterContext.ActionDescriptor).ActionName, filterContext.ActionDescriptor.Parameters.Count));
 #else
                             filterContext.ActionDescriptor.ActionName, filterContext.ActionDescriptor.GetParameters().Length));
@@ -53,7 +53,7 @@ namespace Serenity.Services
 
             var prm = prms.Single();
 
-#if COREFX
+#if ASPNETCORE
             if (method.Equals("POST", StringComparison.OrdinalIgnoreCase) ||
                 method.Equals("PUT", StringComparison.OrdinalIgnoreCase))
 #else
@@ -65,7 +65,7 @@ namespace Serenity.Services
                     .Contains("application/json"))
                 {                   
                     if (request.ContentLength == 0 &&
-#if COREFX
+#if ASPNETCORE
                         !((string)request.Headers["HTTP_VIA"]).IsTrimmedEmpty())
 #else
                         !request.Headers["HTTP_VIA"].IsTrimmedEmpty())
@@ -74,7 +74,7 @@ namespace Serenity.Services
                             "Sisteme bir vekil sunucu (proxy) üzerinden bağlandınız. Sorun bundan kaynaklanıyor olabilir. " +
                             "Lütfen sunucu adresini tarayıcınızın istisna listesine ekleyiniz.");
 
-#if COREFX
+#if ASPNETCORE
                     if (filterContext.HttpContext.Request.Body.CanSeek)
                         filterContext.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
 
@@ -93,7 +93,7 @@ namespace Serenity.Services
                         using (var jr = new JsonTextReader(sr))
                         {
                             var obj = js.Deserialize(jr, prm.ParameterType);
-#if COREFX
+#if ASPNETCORE
                             filterContext.ActionArguments[prm.Name] = obj;
 #else
                             filterContext.ActionParameters[prm.ParameterName] = obj;
@@ -103,7 +103,7 @@ namespace Serenity.Services
                 }
                 else
                 {
-#if COREFX
+#if ASPNETCORE
                     string req = (string)request.Form[prm.Name] ?? (string)request.Query[prm.Name] ??
                             (string)request.Form["request"] ?? request.Query["request"];
 #else
@@ -113,7 +113,7 @@ namespace Serenity.Services
                     if (req != null)
                     {
                         var obj = JsonConvert.DeserializeObject(req, prm.ParameterType, JsonSettings.Strict);
-#if COREFX
+#if ASPNETCORE
                         filterContext.ActionArguments[prm.Name] = obj;
 #else
                         filterContext.ActionParameters[prm.ParameterName] = obj;
@@ -123,7 +123,7 @@ namespace Serenity.Services
             }
             else
             {
-#if COREFX
+#if ASPNETCORE
                 string req = (string)request.Form[prm.Name] ?? (string)request.Query[prm.Name] ??
                         (string)request.Form["request"] ?? request.Query["request"];
 #else
@@ -134,7 +134,7 @@ namespace Serenity.Services
                 if (req != null)
                 {
                     var obj = JsonConvert.DeserializeObject(req, prm.ParameterType, JsonSettings.Strict);
-#if COREFX
+#if ASPNETCORE
                     filterContext.ActionArguments[prm.Name] = obj;
 #else
                     filterContext.ActionParameters[prm.ParameterName] = obj;

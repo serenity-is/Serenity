@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if ASPNETCORE
 using Microsoft.AspNetCore.Http;
 using Serenity;
 

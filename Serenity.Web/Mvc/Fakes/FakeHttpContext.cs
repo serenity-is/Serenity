@@ -1,4 +1,4 @@
-﻿#if !COREFX
+﻿#if !ASPNETCORE
 using System.Collections.Specialized;
 using System.Security.Principal;
 using System.Web;

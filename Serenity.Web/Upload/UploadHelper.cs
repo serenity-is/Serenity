@@ -7,7 +7,7 @@ using System.IO;
 using Serenity.IO;
 using System.Configuration;
 using System.Web.Hosting;
-#if !COREFX
+#if !ASPNETCORE
 using System.Web;
 #endif
 
@@ -282,7 +282,7 @@ namespace Serenity.Web
                 fileName.StartsWith("\\") ||
                 fileName.EndsWith("/") ||
                 fileName.EndsWith("\\"))
-#if COREFX
+#if ASPNETCORE
                 throw new ArgumentOutOfRangeException("fileName");
 #else
                 throw new HttpException(0x194, "Invalid_Request");

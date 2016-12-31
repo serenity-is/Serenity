@@ -12,7 +12,7 @@
     "frameworks": {
         "netstandard1.6": {
             "buildOptions": {
-                "define": [ "COREFX", "NETSTANDARD1_6" ]
+                "define": [ "COREFX", "ASPNETCORE", "NETSTANDARD1_6" ]
             },
             "dependencies": {
                 "CoreCompat.System.Drawing": "1.0.0-beta006",
@@ -27,7 +27,8 @@
                 "System.Diagnostics.Process": "4.3.0",
                 "Dapper": "1.50.2",
                 "Microsoft.AspNetCore.Mvc.Core": "1.1.0",
-                "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.1.0"
+                "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.1.0",
+                "Microsoft.AspNetCore.Mvc.Razor": "1.1.0"
             }
         },
         "net45": {

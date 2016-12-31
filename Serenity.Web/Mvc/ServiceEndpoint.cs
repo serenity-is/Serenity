@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Serenity.Data;
 using System.Data;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 #else
@@ -17,7 +17,7 @@ namespace Serenity.Services
     public abstract class ServiceEndpoint : Controller
     {
 
-#if COREFX
+#if ASPNETCORE
         private IDbConnection connection;
         private UnitOfWork unitOfWork;
 

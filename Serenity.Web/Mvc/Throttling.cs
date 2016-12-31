@@ -1,4 +1,4 @@
-﻿#if !COREFX
+﻿#if !ASPNETCORE
 using System;
 using System.Web.Mvc;
 using System.Web;

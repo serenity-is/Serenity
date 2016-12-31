@@ -4,7 +4,7 @@ using Serenity.Data;
 using Serenity.Services;
 using System;
 using System.Reflection;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.AspNetCore.Mvc;
 #else
 using System.Web.Mvc;

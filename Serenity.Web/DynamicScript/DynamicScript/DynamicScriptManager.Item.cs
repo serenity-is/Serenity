@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
-#if COREFX
+#if ASPNETCORE
 using Microsoft.AspNetCore.WebUtilities;
 #else
 using System.Web;
