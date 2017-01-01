@@ -29,7 +29,6 @@
         "compile": {
             "excludeFiles": [
             ]
-        },
-        "debugType": "full"
+        }
     }
 }
