@@ -1,4 +1,5 @@
-﻿using Serenity.Abstractions;
+﻿#if !COREFX
+using Serenity.Abstractions;
 using Serenity.Caching;
 using Serenity.Configuration;
 using Serenity.Extensibility;
@@ -146,3 +147,4 @@ namespace Serenity.Web
         }
     }
 }
+#endif

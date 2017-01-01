@@ -11,7 +11,9 @@
                 "define": [ "COREFX", "NETSTANDARD1_6" ]
             },
             "dependencies": {
+                "Microsoft.Extensions.Caching.Memory": "1.1.0",
                 "Microsoft.Extensions.DependencyModel": "1.1.0",
+                "Microsoft.Extensions.Options": "1.1.0",
                 "System.Collections.Concurrent": "4.3.0",
                 "System.ComponentModel.Primitives": "4.3.0",
                 "System.Data.Common": "4.3.0",

@@ -5,11 +5,11 @@ namespace Serenity.Caching
     using System;
     using Microsoft.Extensions.Caching.Memory;
 
-    public class MemoryCache : ILocalCache
+    public class MemoryLocalCache : ILocalCache
     {
         private IMemoryCache cache;
 
-        public MemoryCache(IMemoryCache cache)
+        public MemoryLocalCache(IMemoryCache cache)
         {
             this.cache = cache;
         }
