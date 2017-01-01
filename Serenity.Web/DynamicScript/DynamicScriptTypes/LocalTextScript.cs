@@ -6,7 +6,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+#if ASPNETCORE
+using Microsoft.Extensions.Configuration;
+#else
 using System.Configuration;
+#endif
+
 
 namespace Serenity.Web
 {
@@ -38,9 +43,14 @@ namespace Serenity.Web
             if (packages == null)
             {
                 const string key = "LocalTextPackages";
+#if ASPNETCORE
+                packages = new Dictionary<string, string[]>();
+                Dependency.Resolve<IConfiguration>().GetSection("AppSettings:" + key).Bind(packages);
+#else
                 var setting = ConfigurationManager.AppSettings[key];
                 packages = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(
                     setting.TrimToNull() ?? "{}", JsonSettings.Tolerant);
+#endif
             }
 
             string[] packageItems;
