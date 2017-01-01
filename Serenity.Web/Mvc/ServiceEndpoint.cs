@@ -40,9 +40,6 @@ namespace Serenity.Services
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!context.Filters.Any(x => x is JsonFilter))
-                context.Filters.Add(new JsonFilter());
-
             var uowParam = context.ActionDescriptor.Parameters.FirstOrDefault(x => x.ParameterType == typeof(IUnitOfWork));
             if (uowParam != null)
             {

@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
 using Serenity.Extensibility;
 using System;
 using System.Globalization;
@@ -107,8 +109,15 @@ namespace Serenity.Web.Middleware
             LookupScriptRegistration.RegisterLookupScripts();
             FormScriptRegistration.RegisterFormScripts();
             ColumnsScriptRegistration.RegisterColumnsScripts();
+
+            var contentPath = builder.ApplicationServices.GetService<IHostingEnvironment>().ContentRootPath;
             new TemplateScriptRegistrar()
-                .Initialize(new[] { "~/Views/Templates", "~/Modules" }, watchForChanges: true);
+                .Initialize(new[] 
+                {
+                    System.IO.Path.Combine(contentPath, "Views/Templates"),
+                    System.IO.Path.Combine(contentPath, "Modules")
+                }, watchForChanges: true);
+
             ScriptFileWatcher.WatchForChanges();
             CssFileWatcher.WatchForChanges();
 

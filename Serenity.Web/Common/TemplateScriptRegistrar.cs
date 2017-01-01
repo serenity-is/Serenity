@@ -24,7 +24,9 @@ namespace Serenity.Web
 
         private void WatchForChanges(string path)
         {
-            path = HostingEnvironment.MapPath(path);
+            if (path.StartsWith("~/"))
+                path = HostingEnvironment.MapPath(path);
+
             var sw = new FileSystemWatcher(path);
             sw.IncludeSubdirectories = true;
             sw.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite;
@@ -57,7 +59,8 @@ namespace Serenity.Web
             foreach (var rootUrl in rootUrls)
             {
                 var path = rootUrl;
-                path = HostingEnvironment.MapPath(path);
+                if (path.StartsWith("~/"))
+                    path = HostingEnvironment.MapPath(path);
 
                 if (!Directory.Exists(path))
                     continue;

@@ -44,8 +44,8 @@ namespace Serenity.Web
             {
                 const string key = "LocalTextPackages";
 #if ASPNETCORE
-                packages = new Dictionary<string, string[]>();
-                Dependency.Resolve<IConfiguration>().GetSection("AppSettings:" + key).Bind(packages);
+                packages = Dependency.Resolve<IConfiguration>()
+                    .GetSection("AppSettings:" + key).Get<Dictionary<string, string[]>>();
 #else
                 var setting = ConfigurationManager.AppSettings[key];
                 packages = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(

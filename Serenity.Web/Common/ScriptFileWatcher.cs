@@ -8,7 +8,9 @@ namespace Serenity.Web
     {
         public static void WatchForChanges(string path = "~/Scripts")
         {
-            path = HostingEnvironment.MapPath(path);
+            if (path.StartsWith("~/"))
+                path = HostingEnvironment.MapPath(path);
+
             var sw = new FileSystemWatcher(path);
             sw.IncludeSubdirectories = true;
             sw.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite;
