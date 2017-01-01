@@ -8,10 +8,8 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Web.Hosting;
 using System.Web;
-#if COREFX
-using Microsoft.Extensions.Configuration;
-#else
 using System.Configuration;
+#if !COREFX
 using MsieJavaScriptEngine;
 #endif
 
@@ -81,11 +79,7 @@ namespace Serenity.Web
 #endif
             try
             {
-#if COREFX
-                var setting = Dependency.Resolve<IConfigurationRoot>().GetSection("AppSettings")["ScriptBundling"];
-#else
                 var setting = ConfigurationManager.AppSettings["ScriptBundling"];
-#endif
                 var settings = JsonConvert.DeserializeObject<ScriptBundlingSettings>(
                     setting.TrimToNull() ?? "{}", JsonSettings.Tolerant);
 

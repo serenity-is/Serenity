@@ -16,7 +16,10 @@ namespace Serenity.Caching
 
         public void Add(string key, object value, TimeSpan expiration)
         {
-            cache.Set(key, value, expiration);
+            if (expiration == TimeSpan.Zero)
+                cache.Set(key, value);
+            else
+                cache.Set(key, value, expiration);
         }
 
         public TItem Get<TItem>(string key)

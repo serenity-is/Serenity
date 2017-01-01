@@ -19,7 +19,7 @@ namespace Serenity
             DateFormat = DateHelper.DefaultDateFormat(order);
             DateTimeFormat = DateHelper.DefaultDateTimeFormat(order);
 #if COREFX
-            DateSeparator = DateTime.MaxValue.ToString("/", culture.DateTimeFormat);
+            DateSeparator = DateTime.MaxValue.ToString("yy/MM/dd", culture.DateTimeFormat)[2].ToString();
 #else
             DateSeparator = culture.DateTimeFormat.DateSeparator;
 #endif

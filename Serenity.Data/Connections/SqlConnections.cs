@@ -57,11 +57,11 @@ namespace Serenity.Data
             {
                 var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
 #if COREFX
-                var connectionSetting = Dependency.Resolve<IConfigurationRoot>().GetSection("Data:" + connectionKey);
-                var providerName = connectionSetting["ProviderName"] ?? "System.Data.SqlClient";
+                var connectionString = Dependency.Resolve<IConfiguration>().GetValue<string>("Data:" + connectionKey + ":ConnectionString");
+                var providerName = Dependency.Resolve<IConfiguration>().GetValue<string>("Data:" + connectionKey + ":ProviderName") ?? "System.Data.SqlClient";
                 var factory = GetFactory(providerName);
                 connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, 
-                    connectionSetting["ConnectionString"], providerName, factory);
+                    connectionString, providerName, factory);
 #else
                 var connectionSetting = ConfigurationManager.ConnectionStrings[connectionKey];
                 if (connectionSetting == null)

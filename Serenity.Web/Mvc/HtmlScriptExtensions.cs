@@ -7,6 +7,7 @@ using System.Net;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using IHtmlString = Microsoft.AspNetCore.Html.HtmlString;
+using HtmlHelper = Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper;
 using HttpContextBase = Microsoft.AspNetCore.Http.HttpContext;
 #else
 using System.Web;

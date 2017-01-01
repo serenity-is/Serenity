@@ -6,11 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-#if COREFX
-using Microsoft.Extensions.Configuration;
-#else
 using System.Configuration;
-#endif
 
 namespace Serenity.Web
 {
@@ -42,11 +38,7 @@ namespace Serenity.Web
             if (packages == null)
             {
                 const string key = "LocalTextPackages";
-#if COREFX
-                var setting = Dependency.Resolve<IConfigurationRoot>().GetSection("AppSettings")[key];
-#else
                 var setting = ConfigurationManager.AppSettings[key];
-#endif
                 packages = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(
                     setting.TrimToNull() ?? "{}", JsonSettings.Tolerant);
             }

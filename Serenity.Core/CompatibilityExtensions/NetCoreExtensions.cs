@@ -140,7 +140,7 @@ namespace System.Configuration
             {
                 get
                 {
-                    return Serenity.Dependency.Resolve<IConfigurationRoot>().GetSection("AppSettings")[key];
+                    return Serenity.Dependency.Resolve<IConfiguration>().GetSection("AppSettings")[key];
                 }
             }
         }

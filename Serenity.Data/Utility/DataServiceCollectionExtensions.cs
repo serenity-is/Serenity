@@ -11,6 +11,7 @@ namespace Serenity.Extensions.DependencyInjection
     {
         public static void AddConfig(this IServiceCollection services, IConfiguration configuration)
         {
+            services.TryAddSingleton<IConfiguration>(configuration);
             services.TryAddSingleton<IConfigurationRepository, AppSettingsJsonConfigRepository>();
         }
     }
