@@ -1,11 +1,9 @@
-﻿using Newtonsoft.Json;
-using Serenity.ComponentModel;
+﻿using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Serenity.IO;
-using System.Configuration;
 using System.Web.Hosting;
 #if !ASPNETCORE
 using System.Web;
@@ -23,27 +21,29 @@ namespace Serenity.Web
         public long FileSize { get; set; }
     }
 
-    [SettingScope("Application"), SettingKey("Logging")]
+    [SettingScope("Application"), SettingKey("UploadSettings")]
     public class UploadSettings
     {
-        private static UploadSettings current;
-
-        public static UploadSettings Current
-        {
-            get 
-            {
-                current = current ?? JsonConvert.DeserializeObject<UploadSettings>(
-                ConfigurationManager.AppSettings["UploadSettings"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
-                return current;
-            }
-        }
-
         public string Url { get; set; }
         public string Path { get; set; }
     }
 
     public class UploadHelper
     {
+
+        private static UploadSettings settings;
+
+        public static UploadSettings Settings
+        {
+            get
+            {
+                if (settings == null)
+                    settings = Config.Get<UploadSettings>();
+
+                return settings;
+            }
+        }
+
         private string dbFileFormat;
 
         public UploadHelper(string dbFileFormat)
@@ -157,7 +157,7 @@ namespace Serenity.Web
         {
             get
             {
-                var path = UploadSettings.Current.Path;
+                var path = Settings.Path;
                 if (path.IsEmptyOrNull())
                     throw new InvalidOperationException("Please make sure Path in appSettings\\UploadSettings is configured!");
 
@@ -166,7 +166,7 @@ namespace Serenity.Web
                 {
                     path = Path.Combine(HostingEnvironment.MapPath(appData),
                         path.Substring(appData.Length));
-                    UploadSettings.Current.Path = path;
+                    settings.Path = path;
                 }
                 
                 return path;
@@ -191,7 +191,7 @@ namespace Serenity.Web
         {
             get
             {
-                return UploadSettings.Current.Url;
+                return Settings.Url;
             }
         }
         
