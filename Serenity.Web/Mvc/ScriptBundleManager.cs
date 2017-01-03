@@ -276,9 +276,10 @@ namespace Serenity.Web
 
             path = Path.GetDirectoryName(path);
 
-            var beforeName = Path.GetFileName(before.Replace('/', '\\'));
 
-            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', '\\'));
+            var beforeName = Path.GetFileName(before.Replace('/', System.IO.Path.DirectorySeparatorChar));
+
+            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', System.IO.Path.DirectorySeparatorChar));
             if (latest == null)
             {
                 expandVersion[scriptUrl] = scriptUrl;
