@@ -60,7 +60,7 @@ namespace Serenity
 #if ASPNETCORE
             var principal = new GenericPrincipal(new GenericIdentity(username), EmptyStringArray);
             var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
-            httpContext.Authentication.SignInAsync("CookieAuthentication", principal).Wait();
+            httpContext.Authentication.SignInAsync("CookieAuthenticationScheme", principal).Wait();
 #else
             HttpCookie authCookie = FormsAuthentication.GetAuthCookie(username, persist);
             HttpContext.Current.Response.Cookies.Remove(authCookie.Name);
@@ -76,7 +76,7 @@ namespace Serenity
         {
 #if ASPNETCORE
             var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
-            httpContext.Authentication.SignOutAsync("CookieAuthentication").Wait();
+            httpContext.Authentication.SignOutAsync("CookieAuthenticationScheme").Wait();
 #else
             HttpCookie authCookie = new HttpCookie(FormsAuthentication.FormsCookieName);
             // Setting up a cookie which has expired, Enforce client to delete this cookie.
@@ -107,16 +107,7 @@ namespace Serenity
             {
 #if ASPNETCORE
                 var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
-                if (httpContext == null)
-                    return null;
-                try
-                {
-                    return httpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                }
-                catch
-                {
-                    return null;
-                }
+                return httpContext?.User?.Identity?.Name;
 #else
                 var httpContext = HttpContext.Current;
                 if (httpContext != null &&
