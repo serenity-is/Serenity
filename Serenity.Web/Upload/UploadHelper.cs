@@ -147,8 +147,10 @@ namespace Serenity.Web
         ///   Converted filename.</returns>
         public static string ToPath(string fileName)
         {
-            if (fileName != null && fileName.IndexOf('/') >= 0)
-                return fileName.Replace('/', '\\');
+            var seperator = Path.DirectorySeparatorChar;
+            var opposite = seperator == '/' ? '\\' : '/';
+            if (fileName != null && fileName.IndexOf(opposite) >= 0)
+                return fileName.Replace(opposite, seperator);
             else
                 return fileName;
         }
@@ -161,11 +163,11 @@ namespace Serenity.Web
                 if (path.IsEmptyOrNull())
                     throw new InvalidOperationException("Please make sure Path in appSettings\\UploadSettings is configured!");
 
-                string appData = @"~\App_Data\";
-                if (path.StartsWith(appData))
+                string appData1 = @"~\App_Data\";
+                string appData2 = @"~/App_Data/";
+                if (path.StartsWith(appData1) || path.StartsWith(appData2))
                 {
-                    path = Path.Combine(HostingEnvironment.MapPath(appData),
-                        path.Substring(appData.Length));
+                    path = Path.Combine(HostingEnvironment.MapPath(appData2), ToPath(path.Substring(appData2.Length)));
                     settings.Path = path;
                 }
                 
