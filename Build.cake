@@ -95,18 +95,18 @@ Task("Build")
     var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core.Net45/bin/" + configuration + "/Serenity.Core.dll");
     serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
     
-    DotNetCoreBuild("./**/project.json", new DotNetCoreBuildSettings 
-    {
-        Configuration = configuration,
-        NoIncremental = true
-    });
-    
     foreach (var projectjson in System.IO.Directory.GetFiles(".\\", "project.json", System.IO.SearchOption.AllDirectories)) 
     {
         var fn = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(projectjson));
         if (fn.StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase))
             patchProjectVer(projectjson, serenityVersion);
     }
+    
+    DotNetCoreBuild("./**/project.json", new DotNetCoreBuildSettings 
+    {
+        Configuration = configuration,
+        NoIncremental = true
+    });
 });
 
 Task("Unit-Tests")
