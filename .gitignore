@@ -44,3 +44,4 @@ Serenity.Test/Scripts/serenity/Serenity.CoreLib.js
 Serenity.Test/Scripts/serenity/Serenity.CoreLib.min.js
 .vs/restore.dg
 .vs/
+Tools/Addins/
