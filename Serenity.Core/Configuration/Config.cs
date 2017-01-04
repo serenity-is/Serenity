@@ -45,9 +45,9 @@ namespace Serenity
         {
             var scope = GetSettingScope(settingType);
 #if COREFX
-            var repository = Dependency.Resolve<IConfigurationRepository>();
+            var repository = Dependency.TryResolve<IConfigurationRepository>();
 #else
-            var repository = Dependency.Resolve<IConfigurationRepository>(scope);
+            var repository = Dependency.TryResolve<IConfigurationRepository>(scope);
 #endif
             return repository != null ? repository.Load(settingType) : null;
         }
