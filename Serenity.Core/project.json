@@ -1,34 +1,32 @@
-{
-    "version": "3.0.0-*",
-
-    "dependencies": {
-        "Newtonsoft.Json": "9.0.1"
+﻿{
+  "version": "2.7.2-*",
+  "dependencies": {
+    "Newtonsoft.Json": "9.0.1"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [
+          "COREFX",
+          "NETSTANDARD1_6"
+        ]
+      },
+      "dependencies": {
+        "Microsoft.Extensions.Caching.Memory": "1.1.0",
+        "Microsoft.Extensions.DependencyModel": "1.1.0",
+        "Microsoft.Extensions.Options": "1.1.0",
+        "System.Collections.Concurrent": "4.3.0",
+        "System.ComponentModel.Primitives": "4.3.0",
+        "System.Data.Common": "4.3.0",
+        "System.Globalization.Extensions": "4.3.0",
+        "Microsoft.Extensions.Configuration.Abstractions": "1.1.0"
+      }
     },
-
-    "frameworks": {
-        "netstandard1.6": {
-            "buildOptions": {
-                "define": [ "COREFX", "NETSTANDARD1_6" ]
-            },
-            "dependencies": {
-                "Microsoft.Extensions.Caching.Memory": "1.1.0",
-                "Microsoft.Extensions.DependencyModel": "1.1.0",
-                "Microsoft.Extensions.Options": "1.1.0",
-                "System.Collections.Concurrent": "4.3.0",
-                "System.ComponentModel.Primitives": "4.3.0",
-                "System.Data.Common": "4.3.0",
-                "System.Globalization.Extensions": "4.3.0",
-                "Microsoft.Extensions.Configuration.Abstractions": "1.1.0"
-            }
-        },
-        "net45": {
-        }
-    },
-
-    "buildOptions": {
-        "compile": {
-            "excludeFiles": [
-            ]
-        }
+    "net45": {}
+  },
+  "buildOptions": {
+    "compile": {
+      "excludeFiles": []
     }
+  }
 }
