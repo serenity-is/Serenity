@@ -1,6 +1,7 @@
 ﻿#addin "nuget:https://www.nuget.org/api/v2?package=Newtonsoft.Json&version=9.0.1"
 
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 
 var target = Argument("target", "NuGet");
 var configuration = Argument("configuration", "Release");
@@ -20,20 +21,11 @@ var nuspecParams = new Dictionary<string, string> {
     { "configuration", configuration }
 };
 
-var nugetPackages = new List<string>();
-
-Func<string, Newtonsoft.Json.Linq.JObject> loadJson = path => {
-    var content = System.IO.File.ReadAllText(path, Encoding.UTF8);
-    return Newtonsoft.Json.Linq.JObject.Parse(content);
-};
-
-Action<string, string> patchProjectVer = (projectjson, version) => {
-    var node = loadJson(projectjson);
-    if (node["version"].ToString() != "version" + "-*")
-    {
-        node["version"].Replace(version + "-*");
-        System.IO.File.WriteAllText(projectjson, node.ToString(), Encoding.UTF8);
-    }
+Func<string, string> getVersionFromNuspec = (filename) => {
+    var nuspec = System.IO.File.ReadAllText(filename);
+    var xml = XElement.Parse(nuspec);
+    XNamespace ns = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
+    return xml.Descendants(ns + "version").First().Value;
 };
 
 Func<string, System.Xml.XmlDocument> loadXml = path => 
@@ -42,6 +34,50 @@ Func<string, System.Xml.XmlDocument> loadXml = path =>
     xml.LoadXml(System.IO.File.ReadAllText(path));
     return xml;
 };
+
+nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value; 
+nuspecParams["serenityWebAssetsVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Assets.nuspec");
+nuspecParams["serenityWebToolingVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Tooling.nuspec");
+
+
+var nugetPackages = new List<string>();
+
+Func<string, JObject> loadJson = path => {
+    var content = System.IO.File.ReadAllText(path, Encoding.UTF8);
+    return JObject.Parse(content);
+};
+
+Action<string, string> patchProjectVer = (projectjson, version) => {
+	var changed = false;
+    var node = loadJson(projectjson);
+    if (node["version"].ToString() != "version" + "-*")
+    {
+        node["version"].Replace(version + "-*");
+        changed = true;
+    }
+
+	var deps = node["dependencies"] as JObject;
+	if (deps != null) {
+		foreach (var pair in (deps as IEnumerable<KeyValuePair<string, JToken>>).ToList()) {
+			if (pair.Key.StartsWith("Serenity.") &&
+				pair.Key != "Serenity.Web.Assets" &&
+				pair.Key != "Serenity.Web.Tooling")
+			{
+				var v = pair.Value as JValue;
+				if (v != null && (v.Value ?? "").ToString() != version + "-*")
+				{
+					deps[pair.Key].Replace(version + "-*");
+					changed = true;
+				}
+			}
+		}
+	}
+
+	if (changed)
+		System.IO.File.WriteAllText(projectjson, node.ToString(), Encoding.UTF8);
+
+};
+
 
 Func<string, string, string> getPackageVersion = (project, package) => 
 {
@@ -72,7 +108,6 @@ Task("Clean")
 {
     CleanDirectories("./.nupkg");
     CreateDirectory("./.nupkg");
-    CreateDirectory("./.nupkg/.temp");
     CleanDirectories("./Serenity.*.Net45/**/bin/" + configuration);
     CleanDirectories("./Serenity.*/**/bin/" + configuration);
 });
@@ -95,18 +130,25 @@ Task("Build")
     var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core.Net45/bin/" + configuration + "/Serenity.Core.dll");
     serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
     
-    foreach (var projectjson in System.IO.Directory.GetFiles(".\\", "project.json", System.IO.SearchOption.AllDirectories)) 
+	var dotnetProjects = new string[] {
+		"Serenity.Core",
+		"Serenity.Data",
+		"Serenity.Data.Entity",
+		"Serenity.Services",
+		"Serenity.Web"
+	};
+	
+    foreach (var project in dotnetProjects) 
     {
-        var fn = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(projectjson));
-        if (fn.StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase))
-            patchProjectVer(projectjson, serenityVersion);
+		var projectJson = @".\" + project + @"\project.json";
+		patchProjectVer(projectJson, serenityVersion);
+		DotNetCoreRestore(projectJson);
+		DotNetCoreBuild(projectJson, new DotNetCoreBuildSettings 
+		{
+			Configuration = configuration,
+			NoIncremental = true
+		});
     }
-    
-    DotNetCoreBuild("./**/project.json", new DotNetCoreBuildSettings 
-    {
-        Configuration = configuration,
-        NoIncremental = true
-    });
 });
 
 Task("Unit-Tests")
@@ -130,14 +172,30 @@ Task("Pack")
         runGitLink();
 });
 
-Func<string, string> getVersionFromNuspec = (filename) => {
-    var nuspec = System.IO.File.ReadAllText(filename);
-    var xml = XElement.Parse(nuspec);
-    XNamespace ns = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
-    return xml.Descendants(ns + "version").First().Value;
+Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) => {
+    var config = System.IO.File.ReadAllText(path);
+    var xml = XElement.Parse(config);
+	var list = new List<Tuple<string, string, string>>();
+    return xml.Descendants("package").Select(el =>
+		new Tuple<string, string, string>(el.Attribute("id").Value, 
+			el.Attribute("version").Value, el.Attribute("targetFramework").Value))
+				.ToList();
 };
 
+
 Action<string, string> myPack = (s, id) => {
+	var prm = new Dictionary<string, string>(nuspecParams);
+
+	var packagesConfig = "./" + s + ".Net45/packages.config";
+	if (!System.IO.File.Exists(packagesConfig))
+		packagesConfig = "./" + s + "packages.config";
+		
+	var projectJson = "./" + s + "/project.json";
+	if (!System.IO.File.Exists(projectJson))
+		projectJson = null;
+		
+	setPackageVersions(prm, projectJson, packagesConfig);
+	
     var filename = "./" + s + "/" + (id ?? s) + ".nuspec";
     var nuspec = System.IO.File.ReadAllText(filename);
     string version;
@@ -151,7 +209,7 @@ Action<string, string> myPack = (s, id) => {
     }
     nuspec = nuspec.Replace("${id}", (id ?? s));
     
-    foreach (var p in nuspecParams)
+    foreach (var p in prm)
         nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
       
     var assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
@@ -164,16 +222,20 @@ Action<string, string> myPack = (s, id) => {
         nuspec = nuspec.Replace("${title}", vi.FileDescription);
         nuspec = nuspec.Replace("${description}", vi.Comments);
     }
-  
-    System.IO.File.WriteAllText("./nupkg/.temp/" + s + ".temp.nuspec", nuspec);
-   
-    NuGetPack("./nupkg/.temp/" + s + ".temp.nuspec", new NuGetPackSettings {
-        BasePath = "./" + s + "/bin/" + configuration,
-        OutputDirectory = "./nupkg",
+
+	var temp = "./.nupkg/" + s + ".temp.nuspec";
+    System.IO.File.WriteAllText(temp, nuspec);
+     
+	var basePath = @"./" + s;
+	 
+    NuGetPack(temp, new NuGetPackSettings {
+        BasePath = basePath,
+        OutputDirectory = "./.nupkg",
         NoPackageAnalysis = true
     });
     
-    nugetPackages.Add("./nupkg/" + (id ?? s) + "." + version + ".nupkg");
+	System.IO.File.Delete(temp);
+    nugetPackages.Add("./.nupkg/" + (id ?? s) + "." + version + ".nupkg");
 };
 
 Action fixNugetCache = delegate() {
@@ -198,50 +260,51 @@ Action myPush = delegate() {
     }   
 };
 
-Action setPackageVersions = delegate() {
-    nuspecParams["jsonNetVersion"] = getPackageVersion("Serenity.Core", "Newtonsoft.Json");
-    nuspecParams["couchbaseNetClientVersion"] = getPackageVersion("Serenity.Caching.Couchbase", "CouchbaseNetClient");
-    nuspecParams["stackExchangeRedisVersion"] = getPackageVersion("Serenity.Caching.Redis", "StackExchange.Redis");
-    nuspecParams["microsoftAspNetMvcVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.Mvc");
-    nuspecParams["microsoftAspNetRazorVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.Razor");
-    nuspecParams["microsoftAspNetWebPagesVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.WebPages");
-    nuspecParams["microsoftWebInfrastructureVersion"] = getPackageVersion("Serenity.Web", "Microsoft.Web.Infrastructure");
-    nuspecParams["saltarelleCompilerVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Compiler");
-    nuspecParams["saltarellejQueryVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.jQuery");
-    nuspecParams["saltarellejQueryUIVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.jQuery.UI");
-    nuspecParams["saltarelleLinqVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Linq");
-    nuspecParams["saltarelleRuntimeVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Runtime");
-    nuspecParams["saltarelleWebVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Web");
-    nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value; 
-    nuspecParams["serenityWebAssetsVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Assets.nuspec");
-    nuspecParams["serenityWebToolingVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Tooling.nuspec");
-    nuspecParams["jQueryVersion"] = getPackageVersion("Serenity.Test", "jQuery");
-    nuspecParams["jQueryUIVersion"] = getPackageVersion("Serenity.Test", "jQuery.UI.Combined");
-    nuspecParams["validationVersion"] = getPackageVersion("Serenity.Test", "jQuery.Validation");
-    nuspecParams["msieEngineVersion"] = getPackageVersion("Serenity.Test", "MsieJavaScriptEngine");
-    nuspecParams["bootstrapVersion"] = getPackageVersion("Serenity.Test", "bootstrap");
-    nuspecParams["toastrVersion"] = getPackageVersion("Serenity.Test", "toastr");
-    nuspecParams["blockUITSVersion"] = getPackageVersion("Serenity.Web", "jquery.blockUI.TypeScript.DefinitelyTyped");
-    nuspecParams["cookieTSVersion"] = getPackageVersion("Serenity.Web", "jquery.cookie.TypeScript.DefinitelyTyped");
-    nuspecParams["jQueryTSVersion"] = getPackageVersion("Serenity.Web", "jquery.TypeScript.DefinitelyTyped");
-    nuspecParams["jQueryUITSVersion"] = getPackageVersion("Serenity.Web", "jqueryui.TypeScript.DefinitelyTyped");
-    nuspecParams["validationTSVersion"] = getPackageVersion("Serenity.Web", "jquery.validation.TypeScript.DefinitelyTyped");
-    nuspecParams["sortableTSVersion"] = getPackageVersion("Serenity.Web", "sortablejs.TypeScript.DefinitelyTyped");
-    nuspecParams["toastrTSVersion"] = getPackageVersion("Serenity.Web", "toastr.TypeScript.DefinitelyTyped");
+Action<Dictionary<string, string>, JObject, string> addDeps = (p, deps, fw) => {
+	if (deps == null)
+		return;
+	
+	foreach (var pair in deps) {
+		if (pair.Value is JObject) {
+			var o = (pair.Value as JObject)["version"] as JValue;
+			if (o != null && o.Value != null)
+				p[fw + ":" + pair.Key] = o.Value.ToString();
+		}
+		else if (pair.Value is JValue && (pair.Value as JValue).Value != null) {
+			p[fw + ":" + pair.Key] = (pair.Value as JValue).Value.ToString();
+		}
+	}
+
+};
+
+Action<Dictionary<string, string>, string, string> setPackageVersions = (p, projectJson, packagesConfig) => {
+	if (projectJson != null) {
+		var jv = loadJson(projectJson);
+		addDeps(p, jv["dependencies"] as JObject, "*");
+		var fworks = jv["frameworks"] as JObject;
+		if (fworks != null)
+			foreach (var pair in fworks)
+			{
+				var obj = pair.Value as JObject;
+				if (obj != null)
+					addDeps(p, obj["dependencies"] as JObject, pair.Key);
+			}
+	}
+
+	foreach (var x in parsePackageVersions(packagesConfig))
+		p[x.Item3 + ':' + x.Item1] = x.Item2;
 };
 
 Task("NuGet")
     .IsDependentOn("Pack")
     .Does(() =>
-{
-    setPackageVersions();
-    
+{   
     myPack("Serenity.Core", null);
     //myPack("Serenity.Caching.Couchbase", null);
     //myPack("Serenity.Caching.Redis", null);
-    //myPack("Serenity.Data", null);
-    //myPack("Serenity.Data.Entity", null);
-    //myPack("Serenity.Services", null);
+    myPack("Serenity.Data", null);
+    myPack("Serenity.Data.Entity", null);
+    myPack("Serenity.Services", null);
     //myPack("Serenity.Testing", null);
     
     //myPack("Serenity.Script.UI", "Serenity.Script");

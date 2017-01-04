@@ -15,25 +15,25 @@
     <tags>${tags}</tags>
     <dependencies>
       <group targetFramework=".NETFramework4.5">
-        <dependency id="Newtonsoft.Json" version="{net45:Newtonsoft.Json}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
       </group>
       <group targetFramework=".NETStandard1.6">
-        <dependency id="Microsoft.Extensions.Caching.Memory" version="{netstandard1.6:Microsoft.Extensions.Caching.Memory}" />
-        <dependency id="Microsoft.Extensions.DependencyModel" version="{netstandard1.6:Microsoft.Extensions.DependencyModel}" />
-        <dependency id="Microsoft.Extensions.Options" version="{netstandard1.6:Microsoft.Extensions.Options}" />
-        <dependency id="System.Collections.Concurrent" version="{netstandard1.6:System.Collections.Concurrent}" />
-        <dependency id="System.ComponentModel.Primitives" version="{netstandard1.6:System.ComponentModel.Primitives}" />
-        <dependency id="System.Data.Common" version="{netstandard1.6:System.Data.Common}" />
-        <dependency id="System.Globalization.Extensions" version="{netstandard1.6:System.Globalization.Extensions}" />
-        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="{netstandard1.6:Microsoft.Extensions.Configuration.Abstractions}" />
-        <dependency id="Newtonsoft.Json" version="{netstandard1.6:Newtonsoft.Json}" />
+        <dependency id="Microsoft.Extensions.Caching.Memory" version="${netstandard1.6:Microsoft.Extensions.Caching.Memory}" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Configuration.Abstractions}" />
+        <dependency id="Microsoft.Extensions.DependencyModel" version="${netstandard1.6:Microsoft.Extensions.DependencyModel}" />
+        <dependency id="Microsoft.Extensions.Options" version="${netstandard1.6:Microsoft.Extensions.Options}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="System.Collections.Concurrent" version="${netstandard1.6:System.Collections.Concurrent}" />
+        <dependency id="System.ComponentModel.Primitives" version="${netstandard1.6:System.ComponentModel.Primitives}" />
+        <dependency id="System.Data.Common" version="${netstandard1.6:System.Data.Common}" />
+        <dependency id="System.Globalization.Extensions" version="${netstandard1.6:System.Globalization.Extensions}" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="Serenity.Core.dll" target="lib/net45" />
-    <file src="Serenity.Core.pdb" target="lib/net45" />
-    <file src="Serenity.Core.xml" target="lib/net45" />
-    <file src="../Serenity.Core/bin/${configuration}/netstandard1.6/Serenity.Core.dll" />
+    <file src="../Serenity.Core.Net45/bin/${configuration}/Serenity.Core.dll" target="lib/net45" />
+    <file src="../Serenity.Core.Net45/bin/${configuration}/Serenity.Core.pdb" target="lib/net45" />
+    <file src="../Serenity.Core.Net45/bin/${configuration}/Serenity.Core.xml" target="lib/net45" />
+    <file src="bin/${configuration}/netstandard1.6/Serenity.Core.dll" target="lib/netstandard1.6" />
   </files>
 </package>
