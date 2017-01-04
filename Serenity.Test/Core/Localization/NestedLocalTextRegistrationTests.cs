@@ -43,18 +43,6 @@ namespace Serenity.Test
         }
 
         [Fact]
-        public void NestedLocalTextRegistration_Initialize_ThrowsArgumentNull_IfAssembliesIsNull()
-        {
-            using (new MunqContext())
-            {
-                var exception = Assert.Throws<ArgumentNullException>(() =>
-                {
-                    NestedLocalTextRegistration.Initialize(null);
-                });
-            }
-        }
-
-        [Fact]
         public void NestedLocalTextRegistration_Initialize_OnlyRunsOnSpecifiedAssemblies()
         {
             using (new MunqContext())

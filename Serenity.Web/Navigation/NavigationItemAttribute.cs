@@ -58,8 +58,8 @@ namespace Serenity.Navigation
             if (actionMethod == null)
                 throw new ArgumentOutOfRangeException("action");
 
-            var routeController = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            var routeAction = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            var routeController = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
 
             if (routeController == null && routeAction == null)
                 throw new InvalidOperationException(String.Format(
@@ -72,10 +72,10 @@ namespace Serenity.Navigation
             if (routeAction != null && !url.StartsWith("~/") && !url.StartsWith("/") && routeController != null)
             {
                 var tmp = routeController.Template ?? "";
-                if (tmp.IndexOf("[action]") >= 0)
-                    url = tmp.Replace("[action]", routeAction.Template ?? "");
-                else
-                    url = tmp + url;
+                if (tmp.Length > 0 && tmp[tmp.Length - 1] != '/')
+                    tmp += "/";
+
+                url = tmp + url;
             }
 
             const string ControllerSuffix = "Controller";
