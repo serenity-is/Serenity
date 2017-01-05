@@ -1,13 +1,12 @@
 ﻿
 namespace Serenity
 {
+    using ComponentModel;
     using Couchbase;
     using Couchbase.Configuration.Client;
     using Couchbase.Core;
-    using Newtonsoft.Json;
     using Serenity.Abstractions;
     using System;
-    using System.Configuration;
 
     public class CouchbaseDistributedCache : IDistributedCache, IDisposable
     {
@@ -18,11 +17,7 @@ namespace Serenity
 
         public CouchbaseDistributedCache()
         {
-            var setting = (ConfigurationManager.AppSettings["DistributedCache"] ?? "").Trim();
-            if (setting.Length == 0)
-                setting = "{}";
-
-            this.configuration = JsonConvert.DeserializeObject<Configuration>(setting, JsonSettings.Tolerant);
+            this.configuration = Config.Get<Configuration>();
 
             if (String.IsNullOrWhiteSpace(this.configuration.ServerAddress))
                 throw new InvalidOperationException(
@@ -86,6 +81,7 @@ namespace Serenity
                 cacheClient.Upsert(key, value, expiration);
         }
 
+        [SettingKey("DistributedCache"), SettingScope("Application")]
         private class Configuration
         {
             public string ServerAddress { get; set; }

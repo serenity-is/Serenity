@@ -14,13 +14,24 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="${jsonNetVersion}" />
-      <dependency id="Serenity.Core" version="${version}" />
-      <dependency id="CouchbaseNetClient" version="${couchbaseNetClientVersion}" />
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="CouchbaseNetClient" version="${net45:CouchbaseNetClient}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+      </group>
+<!-- CouchbaseNetClient is prerelease
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="CouchbaseNetClient" version="${netstandard1.6:CouchbaseNetClient}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+      </group>
+-->
+      
     </dependencies>
   </metadata>
   <files>
-    <file src="${id}.dll" target="lib/${framework}" />
-    <file src="${id}.pdb" target="lib/${framework}" />
+    <file src="../Serenity.Caching.Couchbase.Net45/bin/${configuration}/Serenity.Caching.Couchbase.dll" target="lib/net45" />
+    <file src="../Serenity.Caching.Couchbase.Net45/bin/${configuration}/Serenity.Caching.Couchbase.pdb" target="lib/net45" />
+<!--    <file src="bin/${configuration}/netstandard1.6/Serenity.Caching.Couchbase.dll" target="lib/netstandard1.6" />-->
   </files>
 </package>

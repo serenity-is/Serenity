@@ -132,6 +132,8 @@ Task("Build")
     
 	var dotnetProjects = new string[] {
 		"Serenity.Core",
+        "Serenity.Caching.Couchbase",
+        "Serenity.Caching.Redis",
 		"Serenity.Data",
 		"Serenity.Data.Entity",
 		"Serenity.Services",
@@ -300,8 +302,8 @@ Task("NuGet")
     .Does(() =>
 {   
     myPack("Serenity.Core", null);
-    //myPack("Serenity.Caching.Couchbase", null);
-    //myPack("Serenity.Caching.Redis", null);
+    myPack("Serenity.Caching.Couchbase", null);
+    myPack("Serenity.Caching.Redis", null);
     myPack("Serenity.Data", null);
     myPack("Serenity.Data.Entity", null);
     myPack("Serenity.Services", null);
