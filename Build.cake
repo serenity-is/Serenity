@@ -3,7 +3,7 @@
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 
-var target = Argument("target", "NuGet");
+var target = Argument("target", "Pack");
 var configuration = Argument("configuration", "Release");
 
 string serenityVersion = null;
@@ -48,7 +48,7 @@ Func<string, JObject> loadJson = path => {
 };
 
 Action<string, string> patchProjectVer = (projectjson, version) => {
-	var changed = false;
+    var changed = false;
     var node = loadJson(projectjson);
     if (node["version"].ToString() != "version" + "-*")
     {
@@ -56,26 +56,31 @@ Action<string, string> patchProjectVer = (projectjson, version) => {
         changed = true;
     }
 
-	var deps = node["dependencies"] as JObject;
-	if (deps != null) {
-		foreach (var pair in (deps as IEnumerable<KeyValuePair<string, JToken>>).ToList()) {
-			if (pair.Key.StartsWith("Serenity.") &&
-				pair.Key != "Serenity.Web.Assets" &&
-				pair.Key != "Serenity.Web.Tooling")
-			{
-				var v = pair.Value as JValue;
-				if (v != null && (v.Value ?? "").ToString() != version + "-*")
-				{
-					deps[pair.Key].Replace(version + "-*");
-					changed = true;
-				}
-			}
-		}
-	}
+    var deps = node["dependencies"] as JObject;
+    if (deps != null) {
+        foreach (var pair in (deps as IEnumerable<KeyValuePair<string, JToken>>).ToList()) {
+            if (pair.Key.StartsWith("Serenity.") &&
+                pair.Key != "Serenity.Web.Assets" &&
+                pair.Key != "Serenity.Web.Tooling")
+            {
+                var v = pair.Value as JValue;
+                if (v != null && (v.Value ?? "").ToString() != version + "-*")
+                {
+                    deps[pair.Key].Replace(version + "-*");
+                    changed = true;
+                }
+            }
+        }
+    }
 
-	if (changed)
-		System.IO.File.WriteAllText(projectjson, node.ToString(), Encoding.UTF8);
+    if (changed)
+        System.IO.File.WriteAllText(projectjson, node.ToString(), Encoding.UTF8);
+};
 
+Action<string> writeHeader = (header) => {
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("*** " + header + " ***");
+    Console.ResetColor();
 };
 
 
@@ -112,15 +117,25 @@ Task("Clean")
     CleanDirectories("./Serenity.*/**/bin/" + configuration);
 });
 
-Task("Restore-NuGet-Packages")
+var dotnetProjects = new string[] {
+    "Serenity.Core",
+    "Serenity.Caching.Couchbase",
+    "Serenity.Caching.Redis",
+    "Serenity.Data",
+    "Serenity.Data.Entity",
+    "Serenity.Services",
+    "Serenity.Web"
+};
+
+Task("Restore")
     .IsDependentOn("Clean")
     .Does(context =>
 {
     NuGetRestore("./Serenity.sln");
 });
 
-Task("Build")
-    .IsDependentOn("Restore-NuGet-Packages")
+Task("Compile")
+    .IsDependentOn("Restore")
     .Does(context => 
 {
     MSBuild("./Serenity.Net45.sln", s => {
@@ -130,74 +145,60 @@ Task("Build")
     var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core.Net45/bin/" + configuration + "/Serenity.Core.dll");
     serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
     
-	var dotnetProjects = new string[] {
-		"Serenity.Core",
-        "Serenity.Caching.Couchbase",
-        "Serenity.Caching.Redis",
-		"Serenity.Data",
-		"Serenity.Data.Entity",
-		"Serenity.Services",
-		"Serenity.Web"
-	};
-	
     foreach (var project in dotnetProjects) 
     {
-		var projectJson = @".\" + project + @"\project.json";
-		patchProjectVer(projectJson, serenityVersion);
-		DotNetCoreRestore(projectJson);
-		DotNetCoreBuild(projectJson, new DotNetCoreBuildSettings 
-		{
-			Configuration = configuration,
-			NoIncremental = true
-		});
+        var projectJson = @"./" + project + @"/project.json";
+        patchProjectVer(projectJson, serenityVersion);
+        writeHeader("dotnet restore " + projectJson);
+        var exitCode = StartProcess("dotnet", "restore " + projectJson);
+        if (exitCode > 0)
+            throw new Exception("Error while restoring " + projectJson);
+        writeHeader("dotnet build " + projectJson);
+        exitCode = StartProcess("dotnet", "build " + projectJson + " -c " + configuration);
+        if (exitCode > 0)
+            throw new Exception("Error while building " + projectJson);
     }
 });
 
-Task("Unit-Tests")
-    .IsDependentOn("Build")
+Task("Test")
+    .IsDependentOn("Compile")
     .Does(() =>
 {
     XUnit2("./Serenity.Test*/**/bin/" + configuration + "/*.Test.dll");
 });
 
-Task("Copy-Files")
-    .IsDependentOn("Unit-Tests")
+Task("PdbPatch")
+    .IsDependentOn("Test")
     .Does(() =>
 {
-});
-
-Task("Pack")
-    .IsDependentOn("Copy-Files")
-    .Does(() =>
-{
-    if ((target ?? "").ToLowerInvariant() == "nuget-push")
+    if ((target ?? "").ToLowerInvariant() == "push")
         runGitLink();
 });
 
 Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) => {
     var config = System.IO.File.ReadAllText(path);
     var xml = XElement.Parse(config);
-	var list = new List<Tuple<string, string, string>>();
+    var list = new List<Tuple<string, string, string>>();
     return xml.Descendants("package").Select(el =>
-		new Tuple<string, string, string>(el.Attribute("id").Value, 
-			el.Attribute("version").Value, el.Attribute("targetFramework").Value))
-				.ToList();
+        new Tuple<string, string, string>(el.Attribute("id").Value, 
+            el.Attribute("version").Value, el.Attribute("targetFramework").Value))
+                .ToList();
 };
 
 
 Action<string, string> myPack = (s, id) => {
-	var prm = new Dictionary<string, string>(nuspecParams);
+    var prm = new Dictionary<string, string>(nuspecParams);
 
-	var packagesConfig = "./" + s + ".Net45/packages.config";
-	if (!System.IO.File.Exists(packagesConfig))
-		packagesConfig = "./" + s + "packages.config";
-		
-	var projectJson = "./" + s + "/project.json";
-	if (!System.IO.File.Exists(projectJson))
-		projectJson = null;
-		
-	setPackageVersions(prm, projectJson, packagesConfig);
-	
+    var packagesConfig = "./" + s + ".Net45/packages.config";
+    if (!System.IO.File.Exists(packagesConfig))
+        packagesConfig = "./" + s + "packages.config";
+        
+    var projectJson = "./" + s + "/project.json";
+    if (!System.IO.File.Exists(projectJson))
+        projectJson = null;
+        
+    setPackageVersions(prm, projectJson, packagesConfig);
+    
     var filename = "./" + s + "/" + (id ?? s) + ".nuspec";
     var nuspec = System.IO.File.ReadAllText(filename);
     string version;
@@ -225,18 +226,18 @@ Action<string, string> myPack = (s, id) => {
         nuspec = nuspec.Replace("${description}", vi.Comments);
     }
 
-	var temp = "./.nupkg/" + s + ".temp.nuspec";
+    var temp = "./.nupkg/" + s + ".temp.nuspec";
     System.IO.File.WriteAllText(temp, nuspec);
      
-	var basePath = @"./" + s;
-	 
+    var basePath = @"./" + s;
+     
     NuGetPack(temp, new NuGetPackSettings {
         BasePath = basePath,
         OutputDirectory = "./.nupkg",
         NoPackageAnalysis = true
     });
     
-	System.IO.File.Delete(temp);
+    System.IO.File.Delete(temp);
     nugetPackages.Add("./.nupkg/" + (id ?? s) + "." + version + ".nupkg");
 };
 
@@ -263,42 +264,42 @@ Action myPush = delegate() {
 };
 
 Action<Dictionary<string, string>, JObject, string> addDeps = (p, deps, fw) => {
-	if (deps == null)
-		return;
-	
-	foreach (var pair in deps) {
-		if (pair.Value is JObject) {
-			var o = (pair.Value as JObject)["version"] as JValue;
-			if (o != null && o.Value != null)
-				p[fw + ":" + pair.Key] = o.Value.ToString();
-		}
-		else if (pair.Value is JValue && (pair.Value as JValue).Value != null) {
-			p[fw + ":" + pair.Key] = (pair.Value as JValue).Value.ToString();
-		}
-	}
+    if (deps == null)
+        return;
+    
+    foreach (var pair in deps) {
+        if (pair.Value is JObject) {
+            var o = (pair.Value as JObject)["version"] as JValue;
+            if (o != null && o.Value != null)
+                p[fw + ":" + pair.Key] = o.Value.ToString();
+        }
+        else if (pair.Value is JValue && (pair.Value as JValue).Value != null) {
+            p[fw + ":" + pair.Key] = (pair.Value as JValue).Value.ToString();
+        }
+    }
 
 };
 
 Action<Dictionary<string, string>, string, string> setPackageVersions = (p, projectJson, packagesConfig) => {
-	if (projectJson != null) {
-		var jv = loadJson(projectJson);
-		addDeps(p, jv["dependencies"] as JObject, "*");
-		var fworks = jv["frameworks"] as JObject;
-		if (fworks != null)
-			foreach (var pair in fworks)
-			{
-				var obj = pair.Value as JObject;
-				if (obj != null)
-					addDeps(p, obj["dependencies"] as JObject, pair.Key);
-			}
-	}
+    if (projectJson != null) {
+        var jv = loadJson(projectJson);
+        addDeps(p, jv["dependencies"] as JObject, "*");
+        var fworks = jv["frameworks"] as JObject;
+        if (fworks != null)
+            foreach (var pair in fworks)
+            {
+                var obj = pair.Value as JObject;
+                if (obj != null)
+                    addDeps(p, obj["dependencies"] as JObject, pair.Key);
+            }
+    }
 
-	foreach (var x in parsePackageVersions(packagesConfig))
-		p[x.Item3 + ':' + x.Item1] = x.Item2;
+    foreach (var x in parsePackageVersions(packagesConfig))
+        p[x.Item3 + ':' + x.Item1] = x.Item2;
 };
 
-Task("NuGet")
-    .IsDependentOn("Pack")
+Task("Pack")
+    .IsDependentOn("PdbPatch")
     .Does(() =>
 {   
     myPack("Serenity.Core", null);
@@ -317,8 +318,8 @@ Task("NuGet")
     fixNugetCache();
 });
 
-Task("NuGet-Push")
-    .IsDependentOn("NuGet")
+Task("Push")
+    .IsDependentOn("Pack")
     .Does(() => 
     {
         myPush();
