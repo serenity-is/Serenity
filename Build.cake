@@ -21,6 +21,16 @@ var nuspecParams = new Dictionary<string, string> {
     { "configuration", configuration }
 };
 
+var dotnetBuildOrder = new string[] {
+    "Serenity.Core",
+    "Serenity.Caching.Couchbase",
+    "Serenity.Caching.Redis",
+    "Serenity.Data",
+    "Serenity.Data.Entity",
+    "Serenity.Services",
+    "Serenity.Web"
+};
+
 Func<string, string> getVersionFromNuspec = (filename) => {
     var nuspec = System.IO.File.ReadAllText(filename);
     var xml = XElement.Parse(nuspec);
@@ -107,74 +117,6 @@ Action runGitLink = () => {
         Arguments = System.IO.Path.GetFullPath(@".\") + " -u https://github.com/volkanceylan/serenity"
     });
 };
-    
-Task("Clean")
-    .Does(() =>
-{
-    CleanDirectories("./.nupkg");
-    CreateDirectory("./.nupkg");
-    CleanDirectories("./Serenity.*.Net45/**/bin/" + configuration);
-    CleanDirectories("./Serenity.*/**/bin/" + configuration);
-});
-
-var dotnetProjects = new string[] {
-    "Serenity.Core",
-    "Serenity.Caching.Couchbase",
-    "Serenity.Caching.Redis",
-    "Serenity.Data",
-    "Serenity.Data.Entity",
-    "Serenity.Services",
-    "Serenity.Web"
-};
-
-Task("Restore")
-    .IsDependentOn("Clean")
-    .Does(context =>
-{
-    NuGetRestore("./Serenity.sln");
-});
-
-Task("Compile")
-    .IsDependentOn("Restore")
-    .Does(context => 
-{
-    MSBuild("./Serenity.Net45.sln", s => {
-        s.SetConfiguration(configuration);
-    });
-    
-    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core.Net45/bin/" + configuration + "/Serenity.Core.dll");
-    serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
-    
-    foreach (var project in dotnetProjects) 
-    {
-        var projectJson = @"./" + project + @"/project.json";
-        patchProjectVer(projectJson, serenityVersion);
-        writeHeader("dotnet restore " + projectJson);
-        var exitCode = StartProcess("dotnet", "restore " + projectJson);
-        if (exitCode > 0)
-            throw new Exception("Error while restoring " + projectJson);
-        writeHeader("dotnet build " + projectJson);
-        exitCode = StartProcess("dotnet", "build " + projectJson + " -c " + configuration);
-        if (exitCode > 0)
-            throw new Exception("Error while building " + projectJson);
-    }
-});
-
-Task("Test")
-    .IsDependentOn("Compile")
-    .Does(() =>
-{
-    XUnit2("./Serenity.Test*/**/bin/" + configuration + "/*.Test.dll");
-});
-
-Task("PdbPatch")
-    .IsDependentOn("Test")
-    .Does(() =>
-{
-    if ((target ?? "").ToLowerInvariant() == "push" ||
-        (target ?? "").ToLowerInvariant() == "pdbpatch")
-        runGitLink();
-});
 
 Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) => {
     var config = System.IO.File.ReadAllText(path);
@@ -185,7 +127,6 @@ Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) 
             el.Attribute("version").Value, el.Attribute("targetFramework").Value))
                 .ToList();
 };
-
 
 Action<string, string> myPack = (s, id) => {
     var prm = new Dictionary<string, string>(nuspecParams);
@@ -298,6 +239,64 @@ Action<Dictionary<string, string>, string, string> setPackageVersions = (p, proj
     foreach (var x in parsePackageVersions(packagesConfig))
         p[x.Item3 + ':' + x.Item1] = x.Item2;
 };
+
+Task("Clean")
+    .Does(() =>
+{
+    CleanDirectories("./.nupkg");
+    CreateDirectory("./.nupkg");
+    CleanDirectories("./Serenity.*.Net45/**/bin/" + configuration);
+    CleanDirectories("./Serenity.*/**/bin/" + configuration);
+});
+
+Task("Restore")
+    .IsDependentOn("Clean")
+    .Does(context =>
+{
+    NuGetRestore("./Serenity.sln");
+});
+
+Task("Compile")
+    .IsDependentOn("Restore")
+    .Does(context => 
+{
+    MSBuild("./Serenity.Net45.sln", s => {
+        s.SetConfiguration(configuration);
+    });
+    
+    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core.Net45/bin/" + configuration + "/Serenity.Core.dll");
+    serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
+    
+    foreach (var project in dotnetBuildOrder) 
+    {
+        var projectJson = @"./" + project + @"/project.json";
+        patchProjectVer(projectJson, serenityVersion);
+        writeHeader("dotnet restore " + projectJson);
+        var exitCode = StartProcess("dotnet", "restore " + projectJson);
+        if (exitCode > 0)
+            throw new Exception("Error while restoring " + projectJson);
+        writeHeader("dotnet build " + projectJson);
+        exitCode = StartProcess("dotnet", "build " + projectJson + " -c " + configuration);
+        if (exitCode > 0)
+            throw new Exception("Error while building " + projectJson);
+    }
+});
+
+Task("Test")
+    .IsDependentOn("Compile")
+    .Does(() =>
+{
+    XUnit2("./Serenity.Test*/**/bin/" + configuration + "/*.Test.dll");
+});
+
+Task("PdbPatch")
+    .IsDependentOn("Test")
+    .Does(() =>
+{
+    if ((target ?? "").ToLowerInvariant() == "push" ||
+        (target ?? "").ToLowerInvariant() == "pdbpatch")
+        runGitLink();
+});
 
 Task("Pack")
     .IsDependentOn("PdbPatch")
