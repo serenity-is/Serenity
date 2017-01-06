@@ -160,7 +160,11 @@ Action<string, string> myPack = (s, id) => {
     foreach (var p in prm)
         nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
       
-    var assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
+    var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + s + ".dll";
+    if (!System.IO.File.Exists(assembly))
+        assembly = "./" + s + ".Net45/bin/" + configuration + "/" + s + ".exe";
+	if (!System.IO.File.Exists(assembly))
+		assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
     if (!System.IO.File.Exists(assembly))
         assembly = "./" + s + "/bin/" + configuration + "/" + s + ".exe";
       
@@ -314,7 +318,7 @@ Task("Pack")
     myPack("Serenity.Testing", null);
     myPack("Serenity.Script.UI", "Serenity.Script");
     myPack("Serenity.Web", null);
-    //myPack("Serenity.CodeGenerator", null);
+    myPack("Serenity.CodeGenerator", null);
     
     fixNugetCache();
 });
@@ -326,7 +330,7 @@ Task("Push")
         myPush();
     });
  
-Task("Assets")
+Task("Assets-Pack")
     .IsDependentOn("Clean")
     .Does(() =>
     {
@@ -335,13 +339,13 @@ Task("Assets")
     });
 
 Task("Assets-Push")
-    .IsDependentOn("Assets")
+    .IsDependentOn("Assets-Pack")
     .Does(() =>
     {
         myPush();
     });
 
-Task("Tooling")
+Task("Tooling-Pack")
     .IsDependentOn("Clean")
     .Does(() =>
     {
@@ -350,7 +354,7 @@ Task("Tooling")
     });
 
 Task("Tooling-Push")
-    .IsDependentOn("Tooling")
+    .IsDependentOn("Tooling-Pack")
     .Does(() =>
     {
         myPush();

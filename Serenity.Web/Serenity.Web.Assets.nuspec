@@ -15,6 +15,6 @@
     <tags>${tags}</tags>
   </metadata>
   <files>
-    <file src="..\..\Assets\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content" />
+    <file src="Assets\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content" />
   </files>
 </package>
