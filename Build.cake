@@ -171,7 +171,8 @@ Task("PdbPatch")
     .IsDependentOn("Test")
     .Does(() =>
 {
-    if ((target ?? "").ToLowerInvariant() == "push")
+    if ((target ?? "").ToLowerInvariant() == "push" ||
+        (target ?? "").ToLowerInvariant() == "pdbpatch")
         runGitLink();
 });
 
@@ -191,7 +192,7 @@ Action<string, string> myPack = (s, id) => {
 
     var packagesConfig = "./" + s + ".Net45/packages.config";
     if (!System.IO.File.Exists(packagesConfig))
-        packagesConfig = "./" + s + "packages.config";
+        packagesConfig = "./" + s + "/packages.config";
         
     var projectJson = "./" + s + "/project.json";
     if (!System.IO.File.Exists(projectJson))
@@ -308,9 +309,8 @@ Task("Pack")
     myPack("Serenity.Data", null);
     myPack("Serenity.Data.Entity", null);
     myPack("Serenity.Services", null);
-    //myPack("Serenity.Testing", null);
-    
-    //myPack("Serenity.Script.UI", "Serenity.Script");
+    myPack("Serenity.Testing", null);
+    myPack("Serenity.Script.UI", "Serenity.Script");
 
     //myPack("Serenity.Web", null);
     //myPack("Serenity.CodeGenerator", null);
