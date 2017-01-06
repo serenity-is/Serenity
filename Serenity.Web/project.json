@@ -17,7 +17,6 @@
         ]
       },
       "dependencies": {
-        "CoreCompat.System.Drawing": "1.0.0-beta006",
         "System.Data.Common": "4.3.0",
         "System.Data.SqlClient": "4.3.0",
         "System.Threading.Thread": "4.3.0",

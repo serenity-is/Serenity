@@ -138,6 +138,9 @@ Action<string, string> myPack = (s, id) => {
     var projectJson = "./" + s + "/project.json";
     if (!System.IO.File.Exists(projectJson))
         projectJson = null;
+
+    if (s == "Serenity.Web")
+        setPackageVersions(prm, null, "./Serenity.Test/packages.config");
         
     setPackageVersions(prm, projectJson, packagesConfig);
     
@@ -310,8 +313,7 @@ Task("Pack")
     myPack("Serenity.Services", null);
     myPack("Serenity.Testing", null);
     myPack("Serenity.Script.UI", "Serenity.Script");
-
-    //myPack("Serenity.Web", null);
+    myPack("Serenity.Web", null);
     //myPack("Serenity.CodeGenerator", null);
     
     fixNugetCache();
