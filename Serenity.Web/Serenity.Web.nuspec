@@ -60,6 +60,19 @@
         <dependency id="System.Net.Requests" version="${netstandard1.6:System.Net.Requests}" />
         <dependency id="System.Runtime.Extensions" version="${netstandard1.6:System.Runtime.Extensions}" />
         <dependency id="System.Threading.Thread" version="${netstandard1.6:System.Threading.Thread}" />
+        <dependency id="jQuery" version="${net45:jQuery}" />
+        <dependency id="jQuery.UI.Combined" version="${net45:jQuery.UI.Combined}" />
+        <dependency id="jQuery.Validation" version="${net45:jQuery.Validation}" />
+        <dependency id="bootstrap" version="${net45:bootstrap}" />
+        <dependency id="toastr" version="${net45:toastr}" />
+        <dependency id="Select2.js" version="[3.5.1]" />
+        <dependency id="jquery.TypeScript.DefinitelyTyped" version="${net45:jquery.TypeScript.DefinitelyTyped}" />
+        <dependency id="jqueryui.TypeScript.DefinitelyTyped" version="${net45:jqueryui.TypeScript.DefinitelyTyped}" />
+        <dependency id="jquery.blockUI.TypeScript.DefinitelyTyped" version="${net45:jquery.blockUI.TypeScript.DefinitelyTyped}" />
+        <dependency id="jquery.cookie.TypeScript.DefinitelyTyped" version="${net45:jquery.cookie.TypeScript.DefinitelyTyped}" />
+        <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="${net45:jquery.validation.TypeScript.DefinitelyTyped}" />
+        <dependency id="sortablejs.TypeScript.DefinitelyTyped" version="${net45:sortablejs.TypeScript.DefinitelyTyped}" />
+        <dependency id="toastr.TypeScript.DefinitelyTyped" version="${net45:toastr.TypeScript.DefinitelyTyped}" />
       </group>      
     </dependencies>
   </metadata>
