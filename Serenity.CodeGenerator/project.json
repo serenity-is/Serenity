@@ -3,11 +3,18 @@
   "description": "Serenity Tooling for .NET Core CLI. Contains the dotnet-sergen command used to generate code, transform templates, restore content packages.",
   "buildOptions": {
     "emitEntryPoint": true,
-    "outputName": "dotnet-sergen",
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+    "embed": {
+      "mappings": {
+        "typeScriptServices.js": "../Serenity.Web/Tooling/JsEngine/typescriptServices.js",
+        "Serenity.CodeGeneration.js": "../Serenity.Web/Scripts/tsservices/Serenity.CodeGeneration.js",
+        "lib.d.ts_": "../Serenity.Web/Tooling/JsEngine/lib.d.ts_"
+      }
+    }
   },
   "dependencies": {
-    "Newtonsoft.Json": "9.0.1"
+    "Newtonsoft.Json": "9.0.1",
+    "Serenity.Web": "2.8.0"
   },
   "frameworks": {
     "netcoreapp1.0": {
@@ -15,7 +22,15 @@
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.1.0"
-        }
+        },
+        "JavaScriptEngineSwitcher.Core": "2.2.0",
+        "JavaScriptEngineSwitcher.ChakraCore": "2.2.0",
+        "JavaScriptEngineSwitcher.ChakraCore.Native.debian-x64": "2.1.0",
+        "JavaScriptEngineSwitcher.ChakraCore.Native.osx-x64": "2.1.0",
+        "JavaScriptEngineSwitcher.ChakraCore.Native.win8-arm": "2.1.0",
+        "JavaScriptEngineSwitcher.ChakraCore.Native.win-x64": "2.1.1",
+        "JavaScriptEngineSwitcher.ChakraCore.Native.win-x86": "2.1.1",
+        "JavaScriptEngineSwitcher.Extensions.MsDependencyInjection": "2.2.0"
       }
     }
   }

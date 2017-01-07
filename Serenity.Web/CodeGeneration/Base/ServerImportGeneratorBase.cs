@@ -401,6 +401,7 @@ namespace Serenity.CodeGeneration
 
 #if ASPNETCORE
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
+            url = url.Replace("/[action]", "");
 #else
             if (!url.StartsWith("~/"))
             {

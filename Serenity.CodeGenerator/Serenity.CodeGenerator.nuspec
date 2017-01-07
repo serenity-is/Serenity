@@ -22,8 +22,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.dll" target="lib/netcoreapp1.0/dotnet-sergen.dll" />	
-    <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" />	
+    <file src="bin/${configuration}/netcoreapp1.0/Serenity.CodeGenerator.dll" target="lib/netcoreapp1.0/dotnet-sergen.dll" />	
+    <file src="bin/${configuration}/netcoreapp1.0/Serenity.CodeGenerator.runtimeconfig.json" target="lib/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" />	
     <file src="../Serenity.CodeGenerator.Net45/Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.CodeGenerator.exe" target="tools/net45/sergen.exe" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Newtonsoft.Json.dll" target="tools/net45" />
