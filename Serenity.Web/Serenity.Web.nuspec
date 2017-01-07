@@ -77,21 +77,21 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/netstandard1.6/Serenity.Web.dll" target="lib/netstandard1.6" />
-    <file src="../Serenity.Web.Net45/bin/${configuration}/Serenity.Web.dll" target="lib/net45" />
-    <file src="../Serenity.Web.Net45/bin/${configuration}/Serenity.Web.pdb" target="lib/net45" />
-    <file src="../Serenity.Web.Net45/bin/${configuration}/serenity.css" target="content/Content/serenity" />
-    <file src="Includes/web.config.transform" target="content/web.config.transform" />
-    <file src="Style/images/*.png" target="content/Content/serenity/images" />
-    <file src="Style/images/*.gif" target="content/Content/serenity/images" />
-    <file src="Style/images/*.jpg" target="content/Content/serenity/images" />
-    <file src="Scripts/typings/rsvp/rsvp.d.ts" target="content/Scripts/typings/rsvp" />
-    <file src="Scripts/typings/slickgrid/slickgrid.d.ts" target="content/Scripts/typings/slickgrid" />
-    <file src="Scripts/Serenity/Serenity.CoreLib.js" target="content/Scripts/serenity" />
-    <file src="Scripts/Serenity/Serenity.CoreLib.min.js" target="content/Scripts/serenity" />
-    <file src="Scripts/Serenity/Serenity.CoreLib.d.ts" target="content/Scripts/serenity" />
-    <file src="Scripts/Serenity/texts/**/*" exclude="**/*.bak;**/*.log;**/*.orig" target="content/Scripts/serenity/texts" />
-    <file src="../Serenity.Script.UI/bin/${configuration}/Serenity.Script.UI.js" target="content/Scripts/serenity" />
-    <file src="../Serenity.Script.UI/bin/${configuration}/Serenity.Script.UI.min.js" target="content/Scripts/serenity" />
+    <file src="bin\${configuration}\netstandard1.6\Serenity.Web.dll" target="lib/netstandard1.6" />
+    <file src="..\Serenity.Web.Net45\bin\${configuration}\Serenity.Web.dll" target="lib/net45" />
+    <file src="..\Serenity.Web.Net45\bin\${configuration}\Serenity.Web.pdb" target="lib/net45" />
+    <file src="..\Serenity.Web.Net45\bin\${configuration}\serenity.css" target="content/Content/serenity" />
+    <file src="Includes\web.config.transform" target="content\web.config.transform" />
+    <file src="Style\images\*.png" target="content/Content/serenity/images" />
+    <file src="Style\images\*.gif" target="content/Content/serenity/images" />
+    <file src="Style\images\*.jpg" target="content/Content/serenity/images" />
+    <file src="Scripts\typings\rsvp\rsvp.d.ts" target="content/Scripts/typings/rsvp" />
+    <file src="Scripts\typings\slickgrid\slickgrid.d.ts" target="content/Scripts/typings/slickgrid" />
+    <file src="Scripts\Serenity\Serenity.CoreLib.js" target="content/Scripts/serenity" />
+    <file src="Scripts\Serenity\Serenity.CoreLib.min.js" target="content/Scripts/serenity" />
+    <file src="Scripts\Serenity\Serenity.CoreLib.d.ts" target="content/Scripts/serenity" />
+    <file src="Scripts\Serenity\texts\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content/Scripts/serenity/texts" />
+    <file src="..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.js" target="content/Scripts/serenity" />
+    <file src="..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.min.js" target="content/Scripts/serenity" />
   </files>
 </package>

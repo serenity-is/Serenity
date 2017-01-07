@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Script.Test", "Ser
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Web", "Serenity.Web.Net45\Serenity.Web.csproj", "{8632943D-2A88-4C83-8451-69D62F059EFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.CodeGenerator", "Serenity.CodeGenerator\Serenity.CodeGenerator.csproj", "{49704C9A-30A2-43DE-AE3D-D13073BA50A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.CodeGenerator", "Serenity.CodeGenerator.Net45\Serenity.CodeGenerator.csproj", "{49704C9A-30A2-43DE-AE3D-D13073BA50A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Caching.Redis", "Serenity.Caching.Redis.Net45\Serenity.Caching.Redis.csproj", "{CEBB3CF6-8EED-4F6D-B29B-0EA5FF06FAF4}"
 EndProject

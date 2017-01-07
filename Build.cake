@@ -4,6 +4,9 @@ using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 
 var target = Argument("target", "Pack");
+if (target == "")
+	target = "Pack";
+	
 var configuration = Argument("configuration", "Release");
 
 string serenityVersion = null;
@@ -28,7 +31,8 @@ var dotnetBuildOrder = new string[] {
     "Serenity.Data",
     "Serenity.Data.Entity",
     "Serenity.Services",
-    "Serenity.Web"
+    "Serenity.Web",
+	"Serenity.CodeGenerator"
 };
 
 Func<string, string> getVersionFromNuspec = (filename) => {
