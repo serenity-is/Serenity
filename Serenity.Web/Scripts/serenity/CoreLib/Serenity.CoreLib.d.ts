@@ -1,10 +1,10 @@
-﻿/// <reference path="../typings/rsvp/rsvp.d.ts" />
-/// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/jquery.blockUI/jquery.blockUI.d.ts" />
-/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../typings/toastr/toastr.d.ts" />
-/// <reference path="../typings/jquery.validation/jquery.validation.d.ts" />
-/// <reference path="../typings/sortablejs/sortablejs.d.ts" />
+﻿/// <reference path="../../typings/rsvp/rsvp.d.ts" />
+/// <reference path="../../typings/jquery/jquery.d.ts" />
+/// <reference path="../../typings/jquery.blockUI/jquery.blockUI.d.ts" />
+/// <reference path="../../typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../../typings/toastr/toastr.d.ts" />
+/// <reference path="../../typings/jquery.validation/jquery.validation.d.ts" />
+/// <reference path="../../typings/sortablejs/sortablejs.d.ts" />
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }

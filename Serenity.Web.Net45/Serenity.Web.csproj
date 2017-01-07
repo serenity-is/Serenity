@@ -571,6 +571,9 @@
     <Content Include="..\Serenity.Web\Assets\Scripts\ckeditor\skins\moono\readme.md">
       <Link>Assets\Scripts\ckeditor\skins\moono\readme.md</Link>
     </Content>
+    <None Include="..\Serenity.Web\Scripts\serenity\CoreLib\Serenity.CoreLib.js.map">
+      <Link>Scripts\serenity\Serenity.CoreLib.js.map</Link>
+    </None>
     <None Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.fa.json">
       <Link>Scripts\serenity\texts\serenity.texts.fa.json</Link>
     </None>
@@ -1377,6 +1380,9 @@
     </Content>
     <Content Include="..\Serenity.Web\Assets\Scripts\jquery.maskedinput.min.js">
       <Link>Assets\Scripts\jquery.maskedinput.min.js</Link>
+    </Content>
+    <Content Include="..\Serenity.Web\Scripts\serenity\CoreLib\Serenity.CoreLib.js">
+      <Link>Scripts\serenity\Serenity.CoreLib.js</Link>
     </Content>
     <Content Include="..\Serenity.Web\Scripts\serenity\texts\serenity.texts.pt-BR.json">
       <Link>Scripts\serenity\texts\serenity.texts.pt-BR.json</Link>
@@ -2707,12 +2713,6 @@
     <None Include="..\Serenity.Web\Assets\Scripts\sortable.min.js">
       <Link>Assets\Scripts\sortable.min.js</Link>
     </None>
-    <Content Include="..\Serenity.Web\Scripts\serenity\Serenity.CoreLib.js">
-      <Link>Scripts\serenity\Serenity.CoreLib.js</Link>
-    </Content>
-    <Content Include="..\Serenity.Web\Scripts\serenity\Serenity.CoreLib.min.js">
-      <Link>Scripts\serenity\Serenity.CoreLib.min.js</Link>
-    </Content>
     <Content Include="..\Serenity.Web\Style\images\32px.png">
       <Link>Style\images\32px.png</Link>
     </Content>
@@ -2808,6 +2808,9 @@
     </None>
     <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Q\Q.Authorization.ts">
       <Link>Scripts\serenity\CoreLib\Q\Q.Authorization.ts</Link>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\Serenity.CoreLib.d.ts">
+      <Link>Scripts\serenity\Serenity.CoreLib.d.ts</Link>
     </TypeScriptCompile>
     <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\DataGrid\IInitializeColumn.ts">
       <Link>Scripts\serenity\CoreLib\UI\DataGrid\IInitializeColumn.ts</Link>
@@ -3136,9 +3139,6 @@
     <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\CoreLib\UI\Widgets\Widgets.ts">
       <Link>Scripts\serenity\CoreLib\UI\Widgets\Widgets.ts</Link>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="..\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts">
-      <Link>Scripts\serenity\Serenity.CoreLib.d.ts</Link>
-    </TypeScriptCompile>
     <TypeScriptCompile Include="..\Serenity.Web\Scripts\tsservices\typescriptServices.d.ts">
       <Link>Scripts\tsservices\typescriptServices.d.ts</Link>
     </TypeScriptCompile>
@@ -3175,7 +3175,7 @@
     </Exec>
     <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js&quot; --comments --mangle">
     </Exec>
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Scripts\Serenity\Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Scripts\Serenity\Serenity.CoreLib.min.js&quot; --comments --mangle">
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Scripts\Serenity\CoreLib\Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Scripts\Serenity\CoreLib\Serenity.CoreLib.min.js&quot; --comments --mangle">
     </Exec>
   </Target>
 </Project>

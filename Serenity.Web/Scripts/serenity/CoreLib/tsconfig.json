@@ -7,7 +7,7 @@
     "emitBOM": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "outFile": "../Serenity.CoreLib.js",
+    "outFile": "Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5"
   },
