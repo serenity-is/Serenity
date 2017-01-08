@@ -5,6 +5,7 @@ namespace Serenity.CodeGenerator
     public class GeneratorConfig
     {
         public ServerTypingsConfig ServerTypings { get; set; }
+        public ClientTypesConfig ClientTypes { get; set; }
         public List<Connection> Connections { get; set; }
         public string KDiff3Path { get; set; }
         public string TFPath { get; set; }
@@ -103,6 +104,11 @@ namespace Serenity.CodeGenerator
         {
             public string[] Assemblies { get; set; }
             public string OutDir { get; set; }           
+        }
+
+        public class ClientTypesConfig
+        {
+            public string OutDir { get; set; }
         }
     }
 }

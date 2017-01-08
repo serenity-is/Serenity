@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Serenity.CodeGeneration;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Loader;
 
 namespace Serenity.CodeGenerator
 {
@@ -66,8 +66,28 @@ namespace Serenity.CodeGenerator
                     Environment.Exit(process.ExitCode);
                 }
 
+                string tsTypesJson = null;
+                Func<List<ExternalType>> getTsTypes = () =>
+                {
+                    if (tsTypesJson == null)
+                    {
+                        var tsTypeLister = new TSTypeLister(Path.GetDirectoryName(projectJson));
+                        var tsTypes = tsTypeLister.List();
+                        tsTypesJson = JSON.Stringify(tsTypes);
+                    }
+
+                    return JSON.Parse<List<ExternalType>>(tsTypesJson);
+                };
+
+                if (type == null || type == "clienttypes" || type == "ct")
+                {
+                    new ClientTypesCommand().Run(projectJson, getTsTypes());
+                }
+
                 if (type == null || type == "servertypings" || type == "st")
-                    new ServerTypingsCommand().Run(projectJson);
+                {
+                    new ServerTypingsCommand().Run(projectJson, getTsTypes());
+                }
             }
             else if (args.Length == 0)
             {
@@ -78,43 +98,6 @@ namespace Serenity.CodeGenerator
             {
                 System.Console.Error.WriteLine("Use one of 'restore', 'transform' as parameter!");
                 Environment.Exit(1);
-            }
-        }
-
-        private static void EnumerateProjectJsonDeps(JObject proj, Action<string, string, string> dependency)
-        {
-            Action<string, JObject> enumDeps = (fwkey, deps) => {
-                if (deps == null)
-                    return;
-
-                foreach (var pair in deps)
-                {
-                    var v = pair.Value as JObject;
-                    if (v != null)
-                    {
-                        var o = v["version"] as JValue;
-                        if (o != null && o.Value != null)
-                            dependency(fwkey, pair.Key, o.Value.ToString());
-                    }
-                    else if (pair.Value is JValue && (pair.Value as JValue).Value != null)
-                    {
-                        dependency(fwkey, pair.Key, (pair.Value as JValue).Value.ToString());
-                    }
-                }
-            };
-
-            var frameworks = proj["frameworks"] as JObject;
-            if (frameworks == null)
-                return;
-
-            foreach (var pair in frameworks)
-            {
-                var val = pair.Value as JObject;
-                if (val == null)
-                    continue;
-
-                enumDeps(pair.Key, val["dependencies"] as JObject);
-                enumDeps(pair.Key, proj["dependencies"] as JObject);
             }
         }
     }

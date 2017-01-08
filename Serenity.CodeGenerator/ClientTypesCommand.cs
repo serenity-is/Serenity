@@ -2,13 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Runtime.Loader;
 using System.Text;
 
 namespace Serenity.CodeGenerator
 {
-    public class ServerTypingsCommand
+    public class ClientTypesCommand
     {
         private static Encoding utf8 = new System.Text.UTF8Encoding(true);
 
@@ -23,15 +21,9 @@ namespace Serenity.CodeGenerator
             }
 
             var config = GeneratorConfig.LoadFromJson(File.ReadAllText(configFile));
-            if (config.ServerTypings == null)
+            if (config.ClientTypes == null)
             {
-                System.Console.Error.WriteLine("ServerTypings is not configured in sergen.json file!");
-                Environment.Exit(1);
-            }
-
-            if (config.ServerTypings.Assemblies.IsEmptyOrNull())
-            {
-                System.Console.Error.WriteLine("ServerTypings has no assemblies configured in sergen.json file!");
+                System.Console.Error.WriteLine("ClientTypes is not configured in sergen.json file!");
                 Environment.Exit(1);
             }
 
@@ -41,19 +33,15 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
-            var outDir = Path.Combine(root, (config.ServerTypings.OutDir.TrimToNull() ?? "Imports/ServerTypings")
+            var outDir = Path.Combine(root, (config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes")
                 .Replace('/', Path.DirectorySeparatorChar));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("Transforming ServerTypings at: ");
+            Console.Write("Transforming ClientTypes at: ");
             Console.ResetColor();
             Console.WriteLine(outDir);
 
-            List<Assembly> assemblies = new List<Assembly>();
-            foreach (var assembly in config.ServerTypings.Assemblies)
-                assemblies.Add(AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(root, assembly)));
-
-            var generator = new ServerTypingsGenerator(assemblies.ToArray());
+            var generator = new ClientTypesGenerator();
             generator.RootNamespaces.Add(config.RootNamespace);
 
             foreach (var type in tsTypes)
