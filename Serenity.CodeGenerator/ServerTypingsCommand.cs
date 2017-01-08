@@ -43,6 +43,14 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
+            var outDir = Path.Combine(root, (config.ServerTypings.OutDir.TrimToNull() ?? "Modules/Common/Imports/ServerTypings")
+                .Replace('/', Path.DirectorySeparatorChar));
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write("Transforming ServerTypings at: ");
+            Console.ResetColor();
+            Console.WriteLine(outDir);
+
             List<Assembly> assemblies = new List<Assembly>();
             foreach (var assembly in config.ServerTypings.Assemblies)
                 assemblies.Add(AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(root, assembly)));
@@ -55,14 +63,16 @@ namespace Serenity.CodeGenerator
             foreach (var type in tsTypes)
                 generator.AddTSType(type);
 
+            var generated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var codeByFilename = generator.Run();
-            var outDir = Path.Combine(root, (config.ServerTypings.OutDir.TrimToNull() ?? "Modules/Common/Imports/ServerTypings")
-                .Replace('/', Path.DirectorySeparatorChar));
 
             foreach (var pair in codeByFilename)
             {
+                generated.Add(pair.Key);
+
                 var outFile = Path.Combine(outDir, pair.Key);
-                if (File.Exists(outFile))
+                bool exists = File.Exists(outFile);
+                if (exists)
                 {
                     var content = File.ReadAllText(outFile, utf8);
                     if (content.Trim().Replace("\r", "") ==
@@ -70,8 +80,24 @@ namespace Serenity.CodeGenerator
                         continue;
                 }
 
+                Console.ForegroundColor = exists ? ConsoleColor.Magenta : ConsoleColor.Green;
+                Console.Write(exists ? "Overwriting: " : "New File: ");
+                Console.ResetColor();
+                Console.WriteLine(Path.GetFileName(outFile));
+
                 File.WriteAllText(outFile, pair.Value, utf8);
             }
+
+            foreach (var file in Directory.GetFiles(outDir, "*.ts"))
+                if (!generated.Contains(Path.GetFileName(file)))
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("Deleting: ");
+                    Console.ResetColor();
+                    Console.WriteLine(Path.GetFileName(file));
+
+                    File.Delete(file);
+                }
         }
     }
 
