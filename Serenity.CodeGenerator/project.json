@@ -30,7 +30,7 @@
         "JavaScriptEngineSwitcher.ChakraCore.Native.win8-arm": "2.1.0",
         "JavaScriptEngineSwitcher.ChakraCore.Native.win-x64": "2.1.1",
         "JavaScriptEngineSwitcher.ChakraCore.Native.win-x86": "2.1.1",
-        "JavaScriptEngineSwitcher.Extensions.MsDependencyInjection": "2.2.0"
+        "JavaScriptEngineSwitcher.Extensions.MsDependencyInjection": "2.2.0" 
       }
     }
   }

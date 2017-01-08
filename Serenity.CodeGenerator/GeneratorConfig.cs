@@ -6,6 +6,7 @@ namespace Serenity.CodeGenerator
     {
         public ServerTypingsConfig ServerTypings { get; set; }
         public ClientTypesConfig ClientTypes { get; set; }
+        public MVCConfig MVC { get; set; }
         public List<Connection> Connections { get; set; }
         public string KDiff3Path { get; set; }
         public string TFPath { get; set; }
@@ -109,6 +110,13 @@ namespace Serenity.CodeGenerator
         public class ClientTypesConfig
         {
             public string OutDir { get; set; }
+        }
+
+        public class MVCConfig
+        {
+            public string OutDir { get; set; }
+            public string[] SearchViewPaths { get; set; }
+            public string[] StripViewPaths { get; set; }
         }
     }
 }

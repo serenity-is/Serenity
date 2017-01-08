@@ -79,6 +79,11 @@ namespace Serenity.CodeGenerator
                     return JSON.Parse<List<ExternalType>>(tsTypesJson);
                 };
 
+                if (type == null || type == "mvc")
+                {
+                    new MvcCommand().Run(projectJson);
+                }
+
                 if (type == null || type == "clienttypes" || type == "ct")
                 {
                     new ClientTypesCommand().Run(projectJson, getTsTypes());

@@ -21,11 +21,7 @@ namespace Serenity.CodeGenerator
             }
 
             var config = GeneratorConfig.LoadFromJson(File.ReadAllText(configFile));
-            if (config.ClientTypes == null)
-            {
-                System.Console.Error.WriteLine("ClientTypes is not configured in sergen.json file!");
-                Environment.Exit(1);
-            }
+            config.ClientTypes = config.ClientTypes ?? new GeneratorConfig.ClientTypesConfig();
 
             if (config.RootNamespace.IsEmptyOrNull())
             {
