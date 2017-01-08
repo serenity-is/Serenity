@@ -1,5 +1,4 @@
 ﻿using Serenity.ComponentModel;
-using Serenity.Data;
 
 namespace Serenity.PropertyGrid
 {

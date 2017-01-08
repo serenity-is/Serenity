@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+#if !COREFX
 using System.Data;
+#endif
 
 namespace Serenity.Data
 {
@@ -82,8 +84,11 @@ namespace Serenity.Data
                     }
 
                     if (_newById.Contains(id.Value))
+#if COREFX
+                        throw new ArgumentException("newItemId");
+#else
                         throw new DuplicateNameException("newItemId");
-
+#endif
                     _newById.Add(id.Value);
                 }
             }

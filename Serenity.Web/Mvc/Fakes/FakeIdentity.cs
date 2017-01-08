@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !ASPNETCORE
+using System;
 using System.Security.Principal;
 
 namespace Serenity.Web.MvcFakes
@@ -30,3 +31,4 @@ namespace Serenity.Web.MvcFakes
 
     }
 }
+#endif

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.IO.Compression;
 using System.Collections;
@@ -161,8 +159,8 @@ namespace Serenity.Web
 
                     int gzipLength = ReadAllBytesFromStream(gzip, decompressedBuffer);
 
-                    gzip.Close();
-                    ms.Close();
+                    gzip.Dispose();
+                    ms.Dispose();
 
                     Array.Resize(ref buffer, gzipLength);
                     Array.Resize(ref decompressedBuffer, gzipLength);
@@ -190,7 +188,11 @@ namespace Serenity.Web
                 // Must get all 4 values in the RECT
                 for (int i = 0; i < 4; i++)
                 {
+#if COREFX
+                    for (int j = 0; j < cval.Length; j++)
+#else
                     for (int j = 0; j < cval.Count; j++)
+#endif
                     {
                         if ((cbyte & 128) > 0)
                         {
@@ -218,7 +220,11 @@ namespace Serenity.Web
                     int c = 1;
                     int val = 0;
 
+#if COREFX
+                    for (int j = cval.Length - 1; j >= 0; j--)
+#else
                     for (int j = cval.Count - 1; j >= 0; j--)
+#endif
                     {
                         if (cval[j])
                         {

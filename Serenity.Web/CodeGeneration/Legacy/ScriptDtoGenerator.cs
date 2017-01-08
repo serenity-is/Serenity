@@ -76,7 +76,7 @@ namespace Serenity.CodeGeneration
                 if (nullableType != null)
                     memberType = nullableType;
 
-                if (memberType.IsEnum)
+                if (memberType.GetIsEnum())
                     EnqueueType(memberType);
             }
         }
@@ -101,7 +101,7 @@ namespace Serenity.CodeGeneration
             foreach (var assembly in this.Assemblies)
             foreach (var fromType in assembly.GetTypes())
             {
-                if (fromType.IsAbstract)
+                if (fromType.GetIsAbstract())
                     continue;
 
                 if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
@@ -132,7 +132,7 @@ namespace Serenity.CodeGeneration
             {
                 var type = generateQueue.Dequeue();
 
-                if (!this.Assemblies.Contains(type.Assembly))
+                if (!this.Assemblies.Contains(type.GetAssembly()))
                     continue;
 
                 GenerateCodeFor(type);
@@ -330,7 +330,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
+            if (memberType.GetIsGenericType() &&
                 (memberType.GetGenericTypeDefinition() == typeof(List<>) || memberType.GetGenericTypeDefinition() == typeof(HashSet<>)))
             {
                 code.Append("List<");
@@ -339,7 +339,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
+            if (memberType.GetIsGenericType() &&
                 memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 code.Append("JsDictionary<");
@@ -358,10 +358,10 @@ namespace Serenity.CodeGeneration
 
         public static bool CanHandleType(Type memberType)
         {
-            if (memberType.IsInterface)
+            if (memberType.GetIsInterface())
                 return false;
 
-            if (memberType.IsAbstract)
+            if (memberType.GetIsAbstract())
                 return false;
 
             if (typeof(Delegate).IsAssignableFrom(memberType))
@@ -372,7 +372,7 @@ namespace Serenity.CodeGeneration
 
         public static string MakeFriendlyName(Type type, string codeNamespace, HashSet<string> usingNamespaces)
         {
-            if (type.IsGenericType)
+            if (type.GetIsGenericType())
             {
                 StringBuilder sb = new StringBuilder();
 
@@ -453,7 +453,7 @@ namespace Serenity.CodeGeneration
             bool anyMetadata = false;
             var codeNamespace = GetNamespace(rowType);
 
-            Row row = (Row)rowType.GetInstance();
+            Row row = (Row)Activator.CreateInstance(rowType);
 
             var idRow = row as IIdRow;
             if (idRow != null)
@@ -498,9 +498,9 @@ namespace Serenity.CodeGeneration
             if (attr == null)
             {
                 var script = lookupScripts.FirstOrDefault(x => 
-                    x.BaseType != null && 
-                    x.BaseType.IsGenericType &&
-                    x.BaseType.GetGenericArguments().Any(z => z == rowType));
+                    x.GetBaseType() != null && 
+                    x.GetBaseType().GetIsGenericType() &&
+                    x.GetBaseType().GetGenericArguments().Any(z => z == rowType));
 
                 if (script != null)
                     attr = script.GetCustomAttribute<LookupScriptAttribute>();
@@ -598,7 +598,7 @@ namespace Serenity.CodeGeneration
 
         private void GenerateCodeFor(Type type)
         {
-            if (type.IsEnum)
+            if (type.GetIsEnum())
             {
                 GenerateEnum(type);
                 return;

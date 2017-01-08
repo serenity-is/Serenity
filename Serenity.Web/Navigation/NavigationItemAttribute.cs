@@ -2,7 +2,11 @@
 using System;
 using System.Linq;
 using System.Reflection;
+#if ASPNETCORE
+using Microsoft.AspNetCore.Mvc;
+#else
 using System.Web.Mvc;
+#endif
 
 namespace Serenity.Navigation
 {
@@ -54,25 +58,40 @@ namespace Serenity.Navigation
             if (actionMethod == null)
                 throw new ArgumentOutOfRangeException("action");
 
-            var route = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault() ?? controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            if (route == null)
+            var routeController = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+
+            if (routeController == null && routeAction == null)
                 throw new InvalidOperationException(String.Format(
                     "Route attribute for {0} action of {1} controller is not found!",
                         actionMethod, controller.FullName));
 
-            string url = route.Template ?? "";
+            string url = (routeAction ?? routeController).Template ?? "";
 
-            if (!url.StartsWith("~/"))
+#if ASPNETCORE
+            if (routeAction != null && !url.StartsWith("~/") && !url.StartsWith("/") && routeController != null)
             {
-                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
-                if (routePrefix != null)
-                {
-                    url = UriHelper.Combine(routePrefix.Prefix, url);
-                }
+                var tmp = routeController.Template ?? "";
+                if (tmp.Length > 0 && tmp[tmp.Length - 1] != '/')
+                    tmp += "/";
+
+                url = tmp + url;
             }
 
-            if (!url.StartsWith("~/") && !url.StartsWith("/"))
-                url = "~/" + url;
+            const string ControllerSuffix = "Controller";
+            var controllerName = controller.Name;
+            if (controllerName.EndsWith(ControllerSuffix))
+                controllerName = controllerName.Substring(0, controllerName.Length - ControllerSuffix.Length);
+            url = url.Replace("[controller]", controllerName);
+            url = url.Replace("[action]", action);
+#else
+            if (!url.StartsWith("~/"))
+            {
+
+                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
+                if (routePrefix != null)
+                    url = UriHelper.Combine(routePrefix.Prefix, url);
+            }
 
             var act = "{action=";
             var act1 = url.IndexOf(act, StringComparison.OrdinalIgnoreCase);
@@ -93,6 +112,10 @@ namespace Serenity.Navigation
                         url = url.Substring(0, url.Length - 1);
                 }
             }
+#endif
+
+            if (!url.StartsWith("~/") && !url.StartsWith("/"))
+                url = "~/" + url;
 
             while (true)
             {

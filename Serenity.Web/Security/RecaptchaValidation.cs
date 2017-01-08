@@ -5,9 +5,11 @@ namespace Serenity.Web
     using Newtonsoft.Json;
     using Serenity.Services;
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Net;
+#if COREFX
+    using System.Threading.Tasks;
+#endif
     public static class RecaptchaValidation
     {
         /// <summary>
@@ -31,27 +33,38 @@ namespace Serenity.Web
 
             var webRequest = (HttpWebRequest)WebRequest.Create(verifyUri);
             webRequest.ContentType = "application/x-www-form-urlencoded";
-            webRequest.ContentLength = postDataBuffer.Length;
-            webRequest.Method = "POST";
-
+#if COREFX
+            webRequest.Headers["Content-Length"] = postDataBuffer.Length.ToString();
+#else
             var proxy = WebRequest.GetSystemWebProxy();
             proxy.Credentials = CredentialCache.DefaultCredentials;
             webRequest.Proxy = proxy;
+#endif
 
+            webRequest.Method = "POST";
+#if COREFX
+            using (var requestStream = Task.Run(() => webRequest.GetRequestStreamAsync()).Result)
+                requestStream.Write(postDataBuffer, 0, postDataBuffer.Length);
+
+            using (var webResponse = Task.Run(() => webRequest.GetResponseAsync()).Result)
+            { 
+#else
             using (var requestStream = webRequest.GetRequestStream())
                 requestStream.Write(postDataBuffer, 0, postDataBuffer.Length);
 
-            var webResponse = (HttpWebResponse)webRequest.GetResponse();
-
-            string responseJson;
-            using (var sr = new StreamReader(webResponse.GetResponseStream()))
-                responseJson = sr.ReadToEnd();
-
-            var response = JSON.ParseTolerant<RecaptchaResponse>(responseJson);
-            if (response == null ||
-                !response.Success)
+            using (var webResponse = (HttpWebResponse)webRequest.GetResponse())
             {
-                throw new ValidationError("Recaptcha", LocalText.Get("Validation.Recaptcha"));
+#endif
+                string responseJson;
+                using (var sr = new StreamReader(webResponse.GetResponseStream()))
+                    responseJson = sr.ReadToEnd();
+
+                var response = JSON.ParseTolerant<RecaptchaResponse>(responseJson);
+                if (response == null ||
+                    !response.Success)
+                {
+                    throw new ValidationError("Recaptcha", LocalText.Get("Validation.Recaptcha"));
+                }
             }
         }
 

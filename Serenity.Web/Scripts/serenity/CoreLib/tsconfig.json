@@ -7,7 +7,7 @@
     "emitBOM": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "outFile": "../Serenity.CoreLib.js",
+    "outFile": "Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
     "target": "ES5"
   },
@@ -76,6 +76,7 @@
     "UI/Filtering/FilterDisplayBar.ts",
     "UI/Filtering/FilterPanel.ts",
     "UI/Filtering/QuickFilterArgs.ts",
+    "UI/Filtering/QuickFilter.ts",
     "UI/Filtering/QuickSearchInput.ts",
     "UI/Formatters/Formatters.ts",
     "UI/Widgets/Flexify.ts",

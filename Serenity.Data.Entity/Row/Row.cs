@@ -7,8 +7,11 @@ using System.ComponentModel;
 namespace Serenity.Data
 {
     [JsonConverter(typeof(JsonRowConverter))]
-    public abstract partial class Row : IEntityWithJoins, ISupportAttached, 
-        INotifyPropertyChanged, IEditableObject, IDataErrorInfo
+    public abstract partial class Row : IEntityWithJoins, 
+        INotifyPropertyChanged, IEditableObject
+#if !COREFX
+        , IDataErrorInfo
+#endif
     {
         internal RowFieldsBase fields;
         internal bool[] assignedFields;
@@ -309,12 +312,6 @@ namespace Serenity.Data
 
                 return false;
             }
-        }
-
-        Hashtable ISupportAttached.AttachedProperties
-        {
-            get { return dictionaryData; }
-            set { dictionaryData = value; }
         }
 
         IDictionary<string, Join> IHaveJoins.Joins

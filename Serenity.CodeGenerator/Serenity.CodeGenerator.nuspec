@@ -14,16 +14,22 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-        <dependency id="Serenity.Web.Tooling" version="${serenityWebToolingVersion}" />
+      <group targetFramework=".NETFramework4.5">
+      </group>
+      <group targetFramework=".NETCoreApp1.0">
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+      </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\Readme.CodeGenerator.txt" target="content\Readme.CodeGenerator.txt" />
-    <file src="Serenity.CodeGenerator.exe" target="tools\sergen.exe" />
-    <file src="Newtonsoft.Json.dll" target="tools" />
-    <file src="RazorGenerator.Templating.dll" target="tools" />
-    <file src="Serenity.Core.dll" target="tools" />
-    <file src="Serenity.Data.dll" target="tools" />
-    <file src="Serenity.Data.Entity.dll" target="tools" />
+    <file src="bin/${configuration}/netcoreapp1.0/Serenity.CodeGenerator.dll" target="lib/netcoreapp1.0/dotnet-sergen.dll" />	
+    <file src="bin/${configuration}/netcoreapp1.0/Serenity.CodeGenerator.runtimeconfig.json" target="lib/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" />	
+    <file src="../Serenity.CodeGenerator.Net45/Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
+    <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.CodeGenerator.exe" target="tools/net45/sergen.exe" />
+    <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Newtonsoft.Json.dll" target="tools/net45" />
+    <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/RazorGenerator.Templating.dll" target="tools/net45" />
+    <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.Core.dll" target="tools/net45" />
+    <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.Data.dll" target="tools/net45" />
+    <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.Data.Entity.dll" target="tools/net45" />
   </files>
 </package>

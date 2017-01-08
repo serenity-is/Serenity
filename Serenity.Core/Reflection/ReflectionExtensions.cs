@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Serenity
@@ -8,13 +9,13 @@ namespace Serenity
         public static TAttribute GetAttribute<TAttribute>(this MemberInfo member, bool inherit = false) where TAttribute : Attribute
         {
             var attrs = member.GetCustomAttributes(typeof(TAttribute), inherit);
-            if (attrs.Length == 0)
+            if (!attrs.Any())
                 return null;
 
-            if (attrs.Length > 1)
+            if (attrs.Count() >  1)
                 throw new InvalidOperationException(String.Format("{0} has more than 1 of {1} attribute", member.Name, typeof(TAttribute).Name));
 
-            return (TAttribute)attrs[0];
+            return (TAttribute)attrs.First();
         }
     }
 }

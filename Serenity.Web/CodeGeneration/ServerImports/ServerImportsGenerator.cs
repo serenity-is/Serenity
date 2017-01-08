@@ -5,7 +5,11 @@ using Serenity.Services;
 using System;
 using System.Linq;
 using System.Reflection;
+#if ASPNETCORE
+using Microsoft.AspNetCore.Mvc;
+#else
 using System.Web.Mvc;
+#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -59,7 +63,7 @@ namespace Serenity.CodeGeneration
                 });
             };
 
-            if (type.IsEnum)
+            if (type.GetIsEnum())
                 run(GenerateEnum);
             else if (type.IsSubclassOf(typeof(Controller)))
                 run(GenerateService);

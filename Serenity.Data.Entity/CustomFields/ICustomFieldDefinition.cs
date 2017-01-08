@@ -1,5 +1,4 @@
-﻿using Serenity.Services;
-
+﻿
 namespace Serenity.Data
 {
     public interface ICustomFieldDefinition

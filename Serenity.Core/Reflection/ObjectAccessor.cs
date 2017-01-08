@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 //#if !NO_DYNAMIC
 //using System.Dynamic;
 //#endif
@@ -94,3 +95,4 @@ namespace Serenity.Reflection
     }
 
 }
+#endif

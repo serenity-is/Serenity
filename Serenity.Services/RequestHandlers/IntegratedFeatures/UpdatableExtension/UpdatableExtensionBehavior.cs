@@ -47,7 +47,7 @@ namespace Serenity.Services
                 info.Attr = attr;
 
                 var rowType = attr.RowType;
-                if (rowType.IsAbstract ||
+                if (rowType.GetIsAbstract() ||
                     !typeof(Row).IsAssignableFrom(rowType))
                 {
                     throw new ArgumentException(String.Format(

@@ -1,4 +1,5 @@
-﻿/*
+﻿#if !COREFX
+/*
  License: http://www.apache.org/licenses/LICENSE-2.0 
  Home page: http://code.google.com/p/dapper-dot-net/
 
@@ -19,7 +20,6 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 using Serenity.Data;
 
 
@@ -3549,3 +3549,4 @@ string name, object value = null, DbType? dbType = null, ParameterDirection? dir
 #endif
 
 }
+#endif

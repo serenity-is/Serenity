@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Text;
-    using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
     public partial class SqlQuery
     {

@@ -1,7 +1,6 @@
 ﻿
 namespace Serenity
 {
-    using Localization;
     using Serenity.Abstractions;
     using System;
     using System.Globalization;

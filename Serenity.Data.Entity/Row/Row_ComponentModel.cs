@@ -176,6 +176,7 @@ namespace Serenity.Data
             }
         }
 
+#if !COREFX
         string IDataErrorInfo.Error
         {
             get
@@ -204,5 +205,6 @@ namespace Serenity.Data
         {
             return fields.propertyDescriptors;
         }
+#endif
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿#if !ASPNETCORE
+using System.Web.Mvc;
 
 namespace Serenity.Web.MvcFakes
 {
@@ -6,3 +7,4 @@ namespace Serenity.Web.MvcFakes
     {
     }
 }
+#endif

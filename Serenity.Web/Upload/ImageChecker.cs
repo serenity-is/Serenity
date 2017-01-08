@@ -1,7 +1,7 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.IO;
 using System.Drawing;
-using System.Drawing.Imaging;
 
 namespace Serenity.Web
 {
@@ -287,3 +287,4 @@ namespace Serenity.Web
         }
     }
 }
+#endif

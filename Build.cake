@@ -1,6 +1,12 @@
-﻿using System.Xml.Linq;
+﻿#addin "nuget:https://www.nuget.org/api/v2?package=Newtonsoft.Json&version=9.0.1"
 
-var target = Argument("target", "NuGet");
+using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
+
+var target = Argument("target", "Pack");
+if (target == "")
+	target = "Pack";
+	
 var configuration = Argument("configuration", "Release");
 
 string serenityVersion = null;
@@ -18,7 +24,23 @@ var nuspecParams = new Dictionary<string, string> {
     { "configuration", configuration }
 };
 
-var nugetPackages = new List<string>();
+var dotnetBuildOrder = new string[] {
+    "Serenity.Core",
+    "Serenity.Caching.Couchbase",
+    "Serenity.Caching.Redis",
+    "Serenity.Data",
+    "Serenity.Data.Entity",
+    "Serenity.Services",
+    "Serenity.Web",
+	"Serenity.CodeGenerator"
+};
+
+Func<string, string> getVersionFromNuspec = (filename) => {
+    var nuspec = System.IO.File.ReadAllText(filename);
+    var xml = XElement.Parse(nuspec);
+    XNamespace ns = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
+    return xml.Descendants(ns + "version").First().Value;
+};
 
 Func<string, System.Xml.XmlDocument> loadXml = path => 
 {
@@ -26,6 +48,55 @@ Func<string, System.Xml.XmlDocument> loadXml = path =>
     xml.LoadXml(System.IO.File.ReadAllText(path));
     return xml;
 };
+
+nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value; 
+nuspecParams["serenityWebAssetsVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Assets.nuspec");
+nuspecParams["serenityWebToolingVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Tooling.nuspec");
+
+
+var nugetPackages = new List<string>();
+
+Func<string, JObject> loadJson = path => {
+    var content = System.IO.File.ReadAllText(path, Encoding.UTF8);
+    return JObject.Parse(content);
+};
+
+Action<string, string> patchProjectVer = (projectjson, version) => {
+    var changed = false;
+    var node = loadJson(projectjson);
+    if (node["version"].ToString() != "version" + "-*")
+    {
+        node["version"].Replace(version + "-*");
+        changed = true;
+    }
+
+    var deps = node["dependencies"] as JObject;
+    if (deps != null) {
+        foreach (var pair in (deps as IEnumerable<KeyValuePair<string, JToken>>).ToList()) {
+            if (pair.Key.StartsWith("Serenity.") &&
+                pair.Key != "Serenity.Web.Assets" &&
+                pair.Key != "Serenity.Web.Tooling")
+            {
+                var v = pair.Value as JValue;
+                if (v != null && (v.Value ?? "").ToString() != version + "-*")
+                {
+                    deps[pair.Key].Replace(version + "-*");
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    if (changed)
+        System.IO.File.WriteAllText(projectjson, node.ToString(), Encoding.UTF8);
+};
+
+Action<string> writeHeader = (header) => {
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("*** " + header + " ***");
+    Console.ResetColor();
+};
+
 
 Func<string, string, string> getPackageVersion = (project, package) => 
 {
@@ -50,65 +121,33 @@ Action runGitLink = () => {
         Arguments = System.IO.Path.GetFullPath(@".\") + " -u https://github.com/volkanceylan/serenity"
     });
 };
-    
-Task("Clean")
-    .Does(() =>
-{
-    CleanDirectories("./Bin");
-    CreateDirectory("./Bin");
-    CreateDirectory("./Bin/Packages");
-    CreateDirectory("./Bin/Temp");
-    CleanDirectories("./Serenity.*/**/bin/" + configuration);
-});
 
-Task("Restore-NuGet-Packages")
-    .IsDependentOn("Clean")
-    .Does(context =>
-{
-    NuGetRestore("./Serenity.sln");
-});
-
-Task("Build")
-    .IsDependentOn("Restore-NuGet-Packages")
-    .Does(context => 
-{
-    MSBuild("./Serenity.sln", s => {
-        s.SetConfiguration(configuration);
-    });
-    
-    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
-    serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
-});
-
-Task("Unit-Tests")
-    .IsDependentOn("Build")
-    .Does(() =>
-{
-    XUnit2("./Serenity.Test*/**/bin/" + configuration + "/*.Test.dll");
-});
-
-Task("Copy-Files")
-    .IsDependentOn("Unit-Tests")
-    .Does(() =>
-{
-});
-
-Task("Pack")
-    .IsDependentOn("Copy-Files")
-    .Does(() =>
-{
-    if ((target ?? "").ToLowerInvariant() == "nuget-push")
-        runGitLink();
-});
-
-Func<string, string> getVersionFromNuspec = (filename) => {
-    var nuspec = System.IO.File.ReadAllText(filename);
-    var xml = XElement.Parse(nuspec);
-    XNamespace ns = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
-    return xml.Descendants(ns + "version").First().Value;
+Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) => {
+    var config = System.IO.File.ReadAllText(path);
+    var xml = XElement.Parse(config);
+    var list = new List<Tuple<string, string, string>>();
+    return xml.Descendants("package").Select(el =>
+        new Tuple<string, string, string>(el.Attribute("id").Value, 
+            el.Attribute("version").Value, el.Attribute("targetFramework").Value))
+                .ToList();
 };
 
 Action<string, string> myPack = (s, id) => {
+    var prm = new Dictionary<string, string>(nuspecParams);
+
+    var packagesConfig = "./" + s + ".Net45/packages.config";
+    if (!System.IO.File.Exists(packagesConfig))
+        packagesConfig = "./" + s + "/packages.config";
+        
+    var projectJson = "./" + s + "/project.json";
+    if (!System.IO.File.Exists(projectJson))
+        projectJson = null;
+
+    if (s == "Serenity.Web")
+        setPackageVersions(prm, null, "./Serenity.Test/packages.config");
+        
+    setPackageVersions(prm, projectJson, packagesConfig);
+    
     var filename = "./" + s + "/" + (id ?? s) + ".nuspec";
     var nuspec = System.IO.File.ReadAllText(filename);
     string version;
@@ -122,10 +161,14 @@ Action<string, string> myPack = (s, id) => {
     }
     nuspec = nuspec.Replace("${id}", (id ?? s));
     
-    foreach (var p in nuspecParams)
+    foreach (var p in prm)
         nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
       
-    var assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
+    var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + s + ".dll";
+    if (!System.IO.File.Exists(assembly))
+        assembly = "./" + s + ".Net45/bin/" + configuration + "/" + s + ".exe";
+	if (!System.IO.File.Exists(assembly))
+		assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
     if (!System.IO.File.Exists(assembly))
         assembly = "./" + s + "/bin/" + configuration + "/" + s + ".exe";
       
@@ -135,16 +178,20 @@ Action<string, string> myPack = (s, id) => {
         nuspec = nuspec.Replace("${title}", vi.FileDescription);
         nuspec = nuspec.Replace("${description}", vi.Comments);
     }
-  
-    System.IO.File.WriteAllText("./Bin/Temp/" + s + ".temp.nuspec", nuspec);
-   
-    NuGetPack("./Bin/Temp/" + s + ".temp.nuspec", new NuGetPackSettings {
-        BasePath = "./" + s + "/bin/" + configuration,
-        OutputDirectory = "./Bin/Packages",
+
+    var temp = "./.nupkg/" + s + ".temp.nuspec";
+    System.IO.File.WriteAllText(temp, nuspec);
+     
+    var basePath = @"./" + s;
+     
+    NuGetPack(temp, new NuGetPackSettings {
+        BasePath = basePath,
+        OutputDirectory = "./.nupkg",
         NoPackageAnalysis = true
     });
     
-    nugetPackages.Add("./Bin/Packages/" + (id ?? s) + "." + version + ".nupkg");
+    System.IO.File.Delete(temp);
+    nugetPackages.Add("./.nupkg/" + (id ?? s) + "." + version + ".nupkg");
 };
 
 Action fixNugetCache = delegate() {
@@ -169,44 +216,103 @@ Action myPush = delegate() {
     }   
 };
 
-Action setPackageVersions = delegate() {
-    nuspecParams["jsonNetVersion"] = getPackageVersion("Serenity.Core", "Newtonsoft.Json");
-    nuspecParams["couchbaseNetClientVersion"] = getPackageVersion("Serenity.Caching.Couchbase", "CouchbaseNetClient");
-    nuspecParams["stackExchangeRedisVersion"] = getPackageVersion("Serenity.Caching.Redis", "StackExchange.Redis");
-    nuspecParams["microsoftAspNetMvcVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.Mvc");
-    nuspecParams["microsoftAspNetRazorVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.Razor");
-    nuspecParams["microsoftAspNetWebPagesVersion"] = getPackageVersion("Serenity.Web", "Microsoft.AspNet.WebPages");
-    nuspecParams["microsoftWebInfrastructureVersion"] = getPackageVersion("Serenity.Web", "Microsoft.Web.Infrastructure");
-    nuspecParams["saltarelleCompilerVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Compiler");
-    nuspecParams["saltarellejQueryVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.jQuery");
-    nuspecParams["saltarellejQueryUIVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.jQuery.UI");
-    nuspecParams["saltarelleLinqVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Linq");
-    nuspecParams["saltarelleRuntimeVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Runtime");
-    nuspecParams["saltarelleWebVersion"] = getPackageVersion("Serenity.Script.Imports", "Saltarelle.Web");
-    nuspecParams["scriptFramework"] = loadXml(@".\Serenity.Script.Imports\packages.config").SelectSingleNode("//package[@id='Saltarelle.Runtime']/@targetFramework").Value; 
-    nuspecParams["serenityWebAssetsVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Assets.nuspec");
-    nuspecParams["serenityWebToolingVersion"] = getVersionFromNuspec(@".\Serenity.Web\Serenity.Web.Tooling.nuspec");
-	nuspecParams["jQueryVersion"] = getPackageVersion("Serenity.Test", "jQuery");
-	nuspecParams["jQueryUIVersion"] = getPackageVersion("Serenity.Test", "jQuery.UI.Combined");
-	nuspecParams["validationVersion"] = getPackageVersion("Serenity.Test", "jQuery.Validation");
-	nuspecParams["msieEngineVersion"] = getPackageVersion("Serenity.Test", "MsieJavaScriptEngine");
-	nuspecParams["bootstrapVersion"] = getPackageVersion("Serenity.Test", "bootstrap");
-	nuspecParams["toastrVersion"] = getPackageVersion("Serenity.Test", "toastr");
-	nuspecParams["blockUITSVersion"] = getPackageVersion("Serenity.Web", "jquery.blockUI.TypeScript.DefinitelyTyped");
-	nuspecParams["cookieTSVersion"] = getPackageVersion("Serenity.Web", "jquery.cookie.TypeScript.DefinitelyTyped");
-	nuspecParams["jQueryTSVersion"] = getPackageVersion("Serenity.Web", "jquery.TypeScript.DefinitelyTyped");
-	nuspecParams["jQueryUITSVersion"] = getPackageVersion("Serenity.Web", "jqueryui.TypeScript.DefinitelyTyped");
-	nuspecParams["validationTSVersion"] = getPackageVersion("Serenity.Web", "jquery.validation.TypeScript.DefinitelyTyped");
-	nuspecParams["sortableTSVersion"] = getPackageVersion("Serenity.Web", "sortablejs.TypeScript.DefinitelyTyped");
-	nuspecParams["toastrTSVersion"] = getPackageVersion("Serenity.Web", "toastr.TypeScript.DefinitelyTyped");
+Action<Dictionary<string, string>, JObject, string> addDeps = (p, deps, fw) => {
+    if (deps == null)
+        return;
+    
+    foreach (var pair in deps) {
+        if (pair.Value is JObject) {
+            var o = (pair.Value as JObject)["version"] as JValue;
+            if (o != null && o.Value != null)
+                p[fw + ":" + pair.Key] = o.Value.ToString();
+        }
+        else if (pair.Value is JValue && (pair.Value as JValue).Value != null) {
+            p[fw + ":" + pair.Key] = (pair.Value as JValue).Value.ToString();
+        }
+    }
+
 };
 
-Task("NuGet")
-    .IsDependentOn("Pack")
+Action<Dictionary<string, string>, string, string> setPackageVersions = (p, projectJson, packagesConfig) => {
+    if (projectJson != null) {
+        var jv = loadJson(projectJson);
+        addDeps(p, jv["dependencies"] as JObject, "*");
+        var fworks = jv["frameworks"] as JObject;
+        if (fworks != null)
+            foreach (var pair in fworks)
+            {
+                var obj = pair.Value as JObject;
+                if (obj != null)
+                    addDeps(p, obj["dependencies"] as JObject, pair.Key);
+            }
+    }
+
+    foreach (var x in parsePackageVersions(packagesConfig))
+        p[x.Item3 + ':' + x.Item1] = x.Item2;
+};
+
+Task("Clean")
     .Does(() =>
 {
-    setPackageVersions();
+    CleanDirectories("./.nupkg");
+    CreateDirectory("./.nupkg");
+    CleanDirectories("./Serenity.*.Net45/**/bin/" + configuration);
+    CleanDirectories("./Serenity.*/**/bin/" + configuration);
+});
+
+Task("Restore")
+    .IsDependentOn("Clean")
+    .Does(context =>
+{
+    NuGetRestore("./Serenity.sln");
+});
+
+Task("Compile")
+    .IsDependentOn("Restore")
+    .Does(context => 
+{
+    MSBuild("./Serenity.Net45.sln", s => {
+        s.SetConfiguration(configuration);
+    });
     
+    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core.Net45/bin/" + configuration + "/Serenity.Core.dll");
+    serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
+    
+    foreach (var project in dotnetBuildOrder) 
+    {
+        var projectJson = @"./" + project + @"/project.json";
+        patchProjectVer(projectJson, serenityVersion);
+        writeHeader("dotnet restore " + projectJson);
+        var exitCode = StartProcess("dotnet", "restore " + projectJson);
+        if (exitCode > 0)
+            throw new Exception("Error while restoring " + projectJson);
+        writeHeader("dotnet build " + projectJson);
+        exitCode = StartProcess("dotnet", "build " + projectJson + " -c " + configuration);
+        if (exitCode > 0)
+            throw new Exception("Error while building " + projectJson);
+    }
+});
+
+Task("Test")
+    .IsDependentOn("Compile")
+    .Does(() =>
+{
+    XUnit2("./Serenity.Test*/**/bin/" + configuration + "/*.Test.dll");
+});
+
+Task("PdbPatch")
+    .IsDependentOn("Test")
+    .Does(() =>
+{
+    if ((target ?? "").ToLowerInvariant() == "push" ||
+        (target ?? "").ToLowerInvariant() == "pdbpatch")
+        runGitLink();
+});
+
+Task("Pack")
+    .IsDependentOn("PdbPatch")
+    .Does(() =>
+{   
     myPack("Serenity.Core", null);
     myPack("Serenity.Caching.Couchbase", null);
     myPack("Serenity.Caching.Redis", null);
@@ -214,23 +320,21 @@ Task("NuGet")
     myPack("Serenity.Data.Entity", null);
     myPack("Serenity.Services", null);
     myPack("Serenity.Testing", null);
-    
     myPack("Serenity.Script.UI", "Serenity.Script");
-
     myPack("Serenity.Web", null);
     myPack("Serenity.CodeGenerator", null);
     
     fixNugetCache();
 });
 
-Task("NuGet-Push")
-    .IsDependentOn("NuGet")
+Task("Push")
+    .IsDependentOn("Pack")
     .Does(() => 
     {
         myPush();
     });
  
-Task("Assets")
+Task("Assets-Pack")
     .IsDependentOn("Clean")
     .Does(() =>
     {
@@ -239,13 +343,13 @@ Task("Assets")
     });
 
 Task("Assets-Push")
-    .IsDependentOn("Assets")
+    .IsDependentOn("Assets-Pack")
     .Does(() =>
     {
         myPush();
     });
 
-Task("Tooling")
+Task("Tooling-Pack")
     .IsDependentOn("Clean")
     .Does(() =>
     {
@@ -254,7 +358,7 @@ Task("Tooling")
     });
 
 Task("Tooling-Push")
-    .IsDependentOn("Tooling")
+    .IsDependentOn("Tooling-Pack")
     .Does(() =>
     {
         myPush();

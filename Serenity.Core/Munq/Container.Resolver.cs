@@ -1,4 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------
+﻿#if !COREFX
+// --------------------------------------------------------------------------------------------------
 // © Copyright 2011 by Matthew Dennis.
 // Released under the Microsoft Public License (Ms-PL) http://www.opensource.org/licenses/ms-pl.html
 // --------------------------------------------------------------------------------------------------
@@ -41,14 +42,14 @@ namespace Munq
 
         private object HandleUnResolved(Exception knfe, string name, Type type)
         {
-            if (type.IsGenericType)
+            if (type.GetIsGenericType())
             {
                 object result = ResolveUsingOpenType(knfe, name, type);
                 if (result!=null)
                     return result;
             }
 
-            if (type.IsClass)
+            if (type.GetIsClass())
             {
                 try
                 {
@@ -63,7 +64,7 @@ namespace Munq
                 }
             }
 
-            if (type.IsInterface)
+            if (type.GetIsInterface())
             {
                 var regs = typeRegistry.GetDerived(name, type);
                 var reg = regs.FirstOrDefault();
@@ -81,7 +82,7 @@ namespace Munq
 
         private object ResolveUsingOpenType(Exception knfe, string name, Type type)
         {
-            if (type.ContainsGenericParameters)
+            if (type.GetContainsGenericParameters())
                 throw new KeyNotFoundException(ResolveFailureMessage(type), knfe);
             else
             {
@@ -178,3 +179,4 @@ namespace Munq
         }
     }
 }
+#endif

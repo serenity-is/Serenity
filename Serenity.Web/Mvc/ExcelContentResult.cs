@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System;
+#if ASPNETCORE
+using Microsoft.AspNetCore.Mvc;
+#else
 using System.Web.Mvc;
-using System;
+#endif
 
 namespace Serenity.Web
 {

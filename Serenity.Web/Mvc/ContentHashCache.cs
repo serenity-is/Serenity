@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
+using System.Web.Hosting;
 using System.Web;
-using System.Web.UI;
+#if ASPNETCORE
+using Microsoft.AspNetCore.WebUtilities;
+#endif
 
 namespace Serenity.Web
 {
@@ -29,10 +29,18 @@ namespace Serenity.Web
         private static string GetFileSHA1(string filePath)
         {
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 120000))
-            using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
-            {
+            { 
+#if ASPNETCORE
+                var md5 = MD5.Create();
                 byte[] hash = md5.ComputeHash(fs);
-                return HttpServerUtility.UrlTokenEncode(hash);
+                return WebEncoders.Base64UrlEncode(hash);
+#else
+                using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
+                {
+                    byte[] hash = md5.ComputeHash(fs);
+                    return HttpServerUtility.UrlTokenEncode(hash);
+                }
+#endif
             }
         }
 
@@ -41,26 +49,22 @@ namespace Serenity.Web
             if (contentUrl.IsNullOrEmpty())
                 throw new ArgumentNullException("contentUrl");
 
-            contentUrl  = VirtualPathUtility.ToAbsolute(contentUrl);
-
             if (contentUrl.IndexOf(".axd/", StringComparison.OrdinalIgnoreCase) >= 0)
                 return contentUrl;
 
-            if (HttpContext.Current == null)
-                throw new InvalidOperationException();
-
-            var contentPath = HttpContext.Current.Server.MapPath(contentUrl);
+            var path = contentUrl;
+            path = HostingEnvironment.MapPath(path);
 
             object hash;
-            hash = hashByContentPath[contentPath];
+            hash = hashByContentPath[path];
             if (hash == null)
             {
-                if (File.Exists(contentPath))
-                    hash = GetFileSHA1(contentPath);
+                if (File.Exists(path))
+                    hash = GetFileSHA1(path);
                 else
                     hash = DateTime.Now.ToString("yyyymmddhh");
 
-                Hashtable.Synchronized(hashByContentPath)[contentPath] = hash;
+                Hashtable.Synchronized(hashByContentPath)[path] = hash;
             }
 
             return VirtualPathUtility.ToAbsolute(contentUrl) + "?v=" + (string)hash;

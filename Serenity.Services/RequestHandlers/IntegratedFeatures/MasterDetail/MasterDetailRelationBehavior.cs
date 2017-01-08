@@ -7,6 +7,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace Serenity.Services
 {
@@ -40,7 +43,7 @@ namespace Serenity.Services
                 return false;
 
             var rowListType = Target.ValueType;
-            if (!rowListType.IsGenericType ||
+            if (!rowListType.GetIsGenericType() ||
                 rowListType.GetGenericTypeDefinition() != typeof(List<>))
             {
                 throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
@@ -49,7 +52,7 @@ namespace Serenity.Services
             }
 
             var rowType = rowListType.GetGenericArguments()[0];
-            if (rowType.IsAbstract ||
+            if (rowType.GetIsAbstract() ||
                 !typeof(Row).IsAssignableFrom(rowType))
             {
                 throw new ArgumentException(String.Format(

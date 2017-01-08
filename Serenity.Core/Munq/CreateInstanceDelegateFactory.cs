@@ -1,4 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------
+﻿#if !COREFX
+// --------------------------------------------------------------------------------------------------
 // © Copyright 2011 by Matthew Dennis.
 // Released under the Microsoft Public License (Ms-PL) http://www.opensource.org/licenses/ms-pl.html
 // --------------------------------------------------------------------------------------------------
@@ -42,7 +43,7 @@ namespace Munq
 
         private static NewExpression BuildExpression(Type type, ParameterExpression container)
         {
-            if (!type.IsGenericTypeDefinition)
+            if (!type.GetIsGenericTypeDefinition())
             {
                 ConstructorInfo constructor = GetConstructorInfo(type);
                 ParameterInfo[] parameters = constructor.GetParameters();
@@ -79,4 +80,4 @@ namespace Munq
         }
     }
 }
-
+#endif

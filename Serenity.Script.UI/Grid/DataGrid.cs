@@ -159,7 +159,11 @@ namespace Serenity
                 }
                 else if (filteringType == typeof(BooleanFiltering))
                 {
-                    quick = BooleanQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name)
+                    var q = item.QuickFilterParams ?? new JsDictionary();
+                    var f = item.FilteringParams ?? new JsDictionary();
+
+                    quick = BooleanQuickFilter(item.Name, Q.TryGetText(item.Title) ?? item.Title ?? item.Name,
+                        (q["trueText"] ?? f["trueText"]).As<string>(), (q["falseText"] ?? f["falseText"]).As<string>())
                         .As<QuickFilter<Widget, object>>();
                 }
                 else
@@ -177,6 +181,11 @@ namespace Serenity
                     else
                         continue;
                 }
+
+                if (item.QuickFilterSeparator == true)
+                    quick.Seperator = true;
+
+                quick.CssClass = item.QuickFilterCssClass;
 
                 list.Add(quick);
             }
@@ -1041,10 +1050,16 @@ namespace Serenity
                 quickFiltersDiv = J("<div/>").AddClass("quick-filters-bar").AppendTo(toolbar.Element);
             }
 
+            if (opt.Seperator)
+                AddFilterSeparator();
+
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)
                 .Children().Text(opt.Title ?? DetermineText(pre => pre + opt.Field) ?? opt.Field)
                 .Parent();
+
+            if (!string.IsNullOrEmpty(opt.CssClass))
+                quickFilter.AddClass(opt.CssClass);
 
             var widget = Widget.CreateOfType(opt.Type, e =>
             {

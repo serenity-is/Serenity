@@ -1,9 +1,6 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
 
 namespace Serenity.PropertyGrid
 {

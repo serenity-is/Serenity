@@ -1,8 +1,8 @@
-﻿using System;
+﻿#if !ASPNETCORE
+using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Web;
-using Serenity.Data;
 using System.IO;
 using System.Web.Hosting;
 
@@ -122,3 +122,4 @@ namespace Serenity.Web.HttpHandlers
         }
     }
 }
+#endif

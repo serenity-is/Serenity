@@ -1,7 +1,9 @@
 ﻿using Serenity.ComponentModel;
-using Serenity.Reflection;
 using Serenity.Web.PropertyEditor;
 using System;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace Serenity.Web
 {
@@ -46,7 +48,7 @@ namespace Serenity.Web
             var items = Serenity.PropertyGrid.PropertyItemHelper.GetPropertyItemsFor(type);
             if (typeof(ICustomizedFormScript).IsAssignableFrom(type))
             {
-                var instance = InstanceCreator.GetInstance(type) as ICustomizedFormScript;
+                var instance = Activator.CreateInstance(type) as ICustomizedFormScript;
                 instance.Customize(items);
             }
 

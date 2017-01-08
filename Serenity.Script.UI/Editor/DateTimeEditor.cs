@@ -40,9 +40,18 @@ namespace Serenity
             });
             input.Bind("change." + this.uniqueName, DateEditor.DateInputChange);
 
-            time = J("<select/>")
-                .AddClass("editor s-DateTimeEditor time")
-                .InsertAfter(input.Next(".ui-datepicker-trigger"));
+            time = J("<select/>").AddClass("editor s-DateTimeEditor time");
+            var after = input.Next(".ui-datepicker-trigger");
+            if (after.Length > 0)
+                time.InsertAfter(after);
+            else
+            {
+                after = input.Prev(".ui-datepicker-trigger");
+                if (after.Length > 0)
+                    time.InsertBefore(after);
+                else
+                    time.InsertAfter(input);
+            }
 
             foreach (var t in GetTimeOptions(fromHour: options.StartHour ?? 0, 
                 toHour: options.EndHour ?? 23, 

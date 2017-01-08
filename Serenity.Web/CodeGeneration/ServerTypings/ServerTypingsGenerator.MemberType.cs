@@ -1,13 +1,8 @@
-﻿using Newtonsoft.Json;
-using Serenity.ComponentModel;
-using Serenity.Data;
-using Serenity.Services;
+﻿using Serenity.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
-using System.Web.Mvc;
 
 namespace Serenity.CodeGeneration
 {
@@ -81,7 +76,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
+            if (memberType.GetIsGenericType() &&
                 (memberType.GetGenericTypeDefinition() == typeof(List<>) ||
                 memberType.GetGenericTypeDefinition() == typeof(HashSet<>)))
             {
@@ -90,7 +85,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
+            if (memberType.GetIsGenericType() &&
                 memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 sb.Append("{ [key: ");

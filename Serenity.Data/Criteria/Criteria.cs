@@ -1,7 +1,6 @@
 ﻿namespace Serenity.Data
 {
     using System;
-    using System.Collections.Generic;
     using System.Text;
 
     /// <summary>
@@ -155,6 +154,16 @@
                 throw new ArgumentNullException("fieldName");
 
             return new Criteria("[" + fieldName + "]");
+        }
+
+        /// <summary>
+        ///   Creates a new EXISTS criteria</summary>
+        /// <param name="query">
+        ///   Expression</param>
+        /// <returns></returns>
+        public static BaseCriteria Exists(ISqlQuery query)
+        {
+            return new UnaryCriteria(CriteriaOperator.Exists, new Criteria(query));
         }
 
         /// <summary>

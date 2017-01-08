@@ -185,19 +185,19 @@
     <Compile Include="Web\NavigationItemTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
+    <ProjectReference Include="..\Serenity.Data.Entity.Net45\Serenity.Data.Entity.csproj">
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+    <ProjectReference Include="..\Serenity.Core.Net45\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
+    <ProjectReference Include="..\Serenity.Data.Net45\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
+    <ProjectReference Include="..\Serenity.Services.Net45\Serenity.Services.csproj">
       <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>
       <Name>Serenity.Services</Name>
     </ProjectReference>
@@ -205,7 +205,7 @@
       <Project>{e5fd07ef-84b5-48c4-8640-46cdc9219ae8}</Project>
       <Name>Serenity.Testing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Web\Serenity.Web.csproj">
+    <ProjectReference Include="..\Serenity.Web.Net45\Serenity.Web.csproj">
       <Project>{8632943d-2a88-4c83-8451-69d62f059efc}</Project>
       <Name>Serenity.Web</Name>
     </ProjectReference>
@@ -302,7 +302,6 @@
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\serenity\Serenity.Test.js" />
-    <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
@@ -419,7 +418,7 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
   <Target Name="BeforeBuild">
-    <Copy SourceFiles="$(ProjectDir)..\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.d.ts" />
+    <Copy SourceFiles="$(ProjectDir)..\Serenity.Web\Scripts\serenity\CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
   </Target>
   <Target Name="AfterBuild">
     <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)tsconfig.json&quot;" ContinueOnError="false" />

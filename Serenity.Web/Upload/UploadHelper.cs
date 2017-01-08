@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
-using Serenity.ComponentModel;
+﻿using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Web;
 using Serenity.IO;
 using System.Web.Hosting;
+#if !ASPNETCORE
+using System.Web;
+#endif
 
 namespace Serenity.Web
 {
@@ -21,28 +21,29 @@ namespace Serenity.Web
         public long FileSize { get; set; }
     }
 
-    [SettingScope("Application"), SettingKey("Logging")]
+    [SettingScope("Application"), SettingKey("UploadSettings")]
     public class UploadSettings
     {
-        private static UploadSettings current;
-
-        public static UploadSettings Current
-        {
-            get 
-            {
-                current = current ?? JsonConvert.DeserializeObject<UploadSettings>(
-                    ConfigurationManager.AppSettings["UploadSettings"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
-
-                return current;
-            }
-        }
-
         public string Url { get; set; }
         public string Path { get; set; }
     }
 
     public class UploadHelper
     {
+
+        private static UploadSettings settings;
+
+        public static UploadSettings Settings
+        {
+            get
+            {
+                if (settings == null)
+                    settings = Config.Get<UploadSettings>();
+
+                return settings;
+            }
+        }
+
         private string dbFileFormat;
 
         public UploadHelper(string dbFileFormat)
@@ -80,7 +81,7 @@ namespace Serenity.Web
             bool hasThumbnail = File.Exists(GetThumbFileName(filePath));
 
             string originalName;
-            using (var sr = new StreamReader(Path.ChangeExtension(temporaryFilePath, ".orig")))
+            using (var sr = new StreamReader(File.OpenRead(Path.ChangeExtension(temporaryFilePath, ".orig"))))
                 originalName = sr.ReadLine();
 
             return new CopyTemporaryFileResult()
@@ -146,8 +147,10 @@ namespace Serenity.Web
         ///   Converted filename.</returns>
         public static string ToPath(string fileName)
         {
-            if (fileName != null && fileName.IndexOf('/') >= 0)
-                return fileName.Replace('/', '\\');
+            var seperator = Path.DirectorySeparatorChar;
+            var opposite = seperator == '/' ? '\\' : '/';
+            if (fileName != null && fileName.IndexOf(opposite) >= 0)
+                return fileName.Replace(opposite, seperator);
             else
                 return fileName;
         }
@@ -156,16 +159,16 @@ namespace Serenity.Web
         {
             get
             {
-                var path = UploadSettings.Current.Path;
+                var path = Settings.Path;
                 if (path.IsEmptyOrNull())
                     throw new InvalidOperationException("Please make sure Path in appSettings\\UploadSettings is configured!");
 
-                string appData = @"~\App_Data\";
-                if (path.StartsWith(appData))
+                string appData1 = @"~\App_Data\";
+                string appData2 = @"~/App_Data/";
+                if (path.StartsWith(appData1) || path.StartsWith(appData2))
                 {
-                    path = Path.Combine(HostingEnvironment.MapPath(appData),
-                        path.Substring(appData.Length));
-                    UploadSettings.Current.Path = path;
+                    path = Path.Combine(HostingEnvironment.MapPath(appData2), ToPath(path.Substring(appData2.Length)));
+                    settings.Path = path;
                 }
                 
                 return path;
@@ -190,7 +193,7 @@ namespace Serenity.Web
         {
             get
             {
-                return UploadSettings.Current.Url;
+                return Settings.Url;
             }
         }
         
@@ -281,7 +284,12 @@ namespace Serenity.Web
                 fileName.StartsWith("\\") ||
                 fileName.EndsWith("/") ||
                 fileName.EndsWith("\\"))
+#if ASPNETCORE
+                throw new ArgumentOutOfRangeException("fileName");
+#else
                 throw new HttpException(0x194, "Invalid_Request");
+#endif
+
         }
 
         public static string GetThumbFileName(string fileName, string thumbSuffix = "_t.jpg")

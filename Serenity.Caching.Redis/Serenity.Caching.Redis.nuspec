@@ -14,12 +14,21 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-      <dependency id="StackExchange.Redis" version="${stackExchangeRedisVersion}" />
-      <dependency id="Serenity.Core" version="${version}" />
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="StackExchange.Redis" version="${*:StackExchange.Redis}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+      </group>
+      <group targetFramework=".NETStandard1.6">
+        <dependency id="StackExchange.Redis" version="${*:StackExchange.Redis}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+      </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="${id}.dll" target="lib/${framework}" />
-    <file src="${id}.pdb" target="lib/${framework}" />
+    <file src="../Serenity.Caching.Redis.Net45/bin/${configuration}/Serenity.Caching.Redis.dll" target="lib/net45" />
+    <file src="../Serenity.Caching.Redis.Net45/bin/${configuration}/Serenity.Caching.Redis.pdb" target="lib/net45" />
+    <file src="bin/${configuration}/netstandard1.6/Serenity.Caching.Redis.dll" target="lib/netstandard1.6" />
   </files>
 </package>

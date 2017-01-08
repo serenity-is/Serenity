@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.IO;
 using System.Data;
 using Newtonsoft.Json;
-using System.Text;
 
 namespace Serenity.Data
 {
@@ -74,7 +72,7 @@ namespace Serenity.Data
             {
                 var ms = new MemoryStream((int)value.Length);
                 CopyStream(value, ms);
-                writer.WriteValue(ms.GetBuffer());
+                writer.WriteValue(ms.ToArray());
             }
         }
 

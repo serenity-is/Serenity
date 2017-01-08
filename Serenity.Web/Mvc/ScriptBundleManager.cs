@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.IO;
-using System.Web;
-using System.Web.Hosting;
-using Serenity.Web;
 using Serenity.Configuration;
 using Serenity.Data;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using System.Web.Hosting;
+using System.Web;
+using System.Configuration;
+#if !COREFX
 using MsieJavaScriptEngine;
+#endif
 
 namespace Serenity.Web
 {
@@ -43,7 +44,7 @@ namespace Serenity.Web
                 if (scriptBundles == null)
                 {
                     scriptBundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
-                        HostingEnvironment.MapPath("~/Scripts/Site/ScriptBundles.json"));
+                    HostingEnvironment.MapPath("~/Scripts/Site/ScriptBundles.json"));
                 }
 
                 return scriptBundles;
@@ -73,11 +74,14 @@ namespace Serenity.Web
             isEnabled = false;
             bundleKeyBySourceUrl = null;
             bundleByKey = null;
+#if !COREFX
             MsieJsEngine jsEngine = null;
+#endif
             try
             {
+                var setting = ConfigurationManager.AppSettings["ScriptBundling"];
                 var settings = JsonConvert.DeserializeObject<ScriptBundlingSettings>(
-                    ConfigurationManager.AppSettings["ScriptBundling"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
+                    setting.TrimToNull() ?? "{}", JsonSettings.Tolerant);
 
                 if (settings == null ||
                     settings.Enabled != true)
@@ -121,10 +125,7 @@ namespace Serenity.Web
 
                         bundleParts.Add(() =>
                         {
-                            if (HttpContext.Current == null)
-                                return String.Format(errorLines, "Tried to generate script while HttpContext is null");
-
-                            var sourcePath = HttpContext.Current.Server.MapPath(sourceUrl);
+                            var sourcePath = VirtualPathUtility.ToAbsolute(sourceUrl);
                             if (!File.Exists(sourcePath))
                                 return String.Format(errorLines, String.Format("File {0} is not found!", sourcePath));
 
@@ -136,15 +137,18 @@ namespace Serenity.Web
                                     if (File.Exists(minPath))
                                     {
                                         sourcePath = minPath;
-                                        using (StreamReader sr = new StreamReader(sourcePath))
+                                        using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
                                             return sr.ReadToEnd();
                                     }
                                 }
 
                                 string code;
-                                using (StreamReader sr = new StreamReader(sourcePath))
+                                using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
                                     code = sr.ReadToEnd();
 
+#if COREFX
+                                return code;
+#else
                                 try
                                 {
                                     return MinimizeWithUglifyJS(ref jsEngine, code);
@@ -154,9 +158,10 @@ namespace Serenity.Web
                                     ex.Log();
                                     return code;
                                 }
+#endif
                             }
 
-                            using (StreamReader sr = new StreamReader(sourcePath))
+                            using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
                                 return sr.ReadToEnd();
                         });
                     }
@@ -176,8 +181,10 @@ namespace Serenity.Web
             }
             finally
             {
+#if !COREFX
                 if (jsEngine != null)
                     jsEngine.Dispose();
+#endif
             }
         }
 
@@ -221,7 +228,6 @@ namespace Serenity.Web
                 {
                     if (s.Length < 0)
                         return false;
-
                     int y;
                     return s.Split('.').All(x => Int32.TryParse(x, out y));
                 })
@@ -258,7 +264,6 @@ namespace Serenity.Web
 
             if (idx < 0)
                 return scriptUrl;
-
             string result;
             if (expandVersion.TryGetValue(scriptUrl, out result))
                 return result;
@@ -271,9 +276,10 @@ namespace Serenity.Web
 
             path = Path.GetDirectoryName(path);
 
-            var beforeName = Path.GetFileName(before.Replace('/', '\\'));
 
-            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', '\\'));
+            var beforeName = Path.GetFileName(before.Replace('/', System.IO.Path.DirectorySeparatorChar));
+
+            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', System.IO.Path.DirectorySeparatorChar));
             if (latest == null)
             {
                 expandVersion[scriptUrl] = scriptUrl;
@@ -289,12 +295,10 @@ namespace Serenity.Web
         {
             scriptUrl = ExpandVersionVariable(scriptUrl);
             scriptUrl = VirtualPathUtility.ToAbsolute(scriptUrl);
-
             Initialize();
 
             if (!isEnabled || bundleKeyBySourceUrl == null)
                 return scriptUrl;
-
             string bundleKey;
             if (!bundleKeyBySourceUrl.TryGetValue(scriptUrl, out bundleKey))
                 return scriptUrl;
@@ -303,6 +307,7 @@ namespace Serenity.Web
             return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + include);
         }
 
+#if !COREFX
         private static MsieJsEngine SetupJsEngine()
         {
             MsieJsEngine jsEngine;
@@ -351,5 +356,6 @@ namespace Serenity.Web
 
             return jsEngine.GetVariableValue<string>("CodeToCompress");
         }
+#endif
     }
 }
