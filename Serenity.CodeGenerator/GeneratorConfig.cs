@@ -9,9 +9,7 @@ namespace Serenity.CodeGenerator
         public MVCConfig MVC { get; set; }
         public List<Connection> Connections { get; set; }
         public string KDiff3Path { get; set; }
-        public string TFPath { get; set; }
         public string TSCPath { get; set; }
-        public bool TFSIntegration { get; set; }
         public string RootNamespace { get; set; }
         public List<BaseRowClass> BaseRowClasses { get; set; }
         public List<string> RemoveForeignFields { get; set; }
