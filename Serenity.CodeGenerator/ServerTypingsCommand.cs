@@ -43,7 +43,7 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
-            var outDir = Path.Combine(root, (config.ServerTypings.OutDir.TrimToNull() ?? "Modules/Common/Imports/ServerTypings")
+            var outDir = Path.Combine(root, (config.ServerTypings.OutDir.TrimToNull() ?? "Imports/ServerTypings")
                 .Replace('/', Path.DirectorySeparatorChar));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -139,6 +139,7 @@ namespace Serenity.CodeGenerator
         public List<ExternalType> List()
         {
             var files = Directory.GetFiles(Path.Combine(projectDir, @"Modules"), "*.ts", SearchOption.AllDirectories)
+                .Concat(Directory.GetFiles(Path.Combine(projectDir, @"Imports"), "*.ts", SearchOption.AllDirectories))
                 .Concat(Directory.GetFiles(Path.Combine(projectDir, @"typings"), "*.ts", SearchOption.AllDirectories))
                 .Where(x => !x.EndsWith(".d.ts") || x.IndexOf("Serenity") >= 0);
 
