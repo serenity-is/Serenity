@@ -24,13 +24,13 @@ namespace Serenity.CodeGenerator
             int length = str1.IndexOf('_');
             if (length <= 0)
                 return 0;
-            string str2 = str1.Substring(0, length);
+            string str2 = str1.Substring(0, length + 1);
             foreach (T obj in list)
             {
-                if (!getName(obj).StartsWith(str2))
+                if (!getName(obj).StartsWith(str2) || getName(obj).Length == str2.Length)
                     return 0;
             }
-            return str2.Length + 1;
+            return str2.Length;
         }
 
         public static string JI(string join, string field)
