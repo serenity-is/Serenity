@@ -9,14 +9,11 @@ namespace Serenity.CodeGenerator
 {
     public class RowGenerator
     {
-        public static string Generate(IDbConnection connection, string tableSchema, string table, string module, string connectionKey, string entityClass, string permission,
-            GeneratorConfig config)
+        public static string Generate(IDbConnection connection, string tableSchema, string table, string module, 
+            string connectionKey, string entityClass, string permission, GeneratorConfig config)
         {
             var model = GenerateModel(connection, tableSchema, table, module, connectionKey, entityClass, permission, config);
-            if (config.RowFieldsSurroundWithRegion)
-                return Templates.Render(new Views.EntityRowWithRegion(), model, config);
-            else
-                return Templates.Render(new Views.EntityRow(), model);
+            return Templates.Render(new Views.EntityRow(), model);
         }
 
         private static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)

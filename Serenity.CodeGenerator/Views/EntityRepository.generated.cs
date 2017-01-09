@@ -25,13 +25,13 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
                                                    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
 
-WriteLiteral("\r\nnamespace ");
+WriteLiteral(Environment.NewLine + "namespace ");
 
 
       Write(Model.RootNamespace);
@@ -39,14 +39,14 @@ WriteLiteral("\r\nnamespace ");
 
                             Write(dotModule);
 
-WriteLiteral(".Repositories\r\n{\r\n    using Serenity;\r\n    using Serenity.Data;\r\n    using Sereni" +
-"ty.Services;\r\n    using System;\r\n    using System.Data;\r\n    using MyRow = Entit" +
+WriteLiteral(".Repositories" + Environment.NewLine + "{" + Environment.NewLine + "    using Serenity;" + Environment.NewLine + "    using Serenity.Data;" + Environment.NewLine + "    using Sereni" +
+"ty.Services;" + Environment.NewLine + "    using System;" + Environment.NewLine + "    using System.Data;" + Environment.NewLine + "    using MyRow = Entit" +
 "ies.");
 
 
                        Write(Model.RowClassName);
 
-WriteLiteral(";\r\n\r\n    public class ");
+WriteLiteral(";" + Environment.NewLine + Environment.NewLine + "    public class ");
 
 
              Write(Model.ClassName);

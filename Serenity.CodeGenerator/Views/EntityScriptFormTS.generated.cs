@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -59,7 +59,7 @@ WriteLiteral("\r\n");
 
 
 
-WriteLiteral("\r\nnamespace ");
+WriteLiteral(Environment.NewLine + "namespace ");
 
 
       Write(Model.RootNamespace);
@@ -67,12 +67,12 @@ WriteLiteral("\r\nnamespace ");
 
                             Write(dotModule);
 
-WriteLiteral(" {\r\n    export class ");
+WriteLiteral(" {" + Environment.NewLine + "    export class ");
 
 
              Write(Model.ClassName);
 
-WriteLiteral("Form extends Serenity.PrefixedContext {\r\n        static formKey = \'");
+WriteLiteral("Form extends Serenity.PrefixedContext {" + Environment.NewLine + "        static formKey = \'");
 
 
                       Write(moduleDot);
@@ -80,7 +80,7 @@ WriteLiteral("Form extends Serenity.PrefixedContext {\r\n        static formKey 
 
                                   Write(Model.ClassName);
 
-WriteLiteral("\';\r\n    }\r\n\r\n    export interface ");
+WriteLiteral("\';" + Environment.NewLine + "    }" + Environment.NewLine + Environment.NewLine + "    export interface ");
 
 
                  Write(Model.ClassName);
@@ -92,7 +92,7 @@ WriteLiteral("\';\r\n    }\r\n\r\n    export interface ");
     {
         if (x.Ident != Model.Identity)
         {
-WriteLiteral("\r\n        ");
+WriteLiteral(Environment.NewLine + "        ");
 
 
     Write(x.Ident);
@@ -108,7 +108,7 @@ WriteLiteral(";");
                                              }
     }
 
-WriteLiteral("\r\n    }\r\n\r\n    [");
+WriteLiteral(Environment.NewLine + "    }" + Environment.NewLine + Environment.NewLine + "    [");
 
 
 Write(fieldList);
@@ -119,7 +119,7 @@ WriteLiteral("].forEach(x => Object.defineProperty(");
                                                 Write(Model.ClassName);
 
 WriteLiteral("Form.prototype, <string>x[0], { get: function () { return this.w(x[0], (x[1] as a" +
-"ny)()); }, enumerable: true, configurable: true }));\r\n}");
+"ny)()); }, enumerable: true, configurable: true }));" + Environment.NewLine + "}");
 
 
         }

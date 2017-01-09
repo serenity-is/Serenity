@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -42,9 +42,9 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(".Forms\r\n{\r\n    using Serenity;\r\n    using Serenity.ComponentModel;\r\n    using Ser" +
-"enity.Data;\r\n    using System;\r\n    using System.ComponentModel;\r\n    using Syst" +
-"em.Collections.Generic;\r\n    using System.IO;\r\n\r\n    [FormScript(\"");
+WriteLiteral(".Forms" + Environment.NewLine + "{" + Environment.NewLine + "    using Serenity;" + Environment.NewLine + "    using Serenity.ComponentModel;" + Environment.NewLine + "    using Ser" +
+"enity.Data;" + Environment.NewLine + "    using System;" + Environment.NewLine + "    using System.ComponentModel;" + Environment.NewLine + "    using Syst" +
+"em.Collections.Generic;" + Environment.NewLine + "    using System.IO;" + Environment.NewLine + Environment.NewLine + "    [FormScript(\"");
 
 
              Write(moduleDot);
@@ -52,24 +52,24 @@ WriteLiteral(".Forms\r\n{\r\n    using Serenity;\r\n    using Serenity.Component
 
                          Write(Model.ClassName);
 
-WriteLiteral("\")]\r\n    [BasedOnRow(typeof(Entities.");
+WriteLiteral("\")]" + Environment.NewLine + "    [BasedOnRow(typeof(Entities.");
 
 
                             Write(Model.RowClassName);
 
-WriteLiteral("))]\r\n    public class ");
+WriteLiteral("))]" + Environment.NewLine + "    public class ");
 
 
              Write(Model.ClassName);
 
 
-                                   WriteLiteral("Form\r\n    {");
+                                   WriteLiteral("Form" + Environment.NewLine + "    {");
 
       foreach (EntityField x in Model.Fields)
     {
         if (x.Ident != Model.IdField)
         {
-WriteLiteral("\r\n        public ");
+WriteLiteral(Environment.NewLine + "        public ");
 
 
           Write(x.DataType);
@@ -85,7 +85,7 @@ WriteLiteral(" { get; set; }");
                                                         }
     }
 
-WriteLiteral("\r\n    }\r\n}");
+WriteLiteral(Environment.NewLine + "    }" + Environment.NewLine + "}");
 
 
         }

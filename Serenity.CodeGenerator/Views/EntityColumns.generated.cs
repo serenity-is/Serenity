@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -42,9 +42,9 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(".Columns\r\n{\r\n    using Serenity;\r\n    using Serenity.ComponentModel;\r\n    using S" +
-"erenity.Data;\r\n    using System;\r\n    using System.ComponentModel;\r\n    using Sy" +
-"stem.Collections.Generic;\r\n    using System.IO;\r\n\r\n    [ColumnsScript(\"");
+WriteLiteral(".Columns" + Environment.NewLine + "{" + Environment.NewLine + "    using Serenity;" + Environment.NewLine + "    using Serenity.ComponentModel;" + Environment.NewLine + "    using S" +
+"erenity.Data;" + Environment.NewLine + "    using System;" + Environment.NewLine + "    using System.ComponentModel;" + Environment.NewLine + "    using Sy" +
+"stem.Collections.Generic;" + Environment.NewLine + "    using System.IO;" + Environment.NewLine + Environment.NewLine + "    [ColumnsScript(\"");
 
 
                 Write(moduleDot);
@@ -52,18 +52,18 @@ WriteLiteral(".Columns\r\n{\r\n    using Serenity;\r\n    using Serenity.Compone
 
                             Write(Model.ClassName);
 
-WriteLiteral("\")]\r\n    [BasedOnRow(typeof(Entities.");
+WriteLiteral("\")]" + Environment.NewLine + "    [BasedOnRow(typeof(Entities.");
 
 
                             Write(Model.RowClassName);
 
-WriteLiteral("))]\r\n    public class ");
+WriteLiteral("))]" + Environment.NewLine + "    public class ");
 
 
              Write(Model.ClassName);
 
 
-                                   WriteLiteral("Columns\r\n    {");
+                                   WriteLiteral("Columns" + Environment.NewLine + "    {");
 
       foreach (EntityField x in Model.Fields) {
         var attrs = new List<string>();
@@ -77,7 +77,7 @@ WriteLiteral("))]\r\n    public class ");
         }
         if (attrs.Count > 0)
         {
-WriteLiteral("\r\n        [");
+WriteLiteral(Environment.NewLine + "        [");
 
 
     Write(string.Join(", ", attrs));
@@ -86,7 +86,7 @@ WriteLiteral("]");
 
 
                                           }
-WriteLiteral("\r\n        public ");
+WriteLiteral(Environment.NewLine + "        public ");
 
 
           Write(x.DataType);
@@ -101,7 +101,7 @@ WriteLiteral(" { get; set; }");
 
                                                         }
 
-WriteLiteral("\r\n    }\r\n}");
+WriteLiteral(Environment.NewLine + "    }" + Environment.NewLine + "}");
 
 
         }

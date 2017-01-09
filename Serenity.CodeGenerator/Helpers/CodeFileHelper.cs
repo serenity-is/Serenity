@@ -14,6 +14,7 @@ namespace Serenity.CodeGenerator
         public static string Kdiff3Path;
         public static string TSCPath;
         public static bool TFSIntegration;
+        public static bool? Overwrite;
 
         public static byte[] ToUTF8BOM(string s)
         {
@@ -73,44 +74,12 @@ namespace Serenity.CodeGenerator
 
                 using (var sw = new StreamWriter(File.Create(file), utf8))
                 {
-                    sw.Write(String.Join("\r\n", lines));
+                    sw.Write(String.Join(Environment.NewLine, lines));
                 }
                 return true;
             }
 
             return false;
-        }
-
-        public static bool StreamsContentsAreEqual(Stream stream1, Stream stream2)
-        {
-            const int bufferSize = 2048 * 2;
-            var buffer1 = new byte[bufferSize];
-            var buffer2 = new byte[bufferSize];
-
-            while (true)
-            {
-                int count1 = stream1.Read(buffer1, 0, bufferSize);
-                int count2 = stream2.Read(buffer2, 0, bufferSize);
-
-                if (count1 != count2)
-                {
-                    return false;
-                }
-
-                if (count1 == 0)
-                {
-                    return true;
-                }
-
-                int iterations = (int)Math.Ceiling((double)count1 / sizeof(Int64));
-                for (int i = 0; i < iterations; i++)
-                {
-                    if (BitConverter.ToInt64(buffer1, i * sizeof(Int64)) != BitConverter.ToInt64(buffer2, i * sizeof(Int64)))
-                    {
-                        return false;
-                    }
-                }
-            }
         }
 
         public static void ExecuteTFCommand(string file, string command)
@@ -148,27 +117,28 @@ namespace Serenity.CodeGenerator
             File.WriteAllBytes(file, contents);
         }
 
+        public static bool FileContentsEqual(string file1, string file2)
+        {
+            var content1 = File.ReadAllText(file1, utf8);
+            var content2 = File.ReadAllText(file2, utf8);
+            return content1.Trim().Replace("\r", "") == content2.Trim().Replace("\r", "");
+        }
+
         public static void MergeChanges(string backup, string file)
         {
             if (backup == null || !File.Exists(backup) || !File.Exists(file))
                 return;
 
-            bool isEqual;
-            using (var fs1 = new FileStream(backup, FileMode.Open))
-            using (var fs2 = new FileStream(file, FileMode.Open))
-                isEqual = CodeFileHelper.StreamsContentsAreEqual(fs1, fs2);
+            bool isEqual = FileContentsEqual(backup, file);
 
             if (isEqual)
             {
+                CheckoutAndWrite(file, File.ReadAllBytes(backup), true);
                 File.Delete(backup);
                 return;
             }
 
-            var generated = Path.ChangeExtension(file, Path.GetExtension(file) + ".gen.bak");
-            CheckoutAndWrite(generated, File.ReadAllBytes(file), false);
-            CheckoutAndWrite(file, File.ReadAllBytes(backup), true);
-
-            if (Kdiff3Path.IsNullOrEmpty() ||
+            if (!Kdiff3Path.IsEmptyOrNull() &&
                 !File.Exists(Kdiff3Path))
             {
                 if (Kdiff3Path.IsNullOrEmpty())
@@ -182,8 +152,58 @@ namespace Serenity.CodeGenerator
                     "Please install it, or if it is not installed to default location, " +
                     "set its path in CodeGenerator.config file!", Kdiff3Path));
             }
+            else if (!Kdiff3Path.IsEmptyOrNull())
+            {
+                var generated = Path.ChangeExtension(file, Path.GetExtension(file) + ".gen.bak");
+                CheckoutAndWrite(generated, File.ReadAllBytes(file), false);
+                CheckoutAndWrite(file, File.ReadAllBytes(backup), true);
+                Process.Start(Kdiff3Path, "--auto \"" + file + "\" \"" + generated + "\" -o \"" + file + "\"");
+            }
+            else
+            {
+                string answer = null;
+                if (Overwrite == true)
+                    answer = "y";
+                else if (Overwrite == false)
+                    answer = "n";
+                else
+                {
+                    
+                    while (true)
+                    {
+                        Console.Write("Overwrite " + Path.GetFileName(file) + "? ([Y]es, [N]o, Yes to [A]ll, [S]kip All): ");
+                        answer = Console.ReadLine();
 
-            Process.Start(Kdiff3Path, "--auto \"" + file + "\" \"" + generated + "\" -o \"" + file + "\"");
+                        if (answer != null)
+                        {
+                            answer = answer.ToLowerInvariant()[0].ToString();
+                            if (answer == "a")
+                            {
+                                Overwrite = true;
+                                break;
+                            }
+                            else if (answer == "s")
+                            {
+                                Overwrite = false;
+                                break;
+                            }
+                            else if (answer == "y" || answer == "n")
+                                break;
+                        }
+                    }
+                }
+                    
+                if (answer == "y" || answer == "a")
+                {
+                    File.Delete(backup);
+                }
+                else
+                {
+                    CheckoutAndWrite(file, File.ReadAllBytes(backup), true);
+                    File.Delete(backup);
+                }
+                
+            }
         }
 
         public static void ExecuteTSC(string workingDirectory, string arguments)

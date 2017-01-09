@@ -1,66 +1,56 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Serenity.CodeGenerator
 {
     public class GeneratorConfig
     {
+        public string RootNamespace { get; set; }
         public ServerTypingsConfig ServerTypings { get; set; }
         public ClientTypesConfig ClientTypes { get; set; }
         public MVCConfig MVC { get; set; }
         public List<Connection> Connections { get; set; }
         public string KDiff3Path { get; set; }
         public string TSCPath { get; set; }
-        public string RootNamespace { get; set; }
         public List<BaseRowClass> BaseRowClasses { get; set; }
         public List<string> RemoveForeignFields { get; set; }
-        public bool GenerateSSImports { get; set; }
-        public bool GenerateTSTypings { get; set; }
-        public bool GenerateTSCode { get; set; }
-        public bool RowFieldsSurroundWithRegion { get; set; }
+        [JsonIgnore]
         public bool GenerateRow { get; set; }
-        public bool GenerateColumn { get; set; }
-        public bool GenerateForm { get; set; }
-        public bool GenerateEndpoint { get; set; }
-        public bool GenerateRepository { get; set; }
-        public bool GeneratePage { get; set; }
-        public bool GenerateGrid { get; set; }
-        public bool GenerateDialog { get; set; }
-        public bool GenerateGridEditor { get; set; }
-        public bool GenerateGridEditorDialog { get; set; }
-        public bool GenerateLookupEditor { get; set; }
-        public bool MaximizableDialog { get; set; }
+        [JsonIgnore]
+        public bool GenerateService { get; set; }
+        [JsonIgnore]
+        public bool GenerateUI { get; set; }
 
         public GeneratorConfig()
         {
             Connections = new List<Connection>();
             BaseRowClasses = new List<BaseRowClass>();
-            GenerateTSTypings = true;
-            GenerateSSImports = false;
-            GenerateTSCode = true;
-            RowFieldsSurroundWithRegion = false;
             GenerateRow = true;
-            GenerateColumn = true;
-            GenerateForm = true;
-            GenerateEndpoint = true;
-            GenerateRepository = true;
-            GeneratePage = true;
-            GenerateGrid = true;
-            GenerateDialog = true;
-            GenerateGridEditor = false;
-            GenerateGridEditorDialog = false;
-            GenerateLookupEditor = false;
-            MaximizableDialog = false;
+            GenerateService = true;
+            GenerateUI = true;
         }
 
         public string SaveToJson()
         {
             Connections.Sort((x, y) => x.Key.CompareTo(y.Key));
-            return JSON.StringifyIndented(this);
+            foreach (var c in Connections)
+                c.Tables.Sort((x, y) => x.Tablename.CompareTo(y.Tablename));
+
+            return JSON.StringifyIndented(this, 2);
+        }
+
+        public static GeneratorConfig LoadFromFile(string sergenJson)
+        {
+            if (!File.Exists(sergenJson))
+                return LoadFromJson(null);
+
+            return LoadFromJson(File.ReadAllText(sergenJson));
         }
 
         public static GeneratorConfig LoadFromJson(string json)
         {
-            var config = JSON.Parse<GeneratorConfig>(json.TrimToNull() ?? "{}");
+            var config = JSON.ParseTolerant<GeneratorConfig>(json.TrimToNull() ?? "{}");
             config.Connections = config.Connections ?? new List<GeneratorConfig.Connection>();
             config.RemoveForeignFields = config.RemoveForeignFields ?? new List<string>();
             return config;
@@ -89,7 +79,6 @@ namespace Serenity.CodeGenerator
             public string Tablename { get; set; }
             public string Identifier { get; set; }
             public string Module { get; set; }
-            public string ConnectionKey { get; set; }
             public string PermissionKey { get; set; }
         }
 

@@ -14,15 +14,9 @@ namespace Serenity.CodeGenerator
 
         public void Run(string projectJson, List<ExternalType> tsTypes)
         {
-            var root = Path.GetDirectoryName(projectJson);
-            var configFile = Path.Combine(root, "sergen.json");
-            if (!File.Exists(configFile))
-            {
-                System.Console.Error.WriteLine("Can't find sergen.json in current directory!");
-                Environment.Exit(1);
-            }
+            var projectDir = Path.GetDirectoryName(projectJson);
+            var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
-            var config = GeneratorConfig.LoadFromJson(File.ReadAllText(configFile));
             if (config.ServerTypings == null)
             {
                 System.Console.Error.WriteLine("ServerTypings is not configured in sergen.json file!");
@@ -41,7 +35,7 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
-            var outDir = Path.Combine(root, (config.ServerTypings.OutDir.TrimToNull() ?? "Imports/ServerTypings")
+            var outDir = Path.Combine(projectDir, (config.ServerTypings.OutDir.TrimToNull() ?? "Imports/ServerTypings")
                 .Replace('/', Path.DirectorySeparatorChar));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -51,7 +45,7 @@ namespace Serenity.CodeGenerator
 
             List<Assembly> assemblies = new List<Assembly>();
             foreach (var assembly in config.ServerTypings.Assemblies)
-                assemblies.Add(AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(root, assembly)));
+                assemblies.Add(AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(projectDir, assembly)));
 
             var generator = new ServerTypingsGenerator(assemblies.ToArray());
             generator.RootNamespaces.Add(config.RootNamespace);

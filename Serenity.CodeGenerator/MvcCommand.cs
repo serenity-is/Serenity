@@ -12,18 +12,12 @@ namespace Serenity.CodeGenerator
 
         public void Run(string projectJson)
         {
-            var root = Path.GetDirectoryName(projectJson);
-            var configFile = Path.Combine(root, "sergen.json");
-            if (!File.Exists(configFile))
-            {
-                System.Console.Error.WriteLine("Can't find sergen.json in current directory!");
-                Environment.Exit(1);
-            }
+            var projectDir = Path.GetDirectoryName(projectJson);
+            var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
-            var config = GeneratorConfig.LoadFromJson(File.ReadAllText(configFile));
             config.MVC = config.MVC ?? new GeneratorConfig.MVCConfig();
 
-            var outDir = Path.Combine(root, (config.MVC.OutDir.TrimToNull() ?? "Imports/MVC")
+            var outDir = Path.Combine(projectDir, (config.MVC.OutDir.TrimToNull() ?? "Imports/MVC")
                 .Replace('/', Path.DirectorySeparatorChar));
 
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -124,7 +118,7 @@ namespace Serenity.CodeGenerator
 
             for (var i = last.Length - 1; i > 0; i--)
             {
-                sb.AppendLine(new String(' ', ((i + 1) * 4)) + "}\r\n");
+                sb.AppendLine(new String(' ', ((i + 1) * 4)) + "}" + Environment.NewLine);
             }
 
             sb.AppendLine("    }");

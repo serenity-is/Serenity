@@ -12,15 +12,9 @@ namespace Serenity.CodeGenerator
 
         public void Run(string projectJson, List<ExternalType> tsTypes)
         {
-            var root = Path.GetDirectoryName(projectJson);
-            var configFile = Path.Combine(root, "sergen.json");
-            if (!File.Exists(configFile))
-            {
-                System.Console.Error.WriteLine("Can't find sergen.json in current directory!");
-                Environment.Exit(1);
-            }
+            var projectDir = Path.GetDirectoryName(projectJson);
+            var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
-            var config = GeneratorConfig.LoadFromJson(File.ReadAllText(configFile));
             config.ClientTypes = config.ClientTypes ?? new GeneratorConfig.ClientTypesConfig();
 
             if (config.RootNamespace.IsEmptyOrNull())
@@ -29,7 +23,7 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
-            var outDir = Path.Combine(root, (config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes")
+            var outDir = Path.Combine(projectDir, (config.ClientTypes.OutDir.TrimToNull() ?? "Imports/ClientTypes")
                 .Replace('/', Path.DirectorySeparatorChar));
 
             Console.ForegroundColor = ConsoleColor.Cyan;

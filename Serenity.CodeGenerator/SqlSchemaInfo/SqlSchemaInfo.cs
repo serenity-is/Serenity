@@ -30,7 +30,7 @@ namespace Serenity.CodeGenerator
         public static List<TableName> GetTableNames(IDbConnection connection)
         {
             var query = "SELECT * FROM INFORMATION_SCHEMA.TABLES";
-            var tables = connection.Query<Dictionary<string, object>>(query);
+            var tables = connection.Query(query);
 
             bool sqlite = connection.GetDialect().ServerType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
 
@@ -39,7 +39,7 @@ namespace Serenity.CodeGenerator
 
             var result = new List<TableName>();
 
-            foreach (var row in tables)
+            foreach (IDictionary<string, object> row in tables)
             {
                 var tableType = row["TABLE_TYPE"] as string;
                 var schema = row["TABLE_SCHEMA"] as string;
@@ -70,7 +70,7 @@ where CAST(RC.RDB$RELATION_NAME AS VARCHAR(40)) = '{0}' and
 RC.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY'
 order by 3";
 
-                foreach (var k in connection.Query<Dictionary<string, object>>(String.Format(q, tableName)))
+                foreach (IDictionary<string, object> k in connection.Query(String.Format(q, tableName)))
                 {
                     primaryFields.Add((k["COLUMN_NAME"] as string).TrimEnd());
                 }
@@ -84,13 +84,13 @@ order by 3";
             if (sqlite)
                 query = "PRAGMA table_info(@tableName)";
 
-            var columns = connection.Query<Dictionary<string, object>>(query, new
+            var columns = connection.Query(query, new
             {
                 schema,
                 tableName
             });
 
-            foreach (var column in columns)
+            foreach (IDictionary<string, object> column in columns)
             {
                 try
                 {
@@ -146,7 +146,7 @@ order by 3";
             if (sqlite)
                 query = "PRAGMA table_info(@tableName)";
 
-            var columns = connection.Query<Dictionary<string, object>>(query, new
+            var columns = connection.Query(query, new
             {
                 schema,
                 tableName
@@ -154,7 +154,7 @@ order by 3";
 
             if (connection.GetDialect().ServerType.StartsWith("Postgres", StringComparison.OrdinalIgnoreCase))
             {
-                foreach (var row in columns)
+                foreach (IDictionary<string, object> row in columns)
                 {
                     var defaultValue = row["column_default"] as string;
                     if (defaultValue != null && defaultValue.IndexOf("nextval(") > 0)
@@ -166,7 +166,7 @@ order by 3";
 
             if (connection.GetDialect().ServerType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase))
             {
-                foreach (var row in columns)
+                foreach (IDictionary<string, object> row in columns)
                 {
                     var isIdentity = (row["EXTRA"] as string) == "auto_increment";
                     if (isIdentity == true)
@@ -176,7 +176,7 @@ order by 3";
                 return identityFields;
             }
 
-            foreach (var row in columns)
+            foreach (IDictionary<string, object> row in columns)
             {
                 var isIdentity = row.ContainsKey("AUTOINCREMENT") && row["AUTOINCREMENT"] as Boolean? == true;
                 if (isIdentity == true)
@@ -216,13 +216,13 @@ order by 3";
             if (sqlite)
                 query = "PRAGMA table_info(@tableName)";
 
-            var columns = connection.Query<Dictionary<string, object>>(query, new
+            var columns = connection.Query(query, new
             {
                 schema,
                 tableName
             });
 
-            foreach (var row in columns)
+            foreach (IDictionary<string, object> row in columns)
             {
                 var col = (string)row["COLUMN_NAME"];
                 dict[col] = (int)row["ORDINAL_POSITION"];
@@ -477,7 +477,7 @@ order by 1, 5";
             if (sqlite)
                 query = "PRAGMA table_info(@tableName)";
 
-            var columns = connection.Query<Dictionary<string, object>>(query, new
+            var columns = connection.Query(query, new
             {
                 schema,
                 tableName
@@ -487,7 +487,7 @@ order by 1, 5";
             if (!columns.Any())
                 return new List<CodeGenerator.SqlSchemaInfo.FieldInfo>();
 
-            var first = columns.First();
+            var first = columns.First() as IDictionary<string, object>;
 
             var ordinal = "ORDINAL_POSITION";
             var columnName = "COLUMN_NAME";
@@ -517,7 +517,7 @@ order by 1, 5";
                 first.ContainsKey("COLUMN_SIZE"))
                 charMax = "COLUMN_SIZE";
 
-            foreach (var row in columns)
+            foreach (IDictionary<string, object> row in columns)
             {
                 FieldInfo fieldInfo = new FieldInfo();
                 fieldInfo.FieldName = (string)row[columnName];

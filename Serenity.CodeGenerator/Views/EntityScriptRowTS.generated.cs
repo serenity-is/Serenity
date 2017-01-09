@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -54,7 +54,7 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(" {\r\n    export interface ");
+WriteLiteral(" {" + Environment.NewLine + "    export interface ");
 
 
                  Write(Model.RowClassName);
@@ -64,7 +64,7 @@ WriteLiteral(" {\r\n    export interface ");
 
                                              foreach (EntityField x in Model.Fields) {
 
-WriteLiteral("\r\n        ");
+WriteLiteral(Environment.NewLine + "        ");
 
 
     Write(x.Ident);
@@ -82,7 +82,7 @@ WriteLiteral(";");
 
  foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 
-WriteLiteral("\r\n        ");
+WriteLiteral(Environment.NewLine + "        ");
 
 
     Write(jf(x.Name, y.Ident));
@@ -97,7 +97,7 @@ WriteLiteral(";");
 
                                                     }}
 
-WriteLiteral("\r\n    }\r\n\r\n    export namespace ");
+WriteLiteral(Environment.NewLine + "    }" + Environment.NewLine + Environment.NewLine + "    export namespace ");
 
 
                  Write(Model.RowClassName);
@@ -106,7 +106,7 @@ WriteLiteral("\r\n    }\r\n\r\n    export namespace ");
                                           WriteLiteral(" {");
 
                                              if (Model.Identity != null) {
-WriteLiteral("\r\n        export const idProperty = \'");
+WriteLiteral(Environment.NewLine + "        export const idProperty = \'");
 
 
                                Write(Model.Identity);
@@ -117,7 +117,7 @@ WriteLiteral("\';");
                                                              }
 
                                                                if (Model.NameField != null) {
-WriteLiteral("\r\n        export const nameProperty = \'");
+WriteLiteral(Environment.NewLine + "        export const nameProperty = \'");
 
 
                                  Write(Model.NameField);
@@ -127,7 +127,7 @@ WriteLiteral("\';");
 
                                                                 }
 
-WriteLiteral("\r\n        export const localTextPrefix = \'");
+WriteLiteral(Environment.NewLine + "        export const localTextPrefix = \'");
 
 
                                    Write(moduleDot);
@@ -136,11 +136,11 @@ WriteLiteral("\r\n        export const localTextPrefix = \'");
                                              Write(Model.ClassName);
 
 
-                                                                  WriteLiteral("\';\r\n\r\n        export namespace Fields {");
+                                                                  WriteLiteral("\';" + Environment.NewLine + Environment.NewLine + "        export namespace Fields {");
 
                                   foreach (EntityField x in Model.Fields) {
 
-WriteLiteral("\r\n            export declare const ");
+WriteLiteral(Environment.NewLine + "            export declare const ");
 
 
                             Write(x.Ident);
@@ -153,7 +153,7 @@ WriteLiteral(";");
 
  foreach (EntityJoin x in Model.Joins){foreach (EntityField y in x.Fields){
 
-WriteLiteral("\r\n            export declare const ");
+WriteLiteral(Environment.NewLine + "            export declare const ");
 
 
                              Write(jf(x.Name, y.Ident));
@@ -163,12 +163,12 @@ WriteLiteral(": string;");
 
                                                                        }}
 
-WriteLiteral("\r\n        }\r\n\r\n        [");
+WriteLiteral(Environment.NewLine + "        }" + Environment.NewLine + Environment.NewLine + "        [");
 
 
     Write(fieldList);
 
-WriteLiteral("].forEach(x => (<any>Fields)[x] = x);\r\n    }\r\n}\r\n\r\n");
+WriteLiteral("].forEach(x => (<any>Fields)[x] = x);" + Environment.NewLine + "    }" + Environment.NewLine + "}" + Environment.NewLine + Environment.NewLine);
 
 
         }

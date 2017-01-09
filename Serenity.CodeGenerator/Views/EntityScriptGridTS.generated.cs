@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -42,10 +42,10 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(" {\r\n    \r\n    ");
+WriteLiteral(" {" + Environment.NewLine + "    " + Environment.NewLine + "    ");
 
 
-WriteLiteral("@Serenity.Decorators.registerClass()\r\n    export class ");
+WriteLiteral("@Serenity.Decorators.registerClass()" + Environment.NewLine + "    export class ");
 
 
              Write(Model.ClassName);
@@ -55,7 +55,7 @@ WriteLiteral("Grid extends Serenity.EntityGrid<");
 
                                                                 Write(Model.RowClassName);
 
-WriteLiteral(", any> {\r\n        protected getColumnsKey() { return \'");
+WriteLiteral(", any> {" + Environment.NewLine + "        protected getColumnsKey() { return \'");
 
 
                                         Write(moduleDot);
@@ -63,7 +63,7 @@ WriteLiteral(", any> {\r\n        protected getColumnsKey() { return \'");
 
                                                     Write(Model.ClassName);
 
-WriteLiteral("\'; }\r\n        protected getDialogType() { return ");
+WriteLiteral("\'; }" + Environment.NewLine + "        protected getDialogType() { return ");
 
 
                                        Write(Model.ClassName);
@@ -72,7 +72,7 @@ WriteLiteral("\'; }\r\n        protected getDialogType() { return ");
                                                              WriteLiteral("Dialog; }");
 
                                                                        if (Model.Identity != null) {
-WriteLiteral("\r\n        protected getIdProperty() { return ");
+WriteLiteral(Environment.NewLine + "        protected getIdProperty() { return ");
 
 
                                        Write(Model.RowClassName);
@@ -82,18 +82,18 @@ WriteLiteral(".idProperty; }");
 
                                                                                      }
 
-WriteLiteral("\r\n        protected getLocalTextPrefix() { return ");
+WriteLiteral(Environment.NewLine + "        protected getLocalTextPrefix() { return ");
 
 
                                             Write(Model.RowClassName);
 
-WriteLiteral(".localTextPrefix; }\r\n        protected getService() { return ");
+WriteLiteral(".localTextPrefix; }" + Environment.NewLine + "        protected getService() { return ");
 
 
                                     Write(Model.ClassName);
 
-WriteLiteral("Service.baseUrl; }\r\n\r\n        constructor(container: JQuery) {\r\n            super" +
-"(container);\r\n        }\r\n    }\r\n}");
+WriteLiteral("Service.baseUrl; }" + Environment.NewLine + Environment.NewLine + "        constructor(container: JQuery) {" + Environment.NewLine + "            super" +
+"(container);" + Environment.NewLine + "        }" + Environment.NewLine + "    }" + Environment.NewLine + "}");
 
 
         }

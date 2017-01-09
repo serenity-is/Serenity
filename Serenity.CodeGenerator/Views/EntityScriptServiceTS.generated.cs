@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -46,7 +46,7 @@ WriteLiteral("\r\n");
     var fieldList = String.Join(", ", fields.Select(x => "'" + x.Ident + "'").Concat(joins.SelectMany(x => x.Fields.Select(y => "'" + jf(x.Name, y.Ident) + "'"))));
 
 
-WriteLiteral("\r\nnamespace ");
+WriteLiteral(Environment.NewLine + "namespace ");
 
 
       Write(Model.RootNamespace);
@@ -54,12 +54,12 @@ WriteLiteral("\r\nnamespace ");
 
                             Write(dotModule);
 
-WriteLiteral(" {\r\n    export namespace ");
+WriteLiteral(" {" + Environment.NewLine + "    export namespace ");
 
 
                  Write(Model.ClassName);
 
-WriteLiteral("Service {\r\n        export const baseUrl = \'");
+WriteLiteral("Service {" + Environment.NewLine + "        export const baseUrl = \'");
 
 
                             Write(modulePrefix);
@@ -67,33 +67,33 @@ WriteLiteral("Service {\r\n        export const baseUrl = \'");
 
                                            Write(Model.ClassName);
 
-WriteLiteral("\';\r\n\r\n        export declare function Create(request: Serenity.SaveRequest<");
+WriteLiteral("\';" + Environment.NewLine + Environment.NewLine + "        export declare function Create(request: Serenity.SaveRequest<");
 
 
                                                                  Write(Model.RowClassName);
 
 WriteLiteral(">, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Serenity.ServiceO" +
-"ptions<any>): JQueryXHR;\r\n        export declare function Update(request: Sereni" +
+"ptions<any>): JQueryXHR;" + Environment.NewLine + "        export declare function Update(request: Sereni" +
 "ty.SaveRequest<");
 
 
                                                                  Write(Model.RowClassName);
 
-WriteLiteral(@">, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
-        export declare function Delete(request: Serenity.DeleteRequest, onSuccess?: (response: Serenity.DeleteResponse) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
+WriteLiteral(@">, onSuccess?: (response: Serenity.SaveResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
+        export declare function Delete(request: Serenity.DeleteRequest, onSuccess?: (response: Serenity.DeleteResponse) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
         export declare function Retrieve(request: Serenity.RetrieveRequest, onSuccess?: (response: Serenity.RetrieveResponse<");
 
 
                                                                                                                          Write(Model.RowClassName);
 
-WriteLiteral(">) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;\r\n        export decla" +
+WriteLiteral(">) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;" + Environment.NewLine + "        export decla" +
 "re function List(request: Serenity.ListRequest, onSuccess?: (response: Serenity." +
 "ListResponse<");
 
 
                                                                                                              Write(Model.RowClassName);
 
-WriteLiteral(@">) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
+WriteLiteral(@">) => void, opt?: Q.ServiceOptions<any>): JQueryXHR;
 
         export namespace Methods {
             export declare const Create: string;
@@ -110,8 +110,8 @@ WriteLiteral(@">) => void, opt?: Serenity.ServiceOptions<any>): JQueryXHR;
               Write(Model.ClassName);
 
 WriteLiteral("Service)[x] = function (r, s, o) { return Q.serviceRequest(baseUrl + \'/\' + x, r, " +
-"s, o); };\r\n            (<any>Methods)[x] = baseUrl + \'/\' + x;\r\n        });\r\n    " +
-"}\r\n}");
+"s, o); };" + Environment.NewLine + "            (<any>Methods)[x] = baseUrl + \'/\' + x;" + Environment.NewLine + "        });" + Environment.NewLine + "    " +
+"}" + Environment.NewLine + "}");
 
 
         }

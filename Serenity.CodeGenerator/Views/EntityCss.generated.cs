@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -33,7 +33,7 @@ WriteLiteral("\r\n");
     var moduleDash = Model.Module == null ? "" : (Model.Module + "-");
 
 
-WriteLiteral("\r\n.s-");
+WriteLiteral(Environment.NewLine + ".s-");
 
 
 Write(moduleDash);
@@ -41,7 +41,7 @@ Write(moduleDash);
 
             Write(Model.ClassName);
 
-WriteLiteral("Dialog {\r\n    > .size { width: 650px; }\r\n    .caption { width: 150px; }\r\n}");
+WriteLiteral("Dialog {" + Environment.NewLine + "    > .size { width: 650px; }" + Environment.NewLine + "    .caption { width: 150px; }" + Environment.NewLine + "}");
 
 
         }

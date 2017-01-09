@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -40,19 +40,19 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(".Endpoints\r\n{\r\n    using Serenity;\r\n    using Serenity.Data;\r\n    using Serenity." +
-"Services;\r\n    using System.Data;\r\n    using System.Web.Mvc;\r\n    using MyReposi" +
+WriteLiteral(".Endpoints" + Environment.NewLine + "{" + Environment.NewLine + "    using Serenity;" + Environment.NewLine + "    using Serenity.Data;" + Environment.NewLine + "    using Serenity." +
+"Services;" + Environment.NewLine + "    using System.Data;" + Environment.NewLine + "    using Microsoft.AspNetCore.Mvc;" + Environment.NewLine + "    using MyReposi" +
 "tory = Repositories.");
 
 
                                   Write(Model.ClassName);
 
-WriteLiteral("Repository;\r\n    using MyRow = Entities.");
+WriteLiteral("Repository;" + Environment.NewLine + "    using MyRow = Entities.");
 
 
                        Write(Model.RowClassName);
 
-WriteLiteral(";\r\n\r\n    [RoutePrefix(\"Services/");
+WriteLiteral(";" + Environment.NewLine + Environment.NewLine + "    [Route(\"Services/");
 
 
                        Write(modulePrefix);
@@ -60,8 +60,8 @@ WriteLiteral(";\r\n\r\n    [RoutePrefix(\"Services/");
 
                                       Write(Model.ClassName);
 
-WriteLiteral("\"), Route(\"{action}\")]\r\n    [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeo" +
-"f(MyRow))]\r\n    public class ");
+WriteLiteral("/[action]\")]" + Environment.NewLine + "    [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeo" +
+"f(MyRow))]" + Environment.NewLine + "    public class ");
 
 
              Write(Model.ClassName);

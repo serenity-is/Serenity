@@ -28,7 +28,7 @@ namespace Serenity.CodeGenerator.Views
         {
 
 
-WriteLiteral("\r\n");
+WriteLiteral(Environment.NewLine);
 
 
 
@@ -44,26 +44,14 @@ WriteLiteral("namespace ");
 
                             Write(dotModule);
 
-WriteLiteral(" {\r\n\r\n    ");
+WriteLiteral(" {" + Environment.NewLine + Environment.NewLine + "    ");
 
 
-WriteLiteral("@Serenity.Decorators.registerClass()\r\n    ");
+WriteLiteral("@Serenity.Decorators.registerClass()" + Environment.NewLine + "    ");
 
 
-WriteLiteral("@Serenity.Decorators.responsive()\r\n");
+WriteLiteral("@Serenity.Decorators.responsive()" + Environment.NewLine);
 
-
- if (Config.MaximizableDialog)
-{
-WriteLiteral("    ");
-
-
-WriteLiteral("@Serenity.Decorators.maximizable()");
-
-WriteLiteral("\r\n");
-
-
-}
 
 WriteLiteral("    export class ");
 
@@ -75,7 +63,7 @@ WriteLiteral("Dialog extends Serenity.EntityDialog<");
 
                                                                     Write(Model.RowClassName);
 
-WriteLiteral(", any> {\r\n        protected getFormKey() { return ");
+WriteLiteral(", any> {" + Environment.NewLine + "        protected getFormKey() { return ");
 
 
                                     Write(Model.ClassName);
@@ -85,7 +73,7 @@ WriteLiteral(", any> {\r\n        protected getFormKey() { return ");
 
                                                                           if (Model.Identity != null)
         {
-WriteLiteral("\r\n        protected getIdProperty() { return ");
+WriteLiteral(Environment.NewLine + "        protected getIdProperty() { return ");
 
 
                                        Write(Model.RowClassName);
@@ -95,7 +83,7 @@ WriteLiteral(".idProperty; }");
 
                                                                                      }
 
-WriteLiteral("\r\n        protected getLocalTextPrefix() { return ");
+WriteLiteral(Environment.NewLine + "        protected getLocalTextPrefix() { return ");
 
 
                                             Write(Model.RowClassName);
@@ -105,7 +93,7 @@ WriteLiteral("\r\n        protected getLocalTextPrefix() { return ");
 
                                                                                          if (Model.NameField != null)
         {
-WriteLiteral("\r\n        protected getNameProperty() { return ");
+WriteLiteral(Environment.NewLine + "        protected getNameProperty() { return ");
 
 
                                          Write(Model.RowClassName);
@@ -115,33 +103,19 @@ WriteLiteral(".nameProperty; }");
 
                                                                                          }
 
-WriteLiteral("\r\n        protected getService() { return ");
+WriteLiteral(Environment.NewLine + "        protected getService() { return ");
 
 
                                     Write(Model.ClassName);
 
-WriteLiteral("Service.baseUrl; }\r\n\r\n        protected form = new ");
+WriteLiteral("Service.baseUrl; }" + Environment.NewLine + Environment.NewLine + "        protected form = new ");
 
 
                          Write(Model.ClassName);
 
-WriteLiteral("Form(this.idPrefix);\r\n\r\n");
+WriteLiteral("Form(this.idPrefix);" + Environment.NewLine + Environment.NewLine);
 
-
-         if (Config.MaximizableDialog)
-        {
-WriteLiteral("        ");
-
-WriteLiteral("dialogOpen() {\r\n                    super.dialogOpen();\r\n                   this." +
-"element.closest(\".ui-dialog\").find(\".ui-icon-maximize-window\").click();\r\n       " +
-"          }");
-
-WriteLiteral("\r\n");
-
-
-        }
-
-WriteLiteral("    }\r\n}");
+WriteLiteral("    }" + Environment.NewLine + "}");
 
 
         }

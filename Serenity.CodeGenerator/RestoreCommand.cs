@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -21,6 +22,20 @@ namespace Serenity.CodeGenerator
 
         public void Run(string projectJson)
         {
+            var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                WorkingDirectory = Path.GetDirectoryName(projectJson),
+                CreateNoWindow = true,
+                Arguments = "restore project.json"
+            });
+
+            process.WaitForExit();
+            if (process.ExitCode > 0)
+            {
+                Console.Error.WriteLine("Error executing dotnet restore!");
+                Environment.Exit(process.ExitCode);
+            }
 
             var packagesDir = new PackageHelper().DeterminePackagesPath();
 
