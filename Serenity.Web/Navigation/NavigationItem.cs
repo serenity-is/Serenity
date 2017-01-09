@@ -1,11 +1,11 @@
 ﻿namespace Serenity.Navigation
 {
-    using System;
     using System.Collections.Generic;
 
     public class NavigationItem
     {
         public string Title { get; set; }
+        public string FullPath { get; set; }
         public string IconClass { get; set; }
         public string Url { get; set; }
         public string Target { get; set; }

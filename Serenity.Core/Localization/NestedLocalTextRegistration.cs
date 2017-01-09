@@ -20,8 +20,14 @@ namespace Serenity.Localization
         /// <summary>
         /// Adds translations from static nested local text classes marked with NestedLocalTextAttribute.
         /// </summary>
-        public static void Initialize(IEnumerable<Assembly> assemblies)
+#if COREFX
+        public static void AddNestedTexts(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null)
+#else
+        public static void Initialize(IEnumerable<Assembly> assemblies, ILocalTextRegistry registry = null)
+#endif
         {
+            assemblies = assemblies ?? ExtensibilityHelper.SelfAssemblies;
+
             if (assemblies == null)
                 throw new ArgumentNullException("assemblies");
 
@@ -31,14 +37,14 @@ namespace Serenity.Localization
                     var attr = type.GetCustomAttribute<NestedLocalTextsAttribute>();
                     if (attr != null)
                     {
-                        Initialize(type, attr.LanguageID ?? LocalText.InvariantLanguageID, attr.Prefix ?? "");
+                        Initialize(registry, type, attr.LanguageID ?? LocalText.InvariantLanguageID, attr.Prefix ?? "");
                     }
                 }
         }
 
-        private static void Initialize(Type type, string languageID, string prefix)
+        private static void Initialize(ILocalTextRegistry registry, Type type, string languageID, string prefix)
         {
-            var provider = Dependency.Resolve<ILocalTextRegistry>();
+            var provider = registry ?? Dependency.Resolve<ILocalTextRegistry>();
             foreach (var member in type.GetMembers(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 var fi = member as FieldInfo;
@@ -68,7 +74,7 @@ namespace Serenity.Localization
                 if (name.EndsWith("_"))
                     name = name.Substring(0, name.Length - 1);
 
-                Initialize(nested, languageID, prefix + name + ".");
+                Initialize(registry, nested, languageID, prefix + name + ".");
             }
         }
     }

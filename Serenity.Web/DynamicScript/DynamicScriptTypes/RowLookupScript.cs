@@ -3,6 +3,9 @@ using Serenity.Data.Mapping;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+#if COREFX
+using System;
+#endif
 
 namespace Serenity.Web
 {
@@ -67,9 +70,9 @@ namespace Serenity.Web
                 this.ParentIdField = field.PropertyName ?? field.Name;
             }
 
-            var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>();
+            var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
             if (readPermission != null)
-                this.Permission = readPermission.Permission.IsEmptyOrNull() ? null : readPermission.Permission;
+                this.Permission = readPermission.Permission ?? "?";
 
             this.GroupKey = row.GetFields().GenerationKey;
             this.getItems = GetItems;

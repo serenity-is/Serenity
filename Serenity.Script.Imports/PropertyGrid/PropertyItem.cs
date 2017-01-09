@@ -14,14 +14,20 @@ namespace Serenity
         public string EditorType { get; set; }
         public JsDictionary EditorParams { get; set; }
         public string Category { get; set; }
+        public bool? Collapsible { get; set; }
+        public bool? Collapsed { get; set; }
         public string CssClass { get; set; }
+        public string HeaderCssClass { get; set; }
         public int? MaxLength { get; set; }
         public bool? Required { get; set; }
         public bool? Insertable { get; set; }
+        public string InsertPermission { get; set; }
         public bool? HideOnInsert { get; set; }
         public bool? Updatable { get; set; }
+        public string UpdatePermission { get; set; }
         public bool? HideOnUpdate { get; set; }
         public bool? ReadOnly { get; set; }
+        public string ReadPermission { get; set; }
         public bool? OneWay { get; set; }
         public object DefaultValue { get; set; }
         public bool? Localizable { get; set; }
@@ -51,5 +57,7 @@ namespace Serenity
 
         public bool? QuickFilter { get; set; }
         public JsDictionary QuickFilterParams { get; set; }
+        public bool? QuickFilterSeparator { get; set; }
+        public string QuickFilterCssClass { get; set; }
     }
 }

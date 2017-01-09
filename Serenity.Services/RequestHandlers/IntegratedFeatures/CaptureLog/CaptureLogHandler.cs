@@ -1,6 +1,7 @@
 ﻿using Serenity.Data;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 
 namespace Serenity.Services
@@ -23,7 +24,7 @@ namespace Serenity.Services
             public ICaptureLogRow captureLogInstance;
             public int rowFieldPrefixLength;
             public int logFieldPrefixLength;
-            public IIdField mappedIdField;
+            public Field mappedIdField;
         }
 
         static CaptureLogHandler()
@@ -60,8 +61,8 @@ namespace Serenity.Services
             newInfo.rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(newInfo.rowInstance.EnumerateTableFields(), x => x.Name);
             newInfo.logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRowInstance.EnumerateTableFields(), x => x.Name);
             var mappedIdField = captureLogAttr.MappedIdField ?? ((Field)newInfo.rowInstance.IdField).Name;
-            newInfo.mappedIdField = ((Row)captureLogRow).FindField(mappedIdField) as IIdField;
-            if (newInfo.mappedIdField == null)
+            newInfo.mappedIdField = ((Row)captureLogRow).FindField(mappedIdField) as Field;
+            if (ReferenceEquals(null, newInfo.mappedIdField))
                 throw new InvalidOperationException(String.Format("Can't locate capture log table mapped ID field for {0}!",
                     ((Row)captureLogRow).Table));
 
@@ -123,7 +124,7 @@ namespace Serenity.Services
             var capture = logRow as ICaptureLogRow;
 
             capture.ChangingUserIdField.AsObject(logRow, userId == null ? null :
-                capture.ChangingUserIdField.ConvertValue(userId, Invariants.NumberFormat));
+                capture.ChangingUserIdField.ConvertValue(userId, CultureInfo.InvariantCulture));
 
             var operationType = old == null ? CaptureOperationType.Insert :
                 (row == null ? CaptureOperationType.Delete : CaptureOperationType.Before);
@@ -144,10 +145,10 @@ namespace Serenity.Services
 
             if (new SqlUpdate(info.logRowInstance.Table)
                     .Set(capture.ValidUntilField, now)
-                    .WhereEqual((Field)info.mappedIdField, info.mappedIdField[logRow])
+                    .WhereEqual(info.mappedIdField, info.mappedIdField.AsObject(logRow))
                     .WhereEqual(capture.ValidUntilField, CaptureLogConsts.UntilMax)
                     .Execute(uow.Connection, ExpectedRows.Ignore) > 1)
-                throw new InvalidOperationException(String.Format("Capture log has more than one active instance for ID {0}?!", info.mappedIdField[logRow]));
+                throw new InvalidOperationException(String.Format("Capture log has more than one active instance for ID {0}?!", info.mappedIdField.AsObject(logRow)));
 
             uow.Connection.Insert(logRow);
             if (operationType == CaptureOperationType.Before)

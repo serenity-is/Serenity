@@ -35,6 +35,13 @@ namespace Serenity.Services
         IDbConnection Connection { get; }
 
         /// <summary>
+        /// Returns true if field is allowed to be selected based on permissions and SelectLevel.Never flag.
+        /// </summary>
+        /// <param name="field">Field</param>
+        /// <returns>True if field is allowed to be selected</returns>
+        bool AllowSelectField(Field field);
+
+        /// <summary>
         /// Returns true if field should be selected based on ColumnSelection flags.
         /// </summary>
         /// <param name="field">Field</param>

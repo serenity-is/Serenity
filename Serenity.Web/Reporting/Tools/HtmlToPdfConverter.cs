@@ -1,8 +1,7 @@
 ﻿
 namespace Serenity.Reporting
 {
-    using Serenity.Console;
-    using Serenity.IO;
+    using IO;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;

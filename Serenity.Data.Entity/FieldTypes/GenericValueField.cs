@@ -1,10 +1,8 @@
-﻿using System;
-using System.Data;
+﻿#if COREFX
+using Newtonsoft.Json.Linq;
+#endif
+using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Reflection.Emit;
-using System.Linq.Expressions;
-using System.ComponentModel;
 
 namespace Serenity.Data
 {
@@ -13,7 +11,6 @@ namespace Serenity.Data
         protected internal Func<Row, TValue?> _getValue;
         protected internal Action<Row, TValue?> _setValue;
         protected internal Type _enumType;
-        protected internal TypeConverter _converter;
 
         internal GenericValueField(ICollection<Field> collection, FieldType type, string name, LocalText caption, int size, FieldFlags flags, 
             Func<Row, TValue?> getValue = null, Action<Row, TValue?> setValue = null)
@@ -25,6 +22,11 @@ namespace Serenity.Data
 
         public override object ConvertValue(object source, IFormatProvider provider)
         {
+#if COREFX
+            if (source is JValue)
+                source = ((JValue)source).Value;
+#endif
+
             if (source == null)
                 return null;
             else

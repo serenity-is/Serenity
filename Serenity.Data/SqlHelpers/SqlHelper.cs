@@ -54,13 +54,12 @@
                 queryText += " RETURNING " + SqlSyntax.AutoBracket(identityColumn);
 
                 if (dialect.UseReturningIntoVar)
-                    queryText = "DECLARE\r\n INSERTED__VALUE NUMBER(18);\r\nBEGIN\r\n" +
-                        queryText + " INTO INSERTED__VALUE; DBMS_OUTPUT.PUT_LINE(INSERTED__VALUE);\r\nEND;";
+                    queryText += " INTO " + dialect.ParameterPrefix + identityColumn;
 
                 using (var command = NewCommand(connection, queryText, query.Params))
                 {
                     var param = command.CreateParameter();
-                    param.Direction = ParameterDirection.Output;
+                    param.Direction = dialect.UseReturningIntoVar ? ParameterDirection.ReturnValue : ParameterDirection.Output;
                     param.ParameterName = identityColumn;
                     param.DbType = DbType.Int64;
                     command.Parameters.Add(param);
@@ -133,16 +132,21 @@
             return CheckExpectedRows(expectedRows, ExecuteNonQuery(connection, query.ToString(), query.Params));
         }
 
+        const string ExpectedRowsError = "Query affected {0} rows while {1} expected! " +
+            "This might mean that your query lacks a proper WHERE statement " +
+            "or a TRIGGER changes number of affected rows. In the latter case, " +
+            "you may try adding \"SET NOCOUNT ON\" to your trigger code.";
+
         private static int CheckExpectedRows(ExpectedRows expectedRows, int affectedRows)
         {
             if (expectedRows == ExpectedRows.Ignore)
                 return affectedRows;
 
             if (expectedRows == ExpectedRows.One && affectedRows != 1)
-                throw new InvalidOperationException(String.Format("Query affected {0} rows while 1 expected!", affectedRows));
+                throw new InvalidOperationException(String.Format(ExpectedRowsError, affectedRows, 1));
 
             if (expectedRows == ExpectedRows.ZeroOrOne && affectedRows > 1)
-                throw new InvalidOperationException("Query affected {0} rows while 1 expected!");
+                throw new InvalidOperationException(String.Format(ExpectedRowsError, affectedRows, "0 or 1"));
 
             return affectedRows;
         }
@@ -231,13 +235,21 @@
 
             IDbCommand command = connection.CreateCommand();
 
+            // TODO: find a workaround in new Dapper
+#if !COREFX
             var bindByName = SqlMapper.GetBindByName(command.GetType());
             if (bindByName != null)
                 bindByName(command, true);
+#endif
+            commandText = FixCommandText(commandText, connection.GetDialect());
+            command.CommandText = commandText;
+            return command;
+        }
 
+        public static string FixCommandText(string commandText, ISqlDialect dialect)
+        {
             commandText = DatabaseCaretReferences.Replace(commandText);
 
-            var dialect = connection.GetDialect();
             var openBracket = dialect.OpenQuote;
             if (openBracket != '[')
                 commandText = BracketLocator.ReplaceBrackets(commandText, dialect);
@@ -246,10 +258,8 @@
             if (paramPrefix != '@')
                 commandText = ParamPrefixReplacer.Replace(commandText, paramPrefix);
 
-            command.CommandText = commandText;
-            return command;
+            return commandText;
         }
-
 
         /// <summary>
         ///   İstenen bağlantıya bağlı ve verilen komutu içeren yeni bir IDbCommand nesnesi oluşturur.</summary>
@@ -340,7 +350,7 @@
 
             value = FixParamType(value) ?? DBNull.Value;
 
-            if (value is Boolean && dialect.GetType() == typeof(OracleDialect))
+            if (value is Boolean && dialect.NeedsBoolWorkaround)
             {
                 // otherwise argument out of range exception!
                 param.Value = (Boolean)value ? 1 : 0;
@@ -351,7 +361,14 @@
 
                 if (value != null && value != DBNull.Value)
                 {
+#if COREFX
+#pragma warning disable CS0618
+                    var mappedType = Dapper.SqlMapper.GetDbType(value);
+#pragma warning restore CS0618
+#else
                     var mappedType = SqlMapper.LookupDbType(value.GetType(), name);
+#endif
+
                     if (mappedType != param.DbType)
                         param.DbType = mappedType;
 

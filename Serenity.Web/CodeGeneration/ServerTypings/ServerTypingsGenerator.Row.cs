@@ -1,6 +1,5 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data;
-using Serenity.Reflection;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +12,7 @@ namespace Serenity.CodeGeneration
         {
             var codeNamespace = GetNamespace(rowType);
 
-            Row row = (Row)rowType.GetInstance();
+            Row row = (Row)Activator.CreateInstance(rowType);
 
             foreach (var field in row.GetFields())
             {
@@ -36,7 +35,7 @@ namespace Serenity.CodeGeneration
 
         private void GenerateRowMetadata(Type rowType)
         {
-            Row row = (Row)rowType.GetInstance();
+            Row row = (Row)Activator.CreateInstance(rowType);
 
             var idRow = row as IIdRow;
             var isActiveRow = row as IIsActiveRow;
@@ -45,9 +44,9 @@ namespace Serenity.CodeGeneration
             if (lookupAttr == null)
             {
                 var script = lookupScripts.FirstOrDefault(x =>
-                    x.BaseType != null &&
-                    x.BaseType.IsGenericType &&
-                    x.BaseType.GetGenericArguments().Any(z => z == rowType));
+                    x.GetBaseType() != null &&
+                    x.GetBaseType().GetIsGenericType() &&
+                    x.GetBaseType().GetGenericArguments().Any(z => z == rowType));
 
                 if (script != null)
                     lookupAttr = script.GetCustomAttribute<LookupScriptAttribute>();

@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Text;
-    using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
     /// <summary>
     ///   Class to generate queries of the form <c>INSERT INTO tablename (field1, field2..fieldN) 

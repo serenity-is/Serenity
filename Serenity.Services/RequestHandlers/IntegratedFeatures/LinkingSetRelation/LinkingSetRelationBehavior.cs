@@ -7,6 +7,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace Serenity.Services
 {
@@ -48,7 +51,7 @@ namespace Serenity.Services
 
 
             var listType = Target.ValueType;
-            if (!listType.IsGenericType ||
+            if (!listType.GetIsGenericType() ||
                 listType.GetGenericTypeDefinition() != typeof(List<>))
             {
                 throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
@@ -57,7 +60,7 @@ namespace Serenity.Services
             }
 
             var rowType = attr.RowType;
-            if (rowType.IsAbstract ||
+            if (rowType.GetIsAbstract() ||
                 !typeof(Row).IsAssignableFrom(rowType))
             {
                 throw new ArgumentException(String.Format(
@@ -142,14 +145,59 @@ namespace Serenity.Services
         public void OnPrepareQuery(IRetrieveRequestHandler handler, SqlQuery query) { }
         public void OnValidateRequest(IRetrieveRequestHandler handler) { }
         public void OnValidateRequest(IListRequestHandler handler) { }
-        public void OnPrepareQuery(IListRequestHandler handler, SqlQuery query) { }
         public void OnApplyFilters(IListRequestHandler handler, SqlQuery query) { }
         public void OnBeforeExecuteQuery(IListRequestHandler handler) { }
         public void OnAfterExecuteQuery(IListRequestHandler handler) { }
 
+        public void OnPrepareQuery(IListRequestHandler handler, SqlQuery query)
+        {
+            if (ReferenceEquals(null, Target) ||
+                handler.Request.EqualityFilter == null ||
+                !attr.HandleEqualityFilter)
+                return;
+
+            object value;
+            if (handler.Request.EqualityFilter.TryGetValue(Target.PropertyName, out value) ||
+                handler.Request.EqualityFilter.TryGetValue(Target.Name, out value))
+            {
+                if (value == null || value as string == "")
+                    return;
+
+                var values = new List<object>();
+
+                if (!(value is string) && value is IEnumerable)
+                {
+                    foreach (var val in (IEnumerable)value)
+                        values.Add(itemKeyField.ConvertValue(val, CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    values.Add(itemKeyField.ConvertValue(value, CultureInfo.InvariantCulture));
+                }
+
+                if (values.Count > 0)
+                {
+                    var ls = new Alias(itemKeyField.Fields.TableName, "__ls");
+
+                    query.Where(Criteria.Exists(
+                        query.SubQuery()
+                            .From(ls)
+                            .Select("1")
+                            .Where(
+                                new Criteria(ls[thisKeyField]) == new Criteria((Field)((IIdRow)handler.Row).IdField) &
+                                new Criteria(ls[itemKeyField]).In(values))
+                            .ToString()));
+                }
+
+                handler.IgnoreEqualityFilter(Target.PropertyName);
+                handler.IgnoreEqualityFilter(Target.Name);
+            }
+        }
+
         public void OnReturn(IRetrieveRequestHandler handler)
         {
             if (ReferenceEquals(null, Target) ||
+                !handler.AllowSelectField(Target) ||
                 !handler.ShouldSelectField(Target))
                 return;
 
@@ -179,6 +227,7 @@ namespace Serenity.Services
         public void OnReturn(IListRequestHandler handler)
         {
             if (ReferenceEquals(null, Target) ||
+                !handler.AllowSelectField(Target) ||
                 !handler.ShouldSelectField(Target) ||
                 handler.Response.Entities.IsEmptyOrNull())
                 return;
@@ -366,6 +415,9 @@ namespace Serenity.Services
         {
             if (ReferenceEquals(null, Target) ||
                 (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+                return;
+
+            if (handler.Row is IIsActiveDeletedRow)
                 return;
 
             var idField = (Field)((handler.Row as IIdRow).IdField);

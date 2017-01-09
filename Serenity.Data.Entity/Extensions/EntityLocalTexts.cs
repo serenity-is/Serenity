@@ -1,19 +1,25 @@
 ﻿
 namespace Serenity.Localization
 {
-    using Localization;
     using Serenity.Abstractions;
     using Serenity.Data;
+#if COREFX
     using System;
     using System.Collections.Generic;
+#endif
     using System.ComponentModel;
     using System.Reflection;
 
     public static class EntityLocalTexts
     {
-        public static void Initialize(string languageID = LocalText.InvariantLanguageID)
+#if COREFX
+        public static void AddRowTexts(this ILocalTextRegistry registry,
+            string languageID = LocalText.InvariantLanguageID)
+#else
+        public static void Initialize(string languageID = LocalText.InvariantLanguageID, ILocalTextRegistry registry = null)
+#endif
         {
-            var provider = Dependency.Resolve<ILocalTextRegistry>();
+            var provider = registry ?? Dependency.Resolve<ILocalTextRegistry>();
 
             foreach (var row in RowRegistry.EnumerateRows())
             {
@@ -52,6 +58,5 @@ namespace Serenity.Localization
                     provider.Add(languageID, "Db." + prefix + ".EntitySingular", instanceName.InstanceName);
             }
         }
-
     }
 }

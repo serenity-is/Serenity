@@ -11,8 +11,8 @@ namespace Serenity.CodeGeneration
             var enumKey = EnumMapper.GetEnumTypeKey(enumType);
 
             cw.Indented("export enum ");
-            var generatedName = MakeFriendlyName(enumType, codeNamespace);
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+            var identifier = MakeFriendlyName(enumType, codeNamespace);
+            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
 
             cw.InBrace(delegate
             {

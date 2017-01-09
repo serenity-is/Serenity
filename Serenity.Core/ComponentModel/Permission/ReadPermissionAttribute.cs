@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Serenity.Data
 {
     public class ReadPermissionAttribute : PermissionAttributeBase

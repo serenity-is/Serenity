@@ -3,10 +3,15 @@ using Serenity.Abstractions;
 using Serenity.Localization;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+#if ASPNETCORE
+using Microsoft.Extensions.Configuration;
+#else
+using System.Configuration;
+#endif
+
 
 namespace Serenity.Web
 {
@@ -37,8 +42,15 @@ namespace Serenity.Web
         {
             if (packages == null)
             {
+                const string key = "LocalTextPackages";
+#if ASPNETCORE
+                packages = Dependency.Resolve<IConfiguration>()
+                    .GetSection("AppSettings:" + key).Get<Dictionary<string, string[]>>();
+#else
+                var setting = ConfigurationManager.AppSettings[key];
                 packages = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(
-                    ConfigurationManager.AppSettings["LocalTextPackages"].TrimToNull() ?? "{}", JsonSettings.Tolerant);
+                    setting.TrimToNull() ?? "{}", JsonSettings.Tolerant);
+#endif
             }
 
             string[] packageItems;

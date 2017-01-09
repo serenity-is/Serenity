@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.Collections;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -307,3 +308,4 @@ namespace Serenity.Reflection
         }
     }
 }
+#endif

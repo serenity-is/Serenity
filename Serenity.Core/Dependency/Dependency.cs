@@ -24,6 +24,7 @@
             return Resolver.Resolve<TService>();
         }
 
+#if !COREFX
         /// <summary>
         /// Maps TService service to its registered provider for specified scope.
         /// Use this method when an interface can be handled by different providers
@@ -39,6 +40,7 @@
         {
             return Resolver.Resolve<TService>(name);
         }
+#endif
 
         /// <summary>
         /// Maps TService service to its registered provider. 
@@ -51,6 +53,7 @@
             return resolver == null ? null : Resolver.TryResolve<TService>();
         }
 
+#if !COREFX
         /// <summary>
         /// Maps TService service to its registered provider for specified scope.
         /// Returns null if registration for TService doesn't exist or 
@@ -64,6 +67,7 @@
         {
             return resolver == null ? null : Resolver.TryResolve<TService>(name);
         }
+#endif
 
         /// <summary>
         /// Sets current dependency resolver and returns previous one if exists.

@@ -582,6 +582,9 @@ namespace Serenity.CodeGeneration {
         let result: ExternalType[] = [];
 
         function visitNode(node: ts.Node) {
+            if (!node)
+                return;
+
             switch (node.kind) {
                 case ts.SyntaxKind.ClassDeclaration:
                     let klass = node as ts.ClassDeclaration;
@@ -687,6 +690,7 @@ namespace Serenity.CodeGeneration {
         }
 
         getCurrentDirectory = () => "/";
+        getDirectories = (path: string) => [];
         getDefaultLibFileName = _ => "/lib.d.ts";
         getCanonicalFileName = fileName => fileName.toLowerCase();
         useCaseSensitiveFileNames = () => false;

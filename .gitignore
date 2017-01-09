@@ -28,3 +28,17 @@ Serenity.CodeGenerator/App.config
 *.crunchsolution.cache
 *.ncrunchproject
 *.ncrunchsolution
+project.lock.json
+*.project.lock.json
+Serenity.Test/Scripts/SlickGrid/slick.grid.js
+Serenity.Test/Scripts/serenity/Serenity.CoreLib.d.ts
+Serenity.Test/Scripts/serenity/Serenity.CoreLib.js
+Serenity.Test/Scripts/serenity/Serenity.Script.UI.js
+Serenity.Test/Scripts/serenity/Serenity.Script.UI.min.js
+Serenity.Test/Scripts/serenity/Serenity.CoreLib.js
+Serenity.Test/Scripts/serenity/Serenity.CoreLib.min.js
+.vs/restore.dg
+.vs/
+Tools/Addins/
+.nupkg/
+Serenity.CodeGenerator/Properties/launchSettings.json

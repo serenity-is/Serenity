@@ -1,10 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Reflection;
-using Serenity.Data;
-using System.ComponentModel;
-using Newtonsoft.Json;
-using Serenity.ComponentModel;
 
 namespace Serenity.ComponentModel
 {
@@ -24,20 +19,32 @@ namespace Serenity.ComponentModel
         public Dictionary<string, object> EditorParams { get; set; }
         [JsonProperty("category")]
         public string Category { get; set; }
+        [JsonProperty("collapsible")]
+        public bool? Collapsible { get; set; }
+        [JsonProperty("collapsed")]
+        public bool? Collapsed { get; set; }
         [JsonProperty("cssClass")]
         public string CssClass { get; set; }
+        [JsonProperty("headerCssClass")]
+        public string HeaderCssClass { get; set; }
         [JsonProperty("maxLength")]
         public int? MaxLength { get; set; }
         [JsonProperty("required")]
         public bool? Required { get; set; }
         [JsonProperty("readOnly")]
         public bool? ReadOnly { get; set; }
+        [JsonProperty("readPermission")]
+        public string ReadPermission { get; set; }
         [JsonProperty("insertable")]
         public bool? Insertable { get; set; }
+        [JsonProperty("insertPermission")]
+        public string InsertPermission { get; set; }
         [JsonProperty("hideOnInsert")]
         public bool? HideOnInsert { get; set; }
         [JsonProperty("updatable")]
         public bool? Updatable { get; set; }
+        [JsonProperty("updatePermission")]
+        public string UpdatePermission { get; set; }
         [JsonProperty("hideOnUpdate")]
         public bool? HideOnUpdate { get; set; }
         [JsonProperty("oneWay")]
@@ -70,7 +77,7 @@ namespace Serenity.ComponentModel
         public bool? Sortable { get; set; }
         [JsonProperty("sortOrder")]
         public int? SortOrder { get; set; }
-       
+
         [JsonProperty("editLink")]
         public bool? EditLink { get; set; }
         [JsonProperty("editLinkItemType")]
@@ -95,7 +102,10 @@ namespace Serenity.ComponentModel
         public bool? QuickFilter { get; set; }
         [JsonProperty("quickFilterParams")]
         public Dictionary<string, object> QuickFilterParams { get; set; }
-
+        [JsonProperty("quickFilterSeparator")]
+        public bool QuickFilterSeparator { get; set; }
+        [JsonProperty("quickFilterCssClass")]
+        public string QuickFilterCssClass { get; set; }
 
         public bool ShouldSerializeEditorType()
         {

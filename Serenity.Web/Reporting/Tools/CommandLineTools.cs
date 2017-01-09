@@ -1,4 +1,4 @@
-﻿namespace Serenity.Console
+﻿namespace Serenity.IO
 {
     using System;
     using System.Text;

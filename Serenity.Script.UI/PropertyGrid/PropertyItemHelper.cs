@@ -28,16 +28,10 @@ namespace Serenity
                     continue;
 
                 var displayNameAttribute = member.GetCustomAttributes(typeof(DisplayNameAttribute), false);
-                if (displayNameAttribute.Length > 1)
-                    throw new Exception(String.Format("{0}.{1} için birden fazla başlık belirlenmiş!", type.Name, pi.Name));
 
                 var hintAttribute = member.GetCustomAttributes(typeof(HintAttribute), false);
-                if (hintAttribute.Length > 1)
-                    throw new Exception(String.Format("{0}.{1} için birden fazla ipucu belirlenmiş!", type.Name, pi.Name));
 
                 var placeholderAttribute = member.GetCustomAttributes(typeof(PlaceholderAttribute), false);
-                if (placeholderAttribute.Length > 1)
-                    throw new Exception(String.Format("{0}.{1} için birden fazla placeholder belirlenmiş!", type.Name, pi.Name));
 
                 Type memberType = member.MemberType == MemberTypes.Property ? ((PropertyInfo)member).PropertyType : ((FieldInfo)member).FieldType;
 
@@ -58,18 +52,22 @@ namespace Serenity
                     continue;
 
                 var categoryAttribute = member.GetCustomAttributes(typeof(CategoryAttribute), false);
-                if (categoryAttribute.Length == 1)
+                if (categoryAttribute.Length > 0)
                     pi.Category = ((CategoryAttribute)categoryAttribute[0]).Category;
-                else if (categoryAttribute.Length > 1)
-                    throw new Exception(String.Format("{0}.{1} için birden fazla kategori belirlenmiş!", type.Name, pi.Name));
                 else if (list.Count > 0)
                     pi.Category = list[list.Count - 1].Category;
 
+                var collapsibleAttribute = member.GetCustomAttributes(typeof(CollapsibleAttribute), false);
+                if (collapsibleAttribute.Length > 0 &&
+                    ((CollapsibleAttribute)collapsibleAttribute[0]).Value)
+                {
+                    pi.Collapsible = true;
+                    pi.Collapsed = ((CollapsibleAttribute)collapsibleAttribute[0]).Collapsed;
+                }
+
                 var cssClassAttr = member.GetCustomAttributes(typeof(CssClassAttribute), false);
-                if (cssClassAttr.Length == 1)
+                if (cssClassAttr.Length > 0)
                     pi.CssClass = ((CssClassAttribute)cssClassAttr[0]).CssClass;
-                else if (cssClassAttr.Length > 1)
-                    throw new Exception(String.Format("{0}.{1} için birden fazla css class belirlenmiş!", type.Name, pi.Name));
 
                 if (member.GetCustomAttributes(typeof(OneWayAttribute), false).Length > 0)
                     pi.OneWay = true;
@@ -106,8 +104,6 @@ namespace Serenity
                     pi.Updatable = true;
 
                 var typeAttrArray = member.GetCustomAttributes(typeof(EditorTypeAttribute), false);
-                if (typeAttrArray.Length > 1)
-                    throw new Exception(String.Format("{0}.{1} için birden fazla editör tipi belirlenmiş!", type.Name, pi.Name));
 
                 Type nullableType = memberType;//Nullable.GetUnderlyingType(memberType);
                 Type enumType = null;

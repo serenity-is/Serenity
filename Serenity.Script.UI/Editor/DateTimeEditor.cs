@@ -40,9 +40,18 @@ namespace Serenity
             });
             input.Bind("change." + this.uniqueName, DateEditor.DateInputChange);
 
-            time = J("<select/>")
-                .AddClass("editor s-DateTimeEditor time")
-                .InsertAfter(input.Next(".ui-datepicker-trigger"));
+            time = J("<select/>").AddClass("editor s-DateTimeEditor time");
+            var after = input.Next(".ui-datepicker-trigger");
+            if (after.Length > 0)
+                time.InsertAfter(after);
+            else
+            {
+                after = input.Prev(".ui-datepicker-trigger");
+                if (after.Length > 0)
+                    time.InsertBefore(after);
+                else
+                    time.InsertAfter(input);
+            }
 
             foreach (var t in GetTimeOptions(fromHour: options.StartHour ?? 0, 
                 toHour: options.EndHour ?? 23, 
@@ -58,12 +67,12 @@ namespace Serenity
                 if (!string.IsNullOrEmpty(MinValue) &&
                     String.Compare(value, MinValue) < 0)
                     return String.Format(Q.Text("Validation.MinDate"),
-                        Q.FormatDate(Q.ParseISODateTime(MinValue)));
+                        Q.FormatDate(MinValue));
 
                 if (!string.IsNullOrEmpty(MaxValue) &&
                     String.Compare(value, MaxValue) >= 0)
                     return String.Format(Q.Text("Validation.MaxDate"),
-                        Q.FormatDate(Q.ParseISODateTime(MaxValue)));
+                        Q.FormatDate(MaxValue));
 
                 return null;
             });
@@ -125,13 +134,13 @@ namespace Serenity
                 if (value != null && value.Length == 0)
                     return null;
 
-                var datePart = Q.FormatDate(Q.Externals.ParseDate(value), "yyyy-MM-dd");
+                var datePart = Q.FormatDate(value, "yyyy-MM-dd");
                 var timePart = this.time.GetValue();
                 return datePart + "T" + timePart + ":00.000";
             }
             set
             {
-                if (value == null)
+                if (string.IsNullOrEmpty(value))
                 {
                     this.element.Value("");
                     this.time.Value("00:00");

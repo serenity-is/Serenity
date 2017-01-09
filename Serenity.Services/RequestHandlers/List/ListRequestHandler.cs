@@ -1,8 +1,10 @@
 ﻿namespace Serenity.Services
 {
+    using ComponentModel;
     using Serenity.Data;
     using Serenity.Data.Mapping;
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Data;
     using System.Globalization;
@@ -20,6 +22,7 @@
 
         protected static IEnumerable<IListBehavior> cachedBehaviors;
         protected IEnumerable<IListBehavior> behaviors;
+        protected HashSet<string> ignoredEqualityFilters;
 
         public ListRequestHandler()
         {
@@ -53,8 +56,11 @@
 
         protected virtual bool AllowSelectField(Field field)
         {
-            if (field.MinSelectLevel == SelectLevel.Never ||
-                (field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped)
+            if (field.MinSelectLevel == SelectLevel.Never)
+                return false;
+
+            if (field.ReadPermission != null &&
+                !Authorization.HasPermission(field.ReadPermission))
                 return false;
 
             return true;
@@ -130,6 +136,9 @@
         {
             foreach (var field in Row.GetFields())
             {
+                if ((field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped)
+                    continue;
+
                 if (AllowSelectField(field) && ShouldSelectField(field))
                     SelectField(query, field);
             }
@@ -350,36 +359,68 @@
             query.Where(~(criteria));
         }
 
+        protected virtual void ApplyFieldEqualityFilter(SqlQuery query, Field field, object value)
+        {
+            if (field.MinSelectLevel == SelectLevel.Never ||
+                field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
+                field.Flags.HasFlag(FieldFlags.NotMapped))
+            {
+                throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name, 
+                    String.Format("Can't apply equality filter on field {0}", field.PropertyName ?? field.Name));
+            }
+
+            if (!(value is string) && value is IEnumerable)
+            {
+                var values = new List<object>();
+                foreach (var val in (IEnumerable)value)
+                    values.Add(field.ConvertValue(val, CultureInfo.InvariantCulture));
+                if (values.Count > 0)
+                    query.Where(field.In(values));
+            }
+            else
+            {
+                value = field.ConvertValue(value, CultureInfo.InvariantCulture);
+                if (value == null)
+                    return;
+                query.WhereEqual(field, value);
+            }
+        }
+
+        protected bool IsEmptyEqualityFilterValue(object value)
+        {
+            if (value == null)
+                return true;
+
+            if (value is string && ((string)value).Length == 0)
+                return true;
+
+            if (!(value is string) && value is IEnumerable && 
+                !((value as IEnumerable).GetEnumerator().MoveNext()))
+                return true;
+
+            return false;
+        }
+
         protected virtual void ApplyEqualityFilter(SqlQuery query)
         {
-            if (Request.EqualityFilter != null)
+            if (Request.EqualityFilter == null)
+                return;
+
+            foreach (var pair in Request.EqualityFilter)
             {
-                foreach (var pair in Request.EqualityFilter)
-                {
-                    if (pair.Value == null)
-                        continue;
+                if (ignoredEqualityFilters != null &&
+                    ignoredEqualityFilters.Contains(pair.Key))
+                    continue;
 
-                    if (pair.Value is string && ((string)pair.Value).Length == 0)
-                        continue;
+                if (IsEmptyEqualityFilterValue(pair.Value))
+                    continue;
 
-                    var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
-                    if (!ReferenceEquals(null, field))
-                    {
-                        if (field.MinSelectLevel == SelectLevel.Never ||
-                            field.Flags.HasFlag(FieldFlags.DenyFiltering))
-                        {
-                            throw new ArgumentOutOfRangeException("equalityFilter");
-                        }
+                var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
+                if (ReferenceEquals(null, field))
+                    throw new ArgumentOutOfRangeException(pair.Key, 
+                        String.Format("Can't find field {0} in row for equality filter.", pair.Key));
 
-                        var value = field.ConvertValue(pair.Value, CultureInfo.InvariantCulture);
-                        if (value == null)
-                            continue;
-
-                        query.WhereEqual(field, value);
-                    }
-                    else
-                        throw new ArgumentOutOfRangeException(String.Format("Can't find field {0} in row for equality filter.", pair.Key));
-                }
+                ApplyFieldEqualityFilter(query, field, pair.Value);
             }
         }
 
@@ -395,14 +436,9 @@
 
         protected virtual void ValidatePermissions()
         {
-            var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(false);
+            var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
             if (readAttr != null)
-            {
-                if (readAttr.Permission.IsNullOrEmpty())
-                    Authorization.ValidateLoggedIn();
-                else
-                    Authorization.ValidatePermission(readAttr.Permission);
-            }
+                Authorization.ValidatePermission(readAttr.Permission ?? "?");
         }
 
         protected virtual void ValidateRequest()
@@ -422,6 +458,19 @@
 
         protected virtual void ApplySortBy(SqlQuery query, SortBy sortBy)
         {
+            var field = this.Row.FindField(sortBy.Field) ??
+                this.Row.FindFieldByPropertyName(sortBy.Field);
+
+            if (!ReferenceEquals(null, field))
+            {
+                if (field.Flags.HasFlag(FieldFlags.NotMapped))
+                    return;
+
+                var sortable = field.GetAttribute<SortableAttribute>();
+                if (sortable != null && !sortable.Value)
+                    return;
+            }
+
             query.ApplySort(sortBy.Field, sortBy.Descending);
         }
 
@@ -495,12 +544,21 @@
             return Process(connection, (TListRequest)request);
         }
 
+        public void IgnoreEqualityFilter(string field)
+        {
+            if (ignoredEqualityFilters == null)
+                ignoredEqualityFilters = new HashSet<string>();
+
+            ignoredEqualityFilters.Add(field);
+        }
+
         public IDbConnection Connection { get; private set; }
         Row IListRequestHandler.Row { get { return this.Row; } }
         public SqlQuery Query { get; private set; }
         ListRequest IListRequestHandler.Request { get { return this.Request; } }
         IListResponse IListRequestHandler.Response { get { return this.Response; } }
         public IDictionary<string, object> StateBag { get; private set; }
+        bool IListRequestHandler.AllowSelectField(Field field) { return AllowSelectField(field); }
         bool IListRequestHandler.ShouldSelectField(Field field) { return ShouldSelectField(field); }
     }
 

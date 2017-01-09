@@ -1,4 +1,4 @@
-﻿using System;
+﻿#if !ASPNETCORE
 using System.Collections.Specialized;
 using System.Security.Principal;
 using System.Web;
@@ -55,3 +55,4 @@ namespace Serenity.Web.MvcFakes
 
 
 }
+#endif

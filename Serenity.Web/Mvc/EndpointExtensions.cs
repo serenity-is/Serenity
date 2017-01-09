@@ -1,11 +1,15 @@
-﻿using Newtonsoft.Json;
-using Serenity.Configuration;
-using Serenity.Data;
+﻿using Serenity.Data;
 using System;
 using System.Data;
-using System.Text;
+#if ASPNETCORE
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+#else
 using System.Web;
 using System.Web.Mvc;
+#endif
 
 namespace Serenity.Services
 {
@@ -16,6 +20,13 @@ namespace Serenity.Services
         {
             exception.Log();
 
+#if ASPNETCORE
+            var context = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
+            bool showDetails = context != null && context.RequestServices.GetService<IHostingEnvironment>().IsDevelopment();
+#else
+            bool showDetails = HttpContext.Current != null && !HttpContext.Current.IsCustomErrorEnabled;
+#endif
+
             var response = new TResponse();
             var error = new ServiceError();
             var ve = exception as ValidationError;
@@ -24,20 +35,20 @@ namespace Serenity.Services
                 error.Code = ve.ErrorCode;
                 error.Arguments = ve.Arguments;
                 error.Message = ve.Message;
-                if (HttpContext.Current != null && !HttpContext.Current.IsCustomErrorEnabled)
+                if (showDetails)
                     error.Details = ve.ToString();
             }
             else
             {
                 error.Code = "Exception";
 
-                if (HttpContext.Current != null && !HttpContext.Current.IsCustomErrorEnabled)
+                if (showDetails)
                 {
                     error.Message = exception.Message;
                     error.Details = exception.ToString();
                 }
                 else
-                    error.Message = "İsteğin işlenmesi esnasında bir hata oluştu!";
+                    error.Message = "An error occured while processing your request.";
             }
 
             response.Error = error;
@@ -57,7 +68,9 @@ namespace Serenity.Services
                 response = exception.ConvertToResponse<TResponse>();
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
+#if !ASPNETCORE
                 controller.HttpContext.Response.TrySkipIisCustomErrors = true;
+#endif
             }
 
             return new Result<TResponse>(response);
@@ -77,7 +90,9 @@ namespace Serenity.Services
                 response = exception.ConvertToResponse<TResponse>();
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
+#if !ASPNETCORE
                 controller.HttpContext.Response.TrySkipIisCustomErrors = true;
+#endif
             }
 
             return new Result<TResponse>(response);
@@ -102,7 +117,9 @@ namespace Serenity.Services
                 response = exception.ConvertToResponse<TResponse>();
                 controller.HttpContext.Response.Clear();
                 controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
+#if !ASPNETCORE
                 controller.HttpContext.Response.TrySkipIisCustomErrors = true;
+#endif
 
             }
 

@@ -1,14 +1,19 @@
-﻿using Serenity.Abstractions;
+﻿#if !COREFX
+using Serenity.Abstractions;
 using Serenity.Caching;
 using Serenity.Configuration;
 using Serenity.Extensibility;
 using Serenity.Localization;
 using Serenity.Logging;
 using Serenity.Services;
-using System.Linq;
 using System.Reflection;
-using System.Web.Compilation;
 using System.Web.Hosting;
+#if ASPNETCORE
+using Microsoft.Extensions.Caching.Memory;
+#else
+using System.Linq;
+using System.Web.Compilation;
+#endif
 
 namespace Serenity.Web
 {
@@ -16,7 +21,9 @@ namespace Serenity.Web
     {
         public static void Run()
         {
+#if !COREFX
             InitializeServiceLocator();
+#endif
             InitializeSelfAssemblies();
             InitializeCaching();
             InitializeConfigurationSystem();
@@ -27,6 +34,7 @@ namespace Serenity.Web
             InitializeRequestBehaviors();
         }
 
+#if !COREFX
         public static void InitializeServiceLocator()
         {
             if (!Dependency.HasResolver)
@@ -35,6 +43,7 @@ namespace Serenity.Web
                 Dependency.SetResolver(container);
             }
         }
+#endif
 
         public static void InitializeLogging()
         {
@@ -46,6 +55,7 @@ namespace Serenity.Web
 
         public static void InitializeSelfAssemblies()
         {
+#if !ASPNETCORE
             var selfAssemblies = BuildManager.GetReferencedAssemblies()
                 .Cast<Assembly>()
                 .Where(x =>
@@ -53,6 +63,7 @@ namespace Serenity.Web
                     x.GetReferencedAssemblies().Any(a => a.Name.Contains("Serenity")));
 
             ExtensibilityHelper.SelfAssemblies = Reflection.AssemblySorter.Sort(selfAssemblies).ToArray();
+#endif
         }
 
         public static void InitializeCaching()
@@ -60,8 +71,11 @@ namespace Serenity.Web
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
             if (Dependency.TryResolve<ILocalCache>() == null)
+#if ASPNETCORE
+                registrar.RegisterInstance<ILocalCache>(new Serenity.Caching.MemoryCache(Dependency.Resolve<IMemoryCache>()));
+#else
                 registrar.RegisterInstance<ILocalCache>(new HttpRuntimeCache());
-
+#endif
             if (Dependency.TryResolve<IDistributedCache>() == null)
                 registrar.RegisterInstance<IDistributedCache>(new DistributedCacheEmulator());
         }
@@ -87,7 +101,11 @@ namespace Serenity.Web
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
             if (Dependency.TryResolve<IConfigurationRepository>() == null)
+#if COREFX
+                registrar.RegisterInstance<IConfigurationRepository>(new AppSettingsJsonConfigRepository());
+#else
                 registrar.RegisterInstance<IConfigurationRepository>("Application", new AppSettingsJsonConfigRepository());
+#endif
         }
 
         public static void InitializeLocalTexts()
@@ -124,8 +142,9 @@ namespace Serenity.Web
             where TAttribute : BaseRegistrarAttribute
         {
             foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
-                foreach (TAttribute attr in assembly.GetCustomAttributes(typeof(TAttribute), false))
+                foreach (TAttribute attr in assembly.GetCustomAttributes(typeof(TAttribute)))
                     Serenity.Extensibility.ExtensibilityHelper.RunClassConstructor(attr.Type);
         }
     }
 }
+#endif

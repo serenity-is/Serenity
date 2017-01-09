@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Serenity.Abstractions;
+﻿using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
@@ -50,8 +48,14 @@ namespace Serenity.Logging
                 {
                     file = value;
 
+#if COREFX
+                    string baseDirectory = AppContext.BaseDirectory;
+#else
+                    string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#endif
+
                     if (file != null && (file.StartsWith("~\\") || file.StartsWith("~/")))
-                        file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, file.Substring(2));
+                        file = Path.Combine(baseDirectory, file.Substring(2));
                 }
             }
         }
@@ -112,7 +116,7 @@ namespace Serenity.Logging
 
                     if (stream != null)
                     {
-                        stream.Close();
+                        stream.Dispose();
                         stream = null;
                     }
                 }
@@ -169,20 +173,26 @@ namespace Serenity.Logging
 
                             try
                             {
-                                stream.Close();
+                                stream.Dispose();
                             }
+#if COREFX
+                            catch
+                            {
+                            }
+#else
                             catch (Exception ex1)
                             {
                                 var internalLogger = Dependency.TryResolve<ILogger>("Internal");
                                 if (internalLogger != null)
                                     internalLogger.Write(LoggingLevel.Fatal, null, ex1, this.GetType());
                             }
+#endif
 
                             stream = null;
-                            stream = new StreamWriter(newFile, true, Encoding.UTF8);
+                            stream = new StreamWriter(System.IO.File.OpenWrite(newFile), Encoding.UTF8);
                         }
                         else
-                            stream = new StreamWriter(newFile, true, Encoding.UTF8);
+                            stream = new StreamWriter(System.IO.File.OpenWrite(newFile), Encoding.UTF8);
                     }
 
                     queue.Enqueue(sb.ToString());
@@ -191,12 +201,18 @@ namespace Serenity.Logging
                         flushTimeout > TimeSpan.Zero && (DateTime.Now - lastFlush) >= flushTimeout)
                         InternalFlush();
                 }
+#if COREFX
+                catch
+                {
+                }
+#else
                 catch (Exception ex2)
                 {
                     var internalLogger = Dependency.TryResolve<ILogger>("Internal");
                     if (internalLogger != null)
                         internalLogger.Write(LoggingLevel.Fatal, null, ex2, this.GetType());
                 }
+#endif
             }
         }
     }

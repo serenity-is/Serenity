@@ -1,12 +1,13 @@
-﻿using Serenity.Abstractions;
-using Serenity.ComponentModel;
-using Serenity.Services;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System;
+using Serenity.Abstractions;
+#if ASPNETCORE
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using System.Security.Principal;
+#else
 using System.Web;
 using System.Web.Security;
-using UserIdName = System.Tuple<System.Int64, System.String>;
+#endif
 
 namespace Serenity
 {
@@ -15,6 +16,7 @@ namespace Serenity
     ///   Static class contains helper functions associated with user rights, login, encrypting </summary>
     public static class WebSecurityHelper
     {
+
         /// <summary>
         ///   Validate user identity by checking username and password and sets 
         ///   authentication ticket that is based on cookie  
@@ -55,9 +57,15 @@ namespace Serenity
             if (username == null)
                 throw new ArgumentNullException(username);
 
+#if ASPNETCORE
+            var principal = new GenericPrincipal(new GenericIdentity(username), EmptyStringArray);
+            var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
+            httpContext.Authentication.SignInAsync("CookieAuthenticationScheme", principal).Wait();
+#else
             HttpCookie authCookie = FormsAuthentication.GetAuthCookie(username, persist);
             HttpContext.Current.Response.Cookies.Remove(authCookie.Name);
             HttpContext.Current.Response.Cookies.Add(authCookie);
+#endif
         }
 
         private static string[] EmptyStringArray = new string[0];
@@ -66,6 +74,10 @@ namespace Serenity
         ///   Logs out to logged user.</summary>
         public static void LogOut()
         {
+#if ASPNETCORE
+            var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
+            httpContext.Authentication.SignOutAsync("CookieAuthenticationScheme").Wait();
+#else
             HttpCookie authCookie = new HttpCookie(FormsAuthentication.FormsCookieName);
             // Setting up a cookie which has expired, Enforce client to delete this cookie.
             authCookie.Expires = DateTime.Now.AddYears(-30);
@@ -75,7 +87,17 @@ namespace Serenity
             authCookie.Path = HttpContext.Current.Request.ApplicationPath;
             HttpContext.Current.Response.Cookies.Add(authCookie);
             //FormsAuthentication.SignOut();
+#endif
         }
+
+#if !ASPNETCORE
+        public static void EnsurePermission(string permission)
+        {
+            if (!Authorization.HasPermission(permission))
+                FormsAuthentication.RedirectToLoginPage(
+                    Authorization.IsLoggedIn ? "denied=1" :null);
+        }
+#endif
 
         /// <summary>
         ///   Returns actual logged user, else if empty string or null.</summary>
@@ -83,9 +105,14 @@ namespace Serenity
         {
             get
             {
-                if (HttpContext.Current != null &&
-                    HttpContext.Current.Request != null &&
-                    HttpContext.Current.Request.IsAuthenticated)
+#if ASPNETCORE
+                var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
+                return httpContext?.User?.Identity?.Name;
+#else
+                var httpContext = HttpContext.Current;
+                if (httpContext != null &&
+                    httpContext.Request != null &&
+                    httpContext.Request.IsAuthenticated)
                 {
                     try
                     {
@@ -96,14 +123,8 @@ namespace Serenity
                     }
                 }
                 return null;
+#endif
             }
-        }
-
-        public static void EnsurePermission(string permission)
-        {
-            if (!Authorization.HasPermission(permission))
-                FormsAuthentication.RedirectToLoginPage(
-                    Authorization.IsLoggedIn ? "denied=1" :null);
         }
     }
 }

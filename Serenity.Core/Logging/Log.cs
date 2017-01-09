@@ -170,12 +170,18 @@ namespace Serenity
             {
                 logger.Write(level, message, exception, source);
             }
+#if COREFX
+            catch
+            {
+            }
+#else
             catch (Exception ex)
             {
                 var internalLogger = Dependency.TryResolve<ILogger>("Internal");
                 if (internalLogger != null)
                     internalLogger.Write(LoggingLevel.Fatal, null, ex, typeof(Log));
             }
+#endif
         }
 
         [Obsolete("Use FileLogger.RandomFileCode")]

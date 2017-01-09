@@ -23,10 +23,26 @@ namespace Serenity.PropertyGrid
                 return;
 
             var quickFilterAttr = source.GetAttribute<QuickFilterAttribute>();
-            if (quickFilterAttr != null && quickFilterAttr.Value)
+            if (quickFilterAttr != null)
+            {
                 item.QuickFilter = true;
+                if (quickFilterAttr.Separator)
+                    item.QuickFilterSeparator = true;
+
+                if (!string.IsNullOrEmpty(quickFilterAttr.CssClass))
+                    item.QuickFilterCssClass = quickFilterAttr.CssClass;
+            }
 
             var basedOnField = source.BasedOnField;
+            if (!ReferenceEquals(null, basedOnField) &&
+                notFilterableAttr == null)
+            {
+                if (basedOnField.Flags.HasFlag(FieldFlags.DenyFiltering) ||
+                    basedOnField.Flags.HasFlag(FieldFlags.NotMapped))
+                {
+                    item.NotFilterable = true;
+                }
+            }
 
             Field idField;
             string idFieldName;

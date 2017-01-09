@@ -345,8 +345,10 @@ declare namespace Slick {
         frozenBottom?: boolean;
         headerRowHeight?: number;
         leaveSpaceForNewRows?: boolean;
+        minBuffer?: number;
         multiColumnSort?: boolean;
         multiSelect?: boolean;
+        renderAllCells?: boolean;
         rowHeight?: number;
         selectedCellCssClass?: string;
         showHeaderRow?: boolean;

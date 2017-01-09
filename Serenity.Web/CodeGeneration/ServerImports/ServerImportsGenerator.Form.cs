@@ -1,17 +1,30 @@
 ﻿using Serenity.ComponentModel;
+using Serenity.Services;
 using System;
 
 namespace Serenity.CodeGeneration
 {
     public partial class ServerImportsGenerator : ServerImportGeneratorBase
     {
+        const string requestSuffix = "Request";
+
         private void GenerateForm(Type type, FormScriptAttribute formScriptAttribute)
         {
             var codeNamespace = GetNamespace(type);
 
             cw.Indented("public partial class ");
-            var generatedName = MakeFriendlyName(type, codeNamespace);
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + generatedName);
+
+            var identifier = type.Name;
+            if (identifier.EndsWith(requestSuffix) &&
+                type.IsSubclassOf(typeof(ServiceRequest)))
+            {
+                identifier = identifier.Substring(0,
+                    identifier.Length - requestSuffix.Length) + "Form";
+                this.fileIdentifier = identifier;
+            }
+
+            sb.Append(identifier);
+
             sb.AppendLine(" : PrefixedContext");
 
             cw.InBrace(delegate
@@ -22,7 +35,7 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine();
 
                 cw.Indented("public ");
-                sb.Append(generatedName);
+                sb.Append(identifier);
                 sb.AppendLine("(string idPrefix) : base(idPrefix) {}");
                 sb.AppendLine();
 

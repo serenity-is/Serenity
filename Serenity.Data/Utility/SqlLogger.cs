@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Serenity.Abstractions;
+﻿using Serenity.Abstractions;
 using Serenity.ComponentModel;
 using Serenity.Data;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-
+#if COREFX
+using DynamicParameters = Dapper.DynamicParameters;
+#endif
 namespace Serenity.Logging
 {
     public class SqlLogger : ILogger, IDisposable
@@ -92,12 +92,19 @@ namespace Serenity.Logging
                         inProgress--;
                     }
                 }
+#if COREFX
+                catch
+                {
+
+                }
+#else
                 catch (Exception ex)
                 {
                     var internalLogger = Dependency.TryResolve<ILogger>("Internal");
                     if (internalLogger != null)
                         internalLogger.Write(LoggingLevel.Fatal, null, ex, this.GetType());
                 }
+#endif
             }
         }
 

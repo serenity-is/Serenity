@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
+﻿#if !ASPNETCORE
+using System;
 using System.Web.Mvc;
-using Newtonsoft.Json;
-using Serenity.Data;
 using Serenity.Reflection;
 using System.Text;
 using System.Collections.Generic;
@@ -128,3 +126,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

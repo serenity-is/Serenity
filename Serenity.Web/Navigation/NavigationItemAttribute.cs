@@ -1,27 +1,39 @@
-﻿using System;
-using System.Reflection;
-using System.IO;
+﻿using Serenity.Web;
+using System;
 using System.Linq;
-using System.Web;
+using System.Reflection;
+#if ASPNETCORE
+using Microsoft.AspNetCore.Mvc;
+#else
 using System.Web.Mvc;
-using Serenity.Services;
-using Serenity.Web;
+#endif
 
 namespace Serenity.Navigation
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public abstract class NavigationItemAttribute : Attribute
     {
+        private string[] EmptyCategory = new string[0];
+
         protected NavigationItemAttribute(int order, string path, string url, object permission, string icon)
         {
-            var idx = (path ?? "").LastIndexOf("/");
+            path = (path ?? "");
+            this.FullPath = path;
+
+            var idx = path.LastIndexOf('/');
+
+            if (idx > 0 && path[idx - 1] == '/')
+                idx = path.Replace("//", "\x1\x1").LastIndexOf('/');
+
             if (idx >= 0)
             {
                 this.Category = path.Substring(0, idx);
                 this.Title = path.Substring(idx + 1);
             }
             else
+            { 
                 this.Title = path;
+            }
 
             this.Order = order;
             this.Permission = permission == null ? null : permission.ToString();
@@ -46,25 +58,40 @@ namespace Serenity.Navigation
             if (actionMethod == null)
                 throw new ArgumentOutOfRangeException("action");
 
-            var route = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault() ?? controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            if (route == null)
+            var routeController = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+
+            if (routeController == null && routeAction == null)
                 throw new InvalidOperationException(String.Format(
                     "Route attribute for {0} action of {1} controller is not found!",
                         actionMethod, controller.FullName));
 
-            string url = route.Template ?? "";
+            string url = (routeAction ?? routeController).Template ?? "";
 
-            if (!url.StartsWith("~/"))
+#if ASPNETCORE
+            if (routeAction != null && !url.StartsWith("~/") && !url.StartsWith("/") && routeController != null)
             {
-                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
-                if (routePrefix != null)
-                {
-                    url = UriHelper.Combine(routePrefix.Prefix, url);
-                }
+                var tmp = routeController.Template ?? "";
+                if (tmp.Length > 0 && tmp[tmp.Length - 1] != '/')
+                    tmp += "/";
+
+                url = tmp + url;
             }
 
-            if (!url.StartsWith("~/") && !url.StartsWith("/"))
-                url = "~/" + url;
+            const string ControllerSuffix = "Controller";
+            var controllerName = controller.Name;
+            if (controllerName.EndsWith(ControllerSuffix))
+                controllerName = controllerName.Substring(0, controllerName.Length - ControllerSuffix.Length);
+            url = url.Replace("[controller]", controllerName);
+            url = url.Replace("[action]", action);
+#else
+            if (!url.StartsWith("~/"))
+            {
+
+                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
+                if (routePrefix != null)
+                    url = UriHelper.Combine(routePrefix.Prefix, url);
+            }
 
             var act = "{action=";
             var act1 = url.IndexOf(act, StringComparison.OrdinalIgnoreCase);
@@ -85,6 +112,10 @@ namespace Serenity.Navigation
                         url = url.Substring(0, url.Length - 1);
                 }
             }
+#endif
+
+            if (!url.StartsWith("~/") && !url.StartsWith("/"))
+                url = "~/" + url;
 
             while (true)
             {
@@ -123,6 +154,7 @@ namespace Serenity.Navigation
 
         public int Order { get; set; }
         public string Url { get; set; }
+        public string FullPath { get; set; }
         public string Category { get; set; }
         public string Title { get; set; }
         public string IconClass { get; set; }

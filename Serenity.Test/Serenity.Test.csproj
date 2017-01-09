@@ -19,7 +19,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
   </PropertyGroup>
   <PropertyGroup>
@@ -56,8 +56,8 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="MsieJavaScriptEngine, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a3a2846a37ac0d3e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MsieJavaScriptEngine.2.0.0\lib\net40-client\MsieJavaScriptEngine.dll</HintPath>
+    <Reference Include="MsieJavaScriptEngine, Version=2.0.2.0, Culture=neutral, PublicKeyToken=a3a2846a37ac0d3e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MsieJavaScriptEngine.2.0.2\lib\net40-client\MsieJavaScriptEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -95,8 +95,8 @@
       <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="WebDriver, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Selenium.WebDriver.3.0.0\lib\net40\WebDriver.dll</HintPath>
+    <Reference Include="WebDriver, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Selenium.WebDriver.3.0.1\lib\net40\WebDriver.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
@@ -120,6 +120,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\LogicOperatorPermissionServiceTests.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidLoadsDetailsOnRetrieve.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidDetailRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.Int32DetailRow.cs" />
@@ -180,22 +181,23 @@
     <Compile Include="Testing\TestRow.cs" />
     <Compile Include="Testing\DbScriptTests.cs" />
     <Compile Include="CodeGeneration\TypeScriptParserTests\TypeScriptParserTests.cs" />
+    <Compile Include="Web\NavigationHelperTests.cs" />
     <Compile Include="Web\NavigationItemTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj">
+    <ProjectReference Include="..\Serenity.Data.Entity.Net45\Serenity.Data.Entity.csproj">
       <Project>{7d55c2e1-b805-428e-873a-1efb55c37dea}</Project>
       <Name>Serenity.Data.Entity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj">
+    <ProjectReference Include="..\Serenity.Core.Net45\Serenity.Core.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
       <Name>Serenity.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj">
+    <ProjectReference Include="..\Serenity.Data.Net45\Serenity.Data.csproj">
       <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
       <Name>Serenity.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj">
+    <ProjectReference Include="..\Serenity.Services.Net45\Serenity.Services.csproj">
       <Project>{027f4308-30bc-458c-9431-7076fe5c6b64}</Project>
       <Name>Serenity.Services</Name>
     </ProjectReference>
@@ -203,7 +205,7 @@
       <Project>{e5fd07ef-84b5-48c4-8640-46cdc9219ae8}</Project>
       <Name>Serenity.Testing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Web\Serenity.Web.csproj">
+    <ProjectReference Include="..\Serenity.Web.Net45\Serenity.Web.csproj">
       <Project>{8632943d-2a88-4c83-8451-69d62f059efc}</Project>
       <Name>Serenity.Web</Name>
     </ProjectReference>
@@ -289,8 +291,6 @@
     </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\jlayout.border.js" />
-    <Content Include="Scripts\jlayout.border.min.js" />
     <Content Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
     <Content Include="Scripts\jquery-3.1.1.min.js" />
@@ -298,78 +298,16 @@
     <Content Include="Scripts\jquery-3.1.1.slim.min.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.js" />
     <Content Include="Scripts\jquery-ui-1.12.1.min.js" />
-    <Content Include="Scripts\jquery-ui-i18n.js" />
-    <Content Include="Scripts\jquery-ui-i18n.min.js" />
-    <Content Include="Scripts\jquery.autoNumeric.js" />
-    <Content Include="Scripts\jquery.autoNumeric.min.js" />
-    <Content Include="Scripts\jquery.blockUI.js" />
-    <Content Include="Scripts\jquery.blockUI.min.js" />
-    <Content Include="Scripts\jquery.colorbox.js" />
-    <Content Include="Scripts\jquery.colorbox.min.js" />
-    <Content Include="Scripts\jquery.cookie.js" />
-    <Content Include="Scripts\jquery.cookie.min.js" />
-    <Content Include="Scripts\jquery.cropzoom.js" />
-    <Content Include="Scripts\jquery.cropzoom.min.js" />
-    <Content Include="Scripts\jquery.dialogextendQ.js" />
-    <Content Include="Scripts\jquery.dialogextendQ.min.js" />
-    <Content Include="Scripts\jquery.fileupload.js" />
-    <Content Include="Scripts\jquery.fileupload.min.js" />
-    <Content Include="Scripts\jquery.iframe-transport.js" />
-    <Content Include="Scripts\jquery.iframe-transport.min.js" />
-    <Content Include="Scripts\jquery.jlayout.js" />
-    <Content Include="Scripts\jquery.jlayout.min.js" />
-    <Content Include="Scripts\jquery.json.js" />
-    <Content Include="Scripts\jquery.json.min.js" />
-    <Content Include="Scripts\jquery.metisMenu.js" />
-    <Content Include="Scripts\jquery.metisMenu.min.js" />
-    <Content Include="Scripts\jquery.scrollintoview.js" />
-    <Content Include="Scripts\jquery.scrollintoview.min.js" />
-    <Content Include="Scripts\jquery.slimscroll.js" />
-    <Content Include="Scripts\jquery.slimscroll.min.js" />
-    <Content Include="Scripts\jsrender.js" />
-    <Content Include="Scripts\jsrender.min.js" />
-    <Content Include="Scripts\pace.js" />
-    <Content Include="Scripts\pace.min.js" />
-    <Content Include="Scripts\rsvp.js" />
-    <Content Include="Scripts\rsvp.min.js" />
-    <Content Include="Scripts\saltarelle\linq.js" />
-    <Content Include="Scripts\saltarelle\linq.min.js" />
-    <Content Include="Scripts\saltarelle\mscorlib.js" />
-    <Content Include="Scripts\saltarelle\mscorlib.min.js" />
+    <Content Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\serenity\Serenity.Test.js" />
-    <Content Include="Scripts\SlickGrid\controls\slick.columnpicker.js" />
-    <Content Include="Scripts\SlickGrid\controls\slick.pager.js" />
-    <Content Include="Scripts\SlickGrid\MIT-LICENSE.txt" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.autotooltips.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.autotooltips.min.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.cellcopymanager.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.cellrangedecorator.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.cellrangeselector.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.cellselectionmodel.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.checkboxselectcolumn.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.headerbuttons.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.headermenu.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.rowmovemanager.js" />
-    <Content Include="Scripts\SlickGrid\plugins\slick.rowselectionmodel.js" />
-    <Content Include="Scripts\SlickGrid\slick.core.js" />
-    <Content Include="Scripts\SlickGrid\slick.core.min.js" />
-    <Content Include="Scripts\SlickGrid\slick.dataview.js" />
-    <Content Include="Scripts\SlickGrid\slick.editors.js" />
-    <Content Include="Scripts\SlickGrid\slick.formatters.js" />
-    <Content Include="Scripts\SlickGrid\slick.grid.js" />
-    <Content Include="Scripts\SlickGrid\slick.grid.min.js" />
-    <Content Include="Scripts\SlickGrid\slick.groupitemmetadataprovider.js" />
-    <Content Include="Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js" />
-    <Content Include="Scripts\SlickGrid\slick.remotemodel-yahoo.js" />
-    <Content Include="Scripts\SlickGrid\slick.remotemodel.js" />
     <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\qunit\qunit-1.16.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\qunit\qunit.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
-    <TypeScriptCompile Include="Scripts\serenity\Serenity.CoreLib.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\sortablejs\sortablejs.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.IntegerEditorTests.ts" />
@@ -379,24 +317,10 @@
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
-    <Content Include="Content\images\collapse.gif" />
-    <Content Include="Content\images\down.gif" />
-    <Content Include="Content\images\expand.gif" />
-    <Content Include="Content\images\header-columns-bg.gif" />
-    <Content Include="Content\images\header-columns-over-bg.gif" />
-    <Content Include="Content\images\sort-asc.gif" />
-    <Content Include="Content\images\sort-desc.gif" />
-    <Content Include="Content\slick-default-theme.css" />
-    <Content Include="Content\slick.columnpicker.css" />
-    <Content Include="Content\slick.grid.css" />
-    <Content Include="Content\slick.headerbuttons.css" />
-    <Content Include="Content\slick.headermenu.css" />
-    <Content Include="Content\slick.pager.css" />
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <None Include="Scripts\jquery-3.1.1.min.map" />
     <None Include="Scripts\jquery-3.1.1.slim.min.map" />
-    <None Include="Scripts\serenity\Serenity.Test.js.map" />
     <None Include="Scripts\serenity\texts\serenity.texts.de.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.es.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.pt.json" />
@@ -404,16 +328,7 @@
     <None Include="Scripts\serenity\texts\serenity.texts.tr.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.zh-CN.json" />
     <None Include="Scripts\serenity\texts\serenity.texts.it.json" />
-    <None Include="Scripts\SlickGrid\README.md" />
     <None Include="tsconfig.json" />
-    <Content Include="Scripts\jquery.event.drag.js" />
-    <Content Include="Scripts\jquery.event.drag.min.js" />
-    <Content Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\jquery.validate.js" />
-    <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\serenity\Serenity.CoreLib.js" />
-    <Content Include="Scripts\serenity\Serenity.CoreLib.min.js" />
-    <Content Include="Scripts\serenity\Serenity.Script.UI.min.js" />
     <Content Include="ScriptTests\qunit\qunit.css" />
     <Content Include="ScriptTests\qunit\qunit.js" />
     <Content Include="Scripts\Select2-locales\select2_locale_ar.js" />
@@ -503,21 +418,9 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
   <Target Name="BeforeBuild">
-    <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Includes\Scripts\**\*.*">
-      <Output TaskParameter="Include" ItemName="SerenityWebIncludesScripts" />
-    </CreateItem>
-    <Copy SourceFiles="@(SerenityWebIncludesScripts)" DestinationFiles="@(SerenityWebIncludesScripts->'$(ProjectDir)Scripts\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true">
-    </Copy>
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.js')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.min.js')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.CoreLib.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.CoreLib.d.ts')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.js')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.min.js')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.d.ts')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.js')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.min.js')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.d.ts" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Externals.Slick.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\Serenity.Externals.Slick.d.ts')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js')" />
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js')" />
+    <Copy SourceFiles="$(ProjectDir)..\Serenity.Web\Scripts\serenity\CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
+  </Target>
+  <Target Name="AfterBuild">
+    <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)tsconfig.json&quot;" ContinueOnError="false" />
   </Target>
 </Project>

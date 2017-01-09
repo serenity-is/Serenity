@@ -1,30 +1,5 @@
 ﻿namespace Q {
 
-    export function addFullHeightResizeHandler(handler: (n: number) => void) {
-        $('body').addClass('full-height-page');
-        let layout = function () {
-            let avail: number;
-            try {
-                avail = parseInt($('.page-content').css('min-height') || '0')
-                    - parseInt($('.page-content').css('padding-top') || '0')
-                    - parseInt($('.page-content').css('padding-bottom') || '0');
-            }
-            catch ($t1) {
-                avail = 100;
-            }
-            handler(avail);
-        };
-
-        if ((window as any).Metronic) {
-            (window as any).Metronic.addResizeHandler(layout);
-        }
-        else {
-            $(window).resize(layout);
-        }
-
-        layout();
-    }
-
     export function autoFullHeight(element: JQuery) {
         element.css('height', '100%');
         triggerLayoutOnShow(element);
@@ -81,7 +56,7 @@
 
     export function layoutFillHeight(element: JQuery) {
         let h = layoutFillHeightValue(element);
-        let n = h + 'px';
+        let n = Math.round(h) + 'px';
         if (element.css('height') != n) {
             element.css('height', n);
         }

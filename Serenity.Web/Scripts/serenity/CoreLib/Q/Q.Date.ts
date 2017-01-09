@@ -4,13 +4,31 @@
 
 namespace Q {
 
-    export function formatDate(date: Date, format?: string) {
-        if (!date) {
+    export function formatDate(d: Date | string, format?: string) {
+        if (!d) {
             return '';
         }
 
-        if (format == null) {
+        let date: Date;
+        if (typeof d == "string") {
+            var res = Q.parseDate(d);
+            if (!res)
+                return d;
+            date = res as Date;
+        }
+        else
+            date = d;
+
+        if (format == null || format == "d") {
             format = Culture.dateFormat;
+        }
+        else {
+            switch (format) {
+                case "g": format = Culture.dateTimeFormat.replace(":ss", ""); break;
+                case "G": format = Culture.dateTimeFormat; break;
+                case "s": format = "yyyy-MM-ddTHH:mm:ss"; break;
+                case "u": return Q.formatISODateTimeUTC(date);
+            }
         }
 
         let pad = function (i: number) {
@@ -192,6 +210,15 @@ namespace Q {
     export function parseDate(s: string, dateOrder?: string): any {
         if (!s || !s.length)
             return null;
+
+        if (s.length >= 10 && s.charAt(4) === '-' && s.charAt(7) === '-' &&
+            (s.length === 10 || (s.length > 10 && s.charAt(10) === 'T'))) {
+            var res = Q.parseISODateTime(s);
+            if (res == null)
+                return false;
+            return res;
+        }
+
         let dateVal: any;
         let dArray: any;
         let d: number, m: number, y: number;

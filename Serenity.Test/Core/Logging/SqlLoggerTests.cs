@@ -18,7 +18,7 @@ namespace Serenity.Test.Logging
             return new DbTestContext(DbOverride.New<SerenityDbScript>("Serenity", "DBSerenity"));
         }
 
-        [Fact]
+        //[Fact]
         public void SqlLogger_WorksProperly()
         {
             using (new MunqContext())

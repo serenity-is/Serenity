@@ -2,14 +2,23 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+#if ASPNETCORE
+using System.Net;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using IHtmlString = Microsoft.AspNetCore.Html.HtmlString;
+using HtmlHelper = Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper;
+using HttpContextBase = Microsoft.AspNetCore.Http.HttpContext;
+#else
 using System.Web;
 using System.Web.Mvc;
+#endif
 
 namespace Serenity.Web
 {
     public static class HtmlScriptExtensions
     {
-        public static IHtmlString Stylesheet(this HtmlHelper helper, string cssUrl)
+        public static HtmlString Stylesheet(this HtmlHelper helper, string cssUrl)
         {
             return new HtmlString(string.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
                 ContentHashCache.ResolveWithHash(cssUrl)));
@@ -32,7 +41,11 @@ namespace Serenity.Web
                 scripts.Add(script);
 
                 return new HtmlString(String.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
+#if ASPNETCORE
+                    WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(script))));
+#else
                     HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(script))));
+#endif
             }
             else
                 return new HtmlString("");

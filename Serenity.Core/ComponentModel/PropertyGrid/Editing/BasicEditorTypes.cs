@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Serenity.ComponentModel
 {
@@ -279,6 +280,15 @@ namespace Serenity.ComponentModel
         }
 
         /// <summary>
+        /// Permission required to use inplace add / edit
+        /// </summary>
+        public string InplaceAddPermission
+        {
+            get { return GetOption<string>("inplaceAddPermission"); }
+            set { SetOption("inplaceAddPermission", value); }
+        }
+
+        /// <summary>
         /// This property is meaningfull when InplaceAdd is true. By default, dialog type name
         /// is determined by LookupKey, e.g. if lookup key is "Northwind.CustomerCity", 
         /// a dialog class named "Northwind.CustomerCityDialog" is used. If dialog type is different
@@ -390,8 +400,8 @@ namespace Serenity.ComponentModel
             if (lookupType == null)
                 throw new ArgumentNullException("lookupType");
 
-            var attr = lookupType.GetCustomAttributes(typeof(LookupScriptAttribute), false);
-            if (attr.Length == 0)
+            var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false);
+            if (attr == null)
             {
                 throw new ArgumentException(String.Format(
                     "'{0}' type doesn't have a [LookupScript] attribute, so it can't " + 
@@ -399,7 +409,7 @@ namespace Serenity.ComponentModel
                     lookupType.FullName), "lookupType");
             }
 
-            SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
+            SetOption("lookupKey", attr.Key);
         }
     }
 
@@ -417,8 +427,8 @@ namespace Serenity.ComponentModel
             if (lookupType == null)
                 throw new ArgumentNullException("lookupType");
 
-            var attr = lookupType.GetCustomAttributes(typeof(LookupScriptAttribute), false);
-            if (attr.Length == 0)
+            var attr = lookupType.GetCustomAttribute<LookupScriptAttribute>(false);
+            if (attr == null)
             {
                 throw new ArgumentException(String.Format(
                     "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
@@ -426,7 +436,7 @@ namespace Serenity.ComponentModel
                     lookupType.FullName), "lookupType");
             }
 
-            SetOption("lookupKey", ((LookupScriptAttribute)attr[0]).Key);
+            SetOption("lookupKey", attr.Key);
         }
 
         public string LookupKey
@@ -522,19 +532,19 @@ namespace Serenity.ComponentModel
             if (enumOrLookupType == null)
                 throw new ArgumentNullException("enumOrLookupType");
 
-            if (enumOrLookupType.IsEnum)
+            if (enumOrLookupType.GetIsEnum())
             {
-                var ek = enumOrLookupType.GetCustomAttributes(typeof(EnumKeyAttribute), false);
-                if (ek.Length == 0)
+                var ek = enumOrLookupType.GetCustomAttribute<EnumKeyAttribute>(false);
+                if (ek == null)
                     EnumKey = enumOrLookupType.FullName;
                 else
-                    EnumKey = ((EnumKeyAttribute)ek[0]).Value;
+                    EnumKey = ek.Value;
 
                 return;
             }
 
-            var lk = enumOrLookupType.GetCustomAttributes(typeof(LookupScriptAttribute), false);
-            if (lk.Length == 0)
+            var lk = enumOrLookupType.GetCustomAttribute<LookupScriptAttribute>(false);
+            if (lk == null)
             {
                 throw new ArgumentException(String.Format(
                     "'{0}' type doesn't have a [LookupScript] attribute, so it can't " +
@@ -542,7 +552,7 @@ namespace Serenity.ComponentModel
                     enumOrLookupType.FullName), "lookupType");
             }
 
-            LookupKey = ((LookupScriptAttribute)lk[0]).Key;
+            LookupKey = lk.Key;
         }
 
         public RadioButtonEditorAttribute()

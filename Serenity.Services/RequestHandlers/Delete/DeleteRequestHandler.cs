@@ -177,16 +177,12 @@ namespace Serenity.Services
 
         protected virtual void ValidatePermissions()
         {
-            var attr = (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(false) ??
-                typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false); 
+            var attr = (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
+                (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
+                typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
             if (attr != null)
-            {
-                if (attr.Permission.IsNullOrEmpty())
-                    Authorization.ValidateLoggedIn();
-                else
-                    Authorization.ValidatePermission(attr.Permission);
-            }
+                Authorization.ValidatePermission(attr.Permission ?? "?");
         }
 
         public TDeleteResponse Process(IUnitOfWork unitOfWork, TDeleteRequest request)

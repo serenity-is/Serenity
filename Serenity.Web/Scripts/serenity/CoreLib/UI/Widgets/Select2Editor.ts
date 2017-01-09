@@ -22,6 +22,7 @@
         value: string;
         values: string[];
         get_text(): string;
+        readOnly: boolean;
     }
 
     namespace Select2Extensions {

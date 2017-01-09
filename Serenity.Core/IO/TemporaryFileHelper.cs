@@ -2,7 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using Serenity.Data;
-using Serenity.IO;
+using System.Linq;
 
 namespace Serenity.IO
 {
@@ -78,25 +78,22 @@ namespace Serenity.IO
                 DateTime autoExpireLimit = DateTime.Now.Subtract(autoExpireTime);
 
                 // traverse all files and if older than limit, try to delete
-                Array.ForEach<FileInfo>(
-                    Array.FindAll<FileInfo>(
-                        directoryInfo.GetFiles(),
-                        delegate(FileInfo fi) { return fi.CreationTime < autoExpireLimit; }),
-                    delegate(FileInfo fiOld)
+                foreach (FileInfo fiOld in directoryInfo.GetFiles()
+                    .Where(fi => fi.CreationTime < autoExpireLimit))
+                {
+                    if (!checkFileName.Equals(fiOld.Name, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (!checkFileName.Equals(fiOld.Name, StringComparison.OrdinalIgnoreCase))
+                        try
                         {
-                            try
-                            {
-                                if (Log.IsDebugEnabled)
-                                    Log.Debug("Deleting Expired Temporary File : " + fiOld.Name);
-                                fiOld.Delete();
-                            }
-                            catch
-                            {
-                            }
+                            if (Log.IsDebugEnabled)
+                                Log.Debug("Deleting Expired Temporary File : " + fiOld.Name);
+                            fiOld.Delete();
                         }
-                    });
+                        catch
+                        {
+                        }
+                    }
+                }
             }
 
             // if maxFilesInDirectory is -1 than no count based deletion
@@ -200,7 +197,7 @@ namespace Serenity.IO
                 {
                     string deleteFile = filePath + ".delete";
                     long fileTime = File.GetLastWriteTimeUtc(filePath).ToFileTimeUtc();
-                    using (var sw = new StreamWriter(deleteFile))
+                    using (var sw = new StreamWriter(File.OpenWrite(deleteFile)))
                         sw.Write(fileTime);                
                 }
                 catch 
@@ -222,7 +219,7 @@ namespace Serenity.IO
                     try
                     {
                         string readLine;
-                        using (var sr = new StreamReader(name))
+                        using (var sr = new StreamReader(File.OpenRead(name)))
                              readLine = sr.ReadToEnd();
                         long fileTime;
                         string actualFile = name.Substring(0, name.Length - 7);

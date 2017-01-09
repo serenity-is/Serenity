@@ -1,12 +1,7 @@
-﻿using Serenity.Web.MvcFakes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
-using System.Web.UI;
+using System.Web.Hosting;
 
 namespace Serenity.Web
 {
@@ -27,9 +22,12 @@ namespace Serenity.Web
             return key.Substring(0, key.Length - TemplateSuffix.Length);
         }
 
-        private void WatchForChanges(string rootUrl)
+        private void WatchForChanges(string path)
         {
-            var sw = new FileSystemWatcher(HttpContext.Current.Server.MapPath(rootUrl));
+            if (path.StartsWith("~/"))
+                path = HostingEnvironment.MapPath(path);
+
+            var sw = new FileSystemWatcher(path);
             sw.IncludeSubdirectories = true;
             sw.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite;
             sw.Changed += (s, e) => Changed(e.Name);
@@ -60,12 +58,14 @@ namespace Serenity.Web
 
             foreach (var rootUrl in rootUrls)
             {
-                var rootPath = HttpContext.Current.Server.MapPath(rootUrl);
+                var path = rootUrl;
+                if (path.StartsWith("~/"))
+                    path = HostingEnvironment.MapPath(path);
 
-                if (!Directory.Exists(rootPath))
+                if (!Directory.Exists(path))
                     continue;
 
-                foreach (var file in Directory.EnumerateFiles(rootPath, "*.html", SearchOption.AllDirectories))
+                foreach (var file in Directory.EnumerateFiles(path, "*.html", SearchOption.AllDirectories))
                 {
                     var key = GetKey(file);
                     if (key == null)

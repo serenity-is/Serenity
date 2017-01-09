@@ -1,5 +1,4 @@
-﻿using Serenity;
-using System;
+﻿using System;
 using Serenity.Services;
 
 namespace Serenity.Data.Mapping

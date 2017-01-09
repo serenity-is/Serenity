@@ -14,12 +14,27 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-      <dependency id="Serenity.Core" version="${version}" />
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+      </group>
+      <group targetFramework=".NETStandard1.6">
+		<dependency id="Dapper" version="${netstandard1.6:Dapper}" />
+        <dependency id="Microsoft.Extensions.Configuration" version="${netstandard1.6:Microsoft.Extensions.Configuration}" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Configuration.Abstractions}" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netstandard1.6:Microsoft.Extensions.Configuration.Binder}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="System.Data.Common" version="${netstandard1.6:System.Data.Common}" />
+        <dependency id="System.Data.SqlClient" version="${netstandard1.6:System.Data.SqlClient}" />
+        <dependency id="System.Threading.Thread" version="${netstandard1.6:System.Threading.Thread}" />
+      </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="${id}.dll" target="lib/${framework}" />
-    <file src="${id}.pdb" target="lib/${framework}" />
-	<file src="${id}.xml" target="lib/${framework}" />
+    <file src="../Serenity.Data.Net45/bin/${configuration}/Serenity.Data.dll" target="lib/net45" />
+    <file src="../Serenity.Data.Net45/bin/${configuration}/Serenity.Data.pdb" target="lib/net45" />
+    <file src="../Serenity.Data.Net45/bin/${configuration}/Serenity.Data.xml" target="lib/net45" />
+    <file src="bin/${configuration}/netstandard1.6/Serenity.Data.dll" target="lib/netstandard1.6" />	
   </files>
 </package>

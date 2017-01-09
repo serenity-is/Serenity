@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !ASPNETCORE
+using System;
 using System.Web.Mvc;
 
 namespace Serenity.Services
@@ -14,3 +15,4 @@ namespace Serenity.Services
         }
     }
 }
+#endif

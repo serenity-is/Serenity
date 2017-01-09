@@ -1,0 +1,16 @@
+Redistributable Code
+==============================================
+The file(s) listed below are "Redistributable Code" within the meaning of the End-User 
+License Agreement under which you have licensed the file(s).  
+
+===================
+dbghelp.dll
+===================
+ 
+(1) You may redistribute dbghelp.dll version 6.12.2.633
+ 
+===================
+pdbstr.exe
+===================
+ 
+(1) You may redistribute pdbstr.exe version 6.12.2.633

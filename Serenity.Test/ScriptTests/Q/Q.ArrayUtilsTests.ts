@@ -1,7 +1,7 @@
 namespace Serenity.Test {
     QUnit.module('Q.ArrayUtils');
 
-    QUnit.test('any()', function (assert: QUnitAssert) {
+    QUnit.test('any()', function (assert: Assert) {
         assert.throws(() => Q.any(null, () => true), null,
             "should throw for null reference");
 
@@ -18,7 +18,7 @@ namespace Serenity.Test {
             "should return true for matching predicate");
     });
 
-    QUnit.test('count()', function (assert: QUnitAssert) {
+    QUnit.test('count()', function (assert: Assert) {
         assert.throws(() => Q.count(null, () => true), null,
             "should throw for null reference");
 

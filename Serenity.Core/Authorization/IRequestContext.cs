@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿#if COREFX
+using IDictionary = System.Collections.Generic.IDictionary<object, object>;
+#else
+using System.Collections;
+#endif
 
 namespace Serenity.Abstractions
 {
@@ -8,6 +12,9 @@ namespace Serenity.Abstractions
     /// </summary>
     public interface IRequestContext
     {
+        /// <summary>
+        /// A dictionary that can be used as a request context specific storage
+        /// </summary>
         IDictionary Items { get; }
     }
 }

@@ -12,6 +12,7 @@
         bool IsLikeCaseSensitive { get; }
         bool MultipleResultsets { get; }
         bool NeedsExecuteBlockStatement { get; }
+        bool NeedsBoolWorkaround { get; }
         string OffsetFormat { get; }
         string OffsetFetchFormat { get; }
         char OpenQuote { get; }
@@ -19,6 +20,7 @@
         string QuoteIdentifier(string s);
         string QuoteUnicodeString(string s);
         string ScopeIdentityExpression { get; }
+        string ServerType { get; }
         string SkipKeyword { get; }
         string TakeKeyword { get; }
         string TimeFormat { get; }

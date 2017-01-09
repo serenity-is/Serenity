@@ -35,10 +35,23 @@ namespace Serenity.Services
         IDbConnection Connection { get; }
 
         /// <summary>
+        /// Returns true if field is allowed to be selected, based on permissions and SelectLevel.Never.
+        /// </summary>
+        /// <param name="field">Field</param>
+        /// <returns>True if field should be selected</returns>
+        bool AllowSelectField(Field field);
+
+        /// <summary>
         /// Returns true if field should be selected based on ColumnSelection flags.
         /// </summary>
         /// <param name="field">Field</param>
         /// <returns>True if field should be selected</returns>
         bool ShouldSelectField(Field field);
+
+        /// <summary>
+        /// Use to ignore an equality filter
+        /// </summary>
+        /// <param name="field">Field name or property name</param>
+        void IgnoreEqualityFilter(string field);
     }
 }

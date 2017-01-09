@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 
 namespace Serenity
 {
@@ -74,3 +75,4 @@ namespace Serenity
         }
     }
 }
+#endif

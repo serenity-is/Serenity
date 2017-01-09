@@ -1,5 +1,4 @@
-﻿using Serenity.Abstractions;
-using Serenity.ComponentModel;
+﻿using Serenity.ComponentModel;
 using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
@@ -91,7 +90,7 @@ namespace Serenity.Reporting
                 return false;
 
             foreach (var report in reports)
-                if (Authorization.HasPermission(report.Permission))
+                if (report.Permission == null || Authorization.HasPermission(report.Permission))
                     return true;
 
             return false;
@@ -102,16 +101,14 @@ namespace Serenity.Reporting
             EnsureTypes();
 
             var list = new List<Report>();
-            var permissionService = Dependency.Resolve<IPermissionService>();
 
             foreach (var k in reportsByCategory)
                 if (categoryKey.IsNullOrEmpty() ||
                     String.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
-                    (categoryKey ?? "").StartsWith(k.Key + "/", StringComparison.OrdinalIgnoreCase))
+                    (k.Key + "/").StartsWith((categoryKey ?? ""), StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (var report in k.Value)
-                        if (report.Permission.IsNullOrEmpty() ||
-                            permissionService.HasPermission(report.Permission))
+                        if (report.Permission == null || Authorization.HasPermission(report.Permission))
                         {
                             list.Add(report);
                         }
@@ -161,8 +158,8 @@ namespace Serenity.Reporting
                 this.Category = new ReportRegistry.Category(category, GetReportCategoryTitle(category));
 
                 attr = type.GetCustomAttributes(typeof(RequiredPermissionAttribute), false);
-                if (attr.Length == 1)
-                    this.Permission = ((RequiredPermissionAttribute)attr[0]).Permission;
+                if (attr.Length > 0)
+                    this.Permission = ((RequiredPermissionAttribute)attr[0]).Permission ?? "?";
             }
         }
 

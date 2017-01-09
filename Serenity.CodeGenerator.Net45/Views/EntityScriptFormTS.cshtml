@@ -1,0 +1,47 @@
+﻿@* Generator: Template *@
+@functions { public dynamic Model { get; set; } }@{
+    var dotModule = Model.Module == null ? "" : ("." + Model.Module);
+    var moduleDot = Model.Module == null ? "" : (Model.Module + ".");
+
+    Func<EntityField, string> gt = (f) => {
+        if (f.FieldType == "String") {
+            return "StringEditor";
+        }
+        else if (f.FieldType == "Int32" || f.FieldType == "Int16" || f.FieldType == "Int64") {
+            return "IntegerEditor";
+        }
+        else if (f.FieldType == "Single" || f.FieldType == "Double" || f.FieldType == "Decimal") {
+            return "DecimalEditor";
+        }
+        else if (f.FieldType == "DateTime") {
+            return "DateEditor";
+        }
+        else if (f.FieldType == "Boolean") {
+            return "BooleanEditor";
+        }
+        else
+            return "StringEditor";
+    };
+
+    var fields = (IEnumerable<EntityField>)Model.Fields;
+    var fieldList = String.Join(", ", fields.Where(x => x.Name != Model.Identity)
+        .Select(x => "['" + x.Ident + "', () => Serenity." + gt(x) + "]"));
+
+}
+
+namespace @(Model.RootNamespace)@(dotModule) {
+    export class @(Model.ClassName)Form extends Serenity.PrefixedContext {
+        static formKey = '@(moduleDot)@(Model.ClassName)';
+    }
+
+    export interface @(Model.ClassName)Form {@foreach (EntityField x in Model.Fields)
+    {
+        if (x.Ident != Model.Identity)
+        {<text>
+        @(x.Ident): Serenity.@(gt(x));</text>}
+    }
+
+    }
+
+    [@fieldList].forEach(x => Object.defineProperty(@(Model.ClassName)Form.prototype, <string>x[0], { get: function () { return this.w(x[0], (x[1] as any)()); }, enumerable: true, configurable: true }));
+}

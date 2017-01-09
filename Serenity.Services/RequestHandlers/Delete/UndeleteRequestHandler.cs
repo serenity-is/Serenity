@@ -136,12 +136,7 @@ namespace Serenity.Services
                 typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(false);
 
             if (attr != null)
-            {
-                if (attr.Permission.IsNullOrEmpty())
-                    Authorization.ValidateLoggedIn();
-                else
-                    Authorization.ValidatePermission(attr.Permission);
-            }
+                Authorization.ValidatePermission(attr.Permission ?? "?");
         }
 
         protected virtual void InvalidateCacheOnCommit()

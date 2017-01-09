@@ -13,15 +13,24 @@
     <projectUrl>${projectUrl}</projectUrl>
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
-    <dependencies>
-      <dependency id="Newtonsoft.Json" version="${jsonNetVersion}" />
-      <dependency id="Serenity.Core" version="${version}" />
-      <dependency id="Serenity.Data" version="${version}" />
-      <dependency id="Serenity.Data.Entity" version="${version}" />
+    <dependencies>    
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="Newtonsoft.Json" version="${net45:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="Serenity.Data" version="${version}" />
+        <dependency id="Serenity.Data.Entity" version="${version}" />
+      </group>
+<!--  <group targetFramework=".NETStandard1.6">
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="Serenity.Data" version="${version}" />
+        <dependency id="Serenity.Data.Entity" version="${version}" />
+      </group>
+-->
     </dependencies>
   </metadata>
   <files>
-    <file src="${id}.dll" target="lib/${framework}" />
-    <file src="${id}.pdb" target="lib/${framework}" />
+    <file src="bin/${configuration}/Serenity.Testing.dll" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Testing.pdb" target="lib/net45" />
   </files>
 </package>

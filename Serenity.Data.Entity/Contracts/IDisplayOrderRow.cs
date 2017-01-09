@@ -1,6 +1,4 @@
-﻿using Serenity.Data;
-using System.Data.SqlClient;
-
+﻿
 namespace Serenity.Data
 {
     /// <summary>

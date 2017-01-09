@@ -1,3 +1,245 @@
+## 2.7.2 (2016-12-25)
+
+Bugfixes:
+  - release assets package containing slickgrid mac fix
+
+## 2.7.1 (2016-12-25)
+
+Features:
+  - remove direct checks on ISqlDialect type and use new ISqlDialect.ServerType and ISqlDialect.NeedsBoolWorkaround properties, which also resolves problems with custom Oracle dialect
+  - OracleDialect like search is now case insensitive by default
+
+Bugfixes:
+  - fix slickgrid mousewheel bug occuring on mac / chrome (thanks @mkoval-ua)
+
+## 2.7.0 (2016-12-22)
+
+Features:
+  - ConnectionKeyAttribute can now accept a type, e.g. a row type, to get its value from that source type, instead of explicitly listing the connection key string.
+  - PageAuthorizeAttribute can now accept a source type, e.g. a row type that gets ReadPermission attribute from, instead of hardcoding the permission
+  - ServiceAuthorizeAttribute and its new subclasses, AuthorizeCreateAttribute and AuthorizeUpdateAttribute and AuthorizeDeleteAttribute can now get a source type parameter, e.g. a row type where they'll read relevant permissions from source type, instead of hard coding the permission. Their permission determination algorithms closely matches relevant handlers.
+  - RowLookupScript lookups inheritance chain for ReadPermissionAttribute 
+  - Request handler looks in inheritance chain for permission attributes, and save/delete handlers should also look for readpermissionattribute
+  - added HeaderCssClass attribute
+  
+Bugfixes:
+  - resolved latest Chrome bug with hasOwnProperty method when key is a negative integer, affecting Saltaralle dictionaries when hash is negative (https://bugs.chromium.org/p/chromium/issues/detail?id=673008)
+  - fix quick search height in dialog
+
+## 2.6.10 (2016-12-12)
+
+Bugfixes:
+  - fix date required even if not
+  
+## 2.6.9 (2016-12-12)
+
+Bugfixes:
+  - fix code generator views
+
+## 2.6.8 (2016-12-11)
+
+Features:
+  - when no category is specified for any of items, don't show default category name, even if useCategories is true, but create category div for CSS compability
+  - added inplaceaddpermission to lookup editor
+  - disable inplace add functionality if select2 editor is readonly
+  - call dialog arrange method on resize and active tab change
+  - add "d": date only, "g": dd/MM/yyyy HH:mm (culture specific dmy order), "G": dd/MM/yyyy HH:mm:ss (culture specific dmy order), "s": yyyy-MM-ddTHH:mm:ss, "u": yyyy-MM-ddTHH:mm:ss.fffZ format specifiers for Q.formatDate function
+  - Q.formatDate can now accept an iso date/time string or normal date string in addition to a Date object
+  - Q.parseDate can also parse iso date/time values
+  - feature selection wizard while creating a new application with Serene template. you can now optionally exclude Northwind, Meeting, Organization, Samples etc. [Serene]
+  - added attendee editor to meeting UI [Serene]
+
+## 2.6.7 (2016-12-09)
+
+Bugfixes:
+  - fix datetimeoffset conversion bug affecting json deserialization
+
+## 2.6.6 (2016-12-09)
+
+Bugfixes:
+  - fix typescript services transform error when node is null somehow
+  - update typescript services used for t4 transforms to 2.0.6
+  - possible problem with asyncPostProcessCleanup when a column is removed
+
+## 2.6.5 (2016-12-08)
+
+Features:
+  - code generator single & multiple tabs merged into a new datagrid based interface
+  - added DateTimeOffset field type 
+  - added ByteArray field type for small binary column types like timestamp, varbinary(8) etc.
+  - add minbuffer (number of buffered rows on top and bottom), and renderAllCells (render all cells in row, including non visible ones, helps with inline editing tab order) options to slick.grid
+  - give a more informational error message about "query affected N rows while 1 expected"
+  - added IReadOnly class to TypeScript defs
+  - add optional AdminLTE style for login and signup pages (thanks @DucThanhNguyen) [Serene]
+  - default timeout of 90 secs for running migrations [Serene]
+  - sample for dynamic navigation items (thanks @DucThanhNguyen) [Serene]
+  
+Bugfixes:
+  - delete button in multiple image upload editor gets lost for long file names
+  - fix android keyboard hiding when search on menu is clicked
+  - oracle sequences should now work (Oracle users, please report)
+  - datetimeeditor fails on empty string
+
+## 2.6.4 (2016-11-26)
+
+Features:
+  - updated font-awesome to 4.7.0
+  - updated simple line icons to 2.4.0
+  - LinkingSetRelation and MasterDetailRelation shouldn't delete detail records when master is IIsActiveDeletedRow
+  - local text key fallback registry (thanks @DucThanhNguyen)
+
+Bugfixes:
+  - filter panel incorrect paren handling when a paren comes right after a line without paren
+  - missing closing paren at end for filter panel display text
+
+## 2.6.3 (2016-11-26)
+
+Features:
+  - make capture log work without integer ID
+  - handle double slashes as single slash in navigation items
+  - auto create intermediate menus on secondary or more levels for navigation items
+  - auto created navigation items now has min display order of their children
+  - add FullPath property to NavigationItem which can be used to get localized captions for navigation items. see change in LeftNavigation.cshtml
+  - it's now possible to custom handle filters by overriding ApplyFieldEqualityFilter in ListRequestHandler
+  - equality filter multiple values with IN filtering are now supported natively by ListRequestHandler
+  - ability to custom handle and ignore an equality filter in ListRequestHandler by behaviors
+  - LinkingSetRelationBehavior handles equality filters by default. set HandleEqualityFilter to false for manual handling.
+  - don't allow sorting for fields with NotMapped or Sortable(false) attribute
+  - set sortable false for fields with NotMapped attribute
+  - don't allow filtering on NotMapped fields
+  - fix some mistakes in Vietnamese translation (thanks @DucThanhNguyen)
+  - add ReportHelper.execute method and related sample in OrderGrid for invoice printing [Serene]
+  - move forward 18 years 6 months in Northwind order dates with a migration (sql server only) [Serene]
+  - add quick filter to Representatives in customer grid which is handled by LinkingSetRelation [Serene]
+
+## 2.6.2 (2016-11-19)
+
+Features:
+  - added tree grid drag & drop sample (thanks @dallemann for sponsoring this sample) [Serene]
+  - added entity dialog as panel sample [Serene]
+  - added vietnamese language and translation (thanks @DucThanhNguyen)
+  - added ability to inject dynamic navigation items through INavigationItemSource interface (thanks @DucThanhNguyen)
+  - include field level permission keys in permission dialog
+
+Bugfixes:
+  - entity dialog load fails when onSuccess parameter is null
+ 
+## 2.6.1 (2016-11-15)
+
+Features:
+  - ability to use original ID column with GridEditorBase instead of "__id"
+
+Bugfixes:
+  - if an item is just readonly in property grid, it should still be serialized
+  - fix tree grid mixin doesn't work when toggle column has no formatter
+
+## 2.6.0 (2016-11-12)
+
+Features:
+  - implemented field level permissions, just add one or more of ReadPermission, ModifyPermission, InsertPermission, UpdatePermission attributes to properties in a row.
+  - added LogicOperatorPermissionService that allows using & (and), | (or) operators in permission checks, e.g. ReadPermission("A&B|C")
+  - ListField, RowField, RowListField types has NotMapped flag by default so no need to add [NotMapped] attribute explicitly
+  - ListField also supports value comparison just like RowListField
+  - added setSelectedKeys method to GridRowSelectionMixin (thanks @estrusco)
+  - added other form in tab with one toolbar sample (thanks @estrusco) [Serene]
+  - added a report page for Northwind, more report samples are on the way [Serene]
+
+## 2.5.9 (2016-11-07)
+
+Features:
+  - expand category when related link is clicked
+
+Bugfixes:
+  - fields in collapsed categories could be focused
+
+## 2.5.8 (2016-11-06)
+
+Features:
+  - TreeGridMixin for tree view like grid functionality
+  - added Collapsible attribute, for collapsible categories in forms (thanks @marcobisio)
+  - added selectKeys method to GridRowSelectionMixin (so no need to access $items directly)
+  - added Tree Grid sample [Serene]
+  - filter sample for showing orders containing a specific products in details [Serene]
+  
+Bugfixes:
+  - don't show pdf button in new order dialog [Serene]
+  - use connection.InsertAndGetID with row, instead of SqlInsert to avoid errors in postgresql and similar
+
+## 2.5.7 (2016-11-04)
+
+Features:
+  - added innerjoin attribute (thanks @marcobisio)
+  - added tabextesnsions.selectTab helper (thanks @estrusco)
+
+Bugfixes:
+  - fix includecolumns parameter in data grid doesn't get cleared when columns are made hidden
+  - fix category filtering in report repository
+  
+## 2.5.6 (2016-10-30)
+
+Bugfixes:
+  - avoid multiple populate on quick filter initialization. it was due to usage of change event and async initialization
+
+## 2.5.5 (2016-10-29)
+
+Features:
+  - integrated StackExchange.Exceptional [Serene]
+  - added validation to another form in tab sample [Serene]
+  - added inline action buttons sample [Serene]
+  
+Bugfixes:
+  - column picker dialog changing height while dragging
+  - fix dashboard link doesn't get active if url doesn't end with '/'
+  
+## 2.5.4 (2016-10-28)
+
+Bugfixes:
+  - fix paging LIMIT OFFSET statement for MySql dialect
+
+## 2.5.3 (2016-10-24)
+
+Bugfixes:
+  - resolve problem with IE11 and slickgrid layout, that is caused by height() returning non-integer values in jQuery v3, which leads to stack overflows
+
+## 2.5.2 (2016-10-23)
+
+Bugfixes:
+  - fix jquery.event.drag.min.js causing problem when bundling is enabled
+  
+## 2.5.1 (2016-10-22)
+
+Features:
+  - upgraded to TypeScript 2.0
+  - fix look of ui dialog buttons after jQuery UI update
+  - added date time quick filtering option
+  - better handling when date entered in a quick filter is invalid
+
+## 2.5.0 (2016-10-21)
+
+Features:
+  - updated bootstrap from 3.3.6 to 3.3.7
+  - updated CouchbaseNetClient from 1.3.10 to 2.3.8
+  - updated FakeItEasy, from 1.25.3.0 to 2.3.1
+  - updated jQuery from 2.2.3 to 3.1.1
+  - updated jQuery.TypeScript.DefinitelyTyped from 3.0.5 to 3.1.2
+  - updated jQuery UI from 1.11.4 to 1.12.1
+  - updated jqueryui.TypeScript.DefinitelyTyped from 1.4.6 to 1.5.1
+  - updated jquery.validation from 1.14.0 to 1.15.1
+  - updated jquery.validation.TypeScript.DefinitelyTyped from 0.4.3 to 0.4.5
+  - updated MsieJavascriptEngine from 1.7.0 to 2.0.0
+  - updated Newtonsoft.Json from 8.0.3 to 9.0.1
+  - updated qunit.TypeScript.DefinitelyTyped from 0.3.3 to 0.3.5
+  - updated RazorGenerator.Templating from 2.3.11 to 2.4.7
+  - updated Selenium.WebDriver from 2.48.2 to 3.0.0
+  - updated sortablejs.TypeScript.DefinitelyTyped from 0.1.7 to 0.1.8
+  - updated StackExchange.Redis from 1.0.488 to 1.1.608
+  - updated System.Data.SqlLocalDb from 1.14.0 to 1.15.0
+  - updated toastr.TypeScript.DefinitelyTyped from 0.3.0 to 0.3.1
+  - removed jquery.event.drag 2.2 package and embedded version 2.3 (from 6pac/SlickGrid) in Serene.Web.Assets as it is compatible with jQuery v3
+  - added data-field attribute to input fields in product grid (@wldkrd1) [Serene]
+  - added showing another form in tab sample [Serene]
+  - removed VS 15 (which is vNext, not 2015) from supported list as it was preventing upload in VSGallery [Serene]
+  
 ## 2.4.13 (2016-10-14)
 
 Features:

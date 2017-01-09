@@ -7,6 +7,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace Serenity.Services
 {
@@ -40,7 +43,7 @@ namespace Serenity.Services
                 return false;
 
             var rowListType = Target.ValueType;
-            if (!rowListType.IsGenericType ||
+            if (!rowListType.GetIsGenericType() ||
                 rowListType.GetGenericTypeDefinition() != typeof(List<>))
             {
                 throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
@@ -49,7 +52,7 @@ namespace Serenity.Services
             }
 
             var rowType = rowListType.GetGenericArguments()[0];
-            if (rowType.IsAbstract ||
+            if (rowType.GetIsAbstract() ||
                 !typeof(Row).IsAssignableFrom(rowType))
             {
                 throw new ArgumentException(String.Format(
@@ -134,6 +137,7 @@ namespace Serenity.Services
         public void OnReturn(IRetrieveRequestHandler handler)
         {
             if (ReferenceEquals(null, Target) ||
+                !handler.AllowSelectField(Target) ||
                 !handler.ShouldSelectField(Target))
                 return;
 
@@ -160,6 +164,7 @@ namespace Serenity.Services
         public void OnReturn(IListRequestHandler handler)
         {
             if (ReferenceEquals(null, Target) ||
+                !handler.AllowSelectField(Target) ||
                 !handler.ShouldSelectField(Target) ||
                 handler.Response.Entities.IsEmptyOrNull())
                 return;
@@ -381,6 +386,9 @@ namespace Serenity.Services
         {
             if (ReferenceEquals(null, Target) ||
                 (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+                return;
+
+            if (handler.Row is IIsActiveDeletedRow)
                 return;
 
             var idField = (Field)((handler.Row as IIdRow).IdField);

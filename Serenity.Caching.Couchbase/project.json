@@ -1,0 +1,30 @@
+﻿{
+  "version": "2.8.0-*",
+  "dependencies": {
+    "Newtonsoft.Json": "9.0.1",
+    "Serenity.Core": "2.8.0-*"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [
+          "COREFX",
+          "NETSTANDARD1_6"
+        ]
+      },
+      "dependencies": {
+        "CouchbaseNetClient": "2.4.0-dp3"
+      }
+    },
+    "net45": {
+      "dependencies": {
+        "CouchbaseNetClient": "2.3.11"
+      }
+    }
+  },
+  "buildOptions": {
+    "compile": {
+      "excludeFiles": []
+    }
+  }
+}

@@ -22,14 +22,14 @@ namespace Serenity.PropertyGrid
             var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
             ValueType = nullableType ?? property.PropertyType;
 
-            if (ValueType.IsEnum)
+            if (ValueType.GetIsEnum())
                 EnumType = ValueType;
             else if (
                 !ReferenceEquals(null, BasedOnField)
                 && BasedOnField is IEnumTypeField)
             {
                 EnumType = (BasedOnField as IEnumTypeField).EnumType;
-                if (EnumType != null && !EnumType.IsEnum)
+                if (EnumType != null && !EnumType.GetIsEnum())
                     EnumType = null;
             }
         }

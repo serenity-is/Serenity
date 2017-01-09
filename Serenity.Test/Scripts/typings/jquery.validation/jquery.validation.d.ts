@@ -128,9 +128,9 @@ declare namespace JQueryValidation
          */
         showErrors?: (errorMap: ErrorDictionary, errorList: ErrorListItem[]) => void;
         /**
-         * Callback for handling the actual submit when the form is valid. Gets the form as the only argument. Replaces the default submit. The right place to submit a form via Ajax after it is validated.
+         * Callback for handling the actual submit when the form is valid. Gets the form and the event object. Replaces the default submit. The right place to submit a form via Ajax after it is validated.
          */
-        submitHandler?: (form: HTMLFormElement) => void;
+        submitHandler?: (form: HTMLFormElement, event?: JQueryEventObject) => void;
         /**
          * String or Function. If specified, the error label is displayed to show a valid element. If a String is given, it is added as a class to the label. If a Function is given, it is called with the label (as a jQuery object) and the validated input (as a DOM element). The label can be used to add a text like "ok!".
          */
@@ -188,6 +188,14 @@ declare namespace JQueryValidation
          * @param method The actual method implementation, returning true if an element is valid. First argument: Current value. Second argument: Validated element. Third argument: Parameters.
          */
         addMethod(name: string, method: (value: any, element: HTMLElement, params: any) => boolean, message?: string): void;
+         /**
+         * Add a custom validation method. It must consist of a name (must be a legal javascript identifier), a predicate function and a message generating function.
+         *
+         * @param name The name of the method used to identify it and referencing it; this must be a valid JavaScript identifier
+         * @param method The actual method implementation, returning true if an element is valid. First argument: Current value. Second argument: Validated element. Third argument: Parameters.
+         * @param message Message generator. First argument: Parameters. Second argument: Validated element.
+         */
+        addMethod(name: string, method: (value: any, element: HTMLElement, params: any) => boolean, message?: (params: any, element: HTMLElement) => string): void;
         /**
          * Replaces {n} placeholders with arguments.
          *
@@ -213,6 +221,8 @@ declare namespace JQueryValidation
          * Validates the form, returns true if it is valid, false otherwise.
          */
         form(): boolean;
+        
+        elementValue(element: Element): any;
 
         invalidElements(): HTMLElement[];
 

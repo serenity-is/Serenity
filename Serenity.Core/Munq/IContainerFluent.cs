@@ -1,9 +1,8 @@
-﻿// --------------------------------------------------------------------------------------------------
+﻿#if !COREFX
+// --------------------------------------------------------------------------------------------------
 // © Copyright 2011 by Matthew Dennis.
 // Released under the Microsoft Public License (Ms-PL) http://www.opensource.org/licenses/ms-pl.html
 // --------------------------------------------------------------------------------------------------
-
-using System;
 
 namespace Munq
 {
@@ -12,3 +11,4 @@ namespace Munq
         IContainerFluent UsesDefaultLifetimeManagerOf(ILifetimeManager lifetimeManager);
     }
 }
+#endif

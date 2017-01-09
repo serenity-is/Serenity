@@ -71,7 +71,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
+            if (memberType.GetIsGenericType() &&
                 (memberType.GetGenericTypeDefinition() == typeof(List<>) ||
                 memberType.GetGenericTypeDefinition() == typeof(HashSet<>)))
             {
@@ -81,7 +81,7 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
+            if (memberType.GetIsGenericType() &&
                 memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
                 sb.Append("JsDictionary<");

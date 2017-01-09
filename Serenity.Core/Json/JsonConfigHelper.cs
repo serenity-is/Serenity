@@ -10,7 +10,7 @@ namespace Serenity.Configuration
         {
             if (File.Exists(path))
             {
-                using (var sr = new StreamReader(path))
+                using (var sr = new StreamReader(File.OpenRead(path)))
                 {
                     string json = sr.ReadToEnd().TrimToNull() ?? "{}";
                     return JsonConvert.DeserializeObject<TConfig>(json, JsonSettings.Tolerant);

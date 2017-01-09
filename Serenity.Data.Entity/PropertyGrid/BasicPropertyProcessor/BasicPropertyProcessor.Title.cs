@@ -1,9 +1,9 @@
 ﻿using Serenity.ComponentModel;
-using Serenity.Data;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+#if COREFX
+using System;
+#endif
 
 namespace Serenity.PropertyGrid
 {

@@ -21,7 +21,9 @@ namespace Serenity.Data
         internal Dictionary<string, Join> joins;
         internal string localTextPrefix;
         internal PropertyChangedEventArgs[] propertyChangedEventArgs;
+#if !COREFX
         internal PropertyDescriptorCollection propertyDescriptors;
+#endif
         internal Func<Row> rowFactory;
         internal Type rowType;
         internal string connectionKey;
@@ -102,7 +104,7 @@ namespace Serenity.Data
             tableName = name;
         }
 
-        public static string ParseDatabaseAndSchema(string tableName, 
+        public static string ParseDatabaseAndSchema(string tableName,
             out string database, out string schema)
         {
             database = null;
@@ -211,10 +213,14 @@ namespace Serenity.Data
                         ScaleAttribute scale = null;
                         MinSelectLevelAttribute selectLevel = null;
                         ForeignKeyAttribute foreignKey = null;
-                        LeftJoinAttribute foreignJoin = null;
+                        LeftJoinAttribute leftJoin = null;
+                        InnerJoinAttribute innerJoin = null;
                         DefaultValueAttribute defaultValue = null;
                         TextualFieldAttribute textualField = null;
                         DateTimeKindAttribute dateTimeKind = null;
+                        PermissionAttributeBase readPermission = null;
+                        PermissionAttributeBase insertPermission = null;
+                        PermissionAttributeBase updatePermission = null;
 
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
@@ -228,10 +234,16 @@ namespace Serenity.Data
                             scale = property.GetCustomAttribute<ScaleAttribute>(false);
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
                             foreignKey = property.GetCustomAttribute<ForeignKeyAttribute>(false);
-                            foreignJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                            leftJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                            innerJoin = property.GetCustomAttributes<InnerJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
                             defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
                             textualField = property.GetCustomAttribute<TextualFieldAttribute>(false);
                             dateTimeKind = property.GetCustomAttribute<DateTimeKindAttribute>(false);
+                            readPermission = property.GetCustomAttribute<ReadPermissionAttribute>(false);
+                            insertPermission = property.GetCustomAttribute<InsertPermissionAttribute>(false) ??
+                                property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
+                            updatePermission = property.GetCustomAttribute<UpdatePermissionAttribute>(false) ??
+                                property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                             var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
@@ -263,7 +275,12 @@ namespace Serenity.Data
                             prm[1] = column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name);
                             prm[2] = display != null ? new LocalText(display.DisplayName) : null;
                             prm[3] = size != null ? size.Value : 0;
-                            prm[4] = (FieldFlags.Default ^ removeFlags) | addFlags;
+
+                            var defaultFlags = FieldFlags.Default;
+                            if (fieldInfo.FieldType.GetCustomAttribute<NotMappedAttribute>() != null)
+                                defaultFlags |= FieldFlags.NotMapped;
+
+                            prm[4] = (defaultFlags ^ removeFlags) | addFlags;
                             prm[5] = null;
                             prm[6] = null;
 
@@ -324,10 +341,16 @@ namespace Serenity.Data
                             field.ForeignField = foreignKey.Field;
                         }
 
-                        if (foreignJoin != null)
+                        if (leftJoin != null)
                         {
-                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, foreignJoin.Alias,
-                                new Criteria(foreignJoin.Alias, field.ForeignField) == new Criteria(field));
+                            field.ForeignJoinAlias = new LeftJoin(this.joins, field.ForeignTable, leftJoin.Alias,
+                                new Criteria(leftJoin.Alias, field.ForeignField) == new Criteria(field));
+                        }
+
+                        if (innerJoin != null)
+                        {
+                            field.ForeignJoinAlias = new InnerJoin(this.joins, field.ForeignTable, innerJoin.Alias,
+                                new Criteria(innerJoin.Alias, field.ForeignField) == new Criteria(field));
                         }
 
                         if (textualField != null)
@@ -340,32 +363,52 @@ namespace Serenity.Data
                             ((DateTimeField)field).DateTimeKind = dateTimeKind.Value;
                         }
 
+                        if (readPermission != null)
+                        {
+                            field.readPermission = readPermission.Permission ?? "?";
+                        }
+
+                        if (insertPermission != null)
+                        {
+                            field.insertPermission = insertPermission.Permission ?? "?";
+                        }
+
+                        if (updatePermission != null)
+                        {
+                            field.updatePermission = updatePermission.Permission ?? "?";
+                        }
+
                         if (property != null)
                         {
                             if (property.PropertyType != null &&
                                 field is IEnumTypeField)
                             {
-                                if (property.PropertyType.IsEnum)
+                                if (property.PropertyType.GetIsEnum())
                                 {
                                     (field as IEnumTypeField).EnumType = property.PropertyType;
                                 }
                                 else
                                 {
                                     var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
-                                    if (nullableType != null && nullableType.IsEnum)
+                                    if (nullableType != null && nullableType.GetIsEnum())
                                         (field as IEnumTypeField).EnumType = nullableType;
                                 }
                             }
-                            
+
                             foreach (var attr in property.GetCustomAttributes<LeftJoinAttribute>())
                                 if (attr.ToTable != null && attr.OnCriteria != null)
                                     new LeftJoin(this.joins, attr.ToTable, attr.Alias,
                                         new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
 
+                            foreach (var attr in property.GetCustomAttributes<InnerJoinAttribute>())
+                                if (attr.ToTable != null && attr.OnCriteria != null)
+                                    new InnerJoin(this.joins, attr.ToTable, attr.Alias,
+                                        new Criteria(attr.Alias, attr.OnCriteria) == new Criteria(field));
+
                             field.PropertyName = property.Name;
                             this.byPropertyName[field.PropertyName] = field;
 
-                            field.CustomAttributes = property.GetCustomAttributes(false);
+                            field.CustomAttributes = property.GetCustomAttributes(false).ToArray();
                         }
                     }
                 }
@@ -373,9 +416,13 @@ namespace Serenity.Data
                 foreach (var attr in this.rowType.GetCustomAttributes<LeftJoinAttribute>())
                     new LeftJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
+                foreach (var attr in this.rowType.GetCustomAttributes<InnerJoinAttribute>())
+                    new InnerJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
+
                 foreach (var attr in this.rowType.GetCustomAttributes<OuterApplyAttribute>())
                     new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
 
+#if !COREFX
                 var propertyDescriptorArray = new PropertyDescriptor[this.Count];
                 for (int i = 0; i < this.Count; i++)
                 {
@@ -384,6 +431,7 @@ namespace Serenity.Data
                 }
 
                 this.propertyDescriptors = new PropertyDescriptorCollection(propertyDescriptorArray);
+#endif
 
                 InferTextualFields();
                 AfterInitialize();
@@ -436,7 +484,7 @@ namespace Serenity.Data
                     foreach (var join in this.joins.Values)
                     {
                         if (String.Compare(field.ForeignTable, join.Table) == 0 &&
-                            join is LeftJoin &&
+                            (join is LeftJoin || join is InnerJoin) &&
                             !Object.ReferenceEquals(null, join.OnCriteria) &&
                             join.OnCriteria.ToStringIgnoreParams().IndexOf(field.Expression, StringComparison.OrdinalIgnoreCase) >= 0)
                         {
@@ -490,7 +538,7 @@ namespace Serenity.Data
 
         public string GenerationKey
         {
-            get 
+            get
             {
                 if (generationKey != null)
                     return generationKey;
@@ -592,7 +640,7 @@ namespace Serenity.Data
                 throw new ArgumentNullException("item");
 
             if (byName.ContainsKey(item.Name))
-                throw new ArgumentOutOfRangeException("item", 
+                throw new ArgumentOutOfRangeException("item",
                     String.Format("field list already contains a field with name '{0}'", item.Name));
 
             var old = base[index];

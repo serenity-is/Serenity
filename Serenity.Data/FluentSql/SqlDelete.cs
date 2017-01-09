@@ -1,9 +1,7 @@
 ﻿namespace Serenity.Data
 {
     using System;
-    using System.Collections.Generic;
     using System.Text;
-    using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 
     /// <summary>
     ///   Class to generate queries of form <c>DELETE FROM tablename WHERE [conditions]</c>.</summary>

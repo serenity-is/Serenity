@@ -14,17 +14,17 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-      <dependency id="Saltarelle.Compiler" version="${saltarelleCompilerVersion}" />
-      <dependency id="Saltarelle.jQuery" version="${saltarellejQueryVersion}" />
-      <dependency id="Saltarelle.jQuery.UI" version="${saltarellejQueryUIVersion}" />
-      <dependency id="Saltarelle.Linq" version="${saltarelleLinqVersion}" />
-      <dependency id="Saltarelle.Runtime" version="${saltarelleRuntimeVersion}" />
-      <dependency id="Saltarelle.Web" version="${saltarelleWebVersion}" />
+      <dependency id="Saltarelle.Compiler" version="${net2:Saltarelle.Compiler}" />
+      <dependency id="Saltarelle.jQuery" version="${net2:Saltarelle.jQuery}" />
+      <dependency id="Saltarelle.jQuery.UI" version="${net2:Saltarelle.jQuery.UI}" />
+      <dependency id="Saltarelle.Linq" version="${net2:Saltarelle.Linq}" />
+      <dependency id="Saltarelle.Runtime" version="${net2:Saltarelle.Runtime}" />
+      <dependency id="Saltarelle.Web" version="${net2:Saltarelle.Web}" />
     </dependencies>
   </metadata>
   <files>
-    <file src="Serenity.Script.Imports.dll" target="lib/${scriptFramework}" />
-    <file src="Serenity.Script.Core.dll" target="lib/${scriptFramework}" />
-    <file src="Serenity.Script.UI.dll" target="lib/${scriptFramework}" />
+    <file src="bin/${configuration}/Serenity.Script.Imports.dll" target="lib/${scriptFramework}" />
+    <file src="bin/${configuration}/Serenity.Script.Core.dll" target="lib/${scriptFramework}" />
+    <file src="bin/${configuration}/Serenity.Script.UI.dll" target="lib/${scriptFramework}" />
   </files>
 </package>

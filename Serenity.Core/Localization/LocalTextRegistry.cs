@@ -5,7 +5,6 @@ namespace Serenity.Localization
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Globalization;
     using ItemKey = System.Tuple<string, string>;
 
     /// <summary>

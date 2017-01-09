@@ -1,7 +1,9 @@
-﻿using Serenity.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace Serenity.Data
 {

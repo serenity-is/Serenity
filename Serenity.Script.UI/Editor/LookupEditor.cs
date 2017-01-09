@@ -19,6 +19,7 @@ namespace Serenity
         public string LookupKey { get; set; }
         public int? MinimumResultsForSearch { get; set; }
         public bool InplaceAdd { get; set; }
+        public string InplaceAddPermission { get; set; }
         public string DialogType { get; set; }
         /// <summary>
         /// ID (can be relative) of the editor that this editor will cascade from, e.g. Country

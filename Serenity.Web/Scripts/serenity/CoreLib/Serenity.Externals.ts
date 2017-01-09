@@ -62,7 +62,17 @@ namespace Q {
         p.showLabel = validateShowLabel;
 
         $.validator.addMethod("dateQ", function (value, element) {
-            return this.optional(element) || parseDate(value) != false;
+            var o = this.optional(element);
+            if (o)
+                return o;
+
+            var d = parseDate(value);
+            if (!d)
+                return false;
+
+            var z = new Date(d);
+            z.setHours(0, 0, 0, 0);
+            return z.getTime() === d.getTime();
         });
 
         $.validator.addMethod("hourAndMin", function (value, element) {
@@ -207,8 +217,13 @@ namespace Q {
             submitHandler: function () {
                 return false;
             },
-            invalidHandler: function () {
+            invalidHandler: function (event: any, validator: JQueryValidation.Validator) {
                 Q.notifyError(Q.text("Validation.InvalidFormMessage"));
+
+                $(validator.errorList.map(x => x.element))
+                    .closest('.category.collapsed')
+                    .children('.category-title')
+                    .each((i, x) => $(x).click());
             },
             success: function (label: JQuery) {
                 label.addClass('checked');

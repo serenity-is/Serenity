@@ -54,7 +54,7 @@ namespace Serenity.Data
 
         internal static Int64 ConvertEnumFromInt(Type enumType, Int64 v)
         {
-            if (enumType.IsEnum)
+            if (enumType.GetIsEnum())
             {
                 var val = Enum.Parse(enumType, v.ToString());
                 if (!Enum.IsDefined(enumType, val))
@@ -68,7 +68,7 @@ namespace Serenity.Data
 
         internal static Int64 ConvertEnumFromString(Type enumType, string s)
         {
-            if (enumType.IsEnum)
+            if (enumType.GetIsEnum())
             {
                 Int64 v;
                 if (Int64.TryParse(s, out v))
