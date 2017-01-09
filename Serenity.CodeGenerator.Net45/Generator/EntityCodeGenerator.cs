@@ -12,6 +12,7 @@ namespace Serenity.CodeGenerator
         private EntityModel model;
         private string siteWebPath;
         private string siteWebProj;
+        private string serverTypings;
         private string scriptPath;
         private string scriptProject;
         private Encoding utf8 = new UTF8Encoding(true);
@@ -35,6 +36,11 @@ namespace Serenity.CodeGenerator
 
             siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
             siteWebPath = Path.GetDirectoryName(siteWebProj);
+
+            this.serverTypings = Path.Combine(siteWebPath, "Modules/Common/Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+            if (!Directory.Exists(serverTypings))
+                this.serverTypings = Path.Combine(siteWebPath, "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+
             if (!string.IsNullOrEmpty(config.ScriptProjectFile))
             {
                 scriptProject = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.ScriptProjectFile));
@@ -314,7 +320,6 @@ namespace Serenity.CodeGenerator
         // newer server imports file in script project
         const string serverImports = @"Imports\ServerImports\ServerImports.tt";
         // newer server imports file in web project
-        const string serverTypings = @"Modules\Common\Imports\ServerTypings\ServerTypings.tt";
 
         private void GenerateScriptRowSS()
         {
