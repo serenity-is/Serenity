@@ -179,7 +179,7 @@ namespace Serenity.Web
         {
             get
             {
-                var path = Path.Combine(RootPath, @"Temporary\");
+                var path = Path.Combine(RootPath, @"Temporary/".Replace('/', Path.DirectorySeparatorChar));
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
