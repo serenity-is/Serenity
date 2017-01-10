@@ -224,6 +224,7 @@
     <None Include="fonts\glyphicons-halflings-regular.ttf" />
     <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="package.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -302,14 +303,7 @@
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\serenity\Serenity.Test.js" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.blockUI\jquery.blockUI.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery.validation\jquery.validation.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jqueryui\jqueryui.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\qunit\qunit.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\rsvp\rsvp.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\sortablejs\sortablejs.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\toastr\toastr.d.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.IntegerEditorTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Formatters\Formatters.UrlFormatterTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.TextAreaEditorTests.ts" />
@@ -418,7 +412,7 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
   <Target Name="BeforeBuild">
-    <Copy SourceFiles="$(ProjectDir)..\Serenity.Web\Scripts\serenity\CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
+    <Copy SourceFiles="$(ProjectDir)..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
   </Target>
   <Target Name="AfterBuild">
     <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)tsconfig.json&quot;" ContinueOnError="false" />

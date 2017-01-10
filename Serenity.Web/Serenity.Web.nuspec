@@ -32,13 +32,6 @@
         <dependency id="bootstrap" version="${net45:bootstrap}" />
         <dependency id="toastr" version="${net45:toastr}" />
         <dependency id="Select2.js" version="[3.5.1]" />
-        <dependency id="jquery.TypeScript.DefinitelyTyped" version="${net45:jquery.TypeScript.DefinitelyTyped}" />
-        <dependency id="jqueryui.TypeScript.DefinitelyTyped" version="${net45:jqueryui.TypeScript.DefinitelyTyped}" />
-        <dependency id="jquery.blockUI.TypeScript.DefinitelyTyped" version="${net45:jquery.blockUI.TypeScript.DefinitelyTyped}" />
-        <dependency id="jquery.cookie.TypeScript.DefinitelyTyped" version="${net45:jquery.cookie.TypeScript.DefinitelyTyped}" />
-        <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="${net45:jquery.validation.TypeScript.DefinitelyTyped}" />
-        <dependency id="sortablejs.TypeScript.DefinitelyTyped" version="${net45:sortablejs.TypeScript.DefinitelyTyped}" />
-        <dependency id="toastr.TypeScript.DefinitelyTyped" version="${net45:toastr.TypeScript.DefinitelyTyped}" />
       </group>
       <group targetFramework=".NETStandard1.6">
         <dependency id="Dapper" version="${netstandard1.6:Dapper}" />
@@ -66,13 +59,6 @@
         <dependency id="bootstrap" version="${net45:bootstrap}" />
         <dependency id="toastr" version="${net45:toastr}" />
         <dependency id="Select2.js" version="[3.5.1]" />
-        <dependency id="jquery.TypeScript.DefinitelyTyped" version="${net45:jquery.TypeScript.DefinitelyTyped}" />
-        <dependency id="jqueryui.TypeScript.DefinitelyTyped" version="${net45:jqueryui.TypeScript.DefinitelyTyped}" />
-        <dependency id="jquery.blockUI.TypeScript.DefinitelyTyped" version="${net45:jquery.blockUI.TypeScript.DefinitelyTyped}" />
-        <dependency id="jquery.cookie.TypeScript.DefinitelyTyped" version="${net45:jquery.cookie.TypeScript.DefinitelyTyped}" />
-        <dependency id="jquery.validation.TypeScript.DefinitelyTyped" version="${net45:jquery.validation.TypeScript.DefinitelyTyped}" />
-        <dependency id="sortablejs.TypeScript.DefinitelyTyped" version="${net45:sortablejs.TypeScript.DefinitelyTyped}" />
-        <dependency id="toastr.TypeScript.DefinitelyTyped" version="${net45:toastr.TypeScript.DefinitelyTyped}" />
       </group>      
     </dependencies>
   </metadata>
@@ -85,12 +71,10 @@
     <file src="Style\images\*.png" target="content/Content/serenity/images" />
     <file src="Style\images\*.gif" target="content/Content/serenity/images" />
     <file src="Style\images\*.jpg" target="content/Content/serenity/images" />
-    <file src="Scripts\typings\rsvp\rsvp.d.ts" target="content/Scripts/typings/rsvp" />
-    <file src="Scripts\typings\slickgrid\slickgrid.d.ts" target="content/Scripts/typings/slickgrid" />
-    <file src="Scripts\Serenity\CoreLib\Serenity.CoreLib.js" target="content/Scripts/serenity" />
-    <file src="Scripts\Serenity\CoreLib\Serenity.CoreLib.min.js" target="content/Scripts/serenity" />
-    <file src="Scripts\Serenity\CoreLib\Serenity.CoreLib.d.ts" target="content/Scripts/typings/serenity" />
     <file src="Scripts\Serenity\texts\**\*" exclude="**\*.bak;**\*.log;**\*.orig" target="content/Scripts/serenity/texts" />
+    <file src="..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.js" target="content/Scripts/serenity" />
+    <file src="..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.min.js" target="content/Scripts/serenity" />
+    <file src="..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" target="content/Scripts/typings/serenity" />
     <file src="..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.js" target="content/Scripts/serenity" />
     <file src="..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.min.js" target="content/Scripts/serenity" />
   </files>

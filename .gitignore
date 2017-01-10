@@ -42,3 +42,4 @@ Serenity.Test/Scripts/serenity/Serenity.CoreLib.min.js
 Tools/Addins/
 .nupkg/
 Serenity.CodeGenerator/Properties/launchSettings.json
+node_modules/
