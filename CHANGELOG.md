@@ -1,3 +1,19 @@
+## 2.8.0 (2017-01-10)
+
+Features:
+
+  - Serenity NuGet packages now contains netstandard1.6 targets (e.g. .NET Core support)
+  - new command line code generator (dotnet-sergen) for .NET cli
+  - criteria.exists overload that accepts a sqlquery
+  - ability to add a quickfilter separator line on columns or manually
+  - option to add a css class to a quick filter, e.g. something like visible-lg to make it visible only on large devices
+  - boolean quick filter takes display texts from filtering options
+  - moving /modules/common/imports to /imports and /modules/common/migrations to /migrations [Serene] by default
+  - switched to NPM for TypeScript typings (.d.ts) files, see upgrade guide in GitHub
+
+Bugfixes:
+  - don't use prefix if a field name is equal to prefix length in sergen
+  
 ## 2.7.2 (2016-12-25)
 
 Bugfixes:
