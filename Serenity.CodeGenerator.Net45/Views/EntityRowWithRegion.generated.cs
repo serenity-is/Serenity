@@ -126,12 +126,12 @@ WriteLiteral("[LookupScript(\"");
 WriteLiteral(".");
 
 
-                                       Write(Model.RowClassName);
+                                       Write(Model.ClassName);
 
 WriteLiteral("\")]");
 
 
-                                                                         }
+                                                                      }
 
 WriteLiteral("\n    public sealed class ");
 
