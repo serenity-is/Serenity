@@ -6,6 +6,7 @@ namespace Serenity.Data.Mapping
     /// Specifies SQL expression this property corresponds to.
     /// You may use brackets ([]) to escape identifiers. Brackets will be converted to database specific quotes.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class ExpressionAttribute : Attribute
     {
         /// <summary>
@@ -18,5 +19,6 @@ namespace Serenity.Data.Mapping
         }
 
         public string Value { get; private set; }
+        public string Dialect { get; set; }
     }
 }
