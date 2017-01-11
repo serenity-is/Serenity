@@ -264,7 +264,8 @@ Task("Restore")
     .IsDependentOn("Clean")
     .Does(context =>
 {
-    NuGetRestore("./Serenity.sln");
+    NuGetRestore("./Serenity.Net45.sln");
+	NuGetRestore("./Serenity.DotNet.sln");
 });
 
 Task("Compile")

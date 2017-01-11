@@ -1,0 +1,10 @@
+﻿{
+  "version": "2.8.0-*",
+  "frameworks": {
+    "net45": {}
+  },
+  "buildOptions": {
+  },
+  "scripts": {
+  }
+}

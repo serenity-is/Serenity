@@ -1,0 +1,217 @@
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+
+namespace Serenity.CodeGenerator
+{
+    public class RestoreCommand
+    {
+        private static string[] skipPackages = new[]
+        {
+            "Microsoft.",
+            "System.",
+            "Newtonsoft.",
+            "EPPlus",
+            "FastMember",
+            "MailKit"
+        };
+
+        public void Run(string projectJson)
+        {
+            var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                WorkingDirectory = Path.GetDirectoryName(projectJson),
+                CreateNoWindow = true,
+                Arguments = "restore project.json"
+            });
+
+            process.WaitForExit();
+            if (process.ExitCode > 0)
+            {
+                Console.Error.WriteLine("Error executing dotnet restore!");
+                Environment.Exit(process.ExitCode);
+            }
+
+            var packagesDir = new PackageHelper().DeterminePackagesPath();
+
+            var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var queue = new Queue<Tuple<string, string, string>>();
+
+            Func<string, bool> skipPackage = id =>
+            {
+                if (visited.Contains(id))
+                    return true;
+
+                foreach (var skip in skipPackages)
+                    if (id.StartsWith(skip, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                visited.Add(id);
+
+                return false;
+            };
+
+            var proj = JObject.Parse(File.ReadAllText(projectJson));
+            EnumerateProjectJsonDeps(proj, (fw, id, ver) =>
+            {
+                if (!skipPackage(id))
+                    queue.Enqueue(new Tuple<string, string, string>(fw, id, ver));
+            });
+
+            while (queue.Count > 0)
+            {
+                var dep = queue.Dequeue();
+                var id = dep.Item2;
+
+                var ver = dep.Item3.Trim();
+                if (ver.EndsWith("-*"))
+                    ver = ver.Substring(0, ver.Length - 2);
+                else if (ver.StartsWith("[") && ver.EndsWith("]"))
+                {
+                    ver = ver.Substring(1, ver.Length - 2).Trim();
+                }
+
+                var packageFolder = Path.Combine(Path.Combine(packagesDir, id), ver);
+                var nuspecFile = Path.Combine(packageFolder, id + ".nuspec");
+                if (!File.Exists(nuspecFile))
+                    continue;
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("Processing: " + id);
+                Console.ResetColor();
+
+                var contentRoot = Path.Combine(packageFolder, "content/".Replace('/', Path.DirectorySeparatorChar));
+                if (Directory.Exists(contentRoot))
+                {
+                    var targetRoot = Path.GetDirectoryName(projectJson);
+
+                    foreach (var file in Directory.GetFiles(contentRoot, "*.*", SearchOption.AllDirectories))
+                    {
+                        var extension = Path.GetExtension(file);
+                        if (String.Compare(extension, ".transform", StringComparison.OrdinalIgnoreCase) == 0)
+                            continue;
+
+                        var relative = file.Substring(contentRoot.Length);
+                        if (relative.StartsWith("scripts/typings/".Replace('/', Path.DirectorySeparatorChar),
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            relative = relative.Substring("scripts/".Length);
+                        }
+                        else
+                        {
+                            relative = Path.Combine("wwwroot", relative);
+                        }
+
+                        var target = Path.Combine(targetRoot, relative);
+                        if (File.Exists(target))
+                        {
+                            if (!File.ReadAllBytes(target)
+                                    .SequenceEqual(File.ReadAllBytes(file)))
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Restoring: " + relative);
+                                Console.ResetColor();
+                                File.Copy(file, target, true);
+                            }
+                        }
+                        else
+                        {
+                            if (!Directory.Exists(target))
+                                Directory.CreateDirectory(Path.GetDirectoryName(target));
+
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("Restoring: " + relative);
+                            Console.ResetColor();
+                            File.Copy(file, target, false);
+                        }
+                    }
+                }
+
+                var nuspec = XElement.Parse(File.ReadAllText(nuspecFile));
+                XNamespace ns = "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd";
+                var meta = nuspec.Element(ns + "metadata");
+                if (meta == null)
+                    continue;
+
+                var deps = meta.Element(ns + "dependencies");
+                if (deps == null)
+                    continue;
+
+                var fw = dep.Item1;
+
+                var groups = deps.Elements(ns + "group");
+                if (groups.Any())
+                {
+                    foreach (var group in groups)
+                    {
+                        var target = group.Attribute("targetFramework").Value;
+                        if (string.IsNullOrEmpty(target) ||
+                            String.Compare(target, fw, StringComparison.OrdinalIgnoreCase) == 0 ||
+                            target.StartsWith(".NETStandard", StringComparison.OrdinalIgnoreCase) ||
+                            target.StartsWith("netstandard", StringComparison.OrdinalIgnoreCase) ||
+                            target.StartsWith("netcore", StringComparison.OrdinalIgnoreCase))
+                        {
+                            foreach (var dep2 in group.Elements(ns + "dependency"))
+                            {
+                                var id2 = dep2.Attribute("id").Value;
+                                if (!skipPackage(id2))
+                                    queue.Enqueue(new Tuple<string, string, string>(fw, id2, dep2.Attribute("version").Value));
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var dep2 in deps.Elements(ns + "dependency"))
+                    {
+                        var id2 = dep2.Attribute("id").Value;
+                        if (!skipPackage(id2))
+                            queue.Enqueue(new Tuple<string, string, string>(fw, id2, dep2.Attribute("version").Value));
+                    }
+                }
+            }
+        }
+
+        private static void EnumerateProjectJsonDeps(JObject proj, Action<string, string, string> dependency)
+        {
+            Action<string, JObject> enumDeps = (fwkey, deps) => {
+                if (deps == null)
+                    return;
+
+                foreach (var pair in deps)
+                {
+                    var v = pair.Value as JObject;
+                    if (v != null)
+                    {
+                        var o = v["version"] as JValue;
+                        if (o != null && o.Value != null)
+                            dependency(fwkey, pair.Key, o.Value.ToString());
+                    }
+                    else if (pair.Value is JValue && (pair.Value as JValue).Value != null)
+                    {
+                        dependency(fwkey, pair.Key, (pair.Value as JValue).Value.ToString());
+                    }
+                }
+            };
+
+            var frameworks = proj["frameworks"] as JObject;
+            if (frameworks == null)
+                return;
+
+            foreach (var pair in frameworks)
+            {
+                var val = pair.Value as JObject;
+                if (val == null)
+                    continue;
+
+                enumDeps(pair.Key, val["dependencies"] as JObject);
+                enumDeps(pair.Key, proj["dependencies"] as JObject);
+            }
+        }
+    }
+}

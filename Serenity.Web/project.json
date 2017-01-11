@@ -53,5 +53,8 @@
     "compile": {
       "excludeFiles": []
     }
+  },
+  "scripts": {
+    "postcompile": []
   }
 }

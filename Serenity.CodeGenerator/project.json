@@ -14,10 +14,14 @@
   },
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
-    "Serenity.Web": "2.8.0"
+    "Serenity.Web": "2.8.0-*"
   },
   "frameworks": {
     "netcoreapp1.0": {
+      "imports": [
+        "netstandard1.6",
+        "netstandard1.3"
+      ],
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
@@ -27,10 +31,7 @@
         "JavaScriptEngineSwitcher.ChakraCore": "2.2.0",
         "JavaScriptEngineSwitcher.ChakraCore.Native.debian-x64": "2.1.0",
         "JavaScriptEngineSwitcher.ChakraCore.Native.osx-x64": "2.1.0",
-        "JavaScriptEngineSwitcher.ChakraCore.Native.win8-arm": "2.1.0",
-        "JavaScriptEngineSwitcher.ChakraCore.Native.win-x64": "2.1.1",
-        "JavaScriptEngineSwitcher.ChakraCore.Native.win-x86": "2.1.1",
-        "JavaScriptEngineSwitcher.Extensions.MsDependencyInjection": "2.2.0"
+        "JavaScriptEngineSwitcher.ChakraCore.Native.win-x64": "2.1.1"
       }
     }
   }

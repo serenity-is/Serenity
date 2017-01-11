@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Serenity.CodeGeneration;
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Loader;
 
 namespace Serenity.CodeGenerator
 {
@@ -20,102 +19,101 @@ namespace Serenity.CodeGenerator
 
         public static void Main(string[] args)
         {
+            string command = null;
+            if (args.Length > 0)
+                command = args[0].ToLowerInvariant().TrimToEmpty();
+
+            if (command.IsEmptyOrNull() ||
+                command == "-?" ||
+                command == "--help")
+            {
+                WriteHelp();
+                Environment.Exit(1);
+            }
+
             var projectJson = "project.json";
 
             if (!File.Exists(projectJson))
             {
                 System.Console.Error.WriteLine("Can't find project.json in current directory!");
+                System.Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
                 Environment.Exit(1);
             }
 
             projectJson = Path.GetFullPath(projectJson);
 
             if (!Directory.Exists(Path.Combine(Path.GetDirectoryName(projectJson), "wwwroot")))
-                throw new Exception("Can't locate wwwroot folder!");
-
-            var process = Process.Start(new ProcessStartInfo
             {
-                FileName = "dotnet",
-                WorkingDirectory = Path.GetDirectoryName(projectJson),
-                CreateNoWindow = true,
-                Arguments = "restore project.json"
-            });
-
-            process.WaitForExit();
-            if (process.ExitCode > 0)
-            {
-                Console.Error.WriteLine("Error executing dotnet restore!");
-                Environment.Exit(process.ExitCode);
+                System.Console.Error.WriteLine("Can't find wwwroot folder in current directory!");
+                System.Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
+                Environment.Exit(1);
             }
 
-            if (args.Length > 0 && (args[0] == "restore"))
+            if ("restore".StartsWith(command))
             {
                 new RestoreCommand().Run(projectJson);
             }
-            else if (args.Length > 0 && (args[0] == "transform" || args[0] == "t"))
+            else if (
+                "transform".StartsWith(command) ||
+                "servertypings".StartsWith(command) ||
+                "clienttypes".StartsWith(command) ||
+                "mvc".StartsWith(command))
             {
-                var type = args.Length < 2 ? null : args[1].ToLowerInvariant();
-                if (type != null && 
-                    type != "servertypings" && 
-                    type != "st" &&
-                    type != "clienttypes" && 
-                    type != "ct" &&
-                    type != "mvc")
+                string tsTypesJson = null;
+                Func<List<ExternalType>> getTsTypes = () =>
                 {
-                    Console.Error.WriteLine("Invalid transform type: " + type + "!");
-                    Environment.Exit(process.ExitCode);
+                    if (tsTypesJson == null)
+                    {
+                        var tsTypeLister = new TSTypeLister(Path.GetDirectoryName(projectJson));
+                        var tsTypes = tsTypeLister.List();
+                        tsTypesJson = JSON.Stringify(tsTypes);
+                    }
+
+                    return JSON.Parse<List<ExternalType>>(tsTypesJson);
+                };
+
+                if ("transform".StartsWith(command) || "mvc".StartsWith("command"))
+                {
+                    new MvcCommand().Run(projectJson);
                 }
 
-                if (type == null || type == "servertypings" || type == "st")
-                    new ServerTypingsCommand().Run(projectJson);
+                if ("transform".StartsWith(command) || "clienttypes".StartsWith(command))
+                {
+                    new ClientTypesCommand().Run(projectJson, getTsTypes());
+                }
+
+                if ("transform".StartsWith(command) || "servertypings".StartsWith(command))
+                {
+                    new ServerTypingsCommand().Run(projectJson, getTsTypes());
+                }
             }
-            else if (args.Length == 0)
+            else if ("generate".StartsWith(command))
             {
-                System.Console.Error.WriteLine("Default action...");
-                Environment.Exit(1);
+                new GenerateCommand().Run(projectJson);
             }
             else
             {
-                System.Console.Error.WriteLine("Use one of 'restore', 'transform' as parameter!");
-                Environment.Exit(1);
+                WriteHelp();
             }
         }
 
-        private static void EnumerateProjectJsonDeps(JObject proj, Action<string, string, string> dependency)
+        private static void WriteHelp()
         {
-            Action<string, JObject> enumDeps = (fwkey, deps) => {
-                if (deps == null)
-                    return;
+            Console.WriteLine("Serenity Code Generator " +
+                Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion);
 
-                foreach (var pair in deps)
-                {
-                    var v = pair.Value as JObject;
-                    if (v != null)
-                    {
-                        var o = v["version"] as JValue;
-                        if (o != null && o.Value != null)
-                            dependency(fwkey, pair.Key, o.Value.ToString());
-                    }
-                    else if (pair.Value is JValue && (pair.Value as JValue).Value != null)
-                    {
-                        dependency(fwkey, pair.Key, (pair.Value as JValue).Value.ToString());
-                    }
-                }
-            };
-
-            var frameworks = proj["frameworks"] as JObject;
-            if (frameworks == null)
-                return;
-
-            foreach (var pair in frameworks)
-            {
-                var val = pair.Value as JObject;
-                if (val == null)
-                    continue;
-
-                enumDeps(pair.Key, val["dependencies"] as JObject);
-                enumDeps(pair.Key, proj["dependencies"] as JObject);
-            }
+            Console.WriteLine();
+            Console.WriteLine("Usage: sergen [command]");
+            Console.WriteLine();
+            Console.WriteLine("Commands:");
+            Console.WriteLine("    g[enerate]        Launches table code generator");
+            Console.WriteLine("    r[estore]         Restores content, e.g. scripts, fonts and css from .nupkg");
+            Console.WriteLine();
+            Console.WriteLine("    c[lienttypes]     Imports editor, formatter types from TypeScript to CS");
+            Console.WriteLine("    m[vc]             Generates intellisense helpers for view locations");
+            Console.WriteLine("    s[ervertypings]   Imports row, form, service types from CS to TypeScript");
+            Console.WriteLine("    t[ransform]       Runs clienttypes, mvc and servertypings commands at once");
+            Environment.Exit(1);
         }
     }
 }
