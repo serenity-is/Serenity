@@ -31,7 +31,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     [UpdatePermission("@Model.Module:@Model.Tablename:Update")]
     [DeletePermission("@Model.Module:@Model.Tablename:Delete")]
     @if (Config.GenerateLookupEditor)
-    {    <text>[LookupScript("@Model.Module.@Model.RowClassName")]</text>}
+    {    <text>[LookupScript("@Model.Module.@Model.ClassName")]</text>}
 
     public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
     {@foreach (EntityField x in Model.Fields)
