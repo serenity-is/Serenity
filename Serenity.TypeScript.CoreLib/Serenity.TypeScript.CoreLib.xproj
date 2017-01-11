@@ -17,7 +17,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>c7fa0438-36aa-4b56-9188-9af75f9cb1a1</ProjectGuid>
+    <ProjectGuid>6f13b7f5-3f1e-4a7f-962d-59ebd3118e83</ProjectGuid>
     <RootNamespace>Serenity.Core</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
