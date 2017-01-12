@@ -25,7 +25,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     using System.ComponentModel;
     using System.IO;
 
-    [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Tablename"), InstanceName("@Model.Tablename"), TwoLevelCached]
+    [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Title"), InstanceName("@Model.Title"), TwoLevelCached]
     [ReadPermission("@Model.Module:@Model.Tablename:Read")]
     [InsertPermission("@Model.Module:@Model.Tablename:Insert")]
     [UpdatePermission("@Model.Module:@Model.Tablename:Update")]
