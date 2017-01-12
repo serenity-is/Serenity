@@ -61,12 +61,12 @@ WriteLiteral(".Entities\r\n{\r\n    using Serenity;\r\n    using Serenity.Compon
 WriteLiteral("\"), DisplayName(\"");
 
 
-                                                    Write(Model.Tablename);
+                                                    Write(Model.Title);
 
 WriteLiteral("\"), InstanceName(\"");
 
 
-                                                                                      Write(Model.Tablename);
+                                                                                  Write(Model.Title);
 
 WriteLiteral("\"), TwoLevelCached]\r\n    [ReadPermission(\"");
 

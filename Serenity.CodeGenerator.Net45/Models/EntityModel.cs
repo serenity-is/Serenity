@@ -12,6 +12,7 @@ namespace Serenity.CodeGenerator
         public string RowClassName { get; set; }
         public string Schema { get; set; }
         public string Tablename { get; set; }
+        public string Title { get; set; }
         public string Identity { get; set; }
         public string RowBaseClass { get; set; }
         public List<EntityField> RowBaseFields { get; set; }

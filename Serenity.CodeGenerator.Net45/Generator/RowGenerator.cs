@@ -128,6 +128,7 @@ namespace Serenity.CodeGenerator
             var className = entityClass ?? ClassNameFromTableName(table);
             model.ClassName = className;
             model.RowClassName = className + "Row";
+            model.Title = Inflector.Inflector.Titleize(className);
             model.Tablename = table;
             model.Fields = new List<EntityField>();
             model.Joins = new List<EntityJoin>();
