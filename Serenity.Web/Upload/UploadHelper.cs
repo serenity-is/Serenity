@@ -163,11 +163,15 @@ namespace Serenity.Web
                 if (path.IsEmptyOrNull())
                     throw new InvalidOperationException("Please make sure Path in appSettings\\UploadSettings is configured!");
 
-                string appData1 = @"~\App_Data\";
-                string appData2 = @"~/App_Data/";
-                if (path.StartsWith(appData1) || path.StartsWith(appData2))
+                string pre1 = @"~\";
+                string pre2 = @"~/";
+                if (path.StartsWith(pre1) || path.StartsWith(pre2))
                 {
-                    path = Path.Combine(HostingEnvironment.MapPath(appData2), ToPath(path.Substring(appData2.Length)));
+#if COREFX
+                    path = Path.Combine(Path.GetDirectoryName(HostingEnvironment.MapPath(pre2)), ToPath(path.Substring(pre2.Length)));
+#else
+                    path = Path.Combine(HostingEnvironment.MapPath(pre2), ToPath(path.Substring(pre2.Length)));
+#endif
                     settings.Path = path;
                 }
                 
