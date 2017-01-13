@@ -1,3 +1,10 @@
+## 2.8.1 (2017-01-13)
+
+Features:
+  - Serene now runs on ASP.NET Core / .NET Core (Beta)
+  - allow specifying expressions for a field based on connection dialect type, for example [Expression("CONCAT(A, B)"), Expression("A || B", Dialect = "Sqlite")], match with longest dialect name wins
+  - [DisplayName] and [InstanceName] used Title instead of Tablename in generated row.cs (thanks @dfaruque)
+
 ## 2.8.0 (2017-01-10)
 
 Features:
