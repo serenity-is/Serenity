@@ -1,7 +1,11 @@
 ﻿using Serenity.CodeGeneration;
+using Serenity.Data;
+using Serenity.Localization;
+using Serenity.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -51,6 +55,15 @@ namespace Serenity.CodeGenerator
                 var fullName = Path.GetFullPath(assembly.Replace('/', Path.DirectorySeparatorChar));
                 assemblies.Add(loadContext.LoadFromAssemblyPath(fullName));
             }
+
+            Extensibility.ExtensibilityHelper.SelfAssemblies = new Assembly[]
+            {
+                typeof(LocalTextRegistry).GetAssembly(),
+                typeof(SqlConnections).GetAssembly(),
+                typeof(Row).GetAssembly(),
+                typeof(SaveRequestHandler<>).GetAssembly(),
+                typeof(WebSecurityHelper).GetAssembly()
+            }.Concat(assemblies).Distinct().ToArray();
 
             var generator = new ServerTypingsGenerator(assemblies.ToArray());
             generator.RootNamespaces.Add(config.RootNamespace);
