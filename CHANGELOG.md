@@ -1,3 +1,8 @@
+## 2.8.3 (2017-01-14)
+
+Bugfixes:
+  - resolve problem with dotnet-sergen self assemblies
+
 ## 2.8.2 (2017-01-14)
 
 Features:
