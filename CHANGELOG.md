@@ -1,3 +1,8 @@
+## 2.8.4 (2017-01-15)
+
+Bugfixes:
+  - can't use auto completion in sergen thanks to cli bug
+
 ## 2.8.3 (2017-01-14)
 
 Bugfixes:
