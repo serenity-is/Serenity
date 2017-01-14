@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Loader;
 using System.Text;
 
 namespace Serenity.CodeGenerator
@@ -43,9 +42,15 @@ namespace Serenity.CodeGenerator
             Console.ResetColor();
             Console.WriteLine(outDir);
 
+            var rootPath = Path.GetFullPath(config.ServerTypings.Assemblies[0].Replace('/', Path.DirectorySeparatorChar));
+            var loadContext = new ProjectLoadContext(projectJson, Path.GetDirectoryName(rootPath));
+
             List<Assembly> assemblies = new List<Assembly>();
             foreach (var assembly in config.ServerTypings.Assemblies)
-                assemblies.Add(AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(projectDir, assembly)));
+            {
+                var fullName = Path.GetFullPath(assembly.Replace('/', Path.DirectorySeparatorChar));
+                assemblies.Add(loadContext.LoadFromAssemblyPath(fullName));
+            }
 
             var generator = new ServerTypingsGenerator(assemblies.ToArray());
             generator.RootNamespaces.Add(config.RootNamespace);
