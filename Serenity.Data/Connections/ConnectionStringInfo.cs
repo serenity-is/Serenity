@@ -27,13 +27,13 @@ namespace Serenity.Data
 
         private string databaseName;
         private ISqlDialect dialect;
+        private DbProviderFactory providerFactory;
 
-        public ConnectionStringInfo(string connectionKey, string connectionString, string providerName, DbProviderFactory providerFactory)
+        public ConnectionStringInfo(string connectionKey, string connectionString, string providerName)
         {
             this.ConnectionKey = connectionKey;
             this.ConnectionString = connectionString;
             this.ProviderName = providerName;
-            this.ProviderFactory = providerFactory;
         }
 
         public string DatabaseName
@@ -106,7 +106,17 @@ namespace Serenity.Data
         public string ConnectionKey { get; private set; }
         public string ConnectionString { get; private set; }
         public string ProviderName { get; private set; }
-        public DbProviderFactory ProviderFactory { get; private set; }
+
+        public DbProviderFactory ProviderFactory
+        {
+            get
+            {
+                if (providerFactory == null)
+                    providerFactory = SqlConnections.GetFactory(ProviderName);
+
+                return providerFactory;
+            }
+        }
 
         [Obsolete("Use ConnectionString")]
         public string Item1 { get { return ConnectionString; } }
