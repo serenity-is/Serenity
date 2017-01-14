@@ -1,3 +1,8 @@
+## 2.8.5 (2017-01-15)
+
+Bugfixes:
+  - remove test check in sergen cli
+  
 ## 2.8.4 (2017-01-15)
 
 Bugfixes:
