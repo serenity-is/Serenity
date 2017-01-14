@@ -1,3 +1,11 @@
+## 2.8.2 (2017-01-14)
+
+Features:
+  - lazy load connection string provider factory
+
+Bugfixes:
+  - resolve problem with dotnet-sergen can't load FluentMigrator assembly
+
 ## 2.8.1 (2017-01-13)
 
 Features:
