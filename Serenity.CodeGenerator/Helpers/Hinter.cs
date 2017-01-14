@@ -73,7 +73,16 @@ namespace Serenity.CodeGenerator
         {
             int currentLineCursor = Console.CursorTop;
             Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write(new string(' ', Console.WindowWidth));
+            int consoleWidth;
+            try
+            {
+                consoleWidth = Console.WindowWidth;
+            }
+            catch (Exception)
+            {
+                consoleWidth = 80;
+            }
+            Console.Write(new string(' ', consoleWidth));
             Console.SetCursorPosition(0, currentLineCursor);
         }
     }
