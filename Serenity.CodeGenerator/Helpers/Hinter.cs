@@ -90,7 +90,6 @@ namespace Serenity.CodeGenerator
                 var w = Console.WindowWidth;
                 if (w >= 0)
                     Console.SetCursorPosition(x, y);
-                failedRedirect = true;
             }
             catch
             {
