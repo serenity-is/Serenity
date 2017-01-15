@@ -1,3 +1,8 @@
+## 2.8.6 (2017-01-15)
+
+Bugfixes:
+  - implement console readline hint without using console width or setcursorposition
+  
 ## 2.8.5 (2017-01-15)
 
 Bugfixes:
