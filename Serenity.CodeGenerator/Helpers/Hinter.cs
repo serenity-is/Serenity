@@ -11,8 +11,6 @@ namespace Serenity.CodeGenerator
     /// </summary>
     public class Hinter
     {
-        private static bool failedRedirect = false;
-
         public static string ReadHintedLine<T, TResult>(IEnumerable<T> hintSource, 
             Func<T, TResult> hintField, string inputRegex = ".", ConsoleColor hintColor = ConsoleColor.DarkGray,
             string userInput = null)
@@ -23,14 +21,11 @@ namespace Serenity.CodeGenerator
             var suggestion = string.Empty;
             var readLine = string.Empty;
             userInput = userInput ?? String.Empty;
-            CheckRedirect();
 
             if (userInput.Length > 0)
             {
                 readLine = userInput;
-                ClearCurrentConsoleLine();
-                if (!failedRedirect)
-                    Console.Write(userInput);
+                Console.Write(userInput);
             }
 
             Func<string> getSuggestion = () =>
@@ -46,14 +41,6 @@ namespace Serenity.CodeGenerator
                 return suggestion == null ? userInput : suggestion;
             };
 
-            if (failedRedirect)
-            {
-                userInput = Console.ReadLine();
-                readLine = getSuggestion();
-                Console.WriteLine(readLine);
-                return readLine;
-            }
-
             while (ConsoleKey.Enter != (input = Console.ReadKey()).Key)
             {
                 if (input.Key == ConsoleKey.Backspace)
@@ -65,56 +52,27 @@ namespace Serenity.CodeGenerator
                 else if (input != null && input.KeyChar != '\0' && Regex.IsMatch(input.KeyChar.ToString(), inputRegex))
                     userInput += input.KeyChar;
 
+                var oldLine = readLine;
                 readLine = getSuggestion();
 
-                ClearCurrentConsoleLine();
-                Console.Write(userInput);
                 var originalColor = Console.ForegroundColor;
+
                 Console.ForegroundColor = hintColor;
-                if (userInput.Any())
-                    Console.Write(readLine.Substring(userInput.Length, readLine.Length - userInput.Length));
-                Console.SetCursorPosition(userInput.Length, Console.CursorTop);
+                Console.Write('\r');
+                for (var i = 0; i < readLine.Length; i++)
+                    Console.Write(readLine[i]);
+
+                for (var i = readLine.Length; i < oldLine.Length; i++)
+                    Console.Write(' ');
+
                 Console.ForegroundColor = originalColor;
+                Console.Write('\r');
+                for (var i = 0; i < userInput.Length; i++)
+                    Console.Write(userInput[i]);
             }
 
             Console.WriteLine(readLine);
             return readLine;
-        }
-
-        private static void CheckRedirect()
-        {
-            try
-            {
-                var y = Console.CursorTop;
-                var x = Console.CursorLeft;
-                var w = Console.WindowWidth;
-                if (w >= 0)
-                    Console.SetCursorPosition(x, y);
-            }
-            catch
-            {
-                failedRedirect = true;
-            }
-        }
-
-        private static void ClearCurrentConsoleLine()
-        {
-            if (failedRedirect)
-                return;
-
-            try
-            {
-                int currentLineCursor = Console.CursorTop;
-                Console.SetCursorPosition(0, Console.CursorTop);
-                int consoleWidth;
-                consoleWidth = Console.WindowWidth;
-                Console.Write(new string(' ', consoleWidth));
-                Console.SetCursorPosition(0, currentLineCursor);
-            }
-            catch (Exception)
-            {
-                failedRedirect = true;
-            }
         }
     }
 }
