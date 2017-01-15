@@ -26,12 +26,7 @@
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.1.0"
-        },
-        "JavaScriptEngineSwitcher.Core": "2.2.0",
-        "JavaScriptEngineSwitcher.ChakraCore": "2.2.0",
-        "JavaScriptEngineSwitcher.ChakraCore.Native.debian-x64": "2.1.0",
-        "JavaScriptEngineSwitcher.ChakraCore.Native.osx-x64": "2.1.0",
-        "JavaScriptEngineSwitcher.ChakraCore.Native.win-x64": "2.1.1"
+        }
       }
     }
   }

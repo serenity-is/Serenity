@@ -18,12 +18,7 @@
       </group>
       <group targetFramework=".NETCoreApp1.0">
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-		<dependency id="Serenity.Web" version="${version}" />
-		<dependency id="JavaScriptEngineSwitcher.Core" version="${netcoreapp1.0:JavaScriptEngineSwitcher.Core}" />
-		<dependency id="JavaScriptEngineSwitcher.ChakraCore" version="${netcoreapp1.0:JavaScriptEngineSwitcher.ChakraCore}" />
-		<dependency id="JavaScriptEngineSwitcher.ChakraCore.Native.debian-x64" version="${netcoreapp1.0:JavaScriptEngineSwitcher.ChakraCore.Native.debian-x64}" />
-		<dependency id="JavaScriptEngineSwitcher.ChakraCore.Native.osx-x64" version="${netcoreapp1.0:JavaScriptEngineSwitcher.ChakraCore.Native.osx-x64}" />
-		<dependency id="JavaScriptEngineSwitcher.ChakraCore.Native.win-x64" version="${netcoreapp1.0:JavaScriptEngineSwitcher.ChakraCore.Native.win-x64}" />
+        <dependency id="Serenity.Web" version="${version}" />
       </group>
     </dependencies>
   </metadata>
