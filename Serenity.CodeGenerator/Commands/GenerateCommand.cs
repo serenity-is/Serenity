@@ -43,6 +43,16 @@ namespace Serenity.CodeGenerator
 
             connectionKeys.AddRange(appSettings.Data.Keys);
 
+            var appSettingsFile2 = Path.Combine(projectDir, "appsettings.machine.json");
+            if (File.Exists(appSettingsFile2))
+            {
+                var appSettings2 = JSON.ParseTolerant<AppSettingsFormat>(File.ReadAllText(appSettingsFile2).TrimToNull() ?? "{}");
+                foreach (var pair in appSettings2.Data)
+                    appSettings.Data[pair.Key] = pair.Value;
+            }
+
+            connectionKeys.AddRange(appSettings.Data.Keys);
+
             connectionKeys = connectionKeys.Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(x => x).ToList();
 
             if (connectionKeys.Count == 0)
@@ -73,7 +83,7 @@ namespace Serenity.CodeGenerator
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Connection: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                connectionKey = Hinter.ReadHintedLine(connectionKeys, x => x, userInput: userInput);
+                connectionKey = Hinter.ReadHintedLine(connectionKeys, userInput: userInput);
                 userInput = connectionKey;
 
                 if (connectionKey == "!")
@@ -132,7 +142,7 @@ namespace Serenity.CodeGenerator
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Table: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                table = Hinter.ReadHintedLine(tables, x => x, userInput: userInput);
+                table = Hinter.ReadHintedLine(tables, userInput: userInput);
                 userInput = table;
 
                 if (table == "!")
@@ -157,7 +167,7 @@ namespace Serenity.CodeGenerator
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Module name for table: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                module = Hinter.ReadHintedLine(new string[0], x => x, userInput: userInput);
+                module = Hinter.ReadHintedLine(new string[0], userInput: userInput);
                 userInput = module;
 
                 if (module == "!")
@@ -178,7 +188,7 @@ namespace Serenity.CodeGenerator
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a class Identifier for table: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                identifier = Hinter.ReadHintedLine(new string[0], x => x, userInput: userInput);
+                identifier = Hinter.ReadHintedLine(new string[0], userInput: userInput);
                 userInput = identifier;
 
                 if (identifier == "!")
@@ -199,7 +209,7 @@ namespace Serenity.CodeGenerator
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Enter a Permission Key for table: ('!' to abort)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                permissionKey = Hinter.ReadHintedLine(new string[0], x => x, userInput: userInput);
+                permissionKey = Hinter.ReadHintedLine(new string[0], userInput: userInput);
                 userInput = permissionKey;
 
                 if (permissionKey == "!")
@@ -218,7 +228,7 @@ namespace Serenity.CodeGenerator
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Choose What to Generate (R:Row, S:Repo+Svc, U=Cols+Form+Page+Grid+Dlg+Css)");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                generate = Hinter.ReadHintedLine(new string[0], x => x, userInput: userInput);
+                generate = Hinter.ReadHintedLine(new string[0], userInput: userInput);
                 userInput = generate;
 
                 if (generate == "!")

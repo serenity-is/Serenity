@@ -11,68 +11,85 @@ namespace Serenity.CodeGenerator
     /// </summary>
     public class Hinter
     {
-        public static string ReadHintedLine<T, TResult>(IEnumerable<T> hintSource, 
-            Func<T, TResult> hintField, string inputRegex = ".", ConsoleColor hintColor = ConsoleColor.DarkGray,
-            string userInput = null)
+        public static string ReadHintedLine(IEnumerable<string> hintSource, 
+            string inputRegex = ".", ConsoleColor hintColor = ConsoleColor.DarkGray, string userInput = null)
         {
             Console.OutputEncoding = Encoding.UTF8;
             ConsoleKeyInfo input;
 
-            var suggestion = string.Empty;
-            var readLine = string.Empty;
             userInput = userInput ?? String.Empty;
 
             if (userInput.Length > 0)
             {
-                readLine = userInput;
                 Console.Write(userInput);
             }
 
-            Func<string> getSuggestion = () =>
+            string lastUserInput = null;
+            string lastSuggestion = null;
+
+            while (ConsoleKey.Enter != (input = Console.ReadKey(true)).Key)
             {
-                suggestion = hintSource.Select(item => hintField(item).ToString())
-                    .FirstOrDefault(item => item.Length > userInput.Length && item.Substring(0, userInput.Length) == userInput);
+                var oldUserInput = userInput;
 
-                if (suggestion == null)
-                    suggestion = hintSource.Select(item => hintField(item).ToString())
-                        .FirstOrDefault(item => item.Length > userInput.Length &&
-                            String.Compare(item.Substring(0, userInput.Length), userInput, StringComparison.OrdinalIgnoreCase) == 0);
-
-                return suggestion == null ? userInput : suggestion;
-            };
-
-            while (ConsoleKey.Enter != (input = Console.ReadKey()).Key)
-            {
                 if (input.Key == ConsoleKey.Backspace)
+                {
                     userInput = userInput.Any() ? userInput.Remove(userInput.Length - 1, 1) : string.Empty;
-
+                    lastSuggestion = null;
+                    lastUserInput = null;
+                }
                 else if (input.Key == ConsoleKey.Tab)
-                    userInput = suggestion ?? userInput;
+                {
+                    lastUserInput = lastUserInput ?? userInput;
+                    var suggestions = hintSource
+                        .Where(item => item.Length >= lastUserInput.Length &&
+                            String.Compare(item.Substring(0, lastUserInput.Length), lastUserInput, StringComparison.OrdinalIgnoreCase) == 0)
+                        .Distinct()
+                        .OrderBy(x => x)
+                        .ToList();
 
+                    if (suggestions.Any())
+                    {
+                        var idx = lastSuggestion == null ? -1 : suggestions.IndexOf(lastSuggestion);
+
+                        if (idx < 0 || idx == suggestions.Count - 1)
+                        {
+                            lastSuggestion = suggestions[0];
+                        }
+                        else
+                        {
+                            lastSuggestion = suggestions[idx + 1];
+                        }
+
+                        
+                        userInput = lastSuggestion;                       
+                    }
+                    else
+                    {
+                        lastSuggestion = null;
+                        lastUserInput = null;
+                    }
+                }
                 else if (input != null && input.KeyChar != '\0' && Regex.IsMatch(input.KeyChar.ToString(), inputRegex))
                     userInput += input.KeyChar;
 
-                var oldLine = readLine;
-                readLine = getSuggestion();
+                var same = 0;
+                while (same < userInput.Length && same < oldUserInput.Length && userInput[same] == oldUserInput[same])
+                    same++;
 
-                var originalColor = Console.ForegroundColor;
-
-                Console.ForegroundColor = hintColor;
-                Console.Write('\r');
-                for (var i = 0; i < readLine.Length; i++)
-                    Console.Write(readLine[i]);
-
-                for (var i = readLine.Length; i < oldLine.Length; i++)
+                for (var i = same; i < oldUserInput.Length; i++)
+                {
+                    Console.Write('\b');
                     Console.Write(' ');
+                    Console.Write('\b');
+                }
 
-                Console.ForegroundColor = originalColor;
-                Console.Write('\r');
-                for (var i = 0; i < userInput.Length; i++)
+                for (var i = same; i < userInput.Length; i++)
                     Console.Write(userInput[i]);
             }
 
-            Console.WriteLine(readLine);
-            return readLine;
+            Console.WriteLine();
+
+            return userInput;
         }
     }
 }
