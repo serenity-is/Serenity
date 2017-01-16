@@ -1,8 +1,8 @@
 {
   "name": "sergen",
-  "version": "2.8.601",
+  "version": "2.8.602",
   "description": "Node CLI interface to dotnet-sergen tool",
-  "preferGlobal": false,
+  "preferGlobal": true,
   "dependencies": {
     "inquirer": "^2.0.0",
     "inquirer-autocomplete-prompt": "^0.3.0",
