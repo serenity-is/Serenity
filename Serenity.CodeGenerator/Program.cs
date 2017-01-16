@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Serenity.CodeGenerator
 {
@@ -89,7 +90,7 @@ namespace Serenity.CodeGenerator
             }
             else if ("generate".StartsWith(command))
             {
-                new GenerateCommand().Run(projectJson);
+                new GenerateCommand().Run(projectJson, args.Skip(1).ToArray());
             }
             else
             {
