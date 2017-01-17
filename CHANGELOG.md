@@ -1,3 +1,8 @@
+## 2.8.7 (2017-01-17)
+
+Features:
+  - develop npm sergen package to workaround dotnet cli tool bug about readline/readkey
+
 ## 2.8.6 (2017-01-15)
 
 Bugfixes:
