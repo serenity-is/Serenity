@@ -125,7 +125,7 @@ namespace Serenity.Web
 
                         bundleParts.Add(() =>
                         {
-                            var sourcePath = VirtualPathUtility.ToAbsolute(sourceUrl);
+                            var sourcePath = HostingEnvironment.MapPath(sourceUrl);
                             if (!File.Exists(sourcePath))
                                 return String.Format(errorLines, String.Format("File {0} is not found!", sourcePath));
 

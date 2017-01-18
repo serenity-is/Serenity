@@ -1,3 +1,8 @@
+## 2.8.8 (2017-01-18)
+
+Features:
+  - resolve regression bug with script bundling
+
 ## 2.8.7 (2017-01-17)
 
 Features:
