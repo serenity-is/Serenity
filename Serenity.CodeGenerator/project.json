@@ -7,7 +7,7 @@
     "embed": {
       "mappings": {
         "typeScriptServices.js": "../Serenity.Web/Tooling/JsEngine/typescriptServices.js",
-        "Serenity.CodeGeneration.js": "../Serenity.Web/Scripts/tsservices/Serenity.CodeGeneration.js",
+        "Serenity.CodeGeneration.js": "../Serenity.TypeScript.CodeGeneration/Serenity.CodeGeneration.js",
         "lib.d.ts_": "../Serenity.Web/Tooling/JsEngine/lib.d.ts_"
       }
     }

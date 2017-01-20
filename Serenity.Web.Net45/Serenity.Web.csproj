@@ -2659,7 +2659,7 @@
     <None Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
       <Link>Tooling\JsEngine\typescriptServices.js</Link>
     </None>
-    <EmbeddedResource Include="..\Serenity.Web\Scripts\tsservices\Serenity.CodeGeneration.js">
+    <EmbeddedResource Include="..\Serenity.TypeScript.CodeGeneration\Serenity.CodeGeneration.js">
       <Link>Scripts\tsservices\Serenity.CodeGeneration.js</Link>
     </EmbeddedResource>
     <None Include="..\Serenity.Web\Tooling\JsEngine\json2.min.js">
@@ -2767,24 +2767,13 @@
     <None Include="..\Serenity.Web\Tooling\JsEngine\lib.d.ts_">
       <Link>Tooling\JsEngine\lib.d.ts_</Link>
     </None>
-    <TypeScriptCompile Include="..\Serenity.Web\Scripts\tsservices\typescriptServices.d.ts">
-      <Link>Scripts\tsservices\typescriptServices.d.ts</Link>
-    </TypeScriptCompile>
-    <TypeScriptCompile Include="..\Serenity.Web\Scripts\tsservices\Serenity.CodeGeneration.ts">
-      <Link>Scripts\tsservices\Serenity.CodeGeneration.ts</Link>
-    </TypeScriptCompile>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>-->
   <Target Name="AfterBuild">
-    <Exec Command="npm run build" ContinueOnError="false" WorkingDirectory="$(ProjectDir)..\Serenity.Web\" />
     <Exec Command="&quot;$(ProjectDir)..\tools\node\lessc.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\style\serenity.less&quot; &gt; &quot;$(OutDir)serenity.css&quot;" />
   </Target>
 </Project>

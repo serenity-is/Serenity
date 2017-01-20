@@ -6,10 +6,11 @@
     "declaration": true,
     "emitBOM": true,
     "sourceMap": true,
-    "target": "es3"
+    "outFile": "Serenity.CodeGeneration.js",
+    "target": "ES3"
   },
-  "exclude": [
-    "scripts/serenity",
-    "node_modules/"
+  "files": [
+    "typeScriptServices.d.ts",
+    "Serenity.CodeGeneration.ts"
   ]
 }

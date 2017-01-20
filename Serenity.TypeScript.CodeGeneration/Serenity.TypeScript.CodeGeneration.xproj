@@ -17,7 +17,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>c7fa0438-36aa-4b56-9188-9af75f9cb1a1</ProjectGuid>
+    <ProjectGuid>9fa23278-8c77-4615-8cf1-9c2318399ceb</ProjectGuid>
     <RootNamespace>Serenity.Core</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
@@ -32,11 +32,6 @@
   </Target>
   <Target Name="AfterBuild">
     <Exec Command="npm run tsc" ContinueOnError="false" />
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\mscorlib.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\mscorlib.min.js&quot; --comments --mangle" />
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\linq.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\linq.min.js&quot; --comments --mangle" />
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.min.js&quot; --comments --mangle" />
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.min.js&quot; --comments --mangle" />
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js&quot; --comments --mangle" />
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)Serenity.CoreLib.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Serenity.CodeGeneration.js&quot; -o &quot;$(ProjectDir)Serenity.CodeGeneration.min.js&quot; --comments --mangle" />
   </Target>
 </Project>
