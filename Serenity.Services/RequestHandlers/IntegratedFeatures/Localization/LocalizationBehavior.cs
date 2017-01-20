@@ -312,7 +312,7 @@ namespace Serenity.Services
                 return;
 
             var idField = (Field)((handler.Row as IIdRow).IdField);
-            var localRow = rowFactory();
+            var localRow = localRowFactory();
 
             var deleteHandler = deleteHandlerFactory();
             var deleteList = new List<object>();
