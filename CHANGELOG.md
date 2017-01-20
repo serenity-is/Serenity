@@ -1,3 +1,9 @@
+## 2.8.9 (2017-01-20)
+
+  - simplified data localization with a behavior
+  - localizations are integrated into saverequest and retrieveresponse for easier implementation
+  - add language / culture switching support to ASP.NET Core version [Serene]
+
 ## 2.8.8 (2017-01-18)
 
 Features:

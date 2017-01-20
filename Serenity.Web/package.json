@@ -1,7 +1,7 @@
 {
-  "name": "serene",
+  "name": "serenity.web",
   "version": "1.0.0",
-  "description": "",
+  "description": "Serenity.Web",
   "main": "index.js",
   "dependencies": {
     "@types/jquery": "^2.0.39",
@@ -14,7 +14,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -p ./tsconfig.json"
   },
   "author": "",
   "license": "ISC"

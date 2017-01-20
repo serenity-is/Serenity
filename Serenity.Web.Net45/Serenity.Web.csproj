@@ -2784,7 +2784,7 @@
   <Target Name="BeforeBuild">
   </Target>-->
   <Target Name="AfterBuild">
-    <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)..\Serenity.Web\tsconfig.json&quot;" ContinueOnError="false" />
+    <Exec Command="npm run build" ContinueOnError="false" WorkingDirectory="$(ProjectDir)..\Serenity.Web\" />
     <Exec Command="&quot;$(ProjectDir)..\tools\node\lessc.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\style\serenity.less&quot; &gt; &quot;$(OutDir)serenity.css&quot;" />
   </Target>
 </Project>
