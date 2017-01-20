@@ -8,6 +8,5 @@ namespace Serenity
     public class SaveWithLocalizationRequest<TEntity> : SaveRequest<TEntity>
         where TEntity : new()
     {
-        public JsDictionary<string, TEntity> Localizations { get; set; }
     }
 }

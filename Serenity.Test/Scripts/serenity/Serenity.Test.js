@@ -161,24 +161,24 @@ var DummyRoot;
         var SomeDialog = (function (_super) {
             __extends(SomeDialog, _super);
             function SomeDialog() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
-            SomeDialog = __decorate([
-                Serenity.Decorators.registerClass()
-            ], SomeDialog);
             return SomeDialog;
         }(Serenity.PropertyDialog));
+        SomeDialog = __decorate([
+            Serenity.Decorators.registerClass()
+        ], SomeDialog);
         SomeModule.SomeDialog = SomeDialog;
         var SomeDialogWithoutDialogSuffix = (function (_super) {
             __extends(SomeDialogWithoutDialogSuffix, _super);
             function SomeDialogWithoutDialogSuffix() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
-            SomeDialogWithoutDialogSuffix = __decorate([
-                Serenity.Decorators.registerClass()
-            ], SomeDialogWithoutDialogSuffix);
             return SomeDialogWithoutDialogSuffix;
         }(Serenity.PropertyDialog));
+        SomeDialogWithoutDialogSuffix = __decorate([
+            Serenity.Decorators.registerClass()
+        ], SomeDialogWithoutDialogSuffix);
         SomeModule.SomeDialogWithoutDialogSuffix = SomeDialogWithoutDialogSuffix;
     })(SomeModule = DummyRoot.SomeModule || (DummyRoot.SomeModule = {}));
 })(DummyRoot || (DummyRoot = {}));

@@ -2482,6 +2482,7 @@ declare namespace Serenity {
         protected updateTitle(): void;
         protected validateBeforeSave(): boolean;
         protected propertyGrid: Serenity.PropertyGrid;
+        static defaultLanguageList: () => string[][];
     }
 }
 declare namespace Serenity {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -9,5 +10,7 @@ namespace Serenity
     {
         public object EntityId { get; set; }
         public TEntity Entity { get; set; }
+
+        public JsDictionary<string, TEntity> Localizations { get; set; }
     }
 }

@@ -3,12 +3,12 @@
     var CodeGeneration;
     (function (CodeGeneration) {
         var typeChecker;
+        var ExternalTypeOrigin;
         (function (ExternalTypeOrigin) {
             ExternalTypeOrigin[ExternalTypeOrigin["Server"] = 1] = "Server";
             ExternalTypeOrigin[ExternalTypeOrigin["SS"] = 2] = "SS";
             ExternalTypeOrigin[ExternalTypeOrigin["TS"] = 3] = "TS";
-        })(CodeGeneration.ExternalTypeOrigin || (CodeGeneration.ExternalTypeOrigin = {}));
-        var ExternalTypeOrigin = CodeGeneration.ExternalTypeOrigin;
+        })(ExternalTypeOrigin = CodeGeneration.ExternalTypeOrigin || (CodeGeneration.ExternalTypeOrigin = {}));
         function any(arr, check) {
             if (!arr || !arr.length)
                 return false;

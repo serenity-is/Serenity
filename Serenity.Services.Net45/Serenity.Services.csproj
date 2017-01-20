@@ -42,6 +42,9 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.Services\RequestHandlers\IntegratedFeatures\Localization\LocalizationBehavior.cs">
+      <Link>RequestHandlers\IntegratedFeatures\Localization\LocalizationBehavior.cs</Link>
+    </Compile>
     <Compile Include="..\Serenity.Services\ServiceRequestExtensions.cs">
       <Link>ServiceRequestExtensions.cs</Link>
     </Compile>

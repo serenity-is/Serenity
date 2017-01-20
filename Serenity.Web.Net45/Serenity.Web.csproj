@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
   </PropertyGroup>
   <PropertyGroup>
@@ -2785,6 +2785,6 @@
   </Target>-->
   <Target Name="AfterBuild">
     <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)..\Serenity.Web\tsconfig.json&quot;" ContinueOnError="false" />
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\lessc.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\style\serenity.less&quot; &gt; &quot;$(OutDir)serenity.css&quot;"/>
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\lessc.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\style\serenity.less&quot; &gt; &quot;$(OutDir)serenity.css&quot;" />
   </Target>
 </Project>

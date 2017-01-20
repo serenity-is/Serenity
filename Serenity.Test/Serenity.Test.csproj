@@ -19,7 +19,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
   </PropertyGroup>
   <PropertyGroup>
@@ -412,8 +412,8 @@
     <Error Condition="!Exists('..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
   <Target Name="BeforeBuild">
-      <Exec Command="npm install" ContinueOnError="false" />
-      <Copy SourceFiles="$(ProjectDir)..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
+    <Exec Command="npm install" ContinueOnError="false" />
+    <Copy SourceFiles="$(ProjectDir)..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
   </Target>
   <Target Name="AfterBuild">
     <Exec Command="npm run build" ContinueOnError="false" />
