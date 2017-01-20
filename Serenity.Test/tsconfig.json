@@ -1,11 +1,15 @@
 {
-    "compileOnSave": true,
-    "compilerOptions": {
-        "preserveConstEnums": true,
-        "experimentalDecorators": true,
-        "declaration": false,
-        "emitBOM": true,
-        "sourceMap": true,
-        "outFile": "Scripts/serenity/Serenity.Test.js"
-    }
+  "compileOnSave": true,
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "experimentalDecorators": true,
+    "declaration": false,
+    "emitBOM": true,
+    "sourceMap": true,
+    "outFile": "Scripts/serenity/Serenity.Test.js"
+  },
+  "exclude": [
+    "node_modules/",
+    "Scripts/serenity/Serenity.CoreLib.d.ts"
+  ]
 }
