@@ -1,3 +1,8 @@
+## 2.8.10 (2017-01-20)
+
+Bugfixes:
+  - resolve delete error on localization behavior
+
 ## 2.8.9 (2017-01-20)
 
   - simplified data localization with a behavior
