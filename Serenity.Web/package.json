@@ -15,7 +15,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "build": "./node_modules/.bin/tsc -p ./tsconfig.json"
+    "build": "npm install && ./node_modules/.bin/tsc -p ./tsconfig.json"
   },
   "author": "",
   "license": "ISC"
