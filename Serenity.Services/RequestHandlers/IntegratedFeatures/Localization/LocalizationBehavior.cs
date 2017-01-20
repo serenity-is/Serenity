@@ -1,6 +1,4 @@
-﻿using Serenity;
-using Serenity.Data;
-using Serenity.Data.Mapping;
+﻿using Serenity.Data;
 using Serenity.Reflection;
 using System;
 using System.Collections;
@@ -8,9 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-#if COREFX
 using System.Reflection;
-#endif
 
 namespace Serenity.Services
 {
@@ -34,7 +30,7 @@ namespace Serenity.Services
 
         public bool ActivateFor(Row row)
         {
-            attr = row.GetType().GetAttribute<LocalizationRowAttribute>();
+            attr = row.GetType().GetCustomAttribute<LocalizationRowAttribute>();
             if (attr == null)
                 return false;
 
