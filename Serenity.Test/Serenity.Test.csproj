@@ -416,7 +416,6 @@
     <Copy SourceFiles="$(ProjectDir)..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
   </Target>
   <Target Name="AfterBuild">
-    <Exec Command="npm run build" ContinueOnError="false" />
-    <Exec Command="&quot;$(TscToolPath)\$(TypeScriptToolsVersion)\$(TscToolExe)&quot; -project &quot;$(ProjectDir)tsconfig.json&quot;" ContinueOnError="false" />
+    <Exec Command="npm run tsc" ContinueOnError="false" />
   </Target>
 </Project>
