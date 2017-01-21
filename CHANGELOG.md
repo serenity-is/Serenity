@@ -1,3 +1,17 @@
+## 2.8.11 (2017-01-21)
+
+Features:
+  - Serin uses latest VSIX template from VSGallery instead of embedding a template in itself [Serene]
+  - Serin replaces connection strings to use Sqlite in OSX / Linux [Serene]
+  - Serene ASP.NET Core version now works with Sqlite (no code generation support yet) [Serene]
+  - Serene ASP.NET Core comes with Sqlite factory preconfigured
+  - Serene uses MsSqlLocalDB instance in Windows by default [Serene]
+  - increased speed of Sqlite migrations for Northwind dramatically
+
+Bugfixes:
+  - resolved problem with .NET Core and Sqlite with reader.GetBytes() as Microsoft.Data.Sqlite doesn't support it
+  - fixed Serenity.FluentMigrator and Sqlite compability problem about case sensitivity
+  
 ## 2.8.10 (2017-01-20)
 
 Bugfixes:
