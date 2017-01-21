@@ -29,10 +29,23 @@ namespace Serenity.Data
                 _setValue(row, null);
             else
             {
-                long available = reader.GetBytes(index, (long)0, null, 0, 0);                  
-                byte[] a = new byte[available];
-                if (a.Length > 0)
-                    reader.GetBytes(index, (long)0, a, 0, a.Length);
+                byte[] a;
+#if COREFX
+                if (reader.GetType().Name == "SqliteDataReader")
+                {
+                    a = (byte[])reader.GetValue(index);
+                }
+                else
+                {
+#endif
+                    long available = reader.GetBytes(index, (long)0, null, 0, 0);
+                    a = new byte[available];
+                    if (a.Length > 0)
+                        reader.GetBytes(index, (long)0, a, 0, a.Length);
+#if COREFX
+                }
+#endif
+
                 _setValue(row, new MemoryStream(a));
             }
 

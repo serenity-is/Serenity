@@ -21,6 +21,7 @@ namespace Serenity.Data
                 { "Npgsql", PostgresDialect.Instance },
                 { "MySql.Data.MySqlClient", MySqlDialect.Instance },
                 { "System.Data.SQLite", SqliteDialect.Instance },
+                { "Microsoft.Data.SQLite", SqliteDialect.Instance },
                 { "System.Data.OracleClient", OracleDialect.Instance },
                 { "Oracle.ManagedDataAccess.Client", OracleDialect.Instance }
             };
