@@ -2518,7 +2518,7 @@ var Serenity;
         }
         Widget.prototype.destroy = function () {
             this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
-            this.element.unbind('.' + this.widgetName).removeData(this.widgetName);
+            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
             this.asyncPromise = null;
         };

@@ -40,7 +40,7 @@
 
         public destroy(): void {
             this.element.removeClass('s-' + (ss as any).getTypeName((ss as any).getInstanceType(this)));
-            this.element.unbind('.' + this.widgetName).removeData(this.widgetName);
+            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
             this.asyncPromise = null;
         }
