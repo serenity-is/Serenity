@@ -44,7 +44,7 @@ namespace Serenity
 
             this.element.AddClass("s-DataGrid").Html("");
             this.element.AddClass("s-" + this.GetType().Name);
-            this.element.AddClass("require-layout").Bind("layout", delegate
+            this.element.AddClass("require-layout").Bind("layout." + this.uniqueName, delegate
             {
                 self.Layout();
             });
