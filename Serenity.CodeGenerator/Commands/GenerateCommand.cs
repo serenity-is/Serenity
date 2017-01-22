@@ -143,12 +143,19 @@ namespace Serenity.CodeGenerator
                 providerName = confConnection.ProviderName.TrimToNull();
             providerName = providerName ?? "System.Data.SqlClient";
 
-            // TODO: register other factories from config file?
             DbProviderFactories.RegisterFactory("System.Data.SqlClient", SqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", Microsoft.Data.Sqlite.SqliteFactory.Instance);
+            DbProviderFactories.RegisterFactory("Npgsql", Npgsql.NpgsqlFactory.Instance);
+            DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
+
+            ISchemaProvider schemaProvider;
 
             List<TableName> tableNames;
             using (var connection = SqlConnections.New(connectionString, providerName))
-                tableNames = SqlSchemaInfo.GetTableNames(connection);
+            {
+                schemaProvider = SqlSchemaInfo.GetSchemaProvider(connection.GetDialect().ServerType);
+                tableNames = schemaProvider.GetTableNames(connection).ToList();
+            }
 
             var tables = tableNames.Select(x => x.Tablename).ToList();
 
@@ -179,8 +186,9 @@ namespace Serenity.CodeGenerator
             }
 
             userInput = tables.Count == 1 ? tables[0] : null;
-            if (userInput == null && tables.Any(x => x.StartsWith("dbo.")))
-                userInput = "dbo.";
+            if (userInput == null && schemaProvider.DefaultSchema != null && 
+                tables.Any(x => x.StartsWith(schemaProvider.DefaultSchema + ".")))
+                userInput = schemaProvider.DefaultSchema + ".";
 
             if (outFile == null)
             {

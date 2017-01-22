@@ -10,6 +10,7 @@ namespace Serenity.CodeGenerator
     {
         public string Schema { get; set; }
         public string Table { get; set; }
+        public bool IsView { get; set; }
 
         public string Tablename
         {
@@ -20,34 +21,67 @@ namespace Serenity.CodeGenerator
         }
     }
 
+    public class FieldInfo
+    {
+        public string FieldName { get; set; }
+        public int Size { get; set; }
+        public int Scale { get; set; }
+        public bool IsPrimaryKey { get; set; }
+        public bool IsIdentity { get; set; }
+        public bool IsNullable { get; set; }
+        public string PKSchema { get; set; }
+        public string PKTable { get; set; }
+        public string PKColumn { get; set; }
+        public string DataType { get; set; }
+    }
+
+    public class ForeignKeyInfo
+    {
+        public string FKName;
+        public string FKSchema;
+        public string FKTable;
+        public string FKColumn;
+        public string PKSchema;
+        public string PKTable;
+        public string PKColumn;
+    }
+
     public class SqlSchemaInfo
     {
+        public static ISchemaProvider GetSchemaProvider(string serverType)
+        {
+            switch ((serverType ?? "").ToLowerInvariant())
+            {
+                case "firebird":
+                    return new FirebirdSchemaProvider();
+
+                case "mysql":
+                    return new MySqlSchemaProvider();
+
+                case "oracle":
+                    return new OracleSchemaProvider();
+
+                case "postgres":
+                    return new PostgresSchemaProvider();
+
+                case "sqlite":
+                    return new SqliteSchemaProvider();
+
+                case "sqlserver":
+                case "sqlserver2000":
+                case "sqlserver2005":
+                case "sqlserver2008":
+                case "sqlserver2012":
+                    return new SqlServerSchemaProvider();
+
+                default:
+                    throw new ArgumentOutOfRangeException("serverType", (object)serverType, "Unknown server type");
+            }
+        }
+
         public static string InformationSchema(IDbConnection connection)
         {
             return "INFORMATION_SCHEMA.";
-        }
-
-        public static List<TableName> GetTableNames(IDbConnection connection)
-        {
-            var query = "SELECT * FROM INFORMATION_SCHEMA.TABLES";
-            var tables = connection.Query(query);
-
-            bool sqlite = connection.GetDialect().ServerType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
-
-            if (sqlite)
-                query = "select name TABLE_NAME, type TABLE_TYPE, '' TABLE_SCHEMA from sqlite_master type='table' or type='view'";
-
-            var result = new List<TableName>();
-
-            foreach (IDictionary<string, object> row in tables)
-            {
-                var tableType = row["TABLE_TYPE"] as string;
-                var schema = row["TABLE_SCHEMA"] as string;
-                var tableName = row["TABLE_NAME"] as string;
-                result.Add(new TableName { Schema = schema, Table = tableName });
-            }
-
-            return result.OrderBy(x => x.Schema).ThenBy(x => x.Table).ToList();
         }
 
         public static List<string> GetTablePrimaryFields(IDbConnection connection, string schema, string tableName)
@@ -55,35 +89,7 @@ namespace Serenity.CodeGenerator
             var inf = InformationSchema(connection);
             List<string> primaryFields = new List<string>();
 
-            if (connection.GetDialect().ServerType == "Firebird")
-            {
-                var q = @"
-select
-cast(RC.RDB$RELATION_NAME as varchar(31)) as TABLE_NAME,
-cast(ISGMT.RDB$FIELD_NAME as varchar(31)) as COLUMN_NAME,
-CAST((ISGMT.RDB$FIELD_POSITION + 1) as SMALLINT) as KEY_SEQ,
-cast(RC.RDB$CONSTRAINT_NAME as varchar(31)) as PK_NAME
-from
-RDB$RELATION_CONSTRAINTS RC
-INNER JOIN RDB$INDEX_SEGMENTS ISGMT ON RC.RDB$INDEX_NAME = ISGMT.RDB$INDEX_NAME
-where CAST(RC.RDB$RELATION_NAME AS VARCHAR(40)) = '{0}' and
-RC.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY'
-order by 3";
-
-                foreach (IDictionary<string, object> k in connection.Query(String.Format(q, tableName)))
-                {
-                    primaryFields.Add((k["COLUMN_NAME"] as string).TrimEnd());
-                }
-
-                return primaryFields;
-            }
-
             var query = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=@schema and TABLE_NAME = @tableName";
-            bool sqlite = connection.GetDialect().ServerType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
-
-            if (sqlite)
-                query = "PRAGMA table_info(@tableName)";
-
             var columns = connection.Query(query, new
             {
                 schema,
@@ -202,35 +208,6 @@ order by 3";
             }
 
             return identityFields;
-        }
-
-        public static List<string> GetTableFieldNames(IDbConnection connection, string schema, string tableName)
-        {
-            var inf = InformationSchema(connection);
-            var list = new List<string>();
-            var dict = new Dictionary<string, int>();
-
-            var query = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=@schema and TABLE_NAME = @tableName";
-            bool sqlite = connection.GetDialect().ServerType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
-
-            if (sqlite)
-                query = "PRAGMA table_info(@tableName)";
-
-            var columns = connection.Query(query, new
-            {
-                schema,
-                tableName
-            });
-
-            foreach (IDictionary<string, object> row in columns)
-            {
-                var col = (string)row["COLUMN_NAME"];
-                dict[col] = (int)row["ORDINAL_POSITION"];
-                list.Add(col);
-            }
-            list.Sort((x, y) => dict[x].CompareTo(dict[y]));
-
-            return list;
         }
 
         public static List<ForeignKeyInfo> GetTableSingleFieldForeignKeys(IDbConnection connection, string schema, string tableName)
@@ -485,7 +462,7 @@ order by 1, 5";
             var order = new Dictionary<string, int>();
 
             if (!columns.Any())
-                return new List<CodeGenerator.SqlSchemaInfo.FieldInfo>();
+                return new List<FieldInfo>();
 
             var first = columns.First() as IDictionary<string, object>;
 
@@ -584,31 +561,6 @@ order by 1, 5";
             }
 
             return fieldInfos;
-        }
-
-        public class FieldInfo
-        {
-            public string FieldName;
-            public int Size;
-            public int Scale;
-            public bool IsPrimaryKey;
-            public bool IsIdentity;
-            public bool IsNullable;
-            public string PKSchema;
-            public string PKTable;
-            public string PKColumn;
-            public string DataType;
-        }
-
-        public class ForeignKeyInfo
-        {
-            public string FKName;
-            public string FKSchema;
-            public string FKTable;
-            public string FKColumn;
-            public string PKSchema;
-            public string PKTable;
-            public string PKColumn;
         }
 
         const string SqlBit = "bit";

@@ -75,7 +75,7 @@ namespace Serenity.CodeGenerator
             return "any";
         }
 
-        private static EntityField ToEntityField(SqlSchemaInfo.FieldInfo fieldInfo, int prefixLength)
+        private static EntityField ToEntityField(FieldInfo fieldInfo, int prefixLength)
         {
             string flags;
             if (fieldInfo.IsIdentity)

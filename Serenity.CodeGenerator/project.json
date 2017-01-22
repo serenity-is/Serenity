@@ -13,7 +13,10 @@
     }
   },
   "dependencies": {
+    "FirebirdSql.Data.FirebirdClient": "5.7.0",
+    "Microsoft.Data.Sqlite": "1.1.0",
     "Newtonsoft.Json": "9.0.1",
+    "Npgsql": "3.1.9",
     "Serenity.Web": "2.8.11-*"
   },
   "frameworks": {
