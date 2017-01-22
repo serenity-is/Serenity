@@ -26,12 +26,33 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
         {
-            return new List<string>();
+            return connection.Query<string>(@"
+                    SELECT COLUMN_NAME  
+                    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS tc  
+                    INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS ku  
+                    USING(constraint_name,table_schema,table_name)
+                    WHERE tc.CONSTRAINT_TYPE = 'PRIMARY KEY'  
+                    AND tc.CONSTRAINT_NAME = ku.CONSTRAINT_NAME  
+                    AND ku.TABLE_SCHEMA = Database()  
+                    AND ku.TABLE_NAME = @tbl  
+                    ORDER BY ku.ORDINAL_POSITION",
+                new
+                {
+                    tbl = table
+                });
         }
 
         public IEnumerable<TableName> GetTableNames(IDbConnection connection)
         {
-            return new List<TableName>();
+            return connection.Query(
+                    "SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES " +
+                    "WHERE TABLE_SCHEMA = Database() " +
+                    "ORDER BY TABLE_SCHEMA, TABLE_NAME")
+                .Select(x => new TableName
+                {
+                    Table = x.TABLE_NAME,
+                    IsView = x.TABLE_TYPE == "VIEW"
+                });
         }
     }
 }
