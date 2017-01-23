@@ -367,6 +367,7 @@ declare namespace Slick {
         setFilter(filter: RemoteViewFilter<TEntity>): void;
         setItems(items: any[], fullReset: boolean): void;
         getItemById(id: any): TEntity;
+        getRowById(id: any): number;
         updateItem(id: any, item: TEntity): void;
         addItem(item: TEntity): void;
         getIdxById(id: any): any;
