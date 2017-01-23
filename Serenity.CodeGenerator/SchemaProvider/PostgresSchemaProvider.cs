@@ -21,7 +21,15 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
         {
-            return new List<string>();
+            return connection.Query<string>(@"
+                SELECT column_name, column_default 
+                FROM information_schema.COLUMNS 
+                WHERE TABLE_SCHEMA = @sma AND TABLE_NAME = @tbl 
+                AND column_default like 'nextval(%'", new
+            {
+                sma = schema,
+                tbl = table
+            });
         }
 
         public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)

@@ -84,132 +84,6 @@ namespace Serenity.CodeGenerator
             return "INFORMATION_SCHEMA.";
         }
 
-        public static List<string> GetTablePrimaryFields(IDbConnection connection, string schema, string tableName)
-        {
-            var inf = InformationSchema(connection);
-            List<string> primaryFields = new List<string>();
-
-            var query = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=@schema and TABLE_NAME = @tableName";
-            var columns = connection.Query(query, new
-            {
-                schema,
-                tableName
-            });
-
-            foreach (IDictionary<string, object> column in columns)
-            {
-                try
-                {
-                    var isPrimaryKey = column["PRIMARY_KEY"] as Boolean?;
-                    if (isPrimaryKey == true)
-                        primaryFields.Add(column["COLUMN_NAME"] as string);
-                }
-                catch
-                {
-                    break;
-                }
-
-                return primaryFields;
-            }
-
-            if (connection.GetDialect().ServerType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase) ||
-                connection.GetDialect().ServerType.StartsWith("SqlServer", StringComparison.OrdinalIgnoreCase))
-            {
-                var query2 = new SqlQuery().Select(
-                        "KCU.COLUMN_NAME")
-                    .From(
-                        inf + "TABLE_CONSTRAINTS AS TC INNER JOIN " +
-                        inf + "KEY_COLUMN_USAGE AS KCU " +
-                        "ON KCU.CONSTRAINT_SCHEMA = TC.CONSTRAINT_SCHEMA AND " +
-                        "KCU.CONSTRAINT_NAME = TC.CONSTRAINT_NAME AND " +
-                        "KCU.TABLE_SCHEMA = TC.TABLE_SCHEMA AND " +
-                        "KCU.TABLE_NAME = TC.TABLE_NAME")
-                    .Where(
-                        new Criteria("TC.CONSTRAINT_TYPE") == "PRIMARY KEY" &
-                        new Criteria("KCU.TABLE_NAME") == tableName)
-                    .OrderBy(
-                        "KCU.ORDINAL_POSITION");
-
-                query2.ForEach(connection, delegate(IDataReader reader)
-                {
-                    primaryFields.Add(reader.GetString(0));
-                });
-            }
-
-            return primaryFields;
-        }
-
-        public static List<string> GetTableIdentityFields(IDbConnection connection, string schema, string tableName)
-        {
-            var identityFields = new List<string>();
-
-            if (connection.GetDialect().ServerType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase))
-                return identityFields;
-
-            var query = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=@schema and TABLE_NAME = @tableName";
-            bool sqlite = connection.GetDialect().ServerType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
-
-            if (sqlite)
-                query = "PRAGMA table_info(@tableName)";
-
-            var columns = connection.Query(query, new
-            {
-                schema,
-                tableName
-            });
-
-            if (connection.GetDialect().ServerType.StartsWith("Postgres", StringComparison.OrdinalIgnoreCase))
-            {
-                foreach (IDictionary<string, object> row in columns)
-                {
-                    var defaultValue = row["column_default"] as string;
-                    if (defaultValue != null && defaultValue.IndexOf("nextval(") > 0)
-                        identityFields.Add(row["COLUMN_NAME"] as string);
-                }
-
-                return identityFields;
-            }
-
-            if (connection.GetDialect().ServerType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase))
-            {
-                foreach (IDictionary<string, object> row in columns)
-                {
-                    var isIdentity = (row["EXTRA"] as string) == "auto_increment";
-                    if (isIdentity == true)
-                        identityFields.Add((string)row["COLUMN_NAME"]);
-                }
-
-                return identityFields;
-            }
-
-            foreach (IDictionary<string, object> row in columns)
-            {
-                var isIdentity = row.ContainsKey("AUTOINCREMENT") && row["AUTOINCREMENT"] as Boolean? == true;
-                if (isIdentity == true)
-                    identityFields.Add((string)row["COLUMN_NAME"]);
-            }
-
-            if (connection.GetDialect().ServerType.StartsWith("SqlServer", StringComparison.OrdinalIgnoreCase))
-            {
-                new SqlQuery().Select(
-                    "C.NAME")
-                .From(
-                    "syscolumns C " +
-                    "LEFT OUTER JOIN sysobjects T " +
-                    "ON (C.id = T.id)")
-                .Where(
-                    new Criteria("C.STATUS & 128") == 128 &
-                    new Criteria("T.NAME") == tableName &
-                    new Criteria("T.XTYPE") == "U")
-                .ForEach(connection, delegate (IDataReader reader)
-                {
-                    identityFields.Add(reader.GetString(0));
-                });
-            }
-
-            return identityFields;
-        }
-
         public static List<ForeignKeyInfo> GetTableSingleFieldForeignKeys(IDbConnection connection, string schema, string tableName)
         {
             var inf = InformationSchema(connection);
@@ -445,8 +319,9 @@ order by 1, 5";
             var inf = InformationSchema(connection);
             List<FieldInfo> fieldInfos = new List<FieldInfo>();
             List<ForeignKeyInfo> foreignKeys = GetTableSingleFieldForeignKeys(connection, schema, tableName);
-            List<string> primaryFields = GetTablePrimaryFields(connection, schema, tableName);
-            List<string> identityFields = GetTableIdentityFields(connection, schema, tableName);
+            var schemaProvider = GetSchemaProvider(connection.GetDialect().ServerType);
+            List<string> primaryFields = schemaProvider.GetPrimaryKeyFields(connection, schema, tableName).ToList();
+            List<string> identityFields = schemaProvider.GetIdentityFields(connection, schema, tableName).ToList();
 
             var query = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=@schema and TABLE_NAME = @tableName";
             bool sqlite = connection.GetDialect().ServerType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);

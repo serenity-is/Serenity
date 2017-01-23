@@ -22,7 +22,16 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
         {
-            return new List<string>();
+            var fields = connection.Query("PRAGMA table_info([" + table + "])")
+                .Where(x => (int)x.pk > 0);
+
+            if (fields.Count() == 1 &&
+                (string)fields.First().type == "INTEGER")
+            {
+                return new List<string> { (string)fields.First().name };
+            };
+
+            return new List<string> { "ROWID" };
         }
 
         public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
