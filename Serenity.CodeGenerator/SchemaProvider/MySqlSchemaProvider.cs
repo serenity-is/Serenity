@@ -16,7 +16,22 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
         {
-            return new List<ForeignKeyInfo>();
+            return connection.Query<ForeignKeyInfo>(@"
+                SELECT 
+                    i.CONSTRAINT_NAME FKName,
+                    k.COLUMN_NAME FKColumn, 
+                    CASE WHEN k.REFERENCED_TABLE_SCHEMA = Database() THEN NULL 
+                        ELSE k.REFERENCED_TABLE_SCHEMA END PKSchema, 
+                    k.REFERENCED_TABLE_NAME PKTable,
+                    k.REFERENCED_COLUMN_NAME PKColumn
+                FROM information_schema.TABLE_CONSTRAINTS i
+                LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                AND i.TABLE_SCHEMA = Database()
+                AND i.TABLE_NAME = @tbl", new
+            {
+                tbl = table
+            });
         }
 
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)

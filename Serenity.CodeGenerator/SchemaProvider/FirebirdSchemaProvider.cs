@@ -20,8 +20,6 @@ namespace Serenity.CodeGenerator
                 SELECT
                     PK.RDB$RELATION_NAME as PKTable,
                     ISP.RDB$FIELD_NAME as PKColumn,
-                    FK.RDB$RELATION_NAME as FKTable,
-                    ISF.RDB$FIELD_NAME as FKColumn,
                     FK.RDB$CONSTRAINT_NAME as FKName
                 FROM
                     RDB$RELATION_CONSTRAINTS PK, 
@@ -41,7 +39,6 @@ namespace Serenity.CodeGenerator
             }).Select(x =>
             {
                 x.FKName = x.FKName.TrimToNull();
-                x.FKTable = x.FKTable.TrimToNull();
                 x.FKColumn = x.FKColumn.TrimToNull();
                 x.PKColumn = x.PKColumn.TrimToNull();
                 x.PKTable = x.PKTable.TrimToNull();

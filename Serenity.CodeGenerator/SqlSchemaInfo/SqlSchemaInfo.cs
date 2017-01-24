@@ -38,8 +38,6 @@ namespace Serenity.CodeGenerator
     public class ForeignKeyInfo
     {
         public string FKName;
-        public string FKSchema;
-        public string FKTable;
         public string FKColumn;
         public string PKSchema;
         public string PKTable;
@@ -101,7 +99,6 @@ namespace Serenity.CodeGenerator
                         {
                             ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
 
-                            foreignKeyInfo.FKTable = tableName;
                             foreignKeyInfo.FKColumn = reader.GetString(3);
                             foreignKeyInfo.PKTable = reader.GetString(2);
                             foreignKeyInfo.PKColumn = reader.GetString(4);
@@ -154,7 +151,6 @@ order by 1, 5";
                         {
                             ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
 
-                            foreignKeyInfo.FKTable = tableName;
                             foreignKeyInfo.FKColumn = reader.GetString(3).TrimEnd();
                             foreignKeyInfo.PKTable = reader.GetString(0).TrimEnd();
                             foreignKeyInfo.PKColumn = reader.GetString(1).TrimEnd();
@@ -213,8 +209,6 @@ order by 1, 5";
                         var foreignKeyInfo = new ForeignKeyInfo
                         {
                             FKName = fkName,
-                            FKSchema = fk.source_schema,
-                            FKTable = fk.source_table,
                             FKColumn = fk.source_column,
                             PKSchema = fk.target_schema,
                             PKTable = fk.target_table,
@@ -251,7 +245,6 @@ order by 1, 5";
                     {
                         ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
 
-                        foreignKeyInfo.FKTable = tableName;
                         foreignKeyInfo.FKColumn = reader.GetString(0);
                         foreignKeyInfo.PKTable = reader.GetString(1);
                         foreignKeyInfo.PKColumn = reader.GetString(2);
