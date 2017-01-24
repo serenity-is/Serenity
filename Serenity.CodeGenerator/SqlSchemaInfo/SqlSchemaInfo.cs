@@ -3,318 +3,39 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.CodeGenerator
 {
-    public class TableName
-    {
-        public string Schema { get; set; }
-        public string Table { get; set; }
-        public bool IsView { get; set; }
-
-        public string Tablename
-        {
-            get
-            {
-                return Schema.IsEmptyOrNull() ? Table : Schema + "." + Table;
-            }
-        }
-    }
-
-    public class FieldInfo
-    {
-        public string FieldName { get; set; }
-        public int Size { get; set; }
-        public int Scale { get; set; }
-        public bool IsPrimaryKey { get; set; }
-        public bool IsIdentity { get; set; }
-        public bool IsNullable { get; set; }
-        public string PKSchema { get; set; }
-        public string PKTable { get; set; }
-        public string PKColumn { get; set; }
-        public string DataType { get; set; }
-    }
-
-    public class ForeignKeyInfo
-    {
-        public string FKName;
-        public string FKColumn;
-        public string PKSchema;
-        public string PKTable;
-        public string PKColumn;
-    }
-
     public class SqlSchemaInfo
     {
         public static ISchemaProvider GetSchemaProvider(string serverType)
         {
-            switch ((serverType ?? "").ToLowerInvariant())
-            {
-                case "firebird":
-                    return new FirebirdSchemaProvider();
+            var providerType = Type.GetType("Serenity.CodeGenerator." + serverType + "SchemaProvider");
+            if (providerType == null || typeof(ISchemaProvider).GetTypeInfo().IsAssignableFrom(providerType))
+                throw new ArgumentOutOfRangeException("serverType", (object)serverType, "Unknown server type");
 
-                case "mysql":
-                    return new MySqlSchemaProvider();
-
-                case "oracle":
-                    return new OracleSchemaProvider();
-
-                case "postgres":
-                    return new PostgresSchemaProvider();
-
-                case "sqlite":
-                    return new SqliteSchemaProvider();
-
-                case "sqlserver":
-                case "sqlserver2000":
-                case "sqlserver2005":
-                case "sqlserver2008":
-                case "sqlserver2012":
-                    return new SqlServerSchemaProvider();
-
-                default:
-                    throw new ArgumentOutOfRangeException("serverType", (object)serverType, "Unknown server type");
-            }
+            return (ISchemaProvider)Activator.CreateInstance(providerType);
         }
 
-        public static string InformationSchema(IDbConnection connection)
+        public static List<ForeignKeyInfo> GetSingleFieldForeignKeys(IDbConnection connection, string schema, string tableName,
+            ISchemaProvider schemaProvider = null)
         {
-            return "INFORMATION_SCHEMA.";
+            schemaProvider = schemaProvider ?? GetSchemaProvider(connection.GetDialect().ServerType);
+            return schemaProvider.GetForeignKeys(connection, schema, tableName)
+                .ToLookup(x => x.FKName)
+                .Where(x => x.Count() == 1)
+                .SelectMany(x => x)
+                .ToList();
         }
-
-        public static List<ForeignKeyInfo> GetTableSingleFieldForeignKeys(IDbConnection connection, string schema, string tableName)
-        {
-            var inf = InformationSchema(connection);
-            List<ForeignKeyInfo> foreignKeyInfos = new List<ForeignKeyInfo>();
-
-            if (connection.GetDialect().ServerType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase))
-            {
-                try
-                {
-                    using (var reader = 
-                        SqlHelper.ExecuteReader(connection, 
-                        (String.Format("PRAGMA foreign_key_list({0});", tableName))))
-                    {
-                        while (reader.Read())
-                        {
-                            ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
-
-                            foreignKeyInfo.FKColumn = reader.GetString(3);
-                            foreignKeyInfo.PKTable = reader.GetString(2);
-                            foreignKeyInfo.PKColumn = reader.GetString(4);
-
-                            foreignKeyInfos.Add(foreignKeyInfo);
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                }
-
-                return foreignKeyInfos;
-            }
-
-            if (connection.GetDialect().ServerType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase))
-            {
-                var query = @"
-select 
- PK.RDB$RELATION_NAME as PKTABLE_NAME
-,ISP.RDB$FIELD_NAME as PKCOLUMN_NAME
-,FK.RDB$RELATION_NAME as FKTABLE_NAME
-,ISF.RDB$FIELD_NAME as FKCOLUMN_NAME
-,(ISP.RDB$FIELD_POSITION + 1) as KEY_SEQ
-,RC.RDB$UPDATE_RULE as UPDATE_RULE
-,RC.RDB$DELETE_RULE as DELETE_RULE
-,PK.RDB$CONSTRAINT_NAME as PK_NAME
-,FK.RDB$CONSTRAINT_NAME as FK_NAME
-from
- RDB$RELATION_CONSTRAINTS PK
-,RDB$RELATION_CONSTRAINTS FK
-,RDB$REF_CONSTRAINTS RC
-,RDB$INDEX_SEGMENTS ISP
-,RDB$INDEX_SEGMENTS ISF
-WHERE FK.RDB$RELATION_NAME = '{0}' and 
- FK.RDB$CONSTRAINT_NAME = RC.RDB$CONSTRAINT_NAME 
-and PK.RDB$CONSTRAINT_NAME = RC.RDB$CONST_NAME_UQ 
-and ISP.RDB$INDEX_NAME = PK.RDB$INDEX_NAME 
-and ISF.RDB$INDEX_NAME = FK.RDB$INDEX_NAME 
-and ISP.RDB$FIELD_POSITION = ISF.RDB$FIELD_POSITION 
-order by 1, 5";
-
-                try
-                {
-                    using (var reader =
-                        SqlHelper.ExecuteReader(connection,
-                        (String.Format(query, tableName))))
-                    {
-                        while (reader.Read())
-                        {
-                            ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
-
-                            foreignKeyInfo.FKColumn = reader.GetString(3).TrimEnd();
-                            foreignKeyInfo.PKTable = reader.GetString(0).TrimEnd();
-                            foreignKeyInfo.PKColumn = reader.GetString(1).TrimEnd();
-
-                            foreignKeyInfos.Add(foreignKeyInfo);
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                }
-
-                return foreignKeyInfos;
-            }
-
-            if (connection.GetDialect().ServerType.StartsWith("Postgres", StringComparison.OrdinalIgnoreCase))
-            {
-                try
-                {
-                    var list = connection.Query(
-                        @"SELECT * FROM (
-                            SELECT
-                                o.conname AS constraint_name,
-                                (SELECT nspname FROM pg_namespace WHERE oid=m.relnamespace) AS source_schema,
-                                m.relname AS source_table,
-                                (SELECT a.attname FROM pg_attribute a WHERE a.attrelid = m.oid AND a.attnum = o.conkey[1] AND a.attisdropped = false) AS source_column,
-                                (SELECT nspname FROM pg_namespace WHERE oid=f.relnamespace) AS target_schema,
-                                f.relname AS target_table,
-                                (SELECT a.attname FROM pg_attribute a WHERE a.attrelid = f.oid AND a.attnum = o.confkey[1] AND a.attisdropped = false) AS target_column
-                            FROM
-                                pg_constraint o LEFT JOIN pg_class c ON c.oid = o.conrelid
-                                LEFT JOIN pg_class f ON f.oid = o.confrelid LEFT JOIN pg_class m ON m.oid = o.conrelid
-                            WHERE
-                                o.contype = 'f' AND o.conrelid IN (SELECT oid FROM pg_class c WHERE c.relkind = 'r')) x
-                        WHERE source_schema = @sh AND source_table = @tb
-                        ORDER BY constraint_name", new { sh = schema, tb = tableName }).ToList();
-
-
-                    foreach (var fk in list)
-                    {
-                        string priorName = "";
-                        bool priorDeleted = false;
-
-                        // eğer bir önceki ile aynıysa bunu listeye ekleme ve öncekini de sil
-                        var fkName = fk.constraint_name as string;
-                        if (priorName == fkName)
-                        {
-                            if (!priorDeleted)
-                            {
-                                foreignKeyInfos.RemoveAt(foreignKeyInfos.Count - 1);
-                                priorDeleted = true;
-                            }
-                            continue;
-                        }
-
-                        var foreignKeyInfo = new ForeignKeyInfo
-                        {
-                            FKName = fkName,
-                            FKColumn = fk.source_column,
-                            PKSchema = fk.target_schema,
-                            PKTable = fk.target_table,
-                            PKColumn = fk.target_column
-                        };
-
-                        foreignKeyInfos.Add(foreignKeyInfo);
-                        priorDeleted = false;
-                        priorName = foreignKeyInfo.FKName;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ex.Log();
-                }
-
-                return foreignKeyInfos;
-            }
-
-            if (connection.GetDialect().ServerType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase))
-            {
-                using (var reader =
-                    SqlHelper.ExecuteReader(connection,
-                    (String.Format(@"
-                        SELECT k.COLUMN_NAME, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME
-                        FROM information_schema.TABLE_CONSTRAINTS i
-                        LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
-                        WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
-                        AND i.TABLE_SCHEMA = '{0}'
-                        AND i.TABLE_NAME = '{1}'"
-                    , schema, tableName))))
-                {
-                    while (reader.Read())
-                    {
-                        ForeignKeyInfo foreignKeyInfo = new ForeignKeyInfo();
-
-                        foreignKeyInfo.FKColumn = reader.GetString(0);
-                        foreignKeyInfo.PKTable = reader.GetString(1);
-                        foreignKeyInfo.PKColumn = reader.GetString(2);
-                        foreignKeyInfos.Add(foreignKeyInfo);
-                    }
-                }
-
-                return foreignKeyInfos;
-            }
-
-            if (connection.GetDialect().ServerType.StartsWith("SqlServer", StringComparison.OrdinalIgnoreCase))
-            {
-                var c = new Alias(inf + "REFERENTIAL_CONSTRAINTS", "c");
-                var fk = new Alias(inf + "CONSTRAINT_COLUMN_USAGE", "fk");
-                var pk = new Alias(inf + "KEY_COLUMN_USAGE", "pk");
-
-                var list = connection.Query<ForeignKeyInfo>(new SqlQuery()
-                    .From(c)
-                    .From(fk)
-                    .From(pk)
-                    .Where(
-                        fk._("TABLE_SCHEMA") == schema &
-                        fk._("TABLE_NAME") == tableName &
-                        fk._("CONSTRAINT_SCHEMA") == c._("CONSTRAINT_SCHEMA") &
-                        fk._("CONSTRAINT_NAME") == c._("CONSTRAINT_NAME") &
-                        pk._("CONSTRAINT_SCHEMA") == c._("UNIQUE_CONSTRAINT_SCHEMA") &
-                        pk._("CONSTRAINT_NAME") == c._("UNIQUE_CONSTRAINT_NAME"))
-                    .Select(fk["CONSTRAINT_NAME"], "FKName")
-                    .Select(fk["TABLE_SCHEMA"], "FKSchema")
-                    .Select(fk["TABLE_NAME"], "FKTable")
-                    .Select(fk["COLUMN_NAME"], "FKColumn")
-                    .Select(pk["TABLE_SCHEMA"], "PKSchema")
-                    .Select(pk["TABLE_NAME"], "PKTable")
-                    .Select(pk["COLUMN_NAME"], "PKColumn")
-                    .OrderBy(fk["CONSTRAINT_NAME"]));
-                    
-                foreach (var foreignKeyInfo in list)
-                {
-                    string priorName = "";
-                    bool priorDeleted = false;
-
-                    // eğer bir önceki ile aynıysa bunu listeye ekleme ve öncekini de sil
-                    if (priorName == foreignKeyInfo.FKName)
-                    {
-                        if (!priorDeleted)
-                        {
-                            foreignKeyInfos.RemoveAt(foreignKeyInfos.Count - 1);
-                            priorDeleted = true;
-                        }
-                        continue;
-                    }
-
-                    foreignKeyInfos.Add(foreignKeyInfo);
-                    priorDeleted = false;
-                    priorName = foreignKeyInfo.FKName;
-                }
-            }
-
-            return foreignKeyInfos;
-        }
-
 
         public static List<FieldInfo> GetTableFieldInfos(IDbConnection connection, string schema, string tableName)
         {
-            var inf = InformationSchema(connection);
-            List<FieldInfo> fieldInfos = new List<FieldInfo>();
-            List<ForeignKeyInfo> foreignKeys = GetTableSingleFieldForeignKeys(connection, schema, tableName);
             var schemaProvider = GetSchemaProvider(connection.GetDialect().ServerType);
+            List<FieldInfo> fieldInfos = new List<FieldInfo>();
             List<string> primaryFields = schemaProvider.GetPrimaryKeyFields(connection, schema, tableName).ToList();
             List<string> identityFields = schemaProvider.GetIdentityFields(connection, schema, tableName).ToList();
+            var singleFieldForeignKeys = GetSingleFieldForeignKeys(connection, schema, tableName, schemaProvider);
 
             var query = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=@schema and TABLE_NAME = @tableName";
             bool sqlite = connection.GetDialect().ServerType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
@@ -417,7 +138,7 @@ order by 1, 5";
 
             foreach (FieldInfo fieldInfo in fieldInfos)
             {
-                ForeignKeyInfo foreignKey = foreignKeys.Find(
+                ForeignKeyInfo foreignKey = singleFieldForeignKeys.Find(
                     delegate(ForeignKeyInfo d) { return d.FKColumn == fieldInfo.FieldName; });
 
                 if (foreignKey != null)

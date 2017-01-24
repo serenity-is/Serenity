@@ -130,7 +130,7 @@ namespace Serenity.CodeGenerator
             model.Instance = true;
 
             var fields = SqlSchemaInfo.GetTableFieldInfos(connection, tableSchema, table);
-            var foreigns = SqlSchemaInfo.GetTableSingleFieldForeignKeys(connection, tableSchema, table);
+            var foreigns = SqlSchemaInfo.GetSingleFieldForeignKeys(connection, tableSchema, table);
 
             var prefix = DeterminePrefixLength(fields, x => x.FieldName);
 
