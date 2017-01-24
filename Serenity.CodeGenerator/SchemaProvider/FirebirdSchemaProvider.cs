@@ -16,7 +16,37 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
         {
-            return new List<ForeignKeyInfo>();
+            return connection.Query<ForeignKeyInfo>(@"
+                SELECT
+                    PK.RDB$RELATION_NAME as PKTable,
+                    ISP.RDB$FIELD_NAME as PKColumn,
+                    FK.RDB$RELATION_NAME as FKTable,
+                    ISF.RDB$FIELD_NAME as FKColumn,
+                    FK.RDB$CONSTRAINT_NAME as FKName
+                FROM
+                    RDB$RELATION_CONSTRAINTS PK, 
+                    RDB$RELATION_CONSTRAINTS FK, 
+                    RDB$REF_CONSTRAINTS RC, 
+                    RDB$INDEX_SEGMENTS ISP, 
+                    RDB$INDEX_SEGMENTS ISF
+                    WHERE FK.RDB$RELATION_NAME = @tbl
+                    AND FK.RDB$CONSTRAINT_NAME = RC.RDB$CONSTRAINT_NAME
+                    AND PK.RDB$CONSTRAINT_NAME = RC.RDB$CONST_NAME_UQ
+                    AND ISP.RDB$INDEX_NAME = PK.RDB$INDEX_NAME
+                    AND ISF.RDB$INDEX_NAME = FK.RDB$INDEX_NAME
+                    AND ISP.RDB$FIELD_POSITION = ISF.RDB$FIELD_POSITION
+                    ORDER BY ISP.RDB$FIELD_POSITION", new
+            {
+                tbl = table
+            }).Select(x =>
+            {
+                x.FKName = x.FKName.TrimToNull();
+                x.FKTable = x.FKTable.TrimToNull();
+                x.FKColumn = x.FKColumn.TrimToNull();
+                x.PKColumn = x.PKColumn.TrimToNull();
+                x.PKTable = x.PKTable.TrimToNull();
+                return x;
+            });
         }
 
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
