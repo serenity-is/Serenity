@@ -16,7 +16,24 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
         {
-            return new List<ForeignKeyInfo>();
+            return connection.Query<ForeignKeyInfo>(@"
+                SELECT
+                    o.conname AS FKName,
+                    (SELECT a.attname FROM pg_attribute a WHERE a.attrelid = m.oid AND a.attnum = o.conkey[1] AND a.attisdropped = false) AS FKColumn,
+                    (SELECT nspname FROM pg_namespace WHERE oid=f.relnamespace) AS PKSchema,
+                    f.relname AS PKTable,
+                    (SELECT a.attname FROM pg_attribute a WHERE a.attrelid = f.oid AND a.attnum = o.confkey[1] AND a.attisdropped = false) AS PKColumn
+                FROM
+                    pg_constraint o LEFT JOIN pg_class c ON c.oid = o.conrelid
+                    LEFT JOIN pg_class f ON f.oid = o.confrelid LEFT JOIN pg_class m ON m.oid = o.conrelid
+                WHERE
+                    o.contype = 'f' AND o.conrelid IN (SELECT oid FROM pg_class c WHERE c.relkind = 'r')
+                    AND (SELECT nspname FROM pg_namespace WHERE oid=m.relnamespace) = @sma
+                    AND m.relname = @tbl", new
+            {
+                sma = schema,
+                tbl = table
+            });
         }
 
         public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
