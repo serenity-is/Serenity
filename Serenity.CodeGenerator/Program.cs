@@ -8,16 +8,6 @@ namespace Serenity.CodeGenerator
 {
     public class Program
     {
-        private static string[] skipPackages = new[]
-        {
-            "Microsoft.",
-            "System.",
-            "Newtonsoft.",
-            "EPPlus",
-            "FastMember",
-            "MailKit"
-        };
-
         public static void Main(string[] args)
         {
             string command = null;

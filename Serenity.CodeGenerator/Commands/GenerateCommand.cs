@@ -147,14 +147,18 @@ namespace Serenity.CodeGenerator
             DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", Microsoft.Data.Sqlite.SqliteFactory.Instance);
             DbProviderFactories.RegisterFactory("Npgsql", Npgsql.NpgsqlFactory.Instance);
             DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
-            //DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
+
+            if (connectionString.IndexOf("../../..") >= 0)
+                connectionString = connectionString.Replace("../../..", Path.GetDirectoryName(projectJson));
+            else if (connectionString.IndexOf(@"..\..\..\") >= 0)
+                connectionString = connectionString.Replace(@"..\..\..\", Path.GetDirectoryName(projectJson));
 
             ISchemaProvider schemaProvider;
-
             List<TableName> tableNames;
             using (var connection = SqlConnections.New(connectionString, providerName))
             {
-                schemaProvider = SqlSchemaInfo.GetSchemaProvider(connection.GetDialect().ServerType);
+                schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
                 tableNames = schemaProvider.GetTableNames(connection).ToList();
             }
 

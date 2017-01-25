@@ -9,13 +9,6 @@ namespace Serenity.CodeGenerator
 {
     public class RowGenerator
     {
-        public static string Generate(IDbConnection connection, string tableSchema, string table, string module, 
-            string connectionKey, string entityClass, string permission, GeneratorConfig config)
-        {
-            var model = GenerateModel(connection, tableSchema, table, module, connectionKey, entityClass, permission, config);
-            return Templates.Render(new Views.EntityRow(), model);
-        }
-
         private static int DeterminePrefixLength<T>(IEnumerable<T> list, Func<T, string> getName)
         {
             if (!Enumerable.Any<T>(list))
@@ -90,7 +83,7 @@ namespace Serenity.CodeGenerator
                 flags = null;
 
             string dataType;
-            var fieldType = SqlSchemaInfo.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out dataType);
+            var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out dataType);
             dataType = dataType ?? fieldType;
             return new EntityField
             {
@@ -124,26 +117,57 @@ namespace Serenity.CodeGenerator
             var className = entityClass ?? ClassNameFromTableName(table);
             model.ClassName = className;
             model.RowClassName = className + "Row";
+            model.Title = Inflector.Inflector.Titleize(className);
             model.Tablename = table;
             model.Fields = new List<EntityField>();
             model.Joins = new List<EntityJoin>();
             model.Instance = true;
 
-            var fields = SqlSchemaInfo.GetTableFieldInfos(connection, tableSchema, table);
-            var foreigns = SqlSchemaInfo.GetSingleFieldForeignKeys(connection, tableSchema, table);
+            var schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
+            var fields = schemaProvider.GetFieldInfos(connection, tableSchema, table).ToList();
+            if (!fields.Any(x => x.IsPrimaryKey))
+            {
+                var primaryKeys = new HashSet<string>(schemaProvider.GetPrimaryKeyFields(connection, tableSchema, table));
+                foreach (var field in fields)
+                    field.IsPrimaryKey = primaryKeys.Contains(field.FieldName);
+            }
+
+            if (!fields.Any(x => x.IsIdentity))
+            {
+                var identities = new HashSet<string>(schemaProvider.GetIdentityFields(connection, tableSchema, table));
+                foreach (var field in fields)
+                    field.IsIdentity = identities.Contains(field.FieldName);
+            }
+
+            var foreigns = schemaProvider.GetForeignKeys(connection, tableSchema, table)
+                .ToLookup(x => x.FKName)
+                .Where(x => x.Count() == 1)
+                .SelectMany(x => x)
+                .ToList();
+
+            foreach (var field in fields)
+            {
+                var fk = foreigns.FirstOrDefault(x => x.FKColumn == field.FieldName);
+                if (fk != null)
+                {
+                    field.PKSchema = fk.PKSchema;
+                    field.PKTable = fk.PKTable;
+                    field.PKColumn = fk.PKColumn;
+                }
+            }
 
             var prefix = DeterminePrefixLength(fields, x => x.FieldName);
 
             model.FieldPrefix = fields.First().FieldName.Substring(0, prefix);
 
-            var identity = fields.Find(f => f.IsIdentity == true);
+            var identity = fields.FirstOrDefault(f => f.IsIdentity == true);
             if (identity == null)
-                identity = fields.Find(f => f.IsPrimaryKey == true);
+                identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true);
             if (identity != null)
                 model.Identity = GenerateVariableName(identity.FieldName.Substring(prefix));
             else
             {
-                identity = fields.Find(f => f.IsPrimaryKey == true);
+                identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true);
                 if (identity != null)
                     model.Identity = GenerateVariableName(identity.FieldName.Substring(prefix));
             }
@@ -160,7 +184,7 @@ namespace Serenity.CodeGenerator
                 foreach (var s in k.Fields ?? new List<string>())
                 {
                     string n = s.TrimToNull();
-                    if (n == null || !fields.Exists(z => z.FieldName.Substring(prefix) == n))
+                    if (n == null || !fields.Any(z => z.FieldName.Substring(prefix) == n))
                     {
                         skip = true;
                         break;
@@ -194,17 +218,17 @@ namespace Serenity.CodeGenerator
                 model.RowBaseClass = baseRowMatch;
                 model.FieldsBaseClass = baseRowMatch + "Fields";
                 model.RowBaseFields = new List<EntityField>();
-                fields.RemoveAll(f =>
+                fields = fields.Where(f =>
                 {
                     if (baseRowFieldset.Contains(f.FieldName.Substring(prefix)))
                     {
                         var ef = ToEntityField(f, prefix);
                         ef.Flags = null;
                         model.RowBaseFields.Add(ef);
-                        return true;
+                        return false;
                     }
-                    return false;
-                });
+                    return true;
+                }).ToList();
             }
             else
             {
@@ -229,7 +253,7 @@ namespace Serenity.CodeGenerator
                     f.PKTable = foreign.PKTable;
                     f.PKColumn = foreign.PKColumn;
 
-                    var frgfld = SqlSchemaInfo.GetTableFieldInfos(connection, foreign.PKSchema, foreign.PKTable);
+                    var frgfld = schemaProvider.GetFieldInfos(connection, foreign.PKSchema, foreign.PKTable).ToList();
                     int frgPrefix = RowGenerator.DeterminePrefixLength(frgfld, z => z.FieldName);
                     var j = new EntityJoin();
                     j.Fields = new List<EntityField>();
@@ -239,7 +263,7 @@ namespace Serenity.CodeGenerator
                     f.ForeignJoinAlias = j.Name;
                     j.SourceField = f.Ident;
 
-                    frgfld.RemoveAll(y => removeForeignFields.Contains(y.FieldName));
+                    frgfld = frgfld.Where(y => !removeForeignFields.Contains(y.FieldName)).ToList();
 
                     foreach (var frg in frgfld)
                     {
@@ -319,7 +343,6 @@ namespace Serenity.CodeGenerator
                     sb.Append(c);
             }
             return sb.ToString();
-
         }
     }
 }

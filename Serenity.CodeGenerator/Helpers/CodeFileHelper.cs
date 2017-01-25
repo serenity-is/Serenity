@@ -176,7 +176,7 @@ namespace Serenity.CodeGenerator
 
                         if (answer != null)
                         {
-                            answer = answer.ToLowerInvariant()[0].ToString();
+                            answer = answer.Length > 0 ? answer.ToLowerInvariant()[0].ToString() : " ";
                             if (answer == "a")
                             {
                                 Overwrite = true;

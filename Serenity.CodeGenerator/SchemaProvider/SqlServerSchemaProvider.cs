@@ -15,7 +15,7 @@ namespace Serenity.CodeGenerator
             return connection.Query<FieldInfo>(@"
                 SELECT
                     COLUMN_NAME [FieldName],
-                    DATA_TYPE [DataType],
+                    CASE WHEN DATA_TYPE = 'timestamp' THEN 'rowversion' ELSE DATA_TYPE END [DataType],
                     CASE WHEN IS_NULLABLE = 'NO' THEN 0 ELSE 1 END [IsNullable],
                     COALESCE(CHARACTER_MAXIMUM_LENGTH, CASE WHEN DATA_TYPE in ('decimal', 'money', 'numeric') THEN NUMERIC_PRECISION ELSE 0 END) [Size],
                     NUMERIC_SCALE [Scale]

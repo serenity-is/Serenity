@@ -12,12 +12,16 @@ namespace Serenity.CodeGenerator
     {
         private static string[] skipPackages = new[]
         {
-            "Microsoft.",
-            "System.",
-            "Newtonsoft.",
+            "Dapper",
             "EPPlus",
             "FastMember",
-            "MailKit"
+            "FirebirdSql.",
+            "MailKit",
+            "MySql",
+            "Microsoft.",
+            "Newtonsoft.",
+            "Npgsql",
+            "System."
         };
 
         public void Run(string projectJson)
