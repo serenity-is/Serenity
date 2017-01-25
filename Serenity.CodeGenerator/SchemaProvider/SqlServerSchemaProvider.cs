@@ -12,7 +12,24 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
-            return new List<FieldInfo>();
+            return connection.Query<FieldInfo>(@"
+                SELECT
+                    COLUMN_NAME [FieldName],
+                    DATA_TYPE [DataType],
+                    CASE WHEN IS_NULLABLE = 'NO' THEN 0 ELSE 1 END [IsNullable],
+                    COALESCE(CHARACTER_MAXIMUM_LENGTH, CASE WHEN DATA_TYPE in ('decimal', 'money', 'numeric') THEN NUMERIC_PRECISION ELSE 0 END) [Size],
+                    NUMERIC_SCALE [Scale]
+                FROM
+                    INFORMATION_SCHEMA.COLUMNS
+                WHERE
+                    TABLE_SCHEMA = @sma 
+                    AND TABLE_NAME = @tbl
+                ORDER BY
+                    ORDINAL_POSITION", new
+            {
+                sma = schema,
+                tbl = table
+            });
         }
 
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
