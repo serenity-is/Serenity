@@ -1,6 +1,8 @@
 ﻿using Serenity.Data;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 
 namespace Serenity.CodeGenerator
@@ -11,7 +13,49 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
-            return new List<FieldInfo>();
+            return connection.Query(@"
+                SELECT
+                    rfr.rdb$field_name AS FIELD_NAME,
+                    fld.rdb$field_type AS FIELD_TYPE,
+                    fld.rdb$field_sub_type AS FIELD_SUB_TYPE,
+                    CAST(fld.rdb$field_length AS integer) AS SIZE,
+                    CAST(fld.rdb$field_precision AS integer) AS NUMERIC_PRECISION,
+                    CAST(fld.rdb$field_scale AS integer) AS NUMERIC_SCALE,
+                    CAST(fld.rdb$character_length AS integer) AS CHARMAXLENGTH,
+                    coalesce(fld.rdb$null_flag, rfr.rdb$null_flag) AS COLUMN_NULLABLE
+                FROM rdb$relation_fields rfr
+                    LEFT JOIN rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name
+                WHERE
+                    rfr.rdb$relation_name = @tbl
+                ORDER BY 
+                    rfr.rdb$field_position",  new
+            {
+                tbl = table   
+            }).Select(src =>
+            {
+                var fi = new FieldInfo();
+                fi.FieldName = ((string)src.FIELD_NAME).TrimToNull();
+                var fieldType = src.FIELD_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_TYPE, CultureInfo.InvariantCulture);
+                var fieldSubType = src.FIELD_SUB_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_SUB_TYPE, CultureInfo.InvariantCulture);
+                var numericScale = src.NUMERIC_SCALE == null ? 0 : Convert.ToInt32(src.NUMERIC_SCALE, CultureInfo.InvariantCulture);
+                var numericPrecision = src.NUMERIC_PRECISION == null ? 0 : Convert.ToInt32(src.NUMERIC_PRECISION, CultureInfo.InvariantCulture);
+                var size = src.SIZE == null ? 0 : Convert.ToInt32(src.SIZE, CultureInfo.InvariantCulture);
+                var sqlType = GetSqlTypeFromBlrType(fieldType, fieldSubType, size, numericScale);
+                fi.DataType = sqlType;
+
+                if (sqlType == "char" || sqlType == "varchar")
+                    fi.Size = src.CHARMAXLENGTH == null ? 0 : Convert.ToInt32(src.CHARMAXLENGTH);
+                else if (sqlType == "varbinary" || sqlType == "text")
+                    fi.Size = 0;
+                else if (sqlType == "decimal" || sqlType == "numeric")
+                {
+                    fi.Size = numericPrecision;
+                    fi.Scale = -numericScale;
+                }
+                fi.IsNullable = src.COLUMN_NULLABLE == null;
+
+                return fi;
+            });
         }
 
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
@@ -107,6 +151,123 @@ namespace Serenity.CodeGenerator
                     Table = StringHelper.TrimToNull(x.NAME),
                     IsView = x.ISVIEW != null
                 });
+        }
+
+        private class BLRCodes
+        {
+            public const int blr_text = 14;
+            public const int blr_text2 = 15;
+            public const int blr_short = 7;
+            public const int blr_long = 8;
+            public const int blr_quad = 9;
+            public const int blr_int64 = 16;
+            public const int blr_float = 10;
+            public const int blr_double = 27;
+            public const int blr_d_float = 11;
+            public const int blr_timestamp = 35;
+            public const int blr_varying = 37;
+            public const int blr_varying2 = 38;
+            public const int blr_blob = 261;
+            public const int blr_cstring = 40;
+            public const int blr_cstring2 = 41;
+            public const int blr_blob_id = 45;
+            public const int blr_sql_date = 12;
+            public const int blr_sql_time = 13;
+            public const int blr_bool = 23;
+        }
+
+        public static string GetSqlTypeFromBlrType(int type, int subType, int size, int scale)
+        {
+            switch (type)
+            {
+                case BLRCodes.blr_varying:
+                case BLRCodes.blr_varying2:
+                    return "varchar";
+
+                case BLRCodes.blr_text:
+                case BLRCodes.blr_text2:
+                case BLRCodes.blr_cstring:
+                case BLRCodes.blr_cstring2:
+                    if (size == 16)
+                        return "guid";
+
+                    return "char";
+
+                case BLRCodes.blr_short:
+                    if (subType == 2)
+                        return "decimal";
+
+                    if (subType == 1)
+                        return "numeric";
+
+                    if (scale < 0)
+                        return "decimal";
+
+                    return "smallint";
+
+                case BLRCodes.blr_long:
+                    if (subType == 2)
+                        return "decimal";
+
+                    if (subType == 1)
+                        return "numeric";
+
+                    if (scale < 0)
+                        return "decimal";
+
+                    return "integer";
+
+                case BLRCodes.blr_quad:
+                case BLRCodes.blr_int64:
+                case BLRCodes.blr_blob_id:
+                    if (subType == 2)
+                        return "decimal";
+
+                    if (subType == 1)
+                        return "numeric";
+
+                    if (scale < 0)
+                        return "decimal";
+
+                    return "bigint";
+
+                case BLRCodes.blr_float:
+                    return "float";
+
+                case BLRCodes.blr_double:
+                case BLRCodes.blr_d_float:
+                    if (subType == 2)
+                        return "decimal";
+
+                    if (subType == 1)
+                        return "numeric";
+
+                    if (scale < 0)
+                        return "decimal";
+
+                    return "double";
+
+                case BLRCodes.blr_blob:
+                    if (subType == 1)
+                        return "text";
+
+                    return "varbinary";
+
+                case BLRCodes.blr_timestamp:
+                    return "datetime";
+
+                case BLRCodes.blr_sql_time:
+                    return "time";
+
+                case BLRCodes.blr_sql_date:
+                    return "date";
+
+                case BLRCodes.blr_bool:
+                    return "boolean";
+
+                default:
+                    return "unknown";
+            }
         }
     }
 }
