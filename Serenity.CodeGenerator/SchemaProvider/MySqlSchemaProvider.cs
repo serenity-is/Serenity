@@ -1,4 +1,5 @@
 ﻿using Serenity.Data;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,7 +12,35 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
-            return new List<FieldInfo>();
+            return connection.Query(string.Format("SHOW FULL COLUMNS FROM `{0}`", table))
+                .OrderBy(x => Convert.ToInt32(x.ORDINAL_POSITION))
+                .Select(src =>
+                {
+                    var fi = new FieldInfo();
+                    fi.FieldName = src.Field;
+                    fi.IsNullable = ((string)src.Null) != "NO";
+                    var dataType = (string)src.Type;
+                    var dx = dataType.IndexOf('(');
+                    if (dx >= 0)
+                    {
+                        var dxend = dataType.IndexOf(')', dx);
+                        var strlen = dataType.Substring(dx + 1, dxend - dx - 1);
+                        dataType = dataType.Substring(0, dx);
+                        var lower = dataType.ToLowerInvariant();
+                        if (lower == "char" || lower == "varchar")
+                            fi.Size = int.Parse(strlen);
+                        else if (lower == "real" || lower == "decimal")
+                        {
+                            var strparts = strlen.Split(',');
+                            fi.Size = int.Parse(strparts[0]);
+                            fi.Scale = int.Parse(strparts[1]);
+                        }
+                    }
+                    fi.DataType = dataType;
+                    fi.IsPrimaryKey = (string)src.Key == "PRI";
+                    fi.IsIdentity = (string)src.Extra == "auto_increment";
+                    return fi;
+                });
         }
 
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
