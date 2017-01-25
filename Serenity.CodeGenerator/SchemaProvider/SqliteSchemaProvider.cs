@@ -12,7 +12,14 @@ namespace Serenity.CodeGenerator
 
         public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
         {
-            return new List<FieldInfo>();
+            return connection.Query("PRAGMA table_info([" + table + "])")
+                .Select(x => new FieldInfo
+                {
+                    FieldName = x.name,
+                    DataType = x.type,
+                    IsNullable = Convert.ToInt32(x.notnull) != 1,
+                    IsPrimaryKey = Convert.ToInt32(x.pk) == 1
+                });
         }
 
         public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
