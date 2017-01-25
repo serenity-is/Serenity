@@ -1,3 +1,15 @@
+## 2.9.0 (2017-01-25)
+
+Features:
+  - Sergen for .NET Core now works with Firebird, MySql, Postgres, Sqlite in addition to SqlServer. 
+  - New schema provider system in Sergen to query database metadata
+  - Made FirebirdDialect quoting compatible with with FluentMigrator one
+  - 
+  
+Bugfixes:
+  - use this.uniqueName while binding to layout, to resolve script errors after widget is destroyed, and use it to unbind on destroy
+  - fix report dialog not showing parameters (thanks @Scott)
+  
 ## 2.8.11 (2017-01-21)
 
 Features:

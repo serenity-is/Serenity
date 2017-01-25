@@ -1,9 +1,9 @@
 ﻿{
-  "version": "2.8.11-*",
+  "version": "2.9.0-*",
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
-    "Serenity.Core": "2.8.11-*",
-    "Serenity.Data": "2.8.11-*"
+    "Serenity.Core": "2.9.0-*",
+    "Serenity.Data": "2.9.0-*"
   },
   "frameworks": {
     "netstandard1.6": {
