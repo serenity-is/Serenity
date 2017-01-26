@@ -45,13 +45,12 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="MsieJavaScriptEngine, Version=2.0.2.0, Culture=neutral, PublicKeyToken=a3a2846a37ac0d3e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\MsieJavaScriptEngine.2.0.2\lib\net40-client\MsieJavaScriptEngine.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NUglify, Version=1.5.4.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUglify.1.5.4\lib\net40\NUglify.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -2665,9 +2664,6 @@
     <None Include="..\Serenity.Web\Tooling\JsEngine\json2.min.js">
       <Link>Tooling\JsEngine\json2.min.js</Link>
     </None>
-    <EmbeddedResource Include="..\Serenity.Web\Scripts\optimization\uglifyjs.min.js">
-      <Link>Scripts\optimization\uglifyjs.min.js</Link>
-    </EmbeddedResource>
     <None Include="..\Serenity.Web\Assets\Scripts\sortable.js">
       <Link>Assets\Scripts\sortable.js</Link>
     </None>

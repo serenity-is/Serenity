@@ -20,7 +20,7 @@
         <dependency id="Microsoft.AspNet.Razor" version="${net45:Microsoft.AspNet.Razor}" />
         <dependency id="Microsoft.AspNet.WebPages" version="${net45:Microsoft.AspNet.WebPages}" />
         <dependency id="Microsoft.Web.Infrastructure" version="${net45:Microsoft.Web.Infrastructure}" />
-        <dependency id="MsieJavaScriptEngine" version="${net45:MsieJavaScriptEngine}" />
+        <dependency id="Nuglify" version="${*:Nuglify}" />
         <dependency id="Serenity.Core" version="${version}" />
         <dependency id="Serenity.Data" version="${version}" />
         <dependency id="Serenity.Data.Entity" version="${version}" />
@@ -41,6 +41,7 @@
         <dependency id="Microsoft.Extensions.Caching.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Caching.Abstractions}" />
         <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Configuration.Abstractions}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Nuglify" version="${*:Nuglify}" />
         <dependency id="Serenity.Core" version="${version}" />
         <dependency id="Serenity.Data" version="${version}" />
         <dependency id="Serenity.Data.Entity" version="${version}" />

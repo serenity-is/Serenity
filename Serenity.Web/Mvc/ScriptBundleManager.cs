@@ -9,9 +9,6 @@ using System.Collections.Concurrent;
 using System.Web.Hosting;
 using System.Web;
 using System.Configuration;
-#if !COREFX
-using MsieJavaScriptEngine;
-#endif
 
 namespace Serenity.Web
 {
@@ -74,9 +71,6 @@ namespace Serenity.Web
             isEnabled = false;
             bundleKeyBySourceUrl = null;
             bundleByKey = null;
-#if !COREFX
-            MsieJsEngine jsEngine = null;
-#endif
             try
             {
                 var setting = ConfigurationManager.AppSettings["ScriptBundling"];
@@ -146,19 +140,18 @@ namespace Serenity.Web
                                 using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
                                     code = sr.ReadToEnd();
 
-#if COREFX
-                                return code;
-#else
                                 try
                                 {
-                                    return MinimizeWithUglifyJS(ref jsEngine, code);
+                                    var result = NUglify.Uglify.Js(code);
+                                    if (result.HasErrors)
+                                        return code;
+                                    return result.Code;
                                 }
                                 catch (Exception ex)
                                 {
                                     ex.Log();
                                     return code;
                                 }
-#endif
                             }
 
                             using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
@@ -178,13 +171,6 @@ namespace Serenity.Web
             catch (Exception ex)
             {
                 ex.Log();
-            }
-            finally
-            {
-#if !COREFX
-                if (jsEngine != null)
-                    jsEngine.Dispose();
-#endif
             }
         }
 
@@ -306,56 +292,5 @@ namespace Serenity.Web
             string include = DynamicScriptManager.GetScriptInclude("Bundle." + bundleKey);
             return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + include);
         }
-
-#if !COREFX
-        private static MsieJsEngine SetupJsEngine()
-        {
-            MsieJsEngine jsEngine;
-            try
-            {
-                jsEngine = new MsieJsEngine(new JsEngineSettings { EngineMode = JsEngineMode.ChakraIeJsRt });
-            }
-            catch
-            {
-                jsEngine = new MsieJsEngine();
-            }
-            try
-            {
-                using (var sr = new StreamReader(
-                    typeof(ScriptBundleManager).Assembly.GetManifestResourceStream(
-                        "Serenity.Web.Scripts.optimization.uglifyjs.min.js")))
-                {
-                    jsEngine.Evaluate(sr.ReadToEnd());
-                }
-
-                return jsEngine;
-            }
-            catch
-            {
-                jsEngine.Dispose();
-                throw;
-            }
-        }
-
-        private static string MinimizeWithUglifyJS(ref MsieJsEngine jsEngine, string code)
-        {
-            jsEngine = jsEngine ?? SetupJsEngine();
-            jsEngine.SetVariableValue("CodeToCompress", code);
-
-            jsEngine.Evaluate(
-                @"(function() { 
-                    var ast = UglifyJS.parse(CodeToCompress);
-                    ast.figure_out_scope();
-                    var compressor = UglifyJS.Compressor();
-                    ast = ast.transform(compressor);
-                    ast.figure_out_scope();
-                    ast.compute_char_frequency();
-                    ast.mangle_names();
-                    CodeToCompress = ast.print_to_string();
-                })();");
-
-            return jsEngine.GetVariableValue<string>("CodeToCompress");
-        }
-#endif
     }
 }

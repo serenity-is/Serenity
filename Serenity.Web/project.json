@@ -2,6 +2,7 @@
   "version": "2.9.0-*",
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
+    "NUglify": "1.5.4",
     "Serenity.Core": "2.9.0-*",
     "Serenity.Data": "2.9.0-*",
     "Serenity.Data.Entity": "2.9.0-*",
@@ -37,8 +38,7 @@
         "Microsoft.AspNet.Mvc": "5.2.3",
         "Microsoft.AspNet.Razor": "3.2.3",
         "Microsoft.AspNet.WebPages": "3.2.3",
-        "Microsoft.Web.Infrastructure": "1.0.0.0",
-        "MsieJavaScriptEngine": "2.1.0"
+        "Microsoft.Web.Infrastructure": "1.0.0.0"
       },
       "frameworkAssemblies": {
         "System.Data": "4.0.0.0",
