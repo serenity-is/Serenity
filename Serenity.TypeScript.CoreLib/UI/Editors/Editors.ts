@@ -48,6 +48,7 @@
     interface EnumEditorOptions {
         enumKey?: string;
         enumType?: any;
+        allowClear?: boolean;
     }
 
     interface HtmlContentEditorOptions {
