@@ -72,5 +72,7 @@ namespace Serenity.Data
         {
             get { return joins; }
         }
+
+        public Type RowType { get; set; }
     }
 }

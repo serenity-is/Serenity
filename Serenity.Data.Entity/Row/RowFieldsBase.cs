@@ -1,6 +1,7 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data.Mapping;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -35,6 +36,8 @@ namespace Serenity.Data
         internal string tableName;
         internal string alias;
         internal string aliasDot;
+
+        internal static ConcurrentDictionary<Type, RowFieldsBase> rowFieldsByType = new ConcurrentDictionary<Type, RowFieldsBase>();
 
         protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
@@ -185,82 +188,6 @@ namespace Serenity.Data
 
         }
 
-        private static readonly char[] comma = new char[] { ',' };
-
-        private ExpressionAttribute GetBestMatchingExpression(IEnumerable<ExpressionAttribute> expressions,
-            ref string dialectServerType, ref string dialectTypeName)
-        {
-            if (!expressions.Any(x => !string.IsNullOrEmpty(x.Dialect)))
-                return expressions.FirstOrDefault();
-
-            if (dialectTypeName == null)
-            {
-                ISqlDialect dialect = null;
-
-                if (!string.IsNullOrEmpty(connectionKey))
-                {
-                    var csi = SqlConnections.TryGetConnectionString(connectionKey);
-                    if (csi != null)
-                        dialect = csi.Dialect;
-                }
-
-                dialect = dialect ?? SqlSettings.DefaultDialect;
-                dialectServerType = dialect.ServerType;
-                dialectTypeName = dialect.GetType().Name;
-            }
-
-            var st = dialectServerType;
-            var tn = dialectTypeName;
-
-            Func<string, bool> isMatch = s =>
-            {
-                return st.StartsWith(s, StringComparison.OrdinalIgnoreCase) ||
-                    tn.StartsWith(s, StringComparison.OrdinalIgnoreCase);
-            };
-
-            Dictionary<ExpressionAttribute, int> weight = null;
-
-            var bestMatch = expressions.Where(x =>
-            {
-                if (string.IsNullOrEmpty(x.Dialect))
-                    return true;
-
-                if (x.Dialect.IndexOf(',') < 0)
-                    return isMatch(x.Dialect);
-
-                var best = x.Dialect.Split(comma, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(z => z.Trim())
-                    .Where(z => isMatch(z))
-                    .OrderByDescending(z => z.Length)
-                    .FirstOrDefault();
-
-                if (best != null)
-                {
-                    if (weight == null)
-                        weight = new Dictionary<ExpressionAttribute, int>();
-
-                    weight[x] = best.Length;
-                    return true;
-                }
-
-                return false;
-            })
-            .OrderByDescending(x =>
-            {
-                if (string.IsNullOrEmpty(x.Dialect))
-                    return 0;
-
-                int w;
-                if (weight != null && weight.TryGetValue(x, out w))
-                    return w;
-
-                return x.Dialect.Length;
-            })
-            .FirstOrDefault();
-
-            return bestMatch;
-        }
-
         public void Initialize()
         {
             if (isInitialized)
@@ -301,8 +228,7 @@ namespace Serenity.Data
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
 
-                        string dialectServerType = null;
-                        string dialectTypeName = null;
+                        DialectExpressionSelector expressionSelector = null;
 
                         if (property != null)
                         {
@@ -312,7 +238,10 @@ namespace Serenity.Data
 
                             var expressions = property.GetCustomAttributes<ExpressionAttribute>(false);
                             if (expressions.Any())
-                                expression = GetBestMatchingExpression(expressions, ref dialectServerType, ref dialectTypeName);
+                            {
+                                expressionSelector = expressionSelector ?? new DialectExpressionSelector(connectionKey);
+                                expression = expressionSelector.GetBestMatch(expressions);
+                            }
 
                             scale = property.GetCustomAttribute<ScaleAttribute>(false);
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
@@ -516,11 +445,33 @@ namespace Serenity.Data
                 this.propertyDescriptors = new PropertyDescriptorCollection(propertyDescriptorArray);
 #endif
 
+                ProcessViewColumns();
                 InferTextualFields();
                 AfterInitialize();
             }
 
             isInitialized = true;
+        }
+
+        private void ProcessViewColumns()
+        {
+            foreach (var field in this)
+            {
+                var viewCol = field.CustomAttributes.FirstOrDefault(x => x.GetType().IsSubclassOf(typeof(ViewColumnAttribute))) as ViewColumnAttribute;
+                if (viewCol == null)
+                    continue;
+
+                if (viewCol.Join == null)
+                {
+                }
+
+                var expressions = field.CustomAttributes.Where(x => x.GetType().IsSubclassOf(typeof(ExpressionAttribute)));
+                if (!expressions.Any())
+                {
+                }
+
+
+            }
         }
 
         private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo)

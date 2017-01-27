@@ -3,19 +3,15 @@
 namespace Serenity.Data.Mapping
 {
     /// <summary>
-    /// Explicitly specifies the database column name for property.
-    /// Use this attribute if matching column name in database is different than the property name.
+    /// Specifies that this column belongs to another table.
     /// </summary>
-    public class ColumnAttribute : Attribute
+    public class ViewColumnAttribute : Attribute
     {
-        public ColumnAttribute(string name)
+        public ViewColumnAttribute()
         {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
-
-            this.Name = name;
         }
 
-        public string Name { get; private set; }
+        public string Join { get; set; }
+        public string Property { get; set; }
     }
 }
