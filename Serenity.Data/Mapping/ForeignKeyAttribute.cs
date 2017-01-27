@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Data.Mapping
 {
@@ -35,7 +36,7 @@ namespace Serenity.Data.Mapping
         {
             Check.NotNull(rowType, nameof(rowType));
 
-            var attr = rowType.GetAttribute<TableNameAttribute>(true);
+            var attr = rowType.GetCustomAttribute<TableNameAttribute>(true);
             if (attr == null || string.IsNullOrEmpty(attr.Name))
                 throw new ArgumentOutOfRangeException(nameof(rowType),
                     String.Format("Type '{0}' is specified for a ForeignKey attribute" +
@@ -46,8 +47,8 @@ namespace Serenity.Data.Mapping
             if (string.IsNullOrEmpty(field))
             {
                 var identityOrPrimaryKey = rowType.GetProperties()
-                    .Where(x => x.GetAttribute<IdentityAttribute>() != null ||
-                        x.GetAttribute<PrimaryKeyAttribute>() != null).ToArray();
+                    .Where(x => x.GetCustomAttribute<IdentityAttribute>() != null ||
+                        x.GetCustomAttribute<PrimaryKeyAttribute>() != null).ToArray();
 
                 if (identityOrPrimaryKey.Length == 0)
                     throw new ArgumentOutOfRangeException(nameof(rowType),
@@ -58,7 +59,7 @@ namespace Serenity.Data.Mapping
                 if (identityOrPrimaryKey.Length > 1)
                 {
                     var identity = identityOrPrimaryKey.Where(x =>
-                        x.GetAttribute<IdentityAttribute>() != null);
+                        x.GetCustomAttribute<IdentityAttribute>() != null);
 
                     if (identity.Count() != 1)
                         throw new ArgumentOutOfRangeException(nameof(rowType),
@@ -69,7 +70,7 @@ namespace Serenity.Data.Mapping
                     identityOrPrimaryKey = identity.ToArray();
                 }
 
-                Field = identityOrPrimaryKey[0].GetAttribute<ColumnAttribute>()?.Name ??
+                Field = identityOrPrimaryKey[0].GetCustomAttribute<ColumnAttribute>()?.Name ??
                     identityOrPrimaryKey[0].Name;
             }
             else
