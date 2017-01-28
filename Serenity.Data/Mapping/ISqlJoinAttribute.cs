@@ -9,6 +9,6 @@ namespace Serenity.Data.Mapping
         string ToTable { get; }
         string OnCriteria { get; }
         string Prefix { get; }
-        Type RowType { get; }
+        Type RowType { get; set; }
     }
 }

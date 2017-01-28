@@ -198,6 +198,7 @@ namespace Serenity.Data
                 GetRowFieldsAndProperties(out rowFields, out rowProperties);
 
                 var expressionSelector = new DialectExpressionSelector(connectionKey);
+                var rowCustomAttributes = this.rowType.GetCustomAttributes().ToList();
 
                 foreach (var fieldInfo in this.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
                 {
@@ -248,9 +249,8 @@ namespace Serenity.Data
                                 propertyDictionary = propertyDictionary ?? RowPropertyDictionary.Get(this.rowType);
                                 try
                                 {
-                                    Dictionary<string, ISqlJoin> originJoins;
                                     expression = propertyDictionary.OriginExpression(property, origin, 
-                                        expressionSelector, "", out originJoins);
+                                        expressionSelector, "", rowCustomAttributes);
                                 }
                                 catch (DivideByZeroException)
                                 {
@@ -445,13 +445,13 @@ namespace Serenity.Data
                     }
                 }
 
-                foreach (var attr in this.rowType.GetCustomAttributes<LeftJoinAttribute>())
+                foreach (var attr in rowCustomAttributes.OfType<LeftJoinAttribute>())
                     new LeftJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
-                foreach (var attr in this.rowType.GetCustomAttributes<InnerJoinAttribute>())
+                foreach (var attr in rowCustomAttributes.OfType<InnerJoinAttribute>())
                     new InnerJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
-                foreach (var attr in this.rowType.GetCustomAttributes<OuterApplyAttribute>())
+                foreach (var attr in rowCustomAttributes.OfType<OuterApplyAttribute>())
                     new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
 
 #if !COREFX

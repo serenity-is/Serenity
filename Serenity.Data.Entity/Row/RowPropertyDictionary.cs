@@ -15,7 +15,7 @@ namespace Serenity.Data
         internal string alias;
         internal string aliasDot;
         internal Dictionary<string, PropertyInfo> propertyByName;
-        internal Dictionary<string, Tuple<string, ForeignKeyAttribute, LeftJoinAttribute>> joinPropertyByAlias;
+        internal Dictionary<string, Tuple<string, ForeignKeyAttribute, ISqlJoin>> joinPropertyByAlias;
         internal Dictionary<string, ISqlJoin> rowJoinByAlias;
         internal Dictionary<string, OriginAttribute> origins;
         internal ILookup<string, KeyValuePair<string, OriginAttribute>> originByAlias;
@@ -51,7 +51,7 @@ namespace Serenity.Data
 
             origins = new Dictionary<string, OriginAttribute>(StringComparer.OrdinalIgnoreCase);
 
-            joinPropertyByAlias = new Dictionary<string, Tuple<string, ForeignKeyAttribute, LeftJoinAttribute>>();
+            joinPropertyByAlias = new Dictionary<string, Tuple<string, ForeignKeyAttribute, ISqlJoin>>();
             foreach (var property in propertyByName.Values)
             {
                 var originAttr = property.GetCustomAttribute<OriginAttribute>();
@@ -61,7 +61,7 @@ namespace Serenity.Data
                 var lj = property.GetCustomAttribute<LeftJoinAttribute>();
                 var fk = property.GetCustomAttribute<ForeignKeyAttribute>();
                 if (lj != null && fk != null)
-                    joinPropertyByAlias[lj.Alias] = new Tuple<string, ForeignKeyAttribute, LeftJoinAttribute>(property.Name, fk, lj);
+                    joinPropertyByAlias[lj.Alias] = new Tuple<string, ForeignKeyAttribute, ISqlJoin>(property.Name, fk, lj);
             }
 
             foreach (var attr in rowType.GetCustomAttributes<LeftJoinAttribute>())
@@ -76,7 +76,7 @@ namespace Serenity.Data
             originByAlias = origins.ToLookup(x => x.Value.Join);
             prefixByAlias = originByAlias.ToDictionary(x => x.Key, x =>
             {
-                Tuple<string, ForeignKeyAttribute, LeftJoinAttribute> joinProperty;
+                Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty;
                 if (joinPropertyByAlias.TryGetValue(x.Key, out joinProperty))
                 {
                     if (joinProperty.Item3.Prefix != null)
@@ -131,14 +131,13 @@ namespace Serenity.Data
         }
 
         public ExpressionAttribute OriginExpression(PropertyInfo property, OriginAttribute origin,
-            DialectExpressionSelector expressionSelector, string aliasPrefix, out Dictionary<string, ISqlJoin> originJoins)
+            DialectExpressionSelector expressionSelector, string aliasPrefix, List<Attribute> extraJoins)
         {
             if (aliasPrefix.Length >= 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
 
-            originJoins = null;
             var joinAlias = origin.Join;
-            Tuple<string, ForeignKeyAttribute, LeftJoinAttribute> joinProperty;
+            Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty;
 
             Type originRowType;
             ISqlJoin rowJoin;
@@ -222,36 +221,26 @@ namespace Serenity.Data
                 if (expressionAttr.Any())
                 {
                     var expression = expressionSelector.GetBestMatch(expressionAttr, x => x.Dialect);
-                    return new ExpressionAttribute(PrefixAliases(expression.Value, aliasPrefix, out originJoins));
+                    return new ExpressionAttribute(originDictionary.PrefixAliases(expression.Value, aliasPrefix, 
+                        expressionSelector, extraJoins));
                 }
                 else
                 {
                     var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
                     if (originOrigin != null)
                     {
-                        Dictionary<string, ISqlJoin> originOriginJoins;
-
-
-                        var expression = originDictionary.OriginExpression(originProperty, originOrigin, expressionSelector,
-                            aliasPrefix, out originOriginJoins);
-
-                        if (originOriginJoins != null)
-                        {
-                        }
-
-                        return new ExpressionAttribute(PrefixAliases(expression.Value, origin.Join, out originJoins));
+                        PrefixAliases(originOrigin.Join + ".Dummy", aliasPrefix, expressionSelector, extraJoins);
+                        return originDictionary.OriginExpression(originProperty, originOrigin, expressionSelector, aliasPrefix, extraJoins);
                     }
                     else
-                        return new ExpressionAttribute(origin.Join + "." + SqlSyntax.AutoBracket(originProperty.Name));
+                        return new ExpressionAttribute(aliasPrefix + "." + SqlSyntax.AutoBracket(originProperty.Name));
                 }
             }
         }
 
-        private string PrefixAliases(string expression, string alias, 
-            out Dictionary<string, ISqlJoin> joins)
+        internal string PrefixAliases(string expression, string alias, 
+            DialectExpressionSelector expressionSelector, List<Attribute> extraJoins)
         {
-            joins = null;
-
             if (string.IsNullOrWhiteSpace(expression))
                 return expression;
 
@@ -280,52 +269,76 @@ namespace Serenity.Data
                 if (mappedJoins.TryGetValue(x, out sqlJoin))
                     return sqlJoin.Alias;
 
-                Tuple<string, ForeignKeyAttribute, LeftJoinAttribute> propJoin;
+                Tuple<string, ForeignKeyAttribute, ISqlJoin> propJoin;
                 if (joinPropertyByAlias.TryGetValue(x, out propJoin))
-                    Console.WriteLine("hello");
+                {
+                    var propertyInfo = propertyByName[propJoin.Item1];
+                    string leftExpression;
+                    var newAlias = aliasPrefix + x;
+                    var columnAttr = propertyInfo.GetCustomAttribute<ColumnAttribute>();
+                    if (columnAttr != null)
+                        leftExpression = alias + "." + SqlSyntax.AutoBracket(columnAttr.Name);
+                    else
+                    {
+                        var expressionAttr = propertyInfo.GetCustomAttribute<ExpressionAttribute>();
+                        if (expressionAttr != null)
+                            leftExpression = mapExpression(expressionAttr.Value);
+                        else
+                        {
+                            var origin = propertyInfo.GetCustomAttribute<OriginAttribute>();
+                            if (origin != null)
+                                leftExpression = OriginExpression(propertyInfo, origin, expressionSelector, alias, extraJoins).Value;
+                            else
+                                leftExpression = alias + "." + SqlSyntax.AutoBracket(propertyInfo.Name);
+                        }
+                    }
+                    
+                    ISqlJoin srcJoin = propJoin.Item3;
+                    var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(propJoin.Item2.Field);
+
+                    if (srcJoin is LeftJoinAttribute)
+                        srcJoin = new LeftJoinAttribute(newAlias, propJoin.Item2.Table, criteriax);
+                    else if (srcJoin is InnerJoinAttribute)
+                        srcJoin = new InnerJoinAttribute(newAlias, propJoin.Item2.Table, criteriax);
+                    else
+                        throw new ArgumentOutOfRangeException("joinType");
+
+                    srcJoin.RowType = propJoin.Item2.RowType ?? propJoin.Item3.RowType;
+                    mappedJoins[x] = srcJoin;
+                    extraJoins.Add((Attribute)srcJoin);
+                    return newAlias;
+                }
 
                 if (rowJoinByAlias.TryGetValue(x, out sqlJoin))
                 {
+                    var mappedCriteria = mapExpression(sqlJoin.OnCriteria);
+                    var newAlias = aliasPrefix + x;
+                    var rowType = sqlJoin.RowType;
+
                     var lja = sqlJoin as LeftJoinAttribute;
                     if (lja != null)
-                    {
-                        Console.WriteLine("hello2");
+                        sqlJoin = new LeftJoinAttribute(lja.Alias, lja.ToTable, mappedCriteria);
+                    else
+                    { 
+                        var ija = sqlJoin as InnerJoinAttribute;
+                        if (ija != null)
+                        {
+                            sqlJoin = new InnerJoinAttribute(ija.Alias, ija.ToTable, mappedCriteria);
+                        }
+                        else
+                        {
+                            var oaa = sqlJoin as OuterApplyAttribute;
+                            if (oaa != null)
+                                sqlJoin = new OuterApplyAttribute(ija.Alias, mappedCriteria);
+                        }
+
                     }
 
-                    var ija = sqlJoin as InnerJoinAttribute;
-                    if (ija != null)
-                    {
-                        Console.WriteLine("hello3");
-                    }
-
-                    var oaa = sqlJoin as OuterApplyAttribute;
-                    if (oaa != null)
-                    {
-                        Console.WriteLine("hello4");
-                    }
+                    sqlJoin.RowType = rowType;
+                    mappedJoins[x] = sqlJoin;
+                    extraJoins.Add((Attribute)sqlJoin);
+                    return newAlias;
                 }
-
-                //if (recursiveJoins != null &&
-                //    recursiveJoins.TryGetValue(x, out sqlJoin))
-                //{
-                //    var lja = sqlJoin as LeftJoinAttribute;
-                //    if (lja != null)
-                //    {
-                //        Console.WriteLine("hello2");
-                //    }
-
-                //    var ija = sqlJoin as InnerJoinAttribute;
-                //    if (ija != null)
-                //    {
-                //        Console.WriteLine("hello3");
-                //    }
-
-                //    var oaa = sqlJoin as OuterApplyAttribute;
-                //    if (oaa != null)
-                //    {
-                //        Console.WriteLine("hello4");
-                //    }
-                //}
 
                 return x;
             };
