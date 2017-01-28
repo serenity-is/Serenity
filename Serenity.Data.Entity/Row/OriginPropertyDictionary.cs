@@ -15,7 +15,7 @@ namespace Serenity.Data
         internal Dictionary<string, Tuple<string, ForeignKeyAttribute, ISqlJoin>> joinPropertyByAlias;
         internal Dictionary<string, ISqlJoin> rowJoinByAlias;
         internal Dictionary<string, OriginAttribute> origins;
-        internal Dictionary<string, PropertyInfo> originPropertyByName;
+        internal Dictionary<string, Tuple<PropertyInfo, Type>> originPropertyByName;
         internal ILookup<string, KeyValuePair<string, OriginAttribute>> originByAlias;
         internal IDictionary<string, string> prefixByAlias;
 
@@ -112,33 +112,35 @@ namespace Serenity.Data
             return dictionary;
         }
 
-        private PropertyInfo GetOriginProperty(string name)
+        private Tuple<PropertyInfo, Type> GetOriginProperty(string name)
         {
-            PropertyInfo pi;
-
+            Type originType;
+            Tuple<PropertyInfo, Type> pi;
             var d = originPropertyByName;
             if (d == null)
             {
-                d = new Dictionary<string, PropertyInfo>();
-                d[name] = pi = GetOriginProperty(propertyByName[name], origins[name]);
+                d = new Dictionary<string, Tuple<PropertyInfo, Type>>();
+                d[name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name], 
+                    origins[name], out originType), originType);
                 originPropertyByName = d;
             }
             else if (!d.TryGetValue(name, out pi))
             {
-                d = new Dictionary<string, PropertyInfo>(d);
-                d[name] = pi = GetOriginProperty(propertyByName[name], origins[name]);
+                d = new Dictionary<string, Tuple<PropertyInfo, Type>>();
+                d[name] = pi = new Tuple<PropertyInfo, Type>(GetOriginProperty(propertyByName[name],
+                    origins[name], out originType), originType);
                 originPropertyByName = d;
             }
 
             return pi;
         }
 
-        private PropertyInfo GetOriginProperty(PropertyInfo property, OriginAttribute origin)
+        private PropertyInfo GetOriginProperty(PropertyInfo property, OriginAttribute origin,
+            out Type originRowType)
         {
             var joinAlias = origin.Join;
             Tuple<string, ForeignKeyAttribute, ISqlJoin> joinProperty;
 
-            Type originRowType;
             ISqlJoin rowJoin;
             if (joinPropertyByAlias.TryGetValue(joinAlias, out joinProperty))
             {
@@ -215,7 +217,8 @@ namespace Serenity.Data
             if (aliasPrefix.Length >= 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
 
-            var originProperty = GetOriginProperty(property.Name);
+            var org = GetOriginProperty(property.Name);
+            var originProperty = org.Item1;
 
             if (aliasPrefix.Length == 0)
                 aliasPrefix = origin.Join;
@@ -227,7 +230,7 @@ namespace Serenity.Data
                 return aliasPrefix + "." + SqlSyntax.AutoBracket(columnAttr.Name);
             else
             {
-                var originDictionary = GetPropertyDictionary(originProperty.ReflectedType);
+                var originDictionary = GetPropertyDictionary(org.Item2);
 
                 var expressionAttr = originProperty.GetCustomAttributes<ExpressionAttribute>();
                 if (expressionAttr.Any())
@@ -256,7 +259,9 @@ namespace Serenity.Data
             if (recursion++ > 1000)
                 throw new DivideByZeroException("Infinite origin recursion detected!");
 
-            var originProperty = GetOriginProperty(property.Name);
+            var org = GetOriginProperty(property.Name);
+            var originProperty = org.Item1;
+
             var attr = originProperty.GetCustomAttribute(typeof(TAttr));
             if (attr != null)
                 return (TAttr)attr;
@@ -264,7 +269,7 @@ namespace Serenity.Data
             var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
             if (originOrigin != null)
             {
-                var originDictionary = GetPropertyDictionary(originProperty.ReflectedType);
+                var originDictionary = GetPropertyDictionary(org.Item2);
                 return originDictionary.OriginAttribute<TAttr>(originProperty, originOrigin);
             }
 
@@ -308,7 +313,8 @@ namespace Serenity.Data
                 return prefix + " " + s;
             };
 
-            var originProperty = GetOriginProperty(property.Name);
+            var org = GetOriginProperty(property.Name);
+            var originProperty = org.Item1;
 
             attr = originProperty.GetCustomAttribute<DisplayNameAttribute>();
             if (attr != null)
@@ -317,7 +323,7 @@ namespace Serenity.Data
             var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
             if (originOrigin != null)
             {
-                var originDictionary = GetPropertyDictionary(originProperty.ReflectedType);
+                var originDictionary = GetPropertyDictionary(org.Item2);
                 return addPrefix(originDictionary.OriginDisplayName(originProperty, originOrigin));
             }
 
