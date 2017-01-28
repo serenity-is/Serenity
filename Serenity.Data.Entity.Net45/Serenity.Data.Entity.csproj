@@ -42,6 +42,12 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.Data.Entity\Row\DialectExpressionSelector.cs">
+      <Link>Row\DialectExpressionSelector.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data.Entity\Row\OriginPropertyDictionary.cs">
+      <Link>Row\OriginPropertyDictionary.cs</Link>
+    </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>

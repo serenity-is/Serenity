@@ -1,49 +1,29 @@
 ﻿using Serenity.Data.Mapping;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Serenity.Data
 {
-    internal class RowPropertyDictionary
+    internal class OriginPropertyDictionary
     {
         internal Type rowType;
-        internal string connectionKey;
-        internal string tableName;
-        internal string alias;
-        internal string aliasDot;
         internal Dictionary<string, PropertyInfo> propertyByName;
         internal Dictionary<string, Tuple<string, ForeignKeyAttribute, ISqlJoin>> joinPropertyByAlias;
         internal Dictionary<string, ISqlJoin> rowJoinByAlias;
         internal Dictionary<string, OriginAttribute> origins;
         internal ILookup<string, KeyValuePair<string, OriginAttribute>> originByAlias;
-        internal DialectExpressionSelector expressionSelector;
         internal IDictionary<string, string> prefixByAlias;
 
-        internal static ConcurrentDictionary<Type, RowPropertyDictionary> cache =
-            new ConcurrentDictionary<Type, RowPropertyDictionary>();
+        internal static ConcurrentDictionary<Type, OriginPropertyDictionary> cache =
+            new ConcurrentDictionary<Type, OriginPropertyDictionary>();
 
-        public RowPropertyDictionary(Type rowType)
+        public OriginPropertyDictionary(Type rowType)
         {
             this.rowType = rowType;
-            this.alias = "T0";
-            this.aliasDot = "T0.";
             this.rowJoinByAlias = new Dictionary<string, ISqlJoin>(StringComparer.OrdinalIgnoreCase);
-            var tbn = this.rowType.GetCustomAttribute<TableNameAttribute>();
-            if (tbn != null)
-                tableName = tbn.Name;
-            else
-                tableName = "!!UNKNOWN!!";
-
-            var connectionKeyAttr = rowType.GetCustomAttribute<ConnectionKeyAttribute>();
-            if (connectionKeyAttr != null)
-                connectionKey = connectionKeyAttr.Value;
-            else
-                connectionKey = "Default";
-
-            expressionSelector = new DialectExpressionSelector(connectionKey);
 
             propertyByName = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
             foreach (var pi in rowType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -119,12 +99,12 @@ namespace Serenity.Data
             return prefix;
         }
 
-        public static RowPropertyDictionary Get(Type rowType)
+        public static OriginPropertyDictionary Get(Type rowType)
         {
-            RowPropertyDictionary dictionary;
+            OriginPropertyDictionary dictionary;
             if (!cache.TryGetValue(rowType, out dictionary))
             {
-                dictionary = new RowPropertyDictionary(rowType);
+                dictionary = new OriginPropertyDictionary(rowType);
                 cache[rowType] = dictionary;
             }
             return dictionary;
@@ -229,7 +209,7 @@ namespace Serenity.Data
                     var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
                     if (originOrigin != null)
                     {
-                        PrefixAliases(originOrigin.Join + ".Dummy", aliasPrefix, expressionSelector, extraJoins);
+                        originDictionary.PrefixAliases(originOrigin.Join + ".Dummy", aliasPrefix, expressionSelector, extraJoins);
                         return originDictionary.OriginExpression(originProperty, originOrigin, expressionSelector, aliasPrefix, extraJoins);
                     }
                     else
@@ -319,7 +299,7 @@ namespace Serenity.Data
                     if (lja != null)
                         sqlJoin = new LeftJoinAttribute(lja.Alias, lja.ToTable, mappedCriteria);
                     else
-                    { 
+                    {
                         var ija = sqlJoin as InnerJoinAttribute;
                         if (ija != null)
                         {
@@ -331,7 +311,6 @@ namespace Serenity.Data
                             if (oaa != null)
                                 sqlJoin = new OuterApplyAttribute(ija.Alias, mappedCriteria);
                         }
-
                     }
 
                     sqlJoin.RowType = rowType;

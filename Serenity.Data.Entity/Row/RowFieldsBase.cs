@@ -229,7 +229,7 @@ namespace Serenity.Data
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
 
-                        RowPropertyDictionary propertyDictionary = null;
+                        OriginPropertyDictionary propertyDictionary = null;
 
                         if (property != null)
                         {
@@ -246,7 +246,7 @@ namespace Serenity.Data
                             }
                             else if (origin != null)
                             {
-                                propertyDictionary = propertyDictionary ?? RowPropertyDictionary.Get(this.rowType);
+                                propertyDictionary = propertyDictionary ?? OriginPropertyDictionary.Get(this.rowType);
                                 try
                                 {
                                     expression = propertyDictionary.OriginExpression(property, origin, 
@@ -465,7 +465,6 @@ namespace Serenity.Data
                 this.propertyDescriptors = new PropertyDescriptorCollection(propertyDescriptorArray);
 #endif
 
-                ProcessViewColumns();
                 InferTextualFields();
                 AfterInitialize();
             }
@@ -477,29 +476,6 @@ namespace Serenity.Data
             where TAttr: Attribute
         {
             return x.CustomAttributes.FirstOrDefault(z => typeof(TAttr).IsAssignableFrom(z.GetType())) as TAttr;
-        }
-
-        private void ProcessViewColumns()
-        {
-            var origins = new Dictionary<Field, OriginAttribute>();
-            var fieldJoins = new Dictionary<string, Tuple<Field, ForeignKeyAttribute, LeftJoinAttribute>>();
-
-            foreach (var field in this)
-            {
-                var attr = GetFieldAttr<OriginAttribute>(field);
-                if (attr != null)
-                    origins[field] = attr;
-
-                var lj = GetFieldAttr<LeftJoinAttribute>(field);
-                var fk = GetFieldAttr<ForeignKeyAttribute>(field);
-                if (lj != null && fk != null)
-                    fieldJoins[lj.Alias] = new Tuple<Field, ForeignKeyAttribute, LeftJoinAttribute>(field, fk, lj);
-            }
-
-            if (origins.Count == 0)
-                return;
-
-            var originByAlias = origins.ToLookup(x => x.Value.Join);
         }
 
         private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo)
