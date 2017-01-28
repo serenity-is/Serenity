@@ -3,7 +3,7 @@
 namespace Serenity.Data.Mapping
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true)]
-    public class LeftJoinAttribute : Attribute
+    public class LeftJoinAttribute : Attribute, ISqlJoin
     {
         /// <summary>
         /// Adds a left join on foreign key. Use this version only on properties with ForeignKey attribute.
@@ -31,6 +31,7 @@ namespace Serenity.Data.Mapping
         public String Alias { get; private set; }
         public String ToTable { get; private set; }
         public String OnCriteria { get; private set; }
-        public Type RowType { get; private set; }
+        public String Prefix { get; set; }
+        public Type RowType { get; set; }
     }
 }

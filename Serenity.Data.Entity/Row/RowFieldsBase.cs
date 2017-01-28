@@ -37,8 +37,6 @@ namespace Serenity.Data
         internal string alias;
         internal string aliasDot;
 
-        internal static ConcurrentDictionary<Type, RowFieldsBase> rowFieldsByType = new ConcurrentDictionary<Type, RowFieldsBase>();
-
         protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
         {
             this.tableName = tableName;
@@ -199,6 +197,8 @@ namespace Serenity.Data
                 Dictionary<string, PropertyInfo> rowProperties;
                 GetRowFieldsAndProperties(out rowFields, out rowProperties);
 
+                var expressionSelector = new DialectExpressionSelector(connectionKey);
+
                 foreach (var fieldInfo in this.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
                 {
                     if (fieldInfo.FieldType.IsSubclassOf(typeof(Field)))
@@ -228,10 +228,12 @@ namespace Serenity.Data
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
 
-                        DialectExpressionSelector expressionSelector = null;
+                        RowPropertyDictionary propertyDictionary = null;
 
                         if (property != null)
                         {
+                            var origin = property.GetCustomAttribute<OriginAttribute>();
+
                             column = property.GetCustomAttribute<ColumnAttribute>(false);
                             display = property.GetCustomAttribute<DisplayNameAttribute>(false);
                             size = property.GetCustomAttribute<SizeAttribute>(false);
@@ -239,15 +241,33 @@ namespace Serenity.Data
                             var expressions = property.GetCustomAttributes<ExpressionAttribute>(false);
                             if (expressions.Any())
                             {
-                                expressionSelector = expressionSelector ?? new DialectExpressionSelector(connectionKey);
-                                expression = expressionSelector.GetBestMatch(expressions);
+                                expression = expressionSelector.GetBestMatch(expressions, x => x.Dialect);
+                            }
+                            else if (origin != null)
+                            {
+                                propertyDictionary = propertyDictionary ?? RowPropertyDictionary.Get(this.rowType);
+                                try
+                                {
+                                    Dictionary<string, ISqlJoin> originJoins;
+                                    expression = propertyDictionary.OriginExpression(property, origin, 
+                                        expressionSelector, "", out originJoins);
+                                }
+                                catch (DivideByZeroException)
+                                {
+                                    throw new Exception(String.Format(
+                                        "Infinite recursion detected while determining origin expression " + 
+                                        "for property '{0}' on row type '{1}'",
+                                        property.Name, rowType.FullName));
+                                }
                             }
 
                             scale = property.GetCustomAttribute<ScaleAttribute>(false);
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
                             foreignKey = property.GetCustomAttribute<ForeignKeyAttribute>(false);
-                            leftJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
-                            innerJoin = property.GetCustomAttributes<InnerJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                            leftJoin = property.GetCustomAttributes<LeftJoinAttribute>(false)
+                                .FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                            innerJoin = property.GetCustomAttributes<InnerJoinAttribute>(false)
+                                .FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
                             defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
                             textualField = property.GetCustomAttribute<TextualFieldAttribute>(false);
                             dateTimeKind = property.GetCustomAttribute<DateTimeKindAttribute>(false);
@@ -453,25 +473,33 @@ namespace Serenity.Data
             isInitialized = true;
         }
 
+        private static TAttr GetFieldAttr<TAttr>(Field x)
+            where TAttr: Attribute
+        {
+            return x.CustomAttributes.FirstOrDefault(z => typeof(TAttr).IsAssignableFrom(z.GetType())) as TAttr;
+        }
+
         private void ProcessViewColumns()
         {
+            var origins = new Dictionary<Field, OriginAttribute>();
+            var fieldJoins = new Dictionary<string, Tuple<Field, ForeignKeyAttribute, LeftJoinAttribute>>();
+
             foreach (var field in this)
             {
-                var viewCol = field.CustomAttributes.FirstOrDefault(x => x.GetType().IsSubclassOf(typeof(ViewColumnAttribute))) as ViewColumnAttribute;
-                if (viewCol == null)
-                    continue;
+                var attr = GetFieldAttr<OriginAttribute>(field);
+                if (attr != null)
+                    origins[field] = attr;
 
-                if (viewCol.Join == null)
-                {
-                }
-
-                var expressions = field.CustomAttributes.Where(x => x.GetType().IsSubclassOf(typeof(ExpressionAttribute)));
-                if (!expressions.Any())
-                {
-                }
-
-
+                var lj = GetFieldAttr<LeftJoinAttribute>(field);
+                var fk = GetFieldAttr<ForeignKeyAttribute>(field);
+                if (lj != null && fk != null)
+                    fieldJoins[lj.Alias] = new Tuple<Field, ForeignKeyAttribute, LeftJoinAttribute>(field, fk, lj);
             }
+
+            if (origins.Count == 0)
+                return;
+
+            var originByAlias = origins.ToLookup(x => x.Value.Join);
         }
 
         private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo)

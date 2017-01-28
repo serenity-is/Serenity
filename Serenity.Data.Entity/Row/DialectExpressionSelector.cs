@@ -1,5 +1,4 @@
-﻿using Serenity.Data.Mapping;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,9 +28,9 @@ namespace Serenity.Data
                 dialectTypeName.StartsWith(s, StringComparison.OrdinalIgnoreCase);
         }
 
-        public ExpressionAttribute GetBestMatch(IEnumerable<ExpressionAttribute> expressions)
+        public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> expressions, Func<TAttribute, string> getDialect)
         {
-            if (!expressions.Any(x => !string.IsNullOrEmpty(x.Dialect)))
+            if (!expressions.Any(x => !string.IsNullOrEmpty(getDialect(x))))
                 return expressions.FirstOrDefault();
 
             if (dialectTypeName == null)
@@ -53,17 +52,19 @@ namespace Serenity.Data
             var st = dialectServerType;
             var tn = dialectTypeName;
 
-            Dictionary<ExpressionAttribute, int> weight = null;
+            Dictionary<TAttribute, int> weight = null;
 
             var bestMatch = expressions.Where(x =>
             {
-                if (string.IsNullOrEmpty(x.Dialect))
+                var d = getDialect(x);
+
+                if (string.IsNullOrEmpty(getDialect(x)))
                     return true;
 
-                if (x.Dialect.IndexOf(',') < 0)
-                    return IsMatch(x.Dialect);
+                if (d.IndexOf(',') < 0)
+                    return IsMatch(d);
 
-                var best = x.Dialect.Split(comma, StringSplitOptions.RemoveEmptyEntries)
+                var best = d.Split(comma, StringSplitOptions.RemoveEmptyEntries)
                     .Select(z => z.Trim())
                     .Where(z => IsMatch(z))
                     .OrderByDescending(z => z.Length)
@@ -72,7 +73,7 @@ namespace Serenity.Data
                 if (best != null)
                 {
                     if (weight == null)
-                        weight = new Dictionary<ExpressionAttribute, int>();
+                        weight = new Dictionary<TAttribute, int>();
 
                     weight[x] = best.Length;
                     return true;
@@ -82,20 +83,20 @@ namespace Serenity.Data
             })
             .OrderByDescending(x =>
             {
-                if (string.IsNullOrEmpty(x.Dialect))
+                var d = getDialect(x);
+                if (string.IsNullOrEmpty(d))
                     return 0;
 
                 int w;
                 if (weight != null && weight.TryGetValue(x, out w))
                     return w;
 
-                return x.Dialect.Length;
+                return d.Length;
             })
             .FirstOrDefault();
 
             return bestMatch;
         }
-
 
         private static readonly char[] comma = new char[] { ',' };
     }

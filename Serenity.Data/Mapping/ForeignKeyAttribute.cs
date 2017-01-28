@@ -35,11 +35,12 @@ namespace Serenity.Data.Mapping
         public ForeignKeyAttribute(Type rowType, string field = null)
         {
             Check.NotNull(rowType, nameof(rowType));
+            this.RowType = rowType;
 
             var attr = rowType.GetCustomAttribute<TableNameAttribute>(true);
             if (attr == null || string.IsNullOrEmpty(attr.Name))
                 throw new ArgumentOutOfRangeException(nameof(rowType),
-                    String.Format("Type '{0}' is specified for a ForeignKey attribute" +
+                    String.Format("Type '{0}' is specified for a ForeignKey attribute " +
                         "but it has no [TableName] attribute", rowType.FullName));
 
             this.Table = attr.Name;
@@ -52,7 +53,7 @@ namespace Serenity.Data.Mapping
 
                 if (identityOrPrimaryKey.Length == 0)
                     throw new ArgumentOutOfRangeException(nameof(rowType),
-                        String.Format("Type '{0}' is specified for a ForeignKey attribute" + 
+                        String.Format("Type '{0}' is specified for a ForeignKey attribute " + 
                             "but it has no property with [Identity] or [PrimaryKey] attribute",
                             rowType.FullName));
 
@@ -63,7 +64,7 @@ namespace Serenity.Data.Mapping
 
                     if (identity.Count() != 1)
                         throw new ArgumentOutOfRangeException(nameof(rowType),
-                            String.Format("Type '{0}' is specified for a ForeignKey attribute" + 
+                            String.Format("Type '{0}' is specified for a ForeignKey attribute " + 
                             "but it has multiple [Identity] or [PrimaryKey] attributes",
                             rowType.FullName));
 
@@ -80,6 +81,5 @@ namespace Serenity.Data.Mapping
         public string Table { get; private set; }
         public string Field { get; private set; }
         public Type RowType { get; set; }
-        public string Prefix { get; set; }
     }
 }
