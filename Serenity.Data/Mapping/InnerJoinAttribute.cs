@@ -31,7 +31,8 @@ namespace Serenity.Data.Mapping
         public String Alias { get; private set; }
         public String ToTable { get; private set; }
         public String OnCriteria { get; private set; }
-        public String Prefix { get; }
+        public String PropertyPrefix { get; set; }
+        public String TitlePrefix { get; set; }
         public Type RowType { get; set; }
     }
 }

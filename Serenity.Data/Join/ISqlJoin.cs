@@ -8,7 +8,8 @@ namespace Serenity.Data.Mapping
         string Alias { get; }
         string ToTable { get; }
         string OnCriteria { get; }
-        string Prefix { get; }
+        string PropertyPrefix { get; }
+        string TitlePrefix { get; set; }
         Type RowType { get; set; }
     }
 }

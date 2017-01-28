@@ -235,31 +235,14 @@ namespace Serenity.Data
                         {
                             var origin = property.GetCustomAttribute<OriginAttribute>();
 
+
                             column = property.GetCustomAttribute<ColumnAttribute>(false);
                             display = property.GetCustomAttribute<DisplayNameAttribute>(false);
                             size = property.GetCustomAttribute<SizeAttribute>(false);
 
                             var expressions = property.GetCustomAttributes<ExpressionAttribute>(false);
                             if (expressions.Any())
-                            {
                                 expression = expressionSelector.GetBestMatch(expressions, x => x.Dialect);
-                            }
-                            else if (origin != null)
-                            {
-                                propertyDictionary = propertyDictionary ?? OriginPropertyDictionary.Get(this.rowType);
-                                try
-                                {
-                                    expression = propertyDictionary.OriginExpression(property, origin, 
-                                        expressionSelector, "", rowCustomAttributes);
-                                }
-                                catch (DivideByZeroException)
-                                {
-                                    throw new Exception(String.Format(
-                                        "Infinite recursion detected while determining origin expression " + 
-                                        "for property '{0}' on row type '{1}'",
-                                        property.Name, rowType.FullName));
-                                }
-                            }
 
                             scale = property.GetCustomAttribute<ScaleAttribute>(false);
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
@@ -276,6 +259,33 @@ namespace Serenity.Data
                                 property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
                             updatePermission = property.GetCustomAttribute<UpdatePermissionAttribute>(false) ??
                                 property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
+
+                            if (origin != null)
+                            {
+                                propertyDictionary = propertyDictionary ?? OriginPropertyDictionary.GetPropertyDictionary(this.rowType);
+                                try
+                                {
+                                    if (!expressions.Any() && expression == null)
+                                        expression = new ExpressionAttribute(propertyDictionary.OriginExpression(
+                                            property, origin, expressionSelector, "", rowCustomAttributes));
+
+                                    if (display == null)
+                                        display = new DisplayNameAttribute(propertyDictionary.OriginDisplayName(property, origin));
+
+                                    if (size == null)
+                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(property, origin);
+
+                                    if (scale == null)
+                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(property, origin);
+                                }
+                                catch (DivideByZeroException)
+                                {
+                                    throw new Exception(String.Format(
+                                        "Infinite recursion detected while determining origins " +
+                                        "for property '{0}' on row type '{1}'",
+                                        property.Name, rowType.FullName));
+                                }
+                            }
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                             var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
