@@ -1,10 +1,18 @@
+## 2.9.1 (2017-01-29)
+
+Features:
+  - new [Origin] attribute to auto set Expression, DisplayName, Size and Scale attributes from the originating row for view fields.
+  - allow specifying a [ForeignKey] by using a row type that has a [TableName] attribute. ID field can also be automatically determined if row has a property with [Identity] attribute, or a single property with [PrimaryKey] attribute. Implementing IIdField doesn't help ID field detection.
+  - for script bundling, replace MsieJsEngine + UglifyJS with Nuglify which is based on MS Ajax Minifier, faster and effective resource wise.
+  - put semicolon between ConcatenatedScript parts to avoid javascript errors with certain minified files
+  - allowClear param in enum editor (thanks @Estrusco)
+
 ## 2.9.0 (2017-01-25)
 
 Features:
   - Sergen for .NET Core now works with Firebird, MySql, Postgres, Sqlite in addition to SqlServer. 
   - New schema provider system in Sergen to query database metadata
   - Made FirebirdDialect quoting compatible with with FluentMigrator one
-  - 
   
 Bugfixes:
   - use this.uniqueName while binding to layout, to resolve script errors after widget is destroyed, and use it to unbind on destroy
