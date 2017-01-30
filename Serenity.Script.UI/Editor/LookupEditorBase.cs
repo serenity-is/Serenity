@@ -181,6 +181,12 @@ namespace Serenity
 
         protected virtual void InitNewEntity(TItem entity)
         {
+            if (!string.IsNullOrEmpty(CascadeField))
+                entity.As<dynamic>()[CascadeField] = CascadeValue;
+
+            if (!string.IsNullOrEmpty(FilterField))
+                entity.As<dynamic>()[FilterField] = FilterValue;
+
             if (OnInitNewEntity != null)
                 OnInitNewEntity(entity);
         }
@@ -213,8 +219,7 @@ namespace Serenity
                     var entity = new object().As<TItem>();
                     entity.As<JsDictionary<string, object>>()[GetLookup().TextField] = lastCreateTerm.TrimToEmpty();
 
-                    if (OnInitNewEntity != null)
-                        OnInitNewEntity(entity);
+                    InitNewEntity(entity);
 
                     dialog.Load(entity, () => dialog.DialogOpen(), null);
                 }
