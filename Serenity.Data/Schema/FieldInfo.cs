@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator
+﻿namespace Serenity.Data.Schema
 {
     public class FieldInfo
     {

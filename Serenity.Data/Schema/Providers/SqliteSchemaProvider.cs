@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using System;
 
-namespace Serenity.CodeGenerator
+namespace Serenity.Data.Schema
 {
     public class SqliteSchemaProvider : ISchemaProvider
     {

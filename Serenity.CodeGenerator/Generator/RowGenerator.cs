@@ -1,4 +1,5 @@
 ﻿using Serenity.Data;
+using Serenity.Data.Schema;
 using System;
 using System.Collections.Generic;
 using System.Data;

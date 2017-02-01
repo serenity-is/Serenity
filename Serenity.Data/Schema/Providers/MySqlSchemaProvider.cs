@@ -1,10 +1,9 @@
-﻿using Serenity.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace Serenity.CodeGenerator
+namespace Serenity.Data.Schema
 {
     public class MySqlSchemaProvider : ISchemaProvider
     {

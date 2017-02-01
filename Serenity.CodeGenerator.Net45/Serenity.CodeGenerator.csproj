@@ -106,6 +106,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\Serenity.CodeGenerator\Helpers\SchemaHelper.cs">
+      <Link>Helpers\SchemaHelper.cs</Link>
+    </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
@@ -119,7 +122,6 @@
     <Compile Include="Generator\EntityCodeGenerator.cs" />
     <Compile Include="Generator\RowGenerator.cs" />
     <Compile Include="Models\EntityJoin.cs" />
-    <Compile Include="SchemaInfo\SqlSchemaInfo.cs" />
     <Compile Include="Templates.cs" />
     <Compile Include="Views\EntityColumns.generated.cs">
       <DependentUpon>EntityColumns.cshtml</DependentUpon>

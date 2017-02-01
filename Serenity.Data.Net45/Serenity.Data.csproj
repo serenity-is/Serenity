@@ -35,6 +35,7 @@
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -52,6 +53,33 @@
     </Compile>
     <Compile Include="..\Serenity.Data\Mapping\OriginAttribute.cs">
       <Link>Mapping\OriginAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\FieldInfo.cs">
+      <Link>Schema\FieldInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\ForeignKeyInfo.cs">
+      <Link>Schema\ForeignKeyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\Providers\FirebirdSchemaProvider.cs">
+      <Link>Schema\Providers\FirebirdSchemaProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\Providers\MySqlSchemaProvider.cs">
+      <Link>Schema\Providers\MySqlSchemaProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\Providers\OracleSchemaProvider.cs">
+      <Link>Schema\Providers\OracleSchemaProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\Providers\PostgresSchemaProvider.cs">
+      <Link>Schema\Providers\PostgresSchemaProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\Providers\SqliteSchemaProvider.cs">
+      <Link>Schema\Providers\SqliteSchemaProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\Providers\SqlServerSchemaProvider.cs">
+      <Link>Schema\Providers\SqlServerSchemaProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\TableName.cs">
+      <Link>Schema\TableName.cs</Link>
     </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
@@ -382,6 +410,9 @@
     </Compile>
     <Compile Include="..\Serenity.Data\QueryModel\Parameter.cs">
       <Link>QueryModel\Parameter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.Data\Schema\ISchemaProvider.cs">
+      <Link>Schema\ISchemaProvider.cs</Link>
     </Compile>
     <Compile Include="..\Serenity.Data\SqlHelpers\SqlHelper.cs">
       <Link>SqlHelpers\SqlHelper.cs</Link>

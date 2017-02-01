@@ -22,7 +22,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     using System.ComponentModel;
     using System.IO;
 
-    [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Title"), InstanceName("@Model.Title"), TwoLevelCached]
+    [ConnectionKey("@Model.ConnectionKey"), TableName("@(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]")"), DisplayName("@Model.Title"), InstanceName("@Model.Title"), TwoLevelCached]
     [ReadPermission("@Model.Permission")]
     [ModifyPermission("@Model.Permission")]
     public sealed class @Model.RowClassName : @Model.RowBaseClass, IIdRow@(Model.IsLookup ? ", IDbLookupRow" : "")@(Model.NameField == null ? "" : ", INameRow")
@@ -104,7 +104,7 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 
 
             public RowFields()
-                : base("@(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]")"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\"")))
+                : base(@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : ("\"" + Model.FieldPrefix + "\"")))
             {
                 LocalTextPrefix = "@(moduleDot)@(Model.ClassName)";
             }
