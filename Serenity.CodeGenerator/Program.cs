@@ -63,7 +63,7 @@ namespace Serenity.CodeGenerator
                     return JSON.Parse<List<ExternalType>>(tsTypesJson);
                 };
 
-                if ("transform".StartsWith(command) || "mvc".StartsWith("command"))
+                if ("transform".StartsWith(command) || "mvc".StartsWith(command))
                 {
                     new MvcCommand().Run(projectJson);
                 }
