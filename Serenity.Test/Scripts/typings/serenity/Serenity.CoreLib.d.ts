@@ -2700,7 +2700,7 @@ declare namespace Slick {
         collapsed: boolean;
         totals: any;
         rows: any;
-        groups: Group<TEntity>;
+        groups: Group<TEntity>[];
         groupingKey: string;
     }
     class GroupTotals<TEntity> {
