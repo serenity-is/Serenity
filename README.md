@@ -3,7 +3,7 @@ Serenity Application Platform
 
 <img src="https://github.com/volkanceylan/Serenity/blob/master/Tools/Images/serenity-logo-128.png" />
 
-[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Script.svg?label=version)](http://www.nuget.org/packages/Serenity.Script/)   [![Join the chat at https://gitter.im/volkanceylan/Serenity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/volkanceylan/Serenity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![Serenity Slack Status](https://serenityslackinvitation.herokuapp.com/badge.svg?2)](https://serenityslackinvitation.herokuapp.com/)
+[![Build status](https://ci.appveyor.com/api/projects/status/hfs2elisqkmg7fp7?svg=true)](https://ci.appveyor.com/project/volkanceylan/serenity)  [![version](https://img.shields.io/nuget/v/Serenity.Core.svg?label=version)](http://www.nuget.org/packages/Serenity.Core/)   [![Join the chat at https://gitter.im/volkanceylan/Serenity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/volkanceylan/Serenity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![Serenity Slack Status](https://serenityslackinvitation.herokuapp.com/badge.svg?2)](https://serenityslackinvitation.herokuapp.com/)
 
 ## What is Serenity Platform
 
