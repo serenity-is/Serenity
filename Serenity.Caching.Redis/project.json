@@ -1,8 +1,8 @@
 ﻿{
-  "version": "2.9.1-*",
+  "version": "2.9.2-*",
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
-    "Serenity.Core": "2.9.1-*",
+    "Serenity.Core": "2.9.2-*",
     "StackExchange.Redis": "1.1.608"
   },
   "frameworks": {

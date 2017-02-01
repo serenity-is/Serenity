@@ -1,3 +1,11 @@
+## 2.9.2 (2017-01-31)
+
+Features:
+  - backport schema providers in sergen .net core version to .net framework version
+  - use Serene.Web for .NET core project template, instead of longer Serene.AspNetCore name
+  - fill in (CascadeField, CascadeValue) and (FilterField, FilterValue) in InitNewEntity method of LookupEditorBase, e.g. InplaceAdd
+  - sergen generates code for mvc, clienttypes before build, and servertypings post build in asp.net core version (project.json)
+
 ## 2.9.1 (2017-01-29)
 
 Features:
