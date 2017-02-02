@@ -7,7 +7,7 @@ namespace Serenity.Web
 {
     public class TemplateScriptRegistrar
     {
-        const string TemplateSuffix = ".Template.html";
+        private static readonly string[] TemplateSuffixes = new[] { ".Template.html", ".ts.html" };
 
         private ConcatenatedScript bundle;
         private Dictionary<string, TemplateScript> scriptByKey = new Dictionary<string, TemplateScript>(StringComparer.OrdinalIgnoreCase);
@@ -16,10 +16,11 @@ namespace Serenity.Web
         {
             string key = Path.GetFileName(filename);
 
-            if (!key.EndsWith(TemplateSuffix, StringComparison.OrdinalIgnoreCase))
-                return null;
+            foreach (var suffix in TemplateSuffixes)
+            if (key.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                    return key.Substring(0, key.Length - suffix.Length);
 
-            return key.Substring(0, key.Length - TemplateSuffix.Length);
+            return null;
         }
 
         private void WatchForChanges(string path)
