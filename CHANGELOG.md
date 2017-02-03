@@ -1,3 +1,13 @@
+## 2.9.3 (2017-01-31)
+
+Features:
+  - allow using .ts.html suffix in addition to .Template.html to let Visual Studio group a template under its related component, e.g. SomeDialog.ts => SomeDialog.ts.html
+  - add module template prefix to template key automatically (might be a breaking change if you relied on exact file name)
+  - 
+
+Bugfixes:
+  - fix group declaration on group import for slickgrid.d.ts
+
 ## 2.9.2 (2017-01-31)
 
 Features:
