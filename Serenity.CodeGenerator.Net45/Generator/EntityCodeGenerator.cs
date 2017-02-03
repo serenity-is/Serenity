@@ -37,9 +37,9 @@ namespace Serenity.CodeGenerator
             siteWebProj = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.WebProjectFile));
             siteWebPath = Path.GetDirectoryName(siteWebProj);
 
-            this.serverTypings = Path.Combine(siteWebPath, "Modules/Common/Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
-            if (!Directory.Exists(serverTypings))
-                this.serverTypings = Path.Combine(siteWebPath, "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+            this.serverTypings = "Modules/Common/Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar);
+            if (!Directory.Exists(Path.Combine(siteWebPath, this.serverTypings)))
+                this.serverTypings = "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar);
 
             if (!string.IsNullOrEmpty(config.ScriptProjectFile))
             {
