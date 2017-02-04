@@ -26,17 +26,37 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        private string GetOption(string[] args, string opt)
+        {
+            var dash = "-" + opt;
+            var val = args.FirstOrDefault(x => x.StartsWith(dash + ":"));
+            if (val != null)
+                return val.Substring(dash.Length + 1);
+
+            var idx = Array.IndexOf(args, dash);
+            if (idx >= 0 && idx < args.Length - 1)
+            {
+                val = args[idx + 1];
+                if (val.StartsWith("\"") && val.EndsWith("\""))
+                    return val.Substring(1, val.Length - 2);
+                else
+                    return val;
+            }
+
+            return null;
+        }
+
         public void Run(string projectJson, string[] args)
         {
             var projectDir = Path.GetDirectoryName(projectJson);
 
-            var outFile = args.FirstOrDefault(x => x.StartsWith("-o:"))?.Substring(3).TrimToNull();
-            var connectionKey = args.FirstOrDefault(x => x.StartsWith("-c:"))?.Substring(3).TrimToNull();
-            var table = args.FirstOrDefault(x => x.StartsWith("-t:"))?.Substring(3).TrimToNull();
-            var what = args.FirstOrDefault(x => x.StartsWith("-w:"))?.Substring(3).TrimToNull();
-            var module = args.FirstOrDefault(x => x.StartsWith("-m:"))?.Substring(3).TrimToNull();
-            var identifier = args.FirstOrDefault(x => x.StartsWith("-i:"))?.Substring(3).TrimToNull();
-            var permissionKey = args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3).TrimToNull();
+            var outFile = GetOption(args, "o").TrimToNull();
+            var connectionKey = GetOption(args, "c").TrimToNull();
+            var table = GetOption(args, "t").TrimToNull();
+            var what = GetOption(args, "w").TrimToNull();
+            var module = GetOption(args, "m").TrimToNull();
+            var identifier = GetOption(args, "i").TrimToNull();
+            var permissionKey = GetOption(args, "p").TrimToNull();
             if (identifier != null)
                 CodeFileHelper.Overwrite = true;
 
