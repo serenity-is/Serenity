@@ -48,7 +48,7 @@ function runGenerate() {
     
     if (generateOptions.connection == null) {
         var tempFile = temp.path() + '.json';
-        spawn("dotnet", ["sergen", "g", "-o:" + tempFile], {stdio: "inherit"}).on('exit', function(code) {
+        spawn("dotnet", ["sergen", "g", "-o", tempFile], {stdio: "inherit"}).on('exit', function(code) {
             if (code != 0)
                 process.exit(code);
 
@@ -72,7 +72,7 @@ function runGenerate() {
 
     if (generateOptions.table == null) {
         var tempFile = temp.path() + '.json';
-        spawn("dotnet", ["sergen", "g", "-o:" + tempFile, "-c:" + generateOptions.connection], {stdio: "inherit"}).on('exit', function(code) {
+        spawn("dotnet", ["sergen", "g", "-o", tempFile, "-c", generateOptions.connection], {stdio: "inherit"}).on('exit', function(code) {
             if (code != 0)
                 process.exit(code);
 
@@ -137,12 +137,12 @@ function runGenerate() {
     }]).then(function(answers) {
         spawn("dotnet", [
             "sergen", "g", 
-            "-c:" + generateOptions.connection,
-            "-t:" + generateOptions.table,
-            "-m:" + answers.module,
-            "-i:" + answers.identifier,
-            "-p:" + answers.permission,
-            "-w:" + answers.what.map(x => x.charAt(0)).join('')
+            "-c", generateOptions.connection,
+            "-t", generateOptions.table,
+            "-m", answers.module,
+            "-i", answers.identifier,
+            "-p", answers.permission,
+            "-w", answers.what.map(x => x.charAt(0)).join('')
         ], { stdio: "inherit" }).on('exit', function(code) {
             process.exit(code);
         });
