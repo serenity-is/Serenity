@@ -1,3 +1,12 @@
+## 2.9.5 (2017-02-14)
+
+Features:
+  - sergen .net core / node version tolerates whitespace in paths and other arguments
+  - russian texts update (thanks @Сергей Соболев)
+
+Bugfixes:
+  - handle issue with servertypings.tt and datetimeoffset/bytearray field types
+
 ## 2.9.4 (2017-01-04)
 
 Features:
