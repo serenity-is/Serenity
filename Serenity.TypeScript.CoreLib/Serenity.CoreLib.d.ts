@@ -2183,6 +2183,7 @@ declare namespace Serenity {
         private static applyCssSizes(opt, dialogClass);
         destroy(): void;
         protected initDialog(): void;
+        protected getIsPanel(isPanel: boolean): boolean;
         protected initToolbar(): void;
         protected getToolbarButtons(): ToolButton[];
         protected getValidatorOptions(): JQueryValidation.ValidationOptions;
