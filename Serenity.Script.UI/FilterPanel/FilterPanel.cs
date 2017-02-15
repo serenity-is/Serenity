@@ -1,9 +1,6 @@
 ﻿using jQueryApi;
-using Serenity.Data;
 using System;
 using System.Collections.Generic;
-using System.Html;
-using System.Linq;
 
 namespace Serenity
 {
@@ -397,7 +394,8 @@ namespace Serenity
             if (operatorSelect.Value.IsEmptyOrNull())
                 return;
 
-            var op = filtering.GetOperators().FirstOrDefault(x => x.Key == operatorSelect.Value);
+            var ops = filtering.GetOperators().Filter(x => x.Key == operatorSelect.Value);
+            var op = ops.Count > 0 ? ops[0] : null;
             if (op == null)
                 return;
 

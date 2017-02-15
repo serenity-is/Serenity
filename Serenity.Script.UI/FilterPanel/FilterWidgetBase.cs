@@ -46,7 +46,7 @@ namespace Serenity
                     if (this.store != null)
                         this.store.Changed -= OnFilterStoreChanged;
 
-                    store = value ?? new FilterStore(new PropertyItem[0]);
+                    store = value ?? new FilterStore(new List<PropertyItem>());
                     store.Changed += OnFilterStoreChanged;
                     FilterStoreChanged();
                 }

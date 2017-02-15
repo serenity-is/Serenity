@@ -1,8 +1,5 @@
 ﻿using jQueryApi;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Serenity
 {
@@ -19,7 +16,11 @@ namespace Serenity
                     AddItem(op.Key, title, op, false);
                 }
 
-                var first = source.FirstOrDefault();
+                FilterOperator first = null;
+                var enumerator = source.GetEnumerator();
+                if (enumerator.MoveNext())
+                    first = enumerator.Current;
+
                 if (first != null)
                     this.Value = first.Key;
             }

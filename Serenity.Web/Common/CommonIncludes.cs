@@ -29,7 +29,6 @@ namespace Serenity.Web
             "~/Scripts/SlickGrid/Plugins/slick.headerbuttons.js",
             "~/Scripts/bootstrap.js",
             "~/Scripts/Saltarelle/mscorlib.js",
-            "~/Scripts/Saltarelle/linq.js",
             "~/Scripts/Serenity/Serenity.CoreLib.js",
             "~/Scripts/Serenity/Serenity.Script.UI.js"
         };

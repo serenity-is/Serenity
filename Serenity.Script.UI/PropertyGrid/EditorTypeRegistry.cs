@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Serenity
 {
@@ -73,7 +72,7 @@ namespace Serenity
         {
             const string suffix = "editor";
 
-            foreach (var k in knownTypes.Keys.ToArray())
+            foreach (var k in Object.Keys(knownTypes))
             {
                 if (!k.EndsWith(suffix))
                     continue;

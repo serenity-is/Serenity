@@ -272,9 +272,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Saltarelle.jQuery.UI.1.10.1\lib\Saltarelle.jQuery.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Saltarelle.Linq">
-      <HintPath>..\..\packages\Saltarelle.Linq.2.4.0\lib\Saltarelle.Linq.dll</HintPath>
-    </Reference>
     <Reference Include="Saltarelle.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a4048e8fcc593f14, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Saltarelle.Web.3.1.0\lib\Saltarelle.Web.dll</HintPath>

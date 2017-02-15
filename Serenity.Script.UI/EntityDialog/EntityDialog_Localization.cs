@@ -1,10 +1,7 @@
 ﻿using jQueryApi;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -82,7 +79,7 @@ namespace Serenity
                         var langsTuple = GetLanguages();
                         langs = (langsTuple as object) as string[][];
                         if (langs == null || langs.Length == 0 || langs[0] == null || !Q.IsArray(langs[0]))
-                            langs = langsTuple.Select(x => new string[] { x.Item1, x.Item2 }).ToArray();
+                            langs = langsTuple.Map(x => new string[] { x.Item1, x.Item2 }).ToArray();
                     }
 
                     foreach (var lang in langs)
@@ -154,10 +151,10 @@ namespace Serenity
                 LoadLocalization();
         }
 
-        protected virtual IEnumerable<Tuple<string, string>> GetLanguages()
+        protected virtual List<Tuple<string, string>> GetLanguages()
         {
             if (defaultLanguageList != null)
-                return defaultLanguageList().As<IEnumerable<Tuple<string, string>>>() ?? new List<Tuple<string, string>>();
+                return defaultLanguageList().As<List<Tuple<string, string>>>() ?? new List<Tuple<string, string>>();
 
             return new List<Tuple<string, string>>();
         }
@@ -262,7 +259,7 @@ namespace Serenity
             var langsTuple = GetLanguages();
             var langs = (langsTuple as object) as string[][];
             if (langs == null || langs.Length == 0 || langs[0] == null || !Q.IsArray(langs[0]))
-                langs = langsTuple.Select(x => new string[] { x.Item1, x.Item2 }).ToArray();
+                langs = langsTuple.Map(x => new string[] { x.Item1, x.Item2 }).ToArray();
 
             foreach (var pair in langs)
             {

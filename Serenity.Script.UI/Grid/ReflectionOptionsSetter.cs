@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using System.ComponentModel;
 
 namespace Serenity
@@ -25,7 +24,7 @@ namespace Serenity
             {
                 var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-                var propList = props.Where(x => x.CanWrite &&
+                var propList = props.Filter(x => x.CanWrite &&
                         (x.GetCustomAttributes(typeof(OptionAttribute)).Length > 0 ||
                             x.GetCustomAttributes(typeof(DisplayNameAttribute)).Length > 0));
 
@@ -39,7 +38,7 @@ namespace Serenity
             if (fieldByName == null)
             {
                 var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-                var fieldList = fields.Where(x =>
+                var fieldList = fields.Filter(x =>
                         (x.GetCustomAttributes(typeof(OptionAttribute)).Length > 0 ||
                             x.GetCustomAttributes(typeof(DisplayNameAttribute)).Length > 0));
 

@@ -1,7 +1,6 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -201,7 +200,7 @@ namespace Serenity
                 if (s.IsTrimmedEmpty())
                     return null;
 
-                if (this.Items.Any(x =>
+                if (Q.Any(this.Items, x =>
                 {
                     var text = getName != null ? getName(x.Source.As<TItem>()) : x.Text;
                     return Q.Externals.StripDiacritics(text ?? "").ToLower() == s;
@@ -210,7 +209,7 @@ namespace Serenity
                     return null;
                 }
 
-                if (!this.Items.Any(x => (Q.Externals.StripDiacritics(x.Text) ?? "").ToLower().Contains(s)))
+                if (!Q.Any(this.Items, x => (Q.Externals.StripDiacritics(x.Text) ?? "").ToLower().Contains(s)))
                 {
                     return new Select2Item
                     {
@@ -279,9 +278,8 @@ namespace Serenity
                     if (!string.IsNullOrEmpty(value) && multiple)
                     {
                         val = value.Split(',')
-                            .Select(x => x.TrimToNull())
-                            .Where(x => x != null)
-                            .ToArray();
+                            .Map(x => x.TrimToNull())
+                            .Filter(x => x != null);
                     }
 
                     this.element.Select2("val", val).TriggerHandler("change", new object[] { true });

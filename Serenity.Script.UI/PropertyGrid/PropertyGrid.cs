@@ -1,7 +1,6 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Serenity
 {
@@ -34,7 +33,7 @@ namespace Serenity
             var categoriesDiv = div;
 
             var useCategories = options.UseCategories &&
-                items.Any(x => !string.IsNullOrEmpty(x.Category));
+                Q.Any(items, x => !string.IsNullOrEmpty(x.Category));
 
             if (options.UseCategories)
             {

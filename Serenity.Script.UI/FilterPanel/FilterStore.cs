@@ -1,7 +1,6 @@
 ﻿using Serenity.Data;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Serenity
 {
@@ -10,14 +9,14 @@ namespace Serenity
         private EventHandler changed;
         private string displayText;
 
-        public FilterStore(IEnumerable<PropertyItem> fields)
+        public FilterStore(List<PropertyItem> fields)
         {
             Items = new List<FilterLine>();
 
             if (fields == null)
                 throw new ArgumentNullException("source");
 
-            this.Fields = fields.ToList();
+            this.Fields = fields.Clone();
             this.Fields.Sort((x, y) => Q.Externals.TurkishLocaleCompare(
                 Q.TryGetText(x.Title) ?? x.Title ?? x.Name, 
                 Q.TryGetText(y.Title) ?? y.Title ?? y.Name));
