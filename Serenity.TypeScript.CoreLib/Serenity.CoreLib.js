@@ -2716,6 +2716,7 @@ var Serenity;
         function TemplatedDialog(options) {
             var _this = _super.call(this, Q.newBodyDiv(), options) || this;
             _this.isPanel = ss.getAttributes(ss.getInstanceType(_this), Serenity.PanelAttribute, true).length > 0;
+            _this.isPanel = _this.getIsPanel(_this.isPanel);
             if (!_this.isPanel) {
                 _this.initDialog();
             }
@@ -2807,6 +2808,9 @@ var Serenity;
                 $(document.body).toggleClass('modal-dialog-open', $('.ui-dialog:visible').length > 0);
                 self.onDialogClose();
             });
+        };
+        TemplatedDialog.prototype.getIsPanel = function (isPanel) {
+            return isPanel;
         };
         TemplatedDialog.prototype.initToolbar = function () {
             var toolbarDiv = this.byId('Toolbar');

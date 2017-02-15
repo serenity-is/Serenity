@@ -15,6 +15,8 @@
             this.isPanel = (ss as any).getAttributes((ss as any).getInstanceType(this),
                 Serenity.PanelAttribute, true).length > 0;
 
+            this.isPanel = this.getIsPanel(this.isPanel);
+
             if (!this.isPanel) {
                 this.initDialog();
             }
@@ -124,6 +126,10 @@
                 $(document.body).toggleClass('modal-dialog-open', $('.ui-dialog:visible').length > 0);
                 self.onDialogClose();
             });
+        }
+
+        protected getIsPanel(isPanel: boolean): boolean {
+            return isPanel;
         }
 
         protected initToolbar(): void {
