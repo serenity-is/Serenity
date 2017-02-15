@@ -1,3 +1,8 @@
+## 2.9.6 (2017-02-15)
+
+Features:
+  - obsoleted linq.js (e.g. Saltaralle.Linq). if you still have saltaralle code that depends on linq.js, add it to your layouthead.cshtml manually, e.g. @Html.Script("~/Scripts/Saltaralle/linq.js")
+
 ## 2.9.5 (2017-02-14)
 
 Features:
