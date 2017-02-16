@@ -1,3 +1,8 @@
+## 2.9.7 (2017-02-17)
+
+Bugfixes:
+  - resolve bug caused by TypeScript __extends helper copying all static members including __metadata which shouldn't be as Saltaralle type system depends on it being a unique array. this is revealed by panel decorator getting applied to base class as well.
+
 ## 2.9.6 (2017-02-15)
 
 Features:
