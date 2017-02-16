@@ -9,9 +9,11 @@
     "sourceMap": true,
     "outFile": "Serenity.CoreLib.js",
     "suppressImplicitAnyIndexErrors": true,
-    "target": "ES5"
+    "target": "ES5",
+    "noEmitHelpers": true
   },
   "files": [
+    "Imports/Helpers.ts",
     "Imports/RSVP.ts",
     "Imports/Select2.ts",
     "Imports/SS.ts",

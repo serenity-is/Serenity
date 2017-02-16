@@ -2,6 +2,9 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
 /// <reference types="jqueryui" />
+declare var Reflect: any;
+declare var __decorate: any;
+declare var __extends: any;
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
