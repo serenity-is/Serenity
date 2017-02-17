@@ -881,6 +881,9 @@ this IDbConnection cnn, string sql, dynamic param = null, IDbTransaction transac
                 int hash = GetColumnHash(reader);
                 if (tuple.Func == null || tuple.Hash != hash)
                 {
+                    if (reader.FieldCount == 0) //https://code.google.com/p/dapper-dot-net/issues/detail?id=57
+                        yield break;
+
                     tuple = info.Deserializer = new DeserializerState(hash, GetDeserializer(typeof(T), reader, 0, -1, false));
                     SetQueryCache(identity, info);
                 }
