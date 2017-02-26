@@ -1,3 +1,8 @@
+## 2.9.8 (2017-02-17)
+
+Bugfixes:
+  - fix issue with stored proc (e.g. sqlite pragma foreign_key_list) returning empty resultset with 0 fields, dapper is raising multi map error. backporting fix from Dapper itself.
+
 ## 2.9.7 (2017-02-17)
 
 Bugfixes:
