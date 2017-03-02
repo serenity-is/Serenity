@@ -1,12 +1,12 @@
 ﻿{
-  "version": "2.9.8-*",
+  "version": "2.9.9-*",
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",
     "NUglify": "1.5.4",
-    "Serenity.Core": "2.9.8-*",
-    "Serenity.Data": "2.9.8-*",
-    "Serenity.Data.Entity": "2.9.8-*",
-    "Serenity.Services": "2.9.8-*"
+    "Serenity.Core": "2.9.9-*",
+    "Serenity.Data": "2.9.9-*",
+    "Serenity.Data.Entity": "2.9.9-*",
+    "Serenity.Services": "2.9.9-*"
   },
   "frameworks": {
     "netstandard1.6": {

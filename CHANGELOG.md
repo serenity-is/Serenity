@@ -1,3 +1,11 @@
+## 2.9.9 (2017-03-02)
+
+Features:
+  - use TypeScript compiler from npm. Visual Studio still uses its own extension for intellisense and compile on save, so make sure your version matches.
+
+Bugfixes:
+  - try fix nuget sergen path issue by moving back it to tools folder from tools/net45
+
 ## 2.9.8 (2017-02-17)
 
 Bugfixes:
