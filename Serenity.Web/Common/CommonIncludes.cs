@@ -18,7 +18,6 @@ namespace Serenity.Web
             "~/Scripts/jquery.dialogextendQ.js",
             "~/Scripts/jquery.event.drag.js",
             "~/Scripts/jquery.scrollintoview.js",
-            "~/Scripts/jsrender.js",
             "~/Scripts/select2.js",
             "~/Scripts/sortable.js",
             "~/Scripts/toastr.js",
