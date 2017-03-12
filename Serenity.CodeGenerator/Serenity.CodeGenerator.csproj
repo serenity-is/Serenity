@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Serenity Tooling for .NET Core CLI. Contains the dotnet-sergen command used to generate code, transform templates, restore content packages.</Description>
+    <VersionPrefix>2.9.9</VersionPrefix>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>Serenity.CodeGenerator</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>Serenity.CodeGenerator</PackageId>
+    <PackageTargetFallback>$(PackageTargetFallback);netstandard1.6;netstandard1.3</PackageTargetFallback>
+    <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\lib.d.ts_">
+      <Link>lib.d.ts_</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.TypeScript.CodeGeneration\Serenity.CodeGeneration.js">
+      <Link>Serenity.CodeGeneration.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
+      <Link>typeScriptServices.js</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Web\Serenity.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.7.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="1.1.0" />
+    <PackageReference Include="MySqlConnector" Version="0.11.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Npgsql" Version="3.1.9" />
+  </ItemGroup>
+
+</Project>

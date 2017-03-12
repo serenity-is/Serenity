@@ -120,5 +120,6 @@
     "Externals/Serenity.Externals.ts"
   ],
   "exclude": [
+    "Serenity.CoreLib.d.ts"
   ]
 }

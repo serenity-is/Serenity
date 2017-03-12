@@ -57,12 +57,8 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Serenity.Caching.Couchbase\CouchbaseDistributedCache.cs">
-      <Link>CouchbaseDistributedCache.cs</Link>
-    </Compile>
-    <Compile Include="..\Serenity.Caching.Couchbase\Properties\AssemblyInfo.cs">
-      <Link>Properties\AssemblyInfo.cs</Link>
-    </Compile>
+    <Compile Include="CouchbaseDistributedCache.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core.Net45\Serenity.Core.csproj">
@@ -71,7 +67,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.Serenity.Caching.Couchbase.Net45.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
