@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7D55C2E1-B805-428E-873A-1EFB55C37DEA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Serenity</RootNamespace>
+    <AssemblyName>Serenity.Data.Entity</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Row\DialectExpressionSelector.cs" />
+    <Compile Include="Row\OriginPropertyDictionary.cs" />
+    <Compile Include="Contracts\IEntity.cs" />
+    <Compile Include="Contracts\IEntityWithJoins.cs" />
+    <Compile Include="Contracts\IFieldWithJoinInfo.cs" />
+    <Compile Include="Contracts\IIsActiveDeletedRow.cs" />
+    <Compile Include="CustomFields\CustomFieldCache.cs" />
+    <Compile Include="CustomFields\CustomFieldExtensions.cs" />
+    <Compile Include="CustomFields\CustomFieldType.cs" />
+    <Compile Include="CustomFields\ICustomFieldDefinition.cs" />
+    <Compile Include="CustomFields\ICustomFieldListService.cs" />
+    <Compile Include="CustomFields\SchemaChangeSource.cs" />
+    <Compile Include="Extensions\AliasedFields.cs" />
+    <Compile Include="Extensions\EntitySqlQueryExtensions.cs" />
+    <Compile Include="Extensions\EntityQueryExtensions.cs" />
+    <Compile Include="Extensions\EntityConnectionExtensions.cs" />
+    <Compile Include="Extensions\EntityFieldExtensions.cs" />
+    <Compile Include="Extensions\EntitySqlHelper.cs" />
+    <Compile Include="Extensions\EntityLocalTexts.cs" />
+    <Compile Include="FieldTypes\DateTimeOffsetField.cs" />
+    <Compile Include="FieldTypes\ListField.cs" />
+    <Compile Include="FieldTypes\RowField.cs" />
+    <Compile Include="FieldTypes\ByteArrayField.cs" />
+    <Compile Include="FieldTypes\TimeSpanField.cs" />
+    <Compile Include="FieldTypes\SingleField.cs" />
+    <Compile Include="FieldTypes\Field.CriteriaOperators.cs" />
+    <Compile Include="FieldTypes\Field.cs" />
+    <Compile Include="Extensions\FieldDescriptor.cs" />
+    <Compile Include="FieldTypes\FieldType.cs" />
+    <Compile Include="FieldTypes\BooleanField.cs" />
+    <Compile Include="FieldTypes\CustomClassField.cs" />
+    <Compile Include="FieldTypes\DateTimeField.cs" />
+    <Compile Include="FieldTypes\DecimalField.cs" />
+    <Compile Include="FieldTypes\DoubleField.cs" />
+    <Compile Include="FieldTypes\RowListField.cs" />
+    <Compile Include="FieldTypes\GenericClassField.cs" />
+    <Compile Include="FieldTypes\GenericField.cs" />
+    <Compile Include="FieldTypes\GenericValueField.cs" />
+    <Compile Include="FieldTypes\GuidField.cs" />
+    <Compile Include="FieldTypes\Int16Field.cs" />
+    <Compile Include="FieldTypes\Int32Field.cs" />
+    <Compile Include="FieldTypes\Int64Field.cs" />
+    <Compile Include="FieldTypes\StreamField.cs" />
+    <Compile Include="FieldTypes\StringField.cs" />
+    <Compile Include="Contracts\IDisplayOrderRow.cs" />
+    <Compile Include="FieldTypes\IEnumTypeField.cs" />
+    <Compile Include="Contracts\IIdField.cs" />
+    <Compile Include="Contracts\IIdRow.cs" />
+    <Compile Include="Contracts\IIsActiveRow.cs" />
+    <Compile Include="Contracts\ILoggingRow.cs" />
+    <Compile Include="Contracts\INameRow.cs" />
+    <Compile Include="Contracts\IParentIdRow.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Collapsible.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.HideOnUpdate.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.HideOnInsert.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.UpdatePermission.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.InsertPermission.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.ReadPermission.cs" />
+    <Compile Include="PropertyGrid\IPropertyProcessor.cs" />
+    <Compile Include="PropertyGrid\IPropertySource.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.CssClass.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Category.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Alignment.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.DefaultValue.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Editing.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.EditLink.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Filtering.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Formatting.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Hint.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Insertable.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.OneWay.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Placeholder.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.ReadOnly.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Required.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Resizable.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Sorting.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Title.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Updatable.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Visible.cs" />
+    <Compile Include="PropertyGrid\BasicPropertyProcessor\BasicPropertyProcessor.Width.cs" />
+    <Compile Include="PropertyGrid\PropertyInfoSource.cs" />
+    <Compile Include="PropertyGrid\PropertyItemHelper.cs" />
+    <Compile Include="PropertyGrid\PropertyItemHelper.CustomField.cs" />
+    <Compile Include="PropertyGrid\PropertyProcessor.cs" />
+    <Compile Include="Row\JsonRowConverter.cs" />
+    <Compile Include="Row\RowValidationContext.cs" />
+    <Compile Include="Row\Row.cs" />
+    <Compile Include="Extensions\RowExtensions.cs" />
+    <Compile Include="Row\RowFieldsBase.cs" />
+    <Compile Include="Row\RowRegistry.cs" />
+    <Compile Include="Row\Row_ComponentModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Serenity.Core\Serenity.Core.Net45.csproj">
+      <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
+      <Name>Serenity.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Serenity.Data\Serenity.Data.Net45.csproj">
+      <Project>{bf7ac82b-3476-4235-8cc2-58bba1c4804b}</Project>
+      <Name>Serenity.Data</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.Serenity.Data.Entity.Net45.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

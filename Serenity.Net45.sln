@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Core", "Serenity.Core.Net45\Serenity.Core.csproj", "{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Core", "Serenity.Core\Serenity.Core.Net45.csproj", "{F76A7628-D2E9-43CC-A3F4-98F76C33DCDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Data", "Serenity.Data.Net45\Serenity.Data.csproj", "{BF7AC82B-3476-4235-8CC2-58BBA1C4804B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Data", "Serenity.Data\Serenity.Data.Net45.csproj", "{BF7AC82B-3476-4235-8CC2-58BBA1C4804B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Data.Entity", "Serenity.Data.Entity.Net45\Serenity.Data.Entity.csproj", "{7D55C2E1-B805-428E-873A-1EFB55C37DEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Data.Entity.Net45", "Serenity.Data.Entity\Serenity.Data.Entity.Net45.csproj", "{7D55C2E1-B805-428E-873A-1EFB55C37DEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Services", "Serenity.Services.Net45\Serenity.Services.csproj", "{027F4308-30BC-458C-9431-7076FE5C6B64}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Services.Net45", "Serenity.Services\Serenity.Services.Net45.csproj", "{027F4308-30BC-458C-9431-7076FE5C6B64}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Testing.Net45", "Serenity.Testing\Serenity.Testing.Net45.csproj", "{E5FD07EF-84B5-48C4-8640-46CDC9219AE8}"
 EndProject

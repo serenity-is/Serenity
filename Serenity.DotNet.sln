@@ -37,6 +37,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Serenity.TypeScript.CoreLib
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "51467"
+		SlnRelativePath = "Serenity.TypeScript.CoreLib\"
 	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Serenity.TypeScript.CodeGeneration", "Serenity.TypeScript.CodeGeneration\", "{EDF5B269-681F-43A8-A0EF-17DA4F6F4966}"
@@ -57,6 +58,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Serenity.TypeScript.CodeGen
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "51477"
+		SlnRelativePath = "Serenity.TypeScript.CodeGeneration\"
 	EndProjectSection
 EndProject
 Global
