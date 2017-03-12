@@ -307,7 +307,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="packages.config" />
+    <None Include="packages.Serenity.CodeGenerator.Net45.config" />
     <AppDesigner Include="Properties\" />
     <None Include="Views\EntityColumns.cshtml">
       <Generator>RazorGenerator</Generator>

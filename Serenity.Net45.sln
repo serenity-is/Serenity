@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Services", "Sereni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Testing.Net45", "Serenity.Testing\Serenity.Testing.Net45.csproj", "{E5FD07EF-84B5-48C4-8640-46CDC9219AE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Test", "Serenity.Test\Serenity.Test.csproj", "{3A47ACB0-E6D4-4014-8DCA-6C27ED8DEC6D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Test.Net45", "Serenity.Test\Serenity.Test.Net45.csproj", "{3A47ACB0-E6D4-4014-8DCA-6C27ED8DEC6D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{56E9E208-55D9-4A50-A5B9-6EB22DF6AF0E} = {56E9E208-55D9-4A50-A5B9-6EB22DF6AF0E}
 		{1E32ED5B-D96E-41D9-B532-577005B0DDB0} = {1E32ED5B-D96E-41D9-B532-577005B0DDB0}
@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Script.UI", "Seren
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Script.Test", "Serenity.Script.Test\Serenity.Script.Test.csproj", "{95EC24BE-CAF7-4E1B-BB45-5FF88F763827}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Web", "Serenity.Web.Net45\Serenity.Web.csproj", "{8632943D-2A88-4C83-8451-69D62F059EFC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Web.Net45", "Serenity.Web\Serenity.Web.Net45.csproj", "{8632943D-2A88-4C83-8451-69D62F059EFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.CodeGenerator.Net45", "Serenity.CodeGenerator.Net45\Serenity.CodeGenerator.Net45.csproj", "{49704C9A-30A2-43DE-AE3D-D13073BA50A4}"
 EndProject

@@ -205,7 +205,7 @@
       <Project>{e5fd07ef-84b5-48c4-8640-46cdc9219ae8}</Project>
       <Name>Serenity.Testing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serenity.Web.Net45\Serenity.Web.csproj">
+    <ProjectReference Include="..\Serenity.Web\Serenity.Web.Net45.csproj">
       <Project>{8632943d-2a88-4c83-8451-69d62f059efc}</Project>
       <Name>Serenity.Web</Name>
     </ProjectReference>
@@ -225,7 +225,7 @@
     <None Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="package.json" />
-    <None Include="packages.config" />
+    <None Include="packages.Serenity.Test.Net45.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SqlScript\DbSerenity.sql" />
