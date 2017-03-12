@@ -31,8 +31,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../Serenity.Services.Net45/bin/${configuration}/Serenity.Services.dll" target="lib/net45" />
-    <file src="../Serenity.Services.Net45/bin/${configuration}/Serenity.Services.pdb" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Services.dll" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Services.pdb" target="lib/net45" />
     <file src="bin/${configuration}/netstandard1.6/Serenity.Services.dll" target="lib/netstandard1.6" />	
   </files>
 </package>

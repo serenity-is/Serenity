@@ -28,8 +28,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../Serenity.Data.Entity.Net45/bin/${configuration}/Serenity.Data.Entity.dll" target="lib/net45" />
-    <file src="../Serenity.Data.Entity.Net45/bin/${configuration}/Serenity.Data.Entity.pdb" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Data.Entity.dll" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Data.Entity.pdb" target="lib/net45" />
     <file src="bin/${configuration}/netstandard1.6/Serenity.Data.Entity.dll" target="lib/netstandard1.6" />	
   </files>
 </package>

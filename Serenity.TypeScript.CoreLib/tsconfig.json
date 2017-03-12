@@ -120,6 +120,7 @@
     "Externals/Serenity.Externals.ts"
   ],
   "exclude": [
+    "node_modules/",
     "Serenity.CoreLib.d.ts"
   ]
 }

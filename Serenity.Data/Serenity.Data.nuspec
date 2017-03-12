@@ -32,9 +32,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../Serenity.Data.Net45/bin/${configuration}/Serenity.Data.dll" target="lib/net45" />
-    <file src="../Serenity.Data.Net45/bin/${configuration}/Serenity.Data.pdb" target="lib/net45" />
-    <file src="../Serenity.Data.Net45/bin/${configuration}/Serenity.Data.xml" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Data.dll" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Data.pdb" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Data.xml" target="lib/net45" />
     <file src="bin/${configuration}/netstandard1.6/Serenity.Data.dll" target="lib/netstandard1.6" />	
   </files>
 </package>

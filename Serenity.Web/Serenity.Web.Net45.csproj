@@ -1002,9 +1002,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Tooling\JsEngine\lib.d.ts_">
-      <Link>Tooling\JsEngine\lib.d.ts_</Link>
-    </None>
+    <None Include="Tooling\JsEngine\lib.d.ts_" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

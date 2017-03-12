@@ -12,5 +12,9 @@
   "files": [
     "typeScriptServices.d.ts",
     "Serenity.CodeGeneration.ts"
+  ],
+  "exclude": [
+    "node_modules/",
+    "Serenity.CodeGeneration.d.ts"
   ]
 }
