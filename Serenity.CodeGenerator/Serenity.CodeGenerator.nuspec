@@ -21,14 +21,18 @@
         <dependency id="Microsoft.Data.Sqlite" version="${*:Microsoft.Data.Sqlite}" />
         <dependency id="MySqlConnector" version="${*:MySqlConnector}" />
         <dependency id="Npgsql" version="${*:Npgsql}" />
+		<dependency id="NetStandard.Library" version="${*:NetStandard.Library}" />
+		<dependency id="Microsoft.NETCore.App" version="${*:Microsoft.NETCore.App}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+		<dependency id="System.Data.SqlClient" version="${*:System.Data.SqlClient}" />
         <dependency id="Serenity.Web" version="${version}" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/netcoreapp1.0/Serenity.CodeGenerator.dll" target="lib/netcoreapp1.0/dotnet-sergen.dll" />	
-    <file src="bin/${configuration}/netcoreapp1.0/Serenity.CodeGenerator.runtimeconfig.json" target="lib/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" />	
+    <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.dll" target="lib/netcoreapp1.0/dotnet-sergen.dll" />	
+	<file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.deps.json" target="lib/netcoreapp1.0/dotnet-sergen.deps.json" />	
+    <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" />	
     <file src="../Serenity.CodeGenerator.Net45/Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Newtonsoft.Json.dll" target="tools" />

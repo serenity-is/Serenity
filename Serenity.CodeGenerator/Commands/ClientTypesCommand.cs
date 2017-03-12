@@ -10,9 +10,9 @@ namespace Serenity.CodeGenerator
     {
         private static Encoding utf8 = new System.Text.UTF8Encoding(true);
 
-        public void Run(string projectJson, List<ExternalType> tsTypes)
+        public void Run(string csproj, List<ExternalType> tsTypes)
         {
-            var projectDir = Path.GetDirectoryName(projectJson);
+            var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
             config.ClientTypes = config.ClientTypes ?? new GeneratorConfig.ClientTypesConfig();

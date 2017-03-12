@@ -14,7 +14,7 @@ namespace Serenity.CodeGenerator
         private string modules = "Modules/".Replace('/', Path.DirectorySeparatorChar);
         private string serverTypings;
 
-        public EntityCodeGenerator(EntityModel model, GeneratorConfig config, string projectJson)
+        public EntityCodeGenerator(EntityModel model, GeneratorConfig config, string csproj)
         {
             var kdiff3Paths = new[]
             {
@@ -25,7 +25,7 @@ namespace Serenity.CodeGenerator
             CodeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
             CodeFileHelper.TSCPath = config.TSCPath ?? "tsc";
 
-            this.rootDir = Path.GetDirectoryName(projectJson);
+            this.rootDir = Path.GetDirectoryName(csproj);
             this.config = config;
 
             this.serverTypings = Path.Combine(rootDir, "Modules/Common/Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));

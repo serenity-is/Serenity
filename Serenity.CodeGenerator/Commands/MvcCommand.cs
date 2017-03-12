@@ -10,9 +10,9 @@ namespace Serenity.CodeGenerator
     {
         private static Encoding utf8 = new System.Text.UTF8Encoding(true);
 
-        public void Run(string projectJson)
+        public void Run(string csproj)
         {
-            var projectDir = Path.GetDirectoryName(projectJson);
+            var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
             config.MVC = config.MVC ?? new GeneratorConfig.MVCConfig();
@@ -30,7 +30,7 @@ namespace Serenity.CodeGenerator
                 "Views/"
             };
 
-            var rootDir = Path.GetDirectoryName(projectJson) + Path.DirectorySeparatorChar;
+            var rootDir = projectDir + Path.DirectorySeparatorChar;
             var searchViewPaths = (config.MVC.SearchViewPaths ?? new string[] { "Modules/", "Views/" })
                 .Select(x => Path.Combine(rootDir, x.Replace('/', Path.DirectorySeparatorChar)));
 

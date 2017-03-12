@@ -22,27 +22,48 @@ namespace Serenity.CodeGenerator
                 Environment.Exit(1);
             }
 
-            var projectJson = "project.json";
+            var sergenJson = "sergen.json";
 
-            if (!File.Exists(projectJson))
+            if (!File.Exists(sergenJson))
             {
-                System.Console.Error.WriteLine("Can't find project.json in current directory!");
+                System.Console.Error.WriteLine("Can't find sergen.json in current directory!");
                 System.Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
                 Environment.Exit(1);
             }
 
-            projectJson = Path.GetFullPath(projectJson);
+            sergenJson = Path.GetFullPath(sergenJson);
+            var projectDir = Path.GetDirectoryName(sergenJson);
 
-            if (!Directory.Exists(Path.Combine(Path.GetDirectoryName(projectJson), "wwwroot")))
+            if (!Directory.Exists(Path.Combine(projectDir, "wwwroot")))
             {
                 System.Console.Error.WriteLine("Can't find wwwroot folder in current directory!");
                 System.Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
                 Environment.Exit(1);
             }
 
+            var csprojs = Directory.GetFiles(projectDir, "*.csproj");
+            if (csprojs.Length > 1)
+                csprojs = csprojs.Where(x => !x.StartsWith("Dev.", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+            if (csprojs.Length == 0)
+            {
+                System.Console.Error.WriteLine("Can't find a project file in current directory!");
+                System.Console.Error.WriteLine("Please run Sergen in a folder that contains the Asp.Net Core project.");
+                Environment.Exit(1);
+            }
+
+            if (csprojs.Length > 1)
+            {
+                System.Console.Error.WriteLine("Multiple project files found in current directory!");
+                System.Console.Error.WriteLine("Please run Sergen in a folder that contains only one Asp.Net Core project.");
+                Environment.Exit(1);
+            }
+
+            var csproj = csprojs.First();
+
             if ("restore".StartsWith(command))
             {
-                new RestoreCommand().Run(projectJson);
+                new RestoreCommand().Run(csproj);
             }
             else if (
                 "transform".StartsWith(command) ||
@@ -55,7 +76,7 @@ namespace Serenity.CodeGenerator
                 {
                     if (tsTypesJson == null)
                     {
-                        var tsTypeLister = new TSTypeLister(Path.GetDirectoryName(projectJson));
+                        var tsTypeLister = new TSTypeLister(projectDir);
                         var tsTypes = tsTypeLister.List();
                         tsTypesJson = JSON.Stringify(tsTypes);
                     }
@@ -65,22 +86,22 @@ namespace Serenity.CodeGenerator
 
                 if ("transform".StartsWith(command) || "mvc".StartsWith(command))
                 {
-                    new MvcCommand().Run(projectJson);
+                    new MvcCommand().Run(csproj);
                 }
 
                 if ("transform".StartsWith(command) || "clienttypes".StartsWith(command))
                 {
-                    new ClientTypesCommand().Run(projectJson, getTsTypes());
+                    new ClientTypesCommand().Run(csproj, getTsTypes());
                 }
 
                 if ("transform".StartsWith(command) || "servertypings".StartsWith(command))
                 {
-                    new ServerTypingsCommand().Run(projectJson, getTsTypes());
+                    new ServerTypingsCommand().Run(csproj, getTsTypes());
                 }
             }
             else if ("generate".StartsWith(command))
             {
-                new GenerateCommand().Run(projectJson, args.Skip(1).ToArray());
+                new GenerateCommand().Run(csproj, args.Skip(1).ToArray());
             }
             else
             {

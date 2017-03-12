@@ -1,26 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <VersionPrefix>2.9.9</VersionPrefix>
+    <VersionPrefix>2.9.12</VersionPrefix>
     <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
     <AssemblyName>Serenity.Web</AssemblyName>
     <PackageId>Serenity.Web</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj" />
     <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj" />
     <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="NUglify" Version="1.5.4" />
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.3.0" />
@@ -36,11 +32,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="1.1.2" />
   </ItemGroup>
-
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <DefineConstants>$(DefineConstants);COREFX;ASPNETCORE;NETSTANDARD1_6</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.3" />
     <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.3" />
@@ -54,5 +48,4 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
 </Project>

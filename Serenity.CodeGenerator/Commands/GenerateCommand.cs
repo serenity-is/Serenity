@@ -46,9 +46,9 @@ namespace Serenity.CodeGenerator
             return null;
         }
 
-        public void Run(string projectJson, string[] args)
+        public void Run(string csproj, string[] args)
         {
-            var projectDir = Path.GetDirectoryName(projectJson);
+            var projectDir = Path.GetDirectoryName(csproj);
 
             var outFile = GetOption(args, "o").TrimToNull();
             var connectionKey = GetOption(args, "c").TrimToNull();
@@ -171,9 +171,9 @@ namespace Serenity.CodeGenerator
             DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
 
             if (connectionString.IndexOf("../../..") >= 0)
-                connectionString = connectionString.Replace("../../..", Path.GetDirectoryName(projectJson));
+                connectionString = connectionString.Replace("../../..", Path.GetDirectoryName(csproj));
             else if (connectionString.IndexOf(@"..\..\..\") >= 0)
-                connectionString = connectionString.Replace(@"..\..\..\", Path.GetDirectoryName(projectJson));
+                connectionString = connectionString.Replace(@"..\..\..\", Path.GetDirectoryName(csproj));
 
             ISchemaProvider schemaProvider;
             List<TableName> tableNames;
@@ -383,7 +383,7 @@ namespace Serenity.CodeGenerator
                 var rowModel = RowGenerator.GenerateModel(connection, tableName.Schema, tableName.Table,
                     module, connectionKey, identifier, permissionKey, config);
 
-                new EntityCodeGenerator(rowModel, config, projectJson).Run();
+                new EntityCodeGenerator(rowModel, config, csproj).Run();
             }
         }
     }

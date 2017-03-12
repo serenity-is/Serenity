@@ -240,7 +240,6 @@ Action<Dictionary<string, string>, string, string> setPackageVersions = (p, cspr
 					var end = condition.Value.IndexOf("'", idx + tf.Length);
 					if (end >= 0) {
 						target = condition.Value.Substring(idx + + tf.Length, end - idx - + tf.Length);
-						Console.WriteLine(target);
 					}
 				}
 			}

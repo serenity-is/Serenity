@@ -39,13 +39,13 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private string projectJson;
+        private string csproj;
         private string assemblyPath;
         private string packagesPath;
         
-        public ProjectLoadContext(string projectJson, string assemblyPath)
+        public ProjectLoadContext(string csproj, string assemblyPath)
         {
-            this.projectJson = projectJson;
+            this.csproj = csproj;
             this.assemblyPath = assemblyPath;
             this.packagesPath = new PackageHelper().DeterminePackagesPath();
         }

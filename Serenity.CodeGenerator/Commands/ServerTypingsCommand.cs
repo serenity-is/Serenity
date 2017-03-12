@@ -15,9 +15,9 @@ namespace Serenity.CodeGenerator
     {
         private static Encoding utf8 = new System.Text.UTF8Encoding(true);
 
-        public void Run(string projectJson, List<ExternalType> tsTypes)
+        public void Run(string csproj, List<ExternalType> tsTypes)
         {
-            var projectDir = Path.GetDirectoryName(projectJson);
+            var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
             if (config.ServerTypings == null)
@@ -47,7 +47,7 @@ namespace Serenity.CodeGenerator
             Console.WriteLine(outDir);
 
             var rootPath = Path.GetFullPath(config.ServerTypings.Assemblies[0].Replace('/', Path.DirectorySeparatorChar));
-            var loadContext = new ProjectLoadContext(projectJson, Path.GetDirectoryName(rootPath));
+            var loadContext = new ProjectLoadContext(csproj, Path.GetDirectoryName(rootPath));
 
             List<Assembly> assemblies = new List<Assembly>();
             foreach (var assembly in config.ServerTypings.Assemblies)
