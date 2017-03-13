@@ -37,9 +37,9 @@ namespace Serenity.CodeGenerator
             Directory.CreateDirectory(tempDirectory);
             try
             {
-                File.WriteAllText(Path.Combine(tempDirectory, "typeScriptServices.js"), GetEmbeddedScript("typeScriptServices.js") + "\n\nif (exports)\nexports.ts = ts;\n");
-                File.WriteAllText(Path.Combine(tempDirectory, "Serenity.CodeGeneration.js"), GetEmbeddedScript("Serenity.CodeGeneration.js") + "\n\nif (exports)\nexports.Serenity = Serenity;\n");
-                File.WriteAllText(Path.Combine(tempDirectory, "lib.d.ts_"), GetEmbeddedScript("lib.d.ts_"));
+                File.WriteAllText(Path.Combine(tempDirectory, "typeScriptServices.js"), GetEmbeddedScript("Serenity.CodeGenerator.typeScriptServices.js") + "\n\nif (exports)\nexports.ts = ts;\n");
+                File.WriteAllText(Path.Combine(tempDirectory, "Serenity.CodeGeneration.js"), GetEmbeddedScript("Serenity.CodeGenerator.Serenity.CodeGeneration.js") + "\n\nif (exports)\nexports.Serenity = Serenity;\n");
+                File.WriteAllText(Path.Combine(tempDirectory, "lib.d.ts_"), GetEmbeddedScript("Serenity.CodeGenerator.lib.d.ts_"));
 
                 var sb = new StringBuilder();
                 sb.AppendLine("var fs = require('fs');");
