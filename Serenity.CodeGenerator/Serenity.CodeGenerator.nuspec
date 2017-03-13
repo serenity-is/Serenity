@@ -20,11 +20,11 @@
         <dependency id="FirebirdSql.Data.FirebirdClient" version="${*:FirebirdSql.Data.FirebirdClient}" />
         <dependency id="Microsoft.Data.Sqlite" version="${*:Microsoft.Data.Sqlite}" />
         <dependency id="MySqlConnector" version="${*:MySqlConnector}" />
-        <dependency id="Npgsql" version="${*:Npgsql}" />
-		<dependency id="NetStandard.Library" version="${*:NetStandard.Library}" />
-		<dependency id="Microsoft.NETCore.App" version="${*:Microsoft.NETCore.App}" />
+        <dependency id="Npgsql" version="${*:Npgsql}" />        
+        <dependency id="NetStandard.Library" version="${*:NetStandard.Library}" />
+        <dependency id="Microsoft.NETCore.App" version="1.1.1" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-		<dependency id="System.Data.SqlClient" version="${*:System.Data.SqlClient}" />
+        <dependency id="System.Data.SqlClient" version="${*:System.Data.SqlClient}" />
         <dependency id="Serenity.Web" version="${version}" />
       </group>
     </dependencies>
