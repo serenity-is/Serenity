@@ -4820,7 +4820,10 @@ var Q;
                 $(validator.errorList.map(function (x) { return x.element; }))
                     .closest('.category.collapsed')
                     .children('.category-title')
-                    .each(function (i, x) { return $(x).click(); });
+                    .each(function (i, x) {
+                    $(x).click();
+                    return true;
+                });
             },
             success: function (label) {
                 label.addClass('checked');

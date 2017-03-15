@@ -218,7 +218,10 @@ namespace Q {
                 $(validator.errorList.map(x => x.element))
                     .closest('.category.collapsed')
                     .children('.category-title')
-                    .each((i, x) => $(x).click());
+                    .each((i, x) => {
+                        $(x).click();
+                        return true;
+                    });
             },
             success: function (label: JQuery) {
                 label.addClass('checked');
