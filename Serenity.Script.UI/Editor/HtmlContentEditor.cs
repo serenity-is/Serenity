@@ -110,7 +110,7 @@ namespace Serenity
                 RemoveButtons = "SpecialChar,Anchor,Subscript,Styles",
                 FormatTags = "p;h1;h2;h3;pre",
                 RemoveDialogTabs = "image:advanced;link:advanced",
-                ContentsCss = Q.ResolveUrl("~/content/site/site.htmlcontent.css"),
+                ContentsCss = Q.ResolveUrl("~/Content/site/site.htmlcontent.css"),
                 Entities = false,
                 EntitiesLatin = false,
                 EntitiesGreek = false,
