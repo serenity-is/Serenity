@@ -41,7 +41,7 @@ namespace Serenity.Web
                 if (scriptBundles == null)
                 {
                     scriptBundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
-                    HostingEnvironment.MapPath("~/Scripts/Site/ScriptBundles.json"));
+                    HostingEnvironment.MapPath("~/Scripts/site/ScriptBundles.json"));
                 }
 
                 return scriptBundles;
