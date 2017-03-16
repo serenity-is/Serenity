@@ -1,3 +1,15 @@
+## 2.9.18 (2017-03-16)
+
+Bugfixes:
+  - backport prefix determination algorithm to sergen net45 version
+
+## 2.9.17 (2017-03-13)
+
+Features:
+  - Visual Studio 2017 support (.NET Core version no longer works on Visual Studio 2015 sorry because of project.json to csproj change. you need to use VS Code or upgrade to VS2017)
+  - obsoleted jsrender (will later replace with Vue)
+  - added language cookie to cookies sent to pdf renderer [Serene]
+
 ## 2.9.9 (2017-03-02)
 
 Features:
