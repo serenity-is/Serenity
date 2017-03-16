@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <VersionPrefix>2.9.18</VersionPrefix>
+    <VersionPrefix>2.9.19</VersionPrefix>
     <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
     <AssemblyName>Serenity.Web</AssemblyName>
     <PackageId>Serenity.Web</PackageId>

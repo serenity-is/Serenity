@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Serenity Tooling for .NET Core CLI. Contains the dotnet-sergen command used to generate code, transform templates, restore content packages.</Description>
-    <VersionPrefix>2.9.18</VersionPrefix>
+    <VersionPrefix>2.9.19</VersionPrefix>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>dotnet-sergen</AssemblyName>

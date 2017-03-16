@@ -1,3 +1,8 @@
+## 2.9.19 (2017-03-16)
+
+Bugfixes:
+  - fix .net core version file name casing issues in linux
+
 ## 2.9.18 (2017-03-16)
 
 Bugfixes:
