@@ -71,7 +71,7 @@ namespace Serenity.CodeGeneration
 
         protected virtual string GetNamespace(Type type)
         {
-            var ns = type.Namespace;
+            var ns = type.Namespace ?? "";
             if (ns.EndsWith(".Entities"))
                 return ns.Substring(0, ns.Length - ".Entities".Length);
 
@@ -124,6 +124,7 @@ namespace Serenity.CodeGeneration
                         fromType.GetCustomAttribute<ColumnsScriptAttribute>() != null ||
                         fromType.IsSubclassOf(typeof(ServiceEndpoint)) ||
                         (fromType.IsSubclassOf(typeof(Controller)) && // backwards compability
+                         fromType.Namespace != null &&
                          fromType.Namespace.EndsWith(".Endpoints")))
                     {
                         EnqueueType(fromType);

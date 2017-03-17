@@ -52,7 +52,7 @@ namespace Serenity.CodeGeneration
             if (GetNamespace != null)
                 return GetNamespace(type);
 
-            return type.Namespace;
+            return type.Namespace ?? "";
         }
 
         public SortedDictionary<string, string> GenerateCode()
