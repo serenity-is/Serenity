@@ -10,7 +10,7 @@ namespace Serenity
 {
     [Editor, DisplayName("Html İçerik"), OptionsType(typeof(HtmlContentEditorOptions))]
     [Element("<textarea />")]
-    public class HtmlContentEditor : Widget<HtmlContentEditorOptions>, IStringValue
+    public class HtmlContentEditor : Widget<HtmlContentEditorOptions>, IStringValue, IReadOnly
     {
         static HtmlContentEditor()
         {
@@ -150,6 +150,28 @@ namespace Serenity
                 this.element.Value(value);
                 if (instanceReady && instance != null)
                     instance.SetData(value);
+            }
+        }
+
+        public bool ReadOnly
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(this.element.GetAttribute("disabled"));
+            }
+            set
+            {
+                if (ReadOnly != value)
+                {
+                    if (value)
+                        this.element.Attribute("disabled", "disabled");
+                    else
+                        this.element.RemoveAttr("disabled");
+
+                    var instance = GetEditorInstance();
+                    if (instanceReady && instance != null)
+                        instance.SetReadOnly(value);
+                }
             }
         }
 
