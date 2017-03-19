@@ -1442,7 +1442,16 @@ var Q;
                         }
                     }
                     var html = xhr.responseText;
-                    Q.iframeDialog({ html: html });
+                    if (!html) {
+                        if (!xhr.status)
+                            Q.alert("An unknown AJAX connection error occured! Check browser console for details.");
+                        else if (xhr.status == 500)
+                            Q.alert("HTTP 500: Connection refused! Check browser console for details.");
+                        else
+                            Q.alert("HTTP " + xhr.status + ' error! Check browser console for details.');
+                    }
+                    else
+                        Q.iframeDialog({ html: html });
                 }
                 finally {
                     if (options.blockUI) {
