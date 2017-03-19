@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
+﻿using Serenity.ComponentModel;
 using Serenity.Configuration;
 using Serenity.Data;
-using Newtonsoft.Json;
+using System;
 using System.Collections.Concurrent;
-using System.Web.Hosting;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Web;
-using System.Configuration;
+using System.Web.Hosting;
 
 namespace Serenity.Web
 {
     public static class ScriptBundleManager
     {
+        [SettingKey("ScriptBundling"), SettingScope("Application")]
         private class ScriptBundlingSettings
         {
             public bool? Enabled { get; set; }
@@ -41,7 +41,7 @@ namespace Serenity.Web
                 if (scriptBundles == null)
                 {
                     scriptBundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
-                    HostingEnvironment.MapPath("~/Scripts/site/ScriptBundles.json"));
+                        HostingEnvironment.MapPath("~/Scripts/site/ScriptBundles.json"));
                 }
 
                 return scriptBundles;
@@ -73,12 +73,8 @@ namespace Serenity.Web
             bundleByKey = null;
             try
             {
-                var setting = ConfigurationManager.AppSettings["ScriptBundling"];
-                var settings = JsonConvert.DeserializeObject<ScriptBundlingSettings>(
-                    setting.TrimToNull() ?? "{}", JsonSettings.Tolerant);
-
-                if (settings == null ||
-                    settings.Enabled != true)
+                var settings = Config.Get<ScriptBundlingSettings>();
+                if (settings.Enabled != true)
                     return;
 
                 var bundles = ScriptBundles;
