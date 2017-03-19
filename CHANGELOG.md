@@ -1,3 +1,12 @@
+## 2.9.20 (2017-03-19)
+
+Features:
+  - allow setting CKEditor readonly option after widget initialization
+
+Bugfixes:
+  - script bundling settings are not read in .net core version
+  - don't crash on t4 transform when a class has no namespace
+
 ## 2.9.19 (2017-03-16)
 
 Bugfixes:
