@@ -42,6 +42,7 @@ namespace Serenity.Web.Middleware
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                 await context.Response.WriteAsync("File not found!");
+                return;
             }
 
             var mediaType = new MediaTypeHeaderValue(contentType);
