@@ -376,9 +376,6 @@ declare namespace System.ComponentModel {
         displayName: string;
     }
 }
-interface Toastr {
-    getContainer(options?: ToastrOptions, create?: boolean): JQuery;
-}
 interface JQueryStatic {
     extend<T>(target: T, object1?: T, ...objectN: T[]): T;
     toJSON(obj: any): string;

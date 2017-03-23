@@ -17,7 +17,6 @@
     "Imports/RSVP.ts",
     "Imports/Select2.ts",
     "Imports/SS.ts",
-    "Imports/Toastr.ts",
     "Imports/jQueryStatic.ts",
     "Imports/JQBlockUI.ts",
     "Services/ServiceError.ts",

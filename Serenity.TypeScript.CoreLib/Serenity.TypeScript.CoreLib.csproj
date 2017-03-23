@@ -55,7 +55,6 @@
     <TypeScriptCompile Include="Imports\RSVP.ts" />
     <TypeScriptCompile Include="Imports\Select2.ts" />
     <TypeScriptCompile Include="Imports\SS.ts" />
-    <TypeScriptCompile Include="Imports\Toastr.ts" />
     <TypeScriptCompile Include="Q\Q.ArrayUtils.ts" />
     <TypeScriptCompile Include="Q\Q.Authorization.ts" />
     <TypeScriptCompile Include="Q\Q.BasicUtils.ts" />

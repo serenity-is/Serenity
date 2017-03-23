@@ -14,7 +14,7 @@
     "@types/toastr": "^2.1.32"
   },
   "devDependencies": {
-    "typescript": "^2.1.5"
+    "typescript": "2.1.5"
   },
   "scripts": {
     "tsc": "tsc -p ./tsconfig.json"

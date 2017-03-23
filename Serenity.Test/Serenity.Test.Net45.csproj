@@ -304,6 +304,7 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\serenity\Serenity.Test.js" />
     <TypeScriptCompile Include="Scripts\typings\qunit\qunit.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\serenity\Serenity.CoreLib.d.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.IntegerEditorTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Formatters\Formatters.UrlFormatterTests.ts" />
     <TypeScriptCompile Include="ScriptTests\Editors\Editors.TextAreaEditorTests.ts" />
