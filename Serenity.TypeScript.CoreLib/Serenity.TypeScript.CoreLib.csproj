@@ -166,7 +166,7 @@
     <Exec Command="npm install" ContinueOnError="false" />
   </Target>
   <Target Name="AfterBuild">
-    <Exec Command="npm run tsc" ContinueOnError="false" />
+    <Exec Command="node_modules/.bin/tsc -p ./tsconfig.json" ContinueOnError="false" />
     <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\mscorlib.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\mscorlib.min.js&quot; --comments --mangle" />
     <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\linq.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\linq.min.js&quot; --comments --mangle" />
     <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.min.js&quot; --comments --mangle" />
