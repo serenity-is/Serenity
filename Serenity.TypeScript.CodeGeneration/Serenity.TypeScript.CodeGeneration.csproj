@@ -65,7 +65,7 @@
     <Exec Command="npm install" ContinueOnError="false" />
   </Target>
   <Target Name="AfterBuild">
-    <Exec Command="node_modules\.bin\tsc -p ./tsconfig.json" ContinueOnError="false" />
+    <Exec Command="node_modules/.bin/tsc -p ./tsconfig.json" ContinueOnError="false" />
     <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Serenity.CodeGeneration.js&quot; -o &quot;$(ProjectDir)Serenity.CodeGeneration.min.js&quot; --comments --mangle" />
   </Target>
 </Project>
