@@ -1,3 +1,12 @@
+## 2.9.21 (2017-03-26)
+
+Features:
+  - run tsc directly, not through npm, to avoid weird error log with npm
+  - ScriptInitialization.ts reference to LanguageList
+  - toastr 2.1.33 has getContainer method, so removing one in Serenity, update toastr typings version in your packages.json to ^2.1.33
+  - don't show "undefined" when a XHR connection error occurs. try to be more descriptive but it will be limited as there is no possibility to get exact error.
+  - return to avoid kestrel header errors in .net core when browser requests .map files which doesn't exist from DynamicScriptMiddleware
+
 ## 2.9.20 (2017-03-19)
 
 Features:
