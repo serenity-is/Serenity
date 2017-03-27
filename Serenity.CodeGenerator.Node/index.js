@@ -35,11 +35,11 @@ if (!fs.existsSync('./sergen.json')) {
     process.exit(2);
 }
 
-var projectJson = JSON.parse(fs.readFileSync('./project.json', 'utf8').replace(/^\uFEFF/, ''));
-if (!projectJson || !projectJson.tools || (projectJson.tools['Serenity.CodeGenerator'] == null)) {
-    console.error('"Serenity.CodeGenerator" package is not found in your project.json "tools" section!');
-    process.exit(3);
-}
+//var projectJson = JSON.parse(fs.readFileSync('./project.json', 'utf8').replace(/^\uFEFF/, ''));
+//if (!projectJson || !projectJson.tools || (projectJson.tools['Serenity.CodeGenerator'] == null)) {
+//    console.error('"Serenity.CodeGenerator" package is not found in your project.json "tools" section!');
+//    process.exit(3);
+//}
 
 var spawn = require('child_process').spawn;
 var generateOptions = {};
