@@ -30,7 +30,7 @@ if (process.argv.length > 2) {
         cmd = serverTypings;
 }
 
-if (!fs.existsSync('./project.json')) {
+if (!fs.existsSync('./sergen.json')) {
     console.error('Please run Sergen in a directory containing Serenity ASP.NET Core project!');
     process.exit(2);
 }

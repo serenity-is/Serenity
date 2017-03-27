@@ -1,6 +1,6 @@
 {
   "name": "sergen",
-  "version": "2.9.300",
+  "version": "2.9.2100",
   "description": "Node CLI interface to dotnet-sergen tool",
   "preferGlobal": true,
   "dependencies": {
