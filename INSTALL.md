@@ -12,7 +12,7 @@ Serene .NET framework version (ASP.NET MVC) requires _Visual Studio 2017_ or _Vi
 
 If you have Visual Studio 2015, please make sure that you have **Update 3** installed by looking at Help => About
 
-![VS2015 Update 3](tools/images/install/vs2015-update-3.png)
+![VS2015 Update 3](Tools/Images/install/vs2015-update-3.png)
 
 > It might be possible to work with Visual Studio 2013 as well but you'll have many intellisense errors as TypeScript 2.1.5 can't be installed in VS2013.
 
@@ -28,7 +28,7 @@ Even though Serene uses NodeJS based TypeScript compiler (tsc) on build, Visual 
 
 To check what version of TypeScript Visual Studio Extension you have, again see Help => About:
 
-![VS2015 TypeScript Extension](tools/images/install/vs2015-typescript-version.png)
+![VS2015 TypeScript Extension](Tools/Images/install/vs2015-typescript-version.png)
 
 Visual Studio 2017 comes with TypeScript 2.1.5 by default, but Visual Studio 2015 might include older versions.
 
@@ -46,7 +46,7 @@ Here is the link for Visual Studio 2015:
 
 But **don't click the download button** right away. Expand **Details** section, and select the exact version you need (e.g. 2.1.5):
 
-![TypeScript Version Selection](tools/images/install/typescript-download-detail.png)
+![TypeScript Version Selection](Tools/Images/install/typescript-download-detail.png)
 
 Later versions, e.g. 2.2.2 might also work but keeping in sync with the version we currently use, can help you avoid compability problems that might come with them.
 
@@ -83,7 +83,7 @@ Even if you have correct Node / NPM installed, Visual Studio might still be tryi
 
 Click _Tools_ => _Options_, and then under _Projects and Solutions_ => _External Web Tools_ add _C:\Program Files\nodejs_ to the top of the list by clicking plus folder icon, typing _C:\Program Files\nodejs_ and using _Up Arrow_ to move it to the start:
 
-![VS External Tools Path](tools/images/install/vs-external-tools-path.png)
+![VS External Tools Path](Tools/Images/install/vs-external-tools-path.png)
 
 ## Installing Serene
 
@@ -110,7 +110,7 @@ Install our project initializer, *serin* as a global tool using NPM:
 > sudo npm install -g serin
 ```
 
-![NPM Install Serin](tools/images/install/linux-npm-install-serin.png)
+![NPM Install Serin](Tools/Images/install/linux-npm-install-serin.png)
 
 > Thanks to Victor (@vctor) for Linux screenshots
 
@@ -144,7 +144,7 @@ While inside an empty directory, run *serin*:
 > serin
 ```
 
-![Windows Serin MyApp](tools/images/install/linux-serin-myserene.png)
+![Windows Serin MyApp](Tools/Images/install/linux-serin-myserene.png)
 
 Type an application name, e.g. *MySerene* and press enter. Take a break while Serin creates 
 your project, initializates static content and restores packages etc.
@@ -191,7 +191,7 @@ To use sergen, open a command prompt and CD into the project directory (one that
 
 > dotnet sergen g
 
-![Dotnet Sergen G](tools/images/install/dotnet-sergen-g.png)
+![Dotnet Sergen G](Tools/Images/install/dotnet-sergen-g.png)
 
 Sergen will list connections in *appsettings.json* file.
 
@@ -199,11 +199,11 @@ You can use *TAB completion*, e.g. type *D* and press *TAB* to complete *Default
 
 After pressing *Enter* you'll get a list of tables in that database:
 
-![Dotnet Sergen Tables](tools/images/install/dotnet-sergen-tables.png)
+![Dotnet Sergen Tables](Tools/Images/install/dotnet-sergen-tables.png)
 
 Again, they exact table name or use *TAB completion*.
 
-![Dotnet Sergen Options](tools/images/install/dotnet-sergen-options.png)
+![Dotnet Sergen Options](Tools/Images/install/dotnet-sergen-options.png)
 
 Then, you can select a Module Name, Class Identifier, Permission Key and what to generate, or just accept defaults by pressing *ENTER*.
 
