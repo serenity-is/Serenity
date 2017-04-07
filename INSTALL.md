@@ -1,9 +1,3 @@
----
-title: Serene Install
-description: Serene has some prerequisites that you should install for it to work properly. Here we document how you should check if you have correct versions of tools required, and install them for a healthier Serene environment. 
-author: Volkan Ceylan
----
-
 # Installation
 
 ## Visual Studio Version
