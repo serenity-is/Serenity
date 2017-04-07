@@ -36,6 +36,10 @@ You can also install it directly from Visual Studio, by entering File -> New -> 
 
 Serene source code is available in its own repository at https://github.com/volkanceylan/serene.
 
+## Installation
+ 
+See [Installation Guide](INSTALL.md) for prerequisites and setup information
+
 ## Online Serene Demo
 
 http://serenity.is/demo/
