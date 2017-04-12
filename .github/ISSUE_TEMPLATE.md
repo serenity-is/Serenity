@@ -27,10 +27,9 @@
   Modules/Filenames Concerned:
      (Which files are causing you trouble?)
   Examples (Code snippets): 
-    (Don't forget to wrap it like ``` code here ``` for formatting and readability-->)
+    (Don't forget to wrap it like ``` code here ``` for formatting and readability)
     When possible, the URL of your Serenity app or Github gist page of your code.
 -->
-
 
 
 <!--    Thank you for giving us your feedback
