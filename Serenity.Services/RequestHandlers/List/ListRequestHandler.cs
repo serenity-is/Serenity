@@ -204,26 +204,30 @@
                 return;
             }
 
+            var fullTextIndex = field.GetAttribute<FullTextIndexAttribute>();
+            var hasFullTextIndex = fullTextIndex != null && fullTextIndex.Value;
             switch (searchType)
             {
                 case SearchType.Contains:
-                    criteria |= new Criteria(field).Contains(containsText);
-                    break;
-
-                case SearchType.FullTextSearchContains:
-                    criteria |= new Criteria(field).FullTextSearchContains(containsText);
-                    break;
-
-                case SearchType.FullTextSearchStartsWith:
-                    criteria |= new Criteria(field).FullTextSearchStartsWith(containsText);
-                    break;
-
-                case SearchType.FullTextSearchFreeText:
-                    criteria |= new Criteria(field).FullTextSearchFreeText(containsText);
+                    if (hasFullTextIndex)
+                    {
+                        criteria |= new Criteria(field).FullTextSearchContains(containsText);
+                    }
+                    else
+                    {
+                        criteria |= new Criteria(field).Contains(containsText);
+                    }
                     break;
 
                 case SearchType.StartsWith:
-                    criteria |= new Criteria(field).StartsWith(containsText);
+                    if (hasFullTextIndex)
+                    {
+                        criteria |= new Criteria(field).FullTextSearchStartsWith(containsText);
+                    }
+                    else
+                    {
+                        criteria |= new Criteria(field).StartsWith(containsText);
+                    }
                     break;
 
                 case SearchType.Equals:

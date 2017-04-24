@@ -17,7 +17,6 @@
             if (ReferenceEquals(right, null))
                 throw new ArgumentNullException("right");
 
-            if (op < CriteriaOperator.AND || op > CriteriaOperator.FullTextSearchFreetext)
                 throw new ArgumentOutOfRangeException("op");
 
             this.left = left;
@@ -52,15 +51,6 @@
             {
                 // Full-text search queries are case-insensitive
                 sb.Append("CONTAINS(");
-                this.left.ToString(sb, query);
-                sb.Append(',');
-                this.right.ToString(sb, query);
-                sb.Append(")");
-            }
-            else if (this.op == CriteriaOperator.FullTextSearchFreetext)
-            {
-                // Full-text search queries are case-insensitive
-                sb.Append("FREETEXT(");
                 this.left.ToString(sb, query);
                 sb.Append(',');
                 this.right.ToString(sb, query);

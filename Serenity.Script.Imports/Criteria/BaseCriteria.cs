@@ -59,6 +59,12 @@
             return null;
         }
 
+        [InlineCode("[{this}, 'contains', {mask}]")]
+        public BaseCriteria FullTextSearchContains(string mask)
+        {
+            return null;
+        }
+
         [InlineCode("[{this}, 'not like', ('%' + {mask} + '%')]")]
         public BaseCriteria NotContains(string mask)
         {
@@ -334,7 +340,7 @@
         {
             return null;
         }
-        
+
         [InlineCode("[{criteria1}, '<=', {criteria2}]")]
         public static BaseCriteria operator <=(BaseCriteria criteria1, BaseCriteria criteria2)
         {
@@ -382,7 +388,7 @@
         {
             return null;
         }
-       
+
         [InlineCode("Serenity.Criteria.join({criteria1}, 'and', {criteria2})")]
         public static BaseCriteria operator &(BaseCriteria criteria1, BaseCriteria criteria2)
         {

@@ -138,6 +138,10 @@ namespace Serenity
                 if (reqAttr.Length > 0)
                     pi.Required = reqAttr[0].As<RequiredAttribute>().IsRequired;
 
+                var fullTextIndexAttr = member.GetCustomAttributes(typeof(FullTextIndexAttribute), true);
+                if (fullTextIndexAttr.Length > 0)
+                    pi.FullTextIndex = fullTextIndexAttr[0].As<FullTextIndexAttribute>().Value;
+
                 var maxLengthAttr = member.GetCustomAttributes(typeof(MaxLengthAttribute), false);
                 if (maxLengthAttr.Length > 0)
                 {

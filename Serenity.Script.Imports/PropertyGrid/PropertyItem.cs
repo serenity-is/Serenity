@@ -54,6 +54,7 @@ namespace Serenity
         public string FilteringIdField { get; set; }
         public bool? NotFilterable { get; set; }
         public bool? FilterOnly { get; set; }
+        public bool? FullTextIndex { get; set; }
 
         public bool? QuickFilter { get; set; }
         public JsDictionary QuickFilterParams { get; set; }

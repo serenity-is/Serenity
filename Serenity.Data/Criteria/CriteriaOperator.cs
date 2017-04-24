@@ -21,6 +21,6 @@
         Like,
         NotLike,
         FullTextSearchContains,
-        FullTextSearchFreetext
+        FullTextSearchStartWith
     }
 }

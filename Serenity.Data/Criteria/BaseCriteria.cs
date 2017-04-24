@@ -44,11 +44,6 @@
             return new BinaryCriteria(this, CriteriaOperator.FullTextSearchContains, new ValueCriteria(mask));
         }
 
-        public BaseCriteria FullTextSearchFreeText(string mask)
-        {
-            return new BinaryCriteria(this, CriteriaOperator.FullTextSearchFreetext, new ValueCriteria(mask));
-        }
-
         public BaseCriteria FullTextSearchStartsWith(string mask)
         {
             if (mask == null)

@@ -211,7 +211,7 @@ namespace Serenity.Data
                 if (!KeyToOperator.TryGetValue(opStr, out op))
                     throw new JsonSerializationException(String.Format("Unknown Criteria operator: {0}", opStr));
 
-                if (op < CriteriaOperator.AND || op > CriteriaOperator.NotLike)
+                if (op < CriteriaOperator.AND || op > CriteriaOperator.FullTextSearchStartWith)
                     throw new JsonSerializationException(String.Format("Invalid Criteria format: {0}", array.ToString()));
 
                 return new BinaryCriteria(ParseValue(array[0]), op, ParseValue(array[2]));
@@ -268,7 +268,8 @@ namespace Serenity.Data
             "in", // IN
             "not in", // NOT IN
             "like", // LIKE
-            "not like" // NOT LIKE
+            "not like", // NOT LIKE
+            "contains" // FULL TEXT SEARCH - CONTAINS
         };
 
         private static readonly Dictionary<string, CriteriaOperator> KeyToOperator;
