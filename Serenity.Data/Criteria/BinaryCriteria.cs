@@ -17,6 +17,7 @@
             if (ReferenceEquals(right, null))
                 throw new ArgumentNullException("right");
 
+            if (op < CriteriaOperator.AND || op > CriteriaOperator.FullTextSearchStartWith)
                 throw new ArgumentOutOfRangeException("op");
 
             this.left = left;
