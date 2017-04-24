@@ -127,7 +127,14 @@ namespace Serenity
                 case FilterOperators.StartsWith:
                     text = GetEditorText();
                     displayText = DisplayText(Operator, text);
-                    return new Criteria(GetCriteriaField()).StartsWith(text);
+                    if (Field.FullTextIndex ?? false)
+                    {
+                        return new Criteria(GetCriteriaField()).FullTextSearchStartsWith(text);
+                    }
+                    else
+                    {
+                        return new Criteria(GetCriteriaField()).StartsWith(text);
+                    }
 
                 case FilterOperators.EQ:
                 case FilterOperators.NE:

@@ -48,7 +48,7 @@
                     this.right.ToString(sb, query);
                 }
             }
-            else if (this.op == CriteriaOperator.FullTextSearchContains)
+            else if (this.op == CriteriaOperator.FullTextSearchContains || this.op == CriteriaOperator.FullTextSearchStartWith)
             {
                 // Full-text search queries are case-insensitive
                 sb.Append("CONTAINS(");

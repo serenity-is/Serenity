@@ -65,6 +65,12 @@
             return null;
         }
 
+        [InlineCode("[{this}, 'starts with', {mask}]")]
+        public BaseCriteria FullTextSearchStartsWith(string mask)
+        {
+            return null;
+        }
+
         [InlineCode("[{this}, 'not like', ('%' + {mask} + '%')]")]
         public BaseCriteria NotContains(string mask)
         {
