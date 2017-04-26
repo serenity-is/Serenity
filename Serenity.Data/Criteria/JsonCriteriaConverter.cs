@@ -270,7 +270,7 @@ namespace Serenity.Data
             "like", // LIKE
             "not like", // NOT LIKE
             "contains", // FULL TEXT SEARCH - CONTAINS
-            "starts with" // FULL TEXT SEARCH - STARTS WITH
+            "startswith" // FULL TEXT SEARCH - STARTS WITH
         };
 
         private static readonly Dictionary<string, CriteriaOperator> KeyToOperator;

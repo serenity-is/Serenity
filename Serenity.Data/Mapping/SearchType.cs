@@ -6,9 +6,6 @@ namespace Serenity.Data.Mapping
         Auto = 0,
         Equals = 1,
         Contains = 2,
-        StartsWith = 3,
-        FullTextSearchContains = 4,
-        FullTextSearchStartsWith = 5,
-        FullTextSearchFreeText = 6
+        StartsWith = 3
     }
 }

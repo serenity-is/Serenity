@@ -65,7 +65,7 @@
             return null;
         }
 
-        [InlineCode("[{this}, 'starts with', {mask}]")]
+        [InlineCode("[{this}, 'startswith', ('\"' + {mask} + '*\"')]")]
         public BaseCriteria FullTextSearchStartsWith(string mask)
         {
             return null;
