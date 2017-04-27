@@ -59,7 +59,7 @@
             return null;
         }
 
-        [InlineCode("[{this}, 'contains', {mask}]")]
+        [InlineCode("[{this}, 'contains', ('\"' + {mask} + '\"')]")]
         public BaseCriteria FullTextSearchContains(string mask)
         {
             return null;
