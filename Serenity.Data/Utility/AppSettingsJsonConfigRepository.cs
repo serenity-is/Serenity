@@ -32,7 +32,11 @@ namespace Serenity.Configuration
 #if COREFX
             var keyAttr = settingType.GetCustomAttribute<SettingKeyAttribute>();
             var key = keyAttr == null ? settingType.Name : keyAttr.Value;
-            return configuration.GetSection("AppSettings:" + key).Get(settingType);
+            var section = configuration.GetSection("AppSettings:" + key);
+            if (section == null)
+                return Activator.CreateInstance(settingType);
+
+            return section.Get(settingType) ?? Activator.CreateInstance(settingType);
 #else
             return LocalCache.Get("ApplicationSetting:" + settingType.FullName, TimeSpan.Zero, delegate()
             {
