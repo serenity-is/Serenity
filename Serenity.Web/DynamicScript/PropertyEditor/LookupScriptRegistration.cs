@@ -24,7 +24,18 @@ namespace Serenity.Web
 
                     if (typeof(Row).IsAssignableFrom(type))
                     {
-                        script = (LookupScript)Activator.CreateInstance(typeof(RowLookupScript<>).MakeGenericType(type));
+                        if (attr.LookupType == null)
+                            script = (LookupScript)Activator.CreateInstance(typeof(RowLookupScript<>).MakeGenericType(type));
+                        else if (attr.LookupType.IsGenericType)
+                            script = (LookupScript)Activator.CreateInstance(attr.LookupType.MakeGenericType(type));
+                        else if (attr.LookupType.GetCustomAttribute<LookupScriptAttribute>() == null)
+                            script = (LookupScript)Activator.CreateInstance(attr.LookupType);
+                        else
+                        {
+                            // lookup script type already has a LookupScript attribute, 
+                            // so it's dynamic script will be generated on itself
+                            continue;
+                        }
                     }
                     else if (!typeof(LookupScript).IsAssignableFrom(type) ||
                         type.GetIsAbstract())
