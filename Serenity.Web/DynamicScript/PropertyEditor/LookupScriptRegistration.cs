@@ -26,7 +26,7 @@ namespace Serenity.Web
                     {
                         if (attr.LookupType == null)
                             script = (LookupScript)Activator.CreateInstance(typeof(RowLookupScript<>).MakeGenericType(type));
-                        else if (attr.LookupType.IsGenericType)
+                        else if (attr.LookupType.GetIsGenericType())
                             script = (LookupScript)Activator.CreateInstance(attr.LookupType.MakeGenericType(type));
                         else if (attr.LookupType.GetCustomAttribute<LookupScriptAttribute>() == null)
                             script = (LookupScript)Activator.CreateInstance(attr.LookupType);
