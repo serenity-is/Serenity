@@ -1,3 +1,16 @@
+## 2.9.22 (2017-05-07)
+
+Features:
+  - allow specifying an external lookup type on rows in LookupScriptAttribute constructor, or a generic type through LookupType property, simplifies multi tenancy
+  - added .gitignore compatible high performance GlobFilter class
+  - introduce mail settings and pickup directory functionality in .net core version
+  
+Bugfixes:
+  - code generator for .net core should look for sergen.json instead of project.json
+  - when an appsetting key is not available, null reference exception occurs
+  - template helper can't find views in .net core version
+  - fix typo in signup (thanks @Febriantos) [Serene]
+
 ## 2.9.21 (2017-03-26)
 
 Features:
