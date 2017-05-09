@@ -112,10 +112,15 @@ namespace Serenity.Web
         {
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
-            if (Dependency.TryResolve<ILocalTextRegistry>() == null)
-                registrar.RegisterInstance<ILocalTextRegistry>(new LocalTextRegistry());
+            var registry = Dependency.TryResolve<ILocalTextRegistry>();
+            if (registry == null)
+            {
+                registry = new LocalTextRegistry();
+                registrar.RegisterInstance<ILocalTextRegistry>(registry);
+            }
 
             NestedLocalTextRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
+            NestedPermissionKeyRegistration.PermissionKeys = NestedPermissionKeyRegistration.AddNestedPermissions(registry, ExtensibilityHelper.SelfAssemblies);
             EnumLocalTextRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
             EntityLocalTexts.Initialize();
             JsonLocalTextRegistration.AddFromFilesInFolder(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));

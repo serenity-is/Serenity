@@ -72,6 +72,7 @@
     <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilterOnlyAttribute.cs" />
     <Compile Include="ComponentModel\Common\HiddenAttribute.cs" />
+    <Compile Include="ComponentModel\Extensibility\NestedPermissionKeysAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\CollapsibleAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HeaderCssClassAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\HideOnUpdateAttribute.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Localization\JsonLocalTextRegistration.cs" />
     <Compile Include="Localization\InitializedLocalText.cs" />
     <Compile Include="Localization\FallbackLocalTextRegistry.cs" />
+    <Compile Include="Localization\NestedPermissionKeyRegistration.cs" />
     <Compile Include="Logging\FileLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Munq\AlwaysNewLifetime.cs" />
