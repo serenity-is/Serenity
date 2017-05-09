@@ -120,7 +120,7 @@ namespace Serenity.Web
             }
 
             NestedLocalTextRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
-            NestedPermissionKeyRegistration.PermissionKeys = NestedPermissionKeyRegistration.AddNestedPermissions(registry, ExtensibilityHelper.SelfAssemblies);
+            NestedPermissionKeyRegistration.AddNestedPermissions(registry, ExtensibilityHelper.SelfAssemblies);
             EnumLocalTextRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
             EntityLocalTexts.Initialize();
             JsonLocalTextRegistration.AddFromFilesInFolder(HostingEnvironment.MapPath("~/Scripts/serenity/texts/"));

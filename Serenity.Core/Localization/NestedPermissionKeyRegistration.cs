@@ -17,10 +17,8 @@ namespace Serenity.Localization
     /// </summary>
     public static class NestedPermissionKeyRegistration
     {
-        public static HashSet<string> PermissionKeys;
-
         /// <summary>
-        /// Adds permissions from static nested permission key classes marked with NestedPermissionKeys attribute.
+        /// Gets permission keys and adds texts if any from static nested permission key classes marked with NestedPermissionKeys attribute.
         /// </summary>
         public static HashSet<string> AddNestedPermissions(this ILocalTextRegistry registry, IEnumerable<Assembly> assemblies = null)
         {
