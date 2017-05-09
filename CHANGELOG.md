@@ -1,3 +1,8 @@
+## 2.9.23 (2017-05-09)
+
+Features:
+  - added NestedPermissionKeys attribute that works kinda similar to NestedLocalTexts attribute for permission key registration
+
 ## 2.9.22 (2017-05-07)
 
 Features:
