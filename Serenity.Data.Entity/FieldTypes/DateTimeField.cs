@@ -20,6 +20,27 @@ namespace Serenity.Data
             return new DateTimeField(collection, name, caption, size, flags, getValue, setValue);
         }
 
+        public override object ConvertValue(object source, IFormatProvider provider)
+        {
+#if COREFX
+            if (source is JValue)
+                source = ((JValue)source).Value;
+#endif
+            if (source == null)
+                return null;
+            else
+            {
+                if (source is DateTime)
+                    return (DateTime)source;
+
+                if (source is DateTimeOffset)
+                    return ((DateTimeOffset)source).DateTime;
+
+                return Convert.ChangeType(source, typeof(DateTime), provider);
+            }
+        }
+
+
 #if !SILVERLIGHT
         public override void GetFromReader(IDataReader reader, int index, Row row)
         {
