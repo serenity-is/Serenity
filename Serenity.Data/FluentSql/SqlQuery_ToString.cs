@@ -6,13 +6,13 @@ namespace Serenity.Data
     public partial class SqlQuery
     {
         /// <summary>
-        ///   SqlSelect sorgusunu formatlayıp bir SELECT sorgusuna çevirir. Sayfalama sözkonusuysa 
-        ///   (atlanan kayıt varsa) birden fazla sorgu arka arkaya oluşturulur.</summary>
+        /// Format the SqlSelect query and convert it to a SELECT query. For paging
+        /// (if there are skipped records) multiple queries are created one after the other. </ Summary>
         /// <returns>
-        ///   Formatlanmış SELECT ifadesi</returns>
+        /// Formatted SELECT expression </ returns>
         public override string ToString()
         {
-            // formatlamada kullanılacak StringBuilder nesnesi
+            // StringBuilder object to be used for formatting
             var sb = new StringBuilder();
 
             // sub queries should be enclosed in paranthesis
@@ -23,7 +23,7 @@ namespace Serenity.Data
                 throw new InvalidOperationException("A query must be ordered by unique fields " +
                     "to be able to skip records!");
 
-            // ek filtremiz şimdilik yok
+            // no additional filters at this time
             string extraWhere = null;
 
             bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
@@ -32,7 +32,7 @@ namespace Serenity.Data
             bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && !useRowNum && dialect.CanUseRowNumber;
             bool useSecondQuery = skip > 0 && !useSkipKeyword && !useOffset && !useRowNumber;
 
-            // atlanması istenen kayıt var mı?
+            // do you have the requested record to be skipped?
             if (useRowNumber || useRowNum || useSecondQuery)
             {
                 if (useRowNumber || useRowNum)
@@ -47,77 +47,77 @@ namespace Serenity.Data
                     const string Greater = "(({0} IS NOT NULL AND @Value{1} IS NULL) OR ({0} > @Value{1}))";
                     const string LessThan = "(({0} IS NULL AND @Value{1} IS NOT NULL) OR ({0} < @Value{1}))";
 
-                    // atlanması istenen kayıtları geçip geri kalanları getirebilmek için öncelikle sorguyu 
-                    // sadece anahtar sahaları seçecek şekilde çalıştırıyor, atlanması istenen kayıt kadar 
-                    // ilerliyor, bu son kaydın sıralanan alanlarının değerlerini buluyoruz.
+                    // skip over the requested records and get the rest first
+                    // run only to select key fields, skip to the desired record
+                    // moving forward, we find the values ​​of the fields in this last record.
 
-                    // Örneğin asıl sorgumuz 
-                    // SELECT ID, A, B, C, D FROM TABLO WHERE X > Y ORDER BY ID olsun. SKIP 5 belirtilmişse 
-                    // ilk 5 kaydın atlanıp 6 dan devam edilmesi gerekir. Bunun için,
-                    // DECLARE @ID SQL_VARIANT; SELECT TOP 5 @ID = ID FROM TABLO ORDER BY ID
-                    // gibi bir sorgu çalıştırılıp, 5. kaydın ID si bulunmuş olur. 5 ten sonraki kayıtları 
-                    // almak için oluşturulması gereken sorgu ise,
-                    // SELECT ID, A, B, C, D FROM TABLO WHERE ID > @ID AND X > Y ORDER BY ID
-                    // Burada @ID 5. kaydın ID sidir.
+                    // For example our main question
+                    // SELECT ID, A, B, C, D FROM TABLE WHERE X> Y ORDER BY ID. If SKIP 5 is specified
+                    // the first 5 records should be skipped and continued from 6. For this,
+                    // DECLARE @ID SQL_VARIANT; SELECT TOP 5 @ID = ID FROM TABLE ORDER BY ID
+                    // is executed, and the ID of the 5th record is found. Records after 5
+                    // If the query needs to be created to retrieve,
+                    // SELECT ID, A, B, C, D FROM TABLE WHERE ID> @ID AND X> Y ORDER BY ID
+                    // where @ID is the ID number of the 5th record.
 
-                    // Sıralanan alanlar birden çok olduğunda, örneğin DATE, ID alanlarına göre sıralama 
-                    // olduğunda, yine bu alanların son değerleri bulunur. Fakat bu sefer,
-                    // DATE > @DATE AND ID > @ID yazılamaz. Çünkü sıralamaya göre bir kaydın DATE değeri 
-                    // daha büyükse ID si ne olursa olsun daha alttadır. Bu tip bir koşulsa ID nin de 
-                    // büyük olmasını gerektirir. Yazılması gereken koşul,
-                    // (DATE > @DATE) OR (DATE = @DATE AND ID > @ID) olmalıdır. 
+                    // When there are multiple sorted fields, for example DATE, sort by ID fields
+                    //, again the last values ​​of these fields are found. But this time,
+                    // DATE> @DATE AND ID> @ID can not be written. Because a record by order is DATE value
+                    // the larger the ID is, the lower the whatever. If this is the case,
+                    // it needs to be big. The condition to be written,
+                    // (DATE> @DATE) OR (DATE = @DATE AND ID> @ID).
 
-                    // Null değerleriyle karşılaştırmalarda sorun çıkmaması ve sıralamanın bozulmaması için 
-                    // karşılaştırmalar Null değerleri de gözönüne alınarak yapılmalıdır. Yukarıdaki ifade NULL 
-                    // durumları da gözönüne alınarak:
-                    // ((DATE IS NOT NULL AND @DATE IS NULL) OR (DATE > @DATE)) OR 
-                    // ((ID IS NULL AND @ID IS NULL) OR (ID = @ID))
-                    // şeklinde yazılabilir. İlk satırda NULL değerlerinin sıralamada her zaman null olmayan 
-                    // bir değerden önce geleceği kabul edilir. İkinci satırda ise iki NULL un sıralama olarak
-                    // eşit oldukları kabul edilir.
+                    // To avoid problems when comparing with null values ​​and not to break the sorting
+                    // comparisons should be made taking into account Null values. The above expression is NULL
+                    // Considering the situations:
+                    // ((DATE IS NOT NULL AND @DATE IS NULL) OR (DATE> @DATE)) OR
+                    // ((ID IS NULL AND @ ID IS NULL) OR (ID = @ ID))
+                    //. NULL values ​​in the first row are not always null
+                    // is considered a future before a value. On the second line, two NULL un
+                    // are considered equal.
 
-                    // ikinci sorgulama için atlanan kayıtların altındaki kayıtları bulmayı sağlayacak koşulu 
-                    // oluşturacağımız StringBuilder
+                    // condition to find records below records skipped for second query
+                    // We will create StringBuilder
                     var check = new StringBuilder();
 
-                    // sıralanan alan adlarını sonlarındaki DESC atılmış şekilde tutacak dizi
+                    // array to hold sorted domain names with DESC at the end
                     var order = new string[orderBy.Count];
 
-                    // alanların ters sıralı olma durumlarını tutacak dizi
+                    // array to hold fields in reverse order
                     var desc = new bool[orderBy.Count];
 
-                    // tüm sıralama listesini tara
+                    // scan entire sort list
                     for (int i = 0; i < orderBy.Count; i++)
                     {
-                        // her sıralı saha için bir SQL_VARIANT değişkeni tanımla
+                        // define an SQL_VARIANT variant for each sequential field
                         sb.AppendFormat(DeclareCmd, i);
 
-                        // sıralanan alanı oku
+                        // read sorted field
                         string o = orderBy[i];
 
-                        // eğer DESC ile bitiyorsa bu ters sıralamadır, karşılaştırmalarda gözönüne alınmalı
+                        // this is the reverse order if it ends with DESC, should be considered in the comparisons
                         desc[i] = o.EndsWith(SqlKeywords.Desc, StringComparison.OrdinalIgnoreCase);
 
-                        // ters sıralıysa DESC ifadesini sonundan atarak sıralı alan listesine ekle
+                        // if it is in reverse order add DESC phrase to the list of ordered fields
                         if (desc[i])
                             order[i] = o.Substring(0, o.Length - SqlKeywords.Desc.Length);
                         else
                             order[i] = o;
                     }
 
-                    // SELECT TOP...
+                    // SELECT TOP ...
                     sb.Append(SqlKeywords.Select);
                     if (distinct)
                         sb.Append(SqlKeywords.Distinct);
 
                     sb.Append(dialect.TakeKeyword);
                     sb.Append(' ');
-                    // Atlanacak kayıt sayısı kadar
+                    // Up to the number of records to be skipped
                     sb.Append(skip);
                     sb.Append(' ');
 
-                    // Alan listesini SqlSelect in kendi seçilecek alan listesi yerine
-                    // @Value1 = SiraliAlan1, @Value2 = SiraliAlan2 şeklinde düzenle.
+                    // Replace the field list with your own field list in SqlSelect
+                    // Edit @ Value1 = SiraliAlan1, @ Value2 = SiraliAlan2.
                     for (int i = 0; i < order.Length; i++)
                     {
                         if (i > 0)
@@ -125,67 +125,67 @@ namespace Serenity.Data
                         sb.AppendFormat(AssignCmd, i, order[i]);
                     }
 
-                    // SqlSelect'in diğer kısımlarını sorguya ekle
+                    // Query other parts of SqlSelect
                     AppendFromWhereOrderByGroupByHaving(sb, null, true);
 
                     sb.Append(";\n");
 
-                    // son kayıttan sonrakileri bulmaya yarayacak koşul, alan sayısı arttıkça biraz daha 
-                    // karmaşıklaşmaktadır. Örneğin A, B, C, D gibi 4 alanlı bir sıralamada,
-                    // (A > @A) OR 
-                    // (A = @A AND B > @B) OR 
-                    // (A = @A AND B = @B AND C > @C) OR
-                    // (A = @A AND B = @B AND C = @C AND D > @D)
-                    // Burada basitlik açısından NULL durumları yazılmamıştır. Görüldüğü gibi her satırda bir 
-                    // öncekinden bir fazla karşılaştırma vardır, bunların satır numarası - 1 adedi
-                    // eşitlik, bir tanesi büyüklük (ters sıralamaysa küçüklük) kontrolüdür.
+                    // condition that will be useful for finding the last record, as the number of fields increases
+                    // complicated. For example, in a 4-field sequence such as A, B, C, D,
+                    // (A> @A) OR
+                    // (A = @A AND B> @B) OR
+                    // (A = @A AND B = @B AND C> @C) OR
+                    // (A = @A AND B = @B AND C = @C AND D> @D)
+                    // Here, NULL states are not written for simplicity. As you can see, one per line
+                    // there is one more comparison before, their line number is -1
+                    // equality, one of them is the size (smallness in opposite order).
 
-                    // tüm satırları ortak paranteze al
+                    // get all lines in common brackets
                     check.Append('(');
                     for (int statement = 0; statement < order.Length; statement++)
                     {
-                        // ilk satırdan sonra araya OR koy
+                        // put together OR after first line
                         if (statement > 0)
                             check.Append(" OR ");
 
-                        // bu satırın açılış parantezi
+                        // opening brace of this line
                         check.Append('(');
 
-                        // satır numarasından bir eksiğine kadar, eşitlik koşulları
+                        // from line number to one minus, equality conditions
                         for (int equality = 0; equality < statement; equality++)
                         {
-                            // ilk koşuldan sonra araya AND koy
+                            // put together after first condition
                             if (equality > 0)
                                 check.Append(" AND ");
 
-                            // null durumunu da gözönüne alan eşitlik karşılaştırmasını yaz
+                            // Write equality comparison that takes into account the null case
                             check.AppendFormat(Equality, order[equality], equality);
                         }
 
-                        // büyüklük ya da küçüklük koşulundan önce araya AND koy. 
-                        // ilk satırda eşitlik durumu olmadığından AND e gerek yok.
+                        // put together before size or size condition.
+                        // there is no equality in the first row, so there is no need for AND.
                         if (statement > 0)
                             check.Append(" AND ");
 
-                        // sıralamanın ters olup olmamasına göre bu satır için büyüklük 
-                        // ya da küçüklük koşulunu null durumunu da gözönüne alarak ekle
+                        // size for this row, based on whether or not the sort is reversed
+                        // or add a small case considering the null state
                         if (desc[statement])
                             check.AppendFormat(LessThan, order[statement], statement);
                         else
                             check.AppendFormat(Greater, order[statement], statement);
 
-                        // bu satırın kapanış parantezi
+                        // closing brace of this line
                         check.Append(')');
                     }
-                    // tüm satırların kapanış parantezi
+                    // closing brace of all lines
                     check.Append(')');
 
-                    // bunu bir sonraki asıl sorgu için ekstra filtre olarak belirle
+                    // set this as an extra filter for the next main query
                     extraWhere = check.ToString();
                 }
             }
 
-            // asıl SELECT sorugusu başlangıcı
+            // actual SELECT query start
             sb.Append(SqlKeywords.Select);
 
             if (distinct)
@@ -193,8 +193,10 @@ namespace Serenity.Data
                 sb.Append(SqlKeywords.Distinct);
             }
 
-            // alınacak kayıt sayısı sınırlanmışsa bunu TOP N olarak sorgu başına yaz
-            if (take != 0 && (!useOffset) && (!useRowNum) && (useRowNumber || !dialect.UseTakeAtEnd))
+            // if the number of records to be fetched is limited, print it as TOP N per query
+            if (take != 0 && (!useOffset) && (!useRowNum) && 
+                ((useRowNumber && !dialect.UseTakeAtEnd) || 
+                (!useRowNumber && (!dialect.UseTakeAtEnd || dialect.CanUseRowNumber))))
             {
                 sb.Append(dialect.TakeKeyword);
                 sb.Append(' ');
@@ -214,12 +216,12 @@ namespace Serenity.Data
                 selCount = new StringBuilder();
 
             sb.Append('\n');
-            // seçilecek alan listesini dolaş
+            // navigate the field list to be selected
             for (int i = 0; i < columns.Count; i++)
             {
                 var s = columns[i];
 
-                // ilk alan adından sonra araya virgül konmalı
+                // comma delimited after first field
                 if (i > 0)
                 {
                     sb.Append(",\n");
@@ -227,13 +229,13 @@ namespace Serenity.Data
                         selCount.Append(',');
                 }
 
-                // alan adını yaz
+                // Write domain
                 sb.Append(s.Expression);
 
                 if (distinct)
                     selCount.Append(s.Expression);
 
-                // alana bir alias atanmışsa bunu yaz
+                // if an alias is assigned to the field, write it
                 if (!string.IsNullOrEmpty(s.ColumnName))
                 {
                     sb.Append(SqlKeywords.As);
@@ -271,26 +273,27 @@ namespace Serenity.Data
 
                     sb.Append(") AS __num__");
                 }
-                
+
             }
 
-            // select sorgusunun kalan kısımlarını yaz
+            // Write the rest of the select query
             AppendFromWhereOrderByGroupByHaving(sb, extraWhere, !useRowNumber);
 
             if (useRowNumber)
             {
-                sb.Append(") __results__ WHERE __num__ > ");
-                sb.Append(skip);
+                sb.Append(") __results__ WHERE __num__ > " + skip);
+                if (take > 0 && dialect.UseTakeAtEnd)
+                    sb.Append(" AND __num__ <= " + (skip + take));
             }
 
             if (useRowNum)
             {
                 sb.Append(") WHERE numberingofrow > " + skip);
                 if (take > 0)
-                    sb.Append(" AND ROWNUM <= " + take);
+                    sb.Append(" AND numberingofrow <= " + (skip + take));
             }
 
-            if (take != 0 && (!useRowNum) && (!useOffset) && !useRowNumber && dialect.UseTakeAtEnd)
+            if (take != 0 && (!useRowNum) && (!useOffset) && !dialect.CanUseRowNumber && dialect.UseTakeAtEnd)
             {
                 sb.Append(' ');
                 sb.Append(dialect.TakeKeyword);
@@ -339,7 +342,7 @@ namespace Serenity.Data
 
                 AppendFromWhereOrderByGroupByHaving(sb, null, false);
 
-                if (distinct || (groupBy!= null && groupBy.Length > 0))
+                if (distinct || (groupBy != null && groupBy.Length > 0))
                 {
                     sb.Append(") _alias_");
                 }
@@ -349,78 +352,78 @@ namespace Serenity.Data
             if (this.parent != null)
                 sb.Append(")");
 
-            // select sorgusunu döndür
+            // return select query
             return sb.ToString();
         }
 
         /// <summary>
-        ///   Verilen StringBuilder nesnesine SqlSelect'in FROM, WHERE, ORDER BY, GROUP BY, HAVING
-        ///   kısımlarını, belirtilirse bir ek filtre de gözönüne alınarak ekler.</summary>
-        /// <param name="sb">
-        ///   SqlSelect nesnesinin mevcut from, where... kısımlarının formatlanıp ekleneceği
-        ///   StringBuilder nesnesi.</param>
-        /// <param name="extraWhere">
-        ///   Belirtilirse WHERE koşullarına AND'lenerek eklenecek ekstra filtre.</param>
-        /// <param name="includeOrderBy">
-        ///   Sonuçta ORDER BY kısmı bulunsun mu?</param>
+        /// SqlSelect FROM, WHERE, ORDER BY, GROUP BY, HAVING to the given StringBuilder object
+        /// sections, if specified, with an additional filter in mind. </ Summary>
+        /// <param name = "sb">
+        /// The existing from, where ... sections of the SqlSelect object will be formatted and inserted
+        /// StringBuilder object. </ Param>
+        /// <param name = "extraWhere">
+        /// Extra filter to be added by ANDing WHERE conditions if specified. </ Param>
+        /// <param name = "includeOrderBy">
+        /// Do you find ORDER BY in the end? </ Param>
         /// <remarks>
-        ///   Sayfalama için üretilen sorgularda SqlSelect'in bu kısımları iki ayrı yerde (birinde ek bir 
-        ///   koşulla birlikte) kullanıldığından, bu şekilde yapılarak, kod tekrarının önüne 
-        ///   geçilmiştir.</remarks>
+        /// In queries generated for paging, these parts of SqlSelect are stored in two separate locations
+        /// condition), this is done in this way,
+        /// passed. </ Remarks>
         private void AppendFromWhereOrderByGroupByHaving(StringBuilder sb, string extraWhere,
             bool includeOrderBy)
         {
             if (from.Length > 0)
             {
-                // FROM yaz
+                // Write FROM
                 sb.Append(SqlKeywords.From);
-                // tablo listesini yaz ("A LEFT OUTER JOIN B ON (...) ....")
+                // write table list ("A LEFT OUTER JOIN B ON (...) ....")
                 sb.Append(from.ToString());
             }
 
-            // ekstra filtre belirtilmişse ya da mevcut bir filtre varsa sorgunun
-            // WHERE kısmı olacaktır
+            // if extra filter is specified or if there is an existing filter
+            // Will have a WHERE part
             if (extraWhere != null || where != null)
             {
-                // WHERE yaz
+                // Write WHERE
                 sb.Append(SqlKeywords.Where);
 
-                // Varsa, SqlSelect'te hazırlanmış filtreleri yaz
+                // Write the filters prepared in SqlSelect, if any
                 if (where != null)
                     sb.Append(@where);
 
-                // Ekstra filtre belirtilmişse...
+                // If extra filter is specified ...
                 if (extraWhere != null)
                 {
-                    // SqlSelect'in kendi filtresi de varsa araya AND koyulmalı
+                    // If sqlSelect has its own filter, AND must be put together
                     if (where != null)
                         sb.Append(" AND ");
-                    // Ekstra filtreyi ekle
+                    // Add extra filter
                     sb.Append(extraWhere);
                 }
             }
 
-            // Gruplama varsa ekle
+            // Add if grouping
             if (groupBy != null)
             {
                 sb.Append(SqlKeywords.GroupBy);
                 sb.Append(groupBy);
             }
 
-            // Grup koşulu varsa ekle
+            // Add if group condition
             if (having != null)
             {
                 sb.Append(SqlKeywords.Having);
                 sb.Append(having);
             }
 
-            // Sıralanmış alanlar varsa
+            // If there are sorted fields
             if (includeOrderBy && orderBy != null)
             {
-                // ORDER BY yaz
+                // Write ORDER BY
                 sb.Append(SqlKeywords.OrderBy);
 
-                // Sıralanan tüm alanları aralarına "," koyarak ekle
+                // Add all sorted fields by putting ","
                 for (int i = 0; i < orderBy.Count; i++)
                 {
                     if (i > 0)
