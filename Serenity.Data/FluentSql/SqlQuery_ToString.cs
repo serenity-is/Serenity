@@ -7,9 +7,9 @@ namespace Serenity.Data
     {
         /// <summary>
         /// Format the SqlSelect query and convert it to a SELECT query. For paging
-        /// (if there are skipped records) multiple queries are created one after the other. </ Summary>
+        /// (if there are skipped records) multiple queries are created one after the other. </summary>
         /// <returns>
-        /// Formatted SELECT expression </ returns>
+        /// Formatted SELECT expression </returns>
         public override string ToString()
         {
             // StringBuilder object to be used for formatting
@@ -290,7 +290,7 @@ namespace Serenity.Data
             {
                 sb.Append(") WHERE numberingofrow > " + skip);
                 if (take > 0)
-                    sb.Append(" AND numberingofrow <= " + (skip + take));
+                    sb.Append(" AND ROWNUM <= " + take);
             }
 
             if (take != 0 && (!useRowNum) && (!useOffset) && !dialect.CanUseRowNumber && dialect.UseTakeAtEnd)
@@ -358,18 +358,18 @@ namespace Serenity.Data
 
         /// <summary>
         /// SqlSelect FROM, WHERE, ORDER BY, GROUP BY, HAVING to the given StringBuilder object
-        /// sections, if specified, with an additional filter in mind. </ Summary>
-        /// <param name = "sb">
+        /// sections, if specified, with an additional filter in mind. </summary>
+        /// <param name="sb">
         /// The existing from, where ... sections of the SqlSelect object will be formatted and inserted
-        /// StringBuilder object. </ Param>
-        /// <param name = "extraWhere">
-        /// Extra filter to be added by ANDing WHERE conditions if specified. </ Param>
-        /// <param name = "includeOrderBy">
-        /// Do you find ORDER BY in the end? </ Param>
+        /// StringBuilder object. </param>
+        /// <param name="extraWhere">
+        /// Extra filter to be added by ANDing WHERE conditions if specified. </param>
+        /// <param name="includeOrderBy">
+        /// Do you find ORDER BY in the end? </param>
         /// <remarks>
         /// In queries generated for paging, these parts of SqlSelect are stored in two separate locations
         /// condition), this is done in this way,
-        /// passed. </ Remarks>
+        /// passed. </remarks>
         private void AppendFromWhereOrderByGroupByHaving(StringBuilder sb, string extraWhere,
             bool includeOrderBy)
         {
