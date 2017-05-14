@@ -3,6 +3,9 @@ using System.Data;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Globalization;
+#if COREFX
+using Newtonsoft.Json.Linq;
+#endif
 
 namespace Serenity.Data
 {
