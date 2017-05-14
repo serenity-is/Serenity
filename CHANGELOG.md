@@ -1,3 +1,8 @@
+## 2.9.24 (2017-05-14)
+
+Bugfixes:
+  - possible filtering problem with DateTimeOffset deserialization in JSON.NET and date/time fields
+
 ## 2.9.23 (2017-05-09)
 
 Features:
