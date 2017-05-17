@@ -113,8 +113,9 @@ namespace Q {
 
         export function setRegisteredScripts(scripts: any[]) {
             registered = {};
+            var t = new Date().getTime();
             for (var k in scripts) {
-                registered[k] = scripts[k].toString();
+                registered[k] = scripts[k] || t;
             }
         }
 
