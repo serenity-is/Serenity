@@ -53,6 +53,15 @@ namespace Serenity.CodeGenerator
             foreach (var assembly in config.ServerTypings.Assemblies)
             {
                 var fullName = Path.GetFullPath(assembly.Replace('/', Path.DirectorySeparatorChar));
+
+                if (!File.Exists(fullName))
+                {
+                    System.Console.Error.WriteLine(String.Format("Assembly file '{0}' specified in sergen.json is not found! " +
+                        "This might happen when project is not successfully built or file name doesn't match the output DLL." +
+                        "Please check path in sergen.json and try again.", fullName));
+                    Environment.Exit(1);
+                }
+
                 assemblies.Add(loadContext.LoadFromAssemblyPath(fullName));
             }
 
