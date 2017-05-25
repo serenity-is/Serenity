@@ -12,9 +12,9 @@
     using System.Reflection;
 
     public class ListRequestHandler<TRow, TListRequest, TListResponse> : IListRequestHandler, IListRequestProcessor
-        where TRow: Row, new()
-        where TListRequest: ListRequest
-        where TListResponse: ListResponse<TRow>, new()
+        where TRow : Row, new()
+        where TListRequest : ListRequest
+        where TListResponse : ListResponse<TRow>, new()
     {
         protected TRow Row;
         protected TListRequest Request;
@@ -69,7 +69,7 @@
         protected virtual bool ShouldSelectField(Field field)
         {
             var mode = field.MinSelectLevel;
-            
+
             if (mode == SelectLevel.Always)
                 return true;
 
@@ -143,7 +143,7 @@
                     SelectField(query, field);
             }
         }
-    
+
         protected virtual void PrepareQuery(SqlQuery query)
         {
             SelectFields(query);
@@ -185,8 +185,8 @@
 
             var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);
             if (ReferenceEquals(null, field) ||
-                ((field.MinSelectLevel == SelectLevel.Never) && 
-                    (field.CustomAttributes == null || 
+                ((field.MinSelectLevel == SelectLevel.Never) &&
+                    (field.CustomAttributes == null ||
                      !field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
             {
                 throw new ArgumentOutOfRangeException("containsField");
@@ -195,7 +195,7 @@
             return new Field[] { field };
         }
 
-        protected virtual void AddFieldContainsCriteria(Field field, string containsText, long? id, 
+        protected virtual void AddFieldContainsCriteria(Field field, string containsText, long? id,
             SearchType searchType, bool numericOnly, ref BaseCriteria criteria, ref bool orFalse)
         {
             if (numericOnly == true && (id == null))
@@ -208,6 +208,18 @@
             {
                 case SearchType.Contains:
                     criteria |= new Criteria(field).Contains(containsText);
+                    break;
+
+                case SearchType.FullTextSearchContains:
+                    criteria |= new Criteria(field).FullTextSearchContains(containsText);
+                    break;
+
+                case SearchType.FullTextSearchStartsWith:
+                    criteria |= new Criteria(field).FullTextSearchStartsWith(containsText);
+                    break;
+
+                case SearchType.FullTextSearchFreeText:
+                    criteria |= new Criteria(field).FullTextSearchFreeText(containsText);
                     break;
 
                 case SearchType.StartsWith:
@@ -365,7 +377,7 @@
                 field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
                 field.Flags.HasFlag(FieldFlags.NotMapped))
             {
-                throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name, 
+                throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name,
                     String.Format("Can't apply equality filter on field {0}", field.PropertyName ?? field.Name));
             }
 
@@ -394,7 +406,7 @@
             if (value is string && ((string)value).Length == 0)
                 return true;
 
-            if (!(value is string) && value is IEnumerable && 
+            if (!(value is string) && value is IEnumerable &&
                 !((value as IEnumerable).GetEnumerator().MoveNext()))
                 return true;
 
@@ -417,7 +429,7 @@
 
                 var field = Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key);
                 if (ReferenceEquals(null, field))
-                    throw new ArgumentOutOfRangeException(pair.Key, 
+                    throw new ArgumentOutOfRangeException(pair.Key,
                         String.Format("Can't find field {0} in row for equality filter.", pair.Key));
 
                 ApplyFieldEqualityFilter(query, field, pair.Value);
@@ -522,7 +534,7 @@
 
             OnBeforeExecuteQuery();
 
-            Response.TotalCount = query.ForEach(Connection, delegate()
+            Response.TotalCount = query.ForEach(Connection, delegate ()
             {
                 var clone = ProcessEntity(Row.Clone());
 
@@ -569,7 +581,7 @@
 
     public class ListRequestHandler<TRow, TListRequest> : ListRequestHandler<TRow, TListRequest, ListResponse<TRow>>
         where TRow : Row, new()
-        where TListRequest: ListRequest
+        where TListRequest : ListRequest
     {
     }
 
