@@ -16,7 +16,7 @@ namespace Serenity.Data.Mapping
         /// </summary>
         /// <param name="table">Primary key table</param>
         /// <param name="field">Matching column in primary key table</param>
-        public ForeignKeyAttribute(string table, string field)
+        public ForeignKeyAttribute(string table, string field = "Id")
         {
             Check.NotNull(table, nameof(table));
             Check.NotNull(field, nameof(field));
