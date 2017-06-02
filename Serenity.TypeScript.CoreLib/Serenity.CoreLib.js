@@ -1673,8 +1673,9 @@ var Q;
         ScriptData.canLoad = canLoad;
         function setRegisteredScripts(scripts) {
             registered = {};
+            var t = new Date().getTime();
             for (var k in scripts) {
-                registered[k] = scripts[k].toString();
+                registered[k] = scripts[k] || t;
             }
         }
         ScriptData.setRegisteredScripts = setRegisteredScripts;

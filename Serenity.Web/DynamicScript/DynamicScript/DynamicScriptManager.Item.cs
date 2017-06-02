@@ -54,7 +54,7 @@ namespace Serenity.Web
                 content = new Script
                 {
                     Time = DateTime.UtcNow,
-                    Hash = DateTime.Now.Ticks.ToString(),
+                    Hash = null,
                     UncompressedBytes = null,
                     CompressedBytes = null
                 };
@@ -151,7 +151,7 @@ namespace Serenity.Web
                 this.content = new Script
                 {
                     Time = DateTime.UtcNow,
-                    Hash = DateTime.Now.Ticks.ToString(),
+                    Hash = null,
                     UncompressedBytes = null,
                     CompressedBytes = null
                 };

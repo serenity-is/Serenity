@@ -28,7 +28,10 @@ namespace Serenity.Web
             foreach (var pair in dictionary)
             {
                 writer.WritePropertyName(pair.Key);
-                writer.WriteValue(pair.Value);
+                if (pair.Value == null)
+                    writer.WriteValue(0);
+                else
+                    writer.WriteValue(pair.Value);
             }
             writer.WriteEndObject();
             return sw.ToString();
