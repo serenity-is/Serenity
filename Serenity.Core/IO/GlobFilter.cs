@@ -159,6 +159,9 @@ namespace Serenity.IO
                     s[0] == sep &&
                     s.IndexOfAny(AsteriskQue) < 0)
                 {
+                    if (startsWith == null)
+                        startsWith = new List<string>();
+
                     startsWith.Add(s.Substring(1));
                     continue;
                 }
