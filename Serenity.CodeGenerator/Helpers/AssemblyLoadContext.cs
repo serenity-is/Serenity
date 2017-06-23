@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-#if !FXCORE
+#if !COREFX
 namespace Serenity.CodeGenerator
 {
     /// <summary>

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-#if FXCORE
+#if COREFX
 using System.Runtime.Loader;
 #endif
 
