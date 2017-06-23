@@ -14,25 +14,43 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-      <group targetFramework=".NETFramework4.5">
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="FirebirdSql.Data.FirebirdClient" version="${*:FirebirdSql.Data.FirebirdClient}" />
+        <dependency id="Microsoft.Data.Sqlite" version="${*:Microsoft.Data.Sqlite}" />
+        <dependency id="MySqlConnector" version="${*:MySqlConnector}" />
+        <dependency id="Npgsql" version="${*:Npgsql}" />        
+        <dependency id="Microsoft.NETCore.App" version="1.1.1" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Web" version="${version}" />
       </group>
       <group targetFramework=".NETCoreApp1.0">
         <dependency id="FirebirdSql.Data.FirebirdClient" version="${*:FirebirdSql.Data.FirebirdClient}" />
         <dependency id="Microsoft.Data.Sqlite" version="${*:Microsoft.Data.Sqlite}" />
         <dependency id="MySqlConnector" version="${*:MySqlConnector}" />
         <dependency id="Npgsql" version="${*:Npgsql}" />        
-        <dependency id="NetStandard.Library" version="${*:NetStandard.Library}" />
+        <dependency id="NetStandard.Library" version="${netcoreapp1.0:NetStandard.Library}" />
         <dependency id="Microsoft.NETCore.App" version="1.1.1" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-        <dependency id="System.Data.SqlClient" version="${*:System.Data.SqlClient}" />
+        <dependency id="System.Data.SqlClient" version="${netcoreapp1.0:System.Data.SqlClient}" />
         <dependency id="Serenity.Web" version="${version}" />
       </group>
     </dependencies>
   </metadata>
   <files>
     <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.dll" target="lib/netcoreapp1.0/dotnet-sergen.dll" />	
-	<file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.deps.json" target="lib/netcoreapp1.0/dotnet-sergen.deps.json" />	
+    <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.deps.json" target="lib/netcoreapp1.0/dotnet-sergen.deps.json" />	
     <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" />	
+    <file src="bin/${configuration}/net46/dotnet-sergen.exe" target="lib/net46/dotnet-sergen.exe" />	
+    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.Abstractions.dll" />
+    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.Core.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.Core.dll" />
+    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.ViewFeatures.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.ViewFeatures.dll" />
+    <file src="bin/${configuration}/net46/Newtonsoft.Json.dll" target="lib/net46/Newtonsoft.Json.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Core.dll" target="lib/net46/Serenity.Core.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Data.dll" target="lib/net46/Serenity.Data.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Data.Entity.dll" target="lib/net46/Serenity.Data.Entity.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Services.dll" target="lib/net46/Serenity.Services.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Web.dll" target="lib/net46/Serenity.Web.dll" />
+    <file src="bin/${configuration}/net46/System.Runtime.InteropServices.RuntimeInformation.dll" target="lib/net46/System.Runtime.InteropServices.RuntimeInformation.dll" />
     <file src="../Serenity.CodeGenerator.Net45/Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Newtonsoft.Json.dll" target="tools" />

@@ -18,8 +18,12 @@
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="Serenity.Core" version="${version}" />
       </group>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Serenity.Core" version="${version}" />
+      </group>
       <group targetFramework=".NETStandard1.6">
-		<dependency id="Dapper" version="${netstandard1.6:Dapper}" />
+		    <dependency id="Dapper" version="${netstandard1.6:Dapper}" />
         <dependency id="Microsoft.Extensions.Configuration" version="${netstandard1.6:Microsoft.Extensions.Configuration}" />
         <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Configuration.Abstractions}" />
         <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netstandard1.6:Microsoft.Extensions.Configuration.Binder}" />
@@ -36,5 +40,7 @@
     <file src="bin/${configuration}/Serenity.Data.pdb" target="lib/net45" />
     <file src="bin/${configuration}/Serenity.Data.xml" target="lib/net45" />
     <file src="bin/${configuration}/netstandard1.6/Serenity.Data.dll" target="lib/netstandard1.6" />	
+    <file src="bin/${configuration}/net46/Serenity.Data.dll" target="lib/net46" />	
+    <file src="bin/${configuration}/net46/Serenity.Data.pdb" target="lib/net46" />	
   </files>
 </package>

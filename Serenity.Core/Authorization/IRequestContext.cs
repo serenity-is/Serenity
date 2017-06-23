@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if ASPNETCORE
 using IDictionary = System.Collections.Generic.IDictionary<object, object>;
 #else
 using System.Collections;

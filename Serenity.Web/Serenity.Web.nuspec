@@ -33,6 +33,25 @@
         <dependency id="toastr" version="${net45:toastr}" />
         <dependency id="Select2.js" version="[3.5.1]" />
       </group>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="${net46:Microsoft.AspNetCore.Mvc.Core}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.ViewFeatures" version="${net46:Microsoft.AspNetCore.Mvc.ViewFeatures}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="${net46:Microsoft.AspNetCore.Mvc.Razor}" />
+        <dependency id="Microsoft.AspNetCore.Hosting.Abstractions" version="${net46:Microsoft.AspNetCore.Hosting.Abstractions}" />
+        <dependency id="NUglify" version="${*:NUglify}" />
+        <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="Serenity.Data" version="${version}" />
+        <dependency id="Serenity.Data.Entity" version="${version}" />
+        <dependency id="Serenity.Services" version="${version}" />
+        <dependency id="Serenity.Web.Assets" version="${serenityWebAssetsVersion}" />
+        <dependency id="jQuery" version="${net45:jQuery}" />
+        <dependency id="jQuery.UI.Combined" version="${net45:jQuery.UI.Combined}" />
+        <dependency id="jQuery.Validation" version="${net45:jQuery.Validation}" />
+        <dependency id="bootstrap" version="${net45:bootstrap}" />
+        <dependency id="toastr" version="${net45:toastr}" />
+        <dependency id="Select2.js" version="[3.5.1]" />        
+      </group>
       <group targetFramework=".NETStandard1.6">
         <dependency id="Dapper" version="${netstandard1.6:Dapper}" />
         <dependency id="Microsoft.AspNetCore.Mvc.Core" version="${netstandard1.6:Microsoft.AspNetCore.Mvc.Core}" />
@@ -65,6 +84,8 @@
   </metadata>
   <files>
     <file src="bin\${configuration}\netstandard1.6\Serenity.Web.dll" target="lib/netstandard1.6" />
+    <file src="bin\${configuration}\net46\Serenity.Web.dll" target="lib/net46" />
+    <file src="bin\${configuration}\net46\Serenity.Web.pdb" target="lib/net46" />
     <file src="bin\${configuration}\Serenity.Web.dll" target="lib/net45" />
     <file src="bin\${configuration}\Serenity.Web.pdb" target="lib/net45" />
     <file src="bin\${configuration}\serenity.css" target="content/Content/serenity" />

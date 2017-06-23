@@ -27,7 +27,7 @@ namespace Serenity
         public static object Get(Type settingType)
         {
             var scope = GetSettingScope(settingType);
-#if COREFX
+#if ASPNETCORE
             var repository = Dependency.Resolve<IConfigurationRepository>();
 #else
             var repository = Dependency.Resolve<IConfigurationRepository>(scope);
@@ -44,7 +44,7 @@ namespace Serenity
         public static object TryGet(Type settingType)
         {
             var scope = GetSettingScope(settingType);
-#if COREFX
+#if ASPNETCORE
             var repository = Dependency.TryResolve<IConfigurationRepository>();
 #else
             var repository = Dependency.TryResolve<IConfigurationRepository>(scope);

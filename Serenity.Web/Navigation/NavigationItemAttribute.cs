@@ -2,6 +2,8 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Serenity.CodeGeneration;
+using Serenity.Web.Common;
 #if ASPNETCORE
 using Microsoft.AspNetCore.Mvc;
 #else
@@ -58,8 +60,8 @@ namespace Serenity.Navigation
             if (actionMethod == null)
                 throw new ArgumentOutOfRangeException("action");
 
-            var routeController = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            var routeAction = actionMethod.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
+            var routeController = AttributeReader.GetAttributeWithAssemblyVersionChecking<RouteAttribute>(controller); 
+            var routeAction = AttributeReader.GetAttributeWithAssemblyVersionChecking<RouteAttribute>(actionMethod);
 
             if (routeController == null && routeAction == null)
                 throw new InvalidOperationException(String.Format(

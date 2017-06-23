@@ -3,7 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+#if FXCORE
 using System.Runtime.Loader;
+#endif
 
 namespace Serenity.CodeGenerator
 {

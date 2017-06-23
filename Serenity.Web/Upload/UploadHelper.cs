@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Serenity.IO;
 using System.Web.Hosting;
-#if !ASPNETCORE
 using System.Web;
-#endif
 
 namespace Serenity.Web
 {

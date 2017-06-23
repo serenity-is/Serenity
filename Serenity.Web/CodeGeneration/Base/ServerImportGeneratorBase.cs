@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Serenity.Web.Common;
 #if ASPNETCORE
 using Microsoft.AspNetCore.Mvc;
 #else
@@ -397,8 +398,8 @@ namespace Serenity.CodeGeneration
 
         protected string GetServiceUrlFromRoute(Type controller)
         {
-            var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            string url = route.Template ?? "";
+            var route = AttributeReader.GetAttributeWithAssemblyVersionChecking<RouteAttribute>(controller);
+            string url = route?.Template ?? "";
 
 #if ASPNETCORE
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));

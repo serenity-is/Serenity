@@ -2,7 +2,11 @@
   <PropertyGroup>
     <Description>Serenity Tooling for .NET Core CLI. Contains the dotnet-sergen command used to generate code, transform templates, restore content packages.</Description>
     <VersionPrefix>2.9.24</VersionPrefix>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
+<!--
+    <TargetFramework>net46</TargetFramework>
+    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
+-->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>dotnet-sergen</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -24,13 +28,28 @@
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Web\Serenity.Web.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <DefineConstants>$(DefineConstants);FXCORE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="NetStandard.Library" Version="1.6.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.7.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="1.1.2" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="1.1.0" />
     <PackageReference Include="MySqlConnector" Version="0.11.3" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
     <PackageReference Include="Npgsql" Version="3.1.9" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.3.0" />
   </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);NET46</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="1.1.2" />
+  </ItemGroup>
+
 </Project>
