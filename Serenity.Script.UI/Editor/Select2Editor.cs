@@ -194,8 +194,8 @@ namespace Serenity
         {
             return s =>
             {
-                s = (Q.Externals.StripDiacritics(s) ?? "").ToLower();
                 lastCreateTerm = s;
+                s = (Q.Externals.StripDiacritics(s) ?? "").ToLower();
 
                 if (s.IsTrimmedEmpty())
                     return null;
