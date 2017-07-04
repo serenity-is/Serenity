@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.TypeScript.CoreLib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.TypeScript.CodeGeneration", "Serenity.TypeScript.CodeGeneration\Serenity.TypeScript.CodeGeneration.csproj", "{6AC1B628-C759-4B5B-ACD7-75C202C65DFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serenity.Configuration.Net45", "Serenity.Configuration\Serenity.Configuration.Net45.csproj", "{DE46F56E-9690-4865-856C-6F429F5087DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,14 @@ Global
 		{6AC1B628-C759-4B5B-ACD7-75C202C65DFB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6AC1B628-C759-4B5B-ACD7-75C202C65DFB}.Release|x86.ActiveCfg = Release|Any CPU
 		{6AC1B628-C759-4B5B-ACD7-75C202C65DFB}.Release|x86.Build.0 = Release|Any CPU
+		{DE46F56E-9690-4865-856C-6F429F5087DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE46F56E-9690-4865-856C-6F429F5087DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE46F56E-9690-4865-856C-6F429F5087DA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DE46F56E-9690-4865-856C-6F429F5087DA}.Debug|x86.Build.0 = Debug|Any CPU
+		{DE46F56E-9690-4865-856C-6F429F5087DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE46F56E-9690-4865-856C-6F429F5087DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE46F56E-9690-4865-856C-6F429F5087DA}.Release|x86.ActiveCfg = Release|Any CPU
+		{DE46F56E-9690-4865-856C-6F429F5087DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

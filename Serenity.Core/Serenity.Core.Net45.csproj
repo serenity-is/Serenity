@@ -98,6 +98,8 @@
     <Compile Include="ComponentModel\PropertyGrid\SortOrderAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\ResizableAttribute.cs" />
     <Compile Include="ComponentModel\Columns\WidthAttribute.cs" />
+    <Compile Include="Configuration\AppSettingsJsonConfigRepository.cs" />
+    <Compile Include="Configuration\IConfigurationManager.cs" />
     <Compile Include="Helpers\AssemblySorter.cs" />
     <Compile Include="Helpers\Check.cs" />
     <Compile Include="Helpers\BinarySerialization.cs" />

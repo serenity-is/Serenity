@@ -18,11 +18,8 @@
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="Serenity.Core" version="${version}" />
       </group>
-      <group targetFramework=".NETStandard1.6">
-		<dependency id="Dapper" version="${netstandard2.0:Dapper}" />
-        <dependency id="Microsoft.Extensions.Configuration" version="${netstandard2.0:Microsoft.Extensions.Configuration}" />
-        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard2.0:Microsoft.Extensions.Configuration.Abstractions}" />
-        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netstandard2.0:Microsoft.Extensions.Configuration.Binder}" />
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Dapper" version="${netstandard2.0:Dapper}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="Serenity.Core" version="${version}" />
         <dependency id="System.Data.Common" version="${netstandard2.0:System.Data.Common}" />

@@ -112,8 +112,12 @@ namespace Serenity.CodeGenerator
         private static void WriteHelp()
         {
             Console.WriteLine("Serenity Code Generator " +
-                Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion);
+#if COREFX
 
+                Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion);
+#else
+                typeof(Program).GetType().Assembly.GetName().Version.ToString());
+#endif
             Console.WriteLine();
             Console.WriteLine("Usage: sergen [command]");
             Console.WriteLine();

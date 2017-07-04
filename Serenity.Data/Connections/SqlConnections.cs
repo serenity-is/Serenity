@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Reflection;
-#if !COREFX
-using System.Configuration;
-#else
-using Microsoft.Extensions.Configuration;
-#endif
+using Serenity.Abstractions;
 
 namespace Serenity.Data
 {
@@ -56,23 +52,17 @@ namespace Serenity.Data
             if (!connections.TryGetValue(connectionKey, out connection))
             {
                 var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
-#if COREFX
-                var configuration = Dependency.TryResolve<IConfiguration>();
+
+                var configuration = Dependency.TryResolve<IConfigurationManager>();
                 if (configuration == null)
                     return null;
 
-                var connectionString = configuration.GetValue<string>("Data:" + connectionKey + ":ConnectionString");
-                var providerName = configuration.GetValue<string>("Data:" + connectionKey + ":ProviderName") ?? "System.Data.SqlClient";
-                connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, 
-                    connectionString, providerName);
-#else
-                var connectionSetting = ConfigurationManager.ConnectionStrings[connectionKey];
+                var connectionSetting = configuration.ConnectionString(connectionKey);
                 if (connectionSetting == null)
                     return null;
 
-                connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, connectionSetting.ConnectionString, 
-                    connectionSetting.ProviderName);
-#endif
+                connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, connectionSetting.Item1, 
+                    connectionSetting.Item2);
 
                 connections = newConnections;
             }

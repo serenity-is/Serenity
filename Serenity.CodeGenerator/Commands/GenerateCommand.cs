@@ -164,11 +164,13 @@ namespace Serenity.CodeGenerator
                 providerName = confConnection.ProviderName.TrimToNull();
             providerName = providerName ?? "System.Data.SqlClient";
 
+#if COREFX
             DbProviderFactories.RegisterFactory("System.Data.SqlClient", SqlClientFactory.Instance);
             DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", Microsoft.Data.Sqlite.SqliteFactory.Instance);
             DbProviderFactories.RegisterFactory("Npgsql", Npgsql.NpgsqlFactory.Instance);
             DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", FirebirdSql.Data.FirebirdClient.FirebirdClientFactory.Instance);
             DbProviderFactories.RegisterFactory("MySql.Data.MySqlClient", MySql.Data.MySqlClient.MySqlClientFactory.Instance);
+#endif
 
             if (connectionString.IndexOf("../../..") >= 0)
                 connectionString = connectionString.Replace("../../..", Path.GetDirectoryName(csproj));

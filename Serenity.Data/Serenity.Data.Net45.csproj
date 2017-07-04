@@ -41,7 +41,6 @@
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
@@ -175,7 +174,6 @@
     <Compile Include="SqlHelpers\SqlHelper.cs" />
     <Compile Include="SqlHelpers\SqlSyntax.cs" />
     <Compile Include="SqlHelpers\SqlSettings.cs" />
-    <Compile Include="Utility\AppSettingsJsonConfigRepository.cs" />
     <Compile Include="Utility\DeltaLister.cs" />
     <Compile Include="Utility\SqlLogger.cs" />
     <Compile Include="Validation\ICustomValidator.cs" />

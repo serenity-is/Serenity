@@ -47,7 +47,6 @@ namespace Serenity.CodeGenerator
             Console.WriteLine(outDir);
 
             var rootPath = Path.GetFullPath(config.ServerTypings.Assemblies[0].Replace('/', Path.DirectorySeparatorChar));
-            var loadContext = new ProjectLoadContext(csproj, Path.GetDirectoryName(rootPath));
 
             List<Assembly> assemblies = new List<Assembly>();
             foreach (var assembly in config.ServerTypings.Assemblies)
@@ -62,7 +61,33 @@ namespace Serenity.CodeGenerator
                     Environment.Exit(1);
                 }
 
-                assemblies.Add(loadContext.LoadFromAssemblyPath(fullName));
+#if COREFX
+                using (var dynamicContext = new AssemblyResolver(fullName))
+                {
+                    var asm = dynamicContext.Assembly;
+#else
+                {
+                    var asm = Assembly.LoadFrom(fullName);
+#endif
+                    try
+                    {
+                        asm.GetTypes();
+                        assemblies.Add(asm);
+                    }
+                    catch (ReflectionTypeLoadException ex1)
+                    {
+                        System.Console.Error.WriteLine(String.Format("Couldn't list types in Assembly file '{0}' specified in sergen.json!", fullName) +
+                            Environment.NewLine + Environment.NewLine +
+                            string.Join(Environment.NewLine, ex1.LoaderExceptions.Select(x => x.Message).Distinct()));
+                        Environment.Exit(1);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Console.Error.WriteLine(String.Format("Couldn't list types in Assembly file '{0}' specified in sergen.json! ", fullName)
+                            + Environment.NewLine + Environment.NewLine + ex.ToString());
+                        Environment.Exit(1);
+                    }
+                }
             }
 
             Extensibility.ExtensibilityHelper.SelfAssemblies = new Assembly[]

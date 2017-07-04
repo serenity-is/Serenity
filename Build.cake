@@ -26,6 +26,7 @@ var nuspecParams = new Dictionary<string, string> {
 
 var dotnetBuildOrder = new string[] {
     "Serenity.Core",
+    "Serenity.Configuration",
     "Serenity.Caching.Couchbase",
     "Serenity.Caching.Redis",
     "Serenity.Data",
@@ -122,7 +123,7 @@ Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) 
                 .ToList();
 };
 
-Action<string, string> myPack = (s, id) => {
+Action<string, string, string> myPack = (s, id, project) => {
     var prm = new Dictionary<string, string>(nuspecParams);
 
     var packagesConfig = "./" + s + ".Net45/packages.config";
@@ -133,16 +134,18 @@ Action<string, string> myPack = (s, id) => {
     if (!System.IO.File.Exists(packagesConfig))
 		packagesConfig = null;
         
-    var csproj = "./" + s + "/" + s + ".csproj";
+	id = id ?? s;
+	project = project ?? s;
+    var csproj = "./" + s + "/" + project + ".csproj";
     if (!System.IO.File.Exists(csproj))
         csproj = null;
 
-    if (s == "Serenity.Web")
+    if (id == "Serenity.Web" || id == "Serenity.Web.AspNetCore")
         setPackageVersions(prm, null, "./Serenity.Test/packages.Serenity.Test.Net45.config");
         
     setPackageVersions(prm, csproj, packagesConfig);
     
-    var filename = "./" + s + "/" + (id ?? s) + ".nuspec";
+    var filename = "./" + s + "/" + id + ".nuspec";
     var nuspec = System.IO.File.ReadAllText(filename);
     string version;
   
@@ -153,18 +156,18 @@ Action<string, string> myPack = (s, id) => {
         version = serenityVersion;
         nuspec = nuspec.Replace("${version}", version);
     }
-    nuspec = nuspec.Replace("${id}", (id ?? s));
+    nuspec = nuspec.Replace("${id}", id);
     
     foreach (var p in prm)
         nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
       
-    var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + s + ".dll";
+    var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".dll";
     if (!System.IO.File.Exists(assembly))
-        assembly = "./" + s + ".Net45/bin/" + configuration + "/" + s + ".exe";
+        assembly = "./" + s + ".Net45/bin/" + configuration + "/" + project + ".exe";
 	if (!System.IO.File.Exists(assembly))
-		assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
+		assembly = "./" + s + "/bin/" + configuration + "/" + project + ".dll";
     if (!System.IO.File.Exists(assembly))
-        assembly = "./" + s + "/bin/" + configuration + "/" + s + ".exe";
+        assembly = "./" + s + "/bin/" + configuration + "/" + project + ".exe";
       
     if (System.IO.File.Exists(assembly)) 
     {
@@ -173,7 +176,7 @@ Action<string, string> myPack = (s, id) => {
         nuspec = nuspec.Replace("${description}", vi.Comments);
     }
 
-    var temp = "./.nupkg/" + s + ".temp.nuspec";
+    var temp = "./.nupkg/" + id + ".temp.nuspec";
     System.IO.File.WriteAllText(temp, nuspec);
      
     var basePath = @"./" + s;
@@ -185,7 +188,7 @@ Action<string, string> myPack = (s, id) => {
     });
     
     System.IO.File.Delete(temp);
-    nugetPackages.Add("./.nupkg/" + (id ?? s) + "." + version + ".nupkg");
+    nugetPackages.Add("./.nupkg/" + id + "." + version + ".nupkg");
 };
 
 Action fixNugetCache = delegate() {
@@ -282,12 +285,8 @@ Task("Compile")
     
     var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
     serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
-    
-    foreach (var project in dotnetBuildOrder) 
-    {
-        var csproj = @"./" + project + "/" + project + ".csproj";
-        patchProjectVer(csproj, serenityVersion);
-    }
+           
+	patchProjectVer(@"./SharedProperties.xml", serenityVersion);
 
 	var dotnetSln = @"./Serenity.DotNet.sln";
 	writeHeader("dotnet restore " + dotnetSln);
@@ -320,16 +319,18 @@ Task("Pack")
     .IsDependentOn("PdbPatch")
     .Does(() =>
 {   
-    myPack("Serenity.Core", null);
-    myPack("Serenity.Caching.Couchbase", null);
-    myPack("Serenity.Caching.Redis", null);
-    myPack("Serenity.Data", null);
-    myPack("Serenity.Data.Entity", null);
-    myPack("Serenity.Services", null);
-    myPack("Serenity.Testing", null);
-    myPack("Serenity.Script.UI", "Serenity.Script");
-    myPack("Serenity.Web", null);
-    myPack("Serenity.CodeGenerator", null);
+    myPack("Serenity.Core", null, null);
+    myPack("Serenity.Configuration", null, null);
+    myPack("Serenity.Caching.Couchbase", null, null);
+    myPack("Serenity.Caching.Redis", null, null);
+    myPack("Serenity.Data", null, null);
+    myPack("Serenity.Data.Entity", null, null);
+    myPack("Serenity.Services", null, null);
+    myPack("Serenity.Testing", null, null);
+    myPack("Serenity.Script.UI", "Serenity.Script", null);
+    myPack("Serenity.Web", null, null);
+    myPack("Serenity.Web", "Serenity.Web.AspNetCore", "Serenity.Web");
+    myPack("Serenity.CodeGenerator", null, null);
     
     fixNugetCache();
 });
@@ -345,7 +346,7 @@ Task("Assets-Pack")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        myPack("Serenity.Web", "Serenity.Web.Assets");
+        myPack("Serenity.Web", "Serenity.Web.Assets", null);
         fixNugetCache();
     });
 
@@ -360,7 +361,7 @@ Task("Tooling-Pack")
     .IsDependentOn("Clean")
     .Does(() =>
     {
-        myPack("Serenity.Web", "Serenity.Web.Tooling");
+        myPack("Serenity.Web", "Serenity.Web.Tooling", null);
         fixNugetCache();
     });
 

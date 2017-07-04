@@ -16,12 +16,11 @@
     <dependencies>
       <group targetFramework=".NETFramework4.5">
       </group>
-      <group targetFramework=".NETCoreApp1.0">
+      <group targetFramework=".NETCoreApp2.0">
         <dependency id="FirebirdSql.Data.FirebirdClient" version="${*:FirebirdSql.Data.FirebirdClient}" />
         <dependency id="Microsoft.Data.Sqlite" version="${*:Microsoft.Data.Sqlite}" />
         <dependency id="MySqlConnector" version="${*:MySqlConnector}" />
-        <dependency id="Npgsql" version="${*:Npgsql}" />        
-        <dependency id="Microsoft.NETCore.App" version="1.1.1" />
+        <dependency id="Npgsql" version="${*:Npgsql}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="System.Data.SqlClient" version="${*:System.Data.SqlClient}" />
         <dependency id="Serenity.Web" version="${version}" />
@@ -29,9 +28,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.dll" target="lib/netcoreapp1.0/dotnet-sergen.dll" />	
-	<file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.deps.json" target="lib/netcoreapp1.0/dotnet-sergen.deps.json" />	
-    <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" />	
+    <file src="bin/${configuration}/netcoreapp2.0/dotnet-sergen.dll" target="lib/netcoreapp2.0/dotnet-sergen.dll" />	
+    <file src="bin/${configuration}/netcoreapp2.0/dotnet-sergen.deps.json" target="lib/netcoreapp2.0/dotnet-sergen.deps.json" />	
+    <file src="bin/${configuration}/netcoreapp2.0/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp2.0/dotnet-sergen.runtimeconfig.json" />	
     <file src="../Serenity.CodeGenerator.Net45/Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Newtonsoft.Json.dll" target="tools" />

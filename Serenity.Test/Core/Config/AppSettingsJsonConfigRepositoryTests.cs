@@ -25,8 +25,9 @@ namespace Serenity.Test
         {
             using (new MunqContext())
             {
-                Dependency.Resolve<IDependencyRegistrar>()
-                    .RegisterInstance<ILocalCache>(new LocalCacheEmulator());
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                registrar.RegisterInstance<ILocalCache>(new LocalCacheEmulator());
+                registrar.RegisterInstance<IConfigurationManager>(new WebConfigurationWrapper());
 
                 var actual = new AppSettingsJsonConfigRepository().Load(typeof(TestDbSettings)) as TestDbSettings;
                 Assert.NotNull(actual);
@@ -41,8 +42,9 @@ namespace Serenity.Test
         {
             using (new MunqContext())
             {
-                Dependency.Resolve<IDependencyRegistrar>()
-                    .RegisterInstance<ILocalCache>(new LocalCacheEmulator());
+                var registrar = Dependency.Resolve<IDependencyRegistrar>();
+                registrar.RegisterInstance<ILocalCache>(new LocalCacheEmulator());
+                registrar.RegisterInstance<IConfigurationManager>(new WebConfigurationWrapper());
 
                 var actual = new AppSettingsJsonConfigRepository().Load(typeof(MyTestDbSettings)) as MyTestDbSettings;
                 Assert.NotNull(actual);

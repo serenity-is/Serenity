@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\SharedProperties.xml" />
   <PropertyGroup>
-    <AssemblyName>Serenity.Caching.Couchbase</AssemblyName>
+    <AssemblyName>Serenity.Configuration</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
@@ -10,11 +10,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="CouchbaseNetClient" Version="2.4.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.0" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <PackageReference Include="CouchbaseNetClient" Version="2.4.7" />
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Configuration" />
   </ItemGroup>
 </Project>

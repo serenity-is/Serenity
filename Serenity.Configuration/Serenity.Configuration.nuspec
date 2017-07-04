@@ -15,20 +15,20 @@
     <tags>${tags}</tags>
     <dependencies>
       <group targetFramework=".NETFramework4.5">
-        <dependency id="CouchbaseNetClient" version="${net45:CouchbaseNetClient}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="Serenity.Core" version="${version}" />
       </group>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="CouchbaseNetClient" version="${netstandard2.0:CouchbaseNetClient}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard2.0:Microsoft.Extensions.Configuration.Abstractions}" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netstandard2.0:Microsoft.Extensions.Configuration.Binder}" />                
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/Serenity.Caching.Couchbase.dll" target="lib/net45" />
-    <file src="bin/${configuration}/Serenity.Caching.Couchbase.pdb" target="lib/net45" />
-    <file src="bin/${configuration}/netstandard2.0/Serenity.Caching.Couchbase.dll" target="lib/netstandard2.0" />
+    <file src="bin/${configuration}/Serenity.Configuration.dll" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Configuration.pdb" target="lib/net45" />
+    <file src="bin/${configuration}/netstandard2.0/Serenity.Configuration.dll" target="lib/netstandard2.0" />
   </files>
 </package>

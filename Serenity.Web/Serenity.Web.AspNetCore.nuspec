@@ -14,13 +14,14 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-      <group targetFramework=".NETFramework4.5">
+      <group targetFramework=".NETFramework4.6.1">
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-        <dependency id="Microsoft.AspNet.Mvc" version="${net45:Microsoft.AspNet.Mvc}" />
-        <dependency id="Microsoft.AspNet.Razor" version="${net45:Microsoft.AspNet.Razor}" />
-        <dependency id="Microsoft.AspNet.WebPages" version="${net45:Microsoft.AspNet.WebPages}" />
-        <dependency id="Microsoft.Web.Infrastructure" version="${net45:Microsoft.Web.Infrastructure}" />
         <dependency id="NUglify" version="${*:NUglify}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="${net461:Microsoft.AspNetCore.Mvc.Core}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="${net461:Microsoft.AspNetCore.Mvc.Razor}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.ViewFeatures" version="${net461:Microsoft.AspNetCore.Mvc.ViewFeatures}" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard2.0:Microsoft.Extensions.Configuration.Abstractions}" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="${netstandard2.0:Microsoft.Extensions.Configuration.Binder}" />        
         <dependency id="Serenity.Core" version="${version}" />
         <dependency id="Serenity.Data" version="${version}" />
         <dependency id="Serenity.Data.Entity" version="${version}" />
@@ -66,8 +67,8 @@
   </metadata>
   <files>
     <file src="bin\${configuration}\netstandard2.0\Serenity.Web.dll" target="lib/netstandard2.0" />
-    <file src="bin\${configuration}\Serenity.Web.dll" target="lib/net45" />
-    <file src="bin\${configuration}\Serenity.Web.pdb" target="lib/net45" />
+    <file src="bin\${configuration}\net461\Serenity.Web.dll" target="lib/net461" />
+    <file src="bin\${configuration}\net461\Serenity.Web.pdb" target="lib/net461" />
     <file src="bin\${configuration}\serenity.css" target="content/Content/serenity" />
     <file src="Includes\web.config.transform" target="content\web.config.transform" />
     <file src="Style\images\*.png" target="content/Content/serenity/images" />

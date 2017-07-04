@@ -163,7 +163,7 @@ namespace Q {
                 e.dialog('destroy').html('');
             }
         }, options);
-        e.dialog(settings);
+        e.dialog(settings as any);
     }
 
     export function information(message: string, onOk: () => void, options?: Q.ConfirmOptions) {
