@@ -1,3 +1,15 @@
+## 2.9.25 (2017-07-06)
+
+Features:
+  - made back button in mobile mode a bit bigger to make it easier to click in small touch devices, closes #1800
+  - updated spanish translations (thanks @gustavo)
+  - triggerDataChange overload that accepts a jQuery object is renamed to triggerDataChanged
+  - exit gracefully when assembly DLL file is not found for sergen transform
+Bugfixes:
+  - inplace add lowercases typed text in new item dialog
+  - jquery ui button noconflict .d.ts typing change warning
+  - resolve possible null reference exception in GlobFilter
+  
 ## 2.9.24 (2017-05-14)
 
 Bugfixes:
