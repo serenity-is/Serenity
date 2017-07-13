@@ -1,3 +1,8 @@
+## 2.9.27 (2017-07-13)
+
+Features:
+  - pass item class from attribute in navigation items
+
 ## 2.9.26 (2017-07-13)
 
 Features:
