@@ -1,3 +1,9 @@
+## 2.9.26 (2017-07-13)
+
+Features:
+  - ability to add css class to navigation items
+  - wrapped headers in grid sample [Serene]
+
 ## 2.9.25 (2017-07-06)
 
 Features:
