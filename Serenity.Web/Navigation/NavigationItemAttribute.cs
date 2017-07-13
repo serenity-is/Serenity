@@ -158,6 +158,7 @@ namespace Serenity.Navigation
         public string Category { get; set; }
         public string Title { get; set; }
         public string IconClass { get; set; }
+        public string ItemClass { get; set; }
         public string Permission { get; set; }
         public string Target { get; set; }
     }
