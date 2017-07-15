@@ -793,6 +793,13 @@ declare namespace Serenity {
         };
     }
 }
+declare namespace Q.Router {
+    function navigate(hash: string, tryBack?: boolean): void;
+    function replace(hash: string, tryBack?: boolean): void;
+    function replaceLast(hash: string, tryBack?: boolean): void;
+    function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
+    function resolve(hash?: string): void;
+}
 declare namespace Serenity {
     class ColumnsKeyAttribute {
         value: string;

@@ -1512,6 +1512,8 @@ var Q;
             $(window).resize(layout);
         }
         layout();
+        // ugly, but to it is to make old pages work without having to add this
+        Q.Router.resolve();
     }
     Q.initFullHeightGridPage = initFullHeightGridPage;
     function layoutFillHeightValue(element) {
@@ -2002,7 +2004,7 @@ var Q;
                         idPrefix += "_";
                         var id = owner.attr("id");
                         if (id && Q.startsWith(id, idPrefix))
-                            value = id.substr(0, idPrefix.length) + '@' + value;
+                            value = id.substr(idPrefix.length) + '@' + value;
                     }
                 }
             }

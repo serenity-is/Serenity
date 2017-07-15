@@ -83,7 +83,7 @@ namespace Q.Router {
                     idPrefix += "_";
                     var id = owner.attr("id");
                     if (id && Q.startsWith(id, idPrefix))
-                        value = id.substr(0, idPrefix.length) + '@' + value;
+                        value = id.substr(idPrefix.length) + '@' + value;
                 }
             }
         }
