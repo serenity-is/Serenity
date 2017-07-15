@@ -178,6 +178,7 @@
     <Compile Include="GoogleMaps\_Customs\StreetViewService.cs" />
     <Compile Include="jsPDF\jsPDF.cs" />
     <Compile Include="LocalText.cs" />
+    <Compile Include="Q\Q.Router.cs" />
     <Compile Include="UserDefinition.cs" />
     <Compile Include="Lookup.cs" />
     <Compile Include="Mousetrap\Mousetrap.cs" />

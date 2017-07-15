@@ -36,27 +36,36 @@ namespace Serenity {
         }
 
         public static createToolButton(grid: DataGrid<any, any>): ToolButton {
+            function onClick() {
+                var picker = new Serenity.ColumnPickerDialog();
+                picker.allColumns = (grid as any).allColumns;
+                if ((grid as any).initialSettings) {
+                    var initialSettings = (grid as any).initialSettings as PersistedGridSettings;
+                    if (initialSettings.columns && initialSettings.columns.length)
+                        picker.defaultColumns = initialSettings.columns.map(x => x.id);
+                }
+                picker.visibleColumns = grid.slickGrid.getColumns().map(x => x.id);
+                picker.done = () => {
+                    (grid as any).allColumns = picker.allColumns;
+                    var visible = picker.allColumns.filter(x => x.visible === true);
+                    grid.slickGrid.setColumns(visible);
+                    (grid as any).persistSettings();
+                    grid.refresh();
+                };
+                Q.Router.dialog(grid.element, picker.element, () => "columns");
+                picker.dialogOpen();
+            }
+
+            grid.element.on('handleroute.' + (grid as any).uniqueName, (e, arg) => {
+                if (arg && !arg.handled && arg.route == "columns") {
+                    onClick();
+                }
+            });
+
             return {
                 hint: Q.text("Controls.ColumnPickerDialog.Title"),
                 cssClass: "column-picker-button",
-                onClick: function () {
-                    var picker = new Serenity.ColumnPickerDialog();
-                    picker.allColumns = (grid as any).allColumns;
-                    if ((grid as any).initialSettings) {
-                        var initialSettings = (grid as any).initialSettings as PersistedGridSettings;
-                        if (initialSettings.columns && initialSettings.columns.length)
-                            picker.defaultColumns = initialSettings.columns.map(x => x.id);
-                    }
-                    picker.visibleColumns = grid.slickGrid.getColumns().map(x => x.id);
-                    picker.done = () => {
-                        (grid as any).allColumns = picker.allColumns;
-                        var visible = picker.allColumns.filter(x => x.visible === true);
-                        grid.slickGrid.setColumns(visible);
-                        (grid as any).persistSettings();
-                        grid.refresh();
-                    };
-                    picker.dialogOpen();
-                }
+                onClick: onClick
             }
         }
 

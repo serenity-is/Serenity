@@ -1923,6 +1923,191 @@ var Q;
         }
     });
 })(Q || (Q = {}));
+var Q;
+(function (Q) {
+    var Router;
+    (function (Router) {
+        var oldURL;
+        var setURL;
+        var replacing = 0;
+        var resolving = 0;
+        function navigate(hash, tryBack) {
+            if (resolving > 0)
+                return;
+            hash = hash || '';
+            hash = hash.replace(/^#/, '');
+            hash = (!hash ? "" : '#' + hash);
+            var newURL = window.location.href.replace(/#$/, '')
+                .replace(/#.*$/, '') + hash;
+            if (newURL != window.location.href) {
+                if (tryBack && (oldURL == newURL ||
+                    oldURL == newURL + '#' ||
+                    oldURL + '#' == newURL)) {
+                    setURL = replacing <= 0 ? null : oldURL;
+                    window.history.back();
+                    if (window.location.href == oldURL)
+                        return;
+                }
+                setURL = replacing <= 0 ? null : newURL;
+                window.location.hash = hash;
+            }
+        }
+        Router.navigate = navigate;
+        function replace(hash, tryBack) {
+            replacing++;
+            try {
+                navigate(hash, tryBack);
+            }
+            finally {
+                replacing--;
+            }
+        }
+        Router.replace = replace;
+        function replaceLast(hash, tryBack) {
+            var current = window.location.hash || '';
+            if (current.charAt(0) == '#')
+                current = current.substr(1, current.length - 1);
+            var parts = current.split('/+/');
+            if (parts.length > 1) {
+                if (hash && hash.length) {
+                    parts[parts.length - 1] = hash;
+                    hash = parts.join("/+/");
+                }
+                else
+                    hash = parts.splice(parts.length - 1, 1).join("/+/");
+            }
+            replace(hash, tryBack);
+        }
+        Router.replaceLast = replaceLast;
+        function dialogOpen(owner, element, hash) {
+            var route = [];
+            var isDialog = owner.hasClass(".ui-dialog-content");
+            var dialog = isDialog ? owner :
+                owner.closest('.ui-dialog-content');
+            var value = hash();
+            var idPrefix;
+            if (dialog.length) {
+                var dialogs = $('.ui-dialog-content:visible');
+                var index = dialogs.index(dialog[0]);
+                for (var i = 0; i <= index; i++) {
+                    var q = dialogs.eq(i).data("qroute");
+                    if (q && q.length)
+                        route.push(q);
+                }
+                if (!isDialog) {
+                    idPrefix = dialog.attr("id");
+                    if (idPrefix) {
+                        idPrefix += "_";
+                        var id = owner.attr("id");
+                        if (id && Q.startsWith(id, idPrefix))
+                            value = id.substr(0, idPrefix.length) + '@' + value;
+                    }
+                }
+            }
+            else {
+                var id = owner.attr("id");
+                if (id && (!owner.hasClass("route-handler") ||
+                    $('.route-handler').first().attr("id") != id))
+                    value = id + "@" + value;
+            }
+            route.push(value);
+            element.data("qroute", value);
+            replace(route.join("/+/"));
+            element.bind("dialogclose.qrouter", function (e) {
+                element.data("qroute", null);
+                element.unbind(".qrouter");
+                replaceLast("", true);
+            });
+        }
+        function dialog(owner, element, hash) {
+            element.bind("dialogopen.qrouter", function (e) {
+                dialogOpen(owner, element, hash);
+            });
+        }
+        Router.dialog = dialog;
+        function resolve(hash) {
+            if (replacing > 0)
+                return;
+            resolving++;
+            try {
+                hash = Q.coalesce(Q.coalesce(hash, window.location.hash), '');
+                if (hash.charAt(0) == '#')
+                    hash = hash.substr(1, hash.length - 1);
+                var newParts = hash.split("/+/");
+                var dialogs = $('.ui-dialog-content:visible');
+                var oldParts = dialogs.toArray()
+                    .map(function (el) { return $(el).data('qroute'); });
+                var same = 0;
+                while (same < dialogs.length &&
+                    same < newParts.length &&
+                    oldParts[same] == newParts[same]) {
+                    same++;
+                }
+                for (var i = same; i < dialogs.length; i++)
+                    dialogs.eq(i).dialog('close');
+                for (var i = same; i < newParts.length; i++) {
+                    var route = newParts[i];
+                    var routeParts = route.split('@');
+                    var handler;
+                    if (routeParts.length == 2) {
+                        var dialog = i > 0 ? $('.ui-dialog-content:visible').eq(i - 1) : $([]);
+                        if (dialog.length) {
+                            var idPrefix = dialog.attr("id");
+                            if (idPrefix) {
+                                handler = $('#' + idPrefix + "_" + routeParts[0]);
+                                if (handler.length) {
+                                    route = routeParts[1];
+                                }
+                            }
+                        }
+                        if (!handler || !handler.length) {
+                            handler = $('#' + routeParts[0]);
+                            if (handler.length) {
+                                route = routeParts[1];
+                            }
+                        }
+                    }
+                    if (!handler || !handler.length) {
+                        handler = i > 0 ? $('.ui-dialog-content:visible').eq(i - 1) :
+                            $('.route-handler').first();
+                    }
+                    handler.triggerHandler("handleroute", {
+                        handled: false,
+                        route: route,
+                        parts: newParts,
+                        index: i
+                    });
+                }
+            }
+            finally {
+                resolving--;
+            }
+        }
+        Router.resolve = resolve;
+        function hashChange(e, o) {
+            oldURL = (e && e.oldURL) || o;
+            if (setURL && setURL == window.location.href) {
+                setURL = null;
+                return;
+            }
+            setURL = null;
+            resolve();
+        }
+        window.addEventListener("hashchange", hashChange);
+        $(document).on("dialogopen", ".ui-dialog-content", function (event, ui) {
+            var dlg = $(event.target);
+            if (dlg.data("qroute"))
+                return;
+            var owner = $('.ui-dialog-content:visible').not(dlg).last();
+            if (!owner.length)
+                owner = $('body');
+            dialogOpen(owner, dlg, function () {
+                return dlg.attr("id") ||
+                    new Date().getTime().toString();
+            });
+        });
+    })(Router = Q.Router || (Q.Router = {}));
+})(Q || (Q = {}));
 var Serenity;
 (function (Serenity) {
     var ColumnsKeyAttribute = (function () {
@@ -2739,6 +2924,7 @@ var Serenity;
         __extends(TemplatedDialog, _super);
         function TemplatedDialog(options) {
             var _this = _super.call(this, Q.newBodyDiv(), options) || this;
+            _this.element.attr("id", _this.uniqueName);
             _this.isPanel = ss.getAttributes(ss.getInstanceType(_this), Serenity.PanelAttribute, true).length > 0;
             if (!_this.isPanel) {
                 _this.initDialog();
@@ -3014,27 +3200,34 @@ var Serenity;
             return _this;
         }
         ColumnPickerDialog.createToolButton = function (grid) {
+            function onClick() {
+                var picker = new Serenity.ColumnPickerDialog();
+                picker.allColumns = grid.allColumns;
+                if (grid.initialSettings) {
+                    var initialSettings = grid.initialSettings;
+                    if (initialSettings.columns && initialSettings.columns.length)
+                        picker.defaultColumns = initialSettings.columns.map(function (x) { return x.id; });
+                }
+                picker.visibleColumns = grid.slickGrid.getColumns().map(function (x) { return x.id; });
+                picker.done = function () {
+                    grid.allColumns = picker.allColumns;
+                    var visible = picker.allColumns.filter(function (x) { return x.visible === true; });
+                    grid.slickGrid.setColumns(visible);
+                    grid.persistSettings();
+                    grid.refresh();
+                };
+                Q.Router.dialog(grid.element, picker.element, function () { return "columns"; });
+                picker.dialogOpen();
+            }
+            grid.element.on('handleroute.' + grid.uniqueName, function (e, arg) {
+                if (arg && !arg.handled && arg.route == "columns") {
+                    onClick();
+                }
+            });
             return {
                 hint: Q.text("Controls.ColumnPickerDialog.Title"),
                 cssClass: "column-picker-button",
-                onClick: function () {
-                    var picker = new Serenity.ColumnPickerDialog();
-                    picker.allColumns = grid.allColumns;
-                    if (grid.initialSettings) {
-                        var initialSettings = grid.initialSettings;
-                        if (initialSettings.columns && initialSettings.columns.length)
-                            picker.defaultColumns = initialSettings.columns.map(function (x) { return x.id; });
-                    }
-                    picker.visibleColumns = grid.slickGrid.getColumns().map(function (x) { return x.id; });
-                    picker.done = function () {
-                        grid.allColumns = picker.allColumns;
-                        var visible = picker.allColumns.filter(function (x) { return x.visible === true; });
-                        grid.slickGrid.setColumns(visible);
-                        grid.persistSettings();
-                        grid.refresh();
-                    };
-                    picker.dialogOpen();
-                }
+                onClick: onClick
             };
         };
         ColumnPickerDialog.prototype.getDialogOptions = function () {
