@@ -51,8 +51,10 @@ namespace Q.Router {
                 parts[parts.length - 1] = hash;
                 hash = parts.join("/+/");
             }
-            else
-                hash = parts.splice(parts.length - 1, 1).join("/+/");
+            else {
+                parts.splice(parts.length - 1, 1);
+                hash = parts.join("/+/");
+            }
         }
         replace(hash, tryBack);
     }
