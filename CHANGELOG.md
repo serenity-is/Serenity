@@ -1,3 +1,8 @@
+## 2.9.28 (2017-07-13)
+
+Features:
+  - basic hash based router for handling back button in mobile / desktop (primarily for modal dialogs). it can also handle forward button / bookmarking if implemented properly by routing targets.
+
 ## 2.9.27 (2017-07-13)
 
 Features:
