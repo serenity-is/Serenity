@@ -1930,11 +1930,12 @@ var Q;
     var Router;
     (function (Router) {
         var oldURL;
-        var ignoreChange = 0;
-        var replacing = 0;
         var resolving = 0;
-        function navigate(hash, tryBack) {
-            if (resolving > 0)
+        var autoinc = 0;
+        var listenerTimeout;
+        Router.enabled = true;
+        function navigate(hash, tryBack, silent) {
+            if (!Router.enabled || resolving > 0)
                 return;
             hash = hash || '';
             hash = hash.replace(/^#/, '');
@@ -1945,27 +1946,25 @@ var Q;
                 if (tryBack && (oldURL == newURL ||
                     oldURL == newURL + '#' ||
                     oldURL + '#' == newURL)) {
-                    ignoreChange++;
+                    if (silent)
+                        ignoreChange();
                     window.history.back();
                     if (window.location.href == oldURL)
                         return;
                 }
-                ignoreChange++;
+                if (silent)
+                    ignoreChange();
                 window.location.hash = hash;
             }
         }
         Router.navigate = navigate;
         function replace(hash, tryBack) {
-            replacing++;
-            try {
-                navigate(hash, tryBack);
-            }
-            finally {
-                replacing--;
-            }
+            navigate(hash, tryBack, true);
         }
         Router.replace = replace;
         function replaceLast(hash, tryBack) {
+            if (!Router.enabled)
+                return;
             var current = window.location.hash || '';
             if (current.charAt(0) == '#')
                 current = current.substr(1, current.length - 1);
@@ -2024,13 +2023,15 @@ var Q;
             });
         }
         function dialog(owner, element, hash) {
+            if (!Router.enabled)
+                return;
             element.bind("dialogopen.qrouter", function (e) {
                 dialogOpen(owner, element, hash);
             });
         }
         Router.dialog = dialog;
         function resolve(hash) {
-            if (replacing > 0)
+            if (!Router.enabled)
                 return;
             resolving++;
             try {
@@ -2090,23 +2091,26 @@ var Q;
         Router.resolve = resolve;
         function hashChange(e, o) {
             oldURL = (e && e.oldURL) || o;
-            if (ignoreChange > 0) {
-                ignoreChange--;
-                return;
-            }
             resolve();
         }
-        window.addEventListener("hashchange", hashChange);
+        function ignoreChange() {
+            window.clearTimeout(listenerTimeout);
+            window.removeEventListener("hashchange", hashChange);
+            setTimeout(function () {
+                window.addEventListener("hashchange", hashChange, false);
+            }, 1);
+        }
         $(document).on("dialogopen", ".ui-dialog-content", function (event, ui) {
+            if (!Router.enabled)
+                return;
             var dlg = $(event.target);
             if (dlg.data("qroute"))
                 return;
             var owner = $('.ui-dialog-content:visible').not(dlg).last();
             if (!owner.length)
-                owner = $('body');
+                owner = $('html');
             dialogOpen(owner, dlg, function () {
-                return dlg.attr("id") ||
-                    new Date().getTime().toString();
+                return "!" + (++autoinc).toString(36);
             });
         });
     })(Router = Q.Router || (Q.Router = {}));

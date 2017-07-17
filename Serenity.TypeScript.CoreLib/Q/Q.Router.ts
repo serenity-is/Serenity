@@ -1,12 +1,13 @@
 ﻿
 namespace Q.Router {
     let oldURL: string;
-    let ignoreChange: number = 0;
-    let replacing: number = 0;
     let resolving: number = 0;
+    let autoinc: number = 0;
+    let listenerTimeout: number;
+    export let enabled: boolean = true;
 
-    export function navigate(hash: string, tryBack?: boolean) {
-        if (resolving > 0)
+    export function navigate(hash: string, tryBack?: boolean, silent?: boolean) {
+        if (!enabled || resolving > 0)
             return;
 
         hash = hash || '';
@@ -18,28 +19,27 @@ namespace Q.Router {
             if (tryBack && (oldURL == newURL ||
                 oldURL == newURL + '#' ||
                 oldURL + '#' == newURL)) {
-                ignoreChange++;
+                if (silent)
+                    ignoreChange();
                 window.history.back();
                 if (window.location.href == oldURL)
                     return;
             }
 
-            ignoreChange++;
+            if (silent)
+                ignoreChange();
             window.location.hash = hash;
         }
     }
 
     export function replace(hash: string, tryBack?: boolean) {
-        replacing++;
-        try {
-            navigate(hash, tryBack);
-        }
-        finally {
-            replacing--;
-        }
+        navigate(hash, tryBack, true);
     }
 
     export function replaceLast(hash: string, tryBack?: boolean) {
+        if (!enabled)
+            return;
+
         var current = window.location.hash || '';
         if (current.charAt(0) == '#')
             current = current.substr(1, current.length - 1);
@@ -106,13 +106,16 @@ namespace Q.Router {
     }
 
     export function dialog(owner: JQuery, element: JQuery, hash: () => string) {
+        if (!enabled)
+            return;
+        
         element.bind("dialogopen.qrouter", e => {
             dialogOpen(owner, element, hash);
         });
     }
 
     export function resolve(hash?: string) {
-        if (replacing > 0)
+        if (!enabled)
             return;
 
         resolving++;
@@ -180,28 +183,31 @@ namespace Q.Router {
 
     function hashChange(e: any, o: string) {
         oldURL = (e && e.oldURL) || o;
-
-        if (ignoreChange > 0) {
-            ignoreChange--;
-            return;
-        }
-
         resolve();
     }
 
-    window.addEventListener("hashchange", hashChange as any);
+    function ignoreChange() {
+        window.clearTimeout(listenerTimeout);
+        window.removeEventListener("hashchange", hashChange as any);
+        setTimeout(function () {
+            window.addEventListener("hashchange", hashChange as any, false);
+        }, 1);
+    }
+
     $(document).on("dialogopen", ".ui-dialog-content", function (event, ui) {
+        if (!enabled)
+            return;
+
         var dlg = $(event.target);
         if (dlg.data("qroute"))
             return;
 
         var owner = $('.ui-dialog-content:visible').not(dlg).last();
         if (!owner.length)
-            owner = $('body');
+            owner = $('html');
 
         dialogOpen(owner, dlg, () => {
-            return dlg.attr("id") ||
-                new Date().getTime().toString();
+            return "!" + (++autoinc).toString(36);
         });
     });
 }
