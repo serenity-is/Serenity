@@ -1,4 +1,9 @@
-## 2.9.28 (2017-07-13)
+## 2.9.29 (2017-07-17)
+
+Bugfixes:
+  - resolve routing problem when a dialog is closed and another opened right away
+  
+## 2.9.28 (2017-07-16)
 
 Features:
   - basic hash based router for handling back button in mobile / desktop (primarily for modal dialogs). it can also handle forward button / bookmarking if implemented properly by routing targets.
