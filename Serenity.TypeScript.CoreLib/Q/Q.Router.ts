@@ -1,7 +1,7 @@
 ﻿
 namespace Q.Router {
     let oldURL: string;
-    let setURL: string;
+    let ignoreChange: number = 0;
     let replacing: number = 0;
     let resolving: number = 0;
 
@@ -18,13 +18,13 @@ namespace Q.Router {
             if (tryBack && (oldURL == newURL ||
                 oldURL == newURL + '#' ||
                 oldURL + '#' == newURL)) {
-                setURL = replacing <= 0 ? null : oldURL;
+                ignoreChange++;
                 window.history.back();
                 if (window.location.href == oldURL)
                     return;
             }
 
-            setURL = replacing <= 0 ? null : newURL;
+            ignoreChange++;
             window.location.hash = hash;
         }
     }
@@ -181,12 +181,11 @@ namespace Q.Router {
     function hashChange(e: any, o: string) {
         oldURL = (e && e.oldURL) || o;
 
-        if (setURL && setURL == window.location.href) {
-            setURL = null;
+        if (ignoreChange > 0) {
+            ignoreChange--;
             return;
         }
 
-        setURL = null;
         resolve();
     }
 

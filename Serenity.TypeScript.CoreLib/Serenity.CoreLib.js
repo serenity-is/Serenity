@@ -1930,7 +1930,7 @@ var Q;
     var Router;
     (function (Router) {
         var oldURL;
-        var setURL;
+        var ignoreChange = 0;
         var replacing = 0;
         var resolving = 0;
         function navigate(hash, tryBack) {
@@ -1945,12 +1945,12 @@ var Q;
                 if (tryBack && (oldURL == newURL ||
                     oldURL == newURL + '#' ||
                     oldURL + '#' == newURL)) {
-                    setURL = replacing <= 0 ? null : oldURL;
+                    ignoreChange++;
                     window.history.back();
                     if (window.location.href == oldURL)
                         return;
                 }
-                setURL = replacing <= 0 ? null : newURL;
+                ignoreChange++;
                 window.location.hash = hash;
             }
         }
@@ -2090,11 +2090,10 @@ var Q;
         Router.resolve = resolve;
         function hashChange(e, o) {
             oldURL = (e && e.oldURL) || o;
-            if (setURL && setURL == window.location.href) {
-                setURL = null;
+            if (ignoreChange > 0) {
+                ignoreChange--;
                 return;
             }
-            setURL = null;
             resolve();
         }
         window.addEventListener("hashchange", hashChange);
