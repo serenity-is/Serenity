@@ -12,7 +12,22 @@
             this.idPrefix = this.uniqueName + '_';
 
             var widgetMarkup = this.getTemplate().replace(new RegExp('~_', 'g'), this.idPrefix);
-            widgetMarkup = Q.jsRender(widgetMarkup);
+
+            // for compability with older templates based on JsRender
+            var end = 0;
+            while (true) {
+                var idx = widgetMarkup.indexOf('{{text:"', end);
+                if (idx < 0)
+                    break;
+                var end = widgetMarkup.indexOf('"}}', idx);
+                if (end < 0)
+                    break;
+                var key = widgetMarkup.substr(idx + 8, end - idx - 8);
+                var text = Q.text(key);
+                widgetMarkup = widgetMarkup.substr(0, idx) + text + widgetMarkup.substr(end + 3);
+                end = idx + text.length;
+            }
+
             this.element.html(widgetMarkup);
         }
 

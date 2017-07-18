@@ -1,3 +1,254 @@
+## 2.9.31 (2017-07-18)
+
+Bugfixes:
+  - router didn't attach to hashchange at start
+
+## 2.9.30 (2017-07-18)
+
+Features:
+  - use shorter hash fragments for not properly routed dialogs
+  - added option to disable router (add "Q.Router.enabled = false" in ScriptInitialization.ts)
+  - when time dropdown changes trigger a change event for date input in DateTimeEditor
+
+Bugfixes:
+  - set file size correctly when uploaded file is not an image
+  - skip assemblies that doesn't like to list types
+
+## 2.9.29 (2017-07-17)
+
+Bugfixes:
+  - resolve routing problem when a dialog is closed and another opened right away
+  
+## 2.9.28 (2017-07-16)
+
+Features:
+  - basic hash based router for handling back button in mobile / desktop (primarily for modal dialogs). it can also handle forward button / bookmarking if implemented properly by routing targets.
+
+## 2.9.27 (2017-07-13)
+
+Features:
+  - pass item class from attribute in navigation items
+
+## 2.9.26 (2017-07-13)
+
+Features:
+  - ability to add css class to navigation items
+  - wrapped headers in grid sample [Serene]
+
+## 2.9.25 (2017-07-06)
+
+Features:
+  - made back button in mobile mode a bit bigger to make it easier to click in small touch devices, closes #1800
+  - updated spanish translations (thanks @gustavo)
+  - triggerDataChange overload that accepts a jQuery object is renamed to triggerDataChanged
+  - exit gracefully when assembly DLL file is not found for sergen transform
+Bugfixes:
+  - inplace add lowercases typed text in new item dialog
+  - jquery ui button noconflict .d.ts typing change warning
+  - resolve possible null reference exception in GlobFilter
+  
+## 2.9.24 (2017-05-14)
+
+Bugfixes:
+  - possible filtering problem with DateTimeOffset deserialization in JSON.NET and date/time fields
+
+## 2.9.23 (2017-05-09)
+
+Features:
+  - added NestedPermissionKeys attribute that works kinda similar to NestedLocalTexts attribute for permission key registration
+
+## 2.9.22 (2017-05-07)
+
+Features:
+  - allow specifying an external lookup type on rows in LookupScriptAttribute constructor, or a generic type through LookupType property, simplifies multi tenancy
+  - added .gitignore compatible high performance GlobFilter class
+  - introduce mail settings and pickup directory functionality in .net core version
+  
+Bugfixes:
+  - code generator for .net core should look for sergen.json instead of project.json
+  - when an appsetting key is not available, null reference exception occurs
+  - template helper can't find views in .net core version
+  - fix typo in signup (thanks @Febriantos) [Serene]
+
+## 2.9.21 (2017-03-26)
+
+Features:
+  - run tsc directly, not through npm, to avoid weird error log with npm
+  - ScriptInitialization.ts reference to LanguageList
+  - toastr 2.1.33 has getContainer method, so removing one in Serenity, update toastr typings version in your packages.json to ^2.1.33
+  - don't show "undefined" when a XHR connection error occurs. try to be more descriptive but it will be limited as there is no possibility to get exact error.
+  - return to avoid kestrel header errors in .net core when browser requests .map files which doesn't exist from DynamicScriptMiddleware
+
+## 2.9.20 (2017-03-19)
+
+Features:
+  - allow setting CKEditor readonly option after widget initialization
+
+Bugfixes:
+  - script bundling settings are not read in .net core version
+  - don't crash on t4 transform when a class has no namespace
+
+## 2.9.19 (2017-03-16)
+
+Bugfixes:
+  - fix .net core version file name casing issues in linux
+
+## 2.9.18 (2017-03-16)
+
+Bugfixes:
+  - backport prefix determination algorithm to sergen net45 version
+
+## 2.9.17 (2017-03-13)
+
+Features:
+  - Visual Studio 2017 support (.NET Core version no longer works on Visual Studio 2015 sorry because of project.json to csproj change. you need to use VS Code or upgrade to VS2017)
+  - obsoleted jsrender (will later replace with Vue)
+  - added language cookie to cookies sent to pdf renderer [Serene]
+
+## 2.9.9 (2017-03-02)
+
+Features:
+  - use TypeScript compiler from npm. Visual Studio still uses its own extension for intellisense and compile on save, so make sure your version matches.
+
+Bugfixes:
+  - try fix nuget sergen path issue by moving back it to tools folder from tools/net45
+
+## 2.9.8 (2017-02-17)
+
+Bugfixes:
+  - fix issue with stored proc (e.g. sqlite pragma foreign_key_list) returning empty resultset with 0 fields, dapper is raising multi map error. backporting fix from Dapper itself.
+
+## 2.9.7 (2017-02-17)
+
+Bugfixes:
+  - resolve bug caused by TypeScript __extends helper copying all static members including __metadata which shouldn't be as Saltaralle type system depends on it being a unique array. this is revealed by panel decorator getting applied to base class as well.
+
+## 2.9.6 (2017-02-15)
+
+Features:
+  - obsoleted linq.js (e.g. Saltaralle.Linq). if you still have saltaralle code that depends on linq.js, add it to your layouthead.cshtml manually, e.g. @Html.Script("~/Scripts/Saltaralle/linq.js")
+
+## 2.9.5 (2017-02-14)
+
+Features:
+  - sergen .net core / node version tolerates whitespace in paths and other arguments
+  - russian texts update (thanks @Сергей Соболев)
+
+Bugfixes:
+  - handle issue with servertypings.tt and datetimeoffset/bytearray field types
+
+## 2.9.4 (2017-01-04)
+
+Features:
+  - allow spaces in dotnet-sergen arguments (requires updating npm sergen too, e.g. npm update -g sergen)
+
+## 2.9.3 (2017-01-31)
+
+Features:
+  - allow using .ts.html suffix in addition to .Template.html to let Visual Studio group a template under its related component, e.g. SomeDialog.ts => SomeDialog.ts.html
+  - add module template prefix to template key automatically (might be a breaking change if you relied on exact file name)
+
+Bugfixes:
+  - fix group declaration on group import for slickgrid.d.ts
+
+## 2.9.2 (2017-01-31)
+
+Features:
+  - backport schema providers in sergen .net core version to .net framework version
+  - use Serene.Web for .NET core project template, instead of longer Serene.AspNetCore name
+  - fill in (CascadeField, CascadeValue) and (FilterField, FilterValue) in InitNewEntity method of LookupEditorBase, e.g. InplaceAdd
+  - sergen generates code for mvc, clienttypes before build, and servertypings post build in asp.net core version (project.json)
+
+## 2.9.1 (2017-01-29)
+
+Features:
+  - new [Origin] attribute to auto set Expression, DisplayName, Size and Scale attributes from the originating row for view fields.
+  - allow specifying a [ForeignKey] by using a row type that has a [TableName] attribute. ID field can also be automatically determined if row has a property with [Identity] attribute, or a single property with [PrimaryKey] attribute. Implementing IIdField doesn't help ID field detection.
+  - for script bundling, replace MsieJsEngine + UglifyJS with Nuglify which is based on MS Ajax Minifier, faster and effective resource wise.
+  - put semicolon between ConcatenatedScript parts to avoid javascript errors with certain minified files
+  - allowClear param in enum editor (thanks @Estrusco)
+
+## 2.9.0 (2017-01-25)
+
+Features:
+  - Sergen for .NET Core now works with Firebird, MySql, Postgres, Sqlite in addition to SqlServer. 
+  - New schema provider system in Sergen to query database metadata
+  - Made FirebirdDialect quoting compatible with with FluentMigrator one
+  
+Bugfixes:
+  - use this.uniqueName while binding to layout, to resolve script errors after widget is destroyed, and use it to unbind on destroy
+  - fix report dialog not showing parameters (thanks @Scott)
+  
+## 2.8.11 (2017-01-21)
+
+Features:
+  - Serin uses latest VSIX template from VSGallery instead of embedding a template in itself [Serene]
+  - Serin replaces connection strings to use Sqlite in OSX / Linux [Serene]
+  - Serene ASP.NET Core version now works with Sqlite (no code generation support yet) [Serene]
+  - Serene ASP.NET Core comes with Sqlite factory preconfigured
+  - Serene uses MsSqlLocalDB instance in Windows by default [Serene]
+  - increased speed of Sqlite migrations for Northwind dramatically
+
+Bugfixes:
+  - resolved problem with .NET Core and Sqlite with reader.GetBytes() as Microsoft.Data.Sqlite doesn't support it
+  - fixed Serenity.FluentMigrator and Sqlite compability problem about case sensitivity
+  
+## 2.8.10 (2017-01-20)
+
+Bugfixes:
+  - resolve delete error on localization behavior
+
+## 2.8.9 (2017-01-20)
+
+  - simplified data localization with a behavior
+  - localizations are integrated into saverequest and retrieveresponse for easier implementation
+  - add language / culture switching support to ASP.NET Core version [Serene]
+
+## 2.8.8 (2017-01-18)
+
+Features:
+  - resolve regression bug with script bundling
+
+## 2.8.7 (2017-01-17)
+
+Features:
+  - develop npm sergen package to workaround dotnet cli tool bug about readline/readkey
+
+## 2.8.6 (2017-01-15)
+
+Bugfixes:
+  - implement console readline hint without using console width or setcursorposition
+  
+## 2.8.5 (2017-01-15)
+
+Bugfixes:
+  - remove test check in sergen cli
+  
+## 2.8.4 (2017-01-15)
+
+Bugfixes:
+  - can't use auto completion in sergen thanks to cli bug
+
+## 2.8.3 (2017-01-14)
+
+Bugfixes:
+  - resolve problem with dotnet-sergen self assemblies
+
+## 2.8.2 (2017-01-14)
+
+Features:
+  - lazy load connection string provider factory
+
+Bugfixes:
+  - resolve problem with dotnet-sergen can't load FluentMigrator assembly
+
+## 2.8.1 (2017-01-13)
+
+Features:
+  - Serene now runs on ASP.NET Core / .NET Core (Beta)
+  - allow specifying expressions for a field based on connection dialect type, for example [Expression("CONCAT(A, B)"), Expression("A || B", Dialect = "Sqlite")], match with longest dialect name wins
+  - [DisplayName] and [InstanceName] used Title instead of Tablename in generated row.cs (thanks @dfaruque)
+
 ## 2.8.0 (2017-01-10)
 
 Features:

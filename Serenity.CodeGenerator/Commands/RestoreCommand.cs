@@ -12,22 +12,26 @@ namespace Serenity.CodeGenerator
     {
         private static string[] skipPackages = new[]
         {
-            "Microsoft.",
-            "System.",
-            "Newtonsoft.",
+            "Dapper",
             "EPPlus",
             "FastMember",
-            "MailKit"
+            "FirebirdSql.",
+            "MailKit",
+            "MySql",
+            "Microsoft.",
+            "Newtonsoft.",
+            "Npgsql",
+            "System."
         };
 
-        public void Run(string projectJson)
+        public void Run(string csproj)
         {
             var process = Process.Start(new ProcessStartInfo
             {
                 FileName = "dotnet",
-                WorkingDirectory = Path.GetDirectoryName(projectJson),
+                WorkingDirectory = Path.GetDirectoryName(csproj),
                 CreateNoWindow = true,
-                Arguments = "restore project.json"
+                Arguments = "restore \"" + csproj + "\""
             });
 
             process.WaitForExit();
@@ -56,8 +60,9 @@ namespace Serenity.CodeGenerator
                 return false;
             };
 
-            var proj = JObject.Parse(File.ReadAllText(projectJson));
-            EnumerateProjectJsonDeps(proj, (fw, id, ver) =>
+            var csprojElement = XElement.Parse(System.IO.File.ReadAllText(csproj));
+
+            EnumerateProjectDeps(csprojElement, (fw, id, ver) =>
             {
                 if (!skipPackage(id))
                     queue.Enqueue(new Tuple<string, string, string>(fw, id, ver));
@@ -88,7 +93,7 @@ namespace Serenity.CodeGenerator
                 var contentRoot = Path.Combine(packageFolder, "content/".Replace('/', Path.DirectorySeparatorChar));
                 if (Directory.Exists(contentRoot))
                 {
-                    var targetRoot = Path.GetDirectoryName(projectJson);
+                    var targetRoot = Path.GetDirectoryName(csproj);
 
                     foreach (var file in Directory.GetFiles(contentRoot, "*.*", SearchOption.AllDirectories))
                     {
@@ -177,40 +182,28 @@ namespace Serenity.CodeGenerator
             }
         }
 
-        private static void EnumerateProjectJsonDeps(JObject proj, Action<string, string, string> dependency)
+        private static void EnumerateProjectDeps(XElement csprojElement, Action<string, string, string> dependency)
         {
-            Action<string, JObject> enumDeps = (fwkey, deps) => {
-                if (deps == null)
-                    return;
-
-                foreach (var pair in deps)
+            foreach (var itemGroup in csprojElement.Descendants("ItemGroup"))
+            {
+                var condition = itemGroup.Attribute("Condition");
+                var target = "";
+                if (condition != null && !string.IsNullOrEmpty(condition.Value))
                 {
-                    var v = pair.Value as JObject;
-                    if (v != null)
+                    const string tf = "'$(TargetFramework)' == '";
+                    var idx = condition.Value.IndexOf(tf);
+                    if (idx >= 0)
                     {
-                        var o = v["version"] as JValue;
-                        if (o != null && o.Value != null)
-                            dependency(fwkey, pair.Key, o.Value.ToString());
-                    }
-                    else if (pair.Value is JValue && (pair.Value as JValue).Value != null)
-                    {
-                        dependency(fwkey, pair.Key, (pair.Value as JValue).Value.ToString());
+                        var end = condition.Value.IndexOf("'", idx + tf.Length);
+                        if (end >= 0)
+                            target = condition.Value.Substring(idx + +tf.Length, end - idx - tf.Length);
                     }
                 }
-            };
 
-            var frameworks = proj["frameworks"] as JObject;
-            if (frameworks == null)
-                return;
-
-            foreach (var pair in frameworks)
-            {
-                var val = pair.Value as JObject;
-                if (val == null)
-                    continue;
-
-                enumDeps(pair.Key, val["dependencies"] as JObject);
-                enumDeps(pair.Key, proj["dependencies"] as JObject);
+                foreach (var packageReference in itemGroup.Descendants("PackageReference"))
+                {
+                    dependency(target, packageReference.Attribute("Include").Value, packageReference.Attribute("Version").Value);
+                }
             }
         }
     }

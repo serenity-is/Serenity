@@ -71,7 +71,7 @@ namespace Serenity.CodeGeneration
 
         protected virtual string GetNamespace(Type type)
         {
-            var ns = type.Namespace;
+            var ns = type.Namespace ?? "";
             if (ns.EndsWith(".Entities"))
                 return ns.Substring(0, ns.Length - ".Entities".Length);
 
@@ -111,7 +111,19 @@ namespace Serenity.CodeGeneration
         protected override void GenerateAll()
         {
             foreach (var assembly in this.Assemblies)
-                foreach (var fromType in assembly.GetTypes())
+            {
+                Type[] types;
+                try
+                {
+                    types = assembly.GetTypes();
+                }
+                catch
+                {
+                    // skip assemblies that doesn't like to list its types (e.g. some SignalR reported in #2340)
+                    continue;
+                }
+
+                foreach (var fromType in types)
                 {
                     if (fromType.GetIsAbstract())
                         continue;
@@ -124,6 +136,7 @@ namespace Serenity.CodeGeneration
                         fromType.GetCustomAttribute<ColumnsScriptAttribute>() != null ||
                         fromType.IsSubclassOf(typeof(ServiceEndpoint)) ||
                         (fromType.IsSubclassOf(typeof(Controller)) && // backwards compability
+                         fromType.Namespace != null &&
                          fromType.Namespace.EndsWith(".Endpoints")))
                     {
                         EnqueueType(fromType);
@@ -136,6 +149,7 @@ namespace Serenity.CodeGeneration
                         continue;
                     }
                 }
+            }
 
             while (generateQueue.Count > 0)
             {

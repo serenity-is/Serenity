@@ -158,6 +158,11 @@ namespace Serenity
             return null;
         }
 
+        public int GetRowById(object id)
+        {
+            return 0;
+        }
+
         public dynamic GetItemByIdx(int index)
         {
             return null;

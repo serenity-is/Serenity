@@ -89,6 +89,8 @@ namespace Serenity
 
                     this.ValueAsDate = JsDate.Now;
                 });
+
+            time.On("change", e => input.TriggerHandler("change"));
         }
 
         private static List<string> GetTimeOptions(int fromHour = 0, int fromMin = 0,

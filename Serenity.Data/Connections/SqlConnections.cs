@@ -57,20 +57,21 @@ namespace Serenity.Data
             {
                 var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
 #if COREFX
-                var connectionString = Dependency.Resolve<IConfiguration>().GetValue<string>("Data:" + connectionKey + ":ConnectionString");
-                var providerName = Dependency.Resolve<IConfiguration>().GetValue<string>("Data:" + connectionKey + ":ProviderName") ?? "System.Data.SqlClient";
-                var factory = GetFactory(providerName);
+                var configuration = Dependency.TryResolve<IConfiguration>();
+                if (configuration == null)
+                    return null;
+
+                var connectionString = configuration.GetValue<string>("Data:" + connectionKey + ":ConnectionString");
+                var providerName = configuration.GetValue<string>("Data:" + connectionKey + ":ProviderName") ?? "System.Data.SqlClient";
                 connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, 
-                    connectionString, providerName, factory);
+                    connectionString, providerName);
 #else
                 var connectionSetting = ConfigurationManager.ConnectionStrings[connectionKey];
                 if (connectionSetting == null)
                     return null;
 
-                var factory = GetFactory(connectionSetting.ProviderName);
-
                 connection = newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, connectionSetting.ConnectionString, 
-                    connectionSetting.ProviderName, factory);
+                    connectionSetting.ProviderName);
 #endif
 
                 connections = newConnections;
@@ -146,7 +147,7 @@ namespace Serenity.Data
         public static void SetConnection(string connectionKey, string connectionString, string providerName)
         {
             var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
-            newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, connectionString, providerName, GetFactory(providerName));
+            newConnections[connectionKey] = new ConnectionStringInfo(connectionKey, connectionString, providerName);
             connections = newConnections;
         }
 

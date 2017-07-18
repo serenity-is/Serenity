@@ -31,9 +31,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../Serenity.Core.Net45/bin/${configuration}/Serenity.Core.dll" target="lib/net45" />
-    <file src="../Serenity.Core.Net45/bin/${configuration}/Serenity.Core.pdb" target="lib/net45" />
-    <file src="../Serenity.Core.Net45/bin/${configuration}/Serenity.Core.xml" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Core.dll" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Core.pdb" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Core.xml" target="lib/net45" />
     <file src="bin/${configuration}/netstandard1.6/Serenity.Core.dll" target="lib/netstandard1.6" />
   </files>
 </package>

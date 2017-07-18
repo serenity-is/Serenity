@@ -40,7 +40,7 @@ namespace Serenity
             return dialog;
         }
 
-        [IncludeGenericArguments(false)]
+        [IncludeGenericArguments(false), ScriptName("triggerDataChanged")]
         public static jQueryObject TriggerDataChange(this jQueryObject element)
         {
             element.TriggerHandler("ondatachange");

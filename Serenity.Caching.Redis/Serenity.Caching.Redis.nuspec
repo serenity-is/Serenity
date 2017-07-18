@@ -27,8 +27,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../Serenity.Caching.Redis.Net45/bin/${configuration}/Serenity.Caching.Redis.dll" target="lib/net45" />
-    <file src="../Serenity.Caching.Redis.Net45/bin/${configuration}/Serenity.Caching.Redis.pdb" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Caching.Redis.dll" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Caching.Redis.pdb" target="lib/net45" />
     <file src="bin/${configuration}/netstandard1.6/Serenity.Caching.Redis.dll" target="lib/netstandard1.6" />
   </files>
 </package>

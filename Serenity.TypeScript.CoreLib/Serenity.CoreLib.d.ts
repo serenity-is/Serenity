@@ -2,6 +2,9 @@
 /// <reference types="jquery" />
 /// <reference types="jquery.validation" />
 /// <reference types="jqueryui" />
+declare var Reflect: any;
+declare var __decorate: any;
+declare var __extends: any;
 declare class RSVP<TResult> {
     constructor(constructor: (p1: (p1: any) => void, p2: any) => void);
 }
@@ -372,9 +375,6 @@ declare namespace System.ComponentModel {
         constructor(displayName: string);
         displayName: string;
     }
-}
-interface Toastr {
-    getContainer(options?: ToastrOptions, create?: boolean): JQuery;
 }
 interface JQueryStatic {
     extend<T>(target: T, object1?: T, ...objectN: T[]): T;
@@ -793,6 +793,14 @@ declare namespace Serenity {
         };
     }
 }
+declare namespace Q.Router {
+    let enabled: boolean;
+    function navigate(hash: string, tryBack?: boolean, silent?: boolean): void;
+    function replace(hash: string, tryBack?: boolean): void;
+    function replaceLast(hash: string, tryBack?: boolean): void;
+    function dialog(owner: JQuery, element: JQuery, hash: () => string): void;
+    function resolve(hash?: string): void;
+}
 declare namespace Serenity {
     class ColumnsKeyAttribute {
         value: string;
@@ -1053,8 +1061,8 @@ declare namespace Serenity {
 declare namespace Serenity {
     namespace SubDialogHelper {
         function bindToDataChange(dialog: any, owner: Serenity.Widget<any>, dataChange: (p1: any, p2: DataChangeInfo) => void, useTimeout?: boolean): any;
-        function triggerDataChange(dialog: any): any;
-        function triggerDataChange(element: JQuery): JQuery;
+        function triggerDataChange(dialog: Serenity.Widget<any>): any;
+        function triggerDataChanged(element: JQuery): JQuery;
         function bubbleDataChange(dialog: any, owner: Serenity.Widget<any>, useTimeout?: boolean): any;
         function cascade(cascadedDialog: any, ofElement: JQuery): any;
         function cascadedDialogOffset(element: JQuery): any;
@@ -1193,6 +1201,7 @@ declare namespace Serenity {
     interface EnumEditorOptions {
         enumKey?: string;
         enumType?: any;
+        allowClear?: boolean;
     }
     interface HtmlContentEditorOptions {
         cols?: any;
@@ -2482,6 +2491,7 @@ declare namespace Serenity {
         protected updateTitle(): void;
         protected validateBeforeSave(): boolean;
         protected propertyGrid: Serenity.PropertyGrid;
+        static defaultLanguageList: () => string[][];
     }
 }
 declare namespace Serenity {
@@ -2698,7 +2708,7 @@ declare namespace Slick {
         collapsed: boolean;
         totals: any;
         rows: any;
-        groups: Group<TEntity>;
+        groups: Group<TEntity>[];
         groupingKey: string;
     }
     class GroupTotals<TEntity> {
@@ -2766,6 +2776,7 @@ declare namespace Slick {
         setFilter(filter: RemoteViewFilter<TEntity>): void;
         setItems(items: any[], fullReset: boolean): void;
         getItemById(id: any): TEntity;
+        getRowById(id: any): number;
         updateItem(id: any, item: TEntity): void;
         addItem(item: TEntity): void;
         getIdxById(id: any): any;

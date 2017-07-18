@@ -18,7 +18,6 @@ namespace Serenity.Web
             "~/Scripts/jquery.dialogextendQ.js",
             "~/Scripts/jquery.event.drag.js",
             "~/Scripts/jquery.scrollintoview.js",
-            "~/Scripts/jsrender.js",
             "~/Scripts/select2.js",
             "~/Scripts/sortable.js",
             "~/Scripts/toastr.js",
@@ -28,10 +27,9 @@ namespace Serenity.Web
             "~/Scripts/SlickGrid/Plugins/slick.autotooltips.js",
             "~/Scripts/SlickGrid/Plugins/slick.headerbuttons.js",
             "~/Scripts/bootstrap.js",
-            "~/Scripts/Saltarelle/mscorlib.js",
-            "~/Scripts/Saltarelle/linq.js",
-            "~/Scripts/Serenity/Serenity.CoreLib.js",
-            "~/Scripts/Serenity/Serenity.Script.UI.js"
+            "~/Scripts/saltarelle/mscorlib.js",
+            "~/Scripts/serenity/Serenity.CoreLib.js",
+            "~/Scripts/serenity/Serenity.Script.UI.js"
         };
 
         public static readonly string[] Styles = new string[] 

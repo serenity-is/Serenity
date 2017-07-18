@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2C18F028-3783-4BFA-9F2E-AC17591278EC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Serenity.TypeScript.CoreLib</RootNamespace>
+    <AssemblyName>Serenity.TypeScript.CoreLib</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Decorators\Attributes.ts" />
+    <TypeScriptCompile Include="Decorators\Decorators.ts" />
+    <TypeScriptCompile Include="Externals\Serenity.Externals.Slick.ts" />
+    <TypeScriptCompile Include="Externals\Serenity.Externals.ts" />
+    <TypeScriptCompile Include="Imports\Helpers.ts" />
+    <TypeScriptCompile Include="Imports\JQBlockUI.ts" />
+    <TypeScriptCompile Include="Imports\jQueryStatic.ts" />
+    <TypeScriptCompile Include="Imports\RSVP.ts" />
+    <TypeScriptCompile Include="Imports\Select2.ts" />
+    <TypeScriptCompile Include="Imports\SS.ts" />
+    <TypeScriptCompile Include="Q\Q.ArrayUtils.ts" />
+    <TypeScriptCompile Include="Q\Q.Authorization.ts" />
+    <TypeScriptCompile Include="Q\Q.BasicUtils.ts" />
+    <TypeScriptCompile Include="Q\Q.BlockUI.ts" />
+    <TypeScriptCompile Include="Q\Q.CommonTypes.ts" />
+    <TypeScriptCompile Include="Q\Q.Config.ts" />
+    <TypeScriptCompile Include="Q\Q.Culture.ts" />
+    <TypeScriptCompile Include="Q\Q.Date.ts" />
+    <TypeScriptCompile Include="Q\Q.Dialogs.ts" />
+    <TypeScriptCompile Include="Q\Q.ErrorHandling.ts" />
+    <TypeScriptCompile Include="Q\Q.Html.ts" />
+    <TypeScriptCompile Include="Q\Q.Layout.ts" />
+    <TypeScriptCompile Include="Q\Q.LocalText.ts" />
+    <TypeScriptCompile Include="Q\Q.Lookup.ts" />
+    <TypeScriptCompile Include="Q\Q.Notify.ts" />
+    <TypeScriptCompile Include="Q\Q.Number.ts" />
+    <TypeScriptCompile Include="Q\Q.ScriptData.ts" />
+    <TypeScriptCompile Include="Q\Q.Router.ts" />
+    <TypeScriptCompile Include="Q\Q.Services.ts" />
+    <TypeScriptCompile Include="Q\Q.StringHelpers.ts" />
+    <TypeScriptCompile Include="Q\Q.TypeSystem.ts" />
+    <TypeScriptCompile Include="Q\Q.Url.ts" />
+    <TypeScriptCompile Include="Serenity.CoreLib.d.ts" />
+    <TypeScriptCompile Include="Services\Criteria.ts" />
+    <TypeScriptCompile Include="Services\ServiceError.ts" />
+    <TypeScriptCompile Include="Services\ServiceResponse.ts" />
+    <TypeScriptCompile Include="UI\DataGrid\ColumnPickerDialog.ts" />
+    <TypeScriptCompile Include="UI\DataGrid\DataGrid.ts" />
+    <TypeScriptCompile Include="UI\DataGrid\IInitializeColumn.ts" />
+    <TypeScriptCompile Include="UI\DataGrid\TreeGridMixin.ts" />
+    <TypeScriptCompile Include="UI\Dialogs\EntityDialog.ts" />
+    <TypeScriptCompile Include="UI\Dialogs\IDialog.ts" />
+    <TypeScriptCompile Include="UI\Dialogs\IEditDialog.ts" />
+    <TypeScriptCompile Include="UI\Dialogs\PropertyDialog.ts" />
+    <TypeScriptCompile Include="UI\Dialogs\TemplatedDialog.ts" />
+    <TypeScriptCompile Include="UI\Editors\CheckTreeEditor.ts" />
+    <TypeScriptCompile Include="UI\Editors\DateEditor.ts" />
+    <TypeScriptCompile Include="UI\Editors\DateTimeEditor.ts" />
+    <TypeScriptCompile Include="UI\Editors\DateYearEditor.ts" />
+    <TypeScriptCompile Include="UI\Editors\DecimalEditor.ts" />
+    <TypeScriptCompile Include="UI\Editors\Editors.ts" />
+    <TypeScriptCompile Include="UI\Editors\LookupEditor.ts" />
+    <TypeScriptCompile Include="UI\Filtering\BaseEditorFiltering.ts" />
+    <TypeScriptCompile Include="UI\Filtering\BaseFiltering.ts" />
+    <TypeScriptCompile Include="UI\Filtering\DateFiltering.ts" />
+    <TypeScriptCompile Include="UI\Filtering\DateTimeFiltering.ts" />
+    <TypeScriptCompile Include="UI\Filtering\DecimalFiltering.ts" />
+    <TypeScriptCompile Include="UI\Filtering\EditorFiltering.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilterDialog.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilterDisplayBar.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilteringTypeRegistry.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilterLine.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilterOperator.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilterOperators.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilterPanel.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilterStore.ts" />
+    <TypeScriptCompile Include="UI\Filtering\FilterWidgetBase.ts" />
+    <TypeScriptCompile Include="UI\Filtering\IFiltering.ts" />
+    <TypeScriptCompile Include="UI\Filtering\LookupFiltering.ts" />
+    <TypeScriptCompile Include="UI\Filtering\QuickFilter.ts" />
+    <TypeScriptCompile Include="UI\Filtering\QuickFilterArgs.ts" />
+    <TypeScriptCompile Include="UI\Filtering\QuickSearchInput.ts" />
+    <TypeScriptCompile Include="UI\Filtering\StringFiltering.ts" />
+    <TypeScriptCompile Include="UI\Formatters\Formatters.ts" />
+    <TypeScriptCompile Include="UI\Helpers\LazyLoadHelper.ts" />
+    <TypeScriptCompile Include="UI\Helpers\SlickHelpers.ts" />
+    <TypeScriptCompile Include="UI\Helpers\SubDialogHelper.ts" />
+    <TypeScriptCompile Include="UI\Helpers\TabsExtensions.ts" />
+    <TypeScriptCompile Include="UI\Helpers\UploadHelper.ts" />
+    <TypeScriptCompile Include="UI\Helpers\ValidationHelper.ts" />
+    <TypeScriptCompile Include="UI\jQuery\jQuery.FlexifyPlugin.ts" />
+    <TypeScriptCompile Include="UI\jQuery\jQuery.WidgetPlugin.ts" />
+    <TypeScriptCompile Include="UI\jQuery\jQueryUI.ButtonNoConflict.ts" />
+    <TypeScriptCompile Include="UI\PropertyGrid\IAsyncInit.ts" />
+    <TypeScriptCompile Include="UI\PropertyGrid\IBooleanValue.ts" />
+    <TypeScriptCompile Include="UI\PropertyGrid\IDoubleValue.ts" />
+    <TypeScriptCompile Include="UI\PropertyGrid\IGetEditValue.ts" />
+    <TypeScriptCompile Include="UI\PropertyGrid\IStringValue.ts" />
+    <TypeScriptCompile Include="UI\PropertyGrid\PropertyGrid.ts" />
+    <TypeScriptCompile Include="UI\PropertyGrid\PropertyItem.ts" />
+    <TypeScriptCompile Include="UI\Widgets\CreateWidgetParams.ts" />
+    <TypeScriptCompile Include="UI\Widgets\CustomValidation.ts" />
+    <TypeScriptCompile Include="UI\Widgets\DataChangeInfo.ts" />
+    <TypeScriptCompile Include="UI\Widgets\EntityGrid.ts" />
+    <TypeScriptCompile Include="UI\Widgets\EnumTypeRegistry.ts" />
+    <TypeScriptCompile Include="UI\Widgets\Flexify.ts" />
+    <TypeScriptCompile Include="UI\Widgets\IValidateRequired.ts" />
+    <TypeScriptCompile Include="UI\Widgets\PropertyPanel.ts" />
+    <TypeScriptCompile Include="UI\Widgets\Reporting.ts" />
+    <TypeScriptCompile Include="UI\Widgets\Select2Editor.ts" />
+    <TypeScriptCompile Include="UI\Widgets\TemplatedPanel.ts" />
+    <TypeScriptCompile Include="UI\Widgets\TemplatedWidget.ts" />
+    <TypeScriptCompile Include="UI\Widgets\Toolbar.ts" />
+    <TypeScriptCompile Include="UI\Widgets\Widget.ts" />
+    <TypeScriptCompile Include="UI\Widgets\Widgets.ts" />
+    <TypeScriptCompile Include="UI\Widgets\WX.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Serenity.CoreLib.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".eslintrc.json" />
+    <None Include="package.json" />
+    <None Include="Serenity.CoreLib.js.map" />
+    <None Include="tsconfig.json" />
+    <None Include="tslint.json" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="BeforeBuild">
+    <Exec Command="npm install" ContinueOnError="false" />
+  </Target>
+  <Target Name="AfterBuild">
+    <Exec Command="node_modules/.bin/tsc -p ./tsconfig.json" ContinueOnError="false" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\mscorlib.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\mscorlib.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\linq.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\Saltarelle\linq.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.core.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.grid.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.js&quot; -o &quot;$(ProjectDir)..\Serenity.Web\Assets\Scripts\SlickGrid\slick.groupitemmetadataprovider.min.js&quot; --comments --mangle" />
+    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Serenity.CoreLib.js&quot; -o &quot;$(ProjectDir)Serenity.CoreLib.min.js&quot; --comments --mangle" />
+  </Target>
+</Project>

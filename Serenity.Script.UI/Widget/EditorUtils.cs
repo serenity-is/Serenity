@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Html;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -185,7 +184,7 @@ namespace Serenity
                 widget.Element.ToggleClass("required", Q.IsTrue(isRequired));
 
             var gridField = widget.GetGridField();
-            var hasSupItem = gridField.Find("sup").GetItems().Any();
+            var hasSupItem = gridField.Find("sup").GetItems().Length > 0;
             if (isRequired && !hasSupItem)
             {
                 jQuery.FromHtml("<sup>*</sup>")

@@ -20,7 +20,7 @@
         <dependency id="Microsoft.AspNet.Razor" version="${net45:Microsoft.AspNet.Razor}" />
         <dependency id="Microsoft.AspNet.WebPages" version="${net45:Microsoft.AspNet.WebPages}" />
         <dependency id="Microsoft.Web.Infrastructure" version="${net45:Microsoft.Web.Infrastructure}" />
-        <dependency id="MsieJavaScriptEngine" version="${net45:MsieJavaScriptEngine}" />
+        <dependency id="NUglify" version="${*:NUglify}" />
         <dependency id="Serenity.Core" version="${version}" />
         <dependency id="Serenity.Data" version="${version}" />
         <dependency id="Serenity.Data.Entity" version="${version}" />
@@ -41,6 +41,7 @@
         <dependency id="Microsoft.Extensions.Caching.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Caching.Abstractions}" />
         <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Configuration.Abstractions}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="NUglify" version="${*:NUglify}" />
         <dependency id="Serenity.Core" version="${version}" />
         <dependency id="Serenity.Data" version="${version}" />
         <dependency id="Serenity.Data.Entity" version="${version}" />
@@ -64,9 +65,9 @@
   </metadata>
   <files>
     <file src="bin\${configuration}\netstandard1.6\Serenity.Web.dll" target="lib/netstandard1.6" />
-    <file src="..\Serenity.Web.Net45\bin\${configuration}\Serenity.Web.dll" target="lib/net45" />
-    <file src="..\Serenity.Web.Net45\bin\${configuration}\Serenity.Web.pdb" target="lib/net45" />
-    <file src="..\Serenity.Web.Net45\bin\${configuration}\serenity.css" target="content/Content/serenity" />
+    <file src="bin\${configuration}\Serenity.Web.dll" target="lib/net45" />
+    <file src="bin\${configuration}\Serenity.Web.pdb" target="lib/net45" />
+    <file src="bin\${configuration}\serenity.css" target="content/Content/serenity" />
     <file src="Includes\web.config.transform" target="content\web.config.transform" />
     <file src="Style\images\*.png" target="content/Content/serenity/images" />
     <file src="Style\images\*.gif" target="content/Content/serenity/images" />

@@ -28,7 +28,7 @@ namespace Serenity.Services
             return true;
         }
 
-        public override void OnValidateRequest(ISaveRequestHandler handler)
+        public override void OnBeforeSave(ISaveRequestHandler handler)
         {
             ValidateUniqueConstraint(handler, new Field[] { Target },
                 attr == null ? (string)null : attr.ErrorMessage,

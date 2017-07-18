@@ -35,6 +35,10 @@ var dotnetBuildOrder = new string[] {
 	"Serenity.CodeGenerator"
 };
 
+Func<string, XElement> loadCsProj = (csproj) => {
+        return XElement.Parse(System.IO.File.ReadAllText(csproj));
+};
+
 Func<string, string> getVersionFromNuspec = (filename) => {
     var nuspec = System.IO.File.ReadAllText(filename);
     var xml = XElement.Parse(nuspec);
@@ -61,34 +65,20 @@ Func<string, JObject> loadJson = path => {
     return JObject.Parse(content);
 };
 
-Action<string, string> patchProjectVer = (projectjson, version) => {
+Action<string, string> patchProjectVer = (csproj, version) => {
     var changed = false;
-    var node = loadJson(projectjson);
-    if (node["version"].ToString() != "version" + "-*")
-    {
-        node["version"].Replace(version + "-*");
-        changed = true;
-    }
-
-    var deps = node["dependencies"] as JObject;
-    if (deps != null) {
-        foreach (var pair in (deps as IEnumerable<KeyValuePair<string, JToken>>).ToList()) {
-            if (pair.Key.StartsWith("Serenity.") &&
-                pair.Key != "Serenity.Web.Assets" &&
-                pair.Key != "Serenity.Web.Tooling")
-            {
-                var v = pair.Value as JValue;
-                if (v != null && (v.Value ?? "").ToString() != version + "-*")
-                {
-                    deps[pair.Key].Replace(version + "-*");
-                    changed = true;
-                }
-            }
-        }
-    }
+	var csprojElement = loadCsProj(csproj);
+	var versionElement = csprojElement.Descendants("VersionPrefix").First();
+	var current = versionElement.Value;
+	
+	if (current != version)
+	{
+		versionElement.Value = version;
+		changed = true;
+	}
 
     if (changed)
-        System.IO.File.WriteAllText(projectjson, node.ToString(), Encoding.UTF8);
+		System.IO.File.WriteAllText(csproj, csprojElement.ToString(SaveOptions.OmitDuplicateNamespaces), Encoding.UTF8);
 };
 
 Action<string> writeHeader = (header) => {
@@ -137,16 +127,20 @@ Action<string, string> myPack = (s, id) => {
 
     var packagesConfig = "./" + s + ".Net45/packages.config";
     if (!System.IO.File.Exists(packagesConfig))
+        packagesConfig = "./" + s + "/packages." + s + ".Net45.config";
+    if (!System.IO.File.Exists(packagesConfig))
         packagesConfig = "./" + s + "/packages.config";
+    if (!System.IO.File.Exists(packagesConfig))
+		packagesConfig = null;
         
-    var projectJson = "./" + s + "/project.json";
-    if (!System.IO.File.Exists(projectJson))
-        projectJson = null;
+    var csproj = "./" + s + "/" + s + ".csproj";
+    if (!System.IO.File.Exists(csproj))
+        csproj = null;
 
     if (s == "Serenity.Web")
-        setPackageVersions(prm, null, "./Serenity.Test/packages.config");
+        setPackageVersions(prm, null, "./Serenity.Test/packages.Serenity.Test.Net45.config");
         
-    setPackageVersions(prm, projectJson, packagesConfig);
+    setPackageVersions(prm, csproj, packagesConfig);
     
     var filename = "./" + s + "/" + (id ?? s) + ".nuspec";
     var nuspec = System.IO.File.ReadAllText(filename);
@@ -233,22 +227,32 @@ Action<Dictionary<string, string>, JObject, string> addDeps = (p, deps, fw) => {
 
 };
 
-Action<Dictionary<string, string>, string, string> setPackageVersions = (p, projectJson, packagesConfig) => {
-    if (projectJson != null) {
-        var jv = loadJson(projectJson);
-        addDeps(p, jv["dependencies"] as JObject, "*");
-        var fworks = jv["frameworks"] as JObject;
-        if (fworks != null)
-            foreach (var pair in fworks)
-            {
-                var obj = pair.Value as JObject;
-                if (obj != null)
-                    addDeps(p, obj["dependencies"] as JObject, pair.Key);
-            }
+Action<Dictionary<string, string>, string, string> setPackageVersions = (p, csproj, packagesConfig) => {
+    if (csproj != null) {
+		var csprojElement = loadCsProj(csproj);
+		foreach (var itemGroup in csprojElement.Descendants("ItemGroup")) {
+			var condition = itemGroup.Attribute("Condition");
+			var target = "*";
+			if (condition != null && !string.IsNullOrEmpty(condition.Value)) {
+				const string tf = "'$(TargetFramework)' == '";
+				var idx = condition.Value.IndexOf(tf);
+				if (idx >= 0) {
+					var end = condition.Value.IndexOf("'", idx + tf.Length);
+					if (end >= 0) {
+						target = condition.Value.Substring(idx + + tf.Length, end - idx - + tf.Length);
+					}
+				}
+			}
+					
+			foreach (var packageReference in itemGroup.Descendants("PackageReference")) {
+				p[target + ':' + packageReference.Attribute("Include").Value] = packageReference.Attribute("Version").Value;
+			}
+		}
     }
 
-    foreach (var x in parsePackageVersions(packagesConfig))
-        p[x.Item3 + ':' + x.Item1] = x.Item2;
+	if (packagesConfig != null)
+		foreach (var x in parsePackageVersions(packagesConfig))
+			p[x.Item3 + ':' + x.Item1] = x.Item2;
 };
 
 Task("Clean")
@@ -276,22 +280,24 @@ Task("Compile")
         s.SetConfiguration(configuration);
     });
     
-    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core.Net45/bin/" + configuration + "/Serenity.Core.dll");
+    var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
     serenityVersion = vi.FileMajorPart + "." + vi.FileMinorPart + "." + vi.FileBuildPart;   
     
     foreach (var project in dotnetBuildOrder) 
     {
-        var projectJson = @"./" + project + @"/project.json";
-        patchProjectVer(projectJson, serenityVersion);
-        writeHeader("dotnet restore " + projectJson);
-        var exitCode = StartProcess("dotnet", "restore " + projectJson);
-        if (exitCode > 0)
-            throw new Exception("Error while restoring " + projectJson);
-        writeHeader("dotnet build " + projectJson);
-        exitCode = StartProcess("dotnet", "build " + projectJson + " -c " + configuration);
-        if (exitCode > 0)
-            throw new Exception("Error while building " + projectJson);
+        var csproj = @"./" + project + "/" + project + ".csproj";
+        patchProjectVer(csproj, serenityVersion);
     }
+
+	var dotnetSln = @"./Serenity.DotNet.sln";
+	writeHeader("dotnet restore " + dotnetSln);
+	var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
+	if (exitCode > 0)
+		throw new Exception("Error while restoring " + dotnetSln);
+	writeHeader("dotnet build " + dotnetSln);
+	exitCode = StartProcess("dotnet", "build " + dotnetSln + " -c " + configuration);
+	if (exitCode > 0)
+		throw new Exception("Error while building " + dotnetSln);
 });
 
 Task("Test")

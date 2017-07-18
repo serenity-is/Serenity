@@ -43,3 +43,8 @@ Tools/Addins/
 .nupkg/
 Serenity.CodeGenerator/Properties/launchSettings.json
 node_modules/
+Serenity.Test/Scripts/serenity/Serenity.Test.js.map
+Serenity.TypeScript.CodeGeneration/Serenity.CodeGeneration.js.map
+Serenity.TypeScript.CodeGeneration/Serenity.CodeGeneration.min.js
+.vs/
+npm-debug.log

@@ -3,7 +3,7 @@ using System;
 namespace Serenity.Data.Mapping
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true)]
-    public class InnerJoinAttribute : Attribute
+    public class InnerJoinAttribute : Attribute, ISqlJoin
     {
         /// <summary>
         /// Adds a inner join on foreign key. Use this version only on properties with ForeignKey attribute.
@@ -31,5 +31,8 @@ namespace Serenity.Data.Mapping
         public String Alias { get; private set; }
         public String ToTable { get; private set; }
         public String OnCriteria { get; private set; }
+        public String PropertyPrefix { get; set; }
+        public String TitlePrefix { get; set; }
+        public Type RowType { get; set; }
     }
 }

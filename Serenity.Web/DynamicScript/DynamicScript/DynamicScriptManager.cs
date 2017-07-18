@@ -79,7 +79,7 @@ namespace Serenity.Web
 
             var script = item.EnsureContentBytes();
 
-            return name + ".js?v=" + script.Hash;
+            return name + ".js?v=" + (script.Hash ?? script.Time.Ticks.ToString());
         }
 
         internal static Script GetScript(string name)

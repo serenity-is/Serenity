@@ -218,7 +218,10 @@ namespace Q {
                 $(validator.errorList.map(x => x.element))
                     .closest('.category.collapsed')
                     .children('.category-title')
-                    .each((i, x) => $(x).click());
+                    .each((i, x) => {
+                        $(x).click();
+                        return true;
+                    });
             },
             success: function (label: JQuery) {
                 label.addClass('checked');
@@ -251,7 +254,7 @@ namespace Q {
             dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
                 (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                     'dd' + s + 'mm' + s + 'yy')),
-            buttonImage: Q.resolveUrl('~/content/serenity/images/datepicker.png'),
+            buttonImage: Q.resolveUrl('~/Content/serenity/images/datepicker.png'),
             buttonImageOnly: true,
             showOn: 'both',
             showButtonPanel: true,

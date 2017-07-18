@@ -1,6 +1,7 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Data.Mapping;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -185,82 +186,6 @@ namespace Serenity.Data
 
         }
 
-        private static readonly char[] comma = new char[] { ',' };
-
-        private ExpressionAttribute GetBestMatchingExpression(IEnumerable<ExpressionAttribute> expressions,
-            ref string dialectServerType, ref string dialectTypeName)
-        {
-            if (!expressions.Any(x => !string.IsNullOrEmpty(x.Dialect)))
-                return expressions.FirstOrDefault();
-
-            if (dialectTypeName == null)
-            {
-                ISqlDialect dialect = null;
-
-                if (!string.IsNullOrEmpty(connectionKey))
-                {
-                    var csi = SqlConnections.TryGetConnectionString(connectionKey);
-                    if (csi != null)
-                        dialect = csi.Dialect;
-                }
-
-                dialect = dialect ?? SqlSettings.DefaultDialect;
-                dialectServerType = dialect.ServerType;
-                dialectTypeName = dialect.GetType().Name;
-            }
-
-            var st = dialectServerType;
-            var tn = dialectTypeName;
-
-            Func<string, bool> isMatch = s =>
-            {
-                return st.StartsWith(s, StringComparison.OrdinalIgnoreCase) ||
-                    tn.StartsWith(s, StringComparison.OrdinalIgnoreCase);
-            };
-
-            Dictionary<ExpressionAttribute, int> weight = null;
-
-            var bestMatch = expressions.Where(x =>
-            {
-                if (string.IsNullOrEmpty(x.Dialect))
-                    return true;
-
-                if (x.Dialect.IndexOf(',') < 0)
-                    return isMatch(x.Dialect);
-
-                var best = x.Dialect.Split(comma, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(z => z.Trim())
-                    .Where(z => isMatch(z))
-                    .OrderByDescending(z => z.Length)
-                    .FirstOrDefault();
-
-                if (best != null)
-                {
-                    if (weight == null)
-                        weight = new Dictionary<ExpressionAttribute, int>();
-
-                    weight[x] = best.Length;
-                    return true;
-                }
-
-                return false;
-            })
-            .OrderByDescending(x =>
-            {
-                if (string.IsNullOrEmpty(x.Dialect))
-                    return 0;
-
-                int w;
-                if (weight != null && weight.TryGetValue(x, out w))
-                    return w;
-
-                return x.Dialect.Length;
-            })
-            .FirstOrDefault();
-
-            return bestMatch;
-        }
-
         public void Initialize()
         {
             if (isInitialized)
@@ -271,6 +196,9 @@ namespace Serenity.Data
                 Dictionary<string, FieldInfo> rowFields;
                 Dictionary<string, PropertyInfo> rowProperties;
                 GetRowFieldsAndProperties(out rowFields, out rowProperties);
+
+                var expressionSelector = new DialectExpressionSelector(connectionKey);
+                var rowCustomAttributes = this.rowType.GetCustomAttributes().ToList();
 
                 foreach (var fieldInfo in this.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
                 {
@@ -301,24 +229,28 @@ namespace Serenity.Data
                         FieldFlags addFlags = (FieldFlags)0;
                         FieldFlags removeFlags = (FieldFlags)0;
 
-                        string dialectServerType = null;
-                        string dialectTypeName = null;
+                        OriginPropertyDictionary propertyDictionary = null;
 
                         if (property != null)
                         {
+                            var origin = property.GetCustomAttribute<OriginAttribute>();
+
+
                             column = property.GetCustomAttribute<ColumnAttribute>(false);
                             display = property.GetCustomAttribute<DisplayNameAttribute>(false);
                             size = property.GetCustomAttribute<SizeAttribute>(false);
 
                             var expressions = property.GetCustomAttributes<ExpressionAttribute>(false);
                             if (expressions.Any())
-                                expression = GetBestMatchingExpression(expressions, ref dialectServerType, ref dialectTypeName);
+                                expression = expressionSelector.GetBestMatch(expressions, x => x.Dialect);
 
                             scale = property.GetCustomAttribute<ScaleAttribute>(false);
                             selectLevel = property.GetCustomAttribute<MinSelectLevelAttribute>(false);
                             foreignKey = property.GetCustomAttribute<ForeignKeyAttribute>(false);
-                            leftJoin = property.GetCustomAttributes<LeftJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
-                            innerJoin = property.GetCustomAttributes<InnerJoinAttribute>(false).FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                            leftJoin = property.GetCustomAttributes<LeftJoinAttribute>(false)
+                                .FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
+                            innerJoin = property.GetCustomAttributes<InnerJoinAttribute>(false)
+                                .FirstOrDefault(x => x.ToTable == null && x.OnCriteria == null);
                             defaultValue = property.GetCustomAttribute<DefaultValueAttribute>(false);
                             textualField = property.GetCustomAttribute<TextualFieldAttribute>(false);
                             dateTimeKind = property.GetCustomAttribute<DateTimeKindAttribute>(false);
@@ -327,6 +259,33 @@ namespace Serenity.Data
                                 property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
                             updatePermission = property.GetCustomAttribute<UpdatePermissionAttribute>(false) ??
                                 property.GetCustomAttribute<ModifyPermissionAttribute>(false) ?? readPermission;
+
+                            if (origin != null)
+                            {
+                                propertyDictionary = propertyDictionary ?? OriginPropertyDictionary.GetPropertyDictionary(this.rowType);
+                                try
+                                {
+                                    if (!expressions.Any() && expression == null)
+                                        expression = new ExpressionAttribute(propertyDictionary.OriginExpression(
+                                            property, origin, expressionSelector, "", rowCustomAttributes));
+
+                                    if (display == null)
+                                        display = new DisplayNameAttribute(propertyDictionary.OriginDisplayName(property, origin));
+
+                                    if (size == null)
+                                        size = propertyDictionary.OriginAttribute<SizeAttribute>(property, origin);
+
+                                    if (scale == null)
+                                        scale = propertyDictionary.OriginAttribute<ScaleAttribute>(property, origin);
+                                }
+                                catch (DivideByZeroException)
+                                {
+                                    throw new Exception(String.Format(
+                                        "Infinite recursion detected while determining origins " +
+                                        "for property '{0}' on row type '{1}'",
+                                        property.Name, rowType.FullName));
+                                }
+                            }
 
                             var insertable = property.GetCustomAttribute<InsertableAttribute>(false);
                             var updatable = property.GetCustomAttribute<UpdatableAttribute>(false);
@@ -496,13 +455,13 @@ namespace Serenity.Data
                     }
                 }
 
-                foreach (var attr in this.rowType.GetCustomAttributes<LeftJoinAttribute>())
+                foreach (var attr in rowCustomAttributes.OfType<LeftJoinAttribute>())
                     new LeftJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
-                foreach (var attr in this.rowType.GetCustomAttributes<InnerJoinAttribute>())
+                foreach (var attr in rowCustomAttributes.OfType<InnerJoinAttribute>())
                     new InnerJoin(this.joins, attr.ToTable, attr.Alias, new Criteria(attr.OnCriteria));
 
-                foreach (var attr in this.rowType.GetCustomAttributes<OuterApplyAttribute>())
+                foreach (var attr in rowCustomAttributes.OfType<OuterApplyAttribute>())
                     new OuterApply(this.joins, attr.InnerQuery, attr.Alias);
 
 #if !COREFX
@@ -521,6 +480,12 @@ namespace Serenity.Data
             }
 
             isInitialized = true;
+        }
+
+        private static TAttr GetFieldAttr<TAttr>(Field x)
+            where TAttr: Attribute
+        {
+            return x.CustomAttributes.FirstOrDefault(z => typeof(TAttr).IsAssignableFrom(z.GetType())) as TAttr;
         }
 
         private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo)

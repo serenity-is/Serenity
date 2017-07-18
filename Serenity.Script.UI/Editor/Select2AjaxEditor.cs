@@ -1,7 +1,7 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections.Generic;
 using System.Html;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -130,12 +130,12 @@ namespace Serenity
                         {
                             query.Callback(new Select2Result
                             {
-                                Results = response.Entities.Take(pageSize).Select(x => new Select2Item
+                                Results = response.Entities.Slice(0, pageSize).As<List<TItem>>().Map(x => new Select2Item
                                 {
                                     Id = GetItemKey(x),
                                     Text = GetItemText(x),
                                     Source = x
-                                }).ToList(),
+                                }),
                                 More = response.Entities.Count >= pageSize
                             });
                         });

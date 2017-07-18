@@ -36,6 +36,15 @@ namespace Serenity
                 AddItem(((int)x).ToString(), Q.TryGetText("Enums." + enumKey + "." + name) ?? name);
             }
         }
+
+        protected override Select2Options GetSelect2Options()
+        {
+            var opt = base.GetSelect2Options();
+
+            opt.AllowClear = options.AllowClear ?? true;
+
+            return opt;
+        }
     }
 
     [Serializable, Reflectable]
@@ -50,5 +59,8 @@ namespace Serenity
 
         [DisplayName("Enum Type Key"), Hidden]
         public Type EnumType { get; set; }
+
+        [DisplayName("Allow Clear"), EditorType("Boolean")]
+        public Boolean? AllowClear { get; set; }
     }
 }

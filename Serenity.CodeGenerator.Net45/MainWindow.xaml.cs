@@ -509,7 +509,8 @@ namespace Serenity.CodeGenerator
                     {
                         connection.Open();
 
-                        foreach (var t in SqlSchemaInfo.GetTableNames(connection))
+                        var schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
+                        foreach (var t in schemaProvider.GetTableNames(connection))
                         {
                             var table = conn != null ? conn.Tables.FirstOrDefault(x => x.Tablename == t.Tablename) : null;
                             var identifier = (table == null || table.Identifier.IsEmptyOrNull()) ?

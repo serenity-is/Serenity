@@ -103,10 +103,6 @@ namespace Q {
         if (!s || !s.length)
             return null;
 
-        let timestamp = Date.parse(s);
-        if (!isNaN(timestamp) && typeof timestamp == "Date")
-            return <Date><any>timestamp;
-
         s = s + "";
         if (typeof (s) != "string" || s.length === 0) {
             return null;

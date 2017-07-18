@@ -20,6 +20,43 @@ namespace Serenity
         public EntityGrid(jQueryObject container, TOptions opt = null)
             : base(container, opt)
         {
+            this.element.AddClass("route-handler")
+                .Bind2("handleroute." + this.UniqueName, (e, arg) =>
+            {
+                if (arg.handled)
+                    return;
+
+                if (arg.route == "new")
+                {
+                    arg.handled = true;
+                    this.AddButtonClick();
+                    return;
+                }
+
+                var parts = arg.route.split("/");
+                if (parts.length == 2 &&
+                    parts[0] == "edit")
+                {
+                    arg.handled = true;
+                    this.EditItem(parts[1]);
+                    return;
+                }
+
+                if (parts.length == 2 &&
+                    parts[1] == "new")
+                {
+                    arg.handled = true;
+                    this.EditItemOfType(parts[0], null);
+                    return;
+                }
+
+                if (parts.length == 3 &&
+                    parts[1] == "edit")
+                {
+                    arg.handled = true;
+                    this.EditItemOfType(parts[0], parts[2]);
+                }
+            });
         }
 
         protected override bool UsePager()
@@ -229,10 +266,29 @@ namespace Serenity
             InitDialog(dialog);
         }
 
+        protected virtual void RouteDialog(string itemType, Widget dialog)
+        {
+            Q.Router.Dialog(this.Element, dialog.Element, () =>
+            {
+                string hash = "";
+
+                if (itemType != this.GetItemType())
+                    hash = itemType + "/";
+
+                if (dialog != null && ((dynamic)dialog).entityId != null)
+                    hash += "edit/" + (((dynamic)dialog).entityId).toString();
+                else
+                    hash += "new";
+
+                return hash;
+            });
+        }
+
         protected virtual void InitDialog(Widget dialog)
         {
             var self = this;
             dialog.BindToDataChange(this, (e, dci) => self.SubDialogDataChange());
+            RouteDialog(this.GetItemType(), dialog);
         }
 
         protected virtual void InitEntityDialog(string itemType, Widget dialog)
@@ -245,6 +301,7 @@ namespace Serenity
 
             var self = this;
             dialog.BindToDataChange(this, (e, dci) => self.SubDialogDataChange());
+            RouteDialog(this.GetItemType(), dialog);
         }
 
         protected virtual Widget CreateEntityDialog(string itemType, Action<Widget> callback)

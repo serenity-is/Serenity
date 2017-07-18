@@ -1,10 +1,6 @@
 ﻿using jQueryApi;
 using System;
-using System.Collections.Generic;
-using System.Html;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -14,11 +10,6 @@ namespace Serenity
     [Imported]
     public abstract class Widget : ScriptContext
     {
-        /// <summary>
-        /// Each widget instance created gets a unique name. This static auto incrementing number is used to generate such names.
-        /// </summary>
-        private static int NextWidgetNumber = 0;
-
         protected Promise asyncPromise;
         protected string widgetName;
         protected string uniqueName;
@@ -36,59 +27,16 @@ namespace Serenity
         /// </remarks>
         protected Widget(jQueryObject element, object options = null)
         {
-            this.element = element;
-            this.options = options ?? new object();
-            this.widgetName = WidgetExtensions.GetWidgetName(this.GetType());
-            this.uniqueName = widgetName + (NextWidgetNumber++).ToString();
-
-            if (element.GetDataValue(widgetName) != null)
-                throw new Exception(String.Format("The element already has widget '{0}'!", widgetName));
-
-            var self = this;
-            element.Bind("remove." + widgetName, (e) => {
-                if (e.Bubbles ||
-                    e.Cancelable)
-                    return;
-
-                self.Destroy();
-            }).Data(widgetName, this);
-
-            AddCssClass();
-
-            if (IsAsyncWidget())
-            {
-                Window.SetTimeout(delegate()
-                {
-                    if (element != null && asyncPromise == null)
-                        asyncPromise = this.InitializeAsync();
-                }, 0);
-            }
         }
 
         [ScriptName("init")]
         private Widget InitializeAndReturnThis(Action<Widget> action)
         {
-            var promise = this.Initialize();
-
-            if (action != null)
-            {
-                promise.Then(() =>
-                {
-                    action(this);
-                });
-            }
-
             return this;
         }
 
         public Promise Initialize()
         {
-            if (!IsAsyncWidget())
-                return Promise.Void;
-
-            if (asyncPromise == null)
-                asyncPromise = this.InitializeAsync();
-
             return asyncPromise;
         }
 
@@ -107,13 +55,6 @@ namespace Serenity
         /// </summary>
         public virtual void Destroy()
         {
-            this.element.RemoveClass("s-" + this.GetType().Name);
-
-            element.Unbind("." + widgetName)
-                .RemoveData(widgetName);
-
-            element = null;
-            asyncPromise = null;
         }
 
         /// <summary>
@@ -121,7 +62,6 @@ namespace Serenity
         /// </summary>
         protected virtual void AddCssClass()
         {
-            this.element.AddClass(GetCssClass());
         }
 
         protected virtual string GetCssClass()
@@ -182,8 +122,7 @@ namespace Serenity
                 Action<TWidget> init = null)
             where TWidget : Widget
         {
-            return Widget.CreateOfType(typeof(TWidget), element, options,
-                init == null ? (Action<Widget>)null : (w => init(w.As<TWidget>()))).As<TWidget>();
+            return null;
         }
 
         [IncludeGenericArguments(false)]
@@ -192,7 +131,7 @@ namespace Serenity
                 Action<TWidget> init = null)
             where TWidget : Widget
         {
-            return Create<TWidget>(e => container.Append(e), options, init);
+            return null;
         }
     }
 }

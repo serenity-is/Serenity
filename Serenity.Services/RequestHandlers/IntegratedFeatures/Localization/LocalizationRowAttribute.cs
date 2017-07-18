@@ -6,6 +6,9 @@ namespace Serenity.Data
     {
         public LocalizationRowAttribute(Type localizationRow)
         {
+            if (localizationRow == null)
+                throw new ArgumentNullException("localizationRow");
+
             this.LocalizationRow = localizationRow;
         }
 

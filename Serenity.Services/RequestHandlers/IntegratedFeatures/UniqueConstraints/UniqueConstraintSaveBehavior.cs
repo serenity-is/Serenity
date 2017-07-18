@@ -24,7 +24,7 @@ namespace Serenity.Services
             return true;
         }
 
-        public override void OnValidateRequest(ISaveRequestHandler handler)
+        public override void OnBeforeSave(ISaveRequestHandler handler)
         {
             if (attrList == null)
                 return;

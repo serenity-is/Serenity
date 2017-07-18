@@ -87,7 +87,6 @@
     "Controls.ImageUpload.MaxHeight": "تصوير آپلود شده بايد زير {0} پيكسل در ارتفاع باشد",
     "Controls.ImageUpload.MaxWidth": "تصوير آپلود شده بايد زير{0} پيكسل در عرض باشد",
     "Controls.ImageUpload.MinHeight": "تصوير آپلود شده بايد حداقل {0}پيكسل در ارتفاع باشد",
-    "Controls.ImageUpload.MinHieght": "تصوير آپلود شده بايد حداقل {0} پيكسل در ارتفاع باشد",
     "Controls.ImageUpload.MinWidth": "تصوير آپلود شده بايد حداقل {0} پيكسل در عرض باشد",
     "Controls.ImageUpload.NotAnImageFile": "فايل آپلود شده تصوير نيست",
     "Controls.ImageUpload.UploadFileTooBig": "فايل آپلود شده بايد كوچكتر از {0} باشد",

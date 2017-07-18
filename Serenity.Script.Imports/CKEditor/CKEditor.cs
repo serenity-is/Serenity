@@ -114,6 +114,10 @@ namespace Serenity
         {
         }
 
+        public void SetReadOnly(bool isReadOnly)
+        {
+        }
+
         public void UpdateElement()
         {
         }

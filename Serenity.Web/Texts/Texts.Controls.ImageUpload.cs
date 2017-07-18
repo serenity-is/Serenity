@@ -15,7 +15,7 @@ namespace Serenity.Web
                 public static LocalText MaxWidth = "Uploaded image should be under {0} pixels in width!";
                 public static LocalText MinWidth = "Uploaded image should be at least {0} pixels in width!";
                 public static LocalText MaxHeight = "Uploaded image should be under {0} pixels in height!";
-                public static LocalText MinHieght = "Uploaded image should be at least {0} pixels in height!";
+                public static LocalText MinHeight = "Uploaded image should be at least {0} pixels in height!";
                 public static LocalText ColorboxCurrent = "image {current} / {total}";
                 public static LocalText ColorboxPrior = "prior";
                 public static LocalText ColorboxNext = "next";

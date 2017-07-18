@@ -1,11 +1,17 @@
 ﻿var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function")
+        r = Reflect.decorate(decorators, target, key, desc);
+    else
+        for (var i = decorators.length - 1; i >= 0; i--)
+            if (d = decorators[i])
+                r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    for (var p in b)
+        if (b.hasOwnProperty(p) && p !== '__metadata')
+            d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
@@ -588,9 +594,6 @@ var Q;
     function parseISODateTime(s) {
         if (!s || !s.length)
             return null;
-        var timestamp = Date.parse(s);
-        if (!isNaN(timestamp) && typeof timestamp == "Date")
-            return timestamp;
         s = s + "";
         if (typeof (s) != "string" || s.length === 0) {
             return null;
@@ -1436,7 +1439,16 @@ var Q;
                         }
                     }
                     var html = xhr.responseText;
-                    Q.iframeDialog({ html: html });
+                    if (!html) {
+                        if (!xhr.status)
+                            Q.alert("An unknown AJAX connection error occured! Check browser console for details.");
+                        else if (xhr.status == 500)
+                            Q.alert("HTTP 500: Connection refused! Check browser console for details.");
+                        else
+                            Q.alert("HTTP " + xhr.status + ' error! Check browser console for details.');
+                    }
+                    else
+                        Q.iframeDialog({ html: html });
                 }
                 finally {
                     if (options.blockUI) {
@@ -1500,6 +1512,8 @@ var Q;
             $(window).resize(layout);
         }
         layout();
+        // ugly, but to it is to make old pages work without having to add this
+        Q.Router.resolve();
     }
     Q.initFullHeightGridPage = initFullHeightGridPage;
     function layoutFillHeightValue(element) {
@@ -1661,8 +1675,9 @@ var Q;
         ScriptData.canLoad = canLoad;
         function setRegisteredScripts(scripts) {
             registered = {};
+            var t = new Date().getTime();
             for (var k in scripts) {
-                registered[k] = scripts[k].toString();
+                registered[k] = scripts[k] || t;
             }
         }
         ScriptData.setRegisteredScripts = setRegisteredScripts;
@@ -1910,6 +1925,197 @@ var Q;
         }
     });
 })(Q || (Q = {}));
+var Q;
+(function (Q) {
+    var Router;
+    (function (Router) {
+        var oldURL;
+        var resolving = 0;
+        var autoinc = 0;
+        var listenerTimeout;
+        Router.enabled = true;
+        function navigate(hash, tryBack, silent) {
+            if (!Router.enabled || resolving > 0)
+                return;
+            hash = hash || '';
+            hash = hash.replace(/^#/, '');
+            hash = (!hash ? "" : '#' + hash);
+            var newURL = window.location.href.replace(/#$/, '')
+                .replace(/#.*$/, '') + hash;
+            if (newURL != window.location.href) {
+                if (tryBack && (oldURL == newURL ||
+                    oldURL == newURL + '#' ||
+                    oldURL + '#' == newURL)) {
+                    if (silent)
+                        ignoreChange();
+                    window.history.back();
+                    if (window.location.href == oldURL)
+                        return;
+                }
+                if (silent)
+                    ignoreChange();
+                window.location.hash = hash;
+            }
+        }
+        Router.navigate = navigate;
+        function replace(hash, tryBack) {
+            navigate(hash, tryBack, true);
+        }
+        Router.replace = replace;
+        function replaceLast(hash, tryBack) {
+            if (!Router.enabled)
+                return;
+            var current = window.location.hash || '';
+            if (current.charAt(0) == '#')
+                current = current.substr(1, current.length - 1);
+            var parts = current.split('/+/');
+            if (parts.length > 1) {
+                if (hash && hash.length) {
+                    parts[parts.length - 1] = hash;
+                    hash = parts.join("/+/");
+                }
+                else {
+                    parts.splice(parts.length - 1, 1);
+                    hash = parts.join("/+/");
+                }
+            }
+            replace(hash, tryBack);
+        }
+        Router.replaceLast = replaceLast;
+        function dialogOpen(owner, element, hash) {
+            var route = [];
+            var isDialog = owner.hasClass(".ui-dialog-content");
+            var dialog = isDialog ? owner :
+                owner.closest('.ui-dialog-content');
+            var value = hash();
+            var idPrefix;
+            if (dialog.length) {
+                var dialogs = $('.ui-dialog-content:visible');
+                var index = dialogs.index(dialog[0]);
+                for (var i = 0; i <= index; i++) {
+                    var q = dialogs.eq(i).data("qroute");
+                    if (q && q.length)
+                        route.push(q);
+                }
+                if (!isDialog) {
+                    idPrefix = dialog.attr("id");
+                    if (idPrefix) {
+                        idPrefix += "_";
+                        var id = owner.attr("id");
+                        if (id && Q.startsWith(id, idPrefix))
+                            value = id.substr(idPrefix.length) + '@' + value;
+                    }
+                }
+            }
+            else {
+                var id = owner.attr("id");
+                if (id && (!owner.hasClass("route-handler") ||
+                    $('.route-handler').first().attr("id") != id))
+                    value = id + "@" + value;
+            }
+            route.push(value);
+            element.data("qroute", value);
+            replace(route.join("/+/"));
+            element.bind("dialogclose.qrouter", function (e) {
+                element.data("qroute", null);
+                element.unbind(".qrouter");
+                replaceLast("", true);
+            });
+        }
+        function dialog(owner, element, hash) {
+            if (!Router.enabled)
+                return;
+            element.bind("dialogopen.qrouter", function (e) {
+                dialogOpen(owner, element, hash);
+            });
+        }
+        Router.dialog = dialog;
+        function resolve(hash) {
+            if (!Router.enabled)
+                return;
+            resolving++;
+            try {
+                hash = Q.coalesce(Q.coalesce(hash, window.location.hash), '');
+                if (hash.charAt(0) == '#')
+                    hash = hash.substr(1, hash.length - 1);
+                var newParts = hash.split("/+/");
+                var dialogs = $('.ui-dialog-content:visible');
+                var oldParts = dialogs.toArray()
+                    .map(function (el) { return $(el).data('qroute'); });
+                var same = 0;
+                while (same < dialogs.length &&
+                    same < newParts.length &&
+                    oldParts[same] == newParts[same]) {
+                    same++;
+                }
+                for (var i = same; i < dialogs.length; i++)
+                    dialogs.eq(i).dialog('close');
+                for (var i = same; i < newParts.length; i++) {
+                    var route = newParts[i];
+                    var routeParts = route.split('@');
+                    var handler;
+                    if (routeParts.length == 2) {
+                        var dialog = i > 0 ? $('.ui-dialog-content:visible').eq(i - 1) : $([]);
+                        if (dialog.length) {
+                            var idPrefix = dialog.attr("id");
+                            if (idPrefix) {
+                                handler = $('#' + idPrefix + "_" + routeParts[0]);
+                                if (handler.length) {
+                                    route = routeParts[1];
+                                }
+                            }
+                        }
+                        if (!handler || !handler.length) {
+                            handler = $('#' + routeParts[0]);
+                            if (handler.length) {
+                                route = routeParts[1];
+                            }
+                        }
+                    }
+                    if (!handler || !handler.length) {
+                        handler = i > 0 ? $('.ui-dialog-content:visible').eq(i - 1) :
+                            $('.route-handler').first();
+                    }
+                    handler.triggerHandler("handleroute", {
+                        handled: false,
+                        route: route,
+                        parts: newParts,
+                        index: i
+                    });
+                }
+            }
+            finally {
+                resolving--;
+            }
+        }
+        Router.resolve = resolve;
+        function hashChange(e, o) {
+            oldURL = (e && e.oldURL) || o;
+            resolve();
+        }
+        function ignoreChange() {
+            window.clearTimeout(listenerTimeout);
+            window.removeEventListener("hashchange", hashChange);
+            setTimeout(function () {
+                window.addEventListener("hashchange", hashChange, false);
+            }, 1);
+        }
+        window.addEventListener("hashchange", hashChange, false);
+        $(document).on("dialogopen", ".ui-dialog-content", function (event, ui) {
+            if (!Router.enabled)
+                return;
+            var dlg = $(event.target);
+            if (dlg.data("qroute"))
+                return;
+            var owner = $('.ui-dialog-content:visible').not(dlg).last();
+            if (!owner.length)
+                owner = $('html');
+            dialogOpen(owner, dlg, function () {
+                return "!" + (++autoinc).toString(36);
+            });
+        });
+    })(Router = Q.Router || (Q.Router = {}));
+})(Q || (Q = {}));
 var Serenity;
 (function (Serenity) {
     var ColumnsKeyAttribute = (function () {
@@ -2068,14 +2274,12 @@ var Serenity;
     var Decorators;
     (function (Decorators) {
         function addAttribute(type, attr) {
-            var old = type.__metadata;
             type.__metadata = type.__metadata || {};
             type.__metadata.attr = type.__metadata.attr || [];
             type.__metadata.attr.push(attr);
         }
         Decorators.addAttribute = addAttribute;
         function addMemberAttr(type, memberName, attr) {
-            var old = type.__metadata;
             type.__metadata = type.__metadata || {};
             type.__metadata.members = type.__metadata.members || [];
             var member = undefined;
@@ -2518,7 +2722,7 @@ var Serenity;
         }
         Widget.prototype.destroy = function () {
             this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
-            this.element.unbind('.' + this.widgetName).removeData(this.widgetName);
+            this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
             this.element = null;
             this.asyncPromise = null;
         };
@@ -2609,7 +2813,20 @@ var Serenity;
             var _this = _super.call(this, container, options) || this;
             _this.idPrefix = _this.uniqueName + '_';
             var widgetMarkup = _this.getTemplate().replace(new RegExp('~_', 'g'), _this.idPrefix);
-            widgetMarkup = Q.jsRender(widgetMarkup);
+            // for compability with older templates based on JsRender
+            var end = 0;
+            while (true) {
+                var idx = widgetMarkup.indexOf('{{text:"', end);
+                if (idx < 0)
+                    break;
+                var end = widgetMarkup.indexOf('"}}', idx);
+                if (end < 0)
+                    break;
+                var key = widgetMarkup.substr(idx + 8, end - idx - 8);
+                var text = Q.text(key);
+                widgetMarkup = widgetMarkup.substr(0, idx) + text + widgetMarkup.substr(end + 3);
+                end = idx + text.length;
+            }
             _this.element.html(widgetMarkup);
             return _this;
         }
@@ -2715,6 +2932,7 @@ var Serenity;
         __extends(TemplatedDialog, _super);
         function TemplatedDialog(options) {
             var _this = _super.call(this, Q.newBodyDiv(), options) || this;
+            _this.element.attr("id", _this.uniqueName);
             _this.isPanel = ss.getAttributes(ss.getInstanceType(_this), Serenity.PanelAttribute, true).length > 0;
             if (!_this.isPanel) {
                 _this.initDialog();
@@ -2990,27 +3208,34 @@ var Serenity;
             return _this;
         }
         ColumnPickerDialog.createToolButton = function (grid) {
+            function onClick() {
+                var picker = new Serenity.ColumnPickerDialog();
+                picker.allColumns = grid.allColumns;
+                if (grid.initialSettings) {
+                    var initialSettings = grid.initialSettings;
+                    if (initialSettings.columns && initialSettings.columns.length)
+                        picker.defaultColumns = initialSettings.columns.map(function (x) { return x.id; });
+                }
+                picker.visibleColumns = grid.slickGrid.getColumns().map(function (x) { return x.id; });
+                picker.done = function () {
+                    grid.allColumns = picker.allColumns;
+                    var visible = picker.allColumns.filter(function (x) { return x.visible === true; });
+                    grid.slickGrid.setColumns(visible);
+                    grid.persistSettings();
+                    grid.refresh();
+                };
+                Q.Router.dialog(grid.element, picker.element, function () { return "columns"; });
+                picker.dialogOpen();
+            }
+            grid.element.on('handleroute.' + grid.uniqueName, function (e, arg) {
+                if (arg && !arg.handled && arg.route == "columns") {
+                    onClick();
+                }
+            });
             return {
                 hint: Q.text("Controls.ColumnPickerDialog.Title"),
                 cssClass: "column-picker-button",
-                onClick: function () {
-                    var picker = new Serenity.ColumnPickerDialog();
-                    picker.allColumns = grid.allColumns;
-                    if (grid.initialSettings) {
-                        var initialSettings = grid.initialSettings;
-                        if (initialSettings.columns && initialSettings.columns.length)
-                            picker.defaultColumns = initialSettings.columns.map(function (x) { return x.id; });
-                    }
-                    picker.visibleColumns = grid.slickGrid.getColumns().map(function (x) { return x.id; });
-                    picker.done = function () {
-                        grid.allColumns = picker.allColumns;
-                        var visible = picker.allColumns.filter(function (x) { return x.visible === true; });
-                        grid.slickGrid.setColumns(visible);
-                        grid.persistSettings();
-                        grid.refresh();
-                    };
-                    picker.dialogOpen();
-                }
+                onClick: onClick
             };
         };
         ColumnPickerDialog.prototype.getDialogOptions = function () {
@@ -4803,7 +5028,10 @@ var Q;
                 $(validator.errorList.map(function (x) { return x.element; }))
                     .closest('.category.collapsed')
                     .children('.category-title')
-                    .each(function (i, x) { return $(x).click(); });
+                    .each(function (i, x) {
+                    $(x).click();
+                    return true;
+                });
             },
             success: function (label) {
                 label.addClass('checked');
@@ -4836,7 +5064,7 @@ var Q;
             dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
                 (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                     'dd' + s + 'mm' + s + 'yy')),
-            buttonImage: Q.resolveUrl('~/content/serenity/images/datepicker.png'),
+            buttonImage: Q.resolveUrl('~/Content/serenity/images/datepicker.png'),
             buttonImageOnly: true,
             showOn: 'both',
             showButtonPanel: true,

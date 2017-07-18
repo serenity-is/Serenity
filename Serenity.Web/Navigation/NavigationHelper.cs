@@ -29,6 +29,7 @@
                     FullPath = attr.FullPath,
                     Url = (!string.IsNullOrEmpty(attr.Url) && resolveUrl != null) ? resolveUrl(attr.Url) : attr.Url,
                     IconClass = attr.IconClass.TrimToNull(),
+                    ItemClass = attr.ItemClass.TrimToNull(),
                     Target = attr.Target.TrimToNull()
                 };
 

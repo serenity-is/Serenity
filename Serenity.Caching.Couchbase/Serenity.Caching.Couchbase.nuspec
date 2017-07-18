@@ -30,8 +30,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="../Serenity.Caching.Couchbase.Net45/bin/${configuration}/Serenity.Caching.Couchbase.dll" target="lib/net45" />
-    <file src="../Serenity.Caching.Couchbase.Net45/bin/${configuration}/Serenity.Caching.Couchbase.pdb" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Caching.Couchbase.dll" target="lib/net45" />
+    <file src="bin/${configuration}/Serenity.Caching.Couchbase.pdb" target="lib/net45" />
 <!--    <file src="bin/${configuration}/netstandard1.6/Serenity.Caching.Couchbase.dll" target="lib/netstandard1.6" />-->
   </files>
 </package>

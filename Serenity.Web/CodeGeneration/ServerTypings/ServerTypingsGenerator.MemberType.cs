@@ -31,7 +31,9 @@ namespace Serenity.CodeGeneration
                 memberType == typeof(UInt64) ||
                 memberType == typeof(Single) ||
                 memberType == typeof(Double) ||
-                memberType == typeof(Decimal))
+                memberType == typeof(Decimal) ||
+                memberType == typeof(Byte) ||
+                memberType == typeof(SByte))
             {
                 sb.Append("number");
                 return;
@@ -45,6 +47,7 @@ namespace Serenity.CodeGeneration
 
             if (memberType == typeof(DateTime) ||
                 memberType == typeof(TimeSpan) ||
+                memberType == typeof(DateTimeOffset) ||
                 memberType == typeof(Guid))
             {
                 sb.Append("string");

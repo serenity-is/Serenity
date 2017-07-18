@@ -76,7 +76,7 @@ namespace Serenity
             }
 
             if (localizationPendingValue != null)
-                req.As<SaveWithLocalizationRequest<TEntity>>().Localizations = GetPendingLocalizations();
+                req.Localizations = GetPendingLocalizations();
 
             return req;
         }

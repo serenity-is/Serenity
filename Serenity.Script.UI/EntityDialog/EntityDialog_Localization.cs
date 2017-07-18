@@ -1,10 +1,7 @@
 ﻿using jQueryApi;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 namespace Serenity
 {
@@ -16,6 +13,7 @@ namespace Serenity
         protected jQueryObject localizationButton;
         protected JsDictionary<string, object> localizationLastValue;
         protected JsDictionary<string, object> localizationPendingValue;
+        public static Func<string[][]> defaultLanguageList;
 
         private void InitLocalizationGrid()
         {
@@ -65,6 +63,8 @@ namespace Serenity
             var items = new List<PropertyItem>();
             foreach (var item in pgOptions.Items)
             {
+                string[][] langs = null;
+
                 if (item.Localizable == true)
                 {
                     var copy = jQuery.ExtendObject(new PropertyItem(), item);
@@ -74,19 +74,19 @@ namespace Serenity
                     copy.DefaultValue = null;
                     items.Add(copy);
 
-                    var langs = GetLanguages();
-                    var langsArr = (langs as object) as string[][];
-                    if (langsArr != null && langsArr.Length > 0 && langsArr[0] != null &&
-                        Q.IsArray(langsArr[0]))
+                    if (langs == null)
                     {
-                        langs = langsArr.Select(x => new Tuple<string, string>(x[0], x[1]));
+                        var langsTuple = GetLanguages();
+                        langs = (langsTuple as object) as string[][];
+                        if (langs == null || langs.Length == 0 || langs[0] == null || !Q.IsArray(langs[0]))
+                            langs = langsTuple.Map(x => new string[] { x.Item1, x.Item2 }).ToArray();
                     }
 
                     foreach (var lang in langs)
                     {
                         copy = jQuery.ExtendObject(new PropertyItem(), item);
-                        copy.Name = lang.Item1 + "$" + copy.Name;
-                        copy.Title = lang.Item2;
+                        copy.Name = lang[0] + "$" + copy.Name;
+                        copy.Title = lang[1];
                         copy.CssClass = string.Join(" ", copy.CssClass, "translation");
                         copy.Insertable = true;
                         copy.Updatable = true;
@@ -151,9 +151,12 @@ namespace Serenity
                 LoadLocalization();
         }
 
-        protected virtual IEnumerable<Tuple<string, string>> GetLanguages()
+        protected virtual List<Tuple<string, string>> GetLanguages()
         {
-            return new List<Tuple<string, string>>{};
+            if (defaultLanguageList != null)
+                return defaultLanguageList().As<List<Tuple<string, string>>>() ?? new List<Tuple<string, string>>();
+
+            return new List<Tuple<string, string>>();
         }
 
         private void LoadLocalization()
@@ -174,21 +177,23 @@ namespace Serenity
             }
 
             var self = this;
-            var opt = new ServiceCallOptions<RetrieveLocalizationResponse<TEntity>>();
-            opt.Service = this.GetService() + "/RetrieveLocalization";
+            var opt = new ServiceCallOptions<RetrieveResponse<TEntity>>();
+            opt.Service = this.GetService() + "/Retrieve";
             opt.BlockUI = true;
-            opt.Request = new RetrieveLocalizationRequest
+            opt.Request = new RetrieveRequest
             {
-                EntityId = this.EntityId
+                EntityId = this.EntityId,
+                ColumnSelection = RetrieveColumnSelection.KeyOnly,
+                IncludeColumns = new List<string> { "Localizations" }
             };
             
             opt.OnSuccess = response => 
             {
                 var copy = jQuery.ExtendObject(new object().As<TEntity>(), self.Entity).As<JsDictionary<string, object>>();
                 
-                foreach (var language in response.Entities.Keys)
+                foreach (var language in response.Localizations.Keys)
                 {
-                    var entity = response.Entities[language].As<JsDictionary<string, object>>();
+                    var entity = response.Localizations[language].As<JsDictionary<string, object>>();
 
                     foreach (var key in entity.Keys)
                         copy[language + "$" + key] = entity[key];
@@ -251,17 +256,14 @@ namespace Serenity
 
             string idField = GetIdProperty();
 
-            var langs = GetLanguages();
-            var langsArr = (langs as object) as string[][];
-            if (langsArr != null && langsArr.Length > 0 && langsArr[0] != null &&
-                Q.IsArray(langsArr[0]))
-            {
-                langs = langsArr.Select(x => new Tuple<string, string>(x[0], x[1]));
-            }
+            var langsTuple = GetLanguages();
+            var langs = (langsTuple as object) as string[][];
+            if (langs == null || langs.Length == 0 || langs[0] == null || !Q.IsArray(langs[0]))
+                langs = langsTuple.Map(x => new string[] { x.Item1, x.Item2 }).ToArray();
 
             foreach (var pair in langs)
             {
-                var language = pair.Item1;
+                var language = pair[0];
 
                 var entity = new JsDictionary<string, object>();
                 if (idField != null)

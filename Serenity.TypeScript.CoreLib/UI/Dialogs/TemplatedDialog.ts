@@ -12,6 +12,8 @@
         constructor(options?: TOptions) {
             super(Q.newBodyDiv(), options);
 
+            this.element.attr("id", this.uniqueName);
+
             this.isPanel = (ss as any).getAttributes((ss as any).getInstanceType(this),
                 Serenity.PanelAttribute, true).length > 0;
 

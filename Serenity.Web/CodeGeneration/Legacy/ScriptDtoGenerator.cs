@@ -83,7 +83,7 @@ namespace Serenity.CodeGeneration
 
         private static string GetNamespace(Type type)
         {
-            var ns = type.Namespace;
+            var ns = type.Namespace ?? "";
             if (ns.EndsWith(".Entities"))
                 return ns.Substring(0, ns.Length - ".Entities".Length);
 

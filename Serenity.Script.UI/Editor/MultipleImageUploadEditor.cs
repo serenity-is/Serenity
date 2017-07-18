@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -130,11 +128,11 @@ namespace Serenity
         {
             get
             {
-                return this.entities.Select(x => jQuery.ExtendObject(new UploadedFile(), x)).ToList();
+                return this.entities.Map(x => jQuery.ExtendObject(new UploadedFile(), x));
             }
             set
             {
-                this.entities = (value ?? new List<UploadedFile>()).Select(x => jQuery.ExtendObject(new UploadedFile(), x)).ToList();
+                this.entities = (value ?? new List<UploadedFile>()).Map(x => jQuery.ExtendObject(new UploadedFile(), x));
                 Populate();
                 UpdateInterface();
             }

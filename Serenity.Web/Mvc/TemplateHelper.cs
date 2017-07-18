@@ -27,7 +27,7 @@ namespace Serenity.Web
         {
             var actionContext = GetActionContext(serviceProvider);
             var viewEngine = serviceProvider.GetService<IRazorViewEngine>();
-            var viewEngineResult = viewEngine.FindView(actionContext, viewName, false);
+            var viewEngineResult = viewEngine.GetView(executingFilePath: viewName, viewPath: viewName, isMainPage: false);
 
             if (!viewEngineResult.Success)
                 throw new InvalidOperationException(string.Format("Couldn't find view '{0}'", viewName));

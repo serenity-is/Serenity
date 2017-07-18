@@ -1,5 +1,6 @@
 ﻿using jQueryApi;
 using System;
+using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
 
@@ -102,6 +103,30 @@ namespace Serenity
         public static T DeepExtend<T>(T target, T merge1, T merge2, T merge3)
         {
             return default(T);
+        }
+
+        [ScriptAlias("Q.any"), IncludeGenericArguments(false)]
+        public static bool Any<T>(T[] array, Func<T, bool> predicate)
+        {
+            return false;
+        }
+
+        [ScriptAlias("Q.any"), IncludeGenericArguments(false)]
+        public static bool Any<T>(List<T> array, Func<T, bool> predicate)
+        {
+            return false;
+        }
+
+        [ScriptAlias("Q.indexOf"), IncludeGenericArguments(false)]
+        public static int IndexOf<T>(T[] array, Func<T, bool> predicate)
+        {
+            return -1;
+        }
+
+        [ScriptAlias("Q.indexOf"), IncludeGenericArguments(false)]
+        public static int IndexOf<T>(List<T> array, Func<T, bool> predicate)
+        {
+            return -1;
         }
 
         [AlternateSignature]

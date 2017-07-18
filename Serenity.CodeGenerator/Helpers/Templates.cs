@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Windows;
-using RazorGenerator.Templating;
+﻿using RazorGenerator.Templating;
 
 namespace Serenity.CodeGenerator
 {

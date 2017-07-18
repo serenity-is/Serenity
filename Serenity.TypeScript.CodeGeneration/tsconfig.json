@@ -1,0 +1,20 @@
+﻿{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "experimentalDecorators": true,
+    "declaration": true,
+    "emitBOM": true,
+    "sourceMap": true,
+    "outFile": "Serenity.CodeGeneration.js",
+    "target": "ES3"
+  },
+  "files": [
+    "typeScriptServices.d.ts",
+    "Serenity.CodeGeneration.ts"
+  ],
+  "exclude": [
+    "node_modules/",
+    "Serenity.CodeGeneration.d.ts"
+  ]
+}

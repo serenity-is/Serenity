@@ -110,8 +110,14 @@ namespace System
             {
                 if (IsCandidateCompilationLibrary(library))
                 {
-                    var assembly = Assembly.Load(new AssemblyName(library.Name));
-                    assemblies.Add(assembly);
+                    try
+                    {
+                        var assembly = Assembly.Load(new AssemblyName(library.Name));
+                        assemblies.Add(assembly);
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
             return assemblies.ToArray();

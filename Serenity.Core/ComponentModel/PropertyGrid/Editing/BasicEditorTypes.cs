@@ -254,6 +254,20 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class EnumEditorAttribute : CustomEditorAttribute
+    {
+        public EnumEditorAttribute()
+            : base("Enum")
+        {
+        }
+
+        public Boolean AllowClear
+        {
+            get { return GetOption<Boolean>("allowClear"); }
+            set { SetOption("allowClear", value); }
+        }
+    }
+
     public abstract class LookupEditorBaseAttribute : CustomEditorAttribute
     {
         protected LookupEditorBaseAttribute(string editorType)

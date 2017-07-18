@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.WebStorage;
 using System.Html;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Serenity
@@ -44,7 +43,7 @@ namespace Serenity
 
             this.element.AddClass("s-DataGrid").Html("");
             this.element.AddClass("s-" + this.GetType().Name);
-            this.element.AddClass("require-layout").Bind("layout", delegate
+            this.element.AddClass("require-layout").Bind("layout." + this.uniqueName, delegate
             {
                 self.Layout();
             });
@@ -138,7 +137,7 @@ namespace Serenity
         {
             var list = new List<QuickFilter<Widget, object>>();
 
-            foreach (var column in this.allColumns.Where(x => 
+            foreach (var column in this.allColumns.Filter(x => 
                 x.SourceItem != null && x.SourceItem.QuickFilter == true))
             {
                 var item = column.SourceItem;
@@ -321,8 +320,8 @@ namespace Serenity
                     var self = this;
                     if (this.filterBar != null)
                     {
-                        filterBar.Store = new FilterStore(this.allColumns.Where(x => 
-                            x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
+                        filterBar.Store = new FilterStore(this.allColumns.Filter(x => 
+                            x.SourceItem != null && x.SourceItem.NotFilterable != true).Map(x => x.SourceItem));
                         filterBar.Store.Changed += (s, e) =>
                         {
                             if (restoringSettings <= 0)
@@ -333,7 +332,7 @@ namespace Serenity
                         };
                     }
 
-                    var visibleColumns = this.allColumns.Where(x => x.Visible != false).ToList();
+                    var visibleColumns = this.allColumns.Filter(x => x.Visible != false);
 
                     if (this.slickGrid != null)
                         this.slickGrid.SetColumns(visibleColumns);
@@ -356,7 +355,7 @@ namespace Serenity
             else
             {
                 this.allColumns = GetColumns();
-                visibleColumns = PostProcessColumns(this.allColumns).Where(x => x.Visible != false).ToList();
+                visibleColumns = PostProcessColumns(this.allColumns).Filter(x => x.Visible != false);
             }
 
             var slickOptions = GetSlickOptions();
@@ -634,7 +633,7 @@ namespace Serenity
         {
             if (slickGrid != null && slickGrid.GetColumns().Count > 0)
             {
-                var columns = slickGrid.GetColumns().Where(x => Script.IsValue(x.SortOrder) && x.SortOrder != 0).ToList();
+                var columns = slickGrid.GetColumns().Filter(x => Script.IsValue(x.SortOrder) && x.SortOrder != 0);
                 if (columns.Count > 0)
                 {
                     columns.Sort((x, y) => Math.Abs(x.SortOrder).CompareTo(Math.Abs(y.SortOrder)));
@@ -680,8 +679,8 @@ namespace Serenity
 
             if (!IsAsyncWidget())
             {
-                filterBar.Store = new FilterStore(this.allColumns.Where(x => 
-                    x.SourceItem != null && x.SourceItem.NotFilterable != true).Select(x => x.SourceItem));
+                filterBar.Store = new FilterStore(this.allColumns.Filter(x => 
+                    x.SourceItem != null && x.SourceItem.NotFilterable != true).Map(x => x.SourceItem));
                 filterBar.Store.Changed += (s, e) =>
                 {
                     if (restoringSettings <= 0)
@@ -1289,7 +1288,7 @@ namespace Serenity
 
             var path = Window.Location.Pathname;
             if (!string.IsNullOrEmpty(path))
-                key += string.Join("/", path.Substr(1).Split('/').Take(2).ToArray()) + ":";
+                key += string.Join("/", path.Substr(1).Split('/').Slice(0, 2)) + ":";
 
             key += this.GetType().FullName;
 
@@ -1381,7 +1380,7 @@ namespace Serenity
                             }
 
                         this.allColumns = newColumns;
-                        columns = this.allColumns.Where(x => x.Visible == true).ToList();
+                        columns = this.allColumns.Filter(x => x.Visible == true);
                     }
 
                     if (flags.ColumnWidths != false)
@@ -1400,9 +1399,10 @@ namespace Serenity
                     {
                         updateColById(columns);
                         var list = new List<SlickColumnSort>();
-                        foreach (var x in settings.Columns
-                            .Where(x => x.ID != null && (x.Sort ?? 0) != 0)
-                            .OrderBy(z => Math.Abs(z.Sort.Value)))
+                        var sortColumns = settings.Columns.Filter(x => x.ID != null && (x.Sort ?? 0) != 0);
+                        sortColumns.Sort((a, b) => a.Sort.Value - b.Sort.Value);
+
+                        foreach (var x in sortColumns)
                         {
                             var column = colById[x.ID];
                             if (column != null)
@@ -1414,8 +1414,8 @@ namespace Serenity
                                 });
                             }
                         }
-                        this.view.SortBy = list.Select(x =>
-                            x.ColumnId + (x.SortAsc == false ? " DESC" : "")).ToArray();
+                        this.view.SortBy = list.Map(x =>
+                            x.ColumnId + (x.SortAsc == false ? " DESC" : "")).As<string[]>();
 
                         this.slickGrid.SetSortColumns(list);
                     }
@@ -1484,7 +1484,7 @@ namespace Serenity
 
                     if (flags.SortColumns != false)
                     {
-                        var sort = sortColumns.IndexOf(x => x.ColumnId == column.Identifier);
+                        var sort = Q.IndexOf(sortColumns, x => x.ColumnId == column.Identifier);
                         p.Sort = sort >= 0 ? (sortColumns[sort].SortAsc != false ? (sort + 1) : (-sort - 1)) : 0;
                     }
 
@@ -1499,7 +1499,7 @@ namespace Serenity
                 this.filterBar != null &&
                 this.filterBar.Store != null)
             {
-                settings.FilterItems = this.filterBar.Store.Items.ToList();
+                settings.FilterItems = this.filterBar.Store.Items.Clone();
             }
 
             return settings;

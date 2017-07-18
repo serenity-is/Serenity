@@ -2,14 +2,12 @@
     export namespace Decorators {
 
         export function addAttribute(type: any, attr: any) {
-            let old: any = type.__metadata;
             type.__metadata = type.__metadata || {};
             type.__metadata.attr = type.__metadata.attr || [];
             type.__metadata.attr.push(attr);
         }
 
         export function addMemberAttr(type: any, memberName: string, attr: any) {
-            let old: any = type.__metadata;
             type.__metadata = type.__metadata || {};
             type.__metadata.members = type.__metadata.members || [];
             let member: any = undefined;

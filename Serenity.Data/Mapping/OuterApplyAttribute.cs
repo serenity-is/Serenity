@@ -3,7 +3,7 @@
 namespace Serenity.Data.Mapping
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class OuterApplyAttribute : Attribute
+    public class OuterApplyAttribute : Attribute, ISqlJoin
     {
         public OuterApplyAttribute(string alias, string innerQuery)
         {
@@ -13,5 +13,11 @@ namespace Serenity.Data.Mapping
 
         public String Alias { get; private set; }
         public String InnerQuery { get; private set; }
+        public String PropertyPrefix { get; set; }
+        public String TitlePrefix { get; set; }
+        public Type RowType { get; set; }
+
+        string ISqlJoin.OnCriteria => InnerQuery;
+        string ISqlJoin.ToTable => null;
     }
 }

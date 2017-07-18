@@ -1,4 +1,5 @@
 ﻿using Serenity.Data;
+using Serenity.Data.Schema;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -28,13 +29,13 @@ namespace Serenity.CodeGenerator
             int length = str1.IndexOf('_');
             if (length <= 0)
                 return 0;
-            string str2 = str1.Substring(0, length);
+            string str2 = str1.Substring(0, length + 1);
             foreach (T obj in list)
             {
-                if (!getName(obj).StartsWith(str2))
+                if (!getName(obj).StartsWith(str2) || getName(obj).Length == str2.Length)
                     return 0;
             }
-            return str2.Length + 1;
+            return str2.Length;
         }
 
         public static string JI(string join, string field)
@@ -79,7 +80,7 @@ namespace Serenity.CodeGenerator
             return "any";
         }
 
-        private static EntityField ToEntityField(SqlSchemaInfo.FieldInfo fieldInfo, int prefixLength)
+        private static EntityField ToEntityField(FieldInfo fieldInfo, int prefixLength)
         {
             string flags;
             if (fieldInfo.IsIdentity)
@@ -94,7 +95,7 @@ namespace Serenity.CodeGenerator
                 flags = null;
 
             string dataType;
-            var fieldType = SqlSchemaInfo.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out dataType);
+            var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out dataType);
             dataType = dataType ?? fieldType;
             return new EntityField
             {
@@ -128,13 +129,44 @@ namespace Serenity.CodeGenerator
             var className = entityClass ?? ClassNameFromTableName(table);
             model.ClassName = className;
             model.RowClassName = className + "Row";
+            model.Title = Inflector.Inflector.Titleize(className);
             model.Tablename = table;
             model.Fields = new List<EntityField>();
             model.Joins = new List<EntityJoin>();
             model.Instance = true;
 
-            var fields = SqlSchemaInfo.GetTableFieldInfos(connection, tableSchema, table);
-            var foreigns = SqlSchemaInfo.GetTableSingleFieldForeignKeys(connection, tableSchema, table);
+            var schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
+            var fields = schemaProvider.GetFieldInfos(connection, tableSchema, table).ToList();
+            if (!fields.Any(x => x.IsPrimaryKey))
+            {
+                var primaryKeys = new HashSet<string>(schemaProvider.GetPrimaryKeyFields(connection, tableSchema, table));
+                foreach (var field in fields)
+                    field.IsPrimaryKey = primaryKeys.Contains(field.FieldName);
+            }
+
+            if (!fields.Any(x => x.IsIdentity))
+            {
+                var identities = new HashSet<string>(schemaProvider.GetIdentityFields(connection, tableSchema, table));
+                foreach (var field in fields)
+                    field.IsIdentity = identities.Contains(field.FieldName);
+            }
+
+            var foreigns = schemaProvider.GetForeignKeys(connection, tableSchema, table)
+                .ToLookup(x => x.FKName)
+                .Where(x => x.Count() == 1)
+                .SelectMany(x => x)
+                .ToList();
+
+            foreach (var field in fields)
+            {
+                var fk = foreigns.FirstOrDefault(x => x.FKColumn == field.FieldName);
+                if (fk != null)
+                {
+                    field.PKSchema = fk.PKSchema;
+                    field.PKTable = fk.PKTable;
+                    field.PKColumn = fk.PKColumn;
+                }
+            }
 
             var prefix = DeterminePrefixLength(fields, x => x.FieldName);
 
@@ -233,7 +265,7 @@ namespace Serenity.CodeGenerator
                     f.PKTable = foreign.PKTable;
                     f.PKColumn = foreign.PKColumn;
 
-                    var frgfld = SqlSchemaInfo.GetTableFieldInfos(connection, foreign.PKSchema, foreign.PKTable);
+                    var frgfld = schemaProvider.GetFieldInfos(connection, foreign.PKSchema, foreign.PKTable).ToList();
                     int frgPrefix = RowGenerator.DeterminePrefixLength(frgfld, z => z.FieldName);
                     var j = new EntityJoin();
                     j.Fields = new List<EntityField>();
