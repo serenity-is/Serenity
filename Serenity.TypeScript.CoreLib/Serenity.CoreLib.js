@@ -2100,6 +2100,7 @@ var Q;
                 window.addEventListener("hashchange", hashChange, false);
             }, 1);
         }
+        window.addEventListener("hashchange", hashChange, false);
         $(document).on("dialogopen", ".ui-dialog-content", function (event, ui) {
             if (!Router.enabled)
                 return;

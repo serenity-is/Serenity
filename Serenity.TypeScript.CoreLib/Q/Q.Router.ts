@@ -194,6 +194,8 @@ namespace Q.Router {
         }, 1);
     }
 
+    window.addEventListener("hashchange", hashChange as any, false);
+
     $(document).on("dialogopen", ".ui-dialog-content", function (event, ui) {
         if (!enabled)
             return;

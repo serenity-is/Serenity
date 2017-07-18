@@ -1,3 +1,19 @@
+## 2.9.31 (2017-07-18)
+
+Bugfixes:
+  - router didn't attach to hashchange at start
+
+## 2.9.30 (2017-07-18)
+
+Features:
+  - use shorter hash fragments for not properly routed dialogs
+  - added option to disable router (add "Q.Router.enabled = false" in ScriptInitialization.ts)
+  - when time dropdown changes trigger a change event for date input in DateTimeEditor
+
+Bugfixes:
+  - set file size correctly when uploaded file is not an image
+  - skip assemblies that doesn't like to list types
+
 ## 2.9.29 (2017-07-17)
 
 Bugfixes:
