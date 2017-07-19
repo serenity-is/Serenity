@@ -2019,7 +2019,11 @@ var Q;
             element.bind("dialogclose.qrouter", function (e) {
                 element.data("qroute", null);
                 element.unbind(".qrouter");
-                replaceLast("", true);
+                var prhash = element.data("qprhash");
+                if (prhash)
+                    replace(prhash, true);
+                else
+                    replaceLast('', true);
             });
         }
         function dialog(owner, element, hash) {
@@ -2107,6 +2111,7 @@ var Q;
             var dlg = $(event.target);
             if (dlg.data("qroute"))
                 return;
+            dlg.data("qprhash", window.location.hash);
             var owner = $('.ui-dialog-content:visible').not(dlg).last();
             if (!owner.length)
                 owner = $('html');
