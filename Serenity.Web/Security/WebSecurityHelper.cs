@@ -103,20 +103,25 @@ namespace Serenity
         {
             if (!Authorization.HasPermission(permission))
             {
-                var loginUrl = FormsAuthentication.LoginUrl;
-                if (loginUrl.IndexOf('?') < 0)
-                    loginUrl += '?';
+                if (FormsAuthentication.LoginUrl.IndexOf("://") >= 0)
+                {
+                    var loginUrl = FormsAuthentication.LoginUrl;
+                    if (loginUrl.IndexOf('?') < 0)
+                        loginUrl += '?';
+                    else
+                        loginUrl += '&';
+
+                    var currentUrl = HttpContext.Current.Request.Url.OriginalString;
+
+                    loginUrl += "returnUrl=" +
+                        Uri.EscapeDataString(currentUrl) +
+                        (Authorization.IsLoggedIn ? "&denied=1" : "");
+
+                    HttpContext.Current.Response.Redirect(loginUrl);
+                }
                 else
-                    loginUrl += '&';
-
-                var currentUrl = loginUrl.IndexOf("://") < 0 ?
-                    HttpContext.Current.Request.Url.PathAndQuery :
-                    HttpContext.Current.Request.Url.OriginalString;
-
-                loginUrl += "returnUrl=" + 
-                    Uri.EscapeDataString(currentUrl) +
-                    (Authorization.IsLoggedIn ? "&denied=1": "");
-
+                    FormsAuthentication.RedirectToLoginPage(
+                        Authorization.IsLoggedIn ? "denied=1" : null);
             }
         }
     }
