@@ -52,7 +52,7 @@ namespace Serenity.Web
                 loginUrl += "returnUrl=" + Uri.EscapeDataString(currentUrl);
 
                 if (Authorization.IsLoggedIn)
-                    loginUrl = "&denied=1";
+                    loginUrl += "&denied=1";
 
                 filterContext.Result = new RedirectResult(loginUrl);
 

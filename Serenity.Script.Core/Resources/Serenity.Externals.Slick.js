@@ -1190,7 +1190,6 @@ var Slick;
         Data.RemoteView = RemoteView;
     })(Data = Slick.Data || (Slick.Data = {}));
 })(Slick || (Slick = {}));
-var Slick;
 (function (Slick) {
     var Data;
     (function (Data) {
