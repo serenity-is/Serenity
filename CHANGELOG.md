@@ -1,3 +1,8 @@
+## 2.10.0 (2017-07-23)
+
+Features:
+  - updated all packages, including Newtonsoft.Json, Nuglify, AspNetCore, StackExchange.Redis
+
 ## 2.9.32 (2017-07-23)
 
 Features:
