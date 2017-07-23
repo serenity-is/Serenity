@@ -129,10 +129,6 @@ namespace System
                 || compilationLibrary.Dependencies.Any(d => d.Name.StartsWith("Serenity."));
         }
     }
-
-    public class SerializableAttribute : Attribute
-    {
-    }
 }
 
 namespace System.Configuration

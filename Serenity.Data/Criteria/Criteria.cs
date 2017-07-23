@@ -6,7 +6,9 @@
     /// <summary>
     ///   An object that is used to create criterias by employing operator overloading 
     ///   features of C# language, instead of using string based criterias.</summary>
+#if !COREFX
     [Serializable]
+#endif
     public class Criteria : BaseCriteria
     {
         public static readonly BaseCriteria Empty = new Criteria();
