@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyModel;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -54,7 +55,7 @@ namespace Serenity.CodeGenerator
         {
             try
             {
-                var assembly = Default.LoadFromAssemblyName(assemblyName);
+                var assembly = Assembly.Load(new AssemblyName(assemblyName.Name));
                 if (assembly != null)
                 {
                     return assembly;
