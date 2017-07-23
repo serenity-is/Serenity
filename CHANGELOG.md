@@ -1,3 +1,12 @@
+## 2.9.32 (2017-07-23)
+
+Features:
+  - better handling of return url when forms auth login url is absolute
+  - try to restore previous hash if non-routed dialog opened
+
+Bugfixes:
+  - fix issues with dotnet-sergen and non-matching assembly versions
+
 ## 2.9.31 (2017-07-18)
 
 Bugfixes:
