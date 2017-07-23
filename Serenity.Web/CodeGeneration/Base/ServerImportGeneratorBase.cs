@@ -411,7 +411,7 @@ namespace Serenity.CodeGeneration
         protected string GetServiceUrlFromRoute(Type controller)
         {
             var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            string url = route.Template ?? "";
+            string url = route == null ? ("Services/HasNoRoute/" + controller.Name) : (route.Template ?? "");
 
 #if ASPNETCORE
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
