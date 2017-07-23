@@ -31,7 +31,7 @@ namespace Serenity.Testing
             var ss = TakeScreenshot();
             const string errorFolder = @"c:\.build\errors";
             Directory.CreateDirectory(errorFolder);
-            ss.SaveAsFile(errorFolder + @"\error_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".jpg", ImageFormat.Jpeg);
+            ss.SaveAsFile(errorFolder + @"\error_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".jpg", ScreenshotImageFormat.Jpeg);
         }
 
         public OpenQA.Selenium.Screenshot TakeScreenshot()
