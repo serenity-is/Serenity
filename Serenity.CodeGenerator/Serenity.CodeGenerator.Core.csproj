@@ -40,5 +40,4 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="1.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="1.1.3" />
   </ItemGroup>
-
 </Project>

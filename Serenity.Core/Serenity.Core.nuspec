@@ -17,15 +17,6 @@
       <group targetFramework=".NETFramework4.5">
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
       </group>
-      <group targetFramework=".NETFramework4.6">
-        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="${net46:Microsoft.Extensions.DependencyInjection.Abstractions}" />
-        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${net46:Microsoft.Extensions.Configuration.Abstractions}" />
-        <dependency id="Microsoft.Extensions.Caching.Abstractions" version="${net46:Microsoft.Extensions.Caching.Abstractions}" />
-        <dependency id="Microsoft.Extensions.Caching.Memory" version="${net46:Microsoft.Extensions.Caching.Memory}" />
-        <dependency id="Microsoft.Extensions.Options" version="${net46:Microsoft.Extensions.Options}" />
-        <dependency id="Microsoft.Extensions.Primitives" version="${net46:Microsoft.Extensions.Primitives}" />
-        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-      </group>
       <group targetFramework=".NETStandard1.6">
         <dependency id="Microsoft.Extensions.Caching.Memory" version="${netstandard1.6:Microsoft.Extensions.Caching.Memory}" />
         <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Configuration.Abstractions}" />
@@ -44,6 +35,5 @@
     <file src="bin/${configuration}/Serenity.Core.pdb" target="lib/net45" />
     <file src="bin/${configuration}/Serenity.Core.xml" target="lib/net45" />
     <file src="bin/${configuration}/netstandard1.6/Serenity.Core.dll" target="lib/netstandard1.6" />
-    <file src="bin/${configuration}/net46/Serenity.Core.dll" target="lib/net46" />
   </files>
 </package>

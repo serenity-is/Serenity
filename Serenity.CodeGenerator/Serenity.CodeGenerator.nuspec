@@ -14,128 +14,24 @@
     <copyright>${copyright}</copyright>
     <tags>${tags}</tags>
     <dependencies>
-      <group targetFramework=".NETFramework4.6">
-        <dependency id="FirebirdSql.Data.FirebirdClient" version="${*:FirebirdSql.Data.FirebirdClient}" />
-        <dependency id="Microsoft.Data.Sqlite" version="${*:Microsoft.Data.Sqlite}" />
-        <dependency id="MySqlConnector" version="${*:MySqlConnector}" />
-        <dependency id="Npgsql" version="${*:Npgsql}" />        
-        <dependency id="Microsoft.NETCore.App" version="1.1.1" />
-        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-        <dependency id="Serenity.Web" version="${version}" />
+      <group targetFramework=".NETFramework4.5">
       </group>
       <group targetFramework=".NETCoreApp1.0">
         <dependency id="FirebirdSql.Data.FirebirdClient" version="${*:FirebirdSql.Data.FirebirdClient}" />
         <dependency id="Microsoft.Data.Sqlite" version="${*:Microsoft.Data.Sqlite}" />
         <dependency id="MySqlConnector" version="${*:MySqlConnector}" />
         <dependency id="Npgsql" version="${*:Npgsql}" />        
-        <dependency id="NetStandard.Library" version="${netcoreapp1.0:NetStandard.Library}" />
         <dependency id="Microsoft.NETCore.App" version="1.1.1" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-        <dependency id="System.Data.SqlClient" version="${netcoreapp1.0:System.Data.SqlClient}" />
+        <dependency id="System.Data.SqlClient" version="${*:System.Data.SqlClient}" />
         <dependency id="Serenity.Web" version="${version}" />
       </group>
     </dependencies>
   </metadata>
   <files>
     <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.dll" target="lib/netcoreapp1.0/dotnet-sergen.dll" />	
-    <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.deps.json" target="lib/netcoreapp1.0/dotnet-sergen.deps.json" />	
+	<file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.deps.json" target="lib/netcoreapp1.0/dotnet-sergen.deps.json" />	
     <file src="bin/${configuration}/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" target="lib/netcoreapp1.0/dotnet-sergen.runtimeconfig.json" />	
-    <file src="bin/${configuration}/net46/dotnet-sergen.exe" target="lib/net46/dotnet-sergen.exe" />
-    <file src="bin/${configuration}/net46/dotnet-sergen.exe.config" target="lib/net46/dotnet-sergen.exe.config" />
-    <file src="bin/${configuration}/net46/FirebirdSql.Data.FirebirdClient.dll" target="lib/net46/FirebirdSql.Data.FirebirdClient.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Antiforgery.dll" target="lib/net46/Microsoft.AspNetCore.Antiforgery.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Authorization.dll" target="lib/net46/Microsoft.AspNetCore.Authorization.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Cryptography.Internal.dll" target="lib/net46/Microsoft.AspNetCore.Cryptography.Internal.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.DataProtection.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.DataProtection.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.DataProtection.dll" target="lib/net46/Microsoft.AspNetCore.DataProtection.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Diagnostics.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.Diagnostics.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Hosting.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.Hosting.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Html.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.Html.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Http.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.Http.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Http.dll" target="lib/net46/Microsoft.AspNetCore.Http.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Http.Extensions.dll" target="lib/net46/Microsoft.AspNetCore.Http.Extensions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Http.Features.dll" target="lib/net46/Microsoft.AspNetCore.Http.Features.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.JsonPatch.dll" target="lib/net46/Microsoft.AspNetCore.JsonPatch.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.Core.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.Core.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.DataAnnotations.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.DataAnnotations.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.Formatters.Json.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.Formatters.Json.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.Razor.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.Razor.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.Razor.Host.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.Razor.Host.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Mvc.ViewFeatures.dll" target="lib/net46/Microsoft.AspNetCore.Mvc.ViewFeatures.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Razor.dll" target="lib/net46/Microsoft.AspNetCore.Razor.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Razor.Runtime.dll" target="lib/net46/Microsoft.AspNetCore.Razor.Runtime.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.ResponseCaching.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.ResponseCaching.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Routing.Abstractions.dll" target="lib/net46/Microsoft.AspNetCore.Routing.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Routing.dll" target="lib/net46/Microsoft.AspNetCore.Routing.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.AspNetCore.WebUtilities.dll" target="lib/net46/Microsoft.AspNetCore.WebUtilities.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.CodeAnalysis.CSharp.dll" target="lib/net46/Microsoft.CodeAnalysis.CSharp.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.CodeAnalysis.dll" target="lib/net46/Microsoft.CodeAnalysis.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Data.Sqlite.dll" target="lib/net46/Microsoft.Data.Sqlite.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.DotNet.PlatformAbstractions.dll" target="lib/net46/Microsoft.DotNet.PlatformAbstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Caching.Abstractions.dll" target="lib/net46/Microsoft.Extensions.Caching.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Caching.Memory.dll" target="lib/net46/Microsoft.Extensions.Caching.Memory.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Configuration.Abstractions.dll" target="lib/net46/Microsoft.Extensions.Configuration.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Configuration.Binder.dll" target="lib/net46/Microsoft.Extensions.Configuration.Binder.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Configuration.dll" target="lib/net46/Microsoft.Extensions.Configuration.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.DependencyInjection.Abstractions.dll" target="lib/net46/Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.DependencyModel.dll" target="lib/net46/Microsoft.Extensions.DependencyModel.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.FileProviders.Abstractions.dll" target="lib/net46/Microsoft.Extensions.FileProviders.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.FileProviders.Composite.dll" target="lib/net46/Microsoft.Extensions.FileProviders.Composite.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.FileProviders.Physical.dll" target="lib/net46/Microsoft.Extensions.FileProviders.Physical.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.FileSystemGlobbing.dll" target="lib/net46/Microsoft.Extensions.FileSystemGlobbing.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Localization.Abstractions.dll" target="lib/net46/Microsoft.Extensions.Localization.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Localization.dll" target="lib/net46/Microsoft.Extensions.Localization.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Logging.Abstractions.dll" target="lib/net46/Microsoft.Extensions.Logging.Abstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.ObjectPool.dll" target="lib/net46/Microsoft.Extensions.ObjectPool.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Options.dll" target="lib/net46/Microsoft.Extensions.Options.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.PlatformAbstractions.dll" target="lib/net46/Microsoft.Extensions.PlatformAbstractions.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.Primitives.dll" target="lib/net46/Microsoft.Extensions.Primitives.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Extensions.WebEncoders.dll" target="lib/net46/Microsoft.Extensions.WebEncoders.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Net.Http.Headers.dll" target="lib/net46/Microsoft.Net.Http.Headers.dll" />
-    <file src="bin/${configuration}/net46/Microsoft.Win32.Primitives.dll" target="lib/net46/Microsoft.Win32.Primitives.dll" />
-    <file src="bin/${configuration}/net46/MySqlConnector.dll" target="lib/net46/MySqlConnector.dll" />
-    <file src="bin/${configuration}/net46/Newtonsoft.Json.dll" target="lib/net46/Newtonsoft.Json.dll" />
-    <file src="bin/${configuration}/net46/Npgsql.dll" target="lib/net46/Npgsql.dll" />
-    <file src="bin/${configuration}/net46/NUglify.dll" target="lib/net46/NUglify.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Core.dll" target="lib/net46/Serenity.Core.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Data.dll" target="lib/net46/Serenity.Data.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Data.Entity.dll" target="lib/net46/Serenity.Data.Entity.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Services.dll" target="lib/net46/Serenity.Services.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Web.dll" target="lib/net46/Serenity.Web.dll" />
-    <file src="bin/${configuration}/net46/sqlite3.dll" target="lib/net46/sqlite3.dll" />
-    <file src="bin/${configuration}/net46/System.AppContext.dll" target="lib/net46/System.AppContext.dll" />
-    <file src="bin/${configuration}/net46/System.Buffers.dll" target="lib/net46/System.Buffers.dll" />
-    <file src="bin/${configuration}/net46/System.Collections.Immutable.dll" target="lib/net46/System.Collections.Immutable.dll" />
-    <file src="bin/${configuration}/net46/System.ComponentModel.Primitives.dll" target="lib/net46/System.ComponentModel.Primitives.dll" />
-    <file src="bin/${configuration}/net46/System.ComponentModel.TypeConverter.dll" target="lib/net46/System.ComponentModel.TypeConverter.dll" />
-    <file src="bin/${configuration}/net46/System.Console.dll" target="lib/net46/System.Console.dll" />
-    <file src="bin/${configuration}/net46/System.Diagnostics.DiagnosticSource.dll" target="lib/net46/System.Diagnostics.DiagnosticSource.dll" />
-    <file src="bin/${configuration}/net46/System.Diagnostics.FileVersionInfo.dll" target="lib/net46/System.Diagnostics.FileVersionInfo.dll" />
-    <file src="bin/${configuration}/net46/System.Diagnostics.StackTrace.dll" target="lib/net46/System.Diagnostics.StackTrace.dll" />
-    <file src="bin/${configuration}/net46/System.Globalization.Calendars.dll" target="lib/net46/System.Globalization.Calendars.dll" />
-    <file src="bin/${configuration}/net46/System.IO.Compression.dll" target="lib/net46/System.IO.Compression.dll" />
-    <file src="bin/${configuration}/net46/System.IO.Compression.ZipFile.dll" target="lib/net46/System.IO.Compression.ZipFile.dll" />
-    <file src="bin/${configuration}/net46/System.IO.FileSystem.dll" target="lib/net46/System.IO.FileSystem.dll" />
-    <file src="bin/${configuration}/net46/System.IO.FileSystem.Primitives.dll" target="lib/net46/System.IO.FileSystem.Primitives.dll" />
-    <file src="bin/${configuration}/net46/System.Net.Http.dll" target="lib/net46/System.Net.Http.dll" />
-    <file src="bin/${configuration}/net46/System.Net.Sockets.dll" target="lib/net46/System.Net.Sockets.dll" />
-    <file src="bin/${configuration}/net46/System.Reflection.Metadata.dll" target="lib/net46/System.Reflection.Metadata.dll" />
-    <file src="bin/${configuration}/net46/System.Runtime.CompilerServices.Unsafe.dll" target="lib/net46/System.Runtime.CompilerServices.Unsafe.dll" />
-    <file src="bin/${configuration}/net46/System.Runtime.InteropServices.RuntimeInformation.dll" target="lib/net46/System.Runtime.InteropServices.RuntimeInformation.dll" />
-    <file src="bin/${configuration}/net46/System.Security.Cryptography.Algorithms.dll" target="lib/net46/System.Security.Cryptography.Algorithms.dll" />
-    <file src="bin/${configuration}/net46/System.Security.Cryptography.Encoding.dll" target="lib/net46/System.Security.Cryptography.Encoding.dll" />
-    <file src="bin/${configuration}/net46/System.Security.Cryptography.Primitives.dll" target="lib/net46/System.Security.Cryptography.Primitives.dll" />
-    <file src="bin/${configuration}/net46/System.Security.Cryptography.X509Certificates.dll" target="lib/net46/System.Security.Cryptography.X509Certificates.dll" />
-    <file src="bin/${configuration}/net46/System.Text.Encoding.CodePages.dll" target="lib/net46/System.Text.Encoding.CodePages.dll" />
-    <file src="bin/${configuration}/net46/System.Text.Encodings.Web.dll" target="lib/net46/System.Text.Encodings.Web.dll" />
-    <file src="bin/${configuration}/net46/System.Threading.Tasks.Extensions.dll" target="lib/net46/System.Threading.Tasks.Extensions.dll" />
-    <file src="bin/${configuration}/net46/System.Threading.Thread.dll" target="lib/net46/System.Threading.Thread.dll" />
-    <file src="bin/${configuration}/net46/System.Xml.ReaderWriter.dll" target="lib/net46/System.Xml.ReaderWriter.dll" />
-    <file src="bin/${configuration}/net46/System.Xml.XmlDocument.dll" target="lib/net46/System.Xml.XmlDocument.dll" />
-    <file src="bin/${configuration}/net46/System.Xml.XPath.dll" target="lib/net46/System.Xml.XPath.dll" />
-    <file src="bin/${configuration}/net46/System.Xml.XPath.XDocument.dll" target="lib/net46/System.Xml.XPath.XDocument.dll" />
     <file src="../Serenity.CodeGenerator.Net45/Readme.CodeGenerator.txt" target="content/Readme.CodeGenerator.txt" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Serenity.CodeGenerator.exe" target="tools/sergen.exe" />
     <file src="../Serenity.CodeGenerator.Net45/bin/${configuration}/Newtonsoft.Json.dll" target="tools" />

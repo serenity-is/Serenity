@@ -14,7 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-  </ItemGroup> 
+  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Data" />
     <Reference Include="System.Configuration" />
