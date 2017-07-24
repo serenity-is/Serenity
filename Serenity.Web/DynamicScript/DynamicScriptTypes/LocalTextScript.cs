@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using Serenity.Core;
 #if ASPNETCORE
 using Microsoft.Extensions.Configuration;
 #else

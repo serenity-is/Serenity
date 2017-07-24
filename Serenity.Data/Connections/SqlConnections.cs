@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Reflection;
-#if !COREFX
-using System.Configuration;
-#else
+using Serenity.Core;
+#if COREFX || NET46
 using Microsoft.Extensions.Configuration;
+#else
+using System.Configuration;
 #endif
+
 
 namespace Serenity.Data
 {
-#if COREFX
+#if COREFX || NET46
     public static class DbProviderFactories
     {
         internal static readonly Dictionary<string, Func<DbProviderFactory>> _configs = new Dictionary<string, Func<DbProviderFactory>>();
@@ -56,7 +58,7 @@ namespace Serenity.Data
             if (!connections.TryGetValue(connectionKey, out connection))
             {
                 var newConnections = new Dictionary<string, ConnectionStringInfo>(connections);
-#if COREFX
+#if COREFX|| NET46
                 var configuration = Dependency.TryResolve<IConfiguration>();
                 if (configuration == null)
                     return null;

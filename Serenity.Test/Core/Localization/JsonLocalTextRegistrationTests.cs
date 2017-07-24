@@ -195,7 +195,7 @@ namespace Serenity.Test
                 Assert.Equal("x", target["Db.x"]);
             }
         }
-
+#if !ASPNETCORE
         [Fact]
         public void JsonLocalTextRegistration_AddFromFilesInFolder_ThrowsArgumentNull_IfPathIsNull()
         {
@@ -207,7 +207,7 @@ namespace Serenity.Test
         {
             JsonLocalTextRegistration.AddFromFilesInFolder(@"c:\s_o_m_e_f_o_l_d_e_r");
         }
-
+#endif
         private string CreateTempFolder()
         {
             var temporary = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));

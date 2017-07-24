@@ -92,9 +92,9 @@ namespace Serenity.Logging
                         inProgress--;
                     }
                 }
-#if COREFX
-                catch
-                {
+#if COREFX || NET46
+                    catch
+                    {
 
                 }
 #else

@@ -1,4 +1,4 @@
-﻿#if !COREFX
+﻿#if !ASPNETCORE
 using Serenity.Abstractions;
 using Serenity.Caching;
 using Serenity.Configuration;
@@ -7,13 +7,9 @@ using Serenity.Localization;
 using Serenity.Logging;
 using Serenity.Services;
 using System.Reflection;
-using System.Web.Hosting;
-#if ASPNETCORE
-using Microsoft.Extensions.Caching.Memory;
-#else
 using System.Linq;
+using System.Web.Hosting;
 using System.Web.Compilation;
-#endif
 
 namespace Serenity.Web
 {
@@ -71,7 +67,7 @@ namespace Serenity.Web
             var registrar = Dependency.Resolve<IDependencyRegistrar>();
 
             if (Dependency.TryResolve<ILocalCache>() == null)
-#if ASPNETCORE
+#if ASPNETCORE && COREFX
                 registrar.RegisterInstance<ILocalCache>(new Serenity.Caching.MemoryCache(Dependency.Resolve<IMemoryCache>()));
 #else
                 registrar.RegisterInstance<ILocalCache>(new HttpRuntimeCache());

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>${id}</id>
+    <version>${version}</version>
+    <authors>${authors}</authors>
+    <owners>${owners}</owners>
+    <title>${title}</title>
+    <description>${description}</description>
+    <language>${language}</language>
+    <iconUrl>${iconUrl}</iconUrl>
+    <licenseUrl>${licenceUrl}</licenseUrl>
+    <projectUrl>${projectUrl}</projectUrl>
+    <copyright>${copyright}</copyright>
+    <tags>${tags}</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6">
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="${net46:Microsoft.Extensions.DependencyInjection.Abstractions}" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${net46:Microsoft.Extensions.Configuration.Abstractions}" />
+        <dependency id="Microsoft.Extensions.Caching.Abstractions" version="${net46:Microsoft.Extensions.Caching.Abstractions}" />
+        <dependency id="Microsoft.Extensions.Caching.Memory" version="${net46:Microsoft.Extensions.Caching.Memory}" />
+        <dependency id="Microsoft.Extensions.Options" version="${net46:Microsoft.Extensions.Options}" />
+        <dependency id="Microsoft.Extensions.Primitives" version="${net46:Microsoft.Extensions.Primitives}" />
+        <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin/${configuration}/net46/Serenity.Core.Core.dll" target="lib/net46" />
+    <file src="bin/${configuration}/net46/Serenity.Core.Core.pdb" target="lib/net46" />
+  </files>
+</package>

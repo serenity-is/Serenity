@@ -1,10 +1,14 @@
 ﻿using Serenity.Abstractions;
+using System;
 #if ASPNETCORE
 using Microsoft.AspNetCore.Http;
+#else
+using System.Web;
+#endif
+#if ASPNETCORE
 using IDictionary = System.Collections.Generic.IDictionary<object, object>;
 #else
 using System.Collections;
-using System.Web;
 #endif
 
 namespace Serenity.Web

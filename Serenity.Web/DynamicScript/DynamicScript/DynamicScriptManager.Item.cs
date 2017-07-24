@@ -69,7 +69,7 @@ namespace Serenity.Web
 
             private static string GetMD5HashString(byte[] bytes)
             {
-#if COREFX
+#if ASPNETCORE
                 var md5 = MD5.Create();
                 byte[] result = md5.ComputeHash(bytes);
                 return WebEncoders.Base64UrlEncode(result);

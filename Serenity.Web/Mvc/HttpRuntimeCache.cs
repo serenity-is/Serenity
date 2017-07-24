@@ -1,4 +1,4 @@
-﻿#if !ASPNETCORE
+﻿#if !(ASPNETCORE || COREFX)
 namespace Serenity.Caching
 {
     using Serenity.Abstractions;

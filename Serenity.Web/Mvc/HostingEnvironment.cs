@@ -26,7 +26,7 @@ namespace Serenity.Web
         }
     }
 }
-
+ 
 namespace System.Web.Hosting
 {
     public static class HostingEnvironment
@@ -61,4 +61,5 @@ namespace System.Web.Hosting
         }
     }
 }
+ 
 #endif

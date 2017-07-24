@@ -74,7 +74,7 @@ namespace Serenity.Web.Middleware
         public async static Task WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)
         {
             string ifModifiedSince = context.Request.Headers["If-Modified-Since"];
-            if (ifModifiedSince != null && ifModifiedSince.Length > 0)
+            if (!string.IsNullOrEmpty(ifModifiedSince))
             {
                 DateTime date;
                 if (DateTime.TryParseExact(ifModifiedSince, "R", Invariants.DateTimeFormat, DateTimeStyles.None,

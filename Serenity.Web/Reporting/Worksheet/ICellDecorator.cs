@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if ASPNETCORE
 using Color = System.String;
 #else
 using System.Drawing;

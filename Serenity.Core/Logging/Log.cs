@@ -170,7 +170,7 @@ namespace Serenity
             {
                 logger.Write(level, message, exception, source);
             }
-#if COREFX
+#if ASPNETCORE
             catch
             {
             }
