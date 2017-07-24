@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <VersionPrefix>2.9.24</VersionPrefix>
-    <TargetFrameworks>netstandard1.6;net45;net46</TargetFrameworks>
+    <VersionPrefix>2.10.0</VersionPrefix>
+    <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
     <AssemblyName>Serenity.Caching.Redis</AssemblyName>
     <PackageId>Serenity.Caching.Redis</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -11,13 +11,13 @@
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="StackExchange.Redis" Version="1.1.608" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="StackExchange.Redis" Version="1.2.4" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
     <DefineConstants>$(DefineConstants);COREFX;NETSTANDARD1_6</DefineConstants>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net46'">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

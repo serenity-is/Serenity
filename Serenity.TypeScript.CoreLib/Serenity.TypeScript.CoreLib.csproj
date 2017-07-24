@@ -72,6 +72,7 @@
     <TypeScriptCompile Include="Q\Q.Notify.ts" />
     <TypeScriptCompile Include="Q\Q.Number.ts" />
     <TypeScriptCompile Include="Q\Q.ScriptData.ts" />
+    <TypeScriptCompile Include="Q\Q.Router.ts" />
     <TypeScriptCompile Include="Q\Q.Services.ts" />
     <TypeScriptCompile Include="Q\Q.StringHelpers.ts" />
     <TypeScriptCompile Include="Q\Q.TypeSystem.ts" />

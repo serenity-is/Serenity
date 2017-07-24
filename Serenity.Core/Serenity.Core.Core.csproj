@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <VersionPrefix>2.9.24</VersionPrefix>
+    <TargetFrameworks>net46</TargetFrameworks>
+    <AssemblyName>Serenity.Core.Core</AssemblyName>
+    <PackageId>Serenity.Core.Core</PackageId>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="1.1.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <DefineConstants>$(DefineConstants);ASPNETCORE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46'">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="1.1.1" />
+  </ItemGroup>
+</Project>

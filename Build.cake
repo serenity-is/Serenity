@@ -32,7 +32,7 @@ var dotnetBuildOrder = new string[] {
     "Serenity.Data.Entity",
     "Serenity.Services",
     "Serenity.Web",
-	"Serenity.CodeGenerator"
+    "Serenity.CodeGenerator"
 };
 
 Func<string, XElement> loadCsProj = (csproj) => {
@@ -122,7 +122,7 @@ Func<string, List<Tuple<string, string, string>>> parsePackageVersions = (path) 
                 .ToList();
 };
 
-Action<string, string> myPack = (s, id) => {
+Action<string, string, string> myPackEx = (projDir, s, id) => {
     var prm = new Dictionary<string, string>(nuspecParams);
 
     var packagesConfig = "./" + s + ".Net45/packages.config";
@@ -133,7 +133,7 @@ Action<string, string> myPack = (s, id) => {
     if (!System.IO.File.Exists(packagesConfig))
 		packagesConfig = null;
         
-    var csproj = "./" + s + "/" + s + ".csproj";
+    var csproj = "./" + projDir + "/" + s + ".csproj";
     if (!System.IO.File.Exists(csproj))
         csproj = null;
 
@@ -142,7 +142,7 @@ Action<string, string> myPack = (s, id) => {
         
     setPackageVersions(prm, csproj, packagesConfig);
     
-    var filename = "./" + s + "/" + (id ?? s) + ".nuspec";
+    var filename = "./" + projDir + "/" + (id ?? s) + ".nuspec";
     var nuspec = System.IO.File.ReadAllText(filename);
     string version;
   
@@ -200,6 +200,14 @@ Action fixNugetCache = delegate() {
             System.IO.File.Delete(package);*/
     }
 };
+
+Action<string, string> myPack = (s, id) => {
+    myPackEx(s, s, id);
+};
+Action<string, string> myPackCore = (s, id) => {
+    myPackEx(s, s+".Core", id);
+};
+
 
 Action myPush = delegate() {
     foreach (var package in nugetPackages)
@@ -269,7 +277,8 @@ Task("Restore")
     .Does(context =>
 {
     NuGetRestore("./Serenity.Net45.sln");
-	NuGetRestore("./Serenity.DotNet.sln");
+    NuGetRestore("./Serenity.DotNet.sln");
+    NuGetRestore("./Serenity.DotNet.Core.sln");
 });
 
 Task("Compile")
@@ -288,10 +297,26 @@ Task("Compile")
         var csproj = @"./" + project + "/" + project + ".csproj";
         patchProjectVer(csproj, serenityVersion);
     }
+    foreach (var project in dotnetBuildOrder) 
+    {
+        var csproj = @"./" + project + "/" + project + ".Core.csproj";
+        patchProjectVer(csproj, serenityVersion);
+    }
 
 	var dotnetSln = @"./Serenity.DotNet.sln";
 	writeHeader("dotnet restore " + dotnetSln);
 	var exitCode = StartProcess("dotnet", "restore " + dotnetSln);
+	if (exitCode > 0)
+		throw new Exception("Error while restoring " + dotnetSln);
+	writeHeader("dotnet build " + dotnetSln);
+	exitCode = StartProcess("dotnet", "build " + dotnetSln + " -c " + configuration);
+	if (exitCode > 0)
+		throw new Exception("Error while building " + dotnetSln);
+
+
+	dotnetSln = @"./Serenity.DotNet.Core.sln";
+	writeHeader("dotnet restore " + dotnetSln);
+	exitCode = StartProcess("dotnet", "restore " + dotnetSln);
 	if (exitCode > 0)
 		throw new Exception("Error while restoring " + dotnetSln);
 	writeHeader("dotnet build " + dotnetSln);
@@ -331,6 +356,18 @@ Task("Pack")
     myPack("Serenity.Web", null);
     myPack("Serenity.CodeGenerator", null);
     
+
+    myPackCore("Serenity.Core", null);
+    myPackCore("Serenity.Caching.Couchbase", null);
+    myPackCore("Serenity.Caching.Redis", null);
+    myPackCore("Serenity.Data", null);
+    myPackCore("Serenity.Data.Entity", null);
+    myPackCore("Serenity.Services", null);
+    // myPack("Serenity.Testing", null);
+    // myPack("Serenity.Script.UI", "Serenity.Script");
+    myPackCore("Serenity.Web", null);
+    myPackCore("Serenity.CodeGenerator", null);
+
     fixNugetCache();
 });
 
