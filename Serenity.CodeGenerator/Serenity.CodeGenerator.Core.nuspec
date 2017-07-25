@@ -26,8 +26,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/net46/dotnet-sergen.exe" target="lib/net46/dotnet-sergen.exe" />
-    <file src="bin/${configuration}/net46/dotnet-sergen.exe.config" target="lib/net46/dotnet-sergen.exe.config" />
+    <file src="bin/${configuration}/net46/dotnet-sergen-core.exe" target="lib/net46/dotnet-sergen.exe" />
+    <file src="bin/${configuration}/net46/dotnet-sergen-core.exe.config" target="lib/net46/dotnet-sergen.exe.config" />
     <file src="bin/${configuration}/net46/FirebirdSql.Data.FirebirdClient.dll" target="lib/net46/FirebirdSql.Data.FirebirdClient.dll" />
     <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Antiforgery.dll" target="lib/net46/Microsoft.AspNetCore.Antiforgery.dll" />
     <file src="bin/${configuration}/net46/Microsoft.AspNetCore.Authorization.dll" target="lib/net46/Microsoft.AspNetCore.Authorization.dll" />
@@ -85,11 +85,11 @@
     <file src="bin/${configuration}/net46/Newtonsoft.Json.dll" target="lib/net46/Newtonsoft.Json.dll" />
     <file src="bin/${configuration}/net46/Npgsql.dll" target="lib/net46/Npgsql.dll" />
     <file src="bin/${configuration}/net46/NUglify.dll" target="lib/net46/NUglify.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Core.dll" target="lib/net46/Serenity.Core.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Data.dll" target="lib/net46/Serenity.Data.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Data.Entity.dll" target="lib/net46/Serenity.Data.Entity.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Services.dll" target="lib/net46/Serenity.Services.dll" />
-    <file src="bin/${configuration}/net46/Serenity.Web.dll" target="lib/net46/Serenity.Web.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Core.Core.dll" target="lib/net46/Serenity.Core.Core.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Data.Core.dll" target="lib/net46/Serenity.Data.Core.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Data.Entity.Core.dll" target="lib/net46/Serenity.Data.Entity.Core.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Services.Core.dll" target="lib/net46/Serenity.Services.Core.dll" />
+    <file src="bin/${configuration}/net46/Serenity.Web.Core.dll" target="lib/net46/Serenity.Web.Core.dll" />
     <file src="bin/${configuration}/net46/sqlite3.dll" target="lib/net46/sqlite3.dll" />
     <file src="bin/${configuration}/net46/System.AppContext.dll" target="lib/net46/System.AppContext.dll" />
     <file src="bin/${configuration}/net46/System.Buffers.dll" target="lib/net46/System.Buffers.dll" />

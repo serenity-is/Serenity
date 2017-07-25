@@ -15,14 +15,14 @@
     <tags>${tags}</tags>
     <dependencies>
       <group targetFramework=".NETFramework4.6">
-        <dependency id="CouchbaseNetClient" version="${net45:CouchbaseNetClient}" />
+        <dependency id="CouchbaseNetClient" version="${net46:CouchbaseNetClient}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-        <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="Serenity.Core.Core" version="${version}" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/net46/Serenity.Caching.Couchbase.dll" target="lib/net46" />
-    <file src="bin/${configuration}/net46/Serenity.Caching.Couchbase.pdb" target="lib/net46" />
+    <file src="bin/${configuration}/net46/Serenity.Caching.Couchbase.Core.dll" target="lib/net46" />
+    <file src="bin/${configuration}/net46/Serenity.Caching.Couchbase.Core.pdb" target="lib/net46" />
   </files>
 </package>

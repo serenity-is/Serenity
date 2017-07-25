@@ -17,12 +17,12 @@
       <group targetFramework=".NETFramework4.6">
         <dependency id="StackExchange.Redis" version="${*:StackExchange.Redis}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-        <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="Serenity.Core.Core" version="${version}" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/net46/Serenity.Caching.Redis.dll" target="lib/net46" />
-    <file src="bin/${configuration}/net46/Serenity.Caching.Redis.pdb" target="lib/net46" />
+    <file src="bin/${configuration}/net46/Serenity.Caching.Redis.Core.dll" target="lib/net46" />
+    <file src="bin/${configuration}/net46/Serenity.Caching.Redis.Core.pdb" target="lib/net46" />
   </files>
 </package>

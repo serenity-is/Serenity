@@ -1,6 +1,5 @@
-﻿using System.Reflection;
-
-#if !COREFX
+﻿#if NET46
+using System.Reflection;
 namespace Serenity.CodeGenerator
 {
     /// <summary>

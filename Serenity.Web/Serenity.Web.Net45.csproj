@@ -136,6 +136,7 @@
     <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs" />
     <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Enum.cs" />
     <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.cs" />
+    <Compile Include="Common\AttributeReader.cs" />
     <Compile Include="Common\RequestContext.cs" />
     <Compile Include="Common\ScriptCulture.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />

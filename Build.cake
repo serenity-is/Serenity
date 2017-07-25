@@ -137,7 +137,7 @@ Action<string, string, string> myPackEx = (projDir, s, id) => {
     if (!System.IO.File.Exists(csproj))
         csproj = null;
 
-    if (s == "Serenity.Web")
+    if (s == "Serenity.Web" || s == "Serenity.Web.Core")
         setPackageVersions(prm, null, "./Serenity.Test/packages.Serenity.Test.Net45.config");
         
     setPackageVersions(prm, csproj, packagesConfig);
@@ -158,13 +158,18 @@ Action<string, string, string> myPackEx = (projDir, s, id) => {
     foreach (var p in prm)
         nuspec = nuspec.Replace("${" + p.Key + "}", p.Value);
       
-    var assembly = "./" + s + ".Net45/bin/" + configuration + "/" + s + ".dll";
+    var assembly = "./" + projDir + ".Net45/bin/" + configuration + "/" + s + ".dll";
     if (!System.IO.File.Exists(assembly))
-        assembly = "./" + s + ".Net45/bin/" + configuration + "/" + s + ".exe";
+        assembly = "./" + projDir + ".Net45/bin/" + configuration + "/" + s + ".exe";
+    
+    if (!System.IO.File.Exists(assembly))
+        assembly = "./" + projDir + "/bin/" + configuration + "/net46/" + s + ".dll";
+    if (!System.IO.File.Exists(assembly))
+        assembly = "./" + projDir + "/bin/" + configuration + "/net46/" + s + ".exe";
 	if (!System.IO.File.Exists(assembly))
-		assembly = "./" + s + "/bin/" + configuration + "/" + s + ".dll";
+		assembly = "./" + projDir + "/bin/" + configuration + "/" + s + ".dll";
     if (!System.IO.File.Exists(assembly))
-        assembly = "./" + s + "/bin/" + configuration + "/" + s + ".exe";
+        assembly = "./" + projDir + "/bin/" + configuration + "/" + s + ".exe";
       
     if (System.IO.File.Exists(assembly)) 
     {
@@ -176,7 +181,7 @@ Action<string, string, string> myPackEx = (projDir, s, id) => {
     var temp = "./.nupkg/" + s + ".temp.nuspec";
     System.IO.File.WriteAllText(temp, nuspec);
      
-    var basePath = @"./" + s;
+    var basePath = @"./" + projDir;
      
     NuGetPack(temp, new NuGetPackSettings {
         BasePath = basePath,

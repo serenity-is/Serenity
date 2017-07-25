@@ -16,12 +16,12 @@
     <dependencies>
       <group targetFramework=".NETFramework4.6">
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-        <dependency id="Serenity.Core" version="${version}" />
+        <dependency id="Serenity.Core.Core" version="${version}" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin/${configuration}/net46/Serenity.Data.dll" target="lib/net46" />	
-    <file src="bin/${configuration}/net46/Serenity.Data.pdb" target="lib/net46" />	
+    <file src="bin/${configuration}/net46/Serenity.Data.Core.dll" target="lib/net46" />	
+    <file src="bin/${configuration}/net46/Serenity.Data.Core.pdb" target="lib/net46" />	
   </files>
 </package>
