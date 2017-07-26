@@ -1,4 +1,5 @@
-﻿using Serenity.CodeGeneration;
+﻿using System;
+using Serenity.CodeGeneration;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -19,8 +20,10 @@ namespace Serenity.CodeGenerator
 
         private string GetEmbeddedScript(string name)
         {
-            using (var sr = new StreamReader(this.GetType()
-                .GetTypeInfo().Assembly.GetManifestResourceStream(name)))
+            var stream = this.GetType().GetTypeInfo().Assembly.GetManifestResourceStream(name);
+            if (stream == null)
+                throw new Exception("Script " + name + " doesn't exist.");
+            using (var sr = new StreamReader(stream))
             {
                 return sr.ReadToEnd();
             }
@@ -37,9 +40,14 @@ namespace Serenity.CodeGenerator
             Directory.CreateDirectory(tempDirectory);
             try
             {
-                File.WriteAllText(Path.Combine(tempDirectory, "typeScriptServices.js"), GetEmbeddedScript("Serenity.CodeGenerator.typeScriptServices.js") + "\n\nif (exports)\nexports.ts = ts;\n");
-                File.WriteAllText(Path.Combine(tempDirectory, "Serenity.CodeGeneration.js"), GetEmbeddedScript("Serenity.CodeGenerator.Serenity.CodeGeneration.js") + "\n\nif (exports)\nexports.Serenity = Serenity;\n");
-                File.WriteAllText(Path.Combine(tempDirectory, "lib.d.ts_"), GetEmbeddedScript("Serenity.CodeGenerator.lib.d.ts_"));
+#if NET46
+                const string nsPrefix = "Serenity.CodeGenerator.Core.";
+#else
+                const string nsPrefix = "Serenity.CodeGenerator.";
+#endif
+                File.WriteAllText(Path.Combine(tempDirectory, "typeScriptServices.js"), GetEmbeddedScript(nsPrefix + "typeScriptServices.js") + "\n\nif (exports)\nexports.ts = ts;\n");
+                File.WriteAllText(Path.Combine(tempDirectory, "Serenity.CodeGeneration.js"), GetEmbeddedScript(nsPrefix + "Serenity.CodeGeneration.js") + "\n\nif (exports)\nexports.Serenity = Serenity;\n");
+                File.WriteAllText(Path.Combine(tempDirectory, "lib.d.ts_"), GetEmbeddedScript(nsPrefix + "lib.d.ts_"));
 
                 var sb = new StringBuilder();
                 sb.AppendLine("var fs = require('fs');");
