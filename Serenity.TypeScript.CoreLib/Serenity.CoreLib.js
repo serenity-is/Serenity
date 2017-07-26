@@ -968,11 +968,11 @@ var Q;
         if (Q.isEmptyOrNull(elementId)) {
             return $('#' + relativeId);
         }
-        var result = $(elementId + relativeId);
+        var result = $('#' + elementId + relativeId);
         if (result.length > 0) {
             return result;
         }
-        result = $(elementId + '_' + relativeId);
+        result = $('#' + elementId + '_' + relativeId);
         if (result.length > 0) {
             return result;
         }
