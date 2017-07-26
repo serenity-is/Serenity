@@ -136,5 +136,39 @@ namespace Serenity
             else
                 return value.ToString();
         }
+
+        /// <summary>
+        /// Check if value of enum be generated client side
+        /// </summary>
+        /// <param name="enumType"></param>
+        /// <returns></returns>
+        public static bool ClientSideEnum(Type enumType)
+        {
+            var attribute = enumType.GetCustomAttribute<NoClientSideAttribute>();
+            if (attribute != null)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check if value of enum must be generated client side
+        /// </summary>
+        /// <param name="enumType"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool ClientSideValue(Type enumType, object value)
+        {
+            var enumName = System.Enum.GetName(enumType, value);
+            var memInfo = enumType.GetMember(enumName);
+            if (memInfo != null && memInfo.Length == 1)
+            {
+                var attribute = memInfo[0].GetCustomAttribute<NoClientSideAttribute>(false);
+                if (attribute != null)
+                    return false;
+            }
+
+            return true;
+        }
     }
 }

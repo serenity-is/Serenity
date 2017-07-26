@@ -7,6 +7,9 @@ namespace Serenity.CodeGeneration
     {
         private void GenerateEnum(Type enumType)
         {
+            if (!EnumMapper.ClientSideEnum(enumType))
+                return;
+
             var codeNamespace = GetNamespace(enumType);
             var enumKey = EnumMapper.GetEnumTypeKey(enumType);
 
@@ -22,15 +25,23 @@ namespace Serenity.CodeGeneration
                 var values = Enum.GetValues(enumType);
 
                 int i = 0;
+                int inserted = 0;
                 foreach (var name in names)
                 {
-                    if (i > 0)
+                    if (!EnumMapper.ClientSideValue(enumType, ((IList)values)[i]))
+                    {
+                        i++;
+                        continue;
+                    }
+
+                    if (inserted > 0)
                         sb.AppendLine(",");
 
                     cw.Indented(name);
                     sb.Append(" = ");
                     sb.Append(Convert.ToInt32(((IList)values)[i]));
                     i++;
+                    inserted++;
                 }
 
                 sb.AppendLine();
