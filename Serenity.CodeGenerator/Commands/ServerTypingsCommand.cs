@@ -61,7 +61,9 @@ namespace Serenity.CodeGenerator
                         "Please check path in sergen.json and try again.", fullName));
                     Environment.Exit(1);
                 }
-
+#if NET46
+                AssemblyHelper.TryAppendRedirectionFromConfigFile(fullName);
+#endif
                 assemblies.Add(loadContext.LoadFromAssemblyPath(fullName));
             }
 
