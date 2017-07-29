@@ -42,6 +42,7 @@ namespace Serenity
             var opt = base.GetSelect2Options();
 
             opt.AllowClear = options.AllowClear ?? true;
+            opt.Multiple = options.Multiple ?? false;
 
             return opt;
         }
@@ -62,5 +63,8 @@ namespace Serenity
 
         [DisplayName("Allow Clear"), EditorType("Boolean")]
         public Boolean? AllowClear { get; set; }
+
+        [DisplayName("Allow Multiple"), EditorType("Boolean")]
+        public Boolean? Multiple { get; set; }
     }
 }
