@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if ASPNETCORE
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

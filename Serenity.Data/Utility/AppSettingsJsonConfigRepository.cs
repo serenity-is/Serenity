@@ -1,4 +1,4 @@
-﻿#if COREFX
+﻿#if COREFX || NET46
 using Microsoft.Extensions.Configuration;
 #else
 using System.Configuration;
@@ -14,7 +14,7 @@ namespace Serenity.Configuration
 
     public class AppSettingsJsonConfigRepository : IConfigurationRepository
     {
-#if COREFX
+#if COREFX || NET46
         private IConfiguration configuration;
 
         public AppSettingsJsonConfigRepository(IConfiguration configuration)
@@ -29,7 +29,7 @@ namespace Serenity.Configuration
 
         public object Load(Type settingType)
         {
-#if COREFX
+#if COREFX || NET46
             var keyAttr = settingType.GetCustomAttribute<SettingKeyAttribute>();
             var key = keyAttr == null ? settingType.Name : keyAttr.Value;
             var section = configuration.GetSection("AppSettings:" + key);

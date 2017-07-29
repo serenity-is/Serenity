@@ -11,7 +11,7 @@ namespace Serenity.Services
     {
         public static AuditLogListResponse List(string schema, AuditLogListRequest request)
         {
-#if COREFX
+#if COREFX || NET46
             var fld = Dependency.Resolve<IAuditLogRow>();
 #else
             var fld = Dependency.Resolve<IAuditLogRow>(schema);
@@ -297,7 +297,7 @@ namespace Serenity.Services
 
         public static void AuditInsert(IDbConnection connection, string schema, AuditSaveRequest request)
         {
-#if COREFX
+#if COREFX || NET46
             var fld = Dependency.Resolve<IAuditLogRow>();
 #else
             var fld = Dependency.Resolve<IAuditLogRow>(schema);
@@ -367,7 +367,7 @@ namespace Serenity.Services
 
         public static Row PrepareAuditUpdate(string schema, AuditSaveRequest request)
         {
-#if COREFX
+#if COREFX || NET46
             var fld = Dependency.Resolve<IAuditLogRow>();
 #else
             var fld = Dependency.Resolve<IAuditLogRow>(schema);
@@ -472,7 +472,7 @@ namespace Serenity.Services
 
         public static void AuditDelete(IDbConnection connection, string schema, AuditDeleteRequest request)
         {
-#if COREFX
+#if COREFX || NET46
             var fld = Dependency.Resolve<IAuditLogRow>();
 #else
             var fld = Dependency.Resolve<IAuditLogRow>(schema);
@@ -493,7 +493,7 @@ namespace Serenity.Services
 
         public static void AuditUndelete(IDbConnection connection, string schema, AuditUndeleteRequest request)
         {
-#if COREFX
+#if COREFX || NET46
             var fld = Dependency.Resolve<IAuditLogRow>();
 #else
             var fld = Dependency.Resolve<IAuditLogRow>(schema);

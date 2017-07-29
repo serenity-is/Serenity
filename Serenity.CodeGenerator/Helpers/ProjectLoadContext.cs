@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+#if !NET46
 using System.Runtime.Loader;
+#endif
 
 namespace Serenity.CodeGenerator
 {

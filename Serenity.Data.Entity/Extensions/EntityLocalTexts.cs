@@ -3,7 +3,7 @@ namespace Serenity.Localization
 {
     using Serenity.Abstractions;
     using Serenity.Data;
-#if COREFX
+#if COREFX || NET46
     using System;
     using System.Collections.Generic;
 #endif
@@ -12,7 +12,7 @@ namespace Serenity.Localization
 
     public static class EntityLocalTexts
     {
-#if COREFX
+#if COREFX|| NET46
         public static void AddRowTexts(this ILocalTextRegistry registry,
             string languageID = LocalText.InvariantLanguageID)
 #else

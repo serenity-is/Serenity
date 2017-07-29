@@ -1202,6 +1202,7 @@ declare namespace Serenity {
         enumKey?: string;
         enumType?: any;
         allowClear?: boolean;
+        multiple?: boolean;
     }
     interface HtmlContentEditorOptions {
         cols?: any;

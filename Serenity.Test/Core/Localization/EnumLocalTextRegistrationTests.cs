@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Serenity.Test
 {
+#if !ASPNETCORE
     [Collection("AvoidParallel")]
     public class EnumLocalTextRegistrationTests
     {
@@ -180,4 +181,5 @@ namespace Serenity.Test
         }
 
     }
+#endif
 }

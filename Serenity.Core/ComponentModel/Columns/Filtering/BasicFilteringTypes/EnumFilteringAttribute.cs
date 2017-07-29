@@ -14,5 +14,11 @@ namespace Serenity.ComponentModel
             get { return GetOption<String>("enumKey"); }
             set { SetOption("enumKey", value); }
         }
+
+        public bool? Multiple
+        {
+            get { return GetOption<bool?>("mutiple"); }
+            set { SetOption("mutiple", value); }
+        }
     }
 }

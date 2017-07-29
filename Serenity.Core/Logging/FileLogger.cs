@@ -175,7 +175,7 @@ namespace Serenity.Logging
                             {
                                 stream.Dispose();
                             }
-#if COREFX
+#if ASPNETCORE
                             catch
                             {
                             }
@@ -201,7 +201,7 @@ namespace Serenity.Logging
                         flushTimeout > TimeSpan.Zero && (DateTime.Now - lastFlush) >= flushTimeout)
                         InternalFlush();
                 }
-#if COREFX
+#if ASPNETCORE
                 catch
                 {
                 }

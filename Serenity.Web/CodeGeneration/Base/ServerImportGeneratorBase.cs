@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Serenity.Web.Common;
 #if ASPNETCORE
 using Microsoft.AspNetCore.Mvc;
 #else
@@ -111,19 +112,7 @@ namespace Serenity.CodeGeneration
         protected override void GenerateAll()
         {
             foreach (var assembly in this.Assemblies)
-            {
-                Type[] types;
-                try
-                {
-                    types = assembly.GetTypes();
-                }
-                catch
-                {
-                    // skip assemblies that doesn't like to list its types (e.g. some SignalR reported in #2340)
-                    continue;
-                }
-
-                foreach (var fromType in types)
+                foreach (var fromType in assembly.GetTypes())
                 {
                     if (fromType.GetIsAbstract())
                         continue;
@@ -149,7 +138,6 @@ namespace Serenity.CodeGeneration
                         continue;
                     }
                 }
-            }
 
             while (generateQueue.Count > 0)
             {
@@ -410,8 +398,8 @@ namespace Serenity.CodeGeneration
 
         protected string GetServiceUrlFromRoute(Type controller)
         {
-            var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            string url = route == null ? ("Services/HasNoRoute/" + controller.Name) : (route.Template ?? "");
+            var route = AttributeReader.GetAttributeWithAssemblyVersionChecking<RouteAttribute>(controller);
+            string url = route?.Template ?? "";
 
 #if ASPNETCORE
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
