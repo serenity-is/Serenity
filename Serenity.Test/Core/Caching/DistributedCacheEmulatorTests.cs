@@ -202,5 +202,24 @@ namespace Serenity.Test
                 }
             }
         }
+
+        [Fact]
+        public void DistributedCacheEmulator_Reset_ClearsCacheItems()
+        {
+            var cache = new DistributedCacheEmulator();
+            cache.Set("SomeInt", 1);
+            cache.Set("SomeStr", "str");
+            cache.Set("WithExpiration", true, TimeSpan.FromHours(10));
+
+            Assert.Equal(cache.Get<int?>("SomeInt"), 1);
+            Assert.Equal(cache.Get<string>("SomeStr"), "str");
+            Assert.Equal(cache.Get<bool?>("WithExpiration"), true);
+
+            cache.Reset();
+
+            Assert.Equal(cache.Get<int?>("SomeInt"), null);
+            Assert.Equal(cache.Get<string>("SomeStr"), null);
+            Assert.Equal(cache.Get<bool?>("WithExpiration"), null);
+        }
     }
 }

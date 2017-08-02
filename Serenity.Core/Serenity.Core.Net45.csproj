@@ -115,7 +115,6 @@
     <Compile Include="Localization\NestedPermissionKeyRegistration.cs" />
     <Compile Include="Logging\FileLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
-    <Compile Include="Munq\AlwaysNewLifetime.cs" />
     <Compile Include="Munq\Container.cs" />
     <Compile Include="Munq\Container.Registrar.cs" />
     <Compile Include="Munq\Container.Resolver.cs" />
