@@ -4,6 +4,9 @@ namespace Q.Router {
     let resolving: number = 0;
     let autoinc: number = 0;
     let listenerTimeout: number;
+    let ignoreHash: number = 0;
+    let ignoreTime: number = 0;
+
     export let enabled: boolean = true;
 
     export function navigate(hash: string, tryBack?: boolean, silent?: boolean) {
@@ -187,15 +190,21 @@ namespace Q.Router {
 
     function hashChange(e: any, o: string) {
         oldURL = (e && e.oldURL) || o;
+        if (ignoreHash > 0) {
+            if (new Date().getTime() - ignoreTime > 100) {
+                ignoreHash = 0;
+            }
+            else {
+                ignoreHash--;
+                return;
+            }
+        }
         resolve();
     }
 
     function ignoreChange() {
-        window.clearTimeout(listenerTimeout);
-        window.removeEventListener("hashchange", hashChange as any);
-        setTimeout(function () {
-            window.addEventListener("hashchange", hashChange as any, false);
-        }, 1);
+        ignoreHash++;
+        ignoreTime = new Date().getTime();
     }
 
     window.addEventListener("hashchange", hashChange as any, false);
