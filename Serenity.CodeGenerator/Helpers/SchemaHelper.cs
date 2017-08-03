@@ -9,7 +9,11 @@ namespace Serenity.CodeGenerator
     {
         public static ISchemaProvider GetSchemaProvider(string serverType)
         {
+#if NET46
+            var providerType = Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, Serenity.Data.Core");
+#else
             var providerType = Type.GetType("Serenity.Data.Schema." + serverType + "SchemaProvider, Serenity.Data");
+#endif
             if (providerType == null || !typeof(ISchemaProvider).GetTypeInfo().IsAssignableFrom(providerType))
                 throw new ArgumentOutOfRangeException("serverType", (object)serverType, "Unknown server type");
 
