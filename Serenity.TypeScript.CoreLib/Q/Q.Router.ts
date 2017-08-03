@@ -191,7 +191,7 @@ namespace Q.Router {
     function hashChange(e: any, o: string) {
         oldURL = (e && e.oldURL) || o;
         if (ignoreHash > 0) {
-            if (new Date().getTime() - ignoreTime > 100) {
+            if (new Date().getTime() - ignoreTime > 1000) {
                 ignoreHash = 0;
             }
             else {

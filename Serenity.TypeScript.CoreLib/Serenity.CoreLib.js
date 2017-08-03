@@ -2098,7 +2098,7 @@ var Q;
         function hashChange(e, o) {
             oldURL = (e && e.oldURL) || o;
             if (ignoreHash > 0) {
-                if (new Date().getTime() - ignoreTime > 100) {
+                if (new Date().getTime() - ignoreTime > 1000) {
                     ignoreHash = 0;
                 }
                 else {
