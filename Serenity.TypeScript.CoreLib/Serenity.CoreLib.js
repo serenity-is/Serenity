@@ -5130,5 +5130,82 @@ var Q;
                 ssExceptionInitialization();
         });
     }
+    function vueInitialization() {
+        Vue.component('editor', {
+            props: {
+                type: {
+                    type: String,
+                    required: true,
+                },
+                id: {
+                    type: String,
+                    required: false
+                },
+                name: {
+                    type: String,
+                    required: false
+                },
+                placeholder: {
+                    type: String,
+                    required: false
+                },
+                value: {
+                    required: false
+                },
+                options: {
+                    required: false
+                }
+            },
+            render: function (createElement) {
+                var editorType = Serenity.EditorTypeRegistry.get(this.type);
+                var elementAttr = ss.getAttributes(editorType, Serenity.ElementAttribute, true);
+                var elementHtml = ((elementAttr.length > 0) ? elementAttr[0].value : '<input/>');
+                var domProps = {};
+                var element = $(elementHtml)[0];
+                var attrs = element.attributes;
+                for (var i = 0; i < attrs.length; i++) {
+                    var attr = attrs.item(i);
+                    domProps[attr.name] = attr.value;
+                }
+                if (this.id != null)
+                    domProps.id = this.id;
+                if (this.name != null)
+                    domProps.name = this.name;
+                if (this.placeholder != null)
+                    domProps.placeholder = this.placeholder;
+                var editorParams = this.options;
+                var optionsType = null;
+                var self = this;
+                var el = createElement(element.tagName, {
+                    domProps: domProps
+                });
+                this.$editorType = editorType;
+                return el;
+            },
+            watch: {
+                value: function (v) {
+                    Serenity.EditorUtils.setValue(this.$widget, v);
+                }
+            },
+            mounted: function () {
+                var self = this;
+                this.$widget = new this.$editorType($(this.$el), this.options);
+                if (this.value != null)
+                    Serenity.EditorUtils.setValue(this.$widget, this.value);
+                if ($(this.$el).data('select2'))
+                    Serenity.WX.changeSelect2(this.$widget, function () {
+                        self.$emit('input', this.value);
+                    });
+                else
+                    Serenity.WX.change(this.$widget, function () {
+                        self.$emit('input', this.value);
+                    });
+            },
+            destroyed: function () {
+                this.$widget && this.$widget.destroy() && (this.$widget = null);
+            }
+        });
+    }
+    window['Vue'] ? vueInitialization() : $(function () { window['Vue'] && vueInitialization(); });
 })(Q || (Q = {}));
 //# sourceMappingURL=Serenity.CoreLib.js.map

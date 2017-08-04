@@ -2933,6 +2933,7 @@ declare namespace Slick.Aggregators {
     function Max(field: string): void;
     function Sum(field: string): void;
 }
+declare var Vue: any;
 declare namespace Q {
     function validatorAbortHandler(validator: any): void;
     function validateOptions(options: JQueryValidation.ValidationOptions): any;
