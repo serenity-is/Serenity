@@ -335,6 +335,9 @@ namespace Q {
                 },
                 options: {
                     required: false
+                },
+                maxLength: {
+                    required: false
                 }
             },
             render: function (createElement: any) {
@@ -377,21 +380,34 @@ namespace Q {
             },
             mounted: function () {
                 var self = this;
+
                 this.$widget = new this.$editorType($(this.$el), this.options);
+                this.$widget.initialize();
+
+                if (this.maxLength) {
+                    (Serenity.PropertyGrid as any).$setMaxLength(this.$widget, this.maxLength);
+                }
+
+                if (this.options)
+                    Serenity.ReflectionOptionsSetter.set(this.$widget, this.options);
+
                 if (this.value != null)
                     Serenity.EditorUtils.setValue(this.$widget, this.value);
 
                 if ($(this.$el).data('select2'))
                     Serenity.WX.changeSelect2(this.$widget, function () {
-                        self.$emit('input', this.value);
+                        self.$emit('input', Serenity.EditorUtils.getValue(self.$widget));
                     });
                 else
                     Serenity.WX.change(this.$widget, function () {
-                        self.$emit('input', this.value);
+                        self.$emit('input', Serenity.EditorUtils.getValue(self.$widget));
                     });
             },
             destroyed: function () {
-                this.$widget && this.$widget.destroy() && (this.$widget = null);
+                if (this.$widget) {
+                    this.$widget.destroy();
+                    this.$widget = null;
+                }
             }
         });
     }
