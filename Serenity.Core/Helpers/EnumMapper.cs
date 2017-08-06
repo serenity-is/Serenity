@@ -136,25 +136,5 @@ namespace Serenity
             else
                 return value.ToString();
         }
-
-        /// <summary>
-        /// Check if value of enum must be generated client side
-        /// </summary>
-        /// <param name="enumType"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static bool GetIgnoreAttribute(Type enumType, object value)
-        {
-            var enumName = System.Enum.GetName(enumType, value);
-            var memInfo = enumType.GetMember(enumName);
-            if (memInfo != null && memInfo.Length == 1)
-            {
-                var attribute = memInfo[0].GetCustomAttribute<IgnoreAttribute>(false);
-                if (attribute != null)
-                    return true;
-            }
-
-            return false;
-        }
     }
 }

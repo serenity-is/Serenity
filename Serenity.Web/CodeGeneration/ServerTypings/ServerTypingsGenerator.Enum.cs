@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serenity.ComponentModel;
+using System;
 using System.Collections;
 
 namespace Serenity.CodeGeneration
@@ -17,18 +18,25 @@ namespace Serenity.CodeGeneration
             cw.InBrace(delegate
             {
                 var names = Enum.GetNames(enumType);
-                var values = Enum.GetValues(enumType);
+                var values = (IList)Enum.GetValues(enumType);
 
-                int i = 0;
-                foreach (var name in names)
+                var inserted = 0;
+                for (var i = 0; i < names.Length; i++)
                 {
-                    if (i > 0)
+                    var name = names[i];
+
+                    var member = enumType.GetMember(name);
+                    if (member != null && member.Length > 0 &&
+                        member[0].GetAttribute<IgnoreAttribute>(false) != null)
+                        continue;
+
+                    if (inserted > 0)
                         sb.AppendLine(",");
 
                     cw.Indented(name);
                     sb.Append(" = ");
-                    sb.Append(Convert.ToInt32(((IList)values)[i]));
-                    i++;
+                    sb.Append(Convert.ToInt32(values[i]));
+                    inserted++;
                 }
 
                 sb.AppendLine();
