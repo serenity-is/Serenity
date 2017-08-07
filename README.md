@@ -56,16 +56,21 @@ Please help spread the word by posting in blogs, forums, social media, starring 
 
 Serenity is a free and open source project with MIT licence, which permits usage in commercial applications. 
 
-## Donating
+## Premium Support
 
-If Serenity was helpful to you, please consider donating to keep Serenity alive and moving forward.
+We offer premium support packages at http://serenity.is. They also include *StartSharp* template with advanced samples, features and modules. 
 
-http://serenity.is/#Donate
+Visit [this blog post](http://serenity.is/blog/2017/08/08/what-is-in-premium) for more information about what is available in premium support and *StartSharp*.
 
 ## Commercial Support
 
 Paid support options are available from the author and a team of Serenity professionals. [Contact us](mailto:volkanceylan@gmail.com) for details.
 
+## Donating
+
+If Serenity was helpful to you, please consider donating to keep Serenity alive and moving forward.
+
+http://serenity.is/#Donate
 ## Video Tutorials (thanks a lot to @samdubey for these contributions)
 
 **Serenity Youtube Channel:** 
