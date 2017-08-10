@@ -1,6 +1,9 @@
 ﻿using Serenity.ComponentModel;
 using System;
 using System.Collections;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace Serenity.CodeGeneration
 {

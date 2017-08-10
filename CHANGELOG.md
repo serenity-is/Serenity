@@ -1,3 +1,12 @@
+## 2.10.1 (2017-08-10)
+
+Features:
+  - added option to ignore enum members (thanks @Estrusco)
+
+Bugfixes:
+  - resolve problem with Firefox / hash based router while editing items in detail editors. You may add Q.Router.enabled = false in ScriptInitialization.ts if still having issues or wan't to disable this "feature".
+  - findElementWithRelativeId missing # (thanks @Estrusco)
+
 ## 2.10.0 (2017-07-23)
 
 Features:
