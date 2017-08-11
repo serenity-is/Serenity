@@ -1936,6 +1936,9 @@ var Q;
         var ignoreHash = 0;
         var ignoreTime = 0;
         Router.enabled = true;
+        function isEqual(url1, url2) {
+            return url1 == url2 || url1 == url2 + '#' || url2 == url1 + '#';
+        }
         function navigate(hash, tryBack, silent) {
             if (!Router.enabled || resolving > 0)
                 return;
@@ -1945,17 +1948,20 @@ var Q;
             var newURL = window.location.href.replace(/#$/, '')
                 .replace(/#.*$/, '') + hash;
             if (newURL != window.location.href) {
-                if (tryBack && (oldURL == newURL ||
-                    oldURL == newURL + '#' ||
-                    oldURL + '#' == newURL)) {
+                if (tryBack && isEqual(oldURL, newURL)) {
                     if (silent)
                         ignoreChange();
+                    var prior = window.location.href;
+                    oldURL = null;
                     window.history.back();
-                    if (window.location.href == oldURL)
+                    if (isEqual(window.location.href, newURL))
                         return;
+                    if (silent && prior == window.location.href && ignoreHash > 0)
+                        ignoreHash--;
                 }
                 if (silent)
                     ignoreChange();
+                oldURL = null;
                 window.location.hash = hash;
             }
         }
