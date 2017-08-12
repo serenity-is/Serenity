@@ -56,9 +56,9 @@ namespace Serenity.Web
             return Path.Combine(RootPath, ToPath(dbFileName));
         }
 
-        public string FormatDbFileName(object entityId, string extension)
+        public string FormatDbFileName(object entityId, string extension, string originalName = null)
         {
-            return FormatDbFileName(dbFileFormat, entityId, extension);
+            return FormatDbFileName(dbFileFormat, entityId, extension, originalName);
         }
 
         public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId, FilesToDelete filesToDelete, Func<string, string> fileNameReplacer = null)
@@ -71,18 +71,35 @@ namespace Serenity.Web
         public CopyTemporaryFileResult CopyTemporaryFile(string dbTemporaryFile, object entityId, Func<string, string> fileNameReplacer = null)
         {
             string temporaryFilePath = DbFilePath(dbTemporaryFile);
-            string dbFileName = ToUrl(FormatDbFileName(entityId, Path.GetExtension(dbTemporaryFile)));
-            if (fileNameReplacer != null)
-                dbFileName = fileNameReplacer(dbFileName);
-
-            string filePath = DbFilePath(dbFileName);
-            UploadHelper.CopyFileAndRelated(temporaryFilePath, filePath);
-            long size = new FileInfo(filePath).Length;
-            bool hasThumbnail = File.Exists(GetThumbFileName(filePath));
 
             string originalName;
             using (var sr = new StreamReader(File.OpenRead(Path.ChangeExtension(temporaryFilePath, ".orig"))))
                 originalName = sr.ReadLine();
+
+            var extension = Path.GetExtension(dbTemporaryFile); 
+
+            string dbFileName = ToUrl(FormatDbFileName(entityId, extension, originalName));
+            if (fileNameReplacer != null)
+                dbFileName = fileNameReplacer(dbFileName);
+
+            string filePath = DbFilePath(dbFileName);
+            string basePath = null;
+            int tries = 0;
+            while (File.Exists(filePath) && ++tries < 10000)
+            {
+                if (basePath == null)
+                    basePath = Path.ChangeExtension(filePath, null);
+                
+                filePath = basePath + " (" + tries + ")" + (extension ?? "");
+            }
+
+            if (tries > 0)
+                dbFileName = Path.ChangeExtension(dbFileName, null) + " (" + tries + ")" + (extension ?? ""); 
+
+            UploadHelper.CopyFileAndRelated(temporaryFilePath, filePath);
+            long size = new FileInfo(filePath).Length;
+            bool hasThumbnail = File.Exists(GetThumbFileName(filePath));
+
 
             return new CopyTemporaryFileResult()
             {
@@ -225,7 +242,7 @@ namespace Serenity.Web
             return RootUrl + ToUrl(fileName);
         }
 
-        public static string FormatDbFileName(string format, object identity, string extension)
+        public static string FormatDbFileName(string format, object identity, string extension, string originalName = null)
         {
             long l;
             object groupKey;
@@ -249,7 +266,8 @@ namespace Serenity.Web
                     groupKey = s.SafeSubstring(0, 2);
             }
 
-            return String.Format(format, identity, groupKey, TemporaryFileHelper.RandomFileCode(), DateTime.Now) + extension;
+            return String.Format(format, identity, groupKey, TemporaryFileHelper.RandomFileCode(), DateTime.Now, 
+                Path.GetFileNameWithoutExtension(originalName)) + extension;
         }
 
         public static void DeleteFileAndRelated(string dbFileName, DeleteType deleteType)

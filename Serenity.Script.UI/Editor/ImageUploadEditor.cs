@@ -102,7 +102,7 @@ namespace Serenity
 
         protected virtual void Populate()
         {
-            bool displayOriginalName = !options.OriginalNameProperty.IsTrimmedEmpty();
+            bool displayOriginalName = options.DisplayFileName || !options.OriginalNameProperty.IsTrimmedEmpty();
 
             if (entity == null)
                 UploadHelper.PopulateFileSymbols(fileSymbols, null, displayOriginalName, options.UrlPrefix);
@@ -170,7 +170,20 @@ namespace Serenity
         {
             var value = new UploadedFile();
             value.Filename = source[property.Name];
-            value.OriginalName = source[options.OriginalNameProperty];
+            if (string.IsNullOrEmpty(options.OriginalNameProperty))
+            {
+                if (this.options.DisplayFileName)
+                {
+                    var s = (value.Filename ?? "");
+                    var idx = s.LastIndexOfAny(new char[] { '/', '\\' });
+                    if (idx >= 0)
+                        value.OriginalName = s.Substr(idx + 1);
+                    else
+                        value.OriginalName = s;
+                }
+            }
+            else
+                value.OriginalName = source[options.OriginalNameProperty];
             this.Value = value;
         }
     }
@@ -199,6 +212,8 @@ namespace Serenity
         public int MaxSize { get; set; }
         [DisplayName("Original Name Property")]
         public string OriginalNameProperty { get; set; }
+        [DisplayName("Display File Name")]
+        public bool DisplayFileName { get; set; }
         [DisplayName("UrlPrefix")]
         public string UrlPrefix { get; set; }
         [DisplayName("Allow Non Image Files")]

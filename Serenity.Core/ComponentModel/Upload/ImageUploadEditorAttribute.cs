@@ -140,6 +140,17 @@ namespace Serenity.ComponentModel
         }
 
         /// <summary>
+        /// If you have no original name property but use original
+        /// name in file name with {4} format parameter, set this
+        /// to true to force ImageUploadEditor show file name.
+        /// </summary>
+        public Boolean DisplayFileName
+        {
+            get { return GetOption<Boolean>("displayFileName"); }
+            set { SetOption("displayFileName", value); }
+        }
+
+        /// <summary>
         /// Should a copy of file placed in a special history folder on upload. 
         /// This helps preserving old files on update.
         /// </summary>
