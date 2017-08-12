@@ -1,3 +1,11 @@
+## 2.10.2 (2017-08-12)
+
+Features:
+  - option to use original file name as uploaded file name with a {4} format parameter in FileNameFormat. it auto adds file (1).docx etc if there is already a file with same name on disk
+
+Bugfixes:
+  - resolve problem if router can't use history.back(), e.g. history is empty somehow
+
 ## 2.10.1 (2017-08-10)
 
 Features:
