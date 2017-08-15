@@ -23,25 +23,20 @@ namespace Q.Router {
         var newURL = window.location.href.replace(/#$/, '')
             .replace(/#.*$/, '') + hash;
         if (newURL != window.location.href) {
-            if (tryBack && isEqual(oldURL, newURL)) {
+            if (tryBack && oldURL != null && isEqual(oldURL, newURL)) {
                 if (silent)
                     ignoreChange();
 
                 var prior = window.location.href;
                 oldURL = null;
                 window.history.back();
-
-                if (isEqual(window.location.href, newURL))
-                    return;
-
-                if (silent && prior == window.location.href && ignoreHash > 0)
-                    ignoreHash--;
+                return;
             }
 
             if (silent)
                 ignoreChange();
 
-            oldURL = null;
+            oldURL = window.location.href;
             window.location.hash = hash;
         }
     }
@@ -116,10 +111,13 @@ namespace Q.Router {
             element.data("qroute", null);
             element.unbind(".qrouter");
             var prhash = element.data("qprhash");
-            if (prhash)
-                replace(prhash, true);
+            var tryBack = e && e.originalEvent &&
+                ((e.originalEvent.type == "keydown" && (e.originalEvent as any).keyCode == 27) ||
+                    $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close"));
+            if (prhash != null)
+                replace(prhash, tryBack);
             else
-                replaceLast('', true);
+                replaceLast('', tryBack);
         });
     }
 
@@ -200,7 +198,6 @@ namespace Q.Router {
     }
 
     function hashChange(e: any, o: string) {
-        oldURL = (e && e.oldURL) || o;
         if (ignoreHash > 0) {
             if (new Date().getTime() - ignoreTime > 1000) {
                 ignoreHash = 0;
