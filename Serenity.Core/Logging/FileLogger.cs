@@ -18,13 +18,13 @@ namespace Serenity.Logging
         private object sync = new object();
         private StreamWriter stream;
 
-        public FileLogger()
+        public FileLogger(LogSettings log = null)
         {
             queue = new Queue<string>();
-            lastFlush = DateTime.Now;
+            lastFlush = DateTimeProvider.Now;
             
             var settings = Config.TryGet<LogSettings>() ?? new LogSettings();
-            File = settings.File;
+            File = string.IsNullOrEmpty(settings.File) ? null : settings.File;
             FlushTimeout = TimeSpan.FromSeconds(settings.FlushTimeout);
         }
 
@@ -71,10 +71,15 @@ namespace Serenity.Logging
         }
 
         [SettingScope("Application"), SettingKey("Logging"), Ignore]
-        private class LogSettings
+        public class LogSettings
         {
             public string File { get; set; }
             public int FlushTimeout { get; set; }
+        }
+
+        public void Flush()
+        {
+            InternalFlush();
         }
 
         internal void InternalFlush()
@@ -98,7 +103,7 @@ namespace Serenity.Logging
                 }
             }
 
-            lastFlush = DateTime.Now;
+            lastFlush = DateTimeProvider.Now;
         }
 
         public void Dispose()
@@ -145,7 +150,7 @@ namespace Serenity.Logging
                     else
                         sb.Append("[?]");
 
-                    sb.Append(DateTime.Now.ToString(DateHelper.ISODateTimeFormatLocal));
+                    sb.Append(DateTimeProvider.Now.ToString(DateHelper.ISODateTimeFormatLocal));
                     sb.Append(' ');
 
                     if (source != null)
@@ -160,9 +165,10 @@ namespace Serenity.Logging
                     if (exception != null)
                         sb.AppendLine(exception.ToString());
 
-                    if (stream == null || writerDate != DateTime.Today)
+                    var currentDate = DateTimeProvider.Now.Date;
+                    if (stream == null || writerDate != currentDate)
                     {
-                        writerDate = DateTime.Today;
+                        writerDate = currentDate;
                         string newFile = String.Format(file, writerDate.ToString("yyyyMMdd"), RandomFileCode());
 
                         Directory.CreateDirectory(Path.GetDirectoryName(newFile));
@@ -198,7 +204,7 @@ namespace Serenity.Logging
                     queue.Enqueue(sb.ToString());
 
                     if (flushTimeout <= TimeSpan.Zero ||
-                        flushTimeout > TimeSpan.Zero && (DateTime.Now - lastFlush) >= flushTimeout)
+                        flushTimeout > TimeSpan.Zero && (DateTimeProvider.Now - lastFlush) >= flushTimeout)
                         InternalFlush();
                 }
 #if COREFX
