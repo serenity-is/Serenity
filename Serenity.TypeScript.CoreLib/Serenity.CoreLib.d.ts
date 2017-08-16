@@ -1375,6 +1375,7 @@ declare namespace Serenity {
         set_maxDate(value: Date): void;
         get_sqlMinMax(): boolean;
         set_sqlMinMax(value: boolean): void;
+        yearRange: string;
     }
 }
 declare namespace Serenity {
@@ -1400,6 +1401,7 @@ declare namespace Serenity {
         startHour?: any;
         endHour?: any;
         intervalMinutes?: any;
+        yearRange?: string;
     }
 }
 declare namespace Serenity {

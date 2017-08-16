@@ -23,6 +23,7 @@
         startHour?: any;
         endHour?: any;
         intervalMinutes?: any;
+        yearRange?: string;
     }
 
 }

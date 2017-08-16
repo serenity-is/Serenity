@@ -19,6 +19,7 @@
         set_maxDate(value: Date): void;
         get_sqlMinMax(): boolean;
         set_sqlMinMax(value: boolean): void;
+        yearRange: string;
     }
 
 }

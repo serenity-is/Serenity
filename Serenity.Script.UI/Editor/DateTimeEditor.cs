@@ -29,7 +29,8 @@ namespace Serenity
                     BeforeShow = new Func<bool>(delegate
                     {
                         return !input.HasClass("readonly");
-                    })
+                    }),
+                    YearRange = options.YearRange ?? "-100:+50"
                 });
 
             input.Bind("keyup." + this.uniqueName, e => {
@@ -196,6 +197,7 @@ namespace Serenity
         [Option]
         public string MaxValue { get; set; }
 
+
         public JsDate MinDate
         {
             get { return Q.ParseISODateTime(MinValue); }
@@ -264,5 +266,6 @@ namespace Serenity
         public int? StartHour { get; set; }
         public int? EndHour { get; set; }
         public int? IntervalMinutes { get; set; }
+        public string YearRange { get; set; }
     }
 }
