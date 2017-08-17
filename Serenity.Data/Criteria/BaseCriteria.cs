@@ -41,12 +41,12 @@
 
         public BaseCriteria FullTextSearchContains(string mask)
         {
-            return new BinaryCriteria(this, CriteriaOperator.FullTextSearchContains, new ValueCriteria("\"" + mask + "\""));
+            return new BinaryCriteria(this, CriteriaOperator.FullTextSearchContains, new ValueCriteria("\"" + mask.Replace("\"", "\"\"") + "\""));
         }
 
         public BaseCriteria FullTextSearchStartsWith(string mask)
         {
-            return new BinaryCriteria(this, CriteriaOperator.FullTextSearchContains, new ValueCriteria("\"" + mask + "*\""));
+            return new BinaryCriteria(this, CriteriaOperator.FullTextSearchContains, new ValueCriteria("\"" + mask.Replace("\"", "\"\"") + "*\""));
         }
 
         public BaseCriteria StartsWith(string mask)
