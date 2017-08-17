@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.4</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>True</TypeScriptCompileBlocked>
     <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
   </PropertyGroup>
@@ -862,7 +862,6 @@
     <None Include="Tooling\Node\lessc.cmd" />
     <None Include="Tooling\Node\less\bin\lessc" />
     <None Include="Tooling\Node\less\lib\lessc" />
-    <None Include="tsconfig.json" />
     <None Include="packages.Serenity.Web.Net45.config" />
   </ItemGroup>
   <ItemGroup>
