@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <VersionPrefix>2.10.2</VersionPrefix>
+    <VersionPrefix>2.10.3</VersionPrefix>
     <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
     <AssemblyName>Serenity.Services</AssemblyName>
     <PackageId>Serenity.Services</PackageId>
