@@ -59,13 +59,13 @@
             return null;
         }
 
-        [InlineCode("[{this}, 'contains', ('\"' + {mask} + '\"')]")]
+        [InlineCode("[{this}, 'contains', ('\"' + Q.replaceAll({mask},'\"','\"\"') + '\"')]")]
         public BaseCriteria FullTextSearchContains(string mask)
         {
             return null;
         }
 
-        [InlineCode("[{this}, 'startswith', ('\"' + {mask} + '*\"')]")]
+        [InlineCode("[{this}, 'startswith', ('\"' + Q.replaceAll({mask},'\"','\"\"') + '*\"')]")]
         public BaseCriteria FullTextSearchStartsWith(string mask)
         {
             return null;
