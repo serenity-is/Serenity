@@ -1,3 +1,10 @@
+## 2.10.3 (2017-08-17)
+
+Features:
+  - experimental functionality to use a Serenity editor as a Vue component using special <editor /> element
+  - date/datetime editor year range option default to -100:+50 instead of -10:+10 (better for birth date etc.)
+  - router use history.back() only when dialog is closed by x button or escape key
+
 ## 2.10.2 (2017-08-12)
 
 Features:
