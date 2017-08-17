@@ -8,7 +8,7 @@ If you have Visual Studio 2015, please make sure that you have **Update 3** inst
 
 ![VS2015 Update 3](Tools/Images/install/vs2015-update-3.png)
 
-> It might be possible to work with Visual Studio 2013 as well but you'll have many intellisense errors as TypeScript 2.1.5 can't be installed in VS2013.
+> It might be possible to work with Visual Studio 2013 as well but you'll have many intellisense errors as TypeScript 2.4.1 can't be installed in VS2013.
 
 Serene .NET Core (ASP.NET Core MVC) version only works in Visual Studio 2017. 
 
@@ -16,7 +16,7 @@ Microsoft recently obsoleted *project.json* based projects and replaced them wit
 
 ## Visual Studio TypeScript Extension
 
-Currently, the recommended version of TypeScript is 2.1.5. 
+Currently, the recommended version of TypeScript is 2.4.1. 
 
 Even though Serene uses NodeJS based TypeScript compiler (tsc) on build, Visual Studio still uses its own version of TypeScript for intellisense and refactoring etc. If you have an older version of that extension, you'll be greeted with many errors as soon as you open a Serene project.
 
@@ -26,7 +26,7 @@ To check what version of TypeScript Visual Studio Extension you have, again see 
 
 Visual Studio 2017 comes with TypeScript 2.1.5 by default, but Visual Studio 2015 might include older versions.
 
-If you have something lower than 2.1.5 there, you need to install TypeScript for Visual Studio 2015 extension.
+If you have something lower than 2.4.1 there, you need to install TypeScript for Visual Studio 2015 extension.
 
 > TypeScript version you see in Control Panel / Add Remove Programs doesn't matter at all. What matters is the one  that is enabled in Visual Studio.
 
@@ -38,7 +38,7 @@ Here is the link for Visual Studio 2015:
 
 [https://www.microsoft.com/en-us/download/details.aspx?id=48593](https://www.microsoft.com/en-us/download/details.aspx?id=48593)
 
-But **don't click the download button** right away. Expand **Details** section, and select the exact version you need (e.g. 2.1.5):
+But **don't click the download button** right away. Expand **Details** section, and select the exact version you need (e.g. 2.4.1):
 
 ![TypeScript Version Selection](Tools/Images/install/typescript-download-detail.png)
 
