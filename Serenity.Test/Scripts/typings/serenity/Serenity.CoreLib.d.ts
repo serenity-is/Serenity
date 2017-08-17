@@ -1375,6 +1375,7 @@ declare namespace Serenity {
         set_maxDate(value: Date): void;
         get_sqlMinMax(): boolean;
         set_sqlMinMax(value: boolean): void;
+        yearRange: string;
     }
 }
 declare namespace Serenity {
@@ -1400,6 +1401,7 @@ declare namespace Serenity {
         startHour?: any;
         endHour?: any;
         intervalMinutes?: any;
+        yearRange?: string;
     }
 }
 declare namespace Serenity {
@@ -2933,6 +2935,7 @@ declare namespace Slick.Aggregators {
     function Max(field: string): void;
     function Sum(field: string): void;
 }
+declare var Vue: any;
 declare namespace Q {
     function validatorAbortHandler(validator: any): void;
     function validateOptions(options: JQueryValidation.ValidationOptions): any;
