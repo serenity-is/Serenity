@@ -126,7 +126,7 @@ namespace Serenity.Data
             if (columnName == null)
                 throw new ArgumentNullException("columnName");
 
-            return query.Select(alias.NameDot + field, columnName);
+            return query.Select(alias.NameDot + SqlSyntax.AutoBracket(field.Name), columnName);
         }
 
         /// <summary>
