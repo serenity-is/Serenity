@@ -70,10 +70,15 @@ WriteLiteral("    export class ");
 
              Write(Model.ClassName);
 
-WriteLiteral("Dialog extends Serenity.EntityDialog<");
+WriteLiteral("Dialog extends ");
 
 
-                                                                    Write(Model.RowClassName);
+                                              Write(Model.GeneratorConfig.DialogBaseClassName);
+
+WriteLiteral("<");
+
+
+                                                                                           Write(Model.RowClassName);
 
 WriteLiteral(", any> {\r\n        protected getFormKey() { return ");
 

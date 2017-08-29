@@ -6,7 +6,7 @@
 namespace @(Model.RootNamespace)@(dotModule) {
     
     @@Serenity.Decorators.registerClass()
-    export class @(Model.ClassName)Grid extends Serenity.EntityGrid<@(Model.RowClassName), any> {
+    export class @(Model.ClassName)Grid extends @(Model.GeneratorConfig.GridBaseClassName)<@(Model.RowClassName), any> {
         protected getColumnsKey() { return '@(moduleDot)@(Model.ClassName)'; }
         protected getDialogType() { return @(Model.ClassName)Dialog; }@if (Model.Identity != null) {<text>
         protected getIdProperty() { return @(Model.RowClassName).idProperty; }</text>}

@@ -117,6 +117,7 @@ namespace Serenity.CodeGenerator
         {
             var model = new EntityModel();
             model.Module = module;
+            model.GeneratorConfig = config;
 
             if (connection.GetDialect().ServerType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase))
                 model.Schema = null;

@@ -34,7 +34,7 @@ WriteLiteral("\r\n");
     var moduleDot = Model.Module == null ? "" : (Model.Module  + ".");
 
 
-WriteLiteral("/// <reference path=\"../../Common/Helpers/GridEditorBase.ts\" />\r\n\r\nnamespace ");
+WriteLiteral("namespace ");
 
 
       Write(Model.RootNamespace);
@@ -50,10 +50,15 @@ WriteLiteral("@Serenity.Decorators.registerClass()\r\n    export class ");
 
              Write(Model.ClassName);
 
-WriteLiteral("Editor extends Common.GridEditorBase<");
+WriteLiteral("Editor extends ");
 
 
-                                                                    Write(Model.RowClassName);
+                                              Write(Model.GeneratorConfig.GridEditorBaseClassName);
+
+WriteLiteral("<");
+
+
+                                                                                               Write(Model.RowClassName);
 
 WriteLiteral("> {\r\n        protected getColumnsKey() { return \'");
 

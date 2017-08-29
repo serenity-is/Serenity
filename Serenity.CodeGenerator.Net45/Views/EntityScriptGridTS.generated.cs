@@ -50,10 +50,15 @@ WriteLiteral("@Serenity.Decorators.registerClass()\r\n    export class ");
 
              Write(Model.ClassName);
 
-WriteLiteral("Grid extends Serenity.EntityGrid<");
+WriteLiteral("Grid extends ");
 
 
-                                                                Write(Model.RowClassName);
+                                            Write(Model.GeneratorConfig.GridBaseClassName);
+
+WriteLiteral("<");
+
+
+                                                                                       Write(Model.RowClassName);
 
 WriteLiteral(", any> {\r\n        protected getColumnsKey() { return \'");
 

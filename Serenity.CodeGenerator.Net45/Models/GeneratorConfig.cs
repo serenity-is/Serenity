@@ -30,9 +30,13 @@ namespace Serenity.CodeGenerator
         public bool GenerateRepository { get; set; }
         public bool GeneratePage { get; set; }
         public bool GenerateGrid { get; set; }
+        public string GridBaseClassName { get; set; }
         public bool GenerateDialog { get; set; }
+        public string DialogBaseClassName { get; set; }
         public bool GenerateGridEditor { get; set; }
+        public string GridEditorBaseClassName { get; set; }
         public bool GenerateGridEditorDialog { get; set; }
+        public string GridEditorDialogBaseClassName { get; set; }
         public bool GenerateLookupEditor { get; set; }
         public bool MaximizableDialog { get; set; }
                 
@@ -52,10 +56,19 @@ namespace Serenity.CodeGenerator
             GenerateEndpoint = true;
             GenerateRepository = true;
             GeneratePage = true;
+
             GenerateGrid = true;
+            GridBaseClassName = "Serenity.EntityGrid";
+
             GenerateDialog = true;
+            DialogBaseClassName = "Serenity.EntityDialog";
+
             GenerateGridEditor = false;
+            GridEditorBaseClassName = "Common.GridEditorBase";
+
             GenerateGridEditorDialog = false;
+            GridEditorDialogBaseClassName = "Common.GridEditorDialog";
+
             GenerateLookupEditor = false;
             MaximizableDialog = false;
             SetDefaults();
