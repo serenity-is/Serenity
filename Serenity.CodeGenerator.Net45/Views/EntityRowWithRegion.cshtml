@@ -25,6 +25,8 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
     using System.ComponentModel;
     using System.IO;
 
+    [ConnectionKey("@Model.ConnectionKey"), TableName(TableName)]
+    [DisplayName("@Model.Title"), InstanceName("@Model.Title"), TwoLevelCached]
     [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Title"), InstanceName("@Model.Title"), TwoLevelCached]
     [ReadPermission("@Model.Module:@Model.Tablename:Read")]
     [InsertPermission("@Model.Module:@Model.Tablename:Insert")]
@@ -132,6 +134,8 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 
     #region RowFields
     public static readonly RowFields Fields = new RowFields().Init();
+
+    public const string TableName = "@(String.IsNullOrEmpty(schemaDot) ? Model.Tablename : schemaDot + "[" + Model.Tablename + "]")"@(string.IsNullOrEmpty(Model.FieldPrefix) ? "" : (", \"" + Model.FieldPrefix + "\""));
 
     public partial class RowFields : @(Model.FieldsBaseClass)
     {
