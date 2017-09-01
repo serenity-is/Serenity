@@ -165,7 +165,7 @@ namespace Serenity.Services
                     connection: Connection,
                     row: displayOrderRow,
                     filter: GetDisplayOrderFilter(),
-                    recordID: Row.IdField[Row].Value,
+                    recordID: ((Field)Row.IdField).AsObject(Row),
                     newDisplayOrder: displayOrderRow.DisplayOrderField[Row].Value,
                     hasUniqueConstraint: false);
             }

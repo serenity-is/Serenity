@@ -90,7 +90,7 @@ namespace Serenity.Data
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
         public static bool ReorderValues(IDbConnection connection, string tableName, Field keyField, Field orderField,
-            ICriteria filter = null, Int64? recordID = null, int newDisplayOrder = 1,
+            ICriteria filter = null, object recordID = null, int newDisplayOrder = 1,
             bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
         {
             if (connection == null)
@@ -138,7 +138,7 @@ namespace Serenity.Data
                     // create an entry to hold current and new display order value of the record
                     OrderRecord r = new OrderRecord();
                     // record ID
-                    r.recordID = Convert.ToInt64(reader.GetValue(0));
+                    r.recordID = reader.GetValue(0);
                     // old display order field value (not the actual display order!)
                     r.oldOrder = Convert.ToInt32(reader.GetValue(1));
                     // new display order value (actual one to be set)
@@ -147,7 +147,7 @@ namespace Serenity.Data
                     orderRecords.Add(r);
 
                     // if this is the one that is requested to be changed, hold a link to its entry
-                    if (recordID == r.recordID)
+                    if (IdToSql(recordID) == IdToSql(r.recordID))
                         changing = r;
                 }
             }
@@ -183,6 +183,24 @@ namespace Serenity.Data
 
             return UpdateOrders(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
         }
+        
+        private static string IdToSql(object id)
+        {
+            if (id == null || id == DBNull.Value)
+                throw new ArgumentNullException("displayOrderID");
+
+            if (id is string)
+                return ((string)id).ToSql();
+
+            if (id is Guid)
+                return ((Guid?)id).ToSql();
+
+            long l;
+            if (long.TryParse(id.ToString(), out l))
+                return l.ToString();
+
+            throw new ArgumentOutOfRangeException("displayOrderIDType");
+        }
 
 
         public static bool UpdateOrders(IDbConnection connection, List<OrderRecord> orderRecords, 
@@ -211,11 +229,11 @@ namespace Serenity.Data
 
             int updateCount = 0;
 
-            Action<long, long> appendSingleUpdate = delegate(long id, long newOrder)
+            Action<object, long> appendSingleUpdate = delegate(object id, long newOrder)
             {
                 queries.AppendLine(String.Format(
                     "UPDATE {0} SET {1} = {2} WHERE {3} = {4};", tableName,
-                    orderField.Name, newOrder, keyField.Name, id));
+                    orderField.Name, newOrder, keyField.Name, IdToSql(id)));
                 updateCount++;
             };
 
@@ -277,7 +295,7 @@ namespace Serenity.Data
                     sb.Length = 0;
 
                     // add this records ID to the IN (...) part
-                    sb.Append(rs.recordID);
+                    sb.Append(IdToSql(rs.recordID));
 
                     // now we'll find all following records whose display orders are changed same amount 
                     // (difference between old and new is same), so we will update them with just one query
@@ -300,7 +318,7 @@ namespace Serenity.Data
                             break;
 
                         sb.Append(',');
-                        sb.Append(rf.recordID);
+                        sb.Append(IdToSql(rf.recordID));
 
                         finish++;
                     }
@@ -310,7 +328,7 @@ namespace Serenity.Data
                     {
                         queries.AppendLine(String.Format(
                             "UPDATE {0} SET {1} = {2} WHERE {3} = {4};", tableName,
-                            orderField.Name, rs.newOrder, keyField.Name, rs.recordID));
+                            orderField.Name, rs.newOrder, keyField.Name, IdToSql(rs.recordID)));
                         updateCount++;
                     }
                     else
@@ -371,7 +389,7 @@ namespace Serenity.Data
         /// <returns>
         ///   If any of the display order values is changed true.</returns>
         public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null, 
-            Int64? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
+            object recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
         {
             return ReorderValues(connection, ((Row)row).Table, (Field)((IIdRow)row).IdField, row.DisplayOrderField, filter, recordID, 
                 newDisplayOrder, descendingKeyOrder, hasUniqueConstraint);
@@ -382,7 +400,7 @@ namespace Serenity.Data
         ///   for records to be sorted.</summary>
         public class OrderRecord
         {
-            public Int64 recordID;
+            public object recordID;
             public int oldOrder;
             public int newOrder;
         }
