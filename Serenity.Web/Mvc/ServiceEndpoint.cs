@@ -14,6 +14,9 @@ using System.Web.Mvc;
 
 namespace Serenity.Services
 {
+#if ASPNETCORE
+    [HandleServiceException]
+#endif
     public abstract class ServiceEndpoint : Controller
     {
 
