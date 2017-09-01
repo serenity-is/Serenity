@@ -41,7 +41,10 @@ namespace Serenity.Web
                     (!string.IsNullOrEmpty(attr.Permission) &&
                      !Authorization.HasPermission(attr.Permission)))
                 {
-                    context.Result = new ChallengeResult();
+                    if (Authorization.IsLoggedIn)
+                        context.Result = new ForbidResult();
+                    else
+                        context.Result = new ChallengeResult();
                 }
             }
         }
