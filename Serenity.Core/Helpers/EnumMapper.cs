@@ -110,7 +110,7 @@ namespace Serenity
                 return String.Empty;
 
             if (enumType != null &&
-                enumType.GetIsEnum() &&
+                enumType.IsEnum &&
                 System.Enum.GetName(enumType, value) != null)
             {
                 var enumName = System.Enum.GetName(enumType, value);

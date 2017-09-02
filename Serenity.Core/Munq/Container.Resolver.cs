@@ -42,14 +42,14 @@ namespace Munq
 
         private object HandleUnResolved(Exception knfe, string name, Type type)
         {
-            if (type.GetIsGenericType())
+            if (type.IsGenericType)
             {
                 object result = ResolveUsingOpenType(knfe, name, type);
                 if (result!=null)
                     return result;
             }
 
-            if (type.GetIsClass())
+            if (type.IsClass)
             {
                 try
                 {
@@ -64,7 +64,7 @@ namespace Munq
                 }
             }
 
-            if (type.GetIsInterface())
+            if (type.IsInterface)
             {
                 var regs = typeRegistry.GetDerived(name, type);
                 var reg = regs.FirstOrDefault();
@@ -82,7 +82,7 @@ namespace Munq
 
         private object ResolveUsingOpenType(Exception knfe, string name, Type type)
         {
-            if (type.GetContainsGenericParameters())
+            if (type.ContainsGenericParameters)
                 throw new KeyNotFoundException(ResolveFailureMessage(type), knfe);
             else
             {

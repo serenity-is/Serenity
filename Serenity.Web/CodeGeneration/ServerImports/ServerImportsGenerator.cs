@@ -63,7 +63,7 @@ namespace Serenity.CodeGeneration
                 });
             };
 
-            if (type.GetIsEnum())
+            if (type.IsEnum)
                 run(GenerateEnum);
             else if (type.IsSubclassOf(typeof(Controller)))
                 run(GenerateService);

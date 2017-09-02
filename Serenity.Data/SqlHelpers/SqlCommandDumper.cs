@@ -247,7 +247,7 @@ namespace Serenity.Data
         private static object unboxNullable(object value)
         {
             var typeOriginal = value.GetType();
-            if (typeOriginal.GetIsGenericType()
+            if (typeOriginal.IsGenericType
                 && typeOriginal.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
 #if COREFX

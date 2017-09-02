@@ -103,7 +103,7 @@ namespace Serenity.Data
             
             foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
                 foreach (var type in assembly.GetTypes())
-                    if (!type.GetIsAbstract() &&
+                    if (!type.IsAbstract &&
                         type.IsSubclassOf(typeof(Row)))
                     {
                         var instance = GetInstance(type);

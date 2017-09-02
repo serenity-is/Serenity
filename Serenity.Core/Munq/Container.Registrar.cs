@@ -63,7 +63,7 @@ namespace Munq
         
         public IRegistration Register(string name, Type tType, Type tImpl)
         {
-            if (tType.GetContainsGenericParameters())
+            if (tType.ContainsGenericParameters)
                 return RegisterOpenType(name, tType, tImpl);
                 
             return Register(name, tType, CreateInstanceDelegateFactory.Create(tImpl));

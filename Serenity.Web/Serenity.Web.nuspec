@@ -34,12 +34,12 @@
         <dependency id="Select2.js" version="[3.5.1]" />
       </group>
       <group targetFramework=".NETStandard1.6">
-        <dependency id="Dapper" version="${netstandard1.6:Dapper}" />
-        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="${netstandard1.6:Microsoft.AspNetCore.Mvc.Core}" />
-        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="${netstandard1.6:Microsoft.AspNetCore.Mvc.Razor}" />
-        <dependency id="Microsoft.AspNetCore.Mvc.ViewFeatures" version="${netstandard1.6:Microsoft.AspNetCore.Mvc.ViewFeatures}" />
-        <dependency id="Microsoft.Extensions.Caching.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Caching.Abstractions}" />
-        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard1.6:Microsoft.Extensions.Configuration.Abstractions}" />
+        <dependency id="Dapper" version="${netstandard2.0:Dapper}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Core" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.Core}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.Razor" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.Razor}" />
+        <dependency id="Microsoft.AspNetCore.Mvc.ViewFeatures" version="${netstandard2.0:Microsoft.AspNetCore.Mvc.ViewFeatures}" />
+        <dependency id="Microsoft.Extensions.Caching.Abstractions" version="${netstandard2.0:Microsoft.Extensions.Caching.Abstractions}" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="${netstandard2.0:Microsoft.Extensions.Configuration.Abstractions}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
         <dependency id="NUglify" version="${*:NUglify}" />
         <dependency id="Serenity.Core" version="${version}" />
@@ -47,13 +47,13 @@
         <dependency id="Serenity.Data.Entity" version="${version}" />
         <dependency id="Serenity.Services" version="${version}" />
         <dependency id="Serenity.Web.Assets" version="${serenityWebAssetsVersion}" />
-        <dependency id="System.Data.Common" version="${netstandard1.6:System.Data.Common}" />
-        <dependency id="System.Data.SqlClient" version="${netstandard1.6:System.Data.SqlClient}" />
-        <dependency id="System.Diagnostics.Process" version="${netstandard1.6:System.Diagnostics.Process}" />
-        <dependency id="System.IO.FileSystem.Watcher" version="${netstandard1.6:System.IO.FileSystem.Watcher}" />
-        <dependency id="System.Net.Requests" version="${netstandard1.6:System.Net.Requests}" />
-        <dependency id="System.Runtime.Extensions" version="${netstandard1.6:System.Runtime.Extensions}" />
-        <dependency id="System.Threading.Thread" version="${netstandard1.6:System.Threading.Thread}" />
+        <dependency id="System.Data.Common" version="${netstandard2.0:System.Data.Common}" />
+        <dependency id="System.Data.SqlClient" version="${netstandard2.0:System.Data.SqlClient}" />
+        <dependency id="System.Diagnostics.Process" version="${netstandard2.0:System.Diagnostics.Process}" />
+        <dependency id="System.IO.FileSystem.Watcher" version="${netstandard2.0:System.IO.FileSystem.Watcher}" />
+        <dependency id="System.Net.Requests" version="${netstandard2.0:System.Net.Requests}" />
+        <dependency id="System.Runtime.Extensions" version="${netstandard2.0:System.Runtime.Extensions}" />
+        <dependency id="System.Threading.Thread" version="${netstandard2.0:System.Threading.Thread}" />
         <dependency id="jQuery" version="${net45:jQuery}" />
         <dependency id="jQuery.UI.Combined" version="${net45:jQuery.UI.Combined}" />
         <dependency id="jQuery.Validation" version="${net45:jQuery.Validation}" />
@@ -64,7 +64,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\${configuration}\netstandard1.6\Serenity.Web.dll" target="lib/netstandard1.6" />
+    <file src="bin\${configuration}\netstandard2.0\Serenity.Web.dll" target="lib/netstandard2.0" />
     <file src="bin\${configuration}\Serenity.Web.dll" target="lib/net45" />
     <file src="bin\${configuration}\Serenity.Web.pdb" target="lib/net45" />
     <file src="bin\${configuration}\serenity.css" target="content/Content/serenity" />

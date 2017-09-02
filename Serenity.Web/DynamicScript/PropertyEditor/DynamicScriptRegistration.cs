@@ -25,10 +25,10 @@ namespace Serenity.Web
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (type.GetIsAbstract() || 
-                        type.GetIsInterface() || 
-                        type.GetIsGenericTypeDefinition() ||
-                        !type.GetIsPublic() ||
+                    if (type.IsAbstract || 
+                        type.IsInterface || 
+                        type.IsGenericTypeDefinition ||
+                        !type.IsPublic ||
                         !type.IsSubclassOf(typeof(Controller)))
                         continue;
 
@@ -74,7 +74,7 @@ namespace Serenity.Web
                                 "DynamicScript defined on method {2} of type {1} has void return type",
                                 type.Name, method.Name));
 
-                        var isResult = returnType.GetIsGenericType() && 
+                        var isResult = returnType.IsGenericType && 
                             returnType.GetGenericTypeDefinition() == typeof(Result<>);
                         if (!isResult && typeof(ActionResult).IsAssignableFrom(returnType))
                             throw new ArgumentOutOfRangeException("returnType", String.Format(

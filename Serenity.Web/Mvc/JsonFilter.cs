@@ -27,7 +27,7 @@ namespace Serenity.Services
 #else
                 .GetParameters()
 #endif
-                .Where(x => !x.ParameterType.GetIsInterface());
+                .Where(x => !x.ParameterType.IsInterface);
 
             if (!prms.Any())
                 return;

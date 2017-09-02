@@ -73,7 +73,7 @@ namespace Serenity.CodeGeneration
                     if (!type.IsSubclassOf(typeof(Controller)))
                         continue;
 
-                    if (type.GetIsAbstract())
+                    if (type.IsAbstract)
                         continue;
 
                     if (this.IsEndpoint != null && !this.IsEndpoint(type))
@@ -120,7 +120,7 @@ namespace Serenity.CodeGeneration
                                 continue;
 
                             // belki burada daha sonra metod listesini de verebiliriz (ayrı bir namespace de?)
-                            var parameters = method.GetParameters().Where(x => !x.ParameterType.GetIsInterface()).ToArray();
+                            var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
                             if (parameters.Length > 1)
                             {
                                 // tek parametreli olmalı
@@ -131,7 +131,7 @@ namespace Serenity.CodeGeneration
                             if (parameters.Length == 1)
                             {
                                 paramType = parameters[0].ParameterType;
-                                if (paramType.GetIsPrimitive() || !ScriptDtoGenerator.CanHandleType(paramType))
+                                if (paramType.IsPrimitive || !ScriptDtoGenerator.CanHandleType(paramType))
                                     continue;
                             }
                             else
@@ -141,7 +141,7 @@ namespace Serenity.CodeGeneration
 
                             Type responseType = returnType;
                             if (returnType != null &&
-                                returnType.GetIsGenericType() &&
+                                returnType.IsGenericType &&
                                 returnType.GetGenericTypeDefinition() == typeof(Result<>))
                             {
                                 responseType = returnType.GenericTypeArguments[0];

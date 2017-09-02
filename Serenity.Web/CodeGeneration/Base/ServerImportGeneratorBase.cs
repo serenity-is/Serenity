@@ -64,7 +64,7 @@ namespace Serenity.CodeGeneration
                 if (nullableType != null)
                     memberType = nullableType;
 
-                if (memberType.GetIsEnum())
+                if (memberType.IsEnum)
                     EnqueueType(memberType);
             }
         }
@@ -125,7 +125,7 @@ namespace Serenity.CodeGeneration
 
                 foreach (var fromType in types)
                 {
-                    if (fromType.GetIsAbstract())
+                    if (fromType.IsAbstract)
                         continue;
 
                     if (fromType.IsSubclassOf(typeof(ServiceRequest)) ||
@@ -155,7 +155,7 @@ namespace Serenity.CodeGeneration
             {
                 var type = generateQueue.Dequeue();
 
-                if (!this.Assemblies.Contains(type.GetAssembly()))
+                if (!this.Assemblies.Contains(type.Assembly))
                     continue;
 
                 var ns = GetNamespace(type);
@@ -171,10 +171,10 @@ namespace Serenity.CodeGeneration
 
         public static bool CanHandleType(Type memberType)
         {
-            if (memberType.GetIsInterface())
+            if (memberType.IsInterface)
                 return false;
 
-            if (memberType.GetIsAbstract())
+            if (memberType.IsAbstract)
                 return false;
 
             if (typeof(Delegate).IsAssignableFrom(memberType))
@@ -247,7 +247,7 @@ namespace Serenity.CodeGeneration
         {
             sb = sb ?? this.sb;
 
-            if (type.GetIsGenericType())
+            if (type.IsGenericType)
             {
                 var gtd = type.GetGenericTypeDefinition();
                 var name = gtd.Name;
@@ -284,7 +284,7 @@ namespace Serenity.CodeGeneration
 
             string ns;
 
-            if (type.GetIsGenericType())
+            if (type.IsGenericType)
             {
                 var gtd = type.GetGenericTypeDefinition();
                 ns = ShortenNamespace(gtd, codeNamespace);
@@ -378,14 +378,14 @@ namespace Serenity.CodeGeneration
             if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
                 return false;
 
-            var parameters = method.GetParameters().Where(x => !x.ParameterType.GetIsInterface()).ToArray();
+            var parameters = method.GetParameters().Where(x => !x.ParameterType.IsInterface).ToArray();
             if (parameters.Length > 1)
                 return false;
 
             if (parameters.Length == 1)
             {
                 requestType = parameters[0].ParameterType;
-                if (requestType.GetIsPrimitive() || !CanHandleType(requestType))
+                if (requestType.IsPrimitive || !CanHandleType(requestType))
                     return false;
             }
             else
@@ -395,7 +395,7 @@ namespace Serenity.CodeGeneration
 
             responseType = method.ReturnType;
             if (responseType != null &&
-                responseType.GetIsGenericType() &&
+                responseType.IsGenericType &&
                 responseType.GetGenericTypeDefinition() == typeof(Result<>))
             {
                 responseType = responseType.GenericTypeArguments[0];

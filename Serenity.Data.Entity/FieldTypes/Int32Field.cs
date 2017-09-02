@@ -42,40 +42,34 @@ namespace Serenity.Data
             var value = _getValue(row);
             if (value == null)
                 writer.WriteNull();
-            else //if (EnumType == null)
+            else
                 writer.WriteValue(value.Value);
-            //else if (EnumType.IsEnum)
-            //    writer.WriteValue(Enum.GetName(EnumType, value.Value));
-            //else if (EnumType.IsSubclassOf(typeof(DataEnum)))
-            //    writer.WriteValue(DataEnum.ConvertFromInt32(EnumType, value.Value).Key);
-            //else
-            //    throw new InvalidProgramException(String.Format("{0} geçerli bir enum tipi değil!", EnumType.Name));
         }
 
         internal static Int64 ConvertEnumFromInt(Type enumType, Int64 v)
         {
-            if (enumType.GetIsEnum())
+            if (enumType.IsEnum)
             {
                 var val = Enum.Parse(enumType, v.ToString());
                 if (!Enum.IsDefined(enumType, val))
-                    throw new InvalidCastException(String.Format("{0} geçerli bir {1} değeri değil!", v, enumType.Name));
+                    throw new InvalidCastException(String.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
 
                 return v;
             }
             else
-                throw new InvalidProgramException(String.Format("{0} geçerli bir enum tipi değil!", enumType.Name));
+                throw new InvalidProgramException(String.Format("{0} is not a valid enum type!", enumType.Name));
         }
 
         internal static Int64 ConvertEnumFromString(Type enumType, string s)
         {
-            if (enumType.GetIsEnum())
+            if (enumType.IsEnum)
             {
                 Int64 v;
                 if (Int64.TryParse(s, out v))
                 {
                     var val = Enum.Parse(enumType, s);
                     if (!Enum.IsDefined(enumType, val))
-                        throw new InvalidCastException(String.Format("{0} geçerli bir {1} değeri değil!", v, enumType.Name));
+                        throw new InvalidCastException(String.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
 
                     return v;
                 }
@@ -83,7 +77,7 @@ namespace Serenity.Data
                     return Convert.ToInt64(Enum.Parse(enumType, s), CultureInfo.InvariantCulture);
             }
             else
-                throw new InvalidProgramException(String.Format("{0} geçerli bir enum tipi değil!", enumType.Name));
+                throw new InvalidProgramException(String.Format("{0} is not a valid enum type!", enumType.Name));
         }
 
         public override void ValueFromJson(JsonReader reader, Row row, JsonSerializer serializer)

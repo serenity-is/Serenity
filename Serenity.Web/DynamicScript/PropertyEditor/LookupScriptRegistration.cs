@@ -26,7 +26,7 @@ namespace Serenity.Web
                     {
                         if (attr.LookupType == null)
                             script = (LookupScript)Activator.CreateInstance(typeof(RowLookupScript<>).MakeGenericType(type));
-                        else if (attr.LookupType.GetIsGenericType())
+                        else if (attr.LookupType.IsGenericType)
                             script = (LookupScript)Activator.CreateInstance(attr.LookupType.MakeGenericType(type));
                         else if (attr.LookupType.GetCustomAttribute<LookupScriptAttribute>() == null)
                             script = (LookupScript)Activator.CreateInstance(attr.LookupType);
@@ -38,7 +38,7 @@ namespace Serenity.Web
                         }
                     }
                     else if (!typeof(LookupScript).IsAssignableFrom(type) ||
-                        type.GetIsAbstract())
+                        type.IsAbstract)
                     {
                         throw new InvalidOperationException(String.Format("Type {0} can't be registered as a lookup script!", type.FullName));
                     }

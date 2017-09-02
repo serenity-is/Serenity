@@ -546,7 +546,7 @@ namespace Serenity.ComponentModel
             if (enumOrLookupType == null)
                 throw new ArgumentNullException("enumOrLookupType");
 
-            if (enumOrLookupType.GetIsEnum())
+            if (enumOrLookupType.IsEnum)
             {
                 var ek = enumOrLookupType.GetCustomAttribute<EnumKeyAttribute>(false);
                 if (ek == null)

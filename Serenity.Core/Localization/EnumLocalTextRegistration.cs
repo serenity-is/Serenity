@@ -44,7 +44,7 @@ namespace Serenity.Localization
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (type.GetIsEnum())
+                    if (type.IsEnum)
                     {
                         var enumKey = EnumMapper.GetEnumTypeKey(type);
 

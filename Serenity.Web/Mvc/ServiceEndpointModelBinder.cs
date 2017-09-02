@@ -35,7 +35,7 @@ namespace Serenity.Services
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
             bindingContext.Result = ModelBindingResult.Success(null);
-            return Microsoft.AspNetCore.Mvc.Internal.TaskCache.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 

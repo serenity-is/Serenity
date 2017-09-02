@@ -67,11 +67,11 @@ namespace Serenity.CodeGenerator
 
             Extensibility.ExtensibilityHelper.SelfAssemblies = new Assembly[]
             {
-                typeof(LocalTextRegistry).GetAssembly(),
-                typeof(SqlConnections).GetAssembly(),
-                typeof(Row).GetAssembly(),
-                typeof(SaveRequestHandler<>).GetAssembly(),
-                typeof(WebSecurityHelper).GetAssembly()
+                typeof(LocalTextRegistry).Assembly,
+                typeof(SqlConnections).Assembly,
+                typeof(Row).Assembly,
+                typeof(SaveRequestHandler<>).Assembly,
+                typeof(WebSecurityHelper).Assembly
             }.Concat(assemblies).Distinct().ToArray();
 
             var generator = new ServerTypingsGenerator(assemblies.ToArray());

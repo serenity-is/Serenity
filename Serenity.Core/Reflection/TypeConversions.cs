@@ -17,7 +17,7 @@ namespace Serenity.Data
                 (value == null || value is Type))
                 return value;
 
-            if (conversionType.GetIsGenericType() &&
+            if (conversionType.IsGenericType &&
                 conversionType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
             {
                 if (value == null)

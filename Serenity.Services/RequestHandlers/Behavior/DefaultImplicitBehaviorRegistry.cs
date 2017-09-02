@@ -22,7 +22,7 @@ namespace Serenity.Services
             var list = new List<Type>();
 
             foreach (var type in ExtensibilityHelper.GetTypesWithInterface(typeof(IImplicitBehavior)))
-                if (!type.GetIsAbstract())
+                if (!type.IsAbstract)
                     list.Add(type);
 
             types = list;

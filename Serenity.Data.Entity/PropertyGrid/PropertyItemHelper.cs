@@ -78,7 +78,7 @@ namespace Serenity.PropertyGrid
 
                 processorTypes = ExtensibilityHelper.GetTypesWithInterface(
                         typeof(IPropertyProcessor))
-                    .Where(x => !x.GetIsAbstract()).ToArray();
+                    .Where(x => !x.IsAbstract).ToArray();
 
                 return processorTypes;
             }

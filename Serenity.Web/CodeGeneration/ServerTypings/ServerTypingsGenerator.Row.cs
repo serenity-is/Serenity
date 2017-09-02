@@ -44,9 +44,9 @@ namespace Serenity.CodeGeneration
             if (lookupAttr == null)
             {
                 var script = lookupScripts.FirstOrDefault(x =>
-                    x.GetBaseType() != null &&
-                    x.GetBaseType().GetIsGenericType() &&
-                    x.GetBaseType().GetGenericArguments().Any(z => z == rowType));
+                    x.BaseType != null &&
+                    x.BaseType.IsGenericType &&
+                    x.BaseType.GetGenericArguments().Any(z => z == rowType));
 
                 if (script != null)
                     lookupAttr = script.GetCustomAttribute<LookupScriptAttribute>();

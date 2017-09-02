@@ -2,6 +2,7 @@
 using Serenity.Abstractions;
 #if ASPNETCORE
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using System.Security.Principal;
 #else
@@ -37,7 +38,7 @@ namespace Serenity
             if (password == null)
                 throw new ArgumentNullException("password");
 
-            if (!Dependency.Resolve<IAuthenticationService>().Validate(ref username, password))
+            if (!Dependency.Resolve<Serenity.Abstractions.IAuthenticationService>().Validate(ref username, password))
                 return false;
             
             SetAuthenticationTicket(username, persist);
@@ -60,7 +61,7 @@ namespace Serenity
 #if ASPNETCORE
             var principal = new GenericPrincipal(new GenericIdentity(username), EmptyStringArray);
             var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
-            httpContext.Authentication.SignInAsync("CookieAuthenticationScheme", principal).Wait();
+            httpContext.SignInAsync("Cookies", principal).Wait();
 #else
             HttpCookie authCookie = FormsAuthentication.GetAuthCookie(username, persist);
             HttpContext.Current.Response.Cookies.Remove(authCookie.Name);
@@ -76,7 +77,7 @@ namespace Serenity
         {
 #if ASPNETCORE
             var httpContext = Dependency.Resolve<IHttpContextAccessor>().HttpContext;
-            httpContext.Authentication.SignOutAsync("CookieAuthenticationScheme").Wait();
+            httpContext.SignOutAsync("Cookies").Wait();
 #else
             HttpCookie authCookie = new HttpCookie(FormsAuthentication.FormsCookieName);
             // Setting up a cookie which has expired, Enforce client to delete this cookie.

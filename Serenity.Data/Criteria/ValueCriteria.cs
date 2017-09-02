@@ -68,7 +68,7 @@
             if (k is int || k is long)
                 return true;
 
-            if (!k.GetType().GetIsPrimitive())
+            if (!k.GetType().IsPrimitive)
                 return false;
 
             return k is Byte ||

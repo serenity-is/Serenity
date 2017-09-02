@@ -425,14 +425,14 @@ namespace Serenity.Data
                             if (property.PropertyType != null &&
                                 field is IEnumTypeField)
                             {
-                                if (property.PropertyType.GetIsEnum())
+                                if (property.PropertyType.IsEnum)
                                 {
                                     (field as IEnumTypeField).EnumType = property.PropertyType;
                                 }
                                 else
                                 {
                                     var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
-                                    if (nullableType != null && nullableType.GetIsEnum())
+                                    if (nullableType != null && nullableType.IsEnum)
                                         (field as IEnumTypeField).EnumType = nullableType;
                                 }
                             }

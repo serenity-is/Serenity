@@ -43,7 +43,7 @@ namespace Serenity.Services
                 return false;
 
             var rowListType = Target.ValueType;
-            if (!rowListType.GetIsGenericType() ||
+            if (!rowListType.IsGenericType ||
                 rowListType.GetGenericTypeDefinition() != typeof(List<>))
             {
                 throw new ArgumentException(String.Format("Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
@@ -52,7 +52,7 @@ namespace Serenity.Services
             }
 
             var rowType = rowListType.GetGenericArguments()[0];
-            if (rowType.GetIsAbstract() ||
+            if (rowType.IsAbstract ||
                 !typeof(Row).IsAssignableFrom(rowType))
             {
                 throw new ArgumentException(String.Format(
