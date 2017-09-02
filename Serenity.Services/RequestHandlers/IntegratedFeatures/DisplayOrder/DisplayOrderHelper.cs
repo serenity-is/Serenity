@@ -147,7 +147,7 @@ namespace Serenity.Data
                     orderRecords.Add(r);
 
                     // if this is the one that is requested to be changed, hold a link to its entry
-                    if (IdToSql(recordID) == IdToSql(r.recordID))
+                    if (recordID != null && IdToSql(recordID) == IdToSql(r.recordID))
                         changing = r;
                 }
             }
