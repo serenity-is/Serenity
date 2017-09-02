@@ -131,6 +131,7 @@ namespace Serenity.Data
             // read all existing records
             using (IDataReader reader = SqlHelper.ExecuteReader(connection, query))
             {
+                var recordIDStr = recordID == null ? null : IdToSql(recordID);
                 while (reader.Read())
                 {
                     // each records actual display order value is one more than previous one
@@ -147,7 +148,7 @@ namespace Serenity.Data
                     orderRecords.Add(r);
 
                     // if this is the one that is requested to be changed, hold a link to its entry
-                    if (recordID != null && IdToSql(recordID) == IdToSql(r.recordID))
+                    if (recordID != null && recordIDStr == IdToSql(r.recordID))
                         changing = r;
                 }
             }
