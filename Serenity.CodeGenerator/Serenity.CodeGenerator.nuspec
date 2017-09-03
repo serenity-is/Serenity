@@ -19,6 +19,7 @@
       <group targetFramework=".NETCoreApp2.0">
         <dependency id="FirebirdSql.Data.FirebirdClient" version="${netcoreapp2.0:FirebirdSql.Data.FirebirdClient}" />
         <dependency id="Microsoft.Data.Sqlite" version="${netcoreapp2.0:Microsoft.Data.Sqlite}" />
+        <dependency id="Microsoft.NETCore.App" version="2.0.0" />
         <dependency id="MySqlConnector" version="${netcoreapp2.0:MySqlConnector}" />
         <dependency id="Npgsql" version="${netcoreapp2.0:Npgsql}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />

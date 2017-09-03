@@ -7,6 +7,7 @@
     <OutputType>Exe</OutputType>
     <PackageId>Serenity.CodeGenerator</PackageId>
     <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8;dnxcore50</AssetTargetFallback>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\lib.d.ts_">
