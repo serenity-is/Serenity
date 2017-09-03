@@ -52,7 +52,6 @@
     <Compile Include="Authorization\Throttler.cs" />
     <Compile Include="Authorization\LogicOperatorPermissionService.cs" />
     <Compile Include="Authorization\TransientGrantingPermissionService.cs" />
-    <Compile Include="CompatibilityExtensions\Net45Extensions.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\BooleanFilteringAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\DateFilteringAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\BasicFilteringTypes\DateTimeFilteringAttribute.cs" />
