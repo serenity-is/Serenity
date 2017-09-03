@@ -1,3 +1,18 @@
+## 3.0.0 (2017-09-03)
+
+Features:
+  - upgraded to .NET Core 2.0 / AspNetCore 2.0
+  - ability to use full .net framework with Serene AspNetCore version (wait for guide)
+  - typescript 2.4 is now recommended version
+  - make sure dotnet-sergen can load assembly and list types properly before trying to generate server typings
+  - added tablename as attribute on Row for RowWithRegion (thanks @dfaruque)
+  - raise forbidresult from PageAuthorizeAttribute when user doesn't have permission but logged in
+  - make display order and IDisplayOrderRow work with rows of non-integer ID columns
+  - handle service exceptions in asp.net core service endpoints similar to mvc ones
+  
+Bugfixes:
+  - fix unused select overload (thanks @TomaszKustra)  
+
 ## 2.10.3 (2017-08-17)
 
 Features:
