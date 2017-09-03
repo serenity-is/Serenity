@@ -17,12 +17,12 @@
       <group targetFramework=".NETFramework4.5">
       </group>
       <group targetFramework=".NETCoreApp2.0">
-        <dependency id="FirebirdSql.Data.FirebirdClient" version="${*:FirebirdSql.Data.FirebirdClient}" />
-        <dependency id="Microsoft.Data.Sqlite" version="${*:Microsoft.Data.Sqlite}" />
-        <dependency id="MySqlConnector" version="${*:MySqlConnector}" />
-        <dependency id="Npgsql" version="${*:Npgsql}" />
+        <dependency id="FirebirdSql.Data.FirebirdClient" version="${netcoreapp2.0:FirebirdSql.Data.FirebirdClient}" />
+        <dependency id="Microsoft.Data.Sqlite" version="${netcoreapp2.0:Microsoft.Data.Sqlite}" />
+        <dependency id="MySqlConnector" version="${netcoreapp2.0:MySqlConnector}" />
+        <dependency id="Npgsql" version="${netcoreapp2.0:Npgsql}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
-        <dependency id="System.Data.SqlClient" version="${*:System.Data.SqlClient}" />
+        <dependency id="System.Data.SqlClient" version="${netcoreapp2.0:System.Data.SqlClient}" />
         <dependency id="Serenity.Web" version="${version}" />
       </group>
     </dependencies>
