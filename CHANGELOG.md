@@ -1,3 +1,8 @@
+## 3.0.1 (2017-09-04)
+
+Bugfixes:
+  - fix dotnet sergen failing with assembly load error
+
 ## 3.0.0 (2017-09-03)
 
 Features:
