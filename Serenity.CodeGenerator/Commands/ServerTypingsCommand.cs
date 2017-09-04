@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Serenity.CodeGenerator
 {
@@ -20,16 +21,97 @@ namespace Serenity.CodeGenerator
             var projectDir = Path.GetDirectoryName(csproj);
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
 
-            if (config.ServerTypings == null)
+            string[] assemblyFiles = null;
+
+            if (config.ServerTypings == null ||
+                config.ServerTypings.Assemblies.IsEmptyOrNull())
             {
-                System.Console.Error.WriteLine("ServerTypings is not configured in sergen.json file!");
-                Environment.Exit(1);
+                var xe = XElement.Parse(File.ReadAllText(csproj));
+                var xtarget = xe.Descendants("TargetFramework").FirstOrDefault();
+
+                if (xtarget == null || string.IsNullOrEmpty(xtarget.Value))
+                {
+                    System.Console.Error.WriteLine("Couldn't read TargetFramework from project file for server typings generation!");
+                    Environment.Exit(1);
+                }
+
+                string outputName;
+                var xasm = xe.Descendants("AssemblyName").FirstOrDefault();
+                if (xasm == null || string.IsNullOrEmpty(xasm.Value))
+                    outputName = Path.ChangeExtension(Path.GetFileName(csproj), null);
+                else
+                    outputName = xasm.Value;
+
+                var outputExtension = ".dll";
+                var targetFramework = xtarget.Value;
+                if (targetFramework.StartsWith("net") &&
+                    !targetFramework.StartsWith("netcoreapp"))
+                    outputExtension = ".exe";
+
+                var outputPath1 = Path.Combine(Path.GetDirectoryName(csproj), "bin/Debug/" + targetFramework + "/" + outputName + outputExtension)
+                    .Replace('/', Path.DirectorySeparatorChar);
+                var outputPath2 = Path.Combine(Path.GetDirectoryName(csproj), "bin/Release/" + targetFramework + "/" + outputName + outputExtension)
+                    .Replace('/', Path.DirectorySeparatorChar);
+
+                if (File.Exists(outputPath1))
+                {
+                    if (File.Exists(outputPath2) &&
+                        File.GetLastWriteTime(outputPath1) < File.GetLastWriteTime(outputPath2))
+                        assemblyFiles = new[] { outputPath2 };
+                    else
+                        assemblyFiles = new[] { outputPath1 };
+                }
+                else if (File.Exists(outputPath2))
+                    assemblyFiles = new[] { outputPath2 };
+                else
+                {
+                    System.Console.Error.WriteLine(String.Format("Couldn't find output file for server typings generation at {0}!" + Environment.NewLine + 
+                        "Make sure project is built successfully before running Sergen", outputPath1));
+                    Environment.Exit(1);
+                }
             }
 
-            if (config.ServerTypings.Assemblies.IsEmptyOrNull())
+            if (assemblyFiles == null)
             {
-                System.Console.Error.WriteLine("ServerTypings has no assemblies configured in sergen.json file!");
-                Environment.Exit(1);
+                if (config.ServerTypings == null)
+                {
+                    System.Console.Error.WriteLine("ServerTypings is not configured in sergen.json file!");
+                    Environment.Exit(1);
+                }
+
+                if (config.ServerTypings.Assemblies.IsEmptyOrNull())
+                {
+                    System.Console.Error.WriteLine("ServerTypings has no assemblies configured in sergen.json file!");
+                    Environment.Exit(1);
+                }
+
+                assemblyFiles = config.ServerTypings.Assemblies;
+                for (var i = 0; i < assemblyFiles.Length; i++)
+                {
+                    var assemblyFile1 = Path.GetFullPath(assemblyFiles[i].Replace('/', Path.DirectorySeparatorChar));
+                    var binDebugIdx = assemblyFile1.IndexOf("/bin/Debug/", StringComparison.OrdinalIgnoreCase);
+                    string assemblyFile2 = assemblyFile1;
+                    if (binDebugIdx >= 0)
+                        assemblyFile2 = assemblyFile1.Substring(0, binDebugIdx) + "/bin/Release/" + assemblyFile1.Substring(binDebugIdx + "/bin/Release".Length);
+
+                    assemblyFiles[i] = assemblyFile1;
+
+                    if (File.Exists(assemblyFile1))
+                    {
+                        if (File.Exists(assemblyFile2) &&
+                            File.GetLastWriteTime(assemblyFile1) < File.GetLastWriteTime(assemblyFile2))
+                            assemblyFiles[i] = assemblyFile2;
+                    }
+                    else if (File.Exists(assemblyFile2))
+                        assemblyFiles[i] = assemblyFile2;
+                    else
+                    {
+                        System.Console.Error.WriteLine(String.Format(String.Format("Assembly file '{0}' specified in sergen.json is not found! " +
+                        "This might happen when project is not successfully built or file name doesn't match the output DLL." +
+                        "Please check path in sergen.json and try again.", assemblyFile1)));
+                        Environment.Exit(1);
+                    }
+                }
             }
 
             if (config.RootNamespace.IsEmptyOrNull())
@@ -46,28 +128,16 @@ namespace Serenity.CodeGenerator
             Console.ResetColor();
             Console.WriteLine(outDir);
 
-            var rootPath = Path.GetFullPath(config.ServerTypings.Assemblies[0].Replace('/', Path.DirectorySeparatorChar));
-
             List<Assembly> assemblies = new List<Assembly>();
-            foreach (var assembly in config.ServerTypings.Assemblies)
+            foreach (var assemblyFile in assemblyFiles)
             {
-                var fullName = Path.GetFullPath(assembly.Replace('/', Path.DirectorySeparatorChar));
-
-                if (!File.Exists(fullName))
-                {
-                    System.Console.Error.WriteLine(String.Format("Assembly file '{0}' specified in sergen.json is not found! " +
-                        "This might happen when project is not successfully built or file name doesn't match the output DLL." +
-                        "Please check path in sergen.json and try again.", fullName));
-                    Environment.Exit(1);
-                }
-
 #if COREFX
-                using (var dynamicContext = new AssemblyResolver(fullName))
+                using (var dynamicContext = new AssemblyResolver(assemblyFile))
                 {
                     var asm = dynamicContext.Assembly;
 #else
                 {
-                    var asm = Assembly.LoadFrom(fullName);
+                    var asm = Assembly.LoadFrom(assemblyFile);
 #endif
                     try
                     {
@@ -76,14 +146,14 @@ namespace Serenity.CodeGenerator
                     }
                     catch (ReflectionTypeLoadException ex1)
                     {
-                        System.Console.Error.WriteLine(String.Format("Couldn't list types in Assembly file '{0}' specified in sergen.json!", fullName) +
+                        System.Console.Error.WriteLine(String.Format("Couldn't list types in project assembly: '{0}'!", assemblyFile) +
                             Environment.NewLine + Environment.NewLine +
                             string.Join(Environment.NewLine, ex1.LoaderExceptions.Select(x => x.Message).Distinct()));
                         Environment.Exit(1);
                     }
                     catch (Exception ex)
                     {
-                        System.Console.Error.WriteLine(String.Format("Couldn't list types in Assembly file '{0}' specified in sergen.json! ", fullName)
+                        System.Console.Error.WriteLine(String.Format("Couldn't list types in project assembly: '{0}'! ", assemblyFile)
                             + Environment.NewLine + Environment.NewLine + ex.ToString());
                         Environment.Exit(1);
                     }
