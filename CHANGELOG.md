@@ -1,3 +1,8 @@
+## 3.0.2 (2017-09-04)
+
+Features:
+  - rowregistry can support multiple rows per ConnectionKey / TableName pair
+
 ## 3.0.1 (2017-09-04)
 
 Bugfixes:
