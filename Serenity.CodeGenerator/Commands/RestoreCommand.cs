@@ -20,6 +20,7 @@ namespace Serenity.CodeGenerator
             "MySql",
             "Microsoft.",
             "Newtonsoft.",
+            "NetStandard.",
             "Npgsql",
             "System."
         };
@@ -82,15 +83,25 @@ namespace Serenity.CodeGenerator
                 }
 
                 var packageFolder = Path.Combine(Path.Combine(packagesDir, id), ver);
+                if (!Directory.Exists(packageFolder))
+                    packageFolder = Path.Combine(Path.Combine(packagesDir, id.ToLowerInvariant()), ver);
+
                 var nuspecFile = Path.Combine(packageFolder, id + ".nuspec");
                 if (!File.Exists(nuspecFile))
-                    continue;
+                {
+                    nuspecFile = Path.Combine(packageFolder, id.ToLowerInvariant() + ".nuspec");
+                    if (!File.Exists(nuspecFile))
+                        continue;
+                }
 
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("Processing: " + id);
                 Console.ResetColor();
 
-                var contentRoot = Path.Combine(packageFolder, "content/".Replace('/', Path.DirectorySeparatorChar));
+                var contentRoot = Path.Combine(packageFolder, "Content/".Replace('/', Path.DirectorySeparatorChar));
+                if (!Directory.Exists(contentRoot))
+                    contentRoot = Path.Combine(packageFolder, "content/".Replace('/', Path.DirectorySeparatorChar));
+
                 if (Directory.Exists(contentRoot))
                 {
                     var targetRoot = Path.GetDirectoryName(csproj);
