@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using Serenity.Extensibility;
+using System.Linq;
 
 namespace Serenity.Data
 {
@@ -8,8 +9,8 @@ namespace Serenity.Data
     {
         public const string DefaultConnectionKey = "Default";
 
-        private static IDictionary<string, Row> emptyRegistry = new Dictionary<string, Row>(StringComparer.OrdinalIgnoreCase);
-        internal static Dictionary<string, Dictionary<string, Row>> registry;
+        private static ILookup<string, Row> emptyRegistry = new List<Row>().ToLookup(x => (string)null);
+        internal static IDictionary<string, ILookup<string, Row>> registry;
 
         static RowRegistry()
         {
@@ -18,39 +19,14 @@ namespace Serenity.Data
             };
         }
 
-        public static string GetConnectionKey(Type type)
-        {
-            var connectionKeyAttrs = type.GetCustomAttributes(typeof(ConnectionKeyAttribute), true);
-            if (connectionKeyAttrs.Length == 1)
-                return ((ConnectionKeyAttribute)connectionKeyAttrs[0]).Value;
-            else
-                return DefaultConnectionKey;
-        }
-
-        public static string GetConnectionKey(Row row)
-        {
-            return GetConnectionKey(row.GetType());
-        }
-
-        public static IDictionary<string, Row> GetRegistry(string connectionKey)
+        public static ILookup<string, Row> ByConnectionKey(string connectionKey)
         {
             var registry = EnsureRegistry();
+            ILookup<string, Row> connectionRegistry;
+            if (!registry.TryGetValue(connectionKey, out connectionRegistry))
+                return emptyRegistry;
 
-            Dictionary<string, Row> schemaRegistry;
-            if (registry.TryGetValue(connectionKey, out schemaRegistry))
-                return schemaRegistry;
-
-            return emptyRegistry;
-        }
-
-        public static Row GetConnectionRow(string connectionKey, string table)
-        {
-            var connectionRegistry = GetRegistry(connectionKey);
-            Row row;
-            if (connectionRegistry.TryGetValue(table, out row))
-                return row;
-
-            return null;
+            return connectionRegistry;
         }
 
         public static IEnumerable<Row> EnumerateRows()
@@ -58,28 +34,9 @@ namespace Serenity.Data
             var registry = EnsureRegistry();
 
             foreach (var reg in registry.Values)
-                foreach (var row in reg.Values)
-                    yield return row;
-        }
-
-        private static void AddInstance(Dictionary<string, Dictionary<string, Row>> registry, Row row)
-        {
-            try
-            {
-                var connectionKey = GetConnectionKey(row.GetType());
-                Dictionary<string, Row> connectionRegistry;
-                if (!registry.TryGetValue(connectionKey, out connectionRegistry))
-                    registry[connectionKey] = connectionRegistry = new Dictionary<string, Row>(StringComparer.OrdinalIgnoreCase);
-
-                string table = row.Table;
-
-                connectionRegistry.Add(table, row);
-            }
-            catch (Exception ex)
-            {
-                new InvalidOperationException(String.Format("Can't register Row instance in DataSchema: {0}",
-                    row.GetType().FullName), ex).Log();
-            }
+                foreach (var rows in reg)
+                    foreach (var row in rows)
+                        yield return row;
         }
 
         private static Row GetInstance(Type rowType)
@@ -87,19 +44,21 @@ namespace Serenity.Data
             return (Row)Activator.CreateInstance(rowType);
         }
 
-        private static Dictionary<string, Dictionary<string, Row>> EnsureRegistry()
+        private static IDictionary<string, ILookup<string, Row>> EnsureRegistry()
         {
             var reg = registry;
             if (reg == null)
-                reg = Initialize();
+            {
+                registry = reg = Initialize();
+                return reg;
+            }
 
-            registry = reg;
             return reg;
         }
 
-        private static Dictionary<string, Dictionary<string, Row>> Initialize()
+        private static IDictionary<string, ILookup<string, Row>> Initialize()
         {
-            var newRegistry = new Dictionary<string, Dictionary<string, Row>>(StringComparer.OrdinalIgnoreCase);
+            var rows = new List<Row>();
             
             foreach (var assembly in ExtensibilityHelper.SelfAssemblies)
                 foreach (var type in assembly.GetTypes())
@@ -107,10 +66,11 @@ namespace Serenity.Data
                         type.IsSubclassOf(typeof(Row)))
                     {
                         var instance = GetInstance(type);
-                        AddInstance(newRegistry, instance);
+                        rows.Add(instance);
                     }
 
-            return newRegistry;
+            return rows.GroupBy(x => x.GetFields().ConnectionKey, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.ToLookup(z => z.Table, StringComparer.OrdinalIgnoreCase), StringComparer.OrdinalIgnoreCase);
         }
     }
 }

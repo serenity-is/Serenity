@@ -44,7 +44,7 @@ namespace Serenity.Services
         {
             var auditRequest = GetAuditDeleteRequest(handler);
             if (auditRequest != null)
-                AuditLogService.AuditDelete(handler.UnitOfWork.Connection, RowRegistry.GetConnectionKey(handler.Row), auditRequest);
+                AuditLogService.AuditDelete(handler.UnitOfWork.Connection, handler.Row.GetFields().ConnectionKey, auditRequest);
         }
 
         protected AuditSaveRequest GetAuditSaveRequest(ISaveRequestHandler handler)
@@ -84,7 +84,7 @@ namespace Serenity.Services
             var auditRequest = GetAuditSaveRequest(handler);
 
             if (connectionKey == null)
-                connectionKey = RowRegistry.GetConnectionKey(handler.Row);
+                connectionKey = handler.Row.GetFields().ConnectionKey;
 
             if (handler.IsCreate)
             {

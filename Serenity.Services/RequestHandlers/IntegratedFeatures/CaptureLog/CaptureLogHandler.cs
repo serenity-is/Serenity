@@ -46,18 +46,19 @@ namespace Serenity.Services
             if (captureLogAttr == null || captureLogAttr.LogRow == null)
                 throw new InvalidOperationException(String.Format("{0} row type has no capture log attribute defined!", typeof(TRow).Name));
 
-            logConnectionKey = RowRegistry.GetConnectionKey(captureLogAttr.LogRow);
             var logRowInstance = (Row)Activator.CreateInstance(captureLogAttr.LogRow);
 
             var captureLogRow = logRowInstance as ICaptureLogRow;
             if (captureLogRow == null)
                 throw new InvalidOperationException(String.Format("Capture log table {0} doesn't implement ICaptureLogRow interface!",
-                    captureLogAttr.LogRow.FullName, logConnectionKey, typeof(TRow).Name));
+                    captureLogAttr.LogRow.FullName, typeof(TRow).Name));
 
             newInfo = new StaticInfo();
             newInfo.logRowInstance = logRowInstance;
             newInfo.captureLogInstance = captureLogRow;
             newInfo.rowInstance = new TRow();
+            logConnectionKey = newInfo.rowInstance.GetFields().ConnectionKey;
+
             newInfo.rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(newInfo.rowInstance.EnumerateTableFields(), x => x.Name);
             newInfo.logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRowInstance.EnumerateTableFields(), x => x.Name);
             var mappedIdField = captureLogAttr.MappedIdField ?? ((Field)newInfo.rowInstance.IdField).Name;

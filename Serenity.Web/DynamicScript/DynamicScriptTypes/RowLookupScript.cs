@@ -89,9 +89,9 @@ namespace Serenity.Web
             PrepareQuery(query);
             ApplyOrder(query);
 
-            using (var connection = SqlConnections.NewByKey(RowRegistry.GetConnectionKey(loader)))
+            using (var connection = SqlConnections.NewByKey(loader.GetFields().ConnectionKey))
             {
-                query.ForEach(connection, delegate()
+                query.ForEach(connection, delegate ()
                 {
                     list.Add(loader.Clone());
                 });

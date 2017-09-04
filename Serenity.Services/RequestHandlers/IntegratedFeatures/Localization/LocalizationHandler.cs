@@ -53,7 +53,7 @@ namespace Serenity.Data
                 throw new InvalidOperationException(String.Format("Localization table {0} doesn't implement ILocalizationRow interface!",
                     localAttr.LocalizationRow.GetType().FullName, schemaName, typeof(TRow).Name));
 
-            schemaName = RowRegistry.GetConnectionKey(localInstance);
+            schemaName = localInstance.GetFields().ConnectionKey;
 
             newInfo = new StaticInfo();
             newInfo.localRowInterface = localRow;

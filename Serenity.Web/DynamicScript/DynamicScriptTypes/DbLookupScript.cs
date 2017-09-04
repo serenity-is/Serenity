@@ -67,7 +67,7 @@ namespace Serenity.Web
             if (connectionKey == null)
             {
                 if (row != null)
-                    connectionKey = RowRegistry.GetConnectionKey(row);
+                    connectionKey = row.GetFields().ConnectionKey;
                 else
                     connectionKey = RowRegistry.DefaultConnectionKey;
             }

@@ -4,6 +4,7 @@ using System.Data;
 using Serenity.Data;
 using EntityType = System.String;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Serenity.Services
 {
@@ -160,7 +161,7 @@ namespace Serenity.Services
                          (AuditType?)fld.AuditTypeIdField[entity] == AuditType.Update) &&
                         (fld.OldAuditDataField[entity] != null || fld.NewAuditDataField[entity] != null))
                     {
-                        theRow = RowRegistry.GetConnectionRow(RowRegistry.DefaultConnectionKey, fld.EntityTypeIdField[entity]);
+                        theRow = RowRegistry.ByConnectionKey(RowRegistry.DefaultConnectionKey)[fld.EntityTypeIdField[entity]].FirstOrDefault();
                         if (theRow == null)
                             continue;
 
@@ -203,7 +204,7 @@ namespace Serenity.Services
 
                 foreach (var pair in response.IdNameLookups)
                 {
-                    Row entity = RowRegistry.GetConnectionRow(RowRegistry.DefaultConnectionKey, pair.Key);
+                    Row entity = RowRegistry.ByConnectionKey(RowRegistry.DefaultConnectionKey)[pair.Key].FirstOrDefault();
                     if (entity != null)
                     {
                         var idRow = entity as IIdRow;
@@ -221,7 +222,7 @@ namespace Serenity.Services
 
                 foreach (var pair in response.FieldTitles)
                 {
-                    Row entity = RowRegistry.GetConnectionRow(RowRegistry.DefaultConnectionKey, pair.Key);
+                    Row entity = RowRegistry.ByConnectionKey(RowRegistry.DefaultConnectionKey)[pair.Key].FirstOrDefault();
                     if (entity != null)
                     {
                         var lookup = pair.Value;

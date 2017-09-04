@@ -584,6 +584,11 @@ namespace Serenity.Data
             set { localTextPrefix = value; }
         }
 
+        public string ConnectionKey
+        {
+            get { return connectionKey; }
+        }
+
         public string GenerationKey
         {
             get

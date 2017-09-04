@@ -1,4 +1,5 @@
 ﻿using Serenity.Data;
+using System.Linq;
 
 namespace Serenity.Services
 {
@@ -27,8 +28,8 @@ namespace Serenity.Services
             if (parentIdField.ForeignTable.IsNullOrEmpty())
                 return;
 
-            var foreignRow = RowRegistry.GetConnectionRow(RowRegistry.GetConnectionKey(row), 
-                parentIdField.ForeignTable);
+            var foreignRow = RowRegistry.ByConnectionKey(row.GetFields().ConnectionKey)
+                [parentIdField.ForeignTable].FirstOrDefault();
 
             if (foreignRow == null)
                 return;
