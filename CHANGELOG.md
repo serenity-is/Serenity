@@ -1,3 +1,8 @@
+## 3.0.4 (2017-09-05)
+
+Bugfixes:
+  - try to resolve problem with dotnet sergen restore in linux due to case sensitivity and nuget lowercasing package ids
+
 ## 3.0.3 (2017-09-04)
 
 Features:
