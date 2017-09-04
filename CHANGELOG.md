@@ -1,3 +1,9 @@
+## 3.0.3 (2017-09-04)
+
+Features:
+  - dotnet sergen servertypings can try to find output DLL itself so assemblies option in sergen.json can be removed for normal workflows
+  - dotnet sergen servertypings uses release output dll if its date is newer than debug output dll
+
 ## 3.0.2 (2017-09-04)
 
 Features:
