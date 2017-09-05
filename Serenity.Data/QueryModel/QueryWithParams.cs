@@ -110,6 +110,22 @@
             get { return dialect; }
         }
 
+        /// <summary>
+        /// Gets the dialect (SQL server type / version) for query.
+        /// </summary>
+        public ISqlDialect Dialect()
+        {
+            return this.dialect;
+        }
+
+        public bool IsDialectOverridden
+        {
+            get
+            {
+                return this.dialectOverridden;
+            }
+        }
+
         public string DebugText
         {
             get

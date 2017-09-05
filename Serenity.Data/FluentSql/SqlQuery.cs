@@ -537,25 +537,8 @@
         }
 
         /// <summary>
-        /// Gets the dialect (SQL server type / version) for query.
-        /// </summary>
-        public ISqlDialect Dialect()
-        {
-            return this.dialect;
-        }
-
-        public bool IsDialectOverridden
-        {
-            get
-            {
-                return this.dialectOverridden;
-            }
-        }
-
-        /// <summary>
         /// Sets the dialect (SQL server type / version) for query.
         /// </summary>
-        /// <remarks>TODO: SqlDialect system should be improved.</remarks>
         public SqlQuery Dialect(ISqlDialect dialect)
         {
             if (dialect == null)
