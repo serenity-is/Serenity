@@ -61,6 +61,7 @@ namespace Serenity
             J(x.Editor.Container.Element).AddClass(this.element.GetAttribute("class"));
             this.element.AddClass("select2-offscreen").CSS("display", "block"); // validasyonun çalışması için
             x.Editor.SetData(this.element.GetValue());
+            x.Editor.SetReadOnly(this.ReadOnly);
         }
 
         protected virtual string GetLanguage()
