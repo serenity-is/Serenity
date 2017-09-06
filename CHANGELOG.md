@@ -1,3 +1,13 @@
+## 3.0.5 (2017-09-06)
+
+Features:
+  - allow overriding dialect for SqlInsert and SqlUpdate like SqlQuery does
+
+Bugfixes:
+  - fix culture identifiers in .net core version UserCultureProvider and don't crash if a culture is not found in the system [Serene]
+  - fix upload problem in linux due to case sensitivity
+  - set readonly flag of ckeditor instance after instance is ready
+
 ## 3.0.4 (2017-09-05)
 
 Bugfixes:
