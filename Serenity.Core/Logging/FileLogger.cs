@@ -23,7 +23,7 @@ namespace Serenity.Logging
             queue = new Queue<string>();
             lastFlush = DateTimeProvider.Now;
             
-            var settings = Config.TryGet<LogSettings>() ?? new LogSettings();
+            var settings = log ?? Config.TryGet<LogSettings>() ?? new LogSettings();
             File = string.IsNullOrEmpty(settings.File) ? null : settings.File;
             FlushTimeout = TimeSpan.FromSeconds(settings.FlushTimeout);
         }
