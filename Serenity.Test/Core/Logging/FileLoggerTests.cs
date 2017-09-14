@@ -44,7 +44,7 @@ namespace Serenity.Test.Logging
                     logger.Write(LoggingLevel.Fatal, "test13579", null, null);
                 }
 
-                Assert.Contains(System.IO.File.ReadAllText(tempFile), "test13579");
+                Assert.Contains("test13579", System.IO.File.ReadAllText(tempFile));
             }
             finally
             {
@@ -74,7 +74,7 @@ namespace Serenity.Test.Logging
                         logger.Write(LoggingLevel.Fatal, "test24680", null, null);
                     }
 
-                    Assert.Contains(System.IO.File.ReadAllText(tempFile), "test24680");
+                    Assert.Contains("test24680", System.IO.File.ReadAllText(tempFile));
                 }
             }
             finally
