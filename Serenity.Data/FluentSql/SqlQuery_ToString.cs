@@ -254,7 +254,23 @@ namespace Serenity.Data
 
                 if (useRowNum)
                 {
-                    sb.Append("ROWNUM AS numberingofrow");
+                    if (orderBy != null)
+                    {
+                        sb.Append("ROW_NUMBER() OVER (ORDER BY ");
+                        for (int i = 0; i < orderBy.Count; i++)
+                        {
+                            if (i > 0)
+                                sb.Append(", ");
+
+                            sb.Append(orderBy[i]);
+                        }
+
+                        sb.Append(") AS numberingofrow");
+                    }
+                    else
+                    {
+                        sb.Append("ROWNUM AS numberingofrow");
+                    }
                 }
                 else
                 {
@@ -271,7 +287,7 @@ namespace Serenity.Data
 
                     sb.Append(") AS __num__");
                 }
-                
+
             }
 
             // select sorgusunun kalan kısımlarını yaz
@@ -339,7 +355,7 @@ namespace Serenity.Data
 
                 AppendFromWhereOrderByGroupByHaving(sb, null, false);
 
-                if (distinct || (groupBy!= null && groupBy.Length > 0))
+                if (distinct || (groupBy != null && groupBy.Length > 0))
                 {
                     sb.Append(") _alias_");
                 }
