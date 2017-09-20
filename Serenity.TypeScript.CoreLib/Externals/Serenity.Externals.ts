@@ -185,7 +185,7 @@ namespace Q {
 
     export function validateOptions(options: JQueryValidation.ValidationOptions) {
         return $.extend({
-            ignore: ":hidden",
+            ignore: Q.isEmptyOrNull(options.ignore) ? ":hidden" : options.ignore,
             meta: 'v',
             errorClass: 'error',
             errorPlacement: function (error: any, element: any) {
