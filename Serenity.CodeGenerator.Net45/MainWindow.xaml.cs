@@ -525,7 +525,8 @@ namespace Serenity.CodeGenerator
                             var tableItem = new TableItem
                             {
                                 IsChecked = false,
-                                ConnectionKey = conn.Key,
+                                //ConnectionKey = conn.Key,
+                                ConnectionKey = connectionKey,
                                 Module = module,
                                 Identifier = identifier,
                                 PermissionKey = permission,
