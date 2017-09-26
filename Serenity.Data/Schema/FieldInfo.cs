@@ -12,5 +12,6 @@
         public string PKTable { get; set; }
         public string PKColumn { get; set; }
         public string DataType { get; set; }
+        public string FieldDescription { get; set; }
     }
 }

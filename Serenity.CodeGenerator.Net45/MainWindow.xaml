@@ -155,6 +155,7 @@
                     <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=RowFieldsSurroundWithRegion}">Row Fields Surround With Region</CheckBox>
                     <CheckBox HorizontalAlignment="Left" Margin="10 0 10 0" IsChecked="{Binding Path=GenerateLookupEditor}">Generate Lookup</CheckBox>
                     <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=MaximizableDialog}">Maximizable Dialog</CheckBox>
+                    <CheckBox HorizontalAlignment="Left" Margin="10 0 10 10" IsChecked="{Binding Path=FieldDecriptionasPlaceholder}">Field Decription as Placeholder</CheckBox>
                 </StackPanel>
             </Border>
         </Popup>

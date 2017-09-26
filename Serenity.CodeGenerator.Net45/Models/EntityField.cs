@@ -19,5 +19,6 @@
         public int? Size { get; set; }
         public int Scale { get; set; }
         public string TextualField { get; set; }
+        public string FieldDescription { get; set; }
     }
 }

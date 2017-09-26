@@ -107,6 +107,7 @@ namespace Serenity.CodeGenerator
                 Title = Inflector.Inflector.Titleize(fieldInfo.FieldName.Substring(prefixLength)),
                 Flags = flags,
                 Name = fieldInfo.FieldName,
+                FieldDescription = fieldInfo.FieldDescription,
                 Size = fieldInfo.Size == 0 ? (Int32?)null : fieldInfo.Size,
                 Scale = fieldInfo.Scale
             };
