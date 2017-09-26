@@ -71,21 +71,6 @@ WriteLiteral("\"), InstanceName(\"");
 
                                            Write(Model.Title);
 
-WriteLiteral("\"), TwoLevelCached]\r\n    [ConnectionKey(\"");
-
-
-               Write(Model.ConnectionKey);
-
-WriteLiteral("\"), DisplayName(\"");
-
-
-                                                    Write(Model.Title);
-
-WriteLiteral("\"), InstanceName(\"");
-
-
-                                                                                  Write(Model.Title);
-
 WriteLiteral("\"), TwoLevelCached]\r\n    [ReadPermission(\"");
 
 

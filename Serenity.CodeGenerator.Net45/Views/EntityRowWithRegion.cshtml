@@ -27,7 +27,6 @@ namespace @(Model.RootNamespace)@(dotModule).Entities
 
     [ConnectionKey("@Model.ConnectionKey"), TableName(TableName)]
     [DisplayName("@Model.Title"), InstanceName("@Model.Title"), TwoLevelCached]
-    [ConnectionKey("@Model.ConnectionKey"), DisplayName("@Model.Title"), InstanceName("@Model.Title"), TwoLevelCached]
     [ReadPermission("@Model.Module:@Model.Tablename:Read")]
     [InsertPermission("@Model.Module:@Model.Tablename:Insert")]
     [UpdatePermission("@Model.Module:@Model.Tablename:Update")]
