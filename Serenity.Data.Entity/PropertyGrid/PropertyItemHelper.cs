@@ -3,8 +3,10 @@ using Serenity.Data;
 using Serenity.Extensibility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Web.Mvc;
 
 namespace Serenity.PropertyGrid
 {
@@ -29,7 +31,26 @@ namespace Serenity.PropertyGrid
                 processor.Initialize();
             }
 
-            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            var allPropertyInfos = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).ToList();
+            // Checks to see if there are any MetadataTypeAttributes. If so, override base class properties with MetaData class
+            var metadataType = type.GetCustomAttributes(typeof(MetadataTypeAttribute), true).OfType<MetadataTypeAttribute>().FirstOrDefault();
+            if (metadataType != null)
+            {
+                var metaData = ModelMetadataProviders.Current.GetMetadataForType(null, metadataType.MetadataClassType);
+                var metaDataProperties = metaData.ModelType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                foreach (var metaDataProperty in metaDataProperties)
+                {
+                    //If it exists in the base generated model, we remove it. In favor of metaDataPropInfo
+                    var match = allPropertyInfos.FirstOrDefault(x => x.Name == metaDataProperty.Name);
+                    if (match != null)
+                    {
+                        allPropertyInfos.Remove(match);
+                        allPropertyInfos.Add(metaDataProperty);
+                    }
+                }
+            }
+
+            foreach (var property in allPropertyInfos
                 .OrderBy(x => x.MetadataToken))
             {
                 if (property.GetCustomAttribute<IgnoreAttribute>(false) != null)
