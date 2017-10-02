@@ -1,3 +1,9 @@
+## 3.0.6 (2017-10-02)
+
+Features:
+  - added autoComplete option to LookupEditor, which allows creating new items by user typed text
+  - sampled autoComplete with Northwind Customer's country / city editing [Serene]
+
 ## 3.0.5 (2017-09-06)
 
 Features:
