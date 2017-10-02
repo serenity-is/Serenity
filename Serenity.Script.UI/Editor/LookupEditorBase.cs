@@ -37,7 +37,9 @@ namespace Serenity
                 #pragma warning restore 618
             }
 
-            if (options.InplaceAdd && (options.InplaceAddPermission == null || Q.Authorization.HasPermission(options.InplaceAddPermission)))
+            if (!options.AutoComplete && options.InplaceAdd && (
+                    options.InplaceAddPermission == null || 
+                    Q.Authorization.HasPermission(options.InplaceAddPermission)))
                 AddInplaceCreate(Q.Text("Controls.SelectEditor.InplaceAdd"));
         }
 
@@ -291,7 +293,11 @@ namespace Serenity
             if (options.MinimumResultsForSearch != null)
                 opt.MinimumResultsForSearch = options.MinimumResultsForSearch.Value;
 
-            if (options.InplaceAdd && (options.InplaceAddPermission == null || Q.Authorization.HasPermission(options.InplaceAddPermission)))
+            if (options.AutoComplete)
+                opt.CreateSearchChoice = GetCreateSearchChoice(null, true);
+            else if (options.InplaceAdd && (
+                options.InplaceAddPermission == null || 
+                Q.Authorization.HasPermission(options.InplaceAddPermission)))
                 opt.CreateSearchChoice = GetCreateSearchChoice();
 
             if (options.Multiple)

@@ -26,6 +26,7 @@
     interface LookupEditorOptions {
         lookupKey?: string;
         minimumResultsForSearch?: any;
+        autoComplete?: boolean;
         inplaceAdd?: boolean;
         inplaceAddPermission?: string;
         dialogType?: string;

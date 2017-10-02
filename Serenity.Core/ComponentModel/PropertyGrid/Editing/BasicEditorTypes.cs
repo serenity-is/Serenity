@@ -285,6 +285,18 @@ namespace Serenity.ComponentModel
         }
 
         /// <summary>
+        /// Allows dynamically creating new options from text input by the user in the search box.
+        /// This option should only be used for free text inputs, not ID / Text pairs.
+        /// When this option is enabled InplaceAdd cannot be used. 
+        /// Newly created option will have same ID / Text which is user entered text.
+        /// </summary>
+        public bool AutoComplete
+        {
+            get { return GetOption<bool>("autoComplete"); }
+            set { SetOption("autoComplete", value); }
+        }
+
+        /// <summary>
         /// Enable inplace add / edit functionality
         /// </summary>
         public bool InplaceAdd

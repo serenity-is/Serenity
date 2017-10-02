@@ -190,7 +190,7 @@ namespace Serenity
         }
 
         public Func<string, object> GetCreateSearchChoice(
-            Func<TItem, string> getName = null)
+            Func<TItem, string> getName = null, bool autoComplete = false)
         {
             return s =>
             {
@@ -211,12 +211,26 @@ namespace Serenity
 
                 if (!Q.Any(this.Items, x => (Q.Externals.StripDiacritics(x.Text) ?? "").ToLower().Contains(s)))
                 {
+                    if (autoComplete)
+                        return new Select2Item
+                        {
+                            Id = lastCreateTerm,
+                            Text = lastCreateTerm,
+                        };
+
                     return new Select2Item
                     {
                         Id = Int32.MinValue.ToString(),
                         Text = Q.Text("Controls.SelectEditor.NoResultsClickToDefine")
                     };
                 }
+
+                if (autoComplete)
+                    return new Select2Item
+                    {
+                        Id = lastCreateTerm,
+                        Text = lastCreateTerm
+                    };
 
                 return new Select2Item
                 {

@@ -56,5 +56,12 @@ namespace Serenity
         /// If this property is false, the Select2Item is not clearable
         /// </summary>
         public bool? AllowClear { get; set; }
+        /// <summary>
+        /// Allows dynamically creating new options from text input by the user in the search box.
+        /// This option should only be used for free text inputs, not ID / Text pairs.
+        /// When this option is enabled InplaceAdd cannot be used. 
+        /// Newly created option will have same ID / Text which is user entered text.
+        /// </summary>
+        public bool AutoComplete { get; set; }
     }
 }
