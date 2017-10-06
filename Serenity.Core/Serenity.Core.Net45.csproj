@@ -90,6 +90,7 @@
     <Compile Include="ComponentModel\Columns\EditLinkAttribute.cs" />
     <Compile Include="ComponentModel\Extensibility\LookupScriptAttribute.cs" />
     <Compile Include="ComponentModel\Permission\RegisterPermissionKeyAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\TabAttribute.cs" />
     <Compile Include="ComponentModel\Upload\FileUploadEditorAttribute.cs" />
     <Compile Include="ComponentModel\Upload\ImageScaleMode.cs" />
     <Compile Include="ComponentModel\Upload\ImageUploadEditorAttribute.cs" />

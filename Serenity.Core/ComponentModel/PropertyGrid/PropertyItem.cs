@@ -23,6 +23,8 @@ namespace Serenity.ComponentModel
         public bool? Collapsible { get; set; }
         [JsonProperty("collapsed")]
         public bool? Collapsed { get; set; }
+        [JsonProperty("tab")]
+        public string Tab { get; set; }
         [JsonProperty("cssClass")]
         public string CssClass { get; set; }
         [JsonProperty("headerCssClass")]
@@ -103,7 +105,7 @@ namespace Serenity.ComponentModel
         [JsonProperty("quickFilterParams")]
         public Dictionary<string, object> QuickFilterParams { get; set; }
         [JsonProperty("quickFilterSeparator")]
-        public bool QuickFilterSeparator { get; set; }
+        public bool? QuickFilterSeparator { get; set; }
         [JsonProperty("quickFilterCssClass")]
         public string QuickFilterCssClass { get; set; }
 

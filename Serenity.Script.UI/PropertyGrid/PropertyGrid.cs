@@ -1,4 +1,5 @@
-﻿using jQueryApi;
+﻿
+using jQueryApi;
 using System;
 using System.Collections.Generic;
 
@@ -22,16 +23,62 @@ namespace Serenity
             if (!Script.IsValue(opt.Mode))
                 opt.Mode = PropertyGridMode.Insert;
 
-            items = options.Items ?? new List<PropertyItem>();
-
             div.AddClass("s-PropertyGrid");
 
             editors = new List<Widget>();
+            items = options.Items ?? new List<PropertyItem>();
 
+            var useTabs = Q.Any(items, x => !string.IsNullOrEmpty(x.Tab));
+
+            if (useTabs)
+            {
+                var ul = J("<ul class='nav nav-tabs property-tabs' role='tablist'></ul>")
+                    .AppendTo(this.element);
+
+                var tc = J("<div class='tab-content property-panes'></div>")
+                    .AppendTo(this.element);
+
+                int tabIndex = 0;
+                int i = 0;
+                while (i < items.Count)
+                {
+                    var tab = items[i].Tab.TrimToEmpty();
+                    var tabItems = new List<PropertyItem>();
+                    var j = i;
+                    do
+                    {
+                        tabItems.Add(items[j]);
+                    }
+                    while (++j < items.Count && items[j].Tab.TrimToEmpty() == tab);
+                    i = j;
+
+                    var li = J("<li><a data-toggle='tab' role='tab'></a></li>").AppendTo(ul);
+                    if (tabIndex == 0)
+                        li.AddClass("active");
+                    var tabID = this.UniqueName + "_Tab" + tabIndex;
+                    li.Children("a")
+                        .Attribute("href", "#" + tabID)
+                        .Text(DetermineText(tab, prefix => prefix + "Tabs." + tab));
+
+                    var pane = J("<div class='tab-pane fade' role='tabpanel'>").AppendTo(tc);
+                    if (tabIndex == 0)
+                        pane.AddClass("in active");
+                    pane.Attribute("id", tabID);
+                    CreateItems(pane, tabItems);
+                    tabIndex++;
+                }
+            }
+            else
+                CreateItems(this.element, items);
+
+            UpdateInterface();
+        }
+
+        private void CreateItems(jQueryObject container, List<PropertyItem> items)
+        { 
             var categoryIndexes = new JsDictionary<string, int>();
-
-            var categoriesDiv = div;
-
+            var categoriesDiv = container;
+            
             var useCategories = options.UseCategories &&
                 Q.Any(items, x => !string.IsNullOrEmpty(x.Category));
 
@@ -43,14 +90,14 @@ namespace Serenity
                 categoryIndexes = CreateCategoryLinks(linkContainer, items);
 
                 if (categoryIndexes.Count > 1)
-                    linkContainer.AppendTo(div);
+                    linkContainer.AppendTo(container);
                 else
                     linkContainer.Find("a.category-link").Unbind("click", CategoryLinkClick).Remove();
             }
 
             categoriesDiv = J("<div/>")
                 .AddClass("categories")
-                .AppendTo(div);
+                .AppendTo(container);
 
             jQueryObject fieldContainer;
             if (useCategories)
@@ -84,10 +131,8 @@ namespace Serenity
 
                 var editor = CreateField(fieldContainer, item);
 
-                editors[i] = editor;
+                editors.Add(editor);
             }
-
-            UpdateInterface();
         }
 
         public override void Destroy()

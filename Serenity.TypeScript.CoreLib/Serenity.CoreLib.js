@@ -5050,6 +5050,28 @@ var Q;
                     $(x).click();
                     return true;
                 });
+                if (validator.errorList.length) {
+                    var el = validator.errorList[0].element;
+                    if (el) {
+                        var bsPane = $(el).closest('.tab-pane');
+                        if (!bsPane.hasClass("active") &&
+                            bsPane.parent().hasClass('tab-content')) {
+                            var bsPaneId = bsPane.attr('id');
+                            if (bsPaneId) {
+                                $('a[href="#' + bsPaneId + '"]').click();
+                            }
+                        }
+                        if ($.fn.tooltip) {
+                            $.fn.tooltip && $(el).tooltip({
+                                title: validator.errorList[0].message,
+                                trigger: 'manual'
+                            }).tooltip('show');
+                            window.setTimeout(function () {
+                                $(el).tooltip('destroy');
+                            }, 1500);
+                        }
+                    }
+                }
             },
             success: function (label) {
                 label.addClass('checked');
