@@ -1,3 +1,8 @@
+## 3.0.7 (2017-10-07)
+
+Features:
+  - add Tab attribute to forms that works similar to Category attribute but works with bootstrap tabs. can be combined with categories.
+
 ## 3.0.6 (2017-10-02)
 
 Features:
