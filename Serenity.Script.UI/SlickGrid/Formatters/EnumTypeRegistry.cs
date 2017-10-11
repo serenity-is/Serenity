@@ -38,7 +38,9 @@ namespace Serenity
             }
 
             if (!knownTypes.ContainsKey(key))
-                throw new Exception(String.Format("Can't find {0} enum type!", key));
+                throw new Exception(String.Format("Can't find {0} enum type! If you have recently defined this enum type in server side code, " + 
+                    "make sure your project builds successfully and transform T4 templates. Also make sure that enum is under your project root namespace, " + 
+                    "and your namespace parts starts with capital letters, e.g. MyProject.Pascal.Cased namespace", key));
 
             return knownTypes[key];
         }
