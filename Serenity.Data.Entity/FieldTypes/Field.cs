@@ -352,7 +352,8 @@ namespace Serenity.Data
                 return;
 
             throw new InvalidOperationException(String.Format(
-                "{0} field on {1} is read before assigned a value!", this.Name, row.GetType().Name));
+                "{0} field on {1} is read before assigned a value! Make sure this field is selected in your SqlQuery. Extensions like connection.List only loads table fields by default, view / expression fields are not loaded unless explicitly selected.", 
+                    this.Name, row.GetType().Name));
         }
 
         public abstract void ValueToJson(JsonWriter writer, Row row, JsonSerializer serializer);
