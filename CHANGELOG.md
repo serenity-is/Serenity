@@ -1,3 +1,15 @@
+## 3.0.8 (2017-10-11)
+
+Features:
+  - made it possible to use bootstrap col-md-6, col-sm-4 etc. to layout form fields. 
+  - added attribute FormCssClassAttribute for applying custom sizes.
+  - use HalfWidthAttribute, OneThirdWidthAttribute, QuarterWidth etc. for quick field sizing 
+  - added ImplicitPermissionAttribute and related auto permission granting system which is a much better alternative to LogicOperatorPermissionService. e.g. when a user / role has Northwind:Modify permission, it should also automatically have Northwind:View and Northwind:General permissions
+  - in addition to resizing canvas, also invalidate grid on resize, fixes some display issues on windows 7 pcs
+  - added missing class declaration for IStringValue to .d.ts
+  - more descriptive error message for "Can't find {0} enum type!"
+  - more descriptive error message for "{0} field on {1} is read before assigned a value!"
+
 ## 3.0.7 (2017-10-07)
 
 Features:
