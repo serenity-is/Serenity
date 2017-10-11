@@ -29,6 +29,8 @@ namespace Serenity.ComponentModel
         public string CssClass { get; set; }
         [JsonProperty("headerCssClass")]
         public string HeaderCssClass { get; set; }
+        [JsonProperty("formCssClass")]
+        public string FormCssClass { get; set; }
         [JsonProperty("maxLength")]
         public int? MaxLength { get; set; }
         [JsonProperty("required")]
@@ -73,6 +75,8 @@ namespace Serenity.ComponentModel
         public int? MinWidth { get; set; }
         [JsonProperty("maxWidth")]
         public int? MaxWidth { get; set; }
+        [JsonProperty("labelWidth")]
+        public string LabelWidth { get; set; }
         [JsonProperty("resizable")]
         public bool? Resizable { get; set; }
         [JsonProperty("sortable")]

@@ -1899,6 +1899,8 @@ declare namespace Serenity {
         get_value(): string;
         set_value(value: string): void;
     }
+    class IStringValue {
+    }
     interface GridPersistanceFlags {
         columnWidths?: boolean;
         columnVisibility?: boolean;
@@ -2007,6 +2009,7 @@ declare namespace Serenity {
         category?: string;
         cssClass?: string;
         headerCssClass?: string;
+        formCssClass?: string;
         maxLength?: number;
         required?: boolean;
         insertable?: boolean;
@@ -2028,6 +2031,7 @@ declare namespace Serenity {
         width?: number;
         minWidth?: number;
         maxWidth?: number;
+        labelWidth?: string;
         resizable?: boolean;
         sortable?: boolean;
         sortOrder?: number;

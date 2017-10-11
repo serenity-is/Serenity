@@ -9,6 +9,7 @@
         category?: string;
         cssClass?: string;
         headerCssClass?: string;
+        formCssClass?: string;
         maxLength?: number;
         required?: boolean;
         insertable?: boolean;
@@ -30,6 +31,7 @@
         width?: number;
         minWidth?: number;
         maxWidth?: number;
+        labelWidth?: string;
         resizable?: boolean;
         sortable?: boolean;
         sortOrder?: number;

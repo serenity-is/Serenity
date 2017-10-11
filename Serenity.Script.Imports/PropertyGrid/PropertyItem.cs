@@ -19,6 +19,7 @@ namespace Serenity
         public bool? Collapsed { get; set; }
         public string CssClass { get; set; }
         public string HeaderCssClass { get; set; }
+        public string FormCssClass { get; set; }
         public int? MaxLength { get; set; }
         public bool? Required { get; set; }
         public bool? Insertable { get; set; }
@@ -41,6 +42,7 @@ namespace Serenity
         public int Width { get; set; }
         public int? MinWidth { get; set; }
         public int? MaxWidth { get; set; }
+        public string LabelWidth { get; set; }
         public bool? Resizable { get; set; }
         public bool? Sortable { get; set; }
         public int? SortOrder { get; set; }

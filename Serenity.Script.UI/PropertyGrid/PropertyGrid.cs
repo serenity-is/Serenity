@@ -213,6 +213,9 @@ namespace Serenity
             if (!String.IsNullOrEmpty(item.CssClass))
                 fieldDiv.AddClass(item.CssClass);
 
+            if (!String.IsNullOrEmpty(item.FormCssClass))
+                fieldDiv.AddClass(item.FormCssClass);
+
             string editorId = options.IdPrefix + item.Name;
 
             string title = DetermineText(item.Title, prefix => prefix + item.Name);
@@ -225,6 +228,14 @@ namespace Serenity
                 .Attribute("title", hint ?? title ?? "")
                 .Html(title ?? "")
                 .AppendTo(fieldDiv);
+
+            if (!string.IsNullOrEmpty(item.LabelWidth))
+            {
+                if (item.LabelWidth == "0")
+                    label.Hide();
+                else
+                    label.CSS("width", item.LabelWidth);
+            }
 
             if (item.Required == true)
                 J("<sup>*</sup>")

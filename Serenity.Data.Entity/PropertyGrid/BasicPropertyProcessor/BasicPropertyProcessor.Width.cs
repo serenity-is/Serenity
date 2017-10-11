@@ -16,6 +16,10 @@ namespace Serenity.PropertyGrid
 
             if (widthAttr != null && (widthAttr.Max != 0))
                 item.MaxWidth = widthAttr.Max;
+
+            var labelWidthAttr = source.GetAttribute<LabelWidthAttribute>();
+            if (labelWidthAttr != null)
+                item.LabelWidth = labelWidthAttr.Value;
         }
 
         private static int AutoWidth(Field field)
