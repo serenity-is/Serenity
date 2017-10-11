@@ -115,7 +115,10 @@ namespace Serenity
             }
 
             if (this.slickGrid != null)
+            {
                 this.slickGrid.ResizeCanvas();
+                this.slickGrid.Invalidate();
+            }
         }
 
         protected virtual string GetInitialTitle()
