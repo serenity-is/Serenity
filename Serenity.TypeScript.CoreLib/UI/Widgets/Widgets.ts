@@ -163,6 +163,9 @@
         set_value(value: string): void;
     }
 
+    class IStringValue {
+    }
+
     interface GridPersistanceFlags {
         columnWidths?: boolean;
         columnVisibility?: boolean;
