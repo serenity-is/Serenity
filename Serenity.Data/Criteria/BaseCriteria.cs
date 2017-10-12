@@ -18,7 +18,7 @@
         {
             get { return false; }
         }
-        
+
         public BaseCriteria IsNull()
         {
             return new UnaryCriteria(CriteriaOperator.IsNull, this);
@@ -37,6 +37,16 @@
         public BaseCriteria NotLike(string mask)
         {
             return new BinaryCriteria(this, CriteriaOperator.NotLike, new ValueCriteria(mask));
+        }
+
+        public BaseCriteria FullTextSearchContains(string mask)
+        {
+            return new BinaryCriteria(this, CriteriaOperator.FullTextSearchContains, new ValueCriteria("\"" + mask.Replace("\"", "\"\"") + "\""));
+        }
+
+        public BaseCriteria FullTextSearchStartsWith(string mask)
+        {
+            return new BinaryCriteria(this, CriteriaOperator.FullTextSearchContains, new ValueCriteria("\"" + mask.Replace("\"", "\"\"") + "*\""));
         }
 
         public BaseCriteria StartsWith(string mask)
@@ -97,7 +107,7 @@
             if (Object.ReferenceEquals(null, statement) || statement.IsEmpty)
                 throw new ArgumentNullException("statement");
 
-            return new BinaryCriteria(this, CriteriaOperator.In, statement); 
+            return new BinaryCriteria(this, CriteriaOperator.In, statement);
         }
 
         public BaseCriteria InStatement(BaseCriteria statement)
@@ -471,7 +481,7 @@
 
             return new BinaryCriteria(criteria1, op, criteria2);
         }
-        
+
         public static BaseCriteria operator &(BaseCriteria criteria1, BaseCriteria criteria2)
         {
             return JoinIf(criteria1, criteria2, CriteriaOperator.AND);

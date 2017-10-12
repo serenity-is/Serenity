@@ -103,6 +103,8 @@ namespace Serenity.ComponentModel
         public bool? FilterOnly { get; set; }
         [JsonProperty("notFilterable")]
         public bool? NotFilterable { get; set; }
+        [JsonProperty("fullTextIndex")]
+        public bool? FullTextIndex { get; set; }
 
         [JsonProperty("quickFilter")]
         public bool? QuickFilter { get; set; }

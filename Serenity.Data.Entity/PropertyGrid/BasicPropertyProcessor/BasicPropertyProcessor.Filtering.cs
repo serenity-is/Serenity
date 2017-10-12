@@ -12,12 +12,16 @@ namespace Serenity.PropertyGrid
         {
             var filterOnlyAttr = source.GetAttribute<FilterOnlyAttribute>();
             var notFilterableAttr = source.GetAttribute<NotFilterableAttribute>();
+            var fullTextIndexAttr = source.GetAttribute<FullTextIndexAttribute>();
 
             if (filterOnlyAttr != null && filterOnlyAttr.Value)
                 item.FilterOnly = true;
 
             if (notFilterableAttr != null && notFilterableAttr.Value)
                 item.NotFilterable = true;
+
+            if (fullTextIndexAttr != null && fullTextIndexAttr.Value)
+                item.FullTextIndex = true;
 
             if (item.NotFilterable == true)
                 return;

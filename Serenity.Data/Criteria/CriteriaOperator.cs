@@ -20,5 +20,7 @@
         NotIn,
         Like,
         NotLike,
+        FullTextSearchContains,
+        FullTextSearchStartWith
     }
 }

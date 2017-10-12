@@ -56,6 +56,7 @@
     <Compile Include="Editor\URLEditor.cs" />
     <Compile Include="Editor\MaskEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
+    <Compile Include="PropertyGrid\Attributes\FullTextIndexAttribute.cs" />
     <Compile Include="FilterPanel\FilteringTypes\BaseEditorFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\EnumFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\DateTimeFiltering.cs" />

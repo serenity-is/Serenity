@@ -115,12 +115,26 @@ namespace Serenity
                 case FilterOperators.Contains:
                     text = GetEditorText();
                     displayText = DisplayText(Operator, text);
-                    return new Criteria(GetCriteriaField()).Contains(text);
+                    if (Field.FullTextIndex ?? false)
+                    {
+                        return new Criteria(GetCriteriaField()).FullTextSearchContains(text);
+                    }
+                    else
+                    {
+                        return new Criteria(GetCriteriaField()).Contains(text);
+                    }
 
                 case FilterOperators.StartsWith:
                     text = GetEditorText();
                     displayText = DisplayText(Operator, text);
-                    return new Criteria(GetCriteriaField()).StartsWith(text);
+                    if (Field.FullTextIndex ?? false)
+                    {
+                        return new Criteria(GetCriteriaField()).FullTextSearchStartsWith(text);
+                    }
+                    else
+                    {
+                        return new Criteria(GetCriteriaField()).StartsWith(text);
+                    }
 
                 case FilterOperators.EQ:
                 case FilterOperators.NE:
@@ -130,7 +144,7 @@ namespace Serenity
                 case FilterOperators.GE:
                     text = GetEditorText();
                     displayText = DisplayText(Operator, text);
-                    return new BinaryCriteria(new Criteria(GetCriteriaField()), FilterOperators.ToCriteriaOperator[Operator.Key], 
+                    return new BinaryCriteria(new Criteria(GetCriteriaField()), FilterOperators.ToCriteriaOperator[Operator.Key],
                         new ValueCriteria(GetEditorValue()));
             }
 
