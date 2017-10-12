@@ -17,6 +17,8 @@ namespace Serenity
         public Action<jQueryObject> Element { get; set; }
         public Action<TWidget> Init { get; set; }
         public Action<QuickFilterArgs<TWidget>> Handler { get; set; }
+        public Func<TWidget, object> SaveState { get; set; }
+        public Action<TWidget, object> LoadState { get; set; }
         public bool Seperator { get; set; }
         public string CssClass { get; set; }
     }

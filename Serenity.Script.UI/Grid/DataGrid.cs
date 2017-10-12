@@ -1057,8 +1057,15 @@ namespace Serenity
 
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")
                 .AppendTo(quickFiltersDiv)
+                .Data("qffield", opt.Field)
                 .Children().Text(opt.Title ?? DetermineText(pre => pre + opt.Field) ?? opt.Field)
                 .Parent();
+
+            if (opt.SaveState != null)
+                quickFilter.Data("qfsavestate", opt.SaveState);
+
+            if (opt.LoadState != null)
+                quickFilter.Data("qfloadstate", opt.LoadState);
 
             if (!string.IsNullOrEmpty(opt.CssClass))
                 quickFilter.AddClass(opt.CssClass);
@@ -1183,6 +1190,18 @@ namespace Serenity
                         next.SetDate(next.GetDate() + 1);
                         args.Request.Criteria &= new Criteria(args.Field) < Q.FormatDate(next, "yyyy-MM-dd");
                     }
+                },
+                SaveState = w =>
+                {
+                    return new object[] { EditorUtils.GetValue(w), EditorUtils.GetValue(end) };
+                },
+                LoadState = (w, state) =>
+                {
+                    if (state == null || !Q.IsArray(state) || state.As<object[]>().Length != 2)
+                        state = new object[] { null, null };
+
+                    EditorUtils.SetValue(w, state.As<object[]>()[0]);
+                    EditorUtils.SetValue(end, state.As<object[]>()[1]);
                 }
             };
         }
@@ -1237,6 +1256,18 @@ namespace Serenity
 
                     if (active2)
                         args.Request.Criteria &= new Criteria(args.Field) <= end.Value;
+                },
+                SaveState = w =>
+                {
+                    return new object[] { EditorUtils.GetValue(w), EditorUtils.GetValue(end) };
+                },
+                LoadState = (w, state) =>
+                {
+                    if (state == null || !Q.IsArray(state) || state.As<object[]>().Length != 2)
+                        state = new object[] { null, null };
+
+                    EditorUtils.SetValue(w, state.As<object[]>()[0]);
+                    EditorUtils.SetValue(end, state.As<object[]>()[1]);
                 }
             };
         }
@@ -1277,6 +1308,7 @@ namespace Serenity
 
         protected virtual void QuickFilterChange(jQueryEvent e)
         {
+            this.PersistSettings();
             this.Refresh();
         }
 
@@ -1444,6 +1476,31 @@ namespace Serenity
                     if (Q.IsTrue(settings.IncludeDeleted) != includeDeletedToggle.HasClass("pressed"))
                         includeDeletedToggle.Children("a").Click();
                 }
+
+                if (settings.QuickFilters != null &&
+                    flags.QuickFilters != false &&
+                    this.quickFiltersDiv != null &&
+                    this.quickFiltersDiv.Length > 0)
+                {
+                    this.quickFiltersDiv.Find(".quick-filter-item").Each((i, e) =>
+                    {
+                        var field = J(e).GetDataValue("qffield") as string;
+                        if (string.IsNullOrEmpty(field))
+                            return;
+
+                        var widget = J("#" + this.UniqueName + "_QuickFilter_" + field).TryGetWidget<Widget>();
+                        if (widget == null)
+                            return;
+
+                        var state = settings.QuickFilters[field];
+
+                        var loadState = J(e).GetDataValue("qfloadstate") as Action<Widget, object>;
+                        if (loadState != null)
+                            loadState(widget, state);
+                        else
+                            EditorUtils.SetValue(widget, state);
+                    });
+                }
             }
             finally
             {
@@ -1503,6 +1560,28 @@ namespace Serenity
                 this.filterBar.Store != null)
             {
                 settings.FilterItems = this.filterBar.Store.Items.Clone();
+            }
+
+            if (flags.QuickFilters != false &&
+                this.quickFiltersDiv != null &&
+                this.quickFiltersDiv.Length > 0)
+            {
+                settings.QuickFilters = new JsDictionary<string, object>();
+                this.quickFiltersDiv.Find(".quick-filter-item").Each((i, e) =>
+                {
+                    var field = J(e).GetDataValue("qffield") as string;
+                    if (string.IsNullOrEmpty(field))
+                        return;
+
+                    var widget = J("#" + this.UniqueName + "_QuickFilter_" + field).TryGetWidget<Widget>();
+                    if (widget == null)
+                        return;
+                    
+                    var saveState = J(e).GetDataValue("qfsavestate") as Func<Widget, object>;
+                    object state = saveState != null ? saveState(widget) : EditorUtils.GetValue(widget);
+
+                    settings.QuickFilters[field] = state;
+                });
             }
 
             return settings;
@@ -1617,7 +1696,7 @@ namespace Serenity
     {
         public List<PersistedGridColumn> Columns { get; set; }
         public List<FilterLine> FilterItems { get; set; }
-        public Dictionary<string, object> QuickFilters { get; set; }
+        public JsDictionary<string, object> QuickFilters { get; set; }
         public bool? IncludeDeleted { get; set; }
     }
 

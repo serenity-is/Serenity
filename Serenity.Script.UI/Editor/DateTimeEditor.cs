@@ -35,7 +35,13 @@ namespace Serenity
 
             input.Bind("keyup." + this.uniqueName, e => {
                 if (e.Which == 32 && !ReadOnly)
-                    this.ValueAsDate = JsDate.Now;
+                {
+                    if (this.ValueAsDate != JsDate.Now)
+                    {
+                        this.ValueAsDate = JsDate.Now;
+                        this.element.Trigger("change");
+                    }
+                }
                 else
                     DateEditor.DateInputKeyup(e);
             });
