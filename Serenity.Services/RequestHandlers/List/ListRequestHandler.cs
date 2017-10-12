@@ -210,6 +210,10 @@
                     criteria |= new Criteria(field).Contains(containsText);
                     break;
 
+                case SearchType.FullTextContains:
+                    criteria |= new Criteria("CONTAINS(" + field.Expression + ", " + containsText.ToSql() + ")");
+                    break;
+
                 case SearchType.StartsWith:
                     criteria |= new Criteria(field).StartsWith(containsText);
                     break;
