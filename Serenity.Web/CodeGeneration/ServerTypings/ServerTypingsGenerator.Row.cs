@@ -136,17 +136,20 @@ namespace Serenity.CodeGeneration
                 });
 
                 sb.AppendLine();
-                cw.Indented("[");
+                cw.IndentedLine("[");
                 int i = 0;
                 foreach (var field in row.GetFields())
                 {
                     if (i++ > 0)
-                        sb.Append(", ");
-                    sb.Append("'");
+                        sb.AppendLine(", ");
+                    cw.Indented("    '");
                     sb.Append(field.PropertyName ?? field.Name);
                     sb.Append("'");
                 }
-                sb.AppendLine("].forEach(x => (<any>Fields)[x] = x);");
+                if (i > 0)
+                    sb.AppendLine();
+
+                cw.IndentedLine("].forEach(x => (<any>Fields)[x] = x);");
             });
         }
     }

@@ -70,23 +70,27 @@ namespace Serenity.CodeGeneration
 
                 if (methodNames.Count > 0)
                 {
-                    cw.Indented("[");
+                    cw.IndentedLine("[");
                     int i = 0;
                     foreach (var methodName in methodNames)
                     {
                         if (i++ > 0)
-                            sb.Append(", ");
+                            sb.AppendLine(", ");
 
-                        sb.Append("'");
+                        cw.Indented("    '");
                         sb.Append(methodName);
                         sb.Append("'");
                     }
-                    sb.AppendLine("].forEach(x => {");
+                    if (i > 0)
+                        sb.AppendLine();
+                    cw.IndentedLine("].forEach(x => {");
                     cw.Block(delegate ()
                     {
                         cw.Indented("(<any>");
                         sb.Append(identifier);
-                        sb.AppendLine(")[x] = function (r, s, o) { return Q.serviceRequest(baseUrl + '/' + x, r, s, o); };");
+                        sb.AppendLine(")[x] = function (r, s, o) {");
+                        cw.IndentedLine("    return Q.serviceRequest(baseUrl + '/' + x, r, s, o);");
+                        cw.IndentedLine("};");
                         cw.IndentedLine("(<any>Methods)[x] = baseUrl + '/' + x;");
                     });
                     cw.IndentedLine("});");
