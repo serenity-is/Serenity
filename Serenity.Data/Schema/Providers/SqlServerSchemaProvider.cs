@@ -16,11 +16,16 @@ namespace Serenity.Data.Schema
                     CASE WHEN DATA_TYPE = 'timestamp' THEN 'rowversion' ELSE DATA_TYPE END [DataType],
                     CASE WHEN IS_NULLABLE = 'NO' THEN 0 ELSE 1 END [IsNullable],
                     COALESCE(CHARACTER_MAXIMUM_LENGTH, CASE WHEN DATA_TYPE in ('decimal', 'money', 'numeric') THEN NUMERIC_PRECISION ELSE 0 END) [Size],
-                    NUMERIC_SCALE [Scale]
+                    NUMERIC_SCALE [Scale],
+                    FieldDescription
                 FROM
                     INFORMATION_SCHEMA.COLUMNS
+                    LEFT OUTER JOIN (SELECT  objname, value as FieldDescription 
+                                     FROM  ::fn_listextendedproperty(null, 'user', 'dbo', 'table', '" + table + @"', 'column', null)  
+                                     where name = 'MS_Description') T1 ON T1.objname collate Latin1_General_BIN = COLUMN_NAME
+
                 WHERE
-                    TABLE_SCHEMA = @sma 
+                    TABLE_SCHEMA = @sma
                     AND TABLE_NAME = @tbl
                 ORDER BY
                     ORDINAL_POSITION", new

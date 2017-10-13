@@ -288,7 +288,23 @@ namespace Serenity.CodeGenerator
                 }
             }
         }
-                
+
+        public bool FieldDecriptionasPlaceholder
+        {
+            get { return config.FieldDecriptionasPlaceholder; }
+            set
+            {
+                if (value != config.FieldDecriptionasPlaceholder)
+                {
+                    config.FieldDecriptionasPlaceholder = value;
+                    config.Save();
+                    Changed("FieldDecriptionasPlaceholder");
+                }
+            }
+        }
+
+        
+
         public string KDiff3Path
         {
             get { return config.KDiff3Path; }
@@ -525,7 +541,8 @@ namespace Serenity.CodeGenerator
                             var tableItem = new TableItem
                             {
                                 IsChecked = false,
-                                ConnectionKey = conn.Key,
+                                //ConnectionKey = conn.Key,
+                                ConnectionKey = connectionKey,
                                 Module = module,
                                 Identifier = identifier,
                                 PermissionKey = permission,

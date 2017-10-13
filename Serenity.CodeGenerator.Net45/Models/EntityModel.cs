@@ -23,5 +23,6 @@ namespace Serenity.CodeGenerator
         public bool Instance { get; set; }
         public string NameField { get; set; }
         public string FieldPrefix { get; set; }
+        public string FieldDescription { get; set; }
     }
 }
