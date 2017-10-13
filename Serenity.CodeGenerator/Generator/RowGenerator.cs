@@ -168,7 +168,8 @@ namespace Serenity.CodeGenerator
                 model.Identity = GenerateVariableName(identity.FieldName.Substring(prefix));
             else
             {
-                identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true);
+                identity = fields.FirstOrDefault(f => f.IsPrimaryKey == true) ??
+                    fields.FirstOrDefault();
                 if (identity != null)
                     model.Identity = GenerateVariableName(identity.FieldName.Substring(prefix));
             }
@@ -238,11 +239,27 @@ namespace Serenity.CodeGenerator
                 model.FieldsBaseClass = "RowFieldsBase";
             }
 
+            var fieldByIdent = new Dictionary<string, EntityField>(StringComparer.OrdinalIgnoreCase);
+
             foreach (var field in fields)
             {
                 var f = ToEntityField(field, prefix);
+
+                if (f.Ident == model.IdField)
+                    f.ColAttributes = "EditLink, DisplayName(\"Db.Shared.RecordId\"), AlignRight";
+
+                int i = 0;
+                string ident = f.Ident;
+                while (fieldByIdent.ContainsKey(ident))
+                    ident = f.Ident + ++i;
+                f.Ident = ident;
+                fieldByIdent[ident] = f;
+
                 if (f.Name == className && f.FieldType == "String")
+                {
                     model.NameField = f.Name;
+                    f.ColAttributes = f.ColAttributes ?? "EditLink";
+                }
 
                 var foreign = foreigns.Find((k) => k.FKColumn.Equals(field.FieldName, StringComparison.OrdinalIgnoreCase));
                 if (foreign != null)
@@ -274,9 +291,22 @@ namespace Serenity.CodeGenerator
                         var k = ToEntityField(frg, frgPrefix);
                         k.Flags = null;
                         k.Title = Inflector.Inflector.Titleize(JU(j.Name, frg.FieldName.Substring(frgPrefix)));
+                        k.Ident = JI(j.Name, k.Ident);
+                        i = 0;
+                        ident = k.Ident;
+                        while (fieldByIdent.ContainsKey(ident))
+                            ident = k.Ident + ++i;
+                        k.Ident = ident;
+                        fieldByIdent[ident] = k;
+
+                        var atk = new List<string>();
+                        atk.Add("DisplayName(\"" + k.Title + "\")");
+                        k.Expression = "j" + j.Name + ".[" + k.Name + "]";
+                        atk.Add("Expression(\"" + k.Expression + "\")");
+                        k.Attributes = String.Join(", ", atk);
 
                         if (f.TextualField == null && k.FieldType == "String")
-                            f.TextualField = JI(j.Name, k.Ident);
+                            f.TextualField = k.Ident;
 
                         j.Fields.Add(k);
                     }
@@ -291,7 +321,42 @@ namespace Serenity.CodeGenerator
             {
                 var fld = model.Fields.FirstOrDefault(z => z.FieldType == "String");
                 if (fld != null)
+                {
                     model.NameField = fld.Ident;
+                    fld.ColAttributes = fld.ColAttributes ?? "EditLink";
+                }
+            }
+
+            foreach (var x in model.Fields)
+            {
+                var attrs = new List<string>();
+                attrs.Add("DisplayName(\"" + x.Title + "\")");
+
+                if (x.Ident != x.Name)
+                    attrs.Add("Column(\"" + x.Name + "\")");
+
+                if ((x.Size ?? 0) > 0)
+                    attrs.Add("Size(" + x.Size + ")");
+
+                if (x.Scale > 0)
+                    attrs.Add("Scale(" + x.Scale + ")");
+
+                if (!String.IsNullOrEmpty(x.Flags))
+                    attrs.Add(x.Flags);
+
+                if (!String.IsNullOrEmpty(x.PKTable))
+                {
+                    attrs.Add("ForeignKey(\"" + (string.IsNullOrEmpty(x.PKSchema) ? x.PKTable : ("[" + x.PKSchema + "].[" + x.PKTable + "]")) + "\", \"" + x.PKColumn + "\")");
+                    attrs.Add("LeftJoin(\"j" + x.ForeignJoinAlias + "\")");
+                }
+
+                if (model.NameField == x.Ident)
+                    attrs.Add("QuickSearch");
+
+                if (x.TextualField != null)
+                    attrs.Add("TextualField(\"" + x.TextualField + "\")");
+
+                x.Attributes = String.Join(", ", attrs.ToArray());
             }
 
             return model;

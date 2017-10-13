@@ -1,0 +1,16 @@
+﻿
+namespace {{RootNamespace}}{{DotModule}} {
+
+    @Serenity.Decorators.registerClass()
+    export class {{ClassName}}Grid extends Serenity.EntityGrid<{{RowClassName}}, any> {
+        protected getColumnsKey() { return '{{ModuleDot}}{{ClassName}}'; }
+        protected getDialogType() { return {{ClassName}}Dialog; }{{if Identity}}
+        protected getIdProperty() { return {{RowClassName}}.idProperty; }{{end}}
+        protected getLocalTextPrefix() { return {{RowClassName}}.localTextPrefix; }
+        protected getService() { return {{ClassName}}Service.baseUrl; }
+
+        constructor(container: JQuery) {
+            super(container);
+        }
+    }
+}

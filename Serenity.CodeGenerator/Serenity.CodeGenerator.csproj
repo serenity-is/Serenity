@@ -19,12 +19,14 @@
     <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\typescriptServices.js">
       <Link>typeScriptServices.js</Link>
     </EmbeddedResource>
+    <EmbeddedResource Include="Templates\*.scriban" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Web\Serenity.Web.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Scriban" Version="0.7.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.9.1" />

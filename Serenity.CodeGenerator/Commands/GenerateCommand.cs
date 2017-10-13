@@ -61,6 +61,10 @@ namespace Serenity.CodeGenerator
                 CodeFileHelper.Overwrite = true;
 
             var config = GeneratorConfig.LoadFromFile(Path.Combine(projectDir, "sergen.json"));
+
+            if (!string.IsNullOrEmpty(config.TemplatePath))
+                Templates.TemplatePath = Path.Combine(projectDir, config.TemplatePath);
+
             var connectionKeys = config.Connections
                 .Where(x => !x.ConnectionString.IsEmptyOrNull())
                 .Select(x => x.Key).ToList();
@@ -384,6 +388,8 @@ namespace Serenity.CodeGenerator
 
                 var rowModel = RowGenerator.GenerateModel(connection, tableName.Schema, tableName.Table,
                     module, connectionKey, identifier, permissionKey, config);
+
+                rowModel.AspNetCore = true;
 
                 new EntityCodeGenerator(rowModel, config, csproj).Run();
             }

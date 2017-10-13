@@ -23,6 +23,7 @@
         <dependency id="MySqlConnector" version="${netcoreapp2.0:MySqlConnector}" />
         <dependency id="Npgsql" version="${netcoreapp2.0:Npgsql}" />
         <dependency id="Newtonsoft.Json" version="${*:Newtonsoft.Json}" />
+        <dependency id="Scriban" version="${*:Scriban}" />
         <dependency id="System.Data.SqlClient" version="${netcoreapp2.0:System.Data.SqlClient}" />
         <dependency id="Serenity.Web" version="${version}" />
       </group>

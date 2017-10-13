@@ -27,6 +27,7 @@ namespace Serenity.CodeGenerator
 
             this.rootDir = Path.GetDirectoryName(csproj);
             this.config = config;
+            this.model.CustomSettings = config.CustomSettings;
 
             this.serverTypings = Path.Combine(rootDir, "Modules/Common/Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
             if (!Directory.Exists(serverTypings))
@@ -40,27 +41,27 @@ namespace Serenity.CodeGenerator
             if (config.GenerateRow)
             {
                 GenerateRow();
-                GenerateScriptRowTS();
+                GenerateRowTyping();
             }
-
 
             if (config.GenerateService)
             {
                 GenerateRepository();
                 GenerateEndpoint();
-                GenerateScriptServiceTS();
+                GenerateServiceTyping();
             }
 
             if (config.GenerateUI)
             {
-                GeneratePageController();
-                GeneratePageIndex();
-                GenerateCss();
+                GeneratePage();
+                GenerateIndexView();
+                GenerateNavigationLink();
+                GenerateStyle();
                 GenerateColumns();
                 GenerateForm();
-                GenerateScriptDialogTS();
-                GenerateScriptGridTS();
-                GenerateScriptFormTS();
+                GenerateDialog();
+                GenerateGrid();
+                GenerateFormTyping();
             }
         }
 
@@ -97,33 +98,61 @@ namespace Serenity.CodeGenerator
 
         private void GenerateRow()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityRow(), model),
+            CreateNewSiteWebFile(Templates.Render("Row", model),
                 Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
                     Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
         }
 
-        private void GenerateCss()
+        private void GenerateStyle()
         {
-            string relativeFile = Path.Combine(@"Content/site/".Replace('/', Path.DirectorySeparatorChar), "site" +  
+            string relativeFile = Path.Combine(@"wwwroot/Content/site/".Replace('/', Path.DirectorySeparatorChar), "site" +  
                 (!string.IsNullOrEmpty(model.Module) ? ("." + model.Module.ToLowerInvariant()) : "") + ".less");
 
             string file = Path.Combine(rootDir, relativeFile);
-            Directory.CreateDirectory(Path.GetDirectoryName(file));
-            if (!File.Exists(file))
-            {
-                if (!string.IsNullOrEmpty(model.Module))
-                {
-                    relativeFile = Path.Combine("wwwroot/Content/site/".Replace('/', Path.DirectorySeparatorChar), "site.less");
-                    file = Path.Combine(rootDir, relativeFile);
-                }
 
-                if (!File.Exists(file))
-                    CodeFileHelper.CheckoutAndWrite(file, Environment.NewLine, false);
+            if (!string.IsNullOrEmpty(model.Module))
+            {
+                var siteLess = Path.Combine("wwwroot/Content/site/".Replace('/', Path.DirectorySeparatorChar), "site.less");
+                var siteLessFile = Path.Combine(rootDir, siteLess);
+                if (File.Exists(siteLessFile))
+                {
+                    var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less";
+                    var lines = File.ReadAllLines(siteLessFile).ToList();
+                    if (!lines.Any(x => (x ?? "").ToLowerInvariant().IsTrimmedSame(importLine)))
+                    {
+                        var index = lines.FindLastIndex(x =>
+                        {
+                            return x.StartsWith("@import") ||
+                                (x.StartsWith("//") && x.Contains("if:"));
+                        });
+
+                        if (index < 0)
+                            index = lines.Count;
+
+                        lines.Insert(index, importLine);
+                        CreateNewSiteWebFile(string.Join(Environment.NewLine, lines), siteLess);
+                    }
+                }
             }
 
-            string code = Templates.Render(new Views.EntityCss(), model);
+            if (!File.Exists(file))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                CreateNewSiteWebFile("@import \"site.mixins.less\";" + Environment.NewLine, relativeFile);
+            }
+
+            string code = Templates.Render("Style", model);
             using (var ms = new MemoryStream())
             {
+                var firstLine = code.Replace("\r", "").Split('\n').FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+                if (!string.IsNullOrWhiteSpace(firstLine))
+                {
+                    var lines = File.ReadAllLines(file);
+                    // don't generate less for dialog multiple times
+                    if (lines.Any(x => x.IsTrimmedSame(firstLine)))
+                        return;
+                }
+
                 var old = File.ReadAllBytes(file);
                 if (old.Length > 0)
                     ms.Write(old, 0, old.Length);
@@ -137,88 +166,93 @@ namespace Serenity.CodeGenerator
             }
         }
 
+        private void GenerateNavigationLink()
+        {
+            string relativeFile = string.IsNullOrEmpty(model.Module) ?
+                "Modules/Common/Navigation/NavigationItems.cs" :
+                "Modules/" + model.ModuleSlash + model.Module + "Navigation.cs";
+            relativeFile = relativeFile.Replace('/', Path.DirectorySeparatorChar);
+
+            string file = Path.Combine(rootDir, relativeFile);
+            string code = Templates.Render("NavigationLink", model);
+
+            if (!File.Exists(file))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                CreateNewSiteWebFile(code, relativeFile);
+            }
+            else
+            {
+                var lines = File.ReadAllLines(file).ToList();
+                var toInsert = code.Replace("\r", "").Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var usingIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("using "));
+                if (usingIndex < 0)
+                    usingIndex = 0;
+                foreach (var usng in toInsert.Where(x => x.TrimToEmpty().StartsWith("using ")))
+                {
+                    if (lines.Find(x => x.TrimToEmpty().Replace(" ", "")
+                        .IsTrimmedSame(usng.TrimToEmpty().Replace(" ", ""))) == null)
+                    {
+                        lines.Insert(usingIndex, usng);
+                        usingIndex++;
+                    }
+                }
+
+                if (!lines.Any(x => x.Contains("MyPages." + model.ClassName + "Controller")))
+                {
+                    var insertIndex = lines.FindLastIndex(x => !string.IsNullOrWhiteSpace(x)) + 1;
+                    foreach (var z in toInsert.Where(x => !string.IsNullOrWhiteSpace(x) &&
+                        !x.TrimToEmpty().StartsWith("using ")))
+                        lines.Insert(insertIndex, z);
+                }
+
+                CodeFileHelper.CheckoutAndWrite(file, string.Join(Environment.NewLine, lines), false);
+            }
+        }
+
         private void GenerateColumns()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityColumns(), new
-            {
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                RootNamespace = model.RootNamespace,
-                Fields = model.Fields,
-                IdField = model.Identity,
-                NameField = model.NameField
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Columns.cs"))));
+            CreateNewSiteWebFile(Templates.Render("Columns", model), 
+                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
+                    Path.Combine(model.ClassName, model.ClassName + "Columns.cs"))));
         }
 
         private void GenerateForm()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityForm(), new
-            {
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                RootNamespace = model.RootNamespace,
-                Fields = model.Fields,
-                IdField = model.Identity,
-                NameField = model.NameField
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
+            CreateNewSiteWebFile(Templates.Render("Form", model), 
+                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
+                    Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
         }
 
         private void GenerateRepository()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityRepository(), new
-            {
-                RootNamespace = model.RootNamespace,
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                Permission = model.Permission
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Repository.cs"))));
+            CreateNewSiteWebFile(Templates.Render("Repository", model), 
+                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
+                    Path.Combine(model.ClassName, model.ClassName + "Repository.cs"))));
         }
 
         private void GenerateEndpoint()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityEndpoint(), new
-            {
-                ConnectionKey = model.ConnectionKey,
-                RootNamespace = model.RootNamespace,
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                Permission = model.Permission
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Endpoint.cs"))));
+            CreateNewSiteWebFile(Templates.Render("Endpoint", model), 
+                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
+                    Path.Combine(model.ClassName, model.ClassName + "Endpoint.cs"))));
         }
 
-        private void GeneratePageController()
+        private void GeneratePage()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityPageController(), new
-            {
-                ConnectionKey = model.ConnectionKey,
-                RootNamespace = model.RootNamespace,
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                Permission = model.Permission,
-                NavigationCategory = model.Module
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Page.cs"))));
+            CreateNewSiteWebFile(Templates.Render("Page", model), 
+                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
+                    Path.Combine(model.ClassName, model.ClassName + "Page.cs"))));
         }
 
-        private void GeneratePageIndex()
+        private void GenerateIndexView()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityPageIndex(), new
-            {
-                ConnectionKey = model.ConnectionKey,
-                RootNamespace = model.RootNamespace,
-                ClassName = model.ClassName,
-                RowClassName = model.RowClassName,
-                Module = model.Module,
-                Permission = model.Permission,
-                NavigationCategory = model.Module
-            }), Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Index.cshtml"))));
+            CreateNewSiteWebFile(Templates.Render("IndexView", model), 
+                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
+                    Path.Combine(model.ClassName, model.ClassName + "Index.cshtml"))));
         }
 
-        private void GenerateScriptRowTS()
+        private void GenerateRowTyping()
         {
             var targetFile = model.RowClassName + ".ts";
 
@@ -227,12 +261,12 @@ namespace Serenity.CodeGenerator
 
             targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
 
-            var content = Templates.Render(new Views.EntityScriptRowTS(), model);
+            var content = Templates.Render("RowTyping", model);
 
             CreateNewSiteWebFile(content, targetFile, serverTypings);
         }
 
-        private void GenerateScriptServiceTS()
+        private void GenerateServiceTyping()
         {
             var targetFile = model.ClassName + "Service.ts";
 
@@ -241,12 +275,12 @@ namespace Serenity.CodeGenerator
 
             targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
 
-            var content = Templates.Render(new Views.EntityScriptServiceTS(), model);
+            var content = Templates.Render("ServiceTyping", model);
 
             CreateNewSiteWebFile(content, targetFile, serverTypings);
         }
 
-        private void GenerateScriptFormTS()
+        private void GenerateFormTyping()
         {
             var targetFile = model.ClassName + "Form.ts";
 
@@ -255,21 +289,23 @@ namespace Serenity.CodeGenerator
 
             targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
 
-            var content = Templates.Render(new Views.EntityScriptFormTS(), model);
+            var content = Templates.Render("FormTyping", model);
 
             CreateNewSiteWebFile(content, targetFile, serverTypings);
         }
 
-        private void GenerateScriptGridTS()
+        private void GenerateGrid()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptGridTS(), model),
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Grid.ts"))));
+            CreateNewSiteWebFile(Templates.Render("Grid", model),
+                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
+                    Path.Combine(model.ClassName, model.ClassName + "Grid.ts"))));
         }
 
-        private void GenerateScriptDialogTS()
+        private void GenerateDialog()
         {
-            CreateNewSiteWebFile(Templates.Render(new Views.EntityScriptDialogTS(), model, config),
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, Path.Combine(model.ClassName, model.ClassName + "Dialog.ts"))));
+            CreateNewSiteWebFile(Templates.Render("Dialog", model),
+                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
+                    Path.Combine(model.ClassName, model.ClassName + "Dialog.ts"))));
         }
     }
 }

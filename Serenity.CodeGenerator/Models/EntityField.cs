@@ -19,5 +19,41 @@
         public int? Size { get; set; }
         public int Scale { get; set; }
         public string TextualField { get; set; }
+        public string Attributes { get; set; }
+        public string ColAttributes { get; set; }
+        public string Expression { get; set; }
+
+        public string TSEditorType
+        {
+            get
+            {
+                switch (FieldType)
+                {
+                    case "Int32":
+                    case "Int16":
+                    case "Int64":
+                        return "IntegerEditor";
+
+                    case "Single":
+                    case "Double":
+                    case "Decimal":
+                        return "DecimalEditor";
+
+                    case "DateTime":
+                        return "DateEditor";
+
+                    case "Boolean":
+                        return "BooleanEditor";
+
+                    default:
+                        return "StringEditor";
+                }
+            }
+        }
+
+        public string PropertyType
+        {
+            get { return IsValueType ? DataType + "?" : DataType; }
+        }
     }
 }

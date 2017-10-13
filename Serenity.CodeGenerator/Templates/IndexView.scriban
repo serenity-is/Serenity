@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = Serenity.LocalText.Get("Db{{DotModule}}.{{ClassName}}.EntityPlural");
+}
+
+<div id="GridDiv"></div>
+
+<script type="text/javascript">
+    jQuery(function () {
+        new {{RootNamespace}}{{DotModule}}.{{ClassName}}Grid($('#GridDiv'), {}).init();
+
+        Q.initFullHeightGridPage($('#GridDiv'));
+    });
+</script>

@@ -1,0 +1,20 @@
+﻿
+namespace {{RootNamespace}}{{DotModule}} {
+    export class {{ClassName}}Form extends Serenity.PrefixedContext {
+        static formKey = '{{ModuleDot}}{{ClassName}}';
+    }
+
+    export interface {{ClassName}}Form {%{{}%}{{for x in Fields}}{{if x.Ident != Identity}}
+        {{x.Ident}}: Serenity.{{x.TSEditorType}};{{end}}{{end}}
+    }
+
+    [{{for x in Fields}}{{if x.Ident != Identity}}{{if !for.first}},{{end}}
+        ['{{x.Ident}}', () => Serenity.{{x.TSEditorType}}]{{end}}{{end}}
+    ].forEach(x => Object.defineProperty({{ClassName}}Form.prototype, <string>x[0], {
+        get: function () {
+            return this.w(x[0], (x[1] as any)());
+        },
+        enumerable: true,
+        configurable: true
+    }));
+}

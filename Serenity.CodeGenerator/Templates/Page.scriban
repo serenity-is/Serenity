@@ -1,0 +1,19 @@
+﻿
+namespace {{RootNamespace}}{{DotModule}}.Pages
+{
+    using Serenity;
+    using Serenity.Web;{{if AspNetCore}}
+    using Microsoft.AspNetCore.Mvc;{{else}}
+    using System.Web.Mvc;{{end}}
+{{if !AspNetCore}}
+    [RoutePrefix("{{ModuleSlash}}{{ClassName}}"), Route("{action=index}")]{{end}}
+    [PageAuthorize(typeof(Entities.{{RowClassName}}))]
+    public class {{ClassName}}Controller : Controller
+    {%{{}%}{{if AspNetCore}}
+        [Route("{{ModuleSlash}}{{ClassName}}")]{{end}}
+        public ActionResult Index()
+        {
+            return View("~/Modules/{{ModuleSlash}}{{ClassName}}/{{ClassName}}Index.cshtml");
+        }
+    }
+}
