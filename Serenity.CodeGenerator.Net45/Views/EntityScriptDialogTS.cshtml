@@ -12,7 +12,7 @@ namespace @(Model.RootNamespace)@(dotModule) {
 @if (Config.MaximizableDialog)
 {    <text>@@Serenity.Decorators.maximizable()</text>
 }
-    export class @(Model.ClassName)Dialog extends Serenity.EntityDialog<@(Model.RowClassName), any> {
+    export class @(Model.ClassName)Dialog extends @(Model.GeneratorConfig.DialogBaseClassName)<@(Model.RowClassName), any> {
         protected getFormKey() { return @(Model.ClassName)Form.formKey; }@if (Model.Identity != null)
         {<text>
         protected getIdProperty() { return @(Model.RowClassName).idProperty; }</text>}

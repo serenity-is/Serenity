@@ -33,7 +33,7 @@ WriteLiteral("\r\n");
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
 
 
-WriteLiteral("/// <reference path=\"../../Common/Helpers/GridEditorDialog.ts\" />\r\n\r\nnamespace ");
+WriteLiteral("namespace ");
 
 
       Write(Model.RootNamespace);
@@ -52,10 +52,15 @@ WriteLiteral("@Serenity.Decorators.responsive()\r\n    export class ");
 
              Write(Model.ClassName);
 
-WriteLiteral("EditorDialog extends Common.GridEditorDialog<");
+WriteLiteral("EditorDialog extends ");
 
 
-                                                                            Write(Model.RowClassName);
+                                                    Write(Model.GeneratorConfig.GridEditorDialogBaseClassName);
+
+WriteLiteral("<");
+
+
+                                                                                                           Write(Model.RowClassName);
 
 WriteLiteral("> {\r\n        protected getFormKey() { return ");
 

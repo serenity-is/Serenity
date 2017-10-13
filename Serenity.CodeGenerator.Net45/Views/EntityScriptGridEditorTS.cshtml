@@ -3,12 +3,10 @@
     var dotModule = Model.Module == null ? "" : ("." + Model.Module);
     var moduleDot = Model.Module == null ? "" : (Model.Module  + ".");
 }
-/// <reference path="../../Common/Helpers/GridEditorBase.ts" />
-
 namespace @(Model.RootNamespace)@(dotModule) {
     
     @@Serenity.Decorators.registerClass()
-    export class @(Model.ClassName)Editor extends Common.GridEditorBase<@(Model.RowClassName)> {
+    export class @(Model.ClassName)Editor extends @(Model.GeneratorConfig.GridEditorBaseClassName)<@(Model.RowClassName)> {
         protected getColumnsKey() { return '@(moduleDot)@(Model.ClassName)'; }
         protected getDialogType() { return @(Model.ClassName)EditorDialog; }@if (Model.Identity != null) {<text>
         </text>}
