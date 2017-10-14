@@ -420,9 +420,9 @@ namespace Serenity.CodeGeneration
             if (!url.StartsWith("~/"))
             {
 
-                var routePrefix = controller.GetCustomAttribute<RoutePrefixAttribute>();
+                var routePrefix = GeneratorUtils.GetAttribute(controller, "System.Web.Mvc.RoutePrefixAttribute");
                 if (routePrefix != null)
-                    url = UriHelper.Combine(routePrefix.Prefix, url);
+                    url = UriHelper.Combine(routePrefix.GetType().GetProperty("RoutePrefix").GetValue(routePrefix) as string, url);
             }
 #endif
 
