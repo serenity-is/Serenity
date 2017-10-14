@@ -6,6 +6,35 @@ namespace Serenity.CodeGeneration
 {
     public partial class ClientTypesGenerator : ImportGeneratorBase
     {
+        internal static string GetOptionTypeName(string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName))
+                return "object";
+
+            switch (typeName)
+            {
+                case "number": return "Double";
+                case "string": return "String";
+                case "Date": return "DateTime";
+                case "boolean": return "Boolean";
+            }
+
+            var nullablePrefix = "System.Nullable`1";
+            bool nullable = typeName.StartsWith(nullablePrefix);
+            if (nullable)
+                typeName = typeName.Substring(nullablePrefix.Length + 1,
+                    typeName.Length - nullablePrefix.Length - 2);
+
+            var systemType = Type.GetType(typeName);
+            if (systemType == null)
+                return "object";
+
+            if (typeName.StartsWith("System."))
+                return typeName.Substring(7);
+
+            return typeName;
+        }
+
         private void GenerateOptionMembers(ExternalType type,
             HashSet<string> skip, bool isWidget)
         {
@@ -20,7 +49,7 @@ namespace Serenity.CodeGeneration
                     skip.Contains(option.Name))
                     continue;
 
-                var typeName = FormatterTypeGenerator.GetOptionTypeName(option.Type);
+                var typeName = GetOptionTypeName(option.Type);
 
                 sb.AppendLine();
                 cw.Indented("public ");
@@ -43,7 +72,7 @@ namespace Serenity.CodeGeneration
                             optionName = optionName.Substring(4);
                         }
 
-                        typeName = FormatterTypeGenerator.GetOptionTypeName(emo.Arguments[0].Type);
+                        typeName = GetOptionTypeName(emo.Arguments[0].Type);
                     }
                 }
 

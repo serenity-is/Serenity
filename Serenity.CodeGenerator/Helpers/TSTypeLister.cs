@@ -39,13 +39,11 @@ namespace Serenity.CodeGenerator
             {
                 File.WriteAllText(Path.Combine(tempDirectory, "typeScriptServices.js"), GetEmbeddedScript("Serenity.CodeGenerator.typeScriptServices.js") + "\n\nif (exports)\nexports.ts = ts;\n");
                 File.WriteAllText(Path.Combine(tempDirectory, "Serenity.CodeGeneration.js"), GetEmbeddedScript("Serenity.CodeGenerator.Serenity.CodeGeneration.js") + "\n\nif (exports)\nexports.Serenity = Serenity;\n");
-                File.WriteAllText(Path.Combine(tempDirectory, "lib.d.ts_"), GetEmbeddedScript("Serenity.CodeGenerator.lib.d.ts_"));
 
                 var sb = new StringBuilder();
                 sb.AppendLine("var fs = require('fs');");
                 sb.AppendLine("global.ts = require('./typescriptServices.js');");
                 sb.AppendLine("global.Serenity = require('./Serenity.CodeGeneration.js').Serenity;");
-                sb.AppendLine("var libdts = fs.readFileSync('./lib.d.ts_').toString();");
                 sb.AppendLine("var inputFiles = " + JSON.StringifyIndented(files.Select(x => x.Replace('\\', '/'))) + ";");
                 sb.AppendLine("for (var i = 0; i < inputFiles.length; i++) {");
                 sb.AppendLine("  var sourceText = fs.readFileSync(inputFiles[i]);");

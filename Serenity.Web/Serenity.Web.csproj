@@ -6,6 +6,9 @@
     <TargetFrameworks>netstandard2.0;net45;net461</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="CodeGeneration\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.csproj" />
     <ProjectReference Include="..\Serenity.Data\Serenity.Data.csproj" />
     <ProjectReference Include="..\Serenity.Data.Entity\Serenity.Data.Entity.csproj" />

@@ -11,9 +11,6 @@
     <DefineConstants>$(DefineConstants);ASPNETCORE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Serenity.Web\Tooling\JsEngine\lib.d.ts_">
-      <Link>lib.d.ts_</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="..\Serenity.TypeScript.CodeGeneration\Serenity.CodeGeneration.js">
       <Link>Serenity.CodeGeneration.js</Link>
     </EmbeddedResource>
@@ -23,7 +20,7 @@
     <EmbeddedResource Include="Templates\*.scriban" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Serenity.Web\Serenity.Web.csproj" />
+    <ProjectReference Include="..\Serenity.Services\Serenity.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
@@ -37,6 +34,9 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CodeGeneration\Base\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <DefineConstants>$(DefineConstants);COREFX</DefineConstants>

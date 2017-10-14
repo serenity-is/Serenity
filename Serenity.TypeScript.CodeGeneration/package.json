@@ -4,8 +4,7 @@
   "description": "Serenity.TypeScript.CodeGeneration",
   "main": "index.js",
   "repository": "https://github.com/volkanceylan/serenity",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^2.1.5"
   },

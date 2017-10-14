@@ -166,7 +166,7 @@ namespace Serenity.CodeGenerator
                 typeof(SqlConnections).Assembly,
                 typeof(Row).Assembly,
                 typeof(SaveRequestHandler<>).Assembly,
-                typeof(WebSecurityHelper).Assembly
+                Assembly.Load(new AssemblyName("Serenity.Web")),
             }.Concat(assemblies).Distinct().ToArray();
 
             var generator = new ServerTypingsGenerator(assemblies.ToArray());

@@ -95,47 +95,93 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Base\CodeGeneratorBase.cs">
+      <Link>CodeGeneration\Base\CodeGeneratorBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Base\GeneratorUtils.cs">
+      <Link>CodeGeneration\Base\GeneratorUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Base\ImportGeneratorBase.cs">
+      <Link>CodeGeneration\Base\ImportGeneratorBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Base\ServerImportGeneratorBase.cs">
+      <Link>CodeGeneration\Base\ServerImportGeneratorBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ClientTypes\ClientTypesGenerator.cs">
+      <Link>CodeGeneration\ClientTypes\ClientTypesGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ClientTypes\ClientTypesGenerator.Editor.cs">
+      <Link>CodeGeneration\ClientTypes\ClientTypesGenerator.Editor.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ClientTypes\ClientTypesGenerator.Formatter.cs">
+      <Link>CodeGeneration\ClientTypes\ClientTypesGenerator.Formatter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ClientTypes\ClientTypesGenerator.Option.cs">
+      <Link>CodeGeneration\ClientTypes\ClientTypesGenerator.Option.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Model\ExternalArgument.cs">
+      <Link>CodeGeneration\Model\ExternalArgument.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Model\ExternalAttribute.cs">
+      <Link>CodeGeneration\Model\ExternalAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Model\ExternalGenericParameter.cs">
+      <Link>CodeGeneration\Model\ExternalGenericParameter.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Model\ExternalMember.cs">
+      <Link>CodeGeneration\Model\ExternalMember.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Model\ExternalMethod.cs">
+      <Link>CodeGeneration\Model\ExternalMethod.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Model\ExternalProperty.cs">
+      <Link>CodeGeneration\Model\ExternalProperty.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Model\ExternalType.cs">
+      <Link>CodeGeneration\Model\ExternalType.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Model\ExternalTypeOrigin.cs">
+      <Link>CodeGeneration\Model\ExternalTypeOrigin.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.Enum.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Enum.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.Form.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Form.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.Service.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.Service.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs">
+      <Link>CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs</Link>
+    </Compile>
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Option.cs" />
-    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Editor.cs" />
-    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.Formatter.cs" />
     <Compile Include="CodeGeneration\Legacy\ManualTsParser.cs" />
     <Compile Include="CodeGeneration\Legacy\Lexer.cs" />
     <Compile Include="CodeGeneration\Legacy\DtoActionResult.cs" />
     <Compile Include="CodeGeneration\Legacy\DtoGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\FormatterTypeGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\EditorTypeGenerator.cs" />
-    <Compile Include="CodeGeneration\Base\GeneratorUtils.cs" />
     <Compile Include="CodeGeneration\Legacy\ScriptDtoGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\ScriptEndpointGenerator.cs" />
     <Compile Include="CodeGeneration\Legacy\ScriptFormGenerator.cs" />
-    <Compile Include="CodeGeneration\Model\ExternalMember.cs" />
-    <Compile Include="CodeGeneration\Model\ExternalMethod.cs" />
-    <Compile Include="CodeGeneration\Model\ExternalProperty.cs" />
-    <Compile Include="CodeGeneration\Model\ExternalAttribute.cs" />
-    <Compile Include="CodeGeneration\Model\ExternalArgument.cs" />
-    <Compile Include="CodeGeneration\Model\ExternalGenericParameter.cs" />
-    <Compile Include="CodeGeneration\Model\ExternalTypeOrigin.cs" />
-    <Compile Include="CodeGeneration\Model\ExternalType.cs" />
-    <Compile Include="CodeGeneration\ClientTypes\ClientTypesGenerator.cs" />
-    <Compile Include="CodeGeneration\Base\CodeGeneratorBase.cs" />
-    <Compile Include="CodeGeneration\Base\ImportGeneratorBase.cs" />
-    <Compile Include="CodeGeneration\Base\ServerImportGeneratorBase.cs" />
     <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.MemberType.cs" />
     <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Enum.cs" />
     <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Row.cs" />
     <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Service.cs" />
     <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.Form.cs" />
     <Compile Include="CodeGeneration\ServerImports\ServerImportsGenerator.cs" />
-    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.MemberType.cs" />
-    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.SS.cs" />
-    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Service.cs" />
-    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Form.cs" />
-    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Row.cs" />
-    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.Enum.cs" />
-    <Compile Include="CodeGeneration\ServerTypings\ServerTypingsGenerator.cs" />
     <Compile Include="Common\RequestContext.cs" />
     <Compile Include="Common\ScriptCulture.cs" />
     <Compile Include="Common\WebConfigurationWrapper.cs" />

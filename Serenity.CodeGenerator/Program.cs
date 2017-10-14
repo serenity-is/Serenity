@@ -69,7 +69,7 @@ namespace Serenity.CodeGenerator
                 "transform".StartsWith(command) ||
                 "servertypings".StartsWith(command) ||
                 "clienttypes".StartsWith(command) ||
-                "mvc".StartsWith(command))
+                "mvct".StartsWith(command))
             {
                 string tsTypesJson = null;
                 Func<List<ExternalType>> getTsTypes = () =>
@@ -84,12 +84,12 @@ namespace Serenity.CodeGenerator
                     return JSON.Parse<List<ExternalType>>(tsTypesJson);
                 };
 
-                if ("transform".StartsWith(command) || "mvc".StartsWith(command))
+                if ("transform".StartsWith(command) || "mvct".StartsWith(command))
                 {
                     new MvcCommand().Run(csproj);
                 }
 
-                if ("transform".StartsWith(command) || "clienttypes".StartsWith(command))
+                if ("transform".StartsWith(command) || "clienttypes".StartsWith(command) || command == "mvct")
                 {
                     new ClientTypesCommand().Run(csproj, getTsTypes());
                 }

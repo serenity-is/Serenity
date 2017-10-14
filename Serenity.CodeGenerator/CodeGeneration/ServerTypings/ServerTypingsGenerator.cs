@@ -1,14 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Serenity.ComponentModel;
 using Serenity.Data;
+using Serenity.Reflection;
 using Serenity.Services;
 using System;
 using System.Reflection;
-#if ASPNETCORE
-using Microsoft.AspNetCore.Mvc;
-#else
-using System.Web.Mvc;
-#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -46,7 +42,8 @@ namespace Serenity.CodeGeneration
 
             if (type.IsEnum)
                 run(GenerateEnum);
-            else if (type.IsSubclassOf(typeof(Controller)))
+            else if (GeneratorUtils.IsSubclassOf(type, "Microsoft.AspNetCore.Mvc.Controller") ||
+                GeneratorUtils.IsSubclassOf(type, "System.Web.Mvc.Controller"))
                 run(GenerateService);
             else
             { 

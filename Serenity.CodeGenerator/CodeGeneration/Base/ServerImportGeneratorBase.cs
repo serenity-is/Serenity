@@ -7,11 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-#if ASPNETCORE
-using Microsoft.AspNetCore.Mvc;
-#else
-using System.Web.Mvc;
-#endif
 
 namespace Serenity.CodeGeneration
 {
@@ -134,8 +129,9 @@ namespace Serenity.CodeGeneration
                         fromType.GetCustomAttribute<ScriptIncludeAttribute>() != null ||
                         fromType.GetCustomAttribute<FormScriptAttribute>() != null ||
                         fromType.GetCustomAttribute<ColumnsScriptAttribute>() != null ||
-                        fromType.IsSubclassOf(typeof(ServiceEndpoint)) ||
-                        (fromType.IsSubclassOf(typeof(Controller)) && // backwards compability
+                        GeneratorUtils.IsSubclassOf(fromType, "Serenity.Services.ServiceEndpoint") ||
+                        ((GeneratorUtils.IsSubclassOf(fromType, "Microsoft.AspNetCore.Mvc.Controller") ||
+                          GeneratorUtils.IsSubclassOf(fromType, "System.Web.Mvc.Controller")) && // backwards compability
                          fromType.Namespace != null &&
                          fromType.Namespace.EndsWith(".Endpoints")))
                     {
@@ -369,12 +365,14 @@ namespace Serenity.CodeGeneration
             requestType = null;
             requestParam = null;
 
-            if (method.GetCustomAttribute<NonActionAttribute>() != null)
+            if ((GeneratorUtils.GetAttribute(method, "System.Web.Mvc.NonActionAttribute") ??
+                 GeneratorUtils.GetAttribute(method, "Microsoft.AspNetCore.Mvc.NonActionAttribute")) != null)
                 return false;
 
-            if (typeof(Controller).IsSubclassOf(method.DeclaringType))
+            if (!GeneratorUtils.IsSubclassOf(method.DeclaringType, "System.Web.Mvc.Controller") &&
+                !GeneratorUtils.IsSubclassOf(method.DeclaringType, "Microsoft.AspNetCore.Mvc.Controller"))
                 return false;
-
+            
             if (method.IsSpecialName && (method.Name.StartsWith("set_") || method.Name.StartsWith("get_")))
                 return false;
 
@@ -396,11 +394,12 @@ namespace Serenity.CodeGeneration
             responseType = method.ReturnType;
             if (responseType != null &&
                 responseType.IsGenericType &&
-                responseType.GetGenericTypeDefinition() == typeof(Result<>))
+                responseType.GetGenericTypeDefinition().Name.StartsWith("Serenity.Services.Result`1"))
             {
                 responseType = responseType.GenericTypeArguments[0];
             }
-            else if (typeof(ActionResult).IsAssignableFrom(responseType))
+            else if (GeneratorUtils.IsEqualOrSubclassOf(responseType, "System.Web.Mvc.ActionResult") ||
+                GeneratorUtils.IsEqualOrSubclassOf(responseType, "Microsoft.AspNetCore.Mvc.ActionResult"))
                 return false;
             else if (responseType == typeof(void))
                 return false;
@@ -410,8 +409,9 @@ namespace Serenity.CodeGeneration
 
         protected string GetServiceUrlFromRoute(Type controller)
         {
-            var route = controller.GetCustomAttributes<RouteAttribute>().FirstOrDefault();
-            string url = route == null ? ("Services/HasNoRoute/" + controller.Name) : (route.Template ?? "");
+            var route = GeneratorUtils.GetAttribute(controller, "System.Web.Mvc.RouteAttribute") ??
+                GeneratorUtils.GetAttribute(controller, "Microsoft.AspNetCore.Mvc.RouteAttribute");
+            string url = route == null ? ("Services/HasNoRoute/" + controller.Name) : (route.GetType().GetProperty("Template").GetValue(route) as string ?? "");
 
 #if ASPNETCORE
             url = url.Replace("[controller]", controller.Name.Substring(0, controller.Name.Length - "Controller".Length));
