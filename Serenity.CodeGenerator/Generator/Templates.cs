@@ -1,5 +1,4 @@
-﻿using RazorGenerator.Templating;
-using Scriban;
+﻿using Scriban;
 using Scriban.Runtime;
 using System;
 using System.Collections.Concurrent;
@@ -56,30 +55,17 @@ namespace Serenity.CodeGenerator
             {
                 var context = new TemplateContext();
                 context.MemberRenamer = noRenamer;
-                context.CurrentGlobal.Import(model, 
-                    ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property, 
+                context.CurrentGlobal.Import(model,
+                    ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property,
                     null, noRenamer);
                 template.Render(context);
                 return context.Output.ToString();
             }
             catch (InvalidOperationException ex)
             {
-                throw new Exception("Template Has Errors: " + Environment.NewLine + 
+                throw new Exception("Template Has Errors: " + Environment.NewLine +
                     string.Join(Environment.NewLine, template.Messages.Select(x => x.ToString())), ex);
             }
-        }
-
-        public static string Render<T>(RazorTemplateBase template, T model)
-        {
-            ((dynamic)template).Model = model;
-            return template.TransformText();
-        }
-
-        public static string Render<T>(RazorTemplateBase template, T model, GeneratorConfig config)
-        {
-            ((dynamic)template).Model = model;
-            ((dynamic)template).Config = config;
-            return template.TransformText();
         }
     }
 }

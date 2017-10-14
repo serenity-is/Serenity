@@ -11,27 +11,34 @@ namespace Serenity.CodeGenerator
         private EntityModel model;
         private string rootDir;
         private Encoding utf8 = new UTF8Encoding(true);
-        private string modules = "Modules/".Replace('/', Path.DirectorySeparatorChar);
-        private string serverTypings;
+        private string csproj;
+        private string moduleClass;
+        private string typingClass;
+        private string serverTypingsTT;
 
         public EntityCodeGenerator(EntityModel model, GeneratorConfig config, string csproj)
         {
-            var kdiff3Paths = new[]
-            {
-                config.KDiff3Path
-            };
-
             this.model = model;
-            CodeFileHelper.Kdiff3Path = kdiff3Paths.FirstOrDefault(File.Exists);
-            CodeFileHelper.TSCPath = config.TSCPath ?? "tsc";
+            this.csproj = csproj;
 
             this.rootDir = Path.GetDirectoryName(csproj);
             this.config = config;
             this.model.CustomSettings = config.CustomSettings;
 
-            this.serverTypings = Path.Combine(rootDir, "Modules/Common/Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+            var serverTypings = Path.Combine(rootDir, "Modules/Common/Imports/ServerTypings/"
+                .Replace('/', Path.DirectorySeparatorChar));
             if (!Directory.Exists(serverTypings))
-                this.serverTypings = Path.Combine(rootDir, "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+                serverTypings = Path.Combine(rootDir, "Imports/ServerTypings/".Replace('/', Path.DirectorySeparatorChar));
+
+            serverTypingsTT = (serverTypings.Substring(rootDir.Length + 1) + "ServerTypings.tt").Replace('/', '\\');
+
+            typingClass = Path.Combine(serverTypings, model.ModuleDot + model.ClassName);
+
+            var modulePath = Path.Combine(rootDir, "Modules"); 
+            if (!string.IsNullOrEmpty(model.Module))
+                modulePath = Path.Combine(modulePath, model.Module);
+
+            moduleClass = Path.Combine(modulePath, Path.Combine(model.ClassName, model.ClassName));
         }
 
         public void Run()
@@ -40,43 +47,61 @@ namespace Serenity.CodeGenerator
 
             if (config.GenerateRow)
             {
-                GenerateRow();
-                GenerateRowTyping();
+                CreateFile(Templates.Render("Row", model), moduleClass + "Row.cs");
+                CreateFile(Templates.Render("RowTyping", model), typingClass + "Row.ts", serverTypingsTT);
             }
 
             if (config.GenerateService)
             {
-                GenerateRepository();
-                GenerateEndpoint();
-                GenerateServiceTyping();
+                CreateFile(Templates.Render("Repository", model), moduleClass + "Repository.cs");
+                CreateFile(Templates.Render("Endpoint", model), moduleClass + "Endpoint.cs");
+                CreateFile(Templates.Render("ServiceTyping", model), typingClass + "Service.ts", serverTypingsTT);
             }
 
             if (config.GenerateUI)
             {
-                GeneratePage();
-                GenerateIndexView();
+                CreateFile(Templates.Render("Page", model), moduleClass + "Page.cs");
+                CreateFile(Templates.Render("IndexView", model), moduleClass + "Index.cshtml");
+                CreateFile(Templates.Render("Columns", model), moduleClass + "Columns.cs");
+                CreateFile(Templates.Render("Form", model), moduleClass + "Form.cs");
+                CreateFile(Templates.Render("Dialog", model), moduleClass + "Dialog.ts");
+                CreateFile(Templates.Render("Grid", model), moduleClass + "Grid.ts");
+                CreateFile(Templates.Render("FormTyping", model), typingClass + "Form.ts", serverTypingsTT);
                 GenerateNavigationLink();
                 GenerateStyle();
-                GenerateColumns();
-                GenerateForm();
-                GenerateDialog();
-                GenerateGrid();
-                GenerateFormTyping();
+            }
+
+            if (config.CustomGenerate != null &&
+                config.GenerateCustom)
+            {
+                foreach (var pair in config.CustomGenerate)
+                {
+                    if (string.IsNullOrEmpty(pair.Value))
+                        continue;
+
+                    var templateKey = pair.Key;
+                    if (templateKey.IndexOf("..") >= 0 ||
+                        templateKey.StartsWith("\\") ||
+                        templateKey.StartsWith("//"))
+                        throw new ArgumentOutOfRangeException("templateFile");
+
+                    var outputFile = pair.Value;
+                    if (outputFile.IndexOf("..") >= 0 || 
+                        outputFile.StartsWith("\\") ||
+                        outputFile.StartsWith("//"))
+                        throw new ArgumentOutOfRangeException("outputFile");
+
+                    outputFile = String.Format(outputFile, model.ClassName, model.Module, 
+                        Path.GetDirectoryName(moduleClass), Path.GetDirectoryName(typingClass), rootDir);
+
+                    var content = Templates.Render(templateKey, model);
+                    if (!string.IsNullOrWhiteSpace(content))
+                        CreateFile(content, outputFile);
+                }
             }
         }
 
         private string CreateDirectoryOrBackupFile(string file)
-        {
-            if (File.Exists(file))
-                return BackupFile(file);
-            else
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(file));
-                return null;
-            }
-        }
-
-        private string BackupFile(string file)
         {
             if (File.Exists(file))
             {
@@ -84,40 +109,42 @@ namespace Serenity.CodeGenerator
                 CodeFileHelper.CheckoutAndWrite(backupFile, File.ReadAllBytes(file), false);
                 return backupFile;
             }
-
-            return null;
+            else
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                return null;
+            }
         }
 
-        private void CreateNewSiteWebFile(string code, string relativeFile, string dependentUpon = null)
+        private void CreateFile(string code, string file, string dependentUpon = null)
         {
-            string file = Path.Combine(rootDir, relativeFile);
             var backup = CreateDirectoryOrBackupFile(file);
             CodeFileHelper.CheckoutAndWrite(file, code, true);
             CodeFileHelper.MergeChanges(backup, file);
-        }
-
-        private void GenerateRow()
-        {
-            CreateNewSiteWebFile(Templates.Render("Row", model),
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.RowClassName + ".cs"))));
+#if !ASPNETCORE
+            ProjectFileHelper.AddFileToProject(this.csproj, 
+                file.Substring(Path.GetDirectoryName(csproj).Length + 1).Replace('/', '\\'), dependentUpon);
+#endif
         }
 
         private void GenerateStyle()
         {
-            string relativeFile = Path.Combine(@"wwwroot/Content/site/".Replace('/', Path.DirectorySeparatorChar), "site" +  
-                (!string.IsNullOrEmpty(model.Module) ? ("." + model.Module.ToLowerInvariant()) : "") + ".less");
-
-            string file = Path.Combine(rootDir, relativeFile);
+#if !ASPNETCORE
+            string contentSite = "wwwroot/Content/site".Replace('/', Path.DirectorySeparatorChar);
+#else
+            string contentSite = "Content/site".Replace('/', Path.DirectorySeparatorChar);
+#endif
+            string file = Path.Combine(rootDir, Path.Combine(contentSite,
+                    "site" + model.DotModule.ToLowerInvariant() + ".less"));
 
             if (!string.IsNullOrEmpty(model.Module))
             {
-                var siteLess = Path.Combine("wwwroot/Content/site/".Replace('/', Path.DirectorySeparatorChar), "site.less");
-                var siteLessFile = Path.Combine(rootDir, siteLess);
-                if (File.Exists(siteLessFile))
+                var siteLess = Path.Combine(rootDir, Path.Combine(contentSite, "site.less"));
+
+                if (File.Exists(siteLess))
                 {
                     var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less";
-                    var lines = File.ReadAllLines(siteLessFile).ToList();
+                    var lines = File.ReadAllLines(siteLess).ToList();
                     if (!lines.Any(x => (x ?? "").ToLowerInvariant().IsTrimmedSame(importLine)))
                     {
                         var index = lines.FindLastIndex(x =>
@@ -128,9 +155,11 @@ namespace Serenity.CodeGenerator
 
                         if (index < 0)
                             index = lines.Count;
+                        else
+                            index++;
 
                         lines.Insert(index, importLine);
-                        CreateNewSiteWebFile(string.Join(Environment.NewLine, lines), siteLess);
+                        CodeFileHelper.CheckoutAndWrite(siteLess, string.Join(Environment.NewLine, lines), false);
                     }
                 }
             }
@@ -138,7 +167,7 @@ namespace Serenity.CodeGenerator
             if (!File.Exists(file))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(file));
-                CreateNewSiteWebFile("@import \"site.mixins.less\";" + Environment.NewLine, relativeFile);
+                CreateFile("@import \"site.mixins.less\";" + Environment.NewLine, file);
             }
 
             string code = Templates.Render("Style", model);
@@ -168,18 +197,17 @@ namespace Serenity.CodeGenerator
 
         private void GenerateNavigationLink()
         {
-            string relativeFile = string.IsNullOrEmpty(model.Module) ?
+            string file = Path.Combine(rootDir, string.IsNullOrEmpty(model.Module) ?
                 "Modules/Common/Navigation/NavigationItems.cs" :
-                "Modules/" + model.ModuleSlash + model.Module + "Navigation.cs";
-            relativeFile = relativeFile.Replace('/', Path.DirectorySeparatorChar);
+                "Modules/" + model.ModuleSlash + model.Module + "Navigation.cs");
+            file = file.Replace('/', Path.DirectorySeparatorChar);
 
-            string file = Path.Combine(rootDir, relativeFile);
             string code = Templates.Render("NavigationLink", model);
 
             if (!File.Exists(file))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(file));
-                CreateNewSiteWebFile(code, relativeFile);
+                CreateFile(code, file);
             }
             else
             {
@@ -188,6 +216,7 @@ namespace Serenity.CodeGenerator
                 var usingIndex = lines.FindLastIndex(x => x.TrimToEmpty().StartsWith("using "));
                 if (usingIndex < 0)
                     usingIndex = 0;
+
                 foreach (var usng in toInsert.Where(x => x.TrimToEmpty().StartsWith("using ")))
                 {
                     if (lines.Find(x => x.TrimToEmpty().Replace(" ", "")
@@ -208,104 +237,6 @@ namespace Serenity.CodeGenerator
 
                 CodeFileHelper.CheckoutAndWrite(file, string.Join(Environment.NewLine, lines), false);
             }
-        }
-
-        private void GenerateColumns()
-        {
-            CreateNewSiteWebFile(Templates.Render("Columns", model), 
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.ClassName + "Columns.cs"))));
-        }
-
-        private void GenerateForm()
-        {
-            CreateNewSiteWebFile(Templates.Render("Form", model), 
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.ClassName + "Form.cs"))));
-        }
-
-        private void GenerateRepository()
-        {
-            CreateNewSiteWebFile(Templates.Render("Repository", model), 
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.ClassName + "Repository.cs"))));
-        }
-
-        private void GenerateEndpoint()
-        {
-            CreateNewSiteWebFile(Templates.Render("Endpoint", model), 
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.ClassName + "Endpoint.cs"))));
-        }
-
-        private void GeneratePage()
-        {
-            CreateNewSiteWebFile(Templates.Render("Page", model), 
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.ClassName + "Page.cs"))));
-        }
-
-        private void GenerateIndexView()
-        {
-            CreateNewSiteWebFile(Templates.Render("IndexView", model), 
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.ClassName + "Index.cshtml"))));
-        }
-
-        private void GenerateRowTyping()
-        {
-            var targetFile = model.RowClassName + ".ts";
-
-            if (model.Module != null)
-                targetFile = model.Module + "." + targetFile;
-
-            targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
-
-            var content = Templates.Render("RowTyping", model);
-
-            CreateNewSiteWebFile(content, targetFile, serverTypings);
-        }
-
-        private void GenerateServiceTyping()
-        {
-            var targetFile = model.ClassName + "Service.ts";
-
-            if (model.Module != null)
-                targetFile = model.Module + "." + targetFile;
-
-            targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
-
-            var content = Templates.Render("ServiceTyping", model);
-
-            CreateNewSiteWebFile(content, targetFile, serverTypings);
-        }
-
-        private void GenerateFormTyping()
-        {
-            var targetFile = model.ClassName + "Form.ts";
-
-            if (model.Module != null)
-                targetFile = model.Module + "." + targetFile;
-
-            targetFile = Path.Combine(Path.GetDirectoryName(serverTypings), targetFile);
-
-            var content = Templates.Render("FormTyping", model);
-
-            CreateNewSiteWebFile(content, targetFile, serverTypings);
-        }
-
-        private void GenerateGrid()
-        {
-            CreateNewSiteWebFile(Templates.Render("Grid", model),
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.ClassName + "Grid.ts"))));
-        }
-
-        private void GenerateDialog()
-        {
-            CreateNewSiteWebFile(Templates.Render("Dialog", model),
-                Path.Combine(modules, Path.Combine(model.Module ?? model.RootNamespace, 
-                    Path.Combine(model.ClassName, model.ClassName + "Dialog.ts"))));
         }
     }
 }

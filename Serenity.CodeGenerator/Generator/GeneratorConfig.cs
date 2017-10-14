@@ -13,9 +13,10 @@ namespace Serenity.CodeGenerator
         public List<Connection> Connections { get; set; }
         public string KDiff3Path { get; set; }
         public string TSCPath { get; set; }
-        public string TemplatePath { get; set; }
         public List<BaseRowClass> BaseRowClasses { get; set; }
         public List<string> RemoveForeignFields { get; set; }
+        public string CustomTemplates { get; set; }
+        public Dictionary<string, string> CustomGenerate { get; set; }
         public Dictionary<string, object> CustomSettings { get; set; }
         [JsonIgnore]
         public bool GenerateRow { get; set; }
@@ -23,15 +24,19 @@ namespace Serenity.CodeGenerator
         public bool GenerateService { get; set; }
         [JsonIgnore]
         public bool GenerateUI { get; set; }
+        [JsonIgnore]
+        public bool GenerateCustom { get; set; }
 
         public GeneratorConfig()
         {
             Connections = new List<Connection>();
             BaseRowClasses = new List<BaseRowClass>();
             CustomSettings = new Dictionary<string, object>();
+            CustomGenerate = new Dictionary<string, string>();
             GenerateRow = true;
             GenerateService = true;
             GenerateUI = true;
+            GenerateCustom = true;
         }
 
         public string SaveToJson()
