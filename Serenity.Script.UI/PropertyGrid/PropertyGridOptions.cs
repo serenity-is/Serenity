@@ -25,7 +25,7 @@ namespace Serenity
 
     public enum PropertyGridMode
     {
-        Insert,
-        Update
+        Insert = 1,
+        Update = 2
     }
 }
