@@ -1,3 +1,25 @@
+## 3.1.0 (2017-10-15)
+
+Features:
+  - .net core sergen no longer has dependency to serenity.web, thus asp.net core, so it is now much slimmer and 10 times faster to load
+  - improved .net core build / dotnet sergen transform time significantly (20x) if input files (.ts) didn't change by employing caching in TSTypeLister.
+  - t4 transform files in .net framework version is also much faster (caching + change control), see latest commit
+  - t4 transform doesn't modify files if only line endings changed, solves a problem with git due to line ending transformation (files was looking like changed after T4 transform)
+  - servertypings t4 transform doesn't invoke tsc if none of files changed
+  - typescript compiler is only invoked when an input file changes which improves build time significantly, see changes in Serene.csproj
+  - less compiler is only invoked when an input file changes which improves build time significantly, see changes in Serene.csproj
+  - use scriban template engine for sergen
+  - it is now possible to override templates sergen uses by setting "CustomTemplates" option to a directory with .scriban templates. if there is a template with same name (e.g. Row.scriban) in that directory sergen uses that, otherwise uses default embedded one.
+  - sergen provides option to generate custom files by setting CustomGenerate option in configuration file. this is a dictionary of template file => output file format ({0} class name, {1} Module, {2} class path, {3} typings path)
+  - it is possible to show / editor custom settings (boolean/string) by adding them to CustomSettings dictionary in sergen configuration file. these settings are available as {{CustomSettings.SettingKey}} in scriban templates.
+  - added "mvct" command to sergen that does mvc / clienttypes at once. used this option for pre build script instead of two calls to dotnet-sergen.
+  - removed rowwithregion, lookup generate options etc as they are now possible with custom generate option and custom settings
+  - sergen no longer generates code for Saltaralle. script project option is removed. use an older sergen version if you still generate code for saltaralle.
+  - put each field on separate line for easier merge in ServerTypings generated files (for easier merge in git)
+  - support quick filter persist / restore  (thanks @marcobisio, pull request #1455)
+  - add FullTextContains quick search type (simple version of pull request #2200 that only support quick search with contains for performance reasons, thanks @marcobisio)
+
+
 ## 3.0.8 (2017-10-11)
 
 Features:
