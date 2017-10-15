@@ -72,7 +72,7 @@ namespace Serenity.CodeGenerator
                 try
                 {
                     Directory.CreateDirectory(cacheDir);
-                    TemporaryFileHelper.PurgeDirectory(cacheDir, TimeSpan.Zero, 9, null);
+                    TemporaryFileHelper.PurgeDirectory(cacheDir, TimeSpan.Zero, 99, null);
                     File.WriteAllText(cacheFile, json);
                 }
                 catch
