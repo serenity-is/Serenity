@@ -84,9 +84,6 @@ namespace Serenity.CodeGenerator
             Directory.CreateDirectory(tempDirectory);
             try
             {
-                sb.Insert(0, "var fs = require('fs');\n");
-                sb.AppendLine("var types = JSON.stringify(Serenity.CodeGeneration.parseTypes());");
-                sb.AppendLine("fs.writeFileSync('./typeList.json', types);");
                 File.WriteAllText(Path.Combine(tempDirectory, "index.js"), sb.ToString());
 
                 var process = Process.Start(new ProcessStartInfo()
