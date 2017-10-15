@@ -561,18 +561,18 @@ namespace Serenity.Test.Data
                 .Where("c > 2")
                 .OrderBy("x")
                 .OrderBy("y")
-                
+
                 .Skip(100)
                 .Take(50);
 
             Assert.Equal(
                 TestSqlHelper.Normalize(
-                    "DECLARE @Value0 SQL_VARIANT;" + 
+                    "DECLARE @Value0 SQL_VARIANT;" +
                     "DECLARE @Value1 SQL_VARIANT;" +
                     "SELECT TOP 100 @Value0 = x,@Value1 = y FROM t WHERE c > 2 ORDER BY x, y;" +
-                    "SELECT TOP 50 c FROM t WHERE c > 2 AND " + 
-                        "((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0))) " + 
-                            "OR (((x IS NULL AND @Value0 IS NULL) OR (x = @Value0)) " + 
+                    "SELECT TOP 50 c FROM t WHERE c > 2 AND " +
+                        "((((x IS NOT NULL AND @Value0 IS NULL) OR (x > @Value0))) " +
+                            "OR (((x IS NULL AND @Value0 IS NULL) OR (x = @Value0)) " +
                             "AND ((y IS NOT NULL AND @Value1 IS NULL) OR (y > @Value1)))) ORDER BY x, y"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
@@ -592,7 +592,7 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT * FROM (\n" +
-                        "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS __num__ FROM t) __results__ " + 
+                        "SELECT TOP 30 c, ROW_NUMBER() OVER (ORDER BY x) AS __num__ FROM t) __results__ " +
                     "WHERE __num__ > 10"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
@@ -711,7 +711,7 @@ namespace Serenity.Test.Data
             Assert.Throws<ArgumentNullException>(() => new SqlQuery().Where((string)null));
             Assert.Throws<ArgumentNullException>(() => new SqlQuery().Where(String.Empty));
         }
-        
+
         [Fact]
         public void WithPassesAndReturnsTheQueryItself()
         {
@@ -793,6 +793,24 @@ namespace Serenity.Test.Data
             Assert.Equal(
                 TestSqlHelper.Normalize(
                     "SELECT * FROM ( SELECT c, ROWNUM AS numberingofrow FROM t) WHERE numberingofrow > 50 AND ROWNUM <= 20"),
+                TestSqlHelper.Normalize(
+                    query.ToString()));
+        }
+
+        [Fact]
+        public void SkipTakeWithOrderByUsesCorrectSyntaxForOracleDialect()
+        {
+            var query = new SqlQuery()
+                .Dialect(OracleDialect.Instance)
+                .Select("c")
+                .From("t")
+                .OrderBy("x")
+                .Take(20)
+                .Skip(50);
+
+            Assert.Equal(
+                TestSqlHelper.Normalize(
+                    "SELECT * FROM ( SELECT c, ROW_NUMBER() OVER (ORDER BY x) AS numberingofrow FROM t ORDER BY x) WHERE numberingofrow > 50 AND ROWNUM <= 20"),
                 TestSqlHelper.Normalize(
                     query.ToString()));
         }
