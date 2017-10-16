@@ -1339,6 +1339,11 @@ var Q;
         $('<input/>').attr('type', 'hidden').attr('name', 'request')
             .val($['toJSON'](options.request))
             .appendTo(div);
+        var csrfToken = Q.getCookie('CSRF-TOKEN');
+        if (csrfToken) {
+            $('<input/>').attr('type', 'hidden').attr('name', '__RequestVerificationToken')
+                .appendTo(div).val(csrfToken);
+        }
         $('<input/>').attr('type', 'submit')
             .appendTo(div);
         form.submit();
@@ -1360,6 +1365,11 @@ var Q;
                     .appendTo(div);
             }
         }
+        var csrfToken = Q.getCookie('CSRF-TOKEN');
+        if (csrfToken) {
+            $('<input/>').attr('type', 'hidden').attr('name', '__RequestVerificationToken')
+                .appendTo(div).val(csrfToken);
+        }
         $('<input/>').attr('type', 'submit')
             .appendTo(div);
         form.submit();
@@ -1376,6 +1386,22 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
+    function getCookie(name) {
+        if ($.cookie)
+            return $.cookie(name);
+        name += '=';
+        for (var ca = document.cookie.split(/;\s*/), i = ca.length - 1; i >= 0; i--)
+            if (!ca[i].indexOf(name))
+                return ca[i].replace(name, '');
+    }
+    Q.getCookie = getCookie;
+    $.ajaxSetup({
+        beforeSend: function (xhr) {
+            var token = Q.getCookie('CSRF-TOKEN');
+            if (token)
+                xhr.setRequestHeader('X-CSRF-TOKEN', token);
+        }
+    });
     function serviceCall(options) {
         var handleError = function (response) {
             if (Q.Config.notLoggedInHandler != null &&

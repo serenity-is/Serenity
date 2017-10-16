@@ -718,6 +718,7 @@ declare namespace Q {
     function resolveUrl(url: string): string;
 }
 declare namespace Q {
+    function getCookie(name: string): any;
     interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends JQueryAjaxSettings {
         request?: any;
         service?: string;

@@ -1,5 +1,24 @@
 ﻿
 namespace Q {
+
+    export function getCookie(name: string) {
+        if ($.cookie)
+            return $.cookie(name);
+
+        name += '=';
+        for (var ca = document.cookie.split(/;\s*/), i = ca.length - 1; i >= 0; i--)
+            if (!ca[i].indexOf(name))
+                return ca[i].replace(name, '');
+    }
+
+    $.ajaxSetup({
+        beforeSend: function (xhr) {
+            var token = Q.getCookie('CSRF-TOKEN');
+            if (token)
+                xhr.setRequestHeader('X-CSRF-TOKEN', token);
+        }
+    });
+
     export interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends JQueryAjaxSettings {
         request?: any;
         service?: string;

@@ -39,6 +39,11 @@
         $('<input/>').attr('type', 'hidden').attr('name', 'request')
             .val($['toJSON'](options.request))
             .appendTo(div);
+        var csrfToken = Q.getCookie('CSRF-TOKEN');
+        if (csrfToken) {
+            $('<input/>').attr('type', 'hidden').attr('name', '__RequestVerificationToken')
+                .appendTo(div).val(csrfToken);
+        }
         $('<input/>').attr('type', 'submit')
             .appendTo(div);
         form.submit();
@@ -59,6 +64,11 @@
                     .val(options.params[k])
                     .appendTo(div);
             }
+        }
+        var csrfToken = Q.getCookie('CSRF-TOKEN');
+        if (csrfToken) {
+            $('<input/>').attr('type', 'hidden').attr('name', '__RequestVerificationToken')
+                .appendTo(div).val(csrfToken);
         }
         $('<input/>').attr('type', 'submit')
             .appendTo(div);
