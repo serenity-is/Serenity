@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace Serenity.Services
 {
-    public class AutoValidateAntiForgeryTokenAttribute : FilterAttribute, IAuthorizationFilter
+    public class AutoValidateAntiforgeryTokenAttribute : FilterAttribute, IAuthorizationFilter
     {
         public void OnAuthorization(AuthorizationContext context)
         {

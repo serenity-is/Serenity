@@ -186,8 +186,8 @@
     <Compile Include="Common\ScriptCulture.cs" />
     <Compile Include="Common\WebConfigurationWrapper.cs" />
     <Compile Include="Common\WebServiceCollectionExtensions.cs" />
-    <Compile Include="Mvc\IgnoreAntiForgeryToken.cs" />
-    <Compile Include="Mvc\AutoValidateAntiForgeryTokenAttribute.cs" />
+    <Compile Include="Mvc\AntiforgeryCookieResultFilter.cs" />
+    <Compile Include="Mvc\AutoValidateAntiforgeryTokenAttribute.cs" />
     <Compile Include="Mvc\IgnoreAntiforgeryTokenAttribute.cs" />
     <Compile Include="Mvc\CompressFilter.cs" />
     <Compile Include="Mvc\EndpointExtensions.cs" />
