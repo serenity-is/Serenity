@@ -1,12 +1,14 @@
-## 3.1.0 (2017-10-15)
+## 3.1.0 (2017-10-16)
 
 Features:
+  - support CSRF (cross site request forgery) protection in Serenity pages / services. it is highly recommended to apply changes in latest Serene commit to your existing project to enable CSRF protection!
   - .net core sergen no longer has dependency to serenity.web, thus asp.net core, so it is now much slimmer and 10 times faster to load
   - improved .net core build / dotnet sergen transform time significantly (20x) if input files (.ts) didn't change by employing caching in TSTypeLister.
   - t4 transform files in .net framework version is also much faster (caching + change control), see latest commit
   - t4 transform doesn't modify files if only line endings changed, solves a problem with git due to line ending transformation (files was looking like changed after T4 transform)
   - servertypings t4 transform doesn't invoke tsc if none of files changed
   - typescript compiler is only invoked when an input file changes which improves build time significantly, see changes in Serene.csproj
+  - using Microsoft.TypeScript.MsBuild package instead of Node based TSC in Serene AspNetCore (usually 2x faster)
   - less compiler is only invoked when an input file changes which improves build time significantly, see changes in Serene.csproj
   - use scriban template engine for sergen
   - it is now possible to override templates sergen uses by setting "CustomTemplates" option to a directory with .scriban templates. if there is a template with same name (e.g. Row.scriban) in that directory sergen uses that, otherwise uses default embedded one.
