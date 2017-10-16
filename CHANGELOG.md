@@ -1,3 +1,8 @@
+## 3.1.1 (2017-10-16)
+
+Bugfixes:
+  - fix null reference exception on t4 transform
+
 ## 3.1.0 (2017-10-16)
 
 Features:
