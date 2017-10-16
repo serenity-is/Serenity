@@ -422,7 +422,7 @@ namespace Serenity.CodeGeneration
 
                 var routePrefix = GeneratorUtils.GetAttribute(controller, "System.Web.Mvc.RoutePrefixAttribute");
                 if (routePrefix != null)
-                    url = UriHelper.Combine(routePrefix.GetType().GetProperty("RoutePrefix").GetValue(routePrefix) as string, url);
+                    url = UriHelper.Combine(routePrefix.GetType().GetProperty("Prefix").GetValue(routePrefix) as string, url);
             }
 #endif
 
