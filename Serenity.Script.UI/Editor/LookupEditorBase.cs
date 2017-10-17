@@ -222,11 +222,11 @@ namespace Serenity
 
                     InitNewEntity(entity);
 
-                    dialog.Load(entity, () => dialog.DialogOpen(), null);
+                    dialog.Load(entity, () => dialog.DialogOpen(null), null);
                 }
                 else
                 {
-                    dialog.Load(this.Value, () => dialog.DialogOpen(), null);
+                    dialog.Load(this.Value, () => dialog.DialogOpen(null), null);
                 }
             });
         }

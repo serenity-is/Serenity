@@ -92,8 +92,7 @@ namespace Serenity
 
         protected virtual void UpdateTitle()
         {
-            if (!isPanel)
-                element.Dialog().Title = GetEntityTitle();
+            DialogTitle = GetEntityTitle();
         }
 
         protected virtual bool IsCloneMode

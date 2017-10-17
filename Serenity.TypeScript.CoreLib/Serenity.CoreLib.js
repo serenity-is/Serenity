@@ -2013,18 +2013,23 @@ var Q;
             replace(hash, tryBack);
         }
         Router.replaceLast = replaceLast;
+        function visibleDialogs() {
+            return $('.ui-dialog-content:visible, .ui-dialog.panel-hidden>.ui-dialog-content, .s-Panel').toArray().sort(function (a, b) {
+                return ($(a).data('qrouterorder') || 0) - ($(b).data('qrouterorder') || 0);
+            });
+        }
         function dialogOpen(owner, element, hash) {
             var route = [];
-            var isDialog = owner.hasClass(".ui-dialog-content");
+            var isDialog = owner.hasClass(".ui-dialog-content") || owner.hasClass('.s-Panel');
             var dialog = isDialog ? owner :
-                owner.closest('.ui-dialog-content');
+                owner.closest('.ui-dialog-content, .s-Panel');
             var value = hash();
             var idPrefix;
             if (dialog.length) {
-                var dialogs = $('.ui-dialog-content:visible');
-                var index = dialogs.index(dialog[0]);
+                var dialogs = visibleDialogs();
+                var index = dialogs.indexOf(dialog[0]);
                 for (var i = 0; i <= index; i++) {
-                    var q = dialogs.eq(i).data("qroute");
+                    var q = $(dialogs[i]).data("qroute");
                     if (q && q.length)
                         route.push(q);
                 }
@@ -2047,13 +2052,14 @@ var Q;
             route.push(value);
             element.data("qroute", value);
             replace(route.join("/+/"));
-            element.bind("dialogclose.qrouter", function (e) {
+            element.bind("dialogclose.qrouter panelclose.qrouter", function (e) {
                 element.data("qroute", null);
                 element.unbind(".qrouter");
                 var prhash = element.data("qprhash");
-                var tryBack = e && e.originalEvent &&
+                var tryBack = $(e.target).closest('.s-MessageDialog').length > 0 || (e && e.originalEvent &&
                     ((e.originalEvent.type == "keydown" && e.originalEvent.keyCode == 27) ||
-                        $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close"));
+                        $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close") ||
+                        $(e.originalEvent.target).hasClass("panel-titlebar-close")));
                 if (prhash != null)
                     replace(prhash, tryBack);
                 else
@@ -2063,7 +2069,7 @@ var Q;
         function dialog(owner, element, hash) {
             if (!Router.enabled)
                 return;
-            element.bind("dialogopen.qrouter", function (e) {
+            element.on("dialogopen.qrouter panelopen.qrouter", function (e) {
                 dialogOpen(owner, element, hash);
             });
         }
@@ -2076,24 +2082,28 @@ var Q;
                 hash = Q.coalesce(Q.coalesce(hash, window.location.hash), '');
                 if (hash.charAt(0) == '#')
                     hash = hash.substr(1, hash.length - 1);
+                var dialogs = visibleDialogs();
                 var newParts = hash.split("/+/");
-                var dialogs = $('.ui-dialog-content:visible');
-                var oldParts = dialogs.toArray()
-                    .map(function (el) { return $(el).data('qroute'); });
+                var oldParts = dialogs.map(function (el) { return $(el).data('qroute'); });
                 var same = 0;
                 while (same < dialogs.length &&
                     same < newParts.length &&
                     oldParts[same] == newParts[same]) {
                     same++;
                 }
-                for (var i = same; i < dialogs.length; i++)
-                    dialogs.eq(i).dialog('close');
+                for (var i = same; i < dialogs.length; i++) {
+                    var d = $(dialogs[i]);
+                    if (d.hasClass('ui-dialog-content'))
+                        d.dialog('close');
+                    else if (d.hasClass('s-Panel'))
+                        d.triggerHandler('closepanel');
+                }
                 for (var i = same; i < newParts.length; i++) {
                     var route = newParts[i];
                     var routeParts = route.split('@');
                     var handler;
                     if (routeParts.length == 2) {
-                        var dialog = i > 0 ? $('.ui-dialog-content:visible').eq(i - 1) : $([]);
+                        var dialog = i > 0 ? $(dialogs[i - 1]) : $([]);
                         if (dialog.length) {
                             var idPrefix = dialog.attr("id");
                             if (idPrefix) {
@@ -2111,7 +2121,7 @@ var Q;
                         }
                     }
                     if (!handler || !handler.length) {
-                        handler = i > 0 ? $('.ui-dialog-content:visible').eq(i - 1) :
+                        handler = i > 0 ? $(dialogs[i - 1]) :
                             $('.route-handler').first();
                     }
                     handler.triggerHandler("handleroute", {
@@ -2144,14 +2154,16 @@ var Q;
             ignoreTime = new Date().getTime();
         }
         window.addEventListener("hashchange", hashChange, false);
-        $(document).on("dialogopen", ".ui-dialog-content", function (event, ui) {
+        var routerOrder = 1;
+        $(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
             if (!Router.enabled)
                 return;
             var dlg = $(event.target);
+            dlg.data("qrouterorder", routerOrder++);
             if (dlg.data("qroute"))
                 return;
             dlg.data("qprhash", window.location.hash);
-            var owner = $('.ui-dialog-content:visible').not(dlg).last();
+            var owner = $(visibleDialogs).not(dlg).last();
             if (!owner.length)
                 owner = $('html');
             dialogOpen(owner, dlg, function () {
@@ -2975,17 +2987,29 @@ var Serenity;
     var TemplatedDialog = TemplatedDialog_1 = (function (_super) {
         __extends(TemplatedDialog, _super);
         function TemplatedDialog(options) {
-            var _this = _super.call(this, Q.newBodyDiv(), options) || this;
+            var _this = _super.call(this, Q.newBodyDiv().addClass('hidden'), options) || this;
             _this.element.attr("id", _this.uniqueName);
-            _this.isPanel = ss.getAttributes(ss.getInstanceType(_this), Serenity.PanelAttribute, true).length > 0;
-            if (!_this.isPanel) {
-                _this.initDialog();
-            }
             _this.initValidator();
             _this.initTabs();
             _this.initToolbar();
             return _this;
         }
+        Object.defineProperty(TemplatedDialog.prototype, "isMarkedAsPanel", {
+            get: function () {
+                var panelAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.PanelAttribute, true);
+                return panelAttr.length > 0 && panelAttr[panelAttr.length - 1].value !== false;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TemplatedDialog.prototype, "isResponsive", {
+            get: function () {
+                return Q.Config.responsiveDialogs ||
+                    ss.getAttributes(ss.getInstanceType(this), Serenity.ResponsiveAttribute, true).length > 0;
+            },
+            enumerable: true,
+            configurable: true
+        });
         TemplatedDialog.getCssSize = function (element, name) {
             var cssSize = element.css(name);
             if (cssSize == null) {
@@ -3030,18 +3054,23 @@ var Serenity;
             this.toolbar = null;
             this.validator && this.byId('Form').remove();
             this.validator = null;
-            !this.isPanel && this.element.dialog('destroy');
+            if (this.element != null &&
+                this.element.hasClass('ui-dialog-content')) {
+                this.element.dialog('destroy');
+                this.element.removeClass('ui-dialog-content');
+            }
             $(window).unbind('.' + this.uniqueName);
             _super.prototype.destroy.call(this);
         };
         TemplatedDialog.prototype.initDialog = function () {
             var _this = this;
+            if (this.element.hasClass('ui-dialog-content'))
+                return;
+            this.element.removeClass('hidden');
             this.element.dialog(this.getDialogOptions());
             this.element.closest('.ui-dialog').on('resize', function (e) { return _this.arrange(); });
             var type = ss.getInstanceType(this);
-            this.responsive = Q.Config.responsiveDialogs ||
-                ss.getAttributes(type, Serenity.ResponsiveAttribute, true).length > 0;
-            if (this.responsive) {
+            if (this.isResponsive) {
                 Serenity.DialogExtensions.dialogResizable(this.element);
                 $(window).bind('resize.' + this.uniqueName, function (e) {
                     if (_this.element && _this.element.is(':visible')) {
@@ -3060,7 +3089,7 @@ var Serenity;
             var self = this;
             this.element.bind('dialogopen.' + this.uniqueName, function () {
                 $(document.body).addClass('modal-dialog-open');
-                if (_this.responsive) {
+                if (_this.isResponsive) {
                     _this.handleResponsive();
                 }
                 self.onDialogOpen();
@@ -3101,11 +3130,68 @@ var Serenity;
         TemplatedDialog.prototype.validateForm = function () {
             return this.validator == null || !!this.validator.form();
         };
-        TemplatedDialog.prototype.dialogOpen = function () {
-            if (this.isPanel) {
-                return;
+        TemplatedDialog.prototype.dialogOpen = function (asPanel) {
+            var _this = this;
+            asPanel = Q.coalesce(asPanel, this.isMarkedAsPanel);
+            if (asPanel) {
+                if (!this.element.hasClass('s-Panel')) {
+                    // so that panel title is created if needed
+                    this.element.on('panelopen.' + this.uniqueName, function () {
+                        _this.onDialogOpen();
+                    });
+                    this.element.on('panelclose.' + this.uniqueName, function () {
+                        _this.onDialogClose();
+                    });
+                }
+                TemplatedDialog_1.openPanel(this.element, this.uniqueName);
+                this.setupPanelTitle();
             }
-            this.element.dialog().dialog('open');
+            else {
+                if (!this.element.hasClass('ui-dialog-content'))
+                    this.initDialog();
+                this.element.dialog('open');
+            }
+        };
+        TemplatedDialog.openPanel = function (element, uniqueName) {
+            var container = $('.panels-container');
+            if (!container.length)
+                container = $('section.content');
+            element.data('paneluniquename', uniqueName);
+            element.off('closepanel').on('closepanel.' + uniqueName, function (e) {
+                TemplatedDialog_1.closePanel(element, e);
+            });
+            if (container.length) {
+                container = container.last();
+                container.children()
+                    .not(element)
+                    .not('.panel-hidden')
+                    .addClass('panel-hidden panel-hidden-' + uniqueName);
+                if (element[0].parentElement !== container[0])
+                    element.appendTo(container);
+            }
+            $('.ui-dialog:visible, .ui-widget-overlay:visible')
+                .not(element)
+                .addClass('panel-hidden panel-hidden-' + uniqueName);
+            element
+                .removeClass('hidden')
+                .removeClass('panel-hidden')
+                .addClass('s-Panel')
+                .trigger('panelopen');
+        };
+        TemplatedDialog.closePanel = function (element, e) {
+            if (!element.hasClass('s-Panel') || element.hasClass('hidden'))
+                return;
+            element.addClass('hidden');
+            var uniqueName = element.data('paneluniquename') || new Date().getTime();
+            var klass = 'panel-hidden-' + uniqueName;
+            $('.' + klass).removeClass(klass).removeClass('panel-hidden');
+            $(window).triggerHandler('resize');
+            $('.require-layout:visible').triggerHandler('layout');
+            var e = $.Event(e);
+            e.type = 'panelclose';
+            e.target = element[0];
+            var orig = e.originalEvent;
+            element.trigger(e);
         };
         TemplatedDialog.prototype.onDialogOpen = function () {
             $(':input:eq(0)', this.element).focus();
@@ -3134,11 +3220,11 @@ var Serenity;
             }, 0);
         };
         TemplatedDialog.prototype.addCssClass = function () {
-            var type = ss.getInstanceType(this);
-            if (ss.getAttributes(type, Serenity.PanelAttribute, true).length > 0) {
+            if (this.isMarkedAsPanel) {
                 _super.prototype.addCssClass.call(this);
+                if (this.isResponsive)
+                    this.element.addClass("flex-layout");
             }
-            // will add css class to ui-dialog container, not content element
         };
         TemplatedDialog.prototype.getDialogOptions = function () {
             var opt = {};
@@ -3151,30 +3237,61 @@ var Serenity;
             opt.resizable = ss.getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
             opt.modal = true;
             opt.position = { my: 'center', at: 'center', of: $(window.window) };
+            opt.title = this.element.data('dialogtitle') || '';
             return opt;
         };
         TemplatedDialog.prototype.dialogClose = function () {
-            if (this.isPanel) {
-                return;
+            if (this.element.hasClass('ui-dialog-content'))
+                this.element.dialog().dialog('close');
+            else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
+                this.element.triggerHandler('closepanel');
             }
-            this.element.dialog().dialog('close');
         };
         Object.defineProperty(TemplatedDialog.prototype, "dialogTitle", {
             get: function () {
-                if (this.isPanel) {
-                    return null;
-                }
-                return this.element.dialog('option', 'title');
+                if (this.element.hasClass('ui-dialog-content'))
+                    return this.element.dialog('option', 'title');
+                return this.element.data('dialogtitle');
             },
             set: function (value) {
-                if (this.isPanel) {
-                    return;
+                var oldTitle = this.dialogTitle;
+                this.element.data('dialogtitle', value);
+                if (this.element.hasClass('ui-dialog-content'))
+                    this.element.dialog('option', 'title', value);
+                else if (this.element.hasClass('s-Panel')) {
+                    if (oldTitle != this.dialogTitle) {
+                        this.setupPanelTitle();
+                        this.arrange();
+                    }
                 }
-                this.element.dialog('option', 'title', value);
             },
             enumerable: true,
             configurable: true
         });
+        TemplatedDialog.prototype.setupPanelTitle = function () {
+            var _this = this;
+            var value = this.dialogTitle;
+            var pt = this.element.children('.panel-titlebar');
+            if (value == null) {
+                pt.remove();
+            }
+            else {
+                if (!this.element.children('.panel-titlebar').length) {
+                    pt = $("<div class='panel-titlebar'><div class='panel-titlebar-text'></div></div>")
+                        .prependTo(this.element);
+                }
+                pt.children('.panel-titlebar-text').text(value);
+                if (this.element.hasClass('s-Panel')) {
+                    if (!pt.children('.panel-titlebar-close').length) {
+                        $('<button class="panel-titlebar-close">&nbsp;</button>')
+                            .prependTo(pt)
+                            .click(function (e) {
+                            TemplatedDialog_1.closePanel(_this.element, e);
+                        });
+                    }
+                }
+            }
+        };
         TemplatedDialog.prototype.set_dialogTitle = function (value) {
             this.dialogTitle = value;
         };

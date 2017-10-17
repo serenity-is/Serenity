@@ -1,24 +1,28 @@
 ﻿@import "serenity.mixins.less";
 
-.s-Dialog {
+.s-Dialog, .s-Panel {
     line-height: normal;
 }
 
-.s-Dialog .ui-tabs {
+.s-Panel {
+    background-color: #fff;
+}
+
+.s-Dialog .ui-tabs, .s-Panel .ui-tabs {
     padding: 0;
     background: transparent;
 }
 
-.s-Dialog .ui-tabs .ui-tabs-nav li a {
+.s-Dialog .ui-tabs .ui-tabs-nav li a, .s-Panel .ui-tabs .ui-tabs-nav li a {
     padding: 2px 10px 3px 10px;
 }
 
-.s-Dialog .ui-dialog-buttonpane {
+.s-Dialog .ui-dialog-buttonpane, .s-Panel .ui-dialog-buttonpane {
     margin: 0px;
     padding: 2px 7px 2px 3px;
 }
 
-.s-Dialog .tab-pane {
+.s-Dialog .tab-pane, s.-Panel .tab-pane {
     overflow: hidden;
     background-color: #fff;
 }
@@ -206,4 +210,8 @@ body.mobile-device.modal-dialog-open {
     .s-PropertyGrid .categories {
         //overflow-y: scroll;
     }
+}
+
+.panel-hidden {
+    display: none !important;
 }

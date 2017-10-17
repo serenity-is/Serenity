@@ -68,20 +68,26 @@ namespace Q.Router {
         replace(hash, tryBack);
     }
 
+    function visibleDialogs() {
+        return $('.ui-dialog-content:visible, .ui-dialog.panel-hidden>.ui-dialog-content, .s-Panel').toArray().sort((a, b) => {
+            return ($(a).data('qrouterorder') || 0) - ($(b).data('qrouterorder') || 0);
+        });
+    }
+
     function dialogOpen(owner: JQuery, element: JQuery, hash: () => string) {
         var route = [];
-        var isDialog = owner.hasClass(".ui-dialog-content");
+        var isDialog = owner.hasClass(".ui-dialog-content") || owner.hasClass('.s-Panel');
         var dialog = isDialog ? owner :
-            owner.closest('.ui-dialog-content');
+            owner.closest('.ui-dialog-content, .s-Panel');
         var value = hash();
 
         var idPrefix: string;
         if (dialog.length) {
-            var dialogs = $('.ui-dialog-content:visible');
-            var index = dialogs.index(dialog[0]);
+            var dialogs = visibleDialogs();
+            var index = dialogs.indexOf(dialog[0]);
 
             for (var i = 0; i <= index; i++) {
-                var q = dialogs.eq(i).data("qroute") as string;
+                var q = $(dialogs[i]).data("qroute") as string;
                 if (q && q.length)
                     route.push(q);
             }
@@ -107,13 +113,14 @@ namespace Q.Router {
         element.data("qroute", value);
         replace(route.join("/+/"));
 
-        element.bind("dialogclose.qrouter", e => {
+        element.bind("dialogclose.qrouter panelclose.qrouter", e => {
             element.data("qroute", null);
             element.unbind(".qrouter");
             var prhash = element.data("qprhash");
-            var tryBack = e && e.originalEvent &&
+            var tryBack = $(e.target).closest('.s-MessageDialog').length > 0 || (e && e.originalEvent &&
                 ((e.originalEvent.type == "keydown" && (e.originalEvent as any).keyCode == 27) ||
-                    $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close"));
+                $(e.originalEvent.target).hasClass("ui-dialog-titlebar-close") ||
+                $(e.originalEvent.target).hasClass("panel-titlebar-close")));
             if (prhash != null)
                 replace(prhash, tryBack);
             else
@@ -125,7 +132,7 @@ namespace Q.Router {
         if (!enabled)
             return;
         
-        element.bind("dialogopen.qrouter", e => {
+        element.on("dialogopen.qrouter panelopen.qrouter", e => {
             dialogOpen(owner, element, hash);
         });
     }
@@ -140,10 +147,9 @@ namespace Q.Router {
             if (hash.charAt(0) == '#')
                 hash = hash.substr(1, hash.length - 1);
 
+            var dialogs = visibleDialogs();
             var newParts = hash.split("/+/");
-            var dialogs = $('.ui-dialog-content:visible');
-            var oldParts = dialogs.toArray()
-                .map(el => $(el).data('qroute') as string);
+            var oldParts = dialogs.map(el => $(el).data('qroute') as string);
 
             var same = 0;
             while (same < dialogs.length &&
@@ -152,15 +158,20 @@ namespace Q.Router {
                 same++;
             }
 
-            for (var i = same; i < dialogs.length; i++)
-                dialogs.eq(i).dialog('close');
+            for (var i = same; i < dialogs.length; i++) {
+                var d = $(dialogs[i]);
+                if (d.hasClass('ui-dialog-content'))
+                    d.dialog('close');
+                else if (d.hasClass('s-Panel'))
+                    d.triggerHandler('closepanel');
+            }
 
             for (var i = same; i < newParts.length; i++) {
                 var route = newParts[i];
                 var routeParts = route.split('@');
                 var handler: JQuery;
                 if (routeParts.length == 2) {
-                    var dialog = i > 0 ? $('.ui-dialog-content:visible').eq(i - 1) : $([]);
+                    var dialog = i > 0 ? $(dialogs[i - 1]) : $([]);
                     if (dialog.length) {
                         var idPrefix = dialog.attr("id");
                         if (idPrefix) {
@@ -180,7 +191,7 @@ namespace Q.Router {
                 }
 
                 if (!handler || !handler.length) {
-                    handler = i > 0 ? $('.ui-dialog-content:visible').eq(i - 1) :
+                    handler = i > 0 ? $(dialogs[i - 1]) :
                         $('.route-handler').first();
                 }
 
@@ -217,17 +228,20 @@ namespace Q.Router {
 
     window.addEventListener("hashchange", hashChange as any, false);
 
-    $(document).on("dialogopen", ".ui-dialog-content", function (event, ui) {
+    let routerOrder = 1;
+
+    $(document).on("dialogopen panelopen", ".ui-dialog-content, .s-Panel", function (event, ui) {
         if (!enabled)
             return;
 
         var dlg = $(event.target);
+        dlg.data("qrouterorder", routerOrder++);
+
         if (dlg.data("qroute"))
             return;
 
         dlg.data("qprhash", window.location.hash);
-
-        var owner = $('.ui-dialog-content:visible').not(dlg).last();
+        var owner = $(visibleDialogs).not(dlg).last();
         if (!owner.length)
             owner = $('html');
 

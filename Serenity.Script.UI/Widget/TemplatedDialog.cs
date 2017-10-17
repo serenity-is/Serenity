@@ -8,7 +8,7 @@ namespace Serenity
 {
     public interface IDialog
     {
-        void DialogOpen();
+        void DialogOpen(bool? asPanel);
     }
 
     [Imported]
@@ -16,7 +16,6 @@ namespace Serenity
     public abstract class TemplatedDialog<TOptions> : TemplatedWidget<TOptions>, IDialog
         where TOptions : class, new()
     {
-        protected bool isPanel;
         protected bool responsive;
         protected jQueryValidator validator;
         protected TabsObject tabs;
@@ -62,7 +61,7 @@ namespace Serenity
             return true;
         }
 
-        public void DialogOpen()
+        public void DialogOpen(bool? asPanel = null)
         {
         }
 
@@ -110,8 +109,8 @@ namespace Serenity
         [IntrinsicProperty]
         public string DialogTitle
         {
-            get { if (isPanel) return null; return element.Dialog().Option("title") as string; }
-            set { if (isPanel) return; element.Dialog().Option("title", value); }
+            get { return null; }
+            set { }
         }
 
         protected virtual void InitTabs()

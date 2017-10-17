@@ -3,6 +3,7 @@ using jQueryApi.UI.Widgets;
 using System;
 using System.Collections;
 using System.Html;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
@@ -57,20 +58,17 @@ namespace Serenity
             }
         }
 
-        public void LoadNewAndOpenDialog()
+        public void LoadNewAndOpenDialog(bool? asPanel = null)
         {
             LoadResponse(new RetrieveResponse<TEntity>());
-            
-            if (!isPanel)
-                this.element.Dialog().Open();
+            DialogOpen(asPanel);
         }
 
-        public virtual void LoadEntityAndOpenDialog(TEntity entity)
+
+        public virtual void LoadEntityAndOpenDialog(TEntity entity, bool? asPanel = null)
         {
             LoadResponse(new RetrieveResponse<TEntity> { Entity = entity });
-
-            if (!isPanel)
-                this.element.Dialog().Open();
+            DialogOpen(asPanel);
         }
 
         public virtual void LoadResponse(RetrieveResponse<TEntity> data)
@@ -117,12 +115,15 @@ namespace Serenity
             UpdateTitle();
         }
 
-        public void LoadByIdAndOpenDialog(long entityId)
+        public void LoadByIdAndOpenDialog(long entityId, bool? asPanel = null)
         {
             var self = this;
-            LoadById(entityId, response => Window.SetTimeout(() => { if (!isPanel) self.element.Dialog().Open(); }, 0), () =>
+            LoadById(entityId, response => Window.SetTimeout(() =>
             {
-                if (!isPanel && !self.Element.Is(":visible"))
+                DialogOpen(asPanel);
+            }, 0), () =>
+            {
+                if (!self.Element.Is(":visible"))
                     self.Element.Remove();
             });
         }

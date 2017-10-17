@@ -1,0 +1,31 @@
+<Project>
+  <Target Name="SubmoduleCreateInputsOutputs" BeforeTargets="BeforeBuild">
+    <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Style\images\*.*">
+      <Output TaskParameter="Include" ItemName="SubmoduleSerenityImages" />
+    </CreateItem>
+    <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Scripts\serenity\texts\*.json">
+      <Output TaskParameter="Include" ItemName="SubmoduleSerenityTexts" />
+    </CreateItem>
+    <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Style\**\*.less">
+      <Output TaskParameter="Include" ItemName="SubmoduleCompileSerenityLessInputs" />
+    </CreateItem>
+  </Target>
+  <Target Name="SubmoduleCompileSerenityLess" AfterTargets="AfterBuild" Inputs="@(SubmoduleCompileSerenityLessInputs)" Outputs="$(ProjectDir)wwwroot\Content\serenity\serenity.css" >
+    <Exec Command="&quot;$(SolutionDir)serenity\tools\node\node.exe&quot; &quot;$(SolutionDir)serenity\tools\node\node_modules\less\bin\lessc&quot; &quot;$(SolutionDir)Serenity\Serenity.Web\Style\serenity.less&quot; &gt; &quot;$(ProjectDir)wwwroot\Content\serenity\serenity.css&quot;"></Exec>
+  </Target>
+  <Target Name="SubmoduleCopySerenityFiles" AfterTargets="AfterBuild">
+    <!--images and texts-->
+    <Copy SourceFiles="@(SubmoduleSerenityImages)" DestinationFolder="$(ProjectDir)wwwroot\Content\serenity\images" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(SubmoduleSerenityTexts)" DestinationFolder="$(ProjectDir)wwwroot\Scripts\serenity\texts" SkipUnchangedFiles="true" />      
+    <!--saltaralle-->
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Includes\Scripts\saltaralle\mscorlib.js" DestinationFiles="$(ProjectDir)wwwroot\Scripts\Saltarelle\mscorlib.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Includes\Scripts\saltaralle\mscorlib.js')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Web\Includes\Scripts\saltaralle\mscorlib.min.js" DestinationFiles="$(ProjectDir)wwwroot\Scripts\Saltarelle\mscorlib.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Web\Includes\Scripts\saltaralle\mscorlib.min.js')" SkipUnchangedFiles="true" />
+    <!--serenity corelib js and typings -->
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.js" DestinationFiles="$(ProjectDir)wwwroot\Scripts\serenity\Serenity.CoreLib.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.js')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.min.js" DestinationFiles="$(ProjectDir)wwwroot\Scripts\serenity\Serenity.CoreLib.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.min.js')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)typings\serenity\Serenity.CoreLib.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts')" SkipUnchangedFiles="true" />
+    <!--serenity script ui -->
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js" DestinationFiles="$(ProjectDir)wwwroot\Scripts\Serenity\Serenity.Script.UI.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js" DestinationFiles="$(ProjectDir)wwwroot\Scripts\Serenity\Serenity.Script.UI.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

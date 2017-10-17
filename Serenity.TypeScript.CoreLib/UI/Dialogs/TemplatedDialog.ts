@@ -3,27 +3,29 @@
     @Serenity.Decorators.registerClass([Serenity.IDialog])
     export class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
 
-        protected isPanel: boolean;
-        protected responsive: boolean;
         protected tabs: JQuery;
         protected toolbar: Serenity.Toolbar;
         protected validator: JQueryValidation.Validator;
 
         constructor(options?: TOptions) {
-            super(Q.newBodyDiv(), options);
+            super(Q.newBodyDiv().addClass('hidden'), options);
 
             this.element.attr("id", this.uniqueName);
-
-            this.isPanel = (ss as any).getAttributes((ss as any).getInstanceType(this),
-                Serenity.PanelAttribute, true).length > 0;
-
-            if (!this.isPanel) {
-                this.initDialog();
-            }
 
             this.initValidator();
             this.initTabs();
             this.initToolbar();
+        }
+
+        private get isMarkedAsPanel() {
+            var panelAttr = (ss as any).getAttributes((ss as any).getInstanceType(this),
+                Serenity.PanelAttribute, true) as Serenity.PanelAttribute[];
+            return panelAttr.length > 0 && panelAttr[panelAttr.length - 1].value !== false;
+        }
+
+        private get isResponsive() {
+            return Q.Config.responsiveDialogs ||
+                (ss as any).getAttributes((ss as any).getInstanceType(this), ResponsiveAttribute, true).length > 0;
         }
 
         private static getCssSize(element: JQuery, name: string): number {
@@ -77,21 +79,27 @@
             this.toolbar = null;
             this.validator && this.byId('Form').remove();
             this.validator = null;
-            !this.isPanel && this.element.dialog('destroy');
+            if (this.element != null &&
+                this.element.hasClass('ui-dialog-content')) {
+                this.element.dialog('destroy');
+                this.element.removeClass('ui-dialog-content');
+            }
             $(window).unbind('.' + this.uniqueName);
             super.destroy();
         }
 
         protected initDialog(): void {
+            if (this.element.hasClass('ui-dialog-content'))
+                return;
+
+            this.element.removeClass('hidden');
+
             this.element.dialog(this.getDialogOptions());
             this.element.closest('.ui-dialog').on('resize', e => this.arrange());
 
             let type = (ss as any).getInstanceType(this);
 
-            this.responsive = Q.Config.responsiveDialogs ||
-                (ss as any).getAttributes(type, ResponsiveAttribute, true).length > 0;
-
-            if (this.responsive) {
+            if (this.isResponsive) {
                 DialogExtensions.dialogResizable(this.element);
 
                 $(window).bind('resize.' + this.uniqueName, e => {
@@ -115,7 +123,7 @@
             this.element.bind('dialogopen.' + this.uniqueName, () => {
                 $(document.body).addClass('modal-dialog-open');
 
-                if (this.responsive) {
+                if (this.isResponsive) {
                     this.handleResponsive();
                 }
 
@@ -167,12 +175,78 @@
             return this.validator == null || !!this.validator.form();
         }
 
-        public dialogOpen(): void {
-            if (this.isPanel) {
-                return;
+        public dialogOpen(asPanel?: boolean): void {
+            asPanel = Q.coalesce(asPanel, this.isMarkedAsPanel);
+            if (asPanel) {
+                if (!this.element.hasClass('s-Panel')) {
+                    // so that panel title is created if needed
+                    this.element.on('panelopen.' + this.uniqueName, () => {
+                        this.onDialogOpen();
+                    });
+                    this.element.on('panelclose.' + this.uniqueName, () => {
+                        this.onDialogClose();
+                    });
+                }
+
+                TemplatedDialog.openPanel(this.element, this.uniqueName);
+                this.setupPanelTitle();
+            }
+            else {
+                if (!this.element.hasClass('ui-dialog-content'))
+                    this.initDialog();
+
+                this.element.dialog('open');
+            }
+        }
+
+        public static openPanel(element: JQuery, uniqueName: string) {
+            var container = $('.panels-container');
+            if (!container.length)
+                container = $('section.content');
+
+            element.data('paneluniquename', uniqueName);
+            element.off('closepanel').on('closepanel.' + uniqueName, (e) => {
+                TemplatedDialog.closePanel(element, e);
+            });
+
+            if (container.length) {
+                container = container.last();
+                container.children()
+                    .not(element)
+                    .not('.panel-hidden')
+                    .addClass('panel-hidden panel-hidden-' + uniqueName);
+
+                if (element[0].parentElement !== container[0])
+                    element.appendTo(container);
             }
 
-            this.element.dialog().dialog('open');
+            $('.ui-dialog:visible, .ui-widget-overlay:visible')
+                .not(element)
+                .addClass('panel-hidden panel-hidden-' + uniqueName);
+
+            element
+                .removeClass('hidden')
+                .removeClass('panel-hidden')
+                .addClass('s-Panel')
+                .trigger('panelopen');
+        }
+
+        public static closePanel(element: JQuery, e?: JQueryEventObject) {
+            if (!element.hasClass('s-Panel') || element.hasClass('hidden'))
+                return;
+
+            element.addClass('hidden');
+            var uniqueName = element.data('paneluniquename') || new Date().getTime();
+            var klass = 'panel-hidden-' + uniqueName;
+            $('.' + klass).removeClass(klass).removeClass('panel-hidden');
+            $(window).triggerHandler('resize');
+            $('.require-layout:visible').triggerHandler('layout');
+
+            var e = $.Event(e as any);
+            (e as any).type = 'panelclose';
+            (e as any).target = element[0];
+            var orig = e.originalEvent;
+            element.trigger(e);
         }
 
         protected onDialogOpen(): void {
@@ -206,12 +280,12 @@
         }
 
         protected addCssClass(): void {
-            let type = (ss as any).getInstanceType(this);
-            if ((ss as any).getAttributes(type, PanelAttribute, true).length > 0) {
+            if (this.isMarkedAsPanel) {
                 super.addCssClass();
-            }
 
-            // will add css class to ui-dialog container, not content element
+                if (this.isResponsive)
+                    this.element.addClass("flex-layout");
+            }
         }
 
         protected getDialogOptions(): JQueryUI.DialogOptions {
@@ -225,31 +299,64 @@
             opt.resizable = (ss as any).getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
             opt.modal = true;
             opt.position = { my: 'center', at: 'center', of: $(window.window) };
+            opt.title = this.element.data('dialogtitle') || '';
             return opt;
         }
 
         public dialogClose(): void {
-            if (this.isPanel) {
-                return;
+            if (this.element.hasClass('ui-dialog-content'))
+                this.element.dialog().dialog('close');
+            else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
+                this.element.triggerHandler('closepanel');
             }
-
-            this.element.dialog().dialog('close');
         }
 
         public get dialogTitle(): string {
-            if (this.isPanel) {
-                return null;
-            }
+            if (this.element.hasClass('ui-dialog-content'))
+                return this.element.dialog('option', 'title');
 
-            return this.element.dialog('option', 'title');
+            return this.element.data('dialogtitle');
+        }
+
+        private setupPanelTitle() {
+            var value = this.dialogTitle;
+            var pt = this.element.children('.panel-titlebar');
+
+            if (value == null) {
+                pt.remove();
+            }
+            else {
+                if (!this.element.children('.panel-titlebar').length) {
+                    pt = $("<div class='panel-titlebar'><div class='panel-titlebar-text'></div></div>")
+                        .prependTo(this.element);
+                }
+                pt.children('.panel-titlebar-text').text(value);
+
+                if (this.element.hasClass('s-Panel')) {
+                    if (!pt.children('.panel-titlebar-close').length) {
+                        $('<button class="panel-titlebar-close">&nbsp;</button>')
+                            .prependTo(pt)
+                            .click(e => {
+                                TemplatedDialog.closePanel(this.element, e);
+                            });
+                    }
+                }
+            }
         }
 
         public set dialogTitle(value: string) {
-            if (this.isPanel) {
-                return;
-            }
+            var oldTitle = this.dialogTitle;
+            this.element.data('dialogtitle', value);
 
-            this.element.dialog('option', 'title', value);
+            if (this.element.hasClass('ui-dialog-content'))
+                this.element.dialog('option', 'title', value);
+            else if (this.element.hasClass('s-Panel')) {
+                if (oldTitle != this.dialogTitle) {
+                    this.setupPanelTitle();
+                    this.arrange();
+                }
+
+            }
         }
 
         public set_dialogTitle(value: string) {

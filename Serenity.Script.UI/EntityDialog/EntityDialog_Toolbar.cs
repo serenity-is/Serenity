@@ -42,27 +42,24 @@ namespace Serenity
 
             var self = this;
 
-            if (!isPanel)
+            list.Add(new ToolButton
             {
-                list.Add(new ToolButton
+                Title = Q.Text("Controls.EntityDialog.SaveButton"),
+                CssClass = "save-and-close-button",
+                Hotkey = "alt+s",
+                OnClick = delegate
                 {
-                    Title = Q.Text("Controls.EntityDialog.SaveButton"),
-                    CssClass = "save-and-close-button",
-                    Hotkey = "alt+s",
-                    OnClick = delegate
+                    self.Save(delegate(ServiceResponse response)
                     {
-                        self.Save(delegate(ServiceResponse response)
-                        {
-                            self.element.Dialog().Close();
-                        });
-                    }
-                });
-            }
+                        self.DialogClose();
+                    });
+                }
+            });
 
             list.Add(new ToolButton
             {
-                Title = isPanel ? Q.Text("Controls.EntityDialog.SaveButton") : "",
-                Hint = isPanel ? Q.Text("Controls.EntityDialog.SaveButton") : Q.Text("Controls.EntityDialog.ApplyChangesButton"),
+                Title = "",
+                Hint = Q.Text("Controls.EntityDialog.ApplyChangesButton"),
                 CssClass = "apply-changes-button",
                 Hotkey = "alt+a",
                 OnClick = delegate
@@ -79,74 +76,71 @@ namespace Serenity
                 }
             });
 
-            if (!isPanel)
+            list.Add(new ToolButton
             {
-                list.Add(new ToolButton
+                Title = Q.Text("Controls.EntityDialog.DeleteButton"),
+                CssClass = "delete-button",
+                Hotkey = "alt+x",
+                OnClick = delegate
                 {
-                    Title = Q.Text("Controls.EntityDialog.DeleteButton"),
-                    CssClass = "delete-button",
-                    Hotkey = "alt+x",
-                    OnClick = delegate
+                    Q.Confirm(Q.Text("Controls.EntityDialog.DeleteConfirmation"), delegate
                     {
-                        Q.Confirm(Q.Text("Controls.EntityDialog.DeleteConfirmation"), delegate
+                        self.DoDelete(delegate
                         {
-                            self.DoDelete(delegate
+                            self.DialogClose();
+                        });
+                    });
+                }
+            });
+
+            list.Add(new ToolButton
+            {
+                Title = Q.Text("Controls.EntityDialog.UndeleteButton"),
+                CssClass = "undo-delete-button",
+                OnClick = delegate
+                {
+                    if (self.IsDeleted)
+                    {
+                        Q.Confirm(Q.Text("Controls.EntityDialog.UndeleteConfirmation"), delegate()
+                        {
+                            self.Undelete(delegate
                             {
-                                self.element.Dialog().Close();
+                                self.LoadById(self.EntityId, null);
                             });
                         });
                     }
-                });
+                }
+            });
 
-                list.Add(new ToolButton
+            list.Add(new ToolButton
+            {
+                Title = Q.Text("Controls.EntityDialog.LocalizationButton"),
+                CssClass = "localization-button",
+                OnClick = delegate
                 {
-                    Title = Q.Text("Controls.EntityDialog.UndeleteButton"),
-                    CssClass = "undo-delete-button",
-                    OnClick = delegate
-                    {
-                        if (self.IsDeleted)
-                        {
-                            Q.Confirm(Q.Text("Controls.EntityDialog.UndeleteConfirmation"), delegate()
-                            {
-                                self.Undelete(delegate
-                                {
-                                    self.LoadById(self.EntityId, null);
-                                });
-                            });
-                        }
-                    }
-                });
+                    this.LocalizationButtonClick();
+                }
+            });
 
-                list.Add(new ToolButton
+            list.Add(new ToolButton
+            {
+                Title = Q.Text("Controls.EntityDialog.CloneButton"),
+                CssClass = "clone-button",
+                OnClick = delegate
                 {
-                    Title = Q.Text("Controls.EntityDialog.LocalizationButton"),
-                    CssClass = "localization-button",
-                    OnClick = delegate
-                    {
-                        this.LocalizationButtonClick();
-                    }
-                });
+                    if (!self.IsEditMode)
+                        return;
 
-                list.Add(new ToolButton
-                {
-                    Title = Q.Text("Controls.EntityDialog.CloneButton"),
-                    CssClass = "clone-button",
-                    OnClick = delegate
-                    {
-                        if (!self.IsEditMode)
-                            return;
-
-                        var cloneEntity = GetCloningEntity();
-                        Widget.CreateOfType(
-                            widgetType: this.GetType(),
-                            options: new object(),
-                            init: w => w.As<EntityDialog<TEntity, TOptions>>()
-                                    .Cascade(this.element)
-                                    .BubbleDataChange(this)
-                                    .LoadEntityAndOpenDialog(cloneEntity));
-                    }
-                });
-            }
+                    var cloneEntity = GetCloningEntity();
+                    Widget.CreateOfType(
+                        widgetType: this.GetType(),
+                        options: new object(),
+                        init: w => w.As<EntityDialog<TEntity, TOptions>>()
+                                .Cascade(this.element)
+                                .BubbleDataChange(this)
+                                .LoadEntityAndOpenDialog(cloneEntity));
+                }
+            });
             
             return list;
         }

@@ -56,9 +56,12 @@ namespace Serenity
 
         [IncludeGenericArguments(false)]
         public static TDialog Cascade<TDialog>(this TDialog cascadedDialog, jQueryObject ofElement)
-            where TDialog: Widget, IDialog
+            where TDialog : Widget, IDialog
         {
-            cascadedDialog.Element.Dialog().Position = CascadedDialogOffset(ofElement);
+            cascadedDialog.Element.One("dialogopen", e => {
+                cascadedDialog.Element.Dialog().Position = CascadedDialogOffset(ofElement);
+            });
+
             return cascadedDialog;
         }
 
