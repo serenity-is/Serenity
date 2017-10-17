@@ -2189,12 +2189,12 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
-        protected isPanel: boolean;
-        protected responsive: boolean;
         protected tabs: JQuery;
         protected toolbar: Serenity.Toolbar;
         protected validator: JQueryValidation.Validator;
         constructor(options?: TOptions);
+        private readonly isMarkedAsPanel;
+        private readonly isResponsive;
         private static getCssSize(element, name);
         private static applyCssSizes(opt, dialogClass);
         destroy(): void;
@@ -2205,7 +2205,9 @@ declare namespace Serenity {
         protected initValidator(): void;
         protected resetValidation(): void;
         protected validateForm(): boolean;
-        dialogOpen(): void;
+        dialogOpen(asPanel?: boolean): void;
+        static openPanel(element: JQuery, uniqueName: string): void;
+        static closePanel(element: JQuery, e?: JQueryEventObject): void;
         protected onDialogOpen(): void;
         protected arrange(): void;
         protected onDialogClose(): void;
@@ -2213,6 +2215,7 @@ declare namespace Serenity {
         protected getDialogOptions(): JQueryUI.DialogOptions;
         dialogClose(): void;
         dialogTitle: string;
+        private setupPanelTitle();
         set_dialogTitle(value: string): void;
         protected initTabs(): void;
         protected handleResponsive(): void;

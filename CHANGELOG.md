@@ -1,3 +1,8 @@
+## 3.2.0 (2017-10-17)
+  - using dialogs as full page panel support, which also works fine with grids, applied it in Northwind Customer and Order dialogs
+  - better responsive handling in x-small devices
+  - [BREAKING CHANGE] panels are hidden by default, so you need to .removeClass('hidden') after appending panel element to a container. see EntityDialogAsPanel sample Index.cshtml
+
 ## 3.1.1 (2017-10-16)
 
 Bugfixes:
