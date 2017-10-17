@@ -205,9 +205,6 @@
                 container = $('section.content');
 
             element.data('paneluniquename', uniqueName);
-            element.off('closepanel').on('closepanel.' + uniqueName, (e) => {
-                TemplatedDialog.closePanel(element, e);
-            });
 
             if (container.length) {
                 container = container.last();
@@ -235,6 +232,13 @@
             if (!element.hasClass('s-Panel') || element.hasClass('hidden'))
                 return;
 
+            var query = $.Event(e as any);
+            (query as any).type = 'panelbeforeclose';
+            query.target = element[0];
+            element.trigger(query);
+            if (query.isDefaultPrevented())
+                return;
+
             element.addClass('hidden');
             var uniqueName = element.data('paneluniquename') || new Date().getTime();
             var klass = 'panel-hidden-' + uniqueName;
@@ -245,7 +249,6 @@
             var e = $.Event(e as any);
             (e as any).type = 'panelclose';
             (e as any).target = element[0];
-            var orig = e.originalEvent;
             element.trigger(e);
         }
 
@@ -307,7 +310,7 @@
             if (this.element.hasClass('ui-dialog-content'))
                 this.element.dialog().dialog('close');
             else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
-                this.element.triggerHandler('closepanel');
+                TemplatedDialog.closePanel(this.element);
             }
         }
 

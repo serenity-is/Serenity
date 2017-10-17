@@ -814,33 +814,33 @@ var Q;
             }
             return t;
         };
+        LT.$table = {};
+        LT.empty = new LT('');
+        LT.initializeTextClass = function (type, prefix) {
+            var $t1 = Object.keys(type).slice();
+            for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+                var member = $t1[$t2];
+                var value = type[member];
+                if (value instanceof LT) {
+                    var lt = value;
+                    var key = prefix + member;
+                    LT.$table[key] = lt.key;
+                    type[member] = new LT(key);
+                }
+            }
+        };
+        LT.getDefault = function (key, defaultText) {
+            var t = LT.$table[key];
+            if (t == null) {
+                t = defaultText;
+                if (t == null) {
+                    t = key || '';
+                }
+            }
+            return t;
+        };
         return LT;
     }());
-    LT.$table = {};
-    LT.empty = new LT('');
-    LT.initializeTextClass = function (type, prefix) {
-        var $t1 = Object.keys(type).slice();
-        for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-            var member = $t1[$t2];
-            var value = type[member];
-            if (value instanceof LT) {
-                var lt = value;
-                var key = prefix + member;
-                LT.$table[key] = lt.key;
-                type[member] = new LT(key);
-            }
-        }
-    };
-    LT.getDefault = function (key, defaultText) {
-        var t = LT.$table[key];
-        if (t == null) {
-            t = defaultText;
-            if (t == null) {
-                t = key || '';
-            }
-        }
-        return t;
-    };
     Q.LT = LT;
 })(Q || (Q = {}));
 var Q;
@@ -2751,7 +2751,7 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var Widget = Widget_1 = (function () {
+    var Widget = (function () {
         function Widget(element, options) {
             var _this = this;
             this.element = element;
@@ -2776,6 +2776,7 @@ var Serenity;
                 }, 0);
             }
         }
+        Widget_1 = Widget;
         Widget.prototype.destroy = function () {
             this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
             this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
@@ -2852,18 +2853,18 @@ var Serenity;
             }
             return this.asyncPromise;
         };
+        Widget.nextWidgetNumber = 0;
+        Widget = Widget_1 = __decorate([
+            Serenity.Decorators.registerClass()
+        ], Widget);
         return Widget;
+        var Widget_1;
     }());
-    Widget.nextWidgetNumber = 0;
-    Widget = Widget_1 = __decorate([
-        Serenity.Decorators.registerClass()
-    ], Widget);
     Serenity.Widget = Widget;
-    var Widget_1;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var TemplatedWidget = TemplatedWidget_1 = (function (_super) {
+    var TemplatedWidget = (function (_super) {
         __extends(TemplatedWidget, _super);
         function TemplatedWidget(container, options) {
             var _this = _super.call(this, container, options) || this;
@@ -2886,6 +2887,7 @@ var Serenity;
             _this.element.html(widgetMarkup);
             return _this;
         }
+        TemplatedWidget_1 = TemplatedWidget;
         TemplatedWidget.prototype.byId = function (id) {
             return $('#' + this.idPrefix + id);
         };
@@ -2949,14 +2951,14 @@ var Serenity;
             }
             return template;
         };
+        TemplatedWidget.templateNames = {};
+        TemplatedWidget = TemplatedWidget_1 = __decorate([
+            Serenity.Decorators.registerClass()
+        ], TemplatedWidget);
         return TemplatedWidget;
+        var TemplatedWidget_1;
     }(Serenity.Widget));
-    TemplatedWidget.templateNames = {};
-    TemplatedWidget = TemplatedWidget_1 = __decorate([
-        Serenity.Decorators.registerClass()
-    ], TemplatedWidget);
     Serenity.TemplatedWidget = TemplatedWidget;
-    var TemplatedWidget_1;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -2984,7 +2986,7 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var TemplatedDialog = TemplatedDialog_1 = (function (_super) {
+    var TemplatedDialog = (function (_super) {
         __extends(TemplatedDialog, _super);
         function TemplatedDialog(options) {
             var _this = _super.call(this, Q.newBodyDiv().addClass('hidden'), options) || this;
@@ -2994,6 +2996,7 @@ var Serenity;
             _this.initToolbar();
             return _this;
         }
+        TemplatedDialog_1 = TemplatedDialog;
         Object.defineProperty(TemplatedDialog.prototype, "isMarkedAsPanel", {
             get: function () {
                 var panelAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.PanelAttribute, true);
@@ -3157,9 +3160,6 @@ var Serenity;
             if (!container.length)
                 container = $('section.content');
             element.data('paneluniquename', uniqueName);
-            element.off('closepanel').on('closepanel.' + uniqueName, function (e) {
-                TemplatedDialog_1.closePanel(element, e);
-            });
             if (container.length) {
                 container = container.last();
                 container.children()
@@ -3181,6 +3181,12 @@ var Serenity;
         TemplatedDialog.closePanel = function (element, e) {
             if (!element.hasClass('s-Panel') || element.hasClass('hidden'))
                 return;
+            var query = $.Event(e);
+            query.type = 'panelbeforeclose';
+            query.target = element[0];
+            element.trigger(query);
+            if (query.isDefaultPrevented())
+                return;
             element.addClass('hidden');
             var uniqueName = element.data('paneluniquename') || new Date().getTime();
             var klass = 'panel-hidden-' + uniqueName;
@@ -3190,7 +3196,6 @@ var Serenity;
             var e = $.Event(e);
             e.type = 'panelclose';
             e.target = element[0];
-            var orig = e.originalEvent;
             element.trigger(e);
         };
         TemplatedDialog.prototype.onDialogOpen = function () {
@@ -3244,7 +3249,7 @@ var Serenity;
             if (this.element.hasClass('ui-dialog-content'))
                 this.element.dialog().dialog('close');
             else if (this.element.hasClass('s-Panel') && !this.element.hasClass('hidden')) {
-                this.element.triggerHandler('closepanel');
+                TemplatedDialog_1.closePanel(this.element);
             }
         };
         Object.defineProperty(TemplatedDialog.prototype, "dialogTitle", {
@@ -3340,13 +3345,13 @@ var Serenity;
                 }
             }
         };
+        TemplatedDialog = TemplatedDialog_1 = __decorate([
+            Serenity.Decorators.registerClass([Serenity.IDialog])
+        ], TemplatedDialog);
         return TemplatedDialog;
+        var TemplatedDialog_1;
     }(Serenity.TemplatedWidget));
-    TemplatedDialog = TemplatedDialog_1 = __decorate([
-        Serenity.Decorators.registerClass([Serenity.IDialog])
-    ], TemplatedDialog);
     Serenity.TemplatedDialog = TemplatedDialog;
-    var TemplatedDialog_1;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -3551,13 +3556,13 @@ var Serenity;
         ColumnPickerDialog.prototype.getTemplate = function () {
             return "\n<div class=\"search\"><input id=\"~_Search\" type=\"text\" disabled /></div>\n<div class=\"columns-container\">\n<div class=\"column-list visible-list bg-success\">\n  <h5><i class=\"icon-eye\"></i> " + Q.text("Controls.ColumnPickerDialog.VisibleColumns") + "</h5>\n  <ul id=\"~_VisibleCols\"></ul>\n</div>\n<div class=\"column-list hidden-list bg-info\">\n  <h5><i class=\"icon-list\"></i> " + Q.text("Controls.ColumnPickerDialog.HiddenColumns") + "</h5>\n  <ul id=\"~_HiddenCols\"></ul>\n</div>\n</div>";
         };
+        ColumnPickerDialog = __decorate([
+            Serenity.Decorators.registerClass(),
+            Serenity.Decorators.resizable(),
+            Serenity.Decorators.responsive()
+        ], ColumnPickerDialog);
         return ColumnPickerDialog;
     }(Serenity.TemplatedDialog));
-    ColumnPickerDialog = __decorate([
-        Serenity.Decorators.registerClass(),
-        Serenity.Decorators.resizable(),
-        Serenity.Decorators.responsive()
-    ], ColumnPickerDialog);
     Serenity.ColumnPickerDialog = ColumnPickerDialog;
 })(Serenity || (Serenity = {}));
 var Serenity;
@@ -4412,6 +4417,7 @@ var Slick;
                     "$filter$; ",
                     "} ",
                     "return _retval; "
+                    //"}"
                 ].join("");
                 tpl = tpl.replace(/\$filter\$/gi, filterBody);
                 tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);
@@ -4442,6 +4448,7 @@ var Slick;
                     "$filter$; ",
                     "} ",
                     "return _retval; "
+                    //"}"
                 ].join("");
                 tpl = tpl.replace(/\$filter\$/gi, filterBody);
                 tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);
