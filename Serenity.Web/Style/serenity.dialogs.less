@@ -51,6 +51,23 @@
     min-height: 44px;
 }
 
+.s-Panel .s-DataGrid.editor {
+    border: 1px solid #eee;
+}
+
+.s-Panel .s-DataGrid.editor .grid-toolbar {
+    background: #f8fafc;
+    border-bottom: 1px solid #e7e7e7;
+    padding: 5px 4px 5px 4px;
+    min-height: 43px;
+    margin-bottom: 0;
+}
+
+.full-height-page section.content {
+    display: flex;
+    flex-direction: column;
+}
+
 div.s-Toolbar .tool-button.no-text span.button-inner {
     padding: 5px 3px 19px 13px;
 }
@@ -138,6 +155,7 @@ div.s-Toolbar .s-PopupToolButton .button-outer > span > b {
     .category-links { .flex(0, 0, auto); }
     .category-title { .flex(0, 1, 100%); }
 
+    &.s-Panel,
     .ui-dialog-content, 
     .s-DialogContent, 
     .s-Form, 
