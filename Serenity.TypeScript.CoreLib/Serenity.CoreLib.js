@@ -3318,6 +3318,7 @@ var Serenity;
                     data = {};
                     data.draggable = dlg.dialog('option', 'draggable');
                     data.resizable = dlg.dialog('option', 'resizable');
+                    data.position = dlg.css('position');
                     var pos = uiDialog.position();
                     data.left = pos.left;
                     data.top = pos.top;
@@ -3329,7 +3330,7 @@ var Serenity;
                     dlg.dialog('option', 'resizable', false);
                 }
                 uiDialog.addClass('mobile-layout');
-                uiDialog.css({ left: '0px', top: '0px', width: $(window).width() + 'px', height: $(window).height() + 'px' });
+                uiDialog.css({ left: '0px', top: '0px', width: $(window).width() + 'px', height: $(window).height() + 'px', position: 'fixed' });
                 $(document.body).scrollTop(0);
                 Q.layoutFillHeight(this.element);
             }
@@ -3338,7 +3339,7 @@ var Serenity;
                 if (d) {
                     dlg.dialog('option', 'draggable', d.draggable);
                     dlg.dialog('option', 'resizable', d.resizable);
-                    this.element.closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px' });
+                    this.element.closest('.ui-dialog').css({ left: '0px', top: '0px', width: d.width + 'px', height: d.height + 'px', position: d.position });
                     this.element.height(d.contentHeight);
                     uiDialog.removeClass('mobile-layout');
                     this.element.removeData('responsiveData');
