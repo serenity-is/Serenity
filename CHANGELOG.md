@@ -1,4 +1,15 @@
+## 3.2.1 (2017-10-18)
+
+Features:
+  - restore hash in login page returnURL (e.g. returnUrl=Northwind/Customer/Edit#12) [Serene]
+
+Bugfixes:
+  - panel is not closed when browser back button pressed
+  - build error in Serene due to TypeScript.MsBuild package on build servers
+
 ## 3.2.0 (2017-10-17)
+
+Features:
   - using dialogs as full page panel support, which also works fine with grids, applied it in Northwind Customer and Order dialogs
   - better responsive handling in x-small devices
   - [BREAKING CHANGE] panels are hidden by default, so you need to .removeClass('hidden') after appending panel element to a container. see EntityDialogAsPanel sample Index.cshtml
