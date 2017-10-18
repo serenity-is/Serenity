@@ -38,6 +38,7 @@ namespace Serenity.CodeGenerator
             GenerateService = true;
             GenerateUI = true;
             GenerateCustom = true;
+            SetDefaults();
         }
 
         public static string GetConfigurationFilePath()
