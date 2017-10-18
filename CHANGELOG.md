@@ -7,7 +7,7 @@
 
 Bugfixes:
   - fix null reference exception on t4 transform
-
+  - Skip Take With Order By clause used correct syntax for OracleDialect
 ## 3.1.0 (2017-10-16)
 
 Features:
