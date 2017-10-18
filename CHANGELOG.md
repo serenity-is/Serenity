@@ -1,3 +1,12 @@
+## 3.2.2 (2017-10-18)
+
+Features:
+  - added openDialogsAsPanel option (which is null by default, e.g. auto) to data grids that allows overriding panel / dialog opening mode per grid.
+  - added openDialogAsPanel option to lookup editor (null = auto by default)
+
+Bugfixes:
+  - bring back default options populated by sergen on first run (.net framework version)
+
 ## 3.2.1 (2017-10-18)
 
 Features:
