@@ -14,8 +14,8 @@ namespace {{RootNamespace}}{{DotModule}} {
         protected form = new {{ClassName}}Form(this.idPrefix);
 {{if CustomSettings.MaximizableDialog}}
 
-        dialogOpen() {
-            super.dialogOpen();
+        onDialogOpen() {
+            super.onDialogOpen();
             this.element.closest(".ui-dialog").find(".ui-icon-maximize-window").click();
         }{{end}}
     }

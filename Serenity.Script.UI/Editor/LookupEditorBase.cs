@@ -222,11 +222,11 @@ namespace Serenity
 
                     InitNewEntity(entity);
 
-                    dialog.Load(entity, () => dialog.DialogOpen(null), null);
+                    dialog.Load(entity, () => dialog.DialogOpen(OpenDialogAsPanel), null);
                 }
                 else
                 {
-                    dialog.Load(this.Value, () => dialog.DialogOpen(null), null);
+                    dialog.Load(this.Value, () => dialog.DialogOpen(OpenDialogAsPanel), null);
                 }
             });
         }
@@ -371,6 +371,9 @@ namespace Serenity
                 }
             }
         }
+
+        [Option]
+        public bool? OpenDialogAsPanel { get; set; }
     }
 
     [Imported, IncludeGenericArguments(false), ScriptName("LookupEditorBase")]

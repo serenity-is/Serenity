@@ -2,8 +2,6 @@
 
     class DataGrid<TItem, TOptions> extends Widget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
-        public dialogOpen(): void;
-        public loadByIdAndOpenDialog(id: any): void;
         protected allColumns: Slick.Column[];
         protected defaultColumns: string[];
         protected titleDiv: JQuery;
@@ -91,6 +89,7 @@
         protected subDialogDataChange(): void;
         protected updateDisabledState(): void;
         protected usePager(): boolean;
+        public openDialogsAsPanel?: boolean;
         public refresh(): void;
         public getItems(): TItem[];
         public setItems(value: TItem[]): void;

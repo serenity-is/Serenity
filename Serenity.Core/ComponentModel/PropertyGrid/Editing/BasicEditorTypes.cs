@@ -405,6 +405,15 @@ namespace Serenity.ComponentModel
             get { return GetOption<bool>("delimited"); }
             set { SetOption("delimited", value); }
         }
+
+        /// <summary>
+        /// Open dialogs as panel (default value is null, which uses panel attribute on dialog class)
+        /// </summary>
+        public bool OpenDialogAsPanel
+        {
+            get { return GetOption<bool>("openDialogAsPanel"); }
+            set { SetOption("openDialogAsPanel", value); }
+        }
     }
 
     public partial class LookupEditorAttribute : LookupEditorBaseAttribute

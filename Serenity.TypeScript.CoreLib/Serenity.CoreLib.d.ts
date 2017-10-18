@@ -2255,8 +2255,6 @@ declare namespace Serenity {
 declare namespace Serenity {
     class DataGrid<TItem, TOptions> extends Widget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
-        dialogOpen(): void;
-        loadByIdAndOpenDialog(id: any): void;
         protected allColumns: Slick.Column[];
         protected defaultColumns: string[];
         protected titleDiv: JQuery;
@@ -2347,6 +2345,7 @@ declare namespace Serenity {
         protected subDialogDataChange(): void;
         protected updateDisabledState(): void;
         protected usePager(): boolean;
+        openDialogsAsPanel?: boolean;
         refresh(): void;
         getItems(): TItem[];
         setItems(value: TItem[]): void;

@@ -1616,6 +1616,9 @@ namespace Serenity
         {
             return this.filterBar == null ? null : this.filterBar.Store;
         }
+
+        [IntrinsicProperty]
+        public bool? OpenDialogsAsPanel { get; set; }
     }
 
     [Imported, IncludeGenericArguments(false), ScriptName("DataGrid")]
