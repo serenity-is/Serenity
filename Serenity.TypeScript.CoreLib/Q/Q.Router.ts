@@ -163,7 +163,7 @@ namespace Q.Router {
                 if (d.hasClass('ui-dialog-content'))
                     d.dialog('close');
                 else if (d.hasClass('s-Panel'))
-                    d.triggerHandler('closepanel');
+                    Serenity.TemplatedDialog.closePanel(d);
             }
 
             for (var i = same; i < newParts.length; i++) {
