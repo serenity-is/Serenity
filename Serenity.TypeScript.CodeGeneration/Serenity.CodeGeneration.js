@@ -515,7 +515,7 @@
             return stringifyNode(parseSourceFile(sourceText));
         }
         CodeGeneration.parseSourceToJson = parseSourceToJson;
-        var MyCompilerHost = (function () {
+        var MyCompilerHost = /** @class */ (function () {
             function MyCompilerHost() {
                 var _this = this;
                 this.files = {};
