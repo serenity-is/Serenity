@@ -967,7 +967,7 @@ declare namespace Serenity {
         function registerClass(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
         function registerEnum(target: any, enumKey?: string, asm?: ss.AssemblyReg): void;
         function registerEditor(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
-        function registerFormatter(intf?: typeof ISlickFormatter[], asm?: ss.AssemblyReg): (target: Function) => void;
+        function registerFormatter(intf?: (typeof ISlickFormatter)[], asm?: ss.AssemblyReg): (target: Function) => void;
         function filterable(value?: boolean): (target: Function) => void;
         function itemName(value: string): (target: Function) => void;
         function isActiveProperty(value: string): (target: Function) => void;

@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".eslintrc.json" />
-    <None Include="package.json" />
+    <None Include="packages.config" />
     <None Include="Serenity.CodeGeneration.js.map" />
     <None Include="tsconfig.json" />
     <None Include="tslint.json" />
@@ -61,11 +61,19 @@
     <Content Include="Serenity.CodeGeneration.min.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="BeforeBuild">
-    <Exec Command="npm install" ContinueOnError="false" />
+  <Target Name="CreateInputsOutputs" BeforeTargets="BeforeBuild">
+    <CreateItem Include="Serenity.CodeGeneration.ts">
+      <Output TaskParameter="Include" ItemName="CompileTSCInputs" />
+    </CreateItem>
   </Target>
-  <Target Name="AfterBuild">
-    <Exec Command="node_modules/.bin/tsc -p ./tsconfig.json" ContinueOnError="false" />
-    <Exec Command="&quot;$(ProjectDir)..\tools\node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Serenity.CodeGeneration.js&quot; -o &quot;$(ProjectDir)Serenity.CodeGeneration.min.js&quot; --comments --mangle" />
+  <Target Name="CompileTSC" AfterTargets="AfterBuild" Inputs="@(CompileTSCInputs)" Outputs="Serenity.CodeGeneration.js">
+    <Message Text="Executing TypeScript compiler..." Importance="high">
+    </Message>
+    <Exec Command="&quot;$(ProjectDir)..\tools\TypeScript\tsc.exe&quot; -p ./tsconfig.json" ContinueOnError="true" />
+  </Target>
+  <Target Name="MinimizeTSC" AfterTargets="AfterBuild" Inputs="Serenity.CodeGeneration.js" Outputs="Serenity.CodeGeneration.min.js">
+    <Message Text="Minimizing Serenity.CodeGeneration.js..." Importance="high">
+    </Message>
+    <Exec Command="&quot;$(ProjectDir)..\tools\Node\uglifyjs.cmd&quot; &quot;$(ProjectDir)Serenity.CodeGeneration.js&quot; -o &quot;$(ProjectDir)Serenity.CodeGeneration.min.js&quot; --comments --mangle" />
   </Target>
 </Project>
