@@ -71,21 +71,24 @@ Paid support options are available from the author and a team of Serenity profes
 If Serenity was helpful to you, please consider donating to keep Serenity alive and moving forward.
 
 http://serenity.is/#Donate
-## Video Tutorials (thanks a lot to @samdubey for these contributions)
+## Video Tutorials (thanks a lot to @samdubey and @sayuga for these contributions)
 
-**Serenity Youtube Channel:** 
+**Starting Point Videos (by @sayuga):**
+https://www.youtube.com/channel/UCHGyxXj-vI32YaRs0v3HvKw (misses captions at the moment)
+
+**Serenity Youtube Channel (by @samdubey):** 
 
 https://www.youtube.com/c/SerenityApplicationFramework
 
-**Introduction to Serene:**
+**Introduction to Serene: (by @samdubey)**
 
 https://www.youtube.com/watch?v=_AqRl_U_gcw
 
-**Setting up Continuous Deployment on Microsoft Azure for Serenity Applications:**
+**Setting up Continuous Deployment on Microsoft Azure for Serenity Applications: (@bysamdubey)**
 
 https://www.youtube.com/watch?v=tcywhS9k9Wc
 
-**Serenity Application Deployment to Microsoft Azure**:
+**Serenity Application Deployment to Microsoft Azure (@bysamdubey)**:
 
 https://www.youtube.com/watch?v=hkU6iVFlWl8
 
