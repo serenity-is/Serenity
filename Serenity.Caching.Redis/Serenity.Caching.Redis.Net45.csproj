@@ -53,7 +53,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Serenity.Core\Serenity.Core.Net45.csproj">
       <Project>{f76a7628-d2e9-43cc-a3f4-98f76c33dcdb}</Project>
-      <Name>Serenity.Core</Name>
+      <Name>Serenity.Core.Net45</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
