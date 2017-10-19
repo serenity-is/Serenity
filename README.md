@@ -71,9 +71,11 @@ Paid support options are available from the author and a team of Serenity profes
 If Serenity was helpful to you, please consider donating to keep Serenity alive and moving forward.
 
 http://serenity.is/#Donate
+
 ## Video Tutorials (thanks a lot to @samdubey and @sayuga for these contributions)
 
 **Starting Point Videos (by @sayuga):**
+
 https://www.youtube.com/channel/UCHGyxXj-vI32YaRs0v3HvKw (misses captions at the moment)
 
 **Serenity Youtube Channel (by @samdubey):** 
