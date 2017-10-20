@@ -9,6 +9,7 @@ using System;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Serenity.Web.Middleware
 {
@@ -56,8 +57,7 @@ namespace Serenity.Web.Middleware
             cacheControl.MustRevalidate = false;
 
             var supportsGzip = dynamicScript.CompressedBytes != null &&
-                context.Request.GetTypedHeaders().AcceptEncoding.ToString()
-                    .IndexOf("gzip", StringComparison.OrdinalIgnoreCase) >= 0;
+                context.Request.Headers["Accept-Encoding"].Any(x => x.IndexOf("gzip") >= 0);
 
             byte[] contentBytes;
             if (supportsGzip)
