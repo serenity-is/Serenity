@@ -155,7 +155,7 @@ namespace Serenity {
   <span class="drag-handle">☰</span>
   ${ Q.htmlEncode(this.getTitle(col)) }
   <i class="js-hide" title="${ Q.text("Controls.ColumnPickerDialog.HideHint") }">✖</i>
-  <i class="js-show icon-eye" title="${ Q.text("Controls.ColumnPickerDialog.ShowHint") }"></i>
+  <i class="js-show fa fa-eye" title="${ Q.text("Controls.ColumnPickerDialog.ShowHint") }"></i>
 </li>`);
         }
 
@@ -249,11 +249,11 @@ namespace Serenity {
 <div class="search"><input id="~_Search" type="text" disabled /></div>
 <div class="columns-container">
 <div class="column-list visible-list bg-success">
-  <h5><i class="icon-eye"></i> ${ Q.text("Controls.ColumnPickerDialog.VisibleColumns") }</h5>
+  <h5><i class="fa fa-eye"></i> ${ Q.text("Controls.ColumnPickerDialog.VisibleColumns") }</h5>
   <ul id="~_VisibleCols"></ul>
 </div>
 <div class="column-list hidden-list bg-info">
-  <h5><i class="icon-list"></i> ${ Q.text("Controls.ColumnPickerDialog.HiddenColumns") }</h5>
+  <h5><i class="fa fa-list"></i> ${ Q.text("Controls.ColumnPickerDialog.HiddenColumns") }</h5>
   <ul id="~_HiddenCols"></ul>
 </div>
 </div>`;
