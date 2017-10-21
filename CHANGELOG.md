@@ -1,3 +1,22 @@
+## 3.3.0 (2017-10-21)
+
+Features:
+  - we now have an embedded css minifier / bundler similar to script bundler. CSS bundler can override URLs in bundled CSS files to absolute paths. it is now possible to include other dynamic scripts in script bundles using dynamic://ScriptName syntax, e.g. dynamic://Lookup.Northwind.Product.
+  - use new css bundling and dynamic script bundling features to improve page load times dramatically and decrease number of loaded resources like scripts, css etc when bundling is enabled [Serene]
+  - login now has a slim layout page, embedded css and javascript so that Serene.Web.js and site.css, and some other scripts that are not required in login page are not loaded [Serene]
+  - use font awesome instead of simple line icons in navigation to remove dependency on simple line icons [Serene]
+  - allow overriding separator in ConcatenatedScript
+  - allow returning css from dynjs handler / middleware, separate legacy BundleCssHandler to its own file
+  - use font awesome icons in column picker instead of simple line icons
+  - slimmer version of jquery ui is default now. it doesn't contain extra effects, tooltips, spinner, accordion, jQuery 1.7 support
+  - font open sans data uri version that only contains Normal version, which will be used by default in Serene
+  - use browser Promise if available, fallback to jQuery.Deferred or RSVP. RSVP is no longer required.
+  - convert most used toolbar buttons, pager buttons, back buttons, dialog close button, quick search icon, select2, date picker and filter panel images to data uris image to data uris
+  - improve submodule.targets file to auto include serenity projects and remove DLLs if projects exists
+  
+Bugfixes:
+  - fix dynamic script middleware gzip support check
+   
 ## 3.2.2 (2017-10-18)
 
 Features:
