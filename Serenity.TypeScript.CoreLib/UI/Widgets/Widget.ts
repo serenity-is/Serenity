@@ -70,7 +70,7 @@
         }
 
         protected initializeAsync(): PromiseLike<void> {
-            return RSVP.resolve();
+            return Promise.resolve();
         }
 
         protected isAsyncWidget(): boolean {
@@ -118,7 +118,7 @@
 
         private initialize(): PromiseLike<void> {
             if (!this.isAsyncWidget()) {
-                return RSVP.resolve();
+                return Promise.resolve();
             }
 
             if (!this.asyncPromise) {
