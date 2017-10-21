@@ -30,10 +30,17 @@ namespace Serenity.Web.Middleware
 
             var scriptKey = context.Request.Path.Value;
             scriptKey = scriptKey.Substring(dynJSPath.Length);
+
+            var contentType = "text/javascript";
             if (scriptKey.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
                 scriptKey = scriptKey.Substring(0, scriptKey.Length - 3);
+            else if (scriptKey.EndsWith(".css", StringComparison.OrdinalIgnoreCase))
+            {
+                contentType = "text/css";
+                scriptKey = scriptKey.Substring(0, scriptKey.Length - 4);
+            }
 
-            return ReturnScript(context, scriptKey, "text/javascript");
+            return ReturnScript(context, scriptKey, contentType);
         }
 
         public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType)

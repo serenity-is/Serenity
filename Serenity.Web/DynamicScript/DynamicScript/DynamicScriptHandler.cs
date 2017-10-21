@@ -52,10 +52,16 @@ namespace Serenity.Web.HttpHandlers
             if (pos >= 0)
                 path = path.Substring(pos + dyn.Length);
 
+            var contentType = "text/javascript";
             if (path.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
                 path = path.Substring(0, path.Length - 3);
+            else if (path.EndsWith(".css", StringComparison.OrdinalIgnoreCase))
+            {
+                contentType = "text/css";
+                path = path.Substring(0, path.Length - 4);
+            }
 
-            ProcessScriptRequest(context, path, "text/javascript");
+            ProcessScriptRequest(context, path, contentType);
         }
 
         public static void WriteWithIfModifiedSinceControl(HttpContext context, byte[] bytes, DateTime lastWriteTime)
@@ -90,32 +96,6 @@ namespace Serenity.Web.HttpHandlers
 
         /// <summary>
         ///   Returns true to set this handler as reusable</summary>
-        public bool IsReusable
-        {
-            get { return true; }
-        }
-    }
-
-    public class BundleCssHandler : IHttpHandler
-    {
-        public void ProcessRequest(HttpContext context)
-        {
-            var request = context.Request;
-            DynamicScriptManager.IfNotRegistered("BundleCss", () =>
-            {
-                DynamicScriptManager.Register("BundleCss",
-                    new ConcatenatedScript(new Func<string>[] {
-                        () => {
-                            using (var sr = new StreamReader(
-                                HostingEnvironment.MapPath("~/Content/bundle.css")))
-                                return sr.ReadToEnd();
-                        }
-                    }));
-            });
-
-            DynamicScriptHandler.ProcessScriptRequest(context, "BundleCss", "text/css");
-        }
-
         public bool IsReusable
         {
             get { return true; }
