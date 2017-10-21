@@ -31,7 +31,7 @@ namespace Serenity.Web
                 return;
 
             ContentHashCache.ScriptsChanged();
-            ScriptBundleManager.ScriptsChanged();
+            CssBundleManager.CssChanged();
         }
     }
 }

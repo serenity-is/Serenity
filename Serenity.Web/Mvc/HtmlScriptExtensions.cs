@@ -20,14 +20,37 @@ namespace Serenity.Web
     {
         public static HtmlString Stylesheet(this HtmlHelper helper, string cssUrl)
         {
-            return new HtmlString(string.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
-                ContentHashCache.ResolveWithHash(cssUrl)));
+            if (helper == null)
+                throw new ArgumentNullException("helper");
+
+            if (String.IsNullOrEmpty(cssUrl))
+                throw new ArgumentNullException("cssUrl");
+
+            var context = helper.ViewContext.HttpContext;
+
+            var css = CssBundleManager.GetCssBundle(cssUrl);
+            var included = GetIncludedCssList(context);
+
+            if (!included.Contains(css))
+            {
+                included.Add(css);
+
+                return new HtmlString(String.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
+#if ASPNETCORE
+                    WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(css))));
+#else
+                    HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(css))));
+#endif
+            }
+            else
+                return new HtmlString("");
         }
 
         public static IHtmlString Script(this HtmlHelper helper, string includeJS)
         {
             if (helper == null)
                 throw new ArgumentNullException("helper");
+
             if (String.IsNullOrEmpty(includeJS))
                 throw new ArgumentNullException("includeJS");
 
@@ -63,6 +86,36 @@ namespace Serenity.Web
             }
 
             return scripts;
+        }
+
+        const string IncludedCssListKey = "IncludedStylesheets";
+
+        private static HashSet<string> GetIncludedCssList(HttpContextBase context)
+        {
+            HashSet<string> styleSheets = (HashSet<string>)context.Items[IncludedCssListKey];
+            if (styleSheets == null)
+            {
+                styleSheets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                context.Items[IncludedCssListKey] = styleSheets;
+            }
+
+            return styleSheets;
+        }
+
+
+        public static string GetLocalTextContent(this HtmlHelper page, string package)
+        {
+            string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
+            var context = Dependency.TryResolve<ILocalTextContext>();
+            var isPending = context != null && context.IsApprovalMode;
+            string scriptName = LocalTextScript.GetScriptName(package, languageId, isPending);
+            DynamicScriptManager.IfNotRegistered(scriptName, () =>
+            {
+                var script = new LocalTextScript(package, (string)languageId, isPending);
+                DynamicScriptManager.Register(script);
+            });
+
+            return DynamicScriptManager.GetScriptText(scriptName);
         }
 
         public static string GetLocalTextInclude(this HtmlHelper page, string package)

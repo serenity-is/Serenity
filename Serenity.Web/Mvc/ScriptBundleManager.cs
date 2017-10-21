@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 
@@ -28,6 +29,8 @@ namespace Serenity.Web
         private static Dictionary<string, ConcatenatedScript> bundleByKey;
         private static ConcurrentDictionary<string, string> expandVersion;
         private const string errorLines = "\r\n//\r\n//!!!ERROR: {0}!!!\r\n//\r\n";
+        [ThreadStatic]
+        private static HashSet<string> recursionCheck;
 
         static ScriptBundleManager()
         {
@@ -105,6 +108,57 @@ namespace Serenity.Web
                         if (sourceFile.IsNullOrEmpty())
                             continue;
 
+                        if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
+                        {
+                            bundleKeyBySourceUrlNew[sourceFile] = bundleKey;
+                            var scriptName = sourceFile.Substring(10);
+                            bundleParts.Add(() =>
+                            {
+                                if (recursionCheck != null &&
+                                    (recursionCheck.Contains(scriptName) ||
+                                     recursionCheck.Count > 100))
+                                {
+                                    return String.Format(errorLines,
+                                        String.Format("Caught infinite recursion with dynamic scripts '{0}'!",
+                                            String.Join(", ", recursionCheck)));
+                                }
+                                else
+                                    recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                                recursionCheck.Add(scriptName);
+                                try
+                                {
+                                    var code = DynamicScriptManager.GetScriptText(scriptName, checkRights: true);
+                                    if (code == null)
+                                        return String.Format(errorLines,
+                                            String.Format("Dynamic script with name '{0}' is not found!", scriptName));
+
+                                    if (minimize && !scriptName.StartsWith("Bundle.",
+                                        StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        try
+                                        {
+                                            var result = NUglify.Uglify.Js(code);
+                                            if (!result.HasErrors)
+                                                code = result.Code;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ex.Log();
+                                        }
+                                    }
+
+                                    return code;
+                                }
+                                finally
+                                {
+                                    recursionCheck.Remove(scriptName);
+                                }
+                            });
+
+                            continue;
+                        }
+
                         string sourceUrl = ExpandVersionVariable(sourceFile);
                         sourceUrl = VirtualPathUtility.ToAbsolute(sourceUrl);
 
@@ -168,6 +222,16 @@ namespace Serenity.Web
             {
                 ex.Log();
             }
+
+            DynamicScriptManager.ScriptChanged += name =>
+            {
+                string bundleKey;
+                if (bundleKeyBySourceUrl != null && 
+                    bundleKeyBySourceUrl.TryGetValue("dynamic://" + name, out bundleKey))
+                {
+                    DynamicScriptManager.Changed("Bundle." + bundleKey);
+                }
+            };
         }
 
         public static void ScriptsChanged()
@@ -275,15 +339,30 @@ namespace Serenity.Web
 
         public static string GetScriptBundle(string scriptUrl)
         {
-            scriptUrl = ExpandVersionVariable(scriptUrl);
-            scriptUrl = VirtualPathUtility.ToAbsolute(scriptUrl);
             Initialize();
 
-            if (!isEnabled || bundleKeyBySourceUrl == null)
-                return scriptUrl;
             string bundleKey;
-            if (!bundleKeyBySourceUrl.TryGetValue(scriptUrl, out bundleKey))
-                return scriptUrl;
+
+            if (scriptUrl != null && scriptUrl.StartsWith("dynamic://",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                var scriptName = scriptUrl.Substring(10);
+                if (!isEnabled || !bundleKeyBySourceUrl.TryGetValue(scriptUrl, out bundleKey))
+                {
+                    scriptUrl = DynamicScriptManager.GetScriptInclude(scriptName);
+                    return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + scriptUrl);
+                }
+            }
+            else
+            {
+                scriptUrl = ExpandVersionVariable(scriptUrl);
+                scriptUrl = VirtualPathUtility.ToAbsolute(scriptUrl);
+
+                if (!isEnabled || 
+                    bundleKeyBySourceUrl == null ||
+                    !bundleKeyBySourceUrl.TryGetValue(scriptUrl, out bundleKey))
+                    return scriptUrl;
+            }
 
             string include = DynamicScriptManager.GetScriptInclude("Bundle." + bundleKey);
             return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + include);

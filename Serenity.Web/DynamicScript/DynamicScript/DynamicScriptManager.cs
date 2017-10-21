@@ -7,6 +7,7 @@ namespace Serenity.Web
     public static partial class DynamicScriptManager
     {
         private static ConcurrentDictionary<string, Item> registeredScripts;
+        private static event Action<string> scriptChanged;
 
         static DynamicScriptManager()
         {
@@ -68,7 +69,23 @@ namespace Serenity.Web
                 script.Generator.Changed();
         }
 
-        public static string GetScriptInclude(string name)
+        public static string GetScriptText(string name, bool checkRights = false)
+        {
+            Item item;
+            if (!registeredScripts.TryGetValue(name, out item)
+                || item == null)
+            {
+                return null;
+            }
+
+            if (checkRights)
+                item.Generator.CheckRights();
+
+            var script = item.EnsureContentBytes();
+            return script.ScriptText;
+        }
+
+        public static string GetScriptInclude(string name, string extension = ".js")
         {
             Item item;
             if (!registeredScripts.TryGetValue(name, out item)
@@ -79,7 +96,7 @@ namespace Serenity.Web
 
             var script = item.EnsureContentBytes();
 
-            return name + ".js?v=" + (script.Hash ?? script.Time.Ticks.ToString());
+            return name + extension + "?v=" + (script.Hash ?? script.Time.Ticks.ToString());
         }
 
         internal static Script GetScript(string name)
@@ -93,6 +110,27 @@ namespace Serenity.Web
 
             item.Generator.CheckRights();
             return item.EnsureContentBytes();
+        }
+
+        private static void RaiseScriptChanged(string name)
+        {
+            var handlers = scriptChanged;
+            if (handlers != null)
+                handlers(name);
+        }
+
+        public static event Action<string> ScriptChanged
+        {
+            add
+            {
+                lock (registeredScripts)
+                    scriptChanged += value;
+            }
+            remove
+            {
+                lock (registeredScripts)
+                    scriptChanged -= value;
+            }
         }
     }
 }
