@@ -15,6 +15,17 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+if (typeof Promise === "undefined") {
+    if (typeof (RSVP) !== "undefined") {
+        Promise = RSVP;
+    }
+    else if (typeof (jQuery) !== "undefined") {
+        Promise = $.Deferred;
+        Promise.resolve = function (value) {
+            return jQuery.Deferred().resolveWith(value);
+        };
+    }
+}
 var Q;
 (function (Q) {
     function coalesce(a, b) {
@@ -1623,9 +1634,9 @@ var Q;
             $.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
         }
         function loadScriptAsync(url) {
-            return RSVP.resolve().then(function () {
+            return Promise.resolve().then(function () {
                 Q.blockUI(null);
-                return RSVP.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function () {
+                return Promise.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function () {
                     Q.blockUndo();
                 }));
             }, null);
@@ -1638,7 +1649,7 @@ var Q;
             syncLoadScript(Q.resolveUrl('~/DynJS.axd/') + name);
         }
         function loadScriptDataAsync(name) {
-            return RSVP.resolve().then(function () {
+            return Promise.resolve().then(function () {
                 if (registered[name] == null) {
                     throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
@@ -1658,10 +1669,10 @@ var Q;
         }
         ScriptData.ensure = ensure;
         function ensureAsync(name) {
-            return RSVP.resolve().then(function () {
+            return Promise.resolve().then(function () {
                 var data = loadedData[name];
                 if (data != null) {
-                    return RSVP.resolve(data);
+                    return Promise.resolve(data);
                 }
                 return loadScriptDataAsync(name).then(function () {
                     data = loadedData[name];
@@ -1684,7 +1695,7 @@ var Q;
         }
         ScriptData.reload = reload;
         function reloadAsync(name) {
-            return RSVP.resolve().then(function () {
+            return Promise.resolve().then(function () {
                 if (registered[name] == null) {
                     throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
@@ -1830,13 +1841,18 @@ var Q;
             scan(global[nsRoot], nsRoot, 0);
         }
     }
+    //all browsers seem to show some unhandled exception message so don't enable this for now
+    //window.addEventListener('unhandledrejection', function (e: any) {
+    //    var error = e.reason || e;
+    //    log(e);
+    //    log((error.get_stack && error.get_stack()) || error.stack);
+    //});
+    //window.addEventListener('error', function (e: any) {
+    //    var error = (e.error | e) as any;
+    //    log(e);
+    //    log((error.get_stack && error.get_stack()) || error.stack);
+    //});
     (function (global) {
-        if (typeof RSVP !== undefined) {
-            RSVP.on && RSVP.on(function (e) {
-                Q.log(e);
-                Q.log((e.get_stack && e.get_stack()) || e.stack);
-            });
-        }
         // fake assembly for typescript apps
         ss.initAssembly({}, 'App', {});
         // for backward compability, avoid!
@@ -2804,7 +2820,7 @@ var Serenity;
             return klass + ' ' + fullClass;
         };
         Widget.prototype.initializeAsync = function () {
-            return RSVP.resolve();
+            return Promise.resolve();
         };
         Widget.prototype.isAsyncWidget = function () {
             return ss.isInstanceOfType(this, Serenity.IAsyncInit);
@@ -2846,7 +2862,7 @@ var Serenity;
         };
         Widget.prototype.initialize = function () {
             if (!this.isAsyncWidget()) {
-                return RSVP.resolve();
+                return Promise.resolve();
             }
             if (!this.asyncPromise) {
                 this.asyncPromise = this.initializeAsync();
@@ -3478,7 +3494,7 @@ var Serenity;
             return col.name || col.toolTip || col.id;
         };
         ColumnPickerDialog.prototype.createLI = function (col) {
-            return $("\n<li data-key=\"" + col.id + "\">\n  <span class=\"drag-handle\">\u2630</span>\n  " + Q.htmlEncode(this.getTitle(col)) + "\n  <i class=\"js-hide\" title=\"" + Q.text("Controls.ColumnPickerDialog.HideHint") + "\">\u2716</i>\n  <i class=\"js-show icon-eye\" title=\"" + Q.text("Controls.ColumnPickerDialog.ShowHint") + "\"></i>\n</li>");
+            return $("\n<li data-key=\"" + col.id + "\">\n  <span class=\"drag-handle\">\u2630</span>\n  " + Q.htmlEncode(this.getTitle(col)) + "\n  <i class=\"js-hide\" title=\"" + Q.text("Controls.ColumnPickerDialog.HideHint") + "\">\u2716</i>\n  <i class=\"js-show fa fa-eye\" title=\"" + Q.text("Controls.ColumnPickerDialog.ShowHint") + "\"></i>\n</li>");
         };
         ColumnPickerDialog.prototype.updateListStates = function () {
             this.ulVisible.children().removeClass("bg-info").addClass("bg-success");
@@ -3555,7 +3571,7 @@ var Serenity;
             Q.centerDialog(this.element);
         };
         ColumnPickerDialog.prototype.getTemplate = function () {
-            return "\n<div class=\"search\"><input id=\"~_Search\" type=\"text\" disabled /></div>\n<div class=\"columns-container\">\n<div class=\"column-list visible-list bg-success\">\n  <h5><i class=\"icon-eye\"></i> " + Q.text("Controls.ColumnPickerDialog.VisibleColumns") + "</h5>\n  <ul id=\"~_VisibleCols\"></ul>\n</div>\n<div class=\"column-list hidden-list bg-info\">\n  <h5><i class=\"icon-list\"></i> " + Q.text("Controls.ColumnPickerDialog.HiddenColumns") + "</h5>\n  <ul id=\"~_HiddenCols\"></ul>\n</div>\n</div>";
+            return "\n<div class=\"search\"><input id=\"~_Search\" type=\"text\" disabled /></div>\n<div class=\"columns-container\">\n<div class=\"column-list visible-list bg-success\">\n  <h5><i class=\"fa fa-eye\"></i> " + Q.text("Controls.ColumnPickerDialog.VisibleColumns") + "</h5>\n  <ul id=\"~_VisibleCols\"></ul>\n</div>\n<div class=\"column-list hidden-list bg-info\">\n  <h5><i class=\"fa fa-list\"></i> " + Q.text("Controls.ColumnPickerDialog.HiddenColumns") + "</h5>\n  <ul id=\"~_HiddenCols\"></ul>\n</div>\n</div>";
         };
         ColumnPickerDialog = __decorate([
             Serenity.Decorators.registerClass(),
@@ -5255,7 +5271,7 @@ var Q;
             dateFormat: (order == 'mdy' ? 'mm' + s + 'dd' + s + 'yy' :
                 (order == 'ymd' ? 'yy' + s + 'mm' + s + 'dd' :
                     'dd' + s + 'mm' + s + 'yy')),
-            buttonImage: Q.resolveUrl('~/Content/serenity/images/datepicker.png'),
+            buttonImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNvyMY98AAAHNSURBVEhLtZU/S8NAGIf7FfpJHDoX136ADp3s4qDgUpeCDlJEEIcubk7ZFJ06OBRcdJAOdhCx6CAWodJFrP8KFexrnhcv3sVLVYyBp/fLXe75hbSkGRFxaLVaEgSBMMbXkpi0Rz8eVlbkrlhUdnM56XQ6Opq57/DtwRkVMCFMhJzn89JoNHQ0c9/h26NOU3BdKMh4eVneFhflcGpK1rNZHTn/CfE9uHA6BSyMFhZkODsrt2E7I+c/Ib4Hl1NwOT0dXcgx2N6Wh+FQx16vp/O/ARdO3FrAs2PhcWZGm3l+9sj8b8Cl34ddwMKgVEoFXE5BUK9zkurx4fwseBuPUyWxYKfZTCQIf+txtvb2HLwFm7WaTg5fX1V0cnWlxPPR2ZmC2GSkB+22QsaBC6dTwMLzaPTnAhy4vhSwcP/yEl1s2D8+ngjFNjhwJRZwt9wB2Jm79WVuws4TC3qDgUrJYGekvozUzjjITsFGtarNpsBw2u0654ghnhEbcODCmVjAewjsjMyXkdo5seDm6Uku+n2VcgHYGakvI7UzDlxOwWql4hT4QOoDqY0pwBkVLM3NRQVpgAtnVFApl3UyTXBGBWvhX9x8+JpNE5xRwf8hmXe+7B9dZrOuOwAAAABJRU5ErkJggg==',
             buttonImageOnly: true,
             showOn: 'both',
             showButtonPanel: true,

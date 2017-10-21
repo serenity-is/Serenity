@@ -26,9 +26,9 @@ namespace Q {
         }
 
         function loadScriptAsync(url: string) {
-            return RSVP.resolve().then(function () {
+            return Promise.resolve().then(function () {
                 Q.blockUI(null);
-                return RSVP.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function () {
+                return Promise.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function () {
                     Q.blockUndo();
                 }));
             }, null);
@@ -43,8 +43,8 @@ namespace Q {
             syncLoadScript(Q.resolveUrl('~/DynJS.axd/') + name);
         }
 
-        function loadScriptDataAsync(name: string): RSVP.Thenable<any> {
-            return RSVP.resolve().then(function () {
+        function loadScriptDataAsync(name: string): PromiseLike<any> {
+            return Promise.resolve().then(function () {
                 if (registered[name] == null) {
                     throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
@@ -68,11 +68,11 @@ namespace Q {
             return data;
         }
 
-        export function ensureAsync(name: string): RSVP.Thenable<any> {
-            return RSVP.resolve().then(function () {
+        export function ensureAsync(name: string): PromiseLike<any> {
+            return Promise.resolve().then(function () {
                 var data = loadedData[name];
                 if (data != null) {
-                    return RSVP.resolve(data);
+                    return Promise.resolve(data);
                 }
 
                 return loadScriptDataAsync(name).then(function () {
@@ -96,7 +96,7 @@ namespace Q {
         }
 
         export function reloadAsync(name: string) {
-            return RSVP.resolve().then(function () {
+            return Promise.resolve().then(function () {
                 if (registered[name] == null) {
                     throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
@@ -137,7 +137,7 @@ namespace Q {
         return ScriptData.ensure('Lookup.' + key);
     }
 
-    export function getLookupAsync<TItem>(key: string): RSVP.Thenable<Lookup<TItem>> {
+    export function getLookupAsync<TItem>(key: string): PromiseLike<Lookup<TItem>> {
         return ScriptData.ensureAsync('Lookup.' + key);
     }
 

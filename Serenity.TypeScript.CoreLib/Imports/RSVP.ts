@@ -4,7 +4,7 @@
 
 declare module RSVP {
     function on(handler: (e: any) => void): void;
-    function resolve(): Thenable<any>;
+    function resolve(): PromiseLike<any>;
 }
 
 // Type definitions for RSVP 3.0.9
@@ -20,22 +20,7 @@ declare module RSVP {
 
 declare module RSVP {
 
-    interface Thenable<R> {
-        then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => Thenable<U>): Thenable<U>;
-        then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => U): Thenable<U>;
-        then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => void): Thenable<U>;
-        then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => Thenable<U>): Thenable<U>;
-        then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => U): Thenable<U>;
-        then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => void): Thenable<U>;
-    }
-
-    interface Deferred<T> {
-        promise: Promise<T>;
-        resolve(value: T): void;
-        reject(reason: any): void;
-    }
-
-    class Promise<R> implements Thenable<R> {
+    class Promise<R> implements PromiseLike<R> {
         /**
          * If you call resolve in the body of the callback passed to the constructor,
          * your promise is fulfilled with result object passed to resolve.
@@ -52,7 +37,7 @@ declare module RSVP {
          * For consistency and debugging (eg stack traces), obj should be an instanceof Error.
          * Any errors thrown in the constructor callback will be implicitly passed to reject().
          */
-        constructor(callback: (resolve: (thenable?: Thenable<R>) => void, reject: (error: any) => void) => void, label?: string);
+        constructor(callback: (resolve: (thenable?: PromiseLike<R>) => void, reject: (error: any) => void) => void, label?: string);
 
         /**
          * onFulfilled is called when/if "promise" resolves. onRejected is called when/if "promise" rejects.
@@ -64,7 +49,7 @@ declare module RSVP {
          * @param onFulfilled called when/if "promise" resolves
          * @param onRejected called when/if "promise" rejects
          */
-        then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => Thenable<U>): Promise<U>;
+        then<U>(onFulfilled?: (value: R) => PromiseLike<U>, onRejected?: (error: any) => PromiseLike<U>): Promise<U>;
 
         /**
          * onFulfilled is called when/if "promise" resolves. onRejected is called when/if "promise" rejects.
@@ -76,7 +61,7 @@ declare module RSVP {
          * @param onFulfilled called when/if "promise" resolves
          * @param onRejected called when/if "promise" rejects
          */
-        then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => U): Promise<U>;
+        then<U>(onFulfilled?: (value: R) => PromiseLike<U>, onRejected?: (error: any) => U): Promise<U>;
 
         /**
          * onFulfilled is called when/if "promise" resolves. onRejected is called when/if "promise" rejects.
@@ -88,7 +73,7 @@ declare module RSVP {
          * @param onFulfilled called when/if "promise" resolves
          * @param onRejected called when/if "promise" rejects
          */
-        then<U>(onFulfilled?: (value: R) => Thenable<U>, onRejected?: (error: any) => void): Promise<U>;
+        then<U>(onFulfilled?: (value: R) => PromiseLike<U>, onRejected?: (error: any) => void): Promise<U>;
 
         /**
          * onFulfilled is called when/if "promise" resolves. onRejected is called when/if "promise" rejects.
@@ -100,7 +85,7 @@ declare module RSVP {
          * @param onFulfilled called when/if "promise" resolves
          * @param onRejected called when/if "promise" rejects
          */
-        then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => Thenable<U>): Promise<U>;
+        then<U>(onFulfilled?: (value: R) => U, onRejected?: (error: any) => PromiseLike<U>): Promise<U>;
 
         /**
          * onFulfilled is called when/if "promise" resolves. onRejected is called when/if "promise" rejects.
@@ -131,7 +116,7 @@ declare module RSVP {
          *
          * @param onRejected called when/if "promise" rejects
          */
-        catch<U>(onRejected?: (error: any) => Thenable<U>): Promise<U>;
+        catch<U>(onRejected?: (error: any) => PromiseLike<U>): Promise<U>;
 
         /**
          * Sugar for promise.then(undefined, onRejected)
@@ -149,7 +134,7 @@ declare module RSVP {
 
         finally(finallyCallback: () => any): Promise<R>;
 
-        static all<T>(promises: Thenable<T>[]): Promise<T[]>;
+        static all<T>(promises: PromiseLike<T>[]): Promise<T[]>;
         static all<T>(promises: any[]): Promise<T[]>;
         static race<R>(promises: Promise<R>[]): Promise<R>;
 
@@ -161,7 +146,7 @@ declare module RSVP {
          @return {Promise} a promise that will become fulfilled with the given
          `value`
          */
-        static resolve<T>(object: Thenable<T>): Promise<T>;
+        static resolve<T>(object: PromiseLike<T>): Promise<T>;
         static resolve<T>(object: T): Promise<T>;
 
         /**
@@ -172,7 +157,7 @@ declare module RSVP {
          @return {Promise} a promise that will become fulfilled with the given
          `value`
          */
-        static cast<T>(object: Thenable<T>, label?: string): Promise<T>;
+        static cast<T>(object: PromiseLike<T>, label?: string): Promise<T>;
         static cast<T>(object: T, label?: string): Promise<T>;
 
         /**
@@ -218,72 +203,10 @@ declare module RSVP {
      * the array passed to all can be a mixture of promise-like objects and other objects.
      * The fulfillment value is an array (in order) of fulfillment values. The rejection value is the first rejection value.
      */
-    export function all<T>(promises: Thenable<T>[]): Promise<T[]>;
+    export function all<T>(promises: PromiseLike<T>[]): Promise<T[]>;
     export function all<T>(promises: any[]): Promise<T[]>;
-    /**
-     * Make a promise that fulfills when every item in the array fulfills, and rejects if (and when) any item rejects.
-     * the array passed to all can be a mixture of promise-like objects and other objects.
-     * The fulfillment value is an array (in order) of fulfillment values. The rejection value is the first rejection value.
-     * The key difference to the all() function is that both the fulfillment value and the argument to the hash() function
-     * are object literals. This allows you to simply reference the results directly off the returned object without
-     * having to remember the initial order like you would with all().
-     *
-     */
-    export function hash<T>(promises: Thenable<T>[]): Promise<T[]>;
-    export function hash<T>(promises: any[]): Promise<T[]>;
 
-    /**
-     `RSVP.map` is similar to JavaScript's native `map` method, except that it
-     waits for all promises to become fulfilled before running the `mapFn` on
-     each item in given to `promises`. `RSVP.map` returns a promise that will
-     become fulfilled with the result of running `mapFn` on the values the promises
-     become fulfilled with.
-     */
-    export function map<T>(promises: Thenable<T>[], mapFn: (item: any) => any, label?: string): Promise<T[]>;
-    export function map<T>(promises: any[], mapFn: (item: any) => any, label?: string): Promise<T[]>;
-
-
-    /**
-     * `RSVP.allSettled` is similar to `RSVP.all`, but instead of implementing
-     * a fail-fast method, it waits until all the promises have returned and
-     * shows you all the results. This is useful if you want to handle multiple
-     * promises' failure states together as a set.
-     */
-    export function allSettled<T>(promises: Thenable<T>[]): Promise<PromiseState<T>[]>;
-    export function allSettled<T>(promises: any[]): Promise<PromiseState<T>[]>;
-
-    /**
-     * `RSVP.hashSettled` is similar to `RSVP.allSettled`, but takes an object
-     * instead of an array for its `promises` argument.
-     *
-     * Unlike `RSVP.all` or `RSVP.hash`, which implement a fail-fast method,
-     * but like `RSVP.allSettled`, `hashSettled` waits until all the
-     * constituent promises have returned and then shows you all the results
-     * with their states and values/reasons. This is useful if you want to
-     * handle multiple promises' failure states together as a set.
-     */
-    export function hashSettled<T>(promises: Thenable<T>[]): Promise<PromiseState<T>[]>;
-    export function hashSettled<T>(promises: any[]): Promise<PromiseState<T>[]>;
-
-    /**
-     * Make a Promise that fulfills when any item fulfills, and rejects if any item rejects.
-     */
     function race<R>(promises: Promise<R>[]): Promise<R>;
-
-    /**
-     * `RSVP.denodeify` takes a "node-style" function and returns a function that
-     * will return an `RSVP.Promise`. You can use `denodeify` in Node.js or the
-     *  browser when you'd prefer to use promises over using callbacks. For example,
-     * `denodeify` transforms the following:
-     */
-    export function denodeify<T>(nodeFunction: Function, ...args: any[]): (...args: any[]) => Promise<T>;
-
-    /**
-     * Favor the Promise Constructor instead (if possible)
-     *
-     */
-    export function defer<T>(): Deferred<T>;
-
 
     /**
      `RSVP.Promise.reject` returns a promise rejected with the passed `reason`.
@@ -294,17 +217,8 @@ declare module RSVP {
      `RSVP.Promise.resolve` returns a promise that will become resolved with the
      passed `value`.
      */
-    export function resolve<T>(object: Thenable<T>): Promise<T>;
+    export function resolve<T>(object: PromiseLike<T>): Promise<T>;
     export function resolve<T>(object: T): Promise<T>;
-
-    /**
-     * `RSVP.filter` is similar to JavaScript's native `filter` method, except that it
-     * waits for all promises to become fulfilled before running the `filterFn` on
-     * each item in given to `promises`. `RSVP.filter` returns a promise that will
-     * become fulfilled with the result of running `filterFn` on the values the
-     * promises become fulfilled with.
-     */
-    export function filter<T>(promises: Thenable<T>[], filterFn: (value: any) => any): Promise<T[]>;
 
     /**
      `RSVP.rethrow` will rethrow an error on the next turn of the JavaScript event
@@ -318,5 +232,4 @@ declare module RSVP {
      error again so the error can be handled by the promise per the spec.
      */
     export function rethrow(reason: any): void;
-
 }

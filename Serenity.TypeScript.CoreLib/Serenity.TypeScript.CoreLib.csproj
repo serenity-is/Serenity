@@ -52,6 +52,7 @@
     <TypeScriptCompile Include="Imports\Helpers.ts" />
     <TypeScriptCompile Include="Imports\JQBlockUI.ts" />
     <TypeScriptCompile Include="Imports\jQueryStatic.ts" />
+    <TypeScriptCompile Include="Imports\Promise.ts" />
     <TypeScriptCompile Include="Imports\RSVP.ts" />
     <TypeScriptCompile Include="Imports\Select2.ts" />
     <TypeScriptCompile Include="Imports\SS.ts" />

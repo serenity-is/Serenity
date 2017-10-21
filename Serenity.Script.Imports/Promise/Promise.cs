@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace System
 {
-    [Imported, IgnoreNamespace, ScriptName("RSVP")]
+    [Imported, IgnoreNamespace, ScriptName("Promise")]
     public class Promise : IPromise
     {
-        [InlineCode("new RSVP.Promise({constructor})")]
+        [InlineCode("new Promise({constructor})")]
         public Promise(Action<Delegate, Delegate> constructor)
         {
         }
@@ -48,7 +48,7 @@ namespace System
             return null;
         }
 
-        [InlineCode("{this}['catch']({onRejected})")]
+        [InlineCode("{this}.catch({onRejected})")]
         public Promise Catch(Callback onRejected)
         {
             return null;
@@ -79,12 +79,7 @@ namespace System
             return null;
         }
 
-        public static Promise<TValue> Resolve<TValue>(TValue value)
-        {
-            return null;
-        }
-
-        [ScriptName("resolve"), IncludeGenericArguments(false)]
+        [ScriptName("Promise.resolve({value})"), IncludeGenericArguments(false)]
         public static Promise<TValue> FromValue<TValue>(TValue value)
         {
             return null;
@@ -92,16 +87,16 @@ namespace System
 
         public static Promise Void
         {
-            [InlineCode("RSVP.resolve()")]
+            [InlineCode("Promise.resolve()")]
             get { return null; }
         }
     }
 
 
-    [Imported, IgnoreNamespace, ScriptName("RSVP")]
+    [Imported, IgnoreNamespace, ScriptName("Promise")]
     public class Promise<TValue> : Promise
     {
-        [InlineCode("new RSVP.Promise({constructor})")]
+        [InlineCode("new Promise({constructor})")]
         public Promise(Action<Action<TValue>, Callback> constructor)
             : base((Action<Delegate, Delegate>)null)
         {

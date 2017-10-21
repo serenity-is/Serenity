@@ -75,13 +75,20 @@ namespace Q {
         }
     }
 
+    //all browsers seem to show some unhandled exception message so don't enable this for now
+    //window.addEventListener('unhandledrejection', function (e: any) {
+    //    var error = e.reason || e;
+    //    log(e);
+    //    log((error.get_stack && error.get_stack()) || error.stack);
+    //});
+
+    //window.addEventListener('error', function (e: any) {
+    //    var error = (e.error | e) as any;
+    //    log(e);
+    //    log((error.get_stack && error.get_stack()) || error.stack);
+    //});
+
     (function (global: any) {
-        if (typeof RSVP !== undefined) {
-            RSVP.on && RSVP.on(function (e) {
-                log(e);
-                log((e.get_stack && e.get_stack()) || e.stack);
-            });
-        }
 
         // fake assembly for typescript apps
         (ss as any).initAssembly({}, 'App', {});
