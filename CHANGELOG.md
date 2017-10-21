@@ -1,6 +1,12 @@
 ## 3.3.0 (2017-10-21)
 
 Features:
+
+  - release new assets package (3.3.1)
+
+## 3.3.0 (2017-10-21)
+
+Features:
   - we now have an embedded css minifier / bundler similar to script bundler. CSS bundler can override URLs in bundled CSS files to absolute paths. it is now possible to include other dynamic scripts in script bundles using dynamic://ScriptName syntax, e.g. dynamic://Lookup.Northwind.Product.
   - use new css bundling and dynamic script bundling features to improve page load times dramatically and decrease number of loaded resources like scripts, css etc when bundling is enabled [Serene]
   - login now has a slim layout page, embedded css and javascript so that Serene.Web.js and site.css, and some other scripts that are not required in login page are not loaded [Serene]
