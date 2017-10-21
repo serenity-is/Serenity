@@ -5,9 +5,8 @@ namespace Serenity.Web
     {
         public static readonly string[] Scripts = new string[] 
         {
-            "~/Scripts/rsvp.js",
             "~/Scripts/jquery-{version}.js",
-            "~/Scripts/jquery-ui-{version}.js",
+            "~/Scripts/jquery-ui.js",
             "~/Scripts/jquery-ui-i18n.js",
             "~/Scripts/jquery.validate.js",
             "~/Scripts/jquery.blockUI.js",
