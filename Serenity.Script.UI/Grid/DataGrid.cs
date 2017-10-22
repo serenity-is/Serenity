@@ -305,10 +305,10 @@ namespace Serenity
             if (PopulateWhenVisible())
             {
                 LazyLoadHelper.ExecuteEverytimeWhenShown(element, () => self.RefreshIfNeeded(), false);
-                if (element.Is(":visible"))
+                if (element.Is(":visible") && view != null)
                     view.Populate();
             }
-            else
+            else if (view != null)
                 view.Populate();
         }
 
