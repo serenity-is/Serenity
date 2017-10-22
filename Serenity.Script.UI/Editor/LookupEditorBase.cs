@@ -57,8 +57,6 @@ namespace Serenity
         public override void Destroy()
         {
             Q.ScriptData.UnbindFromChange(this.uniqueName);
-            element.Select2("destroy");
-
             base.Destroy();
         }
 

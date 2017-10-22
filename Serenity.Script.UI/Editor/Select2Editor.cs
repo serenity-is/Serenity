@@ -57,6 +57,14 @@ namespace Serenity
             });
         }
 
+        public override void Destroy()
+        {
+            if (element != null)
+                element.Select2("destroy");
+            base.Destroy();
+        }
+
+
         protected virtual string EmptyItemText()
         {
             return element.GetAttribute("placeholder") ?? Q.Text("Controls.SelectEditor.EmptyItemText");
