@@ -1,4 +1,10 @@
-## 3.3.0 (2017-10-21)
+## 3.3.2 (2017-10-22)
+
+Bugfixes:
+
+  - select2 sprites broken in high res devices
+
+## 3.3.1 (2017-10-21)
 
 Features:
 
