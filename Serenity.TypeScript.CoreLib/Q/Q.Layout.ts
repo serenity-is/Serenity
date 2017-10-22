@@ -38,6 +38,11 @@
 
         layout();
 
+        gridDiv.one('remove', () => {
+            $(window).off('layout', layout);
+            $('body').off('layout', layout);
+        });
+
         // ugly, but to it is to make old pages work without having to add this
         Q.Router.resolve();
     }
