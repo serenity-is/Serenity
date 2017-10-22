@@ -101,11 +101,11 @@ namespace System.Html
         {
         }
 
-        public static void Trigger(string keys, string action)
+        public void Trigger(string keys, string action)
         {
         }
 
-        public static void Reset()
+        public void Reset()
         {
         }
     }

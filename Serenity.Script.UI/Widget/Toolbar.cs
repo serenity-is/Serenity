@@ -9,6 +9,8 @@ namespace Serenity
 {
     public class Toolbar : Widget<ToolbarOptions>
     {
+        private MousetrapInstance mouseTrap;
+
         public Toolbar(jQueryObject div, ToolbarOptions options)
             : base(div, options)
         {
@@ -81,7 +83,8 @@ namespace Serenity
             if (!string.IsNullOrEmpty(b.Hotkey) &&
                 Script.IsValue(Window.Instance.As<dynamic>().Mousetrap))
             {
-                Mousetrap.Wrap(options.HotkeyContext ?? Window.Document.DocumentElement).Bind(b.Hotkey, (e, action) =>
+                mouseTrap = mouseTrap ?? Mousetrap.Wrap(options.HotkeyContext ?? Window.Document.DocumentElement);
+                mouseTrap.Bind(b.Hotkey, (e, action) =>
                 {
                     if (btn.Is(":visible"))
                         btn.TriggerHandler("click");
@@ -94,6 +97,14 @@ namespace Serenity
         public override void Destroy()
         {
             this.element.Find("div.tool-button").Unbind("click");
+            if (mouseTrap != null)
+            {
+                if (mouseTrap.As<dynamic>().destroy)
+                    mouseTrap.As<dynamic>().destroy();
+                else
+                    mouseTrap.Reset();
+                mouseTrap = null;
+            }
 
             base.Destroy();
         }
