@@ -303,22 +303,32 @@ namespace Q {
         });
     }
 
-    function jQuerySelect2Initialization(): void {
+    function jQueryUIInitialization(): void {
         $.ui.dialog.prototype._allowInteraction = function (event: any) {
             if ($(event.target).closest(".ui-dialog").length) {
                 return true;
             }
             return !!$(event.target).closest(".ui-datepicker, .select2-drop, .cke, .cke_dialog, #support-modal").length;
         };
+
+        (function (orig) {
+            $.ui.dialog.prototype._focusTabbable = function () {
+                if ($(document.body).hasClass('mobile-device')) {
+                    this.uiDialog && this.uiDialog.focus();
+                    return;
+                }
+                orig.call(this);
+            }
+        })($.ui.dialog.prototype._focusTabbable);
     };
 
     if (jQuery.ui) {
-        jQuerySelect2Initialization();
+        jQueryUIInitialization();
     }
     else {
         jQuery(function () {
             if (jQuery.ui)
-                jQuerySelect2Initialization();
+                jQueryUIInitialization();
         });
     }
 
