@@ -571,6 +571,8 @@
     <None Include="Assets\Scripts\jspdf.min.js" />
     <None Include="Assets\Scripts\jspdf.plugin.autotable.js" />
     <None Include="Assets\Scripts\jspdf.plugin.autotable.min.js" />
+    <Content Include="Assets\Scripts\jquery-ui.js" />
+    <Content Include="Assets\Scripts\jquery-ui.min.js" />
     <Content Include="Assets\Scripts\jquery.event.drag.js" />
     <Content Include="Assets\Scripts\jquery.event.drag.min.js" />
     <Content Include="Assets\Scripts\jquery.maskedinput.js" />
