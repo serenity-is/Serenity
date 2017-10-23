@@ -3219,7 +3219,8 @@ var Serenity;
             element.trigger(e);
         };
         TemplatedDialog.prototype.onDialogOpen = function () {
-            $(':input:eq(0)', this.element).focus();
+            if (!$(document.body).hasClass('mobile-device'))
+                $(':input:eq(0)', this.element).focus();
             this.arrange();
             this.tabs && this.tabs.tabs('option', 'active', 0);
         };
