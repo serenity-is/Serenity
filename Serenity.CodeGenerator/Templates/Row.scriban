@@ -24,14 +24,14 @@ namespace {{RootNamespace}}{{DotModule}}.Entities
         }
 {{end}}
 {{~for j in Joins}}
-   {{~for k in j.Fields}}
+{{~for k in j.Fields}}
         [{{k.Attributes}}]
         public {{k.PropertyType}} {{k.Ident}}
         {
             get { return Fields.{{k.Ident}}[this]; }
             set { Fields.{{k.Ident}}[this] = value; }
         }
-   {{~end}}
+{{end}}
 {{~end}}
 {{~if Identity}}
         IIdField IIdRow.IdField
