@@ -52,6 +52,9 @@ namespace Serenity.CodeGenerator
             if (!config.WebProjectFile.IsEmptyOrNull())
                 config.UpdateConnectionsFrom(GetWebConfigLocation(), x => _connections.Add(x));
 
+            if (!string.IsNullOrEmpty(config.CustomTemplates))
+                Templates.TemplatePath = config.CustomTemplates;
+
             if (config.CustomSettings != null)
             {
                 foreach (var pair in config.CustomSettings.OrderBy(x => x.Key))
