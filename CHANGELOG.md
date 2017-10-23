@@ -1,3 +1,23 @@
+## 3.3.3 (2017-10-23)
+
+Features:
+  - dont auto focus first element on mobile device, as it shows keyboard
+  - prevent jquery ui dialog from focusing an input in mobile devices
+  - removing embedded touch punch from cropzoom.js as it was causing dialog back button in android browsers to not work. better to exclude cropzoom.js from layouthead.cshtml completely in your project unless you use it specially.
+  - resolve possible memory leak in jquery ui remove event / cleanData method due to HtmlElementCollection enumeration
+  - remove layout events when full height grid div is removed
+  - removed fastclick.js as it is no longer useful in mobile devices [Serene]
+  - don't spin logo in mobile devices [Serene]
+  - hide some quick filters in order / customer screens for xs devices using hidden-xs bootstrap class [Serene]
+  - specify TypeScriptToolsVersion in web.csproj as VS2017 asks for it on template project creation anyway [Serene]
+
+Bugfixes:
+  - fix HostingEnvironment.MapPath in ASP.NET Core / IIS when app is hosted under a virtual subdirectory, fixes script bundling
+  - add back spacing line between foreign row fields in generated code
+  - call select2 destroy on base select2 editor, not lookupeditorbase
+  - check view is not null before calling populate in initialPopulate
+  - destroy mouse trap instance on toolbar destroy to prevent memory leaks
+
 ## 3.3.2 (2017-10-22)
 
 Bugfixes:
