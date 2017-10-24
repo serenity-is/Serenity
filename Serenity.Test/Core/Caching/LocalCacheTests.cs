@@ -80,7 +80,7 @@ namespace Serenity.Test
                     .Returns(DBNull.Value);
 
                 var actual = LocalCache.Get<object>("NullKey", TimeSpan.Zero, () => null);
-                Assert.Equal(null, actual);
+                Assert.Null(actual);
 
                 A.CallTo(() => cache.Get<object>("NullKey"))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -123,7 +123,7 @@ namespace Serenity.Test
                     .Returns(null);
 
                 var actual = LocalCache.Get<string>("NotFound", TimeSpan.FromMinutes(1), () => null);
-                Assert.Equal(null, actual);
+                Assert.Null(actual);
 
                 A.CallTo(() => cache.Add("NotFound", DBNull.Value, TimeSpan.FromMinutes(1)))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -191,7 +191,7 @@ namespace Serenity.Test
                     .Returns(null);
 
                 var actual = LocalCache.TryGet<string>("NotInCache");
-                Assert.Equal(null, actual);
+                Assert.Null(actual);
 
                 A.CallTo(() => cache.Get<object>("NotInCache"))
                     .MustHaveHappened(Repeated.Exactly.Once);
@@ -233,7 +233,7 @@ namespace Serenity.Test
                     .Returns(1);
 
                 var actual = LocalCache.TryGet<string>("IntegerValue");
-                Assert.Equal(null, actual);
+                Assert.Null(actual);
             }
         }
 
@@ -301,7 +301,7 @@ namespace Serenity.Test
                     .Returns(null);
 
                 var actual = LocalCache.Remove("OldValue");
-                Assert.Equal(null, actual);
+                Assert.Null(actual);
 
                 A.CallTo(() => cache.Remove("OldValue"))
                     .MustHaveHappened(Repeated.Exactly.Once);

@@ -20,17 +20,17 @@ namespace Serenity.Test.Data
             var actual = left == MyEnum.Value1;
 
             Assert.NotNull(actual);
-            Assert.IsType(typeof(BinaryCriteria), actual);
+            Assert.IsType<BinaryCriteria>(actual);
 
             var binary = actual as BinaryCriteria;
 
             Assert.Equal(CriteriaOperator.EQ, binary.Operator);
             Assert.Equal(binary.LeftOperand, left);
-            Assert.IsType(typeof(ValueCriteria), binary.RightOperand);
+            Assert.IsType<ValueCriteria>(binary.RightOperand);
 
             var value = binary.RightOperand as ValueCriteria;
 
-            Assert.IsType(typeof(MyEnum), value.Value);
+            Assert.IsType<MyEnum>(value.Value);
             Assert.Equal(MyEnum.Value1, value.Value);
         }
 
@@ -41,17 +41,17 @@ namespace Serenity.Test.Data
             var actual = left != MyEnum.Value1;
 
             Assert.NotNull(actual);
-            Assert.IsType(typeof(BinaryCriteria), actual);
+            Assert.IsType<BinaryCriteria>(actual);
 
             var binary = actual as BinaryCriteria;
 
             Assert.Equal(CriteriaOperator.NE, binary.Operator);
             Assert.Equal(binary.LeftOperand, left);
-            Assert.IsType(typeof(ValueCriteria), binary.RightOperand);
+            Assert.IsType<ValueCriteria>(binary.RightOperand);
 
             var value = binary.RightOperand as ValueCriteria;
 
-            Assert.IsType(typeof(MyEnum), value.Value);
+            Assert.IsType<MyEnum>(value.Value);
             Assert.Equal(MyEnum.Value1, value.Value);
         }
 
@@ -62,17 +62,17 @@ namespace Serenity.Test.Data
             var actual = left > MyEnum.Value1;
 
             Assert.NotNull(actual);
-            Assert.IsType(typeof(BinaryCriteria), actual);
+            Assert.IsType<BinaryCriteria>(actual);
 
             var binary = actual as BinaryCriteria;
 
             Assert.Equal(CriteriaOperator.GT, binary.Operator);
             Assert.Equal(binary.LeftOperand, left);
-            Assert.IsType(typeof(ValueCriteria), binary.RightOperand);
+            Assert.IsType<ValueCriteria>(binary.RightOperand);
 
             var value = binary.RightOperand as ValueCriteria;
 
-            Assert.IsType(typeof(MyEnum), value.Value);
+            Assert.IsType<MyEnum>(value.Value);
             Assert.Equal(MyEnum.Value1, value.Value);
         }
 
@@ -83,17 +83,17 @@ namespace Serenity.Test.Data
             var actual = left >= MyEnum.Value1;
 
             Assert.NotNull(actual);
-            Assert.IsType(typeof(BinaryCriteria), actual);
+            Assert.IsType<BinaryCriteria>(actual);
 
             var binary = actual as BinaryCriteria;
 
             Assert.Equal(CriteriaOperator.GE, binary.Operator);
             Assert.Equal(binary.LeftOperand, left);
-            Assert.IsType(typeof(ValueCriteria), binary.RightOperand);
+            Assert.IsType<ValueCriteria>(binary.RightOperand);
 
             var value = binary.RightOperand as ValueCriteria;
 
-            Assert.IsType(typeof(MyEnum), value.Value);
+            Assert.IsType<MyEnum>(value.Value);
             Assert.Equal(MyEnum.Value1, value.Value);
         }
 
@@ -104,17 +104,17 @@ namespace Serenity.Test.Data
             var actual = left < MyEnum.Value1;
 
             Assert.NotNull(actual);
-            Assert.IsType(typeof(BinaryCriteria), actual);
+            Assert.IsType<BinaryCriteria>(actual);
 
             var binary = actual as BinaryCriteria;
 
             Assert.Equal(CriteriaOperator.LT, binary.Operator);
             Assert.Equal(binary.LeftOperand, left);
-            Assert.IsType(typeof(ValueCriteria), binary.RightOperand);
+            Assert.IsType<ValueCriteria>(binary.RightOperand);
 
             var value = binary.RightOperand as ValueCriteria;
 
-            Assert.IsType(typeof(MyEnum), value.Value);
+            Assert.IsType<MyEnum>(value.Value);
             Assert.Equal(MyEnum.Value1, value.Value);
         }
 
@@ -125,17 +125,17 @@ namespace Serenity.Test.Data
             var actual = left <= MyEnum.Value1;
 
             Assert.NotNull(actual);
-            Assert.IsType(typeof(BinaryCriteria), actual);
+            Assert.IsType<BinaryCriteria>(actual);
 
             var binary = actual as BinaryCriteria;
 
             Assert.Equal(CriteriaOperator.LE, binary.Operator);
             Assert.Equal(binary.LeftOperand, left);
-            Assert.IsType(typeof(ValueCriteria), binary.RightOperand);
+            Assert.IsType<ValueCriteria>(binary.RightOperand);
 
             var value = binary.RightOperand as ValueCriteria;
 
-            Assert.IsType(typeof(MyEnum), value.Value);
+            Assert.IsType<MyEnum>(value.Value);
             Assert.Equal(MyEnum.Value1, value.Value);
         }
     }

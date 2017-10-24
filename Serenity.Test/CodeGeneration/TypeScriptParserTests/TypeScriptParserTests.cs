@@ -62,11 +62,11 @@ namespace Serenity.CodeGeneration.Test
                     "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
+                Assert.StrictEqual(1, formatterTypes.Count);
                 var k = "Serene.Northwind.MyBoldFormatter";
                 Assert.True(formatterTypes.ContainsKey(k));
                 Assert.NotNull(formatterTypes[k].Options);
-                Assert.Equal(0, formatterTypes[k].Options.Count);
+                Assert.StrictEqual(0, formatterTypes[k].Options.Count);
             }
         }
 
@@ -90,12 +90,12 @@ namespace Serenity.CodeGeneration.Test
                     "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
+                Assert.StrictEqual(1, formatterTypes.Count);
                 var k = "Serene.Northwind.MyBoldFormatter";
                 Assert.True(formatterTypes.ContainsKey(k));
                 var ft = formatterTypes[k];
                 Assert.NotNull(ft.Options);
-                Assert.Equal(1, ft.Options.Count);
+                Assert.StrictEqual(1, ft.Options.Count);
                 Assert.True(ft.Options.ContainsKey("someOption"));
                 var o1 = ft.Options["someOption"];
                 Assert.Equal("someOption", o1.Name);
@@ -124,12 +124,12 @@ namespace Serenity.CodeGeneration.Test
                     "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
+                Assert.StrictEqual(1, formatterTypes.Count);
                 var k = "Serene.Northwind.MyBoldFormatter";
                 Assert.True(formatterTypes.ContainsKey(k));
                 var ft = formatterTypes[k];
                 Assert.NotNull(ft.Options);
-                Assert.Equal(1, ft.Options.Count);
+                Assert.StrictEqual(1, ft.Options.Count);
                 Assert.True(ft.Options.ContainsKey("someOption"));
                 var o1 = ft.Options["someOption"];
                 Assert.Equal("someOption", o1.Name);
@@ -157,12 +157,12 @@ namespace Serenity.CodeGeneration.Test
                     "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
+                Assert.StrictEqual(1, formatterTypes.Count);
                 var k = "Serene.Northwind.MyBoldFormatter";
                 Assert.True(formatterTypes.ContainsKey(k));
                 var ft = formatterTypes[k];
                 Assert.NotNull(ft.Options);
-                Assert.Equal(1, ft.Options.Count);
+                Assert.StrictEqual(1, ft.Options.Count);
                 Assert.True(ft.Options.ContainsKey("someOption"));
                 var o1 = ft.Options["someOption"];
                 Assert.Equal("someOption", o1.Name);
@@ -190,12 +190,12 @@ namespace Serenity.CodeGeneration.Test
                     "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
+                Assert.StrictEqual(1, formatterTypes.Count);
                 var k = "Serene.Northwind.MyBoldFormatter";
                 Assert.True(formatterTypes.ContainsKey(k));
                 var ft = formatterTypes[k];
                 Assert.NotNull(ft.Options);
-                Assert.Equal(1, ft.Options.Count);
+                Assert.StrictEqual(1, ft.Options.Count);
                 Assert.True(ft.Options.ContainsKey("someOption"));
                 var o1 = ft.Options["someOption"];
                 Assert.Equal("someOption", o1.Name);
@@ -218,7 +218,7 @@ namespace Serenity.CodeGeneration.Test
                     "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(0, formatterTypes.Count);
+                Assert.StrictEqual(0, formatterTypes.Count);
             }
         }
 
@@ -245,11 +245,11 @@ namespace Serenity.CodeGeneration.Test
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
 
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
+                Assert.StrictEqual(1, formatterTypes.Count);
                 var k = "Serene.Northwind.MyItalicFormatter";
                 Assert.True(formatterTypes.ContainsKey(k));
                 Assert.NotNull(formatterTypes[k].Options);
-                Assert.Equal(0, formatterTypes[k].Options.Count);
+                Assert.StrictEqual(0, formatterTypes[k].Options.Count);
             }
         }
 
@@ -268,7 +268,7 @@ namespace Serenity.CodeGeneration.Test
                     "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(0, formatterTypes.Count);
+                Assert.StrictEqual(0, formatterTypes.Count);
             }
         }
 
@@ -293,11 +293,11 @@ namespace Serenity.CodeGeneration.Test
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
 
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
+                Assert.StrictEqual(1, formatterTypes.Count);
                 var k = "Serene.Northwind.MyItalicFormatter";
                 Assert.True(formatterTypes.ContainsKey(k));
                 Assert.NotNull(formatterTypes[k].Options);
-                Assert.Equal(0, formatterTypes[k].Options.Count);
+                Assert.StrictEqual(0, formatterTypes[k].Options.Count);
             }
         }
 
@@ -356,11 +356,11 @@ namespace Serenity.CodeGeneration.Test
                     "JSON.stringify(Serenity.CodeGeneration.parseFormatterTypes(sourceText))");
                 var formatterTypes = JSON.Parse<Dictionary<string, FormatterTypeInfo>>(json);
                 Assert.NotNull(formatterTypes);
-                Assert.Equal(1, formatterTypes.Count);
+                Assert.StrictEqual(1, formatterTypes.Count);
                 var k = "Serene.Northwind.MyBoldFormatter";
                 Assert.True(formatterTypes.ContainsKey(k));
                 Assert.NotNull(formatterTypes[k].Options);
-                Assert.Equal(0, formatterTypes[k].Options.Count);
+                Assert.StrictEqual(0, formatterTypes[k].Options.Count);
             }
         }
 

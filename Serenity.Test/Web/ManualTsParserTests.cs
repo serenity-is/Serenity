@@ -39,7 +39,7 @@ class EntityDialog<TEntity>
     loadByIdAndOpenDialog(id: any): void;
 }");
 
-            Assert.Equal(1, types.Count);
+            Assert.StrictEqual(1, types.Count);
             var t0 = types[0];
             Assert.Equal("EntityDialog<TEntity>", t0.Name);
             Assert.Equal(2, t0.Members.Count);
@@ -61,7 +61,7 @@ interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSe
     request?: any;
 }");
 
-            Assert.Equal(1, types.Count);
+            Assert.StrictEqual(1, types.Count);
             Assert.Equal("ServiceOptions<TResponse extends ServiceResponse>", types[0].Name);
         }
 
@@ -78,7 +78,7 @@ interface ServiceOptions<TResponse extends ServiceResponse> extends JQueryAjaxSe
 
             parser.Parse(Input_Lookup);
 
-            Assert.Equal(1, types.Count);
+            Assert.StrictEqual(1, types.Count);
 
             var t0 = types[0];
             Assert.Equal("Lookup<TItem>", t0.Name);
@@ -127,6 +127,7 @@ namespace Serenity {
         }
     }
 }";
+        [Fact]
         public void ParserTest()
         {
             var parser = new TypeScriptParser();

@@ -69,10 +69,10 @@ namespace Serenity.Test
             Assert.Equal(0, actualInt);
 
             var actualStr = cache.Get<string>("NonExistingString");
-            Assert.Equal(null, actualStr);
+            Assert.Null(actualStr);
 
             var actualBool = cache.Get<bool>("NonExistingBoolean");
-            Assert.Equal(false, actualBool);
+            Assert.False(actualBool);
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace Serenity.Test
 
             cache.Set("SomeBool", true);
             var actualBool = cache.Get<bool>("SomeBool");
-            Assert.Equal(true, actualBool);
+            Assert.True(actualBool);
         }
 
         [Fact]
@@ -211,15 +211,15 @@ namespace Serenity.Test
             cache.Set("SomeStr", "str");
             cache.Set("WithExpiration", true, TimeSpan.FromHours(10));
 
-            Assert.Equal(cache.Get<int?>("SomeInt"), 1);
-            Assert.Equal(cache.Get<string>("SomeStr"), "str");
-            Assert.Equal(cache.Get<bool?>("WithExpiration"), true);
+            Assert.Equal(1, cache.Get<int?>("SomeInt"));
+            Assert.Equal("str", cache.Get<string>("SomeStr"));
+            Assert.True(cache.Get<bool?>("WithExpiration"));
 
             cache.Reset();
 
-            Assert.Equal(cache.Get<int?>("SomeInt"), null);
-            Assert.Equal(cache.Get<string>("SomeStr"), null);
-            Assert.Equal(cache.Get<bool?>("WithExpiration"), null);
+            Assert.Null(cache.Get<int?>("SomeInt"));
+            Assert.Null(cache.Get<string>("SomeStr"));
+            Assert.Null(cache.Get<bool?>("WithExpiration"));
         }
     }
 }

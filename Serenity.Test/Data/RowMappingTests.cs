@@ -14,7 +14,7 @@ namespace Serenity.Test.Data
         {
             Exception innerException = null;
 
-            Assert.Throws(typeof(TypeInitializationException), () =>
+            Assert.Throws<TypeInitializationException>(() =>
             {
                 try
                 {
@@ -27,7 +27,7 @@ namespace Serenity.Test.Data
                 }
             });
 
-            Assert.IsType(typeof(InvalidProgramException), innerException);
+            Assert.IsType<InvalidProgramException>(innerException);
             Assert.Contains("Missing", innerException.Message);
         }
 
@@ -42,17 +42,17 @@ namespace Serenity.Test.Data
             Assert.Equal(FieldFlags.Default, BasicRow.Fields.AString.Flags);
             Assert.Equal(0, BasicRow.Fields.AString.Size);
             Assert.Equal(0, BasicRow.Fields.AString.Scale);
-            Assert.Equal(null, BasicRow.Fields.AString.DefaultValue);
+            Assert.Null(BasicRow.Fields.AString.DefaultValue);
             Assert.Equal(SelectLevel.Auto, BasicRow.Fields.AString.MinSelectLevel);
-            Assert.Equal(null, BasicRow.Fields.AString.ForeignTable);
-            Assert.Equal(null, BasicRow.Fields.AString.ForeignField);
-            Assert.Equal(null, BasicRow.Fields.AString.Join);
-            Assert.Equal(null, BasicRow.Fields.AString.JoinAlias);
-            Assert.Equal(null, BasicRow.Fields.AString.ReferencedAliases);
-            Assert.Equal(null, BasicRow.Fields.AString.Origin);
+            Assert.Null(BasicRow.Fields.AString.ForeignTable);
+            Assert.Null(BasicRow.Fields.AString.ForeignField);
+            Assert.Null(BasicRow.Fields.AString.Join);
+            Assert.Null(BasicRow.Fields.AString.JoinAlias);
+            Assert.Null(BasicRow.Fields.AString.ReferencedAliases);
+            Assert.Null(BasicRow.Fields.AString.Origin);
             Assert.Equal(0, BasicRow.Fields.AString.NaturalOrder);
-            Assert.Equal(null, BasicRow.Fields.AString.TextualField);
-            Assert.Equal(null, BasicRow.Fields.AString.Caption);
+            Assert.Null(BasicRow.Fields.AString.TextualField);
+            Assert.Null(BasicRow.Fields.AString.Caption);
             Assert.Equal("AString", BasicRow.Fields.AString.Title);
             Assert.Equal(FieldType.String, BasicRow.Fields.AString.Type);
             Assert.Equal(typeof(String), BasicRow.Fields.AString.ValueType);
@@ -65,17 +65,17 @@ namespace Serenity.Test.Data
             Assert.Equal(FieldFlags.Default, BasicRow.Fields.AInt32.Flags);
             Assert.Equal(0, BasicRow.Fields.AInt32.Size);
             Assert.Equal(0, BasicRow.Fields.AInt32.Scale);
-            Assert.Equal(null, BasicRow.Fields.AInt32.DefaultValue);
+            Assert.Null(BasicRow.Fields.AInt32.DefaultValue);
             Assert.Equal(SelectLevel.Auto, BasicRow.Fields.AInt32.MinSelectLevel);
-            Assert.Equal(null, BasicRow.Fields.AInt32.ForeignTable);
-            Assert.Equal(null, BasicRow.Fields.AInt32.ForeignField);
-            Assert.Equal(null, BasicRow.Fields.AInt32.Join);
-            Assert.Equal(null, BasicRow.Fields.AInt32.JoinAlias);
-            Assert.Equal(null, BasicRow.Fields.AInt32.ReferencedAliases);
-            Assert.Equal(null, BasicRow.Fields.AInt32.Origin);
+            Assert.Null(BasicRow.Fields.AInt32.ForeignTable);
+            Assert.Null(BasicRow.Fields.AInt32.ForeignField);
+            Assert.Null(BasicRow.Fields.AInt32.Join);
+            Assert.Null(BasicRow.Fields.AInt32.JoinAlias);
+            Assert.Null(BasicRow.Fields.AInt32.ReferencedAliases);
+            Assert.Null(BasicRow.Fields.AInt32.Origin);
             Assert.Equal(0, BasicRow.Fields.AInt32.NaturalOrder);
-            Assert.Equal(null, BasicRow.Fields.AInt32.TextualField);
-            Assert.Equal(null, BasicRow.Fields.AInt32.Caption);
+            Assert.Null(BasicRow.Fields.AInt32.TextualField);
+            Assert.Null(BasicRow.Fields.AInt32.Caption);
             Assert.Equal("AInt32", BasicRow.Fields.AInt32.Title);
             Assert.Equal(FieldType.Int32, BasicRow.Fields.AInt32.Type);
             Assert.Equal(typeof(Int32?), BasicRow.Fields.AInt32.ValueType);
@@ -108,7 +108,7 @@ namespace Serenity.Test.Data
         {
             Exception innerException = null;
 
-            Assert.Throws(typeof(TypeInitializationException), () =>
+            Assert.Throws<TypeInitializationException>(() =>
             {
                 try
                 {
@@ -121,7 +121,7 @@ namespace Serenity.Test.Data
                 }
             });
 
-            Assert.IsType(typeof(InvalidProgramException), innerException);
+            Assert.IsType<InvalidProgramException>(innerException);
             Assert.Contains("can't be overridden", innerException.Message);
             Assert.Contains("'Override'", innerException.Message);
         }
@@ -157,7 +157,7 @@ namespace Serenity.Test.Data
 
             Assert.Equal("TheCountryTable", join.Table);
 
-            Assert.IsType(typeof(LeftJoin), join);
+            Assert.IsType<LeftJoin>(join);
         }
 
         [Fact]

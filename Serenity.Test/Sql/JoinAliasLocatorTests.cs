@@ -19,8 +19,8 @@ namespace Serenity.Data.Test
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("", out singleAlias);
-            Assert.Equal(null, aliases);
-            Assert.Equal(null, singleAlias);
+            Assert.Null(aliases);
+            Assert.Null(singleAlias);
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace Serenity.Data.Test
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("x.y", out singleAlias);
-            Assert.Equal(null, aliases);
+            Assert.Null(aliases);
             Assert.Equal("x", singleAlias);
         }
 
@@ -37,7 +37,7 @@ namespace Serenity.Data.Test
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("x.y + x.z", out singleAlias);
-            Assert.Equal(null, aliases);
+            Assert.Null(aliases);
             Assert.Equal("x", singleAlias);
         }
 
@@ -46,10 +46,10 @@ namespace Serenity.Data.Test
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("x.y + y.z", out singleAlias);
-            Assert.Equal(null, singleAlias);
+            Assert.Null(singleAlias);
             Assert.Equal(2, aliases.Count);
-            Assert.True(aliases.Contains("x"));
-            Assert.True(aliases.Contains("y"));
+            Assert.Contains("x", aliases);
+            Assert.Contains("y", aliases);
         }
 
         [Fact]
@@ -57,11 +57,11 @@ namespace Serenity.Data.Test
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("x.y + y.z + u.w", out singleAlias);
-            Assert.Equal(null, singleAlias);
+            Assert.Null(singleAlias);
             Assert.Equal(3, aliases.Count);
-            Assert.True(aliases.Contains("x"));
-            Assert.True(aliases.Contains("y"));
-            Assert.True(aliases.Contains("u"));
+            Assert.Contains("x", aliases);
+            Assert.Contains("y", aliases);
+            Assert.Contains("u", aliases);
         }
 
         [Fact]
@@ -69,12 +69,12 @@ namespace Serenity.Data.Test
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("x.y + y.z + u.w + t.v", out singleAlias);
-            Assert.Equal(null, singleAlias);
+            Assert.Null(singleAlias);
             Assert.Equal(4, aliases.Count);
-            Assert.True(aliases.Contains("x"));
-            Assert.True(aliases.Contains("y"));
-            Assert.True(aliases.Contains("u"));
-            Assert.True(aliases.Contains("t"));
+            Assert.Contains("x", aliases);
+            Assert.Contains("y", aliases);
+            Assert.Contains("u", aliases);
+            Assert.Contains("t", aliases);
         }
 
         [Fact]
@@ -82,12 +82,12 @@ namespace Serenity.Data.Test
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("x.y + y.z", out singleAlias);
-            Assert.Equal(null, singleAlias);
+            Assert.Null(singleAlias);
             Assert.Equal(2, aliases.Count);
-            Assert.True(aliases.Contains("X"));
-            Assert.True(aliases.Contains("x"));
-            Assert.True(aliases.Contains("Y"));
-            Assert.True(aliases.Contains("y"));
+            Assert.Contains("X", aliases);
+            Assert.Contains("x", aliases);
+            Assert.Contains("Y", aliases);
+            Assert.Contains("y", aliases);
         }
 
         [Fact]
@@ -95,11 +95,11 @@ namespace Serenity.Data.Test
         {
             string singleAlias;
             var aliases = JoinAliasLocator.LocateOptimized("x.y + [a].b + y.z + [a].[b].d", out singleAlias);
-            Assert.Equal(null, singleAlias);
+            Assert.Null(singleAlias);
             Assert.Equal(2, aliases.Count);
-            Assert.True(aliases.Contains("x"));
-            Assert.True(aliases.Contains("y"));
-            Assert.Equal(2, aliases.Count);
+            Assert.Contains("x", aliases);
+            Assert.Contains("y", aliases);
+            Assert.StrictEqual(2, aliases.Count);
         }
 
         [Fact]

@@ -66,7 +66,7 @@ namespace Serenity.Test.Services
                         });
 
                     Assert.NotNull(result1.Entity.DetailList);
-                    Assert.Equal(1, result1.Entity.DetailList.Count);
+                    Assert.StrictEqual(1, result1.Entity.DetailList.Count);
                     var result11 = result1.Entity.DetailList[0];
                     Assert.Equal(master1, result11.MasterID);
                     Assert.Equal(detail11, result11.DetailID);
@@ -80,7 +80,7 @@ namespace Serenity.Test.Services
                         });
 
                     Assert.NotNull(result2.Entity.DetailList);
-                    Assert.Equal(0, result2.Entity.DetailList.Count);
+                    Assert.StrictEqual(0, result2.Entity.DetailList.Count);
 
                     var result3 = new RetrieveRequestHandler<Int32MasterRow>().Process(connection, 
                         new RetrieveRequest

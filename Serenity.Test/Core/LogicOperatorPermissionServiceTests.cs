@@ -17,14 +17,14 @@ namespace Serenity.Test
                 .ReturnsLazily(s => expected);
 
             var lops = new LogicOperatorPermissionService(ps);
-            Assert.Equal(false, lops.HasPermission(""));
-            Assert.Equal(false, lops.HasPermission("A"));
-            Assert.Equal(false, lops.HasPermission("B:C"));
+            Assert.False(lops.HasPermission(""));
+            Assert.False(lops.HasPermission("A"));
+            Assert.False(lops.HasPermission("B:C"));
 
             expected = true;
-            Assert.Equal(true, lops.HasPermission(""));
-            Assert.Equal(true, lops.HasPermission("A"));
-            Assert.Equal(true, lops.HasPermission("B:C"));
+            Assert.True( lops.HasPermission(""));
+            Assert.True( lops.HasPermission("A"));
+            Assert.True( lops.HasPermission("B:C"));
         }
 
         private IPermissionService FakeService()
@@ -41,79 +41,79 @@ namespace Serenity.Test
         public void ReturnsFalseForOrWhenAllFalse()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.Equal(false, lops.HasPermission("F|N"));
-            Assert.Equal(false, lops.HasPermission("N|F"));
-            Assert.Equal(false, lops.HasPermission("N|N|N"));
-            Assert.Equal(false, lops.HasPermission("N|N|F|F"));
-            Assert.Equal(false, lops.HasPermission("N|F|N|F"));
+            Assert.False(lops.HasPermission("F|N"));
+            Assert.False(lops.HasPermission("N|F"));
+            Assert.False(lops.HasPermission("N|N|N"));
+            Assert.False(lops.HasPermission("N|N|F|F"));
+            Assert.False(lops.HasPermission("N|F|N|F"));
         }
 
         [Fact]
         public void ReturnsTrueForOrWhenAllTrue()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.Equal(true, lops.HasPermission("T|Y"));
-            Assert.Equal(true, lops.HasPermission("Y|T"));
-            Assert.Equal(true, lops.HasPermission("Y|Y|Y"));
-            Assert.Equal(true, lops.HasPermission("Y|Y|T|T"));
-            Assert.Equal(true, lops.HasPermission("Y|T|Y|T"));
+            Assert.True( lops.HasPermission("T|Y"));
+            Assert.True( lops.HasPermission("Y|T"));
+            Assert.True( lops.HasPermission("Y|Y|Y"));
+            Assert.True( lops.HasPermission("Y|Y|T|T"));
+            Assert.True( lops.HasPermission("Y|T|Y|T"));
         }
 
         [Fact]
         public void ReturnsTrueForOrWhenSomeTrue()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.Equal(true, lops.HasPermission("T|F"));
-            Assert.Equal(true, lops.HasPermission("Y|N"));
-            Assert.Equal(true, lops.HasPermission("N|Y|N"));
-            Assert.Equal(true, lops.HasPermission("F|F|T|T"));
-            Assert.Equal(true, lops.HasPermission("N|Y|N|F|N|N"));
+            Assert.True( lops.HasPermission("T|F"));
+            Assert.True( lops.HasPermission("Y|N"));
+            Assert.True( lops.HasPermission("N|Y|N"));
+            Assert.True( lops.HasPermission("F|F|T|T"));
+            Assert.True( lops.HasPermission("N|Y|N|F|N|N"));
         }
 
         [Fact]
         public void ReturnsFalseForAndWhenAllFalse()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.Equal(false, lops.HasPermission("F&N"));
-            Assert.Equal(false, lops.HasPermission("N&F"));
-            Assert.Equal(false, lops.HasPermission("N&N&N"));
-            Assert.Equal(false, lops.HasPermission("N&N&F&F"));
-            Assert.Equal(false, lops.HasPermission("N&F&N&F"));
+            Assert.False(lops.HasPermission("F&N"));
+            Assert.False(lops.HasPermission("N&F"));
+            Assert.False(lops.HasPermission("N&N&N"));
+            Assert.False(lops.HasPermission("N&N&F&F"));
+            Assert.False(lops.HasPermission("N&F&N&F"));
         }
 
         [Fact]
         public void ReturnsTrueForAndWhenAllTrue()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.Equal(true, lops.HasPermission("T&Y"));
-            Assert.Equal(true, lops.HasPermission("Y&T"));
-            Assert.Equal(true, lops.HasPermission("Y&Y&Y"));
-            Assert.Equal(true, lops.HasPermission("Y&Y&T&T"));
-            Assert.Equal(true, lops.HasPermission("Y&T&Y&T"));
+            Assert.True( lops.HasPermission("T&Y"));
+            Assert.True( lops.HasPermission("Y&T"));
+            Assert.True( lops.HasPermission("Y&Y&Y"));
+            Assert.True( lops.HasPermission("Y&Y&T&T"));
+            Assert.True( lops.HasPermission("Y&T&Y&T"));
         }
 
         [Fact]
         public void ReturnsFalseForAndWhenSomeFalse()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.Equal(false, lops.HasPermission("T&F"));
-            Assert.Equal(false, lops.HasPermission("Y&N"));
-            Assert.Equal(false, lops.HasPermission("T&Y&N"));
-            Assert.Equal(false, lops.HasPermission("T&T&F&T"));
-            Assert.Equal(false, lops.HasPermission("N&Y&N&F&N&N"));
+            Assert.False(lops.HasPermission("T&F"));
+            Assert.False(lops.HasPermission("Y&N"));
+            Assert.False(lops.HasPermission("T&Y&N"));
+            Assert.False(lops.HasPermission("T&T&F&T"));
+            Assert.False(lops.HasPermission("N&Y&N&F&N&N"));
         }
 
         [Fact]
         public void AndTakesPrecedenceOverOr()
         {
             var lops = new LogicOperatorPermissionService(FakeService());
-            Assert.Equal(false, lops.HasPermission("F|T&F"));
-            Assert.Equal(false, lops.HasPermission("F|F&T"));
-            Assert.Equal(true, lops.HasPermission("T|F&T"));
-            Assert.Equal(false, lops.HasPermission("F&T|F&T"));
-            Assert.Equal(false, lops.HasPermission("T&F|F|F&T"));
-            Assert.Equal(false, lops.HasPermission("T&T&T&F|F&F&F&T"));
-            Assert.Equal(true, lops.HasPermission("T&T&T&F|T&T|F&F&F&T"));
+            Assert.False(lops.HasPermission("F|T&F"));
+            Assert.False(lops.HasPermission("F|F&T"));
+            Assert.True( lops.HasPermission("T|F&T"));
+            Assert.False(lops.HasPermission("F&T|F&T"));
+            Assert.False(lops.HasPermission("T&F|F|F&T"));
+            Assert.False(lops.HasPermission("T&T&T&F|F&F&F&T"));
+            Assert.True( lops.HasPermission("T&T&T&F|T&T|F&F&F&T"));
         }
     }
 }

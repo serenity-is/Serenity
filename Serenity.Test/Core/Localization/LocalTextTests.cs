@@ -41,7 +41,7 @@ namespace Serenity.Test
         [Fact]
         public void LocalText_Key_ReturnsKeySetInConstructorAsIs()
         {
-            Assert.Equal(null, new LocalText(null).Key);
+            Assert.Null(new LocalText(null).Key);
             Assert.Equal(String.Empty, new LocalText(String.Empty).Key);
             Assert.Equal("ABC", new LocalText("ABC").Key);
             Assert.Equal("  dEf ", new LocalText("  dEf ").Key);

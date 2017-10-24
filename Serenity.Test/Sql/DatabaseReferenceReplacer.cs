@@ -11,7 +11,7 @@ namespace Serenity.Data.Test
                 "Data Source=server1; Initial Catalog=catalog1",
                 "System.Data.SqlClient");
             var result = DatabaseCaretReferences.Replace("[abc].[dbo].[Table]");
-            Assert.Equal(result, "[abc].[dbo].[Table]");
+            Assert.Equal("[abc].[dbo].[Table]", result);
         }
 
         [Fact]
@@ -21,7 +21,7 @@ namespace Serenity.Data.Test
                 "Data Source=server1; Initial Catalog=catalog1",
                 "System.Data.SqlClient");
             var result = DatabaseCaretReferences.Replace("[Dummy1^].[dbo].[Table]");
-            Assert.Equal(result, "[catalog1].[dbo].[Table]");
+            Assert.Equal("[catalog1].[dbo].[Table]", result);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace Serenity.Data.Test
                 "Data Source=server1; Initial Catalog=catalog1",
                 "System.Data.SqlClient");
             var result = DatabaseCaretReferences.Replace("[^].[dbo].[Table]");
-            Assert.Equal(result, "[^].[dbo].[Table]");
+            Assert.Equal("[^].[dbo].[Table]", result);
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace Serenity.Data.Test
                 "Data Source=server1; Initial Catalog=catalog1",
                 "System.Data.SqlClient");
             var result = DatabaseCaretReferences.Replace("[InvalidConnectionKey^AlternateDB].[dbo].[Table]");
-            Assert.Equal(result, "[AlternateDB].[dbo].[Table]");
+            Assert.Equal("[AlternateDB].[dbo].[Table]", result);
         }
 
         [Fact]

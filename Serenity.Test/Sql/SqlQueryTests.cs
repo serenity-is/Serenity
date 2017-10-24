@@ -55,7 +55,7 @@ namespace Serenity.Test.Data
         [Fact]
         public void FirstIntoRowShouldReturnNullIfNoEntityUsedYet()
         {
-            Assert.Equal(null, ((ISqlQueryExtensible)new SqlQuery()).FirstIntoRow);
+            Assert.Null(((ISqlQueryExtensible)new SqlQuery()).FirstIntoRow);
         }
 
         [Fact]
@@ -260,8 +260,8 @@ namespace Serenity.Test.Data
         public void GetExpressionsWithOutOfBoundsIndexThrowsArgumentOutOfRange()
         {
             var query = new SqlQuery().Select("a").Select("b");
-            Assert.Throws(typeof(ArgumentOutOfRangeException), () => ((ISqlQueryExtensible)query).Columns[2].Expression);
-            Assert.Throws(typeof(ArgumentOutOfRangeException), () => ((ISqlQueryExtensible)query).Columns[-1].Expression);
+            Assert.Throws<ArgumentOutOfRangeException>(() => ((ISqlQueryExtensible)query).Columns[2].Expression);
+            Assert.Throws<ArgumentOutOfRangeException>(() => ((ISqlQueryExtensible)query).Columns[-1].Expression);
         }
 
         [Fact]
@@ -623,7 +623,7 @@ namespace Serenity.Test.Data
         {
             var entity = new MyEntity() { Table = "x" };
             var query = new SqlQuery().From(entity).Select("x1");
-            Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex, 0);
+            Assert.Equal(0, ((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex);
             query.Into(null).Select("x2");
             Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(1).IntoRowIndex, -1);
             Assert.Equal(1, ((ISqlQueryExtensible)query).IntoRows.Count);
@@ -635,7 +635,7 @@ namespace Serenity.Test.Data
         {
             var entity1 = new MyEntity() { Table = "x" };
             var query = new SqlQuery().From(entity1).Select("x1");
-            Assert.Equal(((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex, 0);
+            Assert.Equal(0, ((ISqlQueryExtensible)query).Columns.ElementAt(0).IntoRowIndex);
             var entity2 = new MyEntity() { Table = "y" };
             query.Into(entity2).Select("y1");
             Assert.Equal(1, ((ISqlQueryExtensible)query).Columns.ElementAt(1).IntoRowIndex);
@@ -690,7 +690,7 @@ namespace Serenity.Test.Data
             var sub = query.SubQuery();
             sub.AddParam("@px1", "value");
             Assert.Equal(1, query.ParamCount);
-            Assert.Equal((string)query.Params["@px1"], "value");
+            Assert.Equal("value", (string)query.Params["@px1"]);
         }
 
         [Fact]
