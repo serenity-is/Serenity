@@ -102,6 +102,7 @@ namespace Serenity.Web
                     var bundleKey = pair.Key;
                     var bundleName = "Bundle." + bundleKey;
                     var bundleParts = new List<Func<string>>();
+                    var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                     foreach (var sourceFile in sourceFiles)
                     {
@@ -112,15 +113,15 @@ namespace Serenity.Web
                         {
                             bundleKeyBySourceUrlNew[sourceFile] = bundleKey;
                             var scriptName = sourceFile.Substring(10);
+                            scriptNames.Add(scriptName);
                             bundleParts.Add(() =>
                             {
-                                if (recursionCheck != null &&
-                                    (recursionCheck.Contains(scriptName) ||
-                                     recursionCheck.Count > 100))
+                                if (recursionCheck != null)
                                 {
-                                    return String.Format(errorLines,
-                                        String.Format("Caught infinite recursion with dynamic scripts '{0}'!",
-                                            String.Join(", ", recursionCheck)));
+                                    if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
+                                        return String.Format(errorLines,
+                                            String.Format("Caught infinite recursion with dynamic scripts '{0}'!",
+                                                String.Join(", ", recursionCheck)));
                                 }
                                 else
                                     recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -128,7 +129,7 @@ namespace Serenity.Web
                                 recursionCheck.Add(scriptName);
                                 try
                                 {
-                                    var code = DynamicScriptManager.GetScriptText(scriptName, checkRights: true);
+                                    var code = DynamicScriptManager.GetScriptText(scriptName);
                                     if (code == null)
                                         return String.Format(errorLines,
                                             String.Format("Dynamic script with name '{0}' is not found!", scriptName));
@@ -209,7 +210,32 @@ namespace Serenity.Web
                         });
                     }
 
-                    var bundle = new ConcatenatedScript(bundleParts);
+                    var bundle = new ConcatenatedScript(bundleParts, checkRights: () =>
+                    {
+                        foreach (var scriptName in scriptNames)
+                        {
+                            if (recursionCheck != null)
+                            {
+                                if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
+                                    throw new InvalidOperationException(String.Format(
+                                        "Caught infinite recursion with dynamic scripts '{0}'!",
+                                            String.Join(", ", recursionCheck)));
+                            }
+                            else
+                                recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                            recursionCheck.Add(scriptName);
+                            try
+                            {
+                                DynamicScriptManager.CheckScriptRights(scriptName);
+                            }
+                            finally
+                            {
+                                recursionCheck.Remove(scriptName);
+                            }
+                        }
+                    });
+
                     DynamicScriptManager.Register(bundleName, bundle);
                     bundleByKeyNew[bundleKey] = bundle;
                 }

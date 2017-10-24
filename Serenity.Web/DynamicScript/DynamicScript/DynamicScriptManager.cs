@@ -69,7 +69,14 @@ namespace Serenity.Web
                 script.Generator.Changed();
         }
 
-        public static string GetScriptText(string name, bool checkRights = false)
+        public static void CheckScriptRights(string name)
+        {
+            Item item;
+            if (registeredScripts.TryGetValue(name, out item) && item != null)
+                item.Generator.CheckRights();
+        }
+
+        public static string GetScriptText(string name)
         {
             Item item;
             if (!registeredScripts.TryGetValue(name, out item)
@@ -77,9 +84,6 @@ namespace Serenity.Web
             {
                 return null;
             }
-
-            if (checkRights)
-                item.Generator.CheckRights();
 
             var script = item.EnsureContentBytes();
             return script.ScriptText;
