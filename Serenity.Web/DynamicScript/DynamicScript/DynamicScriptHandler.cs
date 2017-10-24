@@ -27,7 +27,14 @@ namespace Serenity.Web.HttpHandlers
             response.Charset = "utf-8";
 
             response.Cache.SetExpires(DateTime.Now.AddDays(expiresOffset));
-            response.Cache.SetCacheability(HttpCacheability.Private);
+
+            // allow CDNs to cache anonymous resources
+            if (!string.IsNullOrEmpty(request.QueryString["v"]) &&
+                !Authorization.IsLoggedIn)
+                response.Cache.SetCacheability(HttpCacheability.Public);
+            else
+                response.Cache.SetCacheability(HttpCacheability.Private);
+
             response.Cache.SetValidUntilExpires(false);
 
             response.Cache.VaryByHeaders["Accept-Encoding"] = true;

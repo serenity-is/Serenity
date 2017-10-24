@@ -58,10 +58,18 @@ namespace Serenity.Web.Middleware
             context.Response.ContentType = mediaType.ToString();
 
             var responseHeaders = context.Response.GetTypedHeaders();
-            var cacheControl = responseHeaders.CacheControl = new CacheControlHeaderValue();
+            var cacheControl = new CacheControlHeaderValue();
             cacheControl.MaxAge = TimeSpan.FromDays(365);
-            cacheControl.Private = true;
+            
+            // allow CDNs to cache anonymous resources
+            if (!string.IsNullOrEmpty((string)context.Request.Query["v"]) &&
+                !Authorization.IsLoggedIn)
+                cacheControl.Public = true;
+            else                
+                cacheControl.Private = true;
+
             cacheControl.MustRevalidate = false;
+            responseHeaders.CacheControl = cacheControl;
 
             var supportsGzip = dynamicScript.CompressedBytes != null &&
                 context.Request.Headers["Accept-Encoding"].Any(x => x.IndexOf("gzip") >= 0);
