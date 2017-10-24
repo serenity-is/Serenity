@@ -128,30 +128,6 @@ namespace Serenity {
     }
 }";
         [Fact]
-        public void ParserTest()
-        {
-            var parser = new TypeScriptParser();
-            var types = new List<TypeScriptParser.TypeInfo>();
-
-            StringBuilder sb = new StringBuilder();
-
-            parser.ReportToken += (token) =>
-            {
-                if (token.Type != TokenType.WhiteSpace &&
-                   token.Type != TokenType.EndOfLine)
-                    sb.AppendLine(JSON.StringifyIndented(token)); ;
-            };
-
-            parser.ReportType += (type) =>
-            {
-                types.Add(type);
-            };
-
-            parser.Parse(File.ReadAllText(@"P:\Sandbox\Serene\Serenity\Serenity.Script.Core\Resources\Serenity.CoreLib.ts"));
-            throw new Exception(JSON.StringifyIndented(types) + sb.ToString());
-        }
-
-        [Fact]
         public void SetsIsDeclarationCorrectly()
         {
             var parser = new TypeScriptParser();
