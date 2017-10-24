@@ -54,6 +54,8 @@ namespace Serenity.CodeGenerator
             try
             {
                 var context = new TemplateContext();
+                context.LoopLimit = 100000;
+                context.RecursiveLimit = 1000;
                 context.MemberRenamer = noRenamer;
                 context.CurrentGlobal.Import(model,
                     ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property,
