@@ -111,7 +111,7 @@ namespace Serenity
 
         protected virtual string GetSelectAllText()
         {
-            return "Tümünü Seç";
+            return Q.TryGetText("Controls.CheckTreeEditor.SelectAll") ?? "Select All";
         }
 
         protected virtual bool IsThreeStateHierarchy()
@@ -479,7 +479,7 @@ namespace Serenity
         {
             return new ToolButton
             {
-                Title = text ?? "Tümünü Seç",
+                Title = text ?? Q.TryGetText("Controls.CheckTreeEditor.SelectAll") ?? "Select All",
                 CssClass = "select-all-button",
                 OnClick = delegate
                 {

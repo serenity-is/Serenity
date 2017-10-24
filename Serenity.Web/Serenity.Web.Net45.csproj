@@ -261,6 +261,7 @@
     <Compile Include="Security\SiteMembershipProvider.cs" />
     <Compile Include="Security\WebSecurityHelper.cs" />
     <Compile Include="Texts\Texts.Controls.ColumnPickerDialog.cs" />
+    <Compile Include="Texts\Texts.Controls.CheckTreeEditor.cs" />
     <Compile Include="Texts\Texts.Controls.ImageUpload.cs" />
     <Compile Include="Texts\Texts.Controls.EntityDialog.cs" />
     <Compile Include="Texts\Texts.Controls.EntityGrid.cs" />
