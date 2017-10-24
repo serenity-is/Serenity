@@ -1,3 +1,17 @@
+## 3.3.4 (2017-10-14)
+
+Features:
+  - easy to configure cdn support (experimental, in use at serenity.is/demo)
+  - allow cdns to cache dynamic scripts for anonymous access
+  - check bundled script rights also when checkRights() on concatenated script is called
+  - increase scriban template loop limits as some users has tables with many columns (300+)
+  - added LocalTextScript method to HtmlScriptExtensions that works well with CDNs
+  - fix typo in image upload validation error and show file size in KBs/MBs
+  - localize select all button in check tree editor
+ 
+Bugfixes:
+  - custom template path option is not used in .net desktop serene
+
 ## 3.3.3 (2017-10-23)
 
 Features:
