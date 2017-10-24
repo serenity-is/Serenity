@@ -108,7 +108,7 @@ namespace Serenity.Web
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
             var context = Dependency.TryResolve<ILocalTextContext>();
             var isPending = context != null && context.IsApprovalMode;
-            string scriptName = LocalTextScript.GetScriptName(package, languageId, isPending);
+            string scriptName = Serenity.Web.LocalTextScript.GetScriptName(package, languageId, isPending);
             DynamicScriptManager.IfNotRegistered(scriptName, () =>
             {
                 var script = new LocalTextScript(package, (string)languageId, isPending);
@@ -123,14 +123,29 @@ namespace Serenity.Web
             string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
             var context = Dependency.TryResolve<ILocalTextContext>();
             var isPending = context != null && context.IsApprovalMode;
-            string scriptName = LocalTextScript.GetScriptName(package, languageId, isPending);
+            string scriptName = Serenity.Web.LocalTextScript.GetScriptName(package, languageId, isPending);
+            DynamicScriptManager.IfNotRegistered(scriptName, () =>
+            {
+                var script = new Serenity.Web.LocalTextScript(package, (string)languageId, isPending);
+                DynamicScriptManager.Register(script);
+            });
+
+            return DynamicScriptManager.GetScriptInclude(scriptName);
+        }
+
+        public static IHtmlString LocalTextScript(this HtmlHelper page, string package)
+        {
+            string languageId = CultureInfo.CurrentUICulture.Name.TrimToNull() ?? "invariant";
+            var context = Dependency.TryResolve<ILocalTextContext>();
+            var isPending = context != null && context.IsApprovalMode;
+            string scriptName = Serenity.Web.LocalTextScript.GetScriptName(package, languageId, isPending);
             DynamicScriptManager.IfNotRegistered(scriptName, () =>
             {
                 var script = new LocalTextScript(package, (string)languageId, isPending);
                 DynamicScriptManager.Register(script);
             });
 
-            return DynamicScriptManager.GetScriptInclude(scriptName);
+            return Script(page, "dynamic://" + scriptName);
         }
     }
 }
