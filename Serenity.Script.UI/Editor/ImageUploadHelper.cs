@@ -72,13 +72,13 @@ namespace Serenity
 
             if (opt.MinSize > 0 && file.Size < opt.MinSize)
             {
-                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.UploadFileTooSmall"), opt.MinSize));
+                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.UploadFileTooSmall"), FileSizeDisplay(opt.MinSize)));
                 return false;
             }
 
             if (opt.MaxSize > 0 && file.Size > opt.MaxSize)
             {
-                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.UploadFileTooBig"), opt.MaxSize));
+                Q.Alert(String.Format(Q.Text("Controls.ImageUpload.UploadFileTooBig"), FileSizeDisplay(opt.MaxSize)));
                 return false;
             }
 

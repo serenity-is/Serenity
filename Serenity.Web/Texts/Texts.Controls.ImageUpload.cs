@@ -11,7 +11,7 @@ namespace Serenity.Web
                 public static LocalText DeleteButtonHint = "Remove";
                 public static LocalText NotAnImageFile = "Uploaded file is not an image!";
                 public static LocalText UploadFileTooSmall = "Uploaded file must be at least {0}!";
-                public static LocalText UploadFileTooBig = "Uploaded file must be smallar than {0}!";
+                public static LocalText UploadFileTooBig = "Uploaded file must be smaller than {0}!";
                 public static LocalText MaxWidth = "Uploaded image should be under {0} pixels in width!";
                 public static LocalText MinWidth = "Uploaded image should be at least {0} pixels in width!";
                 public static LocalText MaxHeight = "Uploaded image should be under {0} pixels in height!";
