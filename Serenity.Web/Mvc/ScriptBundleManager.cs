@@ -1,12 +1,8 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Configuration;
-using Serenity.Data;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 
@@ -26,18 +22,15 @@ namespace Serenity.Web
         private static bool isInitialized;
         private static Dictionary<string, string[]> scriptBundles;
         private static Dictionary<string, string> bundleKeyBySourceUrl;
+        private static Dictionary<string, HashSet<string>> bundleKeysBySourceUrl;
         private static Dictionary<string, ConcatenatedScript> bundleByKey;
-        private static ConcurrentDictionary<string, string> expandVersion;
+        private static Dictionary<string, List<string>> bundleIncludes;
         private const string errorLines = "\r\n//\r\n//!!!ERROR: {0}!!!\r\n//\r\n";
+
         [ThreadStatic]
         private static HashSet<string> recursionCheck;
 
-        static ScriptBundleManager()
-        {
-            expandVersion = new ConcurrentDictionary<string, string>();
-        }
-
-        public static Dictionary<string, string[]> ScriptBundles
+        private static Dictionary<string, string[]> ScriptBundles
         {
             get
             {
@@ -60,11 +53,6 @@ namespace Serenity.Web
             }
         }
 
-        public static void Reset()
-        {
-            isInitialized = false;
-        }
-
         public static void Initialize()
         {
             if (isInitialized)
@@ -73,23 +61,29 @@ namespace Serenity.Web
             isInitialized = true;
             isEnabled = false;
             bundleKeyBySourceUrl = null;
+            bundleKeysBySourceUrl = null;
             bundleByKey = null;
+            bundleIncludes = null;
             try
             {
                 var settings = Config.Get<ScriptBundlingSettings>();
-                if (settings.Enabled != true)
-                    return;
 
                 var bundles = ScriptBundles;
-
                 if (bundles == null ||
                     bundles.Count == 0)
                 {
                     return;
                 }
 
+                bundleIncludes = BundleUtils.ExpandBundleIncludes(bundles, "dynamic://Bundle.", "script");
+
+                if (settings.Enabled != true)
+                    return;
+
                 var bundleKeyBySourceUrlNew = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                var bundleKeysBySourceUrlNew = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
                 var bundleByKeyNew = new Dictionary<string, ConcatenatedScript>(StringComparer.OrdinalIgnoreCase);
+
                 bool minimize = settings.Minimize == true;
 
                 foreach (var pair in bundles)
@@ -104,6 +98,21 @@ namespace Serenity.Web
                     var bundleParts = new List<Func<string>>();
                     var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+                    Action<string> registerInBundle = delegate (string sourceFile)
+                    {
+                        if (bundleKey.IndexOf('/') < 0 && !bundleKeyBySourceUrlNew.ContainsKey(sourceFile))
+                            bundleKeyBySourceUrlNew[sourceFile] = bundleKey;
+
+                        HashSet<string> bundleKeys;
+                        if (!bundleKeysBySourceUrlNew.TryGetValue(sourceFile, out bundleKeys))
+                        {
+                            bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                            bundleKeysBySourceUrlNew[sourceFile] = new HashSet<string>();
+                        }
+
+                        bundleKeys.Add(bundleKey);
+                    };
+
                     foreach (var sourceFile in sourceFiles)
                     {
                         if (sourceFile.IsNullOrEmpty())
@@ -111,7 +120,8 @@ namespace Serenity.Web
 
                         if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
                         {
-                            bundleKeyBySourceUrlNew[sourceFile] = bundleKey;
+                            registerInBundle(sourceFile);
+
                             var scriptName = sourceFile.Substring(10);
                             scriptNames.Add(scriptName);
                             bundleParts.Add(() =>
@@ -160,13 +170,13 @@ namespace Serenity.Web
                             continue;
                         }
 
-                        string sourceUrl = ExpandVersionVariable(sourceFile);
+                        string sourceUrl = BundleUtils.ExpandVersionVariable(sourceFile);
                         sourceUrl = VirtualPathUtility.ToAbsolute(sourceUrl);
 
                         if (sourceUrl.IsNullOrEmpty())
                             continue;
 
-                        bundleKeyBySourceUrlNew[sourceUrl] = bundleKey;
+                        registerInBundle(sourceUrl);
 
                         bundleParts.Add(() =>
                         {
@@ -241,6 +251,7 @@ namespace Serenity.Web
                 }
 
                 bundleKeyBySourceUrl = bundleKeyBySourceUrlNew;
+                bundleKeysBySourceUrl = bundleKeysBySourceUrlNew;
                 bundleByKey = bundleByKeyNew;
                 isEnabled = true;
             }
@@ -251,116 +262,42 @@ namespace Serenity.Web
 
             DynamicScriptManager.ScriptChanged += name =>
             {
-                string bundleKey;
-                if (bundleKeyBySourceUrl != null && 
-                    bundleKeyBySourceUrl.TryGetValue("dynamic://" + name, out bundleKey))
+                HashSet<string> bundleKeys;
+                if (bundleKeysBySourceUrl != null && 
+                    bundleKeysBySourceUrl.TryGetValue("dynamic://" + name, out bundleKeys))
                 {
-                    DynamicScriptManager.Changed("Bundle." + bundleKey);
+                    foreach (var bundleKey in bundleKeys)
+                        DynamicScriptManager.Changed("Bundle." + bundleKey);
                 }
             };
         }
 
         public static void ScriptsChanged()
         {
-            expandVersion.Clear();
+            BundleUtils.ClearVersionCache();
             scriptBundles = null;
 
-            if (isEnabled && bundleByKey != null)
+            if (isEnabled)
             {
-                foreach (var bundle in bundleByKey.Values)
-                    bundle.Changed();
+                var s = bundleByKey;
+                if (s != null)
+                    foreach (var bundle in s.Values)
+                        bundle.Changed();
 
-                Reset();
+                isInitialized = false;
             }
         }
 
-        public static string GetLatestVersion(string path, string mask)
+        public static IEnumerable<string> GetBundleIncludes(string bundleKey)
         {
-            if (path == null)
-                throw new ArgumentNullException("path");
+            Initialize();
 
-            if (mask.IsNullOrEmpty())
-                return null;
+            var bi = bundleIncludes;
+            List<string> includes;
+            if (bi != null && bi.TryGetValue(bundleKey, out includes) && includes != null)
+                return includes;
 
-            var idx = mask.IndexOf("*");
-            if (idx <= 0)
-                throw new ArgumentOutOfRangeException("mask");
-
-            var before = mask.Substring(0, idx);
-            var after = mask.Substring(idx + 1);
-            var extension = Path.GetExtension(mask);
-
-            var files = Directory.GetFiles(path, mask)
-                .Select(x =>
-                {
-                    var filename = Path.GetFileName(x);
-                    return filename.Substring(before.Length, filename.Length - before.Length - after.Length);
-                })
-                .Where(s =>
-                {
-                    if (s.Length < 0)
-                        return false;
-                    int y;
-                    return s.Split('.').All(x => Int32.TryParse(x, out y));
-                })
-                .ToArray();
-
-            if (!files.Any())
-                return null;
-
-            Array.Sort(files, (x, y) =>
-            {
-                var px = x.Split('.');
-                var py = y.Split('.');
-
-                for (var i = 0; i < Math.Min(px.Length, py.Length); i++)
-                {
-                    var c = Int32.Parse(px[i]).CompareTo(Int32.Parse(py[i]));
-                    if (c != 0)
-                        return c;
-                }
-
-                return px.Length.CompareTo(py.Length);
-            });
-
-            return files.Last();
-        }
-
-        public static string ExpandVersionVariable(string scriptUrl)
-        {
-            if (scriptUrl.IsNullOrEmpty())
-                return scriptUrl;
-
-            var tpl = "{version}";
-            var idx = scriptUrl.IndexOf(tpl, StringComparison.OrdinalIgnoreCase);
-
-            if (idx < 0)
-                return scriptUrl;
-            string result;
-            if (expandVersion.TryGetValue(scriptUrl, out result))
-                return result;
-
-            var before = scriptUrl.Substring(0, idx);
-            var after = scriptUrl.Substring(idx + tpl.Length);
-            var extension = Path.GetExtension(scriptUrl);
-
-            var path = HostingEnvironment.MapPath(before);
-
-            path = Path.GetDirectoryName(path);
-
-
-            var beforeName = Path.GetFileName(before.Replace('/', System.IO.Path.DirectorySeparatorChar));
-
-            var latest = GetLatestVersion(path, beforeName + "*" + extension.Replace('/', System.IO.Path.DirectorySeparatorChar));
-            if (latest == null)
-            {
-                expandVersion[scriptUrl] = scriptUrl;
-                return scriptUrl;
-            }
-            
-            result = before + latest + after;
-            expandVersion[scriptUrl] = result;
-            return result;
+            return new string[0];
         }
 
         public static string GetScriptBundle(string scriptUrl)
@@ -381,7 +318,7 @@ namespace Serenity.Web
             }
             else
             {
-                scriptUrl = ExpandVersionVariable(scriptUrl);
+                scriptUrl = BundleUtils.ExpandVersionVariable(scriptUrl);
                 scriptUrl = VirtualPathUtility.ToAbsolute(scriptUrl);
 
                 if (!isEnabled || 
