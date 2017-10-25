@@ -1,3 +1,12 @@
+## 3.3.5 (2017-10-25)
+
+Features:
+  - introduce explicity included bundles , e.g. ones with "/" in their names and has to be included explicity, using @Html.ScriptBundle or @Html.StyleBundle, which allows using different sets of bundles for different parts of sites.
+  - set customer in new order dialog to selected customer in quick filter of order grid [Serene]
+  
+Bugfixes:
+  - fix RouteDialog call in initEntityDialog method should use itemType passed in parameters
+
 ## 3.3.4 (2017-10-14)
 
 Features:
