@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using IHtmlString = Microsoft.AspNetCore.Html.HtmlString;
 using HtmlHelper = Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper;
 using HttpContextBase = Microsoft.AspNetCore.Http.HttpContext;
+using VirtualPathUtility = System.Web.VirtualPathUtility;
 #else
 using System.Web;
 using System.Web.Mvc;
@@ -84,7 +85,7 @@ namespace Serenity.Web
                         cssList.Add(cssUrl);
                         sb.AppendLine(String.Format("    <link href=\"{0}\" rel=\"stylesheet\" type=\"text/css\"/>\n",
 #if ASPNETCORE
-                            WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(script))));
+                            WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(cssUrl))));
 #else
                             HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(cssUrl))));
 #endif
@@ -162,7 +163,7 @@ namespace Serenity.Web
                         scripts.Add(scriptUrl);
                         sb.AppendLine(String.Format("    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
 #if ASPNETCORE
-                            WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(script))));
+                            WebUtility.HtmlEncode(ContentHashCache.ResolveWithHash(scriptUrl))));
 #else
                             HttpUtility.HtmlAttributeEncode(ContentHashCache.ResolveWithHash(scriptUrl))));
 #endif
