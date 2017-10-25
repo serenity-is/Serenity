@@ -301,7 +301,7 @@ namespace Serenity
 
             var self = this;
             dialog.BindToDataChange(this, (e, dci) => self.SubDialogDataChange());
-            RouteDialog(this.GetItemType(), dialog);
+            RouteDialog(itemType, dialog);
         }
 
         protected virtual Widget CreateEntityDialog(string itemType, Action<Widget> callback)
