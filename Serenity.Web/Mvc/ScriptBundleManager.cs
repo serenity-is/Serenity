@@ -53,6 +53,21 @@ namespace Serenity.Web
             }
         }
 
+        static ScriptBundleManager()
+        {
+            DynamicScriptManager.ScriptChanged += name =>
+            {
+                HashSet<string> bundleKeys;
+                var b = bundleKeysBySourceUrl;
+                if (b != null &&
+                    b.TryGetValue("dynamic://" + name, out bundleKeys))
+                {
+                    foreach (var bundleKey in bundleKeys)
+                        DynamicScriptManager.Changed("Bundle." + bundleKey);
+                }
+            };
+        }
+
         public static void Initialize()
         {
             if (isInitialized)
@@ -255,21 +270,11 @@ namespace Serenity.Web
                 bundleByKey = bundleByKeyNew;
                 isEnabled = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                ex.Log();
+                isInitialized = false;
+                throw;
             }
-
-            DynamicScriptManager.ScriptChanged += name =>
-            {
-                HashSet<string> bundleKeys;
-                if (bundleKeysBySourceUrl != null && 
-                    bundleKeysBySourceUrl.TryGetValue("dynamic://" + name, out bundleKeys))
-                {
-                    foreach (var bundleKey in bundleKeys)
-                        DynamicScriptManager.Changed("Bundle." + bundleKey);
-                }
-            };
         }
 
         public static void ScriptsChanged()
