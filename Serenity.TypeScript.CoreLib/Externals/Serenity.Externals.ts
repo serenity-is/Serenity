@@ -320,6 +320,13 @@ namespace Q {
                 orig.call(this);
             }
         })($.ui.dialog.prototype._focusTabbable);
+
+        (function (orig) {
+            $.ui.dialog.prototype._createTitlebar = function () {
+                orig.call(this);
+                this.uiDialogTitlebar.find('.ui-dialog-titlebar-close').html('<i class="fa fa-times" />');
+            }
+        })($.ui.dialog.prototype._createTitlebar);
     };
 
     if (jQuery.ui) {

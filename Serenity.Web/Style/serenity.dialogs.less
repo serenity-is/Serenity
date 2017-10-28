@@ -220,18 +220,20 @@ body.mobile-device.modal-dialog-open {
 
     .ui-dialog-titlebar {
         border: none;
-        padding: 0.5em 0.5em 0.4em 3em;
+        padding-left: 2px;
     }
 
-    .ui-dialog-titlebar-close, .ui-dialog-titlebar-close:hover {
-        border: none;
-        left: 0;
+    .ui-dialog-titlebar-close {
         width: 44px;
-        height: 36px;
-        top: 30%;
+        order: -1;
+        transition: none;
+
+        i {
+            display: none;
+        }
     }
 
-    .ui-dialog-titlebar-buttonpane {
+    .ui-dialog-titlebar-maximize, .ui-dialog-titlebar-restore {
         display: none;
     }
 
