@@ -7,6 +7,10 @@
 		<IntermediateScript Include="$(IntermediateOutputPath)$(TargetName).js" Condition="'@(IntermediateScript)'==''"/>
 	</ItemGroup>
 
+	<Target Name="CopyMsbuildDLLsToSaltarelle" BeforeTargets="BeforeBuild">
+		<Copy SourceFiles="$(ProjectDir)..\Tools\Saltarelle\Microsoft.Build.dll;$(ProjectDir)..\Tools\Saltarelle\Microsoft.Build.Engine.dll;$(ProjectDir)..\Tools\Saltarelle\Microsoft.Build.Framework.dll" DestinationFolder="$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\" />
+	</Target>
+	
 	<Target Name="BuildScript" >
 		<PropertyGroup>
 			<EmitDebugScript>false</EmitDebugScript>
