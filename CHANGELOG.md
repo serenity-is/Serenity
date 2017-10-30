@@ -1,3 +1,10 @@
+## 3.3.6 (2017-10-30)
+
+Features:
+ - use font awesome icons for dialog titlebar buttons, merge aristo.css into serenity.css, change titlebar styling
+ - cleanup dialogExtendQ
+ - dont swallow exceptions in ScriptBundleManager
+
 ## 3.3.5 (2017-10-25)
 
 Features:
