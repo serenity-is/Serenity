@@ -117,6 +117,30 @@ namespace Serenity
             return false;
         }
 
+        [ScriptAlias("Q.first"), IncludeGenericArguments(false)]
+        public static T First<T>(List<T> array, Func<T, bool> predicate)
+        {
+            return default(T);
+        }
+
+        [ScriptAlias("Q.tryFirst"), IncludeGenericArguments(false)]
+        public static T TryFirst<T>(List<T> array, Func<T, bool> predicate)
+        {
+            return default(T);
+        }
+
+        [ScriptAlias("Q.single"), IncludeGenericArguments(false)]
+        public static T Single<T>(List<T> array, Func<T, bool> predicate)
+        {
+            return default(T);
+        }
+
+        [ScriptAlias("Q.trySingle"), IncludeGenericArguments(false)]
+        public static T TrySingle<T>(List<T> array, Func<T, bool> predicate)
+        {
+            return default(T);
+        }
+
         [ScriptAlias("Q.indexOf"), IncludeGenericArguments(false)]
         public static int IndexOf<T>(T[] array, Func<T, bool> predicate)
         {
@@ -137,5 +161,19 @@ namespace Serenity
         public static void Prop(Type target, string name, string getter, string setter)
         {
         }
+
+        [IncludeGenericArguments(false)]
+        public static JsDictionary<K, List<V>> ToGrouping<K, V>(List<V> input, Func<V, K> keySelector)
+        {
+            return null;
+        }
+
+        [IncludeGenericArguments(false)]
+        public static JsDictionary<K, V> ToDictionary<K, V>(List<V> input, Func<V, K> keySelector)
+        {
+            return null;
+        }
+
+
     }
 }
