@@ -83,7 +83,15 @@ namespace Serenity
 
                 var widget = TryGetWidget(element, widgetType);
                 if (widget == null)
-                    throw new Exception(String.Format("Element has no widget of type '{0}'!", widgetType.FullName));
+                {
+                    var message = String.Format("Element has no widget of type '{0}'! If you have recently changed editor type of a property in " +
+                        "a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. " +
+                        "Make sure your project builds successfully and transform T4 templates", widgetType.FullName);
+
+                    Q.NotifyError(message);
+                    throw new Exception(message);
+
+                }
 
                 return widget;
             });
@@ -100,7 +108,14 @@ namespace Serenity
 
             var widget = TryGetWidget<TWidget>(element);
             if (widget == null)
-                throw new Exception(String.Format("Element has no widget of type '{0}'!", typeof(TWidget).FullName));
+            {
+                var message = String.Format("Element has no widget of type '{0}'! If you have recently changed editor type of a property in " + 
+                    "a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. " + 
+                    "Make sure your project builds successfully and transform T4 templates", typeof(TWidget).FullName);
+
+                Q.NotifyError(message);
+                throw new Exception(message);
+            }
 
             return widget;
         }
