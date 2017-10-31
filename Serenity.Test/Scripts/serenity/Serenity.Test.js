@@ -1,164 +1,14 @@
-﻿var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+﻿var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var Serenity;
-(function (Serenity) {
-    var Test;
-    (function (Test) {
-        var assert = QUnit.assert;
-        QUnit.module('Widget');
-        QUnit.test('GetWidget tests', function () {
-            var input = $('<input />');
-            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'!", 'should throw before widget creation');
-            var stringEditor = new Serenity.StringEditor(input);
-            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
-            var secondaryWidget = new Serenity.DecimalEditor(input);
-            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
-            secondaryWidget.destroy();
-            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
-            assert.strictEqual(input.getWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
-            stringEditor.destroy();
-            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'!", 'should throw after string editor is destroyed');
-        });
-    })(Test = Serenity.Test || (Serenity.Test = {}));
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var Test;
-    (function (Test) {
-        var assert = QUnit.assert;
-        QUnit.module('Widget');
-        QUnit.test('TryGetWidget tests', function () {
-            var input = $('<input />');
-            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), null, 'should return null before widget creation');
-            var stringEditor = new Serenity.StringEditor(input);
-            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
-            var secondaryWidget = new Serenity.DecimalEditor(input);
-            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
-            secondaryWidget.destroy();
-            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
-            assert.strictEqual(input.tryGetWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
-            stringEditor.destroy();
-            assert.equal(input.tryGetWidget(Serenity.StringEditor), null, 'should return null after string editor is destroyed');
-        });
-    })(Test = Serenity.Test || (Serenity.Test = {}));
-})(Serenity || (Serenity = {}));
-var DummyRoot;
-(function (DummyRoot) {
-    var SomeModule;
-    (function (SomeModule) {
-        var SomeDialog = /** @class */ (function (_super) {
-            __extends(SomeDialog, _super);
-            function SomeDialog() {
-                return _super !== null && _super.apply(this, arguments) || this;
-            }
-            SomeDialog = __decorate([
-                Serenity.Decorators.registerClass()
-            ], SomeDialog);
-            return SomeDialog;
-        }(Serenity.PropertyDialog));
-        SomeModule.SomeDialog = SomeDialog;
-        var SomeDialogWithoutDialogSuffix = /** @class */ (function (_super) {
-            __extends(SomeDialogWithoutDialogSuffix, _super);
-            function SomeDialogWithoutDialogSuffix() {
-                return _super !== null && _super.apply(this, arguments) || this;
-            }
-            SomeDialogWithoutDialogSuffix = __decorate([
-                Serenity.Decorators.registerClass()
-            ], SomeDialogWithoutDialogSuffix);
-            return SomeDialogWithoutDialogSuffix;
-        }(Serenity.PropertyDialog));
-        SomeModule.SomeDialogWithoutDialogSuffix = SomeDialogWithoutDialogSuffix;
-    })(SomeModule = DummyRoot.SomeModule || (DummyRoot.SomeModule = {}));
-})(DummyRoot || (DummyRoot = {}));
-var Serenity;
-(function (Serenity) {
-    var Test;
-    (function (Test) {
-        var assert = QUnit.assert;
-        QUnit.module('Registry');
-        QUnit.test('DialogTypeRegistry tests', function () {
-            Q.Config.rootNamespaces.push("DummyRoot");
-            try {
-                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("DummyRoot.SomeModule.SomeDialog"), "should find dialog class with full namespace");
-                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("SomeModule.SomeDialog"), "should find dialog class with module name only");
-                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("SomeModule.Some"), "should find dialog class without specifying Dialog suffix");
-                assert.equal(DummyRoot.SomeModule.SomeDialogWithoutDialogSuffix, Serenity.DialogTypeRegistry.get("SomeModule.SomeDialogWithoutDialogSuffix"), "should find dialog class that doesn't have Dialog suffix");
-                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialog"); }, "SomeDialog dialog class is not found!", "shouldn't find dialog class without module name");
-                assert.throws(function () { return Serenity.DialogTypeRegistry.get("Some"); }, "SomeDialog dialog class is not found!", "shouldn't find dialog class without module name and suffix");
-                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialogWithoutDialogSuffix"); }, "SomeDialogWithoutDialogSuffixDialog dialog class is not found!", "shouldn't find dialog class that doesn't have dialog suffix without module");
-            }
-            finally {
-                Q.Config.rootNamespaces = Q.Config.rootNamespaces.filter(function (x) { return x != "DummyRoot"; });
-            }
-        });
-    })(Test = Serenity.Test || (Serenity.Test = {}));
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var Test;
-    (function (Test) {
-        QUnit.module('Q.ArrayUtils');
-        QUnit.test('any()', function (assert) {
-            assert.throws(function () { return Q.any(null, function () { return true; }); }, null, "should throw for null reference");
-            assert.strictEqual(false, Q.any([], function () { return false; }), "should return false for empty array and false predicate");
-            assert.strictEqual(false, Q.any([], function () { return true; }), "should return false for empty array and true predicate");
-            assert.strictEqual(false, Q.any([1, 2, 3], function (x) { return x === 4; }), "should return false for non-matching predicate");
-            assert.strictEqual(true, Q.any([1, 2, 3], function (x) { return x === 2; }), "should return true for matching predicate");
-        });
-        QUnit.test('count()', function (assert) {
-            assert.throws(function () { return Q.count(null, function () { return true; }); }, null, "should throw for null reference");
-            assert.strictEqual(0, Q.count([], function () { return false; }), "should return 0 for empty array and false predicate");
-            assert.strictEqual(0, Q.count([], function () { return true; }), "should return 0 for empty array and true predicate");
-            assert.strictEqual(0, Q.count([1, 2, 3], function () { return false; }), "should return 0 for array with 3 elements and false predicate");
-            assert.strictEqual(3, Q.count([1, 2, 3], function () { return true; }), "should return 3 for array with 3 elements and true predicate");
-            assert.strictEqual(0, Q.count([1, 2, 3], function (x) { return x === 4; }), "should return 0 for non-matching predicate");
-            assert.strictEqual(1, Q.count([1, 2, 3], function (x) { return x === 2; }), "should return 1 for matching predicate");
-            assert.strictEqual(3, Q.count([4, 3, 2, 2, 1, 2], function (x) { return x === 2; }), "shouldn't short circuit at first match");
-        });
-    })(Test = Serenity.Test || (Serenity.Test = {}));
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
-    var Test;
-    (function (Test) {
-        var assert = QUnit.assert;
-        QUnit.module('Formatters');
-        QUnit.test('UrlFormatter tests', function () {
-            assert.notEqual(null, new Serenity.UrlFormatter(), 'can create instance');
-            assert.strictEqual("<a href='http://simpleurl'>http://simpleurl</a>", new Serenity.UrlFormatter().format({
-                value: 'http://simpleurl'
-            }), 'field with simple url value and text');
-            assert.strictEqual("<a href='http://s?a=b&amp;c=d'>http://s?a=b&amp;c=d</a>", new Serenity.UrlFormatter().format({
-                value: 'http://s?a=b&c=d'
-            }), 'field with simple url value and text, html encoding check');
-            var formatter;
-            formatter = new Serenity.UrlFormatter();
-            formatter.set_target('my');
-            assert.strictEqual("<a href='http://s' target='my'>http://s</a>", formatter.format({
-                value: 'http://s'
-            }), 'respects target');
-            formatter = new Serenity.UrlFormatter();
-            formatter.set_displayFormat('http://s/{0}');
-            assert.strictEqual("<a href='x'>http://s/x</a>", formatter.format({
-                value: 'x'
-            }), 'respects target');
-        });
-    })(Test = Serenity.Test || (Serenity.Test = {}));
-})(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
     var Test;
@@ -249,6 +99,151 @@ var Serenity;
                 rows: 9
             });
             assert.equal(txtarea.attr('rows'), 9, 'respects rows option');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Formatters');
+        QUnit.test('UrlFormatter tests', function () {
+            assert.notEqual(null, new Serenity.UrlFormatter(), 'can create instance');
+            assert.strictEqual("<a href='http://simpleurl'>http://simpleurl</a>", new Serenity.UrlFormatter().format({
+                value: 'http://simpleurl'
+            }), 'field with simple url value and text');
+            assert.strictEqual("<a href='http://s?a=b&amp;c=d'>http://s?a=b&amp;c=d</a>", new Serenity.UrlFormatter().format({
+                value: 'http://s?a=b&c=d'
+            }), 'field with simple url value and text, html encoding check');
+            var formatter;
+            formatter = new Serenity.UrlFormatter();
+            formatter.set_target('my');
+            assert.strictEqual("<a href='http://s' target='my'>http://s</a>", formatter.format({
+                value: 'http://s'
+            }), 'respects target');
+            formatter = new Serenity.UrlFormatter();
+            formatter.set_displayFormat('http://s/{0}');
+            assert.strictEqual("<a href='x'>http://s/x</a>", formatter.format({
+                value: 'x'
+            }), 'respects target');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        QUnit.module('Q.ArrayUtils');
+        QUnit.test('any()', function (assert) {
+            assert.throws(function () { return Q.any(null, function () { return true; }); }, null, "should throw for null reference");
+            assert.strictEqual(false, Q.any([], function () { return false; }), "should return false for empty array and false predicate");
+            assert.strictEqual(false, Q.any([], function () { return true; }), "should return false for empty array and true predicate");
+            assert.strictEqual(false, Q.any([1, 2, 3], function (x) { return x === 4; }), "should return false for non-matching predicate");
+            assert.strictEqual(true, Q.any([1, 2, 3], function (x) { return x === 2; }), "should return true for matching predicate");
+        });
+        QUnit.test('count()', function (assert) {
+            assert.throws(function () { return Q.count(null, function () { return true; }); }, null, "should throw for null reference");
+            assert.strictEqual(0, Q.count([], function () { return false; }), "should return 0 for empty array and false predicate");
+            assert.strictEqual(0, Q.count([], function () { return true; }), "should return 0 for empty array and true predicate");
+            assert.strictEqual(0, Q.count([1, 2, 3], function () { return false; }), "should return 0 for array with 3 elements and false predicate");
+            assert.strictEqual(3, Q.count([1, 2, 3], function () { return true; }), "should return 3 for array with 3 elements and true predicate");
+            assert.strictEqual(0, Q.count([1, 2, 3], function (x) { return x === 4; }), "should return 0 for non-matching predicate");
+            assert.strictEqual(1, Q.count([1, 2, 3], function (x) { return x === 2; }), "should return 1 for matching predicate");
+            assert.strictEqual(3, Q.count([4, 3, 2, 2, 1, 2], function (x) { return x === 2; }), "shouldn't short circuit at first match");
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var DummyRoot;
+(function (DummyRoot) {
+    var SomeModule;
+    (function (SomeModule) {
+        var SomeDialog = (function (_super) {
+            __extends(SomeDialog, _super);
+            function SomeDialog() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            return SomeDialog;
+        }(Serenity.PropertyDialog));
+        SomeDialog = __decorate([
+            Serenity.Decorators.registerClass()
+        ], SomeDialog);
+        SomeModule.SomeDialog = SomeDialog;
+        var SomeDialogWithoutDialogSuffix = (function (_super) {
+            __extends(SomeDialogWithoutDialogSuffix, _super);
+            function SomeDialogWithoutDialogSuffix() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            return SomeDialogWithoutDialogSuffix;
+        }(Serenity.PropertyDialog));
+        SomeDialogWithoutDialogSuffix = __decorate([
+            Serenity.Decorators.registerClass()
+        ], SomeDialogWithoutDialogSuffix);
+        SomeModule.SomeDialogWithoutDialogSuffix = SomeDialogWithoutDialogSuffix;
+    })(SomeModule = DummyRoot.SomeModule || (DummyRoot.SomeModule = {}));
+})(DummyRoot || (DummyRoot = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Registry');
+        QUnit.test('DialogTypeRegistry tests', function () {
+            Q.Config.rootNamespaces.push("DummyRoot");
+            try {
+                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("DummyRoot.SomeModule.SomeDialog"), "should find dialog class with full namespace");
+                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("SomeModule.SomeDialog"), "should find dialog class with module name only");
+                assert.equal(DummyRoot.SomeModule.SomeDialog, Serenity.DialogTypeRegistry.get("SomeModule.Some"), "should find dialog class without specifying Dialog suffix");
+                assert.equal(DummyRoot.SomeModule.SomeDialogWithoutDialogSuffix, Serenity.DialogTypeRegistry.get("SomeModule.SomeDialogWithoutDialogSuffix"), "should find dialog class that doesn't have Dialog suffix");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialog"); }, "SomeDialog dialog class is not found! Make sure there is a dialog class with this name, it is under your project root namespace, and your namespace parts start with capital letters, e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.", "shouldn't find dialog class without module name");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("Some"); }, "Some dialog class is not found! Make sure there is a dialog class with this name, it is under your project root namespace, and your namespace parts start with capital letters, e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.", "shouldn't find dialog class without module name and suffix");
+                assert.throws(function () { return Serenity.DialogTypeRegistry.get("SomeDialogWithoutDialogSuffix"); }, "SomeDialogWithoutDialogSuffix dialog class is not found! Make sure there is a dialog class with this name, it is under your project root namespace, and your namespace parts start with capital letters, e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.", "shouldn't find dialog class that doesn't have dialog suffix without module");
+            }
+            finally {
+                Q.Config.rootNamespaces = Q.Config.rootNamespaces.filter(function (x) { return x != "DummyRoot"; });
+            }
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Widget');
+        QUnit.test('GetWidget tests', function () {
+            var input = $('<input />');
+            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'! If you have recently changed editor type of a property in a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. Make sure your project builds successfully and transform T4 templates", 'should throw before widget creation');
+            var stringEditor = new Serenity.StringEditor(input);
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
+            var secondaryWidget = new Serenity.DecimalEditor(input);
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
+            secondaryWidget.destroy();
+            assert.strictEqual(input.getWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
+            assert.strictEqual(input.getWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
+            stringEditor.destroy();
+            assert.throws(function () { input.getWidget(Serenity.StringEditor); }, "Element has no widget of type 'Serenity.StringEditor'! If you have recently changed editor type of a property in a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. Make sure your project builds successfully and transform T4 templates", 'should throw after string editor is destroyed');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Widget');
+        QUnit.test('TryGetWidget tests', function () {
+            var input = $('<input />');
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), null, 'should return null before widget creation');
+            var stringEditor = new Serenity.StringEditor(input);
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should return created stringeditor widget');
+            var secondaryWidget = new Serenity.DecimalEditor(input);
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget');
+            secondaryWidget.destroy();
+            assert.strictEqual(input.tryGetWidget(Serenity.StringEditor), stringEditor, 'should still return stringeditor after second widget is destroyed');
+            assert.strictEqual(input.tryGetWidget(Serenity.Widget), stringEditor, 'can return stringeditor using base class');
+            stringEditor.destroy();
+            assert.equal(input.tryGetWidget(Serenity.StringEditor), null, 'should return null after string editor is destroyed');
         });
     })(Test = Serenity.Test || (Serenity.Test = {}));
 })(Serenity || (Serenity = {}));
