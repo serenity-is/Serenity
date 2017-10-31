@@ -8,7 +8,7 @@
 	</ItemGroup>
 
 	<Target Name="CopyMsbuildDLLsToSaltarelle" BeforeTargets="BeforeBuild">
-		<Copy SourceFiles="$(ProjectDir)..\Tools\Saltarelle\Microsoft.Build.dll;$(ProjectDir)..\Tools\Saltarelle\Microsoft.Build.Engine.dll;$(ProjectDir)..\Tools\Saltarelle\Microsoft.Build.Framework.dll" DestinationFolder="$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\" />
+		<Copy SourceFiles="$(MsBuildThisFileDirectory)Microsoft.Build.dll;$(MsBuildThisFileDirectory)Microsoft.Build.Engine.dll;$(MsBuildThisFileDirectory)Microsoft.Build.Framework.dll" DestinationFolder="$(SolutionDir)packages\Saltarelle.Compiler.2.7.0\tools\" SkipUnchangedFiles="true" />
 	</Target>
 	
 	<Target Name="BuildScript" >
