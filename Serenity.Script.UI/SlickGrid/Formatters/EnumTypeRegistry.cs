@@ -7,7 +7,7 @@ namespace Serenity
     {
         private static JsDictionary<string, Type> knownTypes;
 
-        public static Type Get(string key)
+        public static Type TryGet(string key)
         {
             if (knownTypes == null)
             {
@@ -38,11 +38,25 @@ namespace Serenity
             }
 
             if (!knownTypes.ContainsKey(key))
-                throw new Exception(String.Format("Can't find {0} enum type! If you have recently defined this enum type in server side code, " + 
-                    "make sure your project builds successfully and transform T4 templates. Also make sure that enum is under your project root namespace, " + 
-                    "and your namespace parts starts with capital letters, e.g. MyProject.Pascal.Cased namespace", key));
+                return null;
 
             return knownTypes[key];
+        }
+
+        public static Type Get(string key)
+        {
+            var type = TryGet(key);
+
+            if (type == null)
+            { 
+                var message = String.Format("Can't find {0} enum type! If you have recently defined this enum type in server side code, " +
+                    "make sure your project builds successfully and transform T4 templates. Also make sure that enum is under your project root namespace, " +
+                    "and your namespace parts starts with capital letters, e.g. MyProject.Pascal.Cased namespace", key);
+                Q.NotifyError(message);
+                throw new Exception(message);
+            }
+
+            return type;
         }
     }
 }
