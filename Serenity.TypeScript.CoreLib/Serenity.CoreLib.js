@@ -15,6 +15,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/**
+ * Represents the completion of an asynchronous operation
+ */
 if (typeof Promise === "undefined") {
     if (typeof (RSVP) !== "undefined") {
         Promise = RSVP;
