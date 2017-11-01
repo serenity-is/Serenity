@@ -101,7 +101,7 @@ namespace Serenity
         public string Id;
         public string Name;
 
-        public void Destroy()
+        public void Destroy(bool noUpdate = false)
         {
         }
 

@@ -23,16 +23,26 @@
                         }
                     });
                 }
+                var bsTabs = element.closest('.nav-tabs');
+                if (bsTabs.length > 0) {
+                    bsTabs.one('shown.bs.tab', e => {
+                        if (!executed && element.is(':visible')) {
+                            executed = true;
+                            callback();
+                        }
+                    });
+                }
                 var dialog: JQuery;
                 if (element.hasClass('ui-dialog')) {
                     dialog = element.children('.ui-dialog-content');
                 }
                 else {
-                    dialog = element.closest('.ui-dialog-content');
+                    dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
                 }
                 if (dialog.length > 0) {
-                    dialog.bind('dialogopen.' + eventClass, function () {
+                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, function () {
                         dialog.unbind('dialogopen.' + eventClass);
+                        dialog.unbind('panelopen.' + eventClass);
                         if (element.is(':visible') && !executed) {
                             executed = true;
                             element.unbind('shown.' + eventClass);
@@ -78,9 +88,9 @@
                 uiTabs.bind('tabsactivate.' + eventClass, check);
             }
 
-            var dialog = element.closest('.ui-dialog-content');
+            var dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
             if (dialog.length > 0) {
-                dialog.bind('dialogopen.' + eventClass, check);
+                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, check);
             }
 
             element.bind('shown.' + eventClass, check);

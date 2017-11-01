@@ -2641,16 +2641,26 @@ var Serenity;
                         }
                     });
                 }
+                var bsTabs = element.closest('.nav-tabs');
+                if (bsTabs.length > 0) {
+                    bsTabs.one('shown.bs.tab', function (e) {
+                        if (!executed && element.is(':visible')) {
+                            executed = true;
+                            callback();
+                        }
+                    });
+                }
                 var dialog;
                 if (element.hasClass('ui-dialog')) {
                     dialog = element.children('.ui-dialog-content');
                 }
                 else {
-                    dialog = element.closest('.ui-dialog-content');
+                    dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
                 }
                 if (dialog.length > 0) {
-                    dialog.bind('dialogopen.' + eventClass, function () {
+                    dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, function () {
                         dialog.unbind('dialogopen.' + eventClass);
+                        dialog.unbind('panelopen.' + eventClass);
                         if (element.is(':visible') && !executed) {
                             executed = true;
                             element.unbind('shown.' + eventClass);
@@ -2692,9 +2702,9 @@ var Serenity;
             if (uiTabs.length > 0) {
                 uiTabs.bind('tabsactivate.' + eventClass, check);
             }
-            var dialog = element.closest('.ui-dialog-content');
+            var dialog = element.closest('.ui-dialog-content, .s-TemplatedDialog');
             if (dialog.length > 0) {
-                dialog.bind('dialogopen.' + eventClass, check);
+                dialog.bind('dialogopen.' + eventClass + ' panelopen.' + eventClass, check);
             }
             element.bind('shown.' + eventClass, check);
         }
@@ -3009,7 +3019,7 @@ var Serenity;
     var TemplatedDialog = /** @class */ (function (_super) {
         __extends(TemplatedDialog, _super);
         function TemplatedDialog(options) {
-            var _this = _super.call(this, Q.newBodyDiv().addClass('hidden'), options) || this;
+            var _this = _super.call(this, Q.newBodyDiv().addClass('s-TemplatedDialog hidden'), options) || this;
             _this.element.attr("id", _this.uniqueName);
             _this.initValidator();
             _this.initTabs();

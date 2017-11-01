@@ -38,10 +38,6 @@ namespace Serenity
                 textArea.Attribute("rows", options.Rows.Value.ToString());
 
             var self = this;
-
-            var config = GetConfig();
-            CKEditor.Replace(id, config);
-
             this.AddValidationRule(this.uniqueName, e =>
             {
                 if (e.HasClass("required"))
@@ -52,6 +48,12 @@ namespace Serenity
                 }
 
                 return null;
+            });
+
+            LazyLoadHelper.ExecuteOnceWhenShown(this.element, () =>
+            {
+                var config = GetConfig();
+                CKEditor.Replace(id, config);
             });
         }
 
@@ -130,7 +132,7 @@ namespace Serenity
         {
             var instance = GetEditorInstance();
             if (instance != null)
-                instance.Destroy();
+                instance.Destroy(true);
 
             base.Destroy();
         }

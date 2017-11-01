@@ -8,7 +8,7 @@
         protected validator: JQueryValidation.Validator;
 
         constructor(options?: TOptions) {
-            super(Q.newBodyDiv().addClass('hidden'), options);
+            super(Q.newBodyDiv().addClass('s-TemplatedDialog hidden'), options);
 
             this.element.attr("id", this.uniqueName);
 
