@@ -48,7 +48,7 @@ namespace Serenity.Reporting
                 {
                     this.reportKey = response.ReportKey ?? reportKey;
                     this.propertyItems = response.Properties ?? new List<PropertyItem>();
-                    this.Element.Dialog().Title = response.Title;
+                    this.DialogTitle = response.Title;
                     CreatePropertyGrid();
                     propertyGrid.Load(response.InitialSettings ?? new object());
 
