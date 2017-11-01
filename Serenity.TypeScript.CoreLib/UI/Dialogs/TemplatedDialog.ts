@@ -303,8 +303,12 @@
             opt.resizable = (ss as any).getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
             opt.modal = true;
             opt.position = { my: 'center', at: 'center', of: $(window.window) };
-            opt.title = this.element.data('dialogtitle') || '';
+            opt.title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';
             return opt;
+        }
+
+        protected getDialogTitle() {
+            return "";
         }
 
         public dialogClose(): void {
@@ -323,10 +327,10 @@
         }
 
         private setupPanelTitle() {
-            var value = this.dialogTitle;
+            var value = Q.coalesce(this.dialogTitle, this.getDialogTitle());
             var pt = this.element.children('.panel-titlebar');
 
-            if (value == null) {
+            if (Q.isEmptyOrNull(value)) {
                 pt.remove();
             }
             else {

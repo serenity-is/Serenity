@@ -2173,6 +2173,7 @@ declare namespace Serenity {
         protected onDialogClose(): void;
         protected addCssClass(): void;
         protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogTitle(): string;
         dialogClose(): void;
         dialogTitle: string;
         private setupPanelTitle();

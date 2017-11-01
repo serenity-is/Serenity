@@ -102,6 +102,11 @@ namespace Serenity
             return null;
         }
 
+        protected virtual string GetDialogTitle()
+        {
+            return null;
+        }
+
         public void DialogClose()
         {
         }

@@ -55,13 +55,7 @@ namespace Serenity
             var opt = base.GetDialogOptions();
             opt.Buttons = GetDialogButtons().As<object[]>();
             opt.Width = 400;
-            opt.Title = GetDialogTitle();
             return opt;
-        }
-
-        protected virtual string GetDialogTitle()
-        {
-            return "";
         }
 
         protected virtual void OkClick()

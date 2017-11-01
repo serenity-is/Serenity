@@ -3276,8 +3276,11 @@ var Serenity;
             opt.resizable = ss.getAttributes(type, Serenity.ResizableAttribute, true).length > 0;
             opt.modal = true;
             opt.position = { my: 'center', at: 'center', of: $(window.window) };
-            opt.title = this.element.data('dialogtitle') || '';
+            opt.title = Q.coalesce(this.element.data('dialogtitle'), this.getDialogTitle()) || '';
             return opt;
+        };
+        TemplatedDialog.prototype.getDialogTitle = function () {
+            return "";
         };
         TemplatedDialog.prototype.dialogClose = function () {
             if (this.element.hasClass('ui-dialog-content'))
@@ -3309,9 +3312,9 @@ var Serenity;
         });
         TemplatedDialog.prototype.setupPanelTitle = function () {
             var _this = this;
-            var value = this.dialogTitle;
+            var value = Q.coalesce(this.dialogTitle, this.getDialogTitle());
             var pt = this.element.children('.panel-titlebar');
-            if (value == null) {
+            if (Q.isEmptyOrNull(value)) {
                 pt.remove();
             }
             else {
