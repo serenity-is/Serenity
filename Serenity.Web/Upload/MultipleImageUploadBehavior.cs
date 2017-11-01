@@ -55,12 +55,6 @@ namespace Serenity.Services
             return true;
         }
 
-        private class UploadedFile
-        {
-            public string Filename { get; set; }
-            public string OriginalName { get; set; }
-        }
-
         private UploadedFile[] ParseAndValidate(string json, string key)
         {
             json = json.TrimToNull();

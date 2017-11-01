@@ -180,12 +180,6 @@ namespace Serenity.Services
             return s;
         }
 
-        private class UploadedFile
-        {
-            public string Filename { get; set; }
-            public string OriginalName { get; set; }
-        }
-
         public override void OnPrepareQuery(ISaveRequestHandler handler, SqlQuery query)
         {
             base.OnPrepareQuery(handler, query);

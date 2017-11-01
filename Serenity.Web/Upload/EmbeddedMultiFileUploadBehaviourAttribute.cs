@@ -9,12 +9,6 @@ namespace Serenity.Services
     [Obsolete("Use MultiImage/FileUploadEditorAttribute in row image/file field and remove this attribute from your handler")]
     public class EmbeddedMultiFileUploadBehaviourAttribute : SaveRequestBehaviorAttribute
     {
-        private class UploadedFile
-        {
-            public string Filename { get; set; }
-            public string OriginalName { get; set; }
-        }
-
         private string filesField;
         private bool copyFilesToHistory;
         private string subFolder;

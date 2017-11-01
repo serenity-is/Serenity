@@ -274,6 +274,7 @@
     <Compile Include="Texts\Texts.cs" />
     <Compile Include="Texts\Texts.Dialogs.cs" />
     <Compile Include="Texts\Texts.Validation.cs" />
+    <Compile Include="Upload\UploadedFile.cs" />
     <Compile Include="Upload\MultipleImageUploadBehavior.cs" />
     <Compile Include="Upload\ImageUploadBehavior.cs" />
     <Compile Include="Upload\EmbeddedMultiFileUploadBehaviourAttribute.cs" />
