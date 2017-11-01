@@ -1,9 +1,20 @@
+## 3.3.7 (2017-11-01)
+
+Features:
+  - give more descriptive error, and show error notification in addition to exception when dialog type is not found
+  - also show a notification when enum type is not found as users generally don't check console for errors
+  - more descriptive error and notification when widget can't be found on an element
+  - add missing methods like tryFirst, single etc. in Q.cs
+
+Bugfixes:
+  - CKEditor fail when initialized /destroyed in an invisible element / dialog / panel.
+  
 ## 3.3.6 (2017-10-30)
 
 Features:
- - use font awesome icons for dialog titlebar buttons, merge aristo.css into serenity.css, change titlebar styling
- - cleanup dialogExtendQ
- - dont swallow exceptions in ScriptBundleManager
+  - use font awesome icons for dialog titlebar buttons, merge aristo.css into serenity.css, change titlebar styling
+  - cleanup dialogExtendQ
+  - dont swallow exceptions in ScriptBundleManager
 
 ## 3.3.5 (2017-10-25)
 
