@@ -394,7 +394,7 @@ namespace Serenity.CodeGeneration
             responseType = method.ReturnType;
             if (responseType != null &&
                 responseType.IsGenericType &&
-                responseType.GetGenericTypeDefinition().Name.StartsWith("Serenity.Services.Result`1"))
+                responseType.GetGenericTypeDefinition().FullName.StartsWith("Serenity.Services.Result`1"))
             {
                 responseType = responseType.GenericTypeArguments[0];
             }
