@@ -167,13 +167,5 @@ namespace Serenity
         {
             return null;
         }
-
-        [IncludeGenericArguments(false)]
-        public static JsDictionary<K, V> ToDictionary<K, V>(List<V> input, Func<V, K> keySelector)
-        {
-            return null;
-        }
-
-
     }
 }
