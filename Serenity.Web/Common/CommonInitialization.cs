@@ -135,6 +135,7 @@ namespace Serenity.Web
         {
             DynamicScriptRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
             LookupScriptRegistration.RegisterLookupScripts();
+            DistinctValuesRegistration.RegisterDistinctValueScripts();
             RunStartupRegistrars<ScriptRegistrarAttribute>();
             FormScriptRegistration.RegisterFormScripts();
             ColumnsScriptRegistration.RegisterColumnsScripts();

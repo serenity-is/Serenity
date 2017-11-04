@@ -19,6 +19,52 @@ namespace Serenity.PropertyGrid
             {
                 item.EditorType = editorTypeAttr.EditorType;
                 editorTypeAttr.SetParams(item.EditorParams);
+                if (item.EditorType == "Lookup" && 
+                    !item.EditorParams.ContainsKey("lookupKey"))
+                {
+                    var distinct = source.GetAttribute<DistinctValuesEditorAttribute>();
+                    if (distinct != null)
+                    {
+                        string prefix = null;
+                        if (distinct.RowType != null)
+                        {
+                            if (!distinct.RowType.IsInterface &&
+                                !distinct.RowType.IsAbstract &&
+                                distinct.RowType.IsSubclassOf(typeof(Row)))
+                            {
+                                prefix = ((Row)Activator.CreateInstance(distinct.RowType))
+                                    .GetFields().LocalTextPrefix;
+                            }
+                        }
+                        else
+                        {
+                            var isRow = source.Property != null &&
+                                source.Property.ReflectedType != null &&
+                                !source.Property.ReflectedType.IsAbstract &&
+                                source.Property.ReflectedType.IsSubclassOf(typeof(Row));
+
+                            if (!isRow)
+                            {
+                                if (!ReferenceEquals(null, source.BasedOnField))
+                                    prefix = source.BasedOnField.Fields.LocalTextPrefix;
+                            }
+                            else
+                                prefix = ((Row)Activator.CreateInstance(source.Property.ReflectedType))
+                                    .GetFields().LocalTextPrefix;
+                        }
+
+                        if (prefix != null)
+                        {
+                            var propertyName = distinct.PropertyName.IsEmptyOrNull() ?
+                                    (!ReferenceEquals(null, source.BasedOnField) ?
+                                        (source.BasedOnField.PropertyName ?? source.BasedOnField.Name) :
+                                    item.Name) : distinct.PropertyName;
+
+                            if (!string.IsNullOrEmpty(propertyName))
+                                item.EditorParams["lookupKey"] = "Distinct." + prefix + "." + propertyName;
+                        }
+                    }
+                }
             }
 
             if (source.EnumType != null)

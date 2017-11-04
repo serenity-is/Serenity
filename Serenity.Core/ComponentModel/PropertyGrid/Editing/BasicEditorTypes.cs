@@ -480,6 +480,47 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class DistinctValuesEditorAttribute : LookupEditorBaseAttribute
+    {
+        public DistinctValuesEditorAttribute()
+            : base("Lookup")
+        {
+        }
+
+        public DistinctValuesEditorAttribute(Type rowType, string propertyName)
+            : base("Lookup")
+        {
+            if (rowType == null)
+                throw new ArgumentNullException("rowType");
+
+            if (propertyName == null)
+                throw new ArgumentNullException("propertyName");
+        }
+
+        /// <summary>
+        /// RowType that this editor will get values from
+        /// </summary>
+        public Type RowType { get; set; }
+
+        /// <summary>
+        /// Property name that this editor will get values from
+        /// </summary>
+        public string PropertyName { get; set; }
+
+        /// <summary>
+        /// Permission key required to access this lookup script.
+        /// Use special value "?" for all logged-in users.
+        /// Use special value "*" for anyone including not logged-in users.
+        /// </summary>
+        public string Permission { get; set; }
+
+        /// <summary>
+        /// Cache duration in seconds
+        /// </summary>
+        public int Expiration { get; set; }
+
+    }
+
     public partial class MaskedEditorAttribute : CustomEditorAttribute
     {
         public MaskedEditorAttribute()

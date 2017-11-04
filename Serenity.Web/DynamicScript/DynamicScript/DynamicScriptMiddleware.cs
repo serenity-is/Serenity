@@ -123,6 +123,7 @@ namespace Serenity.Web.Middleware
         {
             DynamicScriptRegistration.Initialize(ExtensibilityHelper.SelfAssemblies);
             LookupScriptRegistration.RegisterLookupScripts();
+            DistinctValuesRegistration.RegisterDistinctValueScripts();
             FormScriptRegistration.RegisterFormScripts();
             ColumnsScriptRegistration.RegisterColumnsScripts();
 
