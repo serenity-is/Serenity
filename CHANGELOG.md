@@ -1,3 +1,17 @@
+## 3.3.8 (2017-11-04)
+
+Features:
+  - added DistinctValuesScript, DistinctValuesEditorAttribute and related logic to automatically define distinct lookup scripts on fields
+  - extract UploadedFile into public class to be able to use in other methods
+  - move up getDialogTitle method from PropertyDialog to TemplatedDialog
+  - cleanup serenity.jqueryui.less duplicates
+  
+Bugfixes:
+  - fix service typing generation for legacy result<t> type endpoints
+  - fix included deleted toggle background position
+  - report dialog broken after panel feature
+  - remove selectmenu and bring back shake effect as quicksearch is still using it
+
 ## 3.3.7 (2017-11-01)
 
 Features:
