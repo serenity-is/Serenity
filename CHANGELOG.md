@@ -1,3 +1,8 @@
+## 3.3.9 (2017-11-04)
+
+Bugfixes:
+  - fix constructor of DistinctValuesEditorAttribute
+
 ## 3.3.8 (2017-11-04)
 
 Features:
