@@ -495,6 +495,9 @@ namespace Serenity.ComponentModel
 
             if (propertyName == null)
                 throw new ArgumentNullException("propertyName");
+
+            this.RowType = rowType;
+            this.PropertyName = propertyName;
         }
 
         /// <summary>
