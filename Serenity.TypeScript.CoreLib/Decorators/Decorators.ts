@@ -100,6 +100,19 @@
             }
         }
 
+        export function registerInterface(intf?: any[], asm?: ss.AssemblyReg) {
+            return function (target: Function) {
+                (target as any).__register = true;
+                (target as any).__interface = true;
+                (target as any).__assembly = asm || ss.__assemblies['App'];
+                if (intf)
+                    (target as any).__interfaces = intf;
+                (target as any).isAssignableFrom = function (type: any) {
+                    return (ss as any).contains((ss as any).getInterfaces(type), this);
+                };
+            }
+        }
+
         export function registerEnum(target: any, enumKey?: string, asm?: ss.AssemblyReg) {
             if (!target.__enum) {
                 Object.defineProperty(target, '__enum', {

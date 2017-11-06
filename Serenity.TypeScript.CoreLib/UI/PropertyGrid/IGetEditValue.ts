@@ -1,10 +1,10 @@
-﻿declare namespace Serenity {
+﻿namespace Serenity {
 
-    class IGetEditValue {
+    @Serenity.Decorators.registerInterface()
+    export class IGetEditValue {
     }
 
-    interface IGetEditValue {
+    export interface IGetEditValue {
         getEditValue(property: PropertyItem, target: any): void;
     }
-
 }

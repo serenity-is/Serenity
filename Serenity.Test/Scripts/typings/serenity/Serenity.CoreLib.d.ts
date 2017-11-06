@@ -925,6 +925,7 @@ declare namespace Serenity {
         function generatedCode(origin?: string): (target: Function) => void;
         function idProperty(value: string): (target: Function) => void;
         function registerClass(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
+        function registerInterface(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
         function registerEnum(target: any, enumKey?: string, asm?: ss.AssemblyReg): void;
         function registerEditor(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
         function registerFormatter(intf?: (typeof ISlickFormatter)[], asm?: ss.AssemblyReg): (target: Function) => void;
@@ -1121,6 +1122,95 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class IBooleanValue {
+    }
+    interface IBooleanValue {
+        get_value(): boolean;
+        set_value(value: boolean): void;
+    }
+}
+declare namespace Serenity {
+    class IDoubleValue {
+    }
+    interface IDoubleValue {
+        get_value(): any;
+        set_value(value: any): void;
+    }
+}
+declare namespace Serenity {
+    class IGetEditValue {
+    }
+    interface IGetEditValue {
+        getEditValue(property: PropertyItem, target: any): void;
+    }
+}
+declare namespace Serenity {
+    class ISetEditValue {
+    }
+    interface ISetEditValue {
+        setEditValue(source: any, property: PropertyItem): void;
+    }
+}
+declare namespace Serenity {
+    class IStringValue {
+    }
+    interface IStringValue {
+        get_value(): string;
+        set_value(value: string): void;
+    }
+}
+declare namespace Serenity {
+    interface PropertyItem {
+        name?: string;
+        title?: string;
+        hint?: string;
+        placeholder?: string;
+        editorType?: string;
+        editorParams?: any;
+        category?: string;
+        cssClass?: string;
+        headerCssClass?: string;
+        formCssClass?: string;
+        maxLength?: number;
+        required?: boolean;
+        insertable?: boolean;
+        insertPermission?: string;
+        hideOnInsert?: boolean;
+        updatable?: boolean;
+        updatePermission?: string;
+        hideOnUpdate?: boolean;
+        readOnly?: boolean;
+        readPermission?: string;
+        oneWay?: boolean;
+        defaultValue?: any;
+        localizable?: boolean;
+        visible?: boolean;
+        formatterType?: string;
+        formatterParams?: any;
+        displayFormat?: string;
+        alignment?: string;
+        width?: number;
+        minWidth?: number;
+        maxWidth?: number;
+        labelWidth?: string;
+        resizable?: boolean;
+        sortable?: boolean;
+        sortOrder?: number;
+        editLink?: boolean;
+        editLinkItemType?: string;
+        editLinkIdField?: string;
+        editLinkCssClass?: string;
+        filteringType?: string;
+        filteringParams?: any;
+        filteringIdField?: string;
+        notFilterable?: boolean;
+        filterOnly?: boolean;
+        quickFilter?: boolean;
+        quickFilterParams?: any;
+        quickFilterSeparator?: boolean;
+    }
+}
+declare namespace Serenity {
     namespace EditorUtils {
         function getValue(editor: Serenity.Widget<any>): any;
         function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
@@ -1265,24 +1355,6 @@ declare namespace Serenity {
         inplaceCreateClick(e: any): void;
         get_select2Container(): JQuery;
         value: string;
-    }
-    interface TextAreaEditorOptions {
-        cols?: number;
-        rows?: number;
-    }
-    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
-        constructor(input: JQuery, opt?: TextAreaEditorOptions);
-        value: string;
-    }
-    interface TimeEditorOptions {
-        noEmptyOption?: boolean;
-        startHour?: any;
-        endHour?: any;
-        intervalMinutes?: any;
-    }
-    class TimeEditor extends Widget<TimeEditorOptions> {
-        constructor(input: JQuery, opt?: TimeEditorOptions);
-        value: number;
     }
     class URLEditor extends StringEditor {
         constructor(input: JQuery);
@@ -1429,6 +1501,33 @@ declare namespace Serenity {
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(input: JQuery, opt?: LookupEditorOptions);
+    }
+}
+declare namespace Serenity {
+    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+        constructor(input: JQuery, opt?: TextAreaEditorOptions);
+        value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
+    }
+    interface TextAreaEditorOptions {
+        cols?: number;
+        rows?: number;
+    }
+}
+declare namespace Serenity {
+    class TimeEditor extends Widget<TimeEditorOptions> {
+        private minutes;
+        constructor(input: JQuery, opt?: TimeEditorOptions);
+        value: number;
+        protected get_value(): number;
+        protected set_value(value: number): void;
+    }
+    interface TimeEditorOptions {
+        noEmptyOption?: boolean;
+        startHour?: any;
+        endHour?: any;
+        intervalMinutes?: any;
     }
 }
 declare namespace Serenity {
@@ -1851,17 +1950,6 @@ declare namespace Serenity {
     }
     interface HtmlContentEditorOptions {
     }
-    class ISetEditValue {
-    }
-    interface ISetEditValue {
-        setEditValue(source: any, property: PropertyItem): void;
-    }
-    interface IStringValue {
-        get_value(): string;
-        set_value(value: string): void;
-    }
-    class IStringValue {
-    }
     interface GridPersistanceFlags {
         columnWidths?: boolean;
         columnVisibility?: boolean;
@@ -1944,70 +2032,6 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     class IAsyncInit {
-    }
-}
-declare namespace Serenity {
-}
-declare namespace Serenity {
-}
-declare namespace Serenity {
-    class IGetEditValue {
-    }
-    interface IGetEditValue {
-        getEditValue(property: PropertyItem, target: any): void;
-    }
-}
-declare namespace Serenity {
-}
-declare namespace Serenity {
-    interface PropertyItem {
-        name?: string;
-        title?: string;
-        hint?: string;
-        placeholder?: string;
-        editorType?: string;
-        editorParams?: any;
-        category?: string;
-        cssClass?: string;
-        headerCssClass?: string;
-        formCssClass?: string;
-        maxLength?: number;
-        required?: boolean;
-        insertable?: boolean;
-        insertPermission?: string;
-        hideOnInsert?: boolean;
-        updatable?: boolean;
-        updatePermission?: string;
-        hideOnUpdate?: boolean;
-        readOnly?: boolean;
-        readPermission?: string;
-        oneWay?: boolean;
-        defaultValue?: any;
-        localizable?: boolean;
-        visible?: boolean;
-        formatterType?: string;
-        formatterParams?: any;
-        displayFormat?: string;
-        alignment?: string;
-        width?: number;
-        minWidth?: number;
-        maxWidth?: number;
-        labelWidth?: string;
-        resizable?: boolean;
-        sortable?: boolean;
-        sortOrder?: number;
-        editLink?: boolean;
-        editLinkItemType?: string;
-        editLinkIdField?: string;
-        editLinkCssClass?: string;
-        filteringType?: string;
-        filteringParams?: any;
-        filteringIdField?: string;
-        notFilterable?: boolean;
-        filterOnly?: boolean;
-        quickFilter?: boolean;
-        quickFilterParams?: any;
-        quickFilterSeparator?: boolean;
     }
 }
 declare namespace Serenity {

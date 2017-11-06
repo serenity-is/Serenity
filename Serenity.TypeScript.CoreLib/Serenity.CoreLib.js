@@ -1883,10 +1883,10 @@ var Q;
                 }
                 if (!obj.__class) {
                     var baseType = ss.getBaseType(obj);
-                    if (baseType.__class)
+                    if (baseType && baseType.__class)
                         obj.__class = true;
                 }
-                if (obj.__class || obj.__enum) {
+                if (obj.__class || obj.__enum || obj.__interface) {
                     obj.__typeName = fullName;
                     if (!obj.__assembly) {
                         obj.__assembly = ss.__assemblies['App'];
@@ -2451,6 +2451,19 @@ var Serenity;
             };
         }
         Decorators.registerClass = registerClass;
+        function registerInterface(intf, asm) {
+            return function (target) {
+                target.__register = true;
+                target.__interface = true;
+                target.__assembly = asm || ss.__assemblies['App'];
+                if (intf)
+                    target.__interfaces = intf;
+                target.isAssignableFrom = function (type) {
+                    return ss.contains(ss.getInterfaces(type), this);
+                };
+            };
+        }
+        Decorators.registerInterface = registerInterface;
         function registerEnum(target, enumKey, asm) {
             if (!target.__enum) {
                 Object.defineProperty(target, '__enum', {
@@ -2998,24 +3011,159 @@ var Serenity;
     var IBooleanValue = /** @class */ (function () {
         function IBooleanValue() {
         }
+        IBooleanValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], IBooleanValue);
         return IBooleanValue;
     }());
+    Serenity.IBooleanValue = IBooleanValue;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
     var IDoubleValue = /** @class */ (function () {
         function IDoubleValue() {
         }
+        IDoubleValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], IDoubleValue);
         return IDoubleValue;
     }());
+    Serenity.IDoubleValue = IDoubleValue;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var IGetEditValue = /** @class */ (function () {
+        function IGetEditValue() {
+        }
+        IGetEditValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], IGetEditValue);
+        return IGetEditValue;
+    }());
+    Serenity.IGetEditValue = IGetEditValue;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var ISetEditValue = /** @class */ (function () {
+        function ISetEditValue() {
+        }
+        ISetEditValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], ISetEditValue);
+        return ISetEditValue;
+    }());
+    Serenity.ISetEditValue = ISetEditValue;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
     var IStringValue = /** @class */ (function () {
         function IStringValue() {
         }
+        IStringValue = __decorate([
+            Serenity.Decorators.registerInterface()
+        ], IStringValue);
         return IStringValue;
     }());
+    Serenity.IStringValue = IStringValue;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var TextAreaEditor = /** @class */ (function (_super) {
+        __extends(TextAreaEditor, _super);
+        function TextAreaEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            if (_this.options.cols !== 0) {
+                input.attr('cols', Q.coalesce(_this.options.cols, 80));
+            }
+            if (_this.options.rows !== 0) {
+                input.attr('rows', Q.coalesce(_this.options.rows, 6));
+            }
+            return _this;
+        }
+        Object.defineProperty(TextAreaEditor.prototype, "value", {
+            get: function () {
+                return this.element.val();
+            },
+            set: function (value) {
+                this.element.val(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TextAreaEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        TextAreaEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        TextAreaEditor = __decorate([
+            Serenity.Decorators.element("<textarea />"),
+            Serenity.Decorators.registerEditor([Serenity.IStringValue])
+        ], TextAreaEditor);
+        return TextAreaEditor;
+    }(Serenity.Widget));
+    Serenity.TextAreaEditor = TextAreaEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var TimeEditor = /** @class */ (function (_super) {
+        __extends(TimeEditor, _super);
+        function TimeEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            input.addClass('editor s-TimeEditor hour');
+            if (!_this.options.noEmptyOption) {
+                Q.addOption(input, '', '--');
+            }
+            for (var h = (_this.options.startHour || 0); h <= (_this.options.endHour || 23); h++) {
+                Q.addOption(input, h.toString(), ((h < 10) ? ('0' + h) : h.toString()));
+            }
+            _this.minutes = $('<select/>').addClass('editor s-TimeEditor minute').insertAfter(input);
+            for (var m = 0; m <= 59; m += (_this.options.intervalMinutes || 5)) {
+                Q.addOption(_this.minutes, m.toString(), ((m < 10) ? ('0' + m) : m.toString()));
+            }
+            return _this;
+        }
+        Object.defineProperty(TimeEditor.prototype, "value", {
+            get: function () {
+                var hour = Q.toId(this.element.val());
+                var minute = Q.toId(this.minutes.val());
+                if (hour == null || minute == null) {
+                    return null;
+                }
+                return hour * 60 + minute;
+            },
+            set: function (value) {
+                if (!value) {
+                    if (this.options.noEmptyOption) {
+                        this.element.val(this.options.startHour);
+                        this.minutes.val('0');
+                    }
+                    else {
+                        this.element.val('');
+                        this.minutes.val('0');
+                    }
+                }
+                else {
+                    this.element.val(Math.floor(value / 60).toString());
+                    this.minutes.val(value % 60);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TimeEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        TimeEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        TimeEditor = __decorate([
+            Serenity.Decorators.element("<select />"),
+            Serenity.Decorators.registerEditor([Serenity.IDoubleValue])
+        ], TimeEditor);
+        return TimeEditor;
+    }(Serenity.Widget));
+    Serenity.TimeEditor = TimeEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {

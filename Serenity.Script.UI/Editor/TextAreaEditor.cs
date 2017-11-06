@@ -5,25 +5,19 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor, DisplayName("Çok Satırlı Metin"), OptionsType(typeof(TextAreaEditorOptions))]
-    [Element("<textarea />")]
-    public class TextAreaEditor : Widget<TextAreaEditorOptions>, IStringValue
+    [Imported]
+    public class TextAreaEditor : Widget<TextAreaEditorOptions>
     {
         static TextAreaEditor()
         {
-            Q.Prop(typeof(TextAreaEditor), "value");
         }
 
         public TextAreaEditor(jQueryObject input, TextAreaEditorOptions opt)
             : base(input, opt)
         {
-            if (options.Cols != 0)
-                input.Attribute("cols", (options.Cols ?? 80).ToString());
-
-            if (options.Rows != 0)
-                input.Attribute("rows", (options.Rows ?? 6).ToString());
         }
 
+        [IntrinsicProperty]
         public string Value
         {
             get { return this.element.GetValue(); }

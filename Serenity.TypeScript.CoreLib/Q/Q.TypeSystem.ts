@@ -117,11 +117,11 @@ namespace Q {
 
                 if (!obj.__class) {
                     var baseType = (ss as any).getBaseType(obj);
-                    if (baseType.__class)
+                    if (baseType && baseType.__class)
                         obj.__class = true;
                 }
 
-                if (obj.__class || obj.__enum) {
+                if (obj.__class || obj.__enum || obj.__interface) {
                     obj.__typeName = fullName;
                     if (!obj.__assembly) {
                         obj.__assembly = ss.__assemblies['App'];

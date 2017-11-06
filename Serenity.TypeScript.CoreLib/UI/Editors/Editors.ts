@@ -166,28 +166,6 @@
         value: string;
     }
 
-    interface TextAreaEditorOptions {
-        cols?: number;
-        rows?: number;
-    }
-
-    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
-        constructor(input: JQuery, opt?: TextAreaEditorOptions);
-        value: string;
-    }
-
-    interface TimeEditorOptions {
-        noEmptyOption?: boolean;
-        startHour?: any;
-        endHour?: any;
-        intervalMinutes?: any;
-    }
-
-    class TimeEditor extends Widget<TimeEditorOptions> {
-        constructor(input: JQuery, opt?: TimeEditorOptions);
-        value: number;
-    }
-
     class URLEditor extends StringEditor {
         constructor(input: JQuery);
     }

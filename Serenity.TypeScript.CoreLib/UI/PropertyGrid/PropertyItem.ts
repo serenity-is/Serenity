@@ -1,5 +1,5 @@
-﻿declare namespace Serenity {
-    interface PropertyItem {
+﻿namespace Serenity {
+    export interface PropertyItem {
         name?: string;
         title?: string;
         hint?: string;

@@ -151,21 +151,6 @@
     interface HtmlContentEditorOptions {
     }
 
-    class ISetEditValue {
-    }
-
-    interface ISetEditValue {
-        setEditValue(source: any, property: PropertyItem): void;
-    }
-
-    interface IStringValue {
-        get_value(): string;
-        set_value(value: string): void;
-    }
-
-    class IStringValue {
-    }
-
     interface GridPersistanceFlags {
         columnWidths?: boolean;
         columnVisibility?: boolean;

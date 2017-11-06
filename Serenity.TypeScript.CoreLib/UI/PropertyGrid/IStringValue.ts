@@ -1,11 +1,11 @@
 ﻿namespace Serenity {
 
-    class IStringValue {
+    @Serenity.Decorators.registerInterface()
+    export class IStringValue {
     }
 
-    interface IStringValue {
+    export interface IStringValue {
         get_value(): string;
         set_value(value: string): void;
     }
-
 }

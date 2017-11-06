@@ -1,11 +1,11 @@
 ﻿namespace Serenity {
 
-    class IDoubleValue {
+    @Serenity.Decorators.registerInterface()
+    export class IDoubleValue {
     }
 
-    interface IDoubleValue {
+    export interface IDoubleValue {
         get_value(): any;
         set_value(value: any): void;
     }
-
 }

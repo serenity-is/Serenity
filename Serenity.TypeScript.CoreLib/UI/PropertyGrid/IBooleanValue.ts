@@ -1,9 +1,10 @@
 ﻿namespace Serenity {
 
-    class IBooleanValue {
+    @Serenity.Decorators.registerInterface()
+    export class IBooleanValue {
     }
 
-    interface IBooleanValue {
+    export interface IBooleanValue {
         get_value(): boolean;
         set_value(value: boolean): void;
     }
