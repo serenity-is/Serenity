@@ -1,26 +1,17 @@
 ﻿using jQueryApi;
-using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor, DisplayName("Metin")]
-    [Element("<input type=\"text\"/>")]
-    public class StringEditor : Widget<object>, IStringValue
+    [Imported(ObeysTypeSystem = true)]
+    public class StringEditor : Widget<object>
     {
-        static StringEditor()
-        {
-            Q.Prop(typeof(StringEditor), "value");
-        }
-
         public StringEditor(jQueryObject input)
             : base(input, new object())
         {
         }
 
-        public string Value
-        {
-            get { return this.element.GetValue(); }
-            set { this.element.Value(value); }
-        }
+        [IntrinsicProperty]
+        public string Value { get; set; }
     }
 }

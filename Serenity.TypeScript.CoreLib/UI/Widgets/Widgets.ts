@@ -27,12 +27,6 @@
         w(id: string, type: Function): any;
     }
 
-
-
-    class StringEditor extends Widget<any> {
-        value: string;
-    }
-
     interface EmailEditorOptions {
         domain?: string;
         readOnlyDomain?: boolean;

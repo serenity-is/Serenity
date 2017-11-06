@@ -3068,6 +3068,70 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var BooleanEditor = /** @class */ (function (_super) {
+        __extends(BooleanEditor, _super);
+        function BooleanEditor(input) {
+            var _this = _super.call(this, input) || this;
+            input.removeClass("flexify");
+            return _this;
+        }
+        Object.defineProperty(BooleanEditor.prototype, "value", {
+            get: function () {
+                return this.element.is(":checked");
+            },
+            set: function (value) {
+                this.element.prop("checked", !!value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        BooleanEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        BooleanEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        BooleanEditor = __decorate([
+            Serenity.Decorators.element('<input type="checkbox"/>'),
+            Serenity.Decorators.registerEditor([Serenity.IBooleanValue])
+        ], BooleanEditor);
+        return BooleanEditor;
+    }(Serenity.Widget));
+    Serenity.BooleanEditor = BooleanEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var StringEditor = /** @class */ (function (_super) {
+        __extends(StringEditor, _super);
+        function StringEditor(input) {
+            return _super.call(this, input) || this;
+        }
+        Object.defineProperty(StringEditor.prototype, "value", {
+            get: function () {
+                return this.element.val();
+            },
+            set: function (value) {
+                this.element.val(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        StringEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        StringEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        StringEditor = __decorate([
+            Serenity.Decorators.element("<input type=\"text\"/>"),
+            Serenity.Decorators.registerEditor([Serenity.IStringValue])
+        ], StringEditor);
+        return StringEditor;
+    }(Serenity.Widget));
+    Serenity.StringEditor = StringEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var TextAreaEditor = /** @class */ (function (_super) {
         __extends(TextAreaEditor, _super);
         function TextAreaEditor(input, opt) {
@@ -5618,4 +5682,41 @@ var Q;
     }
     window['Vue'] ? vueInitialization() : $(function () { window['Vue'] && vueInitialization(); });
 })(Q || (Q = {}));
+var Serenity;
+(function (Serenity) {
+    // http://digitalbush.com/projects/masked-input-plugin/
+    var MaskedEditor = /** @class */ (function (_super) {
+        __extends(MaskedEditor, _super);
+        function MaskedEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            input.mask(_this.options.mask || '', {
+                placeholder: Q.coalesce(_this.options.placeholder, '_')
+            });
+            return _this;
+        }
+        Object.defineProperty(MaskedEditor.prototype, "value", {
+            get: function () {
+                this.element.triggerHandler("blur.mask");
+                return this.element.val();
+            },
+            set: function (value) {
+                this.element.val(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        MaskedEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        MaskedEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        MaskedEditor = __decorate([
+            Serenity.Decorators.element("<input type=\"text\"/>"),
+            Serenity.Decorators.registerEditor([Serenity.IStringValue])
+        ], MaskedEditor);
+        return MaskedEditor;
+    }(Serenity.Widget));
+    Serenity.MaskedEditor = MaskedEditor;
+})(Serenity || (Serenity = {}));
 //# sourceMappingURL=Serenity.CoreLib.js.map

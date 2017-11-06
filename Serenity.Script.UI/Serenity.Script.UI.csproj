@@ -36,7 +36,6 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Editor\CheckListEditor.cs" />
     <Compile Include="Editor\CheckTreeEditor.cs" />
     <Compile Include="Editor\AsyncLookupEditor.cs" />
     <Compile Include="Editor\HtmlNoteContentEditor.cs" />
@@ -54,7 +53,7 @@
     <Compile Include="Editor\Select2AjaxEditor.cs" />
     <Compile Include="Editor\Select2Editor.cs" />
     <Compile Include="Editor\URLEditor.cs" />
-    <Compile Include="Editor\MaskEditor.cs" />
+    <Compile Include="Editor\MaskedEditor.cs" />
     <Compile Include="Editor\PhoneEditor.cs" />
     <Compile Include="FilterPanel\FilteringTypes\BaseEditorFiltering.cs" />
     <Compile Include="FilterPanel\FilteringTypes\EnumFiltering.cs" />

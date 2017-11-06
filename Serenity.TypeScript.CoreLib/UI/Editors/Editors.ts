@@ -29,11 +29,6 @@
         markerLongitude?: any;
     }
 
-    class BooleanEditor extends Widget<any> {
-        constructor(input: JQuery);
-        value: boolean;
-    }
-
     interface RadioButtonEditorOptions {
         enumKey?: string;
         enumType?: any;
@@ -97,16 +92,6 @@
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         value: UploadedFile;
-    }
-
-    interface MaskedEditorOptions {
-        mask?: string;
-        placeholder?: string;
-    }
-
-    class MaskedEditor extends Widget<MaskedEditorOptions> {
-        constructor(input: JQuery, opt: MaskedEditorOptions);
-        value: string;
     }
 
     class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> {

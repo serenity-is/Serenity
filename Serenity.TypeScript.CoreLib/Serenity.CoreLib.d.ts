@@ -1236,10 +1236,6 @@ declare namespace Serenity {
         markerLatitude?: any;
         markerLongitude?: any;
     }
-    class BooleanEditor extends Widget<any> {
-        constructor(input: JQuery);
-        value: boolean;
-    }
     interface RadioButtonEditorOptions {
         enumKey?: string;
         enumType?: any;
@@ -1295,14 +1291,6 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         value: UploadedFile;
-    }
-    interface MaskedEditorOptions {
-        mask?: string;
-        placeholder?: string;
-    }
-    class MaskedEditor extends Widget<MaskedEditorOptions> {
-        constructor(input: JQuery, opt: MaskedEditorOptions);
-        value: string;
     }
     class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> {
         entities: UploadedFile[];
@@ -1367,6 +1355,14 @@ declare namespace Serenity {
     interface RecaptchaOptions {
         siteKey?: string;
         language?: string;
+    }
+}
+declare namespace Serenity {
+    class BooleanEditor extends Widget<any> {
+        constructor(input: JQuery);
+        value: boolean;
+        protected get_value(): boolean;
+        protected set_value(value: boolean): void;
     }
 }
 declare namespace Serenity {
@@ -1501,6 +1497,14 @@ declare namespace Serenity {
     }
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(input: JQuery, opt?: LookupEditorOptions);
+    }
+}
+declare namespace Serenity {
+    class StringEditor extends Widget<any> {
+        constructor(input: JQuery);
+        value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
     }
 }
 declare namespace Serenity {
@@ -1850,9 +1854,6 @@ declare namespace Serenity {
     class PrefixedContext extends ScriptContext {
         constructor(prefix: string);
         w(id: string, type: Function): any;
-    }
-    class StringEditor extends Widget<any> {
-        value: string;
     }
     interface EmailEditorOptions {
         domain?: string;
@@ -2932,4 +2933,16 @@ declare var Vue: any;
 declare namespace Q {
     function validatorAbortHandler(validator: any): void;
     function validateOptions(options: JQueryValidation.ValidationOptions): any;
+}
+declare namespace Serenity {
+    class MaskedEditor extends Widget<MaskedEditorOptions> {
+        constructor(input: JQuery, opt?: MaskedEditorOptions);
+        value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
+    }
+    interface MaskedEditorOptions {
+        mask?: string;
+        placeholder?: string;
+    }
 }
