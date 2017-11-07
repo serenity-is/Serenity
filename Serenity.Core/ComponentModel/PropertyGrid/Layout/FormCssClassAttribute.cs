@@ -13,5 +13,11 @@ namespace Serenity.ComponentModel
         }
 
         public string Value { get; private set; }
+
+        /// <summary>
+        /// Applies this form css class (e.g. bootstrap grid size) to all 
+        /// following fields until next another FormCssClass/FormWidth attribute
+        /// </summary>
+        public bool UntilNext { get; set; }
     }
 }

@@ -15,6 +15,6 @@ namespace Serenity.ComponentModel
         }
 
         public string Value { get; private set; }
+        public bool UntilNext { get; set; }
     }
-
 }

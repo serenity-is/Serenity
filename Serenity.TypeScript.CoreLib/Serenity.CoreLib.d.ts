@@ -1211,6 +1211,195 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class BooleanEditor extends Widget<any> {
+        constructor(input: JQuery);
+        value: boolean;
+        protected get_value(): boolean;
+        protected set_value(value: boolean): void;
+    }
+}
+declare namespace Serenity {
+    class CheckTreeEditor<TItem, TOptions> extends DataGrid<TItem, TOptions> {
+        constructor(input: JQuery, opt?: TOptions);
+        protected getTreeItems(): TItem[];
+        protected updateItems(): void;
+        protected itemSelectedChanged(item: TItem): void;
+        protected getSelectAllText(): string;
+        protected isThreeStateHierarchy(): boolean;
+        protected getInitialCollapse(): boolean;
+        protected updateSelectAll(): void;
+        protected updateFlags(): void;
+        protected getDescendantsSelected(item: TItem): boolean;
+        protected allDescendantsSelected(item: TItem): boolean;
+        protected getItemText(ctx: Slick.FormatterContext): string;
+        protected sortItems(): void;
+        protected moveSelectedUp(): boolean;
+        value: string[];
+    }
+}
+declare namespace Serenity {
+    class DateEditor extends Widget<any> {
+        constructor(input: JQuery);
+        static dateInputChange(e: any): void;
+        static dateInputKeyup(e: any): void;
+        static defaultAutoNumericOptions(): any;
+        value: string;
+        valueAsDate: Date;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+        get_minValue(): string;
+        set_minValue(value: string): void;
+        get_maxValue(): string;
+        set_maxValue(value: string): void;
+        get_minDate(): Date;
+        set_minDate(value: Date): void;
+        get_maxDate(): Date;
+        set_maxDate(value: Date): void;
+        get_sqlMinMax(): boolean;
+        set_sqlMinMax(value: boolean): void;
+        yearRange: string;
+    }
+}
+declare namespace Serenity {
+    class DateTimeEditor extends Widget<DateTimeEditorOptions> {
+        constructor(input: JQuery, opt?: DateTimeEditorOptions);
+        static roundToMinutes(date: Date, minutesStep: number): Date;
+        value: string;
+        valueAsDate: Date;
+        get_minValue(): string;
+        set_minValue(value: string): void;
+        get_maxValue(): string;
+        set_maxValue(value: string): void;
+        get_minDate(): Date;
+        set_minDate(value: Date): void;
+        get_maxDate(): Date;
+        set_maxDate(value: Date): void;
+        get_sqlMinMax(): boolean;
+        set_sqlMinMax(value: boolean): void;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+    }
+    interface DateTimeEditorOptions {
+        startHour?: any;
+        endHour?: any;
+        intervalMinutes?: any;
+        yearRange?: string;
+    }
+}
+declare namespace Serenity {
+    class DateYearEditor extends SelectEditor {
+        constructor(hidden: JQuery, opt: DateYearEditorOptions);
+    }
+    interface DateYearEditorOptions extends SelectEditorOptions {
+        minYear?: string;
+        maxYear?: string;
+        descending?: boolean;
+    }
+}
+declare namespace Serenity {
+    class DecimalEditor extends Widget<DecimalEditorOptions> {
+        constructor(input: JQuery, opt?: DecimalEditorOptions);
+        static defaultAutoNumericOptions(): any;
+        value: number;
+        get_isValid(): boolean;
+    }
+    interface DecimalEditorOptions {
+        minValue?: string;
+        maxValue?: string;
+        decimals?: any;
+        padDecimals?: any;
+    }
+}
+declare namespace Serenity {
+    class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
+        constructor(input: JQuery, opt?: TOptions);
+        protected cascadeItems(items: TItem[]): TItem[];
+        protected filterItems(items: TItem[]): TItem[];
+        protected getCasecadeFromValue(parent: Widget<any>): any;
+        protected getItems(lookup: Q.Lookup<TItem>): TItem[];
+        protected getItemText(item: TItem, lookup: Q.Lookup<TItem>): string;
+        protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>): boolean;
+        protected getLookup(): Q.Lookup<TItem>;
+        protected getLookupKey(): string;
+        protected initNewEntity(entity: TItem): void;
+        protected updateItems(): void;
+        protected getDialogTypeKey(): string;
+        protected createEditDialog(callback: (dlg: Serenity.IEditDialog) => void): void;
+        onInitNewEntity: (entity: TItem) => void;
+        value: string;
+        cascadeField: string;
+        cascadeFrom: string;
+        cascadeValue: any;
+        filterField: string;
+        filterValue: any;
+    }
+    interface LookupEditorOptions {
+        lookupKey?: string;
+        minimumResultsForSearch?: any;
+        autoComplete?: boolean;
+        inplaceAdd?: boolean;
+        inplaceAddPermission?: string;
+        dialogType?: string;
+        cascadeFrom?: string;
+        cascadeField?: string;
+        cascadeValue?: any;
+        filterField?: string;
+        filterValue?: any;
+        multiple?: boolean;
+        delimited?: boolean;
+    }
+    class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
+        constructor(input: JQuery, opt?: LookupEditorOptions);
+    }
+}
+declare namespace Serenity {
+    class MaskedEditor extends Widget<MaskedEditorOptions> {
+        constructor(input: JQuery, opt?: MaskedEditorOptions);
+        value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
+    }
+    interface MaskedEditorOptions {
+        mask?: string;
+        placeholder?: string;
+    }
+}
+declare namespace Serenity {
+    class StringEditor extends Widget<any> {
+        constructor(input: JQuery);
+        value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
+    }
+}
+declare namespace Serenity {
+    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+        constructor(input: JQuery, opt?: TextAreaEditorOptions);
+        value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
+    }
+    interface TextAreaEditorOptions {
+        cols?: number;
+        rows?: number;
+    }
+}
+declare namespace Serenity {
+    class TimeEditor extends Widget<TimeEditorOptions> {
+        private minutes;
+        constructor(input: JQuery, opt?: TimeEditorOptions);
+        value: number;
+        protected get_value(): number;
+        protected set_value(value: number): void;
+    }
+    interface TimeEditorOptions {
+        noEmptyOption?: boolean;
+        startHour?: any;
+        endHour?: any;
+        intervalMinutes?: any;
+    }
+}
+declare namespace Serenity {
     namespace EditorUtils {
         function getValue(editor: Serenity.Widget<any>): any;
         function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
@@ -1355,183 +1544,6 @@ declare namespace Serenity {
     interface RecaptchaOptions {
         siteKey?: string;
         language?: string;
-    }
-}
-declare namespace Serenity {
-    class BooleanEditor extends Widget<any> {
-        constructor(input: JQuery);
-        value: boolean;
-        protected get_value(): boolean;
-        protected set_value(value: boolean): void;
-    }
-}
-declare namespace Serenity {
-    class CheckTreeEditor<TItem, TOptions> extends DataGrid<TItem, TOptions> {
-        constructor(input: JQuery, opt?: TOptions);
-        protected getTreeItems(): TItem[];
-        protected updateItems(): void;
-        protected itemSelectedChanged(item: TItem): void;
-        protected getSelectAllText(): string;
-        protected isThreeStateHierarchy(): boolean;
-        protected getInitialCollapse(): boolean;
-        protected updateSelectAll(): void;
-        protected updateFlags(): void;
-        protected getDescendantsSelected(item: TItem): boolean;
-        protected allDescendantsSelected(item: TItem): boolean;
-        protected getItemText(ctx: Slick.FormatterContext): string;
-        protected sortItems(): void;
-        protected moveSelectedUp(): boolean;
-        value: string[];
-    }
-}
-declare namespace Serenity {
-    class DateEditor extends Widget<any> {
-        constructor(input: JQuery);
-        static dateInputChange(e: any): void;
-        static dateInputKeyup(e: any): void;
-        static defaultAutoNumericOptions(): any;
-        value: string;
-        valueAsDate: Date;
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-        get_minValue(): string;
-        set_minValue(value: string): void;
-        get_maxValue(): string;
-        set_maxValue(value: string): void;
-        get_minDate(): Date;
-        set_minDate(value: Date): void;
-        get_maxDate(): Date;
-        set_maxDate(value: Date): void;
-        get_sqlMinMax(): boolean;
-        set_sqlMinMax(value: boolean): void;
-        yearRange: string;
-    }
-}
-declare namespace Serenity {
-    class DateTimeEditor extends Widget<DateTimeEditorOptions> {
-        constructor(input: JQuery, opt?: DateTimeEditorOptions);
-        static roundToMinutes(date: Date, minutesStep: number): Date;
-        value: string;
-        valueAsDate: Date;
-        get_minValue(): string;
-        set_minValue(value: string): void;
-        get_maxValue(): string;
-        set_maxValue(value: string): void;
-        get_minDate(): Date;
-        set_minDate(value: Date): void;
-        get_maxDate(): Date;
-        set_maxDate(value: Date): void;
-        get_sqlMinMax(): boolean;
-        set_sqlMinMax(value: boolean): void;
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-    }
-    interface DateTimeEditorOptions {
-        startHour?: any;
-        endHour?: any;
-        intervalMinutes?: any;
-        yearRange?: string;
-    }
-}
-declare namespace Serenity {
-    class DateYearEditor extends SelectEditor {
-        constructor(hidden: JQuery, opt: DateYearEditorOptions);
-    }
-    interface DateYearEditorOptions extends SelectEditorOptions {
-        minYear?: string;
-        maxYear?: string;
-        descending?: boolean;
-    }
-}
-declare namespace Serenity {
-    class DecimalEditor extends Widget<DecimalEditorOptions> {
-        constructor(input: JQuery, opt?: DecimalEditorOptions);
-        static defaultAutoNumericOptions(): any;
-        value: number;
-        get_isValid(): boolean;
-    }
-    interface DecimalEditorOptions {
-        minValue?: string;
-        maxValue?: string;
-        decimals?: any;
-        padDecimals?: any;
-    }
-}
-declare namespace Serenity {
-    class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
-        constructor(input: JQuery, opt?: TOptions);
-        protected cascadeItems(items: TItem[]): TItem[];
-        protected filterItems(items: TItem[]): TItem[];
-        protected getCasecadeFromValue(parent: Widget<any>): any;
-        protected getItems(lookup: Q.Lookup<TItem>): TItem[];
-        protected getItemText(item: TItem, lookup: Q.Lookup<TItem>): string;
-        protected getItemDisabled(item: TItem, lookup: Q.Lookup<TItem>): boolean;
-        protected getLookup(): Q.Lookup<TItem>;
-        protected getLookupKey(): string;
-        protected initNewEntity(entity: TItem): void;
-        protected updateItems(): void;
-        protected getDialogTypeKey(): string;
-        protected createEditDialog(callback: (dlg: Serenity.IEditDialog) => void): void;
-        onInitNewEntity: (entity: TItem) => void;
-        value: string;
-        cascadeField: string;
-        cascadeFrom: string;
-        cascadeValue: any;
-        filterField: string;
-        filterValue: any;
-    }
-    interface LookupEditorOptions {
-        lookupKey?: string;
-        minimumResultsForSearch?: any;
-        autoComplete?: boolean;
-        inplaceAdd?: boolean;
-        inplaceAddPermission?: string;
-        dialogType?: string;
-        cascadeFrom?: string;
-        cascadeField?: string;
-        cascadeValue?: any;
-        filterField?: string;
-        filterValue?: any;
-        multiple?: boolean;
-        delimited?: boolean;
-    }
-    class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
-        constructor(input: JQuery, opt?: LookupEditorOptions);
-    }
-}
-declare namespace Serenity {
-    class StringEditor extends Widget<any> {
-        constructor(input: JQuery);
-        value: string;
-        protected get_value(): string;
-        protected set_value(value: string): void;
-    }
-}
-declare namespace Serenity {
-    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
-        constructor(input: JQuery, opt?: TextAreaEditorOptions);
-        value: string;
-        protected get_value(): string;
-        protected set_value(value: string): void;
-    }
-    interface TextAreaEditorOptions {
-        cols?: number;
-        rows?: number;
-    }
-}
-declare namespace Serenity {
-    class TimeEditor extends Widget<TimeEditorOptions> {
-        private minutes;
-        constructor(input: JQuery, opt?: TimeEditorOptions);
-        value: number;
-        protected get_value(): number;
-        protected set_value(value: number): void;
-    }
-    interface TimeEditorOptions {
-        noEmptyOption?: boolean;
-        startHour?: any;
-        endHour?: any;
-        intervalMinutes?: any;
     }
 }
 declare namespace Serenity {
@@ -2933,16 +2945,4 @@ declare var Vue: any;
 declare namespace Q {
     function validatorAbortHandler(validator: any): void;
     function validateOptions(options: JQueryValidation.ValidationOptions): any;
-}
-declare namespace Serenity {
-    class MaskedEditor extends Widget<MaskedEditorOptions> {
-        constructor(input: JQuery, opt?: MaskedEditorOptions);
-        value: string;
-        protected get_value(): string;
-        protected set_value(value: string): void;
-    }
-    interface MaskedEditorOptions {
-        mask?: string;
-        placeholder?: string;
-    }
 }

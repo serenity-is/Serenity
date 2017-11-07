@@ -3101,6 +3101,43 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    // http://digitalbush.com/projects/masked-input-plugin/
+    var MaskedEditor = /** @class */ (function (_super) {
+        __extends(MaskedEditor, _super);
+        function MaskedEditor(input, opt) {
+            var _this = _super.call(this, input, opt) || this;
+            input.mask(_this.options.mask || '', {
+                placeholder: Q.coalesce(_this.options.placeholder, '_')
+            });
+            return _this;
+        }
+        Object.defineProperty(MaskedEditor.prototype, "value", {
+            get: function () {
+                this.element.triggerHandler("blur.mask");
+                return this.element.val();
+            },
+            set: function (value) {
+                this.element.val(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        MaskedEditor.prototype.get_value = function () {
+            return this.value;
+        };
+        MaskedEditor.prototype.set_value = function (value) {
+            this.value = value;
+        };
+        MaskedEditor = __decorate([
+            Serenity.Decorators.element("<input type=\"text\"/>"),
+            Serenity.Decorators.registerEditor([Serenity.IStringValue])
+        ], MaskedEditor);
+        return MaskedEditor;
+    }(Serenity.Widget));
+    Serenity.MaskedEditor = MaskedEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
     var StringEditor = /** @class */ (function (_super) {
         __extends(StringEditor, _super);
         function StringEditor(input) {
@@ -5682,41 +5719,4 @@ var Q;
     }
     window['Vue'] ? vueInitialization() : $(function () { window['Vue'] && vueInitialization(); });
 })(Q || (Q = {}));
-var Serenity;
-(function (Serenity) {
-    // http://digitalbush.com/projects/masked-input-plugin/
-    var MaskedEditor = /** @class */ (function (_super) {
-        __extends(MaskedEditor, _super);
-        function MaskedEditor(input, opt) {
-            var _this = _super.call(this, input, opt) || this;
-            input.mask(_this.options.mask || '', {
-                placeholder: Q.coalesce(_this.options.placeholder, '_')
-            });
-            return _this;
-        }
-        Object.defineProperty(MaskedEditor.prototype, "value", {
-            get: function () {
-                this.element.triggerHandler("blur.mask");
-                return this.element.val();
-            },
-            set: function (value) {
-                this.element.val(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        MaskedEditor.prototype.get_value = function () {
-            return this.value;
-        };
-        MaskedEditor.prototype.set_value = function (value) {
-            this.value = value;
-        };
-        MaskedEditor = __decorate([
-            Serenity.Decorators.element("<input type=\"text\"/>"),
-            Serenity.Decorators.registerEditor([Serenity.IStringValue])
-        ], MaskedEditor);
-        return MaskedEditor;
-    }(Serenity.Widget));
-    Serenity.MaskedEditor = MaskedEditor;
-})(Serenity || (Serenity = {}));
 //# sourceMappingURL=Serenity.CoreLib.js.map

@@ -6,6 +6,8 @@ namespace Serenity.PropertyGrid
 {
     public partial class BasicPropertyProcessor : PropertyProcessor
     {
+        private LabelWidthAttribute labelWidthPrior;
+
         private void SetWidth(IPropertySource source, PropertyItem item)
         {
             var widthAttr = source.GetAttribute<WidthAttribute>();
@@ -17,9 +19,12 @@ namespace Serenity.PropertyGrid
             if (widthAttr != null && (widthAttr.Max != 0))
                 item.MaxWidth = widthAttr.Max;
 
-            var labelWidthAttr = source.GetAttribute<LabelWidthAttribute>();
+            var labelWidthAttr = source.GetAttribute<LabelWidthAttribute>() ?? labelWidthPrior;
             if (labelWidthAttr != null)
+            {
                 item.LabelWidth = labelWidthAttr.Value;
+                labelWidthPrior = labelWidthAttr.UntilNext ? labelWidthAttr : null;
+            }
         }
 
         private static int AutoWidth(Field field)

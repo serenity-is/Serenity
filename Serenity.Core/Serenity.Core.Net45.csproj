@@ -69,6 +69,9 @@
     <Compile Include="ComponentModel\Columns\Filtering\FilteringOptionAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilterOnlyAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\Layout\DefaultWidthAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\Layout\ThreeQuarterWidthAttribute.cs" />
+    <Compile Include="ComponentModel\PropertyGrid\Layout\TwoThirdWidthAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Layout\OneThirdWidthAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Layout\QuarterWidthAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Layout\LabelWidthAttribute.cs" />
