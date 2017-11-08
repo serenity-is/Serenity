@@ -1540,6 +1540,26 @@ namespace Serenity
                             EditorUtils.SetValue(widget, state);
                     });
                 }
+
+                if (flags.QuickSearch == true &&
+                    (settings.QuickSearchField != null ||
+                     !string.IsNullOrEmpty(settings.QuickSearchText)))
+                {
+                    var qsInput = this.toolbar.Element.Find(".s-QuickSearchInput").First();
+                    if (qsInput.Length > 0)
+                    {
+                        var qsWidget = qsInput.TryGetWidget<QuickSearchInput>();
+                        if (qsWidget != null)
+                        {
+                            if (settings.QuickSearchField != null)
+                                qsWidget.Field = settings.QuickSearchField;
+
+                            if (settings.QuickSearchText != null &&
+                                Q.TrimToNull(settings.QuickSearchText) != Q.TrimToNull(qsWidget.Element.GetValue()))
+                                qsWidget.Element.Value(settings.QuickSearchText).TriggerHandler("change");
+                        }
+                    }
+                }
             }
             finally
             {
@@ -1599,6 +1619,20 @@ namespace Serenity
                 this.filterBar.Store != null)
             {
                 settings.FilterItems = this.filterBar.Store.Items.Clone();
+            }
+
+            if (flags.QuickSearch == true)
+            {
+                var qsInput = this.toolbar.Element.Find(".s-QuickSearchInput").First();
+                if (qsInput.Length > 0)
+                {
+                    var qsWidget = qsInput.TryGetWidget<QuickSearchInput>();
+                    if (qsWidget != null)
+                    {
+                        settings.QuickSearchField = qsWidget.Field;
+                        settings.QuickSearchText = qsWidget.Element.GetValue();
+                    }
+                }
             }
 
             if (flags.QuickFilters != false &&
@@ -1754,6 +1788,7 @@ namespace Serenity
         public bool? FilterItems { get; set; }
         public bool? QuickFilters { get; set; }
         public bool? QuickFilterText { get; set; }
+        public bool? QuickSearch { get; set; }
         public bool? IncludeDeleted { get; set; }
     }
 
@@ -1764,6 +1799,8 @@ namespace Serenity
         public List<FilterLine> FilterItems { get; set; }
         public JsDictionary<string, object> QuickFilters { get; set; }
         public string QuickFilterText { get; set; }
+        public QuickSearchField QuickSearchField { get; set; }
+        public string QuickSearchText { get; set; }
         public bool? IncludeDeleted { get; set; }
     }
 
