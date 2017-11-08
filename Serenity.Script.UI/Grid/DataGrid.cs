@@ -1543,7 +1543,7 @@ namespace Serenity
 
                 if (flags.QuickSearch == true &&
                     (settings.QuickSearchField != null ||
-                     !string.IsNullOrEmpty(settings.QuickSearchText)))
+                     settings.QuickSearchText != null))
                 {
                     var qsInput = this.toolbar.Element.Find(".s-QuickSearchInput").First();
                     if (qsInput.Length > 0)
