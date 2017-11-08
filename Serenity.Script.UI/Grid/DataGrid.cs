@@ -1061,6 +1061,9 @@ namespace Serenity
                 .Children().Text(opt.Title ?? DetermineText(pre => pre + opt.Field) ?? opt.Field)
                 .Parent();
 
+            if (opt.DisplayText != null)
+                quickFilter.Data("qfdisplaytext", opt.DisplayText);
+
             if (opt.SaveState != null)
                 quickFilter.Data("qfsavestate", opt.SaveState);
 
@@ -1191,6 +1194,24 @@ namespace Serenity
                         args.Request.Criteria &= new Criteria(args.Field) < Q.FormatDate(next, "yyyy-MM-dd");
                     }
                 },
+                DisplayText = (w, l) =>
+                {
+                    var v1 = EditorUtils.GetDisplayText(w);
+                    var v2 = EditorUtils.GetDisplayText(end);
+
+                    if (string.IsNullOrEmpty(v1) && string.IsNullOrEmpty(v2))
+                        return null;
+
+                    string text1 = l + " >= " + v1;
+                    string text2 = l + " <= " + v2;
+
+                    if (!string.IsNullOrEmpty(v1) && !string.IsNullOrEmpty(v2))
+                        return text1 + " " + (Q.TryGetText("Controls.FilterPanel.And") ?? "and") + " " + text2;
+                    else if (!string.IsNullOrEmpty(v1))
+                        return text1;
+                    else
+                        return text2;
+                },
                 SaveState = w =>
                 {
                     return new object[] { EditorUtils.GetValue(w), EditorUtils.GetValue(end) };
@@ -1256,6 +1277,24 @@ namespace Serenity
 
                     if (active2)
                         args.Request.Criteria &= new Criteria(args.Field) <= end.Value;
+                },
+                DisplayText = (w, l) =>
+                {
+                    var v1 = EditorUtils.GetDisplayText(w);
+                    var v2 = EditorUtils.GetDisplayText(end);
+
+                    if (string.IsNullOrEmpty(v1) && string.IsNullOrEmpty(v2))
+                        return null;
+
+                    string text1 = l + " >= " + v1;
+                    string text2 = l + " <= " + v2;
+
+                    if (!string.IsNullOrEmpty(v1) && !string.IsNullOrEmpty(v2))
+                        return text1 + " " + (Q.TryGetText("Controls.FilterPanel.And") ?? "and") + " " + text2;
+                    else if (!string.IsNullOrEmpty(v1))
+                        return text1;
+                    else
+                        return text2;
                 },
                 SaveState = w =>
                 {
@@ -1576,11 +1615,34 @@ namespace Serenity
                     var widget = J("#" + this.UniqueName + "_QuickFilter_" + field).TryGetWidget<Widget>();
                     if (widget == null)
                         return;
-                    
+
                     var saveState = J(e).GetDataValue("qfsavestate") as Func<Widget, object>;
                     object state = saveState != null ? saveState(widget) : EditorUtils.GetValue(widget);
-
                     settings.QuickFilters[field] = state;
+
+                    if (J(e).HasClass("quick-filter-active"))
+                    {
+                        var getDisplayText = J(e).GetDataValue("qfdisplaytext") as Func<Widget, string, string>;
+                        var filterLabel = J(e).Find(".quick-filter-label").GetText();
+                        string displayText;
+                        if (getDisplayText != null)
+                        {
+                            displayText = getDisplayText(widget, filterLabel);
+                        }
+                        else
+                            displayText = filterLabel + " = " + EditorUtils.GetDisplayText(widget);
+
+                        if (!string.IsNullOrEmpty(displayText))
+                        {
+                            if (!string.IsNullOrEmpty(settings.QuickFilterText))
+                            {
+                                settings.QuickFilterText += " " + (Q.TryGetText("Controls.FilterPanel.And") ?? "and") + " ";
+                                settings.QuickFilterText += displayText;
+                            }
+                            else
+                                settings.QuickFilterText = displayText;
+                        }
+                    }
                 });
             }
 
@@ -1700,6 +1762,7 @@ namespace Serenity
         public List<PersistedGridColumn> Columns { get; set; }
         public List<FilterLine> FilterItems { get; set; }
         public JsDictionary<string, object> QuickFilters { get; set; }
+        public string QuickFilterText { get; set; }
         public bool? IncludeDeleted { get; set; }
     }
 

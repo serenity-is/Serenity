@@ -10,6 +10,27 @@ namespace Serenity
     {
         private static PropertyItem dummy = new PropertyItem { Name = "_" };
 
+        public static string GetDisplayText(Widget editor)
+        {
+            var select2 = editor.Element.GetDataValue("select2");
+            if (Script.IsValue(select2))
+                return ((editor.Element.Select2Get("data") ?? new object()).As<dynamic>().text) ?? "";
+
+            var value = GetValue(editor);
+
+            if (value == null)
+                return "";
+
+            if (value is string)
+                return value as string;
+
+            if (value is Boolean)
+                return Q.IsTrue(value) ? (Q.TryGetText("Controls.FilterPanel.OperatorNames.true") ?? "True") :
+                    (Q.TryGetText("Controls.FilterPanel.OperatorNames.true") ?? "False");
+
+            return value.ToString();
+        }
+
         public static object GetValue(Widget editor)
         {
             var target = new JsDictionary();

@@ -19,6 +19,7 @@ namespace Serenity
         public Action<QuickFilterArgs<TWidget>> Handler { get; set; }
         public Func<TWidget, object> SaveState { get; set; }
         public Action<TWidget, object> LoadState { get; set; }
+        public Func<TWidget, string, string> DisplayText { get; set; }
         public bool Seperator { get; set; }
         public string CssClass { get; set; }
     }
