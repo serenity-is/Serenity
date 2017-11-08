@@ -35,6 +35,11 @@ classes should alter those!
   float: left;
 }
 
+.ui-widget-content .slick-header-column.ui-state-hover {
+    border-left: 0px;
+    border-top: 0px;
+}
+
 .slick-footerrow-column.ui-state-default {
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
