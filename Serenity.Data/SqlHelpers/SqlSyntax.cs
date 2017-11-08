@@ -69,16 +69,14 @@ namespace Serenity.Data
             if (string.IsNullOrEmpty(s))
                 return false;
 
-            var c = Char.ToUpperInvariant(s[0]);
-            if (c != '_' && (c < 'A' || c > 'Z'))
+            var c = s[0];
+            if (c != '_' && !Char.IsLetter(c))
                 return false;
 
             for (var i = 1; i < s.Length; i++)
             {
-                c = Char.ToUpperInvariant(s[i]);
-                if (c != '_' &&
-                    !((c >= '0' && c <= '9') ||
-                      (c >= 'A' && c <= 'Z')))
+                c = s[i];
+                if (c != '_' && !Char.IsLetterOrDigit(c))
                     return false;
             }
 
