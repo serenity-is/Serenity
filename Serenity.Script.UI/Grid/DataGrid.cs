@@ -1620,7 +1620,7 @@ namespace Serenity
                     object state = saveState != null ? saveState(widget) : EditorUtils.GetValue(widget);
                     settings.QuickFilters[field] = state;
 
-                    if (J(e).HasClass("quick-filter-active"))
+                    if (flags.QuickFilterText == true && J(e).HasClass("quick-filter-active"))
                     {
                         var getDisplayText = J(e).GetDataValue("qfdisplaytext") as Func<Widget, string, string>;
                         var filterLabel = J(e).Find(".quick-filter-label").GetText();
@@ -1753,6 +1753,7 @@ namespace Serenity
         public bool? SortColumns { get; set; }
         public bool? FilterItems { get; set; }
         public bool? QuickFilters { get; set; }
+        public bool? QuickFilterText { get; set; }
         public bool? IncludeDeleted { get; set; }
     }
 
