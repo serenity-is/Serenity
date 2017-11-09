@@ -397,7 +397,7 @@ namespace Serenity.CodeGenerator
                                 table.ConnectionKey : conn.Key;
 
                             var module = (table != null && table.Module != null) ? table.Module :
-                                Inflector.Inflector.Capitalize(connectionKey);
+                                (Inflector.Inflector.Pascalize(connectionKey) ?? "").Replace(" ", "");
 
                             var tableItem = new TableItem
                             {
