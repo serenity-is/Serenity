@@ -412,10 +412,10 @@ namespace Serenity.CodeGeneration
             {
                 var idx = codeNamespace.IndexOf('.');
                 if (idx >= 0 && type.FullName.StartsWith(codeNamespace.Substring(0, idx + 1)))
-                    return type.FullName.Substring(idx + 1);
+                    return (type.FullName.Substring(idx + 1)).Replace(".Entities.", ".");
             }
 
-            return type.FullName;
+            return type.FullName.Replace(".Entities.", ".");
         }
 
         private void GenerateEnum(Type enumType)
