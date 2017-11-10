@@ -76,9 +76,16 @@ namespace Serenity
                 if (value != this.Value)
                 {
                     var inputs = this.element.Find("input");
-                    inputs.Filter(":checked").RemoveAttr("checked");
+                    var checks = inputs.Filter(":checked");
+                    if (checks.Length > 0)
+                        (checks[0] as dynamic).@checked = false;
+
                     if (!string.IsNullOrEmpty(value))
-                        inputs.Filter("[value=" + value + "]").Attribute("checked", "checked");
+                    {
+                        checks = inputs.Filter("[value=" + value + "]");
+                        if (checks.Length > 0)
+                            (checks[0] as dynamic).@checked = true;
+                    }
                 }
             }
         }
