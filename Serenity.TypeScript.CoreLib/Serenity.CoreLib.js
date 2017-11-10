@@ -2940,14 +2940,17 @@ var Serenity;
         TemplatedWidget.prototype.byID = function (id, type) {
             return Serenity.WX.getWidget(this.byId(id), type);
         };
+        TemplatedWidget.noGeneric = function (s) {
+            var dollar = s.indexOf('$');
+            if (dollar >= 0) {
+                return s.substr(0, dollar);
+            }
+            return s;
+        };
+        TemplatedWidget.prototype.getDefaultTemplateName = function () {
+            return TemplatedWidget_1.noGeneric(ss.getTypeName(ss.getInstanceType(this)));
+        };
         TemplatedWidget.prototype.getTemplateName = function () {
-            var noGeneric = function (s) {
-                var dollar = s.indexOf('$');
-                if (dollar >= 0) {
-                    return s.substr(0, dollar);
-                }
-                return s;
-            };
             var type = ss.getInstanceType(this);
             var fullName = ss.getTypeFullName(type);
             var templateNames = TemplatedWidget_1.templateNames;
@@ -2956,7 +2959,7 @@ var Serenity;
                 return cachedName;
             }
             while (type && type !== Serenity.Widget) {
-                var name = noGeneric(ss.getTypeFullName(type));
+                var name = TemplatedWidget_1.noGeneric(ss.getTypeFullName(type));
                 for (var _i = 0, _a = Q.Config.rootNamespaces; _i < _a.length; _i++) {
                     var k = _a[_i];
                     if (Q.startsWith(name, k + '.')) {
@@ -2974,7 +2977,7 @@ var Serenity;
                     templateNames[fullName] = name;
                     return name;
                 }
-                name = noGeneric(ss.getTypeName(type));
+                name = TemplatedWidget_1.noGeneric(ss.getTypeName(type));
                 if (Q.canLoadScriptData('Template.' + name) ||
                     $('script#Template_' + name).length > 0) {
                     TemplatedWidget_1.templateNames[fullName] = name;
@@ -2982,8 +2985,11 @@ var Serenity;
                 }
                 type = ss.getBaseType(type);
             }
-            templateNames[fullName] = cachedName = noGeneric(ss.getTypeName(ss.getInstanceType(this)));
+            templateNames[fullName] = cachedName = this.getDefaultTemplateName();
             return cachedName;
+        };
+        TemplatedWidget.prototype.getFallbackTemplate = function () {
+            return null;
         };
         TemplatedWidget.prototype.getTemplate = function () {
             var templateName = this.getTemplateName();
@@ -2991,7 +2997,12 @@ var Serenity;
             if (script.length > 0) {
                 return script.html();
             }
-            var template = Q.getTemplate(templateName);
+            var template;
+            if (!Q.canLoadScriptData(templateName) &&
+                this.getDefaultTemplateName() == templateName)
+                template = this.getFallbackTemplate();
+            else
+                template = Q.getTemplate(templateName);
             if (template == null) {
                 throw new Error(Q.format("Can't locate template for widget '{0}' with name '{1}'!", ss.getTypeName(ss.getInstanceType(this)), templateName));
             }

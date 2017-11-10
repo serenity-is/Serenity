@@ -39,15 +39,20 @@
             return Serenity.WX.getWidget(this.byId(id), type);
         }
 
-        protected getTemplateName(): string {
+        private static noGeneric(s: string): string {
+            var dollar = s.indexOf('$');
+            if (dollar >= 0) {
+                return s.substr(0, dollar);
+            }
+            return s;
+        }
 
-            var noGeneric = function (s: string) {
-                var dollar = s.indexOf('$');
-                if (dollar >= 0) {
-                    return s.substr(0, dollar);
-                }
-                return s;
-            };
+        private getDefaultTemplateName(): string {
+            return TemplatedWidget.noGeneric((ss as any).getTypeName(
+                (ss as any).getInstanceType(this)));
+        }
+
+        protected getTemplateName(): string {
 
             var type = (ss as any).getInstanceType(this);
             var fullName = (ss as any).getTypeFullName(type);
@@ -60,7 +65,7 @@
             }
             
             while (type && type !== Serenity.Widget) {
-                var name = noGeneric((ss as any).getTypeFullName(type));
+                var name = TemplatedWidget.noGeneric((ss as any).getTypeFullName(type));
 
                 for (let k of Q.Config.rootNamespaces) {
                     if (Q.startsWith(name, k + '.')) {
@@ -81,7 +86,7 @@
                     return name;
                 }
 
-                name = noGeneric((ss as any).getTypeName(type));
+                name = TemplatedWidget.noGeneric((ss as any).getTypeName(type));
                 if (Q.canLoadScriptData('Template.' + name) ||
                     $('script#Template_' + name).length > 0) {
                     TemplatedWidget.templateNames[fullName] = name;
@@ -91,10 +96,12 @@
                 type = (ss as any).getBaseType(type);
             }
 
-            templateNames[fullName] = cachedName = noGeneric((ss as any).getTypeName(
-                (ss as any).getInstanceType(this)));
-
+            templateNames[fullName] = cachedName = this.getDefaultTemplateName();
             return cachedName;
+        }
+
+        protected getFallbackTemplate(): string {
+            return null;
         }
 
         protected getTemplate(): string {
@@ -105,7 +112,12 @@
                 return script.html();
             }
 
-            let template = Q.getTemplate(templateName);
+            let template: string;
+            if (!Q.canLoadScriptData(templateName) &&
+                this.getDefaultTemplateName() == templateName)
+                template = this.getFallbackTemplate();
+            else
+                template = Q.getTemplate(templateName);
 
             if (template == null) {
                 throw new Error(Q.format(
