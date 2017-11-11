@@ -1,3 +1,21 @@
+## 3.3.10 (2017-11-11)
+
+Features:
+  - added wizard dialog widget and related order wizard sample [StartSharp]
+  - added UntilNext option to LabelWidthAttribute and FormCssClassAttribute (e.g. HalfWidth etc) so that it applies to all following properties until another one of same kind is used
+  - port BooleanEditor, MaskedEditor, StringEditor, TextAreaEditor, TimeEditor classes to TypeScript from Saltaralle
+  - ability to save quick filter display text
+  - ability to save quick search text and field
+  - accept unicode letters as valid sql identifiers
+  - use Pascalize instead of Capitalize while generating module name from connection key
+  - added some new attribute derived from FormCssClassAttribute for bootstrap grid system form (thanks @estrusco)
+  - ability to use a fallback template if can't find expected default one in templated widget
+
+Bugfixes:
+  - fix slick grid column header has border on hover inside dialog
+  - replace ".Entities." with "." in ScriptDtoGenerator (for saltaralle)
+  - fix RadioButtonEditor not able to clear checks on setting value
+  
 ## 3.3.9 (2017-11-04)
 
 Bugfixes:

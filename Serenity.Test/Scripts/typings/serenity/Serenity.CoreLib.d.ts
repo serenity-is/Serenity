@@ -1117,7 +1117,10 @@ declare namespace Serenity {
         constructor(container: JQuery, options?: TOptions);
         protected byId(id: string): JQuery;
         private byID<TWidget>(id, type);
+        private static noGeneric(s);
+        private getDefaultTemplateName();
         protected getTemplateName(): string;
+        protected getFallbackTemplate(): string;
         protected getTemplate(): string;
     }
 }
