@@ -10,5 +10,8 @@
         init?: (w: TWidget) => void;
         separator?: boolean;
         cssClass?: string;
+        loadState?: (w: TWidget, state: any) => void;
+        saveState?: (w: TWidget) => any;
+        displayText?: (w: TWidget, label: string) => string;
     }
 }
