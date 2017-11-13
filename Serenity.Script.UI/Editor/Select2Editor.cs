@@ -105,6 +105,7 @@ namespace Serenity
                 InitSelection = delegate(jQueryObject element, Action<object> callback)
                 {
                     var val = element.GetValue();
+                    var isAutoComplete = this.IsAutoComplete();
 
                     if (multiple)
                     {
@@ -112,6 +113,13 @@ namespace Serenity
                         foreach (var z in val.Split(","))
                         {
                             var item = itemById[z];
+
+                            if (item == null && isAutoComplete)
+                            {
+                                item = new Select2Item { Id = z, Text = z };
+                                AddItem(item);
+                            }
+
                             if (item != null)
                                 list.Add(item);
                         }
@@ -120,7 +128,14 @@ namespace Serenity
                         return;
                     }
 
-                    callback(itemById[val]);
+                    var it = itemById[val];
+                    if (it == null && isAutoComplete)
+                    {
+                        it = new Select2Item { Id = val, Text = val };
+                        AddItem(it);
+                    }
+
+                    callback(it);
                 }
             };
         }
@@ -197,8 +212,13 @@ namespace Serenity
         {
         }
 
+        protected virtual bool IsAutoComplete()
+        {
+            return false;
+        }
+
         public Func<string, object> GetCreateSearchChoice(
-            Func<TItem, string> getName = null, bool autoComplete = false)
+            Func<TItem, string> getName = null)
         {
             return s =>
             {
@@ -219,7 +239,7 @@ namespace Serenity
 
                 if (!Q.Any(this.Items, x => (Q.Externals.StripDiacritics(x.Text) ?? "").ToLower().Contains(s)))
                 {
-                    if (autoComplete)
+                    if (IsAutoComplete())
                         return new Select2Item
                         {
                             Id = lastCreateTerm,
@@ -233,7 +253,7 @@ namespace Serenity
                     };
                 }
 
-                if (autoComplete)
+                if (IsAutoComplete())
                     return new Select2Item
                     {
                         Id = lastCreateTerm,

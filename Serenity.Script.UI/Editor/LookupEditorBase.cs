@@ -284,6 +284,11 @@ namespace Serenity
             options.CascadeFrom = value;
         }
 
+        protected override bool IsAutoComplete()
+        {
+            return options != null && options.AutoComplete;
+        }
+
         protected override Select2Options GetSelect2Options()
         {
             var opt = base.GetSelect2Options();
@@ -292,7 +297,7 @@ namespace Serenity
                 opt.MinimumResultsForSearch = options.MinimumResultsForSearch.Value;
 
             if (options.AutoComplete)
-                opt.CreateSearchChoice = GetCreateSearchChoice(null, true);
+                opt.CreateSearchChoice = GetCreateSearchChoice();
             else if (options.InplaceAdd && (
                 options.InplaceAddPermission == null || 
                 Q.Authorization.HasPermission(options.InplaceAddPermission)))
