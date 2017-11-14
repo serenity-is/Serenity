@@ -1,3 +1,11 @@
+## 3.3.11 (2017-11-15)
+
+Features:
+  - added getdisplaytextfor and getcriteriafor to filter store
+  - autocomplete lookup editor should add item on init selection
+  - make quick filter loadState, saveState, displayText methods available in TypeScript
+  - improve fallback template logic
+
 ## 3.3.10 (2017-11-11)
 
 Features:
