@@ -2998,11 +2998,13 @@ var Serenity;
                 return script.html();
             }
             var template;
-            if (!Q.canLoadScriptData(templateName) &&
-                this.getDefaultTemplateName() == templateName)
+            if (!Q.canLoadScriptData('Template.' + templateName) &&
+                this.getDefaultTemplateName() == templateName) {
                 template = this.getFallbackTemplate();
-            else
-                template = Q.getTemplate(templateName);
+                if (template != null)
+                    return template;
+            }
+            template = Q.getTemplate(templateName);
             if (template == null) {
                 throw new Error(Q.format("Can't locate template for widget '{0}' with name '{1}'!", ss.getTypeName(ss.getInstanceType(this)), templateName));
             }

@@ -113,11 +113,14 @@
             }
 
             let template: string;
-            if (!Q.canLoadScriptData(templateName) &&
-                this.getDefaultTemplateName() == templateName)
+            if (!Q.canLoadScriptData('Template.' + templateName) &&
+                this.getDefaultTemplateName() == templateName) {
                 template = this.getFallbackTemplate();
-            else
-                template = Q.getTemplate(templateName);
+                if (template != null)
+                    return template;
+            }
+                
+            template = Q.getTemplate(templateName);
 
             if (template == null) {
                 throw new Error(Q.format(
