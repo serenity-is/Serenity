@@ -10,6 +10,8 @@
         get_items(): FilterLine[];
         get_activeCriteria(): any[];
         get_displayText(): string;
+        static getCriteriaFor(items: FilterLine[]): any[];
+        static getDisplayTextFor(items: FilterLine[]): string;
     }
 
 }

@@ -1616,6 +1616,8 @@ declare namespace Serenity {
         get_items(): FilterLine[];
         get_activeCriteria(): any[];
         get_displayText(): string;
+        static getCriteriaFor(items: FilterLine[]): any[];
+        static getDisplayTextFor(items: FilterLine[]): string;
     }
 }
 declare namespace Serenity {
@@ -1975,6 +1977,8 @@ declare namespace Serenity {
         sortColumns?: boolean;
         filterItems?: boolean;
         quickFilters?: boolean;
+        quickFilterText?: boolean;
+        quickSearch?: boolean;
         includeDeleted?: boolean;
     }
     interface PersistedGridColumn {
@@ -1987,6 +1991,9 @@ declare namespace Serenity {
         columns?: PersistedGridColumn[];
         filterItems?: FilterLine[];
         quickFilters?: Q.Dictionary<any>;
+        quickFilterText?: string;
+        quickSearchField: QuickSearchField;
+        quickSearchText?: string;
         includeDeleted?: boolean;
     }
     interface SettingStorage {

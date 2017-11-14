@@ -151,6 +151,8 @@
         sortColumns?: boolean;
         filterItems?: boolean;
         quickFilters?: boolean;
+        quickFilterText?: boolean;
+        quickSearch?: boolean;
         includeDeleted?: boolean;
     }
 
@@ -165,6 +167,9 @@
         columns?: PersistedGridColumn[];
         filterItems?: FilterLine[];
         quickFilters?: Q.Dictionary<any>;
+        quickFilterText?: string;
+        quickSearchField: QuickSearchField;
+        quickSearchText?: string;
         includeDeleted?: boolean;
     }
 
