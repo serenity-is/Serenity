@@ -793,7 +793,7 @@ var Q;
         return LT.$table[key];
     }
     Q.tryGetText = tryGetText;
-    var LT = /** @class */ (function () {
+    var LT = (function () {
         function LT(key) {
             this.key = key;
         }
@@ -828,38 +828,38 @@ var Q;
             }
             return t;
         };
-        LT.$table = {};
-        LT.empty = new LT('');
-        LT.initializeTextClass = function (type, prefix) {
-            var $t1 = Object.keys(type).slice();
-            for (var $t2 = 0; $t2 < $t1.length; $t2++) {
-                var member = $t1[$t2];
-                var value = type[member];
-                if (value instanceof LT) {
-                    var lt = value;
-                    var key = prefix + member;
-                    LT.$table[key] = lt.key;
-                    type[member] = new LT(key);
-                }
-            }
-        };
-        LT.getDefault = function (key, defaultText) {
-            var t = LT.$table[key];
-            if (t == null) {
-                t = defaultText;
-                if (t == null) {
-                    t = key || '';
-                }
-            }
-            return t;
-        };
         return LT;
     }());
+    LT.$table = {};
+    LT.empty = new LT('');
+    LT.initializeTextClass = function (type, prefix) {
+        var $t1 = Object.keys(type).slice();
+        for (var $t2 = 0; $t2 < $t1.length; $t2++) {
+            var member = $t1[$t2];
+            var value = type[member];
+            if (value instanceof LT) {
+                var lt = value;
+                var key = prefix + member;
+                LT.$table[key] = lt.key;
+                type[member] = new LT(key);
+            }
+        }
+    };
+    LT.getDefault = function (key, defaultText) {
+        var t = LT.$table[key];
+        if (t == null) {
+            t = defaultText;
+            if (t == null) {
+                t = key || '';
+            }
+        }
+        return t;
+    };
     Q.LT = LT;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
-    var Lookup = /** @class */ (function () {
+    var Lookup = (function () {
         function Lookup(options, items) {
             this.items = [];
             this.itemById = {};
@@ -2197,48 +2197,48 @@ var Q;
 })(Q || (Q = {}));
 var Serenity;
 (function (Serenity) {
-    var ColumnsKeyAttribute = /** @class */ (function () {
+    var ColumnsKeyAttribute = (function () {
         function ColumnsKeyAttribute(value) {
             this.value = value;
         }
         return ColumnsKeyAttribute;
     }());
     Serenity.ColumnsKeyAttribute = ColumnsKeyAttribute;
-    var DialogTypeAttribute = /** @class */ (function () {
+    var DialogTypeAttribute = (function () {
         function DialogTypeAttribute(value) {
             this.value = value;
         }
         return DialogTypeAttribute;
     }());
     Serenity.DialogTypeAttribute = DialogTypeAttribute;
-    var EditorAttribute = /** @class */ (function () {
+    var EditorAttribute = (function () {
         function EditorAttribute() {
         }
         return EditorAttribute;
     }());
     Serenity.EditorAttribute = EditorAttribute;
-    var ElementAttribute = /** @class */ (function () {
+    var ElementAttribute = (function () {
         function ElementAttribute(value) {
             this.value = value;
         }
         return ElementAttribute;
     }());
     Serenity.ElementAttribute = ElementAttribute;
-    var EntityTypeAttribute = /** @class */ (function () {
+    var EntityTypeAttribute = (function () {
         function EntityTypeAttribute(value) {
             this.value = value;
         }
         return EntityTypeAttribute;
     }());
     Serenity.EntityTypeAttribute = EntityTypeAttribute;
-    var EnumKeyAttribute = /** @class */ (function () {
+    var EnumKeyAttribute = (function () {
         function EnumKeyAttribute(value) {
             this.value = value;
         }
         return EnumKeyAttribute;
     }());
     Serenity.EnumKeyAttribute = EnumKeyAttribute;
-    var FlexifyAttribute = /** @class */ (function () {
+    var FlexifyAttribute = (function () {
         function FlexifyAttribute(value) {
             if (value === void 0) { value = true; }
             this.value = value;
@@ -2246,49 +2246,49 @@ var Serenity;
         return FlexifyAttribute;
     }());
     Serenity.FlexifyAttribute = FlexifyAttribute;
-    var FormKeyAttribute = /** @class */ (function () {
+    var FormKeyAttribute = (function () {
         function FormKeyAttribute(value) {
             this.value = value;
         }
         return FormKeyAttribute;
     }());
     Serenity.FormKeyAttribute = FormKeyAttribute;
-    var GeneratedCodeAttribute = /** @class */ (function () {
+    var GeneratedCodeAttribute = (function () {
         function GeneratedCodeAttribute(origin) {
             this.origin = origin;
         }
         return GeneratedCodeAttribute;
     }());
     Serenity.GeneratedCodeAttribute = GeneratedCodeAttribute;
-    var IdPropertyAttribute = /** @class */ (function () {
+    var IdPropertyAttribute = (function () {
         function IdPropertyAttribute(value) {
             this.value = value;
         }
         return IdPropertyAttribute;
     }());
     Serenity.IdPropertyAttribute = IdPropertyAttribute;
-    var IsActivePropertyAttribute = /** @class */ (function () {
+    var IsActivePropertyAttribute = (function () {
         function IsActivePropertyAttribute(value) {
             this.value = value;
         }
         return IsActivePropertyAttribute;
     }());
     Serenity.IsActivePropertyAttribute = IsActivePropertyAttribute;
-    var ItemNameAttribute = /** @class */ (function () {
+    var ItemNameAttribute = (function () {
         function ItemNameAttribute(value) {
             this.value = value;
         }
         return ItemNameAttribute;
     }());
     Serenity.ItemNameAttribute = ItemNameAttribute;
-    var LocalTextPrefixAttribute = /** @class */ (function () {
+    var LocalTextPrefixAttribute = (function () {
         function LocalTextPrefixAttribute(value) {
             this.value = value;
         }
         return LocalTextPrefixAttribute;
     }());
     Serenity.LocalTextPrefixAttribute = LocalTextPrefixAttribute;
-    var MaximizableAttribute = /** @class */ (function () {
+    var MaximizableAttribute = (function () {
         function MaximizableAttribute(value) {
             if (value === void 0) { value = true; }
             this.value = value;
@@ -2296,27 +2296,27 @@ var Serenity;
         return MaximizableAttribute;
     }());
     Serenity.MaximizableAttribute = MaximizableAttribute;
-    var NamePropertyAttribute = /** @class */ (function () {
+    var NamePropertyAttribute = (function () {
         function NamePropertyAttribute(value) {
             this.value = value;
         }
         return NamePropertyAttribute;
     }());
     Serenity.NamePropertyAttribute = NamePropertyAttribute;
-    var OptionAttribute = /** @class */ (function () {
+    var OptionAttribute = (function () {
         function OptionAttribute() {
         }
         return OptionAttribute;
     }());
     Serenity.OptionAttribute = OptionAttribute;
-    var OptionsTypeAttribute = /** @class */ (function () {
+    var OptionsTypeAttribute = (function () {
         function OptionsTypeAttribute(value) {
             this.value = value;
         }
         return OptionsTypeAttribute;
     }());
     Serenity.OptionsTypeAttribute = OptionsTypeAttribute;
-    var PanelAttribute = /** @class */ (function () {
+    var PanelAttribute = (function () {
         function PanelAttribute(value) {
             if (value === void 0) { value = true; }
             this.value = value;
@@ -2324,7 +2324,7 @@ var Serenity;
         return PanelAttribute;
     }());
     Serenity.PanelAttribute = PanelAttribute;
-    var ResizableAttribute = /** @class */ (function () {
+    var ResizableAttribute = (function () {
         function ResizableAttribute(value) {
             if (value === void 0) { value = true; }
             this.value = value;
@@ -2332,7 +2332,7 @@ var Serenity;
         return ResizableAttribute;
     }());
     Serenity.ResizableAttribute = ResizableAttribute;
-    var ResponsiveAttribute = /** @class */ (function () {
+    var ResponsiveAttribute = (function () {
         function ResponsiveAttribute(value) {
             if (value === void 0) { value = true; }
             this.value = value;
@@ -2340,7 +2340,7 @@ var Serenity;
         return ResponsiveAttribute;
     }());
     Serenity.ResponsiveAttribute = ResponsiveAttribute;
-    var ServiceAttribute = /** @class */ (function () {
+    var ServiceAttribute = (function () {
         function ServiceAttribute(value) {
             this.value = value;
         }
@@ -2797,7 +2797,7 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var Widget = /** @class */ (function () {
+    var Widget = Widget_1 = (function () {
         function Widget(element, options) {
             var _this = this;
             this.element = element;
@@ -2822,7 +2822,6 @@ var Serenity;
                 }, 0);
             }
         }
-        Widget_1 = Widget;
         Widget.prototype.destroy = function () {
             this.element.removeClass('s-' + ss.getTypeName(ss.getInstanceType(this)));
             this.element.unbind('.' + this.widgetName).unbind('.' + this.uniqueName).removeData(this.widgetName);
@@ -2899,18 +2898,18 @@ var Serenity;
             }
             return this.asyncPromise;
         };
-        Widget.nextWidgetNumber = 0;
-        Widget = Widget_1 = __decorate([
-            Serenity.Decorators.registerClass()
-        ], Widget);
         return Widget;
-        var Widget_1;
     }());
+    Widget.nextWidgetNumber = 0;
+    Widget = Widget_1 = __decorate([
+        Serenity.Decorators.registerClass()
+    ], Widget);
     Serenity.Widget = Widget;
+    var Widget_1;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var TemplatedWidget = /** @class */ (function (_super) {
+    var TemplatedWidget = TemplatedWidget_1 = (function (_super) {
         __extends(TemplatedWidget, _super);
         function TemplatedWidget(container, options) {
             var _this = _super.call(this, container, options) || this;
@@ -2933,7 +2932,6 @@ var Serenity;
             _this.element.html(widgetMarkup);
             return _this;
         }
-        TemplatedWidget_1 = TemplatedWidget;
         TemplatedWidget.prototype.byId = function (id) {
             return $('#' + this.idPrefix + id);
         };
@@ -3010,78 +3008,78 @@ var Serenity;
             }
             return template;
         };
-        TemplatedWidget.templateNames = {};
-        TemplatedWidget = TemplatedWidget_1 = __decorate([
-            Serenity.Decorators.registerClass()
-        ], TemplatedWidget);
         return TemplatedWidget;
-        var TemplatedWidget_1;
     }(Serenity.Widget));
+    TemplatedWidget.templateNames = {};
+    TemplatedWidget = TemplatedWidget_1 = __decorate([
+        Serenity.Decorators.registerClass()
+    ], TemplatedWidget);
     Serenity.TemplatedWidget = TemplatedWidget;
+    var TemplatedWidget_1;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var IBooleanValue = /** @class */ (function () {
+    var IBooleanValue = (function () {
         function IBooleanValue() {
         }
-        IBooleanValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], IBooleanValue);
         return IBooleanValue;
     }());
+    IBooleanValue = __decorate([
+        Serenity.Decorators.registerInterface()
+    ], IBooleanValue);
     Serenity.IBooleanValue = IBooleanValue;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var IDoubleValue = /** @class */ (function () {
+    var IDoubleValue = (function () {
         function IDoubleValue() {
         }
-        IDoubleValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], IDoubleValue);
         return IDoubleValue;
     }());
+    IDoubleValue = __decorate([
+        Serenity.Decorators.registerInterface()
+    ], IDoubleValue);
     Serenity.IDoubleValue = IDoubleValue;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var IGetEditValue = /** @class */ (function () {
+    var IGetEditValue = (function () {
         function IGetEditValue() {
         }
-        IGetEditValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], IGetEditValue);
         return IGetEditValue;
     }());
+    IGetEditValue = __decorate([
+        Serenity.Decorators.registerInterface()
+    ], IGetEditValue);
     Serenity.IGetEditValue = IGetEditValue;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var ISetEditValue = /** @class */ (function () {
+    var ISetEditValue = (function () {
         function ISetEditValue() {
         }
-        ISetEditValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], ISetEditValue);
         return ISetEditValue;
     }());
+    ISetEditValue = __decorate([
+        Serenity.Decorators.registerInterface()
+    ], ISetEditValue);
     Serenity.ISetEditValue = ISetEditValue;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var IStringValue = /** @class */ (function () {
+    var IStringValue = (function () {
         function IStringValue() {
         }
-        IStringValue = __decorate([
-            Serenity.Decorators.registerInterface()
-        ], IStringValue);
         return IStringValue;
     }());
+    IStringValue = __decorate([
+        Serenity.Decorators.registerInterface()
+    ], IStringValue);
     Serenity.IStringValue = IStringValue;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var BooleanEditor = /** @class */ (function (_super) {
+    var BooleanEditor = (function (_super) {
         __extends(BooleanEditor, _super);
         function BooleanEditor(input) {
             var _this = _super.call(this, input) || this;
@@ -3104,18 +3102,18 @@ var Serenity;
         BooleanEditor.prototype.set_value = function (value) {
             this.value = value;
         };
-        BooleanEditor = __decorate([
-            Serenity.Decorators.element('<input type="checkbox"/>'),
-            Serenity.Decorators.registerEditor([Serenity.IBooleanValue])
-        ], BooleanEditor);
         return BooleanEditor;
     }(Serenity.Widget));
+    BooleanEditor = __decorate([
+        Serenity.Decorators.element('<input type="checkbox"/>'),
+        Serenity.Decorators.registerEditor([Serenity.IBooleanValue])
+    ], BooleanEditor);
     Serenity.BooleanEditor = BooleanEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
     // http://digitalbush.com/projects/masked-input-plugin/
-    var MaskedEditor = /** @class */ (function (_super) {
+    var MaskedEditor = (function (_super) {
         __extends(MaskedEditor, _super);
         function MaskedEditor(input, opt) {
             var _this = _super.call(this, input, opt) || this;
@@ -3141,17 +3139,17 @@ var Serenity;
         MaskedEditor.prototype.set_value = function (value) {
             this.value = value;
         };
-        MaskedEditor = __decorate([
-            Serenity.Decorators.element("<input type=\"text\"/>"),
-            Serenity.Decorators.registerEditor([Serenity.IStringValue])
-        ], MaskedEditor);
         return MaskedEditor;
     }(Serenity.Widget));
+    MaskedEditor = __decorate([
+        Serenity.Decorators.element("<input type=\"text\"/>"),
+        Serenity.Decorators.registerEditor([Serenity.IStringValue])
+    ], MaskedEditor);
     Serenity.MaskedEditor = MaskedEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var StringEditor = /** @class */ (function (_super) {
+    var StringEditor = (function (_super) {
         __extends(StringEditor, _super);
         function StringEditor(input) {
             return _super.call(this, input) || this;
@@ -3172,17 +3170,17 @@ var Serenity;
         StringEditor.prototype.set_value = function (value) {
             this.value = value;
         };
-        StringEditor = __decorate([
-            Serenity.Decorators.element("<input type=\"text\"/>"),
-            Serenity.Decorators.registerEditor([Serenity.IStringValue])
-        ], StringEditor);
         return StringEditor;
     }(Serenity.Widget));
+    StringEditor = __decorate([
+        Serenity.Decorators.element("<input type=\"text\"/>"),
+        Serenity.Decorators.registerEditor([Serenity.IStringValue])
+    ], StringEditor);
     Serenity.StringEditor = StringEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var TextAreaEditor = /** @class */ (function (_super) {
+    var TextAreaEditor = (function (_super) {
         __extends(TextAreaEditor, _super);
         function TextAreaEditor(input, opt) {
             var _this = _super.call(this, input, opt) || this;
@@ -3210,17 +3208,17 @@ var Serenity;
         TextAreaEditor.prototype.set_value = function (value) {
             this.value = value;
         };
-        TextAreaEditor = __decorate([
-            Serenity.Decorators.element("<textarea />"),
-            Serenity.Decorators.registerEditor([Serenity.IStringValue])
-        ], TextAreaEditor);
         return TextAreaEditor;
     }(Serenity.Widget));
+    TextAreaEditor = __decorate([
+        Serenity.Decorators.element("<textarea />"),
+        Serenity.Decorators.registerEditor([Serenity.IStringValue])
+    ], TextAreaEditor);
     Serenity.TextAreaEditor = TextAreaEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var TimeEditor = /** @class */ (function (_super) {
+    var TimeEditor = (function (_super) {
         __extends(TimeEditor, _super);
         function TimeEditor(input, opt) {
             var _this = _super.call(this, input, opt) || this;
@@ -3271,17 +3269,48 @@ var Serenity;
         TimeEditor.prototype.set_value = function (value) {
             this.value = value;
         };
-        TimeEditor = __decorate([
-            Serenity.Decorators.element("<select />"),
-            Serenity.Decorators.registerEditor([Serenity.IDoubleValue])
-        ], TimeEditor);
         return TimeEditor;
     }(Serenity.Widget));
+    TimeEditor = __decorate([
+        Serenity.Decorators.element("<select />"),
+        Serenity.Decorators.registerEditor([Serenity.IDoubleValue])
+    ], TimeEditor);
     Serenity.TimeEditor = TimeEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var TemplatedDialog = /** @class */ (function (_super) {
+    var URLEditor = (function (_super) {
+        __extends(URLEditor, _super);
+        function URLEditor(input) {
+            var _this = _super.call(this, input) || this;
+            input.addClass("url").attr("title", "URL should be entered in format: 'http://www.site.com/page'.");
+            input.on("blur." + _this.uniqueName, function (e) {
+                var validator = input.closest("form").data("validator");
+                if (validator == null)
+                    return;
+                if (!input.hasClass("error"))
+                    return;
+                var value = Q.trimToNull(input.val());
+                if (!value)
+                    return;
+                value = "http://" + value;
+                if ($.validator.methods['url'].call(validator, value, input[0]) == true) {
+                    input.val(value);
+                    validator.element(input);
+                }
+            });
+            return _this;
+        }
+        return URLEditor;
+    }(Serenity.StringEditor));
+    URLEditor = __decorate([
+        Serenity.Decorators.registerEditor([Serenity.IStringValue])
+    ], URLEditor);
+    Serenity.URLEditor = URLEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var TemplatedDialog = TemplatedDialog_1 = (function (_super) {
         __extends(TemplatedDialog, _super);
         function TemplatedDialog(options) {
             var _this = _super.call(this, Q.newBodyDiv().addClass('s-TemplatedDialog hidden'), options) || this;
@@ -3291,7 +3320,6 @@ var Serenity;
             _this.initToolbar();
             return _this;
         }
-        TemplatedDialog_1 = TemplatedDialog;
         Object.defineProperty(TemplatedDialog.prototype, "isMarkedAsPanel", {
             get: function () {
                 var panelAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.PanelAttribute, true);
@@ -3645,17 +3673,17 @@ var Serenity;
                 }
             }
         };
-        TemplatedDialog = TemplatedDialog_1 = __decorate([
-            Serenity.Decorators.registerClass([Serenity.IDialog])
-        ], TemplatedDialog);
         return TemplatedDialog;
-        var TemplatedDialog_1;
     }(Serenity.TemplatedWidget));
+    TemplatedDialog = TemplatedDialog_1 = __decorate([
+        Serenity.Decorators.registerClass([Serenity.IDialog])
+    ], TemplatedDialog);
     Serenity.TemplatedDialog = TemplatedDialog;
+    var TemplatedDialog_1;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var ColumnPickerDialog = /** @class */ (function (_super) {
+    var ColumnPickerDialog = (function (_super) {
         __extends(ColumnPickerDialog, _super);
         function ColumnPickerDialog() {
             var _this = _super.call(this) || this;
@@ -3856,13 +3884,13 @@ var Serenity;
         ColumnPickerDialog.prototype.getTemplate = function () {
             return "\n<div class=\"search\"><input id=\"~_Search\" type=\"text\" disabled /></div>\n<div class=\"columns-container\">\n<div class=\"column-list visible-list bg-success\">\n  <h5><i class=\"fa fa-eye\"></i> " + Q.text("Controls.ColumnPickerDialog.VisibleColumns") + "</h5>\n  <ul id=\"~_VisibleCols\"></ul>\n</div>\n<div class=\"column-list hidden-list bg-info\">\n  <h5><i class=\"fa fa-list\"></i> " + Q.text("Controls.ColumnPickerDialog.HiddenColumns") + "</h5>\n  <ul id=\"~_HiddenCols\"></ul>\n</div>\n</div>";
         };
-        ColumnPickerDialog = __decorate([
-            Serenity.Decorators.registerClass(),
-            Serenity.Decorators.resizable(),
-            Serenity.Decorators.responsive()
-        ], ColumnPickerDialog);
         return ColumnPickerDialog;
     }(Serenity.TemplatedDialog));
+    ColumnPickerDialog = __decorate([
+        Serenity.Decorators.registerClass(),
+        Serenity.Decorators.resizable(),
+        Serenity.Decorators.responsive()
+    ], ColumnPickerDialog);
     Serenity.ColumnPickerDialog = ColumnPickerDialog;
 })(Serenity || (Serenity = {}));
 var Serenity;
@@ -3870,7 +3898,7 @@ var Serenity;
     /**
      * A mixin that can be applied to a DataGrid for tree functionality
      */
-    var TreeGridMixin = /** @class */ (function () {
+    var TreeGridMixin = (function () {
         function TreeGridMixin(options) {
             this.options = options;
             var dg = this.dataGrid = options.grid;
@@ -4126,7 +4154,7 @@ var Slick;
     })(Data = Slick.Data || (Slick.Data = {}));
 })(Slick || (Slick = {}));
 (function (Slick) {
-    var RemoteView = /** @class */ (function () {
+    var RemoteView = (function () {
         function RemoteView(options) {
             var self = this;
             var defaults = {
@@ -4717,7 +4745,6 @@ var Slick;
                     "$filter$; ",
                     "} ",
                     "return _retval; "
-                    //"}"
                 ].join("");
                 tpl = tpl.replace(/\$filter\$/gi, filterBody);
                 tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);
@@ -4748,7 +4775,6 @@ var Slick;
                     "$filter$; ",
                     "} ",
                     "return _retval; "
-                    //"}"
                 ].join("");
                 tpl = tpl.replace(/\$filter\$/gi, filterBody);
                 tpl = tpl.replace(/\$item\$/gi, filterInfo.params[0]);

@@ -1403,6 +1403,11 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class URLEditor extends StringEditor {
+        constructor(input: JQuery);
+    }
+}
+declare namespace Serenity {
     namespace EditorUtils {
         function getValue(editor: Serenity.Widget<any>): any;
         function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
@@ -1535,9 +1540,6 @@ declare namespace Serenity {
         inplaceCreateClick(e: any): void;
         get_select2Container(): JQuery;
         value: string;
-    }
-    class URLEditor extends StringEditor {
-        constructor(input: JQuery);
     }
     class Recaptcha extends Widget<RecaptchaOptions> {
         constructor(div: JQuery, opt: RecaptchaOptions);

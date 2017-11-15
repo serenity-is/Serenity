@@ -72,6 +72,7 @@
     "UI/Editors/StringEditor.ts",
     "UI/Editors/TextAreaEditor.ts",
     "UI/Editors/TimeEditor.ts",
+    "UI/Editors/URLEditor.ts",
     "UI/Editors/Editors.ts",
     "UI/Filtering/FilterOperator.ts",
     "UI/Filtering/FilterOperators.ts",

@@ -105,6 +105,7 @@
     <TypeScriptCompile Include="UI\Editors\StringEditor.ts" />
     <TypeScriptCompile Include="UI\Editors\TextAreaEditor.ts" />
     <TypeScriptCompile Include="UI\Editors\TimeEditor.ts" />
+    <TypeScriptCompile Include="UI\Editors\URLEditor.ts" />
     <TypeScriptCompile Include="UI\Editors\Editors.ts" />
     <TypeScriptCompile Include="UI\Filtering\FilterOperator.ts" />
     <TypeScriptCompile Include="UI\Filtering\FilterOperators.ts" />

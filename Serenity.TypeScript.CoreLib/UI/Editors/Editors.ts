@@ -151,10 +151,6 @@
         value: string;
     }
 
-    class URLEditor extends StringEditor {
-        constructor(input: JQuery);
-    }
-
     class Recaptcha extends Widget<RecaptchaOptions> {
         constructor(div: JQuery, opt: RecaptchaOptions);
         get_value(): string;

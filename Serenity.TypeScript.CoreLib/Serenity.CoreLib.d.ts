@@ -711,7 +711,7 @@ declare namespace Q {
         function ensure(name: string): any;
         function ensureAsync(name: string): PromiseLike<any>;
         function reload(name: string): any;
-        function reloadAsync(name: string): PromiseLike<any>;
+        function reloadAsync(name: string): PromiseLike<void>;
         function canLoad(name: string): boolean;
         function setRegisteredScripts(scripts: any[]): void;
         function set(name: string, value: any): void;
@@ -721,7 +721,7 @@ declare namespace Q {
     function getLookup<TItem>(key: string): Lookup<TItem>;
     function getLookupAsync<TItem>(key: string): PromiseLike<Lookup<TItem>>;
     function reloadLookup(key: string): void;
-    function reloadLookupAsync(key: string): PromiseLike<any>;
+    function reloadLookupAsync(key: string): PromiseLike<void>;
     function getColumns(key: string): any;
     function getColumnsAsync(key: string): PromiseLike<any>;
     function getForm(key: string): any;
@@ -928,7 +928,7 @@ declare namespace Serenity {
         function registerInterface(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
         function registerEnum(target: any, enumKey?: string, asm?: ss.AssemblyReg): void;
         function registerEditor(intf?: any[], asm?: ss.AssemblyReg): (target: Function) => void;
-        function registerFormatter(intf?: (typeof ISlickFormatter)[], asm?: ss.AssemblyReg): (target: Function) => void;
+        function registerFormatter(intf?: typeof ISlickFormatter[], asm?: ss.AssemblyReg): (target: Function) => void;
         function filterable(value?: boolean): (target: Function) => void;
         function itemName(value: string): (target: Function) => void;
         function isActiveProperty(value: string): (target: Function) => void;
@@ -1403,6 +1403,11 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class URLEditor extends StringEditor {
+        constructor(input: JQuery);
+    }
+}
+declare namespace Serenity {
     namespace EditorUtils {
         function getValue(editor: Serenity.Widget<any>): any;
         function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
@@ -1535,9 +1540,6 @@ declare namespace Serenity {
         inplaceCreateClick(e: any): void;
         get_select2Container(): JQuery;
         value: string;
-    }
-    class URLEditor extends StringEditor {
-        constructor(input: JQuery);
     }
     class Recaptcha extends Widget<RecaptchaOptions> {
         constructor(div: JQuery, opt: RecaptchaOptions);
