@@ -78,6 +78,28 @@ namespace Serenity.Data
                 return value.ToLocalTime();
         }
 
+        public static DateTime ToDateTimeKind(DateTimeOffset value, DateTimeKind dateTimeKind)
+        {
+            if (dateTimeKind == System.DateTimeKind.Unspecified)
+                return value.DateTime;
+
+            if (dateTimeKind == System.DateTimeKind.Utc)
+                return value.UtcDateTime;
+            else
+                return value.LocalDateTime;
+        }
+
+        private DateTime ToDateTimeKind(DateTimeOffset value)
+        {
+            if (this.DateTimeKind == System.DateTimeKind.Unspecified)
+                return value.DateTime;
+
+            if (this.DateTimeKind == System.DateTimeKind.Utc)
+                return value.UtcDateTime;
+            else
+                return value.LocalDateTime;
+        }
+
         private DateTime ToDateTimeKind(DateTime value)
         {
             if (this.DateTimeKind == System.DateTimeKind.Unspecified)
@@ -152,9 +174,13 @@ namespace Serenity.Data
                     if (obj is DateTime)
                         value = (DateTime)obj;
                     else if (obj is DateTimeOffset)
-                        value = ((DateTimeOffset)obj).DateTime;
+                    {
+                        _setValue(row, ToDateTimeKind((DateTimeOffset)obj));
+                        break;
+                    }
                     else
                         value = Convert.ToDateTime(obj, CultureInfo.InvariantCulture);
+
                     _setValue(row, ToDateTimeKind(value));
                     break;
                 case JsonToken.String:
