@@ -1052,6 +1052,7 @@
     <Content Include="Style\images\down.gif" />
     <Content Include="Style\images\full-screen-2.png" />
     <Content Include="Style\images\header-columns-over-bg.gif" />
+    <None Include="Style\images\icon_sprite.png" />
     <Content Include="Style\images\maximize-button.png" />
     <Content Include="Style\images\maximize-button2.png" />
     <Content Include="Style\images\ok.png" />
