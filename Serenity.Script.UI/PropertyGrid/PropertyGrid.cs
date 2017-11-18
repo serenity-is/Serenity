@@ -222,13 +222,13 @@ namespace Serenity
                     if (splitted.IndexOf("col-break") >= 0)
                         J("<div style='width: 100%' />").InsertAfter(fieldDiv);
                     else if (splitted.IndexOf("col-xs-break") >= 0)
-                        J("<div class='visible-xs' style='width: 100%' />").InsertAfter(fieldDiv);
+                        J("<div class='visible-xs' style='width: 100%' />").InsertBefore(fieldDiv);
                     else if (splitted.IndexOf("col-sm-break") >= 0)
-                        J("<div class='visible-sm' style='width: 100%' />").InsertAfter(fieldDiv);
+                        J("<div class='visible-sm' style='width: 100%' />").InsertBefore(fieldDiv);
                     else if (splitted.IndexOf("col-md-break") >= 0)
-                        J("<div class='visible-md' style='width: 100%' />").InsertAfter(fieldDiv);
+                        J("<div class='visible-md' style='width: 100%' />").InsertBefore(fieldDiv);
                     else if (splitted.IndexOf("col-lg-break") >= 0)
-                        J("<div class='visible-lg' style='width: 100%' />").InsertAfter(fieldDiv);
+                        J("<div class='visible-lg' style='width: 100%' />").InsertBefore(fieldDiv);
                 }
             }
 
