@@ -216,19 +216,17 @@ namespace Serenity
             if (!String.IsNullOrEmpty(item.FormCssClass))
             {
                 fieldDiv.AddClass(item.FormCssClass);
-                if (item.FormCssClass.IndexOf("-break") >= 0)
+                if (item.FormCssClass.IndexOf("line-break-") >= 0)
                 {
                     var splitted = item.FormCssClass.Split(' ');
-                    if (splitted.IndexOf("col-break") >= 0)
-                        J("<div class='break-before' style='width: 100%' />").InsertAfter(fieldDiv);
-                    else if (splitted.IndexOf("col-xs-break") >= 0)
-                        J("<div class='break-before visible-xs' style='width: 100%' />").InsertBefore(fieldDiv);
-                    else if (splitted.IndexOf("col-sm-break") >= 0)
-                        J("<div class='break-before visible-sm' style='width: 100%' />").InsertBefore(fieldDiv);
-                    else if (splitted.IndexOf("col-md-break") >= 0)
-                        J("<div class='break-before visible-md' style='width: 100%' />").InsertBefore(fieldDiv);
-                    else if (splitted.IndexOf("col-lg-break") >= 0)
-                        J("<div class='break-before visible-lg' style='width: 100%' />").InsertBefore(fieldDiv);
+                    if (splitted.IndexOf("line-break-xs") >= 0)
+                        J("<div class='line-break' style='width: 100%' />").InsertBefore(fieldDiv);
+                    else if (splitted.IndexOf("line-break-sm") >= 0)
+                        J("<div class='line-break hidden-xs' style='width: 100%' />").InsertBefore(fieldDiv);
+                    else if (splitted.IndexOf("line-break-md") >= 0)
+                        J("<div class='line-break hidden-sm' style='width: 100%' />").InsertBefore(fieldDiv);
+                    else if (splitted.IndexOf("line-break-lg") >= 0)
+                        J("<div class='line-break hidden-md' style='width: 100%' />").InsertBefore(fieldDiv);
                 }
             }
 
