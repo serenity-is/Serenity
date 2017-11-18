@@ -20,14 +20,25 @@
       <Project>{8632943d-2a88-4c83-8451-69d62f059efc}</Project>
       <Name>Serenity.Web.Net45</Name>
     </ProjectReference>
-	<SerenityNugetReferences Include="@(Reference)" Condition="
+    <SerenityNugetReferences1 Include="@(Reference)" Condition="
+      $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Core,')) OR
+      $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Data,')) OR
+      $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Data.Entity,')) OR
+      $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Services,')) OR
+      $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Web,'))" />
+    <Reference Remove="@(SerenityNugetReferences1)" />
+  </ItemGroup>  
+  <Target Name="RemoveSerenityNugetReferences" BeforeTargets="BeforeBuild" Condition=" Exists('$(MsBuildThisFileDirectory)..\..\Serenity.Core\Serenity.Core.Net45.csproj') ">
+    <ItemGroup>
+      <SerenityNugetReferences Include="@(Reference)" Condition="
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Core,')) OR
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Data,')) OR
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Data.Entity,')) OR
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Services,')) OR
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Web,'))" />
-    <Reference Remove="@(SerenityNugetReferences)" />	
-  </ItemGroup>  
+      <Reference Remove="@(SerenityNugetReferences)" />
+    </ItemGroup>
+  </Target>
   <Target Name="SubmoduleCreateInputsOutputs" BeforeTargets="BeforeBuild">
     <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Style\**\*.less">
       <Output TaskParameter="Include" ItemName="CompileSerenityLessInputs" />
