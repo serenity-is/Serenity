@@ -20,19 +20,14 @@
       <Project>{8632943d-2a88-4c83-8451-69d62f059efc}</Project>
       <Name>Serenity.Web.Net45</Name>
     </ProjectReference>
-  </ItemGroup>  
-  <Target Name="RemoveSerenityNugetReferences" BeforeTargets="BeforeBuild" Condition=" Exists('$(MsBuildThisFileDirectory)..\..\Serenity.Core\Serenity.Core.Net45.csproj') ">
-    <ItemGroup>
-      <SerenityNugetReferences Include="@(Reference)" Condition="
+	<SerenityNugetReferences Include="@(Reference)" Condition="
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Core,')) OR
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Data,')) OR
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Data.Entity,')) OR
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Services,')) OR
         $([System.String]::Copy(&quot;%(Reference.Filename)&quot;).StartsWith('Serenity.Web,'))" />
-      <Reference Remove="@(SerenityNugetReferences)" />
-    </ItemGroup>
-    <Message Text="Removed Serenity Nuget References: @(SerenityNugetReferences)" Importance="high" />
-  </Target>
+    <Reference Remove="@(SerenityNugetReferences)" />	
+  </ItemGroup>  
   <Target Name="SubmoduleCreateInputsOutputs" BeforeTargets="BeforeBuild">
     <CreateItem Include="$(SolutionDir)Serenity\Serenity.Web\Style\**\*.less">
       <Output TaskParameter="Include" ItemName="CompileSerenityLessInputs" />
