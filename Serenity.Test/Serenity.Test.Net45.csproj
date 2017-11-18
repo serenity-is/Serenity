@@ -122,6 +122,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\ComponentModel\PropertyGrid\FormWidthAttributeTests.cs" />
     <Compile Include="Core\IO\GlobFilterTests.cs" />
     <Compile Include="Core\Logging\FileLoggerTests.cs" />
     <Compile Include="Core\LogicOperatorPermissionServiceTests.cs" />
