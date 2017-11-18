@@ -3,7 +3,7 @@
 namespace Serenity.ComponentModel
 {
     /// <summary>
-    /// Sets CSS class for field on forms only. Useful for Bootstrap grid, e.g. col-md-4 etc.
+    /// Sets CSS class for field on forms only. 
     /// </summary>
     public class FormCssClassAttribute : Attribute
     {
@@ -15,8 +15,8 @@ namespace Serenity.ComponentModel
         public string Value { get; private set; }
 
         /// <summary>
-        /// Applies this form css class (e.g. bootstrap grid size) to all 
-        /// following fields until next another FormCssClass/FormWidth attribute
+        /// Applies this form css class to all following fields 
+        /// until next another FormCssClass attribute
         /// </summary>
         public bool UntilNext { get; set; }
     }
