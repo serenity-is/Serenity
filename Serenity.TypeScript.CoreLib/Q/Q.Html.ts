@@ -44,6 +44,31 @@
         }
     }
 
+    function attrEncoder(a: string): string {
+        switch (a) {
+            case '&': return '&amp;';
+            case '>': return '&gt;';
+            case '<': return '&lt;';
+            case '\'': return '&apos;'
+            case '\"': return '&quot;'
+        }
+        return a;
+    }
+
+    const attrRegex = /[><&'"]/g;
+
+    /**
+     * Html attribute encodes a string (encodes quotes in addition to &, > and <)
+     * @param s String to be HTML attribute encoded
+     */
+    export function attrEncode(s: any): string {
+        let text = (s == null ? '' : s.toString());
+        if (attrRegex.test(text)) {
+            return text.replace(attrRegex, attrEncoder);
+        }
+        return text;
+    }
+
     function htmlEncoder(a: string): string {
         switch (a) {
             case '&': return '&amp;';

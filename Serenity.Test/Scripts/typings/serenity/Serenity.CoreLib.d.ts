@@ -578,6 +578,11 @@ declare namespace Q {
     function clearOptions(select: JQuery): void;
     function findElementWithRelativeId(element: JQuery, relativeId: string): JQuery;
     /**
+     * Html attribute encodes a string (encodes quotes in addition to &, > and <)
+     * @param s String to be HTML attribute encoded
+     */
+    function attrEncode(s: any): string;
+    /**
      * Html encodes a string
      * @param s String to be HTML encoded
      */

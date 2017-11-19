@@ -1003,6 +1003,29 @@ var Q;
         }
     }
     Q.findElementWithRelativeId = findElementWithRelativeId;
+    function attrEncoder(a) {
+        switch (a) {
+            case '&': return '&amp;';
+            case '>': return '&gt;';
+            case '<': return '&lt;';
+            case '\'': return '&apos;';
+            case '\"': return '&quot;';
+        }
+        return a;
+    }
+    var attrRegex = /[><&'"]/g;
+    /**
+     * Html attribute encodes a string (encodes quotes in addition to &, > and <)
+     * @param s String to be HTML attribute encoded
+     */
+    function attrEncode(s) {
+        var text = (s == null ? '' : s.toString());
+        if (attrRegex.test(text)) {
+            return text.replace(attrRegex, attrEncoder);
+        }
+        return text;
+    }
+    Q.attrEncode = attrEncode;
     function htmlEncoder(a) {
         switch (a) {
             case '&': return '&amp;';
