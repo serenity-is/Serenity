@@ -6,6 +6,17 @@ namespace Serenity
     public static partial class Q
     {
         /// <summary>
+        /// Html attribute encodes a string
+        /// </summary>
+        /// <param name="value">string</param>
+        /// <returns>encoded string</returns>
+        [InlineCode("Q.attrEncode({value})")]
+        public static string AttrEncode(object value)
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Html encodes a string
         /// </summary>
         /// <param name="value">string</param>

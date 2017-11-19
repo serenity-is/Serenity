@@ -25,7 +25,7 @@ namespace Serenity
             if (!string.IsNullOrEmpty(DisplayFormat))
                 display = string.Format(DisplayFormat, display);
 
-            var s = "<a href='" + Q.HtmlEncode(url) + "'";
+            var s = "<a href='" + Q.AttrEncode(url) + "'";
 
             if (!string.IsNullOrEmpty(Target))
                 s += " target='" + Target + "'";

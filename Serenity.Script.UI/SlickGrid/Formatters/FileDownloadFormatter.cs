@@ -22,7 +22,7 @@ namespace Serenity
                 downloadUrl);
 
             return "<a class='file-download-link' target='_blank' " + 
-                "href='" + Q.HtmlEncode(downloadUrl) + "'>" +
+                "href='" + Q.AttrEncode(downloadUrl) + "'>" +
                 Q.HtmlEncode(text) +
                 "</a>";
         }

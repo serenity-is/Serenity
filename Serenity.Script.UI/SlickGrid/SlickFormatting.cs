@@ -94,8 +94,8 @@ namespace Serenity
         public static string ItemLinkText(string itemType, object id, object text, string extraClass, bool encode)
         {
             return "<a" + (Script.IsValue(id) ? (" href=\"#" + itemType.Replace(".", "-") + "/" + id + "\"") : "") +
-                " data-item-type=\"" + itemType + "\"" +
-                " data-item-id=\"" + id + "\"" +
+                " data-item-type=\"" + Q.AttrEncode(itemType) + "\"" +
+                " data-item-id=\"" + Q.AttrEncode(id) + "\"" +
                 " class=\"s-EditLink s-" + itemType.Replace(".", "-") + "Link" + (extraClass.IsEmptyOrNull() ? "" : (" " + extraClass)) + "\">" +
                 (encode ? Q.HtmlEncode(text ?? "") : (text ?? "")) + "</a>";
         }
