@@ -1,3 +1,14 @@
+## 3.3.12 (2017-11-21)
+
+Features:
+  - introduce FormWidthAttribute which works similar to FormCssClass attribute before, but targeted only at bootstrap grid classes. FormCssClassAttribute is still usable but intended for other cases, like offset, and custom field css classes
+  - ability to add break point, e.g. wrap to next row before this field for bootstrap grid fields, using one of line-break-xs, line-break-sm, line-break-md, line-break-lg attributes
+  - added Q.attrEncode which should be used instead of Q.htmlEncode for attribute values, if you are using Q.htmlEncode in any formatter to generate attribute value, please replace it with attrEncode as quotes can be a problem
+  
+Bugfixes:
+  - fix utc datetime deserialization issue due to DateTimeOffset
+  - added missing date time picker sprites image
+
 ## 3.3.11 (2017-11-15)
 
 Features:
