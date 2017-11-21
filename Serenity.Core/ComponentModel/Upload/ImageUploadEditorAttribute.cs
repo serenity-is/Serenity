@@ -159,7 +159,8 @@ namespace Serenity.ComponentModel
         /// <summary>
         /// Format of the file name like "ProductImage/{1:00000}/{0:00000000}_{2}".
         /// Parameter 0 is the row identity value, 1 is identity value / 1000, 
-        /// and 2 is a random string like 2cxs4bc. 
+        /// and 2 is a random string like 2cxs4bc, 3 is current date/time,
+        /// 4 is original file name.
         /// You can also use the shortcut "ProductImage/~" which is equivalent 
         /// to the prior sample.
         /// If you don't specify this, it will default to something like
