@@ -195,10 +195,12 @@ namespace Serenity.Logging
 #endif
 
                             stream = null;
-                            stream = new StreamWriter(System.IO.File.OpenWrite(newFile), Encoding.UTF8);
+                            stream = new StreamWriter(System.IO.File.Open(newFile, FileMode.OpenOrCreate, 
+                                FileAccess.Write, FileShare.Read), Encoding.UTF8);
                         }
                         else
-                            stream = new StreamWriter(System.IO.File.OpenWrite(newFile), Encoding.UTF8);
+                            stream = new StreamWriter(System.IO.File.Open(newFile, FileMode.OpenOrCreate, 
+                                FileAccess.Write, FileShare.Read), Encoding.UTF8);
                     }
 
                     queue.Enqueue(sb.ToString());
