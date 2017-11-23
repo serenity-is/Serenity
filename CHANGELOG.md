@@ -1,3 +1,10 @@
+## 3.3.13 (2017-11-23)
+
+Features:
+  - added DateOnly option to DateTimeField, which means field has date value only (it only affects json serialization / deserialization not get/set value), DateTimeKind.Unspecified means a DateTime field with Time portion that shouldn't apply any timezone conversions (this might be breaking change if you relied on DateTimeKind.Unspecified means date only), DateTimeKind.Local means server should apply it to its local time zone (as before), DateTimeKind.Utc means store and retrieve as utc (as before). Added tests, property grid changes, and a useUtc option to DateTimeEditor that should be true when DateTimeKind.Local or DateTimeKind.Utc is used.
+  - create log file with FileShare.Read flag in FileLogger
+
+
 ## 3.3.12 (2017-11-21)
 
 Features:
