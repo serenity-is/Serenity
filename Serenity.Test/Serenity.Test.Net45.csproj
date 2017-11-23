@@ -126,6 +126,7 @@
     <Compile Include="Core\IO\GlobFilterTests.cs" />
     <Compile Include="Core\Logging\FileLoggerTests.cs" />
     <Compile Include="Core\LogicOperatorPermissionServiceTests.cs" />
+    <Compile Include="Data\DateTimeFieldKindTests.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidLoadsDetailsOnRetrieve.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidDetailRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.Int32DetailRow.cs" />

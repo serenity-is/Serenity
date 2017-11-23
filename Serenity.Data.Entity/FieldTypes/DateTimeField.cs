@@ -43,7 +43,6 @@ namespace Serenity.Data
             }
         }
 
-
 #if !SILVERLIGHT
         public override void GetFromReader(IDataReader reader, int index, Row row)
         {
@@ -65,11 +64,30 @@ namespace Serenity.Data
         }
 #endif
 
-        public DateTimeKind DateTimeKind { get; set; }
+        private DateTimeKind? dateTimeKind;
 
-        public static DateTime ToDateTimeKind(DateTime value, DateTimeKind dateTimeKind)
+        public bool DateOnly
         {
-            if (dateTimeKind == System.DateTimeKind.Unspecified)
+            get
+            {
+                return dateTimeKind == null;
+            }
+            set
+            {
+                if (value != (dateTimeKind == null))
+                    dateTimeKind = value ? (DateTimeKind?)null : DateTimeKind.Unspecified;
+            }
+        }
+
+        public DateTimeKind DateTimeKind
+        {
+            get { return dateTimeKind ?? DateTimeKind.Unspecified; }
+            set { dateTimeKind = value; }
+        }
+
+        public static DateTime ToDateTimeKind(DateTime value, DateTimeKind? dateTimeKind)
+        {
+            if (dateTimeKind == null || dateTimeKind == System.DateTimeKind.Unspecified)
                 return value;
 
             if (dateTimeKind == System.DateTimeKind.Utc)
@@ -78,9 +96,9 @@ namespace Serenity.Data
                 return value.ToLocalTime();
         }
 
-        public static DateTime ToDateTimeKind(DateTimeOffset value, DateTimeKind dateTimeKind)
+        public static DateTime ToDateTimeKind(DateTimeOffset value, DateTimeKind? dateTimeKind)
         {
-            if (dateTimeKind == System.DateTimeKind.Unspecified)
+            if (dateTimeKind == null || dateTimeKind == System.DateTimeKind.Unspecified)
                 return value.DateTime;
 
             if (dateTimeKind == System.DateTimeKind.Utc)
@@ -91,24 +109,12 @@ namespace Serenity.Data
 
         private DateTime ToDateTimeKind(DateTimeOffset value)
         {
-            if (this.DateTimeKind == System.DateTimeKind.Unspecified)
-                return value.DateTime;
-
-            if (this.DateTimeKind == System.DateTimeKind.Utc)
-                return value.UtcDateTime;
-            else
-                return value.LocalDateTime;
+            return ToDateTimeKind(value, this.dateTimeKind);
         }
 
         private DateTime ToDateTimeKind(DateTime value)
         {
-            if (this.DateTimeKind == System.DateTimeKind.Unspecified)
-                return value;
-
-            if (this.DateTimeKind == System.DateTimeKind.Utc)
-                return value.ToUniversalTime();
-            else
-                return value.ToLocalTime();
+            return ToDateTimeKind(value, this.dateTimeKind);
         }
 
         public new DateTime? this[Row row]
@@ -151,8 +157,9 @@ namespace Serenity.Data
             var value = _getValue(row);
             if (value.HasValue)
                 writer.WriteValue(value.Value.ToString(
-                    (DateTimeKind == System.DateTimeKind.Unspecified ||
-                    DateTimeKind == System.DateTimeKind.Local) ? DateHelper.ISODateTimeFormatLocal : DateHelper.ISODateTimeFormatUTC, CultureInfo.InvariantCulture));
+                    (DateTimeKind == System.DateTimeKind.Unspecified ? 
+                        DateHelper.ISODateTimeFormatLocal : 
+                        DateHelper.ISODateTimeFormatUTC), CultureInfo.InvariantCulture));
             else
                 writer.WriteNull();
         }

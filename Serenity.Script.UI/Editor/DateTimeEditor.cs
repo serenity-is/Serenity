@@ -145,7 +145,10 @@ namespace Serenity
 
                 var datePart = Q.FormatDate(value, "yyyy-MM-dd");
                 var timePart = this.time.GetValue();
-                return datePart + "T" + timePart + ":00.000";
+                var result = datePart + "T" + timePart + ":00.000";
+                if (this.options.UseUtc)
+                    result = Q.FormatISODateTimeUTC(Q.ParseISODateTime(result));
+                return result;
             }
             set
             {
@@ -273,5 +276,6 @@ namespace Serenity
         public int? EndHour { get; set; }
         public int? IntervalMinutes { get; set; }
         public string YearRange { get; set; }
+        public bool UseUtc { get; set; }
     }
 }

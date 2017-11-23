@@ -70,8 +70,17 @@ namespace Serenity.PropertyGrid
             if (source.EnumType != null)
                 item.EditorParams["enumKey"] = EnumMapper.GetEnumTypeKey(source.EnumType);
 
+            var dtka = source.GetAttribute<DateTimeKindAttribute>();
+            if (dtka != null && dtka.Value != DateTimeKind.Unspecified)
+                item.EditorParams["useUtc"] = true;
+
             if (!ReferenceEquals(null, source.BasedOnField))
             {
+                if (dtka == null &&
+                    source.BasedOnField is DateTimeField &&
+                    ((DateTimeField)source.BasedOnField).DateTimeKind != DateTimeKind.Unspecified)
+                    item.EditorParams["useUtc"] = true;
+
                 if (item.EditorType == "Decimal" &&
                     (source.BasedOnField is DoubleField ||
                      source.BasedOnField is DecimalField) &&

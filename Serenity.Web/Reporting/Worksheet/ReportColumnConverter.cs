@@ -31,8 +31,7 @@ namespace Serenity.Reporting
             else
             {
                 var dtf = baseField as DateTimeField;
-                if (!ReferenceEquals(null, dtf) &&
-                    dtf.DateTimeKind != DateTimeKind.Unspecified)
+                if (!ReferenceEquals(null, dtf) && !dtf.DateOnly)
                 {
                     result.Format = "dd/MM/yyyy HH:mm";
                 }

@@ -79,6 +79,12 @@ namespace Serenity.ComponentModel
             get { return GetOption<Int32>("intervalMinutes"); }
             set { SetOption("intervalMinutes", value); }
         }
+
+        public Boolean UseUtc
+        {
+            get { return GetOption<Boolean>("useUtc"); }
+            set { SetOption("useUtc", value); }
+        }
     }
 
     public partial class TimeEditorAttribute : CustomEditorAttribute

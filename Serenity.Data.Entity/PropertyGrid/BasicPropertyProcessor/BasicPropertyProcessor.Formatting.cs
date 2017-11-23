@@ -22,18 +22,10 @@ namespace Serenity.PropertyGrid
                 }
                 else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?))
                 {
-                    if (!ReferenceEquals(null, basedOnField) && basedOnField is DateTimeField)
-                    {
-                        switch (((DateTimeField)basedOnField).DateTimeKind)
-                        {
-                            case DateTimeKind.Unspecified:
-                                item.FormatterType = "Date";
-                                break;
-                            default:
-                                item.FormatterType = "DateTime";
-                                break;
-                        }
-                    }
+                    if (!ReferenceEquals(null, basedOnField) && 
+                        basedOnField is DateTimeField &&
+                        !((DateTimeField)basedOnField).DateOnly)
+                        item.FormatterType = "DateTime";
                     else
                         item.FormatterType = "Date";
                 }
