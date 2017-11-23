@@ -133,6 +133,7 @@
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.Int32LoadsDetailsOnRetrieve.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.Int32MasterRow.cs" />
     <Compile Include="Services\MasterDetailRelationBehavior\MasterDetailRelationBehaviorTests.GuidMasterRow.cs" />
+    <Compile Include="Services\PropertyGrid\UseUtcTests.cs" />
     <Compile Include="Web\ManualTsParserTests.cs" />
     <Compile Include="Core\Config\AppSettingsJsonConfigRepositoryTests.cs" />
     <Compile Include="Core\Caching\DistributedCacheEmulatorTests.cs" />
