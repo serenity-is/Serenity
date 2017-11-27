@@ -129,7 +129,7 @@ namespace Serenity.CodeGenerator
 
         private void GenerateStyle()
         {
-#if !ASPNETCORE
+#if ASPNETCORE
             string contentSite = "wwwroot/Content/site".Replace('/', Path.DirectorySeparatorChar);
 #else
             string contentSite = "Content/site".Replace('/', Path.DirectorySeparatorChar);
