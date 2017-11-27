@@ -184,7 +184,7 @@ namespace Serenity
             if (window.CKEDITOR != null)
                 return;
 
-            var script = J("CKEditorScript");
+            var script = J("#CKEditorScript");
             if (script.Length > 0)
                 return;
 
