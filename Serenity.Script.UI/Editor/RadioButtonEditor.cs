@@ -78,13 +78,13 @@ namespace Serenity
                     var inputs = this.element.Find("input");
                     var checks = inputs.Filter(":checked");
                     if (checks.Length > 0)
-                        (checks[0] as dynamic).@checked = false;
+                        checks.Property("checked", false);
 
                     if (!string.IsNullOrEmpty(value))
                     {
                         checks = inputs.Filter("[value=" + value + "]");
                         if (checks.Length > 0)
-                            (checks[0] as dynamic).@checked = true;
+                            checks.Property("checked", true);
                     }
                 }
             }
