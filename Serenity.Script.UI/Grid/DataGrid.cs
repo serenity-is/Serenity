@@ -1551,12 +1551,29 @@ namespace Serenity
                         var qsWidget = qsInput.TryGetWidget<QuickSearchInput>();
                         if (qsWidget != null)
                         {
-                            if (settings.QuickSearchField != null)
-                                qsWidget.Field = settings.QuickSearchField;
+                            this.view.PopulateLock();
+                            try
+                            {
+                                qsWidget.Element.AddClass("ignore-change");
+                                try
+                                {
+                                    if (settings.QuickSearchField != null)
+                                        qsWidget.Field = settings.QuickSearchField;
 
-                            if (settings.QuickSearchText != null &&
-                                Q.TrimToNull(settings.QuickSearchText) != Q.TrimToNull(qsWidget.Element.GetValue()))
-                                qsWidget.Element.Value(settings.QuickSearchText).TriggerHandler("change");
+                                    if (settings.QuickSearchText != null &&
+                                        Q.TrimToNull(settings.QuickSearchText) != Q.TrimToNull(qsWidget.Element.GetValue()))
+                                        qsWidget.Element.Value(settings.QuickSearchText);
+                                }
+                                finally
+                                {
+                                    qsWidget.Element.RemoveClass("ignore-change");
+                                    qsWidget.Element.TriggerHandler("execute-search");
+                                }
+                            }
+                            finally
+                            {
+                                this.view.PopulateUnlock();
+                            }
                         }
                     }
                 }

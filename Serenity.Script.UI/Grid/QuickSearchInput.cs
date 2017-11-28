@@ -94,6 +94,9 @@ namespace Serenity
 
         protected void CheckIfValueChanged()
         {
+            if (this.element.HasClass("ignore-change"))
+                return;
+
             var value = Q.Trim(this.element.GetValue() ?? "");
             if (value == this.lastValue && (!fieldChanged || value.IsEmptyOrNull()))
             {
