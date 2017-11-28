@@ -119,7 +119,7 @@ namespace Serenity.Reporting
             return list;
         }
 
-        public static Report GetReport(string reportKey)
+        public static Report GetReport(string reportKey, bool validatePermission = true)
         {
             EnsureTypes();
 
@@ -128,7 +128,12 @@ namespace Serenity.Reporting
 
             Report report;
             if (reportByKey.TryGetValue(reportKey, out report))
+            {
+                if (validatePermission && report.Permission != null)
+                    Authorization.ValidatePermission(report.Permission);
+
                 return report;
+            }
 
             return null;
         }
