@@ -76,30 +76,30 @@ namespace Serenity.Web
 
                         list.Add(attr);
                     }
-
-                    var byRowProperty = list.ToLookup(x => new Tuple<Type, string>(x.RowType, x.PropertyName));
-
-                    foreach (var key in byRowProperty)
-                    {
-                        var row = (Row)Activator.CreateInstance(key.Key.Item1);
-
-                        var script = (LookupScript)Activator.CreateInstance(typeof(DistinctValuesScript<>)
-                            .MakeGenericType(key.Key.Item1), new object[] { key.Key.Item2 });
-
-                        script.LookupKey = "Distinct." + row.GetFields().LocalTextPrefix + "." +
-                            key.Key.Item2;
-
-                        var withPermission = key.FirstOrDefault(x => !string.IsNullOrEmpty(x.Permission));
-                        if (withPermission != null)
-                            script.Permission = withPermission.Permission;
-
-                        var withExpiration = key.FirstOrDefault(x => x.Expiration != 0);
-                        if (withExpiration != null)
-                            script.Expiration = TimeSpan.FromSeconds(withExpiration.Expiration);
-
-                        DynamicScriptManager.Register(script.ScriptName, script);
-                    }
                 }
+            }
+
+            var byRowProperty = list.ToLookup(x => new Tuple<Type, string>(x.RowType, x.PropertyName));
+
+            foreach (var key in byRowProperty)
+            {
+                var row = (Row)Activator.CreateInstance(key.Key.Item1);
+
+                var script = (LookupScript)Activator.CreateInstance(typeof(DistinctValuesScript<>)
+                    .MakeGenericType(key.Key.Item1), new object[] { key.Key.Item2 });
+
+                script.LookupKey = "Distinct." + row.GetFields().LocalTextPrefix + "." +
+                    key.Key.Item2;
+
+                var withPermission = key.FirstOrDefault(x => !string.IsNullOrEmpty(x.Permission));
+                if (withPermission != null)
+                    script.Permission = withPermission.Permission;
+
+                var withExpiration = key.FirstOrDefault(x => x.Expiration != 0);
+                if (withExpiration != null)
+                    script.Expiration = TimeSpan.FromSeconds(withExpiration.Expiration);
+
+                DynamicScriptManager.Register(script.ScriptName, script);
             }
         }
     }
