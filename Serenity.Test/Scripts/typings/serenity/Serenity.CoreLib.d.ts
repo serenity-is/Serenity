@@ -1444,7 +1444,7 @@ declare namespace Serenity {
         lookupKey?: string;
     }
     class RadioButtonEditor extends Widget<RadioButtonEditorOptions> {
-        constructor(input: JQuery);
+        constructor(input: JQuery, opt: RadioButtonEditorOptions);
         value: string;
     }
     interface EnumEditorOptions {
