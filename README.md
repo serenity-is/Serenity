@@ -86,6 +86,10 @@ https://www.youtube.com/c/SerenityApplicationFramework
 
 https://www.youtube.com/watch?v=_AqRl_U_gcw
 
+**Movie Tutorial**
+
+https://www.youtube.com/playlist?list=PLMr_-cvwVIMWBsgWWUYdbHxBHPrOSzWVf
+
 **Setting up Continuous Deployment on Microsoft Azure for Serenity Applications: (@bysamdubey)**
 
 https://www.youtube.com/watch?v=tcywhS9k9Wc
