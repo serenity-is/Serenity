@@ -76,7 +76,15 @@ namespace Serenity.Data
             if (value == null)
                 _setValue(row, null);
             else
-                _setValue(row, (TValue)value);
+            {
+                try
+                {
+                    _setValue(row, (TValue)value);
+                } catch(Exception ex)
+                {
+                    throw new Exception($"{ex.Message} This exception occured in Row: {row.GetType().Name}, Field: {this.Name}", ex);
+                }
+            }
 
             if (row.tracking)
                 row.FieldAssignedValue(this);
