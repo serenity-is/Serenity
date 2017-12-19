@@ -212,6 +212,41 @@
                 addAttribute(target, new ServiceAttribute(value));
             }
         }
+
+        export function hideDelete(value = true) {
+            return function (target: Function) {
+                addAttribute(target, new HideDeleteAttribute(value));
+            }
+        }
+
+        export function hideApply(value = true) {
+            return function (target: Function) {
+                addAttribute(target, new HideApplyAttribute(value));
+            }
+        }
+
+        export function hideSave(value = true) {
+            return function (target: Function) {
+                addAttribute(target, new HideSaveAttribute(value));
+            }
+        }
+
+        export function hideUndo(value = true) {
+            return function (target: Function) {
+                addAttribute(target, new HideUndoAttribute(value));
+            }
+        }
+
+        export function hideClone(value = true) {
+            return function (target: Function) {
+                addAttribute(target, new HideCloneAttribute(value));
+            }
+        }
+
+        export function hideLocalization(value = true) {
+            return function (target: Function) {
+                addAttribute(target, new HideLocalizationAttribute(value));
+            }
+        }
     }
 }
-

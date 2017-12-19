@@ -2370,6 +2370,54 @@ var Serenity;
         return ServiceAttribute;
     }());
     Serenity.ServiceAttribute = ServiceAttribute;
+    var HideDeleteAttribute = /** @class */ (function () {
+        function HideDeleteAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        return HideDeleteAttribute;
+    }());
+    Serenity.HideDeleteAttribute = HideDeleteAttribute;
+    var HideApplyAttribute = /** @class */ (function () {
+        function HideApplyAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        return HideApplyAttribute;
+    }());
+    Serenity.HideApplyAttribute = HideApplyAttribute;
+    var HideSaveAttribute = /** @class */ (function () {
+        function HideSaveAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        return HideSaveAttribute;
+    }());
+    Serenity.HideSaveAttribute = HideSaveAttribute;
+    var HideUndoAttribute = /** @class */ (function () {
+        function HideUndoAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        return HideUndoAttribute;
+    }());
+    Serenity.HideUndoAttribute = HideUndoAttribute;
+    var HideCloneAttribute = /** @class */ (function () {
+        function HideCloneAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        return HideCloneAttribute;
+    }());
+    Serenity.HideCloneAttribute = HideCloneAttribute;
+    var HideLocalizationAttribute = /** @class */ (function () {
+        function HideLocalizationAttribute(value) {
+            if (value === void 0) { value = true; }
+            this.value = value;
+        }
+        return HideLocalizationAttribute;
+    }());
+    Serenity.HideLocalizationAttribute = HideLocalizationAttribute;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -2592,6 +2640,48 @@ var Serenity;
             };
         }
         Decorators.service = service;
+        function hideDelete(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                addAttribute(target, new Serenity.HideDeleteAttribute(value));
+            };
+        }
+        Decorators.hideDelete = hideDelete;
+        function hideApply(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                addAttribute(target, new Serenity.HideApplyAttribute(value));
+            };
+        }
+        Decorators.hideApply = hideApply;
+        function hideSave(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                addAttribute(target, new Serenity.HideSaveAttribute(value));
+            };
+        }
+        Decorators.hideSave = hideSave;
+        function hideUndo(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                addAttribute(target, new Serenity.HideUndoAttribute(value));
+            };
+        }
+        Decorators.hideUndo = hideUndo;
+        function hideClone(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                addAttribute(target, new Serenity.HideCloneAttribute(value));
+            };
+        }
+        Decorators.hideClone = hideClone;
+        function hideLocalization(value) {
+            if (value === void 0) { value = true; }
+            return function (target) {
+                addAttribute(target, new Serenity.HideLocalizationAttribute(value));
+            };
+        }
+        Decorators.hideLocalization = hideLocalization;
     })(Decorators = Serenity.Decorators || (Serenity.Decorators = {}));
 })(Serenity || (Serenity = {}));
 var Serenity;
@@ -3362,6 +3452,54 @@ var Serenity;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(TemplatedDialog.prototype, "isHideDelete", {
+            get: function () {
+                var hideDelAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.HideDeleteAttribute, true);
+                return hideDelAttr.length > 0 && hideDelAttr[hideDelAttr.length - 1].value !== false;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TemplatedDialog.prototype, "isHideApply", {
+            get: function () {
+                var hideApplyAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.HideApplyAttribute, true);
+                return hideApplyAttr.length > 0 && hideApplyAttr[hideApplyAttr.length - 1].value !== false;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TemplatedDialog.prototype, "isHideSave", {
+            get: function () {
+                var hideSaveAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.HideSaveAttribute, true);
+                return hideSaveAttr.length > 0 && hideSaveAttr[hideSaveAttr.length - 1].value !== false;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TemplatedDialog.prototype, "isHideUndo", {
+            get: function () {
+                var hideUndoAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.HideUndoAttribute, true);
+                return hideUndoAttr.length > 0 && hideUndoAttr[hideUndoAttr.length - 1].value !== false;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TemplatedDialog.prototype, "isHideClone", {
+            get: function () {
+                var hideCloneAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.HideCloneAttribute, true);
+                return hideCloneAttr.length > 0 && hideCloneAttr[hideCloneAttr.length - 1].value !== false;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TemplatedDialog.prototype, "isHideLocalization", {
+            get: function () {
+                var hideLocAttr = ss.getAttributes(ss.getInstanceType(this), Serenity.HideLocalizationAttribute, true);
+                return hideLocAttr.length > 0 && hideLocAttr[hideLocAttr.length - 1].value !== false;
+            },
+            enumerable: true,
+            configurable: true
+        });
         TemplatedDialog.getCssSize = function (element, name) {
             var cssSize = element.css(name);
             if (cssSize == null) {
@@ -3461,6 +3599,18 @@ var Serenity;
                 hotkeyContext = this.element;
             }
             var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
+            if (this.isHideDelete)
+                opt.buttons.splice(Q.indexOf(opt.buttons, function (x) { return x.cssClass == "delete-button"; }), 1);
+            if (this.isHideApply)
+                opt.buttons.splice(Q.indexOf(opt.buttons, function (x) { return x.cssClass == "apply-changes-button"; }), 1);
+            if (this.isHideSave)
+                opt.buttons.splice(Q.indexOf(opt.buttons, function (x) { return x.cssClass == "save-and-close-button"; }), 1);
+            if (this.isHideUndo)
+                opt.buttons.splice(Q.indexOf(opt.buttons, function (x) { return x.cssClass == "undo-delete-button"; }), 1);
+            if (this.isHideClone)
+                opt.buttons.splice(Q.indexOf(opt.buttons, function (x) { return x.cssClass == "clone-button"; }), 1);
+            if (this.isHideLocalization)
+                opt.buttons.splice(Q.indexOf(opt.buttons, function (x) { return x.cssClass == "localization-button"; }), 1);
             this.toolbar = new Serenity.Toolbar(toolbarDiv, opt);
         };
         TemplatedDialog.prototype.getToolbarButtons = function () {
