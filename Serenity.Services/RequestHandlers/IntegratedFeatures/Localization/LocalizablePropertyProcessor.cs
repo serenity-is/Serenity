@@ -27,7 +27,8 @@ namespace Serenity.PropertyGrid
             var attr = source.GetAttribute<LocalizableAttribute>();
             if (attr != null)
             {
-                item.Localizable = true;
+                if (item.IsLocalizable)
+                    item.Localizable = true;
                 return;
             }
 
