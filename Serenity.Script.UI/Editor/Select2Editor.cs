@@ -19,7 +19,7 @@ namespace Serenity
         where TOptions : class, new()
         where TItem: class
     {
-        private bool multiple;
+        protected bool multiple;
         protected List<Select2Item> items;
         protected JsDictionary<string, Select2Item> itemById;
         protected int pageSize = 100;
@@ -192,7 +192,7 @@ namespace Serenity
 
             this.Change(e =>
             {
-                bool isNew = this.Value.IsEmptyOrNull();
+                bool isNew = this.multiple || this.Value.IsEmptyOrNull();
                 inplaceButton
                     .Attribute("title", isNew ? addTitle : editTitle)
                     .ToggleClass("edit", !isNew);
@@ -200,12 +200,38 @@ namespace Serenity
 
             this.ChangeSelect2(e =>
             {
-                if (this.Value == Int32.MinValue.ToString())
+                if (this.multiple)
+                {
+                    var values = this.Values;
+                    if (values.Length > 0 && values[values.Length - 1] == Int32.MinValue.ToString())
+                    {
+                        this.Values = values.Slice(0, values.Length - 1);
+                        InplaceCreateClick(e);
+                    }
+                }
+                else if (this.Value == Int32.MinValue.ToString())
                 {
                     this.Value = null;
-                    InplaceCreateClick(null);
+                    InplaceCreateClick(e);
                 }
             });
+
+            if (this.multiple)
+            {
+                this.Select2Container.On("dblclick." + this.uniqueName, ".select2-search-choice", e =>
+                {
+                    var q = J(e.Target);
+                    if (!q.HasClass("select2-search-choice"))
+                        q = q.Closest(".select2-search-choice");
+                    var index = q.Index();
+                    var values = this.Values;
+                    if (index < 0 || index >= this.Values.Length)
+                        return;
+
+                    e.As<JsDictionary<string, object>>()["editItem"] = values[index];
+                    InplaceCreateClick(e);
+                });
+            }
         }
 
         protected virtual void InplaceCreateClick(jQueryEvent e)

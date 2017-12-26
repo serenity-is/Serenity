@@ -205,15 +205,43 @@ namespace Serenity
                 {
                     Q.ReloadLookup(GetLookupKey());
                     self.UpdateItems();
-                    self.Value = null;
+                    this.lastCreateTerm = null;
 
                     if ((dci.Type == "create" || dci.Type == "update") && dci.EntityId != null)
                     {
-                        self.Value = dci.EntityId.ToString();
+                        var id = dci.EntityId.ToString();
+                        if (this.multiple)
+                        {
+                            var values = self.Values.Clone().As<List<string>>();
+                            if (!values.Contains(id))
+                                values.Add(id);
+                            self.Values = null;
+                            self.Values = values.ToArray();
+                        }
+                        else
+                        {
+                            self.Value = null;
+                            self.Value = id;
+                        }
                     }
+                    else if (multiple && dci.Type == "delete" && dci.EntityId != null)
+                    {
+                        var id = dci.EntityId.ToString();
+                        var values = self.Values.Clone().As<List<string>>();
+                        values.Remove(id);
+                        self.Values = values.ToArray();
+                    }
+                    else if (!multiple)
+                        self.Value = null;
                 });
 
-                if (this.Value.IsEmptyOrNull())
+                var editItem = e.As<JsDictionary<string, object>>()["editItem"];
+
+                if (editItem != null)
+                {
+                    dialog.Load(editItem, () => dialog.DialogOpen(OpenDialogAsPanel), null);
+                }
+                else if (this.multiple || this.Value.IsEmptyOrNull())
                 {
                     var entity = new object().As<TItem>();
                     entity.As<JsDictionary<string, object>>()[GetLookup().TextField] = lastCreateTerm.TrimToEmpty();
