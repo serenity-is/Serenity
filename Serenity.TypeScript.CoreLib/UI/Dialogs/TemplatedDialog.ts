@@ -28,6 +28,42 @@
                 (ss as any).getAttributes((ss as any).getInstanceType(this), ResponsiveAttribute, true).length > 0;
         }
 
+        private get isHideDelete() {
+            var hideDelAttr = (ss as any).getAttributes((ss as any).getInstanceType(this),
+                Serenity.HideDeleteAttribute, true) as Serenity.HideDeleteAttribute[];
+            return hideDelAttr.length > 0 && hideDelAttr[hideDelAttr.length - 1].value !== false;
+        }
+
+        private get isHideApply() {
+            var hideApplyAttr = (ss as any).getAttributes((ss as any).getInstanceType(this),
+                Serenity.HideApplyAttribute, true) as Serenity.HideApplyAttribute[];
+            return hideApplyAttr.length > 0 && hideApplyAttr[hideApplyAttr.length - 1].value !== false;
+        }
+
+        private get isHideSave() {
+            var hideSaveAttr = (ss as any).getAttributes((ss as any).getInstanceType(this),
+                Serenity.HideSaveAttribute, true) as Serenity.HideSaveAttribute[];
+            return hideSaveAttr.length > 0 && hideSaveAttr[hideSaveAttr.length - 1].value !== false;
+        }
+
+        private get isHideUndo() {
+            var hideUndoAttr = (ss as any).getAttributes((ss as any).getInstanceType(this),
+                Serenity.HideUndoAttribute, true) as Serenity.HideUndoAttribute[];
+            return hideUndoAttr.length > 0 && hideUndoAttr[hideUndoAttr.length - 1].value !== false;
+        }
+
+        private get isHideClone() {
+            var hideCloneAttr = (ss as any).getAttributes((ss as any).getInstanceType(this),
+                Serenity.HideCloneAttribute, true) as Serenity.HideCloneAttribute[];
+            return hideCloneAttr.length > 0 && hideCloneAttr[hideCloneAttr.length - 1].value !== false;
+        }
+
+        private get isHideLocalization() {
+            var hideLocAttr = (ss as any).getAttributes((ss as any).getInstanceType(this),
+                Serenity.HideLocalizationAttribute, true) as Serenity.HideLocalizationAttribute[];
+            return hideLocAttr.length > 0 && hideLocAttr[hideLocAttr.length - 1].value !== false;
+        }
+
         private static getCssSize(element: JQuery, name: string): number {
             var cssSize = element.css(name);
             if (cssSize == null) {
@@ -148,6 +184,20 @@
             }
 
             var opt = { buttons: this.getToolbarButtons(), hotkeyContext: hotkeyContext[0] };
+
+            if (this.isHideDelete)
+                opt.buttons.splice(Q.indexOf(opt.buttons, x => x.cssClass == "delete-button"), 1);
+            if (this.isHideApply)
+                opt.buttons.splice(Q.indexOf(opt.buttons, x => x.cssClass == "apply-changes-button"), 1);
+            if (this.isHideSave)
+                opt.buttons.splice(Q.indexOf(opt.buttons, x => x.cssClass == "save-and-close-button"), 1);
+            if (this.isHideUndo)
+                opt.buttons.splice(Q.indexOf(opt.buttons, x => x.cssClass == "undo-delete-button"), 1);
+            if (this.isHideClone)
+                opt.buttons.splice(Q.indexOf(opt.buttons, x => x.cssClass == "clone-button"), 1);
+            if (this.isHideLocalization)
+                opt.buttons.splice(Q.indexOf(opt.buttons, x => x.cssClass == "localization-button"), 1);
+
             this.toolbar = new Toolbar(toolbarDiv, opt);
         }
 

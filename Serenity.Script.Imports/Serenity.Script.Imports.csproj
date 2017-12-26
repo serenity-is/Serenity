@@ -36,6 +36,12 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Attribute\GeneratedCode.cs" />
+    <Compile Include="Attribute\HideApplyAttribute.cs" />
+    <Compile Include="Attribute\HideCloneAttribute.cs" />
+    <Compile Include="Attribute\HideLocalizationAttribute.cs" />
+    <Compile Include="Attribute\HideUndoAttribute.cs" />
+    <Compile Include="Attribute\HideSaveAttribute.cs" />
+    <Compile Include="Attribute\HideDeleteAttribute.cs" />
     <Compile Include="CKEditor\CKEditor.cs" />
     <Compile Include="Criteria\BaseCriteria.cs" />
     <Compile Include="Criteria\BinaryCriteria.cs" />

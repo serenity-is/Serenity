@@ -851,6 +851,30 @@ declare namespace Serenity {
         value: string;
         constructor(value: string);
     }
+    class HideDeleteAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class HideApplyAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class HideSaveAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class HideUndoAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class HideCloneAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class HideLocalizationAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
 }
 declare namespace Serenity {
     class CategoryAttribute {
@@ -946,6 +970,12 @@ declare namespace Serenity {
         function resizable(value?: boolean): (target: Function) => void;
         function responsive(value?: boolean): (target: Function) => void;
         function service(value: string): (target: Function) => void;
+        function hideDelete(value?: boolean): (target: Function) => void;
+        function hideApply(value?: boolean): (target: Function) => void;
+        function hideSave(value?: boolean): (target: Function) => void;
+        function hideUndo(value?: boolean): (target: Function) => void;
+        function hideClone(value?: boolean): (target: Function) => void;
+        function hideLocalization(value?: boolean): (target: Function) => void;
     }
 }
 declare namespace Serenity {
@@ -2212,6 +2242,12 @@ declare namespace Serenity {
         constructor(options?: TOptions);
         private readonly isMarkedAsPanel;
         private readonly isResponsive;
+        private readonly isHideDelete;
+        private readonly isHideApply;
+        private readonly isHideSave;
+        private readonly isHideUndo;
+        private readonly isHideClone;
+        private readonly isHideLocalization;
         private static getCssSize(element, name);
         private static applyCssSizes(opt, dialogClass);
         destroy(): void;

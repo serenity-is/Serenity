@@ -83,6 +83,30 @@
     export class ServiceAttribute {
         constructor(public value: string) { }
     }
+
+    export class HideDeleteAttribute {
+        constructor(public value = true) { }
+    }
+
+    export class HideApplyAttribute {
+        constructor(public value = true) { }
+    }
+
+    export class HideSaveAttribute {
+        constructor(public value = true) { }
+    }
+
+    export class HideUndoAttribute {
+        constructor(public value = true) { }
+    }
+
+    export class HideCloneAttribute {
+        constructor(public value = true) { }
+    }
+
+    export class HideLocalizationAttribute {
+        constructor(public value = true) { }
+    }
 }
 
 declare namespace Serenity {
