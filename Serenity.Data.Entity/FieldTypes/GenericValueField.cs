@@ -82,7 +82,7 @@ namespace Serenity.Data
                     _setValue(row, (TValue)value);
                 } catch (InvalidCastException ex)
                 {
-                    throw new Exception($"Invalid cast exception while trying to set the value of {this.Name} field on {row.GetType().Name} as object.", ex);
+                    throw new InvalidCastException($"Invalid cast exception while trying to set the value of {this.Name} field on {row.GetType().Name} as object.", ex);
                 }
             }
 
