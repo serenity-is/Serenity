@@ -1,3 +1,26 @@
+## 3.3.14 (2017-12-27)
+
+Features:
+  - prevent reloading grid while loading persisted quick search
+  - validate permission on ReportRegistry.GetReport method to secure execution
+  - message dialog style changes for modern look
+  - made inplace add functionality compatible with multiple lookup editor. when multiple editing items works by double clicking on labels.
+  - give a hint about field name when cast exception occurs on a field asobject method (thanks @dfaruque)
+  - serins npm package (serin for startsharp)
+  
+Bugfixes:
+  - took care of unnecessary loops on distinct lookup registration
+  - should put quotes around guid values in sql debug text
+  - fix search for previously loaded CKEditor script
+  - preprocessor directive to determine site.less folder in new sergen was wrong, so site.module.less was created in wrong directory
+  - RadioButtonEditor missing options in constructor in Editors.ts
+  - renamed getEntityIsActiveField (older name) in d.ts to getIsActiveProperty (current name), thanks @	tky753
+  - set property item as localizable only if Localizable attribute value is true
+  - fix sqlite connection string database location invalid due to a change in Microsoft.Data.Sqlite
+  - fix hint and title options are mixed in ExcelExportHelper.ts [Serene]
+  - show pdf in new window not working on some browsers [Serene]
+  - fix exception while adding implicit permissions [Serene]
+  
 ## 3.3.13 (2017-11-23)
 
 Features:
