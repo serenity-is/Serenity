@@ -1185,10 +1185,13 @@ namespace Serenity
                     args.Active = active1 || active2;
 
                     if (active1)
+                    {
+                        end.MinDate = args.Widget.ValueAsDate;
                         args.Request.Criteria &= new Criteria(args.Field) >= args.Widget.Value;
-
+                    }
                     if (active2)
                     {
+                        args.Widget.MaxDate = end.ValueAsDate;
                         var next = new JsDate(end.ValueAsDate.ValueOf());
                         next.SetDate(next.GetDate() + 1);
                         args.Request.Criteria &= new Criteria(args.Field) < Q.FormatDate(next, "yyyy-MM-dd");
