@@ -30,8 +30,7 @@ namespace Serenity
                 YearRange = YearRange ?? "-100:+50"
             });
 
-            input.Bind("keyup." + this.uniqueName, e =>
-            {
+            input.Bind("keyup." + this.uniqueName, e => {
                 if (e.Which == 32 && !ReadOnly)
                 {
                     if (this.ValueAsDate != JsDate.Today)
@@ -81,8 +80,8 @@ namespace Serenity
             int x;
             if (val.Length >= 6 && Int32.TryParse(val, out x))
             {
-                input.Value(val.Substr(0, 2) + Q.Culture.DateSeparator +
-                    val.Substr(2, 2) + Q.Culture.DateSeparator +
+                input.Value(val.Substr(0, 2) + Q.Culture.DateSeparator + 
+                    val.Substr(2, 2) + Q.Culture.DateSeparator + 
                     val.Substr(4));
             }
 
@@ -164,7 +163,7 @@ namespace Serenity
                         }
                         else
                             break;
-                    default:
+                    default: 
                         return;
                 }
 
@@ -186,7 +185,7 @@ namespace Serenity
                             return;
                         break;
                     case 3:
-                        if (!IsNumeric(val[0]) ||
+                        if (!IsNumeric(val[0]) || 
                             val[1].ToString() != Q.Culture.DateSeparator ||
                             val[2] <= '1')
                             return;
@@ -234,7 +233,7 @@ namespace Serenity
             get
             {
                 string value = this.element.GetValue().Trim();
-
+                
                 if (value != null && value.Length == 0)
                     return null;
 
@@ -339,7 +338,7 @@ namespace Serenity
                 return MinValue == "1753-01-01" &&
                     MaxValue == "9999-12-31";
             }
-            set
+            set 
             {
                 if (value)
                 {
