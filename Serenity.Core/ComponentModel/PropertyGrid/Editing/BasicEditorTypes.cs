@@ -138,6 +138,12 @@ namespace Serenity.ComponentModel
             get { return GetOption<String>("minYear"); }
             set { SetOption("minYear", value); }
         }
+
+        public Boolean Descending
+        {
+            get { return GetOption<Boolean>("descending"); }
+            set { SetOption("descending", value); }
+        }
     }
 
     public partial class DecimalEditorAttribute : CustomEditorAttribute
