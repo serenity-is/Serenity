@@ -143,7 +143,7 @@ namespace Serenity.CodeGenerator
 
                 if (File.Exists(siteLess))
                 {
-                    var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less";
+                    var importLine = "@import \"site." + model.Module.ToLowerInvariant() + ".less\";";
                     var lines = File.ReadAllLines(siteLess).ToList();
                     if (!lines.Any(x => (x ?? "").ToLowerInvariant().IsTrimmedSame(importLine)))
                     {
