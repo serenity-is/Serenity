@@ -24,7 +24,11 @@ namespace Serenity.Data
             get
             {
                 CheckUnassignedRead(row);
-                return (TEnum?)(object)_getValue(row);
+                var value = _getValue(row);
+                if (value == null)
+                    return null;
+
+                return (TEnum)(object)value;
             }
             set
             {
