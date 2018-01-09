@@ -5,8 +5,13 @@ using System.Collections.Generic;
 
 namespace Serenity
 {
-    public class DateTimeFiltering : BaseEditorFiltering<DateEditor>
+    public class DateTimeFiltering : BaseEditorFiltering
     {
+        public DateTimeFiltering()
+            : base(typeof(DateEditor))
+        {
+        }
+
         public override List<FilterOperator> GetOperators()
         {
             return AppendNullableOperators(
@@ -14,8 +19,10 @@ namespace Serenity
                     new List<FilterOperator>()));
         }
 
-        public override BaseCriteria GetCriteria(out string displayText)
+        public override CriteriaWithText GetCriteria()
         {
+            var result = new CriteriaWithText();
+
             switch (Operator.Key)
             {
                 case FilterOperators.EQ:
@@ -26,7 +33,7 @@ namespace Serenity
                 case FilterOperators.GE:
                     {
                         var text = GetEditorText();
-                        displayText = DisplayText(Operator, text);
+                        result.DisplayText = DisplayText(Operator, text);
                         var date = Q.ParseISODateTime((string)GetEditorValue());
                         date = new JsDate(date.GetFullYear(), date.GetMonth(), date.GetDate());
                         var next = new JsDate(date.GetFullYear(), date.GetMonth(), date.GetDate() + 1);
@@ -37,28 +44,34 @@ namespace Serenity
                         switch (Operator.Key)
                         {
                             case FilterOperators.EQ:
-                                return criteria >= dateValue & criteria < nextValue;
+                                result.Criteria = criteria >= dateValue & criteria < nextValue;
+                                return result;
 
                             case FilterOperators.NE:
-                                return ~(criteria < dateValue | criteria > nextValue);
+                                result.Criteria = ~(criteria < dateValue | criteria > nextValue);
+                                return result;
 
                             case FilterOperators.LT:
-                                return criteria < dateValue;
+                                result.Criteria = criteria < dateValue;
+                                return result;
 
                             case FilterOperators.LE:
-                                return criteria < nextValue;
+                                result.Criteria = criteria < nextValue;
+                                return result;
 
                             case FilterOperators.GT:
-                                return criteria >= nextValue;
+                                result.Criteria = criteria >= nextValue;
+                                return result;
 
                             case FilterOperators.GE:
-                                return criteria >= dateValue;
+                                result.Criteria = criteria >= dateValue;
+                                return result;
                         }
                     }
                     break;
             }
 
-            return base.GetCriteria(out displayText);
+            return base.GetCriteria();
         }
     }
 }

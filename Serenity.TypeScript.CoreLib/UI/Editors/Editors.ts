@@ -2,6 +2,7 @@
 
     namespace EditorUtils {
         function getValue(editor: Serenity.Widget<any>): any;
+        function getDisplayText(editor: Serenity.Widget<any>): string;
         function saveValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
         function setValue(editor: Serenity.Widget<any>, value: any): void;
         function loadValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;

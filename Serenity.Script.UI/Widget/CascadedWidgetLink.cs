@@ -1,15 +1,19 @@
 ﻿namespace Serenity
 {
     using System;
+    using System.Runtime.CompilerServices;
 
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false)]
     public class CascadedWidgetLink<TParent>
         where TParent: Widget
     {
         private Widget widget;
+        private Type parentType;
         private Action<TParent> parentChange;
 
-        public CascadedWidgetLink(Widget widget, Action<TParent> parentChange)
+        public CascadedWidgetLink(Type parentType, Widget widget, Action<TParent> parentChange)
         {
+            this.parentType = parentType;
             this.widget = widget;
             this.parentChange = parentChange;
             Bind();
@@ -25,7 +29,7 @@
             if (parentID.IsEmptyOrNull())
                 return null;
 
-            var parent = Q.FindElementWithRelativeId(widget.Element, parentID).TryGetWidget<TParent>();
+            var parent = Q.FindElementWithRelativeId(widget.Element, parentID).TryGetWidget(parentType).As<TParent>();
             if (parent != null)
             {
                 parent.Element.Bind("change." + widget.UniqueName, delegate
@@ -47,7 +51,7 @@
             if (parentID.IsEmptyOrNull())
                 return null;
 
-            var parent = Q.FindElementWithRelativeId(widget.Element, parentID).TryGetWidget<TParent>();
+            var parent = Q.FindElementWithRelativeId(widget.Element, parentID).TryGetWidget(parentType).As<TParent>();
             if (parent != null)
                 parent.Element.Unbind("." + widget.UniqueName);
 

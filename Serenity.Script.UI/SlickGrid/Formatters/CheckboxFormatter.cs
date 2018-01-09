@@ -1,8 +1,10 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class CheckboxFormatter : ISlickFormatter
     {
         public string Format(SlickFormatterContext ctx)

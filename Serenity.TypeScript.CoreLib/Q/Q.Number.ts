@@ -8,7 +8,7 @@ namespace Q {
         }
 
         dec = dec || Culture.decimalSeparator;
-        grp = grp || Culture.get_groupSeperator();
+        grp = grp || Culture.get_groupSeparator();
 
         let r = "";
         if (fmt.indexOf(".") > -1) {
@@ -105,7 +105,7 @@ namespace Q {
 
     export function parseInteger(s: string): number {
         s = trim(s.toString());
-        let ts = Culture.get_groupSeperator();
+        let ts = Culture.get_groupSeparator();
         if (s && s.length && s.indexOf(ts) > 0) {
             s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');
         }
@@ -122,7 +122,7 @@ namespace Q {
         if (s.length == 0)
             return null;
 
-        let ts = Culture.get_groupSeperator();
+        let ts = Culture.get_groupSeparator();
 
         if (s && s.length && s.indexOf(ts) > 0) {
             s = s.replace(new RegExp("(\\b\\d{1,3})\\" + ts + "(?=\\d{3}(\\D|$))", "g"), '$1');

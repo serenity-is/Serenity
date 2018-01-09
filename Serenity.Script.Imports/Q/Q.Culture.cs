@@ -25,17 +25,17 @@ namespace Serenity
             }
 
             /// <summary>
-            /// Thousands (digit grouping) seperator that depends on decimal char
+            /// Thousands (digit grouping) separator that depends on decimal char
             /// </summary>
             
-            public static string GroupSeperator
+            public static string GroupSeparator
             {
                 [InlineCode("Q.Culture.get_groupSeparator()")]
                 get { return null; }
             }
 
             /// <summary>
-            /// Date seperator
+            /// Date separator
             /// </summary>
             public static string DateSeparator
             {

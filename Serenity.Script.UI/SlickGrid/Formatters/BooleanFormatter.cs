@@ -1,8 +1,10 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class BooleanFormatter : ISlickFormatter
     {
         public string Format(SlickFormatterContext ctx)
@@ -16,10 +18,10 @@ namespace Serenity
             return Q.HtmlEncode(Q.TryGetText(FalseText) ?? FalseText ?? Q.TryGetText("Dialogs.NoButton") ?? "No");
         }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string FalseText { get; set; }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string TrueText { get; set; }
     }
 }

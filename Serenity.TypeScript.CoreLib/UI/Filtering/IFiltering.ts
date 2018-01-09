@@ -1,7 +1,7 @@
-﻿declare namespace Serenity {
-    interface IFiltering {
+﻿namespace Serenity {
+    export interface IFiltering {
         createEditor(): void;
-        getCriteria(displayText: any): any[];
+        getCriteria(): CriteriaWithText;
         getOperators(): FilterOperator[];
         loadState(state: any): void;
         saveState(): any;
@@ -11,5 +11,22 @@
         set_container(value: JQuery): void;
         get_operator(): FilterOperator;
         set_operator(value: FilterOperator): void;
+    }
+
+    @Serenity.Decorators.registerInterface('Serenity.IQuickFiltering')
+    export class IFiltering {
+    }
+
+    export interface CriteriaWithText {
+        criteria?: any[];
+        displayText?: string;
+    }
+
+    export interface IQuickFiltering {
+        initQuickFilter(filter: QuickFilter<Widget<any>, any>): void;
+    }
+
+    @Serenity.Decorators.registerInterface('Serenity.IQuickFiltering')
+    export class IQuickFiltering {
     }
 }

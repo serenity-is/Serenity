@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     [Editor, DisplayName("Açılır Liste"), OptionsType(typeof(SelectEditorOptions))]
     [Element("<input type=\"hidden\"/>")]
     public class SelectEditor : Select2Editor<SelectEditorOptions, Select2Item>, IStringValue

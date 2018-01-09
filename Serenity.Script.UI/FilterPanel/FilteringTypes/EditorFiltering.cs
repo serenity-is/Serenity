@@ -3,8 +3,13 @@ using jQueryApi;
 
 namespace Serenity
 {
-    public class EditorFiltering : BaseEditorFiltering<Widget>
+    public class EditorFiltering : BaseEditorFiltering
     {
+        public EditorFiltering()
+            : base(typeof(Widget))
+        {
+        }
+
         [Option]
         public string EditorType { get; set; }
         [Option]

@@ -7,6 +7,7 @@
         set_useRelative(value: boolean): void;
         get_useLike(): boolean;
         set_useLike(value: boolean): void;
+        getOperators(): Serenity.FilterOperator[];
     }
 
 }

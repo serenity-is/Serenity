@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class CollapsibleAttribute : Attribute
     {

@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Element("<div/>")]
+    [Imported(ObeysTypeSystem = true), Element("<div/>")]
     [IdProperty("id")]
     [IncludeGenericArguments(false), ScriptName("CheckTreeEditor")]
     public abstract class CheckTreeEditor<TItem, TOptions> : DataGrid<TItem, TOptions>, IGetEditValue, ISetEditValue

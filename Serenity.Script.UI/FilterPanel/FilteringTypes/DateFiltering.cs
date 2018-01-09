@@ -5,8 +5,13 @@ using System.Collections.Generic;
 
 namespace Serenity
 {
-    public class DateFiltering : BaseEditorFiltering<DateEditor>
+    public class DateFiltering : BaseEditorFiltering
     {
+        public DateFiltering()
+            : base(typeof(DateEditor))
+        {
+        }
+
         public override List<FilterOperator> GetOperators()
         {
             return AppendNullableOperators(

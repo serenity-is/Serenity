@@ -6,7 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Element("<input type=\"hidden\"/>"), IncludeGenericArguments(false), ScriptName("LookupEditorBase")]
+    [Imported(ObeysTypeSystem = true), Element("<input type=\"hidden\"/>")]
+    [IncludeGenericArguments(false), ScriptName("LookupEditorBase")]
     public abstract class LookupEditorBase<TOptions, TItem> : Select2Editor<TOptions, TItem>
         where TOptions: LookupEditorOptions, new()
         where TItem: class, new()
@@ -307,7 +308,7 @@ namespace Serenity
                 return;
             }
 
-            cascadeLink = new CascadedWidgetLink<Widget>(this, p => CascadeValue = GetCascadeFromValue(p));
+            cascadeLink = new CascadedWidgetLink<Widget>(typeof(Widget), this, p => CascadeValue = GetCascadeFromValue(p));
             cascadeLink.ParentID = value;
             options.CascadeFrom = value;
         }

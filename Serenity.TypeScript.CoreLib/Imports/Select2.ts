@@ -15,7 +15,7 @@ interface Select2QueryOptions {
 interface Select2Result {
     results: any;
     more: boolean;
-    context: any;
+    context?: any;
 }
 
 interface Select2AjaxOptions {

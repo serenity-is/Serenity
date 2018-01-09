@@ -164,10 +164,10 @@ namespace Serenity.Web
         ///   Converted filename.</returns>
         public static string ToPath(string fileName)
         {
-            var seperator = Path.DirectorySeparatorChar;
-            var opposite = seperator == '/' ? '\\' : '/';
+            var separator = Path.DirectorySeparatorChar;
+            var opposite = separator == '/' ? '\\' : '/';
             if (fileName != null && fileName.IndexOf(opposite) >= 0)
-                return fileName.Replace(opposite, seperator);
+                return fileName.Replace(opposite, separator);
             else
                 return fileName;
         }

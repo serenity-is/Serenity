@@ -84,8 +84,6 @@ namespace Serenity
     [Imported, Serializable, ScriptNamespace("Slick"), ScriptName("AutoTooltipsOptions")]
     public class SlickAutoTooltipsOptions
     {
-        
-
         public bool EnableForHeaderCells { get; set; }
         public bool EnableForCells { get; set; }
         public int MaxToolTipLength { get; set; }

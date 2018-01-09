@@ -86,15 +86,6 @@
 }
 
 declare namespace Serenity {
-    class CategoryAttribute {
-        constructor(category: string);
-        category: string;
-    }
-
-    class CssClassAttribute {
-        constructor(cssClass: string);
-        cssClass: string;
-    }
 
     class DefaultValueAttribute {
         constructor(defaultValue: any);

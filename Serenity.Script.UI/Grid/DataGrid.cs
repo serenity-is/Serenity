@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [IncludeGenericArguments(false), ScriptName("DataGrid")]
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false), ScriptName("DataGrid")]
     public abstract class DataGrid<TItem, TOptions> : Widget<TOptions>, IDataGrid
         where TItem : class, new()
         where TOptions : class, new()
@@ -185,7 +185,7 @@ namespace Serenity
                 }
 
                 if (item.QuickFilterSeparator == true)
-                    quick.Seperator = true;
+                    quick.Separator = true;
 
                 quick.CssClass = item.QuickFilterCssClass;
 
@@ -1052,7 +1052,7 @@ namespace Serenity
                 quickFiltersDiv = J("<div/>").AddClass("quick-filters-bar").AppendTo(toolbar.Element);
             }
 
-            if (opt.Seperator)
+            if (opt.Separator)
                 AddFilterSeparator();
 
             var quickFilter = J("<div class='quick-filter-item'><span class='quick-filter-label'></span></div>")

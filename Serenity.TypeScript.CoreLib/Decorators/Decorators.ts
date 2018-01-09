@@ -90,30 +90,58 @@
             }
         }
 
-        export function registerClass(intf?: any[], asm?: ss.AssemblyReg) {
+        function distinct(arr: any[]) {
+            return arr.filter((item, pos) => arr.indexOf(item) === pos);
+        }
+
+        function merge(arr1: any[], arr2: any[]) {
+            if (!arr1 || !arr2)
+                return (arr1 || arr2 || []).slice();
+
+            return distinct(arr1.concat(arr2));
+        }
+
+        export function registerClass(nameOrIntf?: string | any[], intf2?: any[]) {
             return function (target: Function) {
-                (target as any).__register = true;
+                if (typeof nameOrIntf == "string") {
+                    (target as any).__typeName = nameOrIntf;
+                    if (intf2)
+                        (target as any).__interfaces = merge((target as any).__interfaces, intf2);
+                }
+                else {
+                    (target as any).__register = true;
+                    if (nameOrIntf)
+                        (target as any).__interfaces = merge((target as any).__interfaces, nameOrIntf);
+                }
+
                 (target as any).__class = true;
-                (target as any).__assembly = asm || ss.__assemblies['App'];
-                if (intf)
-                    (target as any).__interfaces = intf;
+                (target as any).__assembly = ss.__assemblies['App'];
             }
         }
 
-        export function registerInterface(intf?: any[], asm?: ss.AssemblyReg) {
+        export function registerInterface(nameOrIntf?: string | any[], intf2?: any[]) {
             return function (target: Function) {
-                (target as any).__register = true;
+                if (typeof nameOrIntf == "string") {
+                    (target as any).__typeName = nameOrIntf;
+                    if (intf2)
+                        (target as any).__interfaces = intf2;
+                }
+                else {
+                    (target as any).__register = true;
+                    if (nameOrIntf)
+                        (target as any).__interfaces = merge((target as any).__interfaces, nameOrIntf);
+                }
+
                 (target as any).__interface = true;
-                (target as any).__assembly = asm || ss.__assemblies['App'];
-                if (intf)
-                    (target as any).__interfaces = intf;
+                (target as any).__assembly = ss.__assemblies['App'];
+
                 (target as any).isAssignableFrom = function (type: any) {
                     return (ss as any).contains((ss as any).getInterfaces(type), this);
                 };
             }
         }
 
-        export function registerEnum(target: any, enumKey?: string, asm?: ss.AssemblyReg) {
+        export function registerEnum(target: any, enumKey?: string, typeName?: string, asm?: ss.AssemblyReg) {
             if (!target.__enum) {
                 Object.defineProperty(target, '__enum', {
                     get: function () {
@@ -126,19 +154,22 @@
                     if (isNaN(Q.parseInteger(k)) && target[k] != null && !isNaN(Q.parseInteger(target[k])))
                         target.prototype[k] = target[k];
 
-                target.__register = true;
+                if (Q.coalesce(typeName, enumKey))
+                    target.__typeName = Q.coalesce(typeName, enumKey);
+                else
+                    target.__register = true;
 
                 if (enumKey)
                     addAttribute(target, new Serenity.EnumKeyAttribute(enumKey));
             }
         }
 
-        export function registerEditor(intf?: any[], asm?: ss.AssemblyReg) {
-            return registerClass(intf, asm);
+        export function registerEditor(nameOrIntf?: string | any[], intf2?: any[]) {
+            return registerClass(nameOrIntf, intf2);
         }
 
-        export function registerFormatter(intf = [Serenity.ISlickFormatter], asm?: ss.AssemblyReg) {
-            return registerClass(intf, asm);
+        export function registerFormatter(nameOrIntf: string | any[] = [Serenity.ISlickFormatter], intf2: any[] = [Serenity.ISlickFormatter]) {
+            return registerClass(nameOrIntf, intf2);
         }
 
         export function filterable(value = true) {

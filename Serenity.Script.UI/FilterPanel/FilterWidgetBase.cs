@@ -1,9 +1,11 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [IncludeGenericArguments(false), ScriptName("FilterWidgetBase")]
     public abstract class FilterWidgetBase<TOptions> : TemplatedWidget<TOptions>
         where TOptions: class, new()
     {

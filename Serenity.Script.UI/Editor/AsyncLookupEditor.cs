@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor, OptionsType(typeof(LookupEditorOptions))]
+    [Imported(ObeysTypeSystem = true), Editor, OptionsType(typeof(LookupEditorOptions))]
     public class AsyncLookupEditor : LookupEditorBase<LookupEditorOptions, object>, IAsyncInit
     {
         public AsyncLookupEditor(jQueryObject hidden, LookupEditorOptions opt)

@@ -7,7 +7,7 @@ namespace Q {
         export let dateFormat = 'dd/MM/yyyy';
         export let dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
 
-        export function get_groupSeperator(): string {
+        export function get_groupSeparator(): string {
             return ((decimalSeparator === ',') ? '.' : ',');
         };
 

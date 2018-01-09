@@ -259,10 +259,10 @@ declare namespace Slick {
         constructor(options: Slick.AutoTooltipsOptions);
     }
 
-    interface AutoTooltipsOptions {
-        enableForHeaderCells: boolean;
-        enableForCells: boolean;
-        maxToolTipLength: number;
+    export interface AutoTooltipsOptions {
+        enableForHeaderCells?: boolean;
+        enableForCells?: boolean;
+        maxToolTipLength?: number;
     }
 
     interface GroupInfo<TItem> {
@@ -359,9 +359,12 @@ declare namespace Slick {
     interface RemoteView<TEntity> {
         constructor(options: RemoteViewOptions): void;
         onSubmit: Slick.CancellableViewCallback<TEntity>;
+        onDataChanged: Slick.Event;
         onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
         onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
         addData(data: Serenity.ListResponse<TEntity>): void;
+        beginUpdate(): void;
+        endUpdate(): void;
         deleteItem(id: any): void;
         getItems(): TEntity[];
         setFilter(filter: RemoteViewFilter<TEntity>): void;
@@ -379,6 +382,9 @@ declare namespace Slick {
         collapseGroup(keys: any[]): void;
         setSummaryOptions(options: Slick.SummaryOptions): void;
         refresh(): void;
+        populate(): void;
+        populateLock(): void;
+        populateUnlock(): void;
         getItem(row: number): any;
         params: any;
         sortBy: string[];
@@ -413,6 +419,10 @@ declare namespace Slick {
         bottom?: number;
         leftPx?: number;
         rightPx?: number;
+    }
+
+    class Grid {
+        constructor(container: JQuery, data: any, columns: Column[], options: GridOptions);
     }
 
     interface Grid {

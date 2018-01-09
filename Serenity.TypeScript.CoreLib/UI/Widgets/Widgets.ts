@@ -16,9 +16,6 @@
         list = 2
     }
 
-    class ISlickFormatter {
-    }
-
     class ScriptContext {
     }
 
@@ -50,10 +47,6 @@
         set_value(value: string): void;
     }
 
-    class AsyncLookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
-        constructor(hidden: JQuery, opt: LookupEditorOptions);
-    }
-
     interface ToolbarOptions {
         buttons?: ToolButton[];
         hotkeyContext?: any;
@@ -62,29 +55,6 @@
     class Toolbar extends Widget<ToolbarOptions> {
         constructor(div: JQuery, options: ToolbarOptions);
         findButton(className: string): JQuery;
-    }
-
-    class BooleanFiltering extends BaseFiltering {
-    }
-
-    class BooleanFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
-        get_falseText(): string;
-        set_falseText(value: string): void;
-        get_trueText(): string;
-        set_trueText(value: string): void;
-    }
-
-    class CascadedWidgetLink<TParent> {
-        constructor(widget: Serenity.Widget<any>, parentChange: (p1: TParent) => void);
-        bind(): TParent;
-        unbind(): TParent;
-        get_parentID(): string;
-        set_parentID(value: string): void;
-    }
-
-    class CheckboxFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext): string;
     }
 
     class CheckListEditor extends Widget<CheckListEditorOptions> {
@@ -132,14 +102,7 @@
     }
 
     class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
-    }
-
-    interface IReadOnly {
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-    }
-
-    class IReadOnly {
+        getOperators(): Serenity.FilterOperator[];
     }
 
     interface HtmlContentEditorOptions {
@@ -168,7 +131,7 @@
         filterItems?: FilterLine[];
         quickFilters?: Q.Dictionary<any>;
         quickFilterText?: string;
-        quickSearchField: QuickSearchField;
+        quickSearchField?: QuickSearchField;
         quickSearchText?: string;
         includeDeleted?: boolean;
     }
@@ -179,13 +142,6 @@
     }
 
     interface CKEditorConfig {
-    }
-
-    interface IDataGrid {
-        getElement(): JQuery;
-        getGrid(): Slick.Grid;
-        getView(): Slick.RemoteView<any>;
-        getFilterStore(): Serenity.FilterStore;
     }
 
     enum CaptureOperationType {

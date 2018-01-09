@@ -3,8 +3,8 @@
     class FilterStore {
         constructor(fields: any);
         raiseChanged(): void;
-        add_Changed(value: any): void;
-        remove_Changed(value: any): void;
+        add_changed(value: any): void;
+        remove_changed(value: any): void;
         get_fields(): PropertyItem[];
         get_fieldByName(): any;
         get_items(): FilterLine[];

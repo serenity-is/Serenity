@@ -1,6 +1,7 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
+using Serenity.FilterPanels;
 
 namespace Serenity
 {
@@ -162,11 +163,11 @@ namespace Serenity
                     line.IsOr = row.Children("div.l").Children("a.andor").HasClass("or");
                     line.LeftParen = row.Children("div.l").Children("a.leftparen").HasClass("active");
                     line.RightParen = row.Children("div.l").Children("a.rightparen").HasClass("active");
-                    string displayText;
                     filtering.Operator = op;
-                    line.Criteria = filtering.GetCriteria(out displayText);
+                    var criteria = filtering.GetCriteria();
+                    line.Criteria = criteria.Criteria;
                     line.State = filtering.SaveState();
-                    line.DisplayText = displayText;
+                    line.DisplayText = criteria.DisplayText;
 
                     filterLines.Add(line);
                 }

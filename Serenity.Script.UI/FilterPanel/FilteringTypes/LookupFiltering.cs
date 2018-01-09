@@ -2,8 +2,13 @@
 
 namespace Serenity
 {
-    public class LookupFiltering : BaseEditorFiltering<LookupEditor>
+    public class LookupFiltering : BaseEditorFiltering
     {
+        public LookupFiltering()
+            : base(typeof(LookupEditor))
+        {
+        }
+
         public override List<FilterOperator> GetOperators()
         {
             return AppendNullableOperators(

@@ -5,8 +5,13 @@ using System.Collections.Generic;
 
 namespace Serenity
 {
-    public class IntegerFiltering : BaseEditorFiltering<IntegerEditor>
+    public class IntegerFiltering : BaseEditorFiltering
     {
+        public IntegerFiltering()
+            : base(typeof(IntegerEditor))
+        {
+        }
+
         public override List<FilterOperator> GetOperators()
         {
             return AppendNullableOperators(

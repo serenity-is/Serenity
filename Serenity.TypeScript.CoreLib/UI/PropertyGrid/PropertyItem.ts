@@ -47,5 +47,6 @@
         quickFilter?: boolean;
         quickFilterParams?: any;
         quickFilterSeparator?: boolean;
+        quickFilterCssClass?: string;
     }
 }

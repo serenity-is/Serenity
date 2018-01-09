@@ -133,5 +133,13 @@ namespace Serenity
         {
             return null;
         }
+
+        [IncludeGenericArguments(false)]
+        [InlineCode("Serenity.Widget.create({{ type: {type}, container: {container}, options: {options}, init: {init} }})")]
+        public static Widget CreateInside(Type type, jQueryObject container, object options = null,
+                Action<Widget> init = null)
+        {
+            return null;
+        }
     }
 }
