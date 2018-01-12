@@ -1,4 +1,11 @@
-﻿declare namespace Serenity {
+﻿namespace Serenity {
+    @Serenity.Decorators.registerInterface('Serenity.ISlickFormatter')
+    export class ISlickFormatter {
+
+    }
+}
+
+declare namespace Serenity {
 
     class DateFormatter implements Slick.Formatter {
         format(ctx: Slick.FormatterContext): string;

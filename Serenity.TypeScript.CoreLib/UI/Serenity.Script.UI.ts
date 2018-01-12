@@ -194,10 +194,6 @@ namespace Serenity {
 }
 
 namespace Serenity {
-    public interface 
-}
-
-namespace Serenity {
 
     @Serenity.Decorators.registerClass('Serenity.CategoryAttribute')
     export class CategoryAttribute {
@@ -235,4 +231,3 @@ namespace Serenity {
         }
     }
 }
-

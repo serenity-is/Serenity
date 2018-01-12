@@ -101,40 +101,42 @@
             return distinct(arr1.concat(arr2));
         }
 
+        function registerType(target: any, name: string, intf: any[]) {
+            if (name != null)
+                target.__typeName = name;
+            else if (!target.__typeName)
+                target.__register = true;
+
+            if (intf)
+                target.__interfaces = merge(target.__interfaces, intf);
+
+            if (!target.__assembly)
+                target.__assembly = ss.__assemblies['App'];
+
+            if (target.__typeName)
+                target.__assembly.__types[target.__typeName] = target;
+        }
+
         export function registerClass(nameOrIntf?: string | any[], intf2?: any[]) {
             return function (target: Function) {
-                if (typeof nameOrIntf == "string") {
-                    (target as any).__typeName = nameOrIntf;
-                    if (intf2)
-                        (target as any).__interfaces = merge((target as any).__interfaces, intf2);
-                }
-                else {
-                    (target as any).__register = true;
-                    if (nameOrIntf)
-                        (target as any).__interfaces = merge((target as any).__interfaces, nameOrIntf);
-                }
+                if (typeof nameOrIntf == "string")
+                    registerType(target, nameOrIntf, intf2);
+                else
+                    registerType(target, null, nameOrIntf);
 
                 (target as any).__class = true;
-                (target as any).__assembly = ss.__assemblies['App'];
             }
         }
 
         export function registerInterface(nameOrIntf?: string | any[], intf2?: any[]) {
             return function (target: Function) {
-                if (typeof nameOrIntf == "string") {
-                    (target as any).__typeName = nameOrIntf;
-                    if (intf2)
-                        (target as any).__interfaces = intf2;
-                }
-                else {
-                    (target as any).__register = true;
-                    if (nameOrIntf)
-                        (target as any).__interfaces = merge((target as any).__interfaces, nameOrIntf);
-                }
+
+                if (typeof nameOrIntf == "string")
+                    registerType(target, nameOrIntf, intf2);
+                else
+                    registerType(target, null, nameOrIntf);
 
                 (target as any).__interface = true;
-                (target as any).__assembly = ss.__assemblies['App'];
-
                 (target as any).isAssignableFrom = function (type: any) {
                     return (ss as any).contains((ss as any).getInterfaces(type), this);
                 };

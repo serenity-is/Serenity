@@ -29,6 +29,8 @@ if (typeof Promise === "undefined") {
         };
     }
 }
+// fake assembly for typescript apps
+ss.initAssembly({}, 'App', {});
 var Q;
 (function (Q) {
     function coalesce(a, b) {
@@ -1809,6 +1811,20 @@ var Q;
 })(Q || (Q = {}));
 var Q;
 (function (Q) {
+    function initFormType(typ, nameWidgetPairs) {
+        for (var i = 0; i < nameWidgetPairs.length - 1; i += 2) {
+            (function (name, widget) {
+                Object.defineProperty(typ.prototype, name, {
+                    get: function () {
+                        return this.w(name, widget);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+            })(nameWidgetPairs[i], nameWidgetPairs[i + 1]);
+        }
+    }
+    Q.initFormType = initFormType;
     function prop(type, name, getter, setter) {
         getter = getter || "get_" + name;
         setter = setter || "set_" + name;
@@ -1883,8 +1899,6 @@ var Q;
     //    log((error.get_stack && error.get_stack()) || error.stack);
     //});
     (function (global) {
-        // fake assembly for typescript apps
-        ss.initAssembly({}, 'App', {});
         // for backward compability, avoid!
         global.Q$Externals = Q;
         global.Q$Config = Q.Config;
@@ -2472,37 +2486,35 @@ var Serenity;
                 return (arr1 || arr2 || []).slice();
             return distinct(arr1.concat(arr2));
         }
+        function registerType(target, name, intf) {
+            if (name != null)
+                target.__typeName = name;
+            else if (!target.__typeName)
+                target.__register = true;
+            if (intf)
+                target.__interfaces = merge(target.__interfaces, intf);
+            if (!target.__assembly)
+                target.__assembly = ss.__assemblies['App'];
+            if (target.__typeName)
+                target.__assembly.__types[target.__typeName] = target;
+        }
         function registerClass(nameOrIntf, intf2) {
             return function (target) {
-                if (typeof nameOrIntf == "string") {
-                    target.__typeName = nameOrIntf;
-                    if (intf2)
-                        target.__interfaces = merge(target.__interfaces, intf2);
-                }
-                else {
-                    target.__register = true;
-                    if (nameOrIntf)
-                        target.__interfaces = merge(target.__interfaces, nameOrIntf);
-                }
+                if (typeof nameOrIntf == "string")
+                    registerType(target, nameOrIntf, intf2);
+                else
+                    registerType(target, null, nameOrIntf);
                 target.__class = true;
-                target.__assembly = ss.__assemblies['App'];
             };
         }
         Decorators.registerClass = registerClass;
         function registerInterface(nameOrIntf, intf2) {
             return function (target) {
-                if (typeof nameOrIntf == "string") {
-                    target.__typeName = nameOrIntf;
-                    if (intf2)
-                        target.__interfaces = intf2;
-                }
-                else {
-                    target.__register = true;
-                    if (nameOrIntf)
-                        target.__interfaces = merge(target.__interfaces, nameOrIntf);
-                }
+                if (typeof nameOrIntf == "string")
+                    registerType(target, nameOrIntf, intf2);
+                else
+                    registerType(target, null, nameOrIntf);
                 target.__interface = true;
-                target.__assembly = ss.__assemblies['App'];
                 target.isAssignableFrom = function (type) {
                     return ss.contains(ss.getInterfaces(type), this);
                 };
@@ -3172,6 +3184,335 @@ var Serenity;
         return BooleanEditor;
     }(Serenity.Widget));
     Serenity.BooleanEditor = BooleanEditor;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var DateEditor = /** @class */ (function (_super) {
+        __extends(DateEditor, _super);
+        function DateEditor(input) {
+            var _this = _super.call(this, input) || this;
+            input.addClass('dateQ');
+            input.datepicker({
+                showOn: 'button',
+                beforeShow: function (inp, inst) {
+                    return !input.hasClass('readonly');
+                },
+                yearRange: Q.coalesce(_this.yearRange, '-100:+50')
+            });
+            input.bind('keyup.' + _this.uniqueName, function (e) {
+                if (e.which === 32 && !_this.get_readOnly()) {
+                    if (_this.get_valueAsDate() != ss.today()) {
+                        _this.set_valueAsDate(ss.today());
+                        _this.element.trigger('change');
+                    }
+                }
+                else {
+                    Serenity.DateEditor.dateInputKeyup(e);
+                }
+            });
+            input.bind('change.' + _this.uniqueName, Serenity.DateEditor.dateInputChange);
+            Serenity.VX.addValidationRule(input, _this.uniqueName, function (e1) {
+                var value = _this.get_value();
+                if (Q.isEmptyOrNull(value)) {
+                    return null;
+                }
+                if (!Q.isEmptyOrNull(_this.get_minValue()) && ss.compareStrings(value, _this.get_minValue()) < 0) {
+                    return Q.format(Q.text('Validation.MinDate'), Q.formatDate(_this.get_minValue(), null));
+                }
+                if (!Q.isEmptyOrNull(_this.get_maxValue()) && ss.compareStrings(value, _this.get_maxValue()) >= 0) {
+                    return Q.format(Q.text('Validation.MaxDate'), Q.formatDate(_this.get_maxValue(), null));
+                }
+                return null;
+            });
+            _this.set_sqlMinMax(true);
+            return _this;
+        }
+        DateEditor.prototype.get_value = function () {
+            var value = this.element.val().trim();
+            if (value != null && value.length === 0) {
+                return null;
+            }
+            return Q.formatDate(value, 'yyyy-MM-dd');
+        };
+        Object.defineProperty(DateEditor.prototype, "value", {
+            get: function () {
+                return this.get_value();
+            },
+            set: function (v) {
+                this.set_value(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DateEditor.prototype.set_value = function (value) {
+            if (value == null) {
+                this.element.val('');
+            }
+            else if (value.toLowerCase() === 'today' || value.toLowerCase() === 'now') {
+                this.element.val(Q.formatDate(ss.today(), null));
+            }
+            else {
+                this.element.val(Q.formatDate(value, null));
+            }
+        };
+        DateEditor.prototype.get_valueAsDate = function () {
+            if (Q.isEmptyOrNull(this.get_value())) {
+                return null;
+            }
+            return Q.parseISODateTime(this.get_value());
+        };
+        Object.defineProperty(DateEditor.prototype, "valueAsDate", {
+            get: function () {
+                return this.get_valueAsDate();
+            },
+            set: function (v) {
+                this.set_valueAsDate(v);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DateEditor.prototype.set_valueAsDate = function (value) {
+            if (value == null) {
+                this.set_value(null);
+            }
+            this.set_value(Q.formatDate(value, 'yyyy-MM-dd'));
+        };
+        DateEditor.prototype.get_readOnly = function () {
+            return this.element.hasClass('readonly');
+        };
+        DateEditor.prototype.set_readOnly = function (value) {
+            if (value !== this.get_readOnly()) {
+                if (value) {
+                    this.element.addClass('readonly').attr('readonly', 'readonly');
+                    this.element.nextAll('.ui-datepicker-trigger').css('opacity', '0.1');
+                }
+                else {
+                    this.element.removeClass('readonly').removeAttr('readonly');
+                    this.element.nextAll('.ui-datepicker-trigger').css('opacity', '1');
+                }
+            }
+        };
+        DateEditor.prototype.get_minValue = function () {
+            return this.minValue;
+        };
+        DateEditor.prototype.set_minValue = function (value) {
+            this.minValue = value;
+        };
+        DateEditor.prototype.get_maxValue = function () {
+            return this.maxValue;
+        };
+        DateEditor.prototype.set_maxValue = function (value) {
+            this.maxValue = value;
+        };
+        DateEditor.prototype.get_minDate = function () {
+            return Q.parseISODateTime(this.get_minValue());
+        };
+        DateEditor.prototype.set_minDate = function (value) {
+            this.set_minValue(Q.formatDate(value, 'yyyy-MM-dd'));
+        };
+        DateEditor.prototype.get_maxDate = function () {
+            return Q.parseISODateTime(this.get_maxValue());
+        };
+        DateEditor.prototype.set_maxDate = function (value) {
+            this.set_maxValue(Q.formatDate(value, 'yyyy-MM-dd'));
+        };
+        DateEditor.prototype.get_sqlMinMax = function () {
+            return this.get_minValue() === '1753-01-01' && this.get_maxValue() === '9999-12-31';
+        };
+        DateEditor.prototype.set_sqlMinMax = function (value) {
+            if (value) {
+                this.set_minValue('1753-01-01');
+                this.set_maxValue('9999-12-31');
+            }
+            else {
+                this.set_minValue(null);
+                this.set_maxValue(null);
+            }
+        };
+        DateEditor.dateInputKeyup = function (e) {
+            if (Q.Culture.dateOrder !== 'dmy') {
+                return;
+            }
+            var input = $(e.target);
+            if (!input.is(':input')) {
+                return;
+            }
+            if (input.is('[readonly]') || input.is(':disabled')) {
+                return;
+            }
+            var val = Q.coalesce(input.val(), '');
+            if (!!(val.length === 0 || input[0].selectionEnd !== val.length)) {
+                return;
+            }
+            if (val.indexOf(Q.Culture.dateSeparator + Q.Culture.dateSeparator) !== -1) {
+                input.val(Q.replaceAll(val, Q.Culture.dateSeparator + Q.Culture.dateSeparator, Q.Culture.dateSeparator));
+                return;
+            }
+            function isNumeric(c) {
+                return c >= 48 && c <= 57;
+            }
+            if (e.which === 47 || e.which === 111) {
+                if (val.length >= 2 && val.charAt(val.length - 1) === Q.Culture.dateSeparator &&
+                    val.charAt(val.length - 2) === Q.Culture.dateSeparator) {
+                    input.val(val.substr(0, val.length - 1));
+                    return;
+                }
+                if (val.charAt(val.length - 1) !== Q.Culture.dateSeparator) {
+                    return;
+                }
+                switch (val.length) {
+                    case 2: {
+                        if (isNumeric(val.charCodeAt(0))) {
+                            val = '0' + val;
+                            break;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    case 4: {
+                        if (isNumeric(val.charCodeAt(0)) &&
+                            isNumeric(val.charCodeAt(2)) &&
+                            val.charAt(1) == Q.Culture.dateSeparator) {
+                            val = '0' + val.charAt(0) + Q.Culture.dateSeparator + '0' +
+                                val.charAt(2) + Q.Culture.dateSeparator;
+                            break;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    case 5: {
+                        if (isNumeric(val.charCodeAt(0)) &&
+                            isNumeric(val.charCodeAt(2)) &&
+                            isNumeric(val.charCodeAt(3)) &&
+                            val.charAt(1) === Q.Culture.dateSeparator) {
+                            val = '0' + val;
+                            break;
+                        }
+                        else if (isNumeric(val.charCodeAt(0)) &&
+                            isNumeric(val.charCodeAt(1)) &&
+                            isNumeric(val.charCodeAt(3)) &&
+                            val.charAt(2) === Q.Culture.dateSeparator) {
+                            val = val.charAt(0) + val.charAt(1) +
+                                Q.Culture.dateSeparator + '0' + val.charAt(3) + Q.Culture.dateSeparator;
+                            break;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    default: {
+                        return;
+                    }
+                }
+                input.val(val);
+            }
+            if (val.length < 6 && (e.which >= 48 && e.which <= 57 || e.which >= 96 && e.which <= 105) &&
+                isNumeric(val.charCodeAt(val.length - 1))) {
+                switch (val.length) {
+                    case 1: {
+                        if (val.charCodeAt(0) <= 51) {
+                            return;
+                        }
+                        val = '0' + val;
+                        break;
+                    }
+                    case 2: {
+                        if (!isNumeric(val.charCodeAt(0))) {
+                            return;
+                        }
+                        break;
+                    }
+                    case 3: {
+                        if (!isNumeric(val.charCodeAt(0)) ||
+                            val.charAt(1) !== Q.Culture.dateSeparator ||
+                            val.charCodeAt(2) <= 49) {
+                            return;
+                        }
+                        val = '0' + val.charAt(0) + Q.Culture.dateSeparator + '0' + val.charAt(2);
+                        break;
+                    }
+                    case 4: {
+                        if (val.charAt(1) == Q.Culture.dateSeparator) {
+                            if (!isNumeric(val.charCodeAt(0)) ||
+                                !isNumeric(val.charCodeAt(2))) {
+                                return;
+                            }
+                            val = '0' + val;
+                            break;
+                        }
+                        else if (val.charAt(2) == Q.Culture.dateSeparator) {
+                            if (!isNumeric(val.charCodeAt(0)) ||
+                                !isNumeric(val.charCodeAt(1)) ||
+                                val.charCodeAt(3) <= 49) {
+                                return;
+                            }
+                            val = val.charAt(0) + val.charAt(1) + Q.Culture.dateSeparator +
+                                '0' + val.charAt(3);
+                            break;
+                        }
+                        else {
+                            return;
+                        }
+                    }
+                    case 5: {
+                        if (val.charAt(2) !== Q.Culture.dateSeparator ||
+                            !isNumeric(val.charCodeAt(0)) ||
+                            !isNumeric(val.charCodeAt(1)) ||
+                            !isNumeric(val.charCodeAt(3))) {
+                            return;
+                        }
+                        break;
+                    }
+                    default: {
+                        return;
+                    }
+                }
+                input.val(val + Q.Culture.dateSeparator);
+            }
+        };
+        ;
+        DateEditor.dateInputChange = function (e) {
+            if (Q.Culture.dateOrder !== 'dmy') {
+                return;
+            }
+            var input = $(e.target);
+            if (!input.is(':input')) {
+                return;
+            }
+            var val = Q.coalesce(input.val(), '');
+            var x = {};
+            if (val.length >= 6 && ss.Int32.tryParse(val, x)) {
+                input.val(val.substr(0, 2) + Q.Culture.dateSeparator + val.substr(2, 2) + Q.Culture.dateSeparator + val.substr(4));
+            }
+            val = Q.coalesce(input.val(), '');
+            if (!!(val.length >= 5 && Q.parseDate(val) !== false)) {
+                var d = Q.parseDate(val);
+                input.val(Q.formatDate(d, null));
+            }
+        };
+        __decorate([
+            Serenity.Decorators.option()
+        ], DateEditor.prototype, "yearRange", void 0);
+        __decorate([
+            Serenity.Decorators.option()
+        ], DateEditor.prototype, "get_minValue", null);
+        __decorate([
+            Serenity.Decorators.option()
+        ], DateEditor.prototype, "get_maxValue", null);
+        __decorate([
+            Serenity.Decorators.option()
+        ], DateEditor.prototype, "get_maxDate", null);
+        __decorate([
+            Serenity.Decorators.option()
+        ], DateEditor.prototype, "get_sqlMinMax", null);
+        DateEditor = __decorate([
+            Serenity.Decorators.registerClass('Serenity.DateEditor', [Serenity.IStringValue, Serenity.IReadOnly])
+        ], DateEditor);
+        return DateEditor;
+    }(Serenity.Widget));
+    Serenity.DateEditor = DateEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -4409,6 +4750,18 @@ var Serenity;
         return BaseEditorFiltering;
     }(Serenity.BaseFiltering));
     Serenity.BaseEditorFiltering = BaseEditorFiltering;
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var ISlickFormatter = /** @class */ (function () {
+        function ISlickFormatter() {
+        }
+        ISlickFormatter = __decorate([
+            Serenity.Decorators.registerInterface('Serenity.ISlickFormatter')
+        ], ISlickFormatter);
+        return ISlickFormatter;
+    }());
+    Serenity.ISlickFormatter = ISlickFormatter;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -8799,9 +9152,6 @@ var Serenity;
         return CascadedWidgetLink;
     }());
     Serenity.CascadedWidgetLink = CascadedWidgetLink;
-})(Serenity || (Serenity = {}));
-(function (Serenity) {
-    interface;
 })(Serenity || (Serenity = {}));
 (function (Serenity) {
     var CategoryAttribute = /** @class */ (function () {

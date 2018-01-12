@@ -736,6 +736,7 @@ declare namespace Q {
     function canLoadScriptData(name: string): boolean;
 }
 declare namespace Q {
+    function initFormType(typ: Function, nameWidgetPairs: any[]): void;
     function prop(type: any, name: string, getter?: string, setter?: string): void;
 }
 declare namespace Q {
@@ -1228,15 +1229,22 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class DateEditor extends Widget<any> {
+    class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
+        private minValue;
+        private maxValue;
+        private minDate;
+        private maxDate;
+        private sqlMinMax;
         constructor(input: JQuery);
-        static dateInputChange(e: any): void;
-        static dateInputKeyup(e: any): void;
-        static defaultAutoNumericOptions(): any;
+        get_value(): string;
         value: string;
+        set_value(value: string): void;
+        private get_valueAsDate();
         valueAsDate: Date;
+        private set_valueAsDate(value);
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
+        yearRange: string;
         get_minValue(): string;
         set_minValue(value: string): void;
         get_maxValue(): string;
@@ -1247,7 +1255,8 @@ declare namespace Serenity {
         set_maxDate(value: Date): void;
         get_sqlMinMax(): boolean;
         set_sqlMinMax(value: boolean): void;
-        yearRange: string;
+        static dateInputChange: (e: JQueryEventObject) => void;
+        static dateInputKeyup(e: JQueryEventObject): void;
     }
 }
 declare namespace Serenity {
@@ -1858,6 +1867,10 @@ declare namespace Serenity {
         filteredParentClass?: string;
         onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
         fields?: QuickSearchField[];
+    }
+}
+declare namespace Serenity {
+    class ISlickFormatter {
     }
 }
 declare namespace Serenity {
@@ -3090,8 +3103,6 @@ declare namespace Serenity {
         get_parentID(): string;
         set_parentID(value: string): void;
     }
-}
-declare namespace Serenity {
 }
 declare namespace Serenity {
     class CategoryAttribute {

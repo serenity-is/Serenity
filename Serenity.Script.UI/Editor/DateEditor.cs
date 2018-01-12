@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     [Editor, DisplayName("Tarih")]
     [Element("<input type=\"text\"/>")]
     public class DateEditor : Widget<object>, IStringValue, IReadOnly
@@ -266,17 +267,6 @@ namespace Serenity
 
                 this.Value = Q.FormatDate(value, "yyyy-MM-dd");
             }
-        }
-
-        public static dynamic DefaultAutoNumericOptions()
-        {
-            return new
-            {
-                aDec = Q.Culture.DecimalSeparator,
-                altDec = Q.Culture.DecimalSeparator == "." ? "," : ".",
-                aSep = Q.Culture.DecimalSeparator == "." ? "," : ".",
-                aPad = true
-            };
         }
 
         public bool ReadOnly
