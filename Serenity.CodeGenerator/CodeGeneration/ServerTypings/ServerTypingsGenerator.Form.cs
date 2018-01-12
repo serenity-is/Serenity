@@ -64,8 +64,6 @@ namespace Serenity.CodeGeneration
             });
 
             sb.AppendLine();
-            cw.IndentedLine("import s = Serenity;");
-            sb.AppendLine();
             cw.Indented("export class ");
             sb.Append(identifier);
 
@@ -75,56 +73,66 @@ namespace Serenity.CodeGeneration
                 cw.Indented("static formKey = '");
                 sb.Append(formScriptAttribute.Key);
                 sb.AppendLine("';");
-                cw.IndentedLine("private static init: boolean;");
 
-                sb.AppendLine();
-
-                cw.Indented("constructor(prefix: string)");
-                cw.InBrace(delegate
+                if (propertyNames.Count > 0)
                 {
-                    cw.IndentedLine("super(prefix);");
+                    cw.IndentedLine("private static init: boolean;");
                     sb.AppendLine();
-                    cw.Indented("if (!");
-                    sb.Append(identifier);
-                    sb.Append(".init) ");
-
+                    cw.Indented("constructor(prefix: string)");
                     cw.InBrace(delegate
                     {
-                        cw.Indented(identifier);
-                        sb.AppendLine(".init = true;");
-                        cw.IndentedLine("[");
-                        cw.Block(delegate
-                        {
-                            for (var i = 0; i < propertyNames.Count; i++)
-                            {
-                                if (i > 0)
-                                    sb.AppendLine(",");
-
-                                cw.Indented("['");
-                                sb.Append(propertyNames[i]);
-                                sb.Append("', ");
-                                sb.Append(propertyTypes[i]);
-                                sb.Append("]");
-                            }
-
-                            sb.AppendLine();
-                        });
-                        cw.Indented("].forEach(x => Object.defineProperty(");
+                        cw.IndentedLine("super(prefix);");
+                        sb.AppendLine();
+                        cw.Indented("if (!");
                         sb.Append(identifier);
-                        sb.AppendLine(".prototype,");
-                        cw.Block(delegate
+                        sb.Append(".init) ");
+
+
+                        cw.InBrace(delegate
                         {
-                            cw.IndentedLine("<string>x[0], {");
+                            cw.Indented(identifier);
+                            sb.AppendLine(".init = true;");
+                            sb.AppendLine();
+
+                            cw.IndentedLine("var s = Serenity;");
+                            var typeNumber = new Dictionary<string, int>();
+                            foreach (var s in propertyTypes)
+                            {
+                                if (!typeNumber.ContainsKey(s))
+                                {
+                                    cw.Indented("var w");
+                                    sb.Append(typeNumber.Count);
+                                    sb.Append(" = ");
+                                    sb.Append(s);
+                                    sb.AppendLine(";");
+                                    typeNumber[s] = typeNumber.Count;
+                                }
+                            }
+                            sb.AppendLine();
+
+                            cw.Indented("Q.initFormType(");
+                            sb.Append(identifier);
+                            sb.AppendLine(", [");
                             cw.Block(delegate
                             {
-                                cw.IndentedLine("get: function () { return this.w(x[0], x[1]); },");
-                                cw.IndentedLine("enumerable: true,");
-                                cw.IndentedLine("configurable: true");
+                                for (var i = 0; i < propertyNames.Count; i++)
+                                {
+                                    if (i > 0)
+                                        sb.AppendLine(",");
+
+                                    cw.Indented("'");
+                                    sb.Append(propertyNames[i]);
+                                    sb.Append("', w");
+                                    sb.Append(typeNumber[propertyTypes[i]]);
+                                    sb.Append("");
+                                }
+
+                                sb.AppendLine();
                             });
-                            cw.IndentedLine("}));");
+                            cw.IndentedLine("]);");
                         });
                     });
-                });
+                }
             });
 
             generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
