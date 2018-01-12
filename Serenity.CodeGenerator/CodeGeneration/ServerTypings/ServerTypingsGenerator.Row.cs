@@ -122,34 +122,27 @@ namespace Serenity.CodeGeneration
                 if (anyMetadata)
                     sb.AppendLine();
 
-                cw.Indented("export namespace ");
+                cw.Indented("export declare const enum ");
                 sb.Append("Fields");
 
                 cw.InBrace(delegate
                 {
+                    var inserted = 0;
                     foreach (var field in row.GetFields())
                     {
-                        cw.Indented("export declare const ");
+                        if (inserted > 0)
+                            sb.AppendLine(",");
+
+                        cw.Indented(field.PropertyName ?? field.Name);
+                        sb.Append(" = \"");
                         sb.Append(field.PropertyName ?? field.Name);
-                        sb.AppendLine(": string;");
+                        sb.Append("\"");
+
+                        inserted++;
                     }
-                });
 
-                sb.AppendLine();
-                cw.IndentedLine("[");
-                int i = 0;
-                foreach (var field in row.GetFields())
-                {
-                    if (i++ > 0)
-                        sb.AppendLine(", ");
-                    cw.Indented("    '");
-                    sb.Append(field.PropertyName ?? field.Name);
-                    sb.Append("'");
-                }
-                if (i > 0)
                     sb.AppendLine();
-
-                cw.IndentedLine("].forEach(x => (<any>Fields)[x] = x);");
+                });
             });
         }
     }
