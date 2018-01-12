@@ -54,16 +54,28 @@ namespace Serenity.CodeGeneration
                 }
 
                 sb.AppendLine();
-                cw.Indented("export namespace ");
+                cw.Indented("export declare const enum ");
                 sb.Append("Methods");
+
                 cw.InBrace(delegate
                 {
+                    var inserted = 0;
                     foreach (var methodName in methodNames)
                     {
-                        cw.Indented("export declare const ");
+                        if (inserted > 0)
+                            sb.AppendLine(",");
+
+                        cw.Indented(methodName);
+                        sb.Append(" = \"");
+                        sb.Append(serviceUrl);
+                        sb.Append("/");
                         sb.Append(methodName);
-                        sb.AppendLine(": string;");
+                        sb.Append("\"");
+
+                        inserted++;
                     }
+
+                    sb.AppendLine();
                 });
 
                 sb.AppendLine();
@@ -91,7 +103,6 @@ namespace Serenity.CodeGeneration
                         sb.AppendLine(")[x] = function (r, s, o) {");
                         cw.IndentedLine("    return Q.serviceRequest(baseUrl + '/' + x, r, s, o);");
                         cw.IndentedLine("};");
-                        cw.IndentedLine("(<any>Methods)[x] = baseUrl + '/' + x;");
                     });
                     cw.IndentedLine("});");
                 }
