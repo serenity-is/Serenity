@@ -30,3 +30,6 @@ declare namespace System.ComponentModel {
         displayName: string;
     }
 }
+
+// fake assembly for typescript apps
+(ss as any).initAssembly({}, 'App', {});

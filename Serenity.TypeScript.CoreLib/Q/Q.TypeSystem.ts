@@ -1,6 +1,20 @@
 ﻿
 namespace Q {
 
+    export function initFormType(typ: Function, nameWidgetPairs: any[]) {
+        for (var i = 0; i < nameWidgetPairs.length - 1; i += 2) {
+            (function (name: string, widget: any) {
+                Object.defineProperty(typ.prototype, name, {
+                    get: function () {
+                        return this.w(name, widget);
+                    },
+                    enumerable: true,
+                    configurable: true
+                });
+            })(nameWidgetPairs[i], nameWidgetPairs[i + 1]);
+        }
+    }
+
     export function prop(type: any, name: string, getter?: string, setter?: string) {
         getter = getter || "get_" + name;
         setter = setter || "set_" + name;
@@ -89,9 +103,6 @@ namespace Q {
     //});
 
     (function (global: any) {
-
-        // fake assembly for typescript apps
-        (ss as any).initAssembly({}, 'App', {});
 
         // for backward compability, avoid!
         global.Q$Externals = Q;
