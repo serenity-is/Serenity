@@ -1,6 +1,7 @@
 ﻿using Serenity.ComponentModel;
 using Serenity.Services;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Serenity.CodeGeneration
@@ -13,8 +14,6 @@ namespace Serenity.CodeGeneration
         {
             var codeNamespace = GetNamespace(type);
 
-            cw.Indented("export class ");
-
             var identifier = type.Name;
             if (identifier.EndsWith(requestSuffix) &&
                 type.IsSubclassOf(typeof(ServiceRequest)))
@@ -24,29 +23,14 @@ namespace Serenity.CodeGeneration
                 this.fileIdentifier = identifier;
             }
 
-            sb.Append(identifier);
-
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
-
-            sb.Append(" extends Serenity.PrefixedContext");
-            cw.InBrace(delegate
-            {
-                cw.Indented("static formKey = '");
-                sb.Append(formScriptAttribute.Key);
-                sb.AppendLine("';");
-                sb.AppendLine();
-            });
-
-            sb.AppendLine();
-
             cw.Indented("export interface ");
             sb.Append(identifier);
 
-            StringBuilder initializer = new StringBuilder("[");
+            var propertyNames = new List<string>();
+            var propertyTypes = new List<string>();
 
             cw.InBrace(delegate
             {
-                int j = 0;
                 foreach (var item in Serenity.PropertyGrid.PropertyItemHelper.GetPropertyItemsFor(type))
                 {
                     var editorType = item.EditorType ?? "String";
@@ -65,15 +49,12 @@ namespace Serenity.CodeGeneration
                         continue;
 
                     var fullName = ShortenFullName(scriptType, codeNamespace);
+                    var shortName = fullName;
+                    if (fullName.StartsWith("Serenity."))
+                        shortName = "s." + fullName.Substring("Serenity.".Length);
 
-                    if (j++ > 0)
-                        initializer.Append(", ");
-
-                    initializer.Append("['");
-                    initializer.Append(item.Name);
-                    initializer.Append("', () => ");
-                    initializer.Append(fullName);
-                    initializer.Append("]");
+                    propertyNames.Add(item.Name);
+                    propertyTypes.Add(shortName);
 
                     cw.Indented(item.Name);
                     sb.Append(": ");
@@ -82,12 +63,71 @@ namespace Serenity.CodeGeneration
                 }
             });
 
-            initializer.Append("].forEach(x => Object.defineProperty(");
-            initializer.Append(identifier);
-            initializer.Append(".prototype, <string>x[0], { get: function () { return this.w(x[0], (x[1] as any)()); }, enumerable: true, configurable: true }));");
-
             sb.AppendLine();
-            cw.IndentedLine(initializer.ToString());
+            cw.IndentedLine("import s = Serenity;");
+            sb.AppendLine();
+            cw.Indented("export class ");
+            sb.Append(identifier);
+
+            sb.Append(" extends Serenity.PrefixedContext");
+            cw.InBrace(delegate
+            {
+                cw.Indented("static formKey = '");
+                sb.Append(formScriptAttribute.Key);
+                sb.AppendLine("';");
+                cw.IndentedLine("private static init: boolean;");
+
+                sb.AppendLine();
+
+                cw.Indented("constructor(prefix: string)");
+                cw.InBrace(delegate
+                {
+                    cw.IndentedLine("super(prefix);");
+                    sb.AppendLine();
+                    cw.Indented("if (!");
+                    sb.Append(identifier);
+                    sb.Append(".init) ");
+
+                    cw.InBrace(delegate
+                    {
+                        cw.Indented(identifier);
+                        sb.AppendLine(".init = true;");
+                        cw.IndentedLine("[");
+                        cw.Block(delegate
+                        {
+                            for (var i = 0; i < propertyNames.Count; i++)
+                            {
+                                if (i > 0)
+                                    sb.AppendLine(",");
+
+                                cw.Indented("['");
+                                sb.Append(propertyNames[i]);
+                                sb.Append("', ");
+                                sb.Append(propertyTypes[i]);
+                                sb.Append("]");
+                            }
+
+                            sb.AppendLine();
+                        });
+                        cw.Indented("].forEach(x => Object.defineProperty(");
+                        sb.Append(identifier);
+                        sb.AppendLine(".prototype,");
+                        cw.Block(delegate
+                        {
+                            cw.IndentedLine("<string>x[0], {");
+                            cw.Block(delegate
+                            {
+                                cw.IndentedLine("get: function () { return this.w(x[0], x[1]); },");
+                                cw.IndentedLine("enumerable: true,");
+                                cw.IndentedLine("configurable: true");
+                            });
+                            cw.IndentedLine("}));");
+                        });
+                    });
+                });
+            });
+
+            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
         }
     }
 }
