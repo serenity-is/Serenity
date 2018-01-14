@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using jQueryApi;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class EditorFiltering : BaseEditorFiltering
     {
         public EditorFiltering()
@@ -10,11 +12,11 @@ namespace Serenity
         {
         }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string EditorType { get; set; }
-        [Option]
+        [Option, IntrinsicProperty]
         public bool UseRelative { get; set; }
-        [Option]
+        [Option, IntrinsicProperty]
         public bool UseLike { get; set; }
 
         public override List<FilterOperator> GetOperators()

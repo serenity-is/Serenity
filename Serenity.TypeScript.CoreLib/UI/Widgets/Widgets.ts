@@ -24,19 +24,6 @@
         w(id: string, type: Function): any;
     }
 
-    interface EmailEditorOptions {
-        domain?: string;
-        readOnlyDomain?: boolean;
-    }
-
-    class EmailEditor extends Widget<EmailEditorOptions> {
-        constructor(input: JQuery, opt: EmailEditorOptions);
-        static registerValidationMethods(): void;
-        value: string;
-        get_readOnly(): boolean;
-        set_readOnly(value: boolean): void;
-    }
-
     class PasswordEditor extends StringEditor {
         constructor(input: JQuery);
     }
@@ -101,10 +88,6 @@
         maxValue?: number;
     }
 
-    class IntegerFiltering extends BaseEditorFiltering<IntegerEditor> {
-        getOperators(): Serenity.FilterOperator[];
-    }
-
     interface HtmlContentEditorOptions {
     }
 
@@ -155,35 +138,14 @@
         function registerValidationMethods(): void;
     }
 
-    namespace DialogExtensions {
-        function dialogFlexify(dialog: JQuery): JQuery;
-        function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery;
-        function dialogMaximizable(dialog: JQuery): JQuery;
-        function dialogCloseOnEnter(dialog: JQuery): JQuery;
-    }
-
     interface DialogButton {
         text: string;
         click: () => void;
-    }
-
-    namespace DialogTypeRegistry {
-        function get(key: string): Function;
-    }
-
-    class EditorTypeEditor extends SelectEditor {
-        constructor(select: JQuery);
     }
 
     interface EditorTypeInfo {
         type?: Function;
         displayName?: string;
         optionsType?: Function;
-    }
-
-    namespace EditorTypeRegistry {
-        function get(key: string): Function;
-        function initialize(): void;
-        function reset(): void;
     }
 }

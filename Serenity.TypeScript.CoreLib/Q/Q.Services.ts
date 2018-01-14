@@ -140,5 +140,5 @@ namespace Q {
 }
 
 namespace Serenity {
-    export type ServiceOptions<TResponse extends Serenity.ServiceResponse> = Q.ServiceOptions<TResponse>;
+    export type ServiceOptions<TResponse extends ServiceResponse> = Q.ServiceOptions<TResponse>;
 }

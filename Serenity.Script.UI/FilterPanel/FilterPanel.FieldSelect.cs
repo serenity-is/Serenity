@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Serenity.FilterPanels
+namespace Serenity
 {
     [Imported(ObeysTypeSystem = true)]
-    public class FieldSelect : Select2Editor<object, PropertyItem>
+    public class FilterFieldSelect : Select2Editor<object, PropertyItem>
     {
-        public FieldSelect(jQueryObject hidden, IEnumerable<PropertyItem> fields)
+        public FilterFieldSelect(jQueryObject hidden, IEnumerable<PropertyItem> fields)
             : base(hidden, null)
         {
         }

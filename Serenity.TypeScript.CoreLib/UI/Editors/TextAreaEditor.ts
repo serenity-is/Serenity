@@ -1,7 +1,7 @@
 ﻿namespace Serenity {
 
+    @Serenity.Decorators.registerEditor('Serenity.TextAreaEditor', [IStringValue])
     @Serenity.Decorators.element("<textarea />")
-    @Serenity.Decorators.registerEditor([IStringValue])
     export class TextAreaEditor extends Widget<TextAreaEditorOptions> {
 
         constructor(input: JQuery, opt?: TextAreaEditorOptions) {

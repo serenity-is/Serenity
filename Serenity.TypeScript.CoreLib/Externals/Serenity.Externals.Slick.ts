@@ -1,4 +1,8 @@
 ﻿
+interface JQuery {
+    slickPager(options: Slick.PagerOptions): JQuery;
+}
+
 // PAGER -----
 (function ($: JQueryStatic) {
 
@@ -6,8 +10,7 @@ $.widget("ui.slickPager", {
     options: {
         view: null,
         showRowsPerPage: true,
-        rowsPerPageOptions: [20, 100, 500, 2000],
-        onRpChange: null
+        rowsPerPageOptions: [20, 100, 500, 2000]
     },
 
     _create: function () {
@@ -167,6 +170,14 @@ declare namespace Slick.Data {
 }
 
 declare namespace Slick {
+    interface PagerOptions {
+        view?: Slick.RemoteView<any>;
+        showRowsPerPage?: boolean;
+        rowsPerPage?: number;
+        rowsPerPageOptions?: number[],
+        onChangePage?: (newPage: number) => void
+    }
+
     interface FormatterContext {
         row?: number;
         cell?: number;

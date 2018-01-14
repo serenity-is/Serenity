@@ -24,12 +24,5 @@ declare namespace ss {
     }
 }
 
-declare namespace System.ComponentModel {
-    class DisplayNameAttribute {
-        constructor(displayName: string);
-        displayName: string;
-    }
-}
-
 // fake assembly for typescript apps
 (ss as any).initAssembly({}, 'App', {});

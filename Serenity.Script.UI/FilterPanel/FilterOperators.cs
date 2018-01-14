@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class FilterOperators
     {
         /// <summary>true</summary>

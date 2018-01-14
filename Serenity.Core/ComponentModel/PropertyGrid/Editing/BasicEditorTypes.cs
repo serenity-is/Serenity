@@ -178,14 +178,6 @@ namespace Serenity.ComponentModel
         }
     }
 
-    public partial class EditorTypeEditorAttribute : CustomEditorAttribute
-    {
-        public EditorTypeEditorAttribute()
-            : base("EditorType")
-        {
-        }
-    }
-
     public partial class HtmlContentEditorAttribute : CustomEditorAttribute
     {
         public HtmlContentEditorAttribute()

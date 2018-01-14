@@ -1,5 +1,15 @@
 ﻿declare namespace Serenity {
 
+    interface QuickFilterArgs<TWidget> {
+        field?: string;
+        widget?: TWidget;
+        request?: ListRequest;
+        equalityFilter?: any;
+        value?: any;
+        active?: boolean;
+        handled?: boolean;
+    }
+
     interface QuickFilter<TWidget extends Widget<TOptions>, TOptions> {
         field?: string;
         type?: new (element: JQuery, options: TOptions) => TWidget;

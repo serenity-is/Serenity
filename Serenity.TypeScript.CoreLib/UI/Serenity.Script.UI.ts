@@ -13,118 +13,6 @@
     }
 }
 
-namespace Serenity.FilterPanels {
-
-    @Serenity.Decorators.registerClass('Serenity.FilterPanels.FieldSelect',
-        [Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly])
-    export class FieldSelect extends Select2Editor<any, PropertyItem> {
-        constructor(hidden: JQuery, fields: PropertyItem[]) {
-            super(hidden);
-
-            for (var field of fields) {
-                this.addOption(field.name, Q.coalesce(Q.tryGetText(field.title),
-                    Q.coalesce(field.title, field.name)), field);
-            }
-        }
-
-        emptyItemText() {
-            if (Q.isEmptyOrNull(this.value)) {
-                return Q.text('Controls.FilterPanel.SelectField');
-            }
-
-            return null;
-        }
-
-        getSelect2Options() {
-            var opt = super.getSelect2Options();
-            opt.allowClear = false;
-            return opt;
-        }
-    }
-}
-
-namespace Serenity.FilterPanels {
-
-    @Serenity.Decorators.registerClass('Serenity.FilterPanels.FieldSelect',
-        [Serenity.ISetEditValue, Serenity.IGetEditValue, Serenity.IStringValue, Serenity.IReadOnly])
-    export class OperatorSelect extends Select2Editor<any, FilterOperator> {
-        constructor(hidden: JQuery, source: FilterOperator[]) {
-            super(hidden);
-
-            for (var op of source) {
-                var title = Q.coalesce(op.title, Q.coalesce(
-                    Q.tryGetText("Controls.FilterPanel.OperatorNames." + op.key), op.key));
-                this.addOption(op.key, title, op);
-            }
-
-            if (source.length && source[0])
-                this.value = source[0].key;
-        }
-
-        emptyItemText(): string {
-            return null;
-        }
-
-        getSelect2Options() {
-            var opt = super.getSelect2Options();
-            opt.allowClear = false;
-            return opt;
-        }
-    }
-}
-
-namespace Serenity {
-    @Serenity.Decorators.registerClass('Serenity.BooleanFiltering')
-    export class BooleanFiltering extends BaseFiltering {
-        getOperators() {
-            return this.appendNullableOperators([
-                { key: Serenity.FilterOperators.isTrue },
-                { key: Serenity.FilterOperators.isFalse }
-            ]);
-        }
-    }
-}
-
-namespace Serenity {
-    @Serenity.Decorators.registerFormatter('Serenity.BooleanFormatter')
-    export class BooleanFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext) {
-
-            if (ctx.value == null) {
-                return '';
-            }
-
-            var text;
-            if (!!ctx.value) {
-                text = Q.tryGetText(this.trueText);
-                if (text == null) {
-                    text = this.trueText;
-                    if (text == null) {
-                        text = Q.coalesce(Q.tryGetText('Dialogs.YesButton'), 'Yes');
-                    }
-                }
-            }
-            else {
-                text = Q.tryGetText(this.falseText);
-                if (text == null) {
-                    text = this.falseText;
-                    if (text == null) {
-                        text = Q.coalesce(Q.tryGetText('Dialogs.NoButton'), 'No');
-                    }
-                }
-            }
-
-			return Q.htmlEncode(text);
-        }
-
-        @Serenity.Decorators.option()
-        public falseText: string;
-
-        @Serenity.Decorators.option()
-        public trueText: string;
-    }
-}
-
 namespace Serenity {
     @Serenity.Decorators.registerClass('Serenity.CascadedWidgetLink')
     export class CascadedWidgetLink<TParent extends Widget<any>> {
@@ -193,41 +81,128 @@ namespace Serenity {
     }
 }
 
-namespace Serenity {
+namespace Serenity.DialogExtensions {
+    export function dialogFlexify(dialog: JQuery): JQuery {
+        var flexify = new Serenity.Flexify(dialog.closest('.ui-dialog'), {});
+        return dialog;
+    }
 
-    @Serenity.Decorators.registerClass('Serenity.CategoryAttribute')
-    export class CategoryAttribute {
-        constructor(public category: string) {
+    export function dialogResizable(dialog: JQuery, w?: any, h?: any, mw?: any, mh?: any): JQuery {
+        var dlg = dialog.dialog();
+        dlg.dialog('option', 'resizable', true);
+        if (mw != null) {
+            dlg.dialog('option', 'minWidth', mw);
         }
+        if (w != null) {
+            dlg.dialog('option', 'width', w);
+        }
+        if (mh != null) {
+            dlg.dialog('option', 'minHeight', mh);
+        }
+        if (h != null) {
+            dlg.dialog('option', 'height', h);
+        }
+        return dialog;
+    }
+
+    export function dialogMaximizable(dialog: JQuery): JQuery {
+        (dialog as any).dialogExtend({
+            closable: true,
+            maximizable: true,
+            dblclick: 'maximize',
+            icons: { maximize: 'ui-icon-maximize-window' }
+        });
+
+        return dialog;
+    }
+
+    function dialogCloseOnEnter(dialog: JQuery): JQuery {
+        dialog.bind('keydown', function (e) {
+            if (e.which !== 13) {
+                return;
+            }
+            var tagName = e.target.tagName.toLowerCase();
+            if (tagName === 'button' || tagName === 'select' || tagName === 'textarea' ||
+                tagName === 'input' && e.target.getAttribute('type') === 'button') {
+                return;
+            }
+            var dlg = $(this);
+            if (!dlg.hasClass('ui-dialog')) {
+                dlg = dlg.closest('.ui-dialog');
+            }
+            var buttons = dlg.children('.ui-dialog-buttonpane').find('button');
+            if (buttons.length > 0) {
+                var defaultButton = buttons.find('.default-button');
+                if (defaultButton.length > 0) {
+                    buttons = defaultButton;
+                }
+            }
+            var button = buttons.eq(0);
+            if (!button.is(':disabled')) {
+                e.preventDefault();
+                button.trigger('click');
+            }
+        });
+        return dialog;
     }
 }
 
-namespace Serenity {
+namespace Serenity.DialogTypeRegistry {
+    function search(typeName: string) {
 
-    @Serenity.Decorators.registerFormatter('Serenity.CheckboxFormatter')
-    export class CheckboxFormatter implements Slick.Formatter {
-        format(ctx: Slick.FormatterContext) {
-            return '<span class="check-box no-float readonly ' + (!!ctx.value ? ' checked' : '') + '"></span>';
+        var dialogType = (ss as any).getType(typeName);
+        if (dialogType != null && (ss as any).isAssignableFrom(Serenity.IDialog, dialogType)) {
+            return dialogType;
         }
+
+        for (var ns of Q.Config.rootNamespaces) {
+            dialogType = (ss as any).getType(ns + '.' + typeName);
+            if (dialogType != null && (ss as any).isAssignableFrom(Serenity.IDialog, dialogType)) {
+                return dialogType;
+            }
+        }
+        return null;
     }
-}
 
-namespace Serenity {
+    var knownTypes: Q.Dictionary<any> = {};
 
-    @Serenity.Decorators.registerClass('Serenity.CollapsibleAttribute')
-    export class CollapsibleAttribute {
-        constructor(public value: boolean) {
+    export function tryGet(key: string): Function {
+        if (knownTypes[key] == null) {
+            var typeName = key;
+            var dialogType = search(typeName);
+
+            if (dialogType == null && !Q.endsWith(key, 'Dialog')) {
+                typeName = key + 'Dialog';
+                dialogType = search(typeName);
+            }
+
+            if (dialogType == null) {
+                return null;
+            }
+
+            knownTypes[key] = dialogType;
+            return dialogType;
         }
 
-        public collapsed: boolean;
+        return knownTypes[key];
     }
-}
 
-namespace Serenity {
+    export function get(key: string): Function {
 
-    @Serenity.Decorators.registerClass('Serenity.CssClassAttribute')
-    export class CssClassAttribute {
-        constructor(public cssClass: string) {
+        var type = tryGet(key);
+
+        if (type == null) {
+            var message = key + ' dialog class is not found! Make sure there is a dialog class with this name, ' +
+                'it is under your project root namespace, and your namespace parts start with capital letters, ' +
+                'e.g. MyProject.Pascal.Cased namespace. If you got this error from an editor with InplaceAdd option ' +
+                'check that lookup key and dialog type name matches (case sensitive, excluding Dialog suffix). ' +
+                "You need to change lookup key or specify DialogType property in LookupEditor attribute if that's not the case.";
+
+            Q.notifyError(message, '', null);
+
+            throw new ss.Exception(message);
         }
+
+        return type;
     }
 }

@@ -1,6 +1,9 @@
 
+using System.Runtime.CompilerServices;
+
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class UrlFormatter : ISlickFormatter
     {
         public string Format(SlickFormatterContext ctx)
@@ -35,17 +38,17 @@ namespace Serenity
             return s;
         }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string DisplayProperty { get; set; }
-        [Option]
+        [Option, IntrinsicProperty]
         public string DisplayFormat { get; set; }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string UrlProperty { get; set; }
-        [Option]
+        [Option, IntrinsicProperty]
         public string UrlFormat { get; set; }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string Target { get; set; }
     }
 }

@@ -16,7 +16,8 @@ namespace Serenity.CodeGeneration
 
             cw.Indented("export enum ");
             var identifier = MakeFriendlyName(enumType, codeNamespace);
-            generatedTypes.Add((codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier);
+            var fullName = (codeNamespace.IsEmptyOrNull() ? "" : codeNamespace + ".") + identifier;
+            generatedTypes.Add(fullName);
 
             cw.InBrace(delegate
             {
@@ -45,11 +46,19 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine();
             });
 
-            cw.Indented("Serenity.Decorators.registerEnum(");
+            cw.Indented("Serenity.Decorators.registerEnumType(");
             sb.Append(enumType.Name);
             sb.Append(", '");
-            sb.Append(enumKey);
-            sb.AppendLine("');");
+            sb.Append(fullName);
+            sb.Append("'");
+            if (enumKey != fullName)
+            {
+                sb.Append(", '");
+                sb.Append(enumKey);
+                sb.AppendLine("');");
+            }
+            else
+                sb.AppendLine(");");
         }
     }
 }

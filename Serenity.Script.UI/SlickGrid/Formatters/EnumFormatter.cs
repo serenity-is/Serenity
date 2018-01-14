@@ -1,15 +1,17 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public class EnumFormatter : ISlickFormatter
     {
         public EnumFormatter()
         {
         }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string EnumKey { get; set; }
 
         public string Format(SlickFormatterContext ctx)
@@ -40,25 +42,18 @@ namespace Serenity
 
         public static string GetText(string enumKey, string name)
         {
+            if (Q.IsEmptyOrNull(name))
+                return "";
+
             return Q.HtmlEncode(Q.TryGetText("Enums." + enumKey + "." + name) ?? name);
         }
 
-        public static string GetText<TEnum>(TEnum? value)
-            where TEnum: struct
+        public static string GetName(Type enumType, object value)
         {
             if (!Script.IsValue(value))
                 return "";
 
-            return Format(typeof(TEnum), value.Value);
-        }
-
-        public static string GetName<TEnum>(TEnum? value)
-            where TEnum : struct
-        {
-            if (!Script.IsValue(value))
-                return "";
-
-            return Enum.ToString(typeof(TEnum), value.Value.As<Enum>());
+            return Enum.ToString(enumType, value.As<Enum>());
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [IncludeGenericArguments(false), ScriptName("FilterWidgetBase")]
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false), ScriptName("FilterWidgetBase")]
     public abstract class FilterWidgetBase<TOptions> : TemplatedWidget<TOptions>
         where TOptions: class, new()
     {

@@ -1,10 +1,11 @@
 ﻿using jQueryApi;
 using System;
 using System.Collections.Generic;
-using Serenity.FilterPanels;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public partial class FilterPanel : FilterWidgetBase<object>
     {
         private jQueryObject rowsDiv;
@@ -60,11 +61,11 @@ namespace Serenity
                 divl.Children(".andor").ToggleClass("or", Q.IsTrue(item.IsOr))
                     .Text(Q.Text(Q.IsTrue(item.IsOr) ? "Controls.FilterPanel.Or" : "Controls.FilterPanel.And"));
 
-                var fieldSelect = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
+                var fieldSelect = row.Children("div.f").Find("input.field-select").GetWidget<FilterFieldSelect>();
                 fieldSelect.Value = item.Field;
                 RowFieldChange(row);
 
-                var operatorSelect = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>();
+                var operatorSelect = row.Children("div.o").Find("input.op-select").GetWidget<FilterOperatorSelect>();
                 operatorSelect.Value = item.Operator;
                 RowOperatorChange(row);
 
@@ -152,7 +153,7 @@ namespace Serenity
                         continue;
 
                     var field = GetFieldFor(row);
-                    var op = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>().Value;
+                    var op = row.Children("div.o").Find("input.op-select").GetWidget<FilterOperatorSelect>().Value;
 
                     if (op == null || op.Length == 0)
                         throw new ArgumentOutOfRangeException("operator", Q.Text("Controls.FilterPanel.InvalidOperator"));
@@ -273,7 +274,7 @@ namespace Serenity
 
             row.Children("a.delete").Attribute("title", Q.Text("Controls.FilterPanel.RemoveField")).Click(DeleteRowClick);
 
-            var fieldSel = new FieldSelect(row.Children("div.f").Children("input"), this.Store.Fields);
+            var fieldSel = new FilterFieldSelect(row.Children("div.f").Children("input"), this.Store.Fields);
             fieldSel.ChangeSelect2(OnRowFieldChange);
 
             UpdateParens();
@@ -299,7 +300,7 @@ namespace Serenity
         {
             row.RemoveData("Filtering");
 
-            var select = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
+            var select = row.Children("div.f").Find("input.field-select").GetWidget<FilterFieldSelect>();
             string fieldName = select.Value;
 
             bool isEmpty = (fieldName == null || fieldName == "");
@@ -329,7 +330,7 @@ namespace Serenity
 
             var operators = filtering.GetOperators();
 
-            new OperatorSelect(hidden, operators).ChangeSelect2(OnRowOperatorChange);
+            new FilterOperatorSelect(hidden, operators).ChangeSelect2(OnRowOperatorChange);
         }
 
         private PropertyItem GetFieldFor(jQueryObject row)
@@ -337,7 +338,7 @@ namespace Serenity
             if (row.Length == 0)
                 return null;
 
-            var select = row.Children("div.f").Find("input.field-select").GetWidget<FieldSelect>();
+            var select = row.Children("div.f").Find("input.field-select").GetWidget<FilterFieldSelect>();
             if (select.Value.IsEmptyOrNull())
                 return null;
 
@@ -391,7 +392,7 @@ namespace Serenity
             if (filtering == null)
                 return;
 
-            var operatorSelect = row.Children("div.o").Find("input.op-select").GetWidget<OperatorSelect>();
+            var operatorSelect = row.Children("div.o").Find("input.op-select").GetWidget<FilterOperatorSelect>();
             if (operatorSelect.Value.IsEmptyOrNull())
                 return;
 

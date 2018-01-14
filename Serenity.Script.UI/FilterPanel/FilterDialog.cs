@@ -3,9 +3,11 @@ using jQueryApi.UI.Widgets;
 using System;
 using System.Collections.Generic;
 using System.Html;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class FilterDialog : TemplatedDialog
     {
         private FilterPanel filterPanel;

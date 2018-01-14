@@ -1,8 +1,10 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class FilterDisplayBar : FilterWidgetBase<object>
     {
         public FilterDisplayBar(jQueryObject div)

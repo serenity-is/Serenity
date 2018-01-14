@@ -1,8 +1,8 @@
 ﻿namespace Serenity {
 
     // http://digitalbush.com/projects/masked-input-plugin/
+    @Serenity.Decorators.registerEditor('Serenity.MaskedEditor', [IStringValue])
     @Serenity.Decorators.element("<input type=\"text\"/>")
-    @Serenity.Decorators.registerEditor([IStringValue])
     export class MaskedEditor extends Widget<MaskedEditorOptions> {
 
         constructor(input: JQuery, opt?: MaskedEditorOptions) {

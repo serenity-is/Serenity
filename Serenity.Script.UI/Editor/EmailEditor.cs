@@ -1,16 +1,12 @@
 ﻿using jQueryApi;
 using System;
-using System.ComponentModel;
 using System.Html;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Serenity
 {
-    using jQueryApi.UI;
-
-    [Editor, DisplayName("E-posta")]
-    [Element("<input type=\"text\"/>")]
+    [Imported(ObeysTypeSystem = true), Editor, Element("<input type=\"text\"/>")]
     public class EmailEditor : Widget<EmailEditorOptions>, IStringValue, IReadOnly
     {
         static EmailEditor()
@@ -201,12 +197,10 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable]
     public class EmailEditorOptions
     {
-        [DisplayName("Etki Alanı")]
         public string Domain { get; set; }
-        [DisplayName("Etki Alanı Salt Okunur")]
         public bool ReadOnlyDomain { get; set; }
     }
 }

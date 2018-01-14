@@ -1,11 +1,13 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class NumberFormatter : ISlickFormatter
     {
-        [Option]
+        [Option, IntrinsicProperty]
         public string DisplayFormat { get; set; }
 
         public string Format(SlickFormatterContext ctx)

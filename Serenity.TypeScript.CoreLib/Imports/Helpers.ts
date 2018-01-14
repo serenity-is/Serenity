@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators: any, target:
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __extends = (this && this.__extends) || function (d: any, b: any) {
-    for (var p in b) if (b.hasOwnProperty(p) && p !== '__metadata') d[p] = b[p];
+    for (var p in b) if (b.hasOwnProperty(p) && p !== '__metadata' && p !== '__typeName') d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new (__ as any)());
 };

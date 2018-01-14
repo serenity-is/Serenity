@@ -10,6 +10,7 @@ declare namespace Serenity {
     interface SaveRequest<TEntity> extends ServiceRequest {
         EntityId?: any;
         Entity?: TEntity;
+        Localizations?: any;
     }
 
     interface SaveRequestWithAttachment<TEntity> extends SaveRequest<TEntity> {

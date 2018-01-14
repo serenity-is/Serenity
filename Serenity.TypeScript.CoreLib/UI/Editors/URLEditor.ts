@@ -1,6 +1,6 @@
 ﻿namespace Serenity {
 
-    @Serenity.Decorators.registerEditor([IStringValue])
+    @Serenity.Decorators.registerEditor('Serenity.URLEditor', [IStringValue])
     export class URLEditor extends StringEditor {
 
         constructor(input: JQuery) {

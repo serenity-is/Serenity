@@ -1,8 +1,10 @@
 ﻿using jQueryApi;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public class MinuteFormatter : ISlickFormatter
     {
         public string Format(SlickFormatterContext ctx)

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class EditorTypeAttributeBase : Attribute
     {
         protected EditorTypeAttributeBase(string type)

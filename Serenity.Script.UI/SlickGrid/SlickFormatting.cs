@@ -6,10 +6,18 @@ namespace Serenity
 {
     public static class SlickFormatting
     {
-        public static string GetEnumText<TEnum>(this TEnum value)
+        [IncludeGenericArguments(false), InlineCode("Serenity.EnumFormatter.format({TEnum}, {value})")]
+        public static string GetEnumText<TEnum>(this TEnum? value)
             where TEnum: struct
         {
-            return EnumFormatter.GetText<TEnum>(value);
+            return null;
+        }
+
+        [IncludeGenericArguments(false), InlineCode("Serenity.EnumFormatter.format({TEnum}, {value})")]
+        public static string GetEnumText<TEnum>(this TEnum value)
+            where TEnum : struct
+        {
+            return null;
         }
 
         public static string GetEnumText(string enumKey, string name)

@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [IncludeGenericArguments(false), ScriptName("EntityGrid")]
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false), ScriptName("EntityGrid")]
     public abstract class EntityGrid<TEntity, TOptions> : DataGrid<TEntity, TOptions>
         where TEntity: class, new()
         where TOptions: class, new()
@@ -359,7 +359,7 @@ namespace Serenity
         }
     }
 
-    [Imported, IncludeGenericArguments(false), ScriptName("EntityGrid")]
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false), ScriptName("EntityGrid")]
     public abstract class EntityGrid<TEntity> : EntityGrid<TEntity, object>
         where TEntity : class, new()
     {

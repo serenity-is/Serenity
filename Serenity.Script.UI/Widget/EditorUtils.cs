@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class EditorUtils
     {
         private static PropertyItem dummy = new PropertyItem { Name = "_" };

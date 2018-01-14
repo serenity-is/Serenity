@@ -74,3 +74,16 @@ interface Select2Options {
     loadMorePadding?: number;
     nextSearchTerm?: (p1: any, p2: string) => string;
 }
+
+interface Select2Data {
+    text?: string;
+}
+
+interface JQuery {
+    select2(options: Select2Options): JQuery;
+    select2(cmd: 'focus' | 'open'): JQuery;
+    select2(cmd: 'destroy'): void;
+    select2(cmd: 'val'): any;
+    select2(cmd: 'val', value: string | string[]): JQuery;
+    select2(cmd: 'data'): Select2Data;
+}

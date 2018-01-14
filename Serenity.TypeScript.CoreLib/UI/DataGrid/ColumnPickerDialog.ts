@@ -1,9 +1,9 @@
 ﻿
 namespace Serenity {
 
-    @Serenity.Decorators.registerClass()
-    @Serenity.Decorators.resizable()
-    @Serenity.Decorators.responsive()
+    @Decorators.registerClass()
+    @Decorators.resizable()
+    @Decorators.responsive()
     export class ColumnPickerDialog extends Serenity.TemplatedDialog<any> {
 
         private ulVisible: JQuery;

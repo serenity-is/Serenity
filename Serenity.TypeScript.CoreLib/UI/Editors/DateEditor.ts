@@ -1,6 +1,7 @@
 ﻿namespace Serenity {
 
-    @Serenity.Decorators.registerClass('Serenity.DateEditor', [IStringValue, IReadOnly])
+    @Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
+    @Decorators.element('<input type="text"/>')
     export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
 
         private minValue: string;

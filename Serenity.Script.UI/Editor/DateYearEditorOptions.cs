@@ -6,6 +6,7 @@ using System.ComponentModel;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     [Editor, DisplayName("Yıl"), OptionsType(typeof(DateYearEditorOptions))]
     [Element("<input type=\"hidden\"/>")]
     public class DateYearEditor : SelectEditor
@@ -68,15 +69,9 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable]
     public class DateYearEditorOptions : SelectEditorOptions
     {
-        public DateYearEditorOptions()
-        {
-            MinYear = "-10";
-            MaxYear = "+0";
-        }
-
         public string MinYear { get; set; }
         public string MaxYear { get; set; }
         public bool Descending { get; set; }

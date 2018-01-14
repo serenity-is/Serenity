@@ -9,6 +9,7 @@ namespace Serenity
 {
     [Editor, DisplayName("Date/Time")]
     [Element("<input type=\"text\"/>")]
+    [Imported(ObeysTypeSystem = true)]
     public class DateTimeEditor : Widget<DateTimeEditorOptions>, IStringValue, IReadOnly
     {
         static DateTimeEditor()

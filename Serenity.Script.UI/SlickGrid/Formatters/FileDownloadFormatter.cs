@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class FileDownloadFormatter : ISlickFormatter, IInitializeColumn
     {
         public string Format(SlickFormatterContext ctx)
@@ -33,10 +35,10 @@ namespace Serenity
             return Q.ResolveUrl("~/upload/") + filename;
         }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string DisplayFormat { get; set; }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string OriginalNameProperty { get; set; }
 
         public void InitializeColumn(SlickColumn column)

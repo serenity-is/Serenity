@@ -1,9 +1,11 @@
 ﻿using jQueryApi;
 using jQueryApi.UI.Widgets;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class DialogExtensions
     {
         public static jQueryObject DialogFlexify(this jQueryObject dialog)

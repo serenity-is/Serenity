@@ -1,7 +1,7 @@
 ﻿namespace Serenity {
 
+    @Serenity.Decorators.registerEditor('Serenity.TimeEditor', [IDoubleValue])
     @Serenity.Decorators.element("<select />")
-    @Serenity.Decorators.registerEditor([IDoubleValue])
     export class TimeEditor extends Widget<TimeEditorOptions> {
 
         private minutes: JQuery;

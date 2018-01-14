@@ -96,7 +96,6 @@
     <Compile Include="PropertyDialog\PropertyPanel.cs" />
     <Compile Include="PropertyDialog\PropertyDialog.cs" />
     <Compile Include="Editor\BooleanEditor.cs" />
-    <Compile Include="Editor\EditorTypeEditor.cs" />
     <Compile Include="Editor\EmailEditor.cs" />
     <Compile Include="Editor\TextAreaEditor.cs" />
     <Compile Include="Editor\DateEditor.cs" />
@@ -126,10 +125,10 @@
     <Compile Include="PropertyGrid\Attributes\DefaultValueAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\CssClassAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\DisplayNameAttribute.cs" />
+    <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
     <Compile Include="PropertyGrid\Attributes\PlaceholderAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorOptionAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\EditorTypeAttribute.cs" />
-    <Compile Include="PropertyGrid\Attributes\EditorTypeAttributeBase.cs" />
     <Compile Include="PropertyGrid\Attributes\InsertableAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\ReadOnlyAttribute.cs" />
     <Compile Include="PropertyGrid\EditorTypeRegistry.cs" />
@@ -151,7 +150,6 @@
     <Compile Include="SlickGrid\SlickTreeHelper.cs" />
     <Compile Include="Widget\EditorUtils.cs" />
     <Compile Include="PropertyGrid\ReflectionUtils.cs" />
-    <Compile Include="PropertyGrid\PublicEditorTypes.cs" />
     <Compile Include="PropertyGrid\Attributes\HiddenAttribute.cs" />
     <Compile Include="PropertyGrid\Attributes\HintAttribute.cs" />
     <Compile Include="PropertyGrid\IDoubleValue.cs" />

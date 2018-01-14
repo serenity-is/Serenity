@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor, DisplayName("Enumeration"), OptionsType(typeof(EnumEditorOptions))]
+    [Imported(ObeysTypeSystem = true), Editor, DisplayName("Enumeration"), OptionsType(typeof(EnumEditorOptions))]
     [Element("<input type=\"hidden\"/>")]
     public class EnumEditor : Select2Editor<EnumEditorOptions, Select2Item>, IStringValue
     {
@@ -47,7 +47,7 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable]
     public class EnumEditorOptions
     {
         public EnumEditorOptions()

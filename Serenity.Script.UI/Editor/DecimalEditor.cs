@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     [Editor, DisplayName("Ondalıklı Sayı"), OptionsType(typeof(DecimalEditorOptions))]
     [Element("<input type=\"text\"/>")]
     public class DecimalEditor : Widget<DecimalEditorOptions>, IDoubleValue
@@ -73,22 +74,12 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable]
     public class DecimalEditorOptions
     {
-        public DecimalEditorOptions()
-        {
-            MinValue = "0.00";
-            MaxValue = "999999999999.99";
-        }
-
-        [DisplayName("Min Değer")]
         public string MinValue { get; set; }
-        [DisplayName("Max Değer")]
         public string MaxValue { get; set; }
-        [DisplayName("Ondalık"), EditorType("Integer")]
         public Int32? Decimals { get; set; }
-        [DisplayName("Ondalıkları Sıfırla Doldur"), EditorType("Boolean")]
         public Boolean? PadDecimals { get; set; }
     }
 }

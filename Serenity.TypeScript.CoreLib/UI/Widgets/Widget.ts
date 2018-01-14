@@ -116,7 +116,7 @@
             return this;
         }
 
-        private initialize(): PromiseLike<void> {
+        public initialize(): PromiseLike<void> {
             if (!this.isAsyncWidget()) {
                 return Promise.resolve();
             }

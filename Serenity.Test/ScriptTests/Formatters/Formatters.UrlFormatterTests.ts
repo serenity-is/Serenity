@@ -19,14 +19,14 @@ namespace Serenity.Test {
         let formatter: UrlFormatter;
 
         formatter = new UrlFormatter();
-        formatter.set_target('my');
+        formatter.target = 'my';
         assert.strictEqual("<a href='http://s' target='my'>http://s</a>",
             formatter.format({
                 value: 'http://s',
             }), 'respects target');
 
         formatter = new UrlFormatter();
-        formatter.set_displayFormat('http://s/{0}');
+        formatter.displayFormat = 'http://s/{0}';
         assert.strictEqual("<a href='x'>http://s/x</a>",
             formatter.format({
                 value: 'x',

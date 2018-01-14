@@ -1,7 +1,7 @@
 ﻿namespace Serenity {
 
-    @Serenity.Decorators.element('<input type="checkbox"/>')
     @Serenity.Decorators.registerEditor([IBooleanValue])
+    @Serenity.Decorators.element('<input type="checkbox"/>')
     export class BooleanEditor extends Widget<any> {
 
         constructor(input: JQuery) {

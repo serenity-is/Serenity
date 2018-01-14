@@ -88,6 +88,10 @@ namespace Serenity {
             }
         }
 
+        protected attrs<TAttr>(attrType: { new(...args: any[]): TAttr }): TAttr[] {
+            return (ss as any).getAttributes((ss as any).getInstanceType(this), attrType, true);
+        }
+
         protected add_submitHandlers(action: () => void): void {
             this.submitHandlers = (ss as any).delegateCombine(this.submitHandlers, action);
         }
@@ -629,8 +633,7 @@ namespace Serenity {
         }
 
         protected enableFiltering(): boolean {
-            var attr = (ss as any).getAttributes((ss as any).getInstanceType(this),
-                Serenity.FilterableAttribute, true);
+            var attr = this.attrs(Serenity.FilterableAttribute);
             return attr.length > 0 && attr[0].value;
         }
 
@@ -657,7 +660,7 @@ namespace Serenity {
             }
         }
 
-        protected getPagerOptions(): any {
+        protected getPagerOptions(): Slick.PagerOptions {
             return {
                 view: this.view,
                 rowsPerPage: 20,
@@ -744,8 +747,7 @@ namespace Serenity {
         }
 
         protected getColumnsKey(): string {
-            var attr = (ss as any).getAttributes((ss as any).getInstanceType(this),
-                Serenity.ColumnsKeyAttribute, true);
+            var attr = this.attrs(Serenity.ColumnsKeyAttribute);
             if (attr && attr.length > 0) {
                 return attr[0].value;
             }
@@ -765,8 +767,7 @@ namespace Serenity {
         }
 
         protected getPropertyItems(): PropertyItem[] {
-            var attr = (ss as any).getAttributes((ss as any).getInstanceType(this),
-                Serenity.ColumnsKeyAttribute, true);
+            var attr = this.attrs(Serenity.ColumnsKeyAttribute);
 
             var columnsKey = this.getColumnsKey();
             if (!Q.isEmptyOrNull(columnsKey)) {
@@ -793,7 +794,7 @@ namespace Serenity {
                         item.editLinkItemType != null ? item.editLinkItemType : null,
                         item.editLinkIdField != null ? item.editLinkIdField : null,
                         (ss as any).mkdel({ oldFormat: oldFormat }, function(ctx: Slick.FormatterContext) {
-                            if (this.oldFormat.$ !== null) {
+                            if (this.oldFormat.$ != null) {
                                 return this.oldFormat.$(ctx);
                             }
                             return Q.htmlEncode(ctx.value);
@@ -886,22 +887,20 @@ namespace Serenity {
         }
 
         protected getLocalTextPrefix(): string {
-            var attributes = (ss as any).getAttributes(
-                (ss as any).getInstanceType(this), Serenity.LocalTextPrefixAttribute, true);
+            var attr = this.attrs(LocalTextPrefixAttribute);
 
-            if (attributes.length >= 1)
-                return attributes[0].value;
+            if (attr.length >= 1)
+                return attr[0].value;
 
             return '';
         }
 
         protected getIdProperty(): string {
             if (this.idProperty == null) {
-                var attributes = (ss as any).getAttributes(
-                    (ss as any).getInstanceType(this), Serenity.IdPropertyAttribute, true);
+                var attr = this.attrs(IdPropertyAttribute);
 
-                if (attributes.length === 1) {
-                    this.idProperty = attributes[0].value;
+                if (attr.length === 1) {
+                    this.idProperty = attr[0].value;
                 }
                 else {
                     this.idProperty = 'ID';
@@ -913,11 +912,10 @@ namespace Serenity {
 
         protected getIsActiveProperty(): string {
             if (this.isActiveProperty == null) {
-                var attributes = (ss as any).getAttributes(
-                    (ss as any).getInstanceType(this), Serenity.IsActivePropertyAttribute, true);
+                var attr = this.attrs(IsActivePropertyAttribute);
 
-                if (attributes.length === 1) {
-                    this.isActiveProperty = attributes[0].value;
+                if (attr.length === 1) {
+                    this.isActiveProperty = attr[0].value;
                 }
                 else {
                     this.isActiveProperty = '';

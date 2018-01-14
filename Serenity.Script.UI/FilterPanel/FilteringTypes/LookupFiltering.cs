@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class LookupFiltering : BaseEditorFiltering
     {
         public LookupFiltering()

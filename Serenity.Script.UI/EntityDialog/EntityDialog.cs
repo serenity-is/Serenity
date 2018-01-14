@@ -12,7 +12,7 @@ namespace Serenity
         void Load(object entityOrId, Action done, Action<object> fail);
     }
 
-    [IncludeGenericArguments(false), ScriptName("EntityDialog")]
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false), ScriptName("EntityDialog")]
     public abstract partial class EntityDialog<TEntity, TOptions> : TemplatedDialog<TOptions>, IEditDialog
         where TEntity : class, new()
         where TOptions: class, new()

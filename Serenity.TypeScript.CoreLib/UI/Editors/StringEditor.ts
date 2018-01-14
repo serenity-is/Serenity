@@ -1,7 +1,7 @@
 ﻿namespace Serenity {
 
+    @Serenity.Decorators.registerEditor('Serenity.StringEditor', [IStringValue])
     @Serenity.Decorators.element("<input type=\"text\"/>")
-    @Serenity.Decorators.registerEditor([IStringValue])
     export class StringEditor extends Widget<any> {
 
         constructor(input: JQuery) {
