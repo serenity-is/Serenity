@@ -302,7 +302,7 @@ namespace Serenity.Services
                     foreach (var field in item.GetFields())
                     {
                         if (item.IsAssigned(field) &&
-                            (field.Flags & FieldFlags.Updatable) == FieldFlags.Updatable &
+                            (field.Flags & FieldFlags.Updatable) == FieldFlags.Updatable &&
                             field.IndexCompare(old, item) != 0)
                         {
                             anyChanges = true;
