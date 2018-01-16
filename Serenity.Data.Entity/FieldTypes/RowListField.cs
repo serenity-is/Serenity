@@ -39,7 +39,7 @@ namespace Serenity.Data
                 }
             }
 
-            return value2.Count.CompareTo(value2.Count);
+            return value1.Count.CompareTo(value2.Count);
         }
 
         protected override List<TForeign> Clone(List<TForeign> value)
