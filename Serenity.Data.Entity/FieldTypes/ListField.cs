@@ -24,7 +24,7 @@ namespace Serenity.Data
                     return c;
             }
 
-            return value2.Count.CompareTo(value2.Count);
+            return value1.Count.CompareTo(value2.Count);
         }
 
         protected override List<TItem> Clone(List<TItem> value)
