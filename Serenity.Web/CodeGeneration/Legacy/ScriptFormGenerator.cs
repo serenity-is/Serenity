@@ -133,7 +133,7 @@ namespace Serenity.CodeGeneration
                             }
                         }
 
-                        cw.Indented("public ");
+                        cw.Indented("[IntrinsicProperty] public ");
                         sb.Append(widgetTypeName);
                         sb.Append(" ");
                         sb.Append(item.Name);
