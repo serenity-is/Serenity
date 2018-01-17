@@ -6,8 +6,8 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Editor, DisplayName("Tamsayı"), OptionsType(typeof(IntegerEditorOptions))]
-    [Element("<input type=\"text\"/>")]
-    public class IntegerEditor : Widget<IntegerEditorOptions>, IDoubleValue
+    [Imported(ObeysTypeSystem = true), Element("<input type=\"text\"/>")]
+    public class IntegerEditor : Widget<IntegerEditorOptions>
     {
         static IntegerEditor()
         {
@@ -47,29 +47,11 @@ namespace Serenity
                     ((dynamic)element).autoNumeric("set", value);
             }
         }
-
-        double? IDoubleValue.Value
-        {
-            get
-            {
-                return Value;
-            }
-            set
-            {
-                Value = (Int32?)value;
-            }
-        }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable, Reflectable]
     public class IntegerEditorOptions
     {
-        public IntegerEditorOptions()
-        {
-            MinValue = 0;
-            MaxValue = 2147483647;
-        }
-
         public Int64? MinValue { get; set; }
         public Int64? MaxValue { get; set; }
     }

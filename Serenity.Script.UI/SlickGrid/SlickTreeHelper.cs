@@ -8,6 +8,7 @@ namespace Serenity
     /// <summary>
     /// Helper for slick views (remote view)
     /// </summary>
+    [Imported]
     public static class SlickTreeHelper
     {
         [IncludeGenericArguments(false)]

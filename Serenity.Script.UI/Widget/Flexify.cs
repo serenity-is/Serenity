@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public class Flexify : Widget<FlexifyOptions>
     {
         private Int32 xDifference;

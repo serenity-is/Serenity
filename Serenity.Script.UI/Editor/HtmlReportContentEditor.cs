@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Editor, DisplayName("Html Content (Report Compatible Limited Set)"), OptionsType(typeof(HtmlContentEditorOptions))]
-    [Element("<textarea />")]
+    [Imported(ObeysTypeSystem = true), Element("<textarea />")]
     public class HtmlReportContentEditor : HtmlContentEditor, IStringValue
     {
         public HtmlReportContentEditor(jQueryObject textArea, HtmlContentEditorOptions opt)

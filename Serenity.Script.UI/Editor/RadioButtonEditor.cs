@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Editor, DisplayName("Radio Button")]
-    [Element("<div/>")]
+    [Imported(ObeysTypeSystem = true), Element("<div/>")]
     public class RadioButtonEditor : Widget<RadioButtonEditorOptions>, IStringValue
     {
         static RadioButtonEditor()
@@ -91,13 +91,9 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable, Reflectable]
     public class RadioButtonEditorOptions
     {
-        public RadioButtonEditorOptions()
-        {
-        }
-
         public String EnumKey { get; set; }
         public Type EnumType { get; set; }
         public String LookupKey { get; set; }

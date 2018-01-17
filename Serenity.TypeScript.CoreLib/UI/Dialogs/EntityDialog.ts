@@ -1,5 +1,13 @@
 ﻿namespace Serenity {
 
+    @Decorators.registerInterface('Serenity.IEditDialog')
+    export class IEditDialog {
+    }
+
+    export interface IEditDialog {
+        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
+    }
+
     @Serenity.Decorators.registerClass('Serenity.EntityDialog', [Serenity['IEditDialog']])
     export class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog {
 

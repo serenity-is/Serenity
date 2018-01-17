@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Element("<div/>")]
-    [IncludeGenericArguments(false), ScriptName("TemplatedPanel")]
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false), ScriptName("TemplatedPanel")]
     public abstract class TemplatedPanel<TOptions> : TemplatedWidget<TOptions>
         where TOptions : class, new()
     {

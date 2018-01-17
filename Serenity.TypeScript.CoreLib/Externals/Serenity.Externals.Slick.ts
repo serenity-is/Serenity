@@ -259,8 +259,8 @@ declare namespace Slick {
 
     class RowMoveManager {
         constructor(options: Slick.RowMoveManagerOptions);
-        get_onBeforeMoveRows(): Slick.Event;
-        get_onMoveRows(): Slick.Event;
+        onBeforeMoveRows: Slick.Event;
+        onMoveRows: Slick.Event;
     }
 
     class RowSelectionModel {
@@ -371,6 +371,7 @@ declare namespace Slick {
         constructor(options: RemoteViewOptions): void;
         onSubmit: Slick.CancellableViewCallback<TEntity>;
         onDataChanged: Slick.Event;
+        onDataLoaded: Slick.Event;
         onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
         onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
         addData(data: Serenity.ListResponse<TEntity>): void;
@@ -397,9 +398,11 @@ declare namespace Slick {
         populateLock(): void;
         populateUnlock(): void;
         getItem(row: number): any;
+        getLength(): number;
         params: any;
         sortBy: string[];
         url: string;
+        seekToPage?: number;
     }
 
     interface RemoteViewOptions {

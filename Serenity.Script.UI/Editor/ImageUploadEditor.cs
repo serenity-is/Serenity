@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Editor, DisplayName("Image Upload"), OptionsType(typeof(ImageUploadEditorOptions))]
-    [Element("<div/>")]
+    [Imported(ObeysTypeSystem = true), Element("<div/>")]
     public class ImageUploadEditor : Widget<ImageUploadEditorOptions>, IGetEditValue, ISetEditValue, IReadOnly
     {
         protected UploadedFile entity;
@@ -43,6 +43,7 @@ namespace Serenity
             {
                 Container = addFileButton,
                 InputName = this.uniqueName,
+                Zone = this.element,
                 Progress = progress,
                 FileDone = (response, name, data) =>
                 {
@@ -126,9 +127,16 @@ namespace Serenity
                 if (this.ReadOnly != value)
                 {
                     if (value)
-                        uploadInput.Attribute("disabled", "disabled");
+                    {
+                        uploadInput.Attribute("disabled", "disabled")
+                            .As<dynamic>().fileupload("disable");
+                    }
                     else
-                        uploadInput.RemoveAttr("disabled");
+                    {
+                        uploadInput.RemoveAttr("disabled")
+                            .As<dynamic>().fileupload("enable");
+                    }
+
                     UpdateInterface();
                 }
             }
@@ -195,7 +203,7 @@ namespace Serenity
         public string OriginalName { get; set; }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable]
     public class ImageUploadEditorOptions
     {
         [DisplayName("Min Width")]

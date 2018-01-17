@@ -6,6 +6,7 @@ namespace Serenity
     using System.Html;
     using System.Runtime.CompilerServices;
 
+    [Imported(ObeysTypeSystem = true)]
     public class PopupToolButton : PopupMenuButton
     {
         public PopupToolButton(jQueryObject div, PopupToolButtonOptions opt)

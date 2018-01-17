@@ -1744,7 +1744,7 @@ namespace Serenity
         }
     }
 
-    [IncludeGenericArguments(false)]
+    [Imported, IncludeGenericArguments(false)]
     public class GridRows<TItem>
     {
         private GridRows()

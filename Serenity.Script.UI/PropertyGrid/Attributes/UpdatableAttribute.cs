@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class UpdatableAttribute : Attribute
     {
         public UpdatableAttribute(bool updatable = true)

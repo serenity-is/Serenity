@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class PrefixedContext : ScriptContext
     {
         protected readonly string idPrefix;
@@ -13,11 +14,13 @@ namespace Serenity
             this.idPrefix = idPrefix;
         }
 
+        [ScriptName("byId")]
         public jQueryObject ById(string id)
         {
             return J("#" + idPrefix + id);
         }
 
+        [InlineCode("this.byId({id}).getWidget({TWidget})")]
         public TWidget ById<TWidget>(string id)
             where TWidget : Widget
         {

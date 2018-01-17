@@ -6,7 +6,7 @@ namespace Serenity
 {
     public delegate string CustomValidationRule(jQueryObject element);
 
-    [ScriptName("VX")]
+    [Imported, ScriptName("VX")]
     public static class ValidationExtensions
     {
         static ValidationExtensions()

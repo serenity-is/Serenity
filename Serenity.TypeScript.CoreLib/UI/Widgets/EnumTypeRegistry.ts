@@ -8,7 +8,7 @@
             if (knownTypes == null) {
                 knownTypes = {};
                 for (var assembly of (ss as any).getAssemblies()) {
-                    for (var type of assembly) {
+                    for (var type of (ss as any).getAssemblyTypes(assembly)) {
                         if ((ss as any).isEnum(type)) {
                             var fullName = (ss as any).getTypeFullName(type);
                             knownTypes[fullName] = type;

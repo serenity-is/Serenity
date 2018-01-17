@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Serenity
 {
+    [Imported]
     public static class ValidationHelper
     {
         public static bool AsyncSubmit(jQueryObject form, Func<bool> validateBeforeSave, Action submitHandler)

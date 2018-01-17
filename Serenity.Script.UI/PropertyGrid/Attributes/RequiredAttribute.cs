@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public sealed class RequiredAttribute : Attribute
     {
         public RequiredAttribute(bool isRequired)

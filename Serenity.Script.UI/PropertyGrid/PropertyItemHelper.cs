@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public class PropertyItemHelper
     {
         public static List<PropertyItem> GetPropertyItemsFor(Type type)
@@ -162,7 +164,7 @@ namespace Serenity
         }
     }
 
-    [Obsolete("Use PropertyItemHelper")]
+    [Imported, Obsolete("Use PropertyItemHelper"), ScriptName("PropertyItemHelper")]
     public class PropertyEditorHelper : PropertyItemHelper
     {
     }

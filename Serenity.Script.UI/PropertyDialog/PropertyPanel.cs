@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [IncludeGenericArguments(false), ScriptName("PropertyPanel")]
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false), ScriptName("PropertyPanel")]
     public abstract partial class PropertyPanel<TEntity, TOptions> : TemplatedPanel<TOptions>
         where TEntity : class, new()
         where TOptions: class, new()

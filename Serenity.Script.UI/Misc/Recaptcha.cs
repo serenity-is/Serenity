@@ -8,7 +8,7 @@ namespace Serenity
     using System.Html;
     using System.Runtime.CompilerServices;
 
-    [Editor, Element("<div />")]
+    [Imported(ObeysTypeSystem = true), Editor, Element("<div />")]
     public class Recaptcha : Widget<RecaptchaOptions>, IStringValue
     {
         public Recaptcha(jQueryObject div, RecaptchaOptions opt)

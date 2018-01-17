@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Editor, DisplayName("Şifre")]
+    [Imported(ObeysTypeSystem = true), Editor, DisplayName("Şifre")]
     public class PasswordEditor : StringEditor
     {
         public PasswordEditor(jQueryObject input)

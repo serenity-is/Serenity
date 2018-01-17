@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class ReflectionUtils
     {
         public static object GetPropertyValue(object o, string property)

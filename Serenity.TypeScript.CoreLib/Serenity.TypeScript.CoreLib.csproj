@@ -55,13 +55,8 @@
     <TypeScriptCompile Include="Imports\JQBlockUI.ts" />
     <TypeScriptCompile Include="Services\ServiceError.ts" />
     <TypeScriptCompile Include="Services\ServiceResponse.ts" />
-    <TypeScriptCompile Include="Q\Q.CommonTypes.ts" />
     <TypeScriptCompile Include="Q\Q.BasicUtils.ts" />
-    <TypeScriptCompile Include="Q\Q.ArrayUtils.ts" />
-    <TypeScriptCompile Include="Q\Q.StringHelpers.ts" />
-    <TypeScriptCompile Include="Q\Q.Culture.ts" />
-    <TypeScriptCompile Include="Q\Q.Number.ts" />
-    <TypeScriptCompile Include="Q\Q.Date.ts" />
+    <TypeScriptCompile Include="Q\Q.Formatting.ts" />
     <TypeScriptCompile Include="Q\Q.LocalText.ts" />
     <TypeScriptCompile Include="Q\Q.Lookup.ts" />
     <TypeScriptCompile Include="Q\Q.BlockUI.ts" />
@@ -95,20 +90,11 @@
     <TypeScriptCompile Include="UI\PropertyGrid\IStringValue.ts" />
     <TypeScriptCompile Include="UI\PropertyGrid\IReadOnly.ts" />
     <TypeScriptCompile Include="UI\PropertyGrid\PropertyItem.ts" />
-    <TypeScriptCompile Include="UI\Editors\BooleanEditor.ts" />
     <TypeScriptCompile Include="UI\Editors\DateEditor.ts" />
     <TypeScriptCompile Include="UI\Editors\DateTimeEditor.ts" />
     <TypeScriptCompile Include="UI\Widgets\Select2Editor.ts" />
     <TypeScriptCompile Include="UI\Editors\DateYearEditor.ts" />
-    <TypeScriptCompile Include="UI\Editors\DecimalEditor.ts" />
-    <TypeScriptCompile Include="UI\Editors\LookupEditorOptions.ts" />
-    <TypeScriptCompile Include="UI\Editors\LookupEditorBase.ts" />
     <TypeScriptCompile Include="UI\Editors\LookupEditor.ts" />
-    <TypeScriptCompile Include="UI\Editors\MaskedEditor.ts" />
-    <TypeScriptCompile Include="UI\Editors\StringEditor.ts" />
-    <TypeScriptCompile Include="UI\Editors\TextAreaEditor.ts" />
-    <TypeScriptCompile Include="UI\Editors\TimeEditor.ts" />
-    <TypeScriptCompile Include="UI\Editors\URLEditor.ts" />
     <TypeScriptCompile Include="UI\Filtering\FilterOperator.ts" />
     <TypeScriptCompile Include="UI\Editors\Editors.ts" />
     <TypeScriptCompile Include="UI\Filtering\FilterLine.ts" />
@@ -122,11 +108,8 @@
     <TypeScriptCompile Include="UI\Formatters\Formatters.ts" />
     <TypeScriptCompile Include="UI\Widgets\Flexify.ts" />
     <TypeScriptCompile Include="UI\Widgets\EnumTypeRegistry.ts" />
-    <TypeScriptCompile Include="UI\Dialogs\IDialog.ts" />
-    <TypeScriptCompile Include="UI\Dialogs\IEditDialog.ts" />
     <TypeScriptCompile Include="UI\Widgets\Widgets.ts" />
     <TypeScriptCompile Include="UI\Widgets\WX.ts" />
-    <TypeScriptCompile Include="UI\PropertyGrid\IAsyncInit.ts" />
     <TypeScriptCompile Include="UI\PropertyGrid\PropertyGrid.ts" />
     <TypeScriptCompile Include="UI\Widgets\Toolbar.ts" />
     <TypeScriptCompile Include="UI\Widgets\CreateWidgetParams.ts" />
@@ -136,7 +119,6 @@
     <TypeScriptCompile Include="UI\Dialogs\TemplatedDialog.ts" />
     <TypeScriptCompile Include="UI\Dialogs\PropertyDialog.ts" />
     <TypeScriptCompile Include="UI\Filtering\FilterDialog.ts" />
-    <TypeScriptCompile Include="UI\DataGrid\IInitializeColumn.ts" />
     <TypeScriptCompile Include="UI\DataGrid\DataGrid.ts" />
     <TypeScriptCompile Include="UI\Widgets\EntityGrid.ts" />
     <TypeScriptCompile Include="UI\Editors\CheckTreeEditor.ts" />
@@ -155,6 +137,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Serenity.CoreLib.js" />
+    <Content Include="Serenity.Script.Test.js" />
+    <Content Include="Serenity.Script.UI.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".eslintrc.json" />

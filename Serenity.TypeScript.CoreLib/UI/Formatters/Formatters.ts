@@ -1,8 +1,17 @@
 ﻿namespace Serenity {
+
+    export interface IInitializeColumn {
+        initializeColumn(column: Slick.Column): void;
+    }
+
+    @Serenity.Decorators.registerInterface('Serenity.IInitializeColumn')
+    export class IInitializeColumn {
+    }
+
     import Option = Serenity.Decorators.option
 
     function Formatter(name: string, intf?: any[]) {
-        return Decorators.registerClass('Serenity.' + name + 'Formatter')
+        return Decorators.registerFormatter('Serenity.' + name + 'Formatter', intf)
     }
 
     @Formatter('Boolean')
@@ -218,7 +227,7 @@
 
             if (minute < 10)
                 minuteStr = '0' + minute;
-            else 
+            else
                 minuteStr = minute.toString();
 
             return Q.format('{0}:{1}', hourStr, minuteStr);
@@ -233,11 +242,11 @@
 
         static format(value: any, format: string): string {
             format = Q.coalesce(format, '0.##');
-            if (value != null) 
+            if (value != null)
                 return '';
-            
+
             if (typeof (value) === 'number') {
-                if (isNaN(value)) 
+                if (isNaN(value))
                     return '';
 
                 return Q.htmlEncode(Q.formatNumber(value, format));
@@ -316,13 +325,79 @@
         @Option()
         target: string;
     }
-}
 
-declare namespace Serenity {
+    export namespace FormatterTypeRegistry {
 
-    namespace FormatterTypeRegistry {
-        function get(key: string): Function;
-        function initialize(): void;
-        function reset(): void;
+        let knownTypes: Q.Dictionary<Function>;
+
+        function setTypeKeysWithoutFormatterSuffix() {
+            var suffix = 'formatter';
+            for (var k of Object.keys(knownTypes)) {
+                if (!Q.endsWith(k, suffix)) 
+                    continue;
+                
+                var p = k.substr(0, k.length - suffix.length);
+                if (Q.isEmptyOrNull(p))
+                    continue;
+                
+                if (knownTypes[p] != null)
+                    continue;
+                
+                knownTypes[p] = knownTypes[k];
+            }
+        }
+
+        function initialize() {
+
+            if (knownTypes) {
+                return;
+            }
+
+            knownTypes = {};
+            var assemblies = (ss as any).getAssemblies();
+            for (var assembly of assemblies) {
+                var types = (ss as any).getAssemblyTypes(assembly);
+                for (var type of types) {
+                    if (!(ss as any).isAssignableFrom(Serenity.ISlickFormatter, type))
+                        continue;
+                    
+                    if ((ss as any).isGenericTypeDefinition(type))
+                        continue;
+                    
+                    var fullName = (ss as any).getTypeFullName(type).toLowerCase();
+                    knownTypes[fullName] = type;
+
+                    for (var k of Q.Config.rootNamespaces) {
+                        if (Q.startsWith(fullName, k.toLowerCase() + '.')) {
+                            var kx = fullName.substr(k.length + 1).toLowerCase();
+                            if (knownTypes[kx] == null) {
+                                knownTypes[kx] = type;
+                            }
+                        }
+                    }
+                }
+            }
+
+            setTypeKeysWithoutFormatterSuffix();
+        }
+
+        export function get(key: string): Function {
+            if (Q.isEmptyOrNull(key)) 
+                throw new (ss as any).ArgumentNullException('key');
+            
+            initialize();
+
+            var formatterType = knownTypes[key.toLowerCase()];
+            if (formatterType == null) {
+                throw new ss.Exception(Q.format(
+                    "Can't find {0} formatter type!", key));
+            }
+
+            return formatterType;
+        }
+
+        export function reset() {
+            knownTypes = null;
+        }
     }
 }

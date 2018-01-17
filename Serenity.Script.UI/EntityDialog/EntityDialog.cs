@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public interface IEditDialog : IDialog
     {
         void Load(object entityOrId, Action done, Action<object> fail);

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class FormatterTypeRegistry
     {
         internal static JsDictionary<string, Type> knownTypes;

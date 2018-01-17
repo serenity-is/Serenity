@@ -7,7 +7,7 @@ namespace Serenity
     using System.Html;
     using System.Runtime.CompilerServices;
 
-    [Element("<div/>")]
+    [Imported(ObeysTypeSystem = true), Element("<div/>")]
     public class GoogleMap : Widget<GoogleMapOptions>
     {
         private Map map;

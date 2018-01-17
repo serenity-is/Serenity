@@ -9,9 +9,6 @@
     @Serenity.Decorators.registerInterface('Serenity.IDataGrid')
     export class IDataGrid {
     }
-}
-
-namespace Serenity {
 
     @Serenity.Decorators.registerClass('Serenity.DataGrid', [IDataGrid])
     export class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid {

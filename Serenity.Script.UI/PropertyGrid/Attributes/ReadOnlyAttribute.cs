@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class ReadOnlyAttribute : Attribute
     {
         public ReadOnlyAttribute(bool readOnly = true)

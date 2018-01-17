@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
     [Editor, DisplayName("MultipleImage Upload"), OptionsType(typeof(ImageUploadEditorOptions))]
-    [Element("<div/>")]
+    [Imported(ObeysTypeSystem = true), Element("<div/>")]
     public class MultipleImageUploadEditor : Widget<ImageUploadEditorOptions>, IGetEditValue, ISetEditValue, IReadOnly
     {
         static MultipleImageUploadEditor()
@@ -40,6 +41,7 @@ namespace Serenity
             uploadInput = UploadHelper.AddUploadInput(new UploadInputOptions
             {
                 Container = addFileButton,
+                Zone = this.element,
                 InputName = this.uniqueName,
                 Progress = progress,
                 FileDone = (response, name, data) =>
@@ -116,9 +118,16 @@ namespace Serenity
                 if (this.ReadOnly != value)
                 {
                     if (value)
-                        uploadInput.Attribute("disabled", "disabled");
+                    {
+                        uploadInput.Attribute("disabled", "disabled")
+                            .As<dynamic>().fileupload("disable");
+                    }
                     else
-                        uploadInput.RemoveAttr("disabled");
+                    {
+                        uploadInput.RemoveAttr("disabled")
+                            .As<dynamic>().fileupload("enable");
+                    }
+
                     UpdateInterface();
                 }
             }
@@ -173,7 +182,7 @@ namespace Serenity
                 this.Value = (List<UploadedFile>)val;
         }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public bool JsonEncodeValue { get; set; }
     }
 }

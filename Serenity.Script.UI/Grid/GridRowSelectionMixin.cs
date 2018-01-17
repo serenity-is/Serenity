@@ -3,7 +3,9 @@ namespace Serenity
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
 
+    [Imported(ObeysTypeSystem = true)]
     public class GridRowSelectionMixin : ScriptContext
     {
         private string idField;

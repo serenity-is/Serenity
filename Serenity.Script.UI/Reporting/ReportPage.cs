@@ -1,7 +1,9 @@
 ﻿namespace Serenity.Reporting
 {
     using jQueryApi;
+    using System.Runtime.CompilerServices;
 
+    [Imported(ObeysTypeSystem = true)]
     public class ReportPage : Widget
     {
         public ReportPage(jQueryObject div)

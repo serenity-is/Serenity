@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity.Reporting
 {
+    [Imported(ObeysTypeSystem = true)]
     public class ReportDialog : TemplatedDialog<ReportDialogOptions>
     {
         private List<PropertyItem> propertyItems;

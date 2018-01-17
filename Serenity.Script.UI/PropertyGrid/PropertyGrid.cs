@@ -2,9 +2,11 @@
 using jQueryApi;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class PropertyGrid : Widget<PropertyGridOptions>
     {
         private static JsDictionary<string, Type> KnownEditorTypes;

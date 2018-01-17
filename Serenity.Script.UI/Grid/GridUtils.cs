@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class GridUtils
     {
         public static void AddToggleButton(jQueryObject toolDiv, string cssClass, Action<bool> callback,
@@ -110,17 +111,6 @@ namespace Serenity
             });
         }
 
-        public static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string> onSearch,
-            List<QuickSearchField> fields = null)
-        {
-            AddQuickSearchInputCustom(container, (x, y, z) => 
-            {
-                onSearch(x, y);
-                z(true);
-            });
-        }
-
-
         public static void AddQuickSearchInputCustom(jQueryObject container, Action<string, string, Action<bool>> onSearch,
             List<QuickSearchField> fields = null)
         {
@@ -172,6 +162,7 @@ namespace Serenity
             grid.RegisterPlugin(moveRowsPlugin);
         }
 
+        [IncludeGenericArguments(false)]
         public static void MakeOrderableWithUpdateRequest<TItem, TOptions>(DataGrid<TItem, TOptions> grid,
             Func<TItem, Int64> getId, Func<TItem, int?> getDisplayOrder,
             string service, Func<long, int, SaveRequest<TItem>> getUpdateRequest)

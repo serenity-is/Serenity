@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 namespace Serenity
 {
     [Editor, DisplayName("Html İçerik"), OptionsType(typeof(HtmlContentEditorOptions))]
-    [Element("<textarea />")]
+    [Imported(ObeysTypeSystem = true), Element("<textarea />")]
     public class HtmlContentEditor : Widget<HtmlContentEditorOptions>, IStringValue, IReadOnly
     {
         static HtmlContentEditor()
@@ -197,15 +197,9 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable, Reflectable]
     public class HtmlContentEditorOptions
     {
-        public HtmlContentEditorOptions()
-        {
-            Cols = 80;
-            Rows = 6;
-        }
-
         [Hidden]
         public int? Cols { get; set; }
         [Hidden]

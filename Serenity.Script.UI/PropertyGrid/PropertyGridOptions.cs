@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Serializable]
+    [Imported, Serializable]
     public class PropertyGridOptions
     {
         public PropertyGridOptions()
@@ -23,6 +23,7 @@ namespace Serenity
         public PropertyGridMode Mode { get; set; }
     }
 
+    [Imported]
     public enum PropertyGridMode
     {
         Insert = 1,

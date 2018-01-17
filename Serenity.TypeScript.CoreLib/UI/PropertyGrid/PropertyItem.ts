@@ -7,6 +7,9 @@
         editorType?: string;
         editorParams?: any;
         category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
         cssClass?: string;
         headerCssClass?: string;
         formCssClass?: string;

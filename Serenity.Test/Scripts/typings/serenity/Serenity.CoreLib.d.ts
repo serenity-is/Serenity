@@ -431,16 +431,11 @@ declare namespace Q {
     type Grouping<TItem> = {
         [key: string]: TItem[];
     };
-}
-declare namespace Q {
     function coalesce(a: any, b: any): any;
     function isValue(a: any): boolean;
-    function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
-}
-declare namespace Q {
     /**
-     * Tests if any of array elements matches given predicate
-     */
+         * Tests if any of array elements matches given predicate
+         */
     function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): boolean;
     /**
      * Counts number of array elements that matches a given predicate
@@ -478,8 +473,6 @@ declare namespace Q {
      * Returns null if no match is found.
      */
     function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
-}
-declare namespace Q {
     function endsWith(s: string, search: string): boolean;
     function isEmptyOrNull(s: string): boolean;
     function isTrimmedEmpty(s: string): boolean;
@@ -494,6 +487,7 @@ declare namespace Q {
     function turkishLocaleToUpper(a: string): string;
     function replaceAll(s: string, f: string, r: string): string;
     function zeroPad(n: number, digits: number): string;
+    function deepClone<TItem>(arg1: TItem, ...args: TItem[]): TItem;
 }
 declare namespace Q {
     namespace Culture {
@@ -504,14 +498,10 @@ declare namespace Q {
         let dateTimeFormat: string;
         function get_groupSeparator(): string;
     }
-}
-declare namespace Q {
     function formatNumber(n: number, fmt: string, dec?: string, grp?: string): string;
     function parseInteger(s: string): number;
     function parseDecimal(s: string): number;
     function toId(id: any): any;
-}
-declare namespace Q {
     function formatDate(d: Date | string, format?: string): string;
     function formatDayHourAndMin(n: number): string;
     function formatISODateTimeUTC(d: Date): string;
@@ -672,6 +662,18 @@ declare namespace Q {
     }
 }
 declare namespace Q {
+    function getCookie(name: string): any;
+    interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends JQueryAjaxSettings {
+        request?: any;
+        service?: string;
+        blockUI?: boolean;
+        onError?(response: TResponse): void;
+        onSuccess?(response: TResponse): void;
+        onCleanup?(): void;
+    }
+    function serviceCall<TResponse>(options: Q.ServiceOptions<TResponse>): JQueryXHR;
+    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: Q.ServiceOptions<TResponse>): JQueryXHR;
+    function setEquality(request: Serenity.ListRequest, field: string, value: any): void;
     interface PostToServiceOptions {
         url?: string;
         service?: string;
@@ -687,20 +689,6 @@ declare namespace Q {
     function postToService(options: Q.PostToServiceOptions): void;
     function postToUrl(options: Q.PostToUrlOptions): void;
     function resolveUrl(url: string): string;
-}
-declare namespace Q {
-    function getCookie(name: string): any;
-    interface ServiceOptions<TResponse extends Serenity.ServiceResponse> extends JQueryAjaxSettings {
-        request?: any;
-        service?: string;
-        blockUI?: boolean;
-        onError?(response: TResponse): void;
-        onSuccess?(response: TResponse): void;
-        onCleanup?(): void;
-    }
-    function serviceCall<TResponse>(options: Q.ServiceOptions<TResponse>): JQueryXHR;
-    function serviceRequest<TResponse>(service: string, request?: any, onSuccess?: (response: TResponse) => void, options?: Q.ServiceOptions<TResponse>): JQueryXHR;
-    function setEquality(request: Serenity.ListRequest, field: string, value: any): void;
 }
 declare namespace Serenity {
     type ServiceOptions<TResponse extends ServiceResponse> = Q.ServiceOptions<TResponse>;
@@ -860,9 +848,20 @@ declare namespace Serenity {
         origin: string;
         constructor(origin?: string);
     }
+    class HiddenAttribute {
+        constructor();
+    }
+    class HintAttribute {
+        hint: string;
+        constructor(hint: string);
+    }
     class IdPropertyAttribute {
         value: string;
         constructor(value: string);
+    }
+    class InsertableAttribute {
+        value: boolean;
+        constructor(value?: boolean);
     }
     class IsActivePropertyAttribute {
         value: string;
@@ -880,9 +879,15 @@ declare namespace Serenity {
         value: boolean;
         constructor(value?: boolean);
     }
+    class MaxLengthAttribute {
+        maxLength: number;
+        constructor(maxLength: number);
+    }
     class NamePropertyAttribute {
         value: string;
         constructor(value: string);
+    }
+    class OneWayAttribute {
     }
     class OptionAttribute {
         constructor();
@@ -895,6 +900,18 @@ declare namespace Serenity {
         value: boolean;
         constructor(value?: boolean);
     }
+    class PlaceholderAttribute {
+        value: string;
+        constructor(value: string);
+    }
+    class ReadOnlyAttribute {
+        value: boolean;
+        constructor(value?: boolean);
+    }
+    class RequiredAttribute {
+        isRequired: boolean;
+        constructor(isRequired?: boolean);
+    }
     class ResizableAttribute {
         value: boolean;
         constructor(value?: boolean);
@@ -906,6 +923,10 @@ declare namespace Serenity {
     class ServiceAttribute {
         value: string;
         constructor(value: string);
+    }
+    class UpdatableAttribute {
+        value: boolean;
+        constructor(value?: boolean);
     }
 }
 declare namespace Serenity.Decorators {
@@ -938,40 +959,6 @@ declare namespace Serenity.Decorators {
     function service(value: string): (target: Function) => void;
 }
 declare namespace Serenity {
-    class HiddenAttribute {
-    }
-    class HintAttribute {
-        constructor(hint: string);
-        hint: string;
-    }
-    class InsertableAttribute {
-        constructor(insertable?: boolean);
-        value: boolean;
-    }
-    class MaxLengthAttribute {
-        constructor(maxLength: number);
-        maxLength: number;
-    }
-    class OneWayAttribute {
-    }
-    class PlaceholderAttribute {
-        constructor(value: string);
-        value: string;
-    }
-    class ReadOnlyAttribute {
-        constructor(readOnly?: boolean);
-        value: boolean;
-    }
-    class RequiredAttribute {
-        constructor(isRequired: boolean);
-        isRequired: boolean;
-    }
-    class UpdatableAttribute {
-        constructor(updatable?: boolean);
-        value: boolean;
-    }
-}
-declare namespace Serenity {
     function Criteria(field: string): any[];
     namespace Criteria {
         function isEmpty(c: any[]): boolean;
@@ -982,10 +969,16 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class GridRows<TItem> {
+    interface QuickSearchField {
+        name: string;
+        title: string;
     }
-    class GridRowSelectionMixin extends ScriptContext {
+    class GridRowSelectionMixin {
+        private idField;
+        private include;
+        private grid;
         constructor(grid: IDataGrid);
+        updateSelectAll(): void;
         clear(): void;
         resetCheckedAndRefresh(): void;
         selectKeys(keys: string[]): void;
@@ -1003,29 +996,15 @@ declare namespace Serenity {
         function addToggleButton(toolDiv: JQuery, cssClass: string, callback: (p1: boolean) => void, hint: string, initial?: boolean): void;
         function addIncludeDeletedToggle(toolDiv: JQuery, view: Slick.RemoteView<any>, hint?: string, initial?: boolean): void;
         function addQuickSearchInput(toolDiv: JQuery, view: Slick.RemoteView<any>, fields?: QuickSearchField[]): void;
-        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string) => void, fields?: QuickSearchField[]): void;
-        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, p3: (p1: boolean) => void) => void, fields?: QuickSearchField[]): void;
+        function addQuickSearchInputCustom(container: JQuery, onSearch: (p1: string, p2: string, done: (p3: boolean) => void) => void, fields?: QuickSearchField[]): void;
         function makeOrderable(grid: Slick.Grid, handleMove: (p1: any, p2: number) => void): void;
         function makeOrderableWithUpdateRequest(grid: DataGrid<any, any>, getId: (p1: any) => number, getDisplayOrder: (p1: any) => any, service: string, getUpdateRequest: (p1: number, p2: number) => SaveRequest<any>): void;
-    }
-    interface QuickSearchField {
-        name: string;
-        title: string;
     }
     namespace PropertyItemSlickConverter {
         function toSlickColumns(items: PropertyItem[]): Slick.Column[];
         function toSlickColumn(item: PropertyItem): Slick.Column;
     }
-    namespace SlickTreeHelper {
-        function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
-        function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
-        function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
-        function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
-        function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
-        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
-    }
     namespace SlickFormatting {
-        function getEnumText(value: any): string;
         function getEnumText(enumKey: string, name: string): string;
         function treeToggle<TItem>(getView: () => Slick.RemoteView<TItem>, getId: (x: TItem) => any, formatter: Slick.Format): Slick.Format;
         function date(format?: string): Slick.Format;
@@ -1038,8 +1017,16 @@ declare namespace Serenity {
         function itemLink(itemType: string, idField: string, getText: Slick.Format, cssClass?: Slick.Format, encode?: boolean): Slick.Format;
     }
     namespace SlickHelper {
-        function setDefaults(columns: any, localTextPrefix?: string): any;
+        function setDefaults(columns: Slick.Column[], localTextPrefix?: string): any;
         function convertToFormatter(format: Slick.Format): Slick.ColumnFormatter;
+    }
+    namespace SlickTreeHelper {
+        function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean;
+        function filterById<TItem>(item: TItem, view: Slick.RemoteView<TItem>, getParentId: (x: TItem) => any): boolean;
+        function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void;
+        function setCollapsedFlag<TItem>(item: TItem, collapsed: boolean): void;
+        function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any, getParentId: (x: TItem) => any, setCollapsed?: boolean): void;
+        function toggleClick<TItem>(e: JQueryEventObject, row: number, cell: number, view: Slick.RemoteView<TItem>, getId: (x: TItem) => any): void;
     }
 }
 declare namespace Serenity {
@@ -1079,11 +1066,12 @@ declare namespace Serenity {
         function populateFileSymbols(container: JQuery, items: UploadedFile[], displayOriginalName?: boolean, urlPrefix?: string): void;
     }
     interface UploadedFile {
-        Filename: string;
-        OriginalName: string;
+        Filename?: string;
+        OriginalName?: string;
     }
     interface UploadInputOptions {
         container?: JQuery;
+        zone?: JQuery;
         progress?: JQuery;
         inputName?: string;
         allowMultiple?: boolean;
@@ -1110,6 +1098,8 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class IAsyncInit {
+    }
     class Widget<TOptions> {
         private static nextWidgetNumber;
         element: JQuery;
@@ -1207,6 +1197,9 @@ declare namespace Serenity {
         editorType?: string;
         editorParams?: any;
         category?: string;
+        collapsible?: boolean;
+        collapsed?: boolean;
+        tab?: string;
         cssClass?: string;
         headerCssClass?: string;
         formCssClass?: string;
@@ -1248,14 +1241,6 @@ declare namespace Serenity {
         quickFilterParams?: any;
         quickFilterSeparator?: boolean;
         quickFilterCssClass?: string;
-    }
-}
-declare namespace Serenity {
-    class BooleanEditor extends Widget<any> {
-        constructor(input: JQuery);
-        value: boolean;
-        protected get_value(): boolean;
-        protected set_value(value: boolean): void;
     }
 }
 declare namespace Serenity {
@@ -1317,6 +1302,7 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         static roundToMinutes(date: Date, minutesStep: number): Date;
+        static getTimeOptions: (fromHour: number, fromMin: number, toHour: number, toMin: number, stepMins: number) => string[];
     }
     interface DateTimeEditorOptions {
         startHour?: any;
@@ -1394,22 +1380,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
-        constructor(input: JQuery, opt?: DecimalEditorOptions);
-        get_value(): number;
-        value: number;
-        set_value(value: number): void;
-        get_isValid(): boolean;
-        static defaultAutoNumericOptions(): any;
-    }
-    interface DecimalEditorOptions {
-        minValue?: string;
-        maxValue?: string;
-        decimals?: any;
-        padDecimals?: any;
-    }
-}
-declare namespace Serenity {
     interface LookupEditorOptions {
         lookupKey?: string;
         minimumResultsForSearch?: any;
@@ -1425,8 +1395,6 @@ declare namespace Serenity {
         multiple?: boolean;
         delimited?: boolean;
     }
-}
-declare namespace Serenity {
     class LookupEditorBase<TOptions extends LookupEditorOptions, TItem> extends Select2Editor<TOptions, TItem> {
         constructor(input: JQuery, opt?: TOptions);
         protected initializeAsync(): PromiseLike<void>;
@@ -1468,62 +1436,8 @@ declare namespace Serenity {
         protected set_filterValue(value: any): void;
         openDialogAsPanel: boolean;
     }
-}
-declare namespace Serenity {
     class LookupEditor extends LookupEditorBase<LookupEditorOptions, any> {
         constructor(hidden: JQuery, opt?: LookupEditorOptions);
-    }
-}
-declare namespace Serenity {
-    class MaskedEditor extends Widget<MaskedEditorOptions> {
-        constructor(input: JQuery, opt?: MaskedEditorOptions);
-        value: string;
-        protected get_value(): string;
-        protected set_value(value: string): void;
-    }
-    interface MaskedEditorOptions {
-        mask?: string;
-        placeholder?: string;
-    }
-}
-declare namespace Serenity {
-    class StringEditor extends Widget<any> {
-        constructor(input: JQuery);
-        value: string;
-        protected get_value(): string;
-        protected set_value(value: string): void;
-    }
-}
-declare namespace Serenity {
-    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
-        constructor(input: JQuery, opt?: TextAreaEditorOptions);
-        value: string;
-        protected get_value(): string;
-        protected set_value(value: string): void;
-    }
-    interface TextAreaEditorOptions {
-        cols?: number;
-        rows?: number;
-    }
-}
-declare namespace Serenity {
-    class TimeEditor extends Widget<TimeEditorOptions> {
-        private minutes;
-        constructor(input: JQuery, opt?: TimeEditorOptions);
-        value: number;
-        protected get_value(): number;
-        protected set_value(value: number): void;
-    }
-    interface TimeEditorOptions {
-        noEmptyOption?: boolean;
-        startHour?: any;
-        endHour?: any;
-        intervalMinutes?: any;
-    }
-}
-declare namespace Serenity {
-    class URLEditor extends StringEditor {
-        constructor(input: JQuery);
     }
 }
 declare namespace Serenity {
@@ -1540,6 +1454,37 @@ declare namespace Serenity {
         function setReadonly(elements: JQuery, isReadOnly: boolean): JQuery;
         function setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
         function setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
+    }
+    class BooleanEditor extends Widget<any> {
+        constructor(input: JQuery);
+        value: boolean;
+        protected get_value(): boolean;
+        protected set_value(value: boolean): void;
+    }
+    class DecimalEditor extends Widget<DecimalEditorOptions> implements IDoubleValue {
+        constructor(input: JQuery, opt?: DecimalEditorOptions);
+        get_value(): number;
+        value: number;
+        set_value(value: number): void;
+        get_isValid(): boolean;
+        static defaultAutoNumericOptions(): any;
+    }
+    interface IntegerEditorOptions {
+        minValue?: number;
+        maxValue?: number;
+    }
+    class IntegerEditor extends Widget<IntegerEditorOptions> implements IDoubleValue {
+        constructor(input: JQuery, opt?: IntegerEditorOptions);
+        get_value(): number;
+        value: number;
+        set_value(value: number): void;
+        get_isValid(): boolean;
+    }
+    interface DecimalEditorOptions {
+        minValue?: string;
+        maxValue?: string;
+        decimals?: any;
+        padDecimals?: any;
     }
     interface EmailEditorOptions {
         domain?: string;
@@ -1564,12 +1509,6 @@ declare namespace Serenity {
         protected updateItems(): void;
         protected getSelect2Options(): Select2Options;
     }
-}
-declare namespace Serenity {
-    class GoogleMap extends Widget<GoogleMapOptions> {
-        constructor(container: JQuery, opt: GoogleMapOptions);
-        get_map(): any;
-    }
     interface GoogleMapOptions {
         latitude?: any;
         longitude?: any;
@@ -1579,31 +1518,37 @@ declare namespace Serenity {
         markerLatitude?: any;
         markerLongitude?: any;
     }
-    interface RadioButtonEditorOptions {
-        enumKey?: string;
-        enumType?: any;
-        lookupKey?: string;
-    }
-    class RadioButtonEditor extends Widget<RadioButtonEditorOptions> {
-        constructor(input: JQuery, opt: RadioButtonEditorOptions);
-        value: string;
+    class GoogleMap extends Widget<GoogleMapOptions> {
+        private map;
+        constructor(container: JQuery, opt: GoogleMapOptions);
+        get_map(): any;
     }
     interface HtmlContentEditorOptions {
         cols?: any;
         rows?: any;
     }
-    class HtmlContentEditor extends Widget<HtmlContentEditorOptions> {
+    class HtmlContentEditor extends Widget<HtmlContentEditorOptions> implements IStringValue, IReadOnly {
+        private _instanceReady;
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
-        instanceReady(x: any): void;
-        getLanguage(): string;
-        getConfig(): CKEditorConfig;
+        protected instanceReady(x: any): void;
+        protected getLanguage(): string;
+        protected getConfig(): CKEditorConfig;
+        protected getEditorInstance(): any;
+        destroy(): void;
+        get_value(): string;
         value: string;
+        set_value(value: string): void;
+        get_readOnly(): boolean;
+        set_readOnly(value: boolean): void;
+        static includeCKEditor(): void;
     }
     class HtmlNoteContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+        protected getConfig(): CKEditorConfig;
     }
     class HtmlReportContentEditor extends HtmlContentEditor {
         constructor(textArea: JQuery, opt?: HtmlContentEditorOptions);
+        protected getConfig(): CKEditorConfig;
     }
     interface ImageUploadEditorOptions {
         minWidth?: number;
@@ -1615,77 +1560,132 @@ declare namespace Serenity {
         originalNameProperty?: string;
         urlPrefix?: string;
         allowNonImage?: boolean;
+        displayFileName?: boolean;
     }
-    class ImageUploadEditor extends Widget<ImageUploadEditorOptions> {
-        entity: UploadedFile;
-        toolbar: Toolbar;
-        fileSymbols: JQuery;
-        uploadInput: JQuery;
+    class ImageUploadEditor extends Widget<ImageUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
         constructor(div: JQuery, opt: ImageUploadEditorOptions);
-        addFileButtonText(): string;
-        getToolButtons(): ToolButton[];
-        populate(): void;
-        updateInterface(): void;
+        protected getUploadInputOptions(): UploadInputOptions;
+        protected addFileButtonText(): string;
+        protected getToolButtons(): ToolButton[];
+        protected populate(): void;
+        protected updateInterface(): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
-        value: UploadedFile;
+        get_value(): UploadedFile;
+        readonly value: UploadedFile;
+        set_value(value: UploadedFile): void;
+        getEditValue(property: PropertyItem, target: any): void;
+        setEditValue(source: any, property: PropertyItem): void;
+        protected entity: UploadedFile;
+        protected toolbar: Toolbar;
+        protected progress: JQuery;
+        protected fileSymbols: JQuery;
+        protected uploadInput: JQuery;
     }
-    class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> {
-        entities: UploadedFile[];
-        toolbar: Toolbar;
-        fileSymbols: JQuery;
-        uploadInput: JQuery;
+    class MultipleImageUploadEditor extends Widget<ImageUploadEditorOptions> implements IReadOnly, IGetEditValue, ISetEditValue {
+        private entities;
+        private toolbar;
+        private fileSymbols;
+        private uploadInput;
         constructor(div: JQuery, opt: ImageUploadEditorOptions);
-        addFileButtonText(): string;
-        getToolButtons(): ToolButton[];
-        populate(): void;
-        updateInterface(): void;
+        protected addFileButtonText(): string;
+        protected getToolButtons(): ToolButton[];
+        protected populate(): void;
+        protected updateInterface(): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
+        get_value(): UploadedFile[];
         value: UploadedFile[];
-        get_jsonEncodeValue(): boolean;
-        set_jsonEncodeValue(value: boolean): void;
+        set_value(value: UploadedFile[]): void;
+        getEditValue(property: PropertyItem, target: any): void;
+        setEditValue(source: any, property: PropertyItem): void;
+        jsonEncodeValue: boolean;
     }
-    interface PhoneEditorOptions {
-        multiple?: boolean;
-        internal?: boolean;
-        mobile?: boolean;
-        allowExtension?: boolean;
-        allowInternational?: boolean;
-    }
-    class PhoneEditor extends Widget<PhoneEditorOptions> {
-        constructor(input: JQuery, opt?: PhoneEditorOptions);
-        validate(value: string): string;
-        formatValue(): void;
-        getFormattedValue(): string;
+    class MaskedEditor extends Widget<MaskedEditorOptions> {
+        constructor(input: JQuery, opt?: MaskedEditorOptions);
         value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
     }
-    class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> {
-        pageSize: number;
-        constructor(hidden: JQuery, opt: any);
-        emptyItemText(): string;
-        getService(): string;
-        query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
-        executeQuery(options: ServiceOptions<ListResponse<any>>): void;
-        queryByKey(key: string, callback: (p1: any) => void): void;
-        executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
-        getItemKey(item: any): string;
-        getItemText(item: any): string;
-        getTypeDelay(): number;
-        getSelect2Options(): Select2Options;
-        addInplaceCreate(title: string): void;
-        inplaceCreateClick(e: any): void;
-        get_select2Container(): JQuery;
+    interface MaskedEditorOptions {
+        mask?: string;
+        placeholder?: string;
+    }
+    class StringEditor extends Widget<any> {
+        constructor(input: JQuery);
         value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
     }
-    class Recaptcha extends Widget<RecaptchaOptions> {
-        constructor(div: JQuery, opt: RecaptchaOptions);
+    class PasswordEditor extends StringEditor {
+        constructor(input: JQuery);
+    }
+    interface RadioButtonEditorOptions {
+        enumKey?: string;
+        enumType?: any;
+        lookupKey?: string;
+    }
+    class RadioButtonEditor extends Widget<RadioButtonEditorOptions> {
+        constructor(input: JQuery, opt: RadioButtonEditorOptions);
+        protected addRadio(value: string, text: string): void;
         get_value(): string;
+        value: string;
         set_value(value: string): void;
     }
     interface RecaptchaOptions {
         siteKey?: string;
         language?: string;
+    }
+    class Recaptcha extends Widget<RecaptchaOptions> implements IStringValue {
+        constructor(div: JQuery, opt: RecaptchaOptions);
+        get_value(): string;
+        set_value(value: string): void;
+    }
+    interface TextAreaEditorOptions {
+        cols?: number;
+        rows?: number;
+    }
+    class TextAreaEditor extends Widget<TextAreaEditorOptions> {
+        constructor(input: JQuery, opt?: TextAreaEditorOptions);
+        value: string;
+        protected get_value(): string;
+        protected set_value(value: string): void;
+    }
+    interface TimeEditorOptions {
+        noEmptyOption?: boolean;
+        startHour?: any;
+        endHour?: any;
+        intervalMinutes?: any;
+    }
+    class TimeEditor extends Widget<TimeEditorOptions> {
+        private minutes;
+        constructor(input: JQuery, opt?: TimeEditorOptions);
+        value: number;
+        protected get_value(): number;
+        protected set_value(value: number): void;
+    }
+    class URLEditor extends StringEditor {
+        constructor(input: JQuery);
+    }
+    class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
+        pageSize: number;
+        constructor(hidden: JQuery, opt: TOptions);
+        protected emptyItemText(): string;
+        protected getService(): string;
+        protected query(request: ListRequest, callback: (p1: ListResponse<any>) => void): void;
+        protected executeQuery(options: ServiceOptions<ListResponse<any>>): void;
+        protected queryByKey(key: string, callback: (p1: any) => void): void;
+        protected executeQueryByKey(options: ServiceOptions<RetrieveResponse<any>>): void;
+        protected getItemKey(item: any): string;
+        protected getItemText(item: any): string;
+        protected getTypeDelay(): number;
+        protected getSelect2Options(): Select2Options;
+        protected addInplaceCreate(title: string): void;
+        protected inplaceCreateClick(e: any): void;
+        protected get_select2Container(): JQuery;
+        get_value(): string;
+        value: string;
+        set_value(value: string): void;
     }
 }
 declare namespace Serenity {
@@ -1883,8 +1883,6 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     class FilterPanel extends FilterWidgetBase<any> {
-        static panelTemplate: string;
-        static rowTemplate: string;
         private rowsDiv;
         constructor(div: JQuery);
         private showInitialLine;
@@ -1948,12 +1946,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class QuickSearchInput extends Widget<QuickSearchInputOptions> {
-        constructor(input: JQuery, opt: QuickSearchInputOptions);
-        checkIfValueChanged(): void;
-        get_field(): QuickSearchField;
-        set_field(value: QuickSearchField): void;
-    }
     interface QuickSearchInputOptions {
         typeDelay?: number;
         loadingParentClass?: string;
@@ -1961,8 +1953,25 @@ declare namespace Serenity {
         onSearch?: (p1: string, p2: string, p3: (p1: boolean) => void) => void;
         fields?: QuickSearchField[];
     }
+    class QuickSearchInput extends Widget<QuickSearchInputOptions> {
+        private lastValue;
+        private field;
+        private fieldChanged;
+        private timer;
+        constructor(input: JQuery, opt: QuickSearchInputOptions);
+        protected checkIfValueChanged(): void;
+        get_field(): QuickSearchField;
+        set_field(value: QuickSearchField): void;
+        protected updateInputPlaceHolder(): void;
+        protected searchNow(value: string): void;
+    }
 }
 declare namespace Serenity {
+    interface IInitializeColumn {
+        initializeColumn(column: Slick.Column): void;
+    }
+    class IInitializeColumn {
+    }
     class BooleanFormatter implements Slick.Formatter {
         format(ctx: Slick.FormatterContext): string;
         falseText: string;
@@ -2014,30 +2023,27 @@ declare namespace Serenity {
         urlFormat: string;
         target: string;
     }
-}
-declare namespace Serenity {
     namespace FormatterTypeRegistry {
         function get(key: string): Function;
-        function initialize(): void;
         function reset(): void;
     }
 }
 declare namespace Serenity {
     class Flexify extends Widget<FlexifyOptions> {
+        private xDifference;
+        private yDifference;
         constructor(container: JQuery, options: FlexifyOptions);
+        storeInitialSize(): void;
+        private getXFactor(element);
+        private getYFactor(element);
+        private resizeElements();
+        private resizeElement(element);
     }
     interface FlexifyOptions {
         getXFactor?: (p1: JQuery) => any;
         getYFactor?: (p1: JQuery) => any;
         designWidth?: any;
         designHeight?: any;
-    }
-    namespace FLX {
-        function flexHeightOnly(element: JQuery, flexY?: number): JQuery;
-        function flexWidthOnly(element: JQuery, flexX?: number): JQuery;
-        function flexWidthHeight(element: JQuery, flexX?: number, flexY?: number): JQuery;
-        function flexXFactor(element: JQuery, flexX: number): JQuery;
-        function flexYFactor(element: JQuery, flexY: number): JQuery;
     }
 }
 declare namespace Serenity {
@@ -2047,18 +2053,14 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class IDialog {
+    class PrefixedContext {
+        readonly idPrefix: string;
+        constructor(idPrefix: string);
+        byId(id: string): JQuery;
+        w<TWidget>(id: string, type: {
+            new (...args: any[]): TWidget;
+        }): TWidget;
     }
-    interface IDialog {
-        dialogOpen(): void;
-    }
-}
-declare namespace Serenity {
-    interface IEditDialog {
-        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
-    }
-}
-declare namespace Serenity {
     namespace ReflectionOptionsSetter {
         function set(target: any, options: any): void;
     }
@@ -2067,32 +2069,14 @@ declare namespace Serenity {
         function setPropertyValue(o: any, property: string, value: any): void;
         function makeCamelCase(s: string): string;
     }
+}
+declare namespace Serenity {
     const enum RetrieveColumnSelection {
         details = 0,
         keyOnly = 1,
         list = 2,
     }
-    class ScriptContext {
-    }
-    class PrefixedContext extends ScriptContext {
-        constructor(prefix: string);
-        w(id: string, type: Function): any;
-    }
-    class PasswordEditor extends StringEditor {
-        constructor(input: JQuery);
-    }
-    class PersonNameEditor extends Widget<any> {
-        constructor(input: JQuery);
-        get_value(): string;
-        set_value(value: string): void;
-    }
-    interface ToolbarOptions {
-        buttons?: ToolButton[];
-        hotkeyContext?: any;
-    }
-    class Toolbar extends Widget<ToolbarOptions> {
-        constructor(div: JQuery, options: ToolbarOptions);
-        findButton(className: string): JQuery;
+    interface ScriptContext {
     }
     class CheckListEditor extends Widget<CheckListEditorOptions> {
         constructor(div: JQuery, opt: CheckListEditorOptions);
@@ -2122,14 +2106,6 @@ declare namespace Serenity {
         List = 0,
         KeyOnly = 1,
         Details = 2,
-    }
-    class IntegerEditor extends Widget<IntegerEditorOptions> {
-        constructor(input: JQuery, opt?: IntegerEditorOptions);
-        value: number;
-    }
-    interface IntegerEditorOptions {
-        minValue?: number;
-        maxValue?: number;
     }
     interface HtmlContentEditorOptions {
     }
@@ -2186,34 +2162,42 @@ declare namespace Serenity {
 declare namespace Serenity {
     namespace WX {
         function getWidget<TWidget>(element: JQuery, type: Function): any;
-        function tryGetWidget(element: JQuery): any;
         function getWidgetName(type: Function): string;
         function hasOriginalEvent(e: any): boolean;
         function change(widget: any, handler: any): void;
         function changeSelect2(widget: any, handler: any): void;
         function getGridField(widget: Serenity.Widget<any>): JQuery;
-        function create(initElement: (p1: JQuery) => void, options?: any): any;
-    }
-}
-declare namespace Serenity {
-    class IAsyncInit {
     }
 }
 declare namespace Serenity {
     class PropertyGrid extends Widget<PropertyGridOptions> {
+        private editors;
+        private items;
         constructor(div: JQuery, opt: PropertyGridOptions);
-        load(source: any): void;
-        static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
-        save(target: any): void;
-        static saveEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
-        enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
-        static setRequired(widget: Serenity.Widget<any>, isRequired: boolean): void;
-        static setReadOnly(widget: Serenity.Widget<any>, isReadOnly: boolean): void;
-        static setReadOnly(elements: JQuery, isReadOnly: boolean): JQuery;
-        get_editors(): any;
-        get_items(): any;
+        destroy(): void;
+        private createItems(container, items);
+        private createCategoryDiv(categoriesDiv, categoryIndexes, category, collapsed);
+        private categoryLinkClick;
+        private determineText(text, getKey);
+        private createField(container, item);
+        private getCategoryOrder(items);
+        private createCategoryLinks(container, items);
+        get_editors(): Widget<any>[];
+        get_items(): PropertyItem[];
+        get_idPrefix(): string;
         get_mode(): PropertyGridMode;
         set_mode(value: PropertyGridMode): void;
+        static loadEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, source: any): void;
+        static saveEditorValue(editor: Serenity.Widget<any>, item: PropertyItem, target: any): void;
+        private static setReadOnly(widget, isReadOnly);
+        private static setReadonly(elements, isReadOnly);
+        private static setRequired(widget, isRequired);
+        private static setMaxLength(widget, maxLength);
+        load(source: any): void;
+        save(target: any): void;
+        private canModifyItem(item);
+        updateInterface(): void;
+        enumerateItems(callback: (p1: PropertyItem, p2: Serenity.Widget<any>) => void): void;
     }
     const enum PropertyGridMode {
         insert = 1,
@@ -2228,8 +2212,8 @@ declare namespace Serenity {
         localTextPrefix?: string;
         mode?: PropertyGridMode;
     }
-    class PropertyItemHelper {
-        static getPropertyItemsFor(type: Function): PropertyItem[];
+    namespace PropertyItemHelper {
+        function getPropertyItemsFor(type: Function): PropertyItem[];
     }
 }
 declare namespace Serenity {
@@ -2244,19 +2228,28 @@ declare namespace Serenity {
         hotkeyAllowDefault?: boolean;
         separator?: boolean;
     }
-    class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
-        constructor(div: JQuery, opt: PopupMenuButtonOptions);
-    }
     interface PopupMenuButtonOptions {
         menu?: JQuery;
         onPopup?: () => void;
         positionMy?: string;
         positionAt?: string;
     }
-    class PopupToolButton extends PopupMenuButton {
-        constructor(div: JQuery, opt: PopupToolButtonOptions);
+    class PopupMenuButton extends Widget<PopupMenuButtonOptions> {
+        constructor(div: JQuery, opt: PopupMenuButtonOptions);
+        destroy(): void;
     }
     interface PopupToolButtonOptions extends PopupMenuButtonOptions {
+    }
+    interface ToolbarOptions {
+        buttons?: ToolButton[];
+        hotkeyContext?: any;
+    }
+    class Toolbar extends Widget<ToolbarOptions> {
+        constructor(div: JQuery, options: ToolbarOptions);
+        destroy(): void;
+        protected mouseTrap: any;
+        protected createButton(container: JQuery, b: ToolButton): void;
+        findButton(className: string): JQuery;
     }
 }
 declare namespace Serenity {
@@ -2290,6 +2283,11 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
+    class IDialog {
+    }
+    interface IDialog {
+        dialogOpen(asPanel?: boolean): void;
+    }
     class TemplatedDialog<TOptions> extends TemplatedWidget<TOptions> {
         protected tabs: JQuery;
         protected toolbar: Serenity.Toolbar;
@@ -2326,9 +2324,17 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     class PropertyDialog<TItem, TOptions> extends TemplatedDialog<TOptions> {
-        constructor(options?: TOptions);
-        protected entity: TItem;
-        protected entityId: any;
+        protected _entity: TItem;
+        protected _entityId: any;
+        constructor(opt?: TOptions);
+        destroy(): void;
+        protected initPropertyGridAsync(): PromiseLike<void>;
+        protected getDialogOptions(): JQueryUI.DialogOptions;
+        protected getDialogButtons(): JQueryUI.DialogButtonOptions[];
+        protected okClick(): void;
+        protected okClickValidated(): void;
+        protected cancelClick(): void;
+        protected initPropertyGrid(): void;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
@@ -2337,9 +2343,12 @@ declare namespace Serenity {
         protected getSaveEntity(): TItem;
         protected initializeAsync(): PromiseLike<void>;
         protected loadInitialEntity(): void;
-        protected set_entity(entity: TItem): void;
+        protected get_entity(): TItem;
+        protected set_entity(value: TItem): void;
+        protected get_entityId(): any;
         protected set_entityId(value: any): void;
         protected validateBeforeSave(): boolean;
+        protected updateTitle(): void;
         protected propertyGrid: Serenity.PropertyGrid;
     }
 }
@@ -2353,13 +2362,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    class IInitializeColumn {
-    }
-    interface IInitializeColumn {
-        initializeColumn(column: Slick.Column): void;
-    }
-}
-declare namespace Serenity {
     interface IDataGrid {
         getElement(): JQuery;
         getGrid(): Slick.Grid;
@@ -2368,8 +2370,6 @@ declare namespace Serenity {
     }
     class IDataGrid {
     }
-}
-declare namespace Serenity {
     class DataGrid<TItem, TOptions> extends Widget<TOptions> implements IDataGrid {
         protected titleDiv: JQuery;
         protected toolbar: Toolbar;
@@ -2579,10 +2579,10 @@ declare namespace Serenity {
 declare namespace Serenity {
     class TemplatedPanel<TOptions> extends TemplatedWidget<TOptions> {
         constructor(container: JQuery, options?: TOptions);
+        destroy(): void;
         protected tabs: JQuery;
         protected toolbar: Serenity.Toolbar;
         protected validator: JQueryValidation.Validator;
-        protected arrange(): void;
         protected isPanel: boolean;
         protected responsive: boolean;
         protected arrange(): void;
@@ -2597,7 +2597,14 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     class PropertyPanel<TItem, TOptions> extends TemplatedPanel<TOptions> {
+        private _entity;
+        private _entityId;
         constructor(container: JQuery, options?: TOptions);
+        destroy(): void;
+        protected initPropertyGrid(): void;
+        protected initPropertyGridAsync(): PromiseLike<void>;
+        protected loadInitialEntity(): void;
+        protected initializeAsync(): PromiseLike<void>;
         protected getFormKey(): string;
         protected getPropertyGridOptions(): PropertyGridOptions;
         protected getPropertyGridOptionsAsync(): PromiseLike<PropertyGridOptions>;
@@ -2606,15 +2613,18 @@ declare namespace Serenity {
         protected getSaveEntity(): TItem;
         protected get_entity(): TItem;
         protected get_entityId(): any;
-        protected initializeAsync(): PromiseLike<void>;
-        protected loadInitialEntity(): void;
-        protected set_entity(entity: TItem): void;
+        protected set_entity(value: TItem): void;
         protected set_entityId(value: any): void;
         protected validateBeforeSave(): boolean;
         protected propertyGrid: Serenity.PropertyGrid;
     }
 }
 declare namespace Serenity {
+    class IEditDialog {
+    }
+    interface IEditDialog {
+        load(entityOrId: any, done: () => void, fail: (p1: any) => void): void;
+    }
     class EntityDialog<TItem, TOptions> extends TemplatedDialog<TOptions> implements IEditDialog {
         protected entity: TItem;
         protected entityId: any;
@@ -2721,14 +2731,22 @@ declare namespace Serenity {
 }
 declare namespace Serenity {
     namespace Reporting {
-        class ReportDialog extends TemplatedDialog<ReportDialogOptions> {
-            constructor(opt: ReportDialogOptions);
-            createPropertyGrid(): void;
-            loadReport(reportKey: string): void;
-            executeReport(targetFrame: string, exportType: string): void;
-        }
         interface ReportDialogOptions {
             reportKey?: string;
+        }
+        class ReportDialog extends TemplatedDialog<ReportDialogOptions> {
+            constructor(opt: ReportDialogOptions);
+            protected propertyGrid: Serenity.PropertyGrid;
+            protected propertyItems: Serenity.PropertyItem[];
+            protected reportKey: string;
+            protected createPropertyGrid(): void;
+            loadReport(reportKey: string): void;
+            executeReport(targetFrame: string, exportType: string): void;
+            protected getToolbarButtons(): {
+                title: string;
+                cssClass: string;
+                onClick: () => void;
+            }[];
         }
         interface ReportExecuteRequest extends ServiceRequest {
             ExportType?: string;
@@ -2738,6 +2756,9 @@ declare namespace Serenity {
         }
         class ReportPage extends Serenity.Widget<any> {
             constructor(div: JQuery);
+            protected updateMatchFlags(text: string): void;
+            protected categoryClick(e: JQueryEventObject): void;
+            protected reportLinkClick(e: JQueryEventObject): void;
         }
         interface ReportRetrieveRequest extends ServiceRequest {
             ReportKey?: string;
@@ -2903,8 +2924,8 @@ declare namespace Slick {
     }
     class RowMoveManager {
         constructor(options: Slick.RowMoveManagerOptions);
-        get_onBeforeMoveRows(): Slick.Event;
-        get_onMoveRows(): Slick.Event;
+        onBeforeMoveRows: Slick.Event;
+        onMoveRows: Slick.Event;
     }
     class RowSelectionModel {
     }
@@ -3004,6 +3025,7 @@ declare namespace Slick {
         constructor(options: RemoteViewOptions): void;
         onSubmit: Slick.CancellableViewCallback<TEntity>;
         onDataChanged: Slick.Event;
+        onDataLoaded: Slick.Event;
         onAjaxCall: Slick.RemoteViewAjaxCallback<TEntity>;
         onProcessData: Slick.RemoteViewProcessCallback<TEntity>;
         addData(data: Serenity.ListResponse<TEntity>): void;
@@ -3030,9 +3052,11 @@ declare namespace Slick {
         populateLock(): void;
         populateUnlock(): void;
         getItem(row: number): any;
+        getLength(): number;
         params: any;
         sortBy: string[];
         url: string;
+        seekToPage?: number;
     }
     interface RemoteViewOptions {
         autoLoad?: boolean;

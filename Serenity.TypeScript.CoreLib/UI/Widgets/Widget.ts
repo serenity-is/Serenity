@@ -1,5 +1,9 @@
 ﻿namespace Serenity {
 
+    @Decorators.registerInterface('Serenity.IAsyncInit')
+    export class IAsyncInit {
+    }
+
     @Serenity.Decorators.registerClass()
     export class Widget<TOptions> {
         private static nextWidgetNumber = 0;

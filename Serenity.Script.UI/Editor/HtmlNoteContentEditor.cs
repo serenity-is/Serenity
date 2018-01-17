@@ -3,9 +3,10 @@ namespace Serenity
 {
     using jQueryApi;
     using System.ComponentModel;
+    using System.Runtime.CompilerServices;
 
     [Editor, DisplayName("Html Content (Font Style and Color Only)"), OptionsType(typeof(HtmlContentEditorOptions))]
-    [Element("<textarea />")]
+    [Imported(ObeysTypeSystem = true), Element("<textarea />")]
     public class HtmlNoteContentEditor : HtmlContentEditor, IStringValue
     {
         public HtmlNoteContentEditor(jQueryObject textArea, HtmlContentEditorOptions opt)

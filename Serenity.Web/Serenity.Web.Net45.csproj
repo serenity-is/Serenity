@@ -257,7 +257,6 @@
     <Compile Include="DynamicScript\DynamicScript\ITwoLevelCached.cs" />
     <Compile Include="DynamicScript\DynamicScript\IScriptName.cs" />
     <Compile Include="DynamicScript\DynamicScript\IDynamicScript.cs" />
-    <Compile Include="DynamicScript\PropertyEditor\PhoneEditorAttribute.cs" />
     <Compile Include="DynamicScript\PropertyEditor\EmailEditorAttribute.cs" />
     <Compile Include="DynamicScript\DynamicScriptTypes\DataScript.cs" />
     <Compile Include="Security\RecaptchaValidation.cs" />

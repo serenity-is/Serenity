@@ -27,8 +27,7 @@ namespace Serenity.Web
             "~/Scripts/SlickGrid/Plugins/slick.headerbuttons.js",
             "~/Scripts/bootstrap.js",
             "~/Scripts/saltarelle/mscorlib.js",
-            "~/Scripts/serenity/Serenity.CoreLib.js",
-            "~/Scripts/serenity/Serenity.Script.UI.js"
+            "~/Scripts/serenity/Serenity.CoreLib.js"
         };
 
         public static readonly string[] Styles = new string[] 

@@ -186,9 +186,27 @@ namespace Serenity {
         }
     }
 
+    @Attr('Hidden')
+    export class HiddenAttribute {
+        constructor() {
+        }
+    }
+
+    @Attr('Hint')
+    export class HintAttribute {
+        constructor(public hint: string) {
+        }
+    }
+
     @Attr('IdProperty')
     export class IdPropertyAttribute {
         constructor(public value: string) {
+        }
+    }
+
+    @Attr('Insertable')
+    export class InsertableAttribute {
+        constructor(public value = true) {
         }
     }
 
@@ -216,10 +234,20 @@ namespace Serenity {
         }
     }
 
+    @Attr('MaxLength')
+    export class MaxLengthAttribute {
+        constructor(public maxLength: number) {
+        }
+    }
+
     @Attr('NameProperty')
     export class NamePropertyAttribute {
         constructor(public value: string) {
         }
+    }
+
+    @Attr('OneWay')
+    export class OneWayAttribute {
     }
 
     @Attr('Option')
@@ -240,6 +268,24 @@ namespace Serenity {
         }
     }
 
+    @Attr('Placeholder')
+    export class PlaceholderAttribute {
+        constructor(public value: string) {
+        }
+    }
+
+    @Attr('ReadOnly')
+    export class ReadOnlyAttribute {
+        constructor(public value = true) {
+        }
+    }
+
+    @Attr('Required')
+    export class RequiredAttribute {
+        constructor(public isRequired = true) {
+        }
+    }
+
     @Attr('Resizable')
     export class ResizableAttribute {
         constructor(public value = true) {
@@ -255,6 +301,12 @@ namespace Serenity {
     @Attr('Service')
     export class ServiceAttribute {
         constructor(public value: string) {
+        }
+    }
+
+    @Attr('Updatable')
+    export class UpdatableAttribute {
+        constructor(public value = true) {
         }
     }
 }
@@ -454,49 +506,5 @@ namespace Serenity.Decorators {
         return function (target: Function) {
             addAttribute(target, new ServiceAttribute(value));
         }
-    }
-}
-
-declare namespace Serenity {
-
-    class HiddenAttribute {
-    }
-
-    class HintAttribute {
-        constructor(hint: string);
-        hint: string;
-    }
-
-    class InsertableAttribute {
-        constructor(insertable?: boolean);
-        value: boolean;
-    }
-
-    class MaxLengthAttribute {
-        constructor(maxLength: number);
-        maxLength: number;
-    }
-
-    class OneWayAttribute {
-    }
-
-    class PlaceholderAttribute {
-        constructor(value: string);
-        value: string;
-    }
-
-    class ReadOnlyAttribute {
-        constructor(readOnly?: boolean);
-        value: boolean;
-    }
-
-    class RequiredAttribute {
-        constructor(isRequired: boolean);
-        isRequired: boolean;
-    }
-
-    class UpdatableAttribute {
-        constructor(updatable?: boolean);
-        value: boolean;
     }
 }

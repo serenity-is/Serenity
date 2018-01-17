@@ -6,7 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [Element("<input type=\"hidden\"/>"), IncludeGenericArguments(false), ScriptName("Select2AjaxEditor")]
+    [Imported(ObeysTypeSystem = true), Element("<input type=\"hidden\"/>")]
+    [IncludeGenericArguments(false), ScriptName("Select2AjaxEditor")]
     public abstract class Select2AjaxEditor<TOptions, TItem> : Widget<TOptions>, IStringValue
         where TOptions : class, new()
         where TItem: class

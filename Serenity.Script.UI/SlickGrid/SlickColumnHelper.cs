@@ -8,6 +8,7 @@ namespace Serenity
     /// <summary>
     /// Helper for slick grid columns
     /// </summary>
+    [Imported]
     public static class SlickHelper
     {
         [IncludeGenericArguments(false)]

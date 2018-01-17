@@ -53,8 +53,6 @@
     }
 
     export class FilterPanel extends FilterWidgetBase<any> {
-        static panelTemplate: string;
-        static rowTemplate: string;
 
         private rowsDiv: JQuery;
 
@@ -154,7 +152,15 @@
         }
 
         protected getTemplate(): string {
-            return FilterPanel.panelTemplate;
+            return "<div id='~_Rows' class='filter-lines'>" +
+                "</div>" +
+                "<div id='~_Buttons' class='buttons'>" +
+                "<button id='~_AddButton' class='btn btn-primary add'></button>" +
+                "<button id='~_SearchButton' class='btn btn-success search'></button>" +
+                "<button id='~_ResetButton' class='btn btn-danger reset'></button>" +
+                "</div>" +
+                "<div style='clear: both'>" +
+                "</div>"
         }
 
         protected initButtons(): void {
@@ -298,7 +304,22 @@
             var isLastRowOr = this.rowsDiv.children().last()
                 .children('a.andor').hasClass('or');
 
-            var row = $(FilterPanel.rowTemplate).appendTo(this.rowsDiv);
+            var row = $(
+                "<div class='filter-line'>" +
+                "<a class='delete'><span></span></a>" +
+                "<div class='l'>" +
+                "<a class='rightparen' href='#'>)</a>" +
+                "<a class='andor' href='#'></a>" +
+                "<a class='leftparen' href='#'>(</a>" +
+                "</div>" +
+                "<div class='f'>" +
+                "<input type='hidden' class='field-select'>" +
+                "</div>" +
+                "<div class='o'></div>" +
+                "<div class='v'></div>" +
+                "<div style='clear: both'></div>" +
+                "</div>").appendTo(this.rowsDiv);
+
             var parenDiv = row.children('div.l').hide();
 
             parenDiv.children('a.leftparen, a.rightparen')

@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported(ObeysTypeSystem = true)]
     public class InsertableAttribute : Attribute
     {
         public InsertableAttribute(bool insertable = true)

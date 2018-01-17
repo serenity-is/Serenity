@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class PropertyItemSlickConverter
     {
         public static List<SlickColumn> ToSlickColumns(List<PropertyItem> items)

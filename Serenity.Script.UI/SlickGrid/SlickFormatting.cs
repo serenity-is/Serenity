@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class SlickFormatting
     {
         [IncludeGenericArguments(false), InlineCode("Serenity.EnumFormatter.format({TEnum}, {value})")]

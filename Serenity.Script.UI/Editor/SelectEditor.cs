@@ -50,7 +50,7 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable, Reflectable]
     public class SelectEditorOptions
     {
         public SelectEditorOptions()

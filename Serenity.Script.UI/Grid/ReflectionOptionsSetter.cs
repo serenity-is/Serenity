@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
+    [Imported]
     public static class ReflectionOptionsSetter
     {
         public static void Set(object target, JsDictionary<string, object> options)

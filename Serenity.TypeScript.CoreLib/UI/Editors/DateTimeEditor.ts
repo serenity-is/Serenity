@@ -13,6 +13,88 @@
 
         constructor(input: JQuery, opt?: DateTimeEditorOptions) {
             super(input, opt);
+
+            input.addClass('dateQ s-DateTimeEditor').datepicker({
+                showOn: 'button',
+                beforeShow: function () {
+                    return !input.hasClass('readonly');
+                } as any,
+                yearRange: Q.coalesce(this.options.yearRange, '-100:+50')
+            });
+
+            input.bind('keyup.' + this.uniqueName, e => {
+                if (e.which === 32 && !this.get_readOnly()) {
+                    if (this.get_valueAsDate() !== new Date()) {
+                        this.set_valueAsDate(new Date());
+                        this.element.trigger('change');
+                    }
+                }
+                else {
+                    Serenity.DateEditor.dateInputKeyup(e);
+                }
+            });
+
+            input.bind('change.' + this.uniqueName,
+                DateEditor.dateInputChange);
+
+            this.time = $('<select/>').addClass('editor s-DateTimeEditor time');
+            var after = input.next('.ui-datepicker-trigger');
+            if (after.length > 0) {
+                this.time.insertAfter(after);
+            }
+            else {
+                after = input.prev('.ui-datepicker-trigger');
+                if (after.length > 0) {
+                    this.time.insertBefore(after);
+                }
+                else {
+                    this.time.insertAfter(input);
+                }
+            }
+
+            var timeOpt = DateTimeEditor.getTimeOptions(
+                Q.coalesce(this.options.startHour, 0), 0,
+                Q.coalesce(this.options.endHour, 23), 59,
+                Q.coalesce(this.options.intervalMinutes, 5));
+
+            for (var t of timeOpt) {
+                Q.addOption(this.time, t, t);
+            }
+
+            VX.addValidationRule(input, this.uniqueName, e1 => {
+                var value = this.get_value();
+                if (Q.isEmptyOrNull(value)) {
+                    return null;
+                }
+
+                if (!Q.isEmptyOrNull(this.get_minValue()) &&
+                    (ss as any).compareStrings(value, this.get_minValue()) < 0) {
+                    return Q.format(Q.text('Validation.MinDate'),
+                        Q.formatDate(this.get_minValue(), null));
+                }
+
+                if (!Q.isEmptyOrNull(this.get_maxValue()) &&
+                    (ss as any).compareStrings(value, this.get_maxValue()) >= 0) {
+                    return Q.format(Q.text('Validation.MaxDate'),
+                        Q.formatDate(this.get_maxValue(), null));
+                }
+                return null;
+            });
+
+            this.set_sqlMinMax(true);
+
+            $("<div class='inplace-button inplace-now'><b></b></div>")
+                .attr('title', 'set to now')
+                .insertAfter(this.time).click(e2 => {
+                    if (this.element.hasClass('readonly')) {
+                        return;
+                    }
+                    this.set_valueAsDate(new Date());
+                });
+
+            this.time.on('change', function (e3) {
+                input.triggerHandler('change');
+            });
         }
 
         get_value(): string {
@@ -159,6 +241,32 @@
             date.setMilliseconds(0);
             return date;
         }
+
+        static getTimeOptions = function (fromHour: number, fromMin: number,
+            toHour: number, toMin: number, stepMins: number) {
+            var list = [];
+            if (toHour >= 23) {
+                toHour = 23;
+            }
+            if (toMin >= 60) {
+                toMin = 59;
+            }
+            var hour = fromHour;
+            var min = fromMin;
+            while (true) {
+                if (hour > toHour || hour === toHour && min > toMin) {
+                    break;
+                }
+                var t = ((hour >= 10) ? '' : '0') + hour + ':' + ((min >= 10) ? '' : '0') + min;
+                list.push(t);
+                min += stepMins;
+                if (min >= 60) {
+                    min -= 60;
+                    hour++;
+                }
+            }
+            return list;
+        };
     }
 
     export interface DateTimeEditorOptions {

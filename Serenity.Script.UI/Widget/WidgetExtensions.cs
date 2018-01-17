@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Serenity
 {
-    [ScriptName("WX")]
+    [ScriptName("WX"), Imported]
     public static class WidgetExtensions
     {
         static WidgetExtensions()
@@ -97,33 +97,34 @@ namespace Serenity
             });
         }
 
+        [InlineCode("Serenity.WX.getWidget({element}, {TWidget})")]
         public static TWidget GetWidget<TWidget>(this jQueryObject element) where TWidget : class
+        {
+            return null;   
+        }
+
+        [ScriptName("getWidget")]
+        public static object GetWidget(this jQueryObject element, Type widgetType)
         {
             if (element == null)
                 throw new ArgumentNullException("element");
 
             if (element.Length == 0)
-                throw new Exception(String.Format("Searching for widget of type '{0}' on a non-existent element! ({1})", 
-                    typeof(TWidget).FullName, element.Selector));
+                throw new Exception(String.Format("Searching for widget of type '{0}' on a non-existent element! ({1})",
+                    widgetType.FullName, element.Selector));
 
-            var widget = TryGetWidget<TWidget>(element);
+            var widget = element.As<dynamic>().tryGetWidget(widgetType);
             if (widget == null)
             {
-                var message = String.Format("Element has no widget of type '{0}'! If you have recently changed editor type of a property in " + 
-                    "a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. " + 
-                    "Make sure your project builds successfully and transform T4 templates", typeof(TWidget).FullName);
+                var message = String.Format("Element has no widget of type '{0}'! If you have recently changed editor type of a property in " +
+                    "a form class, or changed data type in row (which also changes editor type) your script side Form definition might be out of date. " +
+                    "Make sure your project builds successfully and transform T4 templates", widgetType.FullName);
 
                 Q.NotifyError(message);
                 throw new Exception(message);
             }
 
             return widget;
-        }
-
-        [InlineCode("Serenity.WX.getWidget({widgetType})({element})")]
-        public static object GetWidget(this jQueryObject element, Type widgetType)
-        {
-            return null;
         }
 
         [InlineCode("{element}.tryGetWidget({TWidget})")]
@@ -179,7 +180,7 @@ namespace Serenity
             return null;
         }
         
-        [Obsolete("Use Widget.Create")]
+        [Obsolete("Use Widget.Create"), InlineCode("Serenity.Widget.create({{ type: {TWidget}, element: {initElement}, options: {options} }})")]
         public static TWidget Create<TWidget>(Action<jQueryObject> initElement, object options = null)
             where TWidget : Widget
         {

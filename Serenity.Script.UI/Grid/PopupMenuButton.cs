@@ -6,6 +6,7 @@ namespace Serenity
     using System.Html;
     using System.Runtime.CompilerServices;
 
+    [Imported(ObeysTypeSystem = true)]
     public class PopupMenuButton : Widget<PopupMenuButtonOptions>
     {
         public override void Destroy()

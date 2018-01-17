@@ -2,14 +2,12 @@
 using jQueryApi.UI;
 using jQueryApi.UI.Widgets;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Html;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 
 namespace Serenity
 {
+    [Imported]
     public static class SubDialogHelper
     {
         [IncludeGenericArguments(false)]

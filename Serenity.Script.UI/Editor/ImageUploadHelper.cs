@@ -9,12 +9,14 @@ namespace Serenity
     public class UploadInputOptions
     {
         public jQueryObject Container;
+        public jQueryObject Zone;
         public jQueryObject Progress;
         public string InputName;
         public bool AllowMultiple;
         public Action<UploadResponse, string, dynamic> FileDone;
     }
 
+    [Imported]
     public static class UploadHelper
     {
         public static jQueryObject AddUploadInput(UploadInputOptions options)
@@ -32,6 +34,8 @@ namespace Serenity
             uploadInput.As<dynamic>().fileupload(new
             {
                 dataType = "json",
+                dropZone = options.Zone,
+                pasteZone = options.Zone,
                 done = new Action<jQueryEvent, dynamic>((e, data) =>
                 {
                     var response = (UploadResponse)data.result;

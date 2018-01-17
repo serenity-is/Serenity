@@ -448,6 +448,7 @@ namespace Serenity
         }
     }
 
+    [Imported]
     public static class GridSelectAllButtonHelper
     {
         [IncludeGenericArguments(false)]

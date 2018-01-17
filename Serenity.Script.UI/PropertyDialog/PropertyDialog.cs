@@ -14,7 +14,7 @@ namespace Serenity
         public Action Click { get; set; }
     }
 
-    [IncludeGenericArguments(false), ScriptName("PropertyDialog")]
+    [Imported(ObeysTypeSystem = true), IncludeGenericArguments(false), ScriptName("PropertyDialog")]
     public abstract partial class PropertyDialog<TEntity, TOptions> : TemplatedDialog<TOptions>
         where TEntity : class, new()
         where TOptions: class, new()

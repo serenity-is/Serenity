@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Serenity
 {
+    [Imported]
     public class Toolbar : Widget<ToolbarOptions>
     {
         private MousetrapInstance mouseTrap;

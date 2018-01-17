@@ -7,6 +7,7 @@ namespace Serenity
     using System.Html;
     using System.Runtime.CompilerServices;
 
+    [Imported(ObeysTypeSystem = true)]
     public class QuickSearchInput : Widget<QuickSearchInputOptions>
     {
         private string lastValue;
@@ -113,21 +114,23 @@ namespace Serenity
             this.timer = Window.SetTimeout(delegate
             {
                 self.SearchNow(value);
-            }, this.options.TypeDelay);
+            }, this.options.TypeDelay ?? 500);
 
             this.lastValue = value;
         }
 
         private void SearchNow(string value)
         {
-            this.element.Parent().ToggleClass(this.options.FilteredParentClass ?? "", Q.IsTrue(value.Length > 0));
-            this.element.Parent().AddClass(this.options.LoadingParentClass ?? "")
-                .AddClass(this.options.LoadingParentClass ?? "");
+            this.element.Parent().ToggleClass(this.options.FilteredParentClass ?? 
+                "s-QuickSearchFiltered", Q.IsTrue(value.Length > 0));
+            this.element.Parent().AddClass(this.options.LoadingParentClass ?? 
+                "s-QuickSearchLoading")
+                .AddClass(this.options.LoadingParentClass ?? "s-QuickSearchLoading");
 
             Action<bool> done = delegate(bool results)
             {
-                this.element.RemoveClass(this.options.LoadingParentClass ?? "")
-                    .Parent().RemoveClass(this.options.LoadingParentClass ?? "");
+                this.element.RemoveClass(this.options.LoadingParentClass ?? "s-QuickSearchLoading")
+                    .Parent().RemoveClass(this.options.LoadingParentClass ?? "s-QuickSearchLoading");
 
                 if (!results)
                 {
@@ -158,17 +161,10 @@ namespace Serenity
         }
     }
 
-    [Serializable, Reflectable]
+    [Imported, Serializable]
     public class QuickSearchInputOptions
     {
-        public QuickSearchInputOptions()
-        {
-            TypeDelay = 500;
-            LoadingParentClass = "s-QuickSearchLoading";
-            FilteredParentClass = "s-QuickSearchFiltered";
-        }
-
-        public int TypeDelay { get; set; }
+        public int? TypeDelay { get; set; }
         public string LoadingParentClass { get; set; }
         public string FilteredParentClass { get; set; }
         public Action<string, string, Action<bool>> OnSearch { get; set; }

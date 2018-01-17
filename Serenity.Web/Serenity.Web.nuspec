@@ -77,7 +77,7 @@
     <file src="..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.js" target="content/Scripts/serenity" />
     <file src="..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.min.js" target="content/Scripts/serenity" />
     <file src="..\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" target="content/Scripts/typings/serenity" />
-    <file src="..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.js" target="content/Scripts/serenity" />
-    <file src="..\Serenity.Script.UI\bin\${configuration}\Serenity.Script.UI.min.js" target="content/Scripts/serenity" />
+    <file src="..\Serenity.TypeScript.CoreLib\Serenity.Script.UI.js" target="content/Scripts/serenity" />
+    <file src="..\Serenity.TypeScript.CoreLib\Serenity.Script.UI.js" target="content/Scripts/serenity/Serenity.Script.UI.min.js" />
   </files>
 </package>
