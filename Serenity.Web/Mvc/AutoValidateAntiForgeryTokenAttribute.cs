@@ -30,10 +30,19 @@ namespace Serenity.Services
                 context.Controller.GetType().GetCustomAttribute<IgnoreAntiforgeryTokenAttribute>() != null)
                 return;
 
+            // no need to validate anti forgery token if there is no logged user
+            if (!Authorization.IsLoggedIn)
+                return;
+
+            var cookieToken = context.RequestContext.HttpContext.Request.Cookies[AntiForgeryConfig.CookieName];
+
+            // this is probably a non-browser client, e.g. some mobile device calling services
+            if (cookieToken == null)
+                return;
+
             var headerToken = context.RequestContext.HttpContext.Request.Headers["X-CSRF-TOKEN"];
             if (!string.IsNullOrEmpty(headerToken))
             {
-                var cookieToken = context.RequestContext.HttpContext.Request.Cookies[AntiForgeryConfig.CookieName];
                 AntiForgery.Validate(cookieToken == null ? null : cookieToken.Value, headerToken);
                 return;
             }
