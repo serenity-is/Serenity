@@ -68,7 +68,7 @@
     <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.min.js" DestinationFiles="$(ProjectDir)Scripts\serenity\Serenity.CoreLib.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.min.js')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts" DestinationFiles="$(ProjectDir)Scripts\typings\serenity\Serenity.CoreLib.d.ts" Condition="Exists('$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.CoreLib.d.ts')"  SkipUnchangedFiles="true" />
     <!--serenity script ui -->
-    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js')" SkipUnchangedFiles="true" />
-	<Copy SourceFiles="$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.Script.UI.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.js')" SkipUnchangedFiles="true" />
+	<Copy SourceFiles="$(SolutionDir)Serenity\Serenity.TypeScript.CoreLib\Serenity.Script.UI.js" DestinationFiles="$(ProjectDir)Scripts\Serenity\Serenity.Script.UI.min.js" Condition="Exists('$(SolutionDir)Serenity\Serenity.Script.UI\bin\$(ConfigurationName)\Serenity.Script.UI.min.js')" SkipUnchangedFiles="true" />
   </Target>
 </Project>
