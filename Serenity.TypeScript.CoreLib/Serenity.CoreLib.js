@@ -2967,7 +2967,7 @@ var Serenity;
                     e.preventDefault();
                     var item = grid.getView().getItem(p.row);
                     var id = item[_this.idField].toString();
-                    if (!_this.include[id]) {
+                    if (_this.include[id]) {
                         delete _this.include[id];
                     }
                     else {
@@ -7155,6 +7155,17 @@ var Serenity;
         function Select2AjaxEditor(hidden, opt) {
             var _this = _super.call(this, hidden, opt) || this;
             _this.pageSize = 50;
+            var emptyItemText = _this.emptyItemText();
+            if (emptyItemText != null)
+                hidden.attr("placeholder", emptyItemText);
+            hidden.select2(_this.getSelect2Options());
+            hidden.attr("type", "text"); // jquery validate to work
+            hidden.on("change." + _this.uniqueName, function (e, x) {
+                if (Serenity.WX.hasOriginalEvent(e) || !x) {
+                    if (Serenity.ValidationHelper.getValidator(hidden) != null)
+                        hidden.valid();
+                }
+            });
             return _this;
         }
         Select2AjaxEditor.prototype.emptyItemText = function () {
@@ -7279,7 +7290,8 @@ var Serenity;
             }
         };
         Select2AjaxEditor = __decorate([
-            Editor('Select2Ajax', [Serenity.IStringValue])
+            Editor('Select2Ajax', [Serenity.IStringValue]),
+            Element('<input type="hidden" />')
         ], Select2AjaxEditor);
         return Select2AjaxEditor;
     }(Serenity.Widget));

@@ -24,7 +24,7 @@
                     var item = grid.getView().getItem(p.row);
                     var id = item[this.idField].toString();
 
-                    if (!this.include[id]) {
+                    if (this.include[id]) {
                         delete this.include[id];
                     }
                     else {

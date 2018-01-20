@@ -1643,11 +1643,27 @@
     }
 
     @Editor('Select2Ajax', [IStringValue])
+    @Element('<input type="hidden" />')
     export class Select2AjaxEditor<TOptions, TItem> extends Widget<TOptions> implements IStringValue {
         pageSize: number = 50;
 
         constructor(hidden: JQuery, opt: TOptions) {
-            super(hidden, opt)
+            super(hidden, opt);
+
+            var emptyItemText = this.emptyItemText();
+            if (emptyItemText != null)
+                hidden.attr("placeholder", emptyItemText);
+
+            hidden.select2(this.getSelect2Options());
+
+            hidden.attr("type", "text"); // jquery validate to work
+
+            hidden.on("change." + this.uniqueName, (e, x) => {
+                if (WX.hasOriginalEvent(e) || !x) {
+                    if (ValidationHelper.getValidator(hidden) != null)
+                        hidden.valid();
+                }
+            });
         }
             
         protected emptyItemText(): string {
