@@ -8981,7 +8981,7 @@ var Serenity;
         };
         NumberFormatter.format = function (value, format) {
             format = Q.coalesce(format, '0.##');
-            if (value != null)
+            if (value == null)
                 return '';
             if (typeof (value) === 'number') {
                 if (isNaN(value))

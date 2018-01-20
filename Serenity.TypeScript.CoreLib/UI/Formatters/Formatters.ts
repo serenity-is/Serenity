@@ -242,7 +242,7 @@
 
         static format(value: any, format: string): string {
             format = Q.coalesce(format, '0.##');
-            if (value != null)
+            if (value == null)
                 return '';
 
             if (typeof (value) === 'number') {
