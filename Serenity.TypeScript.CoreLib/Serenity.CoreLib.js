@@ -4153,6 +4153,9 @@ var Serenity;
         var Widget_1;
     }());
     Serenity.Widget = Widget;
+    Widget.prototype.addValidationRule = function (eventClass, rule) {
+        return Serenity.VX.addValidationRule(this.element, eventClass, rule);
+    };
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {

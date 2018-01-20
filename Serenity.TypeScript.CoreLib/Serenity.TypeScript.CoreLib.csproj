@@ -80,8 +80,8 @@
     <TypeScriptCompile Include="UI\Helpers\SubDialogHelper.ts" />
     <TypeScriptCompile Include="UI\Helpers\TabsExtensions.ts" />
     <TypeScriptCompile Include="UI\Helpers\UploadHelper.ts" />
-    <TypeScriptCompile Include="UI\Helpers\ValidationHelper.ts" />
     <TypeScriptCompile Include="UI\Widgets\Widget.ts" />
+    <TypeScriptCompile Include="UI\Helpers\ValidationHelper.ts" />
     <TypeScriptCompile Include="UI\Widgets\TemplatedWidget.ts" />
     <TypeScriptCompile Include="UI\PropertyGrid\IBooleanValue.ts" />
     <TypeScriptCompile Include="UI\PropertyGrid\IDoubleValue.ts" />
@@ -143,7 +143,6 @@
   <ItemGroup>
     <None Include=".eslintrc.json" />
     <None Include="package.json" />
-    <None Include="Serenity.CoreLib.js.map" />
     <None Include="tsconfig.json" />
     <None Include="tslint.json" />
   </ItemGroup>
