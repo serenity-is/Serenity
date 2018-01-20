@@ -113,6 +113,25 @@ var Serenity;
     (function (Test) {
         var assert = QUnit.assert;
         QUnit.module('Formatters');
+        QUnit.test('NumberFormatter tests', function () {
+            assert.notEqual(null, new Serenity.NumberFormatter(), 'can create instance');
+            assert.strictEqual(Serenity.FormatterTypeRegistry.get('Number'), Serenity.NumberFormatter, 'can get from formatter type registry with key: "Number"');
+            assert.strictEqual(Serenity.FormatterTypeRegistry.get('Serenity.Number'), Serenity.NumberFormatter, 'can get from formatter type registry with key: "Serenity.Number"');
+            assert.strictEqual(Serenity.NumberFormatter.format(9.876), '9.88', 'formats with two decimals by default');
+            assert.strictEqual(Serenity.NumberFormatter.format(9.876, '#.0'), '9.9', 'respects format parameter: #.0');
+            assert.strictEqual(Serenity.NumberFormatter.format(9.876, '#.0000'), '9.8760', 'respects format parameter: 0.0000');
+            assert.strictEqual(Serenity.NumberFormatter.format(undefined), '', 'returns empty string for undefined value');
+            assert.strictEqual(Serenity.NumberFormatter.format(null), '', 'returns empty string for null value');
+            assert.strictEqual(Serenity.NumberFormatter.format(NaN), '', 'returns empty string for NaN');
+        });
+    })(Test = Serenity.Test || (Serenity.Test = {}));
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var Test;
+    (function (Test) {
+        var assert = QUnit.assert;
+        QUnit.module('Formatters');
         QUnit.test('UrlFormatter tests', function () {
             assert.notEqual(null, new Serenity.UrlFormatter(), 'can create instance');
             assert.strictEqual("<a href='http://simpleurl'>http://simpleurl</a>", new Serenity.UrlFormatter().format({

@@ -2011,7 +2011,7 @@ declare namespace Serenity {
     }
     class NumberFormatter {
         format(ctx: Slick.FormatterContext): string;
-        static format(value: any, format: string): string;
+        static format(value: any, format?: string): string;
         displayFormat: string;
     }
     class UrlFormatter implements Slick.Formatter, IInitializeColumn {

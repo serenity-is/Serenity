@@ -431,7 +431,7 @@
 			for (var i = 0; i < items.length; i++) {
 				var item = items[i];
 				var category = { $: itemCategory[item.name] };
-                if (categoryIndexes[category.$] != null) {
+                if (categoryIndexes[category.$] == null) {
                     var index = Object.keys(categoryIndexes).length + 1;
 					categoryIndexes[category.$] = index;
 					if (index > 1) {

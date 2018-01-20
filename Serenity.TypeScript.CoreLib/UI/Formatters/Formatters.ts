@@ -240,7 +240,7 @@
             return NumberFormatter.format(ctx.value, this.displayFormat);
         }
 
-        static format(value: any, format: string): string {
+        static format(value: any, format?: string): string {
             format = Q.coalesce(format, '0.##');
             if (value == null)
                 return '';
