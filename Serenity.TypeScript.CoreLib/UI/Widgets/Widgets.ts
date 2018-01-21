@@ -147,7 +147,12 @@
         }
     }
 
+    export interface ScriptContext {
+    }
 
+    @Decorators.registerClass('Serenity.ScriptContext')
+    export class ScriptContext {
+    }
 }
 
 declare namespace Serenity {
@@ -157,13 +162,6 @@ declare namespace Serenity {
         keyOnly = 1,
         list = 2
     }
-
-    interface ScriptContext {
-    }
-
-
-
-    
 
     class CheckListEditor extends Widget<CheckListEditorOptions> {
         constructor(div: JQuery, opt: CheckListEditorOptions);

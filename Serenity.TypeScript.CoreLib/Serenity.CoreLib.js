@@ -3959,81 +3959,6 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
-    var ValidationHelper;
-    (function (ValidationHelper) {
-        function asyncSubmit(form, validateBeforeSave, submitHandler) {
-            var validator = form.validate();
-            var valSettings = validator.settings;
-            if (valSettings.abortHandler) {
-                return false;
-            }
-            if (validateBeforeSave != null && validateBeforeSave() === false) {
-                return false;
-            }
-            valSettings['abortHandler'] = Q.validatorAbortHandler;
-            valSettings['submitHandler'] = function () {
-                if (submitHandler != null) {
-                    submitHandler();
-                }
-                return false;
-            };
-            form.trigger('submit');
-            return true;
-        }
-        ValidationHelper.asyncSubmit = asyncSubmit;
-        function submit(form, validateBeforeSave, submitHandler) {
-            var validator = form.validate();
-            var valSettings = validator.settings;
-            if (valSettings.abortHandler != null) {
-                return false;
-            }
-            if (validateBeforeSave != null && validateBeforeSave() === false) {
-                return false;
-            }
-            if (!validator.form()) {
-                return false;
-            }
-            if (submitHandler != null) {
-                submitHandler();
-            }
-            return true;
-        }
-        ValidationHelper.submit = submit;
-        function getValidator(element) {
-            var form = element.closest('form');
-            if (form.length === 0) {
-                return null;
-            }
-            return form.data('validator');
-        }
-        ValidationHelper.getValidator = getValidator;
-    })(ValidationHelper = Serenity.ValidationHelper || (Serenity.ValidationHelper = {}));
-    var VX;
-    (function (VX) {
-        function addValidationRule(element, eventClass, rule) {
-            if (element.length === 0) {
-                return element;
-            }
-            if (rule == null) {
-                throw new ss.Exception('rule is null!');
-            }
-            element.addClass('customValidate').bind('customValidate.' + eventClass, rule);
-            return element;
-        }
-        VX.addValidationRule = addValidationRule;
-        function removeValidationRule(element, eventClass) {
-            element.unbind('customValidate.' + eventClass);
-            return element;
-        }
-        VX.removeValidationRule = removeValidationRule;
-        function validateElement(validator, widget) {
-            return validator.element(widget.element[0]);
-        }
-        VX.validateElement = validateElement;
-    })(VX = Serenity.VX || (Serenity.VX = {}));
-})(Serenity || (Serenity = {}));
-var Serenity;
-(function (Serenity) {
     var IAsyncInit = /** @class */ (function () {
         function IAsyncInit() {
         }
@@ -4156,6 +4081,81 @@ var Serenity;
     Widget.prototype.addValidationRule = function (eventClass, rule) {
         return Serenity.VX.addValidationRule(this.element, eventClass, rule);
     };
+})(Serenity || (Serenity = {}));
+var Serenity;
+(function (Serenity) {
+    var ValidationHelper;
+    (function (ValidationHelper) {
+        function asyncSubmit(form, validateBeforeSave, submitHandler) {
+            var validator = form.validate();
+            var valSettings = validator.settings;
+            if (valSettings.abortHandler) {
+                return false;
+            }
+            if (validateBeforeSave != null && validateBeforeSave() === false) {
+                return false;
+            }
+            valSettings['abortHandler'] = Q.validatorAbortHandler;
+            valSettings['submitHandler'] = function () {
+                if (submitHandler != null) {
+                    submitHandler();
+                }
+                return false;
+            };
+            form.trigger('submit');
+            return true;
+        }
+        ValidationHelper.asyncSubmit = asyncSubmit;
+        function submit(form, validateBeforeSave, submitHandler) {
+            var validator = form.validate();
+            var valSettings = validator.settings;
+            if (valSettings.abortHandler != null) {
+                return false;
+            }
+            if (validateBeforeSave != null && validateBeforeSave() === false) {
+                return false;
+            }
+            if (!validator.form()) {
+                return false;
+            }
+            if (submitHandler != null) {
+                submitHandler();
+            }
+            return true;
+        }
+        ValidationHelper.submit = submit;
+        function getValidator(element) {
+            var form = element.closest('form');
+            if (form.length === 0) {
+                return null;
+            }
+            return form.data('validator');
+        }
+        ValidationHelper.getValidator = getValidator;
+    })(ValidationHelper = Serenity.ValidationHelper || (Serenity.ValidationHelper = {}));
+    var VX;
+    (function (VX) {
+        function addValidationRule(element, eventClass, rule) {
+            if (element.length === 0) {
+                return element;
+            }
+            if (rule == null) {
+                throw new ss.Exception('rule is null!');
+            }
+            element.addClass('customValidate').bind('customValidate.' + eventClass, rule);
+            return element;
+        }
+        VX.addValidationRule = addValidationRule;
+        function removeValidationRule(element, eventClass) {
+            element.unbind('customValidate.' + eventClass);
+            return element;
+        }
+        VX.removeValidationRule = removeValidationRule;
+        function validateElement(validator, widget) {
+            return validator.element(widget.element[0]);
+        }
+        VX.validateElement = validateElement;
+    })(VX = Serenity.VX || (Serenity.VX = {}));
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -9444,6 +9444,15 @@ var Serenity;
         }
         ReflectionUtils.makeCamelCase = makeCamelCase;
     })(ReflectionUtils = Serenity.ReflectionUtils || (Serenity.ReflectionUtils = {}));
+    var ScriptContext = /** @class */ (function () {
+        function ScriptContext() {
+        }
+        ScriptContext = __decorate([
+            Serenity.Decorators.registerClass('Serenity.ScriptContext')
+        ], ScriptContext);
+        return ScriptContext;
+    }());
+    Serenity.ScriptContext = ScriptContext;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
@@ -10287,6 +10296,7 @@ var Serenity;
         ], PopupToolButton);
         return PopupToolButton;
     }(PopupMenuButton));
+    Serenity.PopupToolButton = PopupToolButton;
     var Toolbar = /** @class */ (function (_super) {
         __extends(Toolbar, _super);
         function Toolbar(div, options) {

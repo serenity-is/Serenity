@@ -63,7 +63,7 @@
     }
 
     @Decorators.registerEditor('Serenity.PopupToolButton')
-    class PopupToolButton extends PopupMenuButton {
+    export class PopupToolButton extends PopupMenuButton {
         constructor(div: JQuery, opt: PopupToolButtonOptions) {
             super(div, opt);
 

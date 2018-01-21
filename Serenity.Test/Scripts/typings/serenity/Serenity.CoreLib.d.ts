@@ -1086,18 +1086,6 @@ declare namespace Serenity {
     }
 }
 declare namespace Serenity {
-    namespace ValidationHelper {
-        function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-        function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
-        function getValidator(element: JQuery): JQueryValidation.Validator;
-    }
-    namespace VX {
-        function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
-        function removeValidationRule(element: JQuery, eventClass: string): JQuery;
-        function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
-    }
-}
-declare namespace Serenity {
     class IAsyncInit {
     }
     class Widget<TOptions> {
@@ -1126,6 +1114,18 @@ declare namespace Serenity {
         getGridField(): JQuery;
         change(handler: (e: JQueryEventObject) => void): void;
         changeSelect2(handler: (e: JQueryEventObject) => void): void;
+    }
+}
+declare namespace Serenity {
+    namespace ValidationHelper {
+        function asyncSubmit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
+        function submit(form: JQuery, validateBeforeSave: () => boolean, submitHandler: () => void): boolean;
+        function getValidator(element: JQuery): JQueryValidation.Validator;
+    }
+    namespace VX {
+        function addValidationRule(element: JQuery, eventClass: string, rule: (p1: JQuery) => string): JQuery;
+        function removeValidationRule(element: JQuery, eventClass: string): JQuery;
+        function validateElement(validator: JQueryValidation.Validator, widget: Serenity.Widget<any>): boolean;
     }
 }
 declare namespace Serenity {
@@ -2069,14 +2069,16 @@ declare namespace Serenity {
         function setPropertyValue(o: any, property: string, value: any): void;
         function makeCamelCase(s: string): string;
     }
+    interface ScriptContext {
+    }
+    class ScriptContext {
+    }
 }
 declare namespace Serenity {
     const enum RetrieveColumnSelection {
         details = 0,
         keyOnly = 1,
         list = 2,
-    }
-    interface ScriptContext {
     }
     class CheckListEditor extends Widget<CheckListEditorOptions> {
         constructor(div: JQuery, opt: CheckListEditorOptions);
@@ -2239,6 +2241,9 @@ declare namespace Serenity {
         destroy(): void;
     }
     interface PopupToolButtonOptions extends PopupMenuButtonOptions {
+    }
+    class PopupToolButton extends PopupMenuButton {
+        constructor(div: JQuery, opt: PopupToolButtonOptions);
     }
     interface ToolbarOptions {
         buttons?: ToolButton[];

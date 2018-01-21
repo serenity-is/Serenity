@@ -64,7 +64,7 @@
         return this.element.closest('.field');
     };
 
-    $.fn.tryGetWidget = function (widgetType) {
+    $.fn.tryGetWidget = function (widgetType: any) {
         var element = this;
         var widget2;
         if ((ss as any).isAssignableFrom(Serenity.Widget, widgetType)) {
@@ -93,7 +93,7 @@
         return null;
     };
 
-    $.fn.getWidget = function (widgetType1) {
+    $.fn.getWidget = function (widgetType1: any) {
         var element1 = this;
         if (element1 == null) {
             throw new (ss as any).ArgumentNullException('element');
