@@ -32,7 +32,8 @@ namespace Serenity.Data
             }
             set
             {
-                _setValue(row, (Int32?)(object)value);
+                Int32? v = value == null ? (Int32?)null : Convert.ToInt32(value);
+                _setValue(row, v);
                 if (row.tracking)
                     row.FieldAssignedValue(this);
             }
