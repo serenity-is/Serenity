@@ -1,3 +1,18 @@
+## 3.4.0 (2018-01-24)
+
+Features:
+  - 4 new themes: Azure, Azure Light, Cosmos, Cosmos Light [StartSharp]
+  - ported all code left in Saltaralle (12K+ lines) to TypeScript
+  - Optimized ServerTypings generation so that it produces a MyProject.Web.js file that is up to %50 less in minified size.
+  - [BREAKING CHANGE] used const enum feature in TypeScript 2.4 to generate field names in ServerTypings Row.ts. Replace "var fld = SomeRow.Fields" with "import fld = SomeRow.Fields" and move that line to just under "namespace" declaration.
+  - don't validate CSRF token when user is not logged in or cookie token is null (e.g. json service client)
+  - changed icon for alert dialog (thanks @Jin)
+  - added descending property in DateYearEditorAttribute (thanks @dfaruque)
+  
+Bugfixes:
+  - fix enum field cast error
+  - CompareValue() of field types based on list/array returns wrong value (#3156, thanks @hannesb)
+
 ## 3.3.15 (2018-01-04)
 
 Bugfixes:

@@ -279,8 +279,13 @@ Task("Compile")
     .IsDependentOn("Restore")
     .Does(context => 
 {
+	var msBuildPath = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\msbuild.exe";
+	if (!System.IO.File.Exists(msBuildPath))
+		msBuildPath = null;
+
     MSBuild("./Serenity.Net45.sln", s => {
         s.SetConfiguration(configuration);
+		s.ToolPath = msBuildPath;
     });
     
     var vi = System.Diagnostics.FileVersionInfo.GetVersionInfo("./Serenity.Core/bin/" + configuration + "/Serenity.Core.dll");
