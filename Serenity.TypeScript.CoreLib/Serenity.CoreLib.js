@@ -10987,7 +10987,7 @@ var Serenity;
                 },
                 {
                     text: Q.text('Dialogs.CancelButton'),
-                    click: function () { return _this.dialogClose; }
+                    click: function () { return _this.dialogClose(); }
                 }
             ];
             opt.title = Q.text('Controls.FilterPanel.DialogTitle');
