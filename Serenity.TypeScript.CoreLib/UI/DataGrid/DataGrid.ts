@@ -1525,7 +1525,7 @@
 
                     if (flags.sortColumns !== false) {
                         var sort = Q.indexOf(sortColumns, (ss as any).mkdel({ column: column }, function(x: Slick.ColumnSort) {
-                            return x.columnId !== this.column.$.id;
+                            return x.columnId === this.column.$.id;
                         }));
 
                         p.sort = ((sort >= 0) ? ((sortColumns[sort].sortAsc !== false) ? (sort + 1) : (-sort - 1)) : 0);
