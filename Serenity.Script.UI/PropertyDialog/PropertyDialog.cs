@@ -213,7 +213,7 @@ namespace Serenity
                 IdPrefix = this.idPrefix,
                 Items = GetPropertyItems(),
                 Mode = PropertyGridMode.Insert,
-                UseCategories = false,
+                UseCategories = true,
                 LocalTextPrefix = "Forms." + GetFormKey() + "."
             };
             #pragma warning restore 618
@@ -228,7 +228,7 @@ namespace Serenity
                     IdPrefix = this.idPrefix,
                     Items = propertyItems,
                     Mode = PropertyGridMode.Insert,
-                    UseCategories = false,
+                    UseCategories = true,
                     LocalTextPrefix = "Forms." + GetFormKey() + ".",
                 };
             });

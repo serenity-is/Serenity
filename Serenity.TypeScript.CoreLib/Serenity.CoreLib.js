@@ -9658,10 +9658,10 @@ var Serenity;
         PropertyGrid.prototype.createItems = function (container, items) {
             var categoryIndexes = {};
             var categoriesDiv = container;
-            var useCategories = this.options.useCategories && Q.any(items, function (x) {
+            var useCategories = this.options.useCategories !== false && Q.any(items, function (x) {
                 return !Q.isEmptyOrNull(x.category);
             });
-            if (this.options.useCategories) {
+            if (useCategories) {
                 var linkContainer = $('<div/>').addClass('category-links');
                 categoryIndexes = this.createCategoryLinks(linkContainer, items);
                 if (Object.keys(categoryIndexes).length > 1) {
@@ -13774,7 +13774,8 @@ var Serenity;
                 idPrefix: this.idPrefix,
                 items: this.getPropertyItems(),
                 mode: 1 /* insert */,
-                localTextPrefix: 'Forms.' + this.getFormKey() + '.'
+                localTextPrefix: 'Forms.' + this.getFormKey() + '.',
+                useCategories: true
             };
         };
         EntityDialog.prototype.getPropertyGridOptionsAsync = function () {
@@ -13784,7 +13785,8 @@ var Serenity;
                     idPrefix: _this.idPrefix,
                     items: propertyItems,
                     mode: 1,
-                    localTextPrefix: 'Forms.' + _this.getFormKey() + '.'
+                    localTextPrefix: 'Forms.' + _this.getFormKey() + '.',
+                    useCategories: true
                 };
             });
         };

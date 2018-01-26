@@ -732,7 +732,8 @@
                 idPrefix: this.idPrefix,
                 items: this.getPropertyItems(),
                 mode: PropertyGridMode.insert,
-                localTextPrefix: 'Forms.' + this.getFormKey() + '.'
+                localTextPrefix: 'Forms.' + this.getFormKey() + '.',
+                useCategories: true
             };
         }
 
@@ -743,7 +744,8 @@
                     idPrefix: this.idPrefix,
                     items: propertyItems,
                     mode: 1,
-                    localTextPrefix: 'Forms.' + this.getFormKey() + '.'
+                    localTextPrefix: 'Forms.' + this.getFormKey() + '.',
+                    useCategories: true
                 };
             });
 
