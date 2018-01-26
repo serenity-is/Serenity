@@ -433,7 +433,7 @@ namespace Serenity.Decorators {
     }
 
     export function registerEnumType(target: any, name?: string, enumKey?: string) {
-        registerEnum(target, name, Q.coalesce(enumKey, name));
+        registerEnum(target, Q.coalesce(enumKey, name), name);
     }
 
     export function filterable(value = true) {

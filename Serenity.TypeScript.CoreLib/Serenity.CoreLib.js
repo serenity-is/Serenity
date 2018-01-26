@@ -2812,7 +2812,7 @@ var System;
         }
         Decorators.registerEnum = registerEnum;
         function registerEnumType(target, name, enumKey) {
-            registerEnum(target, name, Q.coalesce(enumKey, name));
+            registerEnum(target, Q.coalesce(enumKey, name), name);
         }
         Decorators.registerEnumType = registerEnumType;
         function filterable(value) {
