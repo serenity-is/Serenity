@@ -1,3 +1,8 @@
+## 3.4.2 (2018-01-26)
+
+Bugfixes:
+  - fix possible script registration issue with enum types
+
 ## 3.4.1 (2018-01-26)
 
 Bugfixes:
