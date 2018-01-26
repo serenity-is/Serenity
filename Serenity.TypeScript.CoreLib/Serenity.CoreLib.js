@@ -12287,7 +12287,7 @@ var Serenity;
                     }
                     if (flags.sortColumns !== false) {
                         var sort = Q.indexOf(sortColumns, ss.mkdel({ column: column }, function (x) {
-                            return x.columnId !== this.column.$.id;
+                            return x.columnId === this.column.$.id;
                         }));
                         p.sort = ((sort >= 0) ? ((sortColumns[sort].sortAsc !== false) ? (sort + 1) : (-sort - 1)) : 0);
                     }

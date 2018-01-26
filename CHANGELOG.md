@@ -1,3 +1,9 @@
+## 3.4.1 (2018-01-26)
+
+Bugfixes:
+  - use categories default was changed during TypeScript port
+  - persist sort order wasn't working
+
 ## 3.4.0 (2018-01-24)
 
 Features:
