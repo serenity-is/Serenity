@@ -6182,6 +6182,9 @@ var Serenity;
             get: function () {
                 return this.get_value();
             },
+            set: function (v) {
+                this.set_value(v);
+            },
             enumerable: true,
             configurable: true
         });
@@ -6650,6 +6653,9 @@ var Serenity;
             get: function () {
                 return this.get_value();
             },
+            set: function (v) {
+                this.set_value(v);
+            },
             enumerable: true,
             configurable: true
         });
@@ -6893,6 +6899,20 @@ var Serenity;
         return StringEditor;
     }(Serenity.Widget));
     Serenity.StringEditor = StringEditor;
+    var EmailAddressEditor = /** @class */ (function (_super) {
+        __extends(EmailAddressEditor, _super);
+        function EmailAddressEditor(input) {
+            var _this = _super.call(this, input) || this;
+            input.attr('type', 'email')
+                .addClass('email');
+            return _this;
+        }
+        EmailAddressEditor = __decorate([
+            Editor('EmailAddress')
+        ], EmailAddressEditor);
+        return EmailAddressEditor;
+    }(Serenity.StringEditor));
+    Serenity.EmailAddressEditor = EmailAddressEditor;
     var PasswordEditor = /** @class */ (function (_super) {
         __extends(PasswordEditor, _super);
         function PasswordEditor(input) {

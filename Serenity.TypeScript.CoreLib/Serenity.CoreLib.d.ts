@@ -1494,7 +1494,7 @@ declare namespace Serenity {
         constructor(input: JQuery, opt: EmailEditorOptions);
         static registerValidationMethods(): void;
         get_value(): string;
-        readonly value: string;
+        value: string;
         set_value(value: string): void;
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
@@ -1572,7 +1572,7 @@ declare namespace Serenity {
         get_readOnly(): boolean;
         set_readOnly(value: boolean): void;
         get_value(): UploadedFile;
-        readonly value: UploadedFile;
+        value: UploadedFile;
         set_value(value: UploadedFile): void;
         getEditValue(property: PropertyItem, target: any): void;
         setEditValue(source: any, property: PropertyItem): void;
@@ -1616,6 +1616,9 @@ declare namespace Serenity {
         value: string;
         protected get_value(): string;
         protected set_value(value: string): void;
+    }
+    class EmailAddressEditor extends Serenity.StringEditor {
+        constructor(input: JQuery);
     }
     class PasswordEditor extends StringEditor {
         constructor(input: JQuery);

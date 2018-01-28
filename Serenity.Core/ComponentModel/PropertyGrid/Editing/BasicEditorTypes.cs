@@ -87,6 +87,14 @@ namespace Serenity.ComponentModel
         }
     }
 
+    public partial class EmailAddressEditorAttribute : CustomEditorAttribute
+    {
+        public EmailAddressEditorAttribute()
+            : base("EmailAddress")
+        {
+        }
+    }
+
     public partial class TimeEditorAttribute : CustomEditorAttribute
     {
         public TimeEditorAttribute()

@@ -602,6 +602,10 @@
             }
         }
 
+        set value(v: string) {
+            this.set_value(v);
+        }
+
         get_readOnly(): boolean {
             var domain = this.element.nextAll('.emaildomain');
             return !(this.element.attr('readonly') == null &&
@@ -1120,6 +1124,10 @@
             this.updateInterface();
         }
 
+        set value(v: UploadedFile) {
+            this.set_value(v);
+        }
+
         getEditValue(property: PropertyItem, target: any) {
             target[property.name] = this.entity == null ? null :
                 Q.trimToNull(this.entity.Filename);
@@ -1363,6 +1371,15 @@
         }
     }
 
+    @Editor('EmailAddress')
+    export class EmailAddressEditor extends Serenity.StringEditor {
+        constructor(input: JQuery) {
+            super(input);
+
+            input.attr('type', 'email')
+                .addClass('email');
+        }
+    }
 
     @Editor('Password')
     export class PasswordEditor extends StringEditor {
