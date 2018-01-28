@@ -1,3 +1,13 @@
+## 3.4.3 (2018-01-28)
+
+Features:
+  - implemented sorting and text search functionality in DataExplorer sample [StartSharp]
+
+Bugfixes:
+  - fix email and image upload editor value properties are readonly in TS typings
+  - added new EmailAddressEditor with one input for e-mail editing (unlike EmailEditor)
+  - fix MinuteFormatter returns empty text
+
 ## 3.4.2 (2018-01-26)
 
 Bugfixes:
