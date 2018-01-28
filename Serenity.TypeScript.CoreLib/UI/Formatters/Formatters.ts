@@ -213,11 +213,11 @@
         }
 
         static format(value: number): string {
-            var hour = (ss as any).Int32.trunc(Math.floor(value / 60));
+            var hour = Math.floor(value / 60);
             var minute = value - hour * 60;
             var hourStr, minuteStr;
 
-            if (value != null || isNaN(value))
+            if (value == null || isNaN(value))
                 return '';
 
             if (hour < 10)

@@ -8985,10 +8985,10 @@ var Serenity;
             return MinuteFormatter_1.format(ctx.value);
         };
         MinuteFormatter.format = function (value) {
-            var hour = ss.Int32.trunc(Math.floor(value / 60));
+            var hour = Math.floor(value / 60);
             var minute = value - hour * 60;
             var hourStr, minuteStr;
-            if (value != null || isNaN(value))
+            if (value == null || isNaN(value))
                 return '';
             if (hour < 10)
                 hourStr = '0' + hour;
