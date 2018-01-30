@@ -12,7 +12,7 @@ namespace Serenity
             DisplayFormat = Q.Culture.DateFormat;
         }
 
-        [Option]
+        [Option, IntrinsicProperty]
         public string DisplayFormat { get; set; }
 
         public string Format(SlickFormatterContext ctx)

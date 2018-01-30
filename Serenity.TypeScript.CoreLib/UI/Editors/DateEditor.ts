@@ -1,5 +1,7 @@
 ﻿namespace Serenity {
 
+    import Option = Serenity.Decorators.option
+
     @Decorators.registerEditor('Serenity.DateEditor', [IStringValue, IReadOnly])
     @Decorators.element('<input type="text"/>')
     export class DateEditor extends Widget<any> implements IStringValue, IReadOnly {
@@ -127,10 +129,10 @@
             }
         }
 
-        @Decorators.option()
+        @Option()
         public yearRange: string;
 
-        @Decorators.option()
+        @Option()
         get_minValue(): string {
             return this.minValue;
         }
@@ -139,7 +141,7 @@
             this.minValue = value;
         }
 
-        @Decorators.option()
+        @Option()
         get_maxValue(): string {
             return this.maxValue;
         }
@@ -156,7 +158,7 @@
             this.set_minValue(Q.formatDate(value, 'yyyy-MM-dd'));
         }
 
-        @Decorators.option()
+        @Option()
         get_maxDate(): Date {
             return Q.parseISODateTime(this.get_maxValue());
         }
@@ -165,7 +167,7 @@
             this.set_maxValue(Q.formatDate(value, 'yyyy-MM-dd'));
         }
 
-        @Decorators.option()
+        @Option()
         get_sqlMinMax(): boolean {
             return this.get_minValue() === '1753-01-01' && this.get_maxValue() === '9999-12-31';
         }

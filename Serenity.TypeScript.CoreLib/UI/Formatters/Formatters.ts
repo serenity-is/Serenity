@@ -45,10 +45,10 @@
             return Q.htmlEncode(text);
         }
 
-        @Serenity.Decorators.option()
+        @Option()
         public falseText: string;
 
-        @Serenity.Decorators.option()
+        @Option()
         public trueText: string;
     }
 
@@ -62,7 +62,7 @@
     @Formatter('Date')
     export class DateFormatter implements Slick.Formatter {
         constructor() {
-            this.set_displayFormat(Q.Culture.dateFormat);
+            this.displayFormat = Q.Culture.dateFormat;
         }
 
         static format(value: any, format?: string) {
@@ -89,19 +89,11 @@
             return Q.htmlEncode(Q.formatDate(date, format));
         }
 
-        private displayFormat: string;
-
         @Option()
-        get_displayFormat(): string {
-            return this.displayFormat;
-        }
-
-        set_displayFormat(value: string): void {
-            this.displayFormat = value;
-        }
+        public displayFormat: string;
 
         format(ctx: Slick.FormatterContext): string {
-            return DateFormatter.format(ctx.value, this.get_displayFormat());
+            return DateFormatter.format(ctx.value, this.displayFormat);
         }
     }
 
@@ -109,7 +101,7 @@
     export class DateTimeFormatter extends DateFormatter {
         constructor() {
             super();
-            this.set_displayFormat(Q.Culture.dateTimeFormat);
+            this.displayFormat = Q.Culture.dateTimeFormat;
         }
     }
 

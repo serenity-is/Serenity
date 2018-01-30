@@ -932,7 +932,6 @@ declare namespace Serenity {
 declare namespace Serenity.Decorators {
     function registerFormatter(nameOrIntf?: string | any[], intf2?: any[]): (target: Function) => void;
     function addAttribute(type: any, attr: any): void;
-    function addMemberAttr(type: any, memberName: string, attr: any): void;
     function columnsKey(value: string): (target: Function) => void;
     function dialogType(value: Function): (target: Function) => void;
     function editor(key?: string): (target: Function) => void;
@@ -1986,9 +1985,7 @@ declare namespace Serenity {
     class DateFormatter implements Slick.Formatter {
         constructor();
         static format(value: any, format?: string): any;
-        private displayFormat;
-        get_displayFormat(): string;
-        set_displayFormat(value: string): void;
+        displayFormat: string;
         format(ctx: Slick.FormatterContext): string;
     }
     class DateTimeFormatter extends DateFormatter {

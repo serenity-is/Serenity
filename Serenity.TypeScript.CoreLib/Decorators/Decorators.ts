@@ -323,26 +323,6 @@ namespace Serenity.Decorators {
         type.__metadata.attr.push(attr);
     }
 
-    export function addMemberAttr(type: any, memberName: string, attr: any) {
-        type.__metadata = type.__metadata || {};
-        type.__metadata.members = type.__metadata.members || [];
-        let member: any = undefined;
-        for (var m of type.__metadata.members) {
-            if (m.name == memberName) {
-                member = m;
-                break;
-            }
-        }
-
-        if (!member) {
-            member = { name: memberName, attr: [], type: 4, returnType: Object, sname: memberName };
-            type.__metadata.members.push(member);
-        }
-
-        member.attr = member.attr || [];
-        member.attr.push(attr);
-    }
-
     export function columnsKey(value: string) {
         return function (target: Function) {
             addAttribute(target, new ColumnsKeyAttribute(value));
@@ -474,7 +454,58 @@ namespace Serenity.Decorators {
 
     export function option() {
         return function (target: Object, propertyKey: string): void {
-            addMemberAttr(target.constructor, propertyKey, new OptionAttribute());
+
+            var isGetSet = Q.startsWith(propertyKey, 'get_') || Q.startsWith(propertyKey, 'set_');
+            var memberName = isGetSet ? propertyKey.substr(4) : propertyKey;
+
+            var type: any = target.constructor;
+            type.__metadata = type.__metadata || {};
+            type.__metadata.members = type.__metadata.members || [];
+            let member: any = undefined;
+            for (var m of type.__metadata.members) {
+                if (m.name == memberName) {
+                    member = m;
+                    break;
+                }
+            }
+
+            if (!member) {
+                member = {
+                    attr: [new Serenity.OptionAttribute()],
+                    name: memberName,
+                    returnType: Object
+                };
+
+                if (isGetSet) {
+                    member.type = 16;
+
+                    member.getter = {
+                        name: 'get_' + memberName,
+                        type: 8,
+                        sname: 'get_' + memberName,
+                        returnType: Object,
+                        params: []
+                    };
+
+                    member.setter = {
+                        name: 'set_' + memberName,
+                        type: 8,
+                        sname: 'set_' + memberName,
+                        returnType: Object,
+                        params: [Object]
+                    };
+                }
+                else {
+                    member.type = 4;
+                    member.sname = memberName;
+                }
+
+                type.__metadata.members.push(member);
+            }
+            else {
+                member.attr = member.attr || [];
+                member.attr.push(new OptionAttribute());
+            }
         }
     }
 

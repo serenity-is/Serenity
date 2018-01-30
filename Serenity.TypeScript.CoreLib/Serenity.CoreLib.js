@@ -2703,25 +2703,6 @@ var System;
             type.__metadata.attr.push(attr);
         }
         Decorators.addAttribute = addAttribute;
-        function addMemberAttr(type, memberName, attr) {
-            type.__metadata = type.__metadata || {};
-            type.__metadata.members = type.__metadata.members || [];
-            var member = undefined;
-            for (var _i = 0, _a = type.__metadata.members; _i < _a.length; _i++) {
-                var m = _a[_i];
-                if (m.name == memberName) {
-                    member = m;
-                    break;
-                }
-            }
-            if (!member) {
-                member = { name: memberName, attr: [], type: 4, returnType: Object, sname: memberName };
-                type.__metadata.members.push(member);
-            }
-            member.attr = member.attr || [];
-            member.attr.push(attr);
-        }
-        Decorators.addMemberAttr = addMemberAttr;
         function columnsKey(value) {
             return function (target) {
                 addAttribute(target, new Serenity.ColumnsKeyAttribute(value));
@@ -2855,7 +2836,52 @@ var System;
         Decorators.nameProperty = nameProperty;
         function option() {
             return function (target, propertyKey) {
-                addMemberAttr(target.constructor, propertyKey, new Serenity.OptionAttribute());
+                var isGetSet = Q.startsWith(propertyKey, 'get_') || Q.startsWith(propertyKey, 'set_');
+                var memberName = isGetSet ? propertyKey.substr(4) : propertyKey;
+                var type = target.constructor;
+                type.__metadata = type.__metadata || {};
+                type.__metadata.members = type.__metadata.members || [];
+                var member = undefined;
+                for (var _i = 0, _a = type.__metadata.members; _i < _a.length; _i++) {
+                    var m = _a[_i];
+                    if (m.name == memberName) {
+                        member = m;
+                        break;
+                    }
+                }
+                if (!member) {
+                    member = {
+                        attr: [new Serenity.OptionAttribute()],
+                        name: memberName,
+                        returnType: Object
+                    };
+                    if (isGetSet) {
+                        member.type = 16;
+                        member.getter = {
+                            name: 'get_' + memberName,
+                            type: 8,
+                            sname: 'get_' + memberName,
+                            returnType: Object,
+                            params: []
+                        };
+                        member.setter = {
+                            name: 'set_' + memberName,
+                            type: 8,
+                            sname: 'set_' + memberName,
+                            returnType: Object,
+                            params: [Object]
+                        };
+                    }
+                    else {
+                        member.type = 4;
+                        member.sname = memberName;
+                    }
+                    type.__metadata.members.push(member);
+                }
+                else {
+                    member.attr = member.attr || [];
+                    member.attr.push(new Serenity.OptionAttribute());
+                }
             };
         }
         Decorators.option = option;
@@ -4342,6 +4368,7 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var Option = Serenity.Decorators.option;
     var DateEditor = /** @class */ (function (_super) {
         __extends(DateEditor, _super);
         function DateEditor(input) {
@@ -4648,19 +4675,19 @@ var Serenity;
             }
         };
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateEditor.prototype, "yearRange", void 0);
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateEditor.prototype, "get_minValue", null);
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateEditor.prototype, "get_maxValue", null);
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateEditor.prototype, "get_maxDate", null);
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateEditor.prototype, "get_sqlMinMax", null);
         DateEditor = __decorate([
             Serenity.Decorators.registerEditor('Serenity.DateEditor', [Serenity.IStringValue, Serenity.IReadOnly]),
@@ -4672,6 +4699,7 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var Option = Serenity.Decorators.option;
     var DateTimeEditor = /** @class */ (function (_super) {
         __extends(DateTimeEditor, _super);
         function DateTimeEditor(input, opt) {
@@ -4891,16 +4919,16 @@ var Serenity;
             return list;
         };
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateTimeEditor.prototype, "get_minValue", null);
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateTimeEditor.prototype, "get_maxValue", null);
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateTimeEditor.prototype, "get_maxDate", null);
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], DateTimeEditor.prototype, "get_sqlMinMax", null);
         DateTimeEditor = DateTimeEditor_1 = __decorate([
             Serenity.Decorators.registerEditor('Serenity.DateTimeEditor', [Serenity.IStringValue, Serenity.IReadOnly]),
@@ -5694,6 +5722,7 @@ var Serenity;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
+    var Option = Serenity.Decorators.option;
     var EditorTypeRegistry;
     (function (EditorTypeRegistry) {
         var knownTypes;
@@ -6828,7 +6857,7 @@ var Serenity;
             }
         };
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], MultipleImageUploadEditor.prototype, "jsonEncodeValue", void 0);
         MultipleImageUploadEditor = __decorate([
             Editor('MultipleImageUpload', [Serenity.IReadOnly]),
@@ -8807,10 +8836,10 @@ var Serenity;
             return Q.htmlEncode(text);
         };
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], BooleanFormatter.prototype, "falseText", void 0);
         __decorate([
-            Serenity.Decorators.option()
+            Option()
         ], BooleanFormatter.prototype, "trueText", void 0);
         BooleanFormatter = __decorate([
             Formatter('Boolean')
@@ -8832,7 +8861,7 @@ var Serenity;
     Serenity.CheckboxFormatter = CheckboxFormatter;
     var DateFormatter = /** @class */ (function () {
         function DateFormatter() {
-            this.set_displayFormat(Q.Culture.dateFormat);
+            this.displayFormat = Q.Culture.dateFormat;
         }
         DateFormatter_1 = DateFormatter;
         DateFormatter.format = function (value, format) {
@@ -8854,18 +8883,12 @@ var Serenity;
             }
             return Q.htmlEncode(Q.formatDate(date, format));
         };
-        DateFormatter.prototype.get_displayFormat = function () {
-            return this.displayFormat;
-        };
-        DateFormatter.prototype.set_displayFormat = function (value) {
-            this.displayFormat = value;
-        };
         DateFormatter.prototype.format = function (ctx) {
-            return DateFormatter_1.format(ctx.value, this.get_displayFormat());
+            return DateFormatter_1.format(ctx.value, this.displayFormat);
         };
         __decorate([
             Option()
-        ], DateFormatter.prototype, "get_displayFormat", null);
+        ], DateFormatter.prototype, "displayFormat", void 0);
         DateFormatter = DateFormatter_1 = __decorate([
             Formatter('Date')
         ], DateFormatter);
@@ -8877,7 +8900,7 @@ var Serenity;
         __extends(DateTimeFormatter, _super);
         function DateTimeFormatter() {
             var _this = _super.call(this) || this;
-            _this.set_displayFormat(Q.Culture.dateTimeFormat);
+            _this.displayFormat = Q.Culture.dateTimeFormat;
             return _this;
         }
         DateTimeFormatter = __decorate([

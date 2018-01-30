@@ -1,5 +1,7 @@
 ﻿namespace Serenity {
 
+    import Option = Serenity.Decorators.option
+
     export namespace EditorTypeRegistry {
         let knownTypes: Q.Dictionary<Function>;
 
@@ -1306,7 +1308,7 @@
             }
         }
 
-        @Decorators.option()
+        @Option()
         public jsonEncodeValue: boolean;
     }
 
