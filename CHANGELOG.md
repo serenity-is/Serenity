@@ -1,3 +1,8 @@
+## 3.4.4 (2018-01-30)
+
+Bugfixes:
+  - fix issue with formatter displayFormat option not working after TS port, and a few other options in other editor / formatters
+
 ## 3.4.3 (2018-01-28)
 
 Features:
