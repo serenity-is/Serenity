@@ -143,7 +143,7 @@ namespace Serenity.Web
                             if (recursionCheck.Contains(subBundleKey) || recursionCheck.Count > 100)
                                 throw new InvalidOperationException(String.Format(
                                     "Caught infinite recursion with {1} bundles '{0}'!",
-                                        String.Join(", ", recursionCheck, bundleType)));
+                                        String.Join(", ", recursionCheck), bundleType));
                         }
                         else
                             recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

@@ -10,7 +10,7 @@ using System.Web.Hosting;
 
 namespace Serenity.Web
 {
-    public static class CssBundleManager
+    public class CssBundleManager
     {
         [SettingKey("CssBundling"), SettingScope("Application")]
         private class CssBundlingSettings
@@ -20,221 +20,185 @@ namespace Serenity.Web
             public bool? UseMinCSS { get; set; }
         }
 
-        private static bool isEnabled;
-        private static bool isInitialized;
-        private static Dictionary<string, string[]> cssBundles;
-        private static Dictionary<string, string> bundleKeyBySourceUrl;
-        private static Dictionary<string, HashSet<string>> bundleKeysBySourceUrl;
-        private static Dictionary<string, ConcatenatedScript> bundleByKey;
-        private static Dictionary<string, List<string>> bundleIncludes;
+        private bool isEnabled;
+        private Dictionary<string, string> bundleKeyBySourceUrl;
+        private Dictionary<string, HashSet<string>> bundleKeysBySourceUrl;
+        private Dictionary<string, ConcatenatedScript> bundleByKey;
+        private Dictionary<string, List<string>> bundleIncludes;
+
         private const string errorLines = "\r\n/*\r\n!!!ERROR: {0}!!!\r\n*/\r\n";
 
         [ThreadStatic]
         private static HashSet<string> recursionCheck;
 
-        private static Dictionary<string, string[]> CssBundles
-        {
-            get
-            {
-                if (cssBundles == null)
-                {
-                    cssBundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
-                        HostingEnvironment.MapPath("~/Content/site/CssBundles.json"));
-                }
-
-                return cssBundles;
-            }
-        }
-
         public static bool IsEnabled
         {
             get
             {
-                Initialize();
-                return isEnabled;
+                return Instance.isEnabled;
             }
         }
 
-        static CssBundleManager()
+        private static object initializationLock = new object();
+        private static CssBundleManager instance;
+
+        private static CssBundleManager Instance
         {
-            DynamicScriptManager.ScriptChanged += name =>
+            get
             {
-                HashSet<string> bundleKeys;
-                var b = bundleKeysBySourceUrl;
-                if (b != null &&
-                    b.TryGetValue("dynamic://" + name, out bundleKeys))
+                var instance = CssBundleManager.instance;
+                if (instance != null)
+                    return instance;
+
+                lock (initializationLock)
                 {
-                    foreach (var bundleKey in bundleKeys)
-                        DynamicScriptManager.Changed("Bundle." + bundleKey);
+                    instance = CssBundleManager.instance;
+                    if (instance != null)
+                        return instance;
+
+                    CssBundleManager.instance = instance = new CssBundleManager();
                 }
-            };
+
+                return instance;
+            }
         }
 
-        public static void Initialize()
+        public CssBundleManager()
         {
-            if (isInitialized)
-                return;
+            
+            var settings = Config.Get<CssBundlingSettings>();
 
-            isInitialized = true;
-            isEnabled = false;
-            bundleKeyBySourceUrl = null;
-            bundleKeysBySourceUrl = null;
-            bundleByKey = null;
-            bundleIncludes = null;
-            try
+            var bundles = JsonConfigHelper.LoadConfig<Dictionary<string, string[]>>(
+                HostingEnvironment.MapPath("~/Content/site/CssBundles.json"));
+
+            bundleIncludes = BundleUtils.ExpandBundleIncludes(bundles, "dynamic://CssBundle.", "css");
+
+            if (bundles.Count == 0 ||
+                settings.Enabled != true)
             {
-                var settings = Config.Get<CssBundlingSettings>();
+                return;
+            }
 
-                var bundles = CssBundles;
-                if (bundles == null ||
-                    bundles.Count == 0)
+            bundleKeyBySourceUrl = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            bundleKeysBySourceUrl = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            bundleByKey = new Dictionary<string, ConcatenatedScript>(StringComparer.OrdinalIgnoreCase);
+
+            bool minimize = settings.Minimize == true;
+
+            foreach (var pair in bundles)
+            {
+                var sourceFiles = pair.Value;
+                if (sourceFiles == null ||
+                    sourceFiles.Length == 0)
+                    continue;
+
+                var bundleKey = pair.Key;
+                var bundleName = "CssBundle." + bundleKey;
+                var bundleParts = new List<Func<string>>();
+                var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                Action<string> registerInBundle = delegate (string sourceFile)
                 {
-                    return;
-                }
+                    if (bundleKey.IndexOf('/') < 0 && !bundleKeyBySourceUrl.ContainsKey(sourceFile))
+                        bundleKeyBySourceUrl[sourceFile] = bundleKey;
 
-                bundleIncludes = BundleUtils.ExpandBundleIncludes(bundles, "dynamic://CssBundle.", "css");
+                    HashSet<string> bundleKeys;
+                    if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out bundleKeys))
+                    {
+                        bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        bundleKeysBySourceUrl[sourceFile] = new HashSet<string>();
+                    }
 
-                if (settings.Enabled != true)
-                    return;
+                    bundleKeys.Add(bundleKey);
+                };
 
-                var bundleKeyBySourceUrlNew = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                var bundleKeysBySourceUrlNew = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
-                var bundleByKeyNew = new Dictionary<string, ConcatenatedScript>(StringComparer.OrdinalIgnoreCase);
-
-                bool minimize = settings.Minimize == true;
-
-                foreach (var pair in bundles)
+                foreach (var sourceFile in sourceFiles)
                 {
-                    var sourceFiles = pair.Value;
-                    if (sourceFiles == null ||
-                        sourceFiles.Length == 0)
+                    if (sourceFile.IsNullOrEmpty())
                         continue;
 
-                    var bundleKey = pair.Key;
-                    var bundleName = "CssBundle." + bundleKey;
-                    var bundleParts = new List<Func<string>>();
-                    var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                    Action<string> registerInBundle = delegate (string sourceFile)
+                    if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (bundleKey.IndexOf('/') < 0 && !bundleKeyBySourceUrlNew.ContainsKey(sourceFile))
-                            bundleKeyBySourceUrlNew[sourceFile] = bundleKey;
+                        registerInBundle(sourceFile);
 
-                        HashSet<string> bundleKeys;
-                        if (!bundleKeysBySourceUrlNew.TryGetValue(sourceFile, out bundleKeys))
-                        {
-                            bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                            bundleKeysBySourceUrlNew[sourceFile] = new HashSet<string>();
-                        }
-
-                        bundleKeys.Add(bundleKey);
-                    };
-
-                    foreach (var sourceFile in sourceFiles)
-                    {
-                        if (sourceFile.IsNullOrEmpty())
-                            continue;
-
-                        if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
-                        {
-                            registerInBundle(sourceFile);
-
-                            var scriptName = sourceFile.Substring(10);
-                            scriptNames.Add(scriptName);
-                            bundleParts.Add(() =>
-                            {
-                                if (recursionCheck != null)
-                                {
-                                    if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                                        return String.Format(errorLines,
-                                            String.Format("Caught infinite recursion with dynamic scripts '{0}'!",
-                                                String.Join(", ", recursionCheck)));
-                                }
-                                else
-                                    recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                                recursionCheck.Add(scriptName);
-                                try
-                                {
-                                    var code = DynamicScriptManager.GetScriptText(scriptName);
-                                    if (code == null)
-                                        return String.Format(errorLines,
-                                            String.Format("Dynamic script with name '{0}' is not found!", scriptName));
-
-                                    if (!scriptName.StartsWith("CssBundle.", StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        if (minimize)
-                                        {
-                                            try
-                                            {
-                                                var result = NUglify.Uglify.Css(code);
-                                                if (!result.HasErrors)
-                                                    code = result.Code;
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                ex.Log();
-                                            }
-                                        }
-
-                                        var scriptUrl = VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + scriptName);
-                                        code = RewriteUrlsToAbsolute(scriptUrl, code);
-                                    }
-
-                                    return code;
-                                }
-                                finally
-                                {
-                                    recursionCheck.Remove(scriptName);
-                                }
-                            });
-
-                            continue;
-                        }
-
-                        string sourceUrl = BundleUtils.ExpandVersionVariable(sourceFile);
-                        sourceUrl = VirtualPathUtility.ToAbsolute(sourceUrl);
-
-                        if (sourceUrl.IsNullOrEmpty())
-                            continue;
-
-                        registerInBundle(sourceUrl);
-
+                        var scriptName = sourceFile.Substring(10);
+                        scriptNames.Add(scriptName);
                         bundleParts.Add(() =>
                         {
-                            var sourcePath = HostingEnvironment.MapPath(sourceUrl);
-                            if (!File.Exists(sourcePath))
-                                return String.Format(errorLines, String.Format("File {0} is not found!", sourcePath));
-
-                            string code = null;
-
-                            if (minimize)
+                            if (recursionCheck != null)
                             {
-                                if (settings.UseMinCSS == true)
-                                {
-                                    var minPath = Path.ChangeExtension(sourcePath, ".min.css");
-                                    if (File.Exists(minPath))
-                                    {
-                                        using (StreamReader sr = new StreamReader(File.OpenRead(minPath)))
-                                            code = sr.ReadToEnd();
-                                    }
-                                }
+                                if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
+                                    return String.Format(errorLines,
+                                        String.Format("Caught infinite recursion with dynamic scripts '{0}'!",
+                                            String.Join(", ", recursionCheck)));
+                            }
+                            else
+                                recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+                            recursionCheck.Add(scriptName);
+                            try
+                            {
+                                var code = DynamicScriptManager.GetScriptText(scriptName);
                                 if (code == null)
+                                    return String.Format(errorLines,
+                                        String.Format("Dynamic script with name '{0}' is not found!", scriptName));
+
+                                if (!scriptName.StartsWith("CssBundle.", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
-                                        code = sr.ReadToEnd();
+                                    if (minimize)
+                                    {
+                                        try
+                                        {
+                                            var result = NUglify.Uglify.Css(code);
+                                            if (!result.HasErrors)
+                                                code = result.Code;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ex.Log();
+                                        }
+                                    }
+
+                                    var scriptUrl = VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + scriptName);
+                                    code = RewriteUrlsToAbsolute(scriptUrl, code);
                                 }
 
-                                try
+                                return code;
+                            }
+                            finally
+                            {
+                                recursionCheck.Remove(scriptName);
+                            }
+                        });
+
+                        continue;
+                    }
+
+                    string sourceUrl = BundleUtils.ExpandVersionVariable(sourceFile);
+                    sourceUrl = VirtualPathUtility.ToAbsolute(sourceUrl);
+
+                    if (sourceUrl.IsNullOrEmpty())
+                        continue;
+
+                    registerInBundle(sourceUrl);
+
+                    bundleParts.Add(() =>
+                    {
+                        var sourcePath = HostingEnvironment.MapPath(sourceUrl);
+                        if (!File.Exists(sourcePath))
+                            return String.Format(errorLines, String.Format("File {0} is not found!", sourcePath));
+
+                        string code = null;
+
+                        if (minimize)
+                        {
+                            if (settings.UseMinCSS == true)
+                            {
+                                var minPath = Path.ChangeExtension(sourcePath, ".min.css");
+                                if (File.Exists(minPath))
                                 {
-                                    var result = NUglify.Uglify.Css(code);
-                                    if (!result.HasErrors)
-                                        code = result.Code;
-                                }
-                                catch (Exception ex)
-                                {
-                                    ex.Log();
+                                    using (StreamReader sr = new StreamReader(File.OpenRead(minPath)))
+                                        code = sr.ReadToEnd();
                                 }
                             }
 
@@ -244,74 +208,97 @@ namespace Serenity.Web
                                     code = sr.ReadToEnd();
                             }
 
-                            code = RewriteUrlsToAbsolute(sourceUrl, code);
-                            return code;
-                        });
-                    }
-
-                    var bundle = new ConcatenatedScript(bundleParts, "\n\n", checkRights: () =>
-                    {
-                        foreach (var scriptName in scriptNames)
-                        {
-                            if (recursionCheck != null)
-                            {
-                                if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                                    throw new InvalidOperationException(String.Format(
-                                        "Caught infinite recursion with dynamic scripts '{0}'!",
-                                            String.Join(", ", recursionCheck)));
-                            }
-                            else
-                                recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                            recursionCheck.Add(scriptName);
                             try
                             {
-                                DynamicScriptManager.CheckScriptRights(scriptName);
+                                var result = NUglify.Uglify.Css(code);
+                                if (!result.HasErrors)
+                                    code = result.Code;
                             }
-                            finally
+                            catch (Exception ex)
                             {
-                                recursionCheck.Remove(scriptName);
+                                ex.Log();
                             }
                         }
-                    });
 
-                    DynamicScriptManager.Register(bundleName, bundle);
-                    bundleByKeyNew[bundleKey] = bundle;
+                        if (code == null)
+                        {
+                            using (StreamReader sr = new StreamReader(File.OpenRead(sourcePath)))
+                                code = sr.ReadToEnd();
+                        }
+
+                        code = RewriteUrlsToAbsolute(sourceUrl, code);
+                        return code;
+                    });
                 }
 
-                bundleKeyBySourceUrl = bundleKeyBySourceUrlNew;
-                bundleKeysBySourceUrl = bundleKeysBySourceUrlNew;
-                bundleByKey = bundleByKeyNew;
-                isEnabled = true;
+                var bundle = new ConcatenatedScript(bundleParts, "\n\n", checkRights: () =>
+                {
+                    foreach (var scriptName in scriptNames)
+                    {
+                        if (recursionCheck != null)
+                        {
+                            if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
+                                throw new InvalidOperationException(String.Format(
+                                    "Caught infinite recursion with dynamic scripts '{0}'!",
+                                        String.Join(", ", recursionCheck)));
+                        }
+                        else
+                            recursionCheck = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                        recursionCheck.Add(scriptName);
+                        try
+                        {
+                            DynamicScriptManager.CheckScriptRights(scriptName);
+                        }
+                        finally
+                        {
+                            recursionCheck.Remove(scriptName);
+                        }
+                    }
+                });
+
+                DynamicScriptManager.Register(bundleName, bundle);
+                bundleByKey[bundleKey] = bundle;
             }
-            catch (Exception)
+
+            isEnabled = true;
+        }
+
+        static CssBundleManager()
+        {
+            DynamicScriptManager.ScriptChanged += name =>
             {
-                isInitialized = false;
-                throw;
-            }
+                var instance = CssBundleManager.instance;
+
+                HashSet<string> bundleKeys;
+                if (instance != null &&
+                    instance.bundleKeysBySourceUrl != null &&
+                    instance.bundleKeysBySourceUrl.TryGetValue("dynamic://" + name, out bundleKeys))
+                {
+                    foreach (var bundleKey in bundleKeys)
+                        DynamicScriptManager.Changed("Bundle." + bundleKey);
+                }
+            };
         }
 
         public static void CssChanged()
         {
             BundleUtils.ClearVersionCache();
-            cssBundles = null;
+            var instance = CssBundleManager.instance;
 
-            if (isEnabled && bundleByKey != null)
+            if (instance != null &&
+                instance.bundleByKey != null)
             {
-                var s = bundleByKey;
-                if (s != null)
-                    foreach (var bundle in s.Values)
-                        bundle.Changed();
-
-                isInitialized = false;
+                foreach (var bundle in instance.bundleByKey.Values)
+                    bundle.Changed();
             }
+
+            instance = null;
         }
 
         public static IEnumerable<string> GetBundleIncludes(string bundleKey)
         {
-            Initialize();
-
-            var bi = bundleIncludes;
+            var bi = Instance.bundleIncludes;
             List<string> includes;
             if (bi != null && bi.TryGetValue(bundleKey, out includes) && includes != null)
                 return includes;
@@ -369,15 +356,14 @@ namespace Serenity.Web
 
         public static string GetCssBundle(string cssUrl)
         {
-            Initialize();
-
             string bundleKey;
+            var bySrcUrl = Instance.bundleKeyBySourceUrl;
 
             if (cssUrl != null && cssUrl.StartsWith("dynamic://",
                 StringComparison.OrdinalIgnoreCase))
             {
                 var scriptName = cssUrl.Substring(10);
-                if (!isEnabled || !bundleKeyBySourceUrl.TryGetValue(cssUrl, out bundleKey))
+                if (bySrcUrl == null || !bySrcUrl.TryGetValue(cssUrl, out bundleKey))
                 {
                     cssUrl = DynamicScriptManager.GetScriptInclude(scriptName, ".css");
                     return VirtualPathUtility.ToAbsolute("~/DynJS.axd/" + cssUrl);
@@ -388,9 +374,8 @@ namespace Serenity.Web
                 cssUrl = BundleUtils.ExpandVersionVariable(cssUrl);
                 cssUrl = VirtualPathUtility.ToAbsolute(cssUrl);
 
-                if (!isEnabled ||
-                    bundleKeyBySourceUrl == null ||
-                    !bundleKeyBySourceUrl.TryGetValue(cssUrl, out bundleKey))
+                if (bySrcUrl == null ||
+                    !bySrcUrl.TryGetValue(cssUrl, out bundleKey))
                     return cssUrl;
             }
 
