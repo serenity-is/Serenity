@@ -11305,6 +11305,7 @@ var Serenity;
                     _this.filterBar.get_store().add_changed(function (s, e) {
                         if (_this.restoringSettings <= 0) {
                             self.persistSettings(null);
+                            self.view && (self.view.seekToPage = 1);
                             self.refresh();
                         }
                     });
@@ -11400,6 +11401,7 @@ var Serenity;
                         }
                         sortBy.push(col.field + (!!p.sortAsc ? '' : ' DESC'));
                     }
+                    self.view.seekToPage = 1;
                     self.view.sortBy = sortBy;
                 }
                 finally {
@@ -11571,6 +11573,7 @@ var Serenity;
                 this.filterBar.get_store().add_changed(function (s, e) {
                     if (_this.restoringSettings <= 0) {
                         self.persistSettings(null);
+                        self.view && (self.view.seekToPage = 1);
                         self.refresh();
                     }
                 });
@@ -12098,6 +12101,7 @@ var Serenity;
         };
         DataGrid.prototype.quickFilterChange = function (e) {
             this.persistSettings(null);
+            this.view && (this.view.seekToPage = 1);
             this.refresh();
         };
         DataGrid.prototype.getPersistanceStorage = function () {

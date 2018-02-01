@@ -330,6 +330,7 @@
                     this.filterBar.get_store().add_changed((s: JQueryEventObject, e: any) => {
                         if (this.restoringSettings <= 0) {
                             self.persistSettings(null);
+                            self.view && (self.view.seekToPage = 1);
                             self.refresh();
                         }
                     });
@@ -442,6 +443,7 @@
                         sortBy.push(col.field + (!!p.sortAsc ? '' : ' DESC'));
                     }
 
+                    self.view.seekToPage = 1;
                     self.view.sortBy = sortBy;
                 }
                 finally {
@@ -651,6 +653,7 @@
                 this.filterBar.get_store().add_changed((s: JQueryEventObject, e: any) => {
                     if (this.restoringSettings <= 0) {
                         self.persistSettings(null);
+                        self.view && (self.view.seekToPage = 1);
                         self.refresh();
                     }
                 });
@@ -1267,6 +1270,7 @@
 
         protected quickFilterChange(e: JQueryEventObject) {
             this.persistSettings(null);
+            this.view && (this.view.seekToPage = 1);
             this.refresh();
         }
 
