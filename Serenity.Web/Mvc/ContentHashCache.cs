@@ -71,6 +71,32 @@ namespace Serenity.Web
             }
         }
 
+        public static string ResolvePath(string contentPath)
+        {
+            if (contentPath.IsNullOrEmpty())
+                throw new ArgumentNullException("contentPath");
+
+            if (contentPath[0] != '/' &&
+                (contentPath[0] != '~' || contentPath.Length < 2 || contentPath[1] != '/'))
+                return contentPath;
+
+            contentPath = VirtualPathUtility.ToAbsolute(contentPath);
+            if (!cdnEnabled)
+                return contentPath;
+
+#if ASPNETCORE
+            var contextAccessor = Dependency.TryResolve<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
+            bool isSecureConnection = contextAccessor != null && contextAccessor.HttpContext != null &&
+                contextAccessor.HttpContext.Request.IsHttps;
+#else
+            bool isSecureConnection = HttpContext.Current != null &&
+                HttpContext.Current.Request.IsSecureConnection;
+#endif
+
+            string cdnRoot = isSecureConnection ? cdnHttps : cdnHttp;
+            return UriHelper.Combine(cdnRoot, contentPath);
+        }
+
         public static string ResolveWithHash(string contentUrl)
         {
             if (contentUrl.IsNullOrEmpty())
