@@ -16,6 +16,7 @@ namespace Serenity.Web
             public bool? Enabled { get; set; }
             public bool? Minimize { get; set; }
             public bool? UseMinJS { get; set; }
+            public string[] NoMinimize { get; set; }
         }
 
         private static object initializationLock = new object();
@@ -74,6 +75,9 @@ namespace Serenity.Web
             bundleByKey = new Dictionary<string, ConcatenatedScript>(StringComparer.OrdinalIgnoreCase);
 
             bool minimize = settings.Minimize == true;
+            var noMinimize = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (settings.NoMinimize != null)
+                noMinimize.AddRange(settings.NoMinimize);
 
             foreach (var pair in bundles)
             {
@@ -133,8 +137,8 @@ namespace Serenity.Web
                                     return String.Format(errorLines,
                                         String.Format("Dynamic script with name '{0}' is not found!", scriptName));
 
-                                if (minimize && !scriptName.StartsWith("Bundle.",
-                                    StringComparison.OrdinalIgnoreCase))
+                                if (minimize && 
+                                    !scriptName.StartsWith("Bundle.", StringComparison.OrdinalIgnoreCase))
                                 {
                                     try
                                     {
@@ -173,7 +177,7 @@ namespace Serenity.Web
                         if (!File.Exists(sourcePath))
                             return String.Format(errorLines, String.Format("File {0} is not found!", sourcePath));
 
-                        if (minimize)
+                        if (minimize && !noMinimize.Contains(sourceFile))
                         {
                             if (settings.UseMinJS == true)
                             {
