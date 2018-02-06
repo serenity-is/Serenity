@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.IO;
 using System.Web.Hosting;
+using Serenity.Services;
 
 namespace Serenity.Web.HttpHandlers
 {
@@ -18,9 +19,28 @@ namespace Serenity.Web.HttpHandlers
             var response = context.Response;
             var request = context.Request;
 
-            var script = DynamicScriptManager.GetScript(scriptKey);
+            DynamicScriptManager.Script script;
+            try
+            {
+                script = DynamicScriptManager.GetScript(scriptKey);
+            }
+            catch (ValidationError ve)
+            {
+                if (ve.ErrorCode == "AccessDenied")
+                {
+                    response.StatusCode = 403;
+                    return;
+                }
+
+                throw;
+            }
+
             if (script == null)
-                throw new HttpException(404, "File not found!");
+            {
+                response.StatusCode = 404;
+                response.StatusDescription = "A dynamic script with key " + scriptKey + " is not found!";
+                return;
+            }
 
             int expiresOffset = 365; // Cache for 365 days in browser cache
             response.ContentType = contentType;

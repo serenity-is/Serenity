@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
 using System.Linq;
+using Serenity.Services;
 
 namespace Serenity.Web.Middleware
 {
@@ -45,7 +46,22 @@ namespace Serenity.Web.Middleware
 
         public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType)
         {
-            var dynamicScript = DynamicScriptManager.GetScript(scriptKey);
+            DynamicScriptManager.Script dynamicScript;
+            try
+            {
+                dynamicScript = DynamicScriptManager.GetScript(scriptKey);
+            }
+            catch (ValidationError ve)
+            {
+                if (ve.ErrorCode == "AccessDenied")
+                {
+                    context.Response.StatusCode = 403;
+                    return;
+                }
+
+                throw;
+            }
+
             if (dynamicScript == null)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NotFound;

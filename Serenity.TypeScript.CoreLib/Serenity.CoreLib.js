@@ -1179,7 +1179,7 @@ var Q;
     Q.confirm = confirm;
     function iframeDialog(options) {
         var doc;
-        var e = $('<div><iframe></iframe></div>');
+        var e = $('<div style="overflow: hidden"><iframe></iframe></div>');
         var settings = $.extend({
             autoOpen: true,
             modal: true,
@@ -1646,13 +1646,60 @@ var Q;
             $(document.body).unbind('scriptdatachange.' + regClass);
         }
         ScriptData.unbindFromChange = unbindFromChange;
-        function syncLoadScript(url) {
-            $.ajax({ async: false, cache: true, type: 'GET', url: url, data: null, dataType: 'script' });
+        function loadOptions(name, async) {
+            return {
+                async: async,
+                cache: true,
+                type: 'GET',
+                url: Q.resolveUrl('~/DynJS.axd/') + name + '.js?' + registered[name],
+                data: null,
+                dataType: 'text',
+                converters: {
+                    "text script": function (text) {
+                        return text;
+                    }
+                },
+                success: function (data, textStatus, jqXHR) {
+                    $.globalEval(data);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    var isLookup = Q.startsWith(name, "Lookup.");
+                    if (xhr.status == 403 && isLookup) {
+                        Q.notifyError('<p>Access denied while trying to load the lookup: "<b>' +
+                            name.substr(7) + '</b>". Please check if current user has required permissions for this lookup.</p> ' +
+                            '<p><em>Lookups use the ReadPermission of their row by default. You may override that for the lookup ' +
+                            'like [LookupScript("Some.Lookup", Permission = "?")] to grant all ' +
+                            'authenticated users to read it (or use "*" for public).</em></p>' +
+                            '<p><em>Note that this might be a security risk if the lookup contains sensitive data, ' +
+                            'so it could be better to set a separate permission for lookups, like "MyModule:Lookups".</em></p>', null, {
+                            timeOut: 10000,
+                            escapeHtml: false
+                        });
+                        return;
+                    }
+                    Q.notifyError("An error occured while trying to load " +
+                        (isLookup ? ' the lookup: "' + name.substr(7) :
+                            ' dynamic script: "' + name) +
+                        '"!. Please check the error message displayed in the dialog below for more info.');
+                    var html = xhr.responseText;
+                    if (!html) {
+                        if (!xhr.status)
+                            Q.alert("An unknown connection error occured! Check browser console for details.");
+                        else if (xhr.status == 500)
+                            Q.alert("HTTP 500: Connection refused! Check browser console for details.");
+                        else
+                            Q.alert("HTTP " + xhr.status + ' error! Check browser console for details.');
+                    }
+                    else
+                        Q.iframeDialog({ html: html });
+                }
+            };
         }
         function loadScriptAsync(url) {
             return Promise.resolve().then(function () {
                 Q.blockUI(null);
-                return Promise.resolve($.ajax({ async: true, cache: true, type: 'GET', url: url, data: null, dataType: 'script' }).always(function () {
+                return Promise.resolve($.ajax(loadOptions(name, false))
+                    .always(function () {
                     Q.blockUndo();
                 }));
             }, null);
@@ -1661,16 +1708,14 @@ var Q;
             if (registered[name] == null) {
                 throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
             }
-            name = name + '.js?' + registered[name];
-            syncLoadScript(Q.resolveUrl('~/DynJS.axd/') + name);
+            $.ajax(loadOptions(name, false));
         }
         function loadScriptDataAsync(name) {
             return Promise.resolve().then(function () {
                 if (registered[name] == null) {
                     throw new Error(Q.format('Script data {0} is not found in registered script list!', name));
                 }
-                name = name + '.js?' + registered[name];
-                return loadScriptAsync(Q.resolveUrl('~/DynJS.axd/') + name);
+                return loadScriptAsync(name);
             }, null);
         }
         function ensure(name) {
