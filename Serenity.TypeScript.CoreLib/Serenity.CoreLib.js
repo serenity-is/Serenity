@@ -1749,6 +1749,14 @@ var Q;
     }
     Q.getRemoteDataAsync = getRemoteDataAsync;
     function getLookup(key) {
+        var name = 'Lookup.' + key;
+        if (!ScriptData.canLoad(name)) {
+            var message = 'No lookup with key "' + key + '" is registered. Please make sure you have a' +
+                ' [LookupScript("' + key + '")] attribute in server side code on top of a row / custom lookup and ' +
+                ' its key is exactly the same.';
+            Q.notifyError(message);
+            throw new Error(message);
+        }
         return ScriptData.ensure('Lookup.' + key);
     }
     Q.getLookup = getLookup;
