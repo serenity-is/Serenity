@@ -139,7 +139,7 @@ namespace Q {
 
     export function iframeDialog(options: IFrameDialogOptions) {
         let doc: any;
-        let e = $('<div><iframe></iframe></div>');
+        let e = $('<div style="overflow: hidden"><iframe></iframe></div>');
         let settings: IFrameDialogOptions = $.extend(<JQueryUI.DialogOptions>{
             autoOpen: true,
             modal: true,
