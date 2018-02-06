@@ -2,6 +2,7 @@
 using Serenity.Data;
 using Serenity.Extensibility;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Serenity.Web
@@ -11,6 +12,7 @@ namespace Serenity.Web
         public static void RegisterLookupScripts()
         {
             var assemblies = ExtensibilityHelper.SelfAssemblies;
+            var registeredType = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var assembly in assemblies)
             {
@@ -46,8 +48,18 @@ namespace Serenity.Web
                     {
                         script = (LookupScript)Activator.CreateInstance(type);
                     }
-                    
+
                     script.LookupKey = attr.Key;
+
+                    Type otherType;
+                    if (registeredType.TryGetValue(script.LookupKey, out otherType))
+                    {
+                        throw new InvalidOperationException(String.Format("Types {0} and {1} has the same lookup key (\"{2}\"). " +
+                            "\r\n\r\nPlease remove LookupScript attribute from one of them or change the lookup key!",
+                            type.FullName, otherType.FullName, script.LookupKey));
+                    }
+
+                    registeredType[script.LookupKey] = type;
 
                     if (attr.Permission != null)
                         script.Permission = attr.Permission;
