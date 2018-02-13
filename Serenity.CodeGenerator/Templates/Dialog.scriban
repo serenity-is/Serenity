@@ -1,8 +1,7 @@
 ﻿
 namespace {{RootNamespace}}{{DotModule}} {
 
-    @Serenity.Decorators.registerClass()
-    @Serenity.Decorators.responsive(){{if CustomSettings.MaximizableDialog}}
+    @Serenity.Decorators.registerClass(){{if CustomSettings.MaximizableDialog}}
     @Serenity.Decorators.maximizable(){{end}}
     export class {{ClassName}}Dialog extends Serenity.EntityDialog<{{RowClassName}}, any> {
         protected getFormKey() { return {{ClassName}}Form.formKey; }{{if Identity}}
