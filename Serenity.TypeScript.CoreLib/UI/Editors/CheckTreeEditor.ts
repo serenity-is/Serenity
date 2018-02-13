@@ -44,14 +44,15 @@
         }
 
         getEditValue(property: PropertyItem, target: any): void {
-            target[property.name] = this.get_value();
+            if (this.getDelimited())
+                target[property.name] = this.get_value().join(",");
+            else
+                target[property.name] = this.get_value();
         }
 
         setEditValue(source: any, property: PropertyItem): void {
             var value = source[property.name];
-            if (Q.isArray(value)) {
-                this.set_value(value);
-            }
+            this.set_value(value);
         }
 
         protected getButtons(): ToolButton[] {
@@ -269,6 +270,10 @@
             return true;
         }
 
+        protected getDelimited() {
+            return !!!!this.options['delimited'];
+        }
+
         protected anyDescendantsSelected(item: TItem): boolean {
             if (item.children.length > 0) {
                 for (var i = 0; i < item.children.length; i++) {
@@ -351,11 +356,11 @@
             this.view.setItems(list, true);
         }
 
-        moveSelectedUp(): boolean {
+        protected moveSelectedUp(): boolean {
             return false;
         }
 
-        get_value(): any {
+        private get_value(): string[] {
             var list = [];
             var items = this.view.getItems();
             for (var i = 0; i < items.length; i++) {
@@ -370,13 +375,21 @@
             return this.get_value();
         }
 
-        set_value(value: any) {
+        private set_value(value: string | string[]) {
+
             var selected = {};
             if (value != null) {
+                if (typeof value == "string") {
+                    value = value.split(',')
+                        .map(x => Q.trimToNull(x))
+                        .filter(x => x != null);
+                }
+
                 for (var i = 0; i < value.length; i++) {
                     selected[value[i]] = true;
                 }
             }
+
             this.view.beginUpdate();
             try {
                 var items = this.view.getItems();
@@ -397,8 +410,241 @@
             }
         }
 
-        public set value(v: any[]) {
+        public set value(v: string[]) {
             this.set_value(v);
+        }
+    }
+
+    export interface CheckLookupEditorOptions {
+        lookupKey?: string;
+        checkedOnTop?: boolean;
+        showSelectAll?: boolean;
+        delimited?: boolean;
+        cascadeFrom?: string;
+        cascadeField?: string;
+        cascadeValue?: any;
+        filterField?: string;
+        filterValue?: any;
+    }
+
+    @Decorators.registerEditor("Serenity.CheckLookupEditor")
+    export class CheckLookupEditor<TItem> extends CheckTreeEditor<Serenity.CheckTreeItem<TItem>, CheckLookupEditorOptions> {
+
+        private searchText: string;
+        private enableUpdateItems: boolean;
+
+        constructor(div: JQuery, options: CheckLookupEditorOptions) {
+            super(div, options);
+
+            this.enableUpdateItems = true;
+            this.setCascadeFrom(this.options.cascadeFrom);
+            this.updateItems();
+            Q.ScriptData.bindToChange('Lookup.' + this.getLookupKey(), this.uniqueName,
+                () => this.updateItems());
+        }
+
+        protected updateItems() {
+            if (this.enableUpdateItems)
+                super.updateItems();
+        }
+
+        protected getLookupKey() {
+            return this.options.lookupKey;
+        }
+
+        protected createToolbarExtensions() {
+            super.createToolbarExtensions();
+
+            Serenity.GridUtils.addQuickSearchInputCustom(this.toolbar.element, (field, text) => {
+                this.searchText = Select2.util.stripDiacritics(text || '').toUpperCase();
+                this.view.setItems(this.view.getItems(), true);
+            });
+        }
+
+        protected getSelectAllText(): string {
+            if (!this.options.showSelectAll)
+                return null;
+
+            return super.getSelectAllText();
+        }
+
+        protected cascadeItems(items: TItem[]) {
+
+            var val = this.get_cascadeValue();
+
+            if (val == null || val === '') {
+
+                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                    return [];
+                }
+
+                return items;
+            }
+
+            var key = val.toString();
+            var fld = this.get_cascadeField();
+
+            return items.filter(x => {
+                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                return !!(itemKey != null && itemKey.toString() === key);
+            });
+        }
+
+        protected filterItems(items: TItem[]) {
+            var val = this.get_filterValue();
+
+            if (val == null || val === '') {
+                return items;
+            }
+
+            var key = val.toString();
+            var fld = this.get_filterField();
+
+            return items.filter(x => {
+                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                return !!(itemKey != null && itemKey.toString() === key);
+            });
+        }
+
+        protected getLookupItems(lookup: Q.Lookup<TItem>): TItem[] {
+            return this.filterItems(this.cascadeItems(lookup.items));
+        }
+
+        protected getTreeItems() {
+            var lookup = Q.getLookup<TItem>(this.options.lookupKey);
+            var items = this.getLookupItems(lookup);
+            return items.map(item => <Serenity.CheckTreeItem<TItem>>{
+                id: Q.coalesce(item[lookup.idField], "").toString(),
+                text: Q.coalesce(item[lookup.textField], "").toString(),
+                source: item
+            });
+        }
+
+        protected onViewFilter(item: CheckTreeItem<TItem>) {
+            return super.onViewFilter(item) &&
+                (Q.isEmptyOrNull(this.searchText) ||
+                    Select2.util.stripDiacritics(item.text || '')
+                        .toUpperCase().indexOf(this.searchText) >= 0);
+        }
+
+        protected moveSelectedUp(): boolean {
+            return this.options.checkedOnTop;
+        }
+
+        protected get_cascadeFrom(): string {
+            return this.options.cascadeFrom;
+        }
+
+        get cascadeFrom(): string {
+            return this.get_cascadeFrom();
+        }
+
+        protected getCascadeFromValue(parent: Serenity.Widget<any>) {
+            return Serenity.EditorUtils.getValue(parent);
+        }
+
+        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
+
+        protected setCascadeFrom(value: string) {
+
+            if (Q.isEmptyOrNull(value)) {
+                if (this.cascadeLink != null) {
+                    this.cascadeLink.set_parentID(null);
+                    this.cascadeLink = null;
+                }
+                this.options.cascadeFrom = null;
+                return;
+            }
+
+            this.cascadeLink = new Serenity.CascadedWidgetLink<Widget<any>>(Widget, this, p => {
+                this.set_cascadeValue(this.getCascadeFromValue(p));
+            });
+
+            this.cascadeLink.set_parentID(value);
+            this.options.cascadeFrom = value;
+        }
+
+        protected set_cascadeFrom(value: string) {
+            if (value !== this.options.cascadeFrom) {
+                this.setCascadeFrom(value);
+                this.updateItems();
+            }
+        }
+
+        set cascadeFrom(value: string) {
+            this.set_cascadeFrom(value);
+        }
+
+        protected get_cascadeField() {
+            return Q.coalesce(this.options.cascadeField, this.options.cascadeFrom);
+        }
+
+        get cascadeField(): string {
+            return this.get_cascadeField();
+        }
+
+        protected set_cascadeField(value: string) {
+            this.options.cascadeField = value;
+        }
+
+        set cascadeField(value: string) {
+            this.set_cascadeField(value);
+        }
+
+        protected get_cascadeValue(): any {
+            return this.options.cascadeValue;
+        }
+
+        get cascadeValue(): any {
+            return this.get_cascadeValue();
+        }
+
+        protected set_cascadeValue(value: any) {
+            if (this.options.cascadeValue !== value) {
+                this.options.cascadeValue = value;
+                this.value = [];
+                this.updateItems();
+            }
+        }
+
+        set cascadeValue(value: any) {
+            this.set_cascadeValue(value);
+        }
+
+        protected get_filterField() {
+            return this.options.filterField;
+        }
+
+        get filterField(): string {
+            return this.get_filterField();
+        }
+
+        protected set_filterField(value: string) {
+            this.options.filterField = value;
+        }
+
+        set filterField(value: string) {
+            this.set_filterField(value);
+        }
+
+        protected get_filterValue(): any {
+            return this.options.filterValue;
+        }
+
+        get filterValue(): any {
+            return this.get_filterValue();
+        }
+
+        protected set_filterValue(value: any) {
+            if (this.options.filterValue !== value) {
+                this.options.filterValue = value;
+                this.value = null;
+                this.updateItems();
+            }
+        }
+
+        set filterValue(value: any) {
+            this.set_filterValue(value);
         }
     }
 }

@@ -2570,15 +2570,60 @@ declare namespace Serenity {
         protected setAllSubTreeSelected(item: TItem, selected: boolean): boolean;
         protected allItemsSelected(): boolean;
         protected allDescendantsSelected(item: TItem): boolean;
+        protected getDelimited(): boolean;
         protected anyDescendantsSelected(item: TItem): boolean;
         protected getColumns(): Slick.Column[];
         protected getItemText(ctx: Slick.FormatterContext): string;
         protected getSlickOptions(): Slick.GridOptions;
         protected sortItems(): void;
-        moveSelectedUp(): boolean;
-        get_value(): any;
-        value: any[];
-        set_value(value: any): void;
+        protected moveSelectedUp(): boolean;
+        private get_value();
+        value: string[];
+        private set_value(value);
+    }
+    interface CheckLookupEditorOptions {
+        lookupKey?: string;
+        checkedOnTop?: boolean;
+        showSelectAll?: boolean;
+        delimited?: boolean;
+        cascadeFrom?: string;
+        cascadeField?: string;
+        cascadeValue?: any;
+        filterField?: string;
+        filterValue?: any;
+    }
+    class CheckLookupEditor<TItem> extends CheckTreeEditor<Serenity.CheckTreeItem<TItem>, CheckLookupEditorOptions> {
+        private searchText;
+        private enableUpdateItems;
+        constructor(div: JQuery, options: CheckLookupEditorOptions);
+        protected updateItems(): void;
+        protected getLookupKey(): string;
+        protected createToolbarExtensions(): void;
+        protected getSelectAllText(): string;
+        protected cascadeItems(items: TItem[]): TItem[];
+        protected filterItems(items: TItem[]): TItem[];
+        protected getLookupItems(lookup: Q.Lookup<TItem>): TItem[];
+        protected getTreeItems(): CheckTreeItem<TItem>[];
+        protected onViewFilter(item: CheckTreeItem<TItem>): boolean;
+        protected moveSelectedUp(): boolean;
+        protected get_cascadeFrom(): string;
+        cascadeFrom: string;
+        protected getCascadeFromValue(parent: Serenity.Widget<any>): any;
+        protected cascadeLink: Serenity.CascadedWidgetLink<Widget<any>>;
+        protected setCascadeFrom(value: string): void;
+        protected set_cascadeFrom(value: string): void;
+        protected get_cascadeField(): any;
+        cascadeField: string;
+        protected set_cascadeField(value: string): void;
+        protected get_cascadeValue(): any;
+        cascadeValue: any;
+        protected set_cascadeValue(value: any): void;
+        protected get_filterField(): string;
+        filterField: string;
+        protected set_filterField(value: string): void;
+        protected get_filterValue(): any;
+        filterValue: any;
+        protected set_filterValue(value: any): void;
     }
 }
 declare namespace Serenity {

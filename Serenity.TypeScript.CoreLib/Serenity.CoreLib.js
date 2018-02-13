@@ -12760,13 +12760,14 @@ var Serenity;
             this.updateFlags();
         };
         CheckTreeEditor.prototype.getEditValue = function (property, target) {
-            target[property.name] = this.get_value();
+            if (this.getDelimited())
+                target[property.name] = this.get_value().join(",");
+            else
+                target[property.name] = this.get_value();
         };
         CheckTreeEditor.prototype.setEditValue = function (source, property) {
             var value = source[property.name];
-            if (Q.isArray(value)) {
-                this.set_value(value);
-            }
+            this.set_value(value);
         };
         CheckTreeEditor.prototype.getButtons = function () {
             var _this = this;
@@ -12959,6 +12960,9 @@ var Serenity;
             }
             return true;
         };
+        CheckTreeEditor.prototype.getDelimited = function () {
+            return !!!!this.options['delimited'];
+        };
         CheckTreeEditor.prototype.anyDescendantsSelected = function (item) {
             if (item.children.length > 0) {
                 for (var i = 0; i < item.children.length; i++) {
@@ -13062,6 +13066,11 @@ var Serenity;
         CheckTreeEditor.prototype.set_value = function (value) {
             var selected = {};
             if (value != null) {
+                if (typeof value == "string") {
+                    value = value.split(',')
+                        .map(function (x) { return Q.trimToNull(x); })
+                        .filter(function (x) { return x != null; });
+                }
                 for (var i = 0; i < value.length; i++) {
                     selected[value[i]] = true;
                 }
@@ -13092,6 +13101,200 @@ var Serenity;
         return CheckTreeEditor;
     }(Serenity.DataGrid));
     Serenity.CheckTreeEditor = CheckTreeEditor;
+    var CheckLookupEditor = /** @class */ (function (_super) {
+        __extends(CheckLookupEditor, _super);
+        function CheckLookupEditor(div, options) {
+            var _this = _super.call(this, div, options) || this;
+            _this.enableUpdateItems = true;
+            _this.setCascadeFrom(_this.options.cascadeFrom);
+            _this.updateItems();
+            Q.ScriptData.bindToChange('Lookup.' + _this.getLookupKey(), _this.uniqueName, function () { return _this.updateItems(); });
+            return _this;
+        }
+        CheckLookupEditor.prototype.updateItems = function () {
+            if (this.enableUpdateItems)
+                _super.prototype.updateItems.call(this);
+        };
+        CheckLookupEditor.prototype.getLookupKey = function () {
+            return this.options.lookupKey;
+        };
+        CheckLookupEditor.prototype.createToolbarExtensions = function () {
+            var _this = this;
+            _super.prototype.createToolbarExtensions.call(this);
+            Serenity.GridUtils.addQuickSearchInputCustom(this.toolbar.element, function (field, text) {
+                _this.searchText = Select2.util.stripDiacritics(text || '').toUpperCase();
+                _this.view.setItems(_this.view.getItems(), true);
+            });
+        };
+        CheckLookupEditor.prototype.getSelectAllText = function () {
+            if (!this.options.showSelectAll)
+                return null;
+            return _super.prototype.getSelectAllText.call(this);
+        };
+        CheckLookupEditor.prototype.cascadeItems = function (items) {
+            var val = this.get_cascadeValue();
+            if (val == null || val === '') {
+                if (!Q.isEmptyOrNull(this.get_cascadeField())) {
+                    return [];
+                }
+                return items;
+            }
+            var key = val.toString();
+            var fld = this.get_cascadeField();
+            return items.filter(function (x) {
+                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                return !!(itemKey != null && itemKey.toString() === key);
+            });
+        };
+        CheckLookupEditor.prototype.filterItems = function (items) {
+            var val = this.get_filterValue();
+            if (val == null || val === '') {
+                return items;
+            }
+            var key = val.toString();
+            var fld = this.get_filterField();
+            return items.filter(function (x) {
+                var itemKey = Q.coalesce(x[fld], Serenity.ReflectionUtils.getPropertyValue(x, fld));
+                return !!(itemKey != null && itemKey.toString() === key);
+            });
+        };
+        CheckLookupEditor.prototype.getLookupItems = function (lookup) {
+            return this.filterItems(this.cascadeItems(lookup.items));
+        };
+        CheckLookupEditor.prototype.getTreeItems = function () {
+            var lookup = Q.getLookup(this.options.lookupKey);
+            var items = this.getLookupItems(lookup);
+            return items.map(function (item) { return ({
+                id: Q.coalesce(item[lookup.idField], "").toString(),
+                text: Q.coalesce(item[lookup.textField], "").toString(),
+                source: item
+            }); });
+        };
+        CheckLookupEditor.prototype.onViewFilter = function (item) {
+            return _super.prototype.onViewFilter.call(this, item) &&
+                (Q.isEmptyOrNull(this.searchText) ||
+                    Select2.util.stripDiacritics(item.text || '')
+                        .toUpperCase().indexOf(this.searchText) >= 0);
+        };
+        CheckLookupEditor.prototype.moveSelectedUp = function () {
+            return this.options.checkedOnTop;
+        };
+        CheckLookupEditor.prototype.get_cascadeFrom = function () {
+            return this.options.cascadeFrom;
+        };
+        Object.defineProperty(CheckLookupEditor.prototype, "cascadeFrom", {
+            get: function () {
+                return this.get_cascadeFrom();
+            },
+            set: function (value) {
+                this.set_cascadeFrom(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CheckLookupEditor.prototype.getCascadeFromValue = function (parent) {
+            return Serenity.EditorUtils.getValue(parent);
+        };
+        CheckLookupEditor.prototype.setCascadeFrom = function (value) {
+            var _this = this;
+            if (Q.isEmptyOrNull(value)) {
+                if (this.cascadeLink != null) {
+                    this.cascadeLink.set_parentID(null);
+                    this.cascadeLink = null;
+                }
+                this.options.cascadeFrom = null;
+                return;
+            }
+            this.cascadeLink = new Serenity.CascadedWidgetLink(Serenity.Widget, this, function (p) {
+                _this.set_cascadeValue(_this.getCascadeFromValue(p));
+            });
+            this.cascadeLink.set_parentID(value);
+            this.options.cascadeFrom = value;
+        };
+        CheckLookupEditor.prototype.set_cascadeFrom = function (value) {
+            if (value !== this.options.cascadeFrom) {
+                this.setCascadeFrom(value);
+                this.updateItems();
+            }
+        };
+        CheckLookupEditor.prototype.get_cascadeField = function () {
+            return Q.coalesce(this.options.cascadeField, this.options.cascadeFrom);
+        };
+        Object.defineProperty(CheckLookupEditor.prototype, "cascadeField", {
+            get: function () {
+                return this.get_cascadeField();
+            },
+            set: function (value) {
+                this.set_cascadeField(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CheckLookupEditor.prototype.set_cascadeField = function (value) {
+            this.options.cascadeField = value;
+        };
+        CheckLookupEditor.prototype.get_cascadeValue = function () {
+            return this.options.cascadeValue;
+        };
+        Object.defineProperty(CheckLookupEditor.prototype, "cascadeValue", {
+            get: function () {
+                return this.get_cascadeValue();
+            },
+            set: function (value) {
+                this.set_cascadeValue(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CheckLookupEditor.prototype.set_cascadeValue = function (value) {
+            if (this.options.cascadeValue !== value) {
+                this.options.cascadeValue = value;
+                this.value = [];
+                this.updateItems();
+            }
+        };
+        CheckLookupEditor.prototype.get_filterField = function () {
+            return this.options.filterField;
+        };
+        Object.defineProperty(CheckLookupEditor.prototype, "filterField", {
+            get: function () {
+                return this.get_filterField();
+            },
+            set: function (value) {
+                this.set_filterField(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CheckLookupEditor.prototype.set_filterField = function (value) {
+            this.options.filterField = value;
+        };
+        CheckLookupEditor.prototype.get_filterValue = function () {
+            return this.options.filterValue;
+        };
+        Object.defineProperty(CheckLookupEditor.prototype, "filterValue", {
+            get: function () {
+                return this.get_filterValue();
+            },
+            set: function (value) {
+                this.set_filterValue(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CheckLookupEditor.prototype.set_filterValue = function (value) {
+            if (this.options.filterValue !== value) {
+                this.options.filterValue = value;
+                this.value = null;
+                this.updateItems();
+            }
+        };
+        CheckLookupEditor = __decorate([
+            Serenity.Decorators.registerEditor("Serenity.CheckLookupEditor")
+        ], CheckLookupEditor);
+        return CheckLookupEditor;
+    }(CheckTreeEditor));
+    Serenity.CheckLookupEditor = CheckLookupEditor;
 })(Serenity || (Serenity = {}));
 var Serenity;
 (function (Serenity) {
