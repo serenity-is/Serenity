@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : ServerImportGeneratorBase
+    public partial class ServerTypingsGenerator : CecilImportGenerator
     {
-        private void GenerateService(Type type)
+        private void GenerateService(TypeDefinition type)
         {
             var codeNamespace = GetNamespace(type);
 
@@ -27,13 +28,16 @@ namespace Serenity.CodeGeneration
                 sb.AppendLine("';");
                 sb.AppendLine();
 
-                Type responseType;
-                Type requestType;
+                TypeReference responseType;
+                TypeReference requestType;
                 string requestParam;
 
                 var methodNames = new List<string>();
-                foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public))
+                foreach (var method in type.Methods)
                 {
+                    if (!method.IsPublic || method.IsStatic || method.IsAbstract)
+                        continue;
+
                     if (methodNames.Contains(method.Name))
                         continue;
 
@@ -46,7 +50,10 @@ namespace Serenity.CodeGeneration
                     sb.Append(method.Name);
 
                     sb.Append("(request: ");
-                    MakeFriendlyReference(requestType, codeNamespace);
+                    if (requestType == null)
+                        sb.Append(ShortenFullName(new ExternalType { Name = "ServiceRequest", Namespace = "Serenity" }, codeNamespace));
+                    else
+                        MakeFriendlyReference(requestType, codeNamespace);
 
                     sb.Append(", onSuccess?: (response: ");
                     MakeFriendlyReference(responseType, codeNamespace);

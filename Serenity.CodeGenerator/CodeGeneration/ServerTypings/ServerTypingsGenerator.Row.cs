@@ -1,55 +1,140 @@
-﻿using Serenity.ComponentModel;
+﻿using Mono.Cecil;
+using Mono.Cecil.Cil;
 using Serenity.Data;
-using System;
+using Serenity.Reflection;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : ServerImportGeneratorBase
+    public partial class ServerTypingsGenerator : CecilImportGenerator
     {
-        private void GenerateRowMembers(Type rowType)
+        private IEnumerable<PropertyDefinition> EnumerateFieldProperties(TypeDefinition rowType)
+        {
+            do
+            {
+                var propertyByName = rowType.Properties.Where(x =>
+                    CecilUtils.IsPublicInstanceProperty(x) &&
+                    (!x.PropertyType.Name.EndsWith("Field") ||
+                      x.PropertyType.Namespace != "Serenity.Data")).ToLookup(x => x.Name);
+
+                foreach (var fieldName in rowType.NestedTypes.FirstOrDefault(x =>
+                    CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase")).Fields
+                        .Where(x => x.IsPublic)
+                        .Select(x => x.Name))
+                {
+                    var property = propertyByName[fieldName].FirstOrDefault();
+                    if (property != null)
+                        yield return property;
+                }
+            }
+            while ((rowType = (rowType.BaseType?.Resolve())) != null && rowType.FullName != "Serenity.Data.Row");
+        }
+
+        private void GenerateRowMembers(TypeDefinition rowType)
         {
             var codeNamespace = GetNamespace(rowType);
 
-            Row row = (Row)Activator.CreateInstance(rowType);
-
-            foreach (var field in row.GetFields())
+            foreach (var property in EnumerateFieldProperties(rowType))
             {
-                cw.Indented(field.PropertyName ?? field.Name);
+                cw.Indented(property.Name);
                 sb.Append("?: ");
-                var enumField = field as IEnumTypeField;
-                if (enumField != null && enumField.EnumType != null)
+
+                var enumType = CecilUtils.GetEnumTypeFrom(property.PropertyType);
+                if (enumType != null)
                 {
-                    HandleMemberType(enumField.EnumType, codeNamespace);
+                    HandleMemberType(enumType, codeNamespace);
                 }
                 else
                 {
-                    var dataType = field.ValueType;
-                    HandleMemberType(dataType, codeNamespace);
+                    HandleMemberType(CecilUtils.GetNullableUnderlyingType(property.PropertyType) ?? property.PropertyType, codeNamespace);
                 }
 
                 sb.AppendLine(";");
             }
         }
 
-        private void GenerateRowMetadata(Type rowType)
+        private string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string getMethodFullName)
         {
-            Row row = (Row)Activator.CreateInstance(rowType);
+            return rowType.Methods.Where(x => x.Overrides.Any(z => z.FullName == getMethodFullName))
+                .SelectMany(x => x.Body.Instructions.Where(z =>
+                    z.OpCode == OpCodes.Ldfld &&
+                    z.Operand is FieldReference &&
+                    CecilUtils.IsSubclassOf((z.Operand as FieldReference).DeclaringType.Resolve(), "Serenity.Data", "RowFieldsBase"))
+                    .Select(z => (z.Operand as FieldReference).Name))
+                .FirstOrDefault();
+        }
 
-            var idRow = row as IIdRow;
-            var isActiveRow = row as IIsActiveRow;
-            var nameRow = row as INameRow;
-            var lookupAttr = rowType.GetCustomAttribute<LookupScriptAttribute>();
+        private string DetermineLocalTextPrefix(TypeDefinition rowType)
+        {
+            string localTextPrefix = null;
+            var attr = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "LocalTextPrefix");
+            if (attr != null)
+            {
+                localTextPrefix = attr.ConstructorArguments[0].Value as string;
+                if (!string.IsNullOrEmpty(localTextPrefix))
+                    return localTextPrefix;
+            }
+
+            var fieldsType = rowType.NestedTypes.FirstOrDefault(x =>
+                CecilUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
+
+            if (fieldsType != null)
+            {
+                var constructors = fieldsType.Resolve().Methods.Where(x => x.IsConstructor);
+                localTextPrefix = constructors.SelectMany(x => x.Body.Instructions.Where(z =>
+                        (z.OpCode == OpCodes.Call || z.OpCode == OpCodes.Calli ||
+                        z.OpCode == OpCodes.Callvirt) &&
+                        z.Operand is MethodReference &&
+                        (z.Operand as MethodReference).FullName ==
+                        "System.Void Serenity.Data.RowFieldsBase::set_LocalTextPrefix(System.String)" &&
+                        z.Previous.OpCode == OpCodes.Ldstr &&
+                        z.Previous.Operand is string)).Select(x => x.Previous.Operand as string)
+                    .FirstOrDefault();
+
+                if (localTextPrefix != null)
+                    return localTextPrefix;
+            }
+
+            var parts = (rowType.Namespace ?? "").Split('.') as IEnumerable<string>;
+            if (!parts.Any())
+                return null;
+
+            if (parts.Last() == "Entities")
+                parts = parts.Take(parts.Count() - 1);
+
+            if (parts.Count() > 1)
+                parts = parts.Skip(1);
+
+            return string.Join(".", parts);
+        }
+
+        private void GenerateRowMetadata(TypeDefinition rowType)
+        {
+            var idProperty = ExtractInterfacePropertyFromRow(rowType,
+                "Serenity.Data.IIdField Serenity.Data.IIdRow::get_IdField()");
+            var nameProperty = ExtractInterfacePropertyFromRow(rowType,
+                "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
+            var isActiveProperty = ExtractInterfacePropertyFromRow(rowType,
+                "Serenity.Data.Int16Field Serenity.Data.IIsActiveRow::get_IsActiveField()");
+
+            var lookupAttr = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "LookupScriptAttribute");
             if (lookupAttr == null)
             {
                 var script = lookupScripts.FirstOrDefault(x =>
                     x.BaseType != null &&
-                    x.BaseType.IsGenericType &&
-                    x.BaseType.GetGenericArguments().Any(z => z == rowType));
+                    x.BaseType is GenericInstanceType &&
+                    (x.BaseType as GenericInstanceType).GenericArguments.Any(z =>
+                        z.Name == rowType.Name && z.Namespace == rowType.Namespace));
 
                 if (script != null)
-                    lookupAttr = script.GetCustomAttribute<LookupScriptAttribute>();
+                    lookupAttr = CecilUtils.GetAttr(script, "Serenity.ComponentModel", "LookupScriptAttribute");
+            }
+            else if (lookupAttr.ConstructorArguments.Count > 0 &&
+                lookupAttr.ConstructorArguments[0].Type.FullName == "System.Type")
+            {
+                lookupAttr = CecilUtils.GetAttr(((TypeReference)lookupAttr.ConstructorArguments[0].Value).Resolve(), 
+                    "Serenity.ComponentModel", "LookupScriptAttribute");
             }
 
             sb.AppendLine();
@@ -60,34 +145,31 @@ namespace Serenity.CodeGeneration
             {
                 bool anyMetadata = false;
 
-                if (idRow != null)
+                if (idProperty != null)
                 {
                     cw.Indented("export const idProperty = '");
-                    var field = ((Field)idRow.IdField);
-                    sb.Append(field.PropertyName ?? field.Name);
+                    sb.Append(idProperty);
                     sb.AppendLine("';");
                     anyMetadata = true;
                 }
 
-                if (isActiveRow != null)
+                if (isActiveProperty != null)
                 {
                     cw.Indented("export const isActiveProperty = '");
-                    var field = (isActiveRow.IsActiveField);
-                    sb.Append(field.PropertyName ?? field.Name);
+                    sb.Append(isActiveProperty);
                     sb.AppendLine("';");
                     anyMetadata = true;
                 }
 
-                if (nameRow != null)
+                if (nameProperty != null)
                 {
                     cw.Indented("export const nameProperty = '");
-                    var field = (nameRow.NameField);
-                    sb.Append(field.PropertyName ?? field.Name);
+                    sb.Append(nameProperty);
                     sb.AppendLine("';");
                     anyMetadata = true;
                 }
 
-                var localTextPrefix = row.GetFields().LocalTextPrefix;
+                var localTextPrefix = DetermineLocalTextPrefix(rowType);
                 if (!string.IsNullOrEmpty(localTextPrefix))
                 {
                     cw.Indented("export const localTextPrefix = '");
@@ -96,10 +178,12 @@ namespace Serenity.CodeGeneration
                     anyMetadata = true;
                 }
 
-                if (lookupAttr != null)
+                if (lookupAttr != null && lookupAttr.ConstructorArguments.Count > 0 && 
+                    lookupAttr.ConstructorArguments[0].Type.FullName == "System.String")
                 {
+                    var lookupKey = lookupAttr.ConstructorArguments[0].Value as string;
                     cw.Indented("export const lookupKey = '");
-                    sb.Append(lookupAttr.Key);
+                    sb.Append(lookupKey);
                     sb.AppendLine("';");
 
                     sb.AppendLine();
@@ -111,7 +195,7 @@ namespace Serenity.CodeGeneration
                         cw.Indented("return Q.getLookup<");
                         sb.Append(rowType.Name);
                         sb.Append(">('");
-                        sb.Append(lookupAttr.Key);
+                        sb.Append(lookupKey);
                         sb.AppendLine("');");
                     });
 
@@ -128,14 +212,14 @@ namespace Serenity.CodeGeneration
                 cw.InBrace(delegate
                 {
                     var inserted = 0;
-                    foreach (var field in row.GetFields())
+                    foreach (var property in EnumerateFieldProperties(rowType))
                     {
                         if (inserted > 0)
                             sb.AppendLine(",");
 
-                        cw.Indented(field.PropertyName ?? field.Name);
+                        cw.Indented(property.Name);
                         sb.Append(" = \"");
-                        sb.Append(field.PropertyName ?? field.Name);
+                        sb.Append(property.Name);
                         sb.Append("\"");
 
                         inserted++;

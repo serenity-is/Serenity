@@ -45,6 +45,10 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Cecil, Version=0.9.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Tools\Cecil\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
     <Reference Include="MsieJavaScriptEngine, Version=2.2.3.0, Culture=neutral, PublicKeyToken=a3a2846a37ac0d3e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\MsieJavaScriptEngine.2.2.3\lib\net45\MsieJavaScriptEngine.dll</HintPath>
@@ -94,6 +98,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Base\CecilImportGenerator.cs">
+      <Link>CodeGeneration\Base\CecilImportGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Base\CecilUtils.cs">
+      <Link>CodeGeneration\Base\CecilUtils.cs</Link>
+    </Compile>
     <Compile Include="..\Serenity.CodeGenerator\CodeGeneration\Base\CodeGeneratorBase.cs">
       <Link>CodeGeneration\Base\CodeGeneratorBase.cs</Link>
     </Compile>
@@ -361,10 +371,6 @@
     <None Include="Tooling\Node\less\lib\less\tree\variable.js" />
     <None Include="Tooling\Node\less\lib\less\visitor.js" />
     <None Include="Tooling\Node\node.exe" />
-    <None Include="Tooling\Mono.Cecil\Mono.Cecil.dll" />
-    <None Include="Tooling\Mono.Cecil\Mono.Cecil.Mdb.dll" />
-    <None Include="Tooling\Mono.Cecil\Mono.Cecil.Pdb.dll" />
-    <None Include="Tooling\Mono.Cecil\Mono.Cecil.Rocks.dll" />
     <None Include="Tooling\JsEngine\MsieJavaScriptEngine.dll" />
     <None Include="Assets\Fonts\fontawesome-webfont.eot" />
     <None Include="Assets\Fonts\fontawesome-webfont.ttf" />

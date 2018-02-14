@@ -1,72 +1,94 @@
-﻿using Serenity.Services;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Mono.Cecil;
 using System.Text;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : ServerImportGeneratorBase
+    public partial class ServerTypingsGenerator : CecilImportGenerator
     {
-        protected override void HandleMemberType(Type memberType, string codeNamespace, 
+        protected override void HandleMemberType(TypeReference memberType, string codeNamespace, 
             StringBuilder sb = null)
         {
             sb = sb ?? this.sb;
+            bool isSystem = memberType.Namespace == "System";
 
-            if (memberType == typeof(String))
+            if (isSystem && memberType.Name == "String")
             {
                 sb.Append("string");
                 return;
             }
 
-            var nullableType = Nullable.GetUnderlyingType(memberType);
-            if (nullableType != null)
-                memberType = nullableType;
+            if (memberType is GenericInstanceType &&
+                memberType.Name == "Nullable`1" &&
+                isSystem)
+            {
+                memberType = (memberType as GenericInstanceType).GenericArguments[0];
+                isSystem = memberType.Namespace == "System";
+            }
 
-            if (memberType == typeof(Int16) ||
-                memberType == typeof(Int32) ||
-                memberType == typeof(Int64) ||
-                memberType == typeof(UInt16) ||
-                memberType == typeof(UInt32) ||
-                memberType == typeof(UInt64) ||
-                memberType == typeof(Single) ||
-                memberType == typeof(Double) ||
-                memberType == typeof(Decimal) ||
-                memberType == typeof(Byte) ||
-                memberType == typeof(SByte))
+            var name = memberType.Name;
+
+            if (isSystem &&
+                memberType.IsPrimitive)
+            {
+                if (name == "Int16" ||
+                    name == "Int32" ||
+                    name == "Int64" ||
+                    name == "Double" ||
+                    name == "Single" ||
+                    name == "UInt16" ||
+                    name == "UInt32" ||
+                    name == "UInt64" ||
+                    name == "Byte" ||
+                    name == "SByte")
+                {
+                    sb.Append("number");
+                    return;
+                }
+
+                if (name == "Boolean")
+                {
+                    sb.Append("boolean");
+                    return;
+                }
+            }
+
+            if (isSystem &&
+                name == "Decimal")
             {
                 sb.Append("number");
                 return;
             }
 
-            if (memberType == typeof(Boolean))
-            {
-                sb.Append("boolean");
-                return;
-            }
-
-            if (memberType == typeof(DateTime) ||
-                memberType == typeof(TimeSpan) ||
-                memberType == typeof(DateTimeOffset) ||
-                memberType == typeof(Guid))
+            if (isSystem &&
+                name == "DateTime" ||
+                name == "TimeSpan" ||
+                name == "DateTimeOffset" ||
+                name == "Guid")
             {
                 sb.Append("string");
                 return;
             }
 
-            if (memberType == typeof(SortBy[]))
+            if (memberType.IsArray)
             {
-                sb.Append("string[]");
-                return;
+                var elementType = memberType.GetElementType();
+                if (elementType.Namespace == "Serenity.Services" &&
+                    elementType.Name == "SortBy")
+                {
+                    sb.Append("string[]");
+                    return;
+                }
             }
 
-            if (memberType == typeof(Stream))
+            if (name == "Stream" &&
+                memberType.Namespace == "System.IO")
             {
                 sb.Append("number[]");
                 return;
             }
 
-            if (memberType == typeof(Object))
+            if (isSystem && 
+                name == "Object")
             {
                 sb.Append("any");
                 return;
@@ -79,27 +101,32 @@ namespace Serenity.CodeGeneration
                 return;
             }
 
-            if (memberType.IsGenericType &&
-                (memberType.GetGenericTypeDefinition() == typeof(List<>) ||
-                memberType.GetGenericTypeDefinition() == typeof(HashSet<>)))
+            if (memberType.IsGenericInstance)
             {
-                HandleMemberType(memberType.GenericTypeArguments[0], codeNamespace, sb);
-                sb.Append("[]");
-                return;
+                var gi = memberType as GenericInstanceType;
+                if (gi.ElementType.Namespace == "System.Collections.Generic")
+                {
+                    if (gi.ElementType.Name == "List`1" ||
+                        gi.ElementType.Name == "HashSet`1")
+                    {
+                        HandleMemberType(gi.GenericArguments[0], codeNamespace, sb);
+                        sb.Append("[]");
+                        return;
+                    }
+
+                    if (gi.ElementType.Name == "Dictionary`2")
+                    {
+                        sb.Append("{ [key: ");
+                        HandleMemberType(gi.GenericArguments[0], codeNamespace, sb);
+                        sb.Append("]: ");
+                        HandleMemberType(gi.GenericArguments[1], codeNamespace, sb);
+                        sb.Append(" }");
+                        return;
+                    }
+                }
             }
 
-            if (memberType.IsGenericType &&
-                memberType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-            {
-                sb.Append("{ [key: ");
-                HandleMemberType(memberType.GenericTypeArguments[0], codeNamespace, sb);
-                sb.Append("]: ");
-                HandleMemberType(memberType.GenericTypeArguments[1], codeNamespace, sb);
-                sb.Append(" }");
-                return;
-            }
-
-            EnqueueType(memberType);
+            EnqueueType(memberType.Resolve());
             MakeFriendlyReference(memberType, codeNamespace);
         }
 

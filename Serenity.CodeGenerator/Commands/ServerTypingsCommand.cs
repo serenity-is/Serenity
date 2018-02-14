@@ -128,48 +128,7 @@ namespace Serenity.CodeGenerator
             Console.ResetColor();
             Console.WriteLine(outDir);
 
-            List<Assembly> assemblies = new List<Assembly>();
-            foreach (var assemblyFile in assemblyFiles)
-            {
-#if COREFX
-                using (var dynamicContext = new AssemblyResolver(assemblyFile))
-                {
-                    var asm = dynamicContext.Assembly;
-#else
-                {
-                    var asm = Assembly.LoadFrom(assemblyFile);
-#endif
-                    try
-                    {
-                        asm.GetTypes();
-                        assemblies.Add(asm);
-                    }
-                    catch (ReflectionTypeLoadException ex1)
-                    {
-                        System.Console.Error.WriteLine(String.Format("Couldn't list types in project assembly: '{0}'!", assemblyFile) +
-                            Environment.NewLine + Environment.NewLine +
-                            string.Join(Environment.NewLine, ex1.LoaderExceptions.Select(x => x.Message).Distinct()));
-                        Environment.Exit(1);
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Console.Error.WriteLine(String.Format("Couldn't list types in project assembly: '{0}'! ", assemblyFile)
-                            + Environment.NewLine + Environment.NewLine + ex.ToString());
-                        Environment.Exit(1);
-                    }
-                }
-            }
-
-            Extensibility.ExtensibilityHelper.SelfAssemblies = new Assembly[]
-            {
-                typeof(LocalTextRegistry).Assembly,
-                typeof(SqlConnections).Assembly,
-                typeof(Row).Assembly,
-                typeof(SaveRequestHandler<>).Assembly,
-                Assembly.Load(new AssemblyName("Serenity.Web")),
-            }.Concat(assemblies).Distinct().ToArray();
-
-            var generator = new ServerTypingsGenerator(assemblies.ToArray());
+            var generator = new ServerTypingsGenerator(assemblyFiles.ToArray());
             generator.RootNamespaces.Add(config.RootNamespace);
 
             foreach (var type in tsTypes)

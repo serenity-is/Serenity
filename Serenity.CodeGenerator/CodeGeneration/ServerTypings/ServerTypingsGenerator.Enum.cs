@@ -1,18 +1,23 @@
-﻿using Serenity.ComponentModel;
-using System;
-using System.Collections;
+﻿using System;
+using Serenity.Reflection;
 #if COREFX
 using System.Reflection;
 #endif
+using Mono.Cecil;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : ServerImportGeneratorBase
+    public partial class ServerTypingsGenerator : CecilImportGenerator
     {
-        private void GenerateEnum(Type enumType)
+        private void GenerateEnum(TypeDefinition enumType)
         {
             var codeNamespace = GetNamespace(enumType);
-            var enumKey = EnumMapper.GetEnumTypeKey(enumType);
+            string enumKey = enumType.FullName;
+            var enumKeyAttr = CecilUtils.FindAttr(enumType.CustomAttributes, "Serenity.ComponentModel", "EnumKeyAttribute");
+            if (enumKeyAttr != null &&
+                enumKeyAttr.ConstructorArguments.Count >= 1 &&
+                enumKeyAttr.ConstructorArguments[0].Type.FullName == "System.String")
+                enumKey = enumKeyAttr.ConstructorArguments[0].Value as string;
 
             cw.Indented("export enum ");
             var identifier = MakeFriendlyName(enumType, codeNamespace);
@@ -21,25 +26,21 @@ namespace Serenity.CodeGeneration
 
             cw.InBrace(delegate
             {
-                var names = Enum.GetNames(enumType);
-                var values = (IList)Enum.GetValues(enumType);
-
                 var inserted = 0;
-                for (var i = 0; i < names.Length; i++)
+                foreach (var field in enumType.Fields)
                 {
-                    var name = names[i];
+                    if (!field.IsStatic || field.IsSpecialName || field.Constant == null)
+                        continue;
 
-                    var member = enumType.GetMember(name);
-                    if (member != null && member.Length > 0 &&
-                        member[0].GetAttribute<IgnoreAttribute>(false) != null)
+                    if (CecilUtils.GetAttr(enumType, "Serenity.ComponentModel", "IgnoreAttribute") != null)
                         continue;
 
                     if (inserted > 0)
                         sb.AppendLine(",");
 
-                    cw.Indented(name);
+                    cw.Indented(field.Name);
                     sb.Append(" = ");
-                    sb.Append(Convert.ToInt32(values[i]));
+                    sb.Append(Convert.ToInt64(field.Constant));
                     inserted++;
                 }
 

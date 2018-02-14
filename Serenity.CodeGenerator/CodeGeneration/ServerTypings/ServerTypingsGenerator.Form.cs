@@ -1,22 +1,101 @@
-﻿using Serenity.ComponentModel;
-using Serenity.Services;
-using System;
+﻿using Mono.Cecil;
+using Mono.Cecil.Cil;
+using Serenity.Reflection;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : ServerImportGeneratorBase
+    public partial class ServerTypingsGenerator : CecilImportGenerator
     {
         const string requestSuffix = "Request";
 
-        private void GenerateForm(Type type, FormScriptAttribute formScriptAttribute)
+        private static string AutoDetermineEditorType(TypeReference valueType, TypeReference basedOnFieldType)
+        {
+            if (CecilUtils.GetEnumTypeFrom(valueType) != null)
+                return "Enum";
+
+            if (basedOnFieldType != null &&
+                CecilUtils.GetEnumTypeFrom(basedOnFieldType) != null)
+                return "Enum";
+
+            valueType = (CecilUtils.GetNullableUnderlyingType(valueType) ?? valueType).Resolve();
+
+            if (valueType.Namespace == "System")
+            {
+                if (valueType.Name == "String")
+                    return "String";
+
+                if (valueType.Name == "Int32" ||
+                    valueType.Name == "Int16")
+                    return "Integer";
+
+                if (valueType.Name == "DateTime")
+                    return "Date";
+
+                if (valueType.Name == "Boolean")
+                    return "Boolean";
+
+                if (valueType.Name == "Decimal" ||
+                    valueType.Name == "Double" ||
+                    valueType.Name == "Single")
+                    return "Decimal";
+            }
+
+            return "String";
+        }
+
+        private string GetEditorTypeKeyFrom(TypeReference propertyType, TypeReference basedOnFieldType, CustomAttribute editorTypeAttr)
+        {
+            if (editorTypeAttr == null)
+                return AutoDetermineEditorType(propertyType, basedOnFieldType);
+
+            if (editorTypeAttr.AttributeType.FullName == "Serenity.ComponentModel.EditorTypeAttribute" ||
+                editorTypeAttr.AttributeType.FullName == "Serenity.ComponentModel.CustomEditorAttribute")
+            {
+                if (editorTypeAttr.ConstructorArguments.Count == 1 &&
+                    editorTypeAttr.ConstructorArguments[0].Type.FullName == "System.String" &&
+                    editorTypeAttr.ConstructorArguments[0].Value is string)
+                    return editorTypeAttr.ConstructorArguments[0].Value as string;
+            }
+
+            var keyConstant = editorTypeAttr.AttributeType.Resolve().Fields.FirstOrDefault(x =>
+                x.IsStatic &&
+                x.IsPublic &&
+                x.Name == "Key" &&
+                x.HasConstant &&
+                x.Constant is string &&
+                x.DeclaringType.FullName == editorTypeAttr.AttributeType.FullName);
+            
+            if (keyConstant != null && keyConstant.Constant as string != null)
+                return keyConstant.Constant as string;
+
+            var editorType = editorTypeAttr.AttributeType.Resolve().Methods.Where(x => x.IsConstructor)
+                .SelectMany(m => m.Body.Instructions
+                    .Where(i => i.OpCode == OpCodes.Call &&
+                        (i.Operand is MethodReference) &&
+                        (i.Operand as MethodReference).Resolve().IsConstructor &&
+                        i.Previous.OpCode == OpCodes.Ldstr &&
+                        i.Previous.Operand is string)
+                    .Select(x => x.Previous.Operand as string)).FirstOrDefault();
+
+            if (editorType != null)
+                return editorType;
+
+            editorType = editorTypeAttr.AttributeType.FullName;
+            if (editorType.EndsWith("Attribute"))
+                editorType = editorType.Substring(0, editorType.Length - "Attribute".Length);
+
+            return editorType;
+        }
+
+        private void GenerateForm(TypeDefinition type, CustomAttribute formScriptAttribute)
         {
             var codeNamespace = GetNamespace(type);
 
             var identifier = type.Name;
             if (identifier.EndsWith(requestSuffix) &&
-                type.IsSubclassOf(typeof(ServiceRequest)))
+                CecilUtils.IsSubclassOf(type, "Serenity.Services", "ServiceRequest"))
             {
                 identifier = identifier.Substring(0,
                     identifier.Length - requestSuffix.Length) + "Form";
@@ -29,11 +108,43 @@ namespace Serenity.CodeGeneration
             var propertyNames = new List<string>();
             var propertyTypes = new List<string>();
 
+            TypeDefinition basedOnRow = null;
+            var basedOnRowAttr = CecilUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
+            if (basedOnRowAttr != null &&
+                basedOnRowAttr.ConstructorArguments.Count > 0 &&
+                basedOnRowAttr.ConstructorArguments[0].Type.FullName == "System.Type")
+                basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference).Resolve();
+
+            ILookup<string, PropertyDefinition> basedOnByName = null;
+            if (basedOnRowAttr != null)
+            {
+                basedOnByName = basedOnRow.Properties.Where(x => CecilUtils.IsPublicInstanceProperty(x))
+                    .ToLookup(x => x.Name);
+            }
+
             cw.InBrace(delegate
             {
-                foreach (var item in Serenity.PropertyGrid.PropertyItemHelper.GetPropertyItemsFor(type))
+                foreach (var item in type.Properties)
                 {
-                    var editorType = item.EditorType ?? "String";
+                    if (!CecilUtils.IsPublicInstanceProperty(item))
+                        continue;
+
+                    PropertyDefinition basedOnField = null;
+                    if (basedOnByName != null)
+                        basedOnField = basedOnByName[item.Name].FirstOrDefault();
+
+                    if (CecilUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                        continue;
+
+                    if (basedOnField != null &&
+                        CecilUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "IgnoreAttribute") != null)
+                        continue;
+
+                    var editorTypeAttr = CecilUtils.FindAttr(item.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
+                    if (editorTypeAttr == null && basedOnField != null)
+                        editorTypeAttr = CecilUtils.FindAttr(basedOnField.CustomAttributes, "Serenity.ComponentModel", "EditorTypeAttribute");
+
+                    var editorType = GetEditorTypeKeyFrom(item.PropertyType, basedOnField != null ? basedOnField.PropertyType : (TypeReference)null, editorTypeAttr);
 
                     ExternalType scriptType = null;
 
@@ -71,7 +182,7 @@ namespace Serenity.CodeGeneration
             cw.InBrace(delegate
             {
                 cw.Indented("static formKey = '");
-                sb.Append(formScriptAttribute.Key);
+                sb.Append(formScriptAttribute.ConstructorArguments[0].Value as string);
                 sb.AppendLine("';");
 
                 if (propertyNames.Count > 0)

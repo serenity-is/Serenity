@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Serenity.CodeGeneration
 {
-    public partial class ServerTypingsGenerator : ServerImportGeneratorBase
+    public partial class ServerTypingsGenerator : CecilImportGenerator
     {
         private void SSTypeNameToTS(string typeName, string codeNamespace, string defaultType = "any",
             string[] leaveAsIs = null)

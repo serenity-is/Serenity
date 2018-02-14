@@ -32,11 +32,14 @@
     <PackageReference Include="MySqlConnector" Version="0.26.0" />
     <PackageReference Include="Npgsql" Version="3.2.5" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Tools\Cecil\netstandard1.3\Mono.Cecil.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CodeGeneration\Base\" />
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Tools\Cecil\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <DefineConstants>$(DefineConstants);COREFX</DefineConstants>
