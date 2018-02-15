@@ -99,9 +99,36 @@ namespace Serenity.Reflection
             if (assemblyLocations == null || !assemblyLocations.Any())
                 return new AssemblyDefinition[0];
 
+            assemblyLocations = assemblyLocations.Select(x =>
+            {
+                if (!File.Exists(x))
+                    return x;
+
+                var path = Path.GetDirectoryName(x);
+                var asmInfo = Path.Combine(path, "__AssemblyInfo__.ini");
+                if (!File.Exists(asmInfo))
+                    return x;
+
+                var content = File.ReadAllText(asmInfo, System.Text.Encoding.Unicode);
+                var idx = content.LastIndexOf("\0file:///");
+                if (idx < 0)
+                    return x;
+
+                var end = content.IndexOf('\0', idx + 9);
+                if (end < 0)
+                    return x;
+
+                var location = content.Substring(idx + 9, end - idx - 9).Replace('/', '\\');
+                if (File.Exists(location))
+                    return location;
+
+                return x;
+            }).ToList();
+
 #if COREFX
-            var resolver = ICSharpCode.Decompiler.UniversalAssemblyResolver.LoadMainModule(assemblyLocations.First()).AssemblyResolver
-                as ICSharpCode.Decompiler.UniversalAssemblyResolver;
+            var resolver = ICSharpCode.Decompiler.UniversalAssemblyResolver
+                .LoadMainModule(assemblyLocations.First()).AssemblyResolver
+                    as ICSharpCode.Decompiler.UniversalAssemblyResolver;
 #else
             var resolver = new Mono.Cecil.DefaultAssemblyResolver();
 #endif

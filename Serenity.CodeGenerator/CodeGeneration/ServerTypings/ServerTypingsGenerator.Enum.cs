@@ -1,5 +1,6 @@
 ﻿using System;
 using Serenity.Reflection;
+using System.Linq;
 #if COREFX
 using System.Reflection;
 #endif
@@ -26,15 +27,12 @@ namespace Serenity.CodeGeneration
 
             cw.InBrace(delegate
             {
+                var fields = enumType.Fields.Where(x => x.IsStatic && !x.IsSpecialName && x.Constant != null);
+                fields = fields.OrderBy(x => Convert.ToInt64(x.Constant));
+
                 var inserted = 0;
-                foreach (var field in enumType.Fields)
+                foreach (var field in fields)
                 {
-                    if (!field.IsStatic || field.IsSpecialName || field.Constant == null)
-                        continue;
-
-                    if (CecilUtils.GetAttr(enumType, "Serenity.ComponentModel", "IgnoreAttribute") != null)
-                        continue;
-
                     if (inserted > 0)
                         sb.AppendLine(",");
 

@@ -141,9 +141,7 @@ namespace Serenity.CodeGeneration
 
                     foreach (var fromType in types)
                     {
-                        if (fromType.IsAbstract ||
-                            fromType.IsValueType ||
-                            fromType.IsPrimitive)
+                        if (fromType.IsAbstract)
                             continue;
 
                         var baseClasses = CecilUtils.EnumerateBaseClasses(fromType).ToArray();
@@ -370,6 +368,7 @@ namespace Serenity.CodeGeneration
                     t.Name == "DeleteResponse" ||
                     t.Name == "UndeleteRequest" ||
                     t.Name == "UndeleteResponse" ||
+                    t.Name == "SaveResponse" ||
                     t.Name == "ServiceRequest" ||
                     t.Name == "ServiceResponse")
                     return t;

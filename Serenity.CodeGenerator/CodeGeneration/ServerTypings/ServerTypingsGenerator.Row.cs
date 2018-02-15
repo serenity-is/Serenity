@@ -54,15 +54,30 @@ namespace Serenity.CodeGeneration
             }
         }
 
-        private string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string getMethodFullName)
+        private string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes, 
+            string propertyType, string propertyName, string getMethodFullName)
         {
-            return rowType.Methods.Where(x => x.Overrides.Any(z => z.FullName == getMethodFullName))
-                .SelectMany(x => x.Body.Instructions.Where(z =>
-                    z.OpCode == OpCodes.Ldfld &&
-                    z.Operand is FieldReference &&
-                    CecilUtils.IsSubclassOf((z.Operand as FieldReference).DeclaringType.Resolve(), "Serenity.Data", "RowFieldsBase"))
-                    .Select(z => (z.Operand as FieldReference).Name))
-                .FirstOrDefault();
+            do
+            {
+                if (rowType.Interfaces.Any(x => interfaceTypes.Contains(x.InterfaceType.FullName)))
+                {
+                    var name = rowType.Methods.Where(x =>
+                            x.Overrides.Any(z => z.FullName == getMethodFullName) ||
+                            (x.IsSpecialName && x.Name == "get_" + propertyName && x.ReturnType != null && x.ReturnType.FullName == propertyType))
+                        .SelectMany(x => x.Body.Instructions.Where(z =>
+                            z.OpCode == OpCodes.Ldfld &&
+                            z.Operand is FieldReference &&
+                            CecilUtils.IsSubclassOf((z.Operand as FieldReference).DeclaringType.Resolve(), "Serenity.Data", "RowFieldsBase"))
+                            .Select(z => (z.Operand as FieldReference).Name))
+                        .FirstOrDefault();
+
+                    if (name != null)
+                        return name;
+                }
+            }
+            while ((rowType = (rowType.BaseType?.Resolve())) != null && rowType.FullName != "Serenity.Data.Row");
+
+            return null;
         }
 
         private string DetermineLocalTextPrefix(TypeDefinition rowType)
@@ -106,16 +121,26 @@ namespace Serenity.CodeGeneration
             if (parts.Count() > 1)
                 parts = parts.Skip(1);
 
-            return string.Join(".", parts);
+            var name = rowType.Name;
+            if (name.EndsWith("Row"))
+                name = name.Substring(0, name.Length - 3);
+
+            return string.Join(".", parts) + "." + name;
         }
 
         private void GenerateRowMetadata(TypeDefinition rowType)
         {
-            var idProperty = ExtractInterfacePropertyFromRow(rowType,
+            var idProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.IIdRow" }, 
+                "Serenity.Data.IIdField", "IdField", 
                 "Serenity.Data.IIdField Serenity.Data.IIdRow::get_IdField()");
-            var nameProperty = ExtractInterfacePropertyFromRow(rowType,
-                "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
+
+            var nameProperty = ExtractInterfacePropertyFromRow(rowType, new[] { "Serenity.Data.INameRow" }, 
+                    "Serenity.Data.StringField", "NameField",
+                    "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
+
             var isActiveProperty = ExtractInterfacePropertyFromRow(rowType,
+                new[] { "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow" },
+                "Serenity.Data.Int16Field", "IsActiveField", 
                 "Serenity.Data.Int16Field Serenity.Data.IIsActiveRow::get_IsActiveField()");
 
             var lookupAttr = CecilUtils.GetAttr(rowType, "Serenity.ComponentModel", "LookupScriptAttribute");
