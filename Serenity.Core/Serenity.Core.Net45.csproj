@@ -70,6 +70,7 @@
     <Compile Include="ComponentModel\Columns\Filtering\FilteringTypeAttribute.cs" />
     <Compile Include="ComponentModel\Columns\Filtering\FilterOnlyAttribute.cs" />
     <Compile Include="ComponentModel\Common\LocalTextPrefixAttribute.cs" />
+    <Compile Include="ComponentModel\Common\ModuleAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Layout\FormWidthAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Layout\MediumHalfWidthAttribute.cs" />
     <Compile Include="ComponentModel\PropertyGrid\Layout\MediumHalfLargeQuarterWidthAttribute.cs" />
