@@ -11,5 +11,6 @@ namespace Serenity.ComponentModel
         }
 
         public Type RowType { get; private set; }
+        public bool CheckNames { get; set; }
     }
 }
