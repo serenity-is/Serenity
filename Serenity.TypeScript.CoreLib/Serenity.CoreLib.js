@@ -1295,6 +1295,35 @@ var Q;
             Q.alert(msg);
         }
         ErrorHandling.showServiceError = showServiceError;
+        function runtimeErrorHandler(message, filename, lineno, colno, error) {
+            try {
+                var host = (window.location.host || "").toLowerCase();
+                if (host.indexOf("localhost") < 0 &&
+                    host.indexOf("127.0.0.1") < 0)
+                    return;
+                if (!window['toastr'])
+                    return;
+                var errorInfo = JSON.stringify(error || {});
+                message =
+                    '<p></p><p>Message: ' + Q.htmlEncode(message) +
+                        '</p><p>File: ' + Q.htmlEncode(filename) +
+                        ', Line: ' + lineno + ', Column: ' + colno +
+                        (errorInfo != "{}" ? '</p><p>Error: ' : "") + '</p>';
+                window.setTimeout(function () {
+                    try {
+                        Q.notifyError(message, "SCRIPT ERROR! See browser console (F12) for details.", {
+                            escapeHtml: false,
+                            timeOut: 15000
+                        });
+                    }
+                    catch (_a) {
+                    }
+                });
+            }
+            catch (_a) {
+            }
+        }
+        ErrorHandling.runtimeErrorHandler = runtimeErrorHandler;
     })(ErrorHandling = Q.ErrorHandling || (Q.ErrorHandling = {}));
 })(Q || (Q = {}));
 var Q;
